@@ -272,6 +272,279 @@ function FeatureSnapshot() {
   );
 }
 
+// ─── Data Insights ──────────────────────────────────────────────────────────
+function DataInsights() {
+  const { ref, inView } = useInView();
+
+  // ── Brix decay sparkline data (Day 0 → Day 12) ──
+  const brixPoints = [24.3, 22.8, 20.1, 17.4, 14.2, 11.6, 9.1, 7.2, 5.8, 4.4, 3.2, 2.6, 2.1];
+  const brixW = 220, brixH = 56;
+  const brixMin = Math.min(...brixPoints), brixMax = Math.max(...brixPoints);
+  const brixPath = brixPoints
+    .map((v, i) => {
+      const x = (i / (brixPoints.length - 1)) * brixW;
+      const y = brixH - ((v - brixMin) / (brixMax - brixMin)) * brixH;
+      return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+
+  // ── SO2 bar chart (Free SO2 over 6 weeks) ──
+  const so2Weeks = [
+    { week: "W1", free: 38, target: 32 },
+    { week: "W2", free: 34, target: 32 },
+    { week: "W3", free: 28, target: 32 },
+    { week: "W4", free: 22, target: 32 },
+    { week: "W5", free: 18, target: 32 },
+    { week: "W6", free: 32, target: 32 },
+  ];
+
+  // ── YAN gauge ──
+  const yanActual = 120;
+  const yanTarget = 200;
+  const yanPct = Math.min(yanActual / yanTarget, 1);
+  const gaugeR = 44;
+  const gaugeCirc = Math.PI * gaugeR; // half-circle circumference
+  const gaugeDash = yanPct * gaugeCirc;
+
+  // ── AI insight cards ──
+  const insights = [
+    {
+      tag: "FERMENTATION ALERT",
+      tagColor: "oklch(0.65 0.18 25)",
+      tagBg: "oklch(0.65 0.18 25 / 12%)",
+      borderColor: "oklch(0.65 0.18 25 / 20%)",
+      title: "Tank 3 — Brix stalling",
+      body: "Brix has dropped only 0.4° in 48 h. Recommend checking temperature (target 18–22°C) and YAN. Consider a 0.3 g/L DAP addition.",
+      source: "Your Fermentation SOP · Scott Labs YAN Guide",
+    },
+    {
+      tag: "SO₂ RECOMMENDATION",
+      tagColor: "oklch(0.72 0.12 75)",
+      tagBg: "oklch(0.72 0.12 75 / 12%)",
+      borderColor: "oklch(0.72 0.12 75 / 20%)",
+      title: "Chardonnay barrel — addition due",
+      body: "Free SO₂ has dropped to 18 ppm. At pH 3.42, molecular SO₂ is 0.41 ppm — below the 0.5 ppm threshold. Add 28 mg/L KMS to a 60-gallon barrel.",
+      source: "Your Chardonnay SOP · Zoecklein SO₂ Management",
+    },
+    {
+      tag: "HARVEST INSIGHT",
+      tagColor: "oklch(0.68 0.14 200)",
+      tagBg: "oklch(0.68 0.14 200 / 12%)",
+      borderColor: "oklch(0.68 0.14 200 / 20%)",
+      title: "Shiraz — optimal pick window",
+      body: "Based on current Brix (24.3°), pH (3.58), and TA (5.8 g/L), your Shiraz is entering the optimal harvest window. Seed tannin ripeness aligns with your 2022 protocol.",
+      source: "Your Shiraz Harvest Protocol 2024",
+    },
+  ];
+
+  return (
+    <section className="py-28" style={{ background: "oklch(0.11 0.008 60)" }}>
+      <div className="container" ref={ref}>
+        <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "oklch(0.72 0.12 75)", marginBottom: "1rem" }}>
+          Data Insights
+        </p>
+        <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", color: "oklch(0.92 0.018 75)", maxWidth: "600px", lineHeight: 1.2, letterSpacing: "-0.01em", marginBottom: "0.75rem" }}>
+          The intelligence your cellar has been missing.
+        </h2>
+        <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1rem", color: "oklch(0.60 0.013 75)", maxWidth: "560px", lineHeight: 1.7, marginBottom: "3.5rem" }}>
+          Ownology surfaces the right data at the right moment — live fermentation tracking, SO₂ management, YAN analysis, and AI-generated recommendations grounded in your own protocols.
+        </p>
+
+        {/* ── Row 1: Live metrics strip ── */}
+        <div
+          className={`grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 transition-all duration-700 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+        >
+          {[
+            { label: "Active Ferments", value: "7", unit: "tanks", delta: null },
+            { label: "Avg Brix Today", value: "8.4", unit: "°Brix", delta: "−1.8 vs yesterday" },
+            { label: "Free SO₂ (Chard)", value: "18", unit: "ppm", delta: "⚠ Below threshold" },
+            { label: "YAN Deficit", value: "80", unit: "ppm", delta: "Shiraz Tank 7" },
+          ].map((m, i) => (
+            <div
+              key={i}
+              className="p-5 rounded-sm"
+              style={{
+                background: "oklch(0.15 0.010 60)",
+                border: `1px solid ${
+                  m.delta?.includes("⚠") ? "oklch(0.65 0.18 25 / 40%)" : "oklch(1 0 0 / 7%)"
+                }`,
+                transitionDelay: `${i * 60}ms`,
+              }}
+            >
+              <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "oklch(0.50 0.012 75)", marginBottom: "0.5rem" }}>
+                {m.label}
+              </p>
+              <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "1.75rem", fontWeight: 500, color: m.delta?.includes("⚠") ? "oklch(0.72 0.18 25)" : "oklch(0.88 0.018 75)", lineHeight: 1 }}>
+                {m.value} <span style={{ fontSize: "0.875rem", color: "oklch(0.55 0.012 75)", fontFamily: "'Lato', sans-serif", fontWeight: 300 }}>{m.unit}</span>
+              </p>
+              {m.delta && (
+                <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: m.delta.includes("⚠") ? "oklch(0.65 0.18 25)" : "oklch(0.55 0.012 75)", marginTop: "0.375rem" }}>
+                  {m.delta}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* ── Row 2: Charts row ── */}
+        <div
+          className={`grid md:grid-cols-3 gap-4 mb-6 transition-all duration-700 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+          style={{ transitionDelay: "150ms" }}
+        >
+          {/* Brix sparkline */}
+          <div className="p-6 rounded-sm" style={{ background: "oklch(0.15 0.010 60)", border: "1px solid oklch(1 0 0 / 7%)" }}>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "oklch(0.50 0.012 75)", marginBottom: "0.25rem" }}>Fermentation Curve</p>
+            <p style={{ fontFamily: "'Fraunces', serif", fontSize: "1rem", color: "oklch(0.88 0.018 75)", marginBottom: "1rem" }}>Shiraz Tank 7 — Brix over 12 days</p>
+            <svg viewBox={`0 0 ${brixW} ${brixH}`} className="w-full" style={{ height: "56px" }}>
+              <defs>
+                <linearGradient id="brixGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="oklch(0.72 0.12 75)" stopOpacity="0.18" />
+                  <stop offset="100%" stopColor="oklch(0.72 0.12 75)" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path d={`${brixPath} L${brixW},${brixH} L0,${brixH} Z`} fill="url(#brixGrad)" />
+              <path d={brixPath} stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              <circle
+                cx={((brixPoints.length - 1) / (brixPoints.length - 1)) * brixW}
+                cy={brixH - ((brixPoints[brixPoints.length - 1] - brixMin) / (brixMax - brixMin)) * brixH}
+                r="3" fill="oklch(0.72 0.12 75)"
+              />
+            </svg>
+            <div className="flex justify-between mt-2">
+              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.75rem", color: "oklch(0.50 0.012 75)" }}>24.3°</span>
+              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.75rem", color: "oklch(0.72 0.12 75)" }}>2.1° — Day 12</span>
+            </div>
+          </div>
+
+          {/* SO2 bar chart */}
+          <div className="p-6 rounded-sm" style={{ background: "oklch(0.15 0.010 60)", border: "1px solid oklch(1 0 0 / 7%)" }}>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "oklch(0.50 0.012 75)", marginBottom: "0.25rem" }}>Free SO₂ Tracking</p>
+            <p style={{ fontFamily: "'Fraunces', serif", fontSize: "1rem", color: "oklch(0.88 0.018 75)", marginBottom: "1rem" }}>Chardonnay barrel — 6 weeks</p>
+            <div className="flex items-end gap-2" style={{ height: "56px" }}>
+              {so2Weeks.map((w, i) => {
+                const barH = (w.free / 42) * 56;
+                const isLow = w.free < w.target;
+                return (
+                  <div key={i} className="flex flex-col items-center flex-1 gap-1">
+                    <div
+                      style={{
+                        height: `${barH}px`,
+                        background: isLow ? "oklch(0.65 0.18 25 / 70%)" : "oklch(0.72 0.12 75 / 60%)",
+                        border: `1px solid ${isLow ? "oklch(0.65 0.18 25)" : "oklch(0.72 0.12 75 / 40%)"}`,
+                        borderRadius: "2px 2px 0 0",
+                        width: "100%",
+                        transition: "height 0.6s ease",
+                      }}
+                    />
+                    <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.6rem", color: "oklch(0.45 0.010 75)" }}>{w.week}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex items-center gap-3 mt-3">
+              <div style={{ width: "10px", height: "10px", background: "oklch(0.65 0.18 25 / 70%)", borderRadius: "2px" }} />
+              <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.50 0.012 75)" }}>Below target (32 ppm)</span>
+              <div style={{ width: "10px", height: "10px", background: "oklch(0.72 0.12 75 / 60%)", borderRadius: "2px" }} />
+              <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.50 0.012 75)" }}>On target</span>
+            </div>
+          </div>
+
+          {/* YAN gauge */}
+          <div className="p-6 rounded-sm flex flex-col" style={{ background: "oklch(0.15 0.010 60)", border: "1px solid oklch(1 0 0 / 7%)" }}>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "oklch(0.50 0.012 75)", marginBottom: "0.25rem" }}>YAN Analysis</p>
+            <p style={{ fontFamily: "'Fraunces', serif", fontSize: "1rem", color: "oklch(0.88 0.018 75)", marginBottom: "1rem" }}>Shiraz Tank 7 — nitrogen status</p>
+            <div className="flex items-center justify-center flex-1">
+              <svg viewBox="0 0 100 56" style={{ width: "140px", height: "78px" }}>
+                {/* Background arc */}
+                <path
+                  d="M10,50 A40,40 0 0,1 90,50"
+                  fill="none"
+                  stroke="oklch(1 0 0 / 8%)"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                />
+                {/* Filled arc */}
+                <path
+                  d="M10,50 A40,40 0 0,1 90,50"
+                  fill="none"
+                  stroke="oklch(0.72 0.12 75)"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeDasharray={`${gaugeCirc}`}
+                  strokeDashoffset={`${gaugeCirc - gaugeDash}`}
+                />
+                <text x="50" y="46" textAnchor="middle" style={{ fontFamily: "'Fira Code', monospace", fontSize: "14px", fill: "oklch(0.88 0.018 75)", fontWeight: 500 }}>
+                  {yanActual}
+                </text>
+                <text x="50" y="56" textAnchor="middle" style={{ fontFamily: "'Lato', sans-serif", fontSize: "7px", fill: "oklch(0.50 0.012 75)" }}>
+                  ppm / {yanTarget} target
+                </text>
+              </svg>
+            </div>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", color: "oklch(0.65 0.18 25)", textAlign: "center", marginTop: "0.5rem" }}>
+              ⚠ YAN deficit — 80 ppm below target
+            </p>
+          </div>
+        </div>
+
+        {/* ── Row 3: AI insight cards ── */}
+        <div
+          className={`transition-all duration-700 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+          style={{ transitionDelay: "300ms" }}
+        >
+          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "oklch(0.50 0.012 75)", marginBottom: "1rem" }}>
+            AI-Generated Recommendations
+          </p>
+          <div className="grid md:grid-cols-3 gap-4">
+            {insights.map((ins, i) => (
+              <div
+                key={i}
+                className="p-6 rounded-sm flex flex-col gap-3"
+                style={{
+                  background: "oklch(0.14 0.009 60)",
+                  border: `1px solid ${ins.borderColor}`,
+                }}
+              >
+                <span
+                  className="inline-block px-2.5 py-1 rounded-sm text-xs font-bold tracking-widest uppercase self-start"                  style={{ background: ins.tagBg, color: ins.tagColor, fontFamily: "'Lato', sans-serif" }}
+                >
+                  {ins.tag}
+                </span>
+                <h4 style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "1rem", color: "oklch(0.90 0.018 75)", lineHeight: 1.3 }}>
+                  {ins.title}
+                </h4>
+                <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.875rem", color: "oklch(0.65 0.013 75)", lineHeight: 1.7, flex: 1 }}>
+                  {ins.body}
+                </p>
+                <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.42 0.010 75)", borderTop: "1px solid oklch(1 0 0 / 6%)", paddingTop: "0.75rem" }}>
+                  ↳ <em>{ins.source}</em>
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── CTA nudge ── */}
+        <div className="mt-12 text-center">
+          <a
+            href="#request-demo"
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-sm text-sm font-bold transition-all"
+            style={{ background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", letterSpacing: "0.05em", textTransform: "uppercase" }}
+          >
+            See These Insights in Your Cellar
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M3 7h8M8 4l3 3-3 3" stroke="oklch(0.11 0.008 60)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
+          <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", color: "oklch(0.42 0.010 75)", marginTop: "0.75rem" }}>
+            All insights are grounded in your own documents and protocols — not generic advice.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Demo Request Form ────────────────────────────────────────────────────────
 function DemoRequestForm() {
   const [form, setForm] = useState({
@@ -535,6 +808,7 @@ export default function ForWinemakers() {
       <PainPoints />
       <SocialProof />
       <FeatureSnapshot />
+      <DataInsights />
       <DemoRequestForm />
       <Footer />
     </div>

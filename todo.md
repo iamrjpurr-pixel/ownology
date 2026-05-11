@@ -26,3 +26,6 @@
 - [x] Add Open Graph meta tags (og:title, og:description, og:image) to index.html
 - [x] Manus subdomain provisioned: ownology-kjxa9mra.manus.space (custom ownology.ai domain to be bound once Namecheap DNS is pointed at the site)
 - [x] Add "For Winemakers" link to main site nav (desktop + mobile drawer)
+
+## New Items
+- [x] Add Data Insights showcase section to /for-winemakers page (fermentation metrics, SO2 tracking, YAN analysis, AI insight cards, mini SVG charts)
