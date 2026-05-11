@@ -51,32 +51,145 @@ function useInView(threshold = 0.15) {
 }
 
 // ─── Nav ──────────────────────────────────────────────────────────────────────
+const NAV_LINKS = ["Features","How It Works","Our Story","Pricing","FAQ"];
+
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
+  const handleNavClick = () => setMenuOpen(false);
+
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-[oklch(0.11_0.008_60/95%)] backdrop-blur-md border-b border-white/5" : ""}`}>
-      <div className="container flex items-center justify-between py-5">
-        <OwnologyLogo size={36} />
-        <div className="hidden md:flex items-center gap-8">
-          {["Features","How It Works","Our Story","Pricing","FAQ"].map(l => (
-            <a key={l} href={`#${l.toLowerCase().replace(/ /g,"-").replace("'","")}`}
-              className="text-sm font-light tracking-wide transition-colors"
-              style={{color:"oklch(0.65 0.015 75)", fontFamily:"'Lato',sans-serif"}}
-              onMouseEnter={e=>(e.currentTarget.style.color="oklch(0.72 0.12 75)")}
-              onMouseLeave={e=>(e.currentTarget.style.color="oklch(0.65 0.015 75)")}
-            >{l}</a>
-          ))}
+    <>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled || menuOpen ? "bg-[oklch(0.11_0.008_60/97%)] backdrop-blur-md border-b border-white/5" : ""
+      }`}>
+        <div className="container flex items-center justify-between py-5">
+          <OwnologyLogo size={36} />
+
+          {/* Desktop links */}
+          <div className="hidden md:flex items-center gap-8">
+            {NAV_LINKS.map(l => (
+              <a key={l} href={`#${l.toLowerCase().replace(/ /g,"-").replace("'","")}`}
+                className="text-sm font-light tracking-wide transition-colors"
+                style={{color:"oklch(0.65 0.015 75)", fontFamily:"'Lato',sans-serif"}}
+                onMouseEnter={e=>(e.currentTarget.style.color="oklch(0.72 0.12 75)")}
+                onMouseLeave={e=>(e.currentTarget.style.color="oklch(0.65 0.015 75)")}
+              >{l}</a>
+            ))}
+          </div>
+
+          <a href="#pricing" className="btn-amber text-xs hidden md:inline-flex items-center">
+            Start Free Trial
+          </a>
+
+          {/* Hamburger button — mobile only */}
+          <button
+            className="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5 rounded-sm transition-colors"
+            style={{background: menuOpen ? "oklch(0.16 0.010 60)" : "transparent"}}
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+          >
+            <span
+              className="block w-5 h-px transition-all duration-300 origin-center"
+              style={{
+                background: "oklch(0.72 0.12 75)",
+                transform: menuOpen ? "translateY(4px) rotate(45deg)" : "none",
+              }}
+            />
+            <span
+              className="block w-5 h-px transition-all duration-300"
+              style={{
+                background: "oklch(0.72 0.12 75)",
+                opacity: menuOpen ? 0 : 1,
+                transform: menuOpen ? "scaleX(0)" : "scaleX(1)",
+              }}
+            />
+            <span
+              className="block w-5 h-px transition-all duration-300 origin-center"
+              style={{
+                background: "oklch(0.72 0.12 75)",
+                transform: menuOpen ? "translateY(-4px) rotate(-45deg)" : "none",
+              }}
+            />
+          </button>
         </div>
-        <a href="#pricing" className="btn-amber text-xs hidden md:inline-flex items-center">
-          Start Free Trial
-        </a>
+      </nav>
+
+      {/* Mobile drawer overlay */}
+      <div
+        className="fixed inset-0 z-40 md:hidden transition-opacity duration-300"
+        style={{
+          background: "oklch(0 0 0 / 0.6)",
+          opacity: menuOpen ? 1 : 0,
+          pointerEvents: menuOpen ? "auto" : "none",
+        }}
+        onClick={() => setMenuOpen(false)}
+        aria-hidden="true"
+      />
+
+      {/* Mobile drawer panel */}
+      <div
+        className="fixed top-0 left-0 right-0 z-40 md:hidden transition-transform duration-300 ease-out"
+        style={{
+          background: "oklch(0.11 0.008 60)",
+          borderBottom: "1px solid oklch(1 0 0 / 0.08)",
+          transform: menuOpen ? "translateY(0)" : "translateY(-100%)",
+          paddingTop: "80px",
+          paddingBottom: "2rem",
+          boxShadow: "0 24px 60px oklch(0 0 0 / 0.7)",
+        }}
+      >
+        <div className="container flex flex-col gap-1">
+          {NAV_LINKS.map((l, i) => (
+            <a
+              key={l}
+              href={`#${l.toLowerCase().replace(/ /g,"-").replace("'","")}`}
+              onClick={handleNavClick}
+              className="flex items-center justify-between py-4 transition-colors"
+              style={{
+                fontFamily: "'Lato', sans-serif",
+                fontWeight: 300,
+                fontSize: "1.125rem",
+                color: "oklch(0.75 0.015 75)",
+                borderBottom: i < NAV_LINKS.length - 1 ? "1px solid oklch(1 0 0 / 0.06)" : "none",
+                letterSpacing: "0.01em",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = "oklch(0.72 0.12 75)")}
+              onMouseLeave={e => (e.currentTarget.style.color = "oklch(0.75 0.015 75)")}
+            >
+              {l}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M6 4l4 4-4 4" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </a>
+          ))}
+
+          {/* CTA in mobile menu */}
+          <a
+            href="#pricing"
+            onClick={handleNavClick}
+            className="btn-amber w-full text-center mt-4"
+            style={{display: "block", textAlign: "center"}}
+          >
+            Start Free Trial
+          </a>
+        </div>
       </div>
-    </nav>
+    </>
   );
 }
 
