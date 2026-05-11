@@ -63,7 +63,7 @@ function Nav() {
       <div className="container flex items-center justify-between py-5">
         <OwnologyLogo size={36} />
         <div className="hidden md:flex items-center gap-8">
-          {["Features","How It Works","Our Story","Pricing"].map(l => (
+          {["Features","How It Works","Our Story","Pricing","FAQ"].map(l => (
             <a key={l} href={`#${l.toLowerCase().replace(/ /g,"-").replace("'","")}`}
               className="text-sm font-light tracking-wide transition-colors"
               style={{color:"oklch(0.65 0.015 75)", fontFamily:"'Lato',sans-serif"}}
