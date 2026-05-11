@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import FounderStory from "@/components/FounderStory";
 import FAQ from "@/components/FAQ";
+import WaitlistCapture from "@/components/WaitlistCapture";
 
 // ─── Image URLs ───────────────────────────────────────────────────────────────
 const HERO_IMG    = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-hero-HqkryW7dQ2C9TbhdmJ8Kff.webp";
@@ -91,9 +92,9 @@ function Nav() {
             ))}
           </div>
 
-          <a href="#pricing" className="btn-amber text-xs hidden md:inline-flex items-center">
-            Start Free Trial
-          </a>
+          <div className="hidden md:block">
+            <WaitlistCapture variant="nav" />
+          </div>
 
           {/* Hamburger button — mobile only */}
           <button
@@ -178,15 +179,10 @@ function Nav() {
             </a>
           ))}
 
-          {/* CTA in mobile menu */}
-          <a
-            href="#pricing"
-            onClick={handleNavClick}
-            className="btn-amber w-full text-center mt-4"
-            style={{display: "block", textAlign: "center"}}
-          >
-            Start Free Trial
-          </a>
+          {/* Waitlist in mobile menu */}
+          <div className="mt-4">
+            <WaitlistCapture variant="hero" />
+          </div>
         </div>
       </div>
     </>
@@ -222,9 +218,8 @@ function Hero() {
               style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"oklch(0.70 0.015 75)", maxWidth:"480px"}}>
               Ownology gives boutique winery teams instant, document-grounded answers to their toughest cellar questions — from a mobile phone, in seconds, during harvest.
             </p>
-            <div className="flex flex-wrap gap-4 mt-10 fade-up fade-up-delay-3">
-              <a href="#pricing" className="btn-amber">Start 14-Day Free Trial</a>
-              <a href="#how-it-works" className="btn-ghost">See How It Works</a>
+            <div className="mt-10 fade-up fade-up-delay-3 max-w-lg">
+              <WaitlistCapture variant="hero" />
             </div>
             {/* Trust bar */}
             <div className="mt-12 flex items-center gap-6 fade-up fade-up-delay-4">
@@ -604,9 +599,7 @@ function Pricing() {
                   </li>
                 ))}
               </ul>
-              <button className={t.highlight ? "btn-amber w-full" : "btn-ghost w-full"}>
-                {t.cta}
-              </button>
+              <WaitlistCapture variant="hero" />
             </div>
           ))}
         </div>
@@ -620,7 +613,7 @@ function Pricing() {
               Manage multiple winery clients from a single account. $149/month per client with full Cellar features.
             </p>
           </div>
-          <button className="btn-ghost flex-shrink-0">Learn More</button>
+          <a href="mailto:hello@ownology.ai" className="btn-ghost flex-shrink-0">Get in Touch</a>
         </div>
       </div>
     </section>
@@ -643,8 +636,10 @@ function CTA() {
         <p className="mt-6 mx-auto" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", color:"oklch(0.65 0.015 75)", maxWidth:"480px", lineHeight:1.7}}>
           Start your 14-day free trial. No credit card. No setup fee. Cancel anytime.
         </p>
-        <div className="flex flex-wrap justify-center gap-4 mt-10">
-          <a href="#pricing" className="btn-amber">Start Free Trial</a>
+        <div className="mt-10 max-w-xl mx-auto">
+          <WaitlistCapture variant="cta" />
+        </div>
+        <div className="flex justify-center mt-6">
           <a href="mailto:hello@ownology.ai" className="btn-ghost">Talk to Us</a>
         </div>
         <p className="mt-8" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.45 0.010 75)"}}>
@@ -665,11 +660,13 @@ function Footer() {
           © 2026 Ownology. AI Knowledge Assistant for Boutique Winemakers.
         </p>
         <div className="flex gap-6">
-          {["Privacy","Terms","Contact"].map(l=>(
-            <a key={l} href="#" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.48 0.010 75)"}}
+          <a href="mailto:hello@ownology.ai" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.48 0.010 75)"}}
               onMouseEnter={e=>(e.currentTarget.style.color="oklch(0.72 0.12 75)")}
-              onMouseLeave={e=>(e.currentTarget.style.color="oklch(0.48 0.010 75)")}>{l}</a>
-          ))}
+              onMouseLeave={e=>(e.currentTarget.style.color="oklch(0.48 0.010 75)")}>Contact</a>
+          <a href="#faq" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.48 0.010 75)"}}
+              onMouseEnter={e=>(e.currentTarget.style.color="oklch(0.72 0.12 75)")}
+              onMouseLeave={e=>(e.currentTarget.style.color="oklch(0.48 0.010 75)")}>FAQ</a>
+          <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.35 0.008 75)"}}>Privacy & Terms coming soon</span>
         </div>
       </div>
     </footer>

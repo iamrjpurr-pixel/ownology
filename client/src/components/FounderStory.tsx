@@ -230,6 +230,10 @@ export default function FounderStory() {
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
               Ownology grew from years of genuine immersion in wine culture, extensive self-education, and firsthand exposure to the people and processes behind Australian wine — and probably from spending far too much money on wine memberships along the way.
             </p>
+
+            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
+              There is one more thread to this story. My daughter has a deep passion for chemistry and science — and somewhere along the way, we began sharing a quiet dream: what would it look like to bring science, agriculture, systems thinking, and wine together in a single platform? Ownology is, in part, an answer to that question. A project built on curiosity, shaped by two generations of it.
+            </p>
           </div>
 
         </div>
