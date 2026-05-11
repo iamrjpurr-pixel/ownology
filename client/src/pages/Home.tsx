@@ -5,6 +5,8 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import OwnologyLogo from "@/components/OwnologyLogo";
+import FounderStory from "@/components/FounderStory";
 
 // ─── Image URLs ───────────────────────────────────────────────────────────────
 const HERO_IMG    = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-hero-HqkryW7dQ2C9TbhdmJ8Kff.webp";
@@ -58,20 +60,10 @@ function Nav() {
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-[oklch(0.11_0.008_60/95%)] backdrop-blur-md border-b border-white/5" : ""}`}>
       <div className="container flex items-center justify-between py-5">
-        <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-sm bg-[oklch(0.72_0.12_75)] flex items-center justify-center">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <circle cx="7" cy="7" r="5" stroke="oklch(0.11 0.008 60)" strokeWidth="1.5"/>
-              <path d="M7 4v3l2 1.5" stroke="oklch(0.11 0.008 60)" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <span style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.125rem", color:"oklch(0.92 0.018 75)", letterSpacing:"-0.01em"}}>
-            Ownology
-          </span>
-        </div>
+        <OwnologyLogo size={36} />
         <div className="hidden md:flex items-center gap-8">
-          {["Features","How It Works","Pricing"].map(l => (
-            <a key={l} href={`#${l.toLowerCase().replace(/ /g,"-")}`}
+          {["Features","How It Works","Our Story","Pricing"].map(l => (
+            <a key={l} href={`#${l.toLowerCase().replace(/ /g,"-").replace("'","")}`}
               className="text-sm font-light tracking-wide transition-colors"
               style={{color:"oklch(0.65 0.015 75)", fontFamily:"'Lato',sans-serif"}}
               onMouseEnter={e=>(e.currentTarget.style.color="oklch(0.72 0.12 75)")}
@@ -554,15 +546,7 @@ function Footer() {
   return (
     <footer className="py-12" style={{borderTop:"1px solid oklch(1 0 0 / 6%)"}}>
       <div className="container flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded-sm flex items-center justify-center" style={{background:"oklch(0.72 0.12 75)"}}>
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <circle cx="5" cy="5" r="3.5" stroke="oklch(0.11 0.008 60)" strokeWidth="1.2"/>
-              <path d="M5 3v2l1.5 1" stroke="oklch(0.11 0.008 60)" strokeWidth="1.2" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <span style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1rem", color:"oklch(0.75 0.015 75)"}}>Ownology</span>
-        </div>
+        <OwnologyLogo size={28} />
         <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.42 0.010 75)"}}>
           © 2026 Ownology. AI Knowledge Assistant for Boutique Winemakers.
         </p>
@@ -588,6 +572,7 @@ export default function Home() {
       <Features />
       <HowItWorks />
       <Testimonials />
+      <FounderStory />
       <Pricing />
       <CTA />
       <Footer />
