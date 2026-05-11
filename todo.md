@@ -23,6 +23,6 @@
 - [x] Email outreach templates document (5 templates + personalisation guide)
 
 ## Pending
-- [ ] Add Open Graph meta tags (og:title, og:description, og:image) to index.html
-- [ ] Bind ownology.ai custom domain in Management UI
-- [ ] Add "For Winemakers" link to main site nav
+- [x] Add Open Graph meta tags (og:title, og:description, og:image) to index.html
+- [x] Manus subdomain provisioned: ownology-kjxa9mra.manus.space (custom ownology.ai domain to be bound once Namecheap DNS is pointed at the site)
+- [x] Add "For Winemakers" link to main site nav (desktop + mobile drawer)

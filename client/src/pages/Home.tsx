@@ -90,6 +90,12 @@ function Nav() {
                 onMouseLeave={e=>(e.currentTarget.style.color="oklch(0.65 0.015 75)")}
               >{l}</a>
             ))}
+            <a href="/for-winemakers"
+              className="text-sm font-semibold tracking-wide transition-colors px-3 py-1.5 rounded-sm"
+              style={{color:"oklch(0.11 0.008 60)", background:"oklch(0.72 0.12 75)", fontFamily:"'Lato',sans-serif"}}
+              onMouseEnter={e=>{e.currentTarget.style.background="oklch(0.78 0.14 75)"}}
+              onMouseLeave={e=>{e.currentTarget.style.background="oklch(0.72 0.12 75)"}}
+            >For Winemakers</a>
           </div>
 
           <div className="hidden md:block">
@@ -178,6 +184,26 @@ function Nav() {
               </svg>
             </a>
           ))}
+
+          {/* For Winemakers link in mobile menu */}
+          <a
+            href="/for-winemakers"
+            onClick={handleNavClick}
+            className="flex items-center justify-between py-4 transition-colors"
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontWeight: 600,
+              fontSize: "1.125rem",
+              color: "oklch(0.72 0.12 75)",
+              borderBottom: "1px solid oklch(1 0 0 / 0.06)",
+              letterSpacing: "0.01em",
+            }}
+          >
+            For Winemakers
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M6 4l4 4-4 4" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </a>
 
           {/* Waitlist in mobile menu */}
           <div className="mt-4">
