@@ -7,6 +7,7 @@
 import { useEffect, useRef, useState } from "react";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import FounderStory from "@/components/FounderStory";
+import FAQ from "@/components/FAQ";
 
 // ─── Image URLs ───────────────────────────────────────────────────────────────
 const HERO_IMG    = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-hero-HqkryW7dQ2C9TbhdmJ8Kff.webp";
@@ -575,6 +576,7 @@ export default function Home() {
       <FounderStory />
       <Pricing />
       <CTA />
+      <FAQ />
       <Footer />
     </div>
   );
