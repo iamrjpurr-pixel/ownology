@@ -4,7 +4,7 @@
  *   Lato body, Fira Code for data readouts. Bento-grid features, animated demo.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import FounderStory from "@/components/FounderStory";
 import FAQ from "@/components/FAQ";
@@ -54,16 +54,88 @@ function useInView(threshold = 0.15) {
 
 // ─── Nav ──────────────────────────────────────────────────────────────────────
 type NavItem = { label: string; href: string; external?: boolean };
-const NAV_LINKS: NavItem[] = [
-  { label: "Features",      href: "#features" },
-  { label: "How It Works",  href: "#how-it-works" },
-  { label: "See Demo",      href: "#demo" },
-  { label: "Why Ownology",  href: "/why-ownology", external: false },
-  { label: "Our Story",     href: "#our-story" },
-  { label: "Pricing",       href: "#pricing" },
-  { label: "FAQ",           href: "#faq" },
-  { label: "Blog",          href: "/blog", external: false },
+// Primary links — always visible in desktop nav
+const PRIMARY_NAV: NavItem[] = [
+  { label: "Features",     href: "#features" },
+  { label: "How It Works", href: "#how-it-works" },
+  { label: "See Demo",     href: "#demo" },
+  { label: "Why Ownology", href: "/why-ownology" },
 ];
+// Secondary links — shown in "More" dropdown on desktop, full list on mobile
+const MORE_NAV: NavItem[] = [
+  { label: "Our Story",  href: "#our-story" },
+  { label: "Pricing",   href: "#pricing" },
+  { label: "FAQ",       href: "#faq" },
+  { label: "Blog",      href: "/blog" },
+  { label: "Resources", href: "/resources" },
+  { label: "Compliance", href: "/compliance" },
+];
+const NAV_LINKS: NavItem[] = [...PRIMARY_NAV, ...MORE_NAV];
+
+// ─── More dropdown ───────────────────────────────────────────────────────────
+function MoreDropdown({ items }: { items: NavItem[] }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const close = useCallback(() => setOpen(false), []);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) close();
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [close]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-1 text-sm font-light tracking-wide transition-colors"
+        style={{color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", background: "none", border: "none", cursor: "pointer", padding: 0}}
+        onMouseEnter={e => (e.currentTarget.style.color = "var(--ow-amber)")}
+        onMouseLeave={e => (e.currentTarget.style.color = "var(--ow-text-lo)")}
+        aria-haspopup="true"
+        aria-expanded={open}
+      >
+        More
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{marginTop:"1px", transition:"transform 0.2s", transform: open ? "rotate(180deg)" : "none"}}>
+          <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+      {open && (
+        <div
+          className="absolute top-full right-0 mt-2 py-1 rounded-sm"
+          style={{background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)", minWidth: "140px", boxShadow: "0 8px 24px var(--ow-shadow)", zIndex: 100}}
+        >
+          {items.map(item =>
+            item.href.startsWith("/") ? (
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={close}
+                className="block px-4 py-2 text-sm transition-colors"
+                style={{color: "var(--ow-text-mid)", fontFamily: "'Lato',sans-serif", fontWeight: 300}}
+                onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-amber)")}
+                onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-text-mid)")}
+              >{item.label}</Link>
+            ) : (
+              <a
+                key={item.label}
+                href={item.href}
+                onClick={close}
+                className="block px-4 py-2 text-sm transition-colors"
+                style={{color: "var(--ow-text-mid)", fontFamily: "'Lato',sans-serif", fontWeight: 300}}
+                onMouseEnter={e => (e.currentTarget.style.color = "var(--ow-amber)")}
+                onMouseLeave={e => (e.currentTarget.style.color = "var(--ow-text-mid)")}
+              >{item.label}</a>
+            )
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -94,8 +166,8 @@ function Nav() {
           <OwnologyLogo size={36} />
 
           {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-8">
-            {NAV_LINKS.map(item => (
+          <div className="hidden md:flex items-center gap-6">
+            {PRIMARY_NAV.map(item => (
               item.href.startsWith("/") ? (
                 <Link key={item.label} href={item.href}
                   className="text-sm font-light tracking-wide transition-colors"
@@ -112,6 +184,8 @@ function Nav() {
                 >{item.label}</a>
               )
             ))}
+            {/* More dropdown */}
+            <MoreDropdown items={MORE_NAV} />
           </div>
 
           <div className="hidden md:flex items-center gap-3">
@@ -897,6 +971,205 @@ function WeightOfHarvest() {
   );
 }
 
+// ─── What Ownology Knows ─────────────────────────────────────────────────────
+function WhatOwnologyKnows() {
+  const { ref, inView } = useInView(0.12);
+
+  const domains = [
+    {
+      icon: "⚗️",
+      title: "Winemaking Chemistry",
+      items: ["Fermentation kinetics & YAN management", "SO₂ chemistry & molecular fractions", "Malolactic fermentation biology", "Fining agent interactions", "Tartrate stabilisation"],
+    },
+    {
+      icon: "🍇",
+      title: "Viticulture & Fruit Assessment",
+      items: ["Brix, pH, TA at receival", "Grape maturity indicators", "Botrytis & disease management", "Vineyard to tank traceability", "Vintage planning & scheduling"],
+    },
+    {
+      icon: "🏛️",
+      title: "Regulatory Compliance",
+      items: ["Label Integrity Program (LIP)", "FSANZ Standard 4.5.1 additives", "Wine Australia registration", "State liquor licensing (SA, VIC, NSW)", "EPA environmental obligations"],
+    },
+    {
+      icon: "🔬",
+      title: "Cellar Laboratory",
+      items: ["pH, TA & residual sugar analysis", "Free & total SO₂ titration", "Volatile acidity measurement", "Alcohol determination", "Microbial spoilage identification"],
+    },
+    {
+      icon: "📋",
+      title: "Cellar Operations",
+      items: ["Pump-over & plunging regimes", "Racking & lees management", "Barrel maturation protocols", "Blending trial methodology", "Bottling line preparation"],
+    },
+    {
+      icon: "🛡️",
+      title: "Safety & WHS",
+      items: ["CO₂ confined space protocols", "Chemical handling (SO₂, caustic)", "Bunding & spill containment", "Emergency response procedures", "SafeWork SA obligations"],
+    },
+  ];
+
+  return (
+    <section
+      className="py-28 relative overflow-hidden"
+      style={{ background: "var(--ow-bg-base)" }}
+    >
+      {/* Subtle amber gradient top rule */}
+      <div
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{
+          background:
+            "linear-gradient(to right, transparent, color-mix(in oklch, var(--ow-amber) 30%, transparent), transparent)",
+        }}
+      />
+
+      <div className="container relative z-10" ref={ref}>
+        {/* Header */}
+        <div className={`max-w-2xl mb-4 ${inView ? "fade-up" : "opacity-0"}`}>
+          <p
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontWeight: 700,
+              fontSize: "0.7rem",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "var(--ow-amber)",
+              marginBottom: "1.25rem",
+            }}
+          >
+            The Knowledge Base
+          </p>
+          <h2
+            style={{
+              fontFamily: "'Fraunces', serif",
+              fontWeight: 700,
+              fontSize: "clamp(1.9rem, 3.5vw, 2.75rem)",
+              lineHeight: 1.1,
+              letterSpacing: "-0.02em",
+              color: "var(--ow-text-hi)",
+            }}
+          >
+            What Ownology Knows
+          </h2>
+          <p
+            className="mt-5"
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontWeight: 300,
+              fontSize: "1.0625rem",
+              lineHeight: 1.75,
+              color: "var(--ow-text-mid)",
+              maxWidth: "600px",
+            }}
+          >
+            Ownology is trained on the same body of knowledge as a formally qualified winemaker — the equivalent of a Bachelor of Oenology — and is available at 2am during vintage, on a mobile phone, in the middle of a stuck fermentation.
+          </p>
+        </div>
+
+        {/* 24/7 availability callout */}
+        <div
+          className={`inline-flex items-center gap-3 mb-14 px-5 py-3 rounded-sm ${inView ? "fade-up fade-up-delay-1" : "opacity-0"}`}
+          style={{
+            background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+          }}
+        >
+          <span style={{ fontSize: "1.1rem" }}>🕐</span>
+          <span
+            style={{
+              fontFamily: "'Fira Code', monospace",
+              fontSize: "0.8125rem",
+              color: "var(--ow-amber)",
+              letterSpacing: "0.06em",
+            }}
+          >
+            Available 24 / 7 · 365 days · including vintage
+          </span>
+        </div>
+
+        {/* Domain grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {domains.map((d, i) => (
+            <div
+              key={d.title}
+              className={inView ? `fade-up fade-up-delay-${Math.min(i + 1, 4)}` : "opacity-0"}
+              style={{
+                background: "var(--ow-bg-raised)",
+                border: "1px solid var(--ow-border)",
+                borderRadius: "2px",
+                padding: "1.5rem",
+              }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <span style={{ fontSize: "1.375rem" }}>{d.icon}</span>
+                <h3
+                  style={{
+                    fontFamily: "'Fraunces', serif",
+                    fontWeight: 600,
+                    fontSize: "1rem",
+                    color: "var(--ow-text-hi)",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {d.title}
+                </h3>
+              </div>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                {d.items.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-2 mb-2"
+                    style={{
+                      fontFamily: "'Lato', sans-serif",
+                      fontWeight: 300,
+                      fontSize: "0.875rem",
+                      lineHeight: 1.55,
+                      color: "var(--ow-text-mid)",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: "var(--ow-amber)",
+                        marginTop: "0.2rem",
+                        flexShrink: 0,
+                        fontSize: "0.6rem",
+                      }}
+                    >
+                      ◆
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom CTA strip */}
+        <div
+          className={`mt-14 flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 ${inView ? "fade-up fade-up-delay-4" : "opacity-0"}`}
+          style={{ borderTop: "1px solid var(--ow-border)" }}
+        >
+          <p
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontWeight: 300,
+              fontSize: "1rem",
+              color: "var(--ow-text-mid)",
+              maxWidth: "480px",
+              lineHeight: 1.65,
+            }}
+          >
+            Every answer is grounded in your winery's own documents — standard operating procedures, vintage records, supplier sheets — not generic internet content.
+          </p>
+          <a href="#pricing" className="btn-amber" style={{ whiteSpace: "nowrap" }}>
+            Start Free Trial
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── CTA ──────────────────────────────────────────────────────────────────────
 function CTA() {
   return (
@@ -952,6 +1225,12 @@ function Footer() {
           <Link href="/blog" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
             onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
             onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Blog</Link>
+          <Link href="/resources" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
+            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
+            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Resources</Link>
+          <Link href="/compliance" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
+            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
+            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Compliance</Link>
         </div>
       </div>
     </footer>
@@ -972,6 +1251,7 @@ export default function Home() {
       <FounderStory />
       <Pricing />
       <WeightOfHarvest />
+      <WhatOwnologyKnows />
       <CTA />
       <FAQ />
       <Footer />

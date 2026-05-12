@@ -43,4 +43,9 @@
 - [x] Generate solo portrait of Rich surrounded by winery chemistry equipment and wire into FounderStory section
 - [x] Research and save SA winery regulatory requirements to ~/rules-and-regs/states/SA/
 - [x] Wire boutique vs commercial blog article into /blog page as second article
-- [ ] Add 'What Ownology Knows' section to the website based on oenology curricula analysis
+- [x] Add 'What Ownology Knows' section to the website based on oenology curricula analysis
+- [x] Build 'What Ownology Knows' homepage section emphasising 24/7 availability and comprehensive training
+- [x] Add category filter to /blog page (Philosophy, Regulations, Equipment)
+- [x] Build /resources page displaying federal and SA regulations, wire route in App.tsx and add to nav/footer
+- [x] Build /compliance AI search agent page with tRPC procedure querying local regulatory docs via LLM, streaming response, source citations
+- [x] Fix crowded homepage nav — consolidate secondary links (Our Story, FAQ, Blog, Pricing) into a More dropdown

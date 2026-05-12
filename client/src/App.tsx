@@ -10,6 +10,8 @@ import ForInnoVintUsers from "./pages/ForInnoVintUsers";
 import ForVintraceUsers from "./pages/ForVintraceUsers";
 import Blog from "./pages/Blog";
 import BlogArticle from "./pages/BlogArticle";
+import Resources from "./pages/Resources";
+import Compliance from "./pages/Compliance";
 
 
 function Router() {
@@ -21,6 +23,8 @@ function Router() {
       <Route path={"/for-vintrace-users"} component={ForVintraceUsers} />
       <Route path={"/blog"} component={Blog} />
       <Route path={"/blog/:slug"} component={BlogArticle} />
+      <Route path={"/resources"} component={Resources} />
+      <Route path={"/compliance"} component={Compliance} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

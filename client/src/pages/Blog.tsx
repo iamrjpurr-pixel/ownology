@@ -141,7 +141,15 @@ function BlogEmailCapture() {
   );
 }
 
+const ALL_CATEGORIES = ["All", ...Array.from(new Set(ARTICLES.map((a) => a.category)))];
+
 export default function Blog() {
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+
+  const filteredArticles = activeCategory === "All"
+    ? ARTICLES
+    : ARTICLES.filter((a) => a.category === activeCategory);
+
   useEffect(() => {
     document.title = "Cellar Intelligence Blog — Ownology";
     // Set meta description
@@ -235,8 +243,50 @@ export default function Blog() {
       {/* Article list */}
       <section className="py-16">
         <div className="container max-w-4xl">
+          {/* Category filter */}
+          <div className="flex flex-wrap gap-2 mb-10">
+            {ALL_CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                style={{
+                  fontFamily: "'Lato', sans-serif",
+                  fontWeight: activeCategory === cat ? 700 : 300,
+                  fontSize: "0.8125rem",
+                  letterSpacing: activeCategory === cat ? "0.1em" : "0.04em",
+                  textTransform: "uppercase",
+                  padding: "0.4rem 1rem",
+                  borderRadius: "2px",
+                  border: activeCategory === cat
+                    ? "1px solid var(--ow-amber)"
+                    : "1px solid var(--ow-border)",
+                  background: activeCategory === cat
+                    ? "color-mix(in oklch, var(--ow-amber) 12%, transparent)"
+                    : "transparent",
+                  color: activeCategory === cat ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  if (activeCategory !== cat) {
+                    (e.currentTarget as HTMLElement).style.borderColor = "var(--ow-amber)";
+                    (e.currentTarget as HTMLElement).style.color = "var(--ow-text-mid)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeCategory !== cat) {
+                    (e.currentTarget as HTMLElement).style.borderColor = "var(--ow-border)";
+                    (e.currentTarget as HTMLElement).style.color = "var(--ow-text-lo)";
+                  }
+                }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
           <div className="flex flex-col gap-8">
-            {ARTICLES.map((article) => (
+            {filteredArticles.map((article) => (
               <Link key={article.slug} href={`/blog/${article.slug}`}>
                 <article
                   className="group block p-8 transition-all duration-200"
