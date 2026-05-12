@@ -61,6 +61,49 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.72 0.12 75);
+
+  /* ── Ownology semantic surface tokens (dark mode defaults) ── */
+  --ow-bg-base:   oklch(0.11 0.008 60);   /* page background */
+  --ow-bg-raised: oklch(0.14 0.009 60);   /* slightly lifted section */
+  --ow-bg-card:   oklch(0.16 0.010 60);   /* card / panel surface */
+  --ow-bg-inset:  oklch(0.20 0.010 60);   /* code blocks, inset areas */
+  --ow-text-hi:   oklch(0.92 0.018 75);   /* headings */
+  --ow-text-mid:  oklch(0.68 0.013 75);   /* body copy */
+  --ow-text-lo:   oklch(0.50 0.010 75);   /* captions, labels */
+  --ow-amber:     oklch(0.72 0.12 75);    /* brand amber — unchanged */
+  --ow-border:    oklch(1 0 0 / 0.08);    /* subtle dividers */
+  --ow-border-md: oklch(1 0 0 / 0.14);   /* medium dividers */
+  --ow-shadow:    oklch(0 0 0 / 0.40);    /* card shadows */
+  --ow-nav-bg:    oklch(0.11 0.008 60 / 97%); /* scrolled nav */
+  --ow-blue:      oklch(0.65 0.10 230);       /* blue for ERP/system labels */
+}
+
+/* ── Light "Cellar Daylight" theme ── */
+html.light-mode {
+  --background: oklch(0.97 0.010 75);
+  --foreground: oklch(0.18 0.012 60);
+  --card: oklch(0.93 0.012 75);
+  --card-foreground: oklch(0.18 0.012 60);
+  --popover: oklch(0.93 0.012 75);
+  --popover-foreground: oklch(0.18 0.012 60);
+  --muted: oklch(0.90 0.010 75);
+  --muted-foreground: oklch(0.42 0.012 60);
+  --border: oklch(0 0 0 / 0.12);
+  --input: oklch(0 0 0 / 0.10);
+
+  --ow-bg-base:   oklch(0.97 0.010 75);   /* warm parchment */
+  --ow-bg-raised: oklch(0.93 0.012 75);   /* slightly darker parchment */
+  --ow-bg-card:   oklch(0.90 0.014 75);   /* card surface */
+  --ow-bg-inset:  oklch(0.86 0.016 75);   /* inset / code areas */
+  --ow-text-hi:   oklch(0.16 0.012 60);   /* headings — near-black warm */
+  --ow-text-mid:  oklch(0.32 0.010 60);   /* body copy — dark warm grey */
+  --ow-text-lo:   oklch(0.50 0.008 60);   /* captions */
+  --ow-amber:     oklch(0.62 0.14 68);    /* slightly deeper amber for contrast on light */
+  --ow-border:    oklch(0 0 0 / 0.10);
+  --ow-border-md: oklch(0 0 0 / 0.18);
+  --ow-shadow:    oklch(0 0 0 / 0.12);
+  --ow-nav-bg:    oklch(0.97 0.010 75 / 97%);
+  --ow-blue:      oklch(0.50 0.12 230);       /* slightly deeper blue for light mode */
 }
 
 @layer base {
@@ -154,14 +197,14 @@
 
   /* Cellar card */
   .cellar-card {
-    background: oklch(0.16 0.010 60);
-    border: 1px solid oklch(1 0 0 / 8%);
+    background: var(--ow-bg-card);
+    border: 1px solid var(--ow-border);
     border-radius: 4px;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
   .cellar-card:hover {
-    border-color: oklch(0.72 0.12 75 / 30%);
-    box-shadow: 0 4px 32px oklch(0 0 0 / 40%);
+    border-color: oklch(from var(--ow-amber) l c h / 30%);
+    box-shadow: 0 4px 32px var(--ow-shadow);
   }
 
   /* Amber rule divider */

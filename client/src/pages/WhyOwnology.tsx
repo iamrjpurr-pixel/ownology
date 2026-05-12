@@ -23,18 +23,18 @@ function useInView(threshold = 0.12) {
   return { ref, inView };
 }
 
-const BG_BASE   = "oklch(0.11 0.008 60)";
-const BG_RAISED = "oklch(0.14 0.009 60)";
-const BG_CARD   = "oklch(0.16 0.010 60)";
-const AMBER     = "oklch(0.72 0.12 75)";
-const TEXT_HI   = "oklch(0.92 0.018 75)";
-const TEXT_MID  = "oklch(0.68 0.013 75)";
-const TEXT_LO   = "oklch(0.50 0.010 75)";
-const BORDER    = "oklch(1 0 0 / 0.08)";
+const BG_BASE   = "var(--ow-bg-base)";
+const BG_RAISED = "var(--ow-bg-raised)";
+const BG_CARD   = "var(--ow-bg-card)";
+const AMBER     = "var(--ow-amber)";
+const TEXT_HI   = "var(--ow-text-hi)";
+const TEXT_MID  = "var(--ow-text-mid)";
+const TEXT_LO   = "var(--ow-text-lo)";
+const BORDER    = "var(--ow-border)";
 const SERIF     = "'Fraunces', serif";
 const SANS      = "'Lato', sans-serif";
 const MONO      = "'Fira Code', monospace";
-const BLUE      = "oklch(0.65 0.10 230)";
+const BLUE      = "var(--ow-blue)";
 
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -44,7 +44,8 @@ function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-[oklch(0.11_0.008_60/97%)] backdrop-blur-md border-b border-white/5" : ""}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "backdrop-blur-md border-b border-white/5" : ""}`}
+      style={scrolled ? { background: "var(--ow-nav-bg)" } : {}}>
       <div className="container flex items-center justify-between py-5">
         <Link href="/"><OwnologyLogo size={32} /></Link>
         <div className="flex items-center gap-6">
@@ -106,7 +107,7 @@ function TwoSystems() {
             </div>
           </div>
 
-          <div className={`p-8 rounded-sm ${inView ? "fade-up fade-up-delay-1" : "opacity-0"}`} style={{ background: BG_CARD, border: `1px solid ${AMBER}33` }}>
+          <div className={`p-8 rounded-sm ${inView ? "fade-up fade-up-delay-1" : "opacity-0"}`} style={{ background: BG_CARD, border: `1px solid "color-mix(in oklch, var(--ow-amber) 20%, transparent)"` }}>
             <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: AMBER, marginBottom: "0.75rem" }}>Ownology</p>
             <h3 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1.375rem", color: TEXT_HI, marginBottom: "0.75rem" }}>The knowledge layer on top</h3>
             <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9375rem", color: TEXT_MID, lineHeight: 1.75, marginBottom: "1.5rem" }}>
@@ -120,7 +121,7 @@ function TwoSystems() {
                 </li>
               ))}
             </ul>
-            <div className="mt-6 p-4 rounded-sm" style={{ background: BG_BASE, border: `1px solid ${AMBER}25` }}>
+            <div className="mt-6 p-4 rounded-sm" style={{ background: BG_BASE, border: "1px solid color-mix(in oklch, var(--ow-amber) 15%, transparent)" }}>
               <p style={{ fontFamily: MONO, fontSize: "0.8125rem", color: AMBER, lineHeight: 1.6 }}>"Tank 7 is at 8.4 Brix — should I add more yeast nutrient?"</p>
               <p style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_MID, marginTop: "0.5rem" }}>Answers from your Shiraz SOP + Scott Labs YAN guide.</p>
             </div>
@@ -128,7 +129,7 @@ function TwoSystems() {
         </div>
 
         <div className={`mt-10 max-w-5xl mx-auto p-6 rounded-sm text-center ${inView ? "fade-up fade-up-delay-2" : "opacity-0"}`}
-          style={{ background: `${AMBER}0D`, border: `1px solid ${AMBER}25` }}>
+          style={{ background: "color-mix(in oklch, var(--ow-amber) 5%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 15%, transparent)" }}>
           <p style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "1.125rem", color: TEXT_HI, lineHeight: 1.6 }}>
             InnoVint tells you <em style={{ color: AMBER }}>what happened</em>. Ownology tells you <em style={{ color: AMBER }}>what to do about it</em>. Most Ownology customers use both.
           </p>
@@ -155,7 +156,7 @@ function ComparisonTable() {
   const Check = ({ val }: { val: boolean | string }) => {
     if (val === true) return (
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="mx-auto">
-        <circle cx="9" cy="9" r="8" fill={`${AMBER}20`} stroke={AMBER} strokeWidth="1"/>
+        <circle cx="9" cy="9" r="8" fill="color-mix(in oklch, var(--ow-amber) 12%, transparent)" stroke={AMBER} strokeWidth="1"/>
         <path d="M5.5 9l2.5 2.5 4.5-4.5" stroke={AMBER} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     );
@@ -233,10 +234,10 @@ function NotAReplacement() {
           <div className={`flex flex-col gap-4 ${inView ? "fade-up fade-up-delay-1" : "opacity-0"}`}>
             {timeline.map((item, i) => (
               <div key={i} className="flex gap-4 p-4 rounded-sm"
-                style={{ background: BG_BASE, border: `1px solid ${item.type === "insight" ? `${AMBER}30` : BORDER}` }}>
+                style={{ background: BG_BASE, border: `1px solid ${item.type === "insight" ? "color-mix(in oklch, var(--ow-amber) 18%, transparent)" : BORDER}` }}>
                 <div className="flex flex-col items-center gap-1 flex-shrink-0">
                   <span style={{ fontFamily: MONO, fontSize: "0.75rem", color: item.type === "insight" ? AMBER : TEXT_LO }}>{item.time}</span>
-                  <div className="w-px flex-1" style={{ background: item.type === "insight" ? `${AMBER}30` : BORDER, minHeight: "1rem" }} />
+                  <div className="w-px flex-1" style={{ background: item.type === "insight" ? "color-mix(in oklch, var(--ow-amber) 18%, transparent)" : BORDER, minHeight: "1rem" }} />
                 </div>
                 <div>
                   <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.12em", textTransform: "uppercase", color: item.type === "insight" ? AMBER : TEXT_LO, marginBottom: "0.375rem" }}>{item.system}</p>
@@ -280,7 +281,7 @@ function VsMarketing() {
               Excellent tools for your marketing coordinator. Cannot answer a production question.
             </p>
           </div>
-          <div className="p-8 rounded-sm" style={{ background: BG_CARD, border: `1px solid ${AMBER}33` }}>
+          <div className="p-8 rounded-sm" style={{ background: BG_CARD, border: `1px solid "color-mix(in oklch, var(--ow-amber) 20%, transparent)"` }}>
             <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: AMBER, marginBottom: "1.25rem" }}>Ownology — Cellar Intelligence</p>
             <div className="flex flex-col gap-3">
               {ownQs.map(q => (
@@ -302,6 +303,35 @@ function VsMarketing() {
 
 function CTA() {
   const { ref, inView } = useInView();
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || status === "loading") return;
+    setStatus("loading");
+    setErrorMsg("");
+    try {
+      const res = await fetch("https://api.buttondown.email/v1/subscribers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Token ${import.meta.env.VITE_BUTTONDOWN_API_KEY ?? ""}` },
+        body: JSON.stringify({ email_address: email, tags: ["waitlist", "why-ownology"] }),
+      });
+      if (res.status === 201 || res.status === 200) {
+        setStatus("success");
+        setEmail("");
+      } else if (res.status === 422) {
+        setStatus("success"); // already subscribed — treat as success
+      } else {
+        throw new Error("Signup failed");
+      }
+    } catch {
+      setStatus("error");
+      setErrorMsg("Something went wrong. Please try again or email hello@ownology.ai");
+    }
+  };
+
   return (
     <section className="py-24" style={{ background: BG_RAISED }}>
       <div className="container max-w-3xl text-center" ref={ref}>
@@ -313,10 +343,57 @@ function CTA() {
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", color: TEXT_MID, lineHeight: 1.75, marginBottom: "2.5rem" }}>
             No credit card. No setup fee. Works alongside whatever production system you already use.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <a href="/#pricing" className="btn-amber">Start Free Trial</a>
-            <a href="mailto:hello@ownology.ai" className="btn-ghost">Talk to Us</a>
-          </div>
+
+          {status === "success" ? (
+            <div className="py-6 px-8 rounded-sm inline-block" style={{ background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}>
+              <p style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "1.125rem", color: TEXT_HI }}>
+                You're on the list. We'll be in touch.
+              </p>
+              <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: TEXT_MID, marginTop: "0.5rem" }}>
+                In the meantime, explore the full site at <a href="/" style={{ color: AMBER }}>ownology.ai</a>
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-6">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="your@winery.com"
+                disabled={status === "loading"}
+                style={{
+                  flex: 1,
+                  background: BG_BASE,
+                  border: "1px solid var(--ow-border-md)",
+                  borderRadius: "2px",
+                  padding: "0.75rem 1rem",
+                  fontFamily: SANS,
+                  fontSize: "0.9375rem",
+                  color: TEXT_HI,
+                  outline: "none",
+                }}
+                onFocus={e => (e.currentTarget.style.borderColor = AMBER)}
+                onBlur={e => (e.currentTarget.style.borderColor = "var(--ow-border-md)")}
+              />
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                className="btn-amber flex-shrink-0"
+                style={{ opacity: status === "loading" ? 0.7 : 1 }}
+              >
+                {status === "loading" ? "Joining..." : "Join Waitlist"}
+              </button>
+            </form>
+          )}
+
+          {status === "error" && (
+            <p style={{ fontFamily: SANS, fontSize: "0.875rem", color: "oklch(0.65 0.15 30)", marginBottom: "1rem" }}>{errorMsg}</p>
+          )}
+
+          <p style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>
+            Or <a href="mailto:hello@ownology.ai" style={{ color: AMBER }}>talk to us directly</a> — we respond within one business day.
+          </p>
         </div>
       </div>
     </section>

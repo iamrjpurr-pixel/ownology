@@ -15,3 +15,10 @@
 - [x] Build /why-ownology comparison webpage (Ownology vs InnoVint, vs WineryCopilot)
 - [x] Wire /why-ownology into App.tsx routing
 - [x] Add Why Ownology link to home page footer
+- [x] Add 'Why Ownology' link to main nav in Home.tsx between Features and Pricing
+- [x] Upgrade /why-ownology CTA section with email capture to drive waitlist signups
+- [ ] Build /for-innovint-users landing page and wire into App.tsx routing
+- [x] Design light "cellar daylight" theme CSS variables (warm cream/parchment, keep amber gold)
+- [x] Create ThemeToggle component with localStorage persistence and nav integration
+- [x] Apply light theme to Home.tsx via CSS variable references
+- [x] Apply light theme to WhyOwnology.tsx, FAQ.tsx, FounderStory.tsx

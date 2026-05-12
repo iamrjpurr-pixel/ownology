@@ -75,12 +75,12 @@ export default function FAQ() {
     <section
       id="faq"
       className="relative py-24 overflow-hidden"
-      style={{ background: "oklch(0.11 0.009 60)" }}
+      style={{ background: "var(--ow-bg-base)" }}
     >
       {/* Top border rule */}
       <div
         className="absolute top-0 left-0 right-0 h-px"
-        style={{ background: "linear-gradient(to right, transparent, oklch(0.72 0.12 75 / 0.3), transparent)" }}
+        style={{ background: "linear-gradient(to right, transparent, color-mix(in oklch, var(--ow-amber) 30%, transparent), transparent)" }}
       />
 
       <div className="container relative z-10" ref={ref}>
@@ -95,7 +95,7 @@ export default function FAQ() {
                 fontSize: "0.7rem",
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
-                color: "oklch(0.72 0.12 75)",
+                color: "var(--ow-amber)",
                 marginBottom: "1.25rem",
               }}
             >
@@ -107,7 +107,7 @@ export default function FAQ() {
                 fontWeight: 700,
                 fontSize: "clamp(2rem, 3.5vw, 2.75rem)",
                 lineHeight: 1.15,
-                color: "oklch(0.92 0.012 75)",
+                color: "var(--ow-text-hi)",
                 letterSpacing: "-0.02em",
                 marginBottom: "1.5rem",
               }}
@@ -120,13 +120,13 @@ export default function FAQ() {
                 fontWeight: 300,
                 fontSize: "1rem",
                 lineHeight: 1.75,
-                color: "oklch(0.58 0.012 75)",
+                color: "var(--ow-text-mid)",
               }}
             >
               Still have questions? Email us at{" "}
               <a
                 href="mailto:hello@ownology.ai"
-                style={{ color: "oklch(0.72 0.12 75)", textDecoration: "underline", textUnderlineOffset: "3px" }}
+                style={{ color: "var(--ow-amber)", textDecoration: "underline", textUnderlineOffset: "3px" }}
               >
                 hello@ownology.ai
               </a>{" "}
@@ -142,7 +142,7 @@ export default function FAQ() {
                   key={i}
                   value={`faq-${i}`}
                   style={{
-                    borderBottom: "1px solid oklch(1 0 0 / 0.08)",
+                    borderBottom: "1px solid var(--ow-border)",
                   }}
                 >
                   <AccordionTrigger
@@ -151,7 +151,7 @@ export default function FAQ() {
                       fontWeight: 500,
                       fontSize: "1.0625rem",
                       lineHeight: 1.4,
-                      color: "oklch(0.88 0.014 75)",
+                      color: "var(--ow-text-hi)",
                       textAlign: "left",
                       paddingTop: "1.5rem",
                       paddingBottom: "1.5rem",
@@ -167,7 +167,7 @@ export default function FAQ() {
                       fontWeight: 300,
                       fontSize: "1rem",
                       lineHeight: 1.8,
-                      color: "oklch(0.62 0.012 75)",
+                      color: "var(--ow-text-mid)",
                       paddingBottom: "1.5rem",
                     }}
                   >

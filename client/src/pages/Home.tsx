@@ -9,6 +9,7 @@ import OwnologyLogo from "@/components/OwnologyLogo";
 import FounderStory from "@/components/FounderStory";
 import FAQ from "@/components/FAQ";
 import { Link } from "wouter";
+import ThemeToggle, { useOwnologyTheme } from "@/components/ThemeToggle";
 
 // ─── Image URLs ───────────────────────────────────────────────────────────────
 const HERO_IMG    = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-hero-HqkryW7dQ2C9TbhdmJ8Kff.webp";
@@ -52,7 +53,15 @@ function useInView(threshold = 0.15) {
 }
 
 // ─── Nav ──────────────────────────────────────────────────────────────────────
-const NAV_LINKS = ["Features","How It Works","Our Story","Pricing","FAQ"];
+type NavItem = { label: string; href: string; external?: boolean };
+const NAV_LINKS: NavItem[] = [
+  { label: "Features",      href: "#features" },
+  { label: "How It Works",  href: "#how-it-works" },
+  { label: "Why Ownology",  href: "/why-ownology", external: false },
+  { label: "Our Story",     href: "#our-story" },
+  { label: "Pricing",       href: "#pricing" },
+  { label: "FAQ",           href: "#faq" },
+];
 
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -75,31 +84,48 @@ function Nav() {
   return (
     <>
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled || menuOpen ? "bg-[oklch(0.11_0.008_60/97%)] backdrop-blur-md border-b border-white/5" : ""
-      }`}>
+        scrolled || menuOpen ? "backdrop-blur-md border-b border-white/5" : ""
+      }`}
+        style={scrolled || menuOpen ? {background: "var(--ow-nav-bg)"} : undefined}
+      >
         <div className="container flex items-center justify-between py-5">
           <OwnologyLogo size={36} />
 
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-8">
-            {NAV_LINKS.map(l => (
-              <a key={l} href={`#${l.toLowerCase().replace(/ /g,"-").replace("'","")}`}
-                className="text-sm font-light tracking-wide transition-colors"
-                style={{color:"oklch(0.65 0.015 75)", fontFamily:"'Lato',sans-serif"}}
-                onMouseEnter={e=>(e.currentTarget.style.color="oklch(0.72 0.12 75)")}
-                onMouseLeave={e=>(e.currentTarget.style.color="oklch(0.65 0.015 75)")}
-              >{l}</a>
+            {NAV_LINKS.map(item => (
+              item.href.startsWith("/") ? (
+                <Link key={item.label} href={item.href}
+                  className="text-sm font-light tracking-wide transition-colors"
+                  style={{color:"var(--ow-text-lo)", fontFamily:"'Lato',sans-serif"}}
+                  onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
+                  onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}
+                >{item.label}</Link>
+              ) : (
+                <a key={item.label} href={item.href}
+                  className="text-sm font-light tracking-wide transition-colors"
+                  style={{color:"var(--ow-text-lo)", fontFamily:"'Lato',sans-serif"}}
+                  onMouseEnter={e=>(e.currentTarget.style.color="var(--ow-amber)")}
+                  onMouseLeave={e=>(e.currentTarget.style.color="var(--ow-text-lo)")}
+                >{item.label}</a>
+              )
             ))}
           </div>
 
-          <a href="#pricing" className="btn-amber text-xs hidden md:inline-flex items-center">
-            Start Free Trial
-          </a>
+          <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle compact />
+            <a href="#pricing" className="btn-amber text-xs inline-flex items-center">
+              Start Free Trial
+            </a>
+          </div>
 
           {/* Hamburger button — mobile only */}
+          {/* Mobile: theme toggle + hamburger */}
+          <div className="md:hidden flex items-center gap-2">
+          <ThemeToggle compact />
           <button
-            className="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5 rounded-sm transition-colors"
-            style={{background: menuOpen ? "oklch(0.16 0.010 60)" : "transparent"}}
+            className="flex flex-col justify-center items-center w-10 h-10 gap-1.5 rounded-sm transition-colors"
+            style={{background: menuOpen ? "var(--ow-bg-card)" : "transparent"}}
             onClick={() => setMenuOpen(o => !o)}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
@@ -127,6 +153,7 @@ function Nav() {
               }}
             />
           </button>
+          </div>
         </div>
       </nav>
 
@@ -146,38 +173,55 @@ function Nav() {
       <div
         className="fixed top-0 left-0 right-0 z-40 md:hidden transition-transform duration-300 ease-out"
         style={{
-          background: "oklch(0.11 0.008 60)",
-          borderBottom: "1px solid oklch(1 0 0 / 0.08)",
+          background: "var(--ow-bg-base)",
+          borderBottom: "1px solid var(--ow-border)",
           transform: menuOpen ? "translateY(0)" : "translateY(-100%)",
           paddingTop: "80px",
           paddingBottom: "2rem",
-          boxShadow: "0 24px 60px oklch(0 0 0 / 0.7)",
+          boxShadow: "0 24px 60px var(--ow-shadow)",
         }}
       >
         <div className="container flex flex-col gap-1">
-          {NAV_LINKS.map((l, i) => (
-            <a
-              key={l}
-              href={`#${l.toLowerCase().replace(/ /g,"-").replace("'","")}`}
-              onClick={handleNavClick}
-              className="flex items-center justify-between py-4 transition-colors"
-              style={{
-                fontFamily: "'Lato', sans-serif",
-                fontWeight: 300,
-                fontSize: "1.125rem",
-                color: "oklch(0.75 0.015 75)",
-                borderBottom: i < NAV_LINKS.length - 1 ? "1px solid oklch(1 0 0 / 0.06)" : "none",
-                letterSpacing: "0.01em",
-              }}
-              onMouseEnter={e => (e.currentTarget.style.color = "oklch(0.72 0.12 75)")}
-              onMouseLeave={e => (e.currentTarget.style.color = "oklch(0.75 0.015 75)")}
-            >
-              {l}
+          {NAV_LINKS.map((item, i) => {
+            const sharedStyle = {
+              fontFamily: "'Lato', sans-serif",
+              fontWeight: 300,
+              fontSize: "1.125rem",
+              color: "var(--ow-text-mid)",
+              borderBottom: i < NAV_LINKS.length - 1 ? "1px solid var(--ow-border)" : "none",
+              letterSpacing: "0.01em",
+            };
+            const chevron = (
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path d="M6 4l4 4-4 4" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-            </a>
-          ))}
+            );
+            return item.href.startsWith("/") ? (
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={handleNavClick}
+                className="flex items-center justify-between py-4 transition-colors"
+                style={sharedStyle}
+                onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-amber)")}
+                onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-text-mid)")}
+              >
+                {item.label}{chevron}
+              </Link>
+            ) : (
+              <a
+                key={item.label}
+                href={item.href}
+                onClick={handleNavClick}
+                className="flex items-center justify-between py-4 transition-colors"
+                style={sharedStyle}
+                onMouseEnter={e => (e.currentTarget.style.color = "var(--ow-amber)")}
+                onMouseLeave={e => (e.currentTarget.style.color = "var(--ow-text-mid)")}
+              >
+                {item.label}{chevron}
+              </a>
+            );
+          })}
 
           {/* CTA in mobile menu */}
           <a
@@ -204,8 +248,8 @@ function Hero() {
       {/* Background image */}
       <div className="absolute inset-0">
         <img src={HERO_IMG} alt="Wine cellar" className="w-full h-full object-cover" style={{filter:"brightness(0.28)"}} />
-        <div className="absolute inset-0" style={{background:"linear-gradient(135deg, oklch(0.11 0.008 60 / 80%) 0%, transparent 60%, oklch(0.11 0.008 60 / 60%) 100%)"}} />
-        <div className="absolute inset-0" style={{background:"linear-gradient(to top, oklch(0.11 0.008 60) 0%, transparent 50%)"}} />
+        <div className="absolute inset-0" style={{background:"linear-gradient(135deg, var(--ow-bg-base) 0%, transparent 60%, color-mix(in oklch, var(--ow-bg-base) 60%, transparent) 100%)"}} />
+        <div className="absolute inset-0" style={{background:"linear-gradient(to top, var(--ow-bg-base) 0%, transparent 50%)"}} />
       </div>
 
       <div className="container relative z-10 pt-32 pb-24">
@@ -214,13 +258,13 @@ function Hero() {
           <div>
             <p className="section-label mb-6 fade-up">AI Knowledge Assistant for Winemakers</p>
             <h1 className="fade-up fade-up-delay-1"
-              style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2.5rem,5vw,4rem)", lineHeight:1.08, color:"oklch(0.95 0.018 75)", letterSpacing:"-0.02em"}}>
+              style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2.5rem,5vw,4rem)", lineHeight:1.08, color:"var(--ow-text-hi)", letterSpacing:"-0.02em"}}>
               Your cellar's<br/>
-              <em style={{color:"oklch(0.72 0.12 75)", fontStyle:"italic"}}>most knowledgeable</em><br/>
+              <em style={{color:"var(--ow-amber)", fontStyle:"italic"}}>most knowledgeable</em><br/>
               apprentice.
             </h1>
             <p className="mt-6 fade-up fade-up-delay-2"
-              style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"oklch(0.70 0.015 75)", maxWidth:"480px"}}>
+              style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}}>
               Ownology gives boutique winery teams instant, document-grounded answers to their toughest cellar questions — from a mobile phone, in seconds, during harvest.
             </p>
             <div className="flex flex-wrap gap-4 mt-10 fade-up fade-up-delay-3">
@@ -230,7 +274,7 @@ function Hero() {
             {/* Trust bar */}
             <div className="mt-12 flex items-center gap-6 fade-up fade-up-delay-4">
               <div className="amber-rule flex-1" />
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.75rem", color:"oklch(0.50 0.012 75)", letterSpacing:"0.08em", whiteSpace:"nowrap"}}>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.75rem", color:"var(--ow-text-lo)", letterSpacing:"0.08em", whiteSpace:"nowrap"}}>
                 TRUSTED BY BOUTIQUE WINERIES ACROSS AU · NZ · US
               </p>
               <div className="amber-rule flex-1" />
@@ -239,11 +283,11 @@ function Hero() {
 
           {/* Right — live demo card */}
           <div className="fade-up fade-up-delay-2">
-            <div className="cellar-card p-5 max-w-md ml-auto" style={{border:"1px solid oklch(0.72 0.12 75 / 20%)"}}>
+            <div className="cellar-card p-5 max-w-md ml-auto" style={{border:"1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)"}}>
               {/* Header */}
-              <div className="flex items-center gap-3 mb-4 pb-4" style={{borderBottom:"1px solid oklch(1 0 0 / 8%)"}}>
+              <div className="flex items-center gap-3 mb-4 pb-4" style={{borderBottom:"1px solid var(--ow-border)"}}>
                 <div className="w-2 h-2 rounded-full" style={{background:"oklch(0.72 0.12 75)"}} />
-                <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.75rem", color:"oklch(0.55 0.015 75)", letterSpacing:"0.1em", textTransform:"uppercase"}}>Ownology Assistant</span>
+                <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.75rem", color:"var(--ow-text-lo)", letterSpacing:"0.1em", textTransform:"uppercase"}}>Ownology Assistant</span>
                 <div className="ml-auto flex gap-1.5">
                   {["oklch(0.72 0.12 75 / 30%)","oklch(0.72 0.12 75 / 50%)","oklch(0.72 0.12 75)"].map((c,i)=>(
                     <div key={i} className="w-1.5 h-1.5 rounded-full" style={{background:c}} />
@@ -252,7 +296,7 @@ function Hero() {
               </div>
               {/* User message */}
               <div className="mb-4">
-                <div className="inline-block px-4 py-2.5 rounded text-sm" style={{background:"oklch(0.20 0.010 60)", color:"oklch(0.82 0.015 75)", fontFamily:"'Lato',sans-serif", lineHeight:1.5}}>
+                <div className="inline-block px-4 py-2.5 rounded text-sm" style={{background:"var(--ow-bg-inset)", color:"var(--ow-text-hi)", fontFamily:"'Lato',sans-serif", lineHeight:1.5}}>
                   My Shiraz is at 24.3 Brix, YAN is 120ppm. What DAP addition do I need for Tank 7?
                 </div>
               </div>
@@ -264,16 +308,16 @@ function Hero() {
                     <path d="M5 3v2l1.5 1" stroke="oklch(0.72 0.12 75)" strokeWidth="1.2" strokeLinecap="round"/>
                   </svg>
                 </div>
-                <div className="text-sm leading-relaxed" style={{color:"oklch(0.80 0.015 75)", fontFamily:"'Lato',sans-serif", lineHeight:1.65}}>
+                <div className="text-sm leading-relaxed" style={{color:"var(--ow-text-mid)", fontFamily:"'Lato',sans-serif", lineHeight:1.65}}>
                   {displayed}
                   {!done && <span className="cursor-blink" style={{color:"oklch(0.72 0.12 75)"}}>|</span>}
                 </div>
               </div>
               {/* Data chips */}
               {done && (
-                <div className="mt-4 pt-4 flex flex-wrap gap-2" style={{borderTop:"1px solid oklch(1 0 0 / 8%)"}}>
+                <div className="mt-4 pt-4 flex flex-wrap gap-2" style={{borderTop:"1px solid var(--ow-border)"}}>
                   {["Brix: 24.3","YAN: 120ppm","DAP: 2.6kg","Tank 7 · Shiraz"].map(d=>(
-                    <span key={d} className="data-readout px-2.5 py-1 rounded-sm text-xs" style={{background:"oklch(0.72 0.12 75 / 10%)", border:"1px solid oklch(0.72 0.12 75 / 20%)"}}>
+                    <span key={d} className="data-readout px-2.5 py-1 rounded-sm text-xs" style={{background:"color-mix(in oklch, var(--ow-amber) 10%, transparent)", border:"1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)"}}>
                       {d}
                     </span>
                   ))}
@@ -281,7 +325,7 @@ function Hero() {
               )}
               {/* Source citation */}
               {done && (
-                <p className="mt-3 text-xs" style={{color:"oklch(0.45 0.010 75)", fontFamily:"'Lato',sans-serif"}}>
+                <p className="mt-3 text-xs" style={{color:"var(--ow-text-lo)", fontFamily:"'Lato',sans-serif"}}>
                   ↳ Sourced from: <em>Your Shiraz SOP · Scott Labs YAN Guide</em>
                 </p>
               )}
@@ -303,20 +347,20 @@ function PainPoints() {
     { num: "04", title: "No Benchmarking", body: "You know your own numbers intimately, but have no visibility into how your practices compare to regional peers. You're flying blind relative to the vintage." },
   ];
   return (
-    <section className="py-28" style={{background:"oklch(0.13 0.009 60)"}}>
+    <section className="py-28" style={{background:"var(--ow-bg-raised)"}}>
       <div className="container" ref={ref}>
         <p className="section-label mb-4">The Problem</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"oklch(0.92 0.018 75)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"var(--ow-text-hi)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
           Four problems every boutique winery knows too well.
         </h2>
         <div className="amber-rule mt-8 mb-12" />
-        <div className="grid md:grid-cols-2 gap-px" style={{background:"oklch(1 0 0 / 6%)"}}>
+        <div className="grid md:grid-cols-2 gap-px" style={{background:"var(--ow-border-md)"}}>
           {points.map((p, i) => (
             <div key={p.num} className={`p-8 ${inView ? `fade-up fade-up-delay-${i+1}` : "opacity-0"}`}
-              style={{background:"oklch(0.13 0.009 60)"}}>
+              style={{background:"var(--ow-bg-raised)"}}>
               <span className="data-readout text-xs mb-4 block" style={{color:"oklch(0.72 0.12 75 / 60%)"}}>{p.num}</span>
-              <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.25rem", color:"oklch(0.90 0.018 75)", marginBottom:"0.75rem"}}>{p.title}</h3>
-              <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"oklch(0.62 0.015 75)", lineHeight:1.7}}>{p.body}</p>
+              <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.25rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>{p.title}</h3>
+              <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7}}>{p.body}</p>
             </div>
           ))}
         </div>
@@ -332,7 +376,7 @@ function Features() {
     <section id="features" className="py-28">
       <div className="container" ref={ref}>
         <p className="section-label mb-4">Features</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"oklch(0.92 0.018 75)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"var(--ow-text-hi)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
           Everything your team needs. Nothing they don't.
         </h2>
         <div className="amber-rule mt-8 mb-12" />
@@ -348,11 +392,11 @@ function Features() {
                   <path d="M3 9h12M9 3l6 6-6 6" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.375rem", color:"oklch(0.92 0.018 75)", marginBottom:"0.75rem"}}>AI Knowledge Assistant</h3>
-              <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"oklch(0.62 0.015 75)", lineHeight:1.7, maxWidth:"420px"}}>
+              <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.375rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>AI Knowledge Assistant</h3>
+              <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7, maxWidth:"420px"}}>
                 Ask anything — from complex SO2 calculations to your own harvest protocols. The assistant searches your uploaded documents and world-class wine science literature, then delivers a precise, cited answer in seconds.
               </p>
-              <div className="mt-6 p-4 rounded-sm" style={{background:"oklch(0.11 0.008 60)", border:"1px solid oklch(1 0 0 / 8%)"}}>
+              <div className="mt-6 p-4 rounded-sm" style={{background:"var(--ow-bg-base)", border:"1px solid var(--ow-border)"}}>
                 <p className="data-readout text-xs mb-2" style={{color:"oklch(0.72 0.12 75 / 60%)"}}>EXAMPLE QUERY</p>
                 <p style={{fontFamily:"'Fira Code',monospace", fontSize:"0.8125rem", color:"oklch(0.72 0.12 75)", lineHeight:1.6}}>
                   "What is the target Free SO2 for our barrel-aged Chardonnay before bottling, and how much KMS for a 60-gallon barrel at 15ppm?"
@@ -370,14 +414,14 @@ function Features() {
                 <path d="M6 9h6M6 6h6M6 12h4" stroke="oklch(0.62 0.10 45)" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
             </div>
-            <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.25rem", color:"oklch(0.92 0.018 75)", marginBottom:"0.75rem"}}>Smart Cellar Logbook</h3>
-            <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"oklch(0.62 0.015 75)", lineHeight:1.7}}>
+              <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.25rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>Smart Cellar Logbook</h3>
+            <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7}}>
               Log by voice or photo. Snap a handwritten lab slip — Ownology extracts and structures the data automatically. No keyboard. No delay.
             </p>
             <div className="mt-6 flex flex-col gap-2">
               {[["Brix","14.2"],["Temp","22°C"],["pH","3.61"],["Free SO₂","28ppm"]].map(([k,v])=>(
-                <div key={k} className="flex justify-between items-center px-3 py-2 rounded-sm" style={{background:"oklch(0.11 0.008 60)"}}>
-                  <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.55 0.012 75)"}}>{k}</span>
+                <div key={k} className="flex justify-between items-center px-3 py-2 rounded-sm" style={{background:"var(--ow-bg-base)"}}>
+                  <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}>{k}</span>
                   <span className="data-readout text-sm">{v}</span>
                 </div>
               ))}
@@ -392,12 +436,12 @@ function Features() {
                 <circle cx="15" cy="9" r="1.5" fill="oklch(0.72 0.12 75)"/>
               </svg>
             </div>
-            <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.25rem", color:"oklch(0.92 0.018 75)", marginBottom:"0.75rem"}}>Fermentation Dashboard</h3>
-            <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"oklch(0.62 0.015 75)", lineHeight:1.7}}>
+              <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.25rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>Fermentation Dashboard</h3>
+            <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7}}>
               Monitor all active fermentations at a glance. Proactive alerts when a tank deviates from its expected Brix trajectory — before a problem becomes a crisis.
             </p>
             {/* Mini chart */}
-            <div className="mt-6 p-3 rounded-sm" style={{background:"oklch(0.11 0.008 60)"}}>
+            <div className="mt-6 p-3 rounded-sm" style={{background:"var(--ow-bg-base)"}}>
               <div className="flex justify-between mb-2">
                 <span className="data-readout text-xs" style={{color:"oklch(0.72 0.12 75 / 60%)"}}>TANK 7 · SHIRAZ</span>
                 <span className="data-readout text-xs" style={{color:"oklch(0.72 0.12 75)"}}>DAY 8</span>
@@ -425,17 +469,17 @@ function Features() {
                     <path d="M6 10h6M6 13h4" stroke="oklch(0.62 0.10 45)" strokeWidth="1.5" strokeLinecap="round"/>
                   </svg>
                 </div>
-                <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.375rem", color:"oklch(0.92 0.018 75)", marginBottom:"0.75rem"}}>Document Vault</h3>
-                <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"oklch(0.62 0.015 75)", lineHeight:1.7}}>
+                <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.375rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>Document Vault</h3>
+                <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7}}>
                   Upload your SOPs, vintage reports, sensory notes, and protocols. Ownology indexes them instantly — making every document searchable through natural conversation. Your institutional memory, finally accessible.
                 </p>
                 <div className="mt-6 flex flex-col gap-2">
                   {["Shiraz Harvest Protocol 2024.pdf","SO2 Management SOP.docx","Fermentation Targets — All Varieties.pdf","Bottling Line Cleaning Procedure.pdf"].map(f=>(
-                    <div key={f} className="flex items-center gap-3 px-3 py-2 rounded-sm" style={{background:"oklch(0.11 0.008 60)"}}>
+                    <div key={f} className="flex items-center gap-3 px-3 py-2 rounded-sm" style={{background:"var(--ow-bg-base)"}}>
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                         <path d="M3 2h5l2 2v6a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="oklch(0.62 0.10 45)" strokeWidth="1"/>
                       </svg>
-                      <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.65 0.012 75)"}}>{f}</span>
+                      <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-mid)"}}>{f}</span>
                       <div className="ml-auto w-1.5 h-1.5 rounded-full" style={{background:"oklch(0.72 0.12 75)"}} />
                     </div>
                   ))}
@@ -443,7 +487,7 @@ function Features() {
               </div>
               <div className="relative hidden md:block">
                 <img src={VINEYARD_IMG} alt="Vineyard" className="absolute inset-0 w-full h-full object-cover" style={{filter:"brightness(0.35) saturate(0.7)"}} />
-                <div className="absolute inset-0" style={{background:"linear-gradient(to right, oklch(0.16 0.010 60), transparent)"}} />
+                <div className="absolute inset-0" style={{background:"linear-gradient(to right, var(--ow-bg-card), transparent)"}} />
               </div>
             </div>
           </div>
@@ -464,13 +508,13 @@ function HowItWorks() {
     { n:"04", title:"Log and Track", body:"Use the Smart Logbook to record daily readings by voice or photo. The Fermentation Dashboard tracks all active tanks and alerts you to anomalies." },
   ];
   return (
-    <section id="how-it-works" className="py-28 relative overflow-hidden" style={{background:"oklch(0.13 0.009 60)"}}>
+    <section id="how-it-works" className="py-28 relative overflow-hidden" style={{background:"var(--ow-bg-raised)"}}>
       <div className="absolute inset-0 opacity-5">
         <img src={HERO_IMG} alt="" className="w-full h-full object-cover" />
       </div>
       <div className="container relative z-10" ref={ref}>
         <p className="section-label mb-4">How It Works</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"oklch(0.92 0.018 75)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"var(--ow-text-hi)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
           From upload to answer in under a minute.
         </h2>
         <div className="amber-rule mt-8 mb-16" />
@@ -484,8 +528,8 @@ function HowItWorks() {
                   <div className="hidden lg:block absolute top-5 left-full w-full h-px" style={{background:"linear-gradient(to right, oklch(0.72 0.12 75 / 20%), transparent)", transform:"translateX(-50%)"}} />
                 )}
               </div>
-              <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.125rem", color:"oklch(0.90 0.018 75)", marginBottom:"0.625rem"}}>{s.title}</h3>
-              <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9rem", color:"oklch(0.60 0.013 75)", lineHeight:1.7}}>{s.body}</p>
+              <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.125rem", color:"var(--ow-text-hi)", marginBottom:"0.625rem"}}>{s.title}</h3>
+              <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9rem", color:"var(--ow-text-mid)", lineHeight:1.7}}>{s.body}</p>
             </div>
           ))}
         </div>
@@ -493,7 +537,7 @@ function HowItWorks() {
         {/* Phone mockup */}
         <div className="mt-20 flex justify-center">
           <div className="relative max-w-xs w-full">
-            <div className="rounded-2xl overflow-hidden shadow-2xl" style={{border:"1px solid oklch(0.72 0.12 75 / 15%)"}}>
+            <div className="rounded-2xl overflow-hidden shadow-2xl" style={{border:"1px solid color-mix(in oklch, var(--ow-amber) 15%, transparent)"}}>
               <img src={PHONE_IMG} alt="Ownology on mobile" className="w-full" />
             </div>
             <div className="absolute -bottom-4 -right-4 px-4 py-2 rounded-sm" style={{background:"oklch(0.72 0.12 75)", fontFamily:"'Lato',sans-serif", fontWeight:700, fontSize:"0.75rem", color:"oklch(0.11 0.008 60)", letterSpacing:"0.04em", textTransform:"uppercase"}}>
@@ -518,7 +562,7 @@ function Testimonials() {
     <section className="py-28">
       <div className="container" ref={ref}>
         <p className="section-label mb-4">From the Cellar</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"oklch(0.92 0.018 75)", maxWidth:"480px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"var(--ow-text-hi)", maxWidth:"480px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
           What winemakers are saying.
         </h2>
         <div className="amber-rule mt-8 mb-12" />
@@ -526,12 +570,12 @@ function Testimonials() {
           {quotes.map((t, i) => (
             <div key={i} className={`cellar-card p-8 flex flex-col ${inView ? `fade-up fade-up-delay-${i+1}` : "opacity-0"}`}>
               <div className="mb-5" style={{color:"oklch(0.72 0.12 75)", fontSize:"2rem", lineHeight:1, fontFamily:"'Fraunces',serif"}}>"</div>
-              <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"oklch(0.72 0.015 75)", lineHeight:1.75, flex:1, fontStyle:"italic"}}>
+              <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.75, flex:1, fontStyle:"italic"}}>
                 {t.q}
               </p>
-              <div className="mt-6 pt-5" style={{borderTop:"1px solid oklch(1 0 0 / 8%)"}}>
-                <p style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"0.9375rem", color:"oklch(0.88 0.018 75)"}}>{t.name}</p>
-                <p className="data-readout text-xs mt-1" style={{color:"oklch(0.55 0.012 75)"}}>{t.region} · {t.cases}</p>
+              <div className="mt-6 pt-5" style={{borderTop:"1px solid var(--ow-border)"}}>
+                <p style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"0.9375rem", color:"var(--ow-text-hi)"}}>{t.name}</p>
+                <p className="data-readout text-xs mt-1" style={{color:"var(--ow-text-lo)"}}>{t.region} · {t.cases}</p>
               </div>
             </div>
           ))}
@@ -562,13 +606,13 @@ function Pricing() {
     },
   ];
   return (
-    <section id="pricing" className="py-28" style={{background:"oklch(0.13 0.009 60)"}}>
+    <section id="pricing" className="py-28" style={{background:"var(--ow-bg-raised)"}}>
       <div className="container" ref={ref}>
         <p className="section-label mb-4">Pricing</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"oklch(0.92 0.018 75)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"var(--ow-text-hi)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
           Priced by production scale. No surprises.
         </h2>
-        <p className="mt-4" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, color:"oklch(0.60 0.013 75)", fontSize:"1rem"}}>
+        <p className="mt-4" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, color:"var(--ow-text-mid)", fontSize:"1rem"}}>
           All plans include a 14-day free trial. No credit card required.
         </p>
         <div className="amber-rule mt-8 mb-12" />
@@ -577,8 +621,8 @@ function Pricing() {
           {tiers.map((t, i) => (
             <div key={t.name} className={`relative flex flex-col ${inView ? `fade-up fade-up-delay-${i+1}` : "opacity-0"}`}
               style={{
-                background: t.highlight ? "oklch(0.16 0.010 60)" : "oklch(0.14 0.009 60)",
-                border: t.highlight ? "1px solid oklch(0.72 0.12 75 / 40%)" : "1px solid oklch(1 0 0 / 8%)",
+                background: t.highlight ? "var(--ow-bg-card)" : "var(--ow-bg-raised)",
+                border: t.highlight ? "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)" : "1px solid var(--ow-border)",
                 borderRadius:"4px",
                 padding:"2rem",
               }}>
@@ -590,8 +634,8 @@ function Pricing() {
               )}
               <p className="section-label mb-2">{t.name}</p>
               <div className="flex items-end gap-1 mb-1">
-                <span style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"2.75rem", color:"oklch(0.92 0.018 75)", lineHeight:1}}>{t.price}</span>
-                <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.875rem", color:"oklch(0.55 0.012 75)", paddingBottom:"0.35rem"}}>{t.period}</span>
+                <span style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"2.75rem", color:"var(--ow-text-hi)", lineHeight:1}}>{t.price}</span>
+                <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.875rem", color:"var(--ow-text-lo)", paddingBottom:"0.35rem"}}>{t.period}</span>
               </div>
               <p className="data-readout text-xs mb-6" style={{color:"oklch(0.55 0.012 75)"}}>{t.cases}</p>
               <div className="amber-rule mb-6" />
@@ -601,7 +645,7 @@ function Pricing() {
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="mt-0.5 flex-shrink-0">
                       <path d="M2.5 7l3 3 6-6" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.9rem", color:"oklch(0.68 0.013 75)", fontWeight:300}}>{f}</span>
+                    <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.9rem", color:"var(--ow-text-mid)", fontWeight:300}}>{f}</span>
                   </li>
                 ))}
               </ul>
@@ -614,10 +658,10 @@ function Pricing() {
 
         {/* Consultant tier note */}
         <div className="mt-8 p-6 rounded-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
-          style={{background:"oklch(0.16 0.010 60)", border:"1px solid oklch(1 0 0 / 8%)"}}>
+          style={{background:"var(--ow-bg-card)", border:"1px solid var(--ow-border)"}}>
           <div>
-            <p style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.125rem", color:"oklch(0.90 0.018 75)"}}>Consulting Winemaker?</p>
-            <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9rem", color:"oklch(0.60 0.013 75)", marginTop:"0.25rem"}}>
+            <p style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.125rem", color:"var(--ow-text-hi)"}}>Consulting Winemaker?</p>
+            <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9rem", color:"var(--ow-text-mid)", marginTop:"0.25rem"}}>
               Manage multiple winery clients from a single account. $149/month per client with full Cellar features.
             </p>
           </div>
@@ -634,22 +678,22 @@ function CTA() {
     <section className="relative py-32 overflow-hidden">
       <div className="absolute inset-0">
         <img src={VINEYARD_IMG} alt="Vineyard" className="w-full h-full object-cover" style={{filter:"brightness(0.2) saturate(0.6)"}} />
-        <div className="absolute inset-0" style={{background:"linear-gradient(to bottom, oklch(0.11 0.008 60), oklch(0.11 0.008 60 / 70%), oklch(0.11 0.008 60))"}} />
+        <div className="absolute inset-0" style={{background:"linear-gradient(to bottom, var(--ow-bg-base), color-mix(in oklch, var(--ow-bg-base) 70%, transparent), var(--ow-bg-base))"}} />
       </div>
       <div className="container relative z-10 text-center">
         <p className="section-label mb-6">Get Started</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,4.5vw,3.5rem)", color:"oklch(0.95 0.018 75)", lineHeight:1.1, letterSpacing:"-0.02em", maxWidth:"640px", margin:"0 auto"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,4.5vw,3.5rem)", color:"var(--ow-text-hi)", lineHeight:1.1, letterSpacing:"-0.02em", maxWidth:"640px", margin:"0 auto"}}>
           Your winery's most knowledgeable apprentice is ready.
         </h2>
-        <p className="mt-6 mx-auto" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", color:"oklch(0.65 0.015 75)", maxWidth:"480px", lineHeight:1.7}}>
+        <p className="mt-6 mx-auto" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", color:"var(--ow-text-mid)", maxWidth:"480px", lineHeight:1.7}}>
           Start your 14-day free trial. No credit card. No setup fee. Cancel anytime.
         </p>
         <div className="flex flex-wrap justify-center gap-4 mt-10">
           <a href="#pricing" className="btn-amber">Start Free Trial</a>
           <a href="mailto:hello@ownology.ai" className="btn-ghost">Talk to Us</a>
         </div>
-        <p className="mt-8" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.45 0.010 75)"}}>
-          Questions? Email us at <span style={{color:"oklch(0.72 0.12 75)"}}>hello@ownology.ai</span>
+        <p className="mt-8" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}>
+          Questions? Email us at <span style={{color:"var(--ow-amber)"}}>hello@ownology.ai</span>
         </p>
       </div>
     </section>
@@ -659,21 +703,21 @@ function CTA() {
 // ─── Footer ───────────────────────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer className="py-12" style={{borderTop:"1px solid oklch(1 0 0 / 6%)"}}>
+    <footer className="py-12" style={{borderTop:"1px solid var(--ow-border)"}}>
       <div className="container flex flex-col md:flex-row items-center justify-between gap-6">
         <OwnologyLogo size={28} />
-        <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.42 0.010 75)"}}>
+        <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}>
           © 2026 Ownology. AI Knowledge Assistant for Boutique Winemakers.
         </p>
         <div className="flex gap-6">
           {["Privacy","Terms","Contact"].map(l=>(
-            <a key={l} href="#" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.48 0.010 75)"}}
-              onMouseEnter={e=>(e.currentTarget.style.color="oklch(0.72 0.12 75)")}
-              onMouseLeave={e=>(e.currentTarget.style.color="oklch(0.48 0.010 75)")}>{l}</a>
+            <a key={l} href="#" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
+              onMouseEnter={e=>(e.currentTarget.style.color="var(--ow-amber)")}
+              onMouseLeave={e=>(e.currentTarget.style.color="var(--ow-text-lo)")}>{l}</a>
           ))}
-          <Link href="/why-ownology" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.48 0.010 75)"}}
-            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="oklch(0.72 0.12 75)")}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="oklch(0.48 0.010 75)")}>Why Ownology</Link>
+          <Link href="/why-ownology" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
+            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
+            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Why Ownology</Link>
         </div>
       </div>
     </footer>
@@ -683,7 +727,7 @@ function Footer() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function Home() {
   return (
-    <div className="min-h-screen" style={{background:"oklch(0.11 0.008 60)"}}>
+    <div className="min-h-screen" style={{background:"var(--ow-bg-base)"}}>
       <Nav />
       <Hero />
       <PainPoints />

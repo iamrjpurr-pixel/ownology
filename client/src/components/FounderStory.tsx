@@ -32,7 +32,7 @@ export default function FounderStory() {
     <section
       id="our-story"
       className="relative py-28 overflow-hidden"
-      style={{ background: "oklch(0.10 0.009 60)" }}
+      style={{ background: "var(--ow-bg-base)" }}
     >
       {/* Subtle grain overlay */}
       <div
@@ -83,7 +83,7 @@ export default function FounderStory() {
               <div
                 className="absolute bottom-0 left-0 right-0 h-32"
                 style={{
-                  background: "linear-gradient(to top, oklch(0.10 0.009 60) 0%, transparent 100%)",
+                  background: "linear-gradient(to top, var(--ow-bg-base) 0%, transparent 100%)",
                 }}
               />
               {/* Caption */}
@@ -95,7 +95,7 @@ export default function FounderStory() {
                     fontSize: "0.7rem",
                     letterSpacing: "0.12em",
                     textTransform: "uppercase",
-                    color: "oklch(0.72 0.12 75)",
+                    color: "var(--ow-amber)",
                   }}
                 >
                   Founder, Ownology
@@ -104,7 +104,7 @@ export default function FounderStory() {
                   style={{
                     fontFamily: "'Fira Code', monospace",
                     fontSize: "0.7rem",
-                    color: "oklch(0.45 0.010 75)",
+                    color: "var(--ow-text-lo)",
                     marginTop: "0.2rem",
                   }}
                 >
@@ -114,7 +114,7 @@ export default function FounderStory() {
             </div>
 
             {/* Credential stats below portrait */}
-            <div className="grid grid-cols-3 gap-px mt-3" style={{ background: "oklch(1 0 0 / 5%)" }}>
+            <div className="grid grid-cols-3 gap-px mt-3" style={{ background: "var(--ow-border-md)" }}>
               {[
                 { n: "20+", label: "Years" },
                 { n: "~10", label: "Wine clubs" },
@@ -123,14 +123,14 @@ export default function FounderStory() {
                 <div
                   key={s.label}
                   className="p-4 text-center"
-                  style={{ background: "oklch(0.12 0.009 60)" }}
+                  style={{ background: "var(--ow-bg-raised)" }}
                 >
                   <p
                     style={{
                       fontFamily: "'Fraunces', serif",
                       fontWeight: 700,
                       fontSize: "1.4rem",
-                      color: "oklch(0.72 0.12 75)",
+                      color: "var(--ow-amber)",
                       lineHeight: 1,
                     }}
                   >
@@ -141,7 +141,7 @@ export default function FounderStory() {
                       fontFamily: "'Lato', sans-serif",
                       fontWeight: 300,
                       fontSize: "0.65rem",
-                      color: "oklch(0.50 0.010 75)",
+                      color: "var(--ow-text-lo)",
                       marginTop: "0.3rem",
                       lineHeight: 1.35,
                     }}
@@ -187,7 +187,7 @@ export default function FounderStory() {
                 fontWeight: 300,
                 fontSize: "clamp(1.5rem, 2.8vw, 2.2rem)",
                 lineHeight: 1.3,
-                color: "oklch(0.88 0.018 75)",
+                color: "var(--ow-text-hi)",
                 letterSpacing: "-0.01em",
               }}
             >
@@ -195,13 +195,13 @@ export default function FounderStory() {
             </blockquote>
 
             {/* Amber rule */}
-            <div style={{ width: "3rem", height: "1px", background: "oklch(0.72 0.12 75)" }} />
+            <div style={{ width: "3rem", height: "1px", background: "var(--ow-amber)" }} />
 
-            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "var(--ow-text-mid)" }}>
               When I first arrived in Australia, the Hunter Valley captured my attention immediately. What started as curiosity became a long-term passion — and, admittedly, an expensive one. Around the 2005 vintage, I began collecting and studying wines from the region, drawn first to the whites — Semillon, Chardonnay, the Italian varietals gaining prominence across Australian vineyards.
             </p>
 
-            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "var(--ow-text-mid)" }}>
               At one point I belonged to close to ten wine clubs in a single year. Cases arrived faster than I could make room for them, but every shipment was part of an ongoing education. Those memberships opened doors to member days, private tastings, vineyard tours, and behind-the-scenes access to winery operations. I spent countless hours speaking directly with winemakers — walking vineyards, standing around barrels in production sheds, learning the practical realities behind each vintage.
             </p>
 
@@ -209,8 +209,8 @@ export default function FounderStory() {
             <div
               className="p-6"
               style={{
-                background: "oklch(0.14 0.010 60)",
-                borderLeft: "2px solid oklch(0.72 0.12 75)",
+                background: "var(--ow-bg-card)",
+                borderLeft: "2px solid var(--ow-amber)",
               }}
             >
               <p
@@ -220,18 +220,18 @@ export default function FounderStory() {
                   fontWeight: 400,
                   fontSize: "1.125rem",
                   lineHeight: 1.65,
-                  color: "oklch(0.82 0.016 75)",
+                  color: "var(--ow-text-hi)",
                 }}
               >
                 What I kept noticing was how much knowledge lived only in people's heads — and how much of it was at risk of being lost. Ownology is my attempt to change that.
               </p>
             </div>
 
-            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "var(--ow-text-mid)" }}>
               Ownology grew from years of genuine immersion in wine culture, extensive self-education, and firsthand exposure to the people and processes behind Australian wine — and probably from spending far too much money on wine memberships along the way.
             </p>
 
-            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "var(--ow-text-mid)" }}>
               There is one more thread to this story. My daughter has a deep passion for chemistry and science — and somewhere along the way, we began sharing a quiet dream: what would it look like to bring science, agriculture, systems thinking, and wine together in a single platform? Ownology is, in part, an answer to that question. A project built on curiosity, shaped by two generations of it.
             </p>
           </div>
