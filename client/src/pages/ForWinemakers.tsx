@@ -173,19 +173,19 @@ function SocialProof() {
     {
       q: "During harvest I get asked the same questions every single day. Ownology answers them for me. I can finally focus on the wine.",
       name: "Head Winemaker",
-      region: "Sonoma, CA",
+      region: "Family Winery",
       cases: "18,000 cases",
     },
     {
       q: "I work across eight clients. If I had something that could hold my protocols and answer questions on my behalf, I could take on two more clients. This is that thing.",
       name: "Consulting Winemaker",
-      region: "Yarra Valley, VIC",
+      region: "Multi-Client Practice",
       cases: "8 clients",
     },
     {
       q: "The data entry trap is real. Ownology changed that completely — I log by voice while I'm still standing next to the tank.",
       name: "Owner-Winemaker",
-      region: "Marlborough, NZ",
+      region: "Boutique Estate",
       cases: "6,200 cases",
     },
   ];
@@ -506,7 +506,8 @@ function DataInsights() {
                 }}
               >
                 <span
-                  className="inline-block px-2.5 py-1 rounded-sm text-xs font-bold tracking-widest uppercase self-start"                  style={{ background: ins.tagBg, color: ins.tagColor, fontFamily: "'Lato', sans-serif" }}
+                  className="inline-block px-2.5 py-1 rounded-sm text-xs font-bold tracking-widest uppercase self-start"
+                  style={{ background: ins.tagBg, color: ins.tagColor, fontFamily: "'Lato', sans-serif" }}
                 >
                   {ins.tag}
                 </span>
@@ -680,7 +681,7 @@ function DemoRequestForm() {
                   <input
                     type="text"
                     required
-                    placeholder="Hunter Valley Estate"
+                    placeholder="e.g. Ridgeback Wines"
                     value={form.winery}
                     onChange={e => setForm(f => ({ ...f, winery: e.target.value }))}
                     style={inputStyle}
@@ -694,7 +695,7 @@ function DemoRequestForm() {
                     <label style={labelStyle}>Region</label>
                     <input
                       type="text"
-                      placeholder="Hunter Valley, NSW"
+                      placeholder="e.g. Barossa Valley, SA"
                       value={form.region}
                       onChange={e => setForm(f => ({ ...f, region: e.target.value }))}
                       style={inputStyle}

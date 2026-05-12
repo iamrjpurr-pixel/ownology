@@ -29,3 +29,9 @@
 
 ## New Items
 - [x] Add Data Insights showcase section to /for-winemakers page (fermentation metrics, SO2 tracking, YAN analysis, AI insight cards, mini SVG charts)
+
+## Regional Language & Outreach
+- [x] Audit and update Home.tsx — remove/neutralise all regional language (Hunter Valley, Marlborough, Sonoma, Semillon, Verdelho)
+- [x] Audit and update ForWinemakers.tsx — swap region-specific variety names for universal ones (Shiraz, Chardonnay, Pinot Noir, Cab Sav)
+- [x] Audit and update FounderStory.tsx — remove geographic anchors, keep personal story
+- [x] Update email outreach templates to be geographically neutral and universally applicable

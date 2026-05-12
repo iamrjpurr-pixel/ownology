@@ -530,9 +530,9 @@ function HowItWorks() {
 function Testimonials() {
   const { ref, inView } = useInView();
   const quotes = [
-    { q:"I make wine, I don't do data entry. By the time I update the spreadsheet on Friday, I've already forgotten what I observed on Tuesday. Ownology changed that completely.", name:"Owner-Winemaker", region:"Marlborough, NZ", cases:"6,200 cases" },
-    { q:"During harvest I get asked the same questions every single day. Ownology answers them for me. I can finally focus on the wine.", name:"Head Winemaker", region:"Sonoma, CA", cases:"18,000 cases" },
-    { q:"I work across eight clients. If I had something that could hold my protocols and answer questions on my behalf, I could take on two more clients. This is that thing.", name:"Consulting Winemaker", region:"Yarra Valley, VIC", cases:"8 clients" },
+    { q:"I make wine, I don't do data entry. By the time I update the spreadsheet on Friday, I've already forgotten what I observed on Tuesday. Ownology changed that completely.", name:"Owner-Winemaker", region:"Boutique Estate", cases:"6,200 cases" },
+    { q:"During harvest I get asked the same questions every single day. Ownology answers them for me. I can finally focus on the wine.", name:"Head Winemaker", region:"Family Winery", cases:"18,000 cases" },
+    { q:"I work across eight clients. If I had something that could hold my protocols and answer questions on my behalf, I could take on two more clients. This is that thing.", name:"Consulting Winemaker", region:"Multi-Client Practice", cases:"8 clients" },
   ];
   return (
     <section className="py-28">

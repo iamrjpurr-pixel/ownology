@@ -75,7 +75,7 @@ export default function FounderStory() {
             >
               <img
                 src={FOUNDER_IMG}
-                alt="Rich and Gel, Co-Founders of Ownology, in a Hunter Valley wine cellar"
+                alt="Rich and Gel, Co-Founders of Ownology, in a wine cellar"
                 className="w-full object-cover"
                 style={{ aspectRatio: "3/4", display: "block" }}
               />
@@ -108,7 +108,7 @@ export default function FounderStory() {
                     marginTop: "0.2rem",
                   }}
                 >
-                  Hunter Valley · 2005 → 2026
+                  Boutique Wine Country · 2005 → 2026
                 </p>
               </div>
             </div>
@@ -191,14 +191,14 @@ export default function FounderStory() {
                 letterSpacing: "-0.01em",
               }}
             >
-              "I first walked into a Hunter Valley production shed in 2005. I was a collector, not a winemaker — but the winemaker was generous enough to explain everything. Gel has been beside me every step of the way since."
+              "I first walked into a boutique production shed in 2005. I was a collector, not a winemaker — but the winemaker was generous enough to explain everything. Gel has been beside me every step of the way since."
             </blockquote>
 
             {/* Amber rule */}
             <div style={{ width: "3rem", height: "1px", background: "oklch(0.72 0.12 75)" }} />
 
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
-              When Rich first arrived in Australia, the Hunter Valley captured his attention immediately. What started as curiosity became a long-term passion — and, admittedly, an expensive one. Around the 2005 vintage, he began collecting and studying wines from the region, drawn first to the whites — Semillon, Chardonnay, the Italian varietals gaining prominence across Australian vineyards. Geraldine (Gel) was there from the beginning, sharing every tasting, every vineyard walk, and every case that arrived at the door.
+              What started as curiosity became a long-term passion — and, admittedly, an expensive one. Around the 2005 vintage, Rich began collecting and studying wines from small boutique producers, drawn to the craftsmanship and the stories behind every bottle. Geraldine (Gel) was there from the beginning, sharing every tasting, every vineyard walk, and every case that arrived at the door.
             </p>
 
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
@@ -228,7 +228,7 @@ export default function FounderStory() {
             </div>
 
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
-              Ownology grew from years of genuine immersion in wine culture, extensive self-education, and firsthand exposure to the people and processes behind Australian wine — and probably from spending far too much money on wine memberships along the way. Rich and Gel built it together, and that partnership is baked into everything Ownology is.
+              Ownology grew from years of genuine immersion in boutique wine culture, extensive self-education, and firsthand exposure to the people and processes behind small-production winemaking — and probably from spending far too much money on wine memberships along the way. Rich and Gel built it together, and that partnership is baked into everything Ownology is.
             </p>
 
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
