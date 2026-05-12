@@ -241,6 +241,244 @@ const SA_SECTIONS = [
   },
 ];
 
+const VIC_SECTIONS = [
+  {
+    id: "vic-liquor",
+    title: "Liquor Licensing — Winery Producer's Licence",
+    agency: "Liquor Control Victoria (VCGLR)",
+    tags: ["liquor licence", "cellar door", "producer", "VCGLR"],
+    summary:
+      "Victorian wineries require a Producer's Licence under the Liquor Control Reform Act 1998 to manufacture and sell wine. The licence covers cellar door sales, wholesale to licensees, and limited on-site consumption. Applications are lodged with the Victorian Commission for Gambling and Liquor Regulation (VCGLR).",
+    keyPoints: [
+      "Producer's Licence required before manufacturing or selling wine commercially",
+      "Cellar door sales permitted under Producer's Licence — no separate retail licence needed",
+      "Wholesale to other licensees permitted without additional licence",
+      "Application lodged online via VCGLR — processing time typically 4–8 weeks",
+      "Annual licence fee: tiered by turnover category (approx. $300–$2,000+)",
+      "Responsible Service of Alcohol (RSA) training mandatory for all staff serving alcohol",
+      "Extended trading hours or entertainment activities may require variation or additional approval",
+      "Minors: strict rules on presence of minors in licensed areas — check VCGLR guidance",
+    ],
+    source: "Liquor Control Reform Act 1998 (Vic)",
+    sourceUrl: "https://www.vcglr.vic.gov.au/liquor/licences-and-permits",
+  },
+  {
+    id: "vic-epa",
+    title: "EPA Environmental Obligations — D09 Exemption",
+    agency: "Environment Protection Authority Victoria",
+    tags: ["EPA", "wastewater", "D09", "scheduled premises", "environment"],
+    summary:
+      "Most boutique Victorian wineries are exempt from EPA licensing under the D09 beverage manufacturing exemption in the Environment Protection Regulations 2021, provided they meet specific conditions on wastewater volume and land application. Larger operations may require an EPA Works Approval or Licence.",
+    keyPoints: [
+      "D09 exemption applies to beverage manufacturing (including wine) below prescribed thresholds",
+      "Exempt wineries must still comply with the general environmental duty under the EP Act 2017",
+      "Wastewater must be land-applied in accordance with EPA guidelines — no discharge to waterways",
+      "Wineries exceeding D09 thresholds require an EPA Works Approval before construction and a Licence to operate",
+      "General environmental duty: must take reasonably practicable steps to minimise risk of harm",
+      "Odour and noise must not cause unreasonable interference to neighbours",
+      "Chemical bunding: all chemical storage must be bunded to 110% of largest container",
+      "Spill response plan recommended for all wineries regardless of licensing status",
+    ],
+    source: "Environment Protection Act 2017 (Vic) / Environment Protection Regulations 2021 (Vic)",
+    sourceUrl: "https://www.epa.vic.gov.au/for-business/find-your-industry/food-and-beverage",
+  },
+  {
+    id: "vic-worksafe",
+    title: "WorkSafe Victoria — OHS Obligations",
+    agency: "WorkSafe Victoria",
+    tags: ["OHS", "safety", "CO2", "confined space", "WorkSafe"],
+    summary:
+      "WorkSafe Victoria administers the Occupational Health and Safety Act 2004 (Vic). Victorian wineries have specific obligations around CO₂ confined space entry, chemical handling, seasonal harvest worker safety, and plant and equipment registration.",
+    keyPoints: [
+      "CO₂ confined space: written confined space entry permit required, atmospheric testing, standby person",
+      "SO₂ handling: SDS required, PPE mandatory, exposure standard 0.5 ppm TWA",
+      "Forklift operators: must hold a High Risk Work Licence (HRWL) — no exceptions",
+      "Seasonal workers: induction required before commencing work — language barriers must be addressed",
+      "Electrical: all portable electrical equipment must be tested and tagged",
+      "Chemical register: SDS required for all hazardous substances on site",
+      "Incident reporting: serious injuries and dangerous incidents must be notified to WorkSafe Victoria immediately",
+      "Designer/manufacturer duties: any custom-built winery equipment must meet OHS design standards",
+    ],
+    source: "Occupational Health and Safety Act 2004 (Vic)",
+    sourceUrl: "https://www.worksafe.vic.gov.au",
+  },
+  {
+    id: "vic-planning",
+    title: "Planning & Development Approval",
+    agency: "Local Council / DELWP",
+    tags: ["planning", "development", "zoning", "permit", "council"],
+    summary:
+      "Establishing or expanding a winery in Victoria requires a planning permit under the Planning and Environment Act 1987. Requirements vary by zone and overlay — farming zones generally permit winery use, but cellar doors and tourist facilities often require a permit.",
+    keyPoints: [
+      "Planning permit required for new winery buildings, processing facilities, and cellar doors in most zones",
+      "Farming Zone (FZ): winery use generally permitted; cellar door may require permit depending on scale",
+      "Rural Activity Zone (RAZ): winery and cellar door use typically requires permit",
+      "Heritage overlay, bushfire management overlay, or environmental significance overlay may add requirements",
+      "Building permit required for all new structures under the Building Act 1993",
+      "Wastewater/effluent system: EPA and council input required for land application systems",
+      "Application to local council — processing time varies; pre-application meetings recommended",
+    ],
+    source: "Planning and Environment Act 1987 (Vic)",
+    sourceUrl: "https://www.planning.vic.gov.au",
+  },
+  {
+    id: "vic-water",
+    title: "Water Licensing",
+    agency: "Department of Energy, Environment and Climate Action (DEECA)",
+    tags: ["water", "licence", "extraction", "irrigation"],
+    summary:
+      "Victorian wineries that extract water from a waterway, bore, or other water resource require a water licence under the Water Act 1989. Wastewater irrigation is also regulated and must comply with EPA guidelines.",
+    keyPoints: [
+      "Water licence required for extraction from waterways, bores, or prescribed water resources",
+      "Annual water allocation: set by the relevant Catchment Management Authority (CMA)",
+      "Wastewater irrigation: must comply with EPA guidelines and not cause waterway contamination",
+      "Metering: water meters required on all licensed extraction points",
+      "Water trading: allocations can be traded within the same water system",
+      "Groundwater: separate licence required for bore extraction in prescribed areas",
+    ],
+    source: "Water Act 1989 (Vic)",
+    sourceUrl: "https://www.water.vic.gov.au",
+  },
+  {
+    id: "vic-food",
+    title: "Food Act Registration",
+    agency: "Local Council / Department of Health Vic",
+    tags: ["food safety", "food act", "registration", "cellar door"],
+    summary:
+      "Victorian wineries with cellar door food service, tasting rooms serving food, or on-site restaurants must register as a food business under the Food Act 1984 (Vic) with their local council.",
+    keyPoints: [
+      "Food business registration required if food is prepared or served on premises",
+      "Tasting room serving cheese, charcuterie, or any food = food business registration required",
+      "Annual registration fee: approx. $100–$500 depending on risk category and council",
+      "Food Safety Supervisor required for Class 1 and Class 2 food businesses",
+      "Council food safety inspection: typically annual",
+      "Food handler training: all staff handling food must have basic food safety training",
+    ],
+    source: "Food Act 1984 (Vic)",
+    sourceUrl: "https://www.health.vic.gov.au/food-safety",
+  },
+];
+
+const NSW_SECTIONS = [
+  {
+    id: "nsw-liquor",
+    title: "Liquor Licensing — Producer/Wholesaler Licence",
+    agency: "Liquor & Gaming NSW",
+    tags: ["liquor licence", "cellar door", "producer", "L&G NSW"],
+    summary:
+      "NSW wineries require a Producer/Wholesaler Licence under the Liquor Act 2007 to manufacture and sell wine. The licence permits cellar door retail sales, wholesale to other licensees, and limited on-site consumption. Applications are lodged with Liquor & Gaming NSW.",
+    keyPoints: [
+      "Producer/Wholesaler Licence required before manufacturing or selling wine commercially",
+      "Cellar door retail sales permitted under Producer/Wholesaler Licence",
+      "Wholesale to other licensees permitted without additional licence",
+      "Application lodged online via Liquor & Gaming NSW — processing time typically 4–8 weeks",
+      "Annual licence fee: tiered by turnover (approx. $500–$3,000+)",
+      "Responsible Service of Alcohol (RSA) training mandatory for all staff serving alcohol",
+      "Community impact statement may be required for new applications in sensitive areas",
+      "Minors: strict rules on presence of minors in licensed areas — check L&G NSW guidance",
+    ],
+    source: "Liquor Act 2007 (NSW)",
+    sourceUrl: "https://www.liquorandgaming.nsw.gov.au/licences-and-permits",
+  },
+  {
+    id: "nsw-epa",
+    title: "EPA Environment Protection Licence (EPL)",
+    agency: "NSW EPA",
+    tags: ["EPA", "EPL", "wastewater", "scheduled activity", "POEO"],
+    summary:
+      "NSW wineries that are 'scheduled premises' under the Protection of the Environment Operations Act 1997 (POEO Act) require an Environment Protection Licence (EPL). The threshold for beverage manufacturing is typically a production capacity of 750 kL/year or more. Smaller wineries are not scheduled but must still comply with the general environmental duty.",
+    keyPoints: [
+      "EPL required for wineries at or above the scheduled activity threshold (beverage manufacturing ≥ 750 kL/year production capacity)",
+      "Boutique wineries below the threshold are not scheduled but must comply with the general environmental duty",
+      "Wastewater must be managed via approved land application, evaporation, or treatment — no discharge to waterways",
+      "General environmental duty: must not pollute land, water, or air without lawful authority",
+      "Odour and noise must not cause unreasonable interference to neighbours",
+      "Chemical bunding: all chemical storage must be bunded to 110% of largest container",
+      "Pollution incidents must be reported to the NSW EPA immediately",
+      "Annual return required for EPL holders",
+    ],
+    source: "Protection of the Environment Operations Act 1997 (NSW)",
+    sourceUrl: "https://www.epa.nsw.gov.au/licensing-and-regulation/licensing",
+  },
+  {
+    id: "nsw-safework",
+    title: "SafeWork NSW — WHS Obligations",
+    agency: "SafeWork NSW",
+    tags: ["WHS", "safety", "CO2", "confined space", "SafeWork"],
+    summary:
+      "SafeWork NSW administers the Work Health and Safety Act 2011 (NSW). NSW wineries have specific obligations around CO₂ confined space entry, chemical handling, seasonal harvest worker safety, and plant registration.",
+    keyPoints: [
+      "CO₂ confined space: written confined space entry permit required, atmospheric testing, standby person",
+      "SO₂ handling: SDS required, PPE mandatory, exposure standard 0.5 ppm TWA",
+      "Forklift operators: must hold a High Risk Work Licence (HRWL) — no exceptions",
+      "Seasonal workers: induction required before commencing work — language barriers must be addressed",
+      "Electrical: all portable electrical equipment must be tested and tagged",
+      "Chemical register: SDS required for all hazardous chemicals on site",
+      "Incident reporting: serious injuries and dangerous incidents must be notified to SafeWork NSW immediately",
+      "Plant registration: pressure vessels and certain plant items require registration with SafeWork NSW",
+    ],
+    source: "Work Health and Safety Act 2011 (NSW)",
+    sourceUrl: "https://www.safework.nsw.gov.au",
+  },
+  {
+    id: "nsw-planning",
+    title: "Planning & Development Approval",
+    agency: "Local Council / NSW Department of Planning",
+    tags: ["planning", "development", "DA", "zoning", "council"],
+    summary:
+      "Establishing or expanding a winery in NSW requires development consent (DA) under the Environmental Planning and Assessment Act 1979. Requirements vary by zone and local environmental plan (LEP) — rural and primary production zones generally permit winery use, but cellar doors and tourist facilities often require consent.",
+    keyPoints: [
+      "Development consent (DA) required for new winery buildings, processing facilities, and cellar doors in most zones",
+      "Rural zones (RU1, RU2): winery use generally permitted; cellar door may require consent depending on scale",
+      "State Environmental Planning Policy (SEPP) Primary Production and Rural Development may apply",
+      "Heritage conservation area or item: additional requirements if property is heritage listed",
+      "Building approval required for all new structures under the Building Code of Australia",
+      "Wastewater/effluent system: EPA and council input required for land application systems",
+      "Application to local council — pre-DA meeting recommended for significant proposals",
+    ],
+    source: "Environmental Planning and Assessment Act 1979 (NSW)",
+    sourceUrl: "https://www.planning.nsw.gov.au",
+  },
+  {
+    id: "nsw-water",
+    title: "Water Licensing — NRAR",
+    agency: "Natural Resources Access Regulator (NRAR)",
+    tags: ["water", "licence", "NRAR", "extraction", "irrigation"],
+    summary:
+      "NSW wineries that extract water from a waterway, bore, or other regulated water source require a water access licence under the Water Management Act 2000. The Natural Resources Access Regulator (NRAR) enforces water licensing compliance.",
+    keyPoints: [
+      "Water access licence required for extraction from regulated rivers, bores, or prescribed water sources",
+      "Annual water allocation: set by the relevant Water Sharing Plan for the water source",
+      "Wastewater irrigation: must comply with EPA guidelines and not cause waterway contamination",
+      "Metering: water meters required on all licensed extraction points",
+      "Water trading: access licences and allocations can be traded within the same water source",
+      "Groundwater: separate licence required for bore extraction in regulated areas",
+      "Non-compliance: NRAR has strong enforcement powers including stop-work orders and significant penalties",
+    ],
+    source: "Water Management Act 2000 (NSW)",
+    sourceUrl: "https://www.nrar.nsw.gov.au",
+  },
+  {
+    id: "nsw-food",
+    title: "Food Business Notification — NSW Food Authority",
+    agency: "NSW Food Authority / Local Council",
+    tags: ["food safety", "food act", "notification", "cellar door"],
+    summary:
+      "NSW wineries with cellar door food service, tasting rooms serving food, or on-site restaurants must notify the NSW Food Authority and/or register as a food business with their local council under the Food Act 2003 (NSW).",
+    keyPoints: [
+      "Food business notification required if food is prepared or served on premises",
+      "Tasting room serving cheese, charcuterie, or any food = food business notification required",
+      "Winery with restaurant or significant food service: registration with local council required",
+      "Annual registration fee: approx. $100–$500 depending on risk category and council",
+      "Food Safety Supervisor required for businesses handling potentially hazardous food",
+      "Council food safety inspection: typically annual",
+      "Food handler training: all staff handling food must have basic food safety training",
+    ],
+    source: "Food Act 2003 (NSW)",
+    sourceUrl: "https://www.foodauthority.nsw.gov.au",
+  },
+];
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 function RegCard({
@@ -429,11 +667,25 @@ function RegCard({
   );
 }
 
+type ResourceTab = "federal" | "sa" | "vic" | "nsw";
+
+const TAB_LABELS: Record<ResourceTab, string> = {
+  federal: "Federal",
+  sa: "South Australia",
+  vic: "Victoria",
+  nsw: "New South Wales",
+};
+
 export default function Resources() {
-  const [activeTab, setActiveTab] = useState<"federal" | "sa">("federal");
+  const [activeTab, setActiveTab] = useState<ResourceTab>("federal");
   const [search, setSearch] = useState("");
 
-  const sections = activeTab === "federal" ? FEDERAL_SECTIONS : SA_SECTIONS;
+  const sections =
+    activeTab === "federal" ? FEDERAL_SECTIONS
+    : activeTab === "sa" ? SA_SECTIONS
+    : activeTab === "vic" ? VIC_SECTIONS
+    : NSW_SECTIONS;
+
   const filtered = search.trim()
     ? sections.filter(
         (s) =>
@@ -524,8 +776,7 @@ export default function Resources() {
               maxWidth: "560px",
             }}
           >
-            A structured reference covering federal and South Australian regulatory requirements for
-            boutique wine producers. Use the Compliance Agent to ask specific questions.
+            A structured reference covering federal and state regulatory requirements for boutique wine producers across South Australia, Victoria, and New South Wales. Use the Compliance Agent to ask specific questions.
           </p>
         </div>
       </section>
@@ -536,8 +787,8 @@ export default function Resources() {
           {/* Tab + Search row */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
             {/* Tabs */}
-            <div className="flex gap-2">
-              {(["federal", "sa"] as const).map((tab) => (
+            <div className="flex flex-wrap gap-2">
+              {(["federal", "sa", "vic", "nsw"] as ResourceTab[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -560,7 +811,7 @@ export default function Resources() {
                     transition: "all 0.15s ease",
                   }}
                 >
-                  {tab === "federal" ? "Federal" : "South Australia"}
+                  {TAB_LABELS[tab]}
                 </button>
               ))}
             </div>

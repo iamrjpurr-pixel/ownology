@@ -53,3 +53,5 @@
 - [x] Research and save NSW winery regulatory requirements to ~/rules-and-regs/states/NSW/
 - [x] Update Compliance.tsx knowledge base with VIC and NSW regulatory content
 - [x] Add 'Ask a compliance question' CTA button to the homepage hero section
+- [x] Add state selector filter to Compliance page (Federal / SA / VIC / NSW / All)
+- [x] Update /resources page to include VIC and NSW regulatory documents

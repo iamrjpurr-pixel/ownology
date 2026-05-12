@@ -329,32 +329,52 @@ Contact: NSW Food Authority — 1300 552 406 — foodauthority.nsw.gov.au
 `;
 
 // ─── Sample questions ─────────────────────────────────────────────────────────
-const SAMPLE_QUESTIONS = [
-  "Do I need an EPA licence for my 200-tonne crush winery in SA?",
-  "What are the LIP record-keeping requirements for vintage labelling?",
-  "What is the maximum SO₂ level permitted in dry red wine?",
-  "What licences do I need to open a cellar door in South Australia?",
-  "How does the Wine Producer Rebate work and what is the cap?",
-  "What are my WHS obligations for confined spaces in the winery?",
-  "Can I add water to my must during fermentation?",
-  "What environmental obligations apply to winery wastewater?",
-  "Do I need an EPA licence for my 250-tonne crush winery in Victoria?",
-  "What liquor licence do I need to open a cellar door in Victoria?",
-  "What is the Producer/Wholesaler licence in NSW and how do I apply?",
-  "What are the WHS obligations for winery CO₂ management in NSW?",
+type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW";
+
+const SAMPLE_QUESTIONS: { q: string; state: StateFilter }[] = [
+  { q: "What are the LIP record-keeping requirements for vintage labelling?", state: "Federal" },
+  { q: "What is the maximum SO₂ level permitted in dry red wine?", state: "Federal" },
+  { q: "How does the Wine Producer Rebate work and what is the cap?", state: "Federal" },
+  { q: "Can I add water to my must during fermentation?", state: "Federal" },
+  { q: "What are my WHS obligations for confined spaces in the winery?", state: "Federal" },
+  { q: "What environmental obligations apply to winery wastewater?", state: "Federal" },
+  { q: "Do I need an EPA licence for my 200-tonne crush winery in SA?", state: "SA" },
+  { q: "What licences do I need to open a cellar door in South Australia?", state: "SA" },
+  { q: "What is the SA EPA threshold for a scheduled winery premises?", state: "SA" },
+  { q: "Do I need an EPA licence for my 250-tonne crush winery in Victoria?", state: "VIC" },
+  { q: "What liquor licence do I need to open a cellar door in Victoria?", state: "VIC" },
+  { q: "What is the D09 beverage manufacturing licence exemption in Victoria?", state: "VIC" },
+  { q: "What is the Producer/Wholesaler licence in NSW and how do I apply?", state: "NSW" },
+  { q: "What are the WHS obligations for winery CO₂ management in NSW?", state: "NSW" },
+  { q: "Does a boutique NSW winery need an Environment Protection Licence?", state: "NSW" },
 ];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Message = { role: "user" | "assistant"; content: string };
 
 // ─── Main component ───────────────────────────────────────────────────────────
+const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW"];
+
+const STATE_LABELS: Record<StateFilter, string> = {
+  All: "All Jurisdictions",
+  Federal: "Federal",
+  SA: "South Australia",
+  VIC: "Victoria",
+  NSW: "New South Wales",
+};
+
 export default function Compliance() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stateFilter, setStateFilter] = useState<StateFilter>("All");
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const filteredQuestions = stateFilter === "All"
+    ? SAMPLE_QUESTIONS
+    : SAMPLE_QUESTIONS.filter(item => item.state === stateFilter || item.state === "Federal");
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -375,7 +395,15 @@ export default function Compliance() {
     setLoading(true);
 
     try {
-      const systemPrompt = `You are a regulatory compliance assistant specialising in Australian winery regulations. You have access to a comprehensive knowledge base covering federal regulations (Wine Australia, FSANZ, ATO/WET, biosecurity, WHS) and South Australia state regulations (liquor licensing, EPA, planning, SafeWork SA, water licensing).
+      const jurisdictionContext = stateFilter === "All"
+        ? "all Australian jurisdictions covered in the knowledge base (Federal, South Australia, Victoria, New South Wales)"
+        : stateFilter === "Federal"
+          ? "federal Australian regulations only"
+          : `federal Australian regulations and ${STATE_LABELS[stateFilter]} state regulations`;
+
+      const systemPrompt = `You are a regulatory compliance assistant specialising in Australian winery regulations. You have access to a comprehensive knowledge base covering federal regulations (Wine Australia, FSANZ, ATO/WET, biosecurity, WHS) and state regulations for South Australia, Victoria, and New South Wales.
+
+The user has selected a jurisdiction filter: ${jurisdictionContext}. Prioritise answering from that jurisdiction where relevant, but you may reference other jurisdictions if helpful for comparison or if the question is federal in nature.
 
 Answer questions accurately and concisely based ONLY on the knowledge base provided. If a question falls outside the knowledge base, say so clearly and suggest the relevant agency to contact. Always cite the relevant legislation or regulation name when giving an answer. End every response with a brief disclaimer that the user should verify current requirements with the relevant agency or a qualified compliance professional.
 
@@ -478,7 +506,7 @@ ${KNOWLEDGE_BASE}`;
               maxWidth: "560px",
             }}
           >
-            Ask any question about Australian winery regulations — federal (Wine Australia, FSANZ, WET, WHS, biosecurity) or South Australia state (liquor licensing, EPA, planning, SafeWork SA, water). Answers are grounded in our local regulatory knowledge base.
+            Ask any question about Australian winery regulations — federal (Wine Australia, FSANZ, WET, WHS, biosecurity) or state-specific rules for South Australia, Victoria, and New South Wales. Use the jurisdiction filter below to focus on your state.
           </p>
           <div
             className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-sm text-xs"
@@ -493,7 +521,41 @@ ${KNOWLEDGE_BASE}`;
               <circle cx="6" cy="6" r="5" stroke="var(--ow-amber)" strokeWidth="1.2" />
               <path d="M6 4v3M6 8.5v.5" stroke="var(--ow-amber)" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
-            Knowledge base: Federal + South Australia | Updated May 2026
+            Knowledge base: Federal · SA · VIC · NSW | Updated May 2026
+          </div>
+        </div>
+
+        {/* State selector */}
+        <div className="mb-6">
+          <p
+            className="mb-2 text-xs tracking-wider uppercase"
+            style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", letterSpacing: "0.1em" }}
+          >
+            Jurisdiction
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {STATE_FILTERS.map(s => (
+              <button
+                key={s}
+                onClick={() => setStateFilter(s)}
+                className="px-3 py-1.5 rounded-sm text-xs transition-all"
+                style={{
+                  fontFamily: "'Lato',sans-serif",
+                  letterSpacing: "0.06em",
+                  fontWeight: stateFilter === s ? 600 : 300,
+                  background: stateFilter === s
+                    ? "color-mix(in oklch, var(--ow-amber) 15%, transparent)"
+                    : "var(--ow-bg-card)",
+                  border: stateFilter === s
+                    ? "1px solid var(--ow-amber)"
+                    : "1px solid var(--ow-border)",
+                  color: stateFilter === s ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                  cursor: "pointer",
+                }}
+              >
+                {STATE_LABELS[s]}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -507,10 +569,10 @@ ${KNOWLEDGE_BASE}`;
               Example questions
             </p>
             <div className="grid sm:grid-cols-2 gap-2">
-              {SAMPLE_QUESTIONS.map(q => (
+              {filteredQuestions.map(item => (
                 <button
-                  key={q}
-                  onClick={() => ask(q)}
+                  key={item.q}
+                  onClick={() => ask(item.q)}
                   className="text-left px-4 py-3 rounded-sm transition-all text-sm"
                   style={{
                     background: "var(--ow-bg-card)",
@@ -530,7 +592,21 @@ ${KNOWLEDGE_BASE}`;
                     (e.currentTarget as HTMLButtonElement).style.color = "var(--ow-text-mid)";
                   }}
                 >
-                  {q}
+                  <span
+                    className="inline-block mr-2 px-1.5 py-0.5 rounded-sm text-xs"
+                    style={{
+                      background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+                      border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
+                      color: "var(--ow-amber)",
+                      fontFamily: "'Fira Code',monospace",
+                      fontSize: "0.65rem",
+                      letterSpacing: "0.04em",
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    {item.state}
+                  </span>
+                  {item.q}
                 </button>
               ))}
             </div>
