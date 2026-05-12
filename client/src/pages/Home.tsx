@@ -346,6 +346,12 @@ function Hero() {
             <div className="flex flex-wrap gap-4 mt-10 fade-up fade-up-delay-3">
               <a href="#pricing" className="btn-amber">Start 14-Day Free Trial</a>
               <a href="#how-it-works" className="btn-ghost">See How It Works</a>
+              <Link href="/compliance" className="btn-ghost flex items-center gap-2" style={{borderColor:"color-mix(in oklch, var(--ow-amber) 30%, transparent)", color:"var(--ow-text-mid)"}}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M7 1C3.69 1 1 3.69 1 7s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6Zm.5 9h-1V6.5h1V10Zm0-4.5h-1V4h1v1.5Z" fill="currentColor"/>
+                </svg>
+                Ask a Compliance Question
+              </Link>
             </div>
             {/* Trust bar */}
             <div className="mt-12 flex items-center gap-6 fade-up fade-up-delay-4">

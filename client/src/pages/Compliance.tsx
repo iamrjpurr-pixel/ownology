@@ -1,6 +1,6 @@
 /**
  * OWNOLOGY — Compliance AI Search Agent
- * Local knowledge base: Australian federal + SA winery regulations
+ * Local knowledge base: Australian federal + SA + VIC + NSW winery regulations
  * LLM: Manus Forge frontend API (VITE_FRONTEND_FORGE_API_KEY)
  */
 
@@ -12,6 +12,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 // ─── Knowledge base (embedded) ────────────────────────────────────────────────
 const KNOWLEDGE_BASE = `
 # Australian Winery Regulatory Knowledge Base
+Covers: Federal, South Australia (SA), Victoria (VIC), New South Wales (NSW)
 
 ## FEDERAL REGULATIONS
 
@@ -154,6 +155,156 @@ Key obligations:
 
 ---
 
+## VICTORIA (VIC) REGULATIONS
+
+### Liquor Licensing — Liquor Control Victoria (Liquor Control Reform Act 1998 Vic)
+Administered by Liquor Control Victoria (LCV), Department of Justice and Community Safety.
+
+Licence type: Producer's Liquor Licence
+- Authorises selling wine (and other alcohol you produce) retail or wholesale.
+- Cellar door sales and on-premises consumption permitted.
+- Wholesale to other licensees anywhere, anytime.
+- Home delivery (phone, email, online or app orders).
+- Selling at promotional events (farmers' markets, festivals) between 7 am and 8 pm — records required.
+- A second retail location in the same wine region is permitted.
+
+Trading hours (retail/cellar door):
+- Monday to Saturday: 7 am to 11 pm (except Good Friday and Anzac Day)
+- Sunday, Good Friday and Anzac Day: 10 am to 11 pm
+
+Application fees (non-refundable):
+- Floor space 0–150 m²: $334
+- Floor space >150 m²: $504.30
+- Annual renewal fees apply separately.
+
+Processing time: Allow at least 11 weeks. Applications referred to Victoria Police and local council; both may object.
+
+RSA: All staff selling, serving or supplying alcohol must hold a current RSA certificate.
+
+Contact: Liquor Control Victoria — vic.gov.au/apply-producers-liquor-licence
+
+### Environmental Protection — EPA Victoria (Environment Protection Act 2017 Vic)
+Administered by EPA Victoria.
+
+D09 — Beverage Manufacturing Licence:
+- Beverage manufacturing is a prescribed activity under Schedule 1 of the Environment Protection Regulations 2021.
+- Both a development licence and an operating licence are normally required.
+
+Boutique winery exemption from D09 operating licence:
+- A winery is EXEMPT from the D09 operating licence if it meets BOTH conditions:
+  1. Processes less than 300 tonnes of grapes per year, AND
+  2. Discharges or deposits all waste solely to land (no discharge to waterways or sewer).
+- Even if exempt from the operating licence, a D09 development licence may still be required before constructing or significantly modifying winery infrastructure.
+- An A14 — Reclaimed Wastewater Supply or Use permit may be required if reclaimed wastewater is reused on-farm.
+
+If you exceed 300 tonnes/year or discharge to water/sewer: both a development licence and an operating licence are required from EPA Victoria.
+
+Wastewater management:
+- Winery wastewater (marc, lees, wash water, grape juice) has high BOD and must be managed carefully.
+- Land application is the most common approach for small wineries.
+
+Contact: EPA Victoria — 1300 EPA VIC (1300 372 842) — epa.vic.gov.au
+
+### Workplace Health and Safety — WorkSafe Victoria (OHS Act 2004 Vic)
+- Provide and maintain a safe working environment.
+- Key winery hazards: CO₂ accumulation in fermentation areas (ventilation and gas monitoring required), confined space entry (tanks, vats — permit-to-work system required), manual handling, electrical safety in wet environments, chemical handling (SO₂, caustic agents).
+- Duty of care extends to workers, contractors, visitors, and cellar door customers.
+Contact: WorkSafe Victoria — 1800 136 089 — worksafe.vic.gov.au
+
+### Planning and Land Use — Local Council (Planning and Environment Act 1987 Vic)
+- Planning permit required from local council for: establishing a new winery, constructing or expanding cellar door facilities, operating a cellar door restaurant or function venue.
+- Most vineyard land is in the Farming Zone (FZ); a winery is generally a use requiring a permit.
+- Cellar door sales and hospitality uses typically require a separate permit with conditions on hours, patron numbers, and signage.
+Contact: Local council planning department — planning.vic.gov.au
+
+### Water Licensing — Rural Water Corporation (Water Act 1989 Vic)
+- A water take-and-use licence is required to extract water from a waterway, bore or aquifer.
+- Issued by the relevant rural water corporation (Southern Rural Water, Goulburn-Murray Water) or local catchment management authority.
+- Water use must be metered and reported annually.
+Contact: Southern Rural Water — srw.com.au | Goulburn-Murray Water — gmwater.com.au
+
+### Food Safety — Local Council (Food Act 1984 Vic)
+- Wineries that sell wine for consumption are classified as food businesses under the Food Act 1984.
+- Registration with the local council is required.
+- Compliance with FSANZ Food Standards Code (Standard 4.5) is mandatory.
+
+---
+
+## NEW SOUTH WALES (NSW) REGULATIONS
+
+### Liquor Licensing — Liquor & Gaming NSW (Liquor Act 2007 NSW)
+Administered by Liquor & Gaming NSW, Department of Creative Industries, Tourism, Hospitality and Sport.
+
+Licence type: Producer/Wholesaler Licence
+- Authorises selling wine (and other alcohol you produce) to both retail and wholesale customers.
+- Cellar door tastings and sales permitted.
+- Home delivery permitted.
+- Selling at industry liquor shows, producers' markets and fairs permitted.
+
+Key conditions:
+- All staff selling, serving or supplying alcohol must hold a current RSA certificate.
+- Public notice must be displayed after lodging application; neighbours must be notified.
+- Application published on Liquor & Gaming NSW Noticeboard for 30 days; objections may be lodged.
+
+Trading hours (standard):
+- Monday to Saturday: 5 am to midnight
+- Sunday: 10 am to 10 pm
+- Extended trading hours may be applied for.
+
+Application process: Apply online via Liquor & Gaming NSW portal. Notify neighbours. Application on Noticeboard for 30 days.
+
+Contact: Liquor & Gaming NSW — Phone: 1300 024 720 (Mon–Fri 9am–4pm)
+Email: contact.us@liquorandgaming.nsw.gov.au — nsw.gov.au/liquorandgaming
+
+### Environmental Protection — NSW EPA (Protection of the Environment Operations Act 1997 NSW — POEO Act)
+Administered by NSW EPA.
+
+Environment Protection Licence (EPL):
+- Beverage manufacturing (including wineries) is a scheduled activity under Schedule 1 of the POEO Act.
+- An EPL is generally required for operations exceeding the production thresholds in Schedule 1.
+- Small boutique wineries producing below these thresholds typically do not require an EPL, but must comply with general environmental duties.
+
+General environmental duties (all wineries, regardless of size):
+- Must not pollute land, water or air.
+- Must not discharge winery wastewater (marc, lees, wash water) to waterways, stormwater drains or public sewers without authorisation.
+- Winery wastewater must be managed through land application, evaporation ponds, or licensed trade waste agreements with the local water utility.
+- Must immediately notify the EPA and local authority of any pollution incident that causes or threatens material harm to the environment (POEO Act, Part 5.7).
+
+Wastewater management:
+- Land application of diluted winery wastewater is the most common approach for boutique wineries.
+- A trade waste agreement with the local water utility (e.g., Hunter Water, Sydney Water, Essential Water) is required if discharging to sewer.
+- Wastewater must be characterised (BOD, pH, sodium, chloride) before land application.
+
+Contact: NSW EPA — 131 555 — epa.nsw.gov.au
+
+### Workplace Health and Safety — SafeWork NSW (Work Health and Safety Act 2011 NSW)
+- Provide and maintain a safe working environment, so far as is reasonably practicable (SFARP).
+- Key winery hazards: CO₂ accumulation in fermentation areas (ventilation and atmospheric monitoring required), confined space entry (tanks, vats, pits — confined space register, entry permit, atmospheric testing, rescue procedures required), manual handling, electrical safety in wet environments, chemical handling (SO₂, caustic cleaning agents, tartaric acid), working at heights, forklift and mobile plant (traffic management plans required for harvest).
+- Reference: Guide to Managing Risks in Wineries (SafeWork NSW, 2016).
+Contact: SafeWork NSW — 13 10 50 — safework.nsw.gov.au
+
+### Planning and Land Use — Local Council (Environmental Planning and Assessment Act 1979 NSW)
+- A development application (DA) to the relevant local council is required for: establishing a new winery, constructing or expanding cellar door facilities, operating a cellar door restaurant or function venue.
+- Most vineyard land is zoned RU1 (Primary Production) or RU2 (Rural Landscape). A winery is generally a rural industry requiring development consent.
+- Cellar door premises are defined separately in the Standard Instrument LEP and typically require consent.
+- SEPP (Primary Production) 2021 may apply to winery development on rural land.
+Contact: Local council planning department — planningportal.nsw.gov.au
+
+### Water Licensing — NRAR / WaterNSW (Water Management Act 2000 NSW)
+- A water access licence is required to extract water from a waterway, bore or aquifer.
+- Issued by the Natural Resources Access Regulator (NRAR) and managed through WaterNSW.
+- Water use must be metered and reported annually.
+Contact: NRAR — 1800 633 362 — nrar.nsw.gov.au | WaterNSW — waternsw.com.au
+
+### Food Safety — NSW Food Authority / Local Council (Food Act 2003 NSW)
+- Wineries that sell wine for consumption are classified as food businesses under the Food Act 2003.
+- Most wineries are required to notify their local council of their food business activities.
+- Wineries manufacturing wine for wholesale supply may need to notify the NSW Food Authority directly.
+- Compliance with FSANZ Food Standards Code (Standard 4.5) is mandatory.
+Contact: NSW Food Authority — 1300 552 406 — foodauthority.nsw.gov.au
+
+---
+
 ## KEY CONTACTS
 
 | Agency | Role | Website |
@@ -162,11 +313,19 @@ Key obligations:
 | ATO | WET, WPR | ato.gov.au |
 | FSANZ | Food standards | foodstandards.gov.au |
 | DAFF | Biosecurity, imports | agriculture.gov.au |
-| CBS SA | Liquor licensing | cbs.sa.gov.au |
-| EPA SA | Environmental protection | epa.sa.gov.au |
-| SafeWork SA | WHS | safework.sa.gov.au |
+| CBS SA | Liquor licensing (SA) | cbs.sa.gov.au |
+| EPA SA | Environmental protection (SA) | epa.sa.gov.au |
+| SafeWork SA | WHS (SA) | safework.sa.gov.au |
+| Landscape Boards SA | Water licensing (SA) | landscape.sa.gov.au |
+| Liquor Control Victoria | Liquor licensing (VIC) | vic.gov.au |
+| EPA Victoria | Environmental protection (VIC) | epa.vic.gov.au |
+| WorkSafe Victoria | WHS (VIC) | worksafe.vic.gov.au |
+| Liquor & Gaming NSW | Liquor licensing (NSW) | nsw.gov.au/liquorandgaming |
+| NSW EPA | Environmental protection (NSW) | epa.nsw.gov.au |
+| SafeWork NSW | WHS (NSW) | safework.nsw.gov.au |
+| NSW Food Authority | Food safety (NSW) | foodauthority.nsw.gov.au |
+| NRAR / WaterNSW | Water licensing (NSW) | nrar.nsw.gov.au |
 | Local council | Food business registration, development approval | (varies by council) |
-| Landscape Boards SA | Water licensing | landscape.sa.gov.au |
 `;
 
 // ─── Sample questions ─────────────────────────────────────────────────────────
@@ -179,6 +338,10 @@ const SAMPLE_QUESTIONS = [
   "What are my WHS obligations for confined spaces in the winery?",
   "Can I add water to my must during fermentation?",
   "What environmental obligations apply to winery wastewater?",
+  "Do I need an EPA licence for my 250-tonne crush winery in Victoria?",
+  "What liquor licence do I need to open a cellar door in Victoria?",
+  "What is the Producer/Wholesaler licence in NSW and how do I apply?",
+  "What are the WHS obligations for winery CO₂ management in NSW?",
 ];
 
 // ─── Types ────────────────────────────────────────────────────────────────────

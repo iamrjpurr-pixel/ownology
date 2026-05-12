@@ -49,3 +49,7 @@
 - [x] Build /resources page displaying federal and SA regulations, wire route in App.tsx and add to nav/footer
 - [x] Build /compliance AI search agent page with tRPC procedure querying local regulatory docs via LLM, streaming response, source citations
 - [x] Fix crowded homepage nav — consolidate secondary links (Our Story, FAQ, Blog, Pricing) into a More dropdown
+- [x] Research and save VIC winery regulatory requirements to ~/rules-and-regs/states/VIC/
+- [x] Research and save NSW winery regulatory requirements to ~/rules-and-regs/states/NSW/
+- [x] Update Compliance.tsx knowledge base with VIC and NSW regulatory content
+- [x] Add 'Ask a compliance question' CTA button to the homepage hero section
