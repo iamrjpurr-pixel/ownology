@@ -35,3 +35,8 @@
 - [x] Name Geraldine explicitly in FounderStory copy with her role (Chemistry & Science Lead)
 - [x] Add 'See Demo' nav link to homepage nav (desktop + mobile drawer)
 - [x] Name Rich as the narrator in FounderStory copy to complete the two-founder credibility picture
+- [x] Build /blog index page with article card for the thought leadership article
+- [x] Build /blog/weight-of-harvest full article page with SEO meta tags
+- [x] Wire /blog and /blog/:slug routes in App.tsx
+- [x] Add Blog link to homepage nav and footer
+- [x] Add dynamic /blog/:slug route that renders the correct article or 404 for unknown slugs

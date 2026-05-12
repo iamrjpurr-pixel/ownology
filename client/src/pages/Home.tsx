@@ -62,6 +62,7 @@ const NAV_LINKS: NavItem[] = [
   { label: "Our Story",     href: "#our-story" },
   { label: "Pricing",       href: "#pricing" },
   { label: "FAQ",           href: "#faq" },
+  { label: "Blog",          href: "/blog", external: false },
 ];
 
 function Nav() {
@@ -948,6 +949,9 @@ function Footer() {
           <Link href="/for-vintrace-users" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
             onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
             onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>For Vintrace Users</Link>
+          <Link href="/blog" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
+            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
+            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Blog</Link>
         </div>
       </div>
     </footer>

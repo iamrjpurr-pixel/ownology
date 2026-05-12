@@ -8,6 +8,8 @@ import Home from "./pages/Home";
 import WhyOwnology from "./pages/WhyOwnology";
 import ForInnoVintUsers from "./pages/ForInnoVintUsers";
 import ForVintraceUsers from "./pages/ForVintraceUsers";
+import Blog from "./pages/Blog";
+import BlogArticle from "./pages/BlogArticle";
 
 
 function Router() {
@@ -17,6 +19,8 @@ function Router() {
       <Route path={"/why-ownology"} component={WhyOwnology} />
       <Route path={"/for-innovint-users"} component={ForInnoVintUsers} />
       <Route path={"/for-vintrace-users"} component={ForVintraceUsers} />
+      <Route path={"/blog"} component={Blog} />
+      <Route path={"/blog/:slug"} component={BlogArticle} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
