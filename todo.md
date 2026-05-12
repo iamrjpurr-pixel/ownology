@@ -40,3 +40,4 @@
 - [x] Wire /blog and /blog/:slug routes in App.tsx
 - [x] Add Blog link to homepage nav and footer
 - [x] Add dynamic /blog/:slug route that renders the correct article or 404 for unknown slugs
+- [x] Generate solo portrait of Rich surrounded by winery chemistry equipment and wire into FounderStory section
