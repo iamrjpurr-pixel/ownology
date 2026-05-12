@@ -28,3 +28,6 @@
 - [x] Replace solo founder portrait in FounderStory.tsx with the couple photo (you and Geraldine in barrel cellar)
 - [x] Add small image gallery below founder portrait in FounderStory.tsx (vineyard/cellar photos)
 - [x] Generate AI portrait of Geraldine (young woman, chemistry/science aesthetic, cellar/lab setting) and add to Our Story section
+- [x] Write thought leadership article — winemaker psychology, harvest burnout, cognitive load relief framing
+- [x] Add FAQ entries: 'Will this replace me?' and 'Will AI homogenise wine?' through psychology lens
+- [x] Build 'The Weight of Harvest' homepage section — cognitive load relief, inserted before CTA

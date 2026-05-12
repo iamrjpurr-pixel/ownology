@@ -733,6 +733,168 @@ function Pricing() {
   );
 }
 
+// ─── Weight of Harvest ───────────────────────────────────────────────────────
+function WeightOfHarvest() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setInView(true); obs.disconnect(); } },
+      { threshold: 0.12 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const pillars = [
+    {
+      number: "01",
+      heading: "Cognitive Overload",
+      body: "During harvest, a winemaker makes hundreds of high-stakes decisions in six weeks — often simultaneously, often alone, often at 2am. When working memory is saturated, decision quality degrades. The knowledge is there. The bandwidth is not.",
+    },
+    {
+      number: "02",
+      heading: "The Single Point of Failure",
+      body: "In most boutique wineries, the depth of operational knowledge lives in one person's head. When that person is unavailable, a significant portion of the winery's accumulated intelligence goes with them. This is not a failure of documentation. It is a structural reality of small, craft-focused operations.",
+    },
+    {
+      number: "03",
+      heading: "The Lookup Problem",
+      body: "The question at 2am is not 'what kind of wine do I want to make?' It is 'what is the correct DAP addition for this tank right now?' That is a lookup problem — and lookup problems are precisely what well-designed AI systems solve, freeing the winemaker's judgment for decisions that genuinely require it.",
+    },
+  ];
+
+  return (
+    <section
+      className="relative py-28 overflow-hidden"
+      style={{ background: "var(--ow-bg-raised)" }}
+    >
+      {/* Subtle top rule */}
+      <div
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{
+          background:
+            "linear-gradient(to right, transparent, color-mix(in oklch, var(--ow-amber) 25%, transparent), transparent)",
+        }}
+      />
+
+      <div className="container relative z-10" ref={ref}>
+        {/* Section label + headline */}
+        <div className={`max-w-2xl mb-16 ${inView ? "fade-up" : "opacity-0"}`}>
+          <p
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontWeight: 700,
+              fontSize: "0.7rem",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "var(--ow-amber)",
+              marginBottom: "1.25rem",
+            }}
+          >
+            The Psychology of Harvest
+          </p>
+          <h2
+            style={{
+              fontFamily: "'Fraunces', serif",
+              fontWeight: 700,
+              fontSize: "clamp(1.9rem, 3.5vw, 2.75rem)",
+              lineHeight: 1.1,
+              letterSpacing: "-0.02em",
+              color: "var(--ow-text-hi)",
+            }}
+          >
+            The Weight of Harvest
+          </h2>
+          <p
+            className="mt-5"
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontWeight: 300,
+              fontSize: "1.0625rem",
+              lineHeight: 1.75,
+              color: "var(--ow-text-mid)",
+              maxWidth: "560px",
+            }}
+          >
+            Harvest is a six-week sprint where a winemaker makes hundreds of high-stakes decisions — often alone, often at 2am, often with incomplete information. The fear is not just making the wrong call. It is the fear of being the only person who knows what the right call even looks like.
+          </p>
+        </div>
+
+        {/* Three-column pillar grid */}
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
+          {pillars.map((p, i) => (
+            <div
+              key={p.number}
+              className={inView ? `fade-up fade-up-delay-${i + 1}` : "opacity-0"}
+              style={{
+                borderTop: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+                paddingTop: "1.5rem",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "'Fira Code', monospace",
+                  fontSize: "0.7rem",
+                  letterSpacing: "0.12em",
+                  color: "var(--ow-amber)",
+                  display: "block",
+                  marginBottom: "0.75rem",
+                }}
+              >
+                {p.number}
+              </span>
+              <h3
+                style={{
+                  fontFamily: "'Fraunces', serif",
+                  fontWeight: 600,
+                  fontSize: "1.125rem",
+                  color: "var(--ow-text-hi)",
+                  marginBottom: "0.75rem",
+                  lineHeight: 1.2,
+                }}
+              >
+                {p.heading}
+              </h3>
+              <p
+                style={{
+                  fontFamily: "'Lato', sans-serif",
+                  fontWeight: 300,
+                  fontSize: "0.9375rem",
+                  lineHeight: 1.7,
+                  color: "var(--ow-text-mid)",
+                }}
+              >
+                {p.body}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Pull quote */}
+        <div
+          className={`border-l-2 pl-6 max-w-2xl mx-auto text-center ${inView ? "fade-up fade-up-delay-4" : "opacity-0"}`}
+          style={{ borderColor: "var(--ow-amber)" }}
+        >
+          <blockquote
+            style={{
+              fontFamily: "'Fraunces', serif",
+              fontStyle: "italic",
+              fontSize: "clamp(1.1rem, 2vw, 1.375rem)",
+              lineHeight: 1.5,
+              color: "var(--ow-text-hi)",
+            }}
+          >
+            "Ownology does not replace that person. It makes sure their knowledge is never the single point of failure."
+          </blockquote>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── CTA ──────────────────────────────────────────────────────────────────────
 function CTA() {
   return (
@@ -804,6 +966,7 @@ export default function Home() {
       <Testimonials />
       <FounderStory />
       <Pricing />
+      <WeightOfHarvest />
       <CTA />
       <FAQ />
       <Footer />

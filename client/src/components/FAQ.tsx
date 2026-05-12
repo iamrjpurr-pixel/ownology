@@ -63,6 +63,14 @@ const FAQS = [
     a: "Every answer Ownology provides is grounded in your documents and verified wine science literature — it cannot invent a protocol that does not exist in your vault. Every response includes a source citation so you can verify it instantly. The system is also designed to say 'I don't know' rather than guess. And critically, Ownology never makes a decision — it informs yours. The winemaker always has the final call.",
   },
   {
+    q: "Will Ownology replace me as the winemaker?",
+    a: "No — and this is worth being direct about. The creative judgment, the sensory evaluation, the stylistic vision that defines your wine: none of that is what Ownology does. What it does is reduce the cognitive load of harvest — the pressure of retrieving procedural knowledge at 2am when you are already managing three other problems. The question 'what is the correct DAP addition for this tank right now?' is a lookup problem. Ownology solves lookup problems so that your working memory is free for the decisions that genuinely require a winemaker. You remain the winemaker. Ownology is the knowledgeable apprentice who can find the answer in the binder while you are already moving to the next problem.",
+  },
+  {
+    q: "Will AI make all wines taste the same?",
+    a: "This is a legitimate concern — and it is the right question to ask. The homogenisation risk is real for AI systems that draw on shared, generic knowledge bases. It is not a risk for Ownology, because Ownology is grounded in your documents, not a shared corpus. When it answers a question, it draws on your SOPs, your vintage records, your house style protocols — not a generic winemaking database. In fact, the opposite of homogenisation is more likely: by preserving and making accessible the accumulated decisions of your winery's history, Ownology actively protects your stylistic identity against the most common cause of homogenisation, which is staff turnover and knowledge loss. Your terroir stays yours.",
+  },
+  {
     q: "What does it cost, and is there a free trial?",
     a: "Ownology starts at $99/month for the Cellar tier (up to 3 users, full Knowledge Assistant and Smart Logbook). All plans include a 14-day free trial — no credit card required. If you are a consulting winemaker managing multiple clients, contact us about the Consultant tier, which is purpose-built for your workflow.",
   },
