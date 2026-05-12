@@ -34,3 +34,4 @@
 - [x] Regenerate Geraldine portrait using couple photo as reference so she looks like herself
 - [x] Name Geraldine explicitly in FounderStory copy with her role (Chemistry & Science Lead)
 - [x] Add 'See Demo' nav link to homepage nav (desktop + mobile drawer)
+- [x] Name Rich as the narrator in FounderStory copy to complete the two-founder credibility picture

@@ -269,6 +269,21 @@ export default function FounderStory() {
               "I first walked into a boutique production shed in 2005. I was a collector, not a winemaker — but the winemaker was generous enough to explain everything."
             </blockquote>
 
+            {/* Attribution */}
+            <p
+              style={{
+                fontFamily: "'Lato', sans-serif",
+                fontWeight: 700,
+                fontSize: "0.72rem",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--ow-amber)",
+                marginTop: "-0.25rem",
+              }}
+            >
+              Rich, Co-Founder &amp; CEO
+            </p>
+
             {/* Amber rule */}
             <div style={{ width: "3rem", height: "1px", background: "var(--ow-amber)" }} />
 
@@ -298,7 +313,7 @@ export default function FounderStory() {
                   color: "var(--ow-text-hi)",
                 }}
               >
-                What I kept noticing was how much knowledge lived only in people's heads — and how much of it was at risk of being lost. Ownology is my attempt to change that.
+                What I kept noticing was how much knowledge lived only in people's heads — and how much of it was at risk of being lost. Ownology is Rich and Geraldine's attempt to change that.
               </p>
             </div>
 
