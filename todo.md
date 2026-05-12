@@ -1,37 +1,17 @@
 # Ownology Web — Project TODO
 
-## Completed
-- [x] Dark artisan landing page (Fraunces serif, amber gold, Lato body)
-- [x] Hero section with typewriter AI demo card
-- [x] Pain Points, Features (bento grid), How It Works, Testimonials sections
-- [x] Pricing section (Harvest / Cellar / Estate tiers)
-- [x] Founder Story section with AI-generated portrait of Rich & Gel
-- [x] FAQ section
-- [x] Waitlist capture form (hero, nav, CTA variants)
-- [x] Buttondown API integration (email_address field, tag: ownology-waitlist)
-- [x] Waitlist form loading spinner and animated success state
-- [x] Owner notification on new waitlist signup (notifyOwner)
-- [x] OwnologyLogo component (key icon + wordmark)
-- [x] WaitlistCapture component (3 variants)
-- [x] Mobile-responsive nav with hamburger drawer
-- [x] AI founders portrait (Rich & Gel in wine cellar) in Our Story section
-- [x] For Winemakers landing page (/for-winemakers)
-- [x] Demo request form with loading spinner and success state
-- [x] demo_requests DB table + migration
-- [x] demo.request tRPC procedure (saves to DB + notifies owner)
-- [x] Vitest tests: auth logout (1), waitlist (2), demo request (4) — 7 total passing
-- [x] Email outreach templates document (5 templates + personalisation guide)
-
-## Pending
-- [x] Add Open Graph meta tags (og:title, og:description, og:image) to index.html
-- [x] Manus subdomain provisioned: ownology-kjxa9mra.manus.space (custom ownology.ai domain to be bound once Namecheap DNS is pointed at the site)
-- [x] Add "For Winemakers" link to main site nav (desktop + mobile drawer)
-
-## New Items
-- [x] Add Data Insights showcase section to /for-winemakers page (fermentation metrics, SO2 tracking, YAN analysis, AI insight cards, mini SVG charts)
-
-## Regional Language & Outreach
-- [x] Audit and update Home.tsx — remove/neutralise all regional language (Hunter Valley, Marlborough, Sonoma, Semillon, Verdelho)
-- [x] Audit and update ForWinemakers.tsx — swap region-specific variety names for universal ones (Shiraz, Chardonnay, Pinot Noir, Cab Sav)
-- [x] Audit and update FounderStory.tsx — remove geographic anchors, keep personal story
-- [x] Update email outreach templates to be geographically neutral and universally applicable
+- [x] Initial landing page (Home.tsx) — dark artisan design, Fraunces/Lato/Fira Code
+- [x] OwnologyLogo component
+- [x] FounderStory component
+- [x] FAQ component with accordion
+- [x] ForWinemakers page (/for-winemakers)
+- [x] Waitlist signup with Buttondown integration
+- [x] Demo request form with owner notification
+- [x] notifyOwner wired into waitlist.subscribe
+- [x] Regional language audit — remove Hunter Valley, Marlborough, Sonoma, Semillon, Verdelho references
+- [x] FounderStory geographic neutralisation
+- [x] Add FAQ entries distinguishing Ownology from WineryCopilot-style tools and from InnoVint
+- [x] Write competitive landscape presentation script
+- [x] Build /why-ownology comparison webpage (Ownology vs InnoVint, vs WineryCopilot)
+- [x] Wire /why-ownology into App.tsx routing
+- [x] Add Why Ownology link to home page footer

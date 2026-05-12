@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import FounderStory from "@/components/FounderStory";
 import FAQ from "@/components/FAQ";
-import WaitlistCapture from "@/components/WaitlistCapture";
+import { Link } from "wouter";
 
 // ─── Image URLs ───────────────────────────────────────────────────────────────
 const HERO_IMG    = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-hero-HqkryW7dQ2C9TbhdmJ8Kff.webp";
@@ -90,17 +90,11 @@ function Nav() {
                 onMouseLeave={e=>(e.currentTarget.style.color="oklch(0.65 0.015 75)")}
               >{l}</a>
             ))}
-            <a href="/for-winemakers"
-              className="text-sm font-semibold tracking-wide transition-colors px-3 py-1.5 rounded-sm"
-              style={{color:"oklch(0.11 0.008 60)", background:"oklch(0.72 0.12 75)", fontFamily:"'Lato',sans-serif"}}
-              onMouseEnter={e=>{e.currentTarget.style.background="oklch(0.78 0.14 75)"}}
-              onMouseLeave={e=>{e.currentTarget.style.background="oklch(0.72 0.12 75)"}}
-            >For Winemakers</a>
           </div>
 
-          <div className="hidden md:block">
-            <WaitlistCapture variant="nav" />
-          </div>
+          <a href="#pricing" className="btn-amber text-xs hidden md:inline-flex items-center">
+            Start Free Trial
+          </a>
 
           {/* Hamburger button — mobile only */}
           <button
@@ -185,30 +179,15 @@ function Nav() {
             </a>
           ))}
 
-          {/* For Winemakers link in mobile menu */}
+          {/* CTA in mobile menu */}
           <a
-            href="/for-winemakers"
+            href="#pricing"
             onClick={handleNavClick}
-            className="flex items-center justify-between py-4 transition-colors"
-            style={{
-              fontFamily: "'Lato', sans-serif",
-              fontWeight: 600,
-              fontSize: "1.125rem",
-              color: "oklch(0.72 0.12 75)",
-              borderBottom: "1px solid oklch(1 0 0 / 0.06)",
-              letterSpacing: "0.01em",
-            }}
+            className="btn-amber w-full text-center mt-4"
+            style={{display: "block", textAlign: "center"}}
           >
-            For Winemakers
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M6 4l4 4-4 4" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            Start Free Trial
           </a>
-
-          {/* Waitlist in mobile menu */}
-          <div className="mt-4">
-            <WaitlistCapture variant="hero" />
-          </div>
         </div>
       </div>
     </>
@@ -244,8 +223,9 @@ function Hero() {
               style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"oklch(0.70 0.015 75)", maxWidth:"480px"}}>
               Ownology gives boutique winery teams instant, document-grounded answers to their toughest cellar questions — from a mobile phone, in seconds, during harvest.
             </p>
-            <div className="mt-10 fade-up fade-up-delay-3 max-w-lg">
-              <WaitlistCapture variant="hero" />
+            <div className="flex flex-wrap gap-4 mt-10 fade-up fade-up-delay-3">
+              <a href="#pricing" className="btn-amber">Start 14-Day Free Trial</a>
+              <a href="#how-it-works" className="btn-ghost">See How It Works</a>
             </div>
             {/* Trust bar */}
             <div className="mt-12 flex items-center gap-6 fade-up fade-up-delay-4">
@@ -530,9 +510,9 @@ function HowItWorks() {
 function Testimonials() {
   const { ref, inView } = useInView();
   const quotes = [
-    { q:"I make wine, I don't do data entry. By the time I update the spreadsheet on Friday, I've already forgotten what I observed on Tuesday. Ownology changed that completely.", name:"Owner-Winemaker", region:"Boutique Estate", cases:"6,200 cases" },
-    { q:"During harvest I get asked the same questions every single day. Ownology answers them for me. I can finally focus on the wine.", name:"Head Winemaker", region:"Family Winery", cases:"18,000 cases" },
-    { q:"I work across eight clients. If I had something that could hold my protocols and answer questions on my behalf, I could take on two more clients. This is that thing.", name:"Consulting Winemaker", region:"Multi-Client Practice", cases:"8 clients" },
+    { q:"I make wine, I don't do data entry. By the time I update the spreadsheet on Friday, I've already forgotten what I observed on Tuesday. Ownology changed that completely.", name:"Owner-Winemaker", region:"Marlborough, NZ", cases:"6,200 cases" },
+    { q:"During harvest I get asked the same questions every single day. Ownology answers them for me. I can finally focus on the wine.", name:"Head Winemaker", region:"Sonoma, CA", cases:"18,000 cases" },
+    { q:"I work across eight clients. If I had something that could hold my protocols and answer questions on my behalf, I could take on two more clients. This is that thing.", name:"Consulting Winemaker", region:"Yarra Valley, VIC", cases:"8 clients" },
   ];
   return (
     <section className="py-28">
@@ -625,7 +605,9 @@ function Pricing() {
                   </li>
                 ))}
               </ul>
-              <WaitlistCapture variant="hero" />
+              <button className={t.highlight ? "btn-amber w-full" : "btn-ghost w-full"}>
+                {t.cta}
+              </button>
             </div>
           ))}
         </div>
@@ -639,7 +621,7 @@ function Pricing() {
               Manage multiple winery clients from a single account. $149/month per client with full Cellar features.
             </p>
           </div>
-          <a href="mailto:hello@ownology.ai" className="btn-ghost flex-shrink-0">Get in Touch</a>
+          <button className="btn-ghost flex-shrink-0">Learn More</button>
         </div>
       </div>
     </section>
@@ -662,10 +644,8 @@ function CTA() {
         <p className="mt-6 mx-auto" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", color:"oklch(0.65 0.015 75)", maxWidth:"480px", lineHeight:1.7}}>
           Start your 14-day free trial. No credit card. No setup fee. Cancel anytime.
         </p>
-        <div className="mt-10 max-w-xl mx-auto">
-          <WaitlistCapture variant="cta" />
-        </div>
-        <div className="flex justify-center mt-6">
+        <div className="flex flex-wrap justify-center gap-4 mt-10">
+          <a href="#pricing" className="btn-amber">Start Free Trial</a>
           <a href="mailto:hello@ownology.ai" className="btn-ghost">Talk to Us</a>
         </div>
         <p className="mt-8" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.45 0.010 75)"}}>
@@ -686,13 +666,14 @@ function Footer() {
           © 2026 Ownology. AI Knowledge Assistant for Boutique Winemakers.
         </p>
         <div className="flex gap-6">
-          <a href="mailto:hello@ownology.ai" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.48 0.010 75)"}}
+          {["Privacy","Terms","Contact"].map(l=>(
+            <a key={l} href="#" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.48 0.010 75)"}}
               onMouseEnter={e=>(e.currentTarget.style.color="oklch(0.72 0.12 75)")}
-              onMouseLeave={e=>(e.currentTarget.style.color="oklch(0.48 0.010 75)")}>Contact</a>
-          <a href="#faq" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.48 0.010 75)"}}
-              onMouseEnter={e=>(e.currentTarget.style.color="oklch(0.72 0.12 75)")}
-              onMouseLeave={e=>(e.currentTarget.style.color="oklch(0.48 0.010 75)")}>FAQ</a>
-          <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.35 0.008 75)"}}>Privacy & Terms coming soon</span>
+              onMouseLeave={e=>(e.currentTarget.style.color="oklch(0.48 0.010 75)")}>{l}</a>
+          ))}
+          <Link href="/why-ownology" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"oklch(0.48 0.010 75)"}}
+            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="oklch(0.72 0.12 75)")}
+            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="oklch(0.48 0.010 75)")}>Why Ownology</Link>
         </div>
       </div>
     </footer>

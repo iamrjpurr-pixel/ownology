@@ -31,6 +31,18 @@ function useInView(threshold = 0.1) {
 
 const FAQS = [
   {
+    q: "Is Ownology like WineryCopilot or other AI wine tools I've seen?",
+    a: "Those tools are built for marketing teams, not winemakers. WineryCopilot and similar platforms generate tasting room copy, social media posts, and event flyers — they are content generators powered by general-purpose AI with wine-flavoured prompts. Ownology is a cellar intelligence tool. It answers technical production questions (SO₂ additions, YAN targets, fermentation anomalies, protocol lookups) grounded in your own documents and verified wine science. If you are asking \"what DAP addition does Tank 7 need right now?\", Ownology answers it. A marketing AI cannot.",
+  },
+  {
+    q: "How is Ownology different from just using ChatGPT?",
+    a: "ChatGPT gives you generic wine knowledge — the same answer it would give anyone. Ownology gives you answers grounded in your specific documents: your SOPs, your vintage reports, your protocols, your house style notes. When Ownology answers a question, it cites the exact document and passage it drew from. It also understands the context of your winery — your varieties, your tank names, your team's workflow. ChatGPT has none of that. It is the difference between asking a stranger and asking someone who has read every document in your cellar office.",
+  },
+  {
+    q: "We already use InnoVint (or vintrace / WineDirect). Do we need Ownology as well?",
+    a: "Yes — and they work together, not against each other. Your production management system is your record-keeper: it logs what happened, tracks compliance, and manages inventory. Ownology is your knowledge layer: it answers questions, surfaces protocols, and helps your team make better decisions in the moment. InnoVint tells you what Brix Tank 7 was at 6am. Ownology tells you what to do about it, based on your own Shiraz protocol and the latest fermentation science. Most of our customers use both.",
+  },
+  {
     q: "Does Ownology replace my ERP or winery management system?",
     a: "No — and it is not trying to. Systems like InnoVint, vintrace, or WineDirect handle compliance records, inventory, and accounting. Ownology handles knowledge and intelligence. Think of it as the layer that sits on top of your existing tools: it answers questions, surfaces insights, and helps your team make better decisions — it does not replace the systems that track what happened.",
   },

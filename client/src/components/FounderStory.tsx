@@ -23,7 +23,7 @@ function useInView(threshold = 0.1) {
   return { ref, inView };
 }
 
-const FOUNDER_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/founders-rich-gel-v4-BeZGmRgZ5d2ZF7aubhnWpp.png";
+const FOUNDER_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-founder-jEiqZBeugJ4q7zEEKvFoge.webp";
 
 export default function FounderStory() {
   const { ref, inView } = useInView(0.1);
@@ -75,7 +75,7 @@ export default function FounderStory() {
             >
               <img
                 src={FOUNDER_IMG}
-                alt="Rich and Gel, Co-Founders of Ownology, in a wine cellar"
+                alt="Ownology founder in a Hunter Valley wine cellar"
                 className="w-full object-cover"
                 style={{ aspectRatio: "3/4", display: "block" }}
               />
@@ -98,7 +98,7 @@ export default function FounderStory() {
                     color: "oklch(0.72 0.12 75)",
                   }}
                 >
-                  Rich &amp; Gel — Co-Founders, Ownology
+                  Founder, Ownology
                 </p>
                 <p
                   style={{
@@ -108,7 +108,7 @@ export default function FounderStory() {
                     marginTop: "0.2rem",
                   }}
                 >
-                  Boutique Wine Country · 2005 → 2026
+                  Hunter Valley · 2005 → 2026
                 </p>
               </div>
             </div>
@@ -191,18 +191,18 @@ export default function FounderStory() {
                 letterSpacing: "-0.01em",
               }}
             >
-              "I first walked into a boutique production shed in 2005. I was a collector, not a winemaker — but the winemaker was generous enough to explain everything. Gel has been beside me every step of the way since."
+              "I first walked into a Hunter Valley production shed in 2005. I was a collector, not a winemaker — but the winemaker was generous enough to explain everything."
             </blockquote>
 
             {/* Amber rule */}
             <div style={{ width: "3rem", height: "1px", background: "oklch(0.72 0.12 75)" }} />
 
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
-              What started as curiosity became a long-term passion — and, admittedly, an expensive one. Around the 2005 vintage, Rich began collecting and studying wines from small boutique producers, drawn to the craftsmanship and the stories behind every bottle. Geraldine (Gel) was there from the beginning, sharing every tasting, every vineyard walk, and every case that arrived at the door.
+              When I first arrived in Australia, the Hunter Valley captured my attention immediately. What started as curiosity became a long-term passion — and, admittedly, an expensive one. Around the 2005 vintage, I began collecting and studying wines from the region, drawn first to the whites — Semillon, Chardonnay, the Italian varietals gaining prominence across Australian vineyards.
             </p>
 
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
-              At one point Rich belonged to close to ten wine clubs in a single year. Cases arrived faster than they could make room for them, but every shipment was part of an ongoing education. Those memberships opened doors to member days, private tastings, vineyard tours, and behind-the-scenes access to winery operations. Together they spent countless hours speaking directly with winemakers — walking vineyards, standing around barrels in production sheds, learning the practical realities behind each vintage.
+              At one point I belonged to close to ten wine clubs in a single year. Cases arrived faster than I could make room for them, but every shipment was part of an ongoing education. Those memberships opened doors to member days, private tastings, vineyard tours, and behind-the-scenes access to winery operations. I spent countless hours speaking directly with winemakers — walking vineyards, standing around barrels in production sheds, learning the practical realities behind each vintage.
             </p>
 
             {/* Highlighted insight */}
@@ -223,16 +223,16 @@ export default function FounderStory() {
                   color: "oklch(0.82 0.016 75)",
                 }}
               >
-                What we kept noticing was how much knowledge lived only in people's heads — and how much of it was at risk of being lost. Ownology is our attempt to change that.
+                What I kept noticing was how much knowledge lived only in people's heads — and how much of it was at risk of being lost. Ownology is my attempt to change that.
               </p>
             </div>
 
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
-              Ownology grew from years of genuine immersion in boutique wine culture, extensive self-education, and firsthand exposure to the people and processes behind small-production winemaking — and probably from spending far too much money on wine memberships along the way. Rich and Gel built it together, and that partnership is baked into everything Ownology is.
+              Ownology grew from years of genuine immersion in wine culture, extensive self-education, and firsthand exposure to the people and processes behind Australian wine — and probably from spending far too much money on wine memberships along the way.
             </p>
 
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "oklch(0.65 0.013 75)" }}>
-              There is one more thread to this story. Their daughter has a deep passion for chemistry and science — and somewhere along the way, the family began sharing a quiet dream: what would it look like to bring science, agriculture, systems thinking, and wine together in a single platform? Ownology is, in part, an answer to that question. A project built on curiosity, shaped by two generations of it.
+              There is one more thread to this story. My daughter has a deep passion for chemistry and science — and somewhere along the way, we began sharing a quiet dream: what would it look like to bring science, agriculture, systems thinking, and wine together in a single platform? Ownology is, in part, an answer to that question. A project built on curiosity, shaped by two generations of it.
             </p>
           </div>
 
