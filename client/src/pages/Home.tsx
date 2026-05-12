@@ -57,6 +57,7 @@ type NavItem = { label: string; href: string; external?: boolean };
 const NAV_LINKS: NavItem[] = [
   { label: "Features",      href: "#features" },
   { label: "How It Works",  href: "#how-it-works" },
+  { label: "See Demo",      href: "#demo" },
   { label: "Why Ownology",  href: "/why-ownology", external: false },
   { label: "Our Story",     href: "#our-story" },
   { label: "Pricing",       href: "#pricing" },

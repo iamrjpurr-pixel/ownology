@@ -266,14 +266,14 @@ export default function FounderStory() {
                 letterSpacing: "-0.01em",
               }}
             >
-              "I first walked into a Hunter Valley production shed in 2005. I was a collector, not a winemaker — but the winemaker was generous enough to explain everything."
+              "I first walked into a boutique production shed in 2005. I was a collector, not a winemaker — but the winemaker was generous enough to explain everything."
             </blockquote>
 
             {/* Amber rule */}
             <div style={{ width: "3rem", height: "1px", background: "var(--ow-amber)" }} />
 
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "var(--ow-text-mid)" }}>
-              When I first arrived in Australia, the Hunter Valley captured my attention immediately. What started as curiosity became a long-term passion — and, admittedly, an expensive one. Around the 2005 vintage, I began collecting and studying wines from the region, drawn first to the whites — Semillon, Chardonnay, the Italian varietals gaining prominence across Australian vineyards.
+              What started as curiosity became a long-term passion — and, admittedly, an expensive one. Around the 2005 vintage, I began collecting and studying wines from boutique producers, drawn first to the whites — Chardonnay, the Italian varietals, the old-vine varieties gaining prominence in small-batch cellars.
             </p>
 
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "var(--ow-text-mid)" }}>
@@ -303,11 +303,11 @@ export default function FounderStory() {
             </div>
 
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "var(--ow-text-mid)" }}>
-              Ownology grew from years of genuine immersion in wine culture, extensive self-education, and firsthand exposure to the people and processes behind Australian wine — and probably from spending far too much money on wine memberships along the way.
+              Ownology grew from years of genuine immersion in wine culture, extensive self-education, and firsthand exposure to the people and processes behind boutique winemaking — and probably from spending far too much money on wine memberships along the way.
             </p>
 
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "var(--ow-text-mid)" }}>
-              There is one more thread to this story. My daughter has a deep passion for chemistry and science — and somewhere along the way, we began sharing a quiet dream: what would it look like to bring science, agriculture, systems thinking, and wine together in a single platform? Ownology is, in part, an answer to that question. A project built on curiosity, shaped by two generations of it.
+              There is one more thread to this story. My co-founder Geraldine brings a deep passion for chemistry and science — and somewhere along the way, we began sharing a quiet dream: what would it look like to bring science, agriculture, systems thinking, and wine together in a single platform? As Chemistry & Science Lead, Geraldine ensures that every answer Ownology gives is grounded in real winemaking science, not just pattern-matching. Ownology is, in part, an answer to that shared question. A project built on curiosity, shaped by two people who refused to stop asking why.
             </p>
           </div>
 
