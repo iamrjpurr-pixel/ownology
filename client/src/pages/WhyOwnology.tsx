@@ -410,6 +410,7 @@ function Footer() {
         </p>
         <div className="flex gap-6">
           <a href="mailto:hello@ownology.ai" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>Contact</a>
+          <Link href="/for-innovint-users" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>For InnoVint Users</Link>
           <Link href="/" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>Home</Link>
         </div>
       </div>
