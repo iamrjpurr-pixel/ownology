@@ -25,3 +25,4 @@
 - [x] Build /for-vintrace-users landing page (mirror InnoVint page structure, Vintrace-specific content)
 - [x] Add demo video placeholder section to Home.tsx between HowItWorks and Testimonials
 - [x] Wire /for-vintrace-users route in App.tsx and add to footers
+- [x] Replace solo founder portrait in FounderStory.tsx with the couple photo (you and Geraldine in barrel cellar)

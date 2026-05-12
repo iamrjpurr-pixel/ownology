@@ -23,7 +23,7 @@ function useInView(threshold = 0.1) {
   return { ref, inView };
 }
 
-const FOUNDER_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-founder-jEiqZBeugJ4q7zEEKvFoge.webp";
+const FOUNDER_IMG = "/manus-storage/ownology-founders-couple_a5b472c2.jpg";
 
 export default function FounderStory() {
   const { ref, inView } = useInView(0.1);
@@ -98,7 +98,7 @@ export default function FounderStory() {
                     color: "var(--ow-amber)",
                   }}
                 >
-                  Founder, Ownology
+                  Founders, Ownology
                 </p>
                 <p
                   style={{
@@ -108,7 +108,7 @@ export default function FounderStory() {
                     marginTop: "0.2rem",
                   }}
                 >
-                  Hunter Valley · 2005 → 2026
+                  Boutique Wine Country · 2005 → 2026
                 </p>
               </div>
             </div>
