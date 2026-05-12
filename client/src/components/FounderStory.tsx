@@ -24,6 +24,9 @@ function useInView(threshold = 0.1) {
 }
 
 const FOUNDER_IMG = "/manus-storage/ownology-founders-couple_a5b472c2.jpg";
+const GERALDINE_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-geraldine-portrait-K3inKXLkQTvZ7sssneLWKJ.webp";
+const VINEYARD_IMG = "/manus-storage/ownology-vineyard_a3c0d545.jpg";
+const LAB_IMG = "/manus-storage/ownology-lab_cf4a25db.jpg";
 
 export default function FounderStory() {
   const { ref, inView } = useInView(0.1);
@@ -75,7 +78,7 @@ export default function FounderStory() {
             >
               <img
                 src={FOUNDER_IMG}
-                alt="Ownology founder in a Hunter Valley wine cellar"
+                alt="Ownology founders in a wine cellar barrel room"
                 className="w-full object-cover"
                 style={{ aspectRatio: "3/4", display: "block" }}
               />
@@ -151,11 +154,83 @@ export default function FounderStory() {
                 </div>
               ))}
             </div>
+
+            {/* Small vineyard + lab gallery below founders' portrait */}
+            <div className="grid grid-cols-2 gap-1.5 mt-1.5">
+              {[{ src: VINEYARD_IMG, alt: "Vineyard rows at golden hour" }, { src: LAB_IMG, alt: "Cellar lab analysis" }].map((img) => (
+                <div
+                  key={img.alt}
+                  className="overflow-hidden"
+                  style={{ borderRadius: "2px" }}
+                >
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    className="w-full object-cover"
+                    style={{ aspectRatio: "1/1", display: "block" }}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Right — quote + body copy (8 cols) */}
+          {/* Centre — Geraldine portrait (3 cols) */}
           <div
-            className={`lg:col-span-8 flex flex-col gap-7 ${inView ? "fade-up fade-up-delay-2" : "opacity-0"}`}
+            className={`lg:col-span-3 ${inView ? "fade-up fade-up-delay-1" : "opacity-0"}`}
+            style={{ transitionDelay: "80ms" }}
+          >
+            <div
+              className="relative overflow-hidden"
+              style={{
+                borderRadius: "2px",
+                boxShadow: "0 24px 60px oklch(0 0 0 / 0.5), 0 0 0 1px oklch(1 0 0 / 0.06)",
+              }}
+            >
+              <img
+                src={GERALDINE_IMG}
+                alt="Geraldine, co-founder of Ownology, in a wine cellar laboratory"
+                className="w-full object-cover"
+                style={{ aspectRatio: "3/4", display: "block" }}
+              />
+              {/* Gradient overlay */}
+              <div
+                className="absolute bottom-0 left-0 right-0 h-28"
+                style={{
+                  background: "linear-gradient(to top, var(--ow-bg-base) 0%, transparent 100%)",
+                }}
+              />
+              {/* Caption */}
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p
+                  style={{
+                    fontFamily: "'Lato', sans-serif",
+                    fontWeight: 700,
+                    fontSize: "0.7rem",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "var(--ow-amber)",
+                  }}
+                >
+                  Geraldine, Co-Founder
+                </p>
+                <p
+                  style={{
+                    fontFamily: "'Fira Code', monospace",
+                    fontSize: "0.65rem",
+                    color: "var(--ow-text-lo)",
+                    marginTop: "0.2rem",
+                  }}
+                >
+                  Chemistry & Science Lead
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Right — quote + body copy (5 cols) */}
+          <div
+            className={`lg:col-span-5 flex flex-col gap-7 ${inView ? "fade-up fade-up-delay-2" : "opacity-0"}`}
           >
             {/* Cellar key decorative mark */}
             <svg width="24" height="52" viewBox="0 0 20 44" fill="none" aria-hidden="true">
