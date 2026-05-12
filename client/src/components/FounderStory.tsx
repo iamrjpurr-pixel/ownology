@@ -24,7 +24,7 @@ function useInView(threshold = 0.1) {
 }
 
 const FOUNDER_IMG = "/manus-storage/ownology-founders-couple_a5b472c2.jpg";
-const GERALDINE_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-geraldine-portrait-K3inKXLkQTvZ7sssneLWKJ.webp";
+const GERALDINE_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-geraldine-v2-m57Nkp7FDBsiZ4EGyESMwQ.webp";
 const VINEYARD_IMG = "/manus-storage/ownology-vineyard_a3c0d545.jpg";
 const LAB_IMG = "/manus-storage/ownology-lab_cf4a25db.jpg";
 

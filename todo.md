@@ -31,3 +31,4 @@
 - [x] Write thought leadership article — winemaker psychology, harvest burnout, cognitive load relief framing
 - [x] Add FAQ entries: 'Will this replace me?' and 'Will AI homogenise wine?' through psychology lens
 - [x] Build 'The Weight of Harvest' homepage section — cognitive load relief, inserted before CTA
+- [x] Regenerate Geraldine portrait using couple photo as reference so she looks like herself
