@@ -19,6 +19,16 @@ const BG_BASE = "var(--ow-bg-base)";
 
 const ARTICLES = [
   {
+    slug: "two-philosophies",
+    title: "Two Philosophies, One Grape: What Boutique and Commercial Winemaking Actually Have in Common — and Where They Diverge",
+    excerpt:
+      "Boutique and commercial wine production are not different philosophies applied to the same process. They are fundamentally different processes that happen to share a raw material. Understanding the distinction matters for anyone building tools that serve the wine industry.",
+    date: "May 2026",
+    readTime: "8 min read",
+    category: "Winemaking Science",
+    tags: ["boutique winemaking", "commercial winemaking", "winery equipment", "AI in winemaking"],
+  },
+  {
     slug: "weight-of-harvest",
     title: "The Weight of Harvest: Why the Winemaker's Greatest Risk Is Not the Weather",
     excerpt:

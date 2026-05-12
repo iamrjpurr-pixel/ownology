@@ -41,3 +41,6 @@
 - [x] Add Blog link to homepage nav and footer
 - [x] Add dynamic /blog/:slug route that renders the correct article or 404 for unknown slugs
 - [x] Generate solo portrait of Rich surrounded by winery chemistry equipment and wire into FounderStory section
+- [x] Research and save SA winery regulatory requirements to ~/rules-and-regs/states/SA/
+- [x] Wire boutique vs commercial blog article into /blog page as second article
+- [ ] Add 'What Ownology Knows' section to the website based on oenology curricula analysis
