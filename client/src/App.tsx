@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import WhyOwnology from "./pages/WhyOwnology";
 import ForInnoVintUsers from "./pages/ForInnoVintUsers";
+import ForVintraceUsers from "./pages/ForVintraceUsers";
 
 
 function Router() {
@@ -15,6 +16,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/why-ownology"} component={WhyOwnology} />
       <Route path={"/for-innovint-users"} component={ForInnoVintUsers} />
+      <Route path={"/for-vintrace-users"} component={ForVintraceUsers} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -22,3 +22,6 @@
 - [x] Create ThemeToggle component with localStorage persistence and nav integration
 - [x] Apply light theme to Home.tsx via CSS variable references
 - [x] Apply light theme to WhyOwnology.tsx, FAQ.tsx, FounderStory.tsx
+- [x] Build /for-vintrace-users landing page (mirror InnoVint page structure, Vintrace-specific content)
+- [x] Add demo video placeholder section to Home.tsx between HowItWorks and Testimonials
+- [x] Wire /for-vintrace-users route in App.tsx and add to footers

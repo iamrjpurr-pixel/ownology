@@ -550,6 +550,67 @@ function HowItWorks() {
   );
 }
 
+// ─── Demo Video ─────────────────────────────────────────────────────────────
+function DemoVideo() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setInView(true); obs.disconnect(); } },
+      { threshold: 0.12 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <section id="demo" className="py-28" style={{background:"var(--ow-bg-raised)"}}>
+      <div className="container" ref={ref}>
+        <p className="section-label mb-4">See It In Action</p>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"var(--ow-text-hi)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+          60 seconds. A real cellar question. A real answer.
+        </h2>
+        <div className="amber-rule mt-8 mb-12" />
+        {/* Video placeholder — replace src with actual video URL when ready */}
+        <div
+          className={`relative mx-auto max-w-3xl rounded-sm overflow-hidden ${inView ? "fade-up" : "opacity-0"}`}
+          style={{border:"1px solid var(--ow-border-md)", aspectRatio:"16/9", background:"var(--ow-bg-card)"}}
+        >
+          {/* Placeholder overlay — remove this div and uncomment the iframe below when the video is ready */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+            <div
+              className="w-20 h-20 rounded-full flex items-center justify-center"
+              style={{background:"color-mix(in oklch, var(--ow-amber) 12%, transparent)", border:"2px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)"}}
+            >
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <path d="M10 8l12 6-12 6V8z" fill="var(--ow-amber)" />
+              </svg>
+            </div>
+            <p style={{fontFamily:"'Fraunces',serif", fontWeight:500, fontSize:"1.125rem", color:"var(--ow-text-hi)"}}>Demo video coming soon</p>
+            <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9rem", color:"var(--ow-text-lo)", maxWidth:"360px", textAlign:"center", lineHeight:1.6}}>
+              A 60-second walkthrough showing Ownology answering a real cellar question from an uploaded SOP — on mobile, during harvest.
+            </p>
+          </div>
+          {/* Uncomment and replace VIDEO_URL when ready:
+          <iframe
+            src="VIDEO_URL"
+            title="Ownology demo — 60 seconds, real cellar question"
+            className="absolute inset-0 w-full h-full"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+          */}
+        </div>
+        <p className="text-center mt-6" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.875rem", color:"var(--ow-text-lo)"}}>
+          Want an early preview? <a href="mailto:hello@ownology.ai" style={{color:"var(--ow-amber)"}}>Email us</a> and we'll walk you through it live.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 // ─── Testimonials ─────────────────────────────────────────────────────────────
 function Testimonials() {
   const { ref, inView } = useInView();
@@ -721,6 +782,9 @@ function Footer() {
           <Link href="/for-innovint-users" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
             onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
             onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>For InnoVint Users</Link>
+          <Link href="/for-vintrace-users" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
+            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
+            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>For Vintrace Users</Link>
         </div>
       </div>
     </footer>
@@ -736,6 +800,7 @@ export default function Home() {
       <PainPoints />
       <Features />
       <HowItWorks />
+      <DemoVideo />
       <Testimonials />
       <FounderStory />
       <Pricing />
