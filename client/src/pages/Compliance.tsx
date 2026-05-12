@@ -12,7 +12,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 // ─── Knowledge base (embedded) ────────────────────────────────────────────────
 const KNOWLEDGE_BASE = `
 # Australian Winery Regulatory Knowledge Base
-Covers: Federal, South Australia (SA), Victoria (VIC), New South Wales (NSW)
+Covers: Federal, South Australia (SA), Victoria (VIC), New South Wales (NSW), Western Australia (WA)
 
 ## FEDERAL REGULATIONS
 
@@ -305,6 +305,90 @@ Contact: NSW Food Authority — 1300 552 406 — foodauthority.nsw.gov.au
 
 ---
 
+## WESTERN AUSTRALIA (WA) REGULATIONS
+
+### Liquor Licensing — Producer's Licence (Liquor Control Act 1988 WA)
+Administered by the Department of Local Government, Industry Regulation and Safety (DLGSC), Racing, Gaming and Liquor division.
+
+Licence type: Producer's Licence
+- Authorises selling wine (and other alcohol you produce) for consumption on approved premises or off-premises.
+- Cellar door tastings and sales permitted on licensed premises.
+- Home delivery (phone, email, or internet orders) permitted — alcohol must be dispatched from the licensed premises.
+- Cellar door Extended Trading Permit (ETP) may be issued to allow sales from a location away from the production site.
+- Online sales permitted; licensees must check the Banned Drinker Register (BDR) before shipping to Banned Drinker Areas (Kimberley, Pilbara, Goldfields, Carnarvon/Gascoyne Junction).
+
+Trading hours:
+- General days: at any time.
+- Good Friday and Christmas Day: 12 noon to 10 pm (alcohol ancillary to a meal only, if on-premises consumption is permitted).
+- ANZAC Day: 12 noon to midnight.
+- Beer and spirits on-premises: only between 10 am and 10 pm on general days.
+
+Key conditions:
+- Applicant must demonstrate they will produce sufficient alcohol to carry on a genuine business within 12 months.
+- Must have suitable premises; if no production facility on-site, must have access to one and be sole occupier of the vineyard.
+- Blended wine: at least 50% must be fermented by or under the direction of the licensee.
+- Record-keeping: all transactions involving sale, purchase, or disposal of alcohol must be recorded; failure is an offence with a $10,000 fine.
+
+Contact: DLGSC Racing, Gaming and Liquor — 61 8 6551 4888 — dlgsc.wa.gov.au
+
+### Environmental Protection — DWER (Environmental Protection Act 1986 WA)
+Administered by the Department of Water and Environmental Regulation (DWER).
+
+Prescribed premises threshold:
+- Wineries producing 350 kL of wine per year (approximately 500 tonnes of grapes) or more are a Prescribed Premises under the Environmental Protection Regulations 1987.
+- Prescribed premises require a Works Approval before construction and a Licence to operate from DWER.
+- Boutique wineries below 350 kL/year are not prescribed premises but must comply with the general environmental duty.
+
+Key environmental obligations (all wineries):
+- Winery wastewater (high BOD, low pH) must not be discharged to waterways, drains, or groundwater.
+- Land application is the most common disposal method; must comply with DWER Water Quality Protection Note 73 (Wineries and Distilleries).
+- Nutrient and irrigation plan required for land application systems.
+- Chemical bunding: all chemical storage must be bunded.
+- Odour and noise must not cause unreasonable interference to neighbours.
+
+Contact: DWER — 08 6364 7000 — dwer.wa.gov.au
+
+### Workplace Health and Safety — WorkSafe WA (Work Health and Safety Act 2020 WA)
+Administered by WorkSafe WA, Department of Energy, Mines, Industry Regulation and Safety (DEMIRS).
+
+Key obligations:
+- Provide and maintain a safe working environment, so far as is reasonably practicable.
+- Confined space entry (fermentation tanks, underground cellars): written permit system, atmospheric testing, trained standby person required.
+- CO₂ monitoring: mandatory during active fermentation.
+- Chemical register and SDS: all hazardous chemicals must be listed with current Safety Data Sheets accessible to workers.
+- SO₂ handling: PPE mandatory, exposure standard 0.5 ppm TWA.
+- Manual handling: risk assessment required for barrel handling, hose work, grape receival.
+- Forklift operators: must hold a High Risk Work Licence (HRWL).
+- Incident reporting: serious injuries and dangerous incidents must be notified to WorkSafe WA immediately.
+
+Contact: WorkSafe WA — 1300 307 877 — worksafe.wa.gov.au
+
+### Planning and Land Use — Local Council (Planning and Development Act 2005 WA)
+- A development application (DA) to the relevant local government is required for establishing a new winery, constructing or expanding cellar door facilities, or operating a cellar door restaurant or function venue.
+- Most vineyard land is zoned Rural or Agricultural; a winery is generally a use requiring development approval.
+- Cellar door premises typically require a separate development approval with conditions on hours, patron numbers, and signage.
+- State Planning Policy 6.1 (Leeuwin-Naturaliste Ridge) and other regional policies may apply in key wine regions.
+
+Contact: Local council planning department — planning.wa.gov.au
+
+### Water Licensing — DWER (Rights in Water and Irrigation Act 1914 WA)
+- A water licence is required to take water from a waterway, bore, or other water resource for winery production or irrigation.
+- Issued by DWER; water allocations are set by the relevant water resource management plan.
+- Water use must be metered and reported annually.
+- Groundwater: bore licences required in proclaimed groundwater areas (most of the South West, including Margaret River).
+
+Contact: DWER — 08 6364 7000 — dwer.wa.gov.au
+
+### Food Safety — Local Council (Food Act 2008 WA)
+- Wineries that sell wine for consumption are classified as food businesses under the Food Act 2008 (WA).
+- Registration with the local government is required.
+- Compliance with FSANZ Food Standards Code (Standard 4.5) is mandatory.
+- Cellar door food service (cheese, charcuterie, meals) requires food business registration with the local council.
+
+Contact: Local council environmental health department — health.wa.gov.au
+
+---
+
 ## KEY CONTACTS
 
 | Agency | Role | Website |
@@ -325,11 +409,14 @@ Contact: NSW Food Authority — 1300 552 406 — foodauthority.nsw.gov.au
 | SafeWork NSW | WHS (NSW) | safework.nsw.gov.au |
 | NSW Food Authority | Food safety (NSW) | foodauthority.nsw.gov.au |
 | NRAR / WaterNSW | Water licensing (NSW) | nrar.nsw.gov.au |
+| DLGSC (WA) | Liquor licensing (WA) | dlgsc.wa.gov.au |
+| DWER (WA) | Environmental protection, water (WA) | dwer.wa.gov.au |
+| WorkSafe WA | WHS (WA) | worksafe.wa.gov.au |
 | Local council | Food business registration, development approval | (varies by council) |
 `;
 
 // ─── Sample questions ─────────────────────────────────────────────────────────
-type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW";
+type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW" | "WA";
 
 const SAMPLE_QUESTIONS: { q: string; state: StateFilter }[] = [
   { q: "What are the LIP record-keeping requirements for vintage labelling?", state: "Federal" },
@@ -347,13 +434,16 @@ const SAMPLE_QUESTIONS: { q: string; state: StateFilter }[] = [
   { q: "What is the Producer/Wholesaler licence in NSW and how do I apply?", state: "NSW" },
   { q: "What are the WHS obligations for winery CO₂ management in NSW?", state: "NSW" },
   { q: "Does a boutique NSW winery need an Environment Protection Licence?", state: "NSW" },
+  { q: "What is a WA Producer's Licence and what trading hours apply?", state: "WA" },
+  { q: "What is the prescribed premises threshold for wineries in Western Australia?", state: "WA" },
+  { q: "Do I need a water licence to irrigate my vineyard in Margaret River?", state: "WA" },
 ];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Message = { role: "user" | "assistant"; content: string };
 
 // ─── Main component ───────────────────────────────────────────────────────────
-const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW"];
+const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW", "WA"];
 
 const STATE_LABELS: Record<StateFilter, string> = {
   All: "All Jurisdictions",
@@ -361,12 +451,33 @@ const STATE_LABELS: Record<StateFilter, string> = {
   SA: "South Australia",
   VIC: "Victoria",
   NSW: "New South Wales",
+  WA: "Western Australia",
 };
+
+// ─── Knowledge base sections (for jurisdiction-scoped prompts) ────────────────
+const KB_SECTIONS: Record<string, string> = {
+  Federal: KNOWLEDGE_BASE.split("## SOUTH AUSTRALIA REGULATIONS")[0],
+  SA: "## SOUTH AUSTRALIA REGULATIONS" + (KNOWLEDGE_BASE.split("## SOUTH AUSTRALIA REGULATIONS")[1]?.split("## VICTORIA (VIC) REGULATIONS")[0] ?? ""),
+  VIC: "## VICTORIA (VIC) REGULATIONS" + (KNOWLEDGE_BASE.split("## VICTORIA (VIC) REGULATIONS")[1]?.split("## NEW SOUTH WALES (NSW) REGULATIONS")[0] ?? ""),
+  NSW: "## NEW SOUTH WALES (NSW) REGULATIONS" + (KNOWLEDGE_BASE.split("## NEW SOUTH WALES (NSW) REGULATIONS")[1]?.split("## WESTERN AUSTRALIA (WA) REGULATIONS")[0] ?? ""),
+  WA: "## WESTERN AUSTRALIA (WA) REGULATIONS" + (KNOWLEDGE_BASE.split("## WESTERN AUSTRALIA (WA) REGULATIONS")[1]?.split("## KEY CONTACTS")[0] ?? ""),
+  Contacts: "## KEY CONTACTS" + (KNOWLEDGE_BASE.split("## KEY CONTACTS")[1] ?? ""),
+};
+
+function buildScopedKnowledgeBase(jurisdictions: string[]): string {
+  const parts: string[] = [KB_SECTIONS.Federal];
+  for (const j of jurisdictions) {
+    if (j !== "Federal" && KB_SECTIONS[j]) parts.push(KB_SECTIONS[j]);
+  }
+  parts.push(KB_SECTIONS.Contacts);
+  return parts.join("\n\n");
+}
 
 export default function Compliance() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingStage, setLoadingStage] = useState<"classifying" | "answering" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [stateFilter, setStateFilter] = useState<StateFilter>("All");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -395,27 +506,95 @@ export default function Compliance() {
     setLoading(true);
 
     try {
-      const jurisdictionContext = stateFilter === "All"
-        ? "all Australian jurisdictions covered in the knowledge base (Federal, South Australia, Victoria, New South Wales)"
-        : stateFilter === "Federal"
-          ? "federal Australian regulations only"
-          : `federal Australian regulations and ${STATE_LABELS[stateFilter]} state regulations`;
+      // ── Stage 1: Cheap classifier (~200 tokens) ──────────────────────────────
+      setLoadingStage("classifying");
 
-      const systemPrompt = `You are a regulatory compliance assistant specialising in Australian winery regulations. You have access to a comprehensive knowledge base covering federal regulations (Wine Australia, FSANZ, ATO/WET, biosecurity, WHS) and state regulations for South Australia, Victoria, and New South Wales.
+      const classifierPrompt = `You are a jurisdiction classifier for Australian winery regulatory questions.
+Given a user question, identify which Australian jurisdictions it relates to.
+Respond with a JSON object only, no explanation:
+{"jurisdictions": ["Federal", "SA", "VIC", "NSW", "WA"], "inScope": true}
 
-The user has selected a jurisdiction filter: ${jurisdictionContext}. Prioritise answering from that jurisdiction where relevant, but you may reference other jurisdictions if helpful for comparison or if the question is federal in nature.
+Rules:
+- "jurisdictions" must be an array containing only values from: "Federal", "SA", "VIC", "NSW", "WA"
+- Always include "Federal" if the question touches on Wine Australia, FSANZ, WET, biosecurity, or WHS model law
+- "inScope" must be false if the question is completely unrelated to Australian winery regulations (e.g. weather, sport, cooking)
+- If the user filter is not "All", bias toward that jurisdiction but include Federal if relevant
 
-Answer questions accurately and concisely based ONLY on the knowledge base provided. If a question falls outside the knowledge base, say so clearly and suggest the relevant agency to contact. Always cite the relevant legislation or regulation name when giving an answer. End every response with a brief disclaimer that the user should verify current requirements with the relevant agency or a qualified compliance professional.
+User jurisdiction filter: ${stateFilter === "All" ? "All jurisdictions" : STATE_LABELS[stateFilter]}
+User question: ${question.trim()}`;
+
+      const classifierResp = await fetch(`${FORGE_BASE_URL}/v1/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${FORGE_API_KEY}` },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: classifierPrompt }],
+          response_format: { type: "json_object" },
+          stream: false,
+        }),
+      });
+
+      let detectedJurisdictions: string[] = ["Federal", "SA", "VIC", "NSW", "WA"];
+      let inScope = true;
+
+      if (classifierResp.ok) {
+        try {
+          const classifierData = await classifierResp.json();
+          const parsed = JSON.parse(classifierData.choices?.[0]?.message?.content || "{}");
+          if (Array.isArray(parsed.jurisdictions) && parsed.jurisdictions.length > 0) {
+            detectedJurisdictions = parsed.jurisdictions;
+          }
+          if (parsed.inScope === false) inScope = false;
+        } catch {
+          // classifier parse failed — fall back to full knowledge base
+        }
+      }
+
+      // ── Out-of-scope guard ───────────────────────────────────────────────────
+      if (!inScope) {
+        setMessages(prev => [
+          ...prev,
+          {
+            role: "assistant",
+            content:
+              "That question appears to be outside the scope of Australian winery compliance. " +
+              "I can help with topics such as liquor licensing, environmental obligations, WHS, " +
+              "food safety, water licensing, Wine Australia registration, FSANZ standards, and WET. " +
+              "Please ask a question related to these areas.",
+          },
+        ]);
+        return;
+      }
+
+      // ── Stage 2: Focused answer with scoped knowledge base ──────────────────
+      setLoadingStage("answering");
+
+      // If user has a state filter, respect it; otherwise use classifier result
+      const scopeJurisdictions =
+        stateFilter !== "All" && stateFilter !== "Federal"
+          ? ["Federal", stateFilter]
+          : stateFilter === "Federal"
+          ? ["Federal"]
+          : detectedJurisdictions;
+
+      const scopedKB = buildScopedKnowledgeBase(scopeJurisdictions);
+      const jurisdictionLabel = scopeJurisdictions
+        .map(j => STATE_LABELS[j as StateFilter] ?? j)
+        .join(", ");
+
+      const systemPrompt = `You are a regulatory compliance assistant specialising in Australian winery regulations.
+You have been given a targeted knowledge base covering: ${jurisdictionLabel}.
+
+Answer questions accurately and concisely based ONLY on the knowledge base provided below.
+If a question falls outside the knowledge base, say so clearly and suggest the relevant agency to contact.
+Always cite the relevant legislation or regulation name when giving an answer.
+End every response with a brief disclaimer that the user should verify current requirements with the relevant agency or a qualified compliance professional.
 
 KNOWLEDGE BASE:
-${KNOWLEDGE_BASE}`;
+${scopedKB}`;
 
       const response = await fetch(`${FORGE_BASE_URL}/v1/chat/completions`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${FORGE_API_KEY}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${FORGE_API_KEY}` },
         body: JSON.stringify({
           messages: [
             { role: "system", content: systemPrompt },
@@ -425,9 +604,7 @@ ${KNOWLEDGE_BASE}`;
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`API error: ${response.status}`);
 
       const data = await response.json();
       const answer = data.choices?.[0]?.message?.content || "No response received.";
@@ -437,6 +614,7 @@ ${KNOWLEDGE_BASE}`;
       console.error("Compliance agent error:", err);
     } finally {
       setLoading(false);
+      setLoadingStage(null);
     }
   };
 
@@ -662,7 +840,7 @@ ${KNOWLEDGE_BASE}`;
                   className="px-4 py-3 text-sm rounded-sm"
                   style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", fontStyle: "italic" }}
                 >
-                  Searching regulatory knowledge base…
+                  {loadingStage === "classifying" ? "Analysing question…" : "Searching regulatory knowledge base…"}
                 </div>
               </div>
             )}
@@ -735,7 +913,7 @@ ${KNOWLEDGE_BASE}`;
             className="mt-2 text-center text-xs"
             style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif" }}
           >
-            Answers are based on our local regulatory knowledge base. Always verify with the relevant agency or a qualified compliance professional.
+            Answers are AI-generated from our curated knowledge base (Federal, SA, VIC, NSW, WA). Always verify with the relevant agency or a qualified compliance professional.
           </p>
         </form>
 

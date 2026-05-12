@@ -32,6 +32,7 @@ const FEDERAL_SECTIONS = [
     ],
     source: "Wine Australia Act 2013 / Wine Australia Regulations 2018",
     sourceUrl: "https://www.wineaustralia.com/regulation/compliance",
+    verifiedDate: "May 2026",
   },
   {
     id: "fsanz",
@@ -51,6 +52,7 @@ const FEDERAL_SECTIONS = [
     ],
     source: "FSANZ Standard 4.5.1",
     sourceUrl: "https://www.foodstandards.gov.au/food-standards-code/primary-production-and-processing-standards/wine-production-requirements",
+    verifiedDate: "May 2026",
   },
   {
     id: "wet",
@@ -69,6 +71,7 @@ const FEDERAL_SECTIONS = [
     ],
     source: "A New Tax System (Wine Equalisation Tax) Act 1999",
     sourceUrl: "https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/wine-equalisation-tax",
+    verifiedDate: "May 2026",
   },
   {
     id: "labelling",
@@ -87,6 +90,7 @@ const FEDERAL_SECTIONS = [
     ],
     source: "FSANZ Standard 2.7.1 / Wine Australia Act 2013",
     sourceUrl: "https://www.wineaustralia.com/regulation/labelling",
+    verifiedDate: "May 2026",
   },
   {
     id: "biosecurity",
@@ -104,6 +108,7 @@ const FEDERAL_SECTIONS = [
     ],
     source: "Biosecurity Act 2015",
     sourceUrl: "https://www.agriculture.gov.au/biosecurity-trade",
+    verifiedDate: "May 2026",
   },
   {
     id: "whs-federal",
@@ -122,6 +127,7 @@ const FEDERAL_SECTIONS = [
     ],
     source: "Work Health and Safety Act 2011 (Cth model)",
     sourceUrl: "https://www.safeworkaustralia.gov.au",
+    verifiedDate: "May 2026",
   },
 ];
 
@@ -144,6 +150,7 @@ const SA_SECTIONS = [
     ],
     source: "Liquor Licensing Act 1997 (SA)",
     sourceUrl: "https://www.cbs.sa.gov.au/licences/liquor-licences",
+    verifiedDate: "May 2026",
   },
   {
     id: "sa-epa",
@@ -164,6 +171,7 @@ const SA_SECTIONS = [
     ],
     source: "Environment Protection Act 1993 (SA) / EPA Guidelines for Wineries",
     sourceUrl: "https://www.epa.sa.gov.au/business_and_industry/wineries",
+    verifiedDate: "May 2026",
   },
   {
     id: "sa-planning",
@@ -183,6 +191,7 @@ const SA_SECTIONS = [
     ],
     source: "Planning, Development and Infrastructure Act 2016 (SA)",
     sourceUrl: "https://www.sa.gov.au/topics/housing-property-and-land/planning-and-development",
+    verifiedDate: "May 2026",
   },
   {
     id: "sa-safework",
@@ -202,6 +211,7 @@ const SA_SECTIONS = [
     ],
     source: "Work Health and Safety Act 2012 (SA)",
     sourceUrl: "https://www.safework.sa.gov.au",
+    verifiedDate: "May 2026",
   },
   {
     id: "sa-water",
@@ -220,6 +230,7 @@ const SA_SECTIONS = [
     ],
     source: "Natural Resources Management Act 2004 (SA)",
     sourceUrl: "https://www.environment.sa.gov.au/topics/water",
+    verifiedDate: "May 2026",
   },
   {
     id: "sa-food",
@@ -238,6 +249,7 @@ const SA_SECTIONS = [
     ],
     source: "Food Act 2001 (SA)",
     sourceUrl: "https://www.sahealth.sa.gov.au/food",
+    verifiedDate: "May 2026",
   },
 ];
 
@@ -261,6 +273,7 @@ const VIC_SECTIONS = [
     ],
     source: "Liquor Control Reform Act 1998 (Vic)",
     sourceUrl: "https://www.vcglr.vic.gov.au/liquor/licences-and-permits",
+    verifiedDate: "May 2026",
   },
   {
     id: "vic-epa",
@@ -281,6 +294,7 @@ const VIC_SECTIONS = [
     ],
     source: "Environment Protection Act 2017 (Vic) / Environment Protection Regulations 2021 (Vic)",
     sourceUrl: "https://www.epa.vic.gov.au/for-business/find-your-industry/food-and-beverage",
+    verifiedDate: "May 2026",
   },
   {
     id: "vic-worksafe",
@@ -301,6 +315,7 @@ const VIC_SECTIONS = [
     ],
     source: "Occupational Health and Safety Act 2004 (Vic)",
     sourceUrl: "https://www.worksafe.vic.gov.au",
+    verifiedDate: "May 2026",
   },
   {
     id: "vic-planning",
@@ -320,6 +335,7 @@ const VIC_SECTIONS = [
     ],
     source: "Planning and Environment Act 1987 (Vic)",
     sourceUrl: "https://www.planning.vic.gov.au",
+    verifiedDate: "May 2026",
   },
   {
     id: "vic-water",
@@ -338,6 +354,7 @@ const VIC_SECTIONS = [
     ],
     source: "Water Act 1989 (Vic)",
     sourceUrl: "https://www.water.vic.gov.au",
+    verifiedDate: "May 2026",
   },
   {
     id: "vic-food",
@@ -356,6 +373,7 @@ const VIC_SECTIONS = [
     ],
     source: "Food Act 1984 (Vic)",
     sourceUrl: "https://www.health.vic.gov.au/food-safety",
+    verifiedDate: "May 2026",
   },
 ];
 
@@ -379,6 +397,7 @@ const NSW_SECTIONS = [
     ],
     source: "Liquor Act 2007 (NSW)",
     sourceUrl: "https://www.liquorandgaming.nsw.gov.au/licences-and-permits",
+    verifiedDate: "May 2026",
   },
   {
     id: "nsw-epa",
@@ -399,6 +418,7 @@ const NSW_SECTIONS = [
     ],
     source: "Protection of the Environment Operations Act 1997 (NSW)",
     sourceUrl: "https://www.epa.nsw.gov.au/licensing-and-regulation/licensing",
+    verifiedDate: "May 2026",
   },
   {
     id: "nsw-safework",
@@ -419,6 +439,7 @@ const NSW_SECTIONS = [
     ],
     source: "Work Health and Safety Act 2011 (NSW)",
     sourceUrl: "https://www.safework.nsw.gov.au",
+    verifiedDate: "May 2026",
   },
   {
     id: "nsw-planning",
@@ -438,6 +459,7 @@ const NSW_SECTIONS = [
     ],
     source: "Environmental Planning and Assessment Act 1979 (NSW)",
     sourceUrl: "https://www.planning.nsw.gov.au",
+    verifiedDate: "May 2026",
   },
   {
     id: "nsw-water",
@@ -457,6 +479,7 @@ const NSW_SECTIONS = [
     ],
     source: "Water Management Act 2000 (NSW)",
     sourceUrl: "https://www.nrar.nsw.gov.au",
+    verifiedDate: "May 2026",
   },
   {
     id: "nsw-food",
@@ -476,6 +499,131 @@ const NSW_SECTIONS = [
     ],
     source: "Food Act 2003 (NSW)",
     sourceUrl: "https://www.foodauthority.nsw.gov.au",
+    verifiedDate: "May 2026",
+  },
+];
+
+const WA_SECTIONS = [
+  {
+    id: "wa-liquor",
+    title: "Liquor Licensing — Producer's Licence",
+    agency: "DLGSC Racing, Gaming and Liquor",
+    tags: ["liquor licence", "cellar door", "producer", "DLGSC"],
+    summary:
+      "WA wineries require a Producer's Licence under the Liquor Control Act 1988 to manufacture and sell wine. The licence permits cellar door sales, wholesale, home delivery, and online sales. Applications are lodged with the Department of Local Government, Industry Regulation and Safety (DLGSC).",
+    keyPoints: [
+      "Producer's Licence required before manufacturing or selling wine commercially",
+      "Cellar door tastings and sales permitted on licensed premises",
+      "Home delivery and online sales permitted; must check Banned Drinker Register for restricted areas",
+      "Cellar door Extended Trading Permit (ETP) available for off-site sales locations",
+      "Applicant must demonstrate genuine production business within 12 months",
+      "Blended wine: at least 50% must be fermented by or under the direction of the licensee",
+      "Record-keeping mandatory for all alcohol transactions; failure is an offence ($10,000 fine)",
+      "Responsible Service of Alcohol (RSA) training required for all staff serving alcohol",
+    ],
+    source: "Liquor Control Act 1988 (WA)",
+    sourceUrl: "https://www.dlgsc.wa.gov.au/liquor-gaming/liquor/licences-and-permits",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "wa-dwer",
+    title: "Environmental Obligations — DWER Prescribed Premises",
+    agency: "Department of Water and Environmental Regulation (DWER)",
+    tags: ["EPA", "wastewater", "prescribed premises", "DWER", "environment"],
+    summary:
+      "WA wineries producing 350 kL of wine per year (approximately 500 tonnes of grapes) or more are Prescribed Premises under the Environmental Protection Regulations 1987 and require a Works Approval and Licence from DWER. Smaller wineries must still comply with the general environmental duty.",
+    keyPoints: [
+      "Prescribed premises threshold: ≥ 350 kL wine per year",
+      "Prescribed premises require a Works Approval before construction and a Licence to operate",
+      "Boutique wineries below threshold must comply with the general environmental duty",
+      "Winery wastewater must not be discharged to waterways, drains, or groundwater",
+      "Land application must comply with DWER Water Quality Protection Note 73 (Wineries and Distilleries)",
+      "Nutrient and irrigation plan required for land application systems",
+      "Chemical bunding: all chemical storage must be bunded",
+      "Odour and noise must not cause unreasonable interference to neighbours",
+    ],
+    source: "Environmental Protection Act 1986 (WA) / Environmental Protection Regulations 1987 (WA)",
+    sourceUrl: "https://www.dwer.wa.gov.au/licences-permits/environment-protection-licences",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "wa-worksafe",
+    title: "WorkSafe WA — WHS Obligations",
+    agency: "WorkSafe WA (DEMIRS)",
+    tags: ["WHS", "safety", "CO2", "confined space", "WorkSafe WA"],
+    summary:
+      "WorkSafe WA administers the Work Health and Safety Act 2020 (WA). WA wineries have specific obligations around CO₂ confined space entry, chemical handling, seasonal harvest worker safety, and plant registration.",
+    keyPoints: [
+      "Provide and maintain a safe working environment, so far as is reasonably practicable",
+      "Confined space entry: written permit system, atmospheric testing, trained standby person required",
+      "CO₂ monitoring mandatory during active fermentation",
+      "SO₂ handling: SDS required, PPE mandatory, exposure standard 0.5 ppm TWA",
+      "Forklift operators: must hold a High Risk Work Licence (HRWL)",
+      "Chemical register: SDS required for all hazardous chemicals on site",
+      "Incident reporting: serious injuries and dangerous incidents must be notified to WorkSafe WA immediately",
+    ],
+    source: "Work Health and Safety Act 2020 (WA)",
+    sourceUrl: "https://www.worksafe.wa.gov.au",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "wa-planning",
+    title: "Planning & Development Approval",
+    agency: "Local Council / DPLH",
+    tags: ["planning", "development", "DA", "zoning", "council"],
+    summary:
+      "Establishing or expanding a winery in WA requires a development application (DA) to the relevant local government under the Planning and Development Act 2005. Most vineyard land is zoned Rural or Agricultural; cellar door facilities typically require separate development approval.",
+    keyPoints: [
+      "Development application (DA) required for new winery buildings, processing facilities, and cellar doors",
+      "Rural/Agricultural zones: winery use generally requires development approval",
+      "Cellar door premises typically require separate DA with conditions on hours, patron numbers, and signage",
+      "State Planning Policy 6.1 (Leeuwin-Naturaliste Ridge) applies in the Margaret River wine region",
+      "Building permit required for all new structures under the Building Code of Australia",
+      "Wastewater/effluent system: DWER and council input required for land application systems",
+      "Pre-application meeting with council recommended for significant proposals",
+    ],
+    source: "Planning and Development Act 2005 (WA)",
+    sourceUrl: "https://www.planning.wa.gov.au",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "wa-water",
+    title: "Water Licensing — DWER",
+    agency: "Department of Water and Environmental Regulation (DWER)",
+    tags: ["water", "licence", "bore", "extraction", "irrigation"],
+    summary:
+      "WA wineries that extract water from a waterway, bore, or other regulated water resource require a water licence under the Rights in Water and Irrigation Act 1914. Groundwater bore licences are required in proclaimed groundwater areas, including most of the South West (Margaret River, Great Southern).",
+    keyPoints: [
+      "Water licence required for extraction from waterways, bores, or prescribed water resources",
+      "Annual water allocation: set by the relevant water resource management plan",
+      "Groundwater: bore licence required in proclaimed groundwater areas (includes Margaret River, Great Southern)",
+      "Water use must be metered and reported annually",
+      "Wastewater irrigation: must comply with DWER Water Quality Protection Note 73",
+      "Water trading: licences and allocations can be traded within the same water resource",
+    ],
+    source: "Rights in Water and Irrigation Act 1914 (WA)",
+    sourceUrl: "https://www.dwer.wa.gov.au/licences-permits/water-licences",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "wa-food",
+    title: "Food Business Registration — Local Council",
+    agency: "Local Council / Department of Health WA",
+    tags: ["food safety", "food act", "registration", "cellar door"],
+    summary:
+      "WA wineries that sell wine for consumption are classified as food businesses under the Food Act 2008 (WA). Cellar door food service requires food business registration with the local council. All food businesses must comply with the FSANZ Food Standards Code.",
+    keyPoints: [
+      "Food business registration required if food is prepared or served on premises",
+      "Tasting room serving cheese, charcuterie, or any food = food business registration required",
+      "Registration with local government environmental health department",
+      "Annual registration fee: varies by council and risk category",
+      "Food Safety Supervisor required for higher-risk food businesses",
+      "Council food safety inspection: typically annual",
+      "Food handler training: all staff handling food must have basic food safety training",
+    ],
+    source: "Food Act 2008 (WA)",
+    sourceUrl: "https://www.health.wa.gov.au/Articles/F_I/Food-safety-and-hygiene",
+    verifiedDate: "May 2026",
   },
 ];
 
@@ -484,7 +632,7 @@ const NSW_SECTIONS = [
 function RegCard({
   section,
 }: {
-  section: (typeof FEDERAL_SECTIONS)[0];
+  section: (typeof FEDERAL_SECTIONS)[0] & { verifiedDate?: string };
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -634,7 +782,7 @@ function RegCard({
             ))}
           </ul>
           <div
-            className="flex items-center gap-3 mt-4 pt-4"
+            className="flex flex-wrap items-center gap-3 mt-4 pt-4"
             style={{ borderTop: "1px solid var(--ow-border)" }}
           >
             <span
@@ -646,6 +794,23 @@ function RegCard({
             >
               Source: {section.source}
             </span>
+            {section.verifiedDate && (
+              <span
+                style={{
+                  fontFamily: MONO,
+                  fontSize: "0.65rem",
+                  letterSpacing: "0.06em",
+                  color: "oklch(0.65 0.10 145)",
+                  background: "oklch(0.65 0.10 145 / 12%)",
+                  border: "1px solid oklch(0.65 0.10 145 / 30%)",
+                  padding: "0.1rem 0.5rem",
+                  borderRadius: "2px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                ✓ Verified {section.verifiedDate}
+              </span>
+            )}
             <a
               href={section.sourceUrl}
               target="_blank"
@@ -667,13 +832,14 @@ function RegCard({
   );
 }
 
-type ResourceTab = "federal" | "sa" | "vic" | "nsw";
+type ResourceTab = "federal" | "sa" | "vic" | "nsw" | "wa";
 
 const TAB_LABELS: Record<ResourceTab, string> = {
   federal: "Federal",
   sa: "South Australia",
   vic: "Victoria",
   nsw: "New South Wales",
+  wa: "Western Australia",
 };
 
 export default function Resources() {
@@ -684,7 +850,8 @@ export default function Resources() {
     activeTab === "federal" ? FEDERAL_SECTIONS
     : activeTab === "sa" ? SA_SECTIONS
     : activeTab === "vic" ? VIC_SECTIONS
-    : NSW_SECTIONS;
+    : activeTab === "nsw" ? NSW_SECTIONS
+    : WA_SECTIONS;
 
   const filtered = search.trim()
     ? sections.filter(
@@ -776,7 +943,7 @@ export default function Resources() {
               maxWidth: "560px",
             }}
           >
-            A structured reference covering federal and state regulatory requirements for boutique wine producers across South Australia, Victoria, and New South Wales. Use the Compliance Agent to ask specific questions.
+            A structured reference covering federal and state regulatory requirements for boutique wine producers across South Australia, Victoria, New South Wales, and Western Australia. Use the Compliance Agent to ask specific questions.
           </p>
         </div>
       </section>
@@ -788,7 +955,7 @@ export default function Resources() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
             {/* Tabs */}
             <div className="flex flex-wrap gap-2">
-              {(["federal", "sa", "vic", "nsw"] as ResourceTab[]).map((tab) => (
+              {(["federal", "sa", "vic", "nsw", "wa"] as ResourceTab[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}

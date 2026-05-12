@@ -55,3 +55,10 @@
 - [x] Add 'Ask a compliance question' CTA button to the homepage hero section
 - [x] Add state selector filter to Compliance page (Federal / SA / VIC / NSW / All)
 - [x] Update /resources page to include VIC and NSW regulatory documents
+- [x] Add 'last verified' date badge to each regulatory reference card on Resources page
+- [x] Research and save WA winery regulatory requirements to ~/rules-and-regs/states/WA/
+- [x] Add WA tab and data to Resources page (liquor, DWER, WorkSafe WA, planning, water, food)
+- [x] Add WA to Compliance agent knowledge base and sample questions
+- [x] Implement two-stage triage router in Compliance tRPC procedure (Stage 1: cheap classifier, Stage 2: scoped answer)
+- [x] Add out-of-scope guard (return polite message if classifier returns Unknown/off-topic)
+- [x] Scope system prompt to only relevant jurisdiction sections based on classifier result
