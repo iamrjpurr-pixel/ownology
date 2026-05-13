@@ -21,52 +21,74 @@ router.get("/products", (_req, res) => {
 });
 
 // POST /api/merch/checkout — create a Stripe Checkout session
+// Supports both single-item { productId, quantity } and multi-item { items: [{productId, quantity}] }
 router.post("/checkout", express.json(), async (req, res) => {
   try {
-    const { productId, quantity = 1, customerEmail, origin } = req.body as {
-      productId: string;
+    const { productId, quantity = 1, items, customerEmail, origin } = req.body as {
+      productId?: string;
       quantity?: number;
+      items?: Array<{ productId: string; quantity: number }>;
       customerEmail?: string;
       origin: string;
     };
 
-    if (!productId || !origin) {
-      res.status(400).json({ error: "productId and origin are required" });
+    if (!origin) {
+      res.status(400).json({ error: "origin is required" });
       return;
     }
 
-    const product = getProductById(productId);
-    if (!product) {
-      res.status(404).json({ error: "Product not found" });
+    // Normalise to a list of line items
+    const lineItemRequests: Array<{ productId: string; quantity: number }> = items
+      ? items
+      : productId
+      ? [{ productId, quantity: Number(quantity) || 1 }]
+      : [];
+
+    if (lineItemRequests.length === 0) {
+      res.status(400).json({ error: "No items provided" });
       return;
     }
 
-    const qty = Math.max(1, Math.min(20, Number(quantity) || 1));
+    // Resolve products
+    const resolvedItems = lineItemRequests.map(({ productId: pid, quantity: q }) => {
+      const product = getProductById(pid);
+      if (!product) throw Object.assign(new Error(`Product not found: ${pid}`), { status: 404 });
+      return { product, qty: Math.max(1, Math.min(20, Number(q) || 1)) };
+    });
+
     const stripe = getStripe();
+
+    // Build Stripe line_items array — typed inline to avoid Stripe version namespace differences
+    const stripeLineItems = resolvedItems.map(
+      ({ product, qty }) => ({
+        quantity: qty,
+        price_data: {
+          currency: "aud",
+          unit_amount: product.priceAud,
+          product_data: {
+            name: product.name,
+            description: product.description,
+            images: [product.imageUrl],
+          },
+        },
+      })
+    );
+
+    // Build metadata summary (Stripe metadata values must be strings ≤500 chars)
+    const orderSummary = resolvedItems
+      .map(({ product, qty }) => `${qty}× ${product.name}`)
+      .join(", ")
+      .slice(0, 490);
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
       allow_promotion_codes: true,
       ...(customerEmail ? { customer_email: customerEmail } : {}),
-      line_items: [
-        {
-          quantity: qty,
-          price_data: {
-            currency: "aud",
-            unit_amount: product.priceAud,
-            product_data: {
-              name: product.name,
-              description: product.description,
-              images: [product.imageUrl],
-            },
-          },
-        },
-      ],
+      line_items: stripeLineItems,
       metadata: {
-        product_id: product.id,
-        product_name: product.name,
-        quantity: qty.toString(),
+        order_summary: orderSummary,
+        item_count: resolvedItems.length.toString(),
         customer_email: customerEmail ?? "",
       },
       success_url: `${origin}/merch/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -74,9 +96,11 @@ router.post("/checkout", express.json(), async (req, res) => {
     });
 
     res.json({ url: session.url });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("[Merch Checkout Error]", err);
-    res.status(500).json({ error: "Failed to create checkout session" });
+    const status = (err as { status?: number }).status ?? 500;
+    const message = err instanceof Error ? err.message : "Failed to create checkout session";
+    res.status(status).json({ error: message });
   }
 });
 

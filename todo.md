@@ -105,3 +105,6 @@
 - [x] Wire Stripe webhook for order fulfilment and owner notification
 - [x] Add Merch link to Home.tsx navigation and footer
 - [x] Add artwork zoom-on-hover effect to merch product cards (CSS transform scale + overflow:hidden, smooth transition, detail crop reveal)
+- [x] Slide-out shopping cart drawer: multi-item cart state, quantity controls, subtotal, Stripe checkout button
+- [x] Tap-to-zoom modal / swipeable image gallery for mobile merch artwork inspection
+- [x] Customer review and star-rating section below each merch product card (static seed reviews + submit form)
