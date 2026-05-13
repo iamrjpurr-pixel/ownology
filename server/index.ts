@@ -1,8 +1,13 @@
+import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
+import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import { appRouter } from "./routers.js";
+import { createContext } from "./trpc.js";
 import merchRouter from "./merch/api.js";
+import { campaignMetricsHandler } from "./scheduled/campaignMetrics.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,16 +16,31 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // Mount Stripe webhook BEFORE express.json() so raw body is preserved
+  // ── Stripe webhook MUST come before express.json() ──────────────────────────
   app.use("/api/stripe/webhook", express.raw({ type: "application/json" }), (req, res, next) => {
     req.url = "/webhook";
     (merchRouter as express.Router)(req, res, next);
   });
 
-  // Mount merch API routes
+  // ── Scheduled Heartbeat handler ──────────────────────────────────────────────
+  app.post("/api/scheduled/campaign-metrics", express.json(), campaignMetricsHandler);
+
+  // ── JSON body parser ─────────────────────────────────────────────────────────
+  app.use(express.json());
+
+  // ── Merch API ────────────────────────────────────────────────────────────────
   app.use("/api/merch", merchRouter);
 
-  // Serve static files from dist/public in production
+  // ── tRPC API ─────────────────────────────────────────────────────────────────
+  app.use(
+    "/api/trpc",
+    createExpressMiddleware({
+      router: appRouter,
+      createContext,
+    })
+  );
+
+  // ── Static files ─────────────────────────────────────────────────────────────
   const staticPath =
     process.env.NODE_ENV === "production"
       ? path.resolve(__dirname, "public")
@@ -28,15 +48,14 @@ async function startServer() {
 
   app.use(express.static(staticPath));
 
-  // Handle client-side routing - serve index.html for all routes
+  // Client-side routing fallback
   app.get("*", (_req, res) => {
     res.sendFile(path.join(staticPath, "index.html"));
   });
 
   const port = process.env.PORT || 3000;
-
   server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+    console.log(`[server] Running on http://localhost:${port}/`);
   });
 }
 

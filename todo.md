@@ -83,13 +83,15 @@
 - [x] Research and save TAS winery regulatory requirements to ~/rules-and-regs/states/TAS/
 - [x] Add TAS to Compliance agent knowledge base, state filter pill, sample questions, badge, and contacts
 - [x] Add TAS tab and 6 resource cards to Resources page
-- [ ] Add campaign_metrics_snapshots table to drizzle schema (weekly KPI snapshots)
-- [ ] Add server procedures: getCampaignMetrics query + updateCampaignMetrics mutation (owner-only)
-- [ ] Add /api/scheduled/campaign-metrics Heartbeat handler (weekly Monday 09:00 AEST)
-- [ ] Register weekly Heartbeat cron via manus-heartbeat CLI
-- [ ] Build CampaignMetrics dashboard page with trend charts and KPI cards
-- [ ] Add Campaign Metrics route to App.tsx and DashboardLayout nav
-- [ ] Write vitest tests for campaign metrics procedures
+- [x] Upgrade project to full DB + server template (webdev_add_feature web-db-user)
+- [x] Migrate existing merch API and server/index.ts into new tRPC/Express scaffold
+- [x] Add campaign_metrics_snapshots table to drizzle schema (weekly KPI snapshots)
+- [x] Add server procedures: getCampaignMetrics query + updateCampaignMetrics mutation (owner-only)
+- [x] Add /api/scheduled/campaign-metrics Heartbeat handler (weekly Monday 09:00 AEST)
+- [ ] Register weekly Heartbeat cron via manus-heartbeat CLI — REQUIRES DEPLOY FIRST
+- [x] Build CampaignMetrics dashboard page with trend charts and KPI cards
+- [x] Add Campaign Metrics route to App.tsx (/campaign-metrics)
+- [x] Write vitest tests for campaign metrics procedures
 - [x] Fix Compliance.tsx missing import error in App.tsx
 - [x] Fix heartbeat.ts TypeScript errors (missing @trpc/server and ./env modules)
 - [x] Generate founding member badge / glyph artwork (amber foil, dark background)
