@@ -33,7 +33,7 @@ export function vitePluginMerchApi(): Plugin {
       await new Promise<void>((resolve) => {
         httpServer.listen(0, "127.0.0.1", () => {
           apiPort = (httpServer.address() as AddressInfo).port;
-          console.log(`[merch-api] Dev API server on port ${apiPort}`);
+          console.log(`[merch-api] Dev API server ready (internal proxy)`);
           resolve();
         });
       });

@@ -117,3 +117,4 @@
 - [x] Write vitest tests for orders.list procedure schema validation
 - [x] Implement JWT cookie auth in createContext — parse app_session_id cookie, verify with JWT_SECRET (HMAC-SHA256 via jose 6.x), populate ctx.user so ownerProcedure works in production
 - [x] OAuth callback handled by Manus platform via manus-runtime.js postMessage; no server-side route needed
+- [x] Fix dev server port detection: change merch vitePlugin log message to not include port number (was causing platform to expose port 39087 instead of port 3000)
