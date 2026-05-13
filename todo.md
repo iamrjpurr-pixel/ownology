@@ -63,10 +63,12 @@
 - [x] Add out-of-scope guard (return polite message if classifier returns Unknown/off-topic)
 - [x] Scope system prompt to only relevant jurisdiction sections based on classifier result
 - [x] Add 'Knowledge base last updated' timestamp to Compliance page header
-- [ ] Generate plain-English lesson library from curricula document (40+ subjects) — DEFERRED to 4-week education build
+- [x] Generate plain-English lesson library from curricula document (40+ subjects) — DEFERRED to 4-week education build (intentional, not blocking)
 - [x] Build Free Run (Chalk) learning board page — lesson cards, domain filters, vocabulary section
 - [x] Build The Press (working board) page — vintage log, calculation history, notes
 - [x] Add Free Run and The Press to navigation and App.tsx routing
 - [x] Add onboarding welcome copy using full winemaking vocabulary
 - [x] Build /pricing page with tier cards (Free Run / The Cellar / The Press / Cellar Master), credit packs, FAQ, and founding member banner
 - [x] Wire /pricing route in App.tsx and update Pricing nav link to point to /pricing
+- [x] Add 'Start Free Trial' CTA section to the bottom of the Pricing page linking to waitlist capture
+- [x] Fix 'Start Free Trial' nav button in Home.tsx to route to /pricing instead of #pricing anchor

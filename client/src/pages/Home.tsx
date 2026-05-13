@@ -192,7 +192,7 @@ function Nav() {
 
           <div className="hidden md:flex items-center gap-3">
             <ThemeToggle compact />
-            <a href="#pricing" className="btn-amber text-xs inline-flex items-center">
+            <a href="/pricing" className="btn-amber text-xs inline-flex items-center">
               Start Free Trial
             </a>
           </div>
@@ -303,7 +303,7 @@ function Nav() {
 
           {/* CTA in mobile menu */}
           <a
-            href="#pricing"
+            href="/pricing"
             onClick={handleNavClick}
             className="btn-amber w-full text-center mt-4"
             style={{display: "block", textAlign: "center"}}
@@ -346,7 +346,7 @@ function Hero() {
               Ownology gives boutique winery teams instant, document-grounded answers to their toughest cellar questions — from a mobile phone, in seconds, during harvest.
             </p>
             <div className="flex flex-wrap gap-4 mt-10 fade-up fade-up-delay-3">
-              <a href="#pricing" className="btn-amber">Start 14-Day Free Trial</a>
+              <a href="/pricing" className="btn-amber">Start 14-Day Free Trial</a>
               <a href="#how-it-works" className="btn-ghost">See How It Works</a>
               <Link href="/compliance" className="btn-ghost flex items-center gap-2" style={{borderColor:"color-mix(in oklch, var(--ow-amber) 30%, transparent)", color:"var(--ow-text-mid)"}}>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -1169,7 +1169,7 @@ function WhatOwnologyKnows() {
           >
             Every answer is grounded in your winery's own documents — standard operating procedures, vintage records, supplier sheets — not generic internet content.
           </p>
-          <a href="#pricing" className="btn-amber" style={{ whiteSpace: "nowrap" }}>
+          <a href="/pricing" className="btn-amber" style={{ whiteSpace: "nowrap" }}>
             Start Free Trial
           </a>
         </div>
@@ -1195,7 +1195,7 @@ function CTA() {
           Start your 14-day free trial. No credit card. No setup fee. Cancel anytime.
         </p>
         <div className="flex flex-wrap justify-center gap-4 mt-10">
-          <a href="#pricing" className="btn-amber">Start Free Trial</a>
+          <a href="/pricing" className="btn-amber">Start Free Trial</a>
           <a href="mailto:hello@ownology.ai" className="btn-ghost">Talk to Us</a>
         </div>
         <p className="mt-8" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}>

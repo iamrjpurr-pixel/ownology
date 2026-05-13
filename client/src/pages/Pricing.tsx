@@ -2,6 +2,91 @@ import { useState } from "react";
 import { Link } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
 
+// ─── Waitlist CTA ─────────────────────────────────────────────────────────────
+function WaitlistCapture() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || status === "loading") return;
+    setStatus("loading");
+    setErrorMsg("");
+    try {
+      const res = await fetch("https://api.buttondown.email/v1/subscribers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Token ${import.meta.env.VITE_BUTTONDOWN_API_KEY ?? ""}` },
+        body: JSON.stringify({ email_address: email, tags: ["waitlist", "pricing"] }),
+      });
+      if (res.status === 201 || res.status === 200 || res.status === 422) {
+        setStatus("success");
+        setEmail("");
+      } else {
+        throw new Error("Signup failed");
+      }
+    } catch {
+      setStatus("error");
+      setErrorMsg("Something went wrong. Try again or email hello@ownology.ai");
+    }
+  };
+
+  if (status === "success") {
+    return (
+      <div className="py-6 px-8 rounded-sm inline-block" style={{ background: "oklch(0.72 0.12 75 / 10%)", border: "1px solid oklch(0.72 0.12 75 / 30%)" }}>
+        <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, fontSize: "1.125rem", color: "oklch(0.95 0.018 75)" }}>
+          You're on the list. We'll be in touch.
+        </p>
+        <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.875rem", color: "oklch(0.60 0.015 75)", marginTop: "0.5rem" }}>
+          Founding member pricing locked for the first 99 subscribers.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-4">
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="your@winery.com"
+          disabled={status === "loading"}
+          style={{
+            flex: 1,
+            background: "oklch(0.16 0.010 60)",
+            border: "1px solid oklch(1 0 0 / 12%)",
+            borderRadius: "2px",
+            padding: "0.75rem 1rem",
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.9375rem",
+            color: "oklch(0.90 0.018 75)",
+            outline: "none",
+          }}
+          onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
+          onBlur={e => (e.currentTarget.style.borderColor = "oklch(1 0 0 / 12%)")}
+        />
+        <button
+          type="submit"
+          disabled={status === "loading"}
+          className="btn-amber flex-shrink-0"
+          style={{ opacity: status === "loading" ? 0.7 : 1 }}
+        >
+          {status === "loading" ? "Joining..." : "Start Free Trial"}
+        </button>
+      </form>
+      {status === "error" && (
+        <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: "oklch(0.65 0.15 30)", marginBottom: "0.75rem" }}>{errorMsg}</p>
+      )}
+      <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", color: "oklch(0.45 0.010 75)" }}>
+        No credit card required. Or <a href="mailto:hello@ownology.ai" style={{ color: "oklch(0.72 0.12 75)" }}>talk to us directly</a>.
+      </p>
+    </>
+  );
+}
+
 /**
  * Ownology Pricing Page
  * Tiers: Free Run / The Cellar / The Press / Cellar Master
@@ -1006,28 +1091,7 @@ export default function Pricing() {
             First 99 paid subscribers receive lifetime locked rates and a
             permanent founding badge.
           </p>
-          <Link
-            href="/"
-            className="inline-block px-8 py-3.5 rounded-sm text-sm transition-all duration-200"
-            style={{
-              background: "oklch(0.72 0.12 75)",
-              color: "oklch(0.11 0.008 60)",
-              fontFamily: "'Lato', sans-serif",
-              fontWeight: 600,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background =
-                "oklch(0.78 0.13 75)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background =
-                "oklch(0.72 0.12 75)";
-            }}
-          >
-            Join the Waitlist
-          </Link>
+          <WaitlistCapture />
         </div>
       </section>
 
