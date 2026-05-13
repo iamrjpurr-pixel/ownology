@@ -957,7 +957,136 @@ function RegCard({
   );
 }
 
-type ResourceTab = "federal" | "sa" | "vic" | "nsw" | "wa" | "qld";
+const TAS_SECTIONS = [
+  {
+    id: "tas-liquor",
+    title: "Liquor Licence — Commissioner for Licensing",
+    agency: "Department of Treasury and Finance (Commissioner for Licensing)",
+    tags: ["liquor licence", "cellar door", "wine producer", "small producer permit", "Liquor Licensing Act"],
+    summary:
+      "Tasmanian wineries require a liquor licence under the Liquor Licensing Act 1990 (TAS) to sell wine at a cellar door or off-premises. Boutique producers selling at markets and events can apply for a Small Producer's Permit, which allows sales at approved events for 12 months.",
+    keyPoints: [
+      "General Licence: allows sale of liquor between 5 am and midnight daily — used by some producers for cellar door operations",
+      "Special Licence: subject to conditions; commonly used by wine producers, restaurants, and function centres",
+      "Off Licence: for retail sales of liquor for consumption off the premises (e.g. cellar door bottle sales)",
+      "A liquor licence can only be granted to a person, not a company or club",
+      "Application processing time: 4–6 weeks (some applications may take longer)",
+      "Small Producer's Permit: allows sales at farmer's markets, food festivals, and agricultural shows for 12 months",
+      "Small Producer eligibility: total sales in previous financial year < 28,500 litres; 85% of fruit must be grown in Tasmania",
+      "New events during the permit period require written approval from the Commissioner at least 7 days before the event",
+      "Responsible service of alcohol (RSA) training expected for all staff serving liquor",
+    ],
+    source: "Liquor Licensing Act 1990 (TAS)",
+    sourceUrl: "https://www.treasury.tas.gov.au/liquor-and-gaming/liquor/licences",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "tas-empca",
+    title: "Environmental Obligations — EPA Tasmania (EMPCA)",
+    agency: "Environment Protection Authority (EPA) Tasmania",
+    tags: ["EMPCA", "environmental licence", "wastewater", "EPA Tasmania", "Level 2"],
+    summary:
+      "Tasmania's Environmental Management and Pollution Control Act 1994 (EMPCA) governs environmental obligations for wineries. Most boutique wineries fall below the Level 2 licence threshold, but all operators must comply with the general duty to prevent environmental harm — particularly around winery wastewater management.",
+    keyPoints: [
+      "Level 2 environmental licence required for works with capacity to consume ≥ 100 kilolitres of water per 8-hour working day",
+      "Most boutique Tasmanian wineries fall below this threshold and do not require a formal environmental licence",
+      "Wineries are not separately listed in EMPCA Schedule 2; the threshold applies to breweries and distilleries",
+      "General duty of care applies regardless of licence status: operators must prevent environmental harm from pollution and waste",
+      "Winery wastewater (marc, lees, wash-down water) must be managed to prevent environmental harm",
+      "Acceptable wastewater management: land application, evaporation ponds, or licensed trade waste to council sewer",
+      "Relevant regulations: EMPCA (General) Regs 2017, (Noise) Regs 2016, (Waste Management) Regs 2020",
+      "The VinØ Program (Wine Tasmania) provides best practice guidance on winery wastewater and environmental management",
+    ],
+    source: "Environmental Management and Pollution Control Act 1994 (TAS)",
+    sourceUrl: "https://epa.tas.gov.au",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "tas-worksafe",
+    title: "WorkSafe Tasmania — WHS Obligations",
+    agency: "WorkSafe Tasmania",
+    tags: ["WHS", "safety", "CO2", "confined space", "WorkSafe Tasmania", "WHS Act 2012"],
+    summary:
+      "WorkSafe Tasmania administers the Work Health and Safety Act 2012 (TAS). Tasmanian wineries have specific obligations around CO₂ confined space entry, chemical handling, manual handling, and plant registration. Incident notification to WorkSafe Tasmania is mandatory for serious injuries and dangerous incidents.",
+    keyPoints: [
+      "Provide and maintain a safe working environment, so far as is reasonably practicable",
+      "Confined space entry: written permit system, atmospheric testing, and trained standby person required",
+      "CO₂ monitoring mandatory during active fermentation — fermentation tanks are classified confined spaces",
+      "Chemical register and SDS: all hazardous chemicals listed with current Safety Data Sheets",
+      "SO₂ handling: PPE mandatory; exposure standard applies",
+      "Manual handling risk assessments required for barrel handling, bin work, and harvest activities",
+      "Forklift operators: must hold a High Risk Work Licence (HRWL)",
+      "Incident reporting: serious injuries, illnesses, and dangerous incidents must be notified to WorkSafe Tasmania immediately (1300 366 322)",
+      "Workers' compensation insurance mandatory under the Workers Rehabilitation and Compensation Act 1988",
+    ],
+    source: "Work Health and Safety Act 2012 (TAS)",
+    sourceUrl: "https://worksafe.tas.gov.au",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "tas-planning",
+    title: "Planning & Land Use — Tasmanian Planning Scheme",
+    agency: "Local Council (planning authority) / State Planning Office",
+    tags: ["planning", "TPS", "Rural Zone", "Agriculture Zone", "agritourism", "cellar door", "LUPAA"],
+    summary:
+      "Under the Tasmanian Planning Scheme (TPS), a winery is classified as Resource Processing — a Permitted use in the Rural Zone and Agriculture Zone. This means a standard winery and cellar door operation does not require a discretionary planning assessment in most cases. Agritourism activities such as wine tasting and cellar door sales are also Permitted when associated with Resource Processing.",
+    keyPoints: [
+      "Winery classified as Resource Processing under the Tasmanian Planning Scheme (TPS)",
+      "Cellar door (sale of farm goods/products) classified as Resource Processing associated with Resource Development",
+      "Resource Processing is a Permitted use in Rural Zone and Agriculture Zone — no discretionary assessment required for standard winery + cellar door",
+      "Agritourism activities (wine tasting, cellar door sales, farm produce sales, cafes) are Permitted if associated with Resource Processing",
+      "Roadside stalls on the edge of a council road are exempt from a planning permit (may be subject to council by-laws)",
+      "State Policy on the Protection of Agricultural Land 2009 applies to all development in agricultural zones",
+      "Primary Industry Activities Protection Act 1995 protects viticulture from nuisance claims related to normal farming activities",
+      "Discuss specific circumstances with a qualified planner or local council before commencing",
+      "Planning applications lodged via PlanBuild Tasmania: planbuild.tas.gov.au",
+    ],
+    source: "Land Use Planning and Approvals Act 1993 (TAS) / Tasmanian Planning Scheme",
+    sourceUrl: "https://www.planbuild.tas.gov.au",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "tas-food",
+    title: "Food Business Registration — Local Council",
+    agency: "Local Council / Department of Health Tasmania",
+    tags: ["food safety", "food business", "registration", "Food Act 2003", "cellar door food"],
+    summary:
+      "Under the Food Act 2003 (TAS), any winery operating a cellar door café, food service, or selling unpackaged food must register as a food business with the relevant local council. The sale of wine alone does not require food business registration, but any food service — including cheeseboards or prepared food — triggers the requirement.",
+    keyPoints: [
+      "Food business registration required with local council before commencing food service operations",
+      "Sale of wine alone does not require food business registration under the Food Act 2003",
+      "Any food service at the cellar door (café, cheeseboards, prepared meals) triggers registration requirement",
+      "All food handling must comply with the Australia New Zealand Food Standards Code",
+      "The Food Standards Code also prescribes permitted additives, processing aids, and labelling requirements for wine",
+      "Registration must be obtained before commencing operations — not retrospectively",
+      "Contact your local council for registration requirements, fees, and inspection processes",
+    ],
+    source: "Food Act 2003 (TAS) / Australia New Zealand Food Standards Code",
+    sourceUrl: "https://www.health.tas.gov.au",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "tas-water",
+    title: "Water Licence — NRE Tasmania",
+    agency: "Department of Natural Resources and Environment Tasmania (NRE Tas)",
+    tags: ["water licence", "irrigation", "Water Management Act", "NRE Tasmania", "catchment"],
+    summary:
+      "A water licence is required under the Water Management Act 1999 (TAS) to take water from a surface water or groundwater source for vineyard irrigation or winery processing. Water licences are issued under a water management plan for the relevant catchment. Contact NRE Tasmania for licence applications and current allocation status.",
+    keyPoints: [
+      "Water licence required to take water from surface water (river, lake, spring) or groundwater for irrigation or commercial use",
+      "Licences issued under a water management plan for the relevant catchment",
+      "Contact NRE Tasmania to check current allocation status before purchasing land or planning a vineyard",
+      "Water licence applications lodged with NRE Tasmania",
+      "Exceeding licensed limits may be an offence under the Water Management Act 1999",
+      "Water use may be subject to routine audits",
+      "Tasmania has the least carbon-intensive electricity grid in Australia — renewable energy options available for winery operations",
+    ],
+    source: "Water Management Act 1999 (TAS)",
+    sourceUrl: "https://nre.tas.gov.au/water",
+    verifiedDate: "May 2026",
+  },
+];
+type ResourceTab = "federal" | "sa" | "vic" | "nsw" | "wa" | "qld" | "tas";
 
 const TAB_LABELS: Record<ResourceTab, string> = {
   federal: "Federal",
@@ -966,6 +1095,7 @@ const TAB_LABELS: Record<ResourceTab, string> = {
   nsw: "New South Wales",
   wa: "Western Australia",
   qld: "Queensland",
+  tas: "Tasmania",
 };
 
 export default function Resources() {
@@ -978,7 +1108,8 @@ export default function Resources() {
     : activeTab === "vic" ? VIC_SECTIONS
     : activeTab === "nsw" ? NSW_SECTIONS
     : activeTab === "wa" ? WA_SECTIONS
-    : QLD_SECTIONS;
+    : activeTab === "qld" ? QLD_SECTIONS
+    : TAS_SECTIONS;
 
   const filtered = search.trim()
     ? sections.filter(
@@ -1082,7 +1213,7 @@ export default function Resources() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
             {/* Tabs */}
             <div className="flex flex-wrap gap-2">
-              {(["federal", "sa", "vic", "nsw", "wa", "qld"] as ResourceTab[]).map((tab) => (
+              {(["federal", "sa", "vic", "nsw", "wa", "qld", "tas"] as ResourceTab[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}

@@ -80,3 +80,6 @@
 - [x] Fix nav bar text readability in both light and dark modes (ensure always-visible contrast)
 - [x] Fix nav hover states to be accessible and human-factors appropriate (clear but not jarring)
 - [x] Ensure nav and hero layout is responsive across PC, Mac, iOS, Android (mobile-first breakpoints)
+- [x] Research and save TAS winery regulatory requirements to ~/rules-and-regs/states/TAS/
+- [x] Add TAS to Compliance agent knowledge base, state filter pill, sample questions, badge, and contacts
+- [x] Add TAS tab and 6 resource cards to Resources page

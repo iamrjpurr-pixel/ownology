@@ -1,6 +1,6 @@
 /**
  * OWNOLOGY — Compliance AI Search Agent
- * Local knowledge base: Australian federal + SA + VIC + NSW winery regulations
+ * Local knowledge base: Australian federal + SA + VIC + NSW + WA + QLD + TAS winery regulations
  * LLM: Manus Forge frontend API (VITE_FRONTEND_FORGE_API_KEY)
  */
 
@@ -12,7 +12,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 // ─── Knowledge base (embedded) ────────────────────────────────────────────────
 const KNOWLEDGE_BASE = `
 # Australian Winery Regulatory Knowledge Base
-Covers: Federal, South Australia (SA), Victoria (VIC), New South Wales (NSW), Western Australia (WA), Queensland (QLD)
+Covers: Federal, South Australia (SA), Victoria (VIC), New South Wales (NSW), Western Australia (WA), Queensland (QLD), Tasmania (TAS)
 
 ## FEDERAL REGULATIONS
 
@@ -476,6 +476,78 @@ Contact: Business Queensland — 13 QGOV (13 74 68) — business.qld.gov.au
 Contact: Queensland Health — qld.gov.au/health; Local council (varies by region)
 
 ---
+## TASMANIA (TAS) REGULATIONS
+### Liquor Licensing — Commissioner for Licensing (Liquor Licensing Act 1990 TAS)
+Administered by the Commissioner for Licensing, Department of Treasury and Finance.
+Liquor licence types relevant to wineries:
+- General Licence: allows sale of liquor between 5 am and midnight daily. Used by some producers for cellar door operations.
+- Special Licence: a licence subject to conditions; commonly used by wine producers, restaurants, and function centres.
+- Off Licence: for retail sales of liquor for consumption off the premises (e.g. cellar door bottle sales).
+Key requirements:
+- A liquor licence can only be granted to a person, not a company or club.
+- Application processing time: 4–6 weeks (some applications may take longer).
+- Responsible service of alcohol (RSA) training is expected for all staff serving liquor.
+Small Producer's Permit:
+- Allows Tasmanian craft and boutique liquor producers to sell at events (farmer's markets, food festivals, agricultural shows).
+- Granted for 12 months; covers approved events listed in the initial application.
+- Eligibility (wine): total sales in the previous financial year < 28,500 litres; 85% of fruit must be grown in Tasmania.
+- New events during the permit period require written approval from the Commissioner at least 7 days before the event.
+- Application: Small Producers Permit Application form + application fee.
+Contact: Commissioner for Licensing — licensing@treasury.tas.gov.au | (03) 6166 4040 — treasury.tas.gov.au/liquor-and-gaming
+### Environmental Obligations — EPA Tasmania (EMPCA 1994 TAS)
+Administered by the Environment Protection Authority (EPA) Tasmania under the Environmental Management and Pollution Control Act 1994 (EMPCA).
+Level 2 Scheduled Activities (environmental licence required):
+- Schedule 2 of EMPCA lists activities requiring a Level 2 environmental licence.
+- Breweries and Distilleries: works with capacity to consume 100 kilolitres or more of water per 8-hour working day require a licence.
+- Most boutique Tasmanian wineries fall below this threshold. Wineries are not separately listed in Schedule 2.
+General duty of care:
+- All operators must comply with EMPCA's general duty to prevent environmental harm from pollution and waste, regardless of whether a formal licence is required.
+- Winery wastewater (marc, lees, wash-down water) must be managed to prevent environmental harm — typically via land application, evaporation ponds, or licensed trade waste to council sewer.
+Relevant regulations under EMPCA:
+- Environmental Management and Pollution Control (General) Regulations 2017
+- Environmental Management and Pollution Control (Noise) Regulations 2016
+- Environmental Management and Pollution Control (Waste Management) Regulations 2020
+Contact: EPA Tasmania — Enquiries@epa.tas.gov.au | (03) 6165 4599 — epa.tas.gov.au
+### Work Health and Safety — WorkSafe Tasmania (WHS Act 2012 TAS)
+Administered by WorkSafe Tasmania under the Work Health and Safety Act 2012.
+Key obligations for wineries:
+- Provide and maintain a safe working environment, so far as is reasonably practicable.
+- Confined spaces: fermentation tanks, underground cellars, and storage areas can accumulate CO2 to dangerous levels. A confined space entry procedure, atmospheric testing, and trained standby person are required.
+- CO2 monitoring mandatory during active fermentation.
+- Chemical register and SDS: all hazardous chemicals listed with current Safety Data Sheets. SO2 handling requires PPE.
+- Manual handling risk assessments for barrel handling, bin work, and harvest activities.
+- Forklift operators: must hold a High Risk Work Licence (HRWL).
+- Incident reporting: serious injuries, illnesses, and dangerous incidents must be notified to WorkSafe Tasmania immediately (1300 366 322).
+- Workers' compensation insurance is mandatory under the Workers Rehabilitation and Compensation Act 1988.
+Codes of Practice available at worksafe.tas.gov.au:
+- Confined Spaces Code of Practice
+- Managing Risks of Hazardous Chemicals Code of Practice
+Contact: WorkSafe Tasmania — 1300 366 322 — worksafe.tas.gov.au
+### Planning and Land Use — Local Council (LUPAA 1993 TAS)
+Administered by local councils as planning authorities under the Land Use Planning and Approvals Act 1993 (LUPAA) and the Tasmanian Planning Scheme (TPS).
+Winery and cellar door classification under TPS:
+- A winery is classified as Resource Processing under the TPS.
+- A cellar door (sale of farm goods/products) is classified as Resource Processing associated with Resource Development.
+- In the Rural Zone and Agriculture Zone, Resource Processing is a Permitted use — no discretionary assessment required for a standard winery + cellar door operation.
+- Agritourism activities (wine tasting, cellar door sales, farm produce sales, cafes showcasing products) are Permitted if associated with Resource Processing in Rural/Agriculture zones.
+- Roadside stalls located on the edge of a council road are exempt from a planning permit but may be subject to council by-laws.
+State Policy on the Protection of Agricultural Land 2009 applies to all development in agricultural zones.
+Primary Industry Activities Protection Act 1995 protects primary producers (including viticulture) from nuisance claims related to normal farming activities.
+Recommendation: Discuss specific circumstances with a qualified planner or your local council before commencing.
+Contact: Local council planning department — planbuild.tas.gov.au
+### Food Safety — Local Council (Food Act 2003 TAS)
+- Any business selling food (including cellar door food service, café, or food with wine tastings) must be registered as a food business with the relevant local council under the Food Act 2003.
+- Registration is required before commencing operations.
+- The Food Standards Code (FSANZ) prescribes permitted additives, processing aids, and labelling requirements for wine.
+- Sale of wine alone (without food) does not require food business registration, but any food service triggers the requirement.
+Contact: Local council (varies by location) — health.tas.gov.au
+### Water Licensing — NRE Tasmania (Water Management Act 1999 TAS)
+- A water licence is required under the Water Management Act 1999 to take water from a surface water or groundwater source for irrigation (vineyard irrigation) or winery processing.
+- Water licences are issued under a water management plan for the relevant catchment.
+- Contact NRE Tasmania for licence applications and current allocation status in your catchment.
+Contact: Department of Natural Resources and Environment Tasmania — nre.tas.gov.au/water
+
+---
 
 ## KEY CONTACTS
 
@@ -504,10 +576,15 @@ Contact: Queensland Health — qld.gov.au/health; Local council (varies by regio
 | DETSI (QLD) | Environmental authority (QLD) | detsi.qld.gov.au |
 | WorkSafe QLD | WHS (QLD) | worksafe.qld.gov.au |
 | Local council | Food business registration, development approval | (varies by council) |
+| Commissioner for Licensing (TAS) | Liquor licences and permits (TAS) | treasury.tas.gov.au/liquor-and-gaming |
+| EPA Tasmania | Environmental obligations (TAS) | epa.tas.gov.au |
+| WorkSafe Tasmania | WHS (TAS) | worksafe.tas.gov.au |
+| NRE Tasmania | Water licences (TAS) | nre.tas.gov.au/water |
+| Wine Tasmania | Industry body, VinO Program (TAS) | winetasmania.com.au |
 `;
 
 // ─── Sample questions ─────────────────────────────────────────────────────────
-type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW" | "WA" | "QLD";
+type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW" | "WA" | "QLD" | "TAS";
 
 const SAMPLE_QUESTIONS: { q: string; state: StateFilter }[] = [
   { q: "What are the LIP record-keeping requirements for vintage labelling?", state: "Federal" },
@@ -531,13 +608,16 @@ const SAMPLE_QUESTIONS: { q: string; state: StateFilter }[] = [
   { q: "What wine producer licence do I need to operate a winery in Queensland?", state: "QLD" },
   { q: "Does my Granite Belt winery need an Environmental Authority under ERA 22?", state: "QLD" },
   { q: "What are the WorkSafe Queensland obligations for confined spaces in a winery?", state: "QLD" },
+  { q: "What liquor licence do I need to operate a cellar door in Tasmania?", state: "TAS" },
+  { q: "Does my Tasmanian winery need an environmental licence under EMPCA?", state: "TAS" },
+  { q: "What is the Small Producer's Permit and who qualifies in Tasmania?", state: "TAS" },
 ];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Message = { role: "user" | "assistant"; content: string };
 
 // ─── Main component ───────────────────────────────────────────────────────────
-const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW", "WA", "QLD"];
+const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS"];
 
 const STATE_LABELS: Record<StateFilter, string> = {
   All: "All Jurisdictions",
@@ -547,6 +627,7 @@ const STATE_LABELS: Record<StateFilter, string> = {
   NSW: "New South Wales",
   WA: "Western Australia",
   QLD: "Queensland",
+  TAS: "Tasmania",
 };
 
 // ─── Knowledge base sections (for jurisdiction-scoped prompts) ────────────────
@@ -556,7 +637,8 @@ const KB_SECTIONS: Record<string, string> = {
   VIC: "## VICTORIA (VIC) REGULATIONS" + (KNOWLEDGE_BASE.split("## VICTORIA (VIC) REGULATIONS")[1]?.split("## NEW SOUTH WALES (NSW) REGULATIONS")[0] ?? ""),
   NSW: "## NEW SOUTH WALES (NSW) REGULATIONS" + (KNOWLEDGE_BASE.split("## NEW SOUTH WALES (NSW) REGULATIONS")[1]?.split("## WESTERN AUSTRALIA (WA) REGULATIONS")[0] ?? ""),
   WA: "## WESTERN AUSTRALIA (WA) REGULATIONS" + (KNOWLEDGE_BASE.split("## WESTERN AUSTRALIA (WA) REGULATIONS")[1]?.split("## QUEENSLAND (QLD) REGULATIONS")[0] ?? ""),
-  QLD: "## QUEENSLAND (QLD) REGULATIONS" + (KNOWLEDGE_BASE.split("## QUEENSLAND (QLD) REGULATIONS")[1]?.split("## KEY CONTACTS")[0] ?? ""),
+  QLD: "## QUEENSLAND (QLD) REGULATIONS" + (KNOWLEDGE_BASE.split("## QUEENSLAND (QLD) REGULATIONS")[1]?.split("## TASMANIA (TAS) REGULATIONS")[0] ?? ""),
+  TAS: "## TASMANIA (TAS) REGULATIONS" + (KNOWLEDGE_BASE.split("## TASMANIA (TAS) REGULATIONS")[1]?.split("## KEY CONTACTS")[0] ?? ""),
   Contacts: "## KEY CONTACTS" + (KNOWLEDGE_BASE.split("## KEY CONTACTS")[1] ?? ""),
 };
 
@@ -608,10 +690,10 @@ export default function Compliance() {
       const classifierPrompt = `You are a jurisdiction classifier for Australian winery regulatory questions.
 Given a user question, identify which Australian jurisdictions it relates to.
 Respond with a JSON object only, no explanation:
-{"jurisdictions": ["Federal", "SA", "VIC", "NSW", "WA", "QLD"], "inScope": true}
+{"jurisdictions": ["Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS"], "inScope": true}
 
 Rules:
-- "jurisdictions" must be an array containing only values from: "Federal", "SA", "VIC", "NSW", "WA", "QLD"
+- "jurisdictions" must be an array containing only values from: "Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS"
 - Always include "Federal" if the question touches on Wine Australia, FSANZ, WET, biosecurity, or WHS model law
 - "inScope" must be false if the question is completely unrelated to Australian winery regulations (e.g. weather, sport, cooking)
 - If the user filter is not "All", bias toward that jurisdiction but include Federal if relevant
@@ -629,7 +711,7 @@ User question: ${question.trim()}`;
         }),
       });
 
-      let detectedJurisdictions: string[] = ["Federal", "SA", "VIC", "NSW", "WA", "QLD"];
+      let detectedJurisdictions: string[] = ["Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS"];
       let inScope = true;
 
       if (classifierResp.ok) {
@@ -795,7 +877,7 @@ ${scopedKB}`;
               <circle cx="6" cy="6" r="5" stroke="var(--ow-amber)" strokeWidth="1.2" />
               <path d="M6 4v3M6 8.5v.5" stroke="var(--ow-amber)" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
-            Knowledge base: Federal · SA · VIC · NSW · WA · QLD — last updated May 2026
+            Knowledge base: Federal · SA · VIC · NSW · WA · QLD · TAS — last updated May 2026
           </div>
         </div>
 
@@ -1009,7 +1091,7 @@ ${scopedKB}`;
             className="mt-2 text-center text-xs"
             style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif" }}
           >
-            Answers are AI-generated from our curated knowledge base (Federal, SA, VIC, NSW, WA, QLD). Always verify with the relevant agency or a qualified compliance professional.
+            Answers are AI-generated from our curated knowledge base (Federal, SA, VIC, NSW, WA, QLD, TAS). Always verify with the relevant agency or a qualified compliance professional.
           </p>
         </form>
 
