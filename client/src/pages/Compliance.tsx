@@ -4,8 +4,9 @@
  * LLM: Manus Forge frontend API (VITE_FRONTEND_FORGE_API_KEY)
  */
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "wouter";
+import { toast } from "sonner";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -651,6 +652,64 @@ function buildScopedKnowledgeBase(jurisdictions: string[]): string {
   return parts.join("\n\n");
 }
 
+// ─── CopyButton — clipboard icon with animated checkmark feedback ─────────────
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      toast.success("Copied to clipboard", { duration: 2000 });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Copy failed — please select and copy manually");
+    }
+  }, [text]);
+
+  return (
+    <button
+      onClick={handleCopy}
+      title={copied ? "Copied!" : "Copy answer"}
+      className="mt-3 flex items-center gap-1.5 transition-all"
+      style={{
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        padding: "4px 8px",
+        borderRadius: "4px",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        color: copied ? "var(--ow-amber)" : "var(--ow-text-lo)",
+        fontFamily: "'Lato',sans-serif",
+        fontSize: "0.72rem",
+        letterSpacing: "0.06em",
+        opacity: copied ? 1 : 0.7,
+        transition: "color 0.2s, opacity 0.2s",
+      }}
+      onMouseEnter={e => { if (!copied) (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+      onMouseLeave={e => { if (!copied) (e.currentTarget as HTMLButtonElement).style.opacity = "0.7"; }}
+    >
+      {copied ? (
+        // Checkmark icon
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+          <circle cx="6.5" cy="6.5" r="5.5" stroke="var(--ow-amber)" strokeWidth="1.2" />
+          <path d="M4 6.5l2 2 3-3" stroke="var(--ow-amber)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ) : (
+        // Clipboard icon
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+          <rect x="4" y="1.5" width="7" height="9" rx="1" stroke="currentColor" strokeWidth="1.2" />
+          <path d="M4 3H3a1 1 0 00-1 1v7a1 1 0 001 1h6a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <path d="M6 1.5h2a1 1 0 010 2H6a1 1 0 010-2z" stroke="currentColor" strokeWidth="1.2" />
+        </svg>
+      )}
+      {copied ? "Copied!" : "Copy"}
+    </button>
+  );
+}
+
 export default function Compliance() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -999,6 +1058,9 @@ ${scopedKB}`;
                   }}
                 >
                   {msg.content}
+                  {msg.role === "assistant" && (
+                    <CopyButton text={msg.content} />
+                  )}
                 </div>
               </div>
             ))}

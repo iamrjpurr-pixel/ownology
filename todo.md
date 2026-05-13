@@ -110,3 +110,4 @@
 - [x] Slide-out shopping cart drawer: multi-item cart state, quantity controls, subtotal, Stripe checkout button
 - [x] Tap-to-zoom modal / swipeable image gallery for mobile merch artwork inspection
 - [x] Customer review and star-rating section below each merch product card (static seed reviews + submit form)
+- [x] Add copy-to-clipboard button to each AI response on Compliance page (icon button, checkmark feedback on success)
