@@ -14,6 +14,7 @@ import Resources from "./pages/Resources";
 import Compliance from "./pages/Compliance";
 import FreeRun from "./pages/FreeRun";
 import ThePress from "./pages/ThePress";
+import Pricing from "./pages/Pricing";
 
 
 function Router() {
@@ -29,6 +30,7 @@ function Router() {
       <Route path={"/compliance"} component={Compliance} />
       <Route path={"/free-run"} component={FreeRun} />
       <Route path={"/the-press"} component={ThePress} />
+      <Route path={"/pricing"} component={Pricing} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

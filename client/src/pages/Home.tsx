@@ -64,7 +64,7 @@ const PRIMARY_NAV: NavItem[] = [
 // Secondary links — shown in "More" dropdown on desktop, full list on mobile
 const MORE_NAV: NavItem[] = [
   { label: "Our Story",  href: "#our-story" },
-  { label: "Pricing",   href: "#pricing" },
+  { label: "Pricing",   href: "/pricing" },
   { label: "FAQ",       href: "#faq" },
   { label: "Blog",      href: "/blog" },
   { label: "Resources", href: "/resources" },

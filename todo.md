@@ -68,3 +68,5 @@
 - [x] Build The Press (working board) page — vintage log, calculation history, notes
 - [x] Add Free Run and The Press to navigation and App.tsx routing
 - [x] Add onboarding welcome copy using full winemaking vocabulary
+- [x] Build /pricing page with tier cards (Free Run / The Cellar / The Press / Cellar Master), credit packs, FAQ, and founding member banner
+- [x] Wire /pricing route in App.tsx and update Pricing nav link to point to /pricing
