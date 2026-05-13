@@ -2,6 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
+import merchRouter from "./merch/api.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -9,6 +10,15 @@ const __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
   const server = createServer(app);
+
+  // Mount Stripe webhook BEFORE express.json() so raw body is preserved
+  app.use("/api/stripe/webhook", express.raw({ type: "application/json" }), (req, res, next) => {
+    req.url = "/webhook";
+    (merchRouter as express.Router)(req, res, next);
+  });
+
+  // Mount merch API routes
+  app.use("/api/merch", merchRouter);
 
   // Serve static files from dist/public in production
   const staticPath =

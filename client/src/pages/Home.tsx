@@ -71,6 +71,7 @@ const MORE_NAV: NavItem[] = [
   { label: "Compliance", href: "/compliance" },
   { label: "Free Run",  href: "/free-run" },
   { label: "The Press", href: "/the-press" },
+  { label: "Merch",     href: "/merch" },
 ];
 const NAV_LINKS: NavItem[] = [...PRIMARY_NAV, ...MORE_NAV];
 
@@ -1243,6 +1244,9 @@ function Footer() {
           <Link href="/compliance" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
             onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
             onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Compliance</Link>
+          <Link href="/merch" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
+            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
+            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Merch</Link>
         </div>
       </div>
     </footer>

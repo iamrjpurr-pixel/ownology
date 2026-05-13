@@ -15,6 +15,9 @@ import Compliance from "./pages/Compliance";
 import FreeRun from "./pages/FreeRun";
 import ThePress from "./pages/ThePress";
 import Pricing from "./pages/Pricing";
+import Merch from "./pages/Merch";
+import MerchSuccess from "./pages/MerchSuccess";
+import MerchCancel from "./pages/MerchCancel";
 
 
 function Router() {
@@ -31,6 +34,9 @@ function Router() {
       <Route path={"/free-run"} component={FreeRun} />
       <Route path={"/the-press"} component={ThePress} />
       <Route path={"/pricing"} component={Pricing} />
+      <Route path={"/merch/success"} component={MerchSuccess} />
+      <Route path={"/merch/cancel"} component={MerchCancel} />
+      <Route path={"/merch"} component={Merch} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

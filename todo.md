@@ -83,3 +83,24 @@
 - [x] Research and save TAS winery regulatory requirements to ~/rules-and-regs/states/TAS/
 - [x] Add TAS to Compliance agent knowledge base, state filter pill, sample questions, badge, and contacts
 - [x] Add TAS tab and 6 resource cards to Resources page
+- [ ] Add campaign_metrics_snapshots table to drizzle schema (weekly KPI snapshots)
+- [ ] Add server procedures: getCampaignMetrics query + updateCampaignMetrics mutation (owner-only)
+- [ ] Add /api/scheduled/campaign-metrics Heartbeat handler (weekly Monday 09:00 AEST)
+- [ ] Register weekly Heartbeat cron via manus-heartbeat CLI
+- [ ] Build CampaignMetrics dashboard page with trend charts and KPI cards
+- [ ] Add Campaign Metrics route to App.tsx and DashboardLayout nav
+- [ ] Write vitest tests for campaign metrics procedures
+- [x] Fix Compliance.tsx missing import error in App.tsx
+- [x] Fix heartbeat.ts TypeScript errors (missing @trpc/server and ./env modules)
+- [x] Generate founding member badge / glyph artwork (amber foil, dark background)
+- [x] Generate cellar door coaster designs (round cork coaster, 2 variants)
+- [x] Generate bar towel design (linen bar runner with Ownology branding)
+- [x] Generate bottle label sticker (founding member amber foil label)
+- [x] Generate pocket notebook cover design (A6 dark cover, amber foil logo)
+- [x] Add Stripe feature scaffold and configure Stripe secret keys
+- [x] Add merch_orders table to database schema and push migration (no DB needed — Stripe stores order data)
+- [x] Build Express API: GET /api/merch/products, POST /api/merch/checkout, POST /api/stripe/webhook
+- [x] Build /merch page with product cards (coasters dark/light, bar towel, notebook)
+- [x] Build /merch/success and /merch/cancel redirect pages
+- [x] Wire Stripe webhook for order fulfilment and owner notification
+- [x] Add Merch link to Home.tsx navigation and footer
