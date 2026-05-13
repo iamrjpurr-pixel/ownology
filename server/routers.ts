@@ -1,4 +1,5 @@
 import { z } from "zod";
+import Stripe from "stripe";
 import { router, publicProcedure, ownerProcedure } from "./trpc.js";
 import {
   getCampaignMetricsHistory,
@@ -8,6 +9,12 @@ import {
   listFoundingMembers,
   addFoundingMember,
 } from "./db.js";
+
+function getStripe(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("STRIPE_SECRET_KEY is not configured");
+  return new Stripe(key, { apiVersion: "2026-04-22.dahlia" });
+}
 
 // ─── Campaign Metrics Router ──────────────────────────────────────────────────
 
@@ -84,11 +91,99 @@ const foundingMembersRouter = router({
     }),
 });
 
+// ─── Orders Router ───────────────────────────────────────────────────────────
+// Reads directly from Stripe — no local DB table needed.
+
+export interface OrderLineItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitAmountAud: number; // cents
+  totalAmountAud: number; // cents
+}
+
+export interface MerchOrder {
+  sessionId: string;
+  createdAt: number; // Unix ms
+  customerEmail: string | null;
+  customerName: string | null;
+  amountTotalAud: number; // cents
+  currency: string;
+  status: "complete" | "expired" | "open";
+  paymentStatus: string;
+  lineItems: OrderLineItem[];
+  stripeUrl: string;
+}
+
+const ordersRouter = router({
+  // Owner-only: list recent completed checkout sessions with expanded line items
+  list: ownerProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).default(50),
+        startingAfter: z.string().optional(),
+      }).optional()
+    )
+    .query(async ({ input }) => {
+      const stripe = getStripe();
+      const limit = input?.limit ?? 50;
+
+      const params: Stripe.Checkout.SessionListParams = {
+        limit,
+        expand: ["data.line_items"],
+      };
+      if (input?.startingAfter) params.starting_after = input.startingAfter;
+
+      const sessions = await stripe.checkout.sessions.list(params);
+
+      const orders: MerchOrder[] = sessions.data.map((session) => {
+        const lineItems: OrderLineItem[] = (session.line_items?.data ?? []).map((li) => ({
+          productId: (li.price?.metadata?.product_id as string | undefined) ?? li.price?.id ?? "unknown",
+          productName: li.description ?? li.price?.product?.toString() ?? "Unknown product",
+          quantity: li.quantity ?? 1,
+          unitAmountAud: li.price?.unit_amount ?? 0,
+          totalAmountAud: li.amount_total ?? 0,
+        }));
+
+        return {
+          sessionId: session.id,
+          createdAt: session.created * 1000,
+          customerEmail: session.customer_details?.email ?? session.customer_email ?? null,
+          customerName: session.customer_details?.name ?? null,
+          amountTotalAud: session.amount_total ?? 0,
+          currency: session.currency ?? "aud",
+          status: session.status as MerchOrder["status"],
+          paymentStatus: session.payment_status,
+          lineItems,
+          stripeUrl: `https://dashboard.stripe.com/payments/${session.payment_intent}`,
+        };
+      });
+
+      // Summary stats
+      const completedOrders = orders.filter(
+        (o) => o.status === "complete" && o.paymentStatus === "paid"
+      );
+      const totalRevenue = completedOrders.reduce((sum, o) => sum + o.amountTotalAud, 0);
+      const totalOrders = completedOrders.length;
+
+      return {
+        orders,
+        hasMore: sessions.has_more,
+        summary: {
+          totalOrders,
+          totalRevenue,
+          avgOrderValue: totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0,
+        },
+      };
+    }),
+});
+
 // ─── App Router ───────────────────────────────────────────────────────────────
 
 export const appRouter = router({
   campaignMetrics: campaignMetricsRouter,
   foundingMembers: foundingMembersRouter,
+  orders: ordersRouter,
 });
 
 export type AppRouter = typeof appRouter;

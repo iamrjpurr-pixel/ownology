@@ -111,3 +111,9 @@
 - [x] Tap-to-zoom modal / swipeable image gallery for mobile merch artwork inspection
 - [x] Customer review and star-rating section below each merch product card (static seed reviews + submit form)
 - [x] Add copy-to-clipboard button to each AI response on Compliance page (icon button, checkmark feedback on success)
+- [x] Add tRPC ownerProcedure orders.list — fetches last 50 Stripe checkout sessions with line items expanded
+- [x] Build /orders owner-only page — order table (date, product, amount, customer email), KPI summary row, status badge
+- [x] Wire /orders route in App.tsx and add Orders link to Campaign Metrics nav / More dropdown
+- [x] Write vitest tests for orders.list procedure schema validation
+- [x] Implement JWT cookie auth in createContext — parse app_session_id cookie, verify with JWT_SECRET (HMAC-SHA256 via jose 6.x), populate ctx.user so ownerProcedure works in production
+- [x] OAuth callback handled by Manus platform via manus-runtime.js postMessage; no server-side route needed

@@ -19,6 +19,7 @@ import Merch from "./pages/Merch";
 import MerchSuccess from "./pages/MerchSuccess";
 import MerchCancel from "./pages/MerchCancel";
 import CampaignMetrics from "./pages/CampaignMetrics";
+import Orders from "./pages/Orders";
 
 
 function Router() {
@@ -39,6 +40,7 @@ function Router() {
       <Route path={"/merch/cancel"} component={MerchCancel} />
       <Route path={"/merch"} component={Merch} />
       <Route path={"/campaign-metrics"} component={CampaignMetrics} />
+      <Route path={"/orders"} component={Orders} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
