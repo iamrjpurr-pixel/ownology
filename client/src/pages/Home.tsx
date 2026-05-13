@@ -10,6 +10,7 @@ import FounderStory from "@/components/FounderStory";
 import FAQ from "@/components/FAQ";
 import { Link } from "wouter";
 import ThemeToggle, { useOwnologyTheme } from "@/components/ThemeToggle";
+import { trpc } from "@/lib/trpc";
 
 // ─── Image URLs ───────────────────────────────────────────────────────────────
 const HERO_IMG    = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-hero-HqkryW7dQ2C9TbhdmJ8Kff.webp";
@@ -143,6 +144,12 @@ function MoreDropdown({ items }: { items: NavItem[] }) {
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Silently check owner status. FORBIDDEN for non-owners (no crash), data defined for owner.
+  const { data: adminData } = trpc.admin.summary.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const isOwner = !!adminData;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -192,7 +199,7 @@ function Nav() {
               )
             ))}
             {/* More dropdown */}
-            <MoreDropdown items={MORE_NAV} />
+            <MoreDropdown items={isOwner ? [...MORE_NAV, { label: "Admin", href: "/admin" }] : MORE_NAV} />
           </div>
 
           <div className="hidden md:flex items-center gap-3">
@@ -265,7 +272,7 @@ function Nav() {
         }}
       >
         <div className="container flex flex-col gap-1">
-          {NAV_LINKS.map((item, i) => {
+          {(isOwner ? [...NAV_LINKS, { label: "Admin", href: "/admin" }] : NAV_LINKS).map((item, i) => {
             const sharedStyle = {
               fontFamily: "'Lato', sans-serif",
               fontWeight: 300,

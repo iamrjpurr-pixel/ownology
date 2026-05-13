@@ -178,12 +178,48 @@ const ordersRouter = router({
     }),
 });
 
+// ─── Admin Router ────────────────────────────────────────────────────────────
+// Single ownerProcedure that confirms ownership and returns a lightweight
+// summary for the /admin hub page (avoids multiple round-trips).
+
+const adminRouter = router({
+  summary: ownerProcedure.query(async () => {
+    // Latest campaign snapshot
+    const latest = await getLatestCampaignMetrics();
+    // Founding member count
+    const foundingMemberCount = await getFoundingMemberCount();
+    // Stripe: count of completed sessions (last 100)
+    let stripeOrderCount = 0;
+    let stripeRevenueCents = 0;
+    try {
+      const stripe = getStripe();
+      const sessions = await stripe.checkout.sessions.list({ limit: 100 });
+      const completed = sessions.data.filter(
+        (s) => s.status === "complete" && s.payment_status === "paid"
+      );
+      stripeOrderCount = completed.length;
+      stripeRevenueCents = completed.reduce((sum, s) => sum + (s.amount_total ?? 0), 0);
+    } catch {
+      // Stripe not configured yet — return zeros
+    }
+    return {
+      waitlistCount: latest?.waitlistCount ?? 0,
+      foundingMemberCount,
+      stripeOrderCount,
+      stripeRevenueCents,
+      latestWeek: latest?.weekLabel ?? null,
+      snapshotAt: latest?.snapshotAt ?? null,
+    };
+  }),
+});
+
 // ─── App Router ───────────────────────────────────────────────────────────────
 
 export const appRouter = router({
   campaignMetrics: campaignMetricsRouter,
   foundingMembers: foundingMembersRouter,
   orders: ordersRouter,
+  admin: adminRouter,
 });
 
 export type AppRouter = typeof appRouter;

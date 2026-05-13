@@ -118,3 +118,6 @@
 - [x] Implement JWT cookie auth in createContext — parse app_session_id cookie, verify with JWT_SECRET (HMAC-SHA256 via jose 6.x), populate ctx.user so ownerProcedure works in production
 - [x] OAuth callback handled by Manus platform via manus-runtime.js postMessage; no server-side route needed
 - [x] Fix dev server port detection: change merch vitePlugin log message to not include port number (was causing platform to expose port 39087 instead of port 3000)
+- [x] Build /admin owner-only hub page (Admin.tsx) — grid of cards linking to Campaign Metrics, Orders, Founding Members, with owner-gated access and FORBIDDEN fallback
+- [x] Wire /admin route in App.tsx
+- [x] Add conditional "Admin" link to More dropdown in Home.tsx nav — visible only when owner is logged in
