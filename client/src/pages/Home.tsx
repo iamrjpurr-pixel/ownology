@@ -69,6 +69,8 @@ const MORE_NAV: NavItem[] = [
   { label: "Blog",      href: "/blog" },
   { label: "Resources", href: "/resources" },
   { label: "Compliance", href: "/compliance" },
+  { label: "Free Run",  href: "/free-run" },
+  { label: "The Press", href: "/the-press" },
 ];
 const NAV_LINKS: NavItem[] = [...PRIMARY_NAV, ...MORE_NAV];
 

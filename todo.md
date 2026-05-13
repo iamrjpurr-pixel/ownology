@@ -62,3 +62,9 @@
 - [x] Implement two-stage triage router in Compliance tRPC procedure (Stage 1: cheap classifier, Stage 2: scoped answer)
 - [x] Add out-of-scope guard (return polite message if classifier returns Unknown/off-topic)
 - [x] Scope system prompt to only relevant jurisdiction sections based on classifier result
+- [ ] Add 'Knowledge base last updated' timestamp to Compliance page header
+- [ ] Generate plain-English lesson library from curricula document (40+ subjects) — DEFERRED to 4-week education build
+- [x] Build Free Run (Chalk) learning board page — lesson cards, domain filters, vocabulary section
+- [x] Build The Press (working board) page — vintage log, calculation history, notes
+- [x] Add Free Run and The Press to navigation and App.tsx routing
+- [x] Add onboarding welcome copy using full winemaking vocabulary

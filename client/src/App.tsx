@@ -12,6 +12,8 @@ import Blog from "./pages/Blog";
 import BlogArticle from "./pages/BlogArticle";
 import Resources from "./pages/Resources";
 import Compliance from "./pages/Compliance";
+import FreeRun from "./pages/FreeRun";
+import ThePress from "./pages/ThePress";
 
 
 function Router() {
@@ -25,6 +27,8 @@ function Router() {
       <Route path={"/blog/:slug"} component={BlogArticle} />
       <Route path={"/resources"} component={Resources} />
       <Route path={"/compliance"} component={Compliance} />
+      <Route path={"/free-run"} component={FreeRun} />
+      <Route path={"/the-press"} component={ThePress} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
