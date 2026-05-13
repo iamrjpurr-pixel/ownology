@@ -72,3 +72,5 @@
 - [x] Wire /pricing route in App.tsx and update Pricing nav link to point to /pricing
 - [x] Add 'Start Free Trial' CTA section to the bottom of the Pricing page linking to waitlist capture
 - [x] Fix 'Start Free Trial' nav button in Home.tsx to route to /pricing instead of #pricing anchor
+- [ ] Add founding member counter to Pricing page (live countdown from 99, database-backed)
+- [ ] Build cost model spreadsheet (tiers, credit packs, cost vs revenue, margin forecasts)

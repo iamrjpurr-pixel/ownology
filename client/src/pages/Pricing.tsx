@@ -98,6 +98,9 @@ function WaitlistCapture() {
 type BillingCycle = "monthly" | "annual";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
+// UPDATE THIS NUMBER as paid founding members sign up (starts at 99, min 0)
+const FOUNDING_SPOTS_REMAINING = 99;
+
 const TIERS = [
   {
     id: "free_run",
@@ -814,50 +817,83 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Founding member banner */}
+      {/* Founding member banner with counter */}
       <div className="container max-w-5xl mx-auto mb-8">
         <div
-          className="rounded-sm px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3"
+          className="rounded-sm px-6 py-5"
           style={{
             background: "oklch(0.72 0.12 75 / 8%)",
             border: "1px solid oklch(0.72 0.12 75 / 25%)",
           }}
         >
-          <div
-            className="w-8 h-8 rounded-sm flex items-center justify-center flex-shrink-0"
-            style={{ background: "oklch(0.72 0.12 75 / 15%)" }}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M8 2l1.5 3.5L13 6l-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-.5L8 2z"
-                stroke="oklch(0.72 0.12 75)"
-                strokeWidth="1.2"
-                strokeLinejoin="round"
-              />
-            </svg>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
+            <div
+              className="w-8 h-8 rounded-sm flex items-center justify-center flex-shrink-0"
+              style={{ background: "oklch(0.72 0.12 75 / 15%)" }}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M8 2l1.5 3.5L13 6l-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-.5L8 2z"
+                  stroke="oklch(0.72 0.12 75)"
+                  strokeWidth="1.2"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p
+                className="text-sm font-medium"
+                style={{ fontFamily: "'Lato', sans-serif", color: "oklch(0.80 0.015 75)" }}
+              >
+                Founding Member Offer — First 99 paid subscribers
+              </p>
+              <p
+                className="text-xs mt-0.5"
+                style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "oklch(0.55 0.012 75)" }}
+              >
+                Pricing locked for life · Permanent founding badge · Direct product input · Name in Our Story (optional).
+                Numbers 1–9 reserved; public subscriptions begin at #11.
+              </p>
+            </div>
+            {/* Spot counter */}
+            <div
+              className="flex-shrink-0 text-center px-5 py-3 rounded-sm"
+              style={{ background: "oklch(0.72 0.12 75 / 12%)", border: "1px solid oklch(0.72 0.12 75 / 20%)" }}
+            >
+              <p
+                style={{ fontFamily: "'Fira Code', monospace", fontSize: "2rem", fontWeight: 700, color: "oklch(0.72 0.12 75)", lineHeight: 1 }}
+              >
+                {FOUNDING_SPOTS_REMAINING}
+              </p>
+              <p
+                style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.65rem", color: "oklch(0.55 0.012 75)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: "0.25rem" }}
+              >
+                spots remaining
+              </p>
+            </div>
           </div>
+          {/* Progress bar */}
           <div>
-            <p
-              className="text-sm font-medium"
-              style={{
-                fontFamily: "'Lato', sans-serif",
-                color: "oklch(0.80 0.015 75)",
-              }}
+            <div className="flex justify-between mb-1.5">
+              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "oklch(0.55 0.012 75)" }}>
+                {99 - FOUNDING_SPOTS_REMAINING} of 99 founding spots claimed
+              </span>
+              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "oklch(0.72 0.12 75)" }}>
+                {Math.round(((99 - FOUNDING_SPOTS_REMAINING) / 99) * 100)}% claimed
+              </span>
+            </div>
+            <div
+              className="w-full h-1.5 rounded-full overflow-hidden"
+              style={{ background: "oklch(0.22 0.010 60)" }}
             >
-              Founding Member Offer — First 99 paid subscribers
-            </p>
-            <p
-              className="text-xs mt-0.5"
-              style={{
-                fontFamily: "'Lato', sans-serif",
-                fontWeight: 300,
-                color: "oklch(0.55 0.012 75)",
-              }}
-            >
-              Pricing locked for life · Permanent founding badge · Direct
-              product input · Name in Our Story (optional). Numbers 1–9
-              reserved; public subscriptions begin at #11.
-            </p>
+              <div
+                className="h-full rounded-full transition-all duration-1000"
+                style={{
+                  width: `${Math.max(2, ((99 - FOUNDING_SPOTS_REMAINING) / 99) * 100)}%`,
+                  background: "linear-gradient(90deg, oklch(0.65 0.10 75), oklch(0.72 0.12 75))",
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
