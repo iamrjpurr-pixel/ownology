@@ -684,7 +684,7 @@ ${scopedKB}`;
               maxWidth: "560px",
             }}
           >
-            Ask any question about Australian winery regulations — federal (Wine Australia, FSANZ, WET, WHS, biosecurity) or state-specific rules for South Australia, Victoria, and New South Wales. Use the jurisdiction filter below to focus on your state.
+            Ask any question about Australian winery regulations — federal (Wine Australia, FSANZ, WET, WHS, biosecurity) or state-specific rules for South Australia, Victoria, New South Wales, and Western Australia. Use the jurisdiction filter below to focus on your state.
           </p>
           <div
             className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-sm text-xs"
@@ -699,7 +699,7 @@ ${scopedKB}`;
               <circle cx="6" cy="6" r="5" stroke="var(--ow-amber)" strokeWidth="1.2" />
               <path d="M6 4v3M6 8.5v.5" stroke="var(--ow-amber)" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
-            Knowledge base: Federal · SA · VIC · NSW | Updated May 2026
+            Knowledge base: Federal · SA · VIC · NSW · WA — last updated May 2026
           </div>
         </div>
 
