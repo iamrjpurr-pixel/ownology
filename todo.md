@@ -104,3 +104,4 @@
 - [x] Build /merch/success and /merch/cancel redirect pages
 - [x] Wire Stripe webhook for order fulfilment and owner notification
 - [x] Add Merch link to Home.tsx navigation and footer
+- [x] Add artwork zoom-on-hover effect to merch product cards (CSS transform scale + overflow:hidden, smooth transition, detail crop reveal)

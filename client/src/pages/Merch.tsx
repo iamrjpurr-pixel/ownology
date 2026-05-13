@@ -4,7 +4,7 @@
  * Design: dark artisan theme matching the main site (warm black, amber gold, Fraunces/Lato).
  */
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import OwnologyLogo from "@/components/OwnologyLogo";
 
@@ -100,6 +100,9 @@ async function startCheckout(productId: string, quantity: number): Promise<void>
 function ProductCard({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [lensPos, setLensPos] = useState({ x: 50, y: 50 }); // % of image
+  const imgContainerRef = useRef<HTMLDivElement>(null);
 
   const handleBuy = async () => {
     setLoading(true);
@@ -113,7 +116,20 @@ function ProductCard({ product }: { product: Product }) {
     }
   };
 
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = imgContainerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setLensPos({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
+  }, []);
+
   const price = (product.priceAud / 100).toFixed(2);
+
+  // Zoom scale — how much the background image is magnified inside the lens
+  const ZOOM = 2.8;
+  // Lens size in px
+  const LENS = 120;
 
   return (
     <div
@@ -121,15 +137,86 @@ function ProductCard({ product }: { product: Product }) {
       style={{
         background: "oklch(0.14 0.008 60)",
         border: "1px solid oklch(0.72 0.12 75 / 15%)",
+        transition: "border-color 0.25s",
+        ...(hovered ? { borderColor: "oklch(0.72 0.12 75 / 45%)" } : {}),
       }}
     >
-      {/* Product image */}
-      <div className="relative aspect-square overflow-hidden">
+      {/* Product image with zoom lens */}
+      <div
+        ref={imgContainerRef}
+        className="relative aspect-square overflow-hidden"
+        style={{ cursor: "crosshair" }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onMouseMove={handleMouseMove}
+      >
+        {/* Base image — subtle scale on hover */}
         <img
           src={product.imageUrl}
           alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+          className="w-full h-full object-cover"
+          style={{
+            transition: "transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+            transform: hovered ? "scale(1.04)" : "scale(1)",
+          }}
         />
+
+        {/* Magnifier lens — appears on hover, follows cursor */}
+        {hovered && (
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              width: `${LENS}px`,
+              height: `${LENS}px`,
+              borderRadius: "50%",
+              border: "2px solid oklch(0.72 0.12 75 / 70%)",
+              boxShadow: "0 0 0 1px oklch(0 0 0 / 40%), 0 4px 20px oklch(0 0 0 / 60%)",
+              pointerEvents: "none",
+              // Centre lens on cursor
+              left: `calc(${lensPos.x}% - ${LENS / 2}px)`,
+              top: `calc(${lensPos.y}% - ${LENS / 2}px)`,
+              // Clamp lens to stay within the container
+              transform: "translate(0,0)",
+              overflow: "hidden",
+              // Zoomed background
+              backgroundImage: `url(${product.imageUrl})`,
+              backgroundSize: `${ZOOM * 100}%`,
+              backgroundPosition: `${lensPos.x}% ${lensPos.y}%`,
+              backgroundRepeat: "no-repeat",
+              // Amber glow ring
+              outline: "none",
+            }}
+          />
+        )}
+
+        {/* Hover hint — fades out once user moves cursor */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: "10px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "oklch(0 0 0 / 55%)",
+            backdropFilter: "blur(6px)",
+            border: "1px solid oklch(0.72 0.12 75 / 30%)",
+            borderRadius: "2px",
+            padding: "3px 10px",
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.65rem",
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "oklch(0.72 0.12 75)",
+            pointerEvents: "none",
+            opacity: hovered ? 0 : 1,
+            transition: "opacity 0.3s",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Hover to inspect
+        </div>
+
+        {/* Category badge */}
         <div
           className="absolute top-3 left-3 px-2 py-0.5 text-xs tracking-widest uppercase"
           style={{
