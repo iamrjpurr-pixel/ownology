@@ -88,7 +88,7 @@
 - [x] Add campaign_metrics_snapshots table to drizzle schema (weekly KPI snapshots)
 - [x] Add server procedures: getCampaignMetrics query + updateCampaignMetrics mutation (owner-only)
 - [x] Add /api/scheduled/campaign-metrics Heartbeat handler (weekly Monday 09:00 AEST)
-- [ ] Register weekly Heartbeat cron via manus-heartbeat CLI — REQUIRES DEPLOY FIRST
+- [x] Register weekly Heartbeat cron via manus-heartbeat CLI — task_uid: G2Krha4rUqFEFBhCgNLLvn, next run: 2026-05-17T23:00:00Z
 - [x] Build CampaignMetrics dashboard page with trend charts and KPI cards
 - [x] Add Campaign Metrics route to App.tsx (/campaign-metrics)
 - [x] Write vitest tests for campaign metrics procedures
