@@ -627,6 +627,131 @@ const WA_SECTIONS = [
   },
 ];
 
+const QLD_SECTIONS = [
+  {
+    id: "qld-liquor",
+    title: "Wine Producer Licence — OLGR",
+    agency: "Office of Liquor and Gaming Regulation (OLGR)",
+    tags: ["liquor licence", "cellar door", "wine producer", "OLGR", "Wine Industry Act"],
+    summary:
+      "Queensland wineries require a wine producer licence under the Wine Industry Act 1994 (Qld) to manufacture and sell wine. The licence permits on-premises tasting, takeaway sales, and sales at satellite cellar doors. Applications are lodged with the Office of Liquor and Gaming Regulation (OLGR).",
+    keyPoints: [
+      "Wine producer licence required before manufacturing or selling wine commercially in Queensland",
+      "Allows on-premises tasting and consumption, takeaway sales, and satellite cellar door sales",
+      "Other producers' wine may be sold on-premises, provided it does not exceed 49% of annual sales",
+      "Approved wine nominee must be present on each licensed premises",
+      "Annual licence fees due by 31 July each year via OLGR client portal",
+      "Annual return required: lists wine produced, sold, purchased, and blended",
+      "Application: Form 1 + Form 5; criminal history and probity checks required",
+      "Processing time: approximately 2\u20133 months",
+      "Satellite cellar door approval (Form 10) available for sales at a separate premises",
+    ],
+    source: "Wine Industry Act 1994 (Qld) / Wine Industry Regulation 2009 (Qld)",
+    sourceUrl: "https://www.business.qld.gov.au/industries/hospitality-tourism-sport/liquor-gaming/liquor/licensing/licences-permits/types",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "qld-era",
+    title: "Environmental Authority — ERA 22 Beverage Production",
+    agency: "Department of the Environment, Tourism, Science and Innovation (DETSI)",
+    tags: ["ERA", "environmental authority", "wastewater", "DETSI", "beverage production"],
+    summary:
+      "Queensland wineries producing 1 megalitre (1,000 kL) or more of alcoholic beverages per year require an Environmental Authority (EA) under ERA 22(2) \u2014 Beverage Production. Operating without an EA is an offence under the Environmental Protection Act 1994 (Qld).",
+    keyPoints: [
+      "ERA 22(2) threshold: \u2265 1 megalitre (1,000 kL) of alcoholic beverages per year",
+      "Environmental Authority (EA) required before commencing production at or above threshold",
+      "Operating without an EA is an offence under section 426 of the Environmental Protection Act 1994",
+      "Annual fee for ERA 22(2): approximately $17,281 (Aggregate Environmental Score = 55, 2025 rate)",
+      "Applications lodged via DETSI Online Services; contact PALM (palm@detsi.qld.gov.au)",
+      "Winery wastewater (grape marc, wash water, fermentation residues) must comply with EA conditions",
+      "Boutique wineries below 1 ML/year must still comply with the general environmental duty",
+      "ERA 23 (Bottling or canning \u2265 200 tonnes of food) may also apply to larger operations",
+    ],
+    source: "Environmental Protection Act 1994 (Qld) / Environmental Protection Regulation 2019 (Qld)",
+    sourceUrl: "https://www.detsi.qld.gov.au/",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "qld-worksafe",
+    title: "WorkSafe Queensland \u2014 WHS Obligations",
+    agency: "WorkSafe Queensland",
+    tags: ["WHS", "safety", "CO2", "confined space", "WorkSafe Queensland"],
+    summary:
+      "WorkSafe Queensland administers the Work Health and Safety Act 2011 (Qld). Queensland wineries have specific obligations around CO\u2082 confined space entry, chemical handling, seasonal harvest worker safety, and plant registration.",
+    keyPoints: [
+      "Provide and maintain a safe working environment, so far as is reasonably practicable",
+      "Confined space entry: written permit system, atmospheric testing, trained standby person required",
+      "CO\u2082 monitoring mandatory during active fermentation",
+      "SO\u2082 handling: SDS required, PPE mandatory, exposure standard 0.5 ppm TWA",
+      "Forklift operators: must hold a High Risk Work Licence (HRWL)",
+      "Chemical register: SDS required for all hazardous chemicals on site",
+      "Workers\u2019 Compensation insurance (WorkCover Queensland) is mandatory for all employers",
+      "Incident reporting: serious injuries and dangerous incidents must be notified to WorkSafe Queensland immediately",
+    ],
+    source: "Work Health and Safety Act 2011 (Qld)",
+    sourceUrl: "https://www.worksafe.qld.gov.au",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "qld-planning",
+    title: "Planning & Development Approval",
+    agency: "Local Government / Queensland Planning",
+    tags: ["planning", "development", "DA", "zoning", "agritourism", "cellar door"],
+    summary:
+      "Establishing or expanding a winery in Queensland requires a development approval (DA) from the relevant local government under the Planning Act 2016 (Qld). Wineries are typically located in rural zones; cellar doors and tourism facilities may require separate approvals.",
+    keyPoints: [
+      "Development approval (DA) required for new winery buildings, processing facilities, and cellar doors",
+      "Rural zones: winery may be accepted development or may require code or impact assessment",
+      "Cellar doors with on-site dining, events, or accommodation may require separate DA",
+      "State Planning Policy (Agriculture) supports wineries, rural industry, and agritourism on agricultural land",
+      "Agritourism provisions in local planning schemes may facilitate cellar door, farm stay, and farm tour activities",
+      "Building permit required for all new structures under the National Construction Code",
+      "Pre-application meeting with local council recommended for significant proposals",
+    ],
+    source: "Planning Act 2016 (Qld) / Planning Regulation 2017 (Qld)",
+    sourceUrl: "https://www.planning.qld.gov.au/",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "qld-water",
+    title: "Water Licensing \u2014 Dept Regional Development",
+    agency: "Department of Regional Development, Manufacturing and Water",
+    tags: ["water", "licence", "bore", "extraction", "irrigation"],
+    summary:
+      "Queensland wineries that take water from a waterway, bore, or other regulated water resource require a water licence under the Water Act 2000 (Qld). Water licences attach to land and may only be used on the land to which they are attached.",
+    keyPoints: [
+      "Water licence required for taking surface water (watercourse, lake, or spring) for irrigation or commercial use",
+      "Water licence required for taking underground water in groundwater areas",
+      "Licence states either a maximum annual volume or a maximum irrigable area",
+      "Exceeding licensed limits is an offence under the Water Act 2000",
+      "Water use is subject to routine property audits",
+      "Water licences attach to land and may only be used on the land to which they are attached",
+    ],
+    source: "Water Act 2000 (Qld)",
+    sourceUrl: "https://www.business.qld.gov.au/industries/mining-energy-water/water/authorisations/licences/requirements",
+    verifiedDate: "May 2026",
+  },
+  {
+    id: "qld-food",
+    title: "Food Safety \u2014 Local Council",
+    agency: "Local Council / Queensland Health",
+    tags: ["food safety", "food act", "licence", "cellar door"],
+    summary:
+      "Under the Food Act 2006 (Qld), the sale of alcoholic drinks (including wine) is exempt from the food business licence requirement. However, cellar doors that manufacture food or sell unpackaged food by retail require a food business licence from the local council.",
+    keyPoints: [
+      "Sale of wine and other alcoholic drinks is exempt from the food business licence requirement",
+      "Food business licence required if the cellar door manufactures food (e.g., cheeseboards, prepared meals)",
+      "Food business licence required if unpackaged food is sold by retail on the premises",
+      "Food Safety Supervisor certificate required for Category 1 and Category 2 food businesses",
+      "All food handling must comply with the Australia New Zealand Food Standards Code and Food Act 2006",
+      "Registration with local council environmental health department required if licence is needed",
+    ],
+    source: "Food Act 2006 (Qld)",
+    sourceUrl: "https://www.qld.gov.au/health/staying-healthy/food-pantry/starting-a-food-business/food-business-licences/do-i-need-a-food-business-licence",
+    verifiedDate: "May 2026",
+  },
+];
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 function RegCard({
@@ -832,7 +957,7 @@ function RegCard({
   );
 }
 
-type ResourceTab = "federal" | "sa" | "vic" | "nsw" | "wa";
+type ResourceTab = "federal" | "sa" | "vic" | "nsw" | "wa" | "qld";
 
 const TAB_LABELS: Record<ResourceTab, string> = {
   federal: "Federal",
@@ -840,6 +965,7 @@ const TAB_LABELS: Record<ResourceTab, string> = {
   vic: "Victoria",
   nsw: "New South Wales",
   wa: "Western Australia",
+  qld: "Queensland",
 };
 
 export default function Resources() {
@@ -851,7 +977,8 @@ export default function Resources() {
     : activeTab === "sa" ? SA_SECTIONS
     : activeTab === "vic" ? VIC_SECTIONS
     : activeTab === "nsw" ? NSW_SECTIONS
-    : WA_SECTIONS;
+    : activeTab === "wa" ? WA_SECTIONS
+    : QLD_SECTIONS;
 
   const filtered = search.trim()
     ? sections.filter(
@@ -943,7 +1070,7 @@ export default function Resources() {
               maxWidth: "560px",
             }}
           >
-            A structured reference covering federal and state regulatory requirements for boutique wine producers across South Australia, Victoria, New South Wales, and Western Australia. Use the Compliance Agent to ask specific questions.
+            A structured reference covering federal and state regulatory requirements for boutique wine producers across South Australia, Victoria, New South Wales, Western Australia, and Queensland. Use the Compliance Agent to ask specific questions.
           </p>
         </div>
       </section>
@@ -955,7 +1082,7 @@ export default function Resources() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
             {/* Tabs */}
             <div className="flex flex-wrap gap-2">
-              {(["federal", "sa", "vic", "nsw", "wa"] as ResourceTab[]).map((tab) => (
+              {(["federal", "sa", "vic", "nsw", "wa", "qld"] as ResourceTab[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}

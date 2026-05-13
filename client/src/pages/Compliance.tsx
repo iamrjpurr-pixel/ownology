@@ -12,7 +12,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 // ─── Knowledge base (embedded) ────────────────────────────────────────────────
 const KNOWLEDGE_BASE = `
 # Australian Winery Regulatory Knowledge Base
-Covers: Federal, South Australia (SA), Victoria (VIC), New South Wales (NSW), Western Australia (WA)
+Covers: Federal, South Australia (SA), Victoria (VIC), New South Wales (NSW), Western Australia (WA), Queensland (QLD)
 
 ## FEDERAL REGULATIONS
 
@@ -389,6 +389,94 @@ Contact: Local council environmental health department — health.wa.gov.au
 
 ---
 
+## QUEENSLAND (QLD) REGULATIONS
+
+Queensland's wine industry is centred on the Granite Belt (Stanthorpe/Ballandean), South Burnett, and Scenic Rim regions. The key regulatory framework combines the Wine Industry Act 1994 (Qld), the Environmental Protection Act 1994 (Qld), the WHS Act 2011 (Qld), the Planning Act 2016 (Qld), and the Water Act 2000 (Qld).
+
+### Liquor & Wine Licensing — OLGR (Wine Industry Act 1994 Qld)
+Administered by the Office of Liquor and Gaming Regulation (OLGR), Department of Justice.
+
+A wine producer licence is required to operate a vineyard or winery. It allows:
+- On-premises tasting and consumption
+- Takeaway (off-premises) sales
+- Sales at satellite cellar doors (with separate approval)
+- Sale of other producers' wine on-premises, provided it does not exceed 49% of annual sales
+
+An approved wine nominee must be present on each licensed premises. If more than one licence is held, a separate wine nominee is required for each.
+
+Annual obligations:
+- Annual licence fees due by 31 July each year (via OLGR client portal)
+- Annual return lodged online via the Liquor, Gaming and Fair Trading portal, listing wine produced, sold, purchased, and blended
+
+Application process:
+- Form 1: Application for a wine producer licence
+- Form 5: Personal details schedule (wine)
+- Criminal history and probity checks required
+- Advertising of application may be required
+- Processing time: approximately 2–3 months
+
+Satellite Cellar Door: Wine producer licensees may apply for satellite cellar door approval (Form 10) to sell wine at a separate premises.
+
+Contact: OLGR — 13 QGOV (13 74 68) — olgr.qld.gov.au
+
+### Environmental Regulation — DETSI (Environmental Protection Act 1994 Qld)
+Administered by the Department of the Environment, Tourism, Science and Innovation (DETSI).
+
+Environmentally Relevant Activity (ERA) 22(2) — Beverage Production:
+- Wineries producing 1 megalitre (1,000 kL) or more of alcoholic beverages per year require an Environmental Authority (EA).
+- Operating without an EA is an offence under section 426 of the Environmental Protection Act 1994.
+- Annual fee for ERA 22(2): approximately $17,281 (AES = 55, 2025 rate).
+- Applications lodged via DETSI Online Services; contact PALM (palm@detsi.qld.gov.au).
+- Winery wastewater (grape marc, wash water, fermentation residues) must be managed in accordance with EA conditions.
+- Boutique wineries below 1 ML/year are not subject to ERA 22 but must still comply with the general environmental duty under the Environmental Protection Act 1994.
+
+Contact: DETSI — detsi.qld.gov.au
+
+### Workplace Health and Safety — WorkSafe Queensland (WHS Act 2011 Qld)
+Administered by WorkSafe Queensland.
+
+Key obligations:
+- Provide and maintain a safe working environment, so far as is reasonably practicable.
+- Confined space entry procedures for fermentation tanks and vats: written permit, atmospheric testing, trained standby person.
+- CO₂ monitoring mandatory during active fermentation.
+- Chemical register and SDS: all hazardous chemicals listed with current Safety Data Sheets.
+- SO₂ handling: PPE mandatory; exposure standard 0.5 ppm TWA.
+- Manual handling risk assessments for barrel handling and bottling operations.
+- Forklift operators: must hold a High Risk Work Licence (HRWL).
+- Incident reporting: serious injuries and dangerous incidents must be notified to WorkSafe Queensland immediately.
+- Workers' Compensation insurance (WorkCover Queensland) is mandatory.
+
+Contact: WorkSafe Queensland — 1300 362 128 — worksafe.qld.gov.au
+
+### Planning and Development Approval — Local Government (Planning Act 2016 Qld)
+- A development approval (DA) from the relevant local government is required for establishing or expanding a winery, cellar door, or associated tourism facilities.
+- Wineries are typically located in rural zones under local planning schemes.
+- A winery may be accepted development in a rural zone, or may require code assessment or impact assessment depending on the local scheme.
+- Cellar doors with on-site dining, events, or accommodation may require separate approvals.
+- Queensland's State Planning Policy (Agriculture) supports compatible land uses such as wineries, rural industry, and agritourism on agricultural land.
+- Agritourism provisions in local planning schemes may facilitate cellar door, farm stay, and farm tour activities.
+
+Contact: Local government planning department — planning.qld.gov.au
+
+### Water Licensing — Dept Regional Development (Water Act 2000 Qld)
+- A water licence is required under the Water Act 2000 for taking surface water (watercourse, lake, or spring) for irrigation or commercial use, or taking underground water in groundwater areas.
+- Water licences state either a maximum annual volume or a maximum irrigable area.
+- Exceeding licensed limits is an offence under the Water Act 2000.
+- Water use is subject to routine property audits.
+- Water licences attach to land and may only be used on the land to which they are attached.
+
+Contact: Business Queensland — 13 QGOV (13 74 68) — business.qld.gov.au
+
+### Food Safety — Local Council (Food Act 2006 Qld)
+- Under the Food Act 2006, the sale of alcoholic drinks (including wine) is exempt from the food business licence requirement.
+- However, if the cellar door also manufactures food (e.g., cheeseboards, prepared meals, charcuterie) or sells unpackaged food by retail, a food business licence from the local council is required.
+- A Food Safety Supervisor certificate is required for Category 1 and Category 2 food businesses.
+- All food handling must comply with the Australia New Zealand Food Standards Code and the Food Act 2006, regardless of whether a licence is required.
+
+Contact: Queensland Health — qld.gov.au/health; Local council (varies by region)
+
+---
+
 ## KEY CONTACTS
 
 | Agency | Role | Website |
@@ -412,11 +500,14 @@ Contact: Local council environmental health department — health.wa.gov.au
 | DLGSC (WA) | Liquor licensing (WA) | dlgsc.wa.gov.au |
 | DWER (WA) | Environmental protection, water (WA) | dwer.wa.gov.au |
 | WorkSafe WA | WHS (WA) | worksafe.wa.gov.au |
+| OLGR (QLD) | Liquor & wine licensing (QLD) | olgr.qld.gov.au |
+| DETSI (QLD) | Environmental authority (QLD) | detsi.qld.gov.au |
+| WorkSafe QLD | WHS (QLD) | worksafe.qld.gov.au |
 | Local council | Food business registration, development approval | (varies by council) |
 `;
 
 // ─── Sample questions ─────────────────────────────────────────────────────────
-type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW" | "WA";
+type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW" | "WA" | "QLD";
 
 const SAMPLE_QUESTIONS: { q: string; state: StateFilter }[] = [
   { q: "What are the LIP record-keeping requirements for vintage labelling?", state: "Federal" },
@@ -437,13 +528,16 @@ const SAMPLE_QUESTIONS: { q: string; state: StateFilter }[] = [
   { q: "What is a WA Producer's Licence and what trading hours apply?", state: "WA" },
   { q: "What is the prescribed premises threshold for wineries in Western Australia?", state: "WA" },
   { q: "Do I need a water licence to irrigate my vineyard in Margaret River?", state: "WA" },
+  { q: "What wine producer licence do I need to operate a winery in Queensland?", state: "QLD" },
+  { q: "Does my Granite Belt winery need an Environmental Authority under ERA 22?", state: "QLD" },
+  { q: "What are the WorkSafe Queensland obligations for confined spaces in a winery?", state: "QLD" },
 ];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Message = { role: "user" | "assistant"; content: string };
 
 // ─── Main component ───────────────────────────────────────────────────────────
-const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW", "WA"];
+const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW", "WA", "QLD"];
 
 const STATE_LABELS: Record<StateFilter, string> = {
   All: "All Jurisdictions",
@@ -452,6 +546,7 @@ const STATE_LABELS: Record<StateFilter, string> = {
   VIC: "Victoria",
   NSW: "New South Wales",
   WA: "Western Australia",
+  QLD: "Queensland",
 };
 
 // ─── Knowledge base sections (for jurisdiction-scoped prompts) ────────────────
@@ -460,7 +555,8 @@ const KB_SECTIONS: Record<string, string> = {
   SA: "## SOUTH AUSTRALIA REGULATIONS" + (KNOWLEDGE_BASE.split("## SOUTH AUSTRALIA REGULATIONS")[1]?.split("## VICTORIA (VIC) REGULATIONS")[0] ?? ""),
   VIC: "## VICTORIA (VIC) REGULATIONS" + (KNOWLEDGE_BASE.split("## VICTORIA (VIC) REGULATIONS")[1]?.split("## NEW SOUTH WALES (NSW) REGULATIONS")[0] ?? ""),
   NSW: "## NEW SOUTH WALES (NSW) REGULATIONS" + (KNOWLEDGE_BASE.split("## NEW SOUTH WALES (NSW) REGULATIONS")[1]?.split("## WESTERN AUSTRALIA (WA) REGULATIONS")[0] ?? ""),
-  WA: "## WESTERN AUSTRALIA (WA) REGULATIONS" + (KNOWLEDGE_BASE.split("## WESTERN AUSTRALIA (WA) REGULATIONS")[1]?.split("## KEY CONTACTS")[0] ?? ""),
+  WA: "## WESTERN AUSTRALIA (WA) REGULATIONS" + (KNOWLEDGE_BASE.split("## WESTERN AUSTRALIA (WA) REGULATIONS")[1]?.split("## QUEENSLAND (QLD) REGULATIONS")[0] ?? ""),
+  QLD: "## QUEENSLAND (QLD) REGULATIONS" + (KNOWLEDGE_BASE.split("## QUEENSLAND (QLD) REGULATIONS")[1]?.split("## KEY CONTACTS")[0] ?? ""),
   Contacts: "## KEY CONTACTS" + (KNOWLEDGE_BASE.split("## KEY CONTACTS")[1] ?? ""),
 };
 
@@ -512,10 +608,10 @@ export default function Compliance() {
       const classifierPrompt = `You are a jurisdiction classifier for Australian winery regulatory questions.
 Given a user question, identify which Australian jurisdictions it relates to.
 Respond with a JSON object only, no explanation:
-{"jurisdictions": ["Federal", "SA", "VIC", "NSW", "WA"], "inScope": true}
+{"jurisdictions": ["Federal", "SA", "VIC", "NSW", "WA", "QLD"], "inScope": true}
 
 Rules:
-- "jurisdictions" must be an array containing only values from: "Federal", "SA", "VIC", "NSW", "WA"
+- "jurisdictions" must be an array containing only values from: "Federal", "SA", "VIC", "NSW", "WA", "QLD"
 - Always include "Federal" if the question touches on Wine Australia, FSANZ, WET, biosecurity, or WHS model law
 - "inScope" must be false if the question is completely unrelated to Australian winery regulations (e.g. weather, sport, cooking)
 - If the user filter is not "All", bias toward that jurisdiction but include Federal if relevant
@@ -533,7 +629,7 @@ User question: ${question.trim()}`;
         }),
       });
 
-      let detectedJurisdictions: string[] = ["Federal", "SA", "VIC", "NSW", "WA"];
+      let detectedJurisdictions: string[] = ["Federal", "SA", "VIC", "NSW", "WA", "QLD"];
       let inScope = true;
 
       if (classifierResp.ok) {
@@ -699,7 +795,7 @@ ${scopedKB}`;
               <circle cx="6" cy="6" r="5" stroke="var(--ow-amber)" strokeWidth="1.2" />
               <path d="M6 4v3M6 8.5v.5" stroke="var(--ow-amber)" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
-            Knowledge base: Federal · SA · VIC · NSW · WA — last updated May 2026
+            Knowledge base: Federal · SA · VIC · NSW · WA · QLD — last updated May 2026
           </div>
         </div>
 
@@ -913,7 +1009,7 @@ ${scopedKB}`;
             className="mt-2 text-center text-xs"
             style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif" }}
           >
-            Answers are AI-generated from our curated knowledge base (Federal, SA, VIC, NSW, WA). Always verify with the relevant agency or a qualified compliance professional.
+            Answers are AI-generated from our curated knowledge base (Federal, SA, VIC, NSW, WA, QLD). Always verify with the relevant agency or a qualified compliance professional.
           </p>
         </form>
 

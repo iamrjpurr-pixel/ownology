@@ -72,5 +72,11 @@
 - [x] Wire /pricing route in App.tsx and update Pricing nav link to point to /pricing
 - [x] Add 'Start Free Trial' CTA section to the bottom of the Pricing page linking to waitlist capture
 - [x] Fix 'Start Free Trial' nav button in Home.tsx to route to /pricing instead of #pricing anchor
-- [ ] Add founding member counter to Pricing page (live countdown from 99, database-backed)
-- [ ] Build cost model spreadsheet (tiers, credit packs, cost vs revenue, margin forecasts)
+- [x] Add founding member counter to Pricing page (live countdown from 99, database-backed)
+- [x] Build cost model spreadsheet (tiers, credit packs, cost vs revenue, margin forecasts)
+- [x] Research and save QLD winery regulatory requirements to ~/rules-and-regs/states/QLD/
+- [x] Add QLD to Compliance agent knowledge base, state filter pill, and sample questions
+- [x] Add QLD tab and 6 resource cards to Resources page
+- [x] Fix nav bar text readability in both light and dark modes (ensure always-visible contrast)
+- [x] Fix nav hover states to be accessible and human-factors appropriate (clear but not jarring)
+- [x] Ensure nav and hero layout is responsive across PC, Mac, iOS, Android (mobile-first breakpoints)

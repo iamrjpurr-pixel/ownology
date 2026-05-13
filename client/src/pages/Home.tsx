@@ -94,9 +94,9 @@ function MoreDropdown({ items }: { items: NavItem[] }) {
       <button
         onClick={() => setOpen(o => !o)}
         className="flex items-center gap-1 text-sm font-light tracking-wide transition-colors"
-        style={{color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", background: "none", border: "none", cursor: "pointer", padding: 0}}
+        style={{color: "var(--ow-text-mid)", fontFamily: "'Lato',sans-serif", background: "none", border: "none", cursor: "pointer", padding: 0}}
         onMouseEnter={e => (e.currentTarget.style.color = "var(--ow-amber)")}
-        onMouseLeave={e => (e.currentTarget.style.color = "var(--ow-text-lo)")}
+        onMouseLeave={e => (e.currentTarget.style.color = "var(--ow-text-mid)")}
         aria-haspopup="true"
         aria-expanded={open}
       >
@@ -159,10 +159,14 @@ function Nav() {
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled || menuOpen ? "backdrop-blur-md border-b border-white/5" : ""
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-md border-b ${
+        scrolled || menuOpen ? "border-white/5" : "border-transparent"
       }`}
-        style={scrolled || menuOpen ? {background: "var(--ow-nav-bg)"} : undefined}
+        style={{
+          background: scrolled || menuOpen
+            ? "var(--ow-nav-bg)"
+            : "oklch(0.11 0.008 60 / 55%)",
+        }}
       >
         <div className="container flex items-center justify-between py-5">
           <OwnologyLogo size={36} />
@@ -173,16 +177,16 @@ function Nav() {
               item.href.startsWith("/") ? (
                 <Link key={item.label} href={item.href}
                   className="text-sm font-light tracking-wide transition-colors"
-                  style={{color:"var(--ow-text-lo)", fontFamily:"'Lato',sans-serif"}}
+                  style={{color:"var(--ow-text-mid)", fontFamily:"'Lato',sans-serif"}}
                   onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
-                  onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}
+                  onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-mid)")}
                 >{item.label}</Link>
               ) : (
                 <a key={item.label} href={item.href}
                   className="text-sm font-light tracking-wide transition-colors"
-                  style={{color:"var(--ow-text-lo)", fontFamily:"'Lato',sans-serif"}}
+                  style={{color:"var(--ow-text-mid)", fontFamily:"'Lato',sans-serif"}}
                   onMouseEnter={e=>(e.currentTarget.style.color="var(--ow-amber)")}
-                  onMouseLeave={e=>(e.currentTarget.style.color="var(--ow-text-lo)")}
+                  onMouseLeave={e=>(e.currentTarget.style.color="var(--ow-text-mid)")}
                 >{item.label}</a>
               )
             ))}
