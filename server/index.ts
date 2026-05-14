@@ -8,6 +8,7 @@ import { appRouter } from "./routers.js";
 import { createContext } from "./trpc.js";
 import merchRouter from "./merch/api.js";
 import { campaignMetricsHandler } from "./scheduled/campaignMetrics.js";
+import { vintageRemindersHandler } from "./scheduled/vintageReminders.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,6 +25,7 @@ async function startServer() {
 
   // ── Scheduled Heartbeat handler ──────────────────────────────────────────────
   app.post("/api/scheduled/campaign-metrics", express.json(), campaignMetricsHandler);
+  app.post("/api/scheduled/vintage-reminders", express.json(), vintageRemindersHandler);
 
   // ── JSON body parser ─────────────────────────────────────────────────────────
   app.use(express.json());

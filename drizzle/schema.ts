@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, int, bigint, text, mysqlEnum, index } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, int, bigint, text, mysqlEnum, index, boolean } from "drizzle-orm/mysql-core";
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
@@ -64,6 +64,38 @@ export const foundingMembers = mysqlTable("founding_members", {
   joinedAt: bigint("joined_at", { mode: "number" }).notNull(),
   notes: text("notes"),
 });
+
+// ─── Tank Reminders ──────────────────────────────────────────────────────────────────────────────
+// One row per (user, tank, eventType) reminder. A Heartbeat cron fires hourly
+// and checks whether any active reminder's tank is overdue.
+export const tankReminders = mysqlTable(
+  "tank_reminders",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull(),
+    tankName: varchar("tank_name", { length: 128 }).notNull(),
+    // Which event type to watch for; 'any' means any event type resets the clock
+    eventType: mysqlEnum("event_type", [
+      "addition",
+      "measurement",
+      "racking",
+      "inoculation",
+      "observation",
+      "any",
+    ])
+      .notNull()
+      .default("any"),
+    // Hours without a matching entry before the warning fires
+    thresholdHours: int("threshold_hours").notNull().default(24),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("tr_user_idx").on(t.userId),
+    index("tr_tank_idx").on(t.tankName),
+  ]
+);
 
 // ─── Vintage Log Entries ──────────────────────────────────────────────────────
 // One row per cellar event recorded by a user in The Press → Vintage Log tab.

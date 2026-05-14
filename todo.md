@@ -142,3 +142,16 @@
 - [x] Mobile Compliance page: larger textarea, bigger submit button, full-width source citation cards, iOS font-size 16px to prevent auto-zoom
 - [x] Mobile ThePress page: full-width tabs with 44px touch targets, scrollable tab bar on mobile, short labels on small screens
 - [ ] Mobile Pricing page: single-column tier cards, sticky CTA bar at bottom (deferred)
+
+## Reminder System + Quick Entry + Presentation Script
+
+- [x] Add tank_reminders table to schema (userId, tankName, eventType, thresholdHours, isActive, schedCronTaskUid, createdAt)
+- [x] Add db helpers: upsertTankReminder, listTankReminders, getOverdueTanks (query vintage_log_entries for tanks past threshold)
+- [x] Add vintageReminder tRPC router: setReminder (protectedProcedure), listReminders, deleteReminder — creates/updates Heartbeat job per user/tank/eventType
+- [x] Add /api/scheduled/vintage-reminders Express handler: checks all active reminders, finds overdue tanks, sends owner notification per overdue tank
+- [x] Mount /api/scheduled/vintage-reminders in server/index.ts before express.json()
+- [x] Add Reminder Settings UI to ThePress Vintage Log tab: per-tank alarm config with threshold selector (2h, 4h, 8h, 12h, 24h, 48h, 72h) and on/off toggle
+- [x] Build /quick-entry dedicated page: rapid multi-tank logging with inline event type selector, no modal, keyboard-optimised for harvest floor use
+- [x] Wire /quick-entry route in App.tsx and add Quick Entry link to mobile hamburger drawer
+- [x] Write presentation script: 5-step Vintage Log entry flow walkthrough (onboarding/demo pitch document)
+- [x] Write vitest tests for reminder threshold logic and overdue detection

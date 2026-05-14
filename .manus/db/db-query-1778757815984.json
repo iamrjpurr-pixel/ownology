@@ -1,0 +1,9 @@
+{
+  "query": "\nCREATE TABLE IF NOT EXISTS `tank_reminders` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `user_id` int NOT NULL,\n  `tank_name` varchar(128) NOT NULL,\n  `event_type` enum('addition','measurement','racking','inoculation','observation','any') NOT NULL DEFAULT 'any',\n  `threshold_hours` int NOT NULL DEFAULT 24,\n  `is_active` boolean NOT NULL DEFAULT true,\n  `created_at` bigint NOT NULL,\n  `updated_at` bigint NOT NULL,\n  PRIMARY KEY (`id`),\n  INDEX `tr_user_idx` (`user_id`),\n  INDEX `tr_tank_idx` (`tank_name`)\n);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4HByWUH885AfJUE.9472483f21d7 --database kjXA9MRaPtPLGHog5yynHZ --execute \nCREATE TABLE IF NOT EXISTS `tank_reminders` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `user_id` int NOT NULL,\n  `tank_name` varchar(128) NOT NULL,\n  `event_type` enum('addition','measurement','racking','inoculation','observation','any') NOT NULL DEFAULT 'any',\n  `threshold_hours` int NOT NULL DEFAULT 24,\n  `is_active` boolean NOT NULL DEFAULT true,\n  `created_at` bigint NOT NULL,\n  `updated_at` bigint NOT NULL,\n  PRIMARY KEY (`id`),\n  INDEX `tr_user_idx` (`user_id`),\n  INDEX `tr_tank_idx` (`tank_name`)\n);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2483
+}

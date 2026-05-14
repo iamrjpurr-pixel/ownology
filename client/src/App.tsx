@@ -21,6 +21,7 @@ import MerchCancel from "./pages/MerchCancel";
 import CampaignMetrics from "./pages/CampaignMetrics";
 import Orders from "./pages/Orders";
 import Admin from "./pages/Admin";
+import QuickEntry from "./pages/QuickEntry";
 
 
 function Router() {
@@ -43,6 +44,7 @@ function Router() {
       <Route path={"/campaign-metrics"} component={CampaignMetrics} />
       <Route path={"/orders"} component={Orders} />
       <Route path={"/admin"} component={Admin} />
+      <Route path={"/quick-entry"} component={QuickEntry} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

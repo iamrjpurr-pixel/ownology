@@ -11,6 +11,7 @@ import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
 import VintageEntrySheet from "@/components/VintageEntrySheet";
+import TankReminderSheet from "@/components/TankReminderSheet";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface VintageEntry {
@@ -138,6 +139,8 @@ export default function ThePress() {
   const [noteText, setNoteText] = useState("");
   const [entrySheetOpen, setEntrySheetOpen] = useState(false);
   const [quickEntryTank, setQuickEntryTank] = useState<string | undefined>(undefined);
+  const [reminderSheetOpen, setReminderSheetOpen] = useState(false);
+  const [reminderDefaultTank, setReminderDefaultTank] = useState<string | undefined>(undefined);
   // Filter state
   const [filterTank, setFilterTank] = useState("");
   const [filterVariety, setFilterVariety] = useState("");
@@ -360,26 +363,61 @@ export default function ThePress() {
                   title="Vintage Log"
                   subtitle="Every decision, every tank, every vintage — your permanent cellar record."
                 />
-                {/* Add Entry button — shown when authenticated */}
+                {/* Add Entry + Reminders buttons — shown when authenticated */}
                 {logEntries !== undefined && (
-                  <button
-                    type="button"
-                    onClick={() => { setQuickEntryTank(undefined); setEntrySheetOpen(true); }}
-                    className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-sm text-sm font-semibold transition-all mt-1"
-                    style={{
-                      background: "var(--ow-amber)",
-                      color: "oklch(0.11 0.008 60)",
-                      border: "none",
-                      fontFamily: "'Lato',sans-serif",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                      <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3" />
-                      <path d="M7 4v6M4 7h6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-                    </svg>
-                    Add Entry
-                  </button>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Link
+                      href="/quick-entry"
+                      className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 rounded-sm text-sm transition-all"
+                      style={{
+                        background: "var(--ow-bg-card)",
+                        color: "oklch(0.72 0.12 75)",
+                        border: "1px solid var(--ow-border-md)",
+                        fontFamily: "'Lato',sans-serif",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <span>⚡</span>
+                      <span className="hidden sm:inline">Quick Entry</span>
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => { setReminderDefaultTank(undefined); setReminderSheetOpen(true); }}
+                      title="Manage tank reminders"
+                      className="flex-shrink-0 flex items-center gap-2 px-3 py-2.5 rounded-sm text-sm transition-all"
+                      style={{
+                        background: "var(--ow-bg-card)",
+                        color: "var(--ow-amber)",
+                        border: "1px solid var(--ow-border-md)",
+                        fontFamily: "'Lato',sans-serif",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                      </svg>
+                      <span className="hidden sm:inline">Reminders</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setQuickEntryTank(undefined); setEntrySheetOpen(true); }}
+                      className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-sm text-sm font-semibold transition-all"
+                      style={{
+                        background: "var(--ow-amber)",
+                        color: "oklch(0.11 0.008 60)",
+                        border: "none",
+                        fontFamily: "'Lato',sans-serif",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3" />
+                        <path d="M7 4v6M4 7h6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                      </svg>
+                      Add Entry
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -994,6 +1032,22 @@ export default function ThePress() {
         </div>
 
       </div>
+
+      {/* Vintage Entry Sheet */}
+      <VintageEntrySheet
+        open={entrySheetOpen}
+        onClose={() => { setEntrySheetOpen(false); setQuickEntryTank(undefined); }}
+        prefillTank={quickEntryTank}
+        onSaved={() => { refetchLog(); setEntrySheetOpen(false); setQuickEntryTank(undefined); }}
+      />
+
+      {/* Tank Reminder Sheet */}
+      <TankReminderSheet
+        open={reminderSheetOpen}
+        onClose={() => { setReminderSheetOpen(false); setReminderDefaultTank(undefined); }}
+        defaultTankName={reminderDefaultTank}
+        tankNames={allTanks}
+      />
     </div>
   );
 }

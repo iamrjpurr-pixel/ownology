@@ -73,6 +73,7 @@ const MORE_NAV: NavItem[] = [
   { label: "Free Run",  href: "/free-run" },
   { label: "The Press", href: "/the-press" },
   { label: "Merch",     href: "/merch" },
+  { label: "⚡ Quick Entry", href: "/quick-entry" },
 ];
 const NAV_LINKS: NavItem[] = [...PRIMARY_NAV, ...MORE_NAV];
 

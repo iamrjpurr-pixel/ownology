@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import * as schema from "../drizzle/schema.js";
-import { desc, eq, and } from "drizzle-orm";
+import { desc, eq, and, gte } from "drizzle-orm";
 
 // ─── Connection pool ──────────────────────────────────────────────────────────
 
@@ -179,4 +179,99 @@ export async function deleteVintageLogEntry(id: number, userId: number) {
         eq(schema.vintageLogEntries.userId, userId)
       )
     );
+}
+
+// ─── Tank Reminders ──────────────────────────────────────────────────────
+
+export type ReminderEventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "any";
+
+export async function upsertTankReminder(data: {
+  userId: number;
+  tankName: string;
+  eventType: ReminderEventType;
+  thresholdHours: number;
+  isActive: boolean;
+}) {
+  const existing = await db.query.tankReminders.findFirst({
+    where: and(
+      eq(schema.tankReminders.userId, data.userId),
+      eq(schema.tankReminders.tankName, data.tankName),
+      eq(schema.tankReminders.eventType, data.eventType)
+    ),
+  });
+  const now = Date.now();
+  if (existing) {
+    await db
+      .update(schema.tankReminders)
+      .set({
+        thresholdHours: data.thresholdHours,
+        isActive: data.isActive,
+        updatedAt: now,
+      })
+      .where(eq(schema.tankReminders.id, existing.id));
+    return existing.id;
+  } else {
+    const result = await db.insert(schema.tankReminders).values({
+      userId: data.userId,
+      tankName: data.tankName,
+      eventType: data.eventType,
+      thresholdHours: data.thresholdHours,
+      isActive: data.isActive,
+      createdAt: now,
+      updatedAt: now,
+    });
+    return (result as unknown as { insertId: number }).insertId;
+  }
+}
+
+export async function listTankReminders(userId: number) {
+  return db.query.tankReminders.findMany({
+    where: eq(schema.tankReminders.userId, userId),
+    orderBy: [desc(schema.tankReminders.updatedAt)],
+  });
+}
+
+export async function deleteTankReminder(id: number, userId: number) {
+  await db
+    .delete(schema.tankReminders)
+    .where(
+      and(
+        eq(schema.tankReminders.id, id),
+        eq(schema.tankReminders.userId, userId)
+      )
+    );
+}
+
+export async function getAllActiveReminders() {
+  return db.query.tankReminders.findMany({
+    where: eq(schema.tankReminders.isActive, true),
+  });
+}
+
+/**
+ * Returns the most recent vintage log entry for a given user+tank+eventType.
+ * If eventType is 'any', returns the most recent entry regardless of type.
+ */
+export async function getLastEntryForTank(
+  userId: number,
+  tankName: string,
+  eventType: ReminderEventType
+) {
+  if (eventType === "any") {
+    return db.query.vintageLogEntries.findFirst({
+      where: and(
+        eq(schema.vintageLogEntries.userId, userId),
+        eq(schema.vintageLogEntries.tankName, tankName)
+      ),
+      orderBy: [desc(schema.vintageLogEntries.entryAt)],
+    });
+  }
+  return db.query.vintageLogEntries.findFirst({
+    where: and(
+      eq(schema.vintageLogEntries.userId, userId),
+      eq(schema.vintageLogEntries.tankName, tankName),
+      eq(schema.vintageLogEntries.eventType, eventType as EventType)
+    ),
+    orderBy: [desc(schema.vintageLogEntries.entryAt)],
+  });
 }

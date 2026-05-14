@@ -14,6 +14,10 @@ import {
   deleteVintageLogEntry,
   getUserByOpenId,
   type EventType,
+  upsertTankReminder,
+  listTankReminders,
+  deleteTankReminder,
+  type ReminderEventType,
 } from "./db.js";
 
 function getStripe(): Stripe {
@@ -311,7 +315,50 @@ const vintageLogRouter = router({
     }),
 });
 
-// ─── App Router ───────────────────────────────────────────────────────────────
+// ─── Tank Reminders Router ──────────────────────────────────────────────────────────────────────────────
+
+const REMINDER_EVENT_TYPES = ["addition", "measurement", "racking", "inoculation", "observation", "any"] as const;
+
+const vintageReminderRouter = router({
+  upsert: protectedProcedure
+    .input(
+      z.object({
+        tankName: z.string().min(1).max(128),
+        eventType: z.enum(REMINDER_EVENT_TYPES),
+        thresholdHours: z.number().int().min(1).max(168), // 1h to 7 days
+        isActive: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const id = await upsertTankReminder({
+        userId: dbUser.id,
+        tankName: input.tankName,
+        eventType: input.eventType as ReminderEventType,
+        thresholdHours: input.thresholdHours,
+        isActive: input.isActive,
+      });
+      return { success: true, id };
+    }),
+
+  list: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return [];
+    return listTankReminders(dbUser.id);
+  }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await deleteTankReminder(input.id, dbUser.id);
+      return { success: true };
+    }),
+});
+
+// ─── App Router ──────────────────────────────────────────────────────────────────────────────
 
 export const appRouter = router({
   campaignMetrics: campaignMetricsRouter,
@@ -319,6 +366,7 @@ export const appRouter = router({
   orders: ordersRouter,
   admin: adminRouter,
   vintageLog: vintageLogRouter,
+  vintageReminder: vintageReminderRouter,
 });
 
 export type AppRouter = typeof appRouter;
