@@ -309,17 +309,23 @@ export default function ThePress() {
 
         {/* ── Tab navigation ── */}
         <div
-          className="flex gap-1 mb-8 p-1 rounded-sm"
-          style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)", width: "fit-content" }}
+          className="flex gap-1 mb-8 p-1 rounded-sm overflow-x-auto"
+          style={{
+            background: "var(--ow-bg-card)",
+            border: "1px solid var(--ow-border)",
+            width: "100%",
+            WebkitOverflowScrolling: "touch",
+            scrollbarWidth: "none",
+          }}
         >
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className="px-4 py-2 rounded-sm text-xs transition-all flex items-center gap-2"
+              className="flex-1 rounded-sm text-xs transition-all flex items-center justify-center gap-1.5"
               style={{
                 fontFamily: "'Lato',sans-serif",
-                letterSpacing: "0.05em",
+                letterSpacing: "0.04em",
                 fontWeight: activeTab === tab.id ? 600 : 300,
                 background: activeTab === tab.id
                   ? "color-mix(in oklch, var(--ow-amber) 15%, transparent)"
@@ -329,10 +335,15 @@ export default function ThePress() {
                   : "1px solid transparent",
                 color: activeTab === tab.id ? "var(--ow-amber)" : "var(--ow-text-lo)",
                 cursor: "pointer",
+                minHeight: "44px",
+                padding: "0.5rem 0.75rem",
+                whiteSpace: "nowrap",
+                touchAction: "manipulation",
               }}
             >
               <span>{tab.icon}</span>
-              {tab.label}
+              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="sm:hidden" style={{ fontSize: "0.65rem", letterSpacing: "0.06em" }}>{tab.label.split(" ")[0]}</span>
             </button>
           ))}
         </div>

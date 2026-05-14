@@ -119,6 +119,12 @@ html.light-mode {
     font-family: 'Lato', sans-serif;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
+    /* iOS momentum scrolling */
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Prevent double-tap zoom on interactive elements */
+  button, a, [role="button"] {
+    touch-action: manipulation;
   }
   h1, h2, h3, h4 {
     font-family: 'Fraunces', serif;
@@ -159,6 +165,37 @@ html.light-mode {
     }
   }
 
+  /* ── Mobile-first utilities ── */
+
+  /* Nav bar respects iOS notch */
+  .nav-safe {
+    padding-top: max(1.25rem, env(safe-area-inset-top));
+    padding-left: max(1.25rem, env(safe-area-inset-left));
+    padding-right: max(1.25rem, env(safe-area-inset-right));
+  }
+
+  /* Mobile drawer respects home bar */
+  .drawer-safe {
+    padding-bottom: max(2rem, env(safe-area-inset-bottom));
+    padding-left: max(1.25rem, env(safe-area-inset-left));
+    padding-right: max(1.25rem, env(safe-area-inset-right));
+  }
+
+  /* Minimum 44×44px touch target (Apple HIG / WCAG 2.5.5) */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Sticky bottom bar with home-bar clearance */
+  .sticky-bottom-safe {
+    position: sticky;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
   /* Amber glow button */
   .btn-amber {
     background: oklch(0.72 0.12 75);
@@ -173,6 +210,8 @@ html.light-mode {
     transition: all 0.2s ease;
     border: none;
     cursor: pointer;
+    min-height: 44px;
+    touch-action: manipulation;
   }
   .btn-amber:hover {
     background: oklch(0.78 0.13 75);
@@ -193,6 +232,8 @@ html.light-mode {
     border: 1px solid oklch(0.72 0.12 75 / 50%);
     transition: all 0.2s ease;
     cursor: pointer;
+    min-height: 44px;
+    touch-action: manipulation;
   }
   .btn-ghost:hover {
     border-color: oklch(0.72 0.12 75);

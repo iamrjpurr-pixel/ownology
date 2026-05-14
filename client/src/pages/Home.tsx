@@ -209,119 +209,177 @@ function Nav() {
             </a>
           </div>
 
-          {/* Hamburger button — mobile only */}
           {/* Mobile: theme toggle + hamburger */}
-          <div className="md:hidden flex items-center gap-2">
-          <ThemeToggle compact />
-          <button
-            className="flex flex-col justify-center items-center w-10 h-10 gap-1.5 rounded-sm transition-colors"
-            style={{background: menuOpen ? "var(--ow-bg-card)" : "transparent"}}
-            onClick={() => setMenuOpen(o => !o)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-          >
-            <span
-              className="block w-5 h-px transition-all duration-300 origin-center"
-              style={{
-                background: "oklch(0.72 0.12 75)",
-                transform: menuOpen ? "translateY(4px) rotate(45deg)" : "none",
-              }}
-            />
-            <span
-              className="block w-5 h-px transition-all duration-300"
-              style={{
-                background: "oklch(0.72 0.12 75)",
-                opacity: menuOpen ? 0 : 1,
-                transform: menuOpen ? "scaleX(0)" : "scaleX(1)",
-              }}
-            />
-            <span
-              className="block w-5 h-px transition-all duration-300 origin-center"
-              style={{
-                background: "oklch(0.72 0.12 75)",
-                transform: menuOpen ? "translateY(-4px) rotate(-45deg)" : "none",
-              }}
-            />
-          </button>
+          <div className="md:hidden flex items-center gap-1">
+            <ThemeToggle compact />
+            <button
+              className="touch-target rounded-sm transition-colors"
+              style={{background: menuOpen ? "var(--ow-bg-card)" : "transparent"}}
+              onClick={() => setMenuOpen(o => !o)}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-nav-drawer"
+            >
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+                {menuOpen ? (
+                  <>
+                    <path d="M5 5l12 12M17 5L5 17" stroke="oklch(0.72 0.12 75)" strokeWidth="1.8" strokeLinecap="round"/>
+                  </>
+                ) : (
+                  <>
+                    <path d="M3 6h16M3 11h16M3 16h16" stroke="oklch(0.72 0.12 75)" strokeWidth="1.8" strokeLinecap="round"/>
+                  </>
+                )}
+              </svg>
+            </button>
           </div>
         </div>
       </nav>
 
-      {/* Mobile drawer overlay */}
+      {/* Mobile drawer — full-screen overlay */}
       <div
-        className="fixed inset-0 z-40 md:hidden transition-opacity duration-300"
-        style={{
-          background: "oklch(0 0 0 / 0.6)",
-          opacity: menuOpen ? 1 : 0,
-          pointerEvents: menuOpen ? "auto" : "none",
-        }}
-        onClick={() => setMenuOpen(false)}
-        aria-hidden="true"
-      />
-
-      {/* Mobile drawer panel */}
-      <div
-        className="fixed top-0 left-0 right-0 z-40 md:hidden transition-transform duration-300 ease-out"
+        id="mobile-nav-drawer"
+        className="fixed inset-0 z-40 md:hidden flex flex-col"
         style={{
           background: "var(--ow-bg-base)",
-          borderBottom: "1px solid var(--ow-border)",
-          transform: menuOpen ? "translateY(0)" : "translateY(-100%)",
-          paddingTop: "80px",
-          paddingBottom: "2rem",
-          boxShadow: "0 24px 60px var(--ow-shadow)",
+          transform: menuOpen ? "translateX(0)" : "translateX(100%)",
+          transition: "transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)",
+          overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
         }}
+        aria-hidden={!menuOpen}
+        aria-label="Navigation menu"
+        role="dialog"
+        aria-modal="true"
       >
-        <div className="container flex flex-col gap-1">
-          {(isOwner ? [...NAV_LINKS, { label: "Admin", href: "/admin" }] : NAV_LINKS).map((item, i) => {
-            const sharedStyle = {
-              fontFamily: "'Lato', sans-serif",
-              fontWeight: 300,
-              fontSize: "1.125rem",
-              color: "var(--ow-text-mid)",
-              borderBottom: i < NAV_LINKS.length - 1 ? "1px solid var(--ow-border)" : "none",
-              letterSpacing: "0.01em",
-            };
-            const chevron = (
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M6 4l4 4-4 4" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            );
-            return item.href.startsWith("/") ? (
-              <Link
-                key={item.label}
-                href={item.href}
-                onClick={handleNavClick}
-                className="flex items-center justify-between py-4 transition-colors"
-                style={sharedStyle}
-                onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-amber)")}
-                onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-text-mid)")}
-              >
-                {item.label}{chevron}
-              </Link>
-            ) : (
-              <a
-                key={item.label}
-                href={item.href}
-                onClick={handleNavClick}
-                className="flex items-center justify-between py-4 transition-colors"
-                style={sharedStyle}
-                onMouseEnter={e => (e.currentTarget.style.color = "var(--ow-amber)")}
-                onMouseLeave={e => (e.currentTarget.style.color = "var(--ow-text-mid)")}
-              >
-                {item.label}{chevron}
-              </a>
-            );
-          })}
-
-          {/* CTA in mobile menu */}
-          <a
-            href="/pricing"
-            onClick={handleNavClick}
-            className="btn-amber w-full text-center mt-4"
-            style={{display: "block", textAlign: "center"}}
+        {/* Drawer header */}
+        <div
+          className="flex items-center justify-between"
+          style={{
+            paddingTop: "max(1.25rem, env(safe-area-inset-top))",
+            paddingLeft: "max(1.25rem, env(safe-area-inset-left))",
+            paddingRight: "max(1.25rem, env(safe-area-inset-right))",
+            paddingBottom: "1rem",
+            borderBottom: "1px solid var(--ow-border)",
+          }}
+        >
+          <OwnologyLogo size={32} />
+          <button
+            className="touch-target rounded-sm"
+            onClick={() => setMenuOpen(false)}
+            aria-label="Close menu"
           >
-            Start Free Trial
-          </a>
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+              <path d="M5 5l12 12M17 5L5 17" stroke="oklch(0.72 0.12 75)" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Drawer body */}
+        <div
+          className="flex flex-col flex-1"
+          style={{
+            paddingLeft: "max(1.25rem, env(safe-area-inset-left))",
+            paddingRight: "max(1.25rem, env(safe-area-inset-right))",
+          }}
+        >
+          {/* Primary nav group */}
+          <div className="pt-2">
+            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.65rem", letterSpacing: "0.14em", color: "var(--ow-text-lo)", textTransform: "uppercase", padding: "0.75rem 0 0.25rem" }}>Explore</p>
+            {PRIMARY_NAV.map((item) => (
+              item.href.startsWith("/") ? (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={handleNavClick}
+                  className="flex items-center justify-between transition-colors"
+                  style={{ fontFamily: "'Lato',sans-serif", fontWeight: 400, fontSize: "1.0625rem", color: "var(--ow-text-hi)", borderBottom: "1px solid var(--ow-border)", letterSpacing: "0.01em", minHeight: "52px" }}
+                >
+                  {item.label}
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </Link>
+              ) : (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={handleNavClick}
+                  className="flex items-center justify-between transition-colors"
+                  style={{ fontFamily: "'Lato',sans-serif", fontWeight: 400, fontSize: "1.0625rem", color: "var(--ow-text-hi)", borderBottom: "1px solid var(--ow-border)", letterSpacing: "0.01em", minHeight: "52px" }}
+                >
+                  {item.label}
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </a>
+              )
+            ))}
+          </div>
+
+          {/* More nav group */}
+          <div className="pt-2">
+            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.65rem", letterSpacing: "0.14em", color: "var(--ow-text-lo)", textTransform: "uppercase", padding: "0.75rem 0 0.25rem" }}>More</p>
+            {MORE_NAV.map((item) => (
+              item.href.startsWith("/") ? (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={handleNavClick}
+                  className="flex items-center justify-between transition-colors"
+                  style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.9375rem", color: "var(--ow-text-mid)", borderBottom: "1px solid var(--ow-border)", letterSpacing: "0.01em", minHeight: "48px" }}
+                >
+                  {item.label}
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="var(--ow-border)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </Link>
+              ) : (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={handleNavClick}
+                  className="flex items-center justify-between transition-colors"
+                  style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.9375rem", color: "var(--ow-text-mid)", borderBottom: "1px solid var(--ow-border)", letterSpacing: "0.01em", minHeight: "48px" }}
+                >
+                  {item.label}
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="var(--ow-border)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </a>
+              )
+            ))}
+          </div>
+
+          {/* Admin — owner only */}
+          {isOwner && (
+            <div className="pt-2">
+              <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.65rem", letterSpacing: "0.14em", color: "var(--ow-text-lo)", textTransform: "uppercase", padding: "0.75rem 0 0.25rem" }}>Owner</p>
+              <Link
+                href="/admin"
+                onClick={handleNavClick}
+                className="flex items-center justify-between transition-colors"
+                style={{ fontFamily: "'Lato',sans-serif", fontWeight: 400, fontSize: "0.9375rem", color: "var(--ow-amber)", borderBottom: "1px solid var(--ow-border)", letterSpacing: "0.01em", minHeight: "48px" }}
+              >
+                <span className="flex items-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/></svg>
+                  Admin
+                </span>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </Link>
+            </div>
+          )}
+
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* CTA */}
+          <div
+            style={{
+              paddingBottom: "max(2rem, env(safe-area-inset-bottom))",
+              paddingTop: "1.5rem",
+            }}
+          >
+            <a
+              href="/pricing"
+              onClick={handleNavClick}
+              className="btn-amber w-full text-center block"
+            >
+              Start Free Trial
+            </a>
+          </div>
         </div>
       </div>
     </>
@@ -348,7 +406,7 @@ function Hero() {
           <div>
             <p className="section-label mb-6 fade-up">AI Knowledge Assistant for Winemakers</p>
             <h1 className="fade-up fade-up-delay-1"
-              style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2.5rem,5vw,4rem)", lineHeight:1.08, color:"var(--ow-text-hi)", letterSpacing:"-0.02em"}}>
+              style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,4rem)", lineHeight:1.1, color:"var(--ow-text-hi)", letterSpacing:"-0.02em"}}>
               Your cellar's<br/>
               <em style={{color:"var(--ow-amber)", fontStyle:"italic"}}>most knowledgeable</em><br/>
               apprentice.
@@ -357,10 +415,10 @@ function Hero() {
               style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}}>
               Ownology gives boutique winery teams instant, document-grounded answers to their toughest cellar questions — from a mobile phone, in seconds, during harvest.
             </p>
-            <div className="flex flex-wrap gap-4 mt-10 fade-up fade-up-delay-3">
-              <a href="/pricing" className="btn-amber">Start 14-Day Free Trial</a>
-              <a href="#how-it-works" className="btn-ghost">See How It Works</a>
-              <Link href="/compliance" className="btn-ghost flex items-center gap-2" style={{borderColor:"color-mix(in oklch, var(--ow-amber) 30%, transparent)", color:"var(--ow-text-mid)"}}>
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-10 fade-up fade-up-delay-3">
+              <a href="/pricing" className="btn-amber text-center">Start 14-Day Free Trial</a>
+              <a href="#how-it-works" className="btn-ghost text-center">See How It Works</a>
+              <Link href="/compliance" className="btn-ghost flex items-center justify-center gap-2" style={{borderColor:"color-mix(in oklch, var(--ow-amber) 30%, transparent)", color:"var(--ow-text-mid)"}}>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                   <path d="M7 1C3.69 1 1 3.69 1 7s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6Zm.5 9h-1V6.5h1V10Zm0-4.5h-1V4h1v1.5Z" fill="currentColor"/>
                 </svg>

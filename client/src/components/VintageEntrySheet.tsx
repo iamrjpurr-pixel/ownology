@@ -115,7 +115,7 @@ function OptionButton({
         border: `1px solid ${selected ? "var(--ow-amber)" : "var(--ow-border)"}`,
         color: selected ? "var(--ow-amber)" : "var(--ow-text-mid)",
         fontFamily: "'Lato', sans-serif",
-        fontSize: "0.9rem",
+        fontSize: "max(1rem, 16px)",
       }}
     >
       {children}
@@ -152,7 +152,7 @@ function TextInput({
           border: "1px solid var(--ow-border-md)",
           color: "var(--ow-text-hi)",
           fontFamily: "'Lato', sans-serif",
-          fontSize: "0.9rem",
+          fontSize: "max(1rem, 16px)",
           paddingRight: unit ? "3.5rem" : undefined,
         }}
         onFocus={(e) => (e.currentTarget.style.borderColor = "var(--ow-amber)")}
@@ -229,7 +229,7 @@ function AdditionDetails({
               border: "1px solid var(--ow-border-md)",
               color: "var(--ow-text-hi)",
               fontFamily: "'Fira Code', monospace",
-              fontSize: "0.85rem",
+              fontSize: "max(0.85rem, 16px)",
               minWidth: "5rem",
             }}
           >
@@ -379,7 +379,7 @@ function ObservationDetails({
           border: "1px solid var(--ow-border-md)",
           color: "var(--ow-text-hi)",
           fontFamily: "'Lato', sans-serif",
-          fontSize: "0.9rem",
+          fontSize: "max(1rem, 16px)",
           lineHeight: 1.6,
         }}
         onFocus={(e) => (e.currentTarget.style.borderColor = "var(--ow-amber)")}
@@ -411,7 +411,7 @@ function OtherDetails({
           border: "1px solid var(--ow-border-md)",
           color: "var(--ow-text-hi)",
           fontFamily: "'Lato', sans-serif",
-          fontSize: "0.9rem",
+          fontSize: "max(1rem, 16px)",
           lineHeight: 1.6,
         }}
         onFocus={(e) => (e.currentTarget.style.borderColor = "var(--ow-amber)")}
@@ -787,7 +787,7 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
                     border: "1px solid var(--ow-border-md)",
                     color: "var(--ow-text-hi)",
                     fontFamily: "'Lato', sans-serif",
-                    fontSize: "0.9rem",
+                    fontSize: "max(1rem, 16px)",
                     lineHeight: 1.6,
                   }}
                   onFocus={(e) => (e.currentTarget.style.borderColor = "var(--ow-amber)")}

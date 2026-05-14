@@ -135,3 +135,10 @@
 - [x] Add desktop modal presentation to VintageEntrySheet (bottom-sheet on mobile, centred modal on desktop via CSS media query)
 - [x] Add explicit tag filter chip/dropdown to Vintage Log filter bar (tags are currently searchable via text search but not filterable as a dedicated control)
 - [x] Fix mobile horizontal overflow on Samsung Chrome: add overflow-x:hidden to html/body in index.css, remove whiteSpace:nowrap from trust bar, hide hero demo card below lg breakpoint
+- [x] Rebuild mobile hamburger drawer: full-screen slide-in panel, all nav links + Admin (owner-only), 44px touch targets, safe-area insets for iOS notch/home bar, smooth 300ms ease-out animation, close on backdrop tap and link tap
+- [x] Add viewport-fit=cover to index.html meta viewport tag for iOS safe-area support
+- [x] Add env(safe-area-inset-*) padding to nav bar and mobile drawer in index.css
+- [x] Mobile hero polish: reduce heading font size on small screens, stack CTAs vertically with full-width buttons, improve padding
+- [x] Mobile Compliance page: larger textarea, bigger submit button, full-width source citation cards, iOS font-size 16px to prevent auto-zoom
+- [x] Mobile ThePress page: full-width tabs with 44px touch targets, scrollable tab bar on mobile, short labels on small screens
+- [ ] Mobile Pricing page: single-column tier cards, sticky CTA bar at bottom (deferred)

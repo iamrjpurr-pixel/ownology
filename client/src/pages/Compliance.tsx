@@ -983,7 +983,7 @@ ${scopedKB}`;
             >
               Example questions
             </p>
-            <div className="grid sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {filteredQuestions.map(item => (
                 <button
                   key={item.q}
@@ -997,6 +997,8 @@ ${scopedKB}`;
                     fontWeight: 300,
                     lineHeight: 1.5,
                     cursor: "pointer",
+                    minHeight: "52px",
+                    touchAction: "manipulation",
                   }}
                   onMouseEnter={e => {
                     (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--ow-amber)";
@@ -1106,7 +1108,7 @@ ${scopedKB}`;
         {/* Input */}
         <form
           onSubmit={handleSubmit}
-          className="sticky bottom-4"
+          className="sticky-bottom-safe"
         >
           <div
             className="flex gap-3 items-end rounded-sm p-3"
@@ -1121,7 +1123,7 @@ ${scopedKB}`;
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask a compliance question… (Enter to send, Shift+Enter for new line)"
+              placeholder="Ask a compliance question…"
               rows={2}
               className="flex-1 resize-none bg-transparent outline-none text-sm"
               style={{
@@ -1131,19 +1133,22 @@ ${scopedKB}`;
                 lineHeight: 1.6,
                 border: "none",
                 padding: "4px 0",
+                fontSize: "16px", /* Prevent iOS auto-zoom on focus */
               }}
               disabled={loading}
             />
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="flex-shrink-0 px-4 py-2 rounded-sm text-xs font-medium transition-all"
+              className="touch-target flex-shrink-0 rounded-sm text-xs font-medium transition-all"
               style={{
                 background: loading || !input.trim() ? "var(--ow-border)" : "var(--ow-amber)",
                 color: loading || !input.trim() ? "var(--ow-text-lo)" : "oklch(0.12 0.01 60)",
                 fontFamily: "'Lato',sans-serif",
                 cursor: loading || !input.trim() ? "not-allowed" : "pointer",
                 letterSpacing: "0.05em",
+                padding: "0 1rem",
+                touchAction: "manipulation",
               }}
             >
               {loading ? "…" : "Ask"}
