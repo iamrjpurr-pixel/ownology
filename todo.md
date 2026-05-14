@@ -131,5 +131,6 @@
 ## Ideas / Future Features
 
 - [ ] IDEA: Vintage Log reminder/alarm system — if a winemaker has not logged a required event type (Addition, Measurement, Racking, Inoculation, Observation) within a configurable window (hours or days), fire a push notification or in-app warning. Interval is set either by the winemaker manually (e.g. "remind me to check Brix every 24h") or suggested by the AI based on the fermentation stage (e.g. "Shiraz at 18 Brix — recommend Brix check every 12h, YAN check before ⅓ sugar depletion"). Alarms are per-tank and per-event-type. Implementation path: scheduled Heartbeat job queries vintage_log_entries for last entry per (userId, tankName, eventType), compares to configured interval, fires notifyOwner or browser push notification if overdue.
-- [ ] Add search/filter controls to Vintage Log tab (by tank, variety, event type, tag)
-- [ ] Add desktop modal presentation to VintageEntrySheet (bottom-sheet on mobile, centred modal on desktop via CSS media query)
+- [x] Add search/filter controls to Vintage Log tab (by tank, variety, event type, tag)
+- [x] Add desktop modal presentation to VintageEntrySheet (bottom-sheet on mobile, centred modal on desktop via CSS media query)
+- [x] Add explicit tag filter chip/dropdown to Vintage Log filter bar (tags are currently searchable via text search but not filterable as a dedicated control)

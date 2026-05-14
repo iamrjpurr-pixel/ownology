@@ -138,6 +138,12 @@ export default function ThePress() {
   const [noteText, setNoteText] = useState("");
   const [entrySheetOpen, setEntrySheetOpen] = useState(false);
   const [quickEntryTank, setQuickEntryTank] = useState<string | undefined>(undefined);
+  // Filter state
+  const [filterTank, setFilterTank] = useState("");
+  const [filterVariety, setFilterVariety] = useState("");
+  const [filterEventType, setFilterEventType] = useState("");
+  const [filterText, setFilterText] = useState("");
+  const [filterTag, setFilterTag] = useState("");
   const headerRef = useInView(0.1);
   const contentRef = useInView(0.05);
 
@@ -148,6 +154,32 @@ export default function ThePress() {
   );
   const isLoggedIn = logEntries !== undefined || false;
   const hasEntries = logEntries && logEntries.length > 0;
+
+  // Derived filter options from live data
+  const allTanks = logEntries ? Array.from(new Set(logEntries.map((e) => e.tankName))) : [];
+  const allVarieties = logEntries ? Array.from(new Set(logEntries.map((e) => e.variety))) : [];
+  const allTags = logEntries
+    ? Array.from(new Set(logEntries.flatMap((e) => e.tags))).sort()
+    : [];
+
+  // Filtered entries
+  const filteredEntries = (logEntries ?? []).filter((entry) => {
+    if (filterTank && entry.tankName !== filterTank) return false;
+    if (filterVariety && entry.variety !== filterVariety) return false;
+    if (filterEventType && entry.eventType !== filterEventType) return false;
+    if (filterTag && !entry.tags.includes(filterTag)) return false;
+    if (filterText) {
+      const needle = filterText.toLowerCase();
+      const haystack = [
+        entry.tankName, entry.variety, entry.eventType, entry.noteText ?? "",
+        ...entry.tags,
+        ...Object.values(entry.details as Record<string, string>),
+      ].join(" ").toLowerCase();
+      if (!haystack.includes(needle)) return false;
+    }
+    return true;
+  });
+  const isFiltered = filterTank || filterVariety || filterEventType || filterTag || filterText;
 
   const tabs = [
     { id: "log" as const, label: "Vintage Log", icon: "📋" },
@@ -398,10 +430,131 @@ export default function ThePress() {
                 </button>
               )}
 
+              {/* Filter bar — only shown when there are entries */}
+              {hasEntries && (
+                <div className="mb-5 flex flex-wrap gap-2 items-center">
+                  {/* Text search */}
+                  <div className="relative flex-1 min-w-[160px]">
+                    <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <circle cx="5" cy="5" r="4" stroke="var(--ow-text-lo)" strokeWidth="1.2"/>
+                      <path d="M8.5 8.5l2 2" stroke="var(--ow-text-lo)" strokeWidth="1.2" strokeLinecap="round"/>
+                    </svg>
+                    <input
+                      type="text"
+                      placeholder="Search entries…"
+                      value={filterText}
+                      onChange={(e) => setFilterText(e.target.value)}
+                      className="w-full pl-8 pr-3 py-2 rounded-sm text-xs"
+                      style={{
+                        background: "var(--ow-bg-inset)",
+                        border: "1px solid var(--ow-border)",
+                        color: "var(--ow-text-hi)",
+                        fontFamily: "'Lato',sans-serif",
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+                  {/* Tank filter */}
+                  {allTanks.length > 1 && (
+                    <select
+                      value={filterTank}
+                      onChange={(e) => setFilterTank(e.target.value)}
+                      className="px-3 py-2 rounded-sm text-xs"
+                      style={{
+                        background: filterTank ? "color-mix(in oklch, var(--ow-amber) 12%, var(--ow-bg-inset))" : "var(--ow-bg-inset)",
+                        border: filterTank ? "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)" : "1px solid var(--ow-border)",
+                        color: filterTank ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                        fontFamily: "'Fira Code',monospace",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <option value="">All tanks</option>
+                      {allTanks.map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  )}
+                  {/* Variety filter */}
+                  {allVarieties.length > 1 && (
+                    <select
+                      value={filterVariety}
+                      onChange={(e) => setFilterVariety(e.target.value)}
+                      className="px-3 py-2 rounded-sm text-xs"
+                      style={{
+                        background: filterVariety ? "color-mix(in oklch, var(--ow-amber) 12%, var(--ow-bg-inset))" : "var(--ow-bg-inset)",
+                        border: filterVariety ? "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)" : "1px solid var(--ow-border)",
+                        color: filterVariety ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                        fontFamily: "'Lato',sans-serif",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <option value="">All varieties</option>
+                      {allVarieties.map((v) => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  )}
+                  {/* Event type filter */}
+                  <select
+                    value={filterEventType}
+                    onChange={(e) => setFilterEventType(e.target.value)}
+                    className="px-3 py-2 rounded-sm text-xs"
+                    style={{
+                      background: filterEventType ? "color-mix(in oklch, var(--ow-amber) 12%, var(--ow-bg-inset))" : "var(--ow-bg-inset)",
+                      border: filterEventType ? "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)" : "1px solid var(--ow-border)",
+                      color: filterEventType ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                      fontFamily: "'Fira Code',monospace",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <option value="">All events</option>
+                    {["addition","measurement","racking","inoculation","observation","other"].map((et) => (
+                      <option key={et} value={et}>{et}</option>
+                    ))}
+                  </select>
+                  {/* Tag filter */}
+                  {allTags.length > 0 && (
+                    <select
+                      value={filterTag}
+                      onChange={(e) => setFilterTag(e.target.value)}
+                      className="px-3 py-2 rounded-sm text-xs"
+                      style={{
+                        background: filterTag ? "color-mix(in oklch, var(--ow-amber) 12%, var(--ow-bg-inset))" : "var(--ow-bg-inset)",
+                        border: filterTag ? "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)" : "1px solid var(--ow-border)",
+                        color: filterTag ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                        fontFamily: "'Fira Code',monospace",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <option value="">All tags</option>
+                      {allTags.map((tag) => <option key={tag} value={tag}>{tag}</option>)}
+                    </select>
+                  )}
+                  {/* Clear filters */}
+                  {isFiltered && (
+                    <button
+                      type="button"
+                      onClick={() => { setFilterTank(""); setFilterVariety(""); setFilterEventType(""); setFilterTag(""); setFilterText(""); }}
+                      className="px-3 py-2 rounded-sm text-xs transition-colors"
+                      style={{
+                        background: "transparent",
+                        border: "1px solid var(--ow-border)",
+                        color: "var(--ow-text-lo)",
+                        fontFamily: "'Lato',sans-serif",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              )}
+
               {/* Live entries */}
               {hasEntries && (
                 <div className="flex flex-col gap-4">
-                  {logEntries!.map((entry) => {
+                  {filteredEntries.length === 0 && isFiltered && (
+                    <p className="text-center py-8" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", color: "var(--ow-text-lo)", fontStyle: "italic" }}>
+                      No entries match your filters.
+                    </p>
+                  )}
+                  {filteredEntries.map((entry) => {
                     const EVENT_ICONS: Record<string, string> = {
                       addition: "⊕", measurement: "◎", racking: "⇄",
                       inoculation: "✦", observation: "◉", other: "◈",

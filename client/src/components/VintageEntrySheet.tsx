@@ -16,6 +16,20 @@ import { useState, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
+// ─── Media query hook ─────────────────────────────────────────────────────────
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 768px)").matches : false
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isDesktop;
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "other";
@@ -410,6 +424,7 @@ function OtherDetails({
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank }: Props) {
+  const isDesktop = useIsDesktop();
   const totalSteps = prefillTank ? 4 : 5;
   const [step, setStep] = useState(0);
 
@@ -514,11 +529,22 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
         onClick={onClose}
       />
 
-      {/* Sheet */}
+      {/* Sheet — bottom-sheet on mobile, centred modal on desktop */}
       <div
         className="fixed z-50 flex flex-col"
-        style={{
-          // Mobile: bottom sheet; Desktop: centred modal
+        style={isDesktop ? {
+          // Desktop: centred modal
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "min(560px, 92vw)",
+          maxHeight: "88dvh",
+          background: "var(--ow-bg-raised)",
+          border: "1px solid var(--ow-border-md)",
+          borderRadius: "1rem",
+          boxShadow: "0 32px 80px oklch(0 0 0 / 0.6)",
+        } : {
+          // Mobile: bottom sheet
           bottom: 0,
           left: 0,
           right: 0,
@@ -527,13 +553,14 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
           borderTop: "1px solid var(--ow-border-md)",
           borderRadius: "1.25rem 1.25rem 0 0",
           boxShadow: "0 -24px 80px oklch(0 0 0 / 0.5)",
-          // Desktop override via media query — handled with inline style trick
         }}
       >
-        {/* Drag handle */}
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full" style={{ background: "var(--ow-border-md)" }} />
-        </div>
+        {/* Drag handle — mobile bottom-sheet only */}
+        {!isDesktop && (
+          <div className="flex justify-center pt-3 pb-1">
+            <div className="w-10 h-1 rounded-full" style={{ background: "var(--ow-border-md)" }} />
+          </div>
+        )}
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-3 pb-2">
