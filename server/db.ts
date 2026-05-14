@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import * as schema from "../drizzle/schema.js";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, and } from "drizzle-orm";
 
 // ─── Connection pool ──────────────────────────────────────────────────────────
 
@@ -122,4 +122,61 @@ export async function addFoundingMember(data: {
     joinedAt: Date.now(),
     notes: data.notes ?? null,
   });
+}
+
+// ─── Vintage Log ──────────────────────────────────────────────────────────────
+
+export type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "other";
+
+export async function addVintageLogEntry(data: {
+  userId: number;
+  tankName: string;
+  variety: string;
+  eventType: EventType;
+  detailsJson: string;
+  noteText?: string;
+  tagsJson: string;
+  entryAt?: number;
+}) {
+  const now = Date.now();
+  const result = await db.insert(schema.vintageLogEntries).values({
+    userId: data.userId,
+    tankName: data.tankName.trim(),
+    variety: data.variety.trim(),
+    eventType: data.eventType,
+    detailsJson: data.detailsJson,
+    noteText: data.noteText ?? null,
+    tagsJson: data.tagsJson,
+    entryAt: data.entryAt ?? now,
+    createdAt: now,
+  });
+  return result;
+}
+
+export async function listVintageLogEntries(userId: number, limit = 50) {
+  return db.query.vintageLogEntries.findMany({
+    where: eq(schema.vintageLogEntries.userId, userId),
+    orderBy: [desc(schema.vintageLogEntries.entryAt)],
+    limit,
+  });
+}
+
+export async function getUsedTankNames(userId: number): Promise<string[]> {
+  const rows = await db.query.vintageLogEntries.findMany({
+    where: eq(schema.vintageLogEntries.userId, userId),
+    columns: { tankName: true },
+  });
+  // Return unique tank names sorted alphabetically
+  return Array.from(new Set(rows.map((r) => r.tankName))).sort();
+}
+
+export async function deleteVintageLogEntry(id: number, userId: number) {
+  await db
+    .delete(schema.vintageLogEntries)
+    .where(
+      and(
+        eq(schema.vintageLogEntries.id, id),
+        eq(schema.vintageLogEntries.userId, userId)
+      )
+    );
 }

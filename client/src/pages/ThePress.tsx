@@ -8,6 +8,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
+import { trpc } from "@/lib/trpc";
+import { getLoginUrl } from "@/const";
+import VintageEntrySheet from "@/components/VintageEntrySheet";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface VintageEntry {
@@ -133,8 +136,18 @@ function SectionHeader({ label, title, subtitle }: { label: string; title: strin
 export default function ThePress() {
   const [activeTab, setActiveTab] = useState<"log" | "calcs" | "scenarios" | "notes">("log");
   const [noteText, setNoteText] = useState("");
+  const [entrySheetOpen, setEntrySheetOpen] = useState(false);
+  const [quickEntryTank, setQuickEntryTank] = useState<string | undefined>(undefined);
   const headerRef = useInView(0.1);
   const contentRef = useInView(0.05);
+
+  // Live vintage log data (requires auth — errors are handled gracefully)
+  const { data: logEntries, refetch: refetchLog } = trpc.vintageLog.list.useQuery(
+    { limit: 100 },
+    { retry: false }
+  );
+  const isLoggedIn = logEntries !== undefined || false;
+  const hasEntries = logEntries && logEntries.length > 0;
 
   const tabs = [
     { id: "log" as const, label: "Vintage Log", icon: "📋" },
@@ -298,110 +311,217 @@ export default function ThePress() {
           {/* Vintage Log */}
           {activeTab === "log" && (
             <div>
-              <SectionHeader
-                label="Carnet de Cave"
-                title="Vintage Log"
-                subtitle="Every decision, every tank, every vintage — your permanent cellar record."
-              />
-
-              {/* Add entry placeholder */}
-              <div
-                className="mb-6 p-4 rounded-sm flex items-center gap-3"
-                style={{ background: "var(--ow-bg-card)", border: "1px dashed var(--ow-border)", cursor: "not-allowed", opacity: 0.7 }}
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <circle cx="8" cy="8" r="7" stroke="var(--ow-text-lo)" strokeWidth="1.2" />
-                  <path d="M8 5v6M5 8h6" stroke="var(--ow-text-lo)" strokeWidth="1.2" strokeLinecap="round" />
-                </svg>
-                <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", color: "var(--ow-text-lo)", fontStyle: "italic" }}>
-                  Add vintage entry — available in The Press (education build)
-                </span>
-              </div>
-
-              {/* Sample entries */}
-              <div className="flex flex-col gap-4">
-                {SAMPLE_VINTAGE_ENTRIES.map(entry => (
-                  <div
-                    key={entry.id}
-                    className="cellar-card p-5"
-                    style={{ border: "1px solid var(--ow-border)" }}
+              <div className="flex items-start justify-between gap-4 mb-6">
+                <SectionHeader
+                  label="Carnet de Cave"
+                  title="Vintage Log"
+                  subtitle="Every decision, every tank, every vintage — your permanent cellar record."
+                />
+                {/* Add Entry button — shown when authenticated */}
+                {logEntries !== undefined && (
+                  <button
+                    type="button"
+                    onClick={() => { setQuickEntryTank(undefined); setEntrySheetOpen(true); }}
+                    className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-sm text-sm font-semibold transition-all mt-1"
+                    style={{
+                      background: "var(--ow-amber)",
+                      color: "oklch(0.11 0.008 60)",
+                      border: "none",
+                      fontFamily: "'Lato',sans-serif",
+                      cursor: "pointer",
+                    }}
                   >
-                    <div className="flex items-start justify-between gap-4 mb-3">
-                      <div className="flex items-center gap-3">
-                        <span
-                          style={{
-                            fontFamily: "'Fira Code',monospace",
-                            fontSize: "0.7rem",
-                            color: "var(--ow-text-lo)",
-                            letterSpacing: "0.06em",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {entry.date}
-                        </span>
-                        <span
-                          className="px-2 py-0.5 rounded-sm text-xs"
-                          style={{
-                            fontFamily: "'Fira Code',monospace",
-                            fontSize: "0.7rem",
-                            color: "var(--ow-amber)",
-                            background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
-                            border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
-                          }}
-                        >
-                          {entry.tank}
-                        </span>
-                        <span
-                          style={{
-                            fontFamily: "'Lato',sans-serif",
-                            fontSize: "0.8125rem",
-                            fontWeight: 600,
-                            color: "var(--ow-text-hi)",
-                          }}
-                        >
-                          {entry.variety}
-                        </span>
-                      </div>
-                    </div>
-                    <p
-                      style={{
-                        fontFamily: "'Lato',sans-serif",
-                        fontWeight: 300,
-                        fontSize: "0.875rem",
-                        lineHeight: 1.65,
-                        color: "var(--ow-text-mid)",
-                      }}
-                    >
-                      {entry.note}
-                    </p>
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {entry.tags.map(tag => (
-                        <span
-                          key={tag}
-                          className="px-2 py-0.5 rounded-sm text-xs"
-                          style={{
-                            fontFamily: "'Fira Code',monospace",
-                            fontSize: "0.65rem",
-                            color: "var(--ow-text-lo)",
-                            background: "var(--ow-bg-inset)",
-                            border: "1px solid var(--ow-border)",
-                            letterSpacing: "0.04em",
-                          }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3" />
+                      <path d="M7 4v6M4 7h6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                    </svg>
+                    Add Entry
+                  </button>
+                )}
               </div>
 
-              <p
-                className="mt-6 text-center"
-                style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem", color: "var(--ow-text-lo)", fontStyle: "italic" }}
-              >
-                Sample entries shown — your live vintage log populates here during the education build.
-              </p>
+              {/* Not logged in — prompt to sign in */}
+              {logEntries === undefined && (
+                <div
+                  className="mb-6 p-5 rounded-sm flex items-center justify-between gap-4"
+                  style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}
+                >
+                  <div>
+                    <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.9rem", fontWeight: 600, color: "var(--ow-text-hi)" }}>
+                      Sign in to start your Vintage Log
+                    </p>
+                    <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem", color: "var(--ow-text-lo)", marginTop: "0.25rem" }}>
+                      Your log is private to your account and persists across sessions.
+                    </p>
+                  </div>
+                  <a
+                    href={getLoginUrl()}
+                    className="flex-shrink-0 px-4 py-2.5 rounded-sm text-sm font-semibold"
+                    style={{
+                      background: "var(--ow-amber)",
+                      color: "oklch(0.11 0.008 60)",
+                      fontFamily: "'Lato',sans-serif",
+                      textDecoration: "none",
+                    }}
+                  >
+                    Sign in
+                  </a>
+                </div>
+              )}
+
+              {/* Empty state — logged in but no entries yet */}
+              {logEntries !== undefined && !hasEntries && (
+                <button
+                  type="button"
+                  onClick={() => { setQuickEntryTank(undefined); setEntrySheetOpen(true); }}
+                  className="w-full mb-6 p-6 rounded-sm flex flex-col items-center gap-3 transition-all"
+                  style={{
+                    background: "var(--ow-bg-card)",
+                    border: "1px dashed var(--ow-border-md)",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--ow-amber)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--ow-border-md)")}
+                >
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="14" stroke="var(--ow-border-md)" strokeWidth="1.5" />
+                    <path d="M16 10v12M10 16h12" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                  <div className="text-center">
+                    <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.9rem", fontWeight: 600, color: "var(--ow-text-hi)" }}>
+                      Log your first entry
+                    </p>
+                    <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem", color: "var(--ow-text-lo)", marginTop: "0.25rem" }}>
+                      Tap to open the guided entry sheet
+                    </p>
+                  </div>
+                </button>
+              )}
+
+              {/* Live entries */}
+              {hasEntries && (
+                <div className="flex flex-col gap-4">
+                  {logEntries!.map((entry) => {
+                    const EVENT_ICONS: Record<string, string> = {
+                      addition: "⊕", measurement: "◎", racking: "⇄",
+                      inoculation: "✦", observation: "◉", other: "◈",
+                    };
+                    const icon = EVENT_ICONS[entry.eventType] ?? "◈";
+                    const dateStr = new Date(entry.entryAt).toLocaleDateString("en-AU", { day: "numeric", month: "short" });
+
+                    // Build a human-readable summary line from details
+                    let summaryLine = "";
+                    const d = entry.details as Record<string, string>;
+                    if (entry.eventType === "addition" && d.what) {
+                      summaryLine = `${d.what}${d.quantity ? " · " + d.quantity + (d.unit ?? "") : ""}${d.timing ? " · " + d.timing : ""}`;
+                    } else if (entry.eventType === "measurement" && d.what) {
+                      summaryLine = `${d.what}: ${d.value ?? ""}`;
+                    } else if (entry.eventType === "racking") {
+                      summaryLine = `${d.fromLocation ?? ""} → ${d.toLocation ?? ""}${d.volumeL ? " · " + d.volumeL + "L" : ""}`;
+                    } else if (entry.eventType === "inoculation" && d.what) {
+                      summaryLine = `${d.what} · ${d.productName ?? ""}${d.rate ? " · " + d.rate + " g/hL" : ""}`;
+                    } else if ((entry.eventType === "observation" || entry.eventType === "other") && d.text) {
+                      summaryLine = d.text.slice(0, 120);
+                    }
+
+                    return (
+                      <div
+                        key={entry.id}
+                        className="cellar-card p-5"
+                        style={{ border: "1px solid var(--ow-border)" }}
+                      >
+                        <div className="flex items-start justify-between gap-4 mb-2">
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.7rem", color: "var(--ow-text-lo)", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>
+                              {dateStr}
+                            </span>
+                            <span
+                              className="px-2 py-0.5 rounded-sm"
+                              style={{
+                                fontFamily: "'Fira Code',monospace", fontSize: "0.7rem",
+                                color: "var(--ow-amber)",
+                                background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+                                border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
+                              }}
+                            >
+                              {entry.tankName}
+                            </span>
+                            <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem", fontWeight: 600, color: "var(--ow-text-hi)" }}>
+                              {entry.variety}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <span
+                              className="px-2 py-0.5 rounded-sm text-xs flex items-center gap-1"
+                              style={{
+                                fontFamily: "'Fira Code',monospace", fontSize: "0.65rem",
+                                color: "var(--ow-text-mid)",
+                                background: "var(--ow-bg-inset)",
+                                border: "1px solid var(--ow-border)",
+                              }}
+                            >
+                              <span>{icon}</span>
+                              {entry.eventType}
+                            </span>
+                            {/* Quick-entry button: add another entry for same tank */}
+                            <button
+                              type="button"
+                              onClick={() => { setQuickEntryTank(entry.tankName); setEntrySheetOpen(true); }}
+                              title={`Add entry for ${entry.tankName}`}
+                              className="w-6 h-6 rounded-sm flex items-center justify-center transition-colors"
+                              style={{ background: "var(--ow-bg-inset)", border: "1px solid var(--ow-border)", color: "var(--ow-text-lo)", cursor: "pointer" }}
+                            >
+                              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                <path d="M5 2v6M2 5h6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+
+                        {summaryLine && (
+                          <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 400, fontSize: "0.875rem", lineHeight: 1.65, color: "var(--ow-text-mid)", marginBottom: "0.5rem" }}>
+                            {summaryLine}
+                          </p>
+                        )}
+
+                        {entry.noteText && (
+                          <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.8125rem", lineHeight: 1.65, color: "var(--ow-text-lo)", fontStyle: "italic" }}>
+                            {entry.noteText}
+                          </p>
+                        )}
+
+                        {entry.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            {entry.tags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="px-2 py-0.5 rounded-sm"
+                                style={{
+                                  fontFamily: "'Fira Code',monospace", fontSize: "0.65rem",
+                                  color: "var(--ow-text-lo)",
+                                  background: "var(--ow-bg-inset)",
+                                  border: "1px solid var(--ow-border)",
+                                  letterSpacing: "0.04em",
+                                }}
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Guided entry sheet */}
+              <VintageEntrySheet
+                open={entrySheetOpen}
+                onClose={() => setEntrySheetOpen(false)}
+                onSaved={() => { setEntrySheetOpen(false); refetchLog(); }}
+                prefillTank={quickEntryTank}
+              />
             </div>
           )}
 

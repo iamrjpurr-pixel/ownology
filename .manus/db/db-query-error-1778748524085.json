@@ -1,0 +1,14 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `vintage_log_entries` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int NOT NULL,\n  `tank_name` varchar(128) NOT NULL,\n  `variety` varchar(128) NOT NULL,\n  `event_type` enum('addition','measurement','racking','inoculation','observation','other') NOT NULL,\n  `details_json` text NOT NULL DEFAULT ('{}'),\n  `note_text` text,\n  `tags_json` text NOT NULL DEFAULT ('[]'),\n  `entry_at` bigint NOT NULL,\n  `created_at` bigint NOT NULL,\n  CONSTRAINT `vintage_log_entries_id` PRIMARY KEY(`id`)\n);\nCREATE INDEX IF NOT EXISTS `vle_user_idx` ON `vintage_log_entries` (`user_id`);\nCREATE INDEX IF NOT EXISTS `vle_entry_at_idx` ON `vintage_log_entries` (`entry_at`);\nCREATE INDEX IF NOT EXISTS `vle_tank_idx` ON `vintage_log_entries` (`tank_name`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4HByWUH885AfJUE.9472483f21d7 --database kjXA9MRaPtPLGHog5yynHZ --execute CREATE TABLE IF NOT EXISTS `vintage_log_entries` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int NOT NULL,\n  `tank_name` varchar(128) NOT NULL,\n  `variety` varchar(128) NOT NULL,\n  `event_type` enum('addition','measurement','racking','inoculation','observation','other') NOT NULL,\n  `details_json` text NOT NULL DEFAULT ('{}'),\n  `note_text` text,\n  `tags_json` text NOT NULL DEFAULT ('[]'),\n  `entry_at` bigint NOT NULL,\n  `created_at` bigint NOT NULL,\n  CONSTRAINT `vintage_log_entries_id` PRIMARY KEY(`id`)\n);\nCREATE INDEX IF NOT EXISTS `vle_user_idx` ON `vintage_log_entries` (`user_id`);\nCREATE INDEX IF NOT EXISTS `vle_entry_at_idx` ON `vintage_log_entries` (`entry_at`);\nCREATE INDEX IF NOT EXISTS `vle_tank_idx` ON `vintage_log_entries` (`tank_name`);",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1064 (42000) at line 1: You have an error in your SQL syntax; check the manual that corresponds to your TiDB version for the right syntax to use line 7 column 45 near \"'{}'),",
+    "  `note_text` text,",
+    "  `tags_json` text NOT NULL DEFAULT ('[]'),",
+    "  `entry_at` bigint NOT NULL,",
+    "  `created_at` bigint NOT NULL,",
+    "  CONSTRAINT `vintage_log_entries_id` PRIMARY KEY(`id`)",
+    ")\""
+  ]
+}

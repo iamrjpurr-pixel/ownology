@@ -121,3 +121,15 @@
 - [x] Build /admin owner-only hub page (Admin.tsx) — grid of cards linking to Campaign Metrics, Orders, Founding Members, with owner-gated access and FORBIDDEN fallback
 - [x] Wire /admin route in App.tsx
 - [x] Add conditional "Admin" link to More dropdown in Home.tsx nav — visible only when owner is logged in
+- [x] Add vintage_log_entries table to drizzle/schema.ts and push migration
+- [x] Add db helpers for vintage log (addVintageEntry, listVintageEntries, getUsedTankNames) to server/db.ts
+- [x] Add vintageLog tRPC router (add, list, getUsedTankNames) with protectedProcedure to server/routers.ts
+- [x] Build VintageEntrySheet.tsx — guided bottom-sheet/modal with 5-step flow (tank, variety, event type, contextual details, note) and Quick-Entry mode
+- [x] Replace placeholder Vintage Log tab in ThePress.tsx with live data, real entry sheet, and search/filter
+- [x] Write vitest tests for vintage log auto-tagging logic and input validation
+
+## Ideas / Future Features
+
+- [ ] IDEA: Vintage Log reminder/alarm system — if a winemaker has not logged a required event type (Addition, Measurement, Racking, Inoculation, Observation) within a configurable window (hours or days), fire a push notification or in-app warning. Interval is set either by the winemaker manually (e.g. "remind me to check Brix every 24h") or suggested by the AI based on the fermentation stage (e.g. "Shiraz at 18 Brix — recommend Brix check every 12h, YAN check before ⅓ sugar depletion"). Alarms are per-tank and per-event-type. Implementation path: scheduled Heartbeat job queries vintage_log_entries for last entry per (userId, tankName, eventType), compares to configured interval, fires notifyOwner or browser push notification if overdue.
+- [ ] Add search/filter controls to Vintage Log tab (by tank, variety, event type, tag)
+- [ ] Add desktop modal presentation to VintageEntrySheet (bottom-sheet on mobile, centred modal on desktop via CSS media query)

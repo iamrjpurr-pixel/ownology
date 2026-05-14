@@ -1,6 +1,6 @@
 import { z } from "zod";
 import Stripe from "stripe";
-import { router, publicProcedure, ownerProcedure } from "./trpc.js";
+import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
 import {
   getCampaignMetricsHistory,
   getLatestCampaignMetrics,
@@ -8,6 +8,12 @@ import {
   getFoundingMemberCount,
   listFoundingMembers,
   addFoundingMember,
+  addVintageLogEntry,
+  listVintageLogEntries,
+  getUsedTankNames,
+  deleteVintageLogEntry,
+  getUserByOpenId,
+  type EventType,
 } from "./db.js";
 
 function getStripe(): Stripe {
@@ -213,6 +219,98 @@ const adminRouter = router({
   }),
 });
 
+// ─── Vintage Log Router ───────────────────────────────────────────────────────
+// All procedures are protectedProcedure — any authenticated user can log entries.
+// Entries are scoped to ctx.user.id so users only see their own log.
+
+const EVENT_TYPES = ["addition", "measurement", "racking", "inoculation", "observation", "other"] as const;
+
+/**
+ * Auto-generate searchable tags from event type + details.
+ * Called server-side so the client never needs to replicate the logic.
+ */
+function generateTags(eventType: EventType, details: Record<string, unknown>, variety: string, tankName: string): string[] {
+  const tags: string[] = [eventType, variety, tankName];
+  if (eventType === "addition") {
+    const what = (details.what as string) ?? "";
+    if (what) tags.push(what);
+    const timing = (details.timing as string) ?? "";
+    if (timing) tags.push(timing);
+  } else if (eventType === "measurement") {
+    const what = (details.what as string) ?? "";
+    if (what) tags.push(what);
+  } else if (eventType === "racking") {
+    tags.push("racking");
+    const leesStatus = (details.leesStatus as string) ?? "";
+    if (leesStatus) tags.push(leesStatus);
+  } else if (eventType === "inoculation") {
+    const what = (details.what as string) ?? "";
+    if (what) tags.push(what);
+    const product = (details.productName as string) ?? "";
+    if (product) tags.push(product);
+  }
+  // Deduplicate and normalise
+  return Array.from(new Set(tags.map((t) => t.trim().toLowerCase()).filter(Boolean)));
+}
+
+const vintageLogRouter = router({
+  add: protectedProcedure
+    .input(
+      z.object({
+        tankName: z.string().min(1).max(128),
+        variety: z.string().min(1).max(128),
+        eventType: z.enum(["addition", "measurement", "racking", "inoculation", "observation", "other"]),
+        details: z.record(z.string(), z.unknown()),
+        noteText: z.string().max(2000).optional(),
+        entryAt: z.number().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const tags = generateTags(input.eventType, input.details, input.variety, input.tankName);
+      await addVintageLogEntry({
+        userId: dbUser.id,
+        tankName: input.tankName,
+        variety: input.variety,
+        eventType: input.eventType,
+        detailsJson: JSON.stringify(input.details),
+        noteText: input.noteText,
+        tagsJson: JSON.stringify(tags),
+        entryAt: input.entryAt,
+      });
+      return { success: true };
+    }),
+
+  list: protectedProcedure
+    .input(z.object({ limit: z.number().min(1).max(200).optional() }))
+    .query(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) return [];
+      const rows = await listVintageLogEntries(dbUser.id, input.limit ?? 50);
+      return rows.map((r) => ({
+        ...r,
+        details: JSON.parse(r.detailsJson) as Record<string, unknown>,
+        tags: JSON.parse(r.tagsJson) as string[],
+      }));
+    }),
+
+  getUsedTanks: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return [];
+    return getUsedTankNames(dbUser.id);
+  }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await deleteVintageLogEntry(input.id, dbUser.id);
+      return { success: true };
+    }),
+});
+
 // ─── App Router ───────────────────────────────────────────────────────────────
 
 export const appRouter = router({
@@ -220,6 +318,7 @@ export const appRouter = router({
   foundingMembers: foundingMembersRouter,
   orders: ordersRouter,
   admin: adminRouter,
+  vintageLog: vintageLogRouter,
 });
 
 export type AppRouter = typeof appRouter;
