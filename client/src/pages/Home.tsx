@@ -368,17 +368,17 @@ function Hero() {
               </Link>
             </div>
             {/* Trust bar */}
-            <div className="mt-12 flex items-center gap-6 fade-up fade-up-delay-4">
-              <div className="amber-rule flex-1" />
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.75rem", color:"var(--ow-text-lo)", letterSpacing:"0.08em", whiteSpace:"nowrap"}}>
+            <div className="mt-12 flex items-center gap-4 fade-up fade-up-delay-4">
+              <div className="amber-rule flex-1 hidden sm:block" />
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.7rem", color:"var(--ow-text-lo)", letterSpacing:"0.06em", textAlign:"center"}}>
                 TRUSTED BY BOUTIQUE WINERIES ACROSS AU · NZ · US
               </p>
-              <div className="amber-rule flex-1" />
+              <div className="amber-rule flex-1 hidden sm:block" />
             </div>
           </div>
 
-          {/* Right — live demo card */}
-          <div className="fade-up fade-up-delay-2">
+          {/* Right — live demo card — hidden on mobile to prevent overflow */}
+          <div className="hidden lg:block fade-up fade-up-delay-2">
             <div className="cellar-card p-5 max-w-md ml-auto" style={{border:"1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)"}}>
               {/* Header */}
               <div className="flex items-center gap-3 mb-4 pb-4" style={{borderBottom:"1px solid var(--ow-border)"}}>
@@ -1181,7 +1181,7 @@ function WhatOwnologyKnows() {
           >
             Every answer is grounded in your winery's own documents — standard operating procedures, vintage records, supplier sheets — not generic internet content.
           </p>
-          <a href="/pricing" className="btn-amber" style={{ whiteSpace: "nowrap" }}>
+          <a href="/pricing" className="btn-amber">
             Start Free Trial
           </a>
         </div>

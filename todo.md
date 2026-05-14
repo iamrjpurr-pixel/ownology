@@ -134,3 +134,4 @@
 - [x] Add search/filter controls to Vintage Log tab (by tank, variety, event type, tag)
 - [x] Add desktop modal presentation to VintageEntrySheet (bottom-sheet on mobile, centred modal on desktop via CSS media query)
 - [x] Add explicit tag filter chip/dropdown to Vintage Log filter bar (tags are currently searchable via text search but not filterable as a dedicated control)
+- [x] Fix mobile horizontal overflow on Samsung Chrome: add overflow-x:hidden to html/body in index.css, remove whiteSpace:nowrap from trust bar, hide hero demo card below lg breakpoint
