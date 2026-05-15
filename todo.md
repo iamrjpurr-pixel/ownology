@@ -155,3 +155,10 @@
 - [x] Wire /quick-entry route in App.tsx and add Quick Entry link to mobile hamburger drawer
 - [x] Write presentation script: 5-step Vintage Log entry flow walkthrough (onboarding/demo pitch document)
 - [x] Write vitest tests for reminder threshold logic and overdue detection
+
+## Competitive Intelligence + Advantage Page
+
+- [x] Deep-dive research on 7 competitor products (PlantVoice, VitisFlower, InnoVint, EnoFile, iWineMaker, Vineyard Growth Manager, Winemaker Manager)
+- [x] Write competitive intelligence report (ownology-competitive-intelligence-2026.md)
+- [x] Build /competitive-advantage page: hero, unoccupied market section, 7-product competitor grid, feature matrix table, intelligence layer explainer, Australian compliance moat, investment thesis, waitlist CTA
+- [x] Wire /competitive-advantage route in App.tsx, add to More dropdown nav and home page footer
