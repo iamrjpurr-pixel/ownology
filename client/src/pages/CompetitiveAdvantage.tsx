@@ -3,11 +3,21 @@
  * Translates the May 2026 competitive intelligence report into a public-facing
  * page that clearly articulates Ownology's unique market position.
  * Design: matches the dark artisan system — Fraunces display, Lato body, amber gold.
+ *
+ * Interactive enhancements (May 2026):
+ *  1. Feature Matrix — tooltip on each capability column header
+ *  2. Competitor Grid — threat-level + status filter pills
+ *  3. Australian Compliance Moat — interactive SVG map with hover/tap state panel
  */
 import { useEffect, useRef, useState } from "react";
 import OwnologyLogo from "@/components/OwnologyLogo";
-
 import { Link } from "wouter";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const BG_BASE   = "var(--ow-bg-base)";
@@ -86,15 +96,11 @@ function Hero() {
           We researched every winemaking and viticulture app on the market in 2026. The finding is unambiguous: no product answers winemakers' questions, knows their regulatory obligations, or reasons over their own documents. That gap is where Ownology lives — and it is unoccupied.
         </p>
         <div className="flex flex-wrap gap-4 items-center">
-          <div className="px-4 py-2 rounded-full text-sm font-medium" style={{ background: "oklch(0.72 0.12 75 / 12%)", border: "1px solid oklch(0.72 0.12 75 / 30%)", color: AMBER, fontFamily: SANS }}>
-            7 products researched
-          </div>
-          <div className="px-4 py-2 rounded-full text-sm font-medium" style={{ background: "oklch(0.72 0.12 75 / 12%)", border: "1px solid oklch(0.72 0.12 75 / 30%)", color: AMBER, fontFamily: SANS }}>
-            0 direct competitors found
-          </div>
-          <div className="px-4 py-2 rounded-full text-sm font-medium" style={{ background: "oklch(0.72 0.12 75 / 12%)", border: "1px solid oklch(0.72 0.12 75 / 30%)", color: AMBER, fontFamily: SANS }}>
-            1 market to watch
-          </div>
+          {["7 products researched", "0 direct competitors found", "1 market to watch"].map(label => (
+            <div key={label} className="px-4 py-2 rounded-full text-sm font-medium" style={{ background: "oklch(0.72 0.12 75 / 12%)", border: "1px solid oklch(0.72 0.12 75 / 30%)", color: AMBER, fontFamily: SANS }}>
+              {label}
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -146,6 +152,7 @@ function TheGap() {
 
 // ─── Competitor grid ──────────────────────────────────────────────────────────
 type ThreatLevel = "None" | "Low" | "Moderate";
+type StatusType = "Active" | "Abandoned" | "Uncertain";
 
 interface Competitor {
   name: string;
@@ -154,7 +161,7 @@ interface Competitor {
   aiFeatures: string;
   compliance: string;
   threat: ThreatLevel;
-  status: "Active" | "Abandoned" | "Uncertain";
+  status: StatusType;
   verdict: string;
 }
 
@@ -237,14 +244,36 @@ const THREAT_STYLES: Record<ThreatLevel, { bg: string; text: string; label: stri
   Moderate: { bg: "oklch(0.22 0.08 75 / 40%)", text: "oklch(0.72 0.12 75)", label: "Monitor" },
 };
 
-const STATUS_STYLES: Record<string, { color: string }> = {
+const STATUS_STYLES: Record<StatusType, { color: string }> = {
   Active:    { color: "oklch(0.68 0.10 145)" },
   Abandoned: { color: "oklch(0.55 0.010 75)" },
   Uncertain: { color: "oklch(0.65 0.08 55)" },
 };
 
+type ThreatFilter = "All" | ThreatLevel;
+type StatusFilter = "All" | StatusType;
+
 function CompetitorGrid() {
   const { ref, inView } = useInView();
+  const [threatFilter, setThreatFilter] = useState<ThreatFilter>("All");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
+
+  const filtered = COMPETITORS.filter(c => {
+    const threatOk = threatFilter === "All" || c.threat === threatFilter;
+    const statusOk = statusFilter === "All" || c.status === statusFilter;
+    return threatOk && statusOk;
+  });
+
+  const pillBase: React.CSSProperties = {
+    fontFamily: SANS, fontSize: "0.8rem", fontWeight: 400,
+    padding: "0.35rem 0.85rem", borderRadius: "999px", cursor: "pointer",
+    border: `1px solid ${BORDER}`, transition: "all 0.15s",
+  };
+
+  const activePill = (active: boolean): React.CSSProperties => active
+    ? { ...pillBase, background: "oklch(0.72 0.12 75 / 18%)", borderColor: "oklch(0.72 0.12 75 / 50%)", color: AMBER, fontWeight: 600 }
+    : { ...pillBase, background: BG_CARD, color: TEXT_LO };
+
   return (
     <section style={{ background: BG_BASE }} className="py-20">
       <div className="container max-w-5xl">
@@ -255,11 +284,49 @@ function CompetitorGrid() {
           <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 4vw, 2.75rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1rem" }}>
             Seven products. Zero direct competitors.
           </h2>
-          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "600px", marginBottom: "3rem" }}>
+          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "600px", marginBottom: "2rem" }}>
             Each product was evaluated against Ownology's core capabilities: AI-powered Q&A, document grounding, Australian compliance intelligence, structured cellar logging, and mobile-first design.
           </p>
+
+          {/* ── Filter bar ── */}
+          <div className="flex flex-wrap gap-4 mb-6 pb-5" style={{ borderBottom: `1px solid ${BORDER}` }}>
+            <div className="flex flex-wrap items-center gap-2">
+              <span style={{ fontFamily: SANS, fontSize: "0.75rem", color: TEXT_LO, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>Threat:</span>
+              {(["All", "None", "Low", "Moderate"] as ThreatFilter[]).map(f => (
+                <button key={f} style={activePill(threatFilter === f)} onClick={() => setThreatFilter(f)}>
+                  {f === "None" ? "No Threat" : f === "Moderate" ? "Monitor" : f}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span style={{ fontFamily: SANS, fontSize: "0.75rem", color: TEXT_LO, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>Status:</span>
+              {(["All", "Active", "Abandoned", "Uncertain"] as StatusFilter[]).map(f => (
+                <button key={f} style={activePill(statusFilter === f)} onClick={() => setStatusFilter(f)}>
+                  {f}
+                </button>
+              ))}
+            </div>
+            {(threatFilter !== "All" || statusFilter !== "All") && (
+              <button
+                style={{ ...pillBase, background: "transparent", color: TEXT_LO, borderColor: BORDER, fontSize: "0.75rem" }}
+                onClick={() => { setThreatFilter("All"); setStatusFilter("All"); }}
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+
+          {/* ── Result count ── */}
+          <p style={{ fontFamily: MONO, fontSize: "0.75rem", color: TEXT_LO, marginBottom: "1.5rem" }}>
+            Showing {filtered.length} of {COMPETITORS.length} products
+          </p>
+
           <div className="flex flex-col gap-4">
-            {COMPETITORS.map((c, i) => {
+            {filtered.length === 0 ? (
+              <div className="py-12 text-center rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+                <p style={{ fontFamily: SANS, fontWeight: 300, color: TEXT_LO }}>No products match the selected filters.</p>
+              </div>
+            ) : filtered.map((c, i) => {
               const threat = THREAT_STYLES[c.threat];
               const status = STATUS_STYLES[c.status];
               return (
@@ -273,12 +340,10 @@ function CompetitorGrid() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      {/* Status badge */}
                       <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs" style={{ background: BG_INSET, color: status.color, fontFamily: SANS }}>
                         <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: status.color }} />
                         {c.status}
                       </span>
-                      {/* Threat badge */}
                       <span className="px-3 py-1 rounded-full text-xs font-semibold" style={{ background: threat.bg, color: threat.text, fontFamily: SANS }}>
                         {threat.label}
                       </span>
@@ -309,17 +374,19 @@ function CompetitorGrid() {
 }
 
 // ─── Feature matrix ───────────────────────────────────────────────────────────
+const FEATURE_TOOLTIPS: Record<string, string> = {
+  "AI-powered Q&A":       "Can a winemaker ask a natural language question and receive a contextual, reasoned answer — not just a search result or a static reference?",
+  "Document grounding":   "Does the AI reason over the winery's own documents — SOPs, house style guides, lab records — rather than generic internet knowledge?",
+  "Australian compliance":"Does the product cover Australian state-by-state liquor licensing, environmental authority obligations, and WHS requirements?",
+  "Cellar log":           "Can the winemaker record tank events (measurements, additions, rackings, inoculations) in a structured, searchable log from a mobile device?",
+  "Mobile-first":         "Is the product designed to be used on a phone in a cellar during harvest — not just accessible via a mobile browser as an afterthought?",
+  "Active development":   "Is the product actively maintained and receiving new features as of May 2026? Abandoned products carry integration and support risk.",
+};
+
 function FeatureMatrix() {
   const { ref, inView } = useInView();
 
-  const features = [
-    "AI-powered Q&A",
-    "Document grounding",
-    "Australian compliance",
-    "Cellar log",
-    "Mobile-first",
-    "Active development",
-  ];
+  const features = Object.keys(FEATURE_TOOLTIPS);
 
   type ProductRow = { name: string; values: (boolean | "partial" | "sensor")[]; note?: string };
   const products: ProductRow[] = [
@@ -354,69 +421,106 @@ function FeatureMatrix() {
   };
 
   return (
-    <section style={{ background: BG_RAISED, borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}` }} className="py-20">
-      <div className="container max-w-5xl">
-        <div ref={ref} className={`transition-all duration-700 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
-          <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>
-            Feature Matrix
-          </p>
-          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 4vw, 2.75rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "2.5rem" }}>
-            Side by side, the picture is clear.
-          </h2>
-          <div className="overflow-x-auto rounded-xl" style={{ border: `1px solid ${BORDER_MD}` }}>
-            <table className="w-full min-w-[640px]" style={{ borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ background: BG_INSET }}>
-                  <th className="text-left px-5 py-3.5" style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.8125rem", color: TEXT_LO, borderBottom: `1px solid ${BORDER_MD}` }}>
-                    Product
-                  </th>
-                  {features.map(f => (
-                    <th key={f} className="text-center px-3 py-3.5" style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.75rem", color: TEXT_LO, borderBottom: `1px solid ${BORDER_MD}`, whiteSpace: "nowrap" }}>
-                      {f}
+    <TooltipProvider delayDuration={120}>
+      <section style={{ background: BG_RAISED, borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}` }} className="py-20">
+        <div className="container max-w-5xl">
+          <div ref={ref} className={`transition-all duration-700 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
+            <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>
+              Feature Matrix
+            </p>
+            <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 4vw, 2.75rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "0.75rem" }}>
+              Side by side, the picture is clear.
+            </h2>
+            <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: TEXT_LO, marginBottom: "2rem" }}>
+              Hover or tap a column header to learn what each capability means and why it matters.
+            </p>
+            <div className="overflow-x-auto rounded-xl" style={{ border: `1px solid ${BORDER_MD}` }}>
+              <table className="w-full min-w-[640px]" style={{ borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ background: BG_INSET }}>
+                    <th className="text-left px-5 py-3.5" style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.8125rem", color: TEXT_LO, borderBottom: `1px solid ${BORDER_MD}` }}>
+                      Product
                     </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((p, i) => {
-                  const isOwnology = p.name === "Ownology";
-                  return (
-                    <tr
-                      key={i}
-                      style={{
-                        background: isOwnology ? "oklch(0.72 0.12 75 / 8%)" : i % 2 === 0 ? BG_CARD : BG_BASE,
-                        borderBottom: `1px solid ${BORDER}`,
-                      }}
-                    >
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-2">
-                          <span style={{ fontFamily: SANS, fontWeight: isOwnology ? 700 : 400, fontSize: "0.875rem", color: isOwnology ? AMBER : TEXT_MID }}>
-                            {p.name}
-                          </span>
-                          {p.note && (
-                            <span className="px-2 py-0.5 rounded text-xs" style={{ background: "oklch(0.72 0.12 75 / 15%)", color: AMBER, fontFamily: SANS, fontWeight: 600 }}>
-                              {p.note}
+                    {features.map(f => (
+                      <th key={f} className="text-center px-3 py-3.5" style={{ borderBottom: `1px solid ${BORDER_MD}` }}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              className="inline-flex items-center gap-1 group"
+                              style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.75rem", color: TEXT_LO, background: "none", border: "none", cursor: "help", whiteSpace: "nowrap", padding: 0 }}
+                            >
+                              {f}
+                              {/* info icon */}
+                              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ opacity: 0.5, flexShrink: 0 }}>
+                                <circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.2"/>
+                                <path d="M6 5.5v3M6 4v.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                              </svg>
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent
+                            side="top"
+                            className="max-w-[220px] text-left"
+                            style={{
+                              background: "var(--ow-bg-card)",
+                              border: `1px solid ${BORDER_MD}`,
+                              color: TEXT_MID,
+                              fontFamily: SANS,
+                              fontSize: "0.8rem",
+                              lineHeight: 1.55,
+                              padding: "0.625rem 0.875rem",
+                              borderRadius: "6px",
+                              boxShadow: "0 8px 24px oklch(0 0 0 / 0.5)",
+                            }}
+                          >
+                            <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", color: AMBER, marginBottom: "0.3rem", letterSpacing: "0.06em", textTransform: "uppercase" }}>{f}</p>
+                            {FEATURE_TOOLTIPS[f]}
+                          </TooltipContent>
+                        </Tooltip>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map((p, i) => {
+                    const isOwnology = p.name === "Ownology";
+                    return (
+                      <tr
+                        key={i}
+                        style={{
+                          background: isOwnology ? "oklch(0.72 0.12 75 / 8%)" : i % 2 === 0 ? BG_CARD : BG_BASE,
+                          borderBottom: `1px solid ${BORDER}`,
+                        }}
+                      >
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-2">
+                            <span style={{ fontFamily: SANS, fontWeight: isOwnology ? 700 : 400, fontSize: "0.875rem", color: isOwnology ? AMBER : TEXT_MID }}>
+                              {p.name}
                             </span>
-                          )}
-                        </div>
-                      </td>
-                      {p.values.map((v, j) => (
-                        <td key={j} className="text-center px-3 py-3.5">
-                          {renderCell(v)}
+                            {p.note && (
+                              <span className="px-2 py-0.5 rounded-full text-xs" style={{ background: "oklch(0.72 0.12 75 / 15%)", color: AMBER, fontFamily: SANS, whiteSpace: "nowrap" }}>
+                                {p.note}
+                              </span>
+                            )}
+                          </div>
                         </td>
-                      ))}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        {p.values.map((v, j) => (
+                          <td key={j} className="text-center px-3 py-3.5">
+                            {renderCell(v)}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.8125rem", color: TEXT_LO, marginTop: "1rem" }}>
+              Research conducted May 2026. "partial" = iOS only. "sensor" = ML applied to hardware sensor data, not language understanding.
+            </p>
           </div>
-          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.8125rem", color: TEXT_LO, marginTop: "1rem" }}>
-            Research conducted May 2026. "partial" = iOS only. "sensor" = ML applied to hardware sensor data, not language understanding.
-          </p>
         </div>
-      </div>
-    </section>
+      </section>
+    </TooltipProvider>
   );
 }
 
@@ -437,7 +541,6 @@ function IntelligenceLayer() {
             Every other product on this list is a library — it stores information, records data, or runs calculations. Ownology is the librarian who has read everything in it and can answer your specific question about your specific tank, your specific vintage, your specific regulatory obligation, right now, from your phone.
           </p>
 
-          {/* Three-column distinction */}
           <div className="grid md:grid-cols-3 gap-5 mb-12">
             {[
               {
@@ -474,7 +577,6 @@ function IntelligenceLayer() {
             ))}
           </div>
 
-          {/* InnoVint partnership framing */}
           <div className="rounded-xl p-6" style={{ background: BG_CARD, border: `1px solid ${BORDER_MD}` }}>
             <div className="flex gap-4 items-start">
               <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: "oklch(0.65 0.10 230 / 15%)", border: "1px solid oklch(0.65 0.10 230 / 30%)" }}>
@@ -498,17 +600,90 @@ function IntelligenceLayer() {
   );
 }
 
-// ─── Moat section ─────────────────────────────────────────────────────────────
+// ─── Australian Compliance Moat — Interactive SVG Map ─────────────────────────
+interface StateData {
+  code: string;
+  name: string;
+  items: string[];
+  /** SVG path data for the state shape (simplified outlines) */
+  path: string;
+  /** Label position for the state code text */
+  labelX: number;
+  labelY: number;
+}
+
+// Simplified SVG paths for Australian states in a 500×520 viewBox
+// Coordinates are approximate but recognisable
+const AU_STATES: StateData[] = [
+  {
+    code: "WA",
+    name: "Western Australia",
+    items: ["DLGSC liquor licensing", "DWER environmental authority", "WorkSafe WA"],
+    path: "M 0 60 L 155 60 L 155 0 L 0 0 Z M 0 60 L 155 60 L 175 200 L 175 420 L 0 420 Z",
+    labelX: 72,
+    labelY: 230,
+  },
+  {
+    code: "NT",
+    name: "Northern Territory",
+    items: ["NT Liquor Commission", "NT EPA", "NT WorkSafe"],
+    path: "M 175 60 L 295 60 L 295 260 L 175 260 Z",
+    labelX: 234,
+    labelY: 155,
+  },
+  {
+    code: "SA",
+    name: "South Australia",
+    items: ["Liquor licensing (LBSA)", "EPA environmental authority", "SafeWork SA WHS"],
+    path: "M 175 260 L 295 260 L 320 340 L 295 420 L 175 420 Z",
+    labelX: 237,
+    labelY: 345,
+  },
+  {
+    code: "QLD",
+    name: "Queensland",
+    items: ["OLGR licensing", "DESI environmental authority", "WorkSafe QLD"],
+    path: "M 295 60 L 430 60 L 430 280 L 295 280 L 295 60 Z",
+    labelX: 362,
+    labelY: 165,
+  },
+  {
+    code: "NSW",
+    name: "New South Wales",
+    items: ["LGNSW licensing", "EPA NSW", "SafeWork NSW"],
+    path: "M 295 280 L 430 280 L 430 380 L 340 420 L 295 380 Z",
+    labelX: 365,
+    labelY: 335,
+  },
+  {
+    code: "VIC",
+    name: "Victoria",
+    items: ["VCGLR licensing", "EPA Victoria", "WorkSafe Victoria"],
+    path: "M 295 380 L 340 420 L 430 380 L 430 420 L 340 460 L 295 420 Z",
+    labelX: 362,
+    labelY: 415,
+  },
+  {
+    code: "TAS",
+    name: "Tasmania",
+    items: ["CBOS licensing", "EPA Tasmania", "WorkSafe Tasmania"],
+    path: "M 340 460 L 390 460 L 410 500 L 360 510 L 330 490 Z",
+    labelX: 368,
+    labelY: 483,
+  },
+];
+
+// States covered by Ownology
+const COVERED = new Set(["SA", "VIC", "NSW", "WA", "QLD", "TAS"]);
+
 function AustralianMoat() {
   const { ref, inView } = useInView();
-  const states = [
-    { code: "SA", name: "South Australia", items: ["Liquor licensing (LBSA)", "EPA environmental authority", "SafeWork SA WHS"] },
-    { code: "VIC", name: "Victoria", items: ["VCGLR licensing", "EPA Victoria", "WorkSafe Victoria"] },
-    { code: "NSW", name: "New South Wales", items: ["LGNSW licensing", "EPA NSW", "SafeWork NSW"] },
-    { code: "WA", name: "Western Australia", items: ["DLGSC liquor", "DWER environmental", "WorkSafe WA"] },
-    { code: "QLD", name: "Queensland", items: ["OLGR licensing", "DESI environmental", "WorkSafe QLD"] },
-    { code: "TAS", name: "Tasmania", items: ["CBOS licensing", "EPA Tasmania", "WorkSafe Tasmania"] },
-  ];
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string>("SA");
+
+  const activeCode = hovered ?? selected;
+  const activeState = AU_STATES.find(s => s.code === activeCode);
+
   return (
     <section style={{ background: BG_RAISED, borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}` }} className="py-20">
       <div className="container max-w-5xl">
@@ -522,25 +697,130 @@ function AustralianMoat() {
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "600px", marginBottom: "3rem" }}>
             InnoVint automates US TTB form-filling. Every other product on the list has zero compliance features. Ownology is the only tool with deep, state-by-state Australian regulatory intelligence — covering liquor licensing, environmental authority obligations, and WHS requirements across all six major wine states.
           </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {states.map((s) => (
-              <div key={s.code} className="p-4 rounded-lg" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: "oklch(0.72 0.12 75 / 12%)", border: "1px solid oklch(0.72 0.12 75 / 25%)" }}>
-                    <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: "0.75rem", color: AMBER }}>{s.code}</span>
-                  </div>
-                  <span style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.875rem", color: TEXT_HI }}>{s.name}</span>
-                </div>
-                <ul className="space-y-1">
-                  {s.items.map((item, j) => (
-                    <li key={j} className="flex items-center gap-2">
-                      <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: AMBER }} />
-                      <span style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.8rem", color: TEXT_MID }}>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+
+          {/* Interactive map + panel */}
+          <div className="grid md:grid-cols-2 gap-8 items-start">
+            {/* SVG Map */}
+            <div className="rounded-xl overflow-hidden" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+              <div className="p-4 pb-2" style={{ borderBottom: `1px solid ${BORDER}` }}>
+                <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.8125rem", color: TEXT_LO }}>
+                  Hover or tap a state to see regulatory coverage
+                </p>
               </div>
-            ))}
+              <div className="p-4">
+                <svg
+                  viewBox="0 0 500 520"
+                  style={{ width: "100%", height: "auto", display: "block" }}
+                  aria-label="Interactive map of Australia showing Ownology compliance coverage"
+                >
+                  {AU_STATES.map(state => {
+                    const isCovered = COVERED.has(state.code);
+                    const isActive = activeCode === state.code;
+                    return (
+                      <g
+                        key={state.code}
+                        style={{ cursor: isCovered ? "pointer" : "default" }}
+                        onMouseEnter={() => isCovered && setHovered(state.code)}
+                        onMouseLeave={() => setHovered(null)}
+                        onClick={() => isCovered && setSelected(state.code)}
+                        aria-label={`${state.name}${isCovered ? " — click to view compliance details" : " — not yet covered"}`}
+                      >
+                        <path
+                          d={state.path}
+                          style={{
+                            fill: isActive && isCovered
+                              ? "oklch(0.72 0.12 75 / 35%)"
+                              : isCovered
+                              ? "oklch(0.72 0.12 75 / 15%)"
+                              : "oklch(0.20 0.005 60)",
+                            stroke: isActive && isCovered
+                              ? "oklch(0.72 0.12 75)"
+                              : isCovered
+                              ? "oklch(0.72 0.12 75 / 40%)"
+                              : "oklch(0.30 0.005 60)",
+                            strokeWidth: isActive ? 2 : 1,
+                            transition: "fill 0.2s, stroke 0.2s",
+                          }}
+                        />
+                        <text
+                          x={state.labelX}
+                          y={state.labelY}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          style={{
+                            fontFamily: MONO,
+                            fontSize: "11px",
+                            fontWeight: "700",
+                            fill: isActive && isCovered ? "oklch(0.85 0.10 75)" : isCovered ? AMBER : "oklch(0.40 0.005 60)",
+                            pointerEvents: "none",
+                            transition: "fill 0.2s",
+                          }}
+                        >
+                          {state.code}
+                        </text>
+                      </g>
+                    );
+                  })}
+                </svg>
+                {/* Legend */}
+                <div className="flex items-center gap-5 mt-3 px-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm" style={{ background: "oklch(0.72 0.12 75 / 15%)", border: "1px solid oklch(0.72 0.12 75 / 40%)" }} />
+                    <span style={{ fontFamily: SANS, fontSize: "0.75rem", color: TEXT_LO }}>Covered by Ownology</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm" style={{ background: "oklch(0.20 0.005 60)", border: "1px solid oklch(0.30 0.005 60)" }} />
+                    <span style={{ fontFamily: SANS, fontSize: "0.75rem", color: TEXT_LO }}>Not yet covered</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Detail panel */}
+            <div className="rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}`, minHeight: "280px" }}>
+              {activeState && COVERED.has(activeState.code) ? (
+                <div className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: "oklch(0.72 0.12 75 / 15%)", border: "1px solid oklch(0.72 0.12 75 / 30%)" }}>
+                      <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: "0.8rem", color: AMBER }}>{activeState.code}</span>
+                    </div>
+                    <div>
+                      <p style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1.125rem", color: TEXT_HI }}>{activeState.name}</p>
+                      <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.75rem", color: TEXT_LO }}>3 regulatory bodies covered</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {activeState.items.map((item, j) => (
+                      <div key={j} className="flex items-start gap-3 p-3 rounded-lg" style={{ background: BG_INSET, border: `1px solid ${BORDER}` }}>
+                        <div className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5" style={{ background: "oklch(0.72 0.12 75 / 15%)", border: "1px solid oklch(0.72 0.12 75 / 30%)" }}>
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                            <path d="M2 5.5l2 2 4-4" stroke="oklch(0.72 0.12 75)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+                        <span style={{ fontFamily: SANS, fontWeight: 400, fontSize: "0.875rem", color: TEXT_MID, lineHeight: 1.5 }}>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${BORDER}` }}>
+                    <Link href="/compliance" style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.8125rem", color: AMBER, textDecoration: "none" }}>
+                      Ask a {activeState.name} compliance question →
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-6 flex flex-col items-center justify-center h-full text-center" style={{ minHeight: "280px" }}>
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ background: "oklch(0.72 0.12 75 / 10%)", border: "1px solid oklch(0.72 0.12 75 / 25%)" }}>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path d="M10 4v8M10 14v2" stroke="oklch(0.72 0.12 75)" strokeWidth="1.8" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                  <p style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "1rem", color: TEXT_HI, marginBottom: "0.5rem" }}>Select a state</p>
+                  <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: TEXT_LO, maxWidth: "200px" }}>
+                    Hover or tap a highlighted state on the map to view its regulatory coverage.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -603,7 +883,6 @@ function CTA() {
       });
       if (res.status === 201 || res.status === 200 || res.status === 422) {
         setStatus("success");
-        setEmail("");
       } else {
         throw new Error("Signup failed");
       }

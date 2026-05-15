@@ -130,7 +130,7 @@
 
 ## Ideas / Future Features
 
-- [ ] IDEA: Vintage Log reminder/alarm system — if a winemaker has not logged a required event type (Addition, Measurement, Racking, Inoculation, Observation) within a configurable window (hours or days), fire a push notification or in-app warning. Interval is set either by the winemaker manually (e.g. "remind me to check Brix every 24h") or suggested by the AI based on the fermentation stage (e.g. "Shiraz at 18 Brix — recommend Brix check every 12h, YAN check before ⅓ sugar depletion"). Alarms are per-tank and per-event-type. Implementation path: scheduled Heartbeat job queries vintage_log_entries for last entry per (userId, tankName, eventType), compares to configured interval, fires notifyOwner or browser push notification if overdue.
+- [x] IDEA: Vintage Log reminder/alarm system — Phase 1 implemented: tank_reminders table, per-tank threshold config UI, Heartbeat handler with owner notification for overdue tanks, vitest tests. Phase 2 (in-app overdue banner UI, AI-suggested intervals) deferred.
 - [x] Add search/filter controls to Vintage Log tab (by tank, variety, event type, tag)
 - [x] Add desktop modal presentation to VintageEntrySheet (bottom-sheet on mobile, centred modal on desktop via CSS media query)
 - [x] Add explicit tag filter chip/dropdown to Vintage Log filter bar (tags are currently searchable via text search but not filterable as a dedicated control)
@@ -162,3 +162,9 @@
 - [x] Write competitive intelligence report (ownology-competitive-intelligence-2026.md)
 - [x] Build /competitive-advantage page: hero, unoccupied market section, 7-product competitor grid, feature matrix table, intelligence layer explainer, Australian compliance moat, investment thesis, waitlist CTA
 - [x] Wire /competitive-advantage route in App.tsx, add to More dropdown nav and home page footer
+
+## Competitive Advantage Page — Interactive Enhancements
+
+- [x] Feature Matrix: add interactive tooltips to each of the six capability column headers explaining what the capability means and why it matters
+- [x] Competitor Grid: add threat-level and status filter pills (All / No Threat / Low / Monitor and All / Active / Abandoned) so users can sort the competitor cards
+- [x] Australian Compliance Moat: replace the static state card grid with an interactive SVG map of Australia — hover/tap a state to highlight it and reveal its three regulatory bodies in a side panel
