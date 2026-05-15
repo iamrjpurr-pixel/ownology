@@ -181,3 +181,7 @@
 - [x] Pricing mobile cards: add billing toggle (monthly/annual) directly on the mobile card layout so prices update dynamically without scrolling back to the hero toggle
 - [x] Pricing mobile cards: add small info icons next to complex features in the collapsible list (custom document upload, AI tutor credits, priority responses) that reveal brief explanations when tapped
 - [x] Pricing mobile cards: add subtle highlight/pulse animation to The Press card when the user is scrolled to it via the sticky CTA "See Plan" button
+
+## Mobile Pricing Page — Round 3
+
+- [x] Pricing mobile: add smooth scroll-to-top button that appears when user reaches the bottom of the page (mobile only, fades in/out, positioned above sticky CTA bar)

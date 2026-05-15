@@ -804,13 +804,62 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   );
 }
 
+// ─── Scroll-to-top button ────────────────────────────────────────────────────
+// Mobile only. Appears when the user has scrolled past 60% of the page.
+// Fades in/out with a CSS transition. Positioned just above the sticky CTA bar.
+function ScrollToTopButton({ hasStickyBar }: { hasStickyBar: boolean }) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const scrolled = window.scrollY;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      setVisible(total > 0 && scrolled / total > 0.6);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    // sm:hidden — mobile only
+    <button
+      onClick={scrollToTop}
+      className="sm:hidden fixed z-40 w-11 h-11 rounded-full flex items-center justify-center transition-all duration-300"
+      style={{
+        right: "1rem",
+        // Sit above the sticky CTA bar (≈ 64px) + safe area, or near bottom if bar is gone
+        bottom: hasStickyBar
+          ? "calc(64px + env(safe-area-inset-bottom, 0px) + 0.75rem)"
+          : "calc(env(safe-area-inset-bottom, 0px) + 1rem)",
+        background: "oklch(0.18 0.010 60)",
+        border: "1px solid oklch(0.72 0.12 75 / 35%)",
+        boxShadow: "0 4px 16px oklch(0 0 0 / 0.5)",
+        opacity: visible ? 1 : 0,
+        pointerEvents: visible ? "auto" : "none",
+        transform: visible ? "translateY(0) scale(1)" : "translateY(8px) scale(0.9)",
+      }}
+      aria-label="Scroll to top"
+    >
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M4 10l4-4 4 4" stroke="oklch(0.72 0.12 75)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </button>
+  );
+}
+
 // ─── Sticky mobile CTA bar ────────────────────────────────────────────────────
 function StickyMobileCTA({
   cycle,
   onFlashPress,
+  onVisibilityChange,
 }: {
   cycle: BillingCycle;
   onFlashPress: () => void;
+  onVisibilityChange?: (visible: boolean) => void;
 }) {
   const [visible, setVisible] = useState(true);
   const [dismissed, setDismissed] = useState(false);
@@ -833,8 +882,10 @@ function StickyMobileCTA({
   }, []);
 
   useEffect(() => {
-    setVisible(!dismissed && !nearBottom);
-  }, [dismissed, nearBottom]);
+    const next = !dismissed && !nearBottom;
+    setVisible(next);
+    onVisibilityChange?.(next);
+  }, [dismissed, nearBottom, onVisibilityChange]);
 
   const scrollToTier = () => {
     const el = document.getElementById(`tier-${highlightedTier.id}`);
@@ -909,6 +960,10 @@ export default function Pricing() {
   // flashRef holds the flash() callback registered by The Press TierCard
   const flashRef = useRef<(() => void) | null>(null);
   const pressCardRef = useRef<HTMLDivElement | null>(null);
+
+  // Track whether the sticky CTA bar is visible so the scroll-to-top button
+  // can position itself correctly (above the bar vs. near the bottom edge)
+  const [stickyBarVisible, setStickyBarVisible] = useState(true);
 
   const handleFlashPress = () => {
     // Small delay to let scroll animation finish before flashing
@@ -1147,7 +1202,10 @@ export default function Pricing() {
       </div>
 
       {/* Sticky mobile CTA bar */}
-      <StickyMobileCTA cycle={cycle} onFlashPress={handleFlashPress} />
+      <StickyMobileCTA cycle={cycle} onFlashPress={handleFlashPress} onVisibilityChange={setStickyBarVisible} />
+
+      {/* Scroll-to-top button — mobile only, appears after 60% scroll */}
+      <ScrollToTopButton hasStickyBar={stickyBarVisible} />
     </div>
   );
 }
