@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 // ─── Waitlist CTA ─────────────────────────────────────────────────────────────
 function WaitlistCapture() {
@@ -93,17 +94,29 @@ function WaitlistCapture() {
  * Credit Packs: The Measure / The Vintage / The Reserve / The Magnum
  * Founding member strategy: first 99 paid subscribers, locked pricing
  *
- * Mobile enhancements:
- *  - Single-column tier cards with compact mobile layout and collapsible feature lists
- *  - Sticky CTA bar at bottom on mobile — shows highlighted tier, hides near #waitlist, dismissible
+ * Mobile enhancements (Round 2):
+ *  - Billing toggle on mobile cards (synced with hero toggle)
+ *  - Info icon popovers on complex features in collapsible list
+ *  - Amber pulse animation on The Press card when scrolled to via sticky CTA
  */
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type BillingCycle = "monthly" | "annual";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
-// UPDATE THIS NUMBER as paid founding members sign up (starts at 99, min 0)
 const FOUNDING_SPOTS_REMAINING = 99;
+
+// Feature explanations for info icon popovers — keyed by exact feature string
+const FEATURE_EXPLANATIONS: Record<string, string> = {
+  "30 AI tutor credits per month": "Credits power AI tutor interactions — questions, quizzes, and 'explain it differently' requests. 30 credits ≈ 30 lesson conversations per month.",
+  "150 AI tutor credits per month": "150 credits per month — enough for daily lesson questions, quizzes, and deep-dives throughout the vintage.",
+  "Unlimited AI tutor credits": "No monthly cap. Ask as many questions, run as many quizzes, and request as many explanations as your team needs.",
+  "Custom document upload (your SOPs)": "Upload your winery's own SOPs, recipes, and protocols. Ownology will answer questions grounded in your specific documents, not just general knowledge.",
+  "Priority Compliance Agent responses": "Your compliance queries jump the queue — faster response times during busy harvest periods when you need answers in seconds, not minutes.",
+  "3 team seats (winemaker + 2 staff)": "One Cellar Master account covers you plus two additional team members — cellar hands, assistant winemakers, or vineyard staff.",
+  "Annual knowledge base review alert": "Each year, Ownology flags any regulatory changes in your state jurisdictions so your compliance knowledge stays current without manual checking.",
+  "Dedicated onboarding call (30 min)": "A 30-minute video call with the Ownology team to configure your document library, set up team seats, and walk through the platform for your specific winery.",
+};
 
 const TIERS = [
   {
@@ -348,17 +361,96 @@ function BillingToggle({
   );
 }
 
+// ─── Mini billing toggle for mobile cards ─────────────────────────────────────
+// Compact pill switcher that sits inside each mobile tier card
+function MiniCycleToggle({
+  cycle,
+  onChange,
+}: {
+  cycle: BillingCycle;
+  onChange: (c: BillingCycle) => void;
+}) {
+  return (
+    <div
+      className="flex items-center rounded-sm overflow-hidden self-start"
+      style={{ border: "1px solid oklch(1 0 0 / 12%)", background: "oklch(0.15 0.008 60)" }}
+      role="group"
+      aria-label="Billing cycle"
+    >
+      {(["monthly", "annual"] as BillingCycle[]).map(c => (
+        <button
+          key={c}
+          onClick={() => onChange(c)}
+          className="px-2.5 py-1 text-xs transition-all duration-150"
+          style={{
+            fontFamily: "'Lato', sans-serif",
+            fontWeight: cycle === c ? 600 : 300,
+            background: cycle === c ? "oklch(0.72 0.12 75)" : "transparent",
+            color: cycle === c ? "oklch(0.11 0.008 60)" : "oklch(0.55 0.012 75)",
+            letterSpacing: "0.04em",
+          }}
+        >
+          {c === "monthly" ? "Mo" : "Yr"}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ─── Feature info icon with popover ──────────────────────────────────────────
+function FeatureInfoIcon({ explanation }: { explanation: string }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          className="inline-flex items-center justify-center flex-shrink-0 w-4 h-4 rounded-full ml-1 align-middle"
+          style={{
+            background: "oklch(0.22 0.010 60)",
+            border: "1px solid oklch(1 0 0 / 15%)",
+            verticalAlign: "middle",
+          }}
+          aria-label="More information"
+          onClick={e => e.stopPropagation()}
+        >
+          <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+            <circle cx="4" cy="2.5" r="0.7" fill="oklch(0.72 0.12 75)" />
+            <path d="M4 4v2.5" stroke="oklch(0.72 0.12 75)" strokeWidth="1.1" strokeLinecap="round" />
+          </svg>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="max-w-[240px] text-xs p-3"
+        style={{
+          background: "oklch(0.17 0.010 60)",
+          border: "1px solid oklch(0.72 0.12 75 / 25%)",
+          color: "oklch(0.72 0.015 75)",
+          fontFamily: "'Lato', sans-serif",
+          fontWeight: 300,
+          lineHeight: 1.6,
+          borderRadius: "4px",
+          boxShadow: "0 8px 24px oklch(0 0 0 / 0.6)",
+        }}
+        sideOffset={6}
+      >
+        {explanation}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 // ─── Tier card ────────────────────────────────────────────────────────────────
-// Mobile: single-column, compact header row, collapsible feature list
-// Desktop: full card with all features visible
 function TierCard({
   tier,
   cycle,
+  onCycleChange,
   cardRef,
+  flashRef,
 }: {
   tier: (typeof TIERS)[0];
   cycle: BillingCycle;
+  onCycleChange: (c: BillingCycle) => void;
   cardRef?: React.RefObject<HTMLDivElement | null>;
+  flashRef?: React.RefObject<(() => void) | null>;
 }) {
   const price = cycle === "annual" ? tier.annualPrice : tier.monthlyPrice;
   const displayPrice =
@@ -369,17 +461,35 @@ function TierCard({
   // Mobile feature list: collapsed by default for non-highlighted tiers
   const [featuresOpen, setFeaturesOpen] = useState(tier.highlight);
 
+  // Highlight/pulse animation state — triggered by sticky CTA "See Plan"
+  const [pulsing, setPulsing] = useState(false);
+
+  // Expose a flash() function via flashRef so StickyMobileCTA can trigger it
+  useEffect(() => {
+    if (!flashRef) return;
+    flashRef.current = () => {
+      setPulsing(true);
+      setTimeout(() => setPulsing(false), 1600);
+    };
+  }, [flashRef]);
+
   return (
     <div
       ref={cardRef}
       id={`tier-${tier.id}`}
-      className="relative flex flex-col rounded-sm transition-all duration-200"
+      className="relative flex flex-col rounded-sm transition-all duration-300"
       style={{
         background: tier.highlight ? "oklch(0.16 0.012 60)" : "oklch(0.13 0.008 60)",
-        border: tier.highlight
-          ? "1px solid oklch(0.72 0.12 75 / 40%)"
-          : "1px solid oklch(1 0 0 / 8%)",
-        boxShadow: tier.highlight ? "0 0 40px oklch(0.72 0.12 75 / 8%)" : "none",
+        border: pulsing
+          ? "1px solid oklch(0.72 0.12 75 / 90%)"
+          : tier.highlight
+            ? "1px solid oklch(0.72 0.12 75 / 40%)"
+            : "1px solid oklch(1 0 0 / 8%)",
+        boxShadow: pulsing
+          ? "0 0 0 3px oklch(0.72 0.12 75 / 25%), 0 0 40px oklch(0.72 0.12 75 / 20%)"
+          : tier.highlight
+            ? "0 0 40px oklch(0.72 0.12 75 / 8%)"
+            : "none",
       }}
     >
       {/* Badge */}
@@ -398,21 +508,21 @@ function TierCard({
         </div>
       )}
 
-      {/* ── Mobile layout: compact header row ── */}
-      {/* Visible only on mobile (< sm), hidden on sm+ */}
+      {/* ── Mobile layout ── */}
       <div className="sm:hidden p-4 pt-5">
-        {/* Top row: name + price */}
-        <div className="flex items-center justify-between mb-1">
-          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: "1.25rem", fontWeight: 600, color: tier.color }}>
+        {/* Top row: name + price + mini cycle toggle */}
+        <div className="flex items-start justify-between mb-1 gap-2">
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: "1.25rem", fontWeight: 600, color: tier.color, lineHeight: 1.2 }}>
             {tier.name}
           </h3>
-          <div className="text-right">
+          <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+            {/* Price display */}
             {tier.monthlyPrice === 0 ? (
               <span style={{ fontFamily: "'Fraunces', serif", fontSize: "1.5rem", fontWeight: 700, color: "oklch(0.85 0.018 75)", lineHeight: 1 }}>
                 Free
               </span>
             ) : (
-              <div className="flex items-end gap-0.5 justify-end">
+              <div className="flex items-end gap-0.5">
                 <span style={{ fontFamily: "'Fraunces', serif", fontSize: "1.5rem", fontWeight: 700, color: "oklch(0.85 0.018 75)", lineHeight: 1 }}>
                   ${displayPrice}
                 </span>
@@ -421,12 +531,25 @@ function TierCard({
                 </span>
               </div>
             )}
+            {/* Mini cycle toggle — only show for paid tiers */}
+            {tier.monthlyPrice > 0 && (
+              <MiniCycleToggle cycle={cycle} onChange={onCycleChange} />
+            )}
           </div>
         </div>
+
+        {/* Annual savings callout */}
+        {tier.monthlyPrice > 0 && cycle === "annual" && (
+          <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", color: "oklch(0.72 0.12 75)", marginBottom: "0.375rem", letterSpacing: "0.04em" }}>
+            ${tier.annualPrice}/yr · save ${(tier.monthlyPrice * 12) - tier.annualPrice}
+          </p>
+        )}
+
         {/* Tagline */}
         <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8125rem", color: "oklch(0.55 0.012 75)", fontStyle: "italic", marginBottom: "0.875rem" }}>
           {tier.tagline}
         </p>
+
         {/* Feature toggle */}
         <button
           className="w-full flex items-center justify-between py-2 text-left"
@@ -444,9 +567,10 @@ function TierCard({
             <path d="M3 5l4 4 4-4" stroke="oklch(0.72 0.12 75)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
-        {/* Collapsible features */}
+
+        {/* Collapsible features with info icons */}
         {featuresOpen && (
-          <ul className="pt-3 pb-2 space-y-2">
+          <ul className="pt-3 pb-2 space-y-2.5">
             {tier.features.map(f => (
               <li key={f} className="flex items-start gap-2">
                 <svg width="13" height="13" viewBox="0 0 14 14" fill="none" className="mt-0.5 flex-shrink-0">
@@ -455,17 +579,22 @@ function TierCard({
                 </svg>
                 <span style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8125rem", color: "oklch(0.70 0.015 75)", lineHeight: 1.5 }}>
                   {f}
+                  {FEATURE_EXPLANATIONS[f] && (
+                    <FeatureInfoIcon explanation={FEATURE_EXPLANATIONS[f]} />
+                  )}
                 </span>
               </li>
             ))}
           </ul>
         )}
+
         {/* Note */}
         {tier.note && (
           <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", fontStyle: "italic", color: "oklch(0.50 0.012 75)", marginTop: "0.5rem", marginBottom: "0.75rem" }}>
             {tier.note}
           </p>
         )}
+
         {/* CTA */}
         <a
           href={tier.ctaHref}
@@ -495,10 +624,8 @@ function TierCard({
         </a>
       </div>
 
-      {/* ── Desktop layout: full card ── */}
-      {/* Hidden on mobile (< sm), visible on sm+ */}
+      {/* ── Desktop layout ── */}
       <div className="hidden sm:flex flex-col flex-1 p-6">
-        {/* Header */}
         <div className="mb-5">
           <h3 className="mb-1" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.375rem", fontWeight: 600, color: tier.color }}>
             {tier.name}
@@ -507,7 +634,6 @@ function TierCard({
             {tier.tagline}
           </p>
         </div>
-        {/* Price */}
         <div className="mb-6">
           {tier.monthlyPrice === 0 ? (
             <div style={{ fontFamily: "'Fraunces', serif", fontSize: "2.5rem", fontWeight: 700, color: "oklch(0.85 0.018 75)", lineHeight: 1 }}>
@@ -529,7 +655,6 @@ function TierCard({
             </p>
           )}
         </div>
-        {/* Features */}
         <ul className="flex-1 space-y-2.5 mb-6">
           {tier.features.map(f => (
             <li key={f} className="flex items-start gap-2.5">
@@ -543,7 +668,6 @@ function TierCard({
             </li>
           ))}
         </ul>
-        {/* CTA */}
         <a
           href={tier.ctaHref}
           className="block text-center py-3 rounded-sm text-sm transition-all duration-200"
@@ -681,9 +805,13 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 }
 
 // ─── Sticky mobile CTA bar ────────────────────────────────────────────────────
-// Shown only on mobile (< sm breakpoint). Highlights The Press tier.
-// Hides when user scrolls into the #waitlist section. Dismissible.
-function StickyMobileCTA({ cycle }: { cycle: BillingCycle }) {
+function StickyMobileCTA({
+  cycle,
+  onFlashPress,
+}: {
+  cycle: BillingCycle;
+  onFlashPress: () => void;
+}) {
   const [visible, setVisible] = useState(true);
   const [dismissed, setDismissed] = useState(false);
   const [nearBottom, setNearBottom] = useState(false);
@@ -696,7 +824,6 @@ function StickyMobileCTA({ cycle }: { cycle: BillingCycle }) {
   useEffect(() => {
     const waitlistEl = document.getElementById("waitlist");
     if (!waitlistEl) return;
-
     const observer = new IntersectionObserver(
       ([entry]) => setNearBottom(entry.isIntersecting),
       { rootMargin: "0px 0px -20% 0px", threshold: 0 }
@@ -712,12 +839,13 @@ function StickyMobileCTA({ cycle }: { cycle: BillingCycle }) {
   const scrollToTier = () => {
     const el = document.getElementById(`tier-${highlightedTier.id}`);
     el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    // Trigger the highlight animation on The Press card
+    onFlashPress();
   };
 
   if (!visible) return null;
 
   return (
-    // sm:hidden ensures this only renders on mobile viewports
     <div
       className="sm:hidden fixed left-0 right-0 z-40"
       style={{
@@ -732,7 +860,6 @@ function StickyMobileCTA({ cycle }: { cycle: BillingCycle }) {
       aria-label="Pricing quick action"
     >
       <div className="flex items-center gap-3 px-4 py-3">
-        {/* Tier info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-1.5">
             <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "1rem", color: "oklch(0.72 0.12 75)" }}>
@@ -746,7 +873,6 @@ function StickyMobileCTA({ cycle }: { cycle: BillingCycle }) {
             {cycle === "annual" ? "Billed annually · " : ""}Most popular tier
           </p>
         </div>
-        {/* CTA button */}
         <button
           onClick={scrollToTier}
           className="flex-shrink-0 px-4 py-2.5 rounded-sm text-sm font-semibold transition-opacity"
@@ -761,7 +887,6 @@ function StickyMobileCTA({ cycle }: { cycle: BillingCycle }) {
         >
           See Plan
         </button>
-        {/* Dismiss */}
         <button
           onClick={() => setDismissed(true)}
           className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full"
@@ -781,15 +906,22 @@ function StickyMobileCTA({ cycle }: { cycle: BillingCycle }) {
 export default function Pricing() {
   const [cycle, setCycle] = useState<BillingCycle>("annual");
 
-  // Refs for each tier card — used by sticky bar scroll-to
-  const pressRef = useRef<HTMLDivElement | null>(null);
+  // flashRef holds the flash() callback registered by The Press TierCard
+  const flashRef = useRef<(() => void) | null>(null);
+  const pressCardRef = useRef<HTMLDivElement | null>(null);
+
+  const handleFlashPress = () => {
+    // Small delay to let scroll animation finish before flashing
+    setTimeout(() => {
+      flashRef.current?.();
+    }, 500);
+  };
 
   return (
     <div
       className="min-h-screen"
       style={{
         background: "oklch(0.11 0.008 60)",
-        // Extra bottom padding on mobile so sticky bar doesn't cover content
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >
@@ -832,7 +964,7 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Founding member banner with counter */}
+      {/* Founding member banner */}
       <div className="container max-w-5xl mx-auto mb-8">
         <div
           className="rounded-sm px-6 py-5"
@@ -853,7 +985,6 @@ export default function Pricing() {
                 Numbers 1–9 reserved; public subscriptions begin at #11.
               </p>
             </div>
-            {/* Spot counter */}
             <div className="flex-shrink-0 text-center px-5 py-3 rounded-sm" style={{ background: "oklch(0.72 0.12 75 / 12%)", border: "1px solid oklch(0.72 0.12 75 / 20%)" }}>
               <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "2rem", fontWeight: 700, color: "oklch(0.72 0.12 75)", lineHeight: 1 }}>
                 {FOUNDING_SPOTS_REMAINING}
@@ -863,7 +994,6 @@ export default function Pricing() {
               </p>
             </div>
           </div>
-          {/* Progress bar */}
           <div>
             <div className="flex justify-between mb-1.5">
               <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "oklch(0.55 0.012 75)" }}>
@@ -886,25 +1016,23 @@ export default function Pricing() {
         </div>
       </div>
 
-      {/* Tier cards
-          Mobile: single column, stacked vertically with compact layout
-          sm: 2-column grid
-          lg: 4-column grid */}
+      {/* Tier cards */}
       <section className="container max-w-5xl mx-auto mb-16 sm:mb-20">
-        {/* Mobile: add bottom padding so sticky bar doesn't cover last card */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 pb-20 sm:pb-0">
           {TIERS.map(tier => (
             <TierCard
               key={tier.id}
               tier={tier}
               cycle={cycle}
-              cardRef={tier.highlight ? pressRef : undefined}
+              onCycleChange={setCycle}
+              cardRef={tier.highlight ? pressCardRef : undefined}
+              flashRef={tier.highlight ? flashRef : undefined}
             />
           ))}
         </div>
       </section>
 
-      {/* Divider + Credit packs */}
+      {/* Credit packs */}
       <div className="container max-w-5xl mx-auto mb-16">
         <div className="flex items-center gap-4" style={{ borderTop: "1px solid oklch(1 0 0 / 6%)" }}>
           <div className="pt-8 flex-1">
@@ -976,7 +1104,7 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Bottom CTA — anchor for sticky bar and scroll target */}
+      {/* Bottom CTA */}
       <section
         id="waitlist"
         className="py-20 text-center"
@@ -1018,8 +1146,8 @@ export default function Pricing() {
         </p>
       </div>
 
-      {/* Sticky mobile CTA bar — renders last so it sits above everything */}
-      <StickyMobileCTA cycle={cycle} />
+      {/* Sticky mobile CTA bar */}
+      <StickyMobileCTA cycle={cycle} onFlashPress={handleFlashPress} />
     </div>
   );
 }

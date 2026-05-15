@@ -141,7 +141,7 @@
 - [x] Mobile hero polish: reduce heading font size on small screens, stack CTAs vertically with full-width buttons, improve padding
 - [x] Mobile Compliance page: larger textarea, bigger submit button, full-width source citation cards, iOS font-size 16px to prevent auto-zoom
 - [x] Mobile ThePress page: full-width tabs with 44px touch targets, scrollable tab bar on mobile, short labels on small screens
-- [ ] Mobile Pricing page: single-column tier cards, sticky CTA bar at bottom (deferred)
+- [x] Mobile Pricing page: single-column tier cards, sticky CTA bar at bottom (implemented in Mobile Pricing Page section below)
 
 ## Reminder System + Quick Entry + Presentation Script
 
@@ -175,3 +175,9 @@
 - [x] Pricing page: sticky CTA bar at bottom of screen on mobile (shows active tier name + primary action button, dismissible)
 - [x] Pricing page: smooth scroll to tier card when sticky bar CTA is tapped
 - [x] Pricing page: ensure sticky bar clears when user reaches the page CTA section (no double CTA)
+
+## Mobile Pricing Page — Round 2 Enhancements
+
+- [x] Pricing mobile cards: add billing toggle (monthly/annual) directly on the mobile card layout so prices update dynamically without scrolling back to the hero toggle
+- [x] Pricing mobile cards: add small info icons next to complex features in the collapsible list (custom document upload, AI tutor credits, priority responses) that reveal brief explanations when tapped
+- [x] Pricing mobile cards: add subtle highlight/pulse animation to The Press card when the user is scrolled to it via the sticky CTA "See Plan" button
