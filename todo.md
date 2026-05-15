@@ -168,3 +168,10 @@
 - [x] Feature Matrix: add interactive tooltips to each of the six capability column headers explaining what the capability means and why it matters
 - [x] Competitor Grid: add threat-level and status filter pills (All / No Threat / Low / Monitor and All / Active / Abandoned) so users can sort the competitor cards
 - [x] Australian Compliance Moat: replace the static state card grid with an interactive SVG map of Australia — hover/tap a state to highlight it and reveal its three regulatory bodies in a side panel
+
+## Mobile Pricing Page
+
+- [x] Pricing page: single-column tier cards on mobile (stack vertically, full-width, clear visual hierarchy)
+- [x] Pricing page: sticky CTA bar at bottom of screen on mobile (shows active tier name + primary action button, dismissible)
+- [x] Pricing page: smooth scroll to tier card when sticky bar CTA is tapped
+- [x] Pricing page: ensure sticky bar clears when user reaches the page CTA section (no double CTA)
