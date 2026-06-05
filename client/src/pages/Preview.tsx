@@ -325,90 +325,74 @@ function PreviewContent() {
               color: "oklch(0.60 0.015 75)",
               lineHeight: 1.6,
             }}>
-              Ownology is built on the same curriculum that trained you. Below is a preview of our CSU-aligned learning content — the science behind the decisions you make every vintage.
+              The science you studied is the foundation. Ownology is the layer that sits on top of it — translating that knowledge into real-time answers during harvest, when you need them most.
             </p>
 
-            {/* Education card grid */}
+            {/* Science domain cards */}
             <div className="grid md:grid-cols-2 gap-4 mb-10">
               {[
                 {
-                  code: "MCR101",
-                  title: "Introduction to Microbiology",
-                  desc: "Fermentation biology, yeast ecology, spoilage control — the foundation of everything in the cellar.",
-                  slides: 12,
-                  href: "https://ownology-kjxa9mra.manus.space",
+                  domain: "Fermentation Biology",
+                  icon: "🧫",
+                  desc: "Yeast ecology, nitrogen nutrition, stuck fermentation risk — Ownology draws on this science to answer DAP, GoFerm, and inoculation questions in real time.",
+                  example: "\"My YAN is 95 ppm at 24 Brix — what addition rate for this Grenache?\"",
                 },
                 {
-                  code: "WSC115",
-                  title: "Wine Science 1",
-                  desc: "SO₂ chemistry, phenolics, oxidation, fermentation control — the core science layer.",
-                  slides: 12,
-                  href: "https://ownology-kjxa9mra.manus.space",
+                  domain: "SO₂ & Oxidation Chemistry",
+                  icon: "⚗️",
+                  desc: "Free SO₂, molecular SO₂, pH relationships, and oxidation windows — the science behind every addition decision from crush to bottling.",
+                  example: "\"pH is 3.62, free SO₂ is 18 ppm — what do I add before pressing?\"",
                 },
                 {
-                  code: "WSC318",
-                  title: "Wine Microbiology",
-                  desc: "Yeast physiology, MLF bacteria, spoilage organisms — the most operationally critical unit.",
-                  slides: 12,
-                  href: "https://ownology-kjxa9mra.manus.space",
+                  domain: "Microbial Spoilage & MLF",
+                  icon: "🔬",
+                  desc: "Brettanomyces, acetic acid bacteria, Oenococcus — understanding the organisms that threaten your wine and the conditions that favour them.",
+                  example: "\"VA is creeping up in Tank 3 — what are my intervention options?\"",
                 },
                 {
-                  code: "WSC217",
-                  title: "Sensory Science",
-                  desc: "Fault detection, tasting methodology, sensory thresholds — applied at the bench every day.",
-                  slides: 12,
-                  href: "https://ownology-kjxa9mra.manus.space",
+                  domain: "Sensory & Fault Detection",
+                  icon: "👃",
+                  desc: "Sensory thresholds, fault identification, and the chemistry behind what you smell and taste — applied at the bench every day.",
+                  example: "\"There's a reductive note on this Shiraz — what's the likely cause?\"",
                 },
-              ].map(unit => (
-                <div key={unit.code} style={{
+              ].map(item => (
+                <div key={item.domain} style={{
                   background: "oklch(0.14 0.010 60)",
                   border: "1px solid oklch(1 0 0 / 8%)",
                   borderRadius: "4px",
                   padding: "1.5rem",
                 }}>
-                  <div className="flex items-start justify-between mb-3">
-                    <span style={{
-                      fontFamily: "'Fira Code', monospace",
-                      fontSize: "0.75rem",
-                      color: "oklch(0.72 0.12 75)",
-                      letterSpacing: "0.06em",
+                  <div className="flex items-center gap-2 mb-3">
+                    <span style={{ fontSize: "1.1rem" }}>{item.icon}</span>
+                    <h3 style={{
+                      fontFamily: "'Fraunces', serif",
+                      fontWeight: 600,
+                      fontSize: "1.0rem",
+                      color: "oklch(0.90 0.018 75)",
+                      lineHeight: 1.3,
+                      margin: 0,
                     }}>
-                      {unit.code}
-                    </span>
-                    <span style={{
-                      fontFamily: "'Lato', sans-serif",
-                      fontSize: "0.75rem",
-                      color: "oklch(0.45 0.012 75)",
-                    }}>
-                      {unit.slides} slides
-                    </span>
+                      {item.domain}
+                    </h3>
                   </div>
-                  <h3 className="mb-2" style={{
-                    fontFamily: "'Fraunces', serif",
-                    fontWeight: 600,
-                    fontSize: "1.0625rem",
-                    color: "oklch(0.90 0.018 75)",
-                    lineHeight: 1.3,
-                  }}>
-                    {unit.title}
-                  </h3>
                   <p style={{
                     fontFamily: "'Lato', sans-serif",
                     fontWeight: 300,
                     fontSize: "0.875rem",
                     color: "oklch(0.60 0.015 75)",
                     lineHeight: 1.6,
+                    marginBottom: "0.75rem",
                   }}>
-                    {unit.desc}
+                    {item.desc}
                   </p>
-                  <p className="mt-4" style={{
-                    fontFamily: "'Lato', sans-serif",
-                    fontWeight: 300,
-                    fontSize: "0.8125rem",
-                    color: "oklch(0.40 0.012 75)",
+                  <p style={{
+                    fontFamily: "'Fira Code', monospace",
+                    fontSize: "0.75rem",
+                    color: "oklch(0.72 0.12 75)",
+                    lineHeight: 1.5,
                     fontStyle: "italic",
                   }}>
-                    Full slide deck available to founding members.
+                    {item.example}
                   </p>
                 </div>
               ))}
@@ -427,7 +411,7 @@ function PreviewContent() {
                 lineHeight: 1.5,
                 marginBottom: "0.75rem",
               }}>
-                "The curriculum teaches the science. Ownology answers the 2am question."
+                "The education section reminds us of the science we studied. Ownology answers the 2am question."
               </p>
               <p style={{
                 fontFamily: "'Lato', sans-serif",
@@ -436,7 +420,7 @@ function PreviewContent() {
                 color: "oklch(0.60 0.015 75)",
                 lineHeight: 1.6,
               }}>
-                WSC318 teaches yeast physiology. But it cannot tell you: <em style={{ color: "oklch(0.80 0.015 75)" }}>"My YAN is 95 ppm, Brix is 26.4, what DAP rate for this Grenache, right now?"</em> That is the gap Ownology fills.
+                The free-run science flows naturally from your training. But the cellar doesn't wait for office hours — it asks you at 2am, mid-vintage, with a stuck ferment in Tank 7. That is the gap Ownology fills: <em style={{ color: "oklch(0.80 0.015 75)" }}>the press that extracts the answer your knowledge already contains.</em>
               </p>
             </div>
 

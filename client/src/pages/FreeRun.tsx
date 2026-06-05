@@ -367,7 +367,7 @@ export default function FreeRun() {
             <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem", lineHeight: 1.6, color: "var(--ow-text-mid)" }}>
               <strong style={{ color: "var(--ow-text-hi)" }}>{freeCount} lessons are free.</strong> The remaining {totalCount - freeCount} require{" "}
               <Link href="/the-press" style={{ color: "var(--ow-amber)", textDecoration: "none" }}>The Press</Link>
-              {" "}— your working board and full curriculum access.
+              {" "}— your working board and full cellar science library.
             </p>
           </div>
         </div>
@@ -471,7 +471,7 @@ export default function FreeRun() {
                   maxWidth: "440px",
                 }}
               >
-                The press extracts what free run cannot reach. Full curriculum. Adaptive learning. Your working board for the vintage. Every calculation saved.
+                The press extracts what free run cannot reach. The full cellar science library. Your working board for the vintage. Every calculation saved.
               </p>
               <p
                 className="mt-2"
