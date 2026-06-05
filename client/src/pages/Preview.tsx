@@ -325,7 +325,7 @@ function PreviewContent() {
               color: "oklch(0.60 0.015 75)",
               lineHeight: 1.6,
             }}>
-              Two resource layers built into Ownology — the regulatory reference you need to stay compliant, and the science context that grounds every answer the assistant gives you.
+              Two resource layers built into Ownology — the compliance reference you need to stay on the right side of the law, and the science context that grounds every answer the assistant gives you.
             </p>
 
             {/* ── Regulatory sub-section ── */}
@@ -337,7 +337,7 @@ function PreviewContent() {
                 textTransform: "uppercase" as const,
                 color: "oklch(0.72 0.12 75)",
                 fontWeight: 600,
-              }}>Regulatory</span>
+              }}>Compliance</span>
               <div style={{ flex: 1, height: "1px", background: "oklch(0.72 0.12 75 / 20%)" }} />
             </div>
             <div className="grid md:grid-cols-3 gap-4 mb-10">
