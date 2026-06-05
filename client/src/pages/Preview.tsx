@@ -6,6 +6,8 @@ import { trpc } from "@/lib/trpc";
 // ─── Gate component ───────────────────────────────────────────────────────────
 function EmailGate({ onUnlock }: { onUnlock: () => void }) {
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [wineryName, setWineryName] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const subscribeMutation = trpc.email.subscribe.useMutation();
 
@@ -16,6 +18,8 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
     try {
       await subscribeMutation.mutateAsync({
         email: email.trim(),
+        name: name.trim() || undefined,
+        wineryName: wineryName.trim() || undefined,
         source: "preview",
         tags: ["preview", "event-handout"],
       });
@@ -100,49 +104,95 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
           </p>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="cellar@yourdomain.com"
-            disabled={status === "loading"}
-            style={{
-              flex: 1,
-              background: "oklch(0.16 0.010 60)",
-              border: "1px solid oklch(1 0 0 / 12%)",
-              borderRadius: "2px",
-              padding: "0.75rem 1rem",
-              fontFamily: "'Lato', sans-serif",
-              fontSize: "0.9375rem",
-              color: "oklch(0.90 0.018 75)",
-              outline: "none",
-            }}
-            onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
-            onBlur={e => (e.currentTarget.style.borderColor = "oklch(1 0 0 / 12%)")}
-          />
-          <button
-            type="submit"
-            disabled={status === "loading"}
-            style={{
-              background: "oklch(0.72 0.12 75)",
-              color: "oklch(0.10 0.008 60)",
-              fontFamily: "'Lato', sans-serif",
-              fontWeight: 700,
-              fontSize: "0.8125rem",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              padding: "0.75rem 1.75rem",
-              borderRadius: "2px",
-              border: "none",
-              cursor: status === "loading" ? "not-allowed" : "pointer",
-              opacity: status === "loading" ? 0.7 : 1,
-              flexShrink: 0,
-            }}
-          >
-            {status === "loading" ? "Opening…" : "See Ownology"}
-          </button>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full max-w-md">
+          {/* Row 1: Name + Winery */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Your name"
+              disabled={status === "loading"}
+              style={{
+                flex: 1,
+                background: "oklch(0.16 0.010 60)",
+                border: "1px solid oklch(1 0 0 / 12%)",
+                borderRadius: "2px",
+                padding: "0.75rem 1rem",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.9375rem",
+                color: "oklch(0.90 0.018 75)",
+                outline: "none",
+              }}
+              onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
+              onBlur={e => (e.currentTarget.style.borderColor = "oklch(1 0 0 / 12%)")}
+            />
+            <input
+              type="text"
+              value={wineryName}
+              onChange={e => setWineryName(e.target.value)}
+              placeholder="Winery name"
+              disabled={status === "loading"}
+              style={{
+                flex: 1,
+                background: "oklch(0.16 0.010 60)",
+                border: "1px solid oklch(1 0 0 / 12%)",
+                borderRadius: "2px",
+                padding: "0.75rem 1rem",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.9375rem",
+                color: "oklch(0.90 0.018 75)",
+                outline: "none",
+              }}
+              onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
+              onBlur={e => (e.currentTarget.style.borderColor = "oklch(1 0 0 / 12%)")}
+            />
+          </div>
+          {/* Row 2: Email + Submit */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="cellar@yourdomain.com"
+              disabled={status === "loading"}
+              style={{
+                flex: 1,
+                background: "oklch(0.16 0.010 60)",
+                border: "1px solid oklch(1 0 0 / 12%)",
+                borderRadius: "2px",
+                padding: "0.75rem 1rem",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.9375rem",
+                color: "oklch(0.90 0.018 75)",
+                outline: "none",
+              }}
+              onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
+              onBlur={e => (e.currentTarget.style.borderColor = "oklch(1 0 0 / 12%)")}
+            />
+            <button
+              type="submit"
+              disabled={status === "loading"}
+              style={{
+                background: "oklch(0.72 0.12 75)",
+                color: "oklch(0.10 0.008 60)",
+                fontFamily: "'Lato', sans-serif",
+                fontWeight: 700,
+                fontSize: "0.8125rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                padding: "0.75rem 1.75rem",
+                borderRadius: "2px",
+                border: "none",
+                cursor: status === "loading" ? "not-allowed" : "pointer",
+                opacity: status === "loading" ? 0.7 : 1,
+                flexShrink: 0,
+              }}
+            >
+              {status === "loading" ? "Opening…" : "See Ownology"}
+            </button>
+          </div>
         </form>
       )}
 
