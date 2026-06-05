@@ -11,4 +11,5 @@ export const ENV = {
   ownerName: process.env.OWNER_NAME ?? "",
   databaseUrl: process.env.DATABASE_URL ?? "",
   nodeEnv: process.env.NODE_ENV ?? "development",
+  buttondownApiKey: process.env.BUTTONDOWN_API_KEY ?? "",
 } as const;

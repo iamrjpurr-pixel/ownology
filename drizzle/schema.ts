@@ -97,6 +97,37 @@ export const tankReminders = mysqlTable(
   ]
 );
 
+// ─── Leads (CRM) ─────────────────────────────────────────────────────────────
+// Every email sign-up captured from any page is stored here.
+// source: which page/event triggered the capture (e.g. "preview", "pricing", "event")
+// tagsJson: JSON array of string tags (e.g. '["preview","founding"]')
+
+export const leads = mysqlTable(
+  "leads",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    email: varchar("email", { length: 256 }).notNull(),
+    // Where the sign-up originated
+    source: varchar("source", { length: 64 }).notNull().default("unknown"),
+    // JSON array of string tags
+    tagsJson: text("tags_json").notNull().default("[]"),
+    // Optional contact details (filled in later or from form)
+    name: varchar("name", { length: 256 }),
+    wineryName: varchar("winery_name", { length: 256 }),
+    // Free-text notes editable from the CRM
+    notes: text("notes"),
+    // UTC ms timestamp of sign-up
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    // UTC ms timestamp of last update
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("leads_email_idx").on(t.email),
+    index("leads_source_idx").on(t.source),
+    index("leads_created_at_idx").on(t.createdAt),
+  ]
+);
+
 // ─── Vintage Log Entries ──────────────────────────────────────────────────────
 // One row per cellar event recorded by a user in The Press → Vintage Log tab.
 // detailsJson and tagsJson are stored as text; application layer always provides

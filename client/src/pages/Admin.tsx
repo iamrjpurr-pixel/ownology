@@ -83,6 +83,17 @@ function IconPricing() {
   );
 }
 
+function IconLeads() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      <path d="M21 21v-2a4 4 0 0 0-3-3.87" />
+    </svg>
+  );
+}
+
 // ─── KPI stat card ────────────────────────────────────────────────────────────
 
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
@@ -325,6 +336,13 @@ const TOOLS: AdminTool[] = [
     description: "Review subscription tiers, credit packs, founding member counter, and the Buttondown waitlist capture CTA.",
     href: "/pricing",
     icon: <IconPricing />,
+  },
+  {
+    label: "Lead CRM",
+    description: "Every email sign-up stored in your own database — source tag, date, winery name, and inline notes. CSV export included.",
+    href: "/admin/leads",
+    icon: <IconLeads />,
+    badge: "New",
   },
 ];
 

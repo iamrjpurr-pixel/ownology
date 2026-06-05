@@ -1,34 +1,27 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
-
-// ─── Buttondown email capture ─────────────────────────────────────────────────
-async function subscribeToButtondown(email: string, tags: string[]): Promise<boolean> {
-  const res = await fetch("https://api.buttondown.email/v1/subscribers", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token ${import.meta.env.VITE_BUTTONDOWN_API_KEY ?? ""}`,
-    },
-    body: JSON.stringify({ email_address: email, tags }),
-  });
-  return res.status === 201 || res.status === 200 || res.status === 422;
-}
+import { trpc } from "@/lib/trpc";
 
 // ─── Gate component ───────────────────────────────────────────────────────────
 function EmailGate({ onUnlock }: { onUnlock: () => void }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const subscribeMutation = trpc.email.subscribe.useMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || status === "loading") return;
     setStatus("loading");
-    const ok = await subscribeToButtondown(email, ["preview", "event-handout"]);
-    if (ok) {
+    try {
+      await subscribeMutation.mutateAsync({
+        email: email.trim(),
+        source: "preview",
+        tags: ["preview", "event-handout"],
+      });
       setStatus("success");
       setTimeout(onUnlock, 800);
-    } else {
+    } catch {
       setStatus("error");
     }
   };

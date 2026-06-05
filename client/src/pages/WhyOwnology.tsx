@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from "react";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import { Link } from "wouter";
+import { trpc } from "@/lib/trpc";
 
 function useInView(threshold = 0.12) {
   const ref = useRef<HTMLDivElement>(null);
@@ -307,25 +308,21 @@ function CTA() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
+  const subscribeMutation = trpc.email.subscribe.useMutation();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || status === "loading") return;
     setStatus("loading");
     setErrorMsg("");
     try {
-      const res = await fetch("https://api.buttondown.email/v1/subscribers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Token ${import.meta.env.VITE_BUTTONDOWN_API_KEY ?? ""}` },
-        body: JSON.stringify({ email_address: email, tags: ["waitlist", "why-ownology"] }),
+      await subscribeMutation.mutateAsync({
+        email: email.trim(),
+        source: "why-ownology",
+        tags: ["waitlist", "why-ownology"],
       });
-      if (res.status === 201 || res.status === 200) {
-        setStatus("success");
-        setEmail("");
-      } else if (res.status === 422) {
-        setStatus("success"); // already subscribed — treat as success
-      } else {
-        throw new Error("Signup failed");
-      }
+      setStatus("success");
+      setEmail("");
     } catch {
       setStatus("error");
       setErrorMsg("Something went wrong. Please try again or email support@ownology.ai");

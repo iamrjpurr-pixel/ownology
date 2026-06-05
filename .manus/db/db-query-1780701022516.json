@@ -1,0 +1,9 @@
+{
+  "query": "\nCREATE TABLE IF NOT EXISTS `leads` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `email` varchar(256) NOT NULL,\n  `source` varchar(64) NOT NULL DEFAULT 'unknown',\n  `tags_json` text NOT NULL,\n  `name` varchar(256),\n  `winery_name` varchar(256),\n  `notes` text,\n  `created_at` bigint NOT NULL,\n  `updated_at` bigint NOT NULL,\n  CONSTRAINT `leads_id` PRIMARY KEY(`id`)\n);\nCREATE INDEX IF NOT EXISTS `leads_email_idx` ON `leads` (`email`);\nCREATE INDEX IF NOT EXISTS `leads_source_idx` ON `leads` (`source`);\nCREATE INDEX IF NOT EXISTS `leads_created_at_idx` ON `leads` (`created_at`);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4HByWUH885AfJUE.9472483f21d7 --database kjXA9MRaPtPLGHog5yynHZ --execute \nCREATE TABLE IF NOT EXISTS `leads` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `email` varchar(256) NOT NULL,\n  `source` varchar(64) NOT NULL DEFAULT 'unknown',\n  `tags_json` text NOT NULL,\n  `name` varchar(256),\n  `winery_name` varchar(256),\n  `notes` text,\n  `created_at` bigint NOT NULL,\n  `updated_at` bigint NOT NULL,\n  CONSTRAINT `leads_id` PRIMARY KEY(`id`)\n);\nCREATE INDEX IF NOT EXISTS `leads_email_idx` ON `leads` (`email`);\nCREATE INDEX IF NOT EXISTS `leads_source_idx` ON `leads` (`source`);\nCREATE INDEX IF NOT EXISTS `leads_created_at_idx` ON `leads` (`created_at`);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3285
+}

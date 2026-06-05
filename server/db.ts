@@ -275,3 +275,71 @@ export async function getLastEntryForTank(
     orderBy: [desc(schema.vintageLogEntries.entryAt)],
   });
 }
+
+// ─── Leads (CRM) ─────────────────────────────────────────────────────────────
+
+/**
+ * Add a new lead. If the email already exists for the same source, returns the
+ * existing lead id without creating a duplicate. If the email exists from a
+ * different source, creates a new row (same person, different touch-point).
+ */
+export async function addLead(data: {
+  email: string;
+  source: string;
+  tags?: string[];
+  name?: string;
+  wineryName?: string;
+}) {
+  const now = Date.now();
+  // Check for exact email+source duplicate
+  const existing = await db.query.leads.findFirst({
+    where: and(
+      eq(schema.leads.email, data.email.toLowerCase().trim()),
+      eq(schema.leads.source, data.source)
+    ),
+  });
+  if (existing) return existing.id;
+
+  const result = await db.insert(schema.leads).values({
+    email: data.email.toLowerCase().trim(),
+    source: data.source,
+    tagsJson: JSON.stringify(data.tags ?? []),
+    name: data.name ?? null,
+    wineryName: data.wineryName ?? null,
+    notes: null,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return (result as unknown as { insertId: number }).insertId;
+}
+
+export async function listLeads(limit = 500) {
+  return db.query.leads.findMany({
+    orderBy: [desc(schema.leads.createdAt)],
+    limit,
+  });
+}
+
+export async function updateLeadNotes(id: number, notes: string) {
+  await db
+    .update(schema.leads)
+    .set({ notes, updatedAt: Date.now() })
+    .where(eq(schema.leads.id, id));
+}
+
+export async function updateLead(id: number, data: {
+  name?: string;
+  wineryName?: string;
+  notes?: string;
+  source?: string;
+  tagsJson?: string;
+}) {
+  await db
+    .update(schema.leads)
+    .set({ ...data, updatedAt: Date.now() })
+    .where(eq(schema.leads.id, id));
+}
+
+export async function deleteLead(id: number) {
+  await db.delete(schema.leads).where(eq(schema.leads.id, id));
+}

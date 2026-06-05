@@ -24,6 +24,7 @@ import Admin from "./pages/Admin";
 import QuickEntry from "./pages/QuickEntry";
 import CompetitiveAdvantage from "./pages/CompetitiveAdvantage";
 import Preview from "./pages/Preview";
+import AdminLeads from "./pages/AdminLeads";
 
 
 function Router() {
@@ -49,6 +50,7 @@ function Router() {
       <Route path={"/quick-entry"} component={QuickEntry} />
       <Route path={"/competitive-advantage"} component={CompetitiveAdvantage} />
       <Route path={"/preview"} component={Preview} />
+      <Route path={"/admin/leads"} component={AdminLeads} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

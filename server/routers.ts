@@ -18,6 +18,11 @@ import {
   listTankReminders,
   deleteTankReminder,
   type ReminderEventType,
+  addLead,
+  listLeads,
+  updateLeadNotes,
+  updateLead,
+  deleteLead,
 } from "./db.js";
 
 function getStripe(): Stripe {
@@ -358,6 +363,139 @@ const vintageReminderRouter = router({
     }),
 });
 
+// ─── Email Subscribe Router ─────────────────────────────────────────────────
+// Server-side Buttondown subscription — keeps the API key off the frontend.
+
+const emailRouter = router({
+  subscribe: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        tags: z.array(z.string()).optional(),
+        source: z.string().optional(),
+        name: z.string().optional(),
+        wineryName: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const source = input.source ?? (input.tags?.[0] ?? "unknown");
+      const tags = input.tags ?? [];
+
+      // 1. Always save to our own CRM first (independent of Buttondown)
+      try {
+        await addLead({
+          email: input.email,
+          source,
+          tags,
+          name: input.name,
+          wineryName: input.wineryName,
+        });
+      } catch (err) {
+        console.error("[emailRouter] Failed to save lead to DB", err);
+        // Don't fail the whole request — DB write failure shouldn't block the user
+      }
+
+      // 2. Also subscribe to Buttondown if key is configured
+      const apiKey = process.env.BUTTONDOWN_API_KEY ?? "";
+      if (apiKey) {
+        try {
+          const res = await fetch("https://api.buttondown.email/v1/subscribers", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Token ${apiKey}`,
+            },
+            body: JSON.stringify({
+              email_address: input.email,
+              tags,
+            }),
+          });
+          if (res.status !== 201 && res.status !== 200 && res.status !== 409) {
+            const body = await res.text();
+            console.error("[emailRouter] Buttondown error", res.status, body);
+          }
+        } catch (err) {
+          console.error("[emailRouter] Buttondown fetch error", err);
+        }
+      }
+
+      return { ok: true };
+    }),
+});
+
+// ─── Leads (CRM) Router ─────────────────────────────────────────────────────────────
+// All procedures are ownerProcedure — only the site owner can view/edit leads.
+
+const leadsRouter = router({
+  list: ownerProcedure
+    .input(z.object({ limit: z.number().min(1).max(1000).default(500) }).optional())
+    .query(async ({ input }) => {
+      const rows = await listLeads(input?.limit ?? 500);
+      return rows.map((r) => ({
+        ...r,
+        tags: JSON.parse(r.tagsJson) as string[],
+      }));
+    }),
+
+  updateNotes: ownerProcedure
+    .input(z.object({ id: z.number(), notes: z.string().max(4000) }))
+    .mutation(async ({ input }) => {
+      await updateLeadNotes(input.id, input.notes);
+      return { ok: true };
+    }),
+
+  update: ownerProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string().max(256).optional(),
+        wineryName: z.string().max(256).optional(),
+        notes: z.string().max(4000).optional(),
+        source: z.string().max(64).optional(),
+        tags: z.array(z.string()).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { id, tags, ...rest } = input;
+      await updateLead(id, {
+        ...rest,
+        tagsJson: tags ? JSON.stringify(tags) : undefined,
+      });
+      return { ok: true };
+    }),
+
+  delete: ownerProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await deleteLead(input.id);
+      return { ok: true };
+    }),
+
+  // Manual add from admin panel
+  add: ownerProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        source: z.string().max(64).default("manual"),
+        tags: z.array(z.string()).optional(),
+        name: z.string().max(256).optional(),
+        wineryName: z.string().max(256).optional(),
+        notes: z.string().max(4000).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const id = await addLead({
+        email: input.email,
+        source: input.source,
+        tags: input.tags,
+        name: input.name,
+        wineryName: input.wineryName,
+      });
+      if (input.notes) await updateLeadNotes(id, input.notes);
+      return { ok: true, id };
+    }),
+});
+
 // ─── App Router ──────────────────────────────────────────────────────────────────────────────
 
 export const appRouter = router({
@@ -367,6 +505,8 @@ export const appRouter = router({
   admin: adminRouter,
   vintageLog: vintageLogRouter,
   vintageReminder: vintageReminderRouter,
+  email: emailRouter,
+  leads: leadsRouter,
 });
 
 export type AppRouter = typeof appRouter;
