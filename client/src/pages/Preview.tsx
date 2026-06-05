@@ -66,7 +66,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
           lineHeight: 1.7,
           color: "oklch(0.65 0.015 75)",
         }}>
-          Built for harvest. Built for the winery floor. Enter your email to see the Ownology overview and winemaker education preview.
+          Built for harvest. Built for the winery floor. Enter your email to see the Ownology overview and resource library preview.
         </p>
       </div>
 
@@ -167,7 +167,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
 
 // ─── Content component (shown after gate) ────────────────────────────────────
 function PreviewContent() {
-  const [activeTab, setActiveTab] = useState<"brochure" | "education">("brochure");
+  const [activeTab, setActiveTab] = useState<"brochure" | "resources">("brochure");
 
   const tabStyle = (active: boolean) => ({
     fontFamily: "'Lato', sans-serif",
@@ -245,8 +245,8 @@ function PreviewContent() {
           <button style={tabStyle(activeTab === "brochure")} onClick={() => setActiveTab("brochure")}>
             Winemaker Overview
           </button>
-          <button style={tabStyle(activeTab === "education")} onClick={() => setActiveTab("education")}>
-            Education Preview
+          <button style={tabStyle(activeTab === "resources")} onClick={() => setActiveTab("resources")}>
+            Resources
           </button>
         </div>
 
@@ -315,19 +315,103 @@ function PreviewContent() {
           </div>
         )}
 
-        {/* Education tab */}
-        {activeTab === "education" && (
+        {/* Resources tab */}
+        {activeTab === "resources" && (
           <div className="pb-16">
-            <p className="mb-8" style={{
+            <p className="mb-10" style={{
               fontFamily: "'Lato', sans-serif",
               fontWeight: 300,
               fontSize: "0.9375rem",
               color: "oklch(0.60 0.015 75)",
               lineHeight: 1.6,
             }}>
-              The science you studied is the foundation. Ownology is the layer that sits on top of it — translating that knowledge into real-time answers during harvest, when you need them most.
+              Two resource layers built into Ownology — the regulatory reference you need to stay compliant, and the science context that grounds every answer the assistant gives you.
             </p>
 
+            {/* ── Regulatory sub-section ── */}
+            <div className="flex items-center gap-3 mb-5">
+              <span style={{
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.65rem",
+                letterSpacing: "0.14em",
+                textTransform: "uppercase" as const,
+                color: "oklch(0.72 0.12 75)",
+                fontWeight: 600,
+              }}>Regulatory</span>
+              <div style={{ flex: 1, height: "1px", background: "oklch(0.72 0.12 75 / 20%)" }} />
+            </div>
+            <div className="grid md:grid-cols-3 gap-4 mb-10">
+              {[
+                { title: "Wine Australia & LIP", desc: "Registration obligations and Label Integrity Program record-keeping for every batch.", tag: "Federal" },
+                { title: "FSANZ Standard 4.5.1", desc: "Permitted additives, SO₂ limits (250/300 mg/L), and compositional requirements under the Food Standards Code.", tag: "Federal" },
+                { title: "Mandatory Labelling", desc: "Pregnancy warning (mandatory from July 2023), allergen declarations, and Wine Australia label rules.", tag: "Federal" },
+                { title: "WET & Producer Rebate", desc: "29% wholesale tax and the producer rebate rising to $400k cap from 1 July 2026.", tag: "ATO" },
+                { title: "Biosecurity & Imports", desc: "DAFF controls on imported plant material, oak products, and winemaking equipment.", tag: "DAFF" },
+                { title: "Work Health & Safety", desc: "CO₂ confined space entry, chemical handling, and manual tasks under federal model WHS law.", tag: "Safe Work AU" },
+              ].map(item => (
+                <div key={item.title} style={{
+                  background: "oklch(0.14 0.010 60)",
+                  border: "1px solid oklch(1 0 0 / 8%)",
+                  borderRadius: "4px",
+                  padding: "1.25rem",
+                }}>
+                  <span style={{
+                    fontFamily: "'Fira Code', monospace",
+                    fontSize: "0.65rem",
+                    color: "oklch(0.55 0.12 75)",
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase" as const,
+                    display: "block",
+                    marginBottom: "0.4rem",
+                  }}>{item.tag}</span>
+                  <h3 style={{
+                    fontFamily: "'Fraunces', serif",
+                    fontWeight: 600,
+                    fontSize: "0.9375rem",
+                    color: "oklch(0.90 0.018 75)",
+                    lineHeight: 1.3,
+                    marginBottom: "0.5rem",
+                  }}>{item.title}</h3>
+                  <p style={{
+                    fontFamily: "'Lato', sans-serif",
+                    fontWeight: 300,
+                    fontSize: "0.8125rem",
+                    color: "oklch(0.58 0.015 75)",
+                    lineHeight: 1.6,
+                  }}>{item.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mb-10">
+              <Link href="/resources">
+                <span style={{
+                  fontFamily: "'Lato', sans-serif",
+                  fontSize: "0.8125rem",
+                  color: "oklch(0.72 0.12 75)",
+                  letterSpacing: "0.06em",
+                  cursor: "pointer",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                }}>
+                  View full regulatory reference library →
+                </span>
+              </Link>
+            </div>
+
+            {/* ── Science sub-section ── */}
+            <div className="flex items-center gap-3 mb-5">
+              <span style={{
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.65rem",
+                letterSpacing: "0.14em",
+                textTransform: "uppercase" as const,
+                color: "oklch(0.72 0.12 75)",
+                fontWeight: 600,
+              }}>Science</span>
+              <div style={{ flex: 1, height: "1px", background: "oklch(0.72 0.12 75 / 20%)" }} />
+            </div>
             {/* Science domain cards */}
             <div className="grid md:grid-cols-2 gap-4 mb-10">
               {[
