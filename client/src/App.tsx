@@ -30,7 +30,8 @@ import AdminLeads from "./pages/AdminLeads";
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={Preview} />
+      <Route path={"/home"} component={Home} />
       <Route path={"/why-ownology"} component={WhyOwnology} />
       <Route path={"/for-innovint-users"} component={ForInnoVintUsers} />
       <Route path={"/for-vintrace-users"} component={ForVintraceUsers} />
@@ -49,7 +50,7 @@ function Router() {
       <Route path={"/admin"} component={Admin} />
       <Route path={"/quick-entry"} component={QuickEntry} />
       <Route path={"/competitive-advantage"} component={CompetitiveAdvantage} />
-      <Route path={"/preview"} component={Preview} />
+      <Route path={"/preview"} component={Preview} />  {/* kept for backward compat */}
       <Route path={"/admin/leads"} component={AdminLeads} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
