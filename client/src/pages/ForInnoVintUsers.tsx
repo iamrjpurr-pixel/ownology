@@ -313,7 +313,7 @@ function CTA() {
       }
     } catch {
       setStatus("error");
-      setErrorMsg("Something went wrong. Please try again or email hello@ownology.ai");
+      setErrorMsg("Something went wrong. Please try again or email support@ownology.ai");
     }
   };
 
@@ -337,7 +337,7 @@ function CTA() {
                 You're on the list. We'll be in touch shortly.
               </p>
               <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: TEXT_MID, marginTop: "0.5rem" }}>
-                Questions? Email us at <a href="mailto:hello@ownology.ai" style={{ color: AMBER }}>hello@ownology.ai</a>
+                Questions? Email us at <a href="mailto:support@ownology.ai" style={{ color: AMBER }}>support@ownology.ai</a>
               </p>
             </div>
           ) : (
@@ -379,7 +379,7 @@ function CTA() {
           )}
 
           <p style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>
-            Or <a href="mailto:hello@ownology.ai" style={{ color: AMBER }}>talk to us directly</a> — we respond within one business day.
+            Or <a href="mailto:support@ownology.ai" style={{ color: AMBER }}>talk to us directly</a> — we respond within one business day.
           </p>
         </div>
       </div>
@@ -396,7 +396,7 @@ function Footer() {
           © 2026 Ownology. AI Knowledge Assistant for Boutique Winemakers.
         </p>
         <div className="flex gap-6">
-          <a href="mailto:hello@ownology.ai" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>Contact</a>
+          <a href="mailto:support@ownology.ai" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>Contact</a>
           <Link href="/why-ownology" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>Why Ownology</Link>
           <Link href="/" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>Home</Link>
         </div>

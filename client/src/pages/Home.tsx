@@ -776,7 +776,7 @@ function DemoVideo() {
           */}
         </div>
         <p className="text-center mt-6" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.875rem", color:"var(--ow-text-lo)"}}>
-          Want an early preview? <a href="mailto:hello@ownology.ai" style={{color:"var(--ow-amber)"}}>Email us</a> and we'll walk you through it live.
+          Want an early preview? <a href="mailto:support@ownology.ai" style={{color:"var(--ow-amber)"}}>Email us</a> and we'll walk you through it live.
         </p>
       </div>
     </section>
@@ -1284,10 +1284,10 @@ function CTA() {
         </p>
         <div className="flex flex-wrap justify-center gap-4 mt-10">
           <a href="/pricing" className="btn-amber">Start Free Trial</a>
-          <a href="mailto:hello@ownology.ai" className="btn-ghost">Talk to Us</a>
+          <a href="mailto:support@ownology.ai" className="btn-ghost">Talk to Us</a>
         </div>
         <p className="mt-8" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}>
-          Questions? Email us at <span style={{color:"var(--ow-amber)"}}>hello@ownology.ai</span>
+          Questions? Email us at <span style={{color:"var(--ow-amber)"}}>support@ownology.ai</span>
         </p>
       </div>
     </section>

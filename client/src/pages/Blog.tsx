@@ -69,7 +69,7 @@ function BlogEmailCapture() {
       }
     } catch {
       setStatus("error");
-      setErrorMsg("Something went wrong. Please try again or email hello@ownology.ai");
+      setErrorMsg("Something went wrong. Please try again or email support@ownology.ai");
     }
   };
 
@@ -134,7 +134,7 @@ function BlogEmailCapture() {
       )}
       <p style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>
         Or{" "}
-        <a href="mailto:hello@ownology.ai" style={{ color: AMBER }}>talk to us directly</a>
+        <a href="mailto:support@ownology.ai" style={{ color: AMBER }}>talk to us directly</a>
         {" "}&mdash; we respond within one business day.
       </p>
     </div>

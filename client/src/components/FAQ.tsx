@@ -133,10 +133,10 @@ export default function FAQ() {
             >
               Still have questions? Email us at{" "}
               <a
-                href="mailto:hello@ownology.ai"
+                href="mailto:support@ownology.ai"
                 style={{ color: "var(--ow-amber)", textDecoration: "underline", textUnderlineOffset: "3px" }}
               >
-                hello@ownology.ai
+                support@ownology.ai
               </a>{" "}
               — we respond within one business day.
             </p>

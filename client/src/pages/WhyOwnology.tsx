@@ -328,7 +328,7 @@ function CTA() {
       }
     } catch {
       setStatus("error");
-      setErrorMsg("Something went wrong. Please try again or email hello@ownology.ai");
+      setErrorMsg("Something went wrong. Please try again or email support@ownology.ai");
     }
   };
 
@@ -392,7 +392,7 @@ function CTA() {
           )}
 
           <p style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>
-            Or <a href="mailto:hello@ownology.ai" style={{ color: AMBER }}>talk to us directly</a> — we respond within one business day.
+            Or <a href="mailto:support@ownology.ai" style={{ color: AMBER }}>talk to us directly</a> — we respond within one business day.
           </p>
         </div>
       </div>
@@ -409,7 +409,7 @@ function Footer() {
           © 2026 Ownology. AI Knowledge Assistant for Boutique Winemakers.
         </p>
         <div className="flex gap-6">
-          <a href="mailto:hello@ownology.ai" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>Contact</a>
+          <a href="mailto:support@ownology.ai" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>Contact</a>
           <Link href="/for-innovint-users" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>For InnoVint Users</Link>
           <Link href="/for-vintrace-users" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>For Vintrace Users</Link>
           <Link href="/" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>Home</Link>

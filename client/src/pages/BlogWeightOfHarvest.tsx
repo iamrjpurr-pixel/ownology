@@ -48,7 +48,7 @@ function ArticleEmailCapture() {
       }
     } catch {
       setStatus("error");
-      setErrorMsg("Something went wrong. Please try again or email hello@ownology.ai");
+      setErrorMsg("Something went wrong. Please try again or email support@ownology.ai");
     }
   };
 

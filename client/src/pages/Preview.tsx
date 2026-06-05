@@ -155,7 +155,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
 
       {status === "error" && (
         <p className="mt-3 text-sm" style={{ color: "oklch(0.65 0.15 25)", fontFamily: "'Lato', sans-serif" }}>
-          Something went wrong. Email <a href="mailto:hello@ownology.ai" style={{ color: "oklch(0.72 0.12 75)" }}>hello@ownology.ai</a> directly.
+          Something went wrong. Email <a href="mailto:support@ownology.ai" style={{ color: "oklch(0.72 0.12 75)" }}>support@ownology.ai</a> directly.
         </p>
       )}
 

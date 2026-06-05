@@ -28,7 +28,7 @@ function WaitlistCapture() {
       }
     } catch {
       setStatus("error");
-      setErrorMsg("Something went wrong. Try again or email hello@ownology.ai");
+      setErrorMsg("Something went wrong. Try again or email support@ownology.ai");
     }
   };
 
@@ -82,7 +82,7 @@ function WaitlistCapture() {
         <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: "oklch(0.65 0.15 30)", marginBottom: "0.75rem" }}>{errorMsg}</p>
       )}
       <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", color: "oklch(0.45 0.010 75)" }}>
-        No credit card required. Or <a href="mailto:hello@ownology.ai" style={{ color: "oklch(0.72 0.12 75)" }}>talk to us directly</a>.
+        No credit card required. Or <a href="mailto:support@ownology.ai" style={{ color: "oklch(0.72 0.12 75)" }}>talk to us directly</a>.
       </p>
     </>
   );
