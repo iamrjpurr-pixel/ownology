@@ -62,27 +62,44 @@ const PRIMARY_NAV: NavItem[] = [
   { label: "See Demo",     href: "#demo" },
   { label: "Why Ownology", href: "/why-ownology" },
 ];
-// Secondary links — shown in "More" dropdown on desktop, full list on mobile
-const MORE_NAV: NavItem[] = [
-  { label: "Our Story",  href: "#our-story" },
-  { label: "Pricing",   href: "/pricing" },
-  { label: "FAQ",       href: "#faq" },
-  { label: "Blog",      href: "/blog" },
-  { label: "Resources", href: "/resources" },
-  { label: "Compliance", href: "/compliance" },
-  { label: "Free Run",  href: "/free-run" },
-  { label: "The Press", href: "/the-press" },
-  { label: "Merch",     href: "/merch" },
-  { label: "⚡ Quick Entry", href: "/quick-entry" },
+// Secondary links — grouped by product pillar
+const VINTAGE_NAV: NavItem[] = [
+  { label: "Quick Entry",  href: "/quick-entry" },
+  { label: "Free Run",     href: "/free-run" },
+  { label: "Resources",    href: "/resources" },
   { label: "Competitive Advantage", href: "/competitive-advantage" },
+];
+const BUSINESS_NAV: NavItem[] = [
+  { label: "Compliance",   href: "/compliance" },
+  { label: "The Press",    href: "/the-press" },
+  { label: "Blog",         href: "/blog" },
+  { label: "Merch",        href: "/merch" },
+];
+const MORE_NAV: NavItem[] = [
+  { label: "Our Story",    href: "#our-story" },
+  { label: "Pricing",      href: "/pricing" },
+  { label: "FAQ",          href: "#faq" },
+  ...VINTAGE_NAV,
+  ...BUSINESS_NAV,
 ];
 const NAV_LINKS: NavItem[] = [...PRIMARY_NAV, ...MORE_NAV];
 
 // ─── More dropdown ───────────────────────────────────────────────────────────
-function MoreDropdown({ items }: { items: NavItem[] }) {
+function NavLink({ item, close }: { item: NavItem; close: () => void }) {
+  const cls = "block px-4 py-1.5 text-sm transition-colors";
+  const sty = {color: "var(--ow-text-mid)", fontFamily: "'Lato',sans-serif", fontWeight: 300 as const};
+  const enter = (e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-amber)");
+  const leave = (e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-text-mid)");
+  return item.href.startsWith("/") ? (
+    <Link href={item.href} onClick={close} className={cls} style={sty} onMouseEnter={enter} onMouseLeave={leave}>{item.label}</Link>
+  ) : (
+    <a href={item.href} onClick={close} className={cls} style={sty} onMouseEnter={enter} onMouseLeave={leave}>{item.label}</a>
+  );
+}
+
+function MoreDropdown({ extraItems }: { extraItems?: NavItem[] }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-
   const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
@@ -92,6 +109,12 @@ function MoreDropdown({ items }: { items: NavItem[] }) {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [close]);
+
+  const generalLinks: NavItem[] = [
+    { label: "Our Story", href: "#our-story" },
+    { label: "Pricing",   href: "/pricing" },
+    { label: "FAQ",       href: "#faq" },
+  ];
 
   return (
     <div ref={ref} className="relative">
@@ -111,32 +134,25 @@ function MoreDropdown({ items }: { items: NavItem[] }) {
       </button>
       {open && (
         <div
-          className="absolute top-full right-0 mt-2 py-1 rounded-sm"
-          style={{background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)", minWidth: "140px", boxShadow: "0 8px 24px var(--ow-shadow)", zIndex: 100}}
+          className="absolute top-full right-0 mt-2 rounded-sm"
+          style={{background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)", minWidth: "320px", boxShadow: "0 8px 24px var(--ow-shadow)", zIndex: 100}}
         >
-          {items.map(item =>
-            item.href.startsWith("/") ? (
-              <Link
-                key={item.label}
-                href={item.href}
-                onClick={close}
-                className="block px-4 py-2 text-sm transition-colors"
-                style={{color: "var(--ow-text-mid)", fontFamily: "'Lato',sans-serif", fontWeight: 300}}
-                onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-amber)")}
-                onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-text-mid)")}
-              >{item.label}</Link>
-            ) : (
-              <a
-                key={item.label}
-                href={item.href}
-                onClick={close}
-                className="block px-4 py-2 text-sm transition-colors"
-                style={{color: "var(--ow-text-mid)", fontFamily: "'Lato',sans-serif", fontWeight: 300}}
-                onMouseEnter={e => (e.currentTarget.style.color = "var(--ow-amber)")}
-                onMouseLeave={e => (e.currentTarget.style.color = "var(--ow-text-mid)")}
-              >{item.label}</a>
-            )
-          )}
+          {/* General links */}
+          <div className="py-2 px-1">
+            {generalLinks.map(item => <NavLink key={item.label} item={item} close={close} />)}
+          </div>
+          {/* Two-column pillar section */}
+          <div className="grid grid-cols-2" style={{borderTop: "1px solid var(--ow-border)"}}>
+            <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Help at Vintage</p>
+              {VINTAGE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
+            </div>
+            <div className="py-3 px-1">
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Business &amp; Science</p>
+              {BUSINESS_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
+              {extraItems?.map(item => <NavLink key={item.label} item={item} close={close} />)}
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -201,7 +217,7 @@ function Nav() {
               )
             ))}
             {/* More dropdown */}
-            <MoreDropdown items={isOwner ? [...MORE_NAV, { label: "Admin", href: "/admin" }] : MORE_NAV} />
+            <MoreDropdown extraItems={isOwner ? [{ label: "Admin", href: "/admin" }] : undefined} />
           </div>
 
           <div className="hidden md:flex items-center gap-3">
