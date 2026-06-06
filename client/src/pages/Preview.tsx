@@ -32,7 +32,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16"
-      style={{ background: "oklch(0.97 0.010 75)" }}>
+      style={{ background: "oklch(0.10 0.008 60)" }}>
       {/* Logo */}
       <div className="mb-10">
         <OwnologyLogo size={44} />
@@ -46,19 +46,20 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
           fontSize: "0.8125rem",
           letterSpacing: "0.14em",
           textTransform: "uppercase",
-         color: "oklch(0.62 0.14 68)",
-        }}
-        >
-          AI KNOWLEDGE ASSISTANT FOR WINEMAKERS </p>
+          color: "oklch(0.72 0.12 75)",
+        }}>
+          AI KNOWLEDGE ASSISTANT FOR WINEMAKERS
+        </p>
         <h1 style={{
           fontFamily: "'Fraunces', serif",
           fontWeight: 700,
           fontSize: "clamp(2rem, 5vw, 3.25rem)",
-          lineHeight: 1.          color: "oklch(0.16 0.012 60)",
+          lineHeight: 1.08,
+          color: "oklch(0.16 0.012 60)",
           letterSpacing: "-0.02em",
-        }}
-        >
-          You are the must.<b          <em style={{ color: "oklch(0.62 0.14 68)", fontStyle: "italic" }}>
+        }}>
+          You are the must.<br />
+          <em style={{ color: "oklch(0.62 0.14 68)", fontStyle: "italic" }}>
             Ownology is the ferment.
           </em>
         </h1>
@@ -68,22 +69,21 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
           fontSize: "1.0625rem",
           lineHeight: 1.7,
           color: "oklch(0.32 0.010 60)",
-        }}
-        >
-          Built for harvest.r the winery floor. Enter your email to see the Ownology overview and resource library preview.
+        }}>
+          Built for harvest. Built for the winery floor. Enter your email to see the Ownology overview and resource library preview.
         </p>
       </div>
 
       {/* Urgency signal */}
       <div className="mb-8 px-5 py-2.5 rounded-sm text-center" style={{
-        background: "oklch(0.62 0.14 68 / 10%)",
-        border: "1px solid oklch(0.62 0.14 68 / 35%)",
+        background: "oklch(0.72 0.12 75 / 10%)",
+        border: "1px solid oklch(0.72 0.12 75 / 30%)",
       }}>
         <p style={{
           fontFamily: "'Lato', sans-serif",
           fontWeight: 400,
           fontSize: "0.875rem",
-          color: "oklch(0.38 0.10 68)",
+          color: "oklch(0.82 0.10 75)",
           letterSpacing: "0.02em",
         }}>
           First 99 founding members — lifetime pricing locked.
@@ -93,13 +93,13 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
       {/* Email form */}
       {status === "success" ? (
         <div className="text-center py-6 px-8 rounded-sm" style={{
-          background: "oklch(0.62 0.14 68 / 10%)",
-          border: "1px solid oklch(0.62 0.14 68 / 35%)",
+          background: "oklch(0.72 0.12 75 / 10%)",
+          border: "1px solid oklch(0.72 0.12 75 / 30%)",
         }}>
-          <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, fontSize: "1.125rem", color: "oklch(0.16 0.012 60)" }}>
+          <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, fontSize: "1.125rem", color: "oklch(0.95 0.018 75)" }}>
             You're on the list.
           </p>
-          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.875rem", color: "oklch(0.42 0.012 60)", marginTop: "0.5rem" }}>
+          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.875rem", color: "oklch(0.60 0.015 75)", marginTop: "0.5rem" }}>
             Opening your preview now…
           </p>
         </div>
@@ -115,18 +115,18 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
               disabled={status === "loading"}
               style={{
                 flex: 1,
-                background: "oklch(0.93 0.012 75)",
-              border: "1px solid oklch(0 0 0 / 15%)",
-              borderRadius: "2px",
-              padding: "0.75rem 1rem",
-              fontFamily: "'Lato', sans-serif",
-              fontSize: "0.9375rem",
-              color: "oklch(0.16 0.012 60)",
-              outline: "none",
-            }}
-            onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.62 0.14 68)")}
-            onBlur={e => (e.currentTarget.style.borderColor = "oklch(0 0 0 / 15%)")}
-          />
+                background: "oklch(0.16 0.010 60)",
+                border: "1px solid oklch(1 0 0 / 12%)",
+                borderRadius: "2px",
+                padding: "0.75rem 1rem",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.9375rem",
+                color: "oklch(0.90 0.018 75)",
+                outline: "none",
+              }}
+              onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
+              onBlur={e => (e.currentTarget.style.borderColor = "oklch(1 0 0 / 12%)")}
+            />
             <input
               type="text"
               value={wineryName}
@@ -135,18 +135,18 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
               disabled={status === "loading"}
               style={{
                 flex: 1,
-                background: "oklch(0.93 0.012 75)",
-              border: "1px solid oklch(0 0 0 / 15%)",
-              borderRadius: "2px",
-              padding: "0.75rem 1rem",
-              fontFamily: "'Lato', sans-serif",
-              fontSize: "0.9375rem",
-              color: "oklch(0.16 0.012 60)",
-              outline: "none",
-            }}
-            onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.62 0.14 68)")}
-            onBlur={e => (e.currentTarget.style.borderColor = "oklch(0 0 0 / 15%)")}
-          />
+                background: "oklch(0.16 0.010 60)",
+                border: "1px solid oklch(1 0 0 / 12%)",
+                borderRadius: "2px",
+                padding: "0.75rem 1rem",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.9375rem",
+                color: "oklch(0.90 0.018 75)",
+                outline: "none",
+              }}
+              onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
+              onBlur={e => (e.currentTarget.style.borderColor = "oklch(1 0 0 / 12%)")}
+            />
           </div>
           {/* Row 2: Email + Submit */}
           <div className="flex flex-col sm:flex-row gap-3">
@@ -159,24 +159,24 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
               disabled={status === "loading"}
               style={{
                 flex: 1,
-                background: "oklch(0.93 0.012 75)",
-              border: "1px solid oklch(0 0 0 / 15%)",
-              borderRadius: "2px",
-              padding: "0.75rem 1rem",
-              fontFamily: "'Lato', sans-serif",
-              fontSize: "0.9375rem",
-              color: "oklch(0.16 0.012 60)",
-              outline: "none",
-            }}
-            onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.62 0.14 68)")}
-            onBlur={e => (e.currentTarget.style.borderColor = "oklch(0 0 0 / 15%)")
+                background: "oklch(0.16 0.010 60)",
+                border: "1px solid oklch(1 0 0 / 12%)",
+                borderRadius: "2px",
+                padding: "0.75rem 1rem",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.9375rem",
+                color: "oklch(0.16 0.012 60)",
+                outline: "none",
+              }}
+              onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.62 0.14 68)")}
+              onBlur={e => (e.currentTarget.style.borderColor = "oklch(0 0 0 / 15%)")}
             />
             <button
               type="submit"
               disabled={status === "loading"}
               style={{
-                background: "oklch(0.72 0.12 75)",
-                color: "oklch(0.10 0.008 60)",
+                background: "oklch(0.62 0.14 68)",
+                color: "oklch(0.97 0.010 75)",
                 fontFamily: "'Lato', sans-serif",
                 fontWeight: 700,
                 fontSize: "0.8125rem",
@@ -198,7 +198,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
 
       {status === "error" && (
         <p className="mt-3 text-sm" style={{ color: "oklch(0.65 0.15 25)", fontFamily: "'Lato', sans-serif" }}>
-          Something went wrong. Email <a href="mailto:support@ownology.ai" style={{ color: "oklch(0.72 0.12 75)" }}>support@ownology.ai</a> directly.
+          Something went wrong. Email <a href="mailto:support@ownology.ai" style={{ color: "oklch(0.62 0.14 68)" }}>support@ownology.ai</a> directly.
         </p>
       )}
 
@@ -207,7 +207,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
         fontFamily: "'Lato', sans-serif",
         fontWeight: 300,
         fontSize: "0.8125rem",
-        color: "oklch(0.45 0.012 75)",
+        color: "oklch(0.50 0.008 60)",
       }}>
         No credit card. No commitment. Just the idea.
       </p>
@@ -338,8 +338,8 @@ function PreviewContent() {
               </p>
               <Link href="/pricing">
                 <button style={{
-                  background: "oklch(0.72 0.12 75)",
-                  color: "oklch(0.10 0.008 60)",
+                  background: "oklch(0.62 0.14 68)",
+                  color: "oklch(0.97 0.010 75)",
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 700,
                   fontSize: "0.8125rem",
@@ -357,9 +357,9 @@ function PreviewContent() {
                 fontFamily: "'Lato', sans-serif",
                 fontWeight: 300,
                 fontSize: "0.8125rem",
-                color: "oklch(0.45 0.012 75)",
+                color: "oklch(0.50 0.008 60)",
               }}>
-                Or email <a href="mailto:winery@ownology.ai" style={{ color: "oklch(0.72 0.12 75)" }}>winery@ownology.ai</a> to talk directly with Richard.
+                Or email <a href="mailto:winery@ownology.ai" style={{ color: "oklch(0.62 0.14 68)" }}>winery@ownology.ai</a> to talk directly with Richard.
               </p>
             </div>
           </div>
@@ -562,8 +562,8 @@ function PreviewContent() {
             <div className="text-center">
               <Link href="/pricing">
                 <button style={{
-                  background: "oklch(0.72 0.12 75)",
-                  color: "oklch(0.10 0.008 60)",
+                  background: "oklch(0.62 0.14 68)",
+                  color: "oklch(0.97 0.010 75)",
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 700,
                   fontSize: "0.8125rem",
@@ -581,9 +581,9 @@ function PreviewContent() {
                 fontFamily: "'Lato', sans-serif",
                 fontWeight: 300,
                 fontSize: "0.8125rem",
-                color: "oklch(0.45 0.012 75)",
+                color: "oklch(0.50 0.008 60)",
               }}>
-                Or email <a href="mailto:winery@ownology.ai" style={{ color: "oklch(0.72 0.12 75)" }}>winery@ownology.ai</a> to talk directly with Richard.
+                Or email <a href="mailto:winery@ownology.ai" style={{ color: "oklch(0.62 0.14 68)" }}>winery@ownology.ai</a> to talk directly with Richard.
               </p>
             </div>
           </div>
