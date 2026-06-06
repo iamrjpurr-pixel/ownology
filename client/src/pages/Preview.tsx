@@ -32,7 +32,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16"
-      style={{ background: "oklch(0.10 0.008 60)" }}>
+      style={{ background: "#f5ede0" }}>
       {/* Logo */}
       <div className="mb-10">
         <OwnologyLogo size={44} />
