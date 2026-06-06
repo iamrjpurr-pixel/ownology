@@ -3,6 +3,26 @@ import { Link } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import { trpc } from "@/lib/trpc";
 
+// ─── Cream palette (all hex, no oklch, works on any OS theme) ─────────────────
+const C = {
+  bg:          "#f5ede0",   // page background — warm cream
+  bgCard:      "#ede2d0",   // card / inset background — slightly darker cream
+  bgCardHover: "#e6d8c4",   // card hover
+  border:      "#d4c4a8",   // subtle border
+  borderAmber: "#c4a96b",   // amber border accent
+  text:        "#2a1f14",   // primary text — dark espresso
+  textMid:     "#5a4a38",   // secondary text — warm brown
+  textMuted:   "#8a7a68",   // muted text
+  amber:       "#b07d2e",   // amber accent (links, labels, highlights)
+  amberBright: "#c49a3c",   // brighter amber for italic headings
+  btnBg:       "#b07d2e",   // CTA button background
+  btnText:     "#f5ede0",   // CTA button text
+  inputBg:     "#ede2d0",   // input background
+  inputText:   "#2a1f14",   // input text
+  inputBorder: "#c4a96b",   // input border
+  headerBg:    "#f0e6d2",   // sticky header
+};
+
 // ─── Gate component ───────────────────────────────────────────────────────────
 function EmailGate({ onUnlock }: { onUnlock: () => void }) {
   const [email, setEmail] = useState("");
@@ -30,12 +50,28 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
     }
   };
 
+  const inputStyle: React.CSSProperties = {
+    flex: 1,
+    background: C.inputBg,
+    border: `1px solid ${C.inputBorder}`,
+    borderRadius: "2px",
+    padding: "0.75rem 1rem",
+    fontFamily: "'Lato', sans-serif",
+    fontSize: "0.9375rem",
+    color: C.inputText,
+    outline: "none",
+    colorScheme: "light" as const,
+    WebkitTextFillColor: C.inputText,
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16"
-      style={{ background: "#f5ede0" }}>
+    <div
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-16"
+      style={{ background: C.bg }}
+    >
       {/* Logo */}
       <div className="mb-10">
-        <OwnologyLogo size={44} />
+        <OwnologyLogo size={44} variant="dark" />
       </div>
 
       {/* Hero text */}
@@ -46,7 +82,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
           fontSize: "0.8125rem",
           letterSpacing: "0.14em",
           textTransform: "uppercase",
-          color: "oklch(0.40 0.13 68)",
+          color: C.amber,
         }}>
           AI KNOWLEDGE ASSISTANT FOR WINEMAKERS
         </p>
@@ -55,11 +91,11 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
           fontWeight: 700,
           fontSize: "clamp(2rem, 5vw, 3.25rem)",
           lineHeight: 1.08,
-          color: "oklch(0.12 0.010 60)",
+          color: C.text,
           letterSpacing: "-0.02em",
         }}>
           You are the must.<br />
-          <em style={{ color: "oklch(0.40 0.13 68)", fontStyle: "italic" }}>
+          <em style={{ color: C.amberBright, fontStyle: "italic" }}>
             Ownology is the ferment.
           </em>
         </h1>
@@ -68,7 +104,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
           fontWeight: 300,
           fontSize: "1.0625rem",
           lineHeight: 1.7,
-          color: "oklch(0.65 0.015 75)",
+          color: C.textMid,
         }}>
           Built for harvest. Built for the winery floor. Enter your email to see the Ownology overview and resource library preview.
         </p>
@@ -76,14 +112,14 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
 
       {/* Urgency signal */}
       <div className="mb-8 px-5 py-2.5 rounded-sm text-center" style={{
-        background: "oklch(0.72 0.12 75 / 10%)",
-        border: "1px solid oklch(0.72 0.12 75 / 30%)",
+        background: `${C.amber}18`,
+        border: `1px solid ${C.borderAmber}`,
       }}>
         <p style={{
           fontFamily: "'Lato', sans-serif",
           fontWeight: 400,
           fontSize: "0.875rem",
-          color: "#7a5c2e",
+          color: C.amber,
           letterSpacing: "0.02em",
         }}>
           First 99 founding members — lifetime pricing locked.
@@ -93,13 +129,13 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
       {/* Email form */}
       {status === "success" ? (
         <div className="text-center py-6 px-8 rounded-sm" style={{
-          background: "oklch(0.72 0.12 75 / 10%)",
-          border: "1px solid oklch(0.72 0.12 75 / 30%)",
+          background: `${C.amber}18`,
+          border: `1px solid ${C.borderAmber}`,
         }}>
-          <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, fontSize: "1.125rem", color: "oklch(0.12 0.010 60)" }}>
+          <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, fontSize: "1.125rem", color: C.text }}>
             You're on the list.
           </p>
-          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.875rem", color: "oklch(0.60 0.015 75)", marginTop: "0.5rem" }}>
+          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.875rem", color: C.textMid, marginTop: "0.5rem" }}>
             Opening your preview now…
           </p>
         </div>
@@ -113,21 +149,9 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
               onChange={e => setName(e.target.value)}
               placeholder="Your name"
               disabled={status === "loading"}
-              style={{
-                flex: 1,
-                background: "#f5ede0",
-                border: "1px solid #c4a96b",
-                borderRadius: "2px",
-                padding: "0.75rem 1rem",
-                fontFamily: "'Lato', sans-serif",
-                fontSize: "0.9375rem",
-                color: "#1a1510",
-                outline: "none",
-                colorScheme: "light",
-                WebkitTextFillColor: "#1a1510",
-              }}
-              onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
-              onBlur={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.015 75)")}
+              style={inputStyle}
+              onFocus={e => (e.currentTarget.style.borderColor = C.amberBright)}
+              onBlur={e => (e.currentTarget.style.borderColor = C.inputBorder)}
             />
             <input
               type="text"
@@ -135,21 +159,9 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
               onChange={e => setWineryName(e.target.value)}
               placeholder="Winery name"
               disabled={status === "loading"}
-              style={{
-                flex: 1,
-                background: "#f5ede0",
-                border: "1px solid #c4a96b",
-                borderRadius: "2px",
-                padding: "0.75rem 1rem",
-                fontFamily: "'Lato', sans-serif",
-                fontSize: "0.9375rem",
-                color: "#1a1510",
-                outline: "none",
-                colorScheme: "light",
-                WebkitTextFillColor: "#1a1510",
-              }}
-              onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
-              onBlur={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.015 75)")}
+              style={inputStyle}
+              onFocus={e => (e.currentTarget.style.borderColor = C.amberBright)}
+              onBlur={e => (e.currentTarget.style.borderColor = C.inputBorder)}
             />
           </div>
           {/* Row 2: Email + Submit */}
@@ -161,28 +173,16 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
               onChange={e => setEmail(e.target.value)}
               placeholder="cellar@yourdomain.com"
               disabled={status === "loading"}
-              style={{
-                flex: 1,
-                background: "#f5ede0",
-                border: "1px solid #c4a96b",
-                borderRadius: "2px",
-                padding: "0.75rem 1rem",
-                fontFamily: "'Lato', sans-serif",
-                fontSize: "0.9375rem",
-                color: "#1a1510",
-                outline: "none",
-                colorScheme: "light",
-                WebkitTextFillColor: "#1a1510",
-              }}
-              onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
-              onBlur={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.015 75)")}
+              style={inputStyle}
+              onFocus={e => (e.currentTarget.style.borderColor = C.amberBright)}
+              onBlur={e => (e.currentTarget.style.borderColor = C.inputBorder)}
             />
             <button
               type="submit"
               disabled={status === "loading"}
               style={{
-                background: "oklch(0.72 0.12 75)",
-                color: "oklch(0.97 0.010 75)",
+                background: C.btnBg,
+                color: C.btnText,
                 fontFamily: "'Lato', sans-serif",
                 fontWeight: 700,
                 fontSize: "0.8125rem",
@@ -203,8 +203,8 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
       )}
 
       {status === "error" && (
-        <p className="mt-3 text-sm" style={{ color: "oklch(0.65 0.15 25)", fontFamily: "'Lato', sans-serif" }}>
-          Something went wrong. Email <a href="mailto:support@ownology.ai" style={{ color: "oklch(0.40 0.13 68)" }}>support@ownology.ai</a> directly.
+        <p className="mt-3 text-sm" style={{ color: "#c0392b", fontFamily: "'Lato', sans-serif" }}>
+          Something went wrong. Email <a href="mailto:support@ownology.ai" style={{ color: C.amber }}>support@ownology.ai</a> directly.
         </p>
       )}
 
@@ -213,7 +213,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
         fontFamily: "'Lato', sans-serif",
         fontWeight: 300,
         fontSize: "0.8125rem",
-        color: "#7a6a58",
+        color: C.textMuted,
       }}>
         No credit card. No commitment. Just the idea.
       </p>
@@ -225,34 +225,35 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
 function PreviewContent() {
   const [activeTab, setActiveTab] = useState<"brochure" | "resources">("brochure");
 
-  const tabStyle = (active: boolean) => ({
+  const tabStyle = (active: boolean): React.CSSProperties => ({
     fontFamily: "'Lato', sans-serif",
     fontWeight: active ? 600 : 300,
     fontSize: "0.875rem",
     letterSpacing: "0.08em",
-    textTransform: "uppercase" as const,
-    color: active ? "oklch(0.72 0.12 75)" : "oklch(0.55 0.015 75)",
-    borderBottom: active ? "2px solid oklch(0.72 0.12 75)" : "2px solid transparent",
+    textTransform: "uppercase",
+    color: active ? C.amber : C.textMuted,
     paddingBottom: "0.5rem",
     cursor: "pointer",
     background: "none",
     border: "none",
     borderBottomWidth: "2px",
     borderBottomStyle: "solid" as const,
-    borderBottomColor: active ? "oklch(0.72 0.12 75)" : "transparent",
+    borderBottomColor: active ? C.amber : "transparent",
   });
 
   return (
-    <div className="min-h-screen" style={{ background: "oklch(0.10 0.008 60)" }}>
+    <div className="min-h-screen" style={{ background: C.bg }}>
       {/* Header */}
-      <header className="sticky top-0 z-40 py-4 px-6 flex items-center justify-between"
-        style={{ background: "oklch(0.10 0.008 60 / 97%)", borderBottom: "1px solid oklch(1 0 0 / 6%)" }}>
-        <OwnologyLogo size={32} />
+      <header
+        className="sticky top-0 z-40 py-4 px-6 flex items-center justify-between"
+        style={{ background: C.headerBg, borderBottom: `1px solid ${C.border}` }}
+      >
+        <OwnologyLogo size={32} variant="dark" />
         <Link href="/" style={{
           fontFamily: "'Lato', sans-serif",
           fontWeight: 300,
           fontSize: "0.8125rem",
-          color: "oklch(0.55 0.015 75)",
+          color: C.textMuted,
           letterSpacing: "0.06em",
           textDecoration: "none",
         }}>
@@ -268,7 +269,7 @@ function PreviewContent() {
           fontSize: "0.75rem",
           letterSpacing: "0.14em",
           textTransform: "uppercase",
-          color: "oklch(0.40 0.13 68)",
+          color: C.amber,
           marginBottom: "1rem",
         }}>
           OWNOLOGY PREVIEW
@@ -278,26 +279,26 @@ function PreviewContent() {
           fontWeight: 700,
           fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
           lineHeight: 1.1,
-          color: "oklch(0.12 0.010 60)",
+          color: C.text,
           letterSpacing: "-0.02em",
         }}>
           The cellar intelligence platform<br />
-          <em style={{ color: "oklch(0.40 0.13 68)", fontStyle: "italic" }}>built for winemakers.</em>
+          <em style={{ color: C.amberBright, fontStyle: "italic" }}>built for winemakers.</em>
         </h2>
         <p className="mt-4" style={{
           fontFamily: "'Lato', sans-serif",
           fontWeight: 300,
           fontSize: "1rem",
           lineHeight: 1.7,
-          color: "oklch(0.65 0.015 75)",
+          color: C.textMid,
         }}>
-          Instant, document-grounded answers to your toughest cellar questions — from a phone, in seconds, during harvest.
+          Document-grounded answers to your toughest cellar questions — from a phone, in seconds, during harvest.
         </p>
       </div>
 
       {/* Tabs */}
       <div className="max-w-5xl mx-auto px-6">
-        <div className="flex gap-8 mb-8" style={{ borderBottom: "1px solid oklch(1 0 0 / 8%)" }}>
+        <div className="flex gap-8 mb-8" style={{ borderBottom: `1px solid ${C.border}` }}>
           <button style={tabStyle(activeTab === "brochure")} onClick={() => setActiveTab("brochure")}>
             Winemaker Overview
           </button>
@@ -313,7 +314,7 @@ function PreviewContent() {
               fontFamily: "'Lato', sans-serif",
               fontWeight: 300,
               fontSize: "0.9375rem",
-              color: "oklch(0.60 0.015 75)",
+              color: C.textMid,
               lineHeight: 1.6,
             }}>
               The Ownology winemaker overview — what it is, who it is for, and why it matters at harvest.
@@ -323,8 +324,8 @@ function PreviewContent() {
               width: "100%",
               borderRadius: "4px",
               overflow: "hidden",
-              border: "1px solid oklch(1 0 0 / 10%)",
-              background: "oklch(0.13 0.008 60)",
+              border: `1px solid ${C.border}`,
+              background: C.bgCard,
             }}>
               <iframe
                 src="/manus-storage/ownology-winemaker-brochure_f76878ef.pdf#toolbar=0&navpanes=0&scrollbar=0"
@@ -338,14 +339,14 @@ function PreviewContent() {
                 fontFamily: "'Lato', sans-serif",
                 fontWeight: 300,
                 fontSize: "0.9375rem",
-                color: "oklch(0.60 0.015 75)",
+                color: C.textMid,
               }}>
                 Ready to be part of the first 99?
               </p>
               <Link href="/pricing">
                 <button style={{
-                  background: "oklch(0.72 0.12 75)",
-                  color: "oklch(0.97 0.010 75)",
+                  background: C.btnBg,
+                  color: C.btnText,
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 700,
                   fontSize: "0.8125rem",
@@ -363,9 +364,9 @@ function PreviewContent() {
                 fontFamily: "'Lato', sans-serif",
                 fontWeight: 300,
                 fontSize: "0.8125rem",
-                color: "oklch(0.42 0.010 60)",
+                color: C.textMuted,
               }}>
-                Or email <a href="mailto:winery@ownology.ai" style={{ color: "oklch(0.40 0.13 68)" }}>winery@ownology.ai</a> to talk directly with Richard.
+                Or email <a href="mailto:winery@ownology.ai" style={{ color: C.amber }}>winery@ownology.ai</a> to talk directly with Richard.
               </p>
             </div>
           </div>
@@ -378,7 +379,7 @@ function PreviewContent() {
               fontFamily: "'Lato', sans-serif",
               fontWeight: 300,
               fontSize: "0.9375rem",
-              color: "oklch(0.60 0.015 75)",
+              color: C.textMid,
               lineHeight: 1.6,
             }}>
               Two resource layers built into Ownology — the compliance reference you need to stay on the right side of the law, and the science context that grounds every answer the assistant gives you.
@@ -391,10 +392,10 @@ function PreviewContent() {
                 fontSize: "0.65rem",
                 letterSpacing: "0.14em",
                 textTransform: "uppercase" as const,
-                color: "oklch(0.40 0.13 68)",
+                color: C.amber,
                 fontWeight: 600,
               }}>Compliance</span>
-              <div style={{ flex: 1, height: "1px", background: "oklch(0.72 0.12 75 / 20%)" }} />
+              <div style={{ flex: 1, height: "1px", background: C.border }} />
             </div>
             <div className="grid md:grid-cols-3 gap-4 mb-10">
               {[
@@ -406,15 +407,15 @@ function PreviewContent() {
                 { title: "Work Health & Safety", desc: "CO₂ confined space entry, chemical handling, and manual tasks under federal model WHS law.", tag: "Safe Work AU" },
               ].map(item => (
                 <div key={item.title} style={{
-                  background: "oklch(0.14 0.010 60)",
-                  border: "1px solid oklch(1 0 0 / 8%)",
+                  background: C.bgCard,
+                  border: `1px solid ${C.border}`,
                   borderRadius: "4px",
                   padding: "1.25rem",
                 }}>
                   <span style={{
                     fontFamily: "'Fira Code', monospace",
                     fontSize: "0.65rem",
-                    color: "oklch(0.55 0.12 75)",
+                    color: C.amber,
                     letterSpacing: "0.06em",
                     textTransform: "uppercase" as const,
                     display: "block",
@@ -424,36 +425,23 @@ function PreviewContent() {
                     fontFamily: "'Fraunces', serif",
                     fontWeight: 600,
                     fontSize: "0.9375rem",
-                    color: "oklch(0.12 0.010 60)",
+                    color: C.text,
                     lineHeight: 1.3,
                     marginBottom: "0.5rem",
-                  }}>{item.title}</h3>
+                  }}>
+                    {item.title}
+                  </h3>
                   <p style={{
                     fontFamily: "'Lato', sans-serif",
                     fontWeight: 300,
-                    fontSize: "0.8125rem",
-                    color: "oklch(0.58 0.015 75)",
+                    fontSize: "0.875rem",
+                    color: C.textMid,
                     lineHeight: 1.6,
-                  }}>{item.desc}</p>
+                  }}>
+                    {item.desc}
+                  </p>
                 </div>
               ))}
-            </div>
-            <div className="mb-10">
-              <Link href="/resources">
-                <span style={{
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.8125rem",
-                  color: "oklch(0.40 0.13 68)",
-                  letterSpacing: "0.06em",
-                  cursor: "pointer",
-                  textDecoration: "none",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.35rem",
-                }}>
-                  View full regulatory reference library →
-                </span>
-              </Link>
             </div>
 
             {/* ── Science sub-section ── */}
@@ -463,42 +451,41 @@ function PreviewContent() {
                 fontSize: "0.65rem",
                 letterSpacing: "0.14em",
                 textTransform: "uppercase" as const,
-                color: "oklch(0.40 0.13 68)",
+                color: C.amber,
                 fontWeight: 600,
-              }}>Science</span>
-              <div style={{ flex: 1, height: "1px", background: "oklch(0.72 0.12 75 / 20%)" }} />
+              }}>Winemaking Science</span>
+              <div style={{ flex: 1, height: "1px", background: C.border }} />
             </div>
-            {/* Science domain cards */}
             <div className="grid md:grid-cols-2 gap-4 mb-10">
               {[
                 {
-                  domain: "Fermentation Biology",
-                  icon: "🧫",
-                  desc: "Yeast ecology, nitrogen nutrition, stuck fermentation risk — Ownology draws on this science to answer DAP, GoFerm, and inoculation questions in real time.",
-                  example: "\"My YAN is 95 ppm at 24 Brix — what addition rate for this Grenache?\"",
-                },
-                {
-                  domain: "SO₂ & Oxidation Chemistry",
+                  domain: "Fermentation Biochemistry",
                   icon: "⚗️",
-                  desc: "Free SO₂, molecular SO₂, pH relationships, and oxidation windows — the science behind every addition decision from crush to bottling.",
-                  example: "\"pH is 3.62, free SO₂ is 18 ppm — what do I add before pressing?\"",
+                  desc: "Yeast metabolism, nitrogen assimilation, volatile acidity formation, and stuck ferment diagnosis.",
+                  example: "\"My YAN is 120ppm at 24 Brix. What DAP rate for Tank 7?\"",
                 },
                 {
-                  domain: "Microbial Spoilage & MLF",
+                  domain: "Sulphur Dioxide Chemistry",
+                  icon: "🧪",
+                  desc: "Free vs bound SO₂, molecular SO₂ targets by pH, and addition timing across vintage.",
+                  example: "\"pH 3.55 red, 28 free SO₂. Do I need to add before bottling?\"",
+                },
+                {
+                  domain: "Malolactic Fermentation",
+                  icon: "🦠",
+                  desc: "Bacterial inoculation windows, co-inoculation risk, and stuck MLF rescue protocols.",
+                  example: "\"Day 14 post-AF, malic still at 1.8 g/L. What's the rescue path?\"",
+                },
+                {
+                  domain: "Fining & Stability",
                   icon: "🔬",
-                  desc: "Brettanomyces, acetic acid bacteria, Oenococcus — understanding the organisms that threaten your wine and the conditions that favour them.",
-                  example: "\"VA is creeping up in Tank 3 — what are my intervention options?\"",
-                },
-                {
-                  domain: "Sensory & Fault Detection",
-                  icon: "👃",
-                  desc: "Sensory thresholds, fault identification, and the chemistry behind what you smell and taste — applied at the bench every day.",
-                  example: "\"There's a reductive note on this Shiraz — what's the likely cause?\"",
+                  desc: "Protein, tartrate, and colour stability — bench trials, rates, and timing.",
+                  example: "\"Bentonite trial shows 0.8 NTU at 2 g/L. Is that enough for export?\"",
                 },
               ].map(item => (
                 <div key={item.domain} style={{
-                  background: "oklch(0.14 0.010 60)",
-                  border: "1px solid oklch(1 0 0 / 8%)",
+                  background: C.bgCard,
+                  border: `1px solid ${C.border}`,
                   borderRadius: "4px",
                   padding: "1.5rem",
                 }}>
@@ -508,7 +495,7 @@ function PreviewContent() {
                       fontFamily: "'Fraunces', serif",
                       fontWeight: 600,
                       fontSize: "1.0rem",
-                      color: "oklch(0.12 0.010 60)",
+                      color: C.text,
                       lineHeight: 1.3,
                       margin: 0,
                     }}>
@@ -519,7 +506,7 @@ function PreviewContent() {
                     fontFamily: "'Lato', sans-serif",
                     fontWeight: 300,
                     fontSize: "0.875rem",
-                    color: "oklch(0.60 0.015 75)",
+                    color: C.textMid,
                     lineHeight: 1.6,
                     marginBottom: "0.75rem",
                   }}>
@@ -528,7 +515,7 @@ function PreviewContent() {
                   <p style={{
                     fontFamily: "'Fira Code', monospace",
                     fontSize: "0.75rem",
-                    color: "oklch(0.40 0.13 68)",
+                    color: C.amber,
                     lineHeight: 1.5,
                     fontStyle: "italic",
                   }}>
@@ -540,14 +527,14 @@ function PreviewContent() {
 
             {/* Ownology gap callout */}
             <div className="p-6 rounded-sm mb-8" style={{
-              background: "oklch(0.72 0.12 75 / 8%)",
-              border: "1px solid oklch(0.72 0.12 75 / 25%)",
+              background: `${C.amber}14`,
+              border: `1px solid ${C.borderAmber}`,
             }}>
               <p style={{
                 fontFamily: "'Fraunces', serif",
                 fontWeight: 500,
                 fontSize: "1.125rem",
-                color: "oklch(0.12 0.010 60)",
+                color: C.text,
                 lineHeight: 1.5,
                 marginBottom: "0.75rem",
               }}>
@@ -557,10 +544,11 @@ function PreviewContent() {
                 fontFamily: "'Lato', sans-serif",
                 fontWeight: 300,
                 fontSize: "0.9375rem",
-                color: "oklch(0.60 0.015 75)",
+                color: C.textMid,
                 lineHeight: 1.6,
               }}>
-                The free-run science flows naturally from your training. But the cellar doesn't wait for office hours — it asks you at 2am, mid-vintage, with a stuck ferment in Tank 7. That is the gap Ownology fills: <em style={{ color: "oklch(0.80 0.015 75)" }}>the press that extracts the answer your knowledge already contains.</em>
+                The free-run science flows naturally from your training. But the cellar doesn't wait for office hours — it asks you at 2am, mid-vintage, with a stuck ferment in Tank 7. That is the gap Ownology fills:{" "}
+                <em style={{ color: C.amber }}>the press that extracts the answer your knowledge already contains.</em>
               </p>
             </div>
 
@@ -568,8 +556,8 @@ function PreviewContent() {
             <div className="text-center">
               <Link href="/pricing">
                 <button style={{
-                  background: "oklch(0.72 0.12 75)",
-                  color: "oklch(0.97 0.010 75)",
+                  background: C.btnBg,
+                  color: C.btnText,
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 700,
                   fontSize: "0.8125rem",
@@ -587,9 +575,9 @@ function PreviewContent() {
                 fontFamily: "'Lato', sans-serif",
                 fontWeight: 300,
                 fontSize: "0.8125rem",
-                color: "oklch(0.42 0.010 60)",
+                color: C.textMuted,
               }}>
-                Or email <a href="mailto:winery@ownology.ai" style={{ color: "oklch(0.40 0.13 68)" }}>winery@ownology.ai</a> to talk directly with Richard.
+                Or email <a href="mailto:winery@ownology.ai" style={{ color: C.amber }}>winery@ownology.ai</a> to talk directly with Richard.
               </p>
             </div>
           </div>
@@ -603,20 +591,20 @@ function PreviewContent() {
 export default function Preview() {
   const [unlocked, setUnlocked] = useState(false);
 
-  // Force light mode for this page only
+  // Force cream background — set directly on body so it takes effect before paint
   useEffect(() => {
     const html = document.documentElement;
+    const body = document.body;
+    const prevBg = body.style.background;
+    const prevScheme = body.style.colorScheme;
     const hadDark = html.classList.contains("dark");
     html.classList.remove("dark");
-    html.classList.add("light-mode");
-    const prevBodyBg = document.body.style.background;
-    document.body.style.background = "oklch(0.97 0.010 75)";
-    document.body.style.colorScheme = "light";
+    body.style.background = C.bg;
+    body.style.colorScheme = "light";
     return () => {
-      html.classList.remove("light-mode");
       if (hadDark) html.classList.add("dark");
-      document.body.style.background = prevBodyBg;
-      document.body.style.colorScheme = "";
+      body.style.background = prevBg;
+      body.style.colorScheme = prevScheme;
     };
   }, []);
 
