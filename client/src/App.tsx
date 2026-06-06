@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -30,7 +30,8 @@ import AdminLeads from "./pages/AdminLeads";
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"}><Redirect to="/preview" /></Route>
+      <Route path={"/home"} component={Home} />
       <Route path={"/why-ownology"} component={WhyOwnology} />
       <Route path={"/for-innovint-users"} component={ForInnoVintUsers} />
       <Route path={"/for-vintrace-users"} component={ForVintraceUsers} />
