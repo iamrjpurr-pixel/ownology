@@ -289,6 +289,7 @@ export async function addLead(data: {
   tags?: string[];
   name?: string;
   wineryName?: string;
+  phone?: string;
 }) {
   const now = Date.now();
   // Check for exact email+source duplicate
@@ -306,6 +307,7 @@ export async function addLead(data: {
     tagsJson: JSON.stringify(data.tags ?? []),
     name: data.name ?? null,
     wineryName: data.wineryName ?? null,
+    phone: data.phone ?? null,
     notes: null,
     createdAt: now,
     updatedAt: now,
@@ -327,12 +329,67 @@ export async function updateLeadNotes(id: number, notes: string) {
     .where(eq(schema.leads.id, id));
 }
 
+/**
+ * Upsert a lead by email — if the email already exists (any source), update the
+ * fields that are provided; otherwise insert a new row. Returns the lead id.
+ * Used by the Stripe webhook and external API to avoid duplicates.
+ */
+export async function upsertLeadByEmail(data: {
+  email: string;
+  source: string;
+  tags?: string[];
+  name?: string;
+  wineryName?: string;
+  phone?: string;
+  notes?: string;
+  stripeCustomerId?: string;
+  stripePaid?: boolean;
+}) {
+  const now = Date.now();
+  const existing = await db.query.leads.findFirst({
+    where: eq(schema.leads.email, data.email.toLowerCase().trim()),
+  });
+  if (existing) {
+    // Update fields that are newly provided
+    await db
+      .update(schema.leads)
+      .set({
+        name: data.name ?? existing.name,
+        wineryName: data.wineryName ?? existing.wineryName,
+        phone: data.phone ?? existing.phone,
+        notes: data.notes ?? existing.notes,
+        stripeCustomerId: data.stripeCustomerId ?? existing.stripeCustomerId,
+        stripePaid: data.stripePaid !== undefined ? data.stripePaid : existing.stripePaid,
+        updatedAt: now,
+      })
+      .where(eq(schema.leads.id, existing.id));
+    return existing.id;
+  }
+  const result = await db.insert(schema.leads).values({
+    email: data.email.toLowerCase().trim(),
+    source: data.source,
+    tagsJson: JSON.stringify(data.tags ?? []),
+    name: data.name ?? null,
+    wineryName: data.wineryName ?? null,
+    phone: data.phone ?? null,
+    notes: data.notes ?? null,
+    stripeCustomerId: data.stripeCustomerId ?? null,
+    stripePaid: data.stripePaid ?? false,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return (result as unknown as { insertId: number }).insertId;
+}
+
 export async function updateLead(id: number, data: {
   name?: string;
   wineryName?: string;
+  phone?: string;
   notes?: string;
   source?: string;
   tagsJson?: string;
+  stripeCustomerId?: string;
+  stripePaid?: boolean;
 }) {
   await db
     .update(schema.leads)

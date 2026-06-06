@@ -114,6 +114,11 @@ export const leads = mysqlTable(
     // Optional contact details (filled in later or from form)
     name: varchar("name", { length: 256 }),
     wineryName: varchar("winery_name", { length: 256 }),
+    // Phone number (optional, captured from in-person contact)
+    phone: varchar("phone", { length: 64 }),
+    // Stripe integration — set when a payment is completed
+    stripeCustomerId: varchar("stripe_customer_id", { length: 64 }),
+    stripePaid: boolean("stripe_paid").notNull().default(false),
     // Free-text notes editable from the CRM
     notes: text("notes"),
     // UTC ms timestamp of sign-up

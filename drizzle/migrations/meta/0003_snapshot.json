@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "376f4502-dc45-4afe-ac1c-aa17ebb4e00d",
-  "prevId": "10eba2a4-eb60-416e-bae0-030380cdc15e",
+  "id": "90585252-c020-4f4d-94ee-0aec4d9b89f5",
+  "prevId": "376f4502-dc45-4afe-ac1c-aa17ebb4e00d",
   "tables": {
     "campaign_metrics_snapshots": {
       "name": "campaign_metrics_snapshots",
@@ -285,6 +285,21 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "stripe_customer_id": {
+          "name": "stripe_customer_id",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "stripe_paid": {
+          "name": "stripe_paid",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
         },
         "notes": {
           "name": "notes",

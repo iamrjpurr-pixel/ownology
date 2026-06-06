@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE leads ADD COLUMN phone VARCHAR(64) NULL AFTER winery_name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4HByWUH885AfJUE.9472483f21d7 --database kjXA9MRaPtPLGHog5yynHZ --execute ALTER TABLE leads ADD COLUMN phone VARCHAR(64) NULL AFTER winery_name;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2054
+}

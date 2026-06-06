@@ -314,20 +314,3 @@ html.light-mode {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
 }
-
-/* ── /preview gate page: force light inputs regardless of OS dark mode ── */
-html.light-mode input,
-html.light-mode textarea,
-html.light-mode select {
-  color-scheme: light;
-  background-color: oklch(0.94 0.008 75) !important;
-  color: oklch(0.12 0.010 60) !important;
-}
-
-html.light-mode input:-webkit-autofill,
-html.light-mode input:-webkit-autofill:hover,
-html.light-mode input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0px 1000px oklch(0.94 0.008 75) inset !important;
-  -webkit-text-fill-color: oklch(0.12 0.010 60) !important;
-  caret-color: oklch(0.12 0.010 60);
-}
