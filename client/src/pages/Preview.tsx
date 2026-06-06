@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import { Link } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import { trpc } from "@/lib/trpc";
@@ -596,6 +597,16 @@ function PreviewContent() {
 // ─── Main export ──────────────────────────────────────────────────────────────
 export default function Preview() {
   const [unlocked, setUnlocked] = useState(false);
+
+  // Force light mode on this page regardless of global theme setting
+  useEffect(() => {
+    const html = document.documentElement;
+    const hadLightMode = html.classList.contains("light-mode");
+    html.classList.add("light-mode");
+    return () => {
+      if (!hadLightMode) html.classList.remove("light-mode");
+    };
+  }, []);
 
   // Check if already unlocked in session
   const [checked] = useState(() => {
