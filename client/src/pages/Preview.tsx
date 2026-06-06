@@ -125,7 +125,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
                 outline: "none",
               }}
               onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
-              onBlur={e => (e.currentTarget.style.borderColor = "oklch(1 0 0 / 12%)")}
+              onBlur={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.015 75)")}
             />
             <input
               type="text"
@@ -145,7 +145,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
                 outline: "none",
               }}
               onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
-              onBlur={e => (e.currentTarget.style.borderColor = "oklch(1 0 0 / 12%)")}
+              onBlur={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.015 75)")}
             />
           </div>
           {/* Row 2: Email + Submit */}
@@ -169,7 +169,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
                 outline: "none",
               }}
               onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
-              onBlur={e => (e.currentTarget.style.borderColor = "oklch(1 0 0 / 12%)")}
+              onBlur={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.015 75)")}
             />
             <button
               type="submit"
