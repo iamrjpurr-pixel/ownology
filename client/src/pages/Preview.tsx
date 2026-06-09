@@ -29,7 +29,14 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
   const [name, setName] = useState("");
   const [wineryName, setWineryName] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [logoTaps, setLogoTaps] = useState(0);
   const subscribeMutation = trpc.email.subscribe.useMutation();
+
+  const handleLogoTap = () => {
+    const next = logoTaps + 1;
+    setLogoTaps(next);
+    if (next >= 3) onUnlock();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,8 +76,8 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
       className="min-h-screen flex flex-col items-center justify-center px-4 py-16"
       style={{ background: C.bg }}
     >
-      {/* Logo */}
-      <div className="mb-10">
+      {/* Logo — triple-tap to bypass gate (owner only) */}
+      <div className="mb-10" onClick={handleLogoTap} style={{ cursor: "default" }}>
         <OwnologyLogo size={44} variant="dark" />
       </div>
 

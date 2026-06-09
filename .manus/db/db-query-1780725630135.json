@@ -1,0 +1,34 @@
+{
+  "query": "SELECT name, winery_name, email, phone, notes, FROM_UNIXTIME(created_at/1000) as signed_up FROM leads WHERE source = 'preview' ORDER BY created_at ASC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4HByWUH885AfJUE.9472483f21d7 --database kjXA9MRaPtPLGHog5yynHZ --execute SELECT name, winery_name, email, phone, notes, FROM_UNIXTIME(created_at/1000) as signed_up FROM leads WHERE source = 'preview' ORDER BY created_at ASC;",
+  "rows": [
+    {
+      "name": "NULL",
+      "winery_name": "NULL",
+      "email": "iamrjpurr@gmail.com",
+      "phone": "NULL",
+      "notes": "NULL",
+      "signed_up": "2026-06-05 23:23:08.1630"
+    },
+    {
+      "name": "RP",
+      "winery_name": "RP wine",
+      "email": "iamrjpurr+ownology@gmail.com",
+      "phone": "NULL",
+      "notes": "NULL",
+      "signed_up": "2026-06-06 02:42:24.0690"
+    },
+    {
+      "name": "r",
+      "winery_name": "rpj",
+      "email": "rpurr@hotmail.com",
+      "phone": "NULL",
+      "notes": "NULL",
+      "signed_up": "2026-06-06 03:03:56.2460"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\twinery_name\temail\tphone\tnotes\tsigned_up\nNULL\tNULL\tiamrjpurr@gmail.com\tNULL\tNULL\t2026-06-05 23:23:08.1630\nRP\tRP wine\tiamrjpurr+ownology@gmail.com\tNULL\tNULL\t2026-06-06 02:42:24.0690\nr\trpj\trpurr@hotmail.com\tNULL\tNULL\t2026-06-06 03:03:56.2460\n",
+  "stderr": "",
+  "execution_time_ms": 3496
+}

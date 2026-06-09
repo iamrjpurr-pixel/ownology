@@ -1,0 +1,343 @@
+{
+  "query": "SELECT name, winery_name, phone, email, source, notes, tags_json FROM leads ORDER BY source DESC, id ASC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4HByWUH885AfJUE.9472483f21d7 --database kjXA9MRaPtPLGHog5yynHZ --execute SELECT name, winery_name, phone, email, source, notes, tags_json FROM leads ORDER BY source DESC, id ASC;",
+  "rows": [
+    {
+      "name": "Lou (PnV)",
+      "winery_name": "P&V + Meredith",
+      "phone": "0413958717",
+      "email": "lou@pnv.com.au",
+      "source": "vivid-event",
+      "notes": "Lobby stall. Delivery 12:30 via loading dock.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "Mem Hemmings",
+      "winery_name": "P&V + Meredith",
+      "phone": "0434886456",
+      "email": "mem@pnv.com.au",
+      "source": "vivid-event",
+      "notes": "Lobby stall.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "Nathan",
+      "winery_name": "Brokenwood Wines",
+      "phone": "0413970167",
+      "email": "nathan@brokenwood.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 1. Hunter Valley.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "Jane",
+      "winery_name": "Tyrrells",
+      "phone": "0408670786",
+      "email": "jane@tyrrells.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 2. Hunter Valley.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "Olllie",
+      "winery_name": "Margan Wines",
+      "phone": "0432977226",
+      "email": "olllie@marganwines.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 3. Hunter Valley.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "Sarah",
+      "winery_name": "Mount Pleasant",
+      "phone": "0491029549",
+      "email": "sarah@mountpleasant.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 4. Hunter Valley.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "Allanna Wells",
+      "winery_name": "De Iuliis",
+      "phone": "0249938000",
+      "email": "allanna@deiuliis.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 5. Hunter Valley. Ext 2.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "Dan Simmons",
+      "winery_name": "M+J Becker Wines / Sabi Wabi / Balmy Nights",
+      "phone": "0456091746",
+      "email": "dan@mjbecker.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 6. Hunter Valley.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "Michael",
+      "winery_name": "Usher Tinkler",
+      "phone": "0412249845",
+      "email": "michael@ushertinkler.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 7. Hunter Valley.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "PJ",
+      "winery_name": "Charteris",
+      "phone": "0409981385",
+      "email": "pj@charteris.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 8. Hunter Valley.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "Andrew Thomas",
+      "winery_name": "Thomas Wines",
+      "phone": "0418456853",
+      "email": "andrew@thomaswines.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 9. Hunter Valley.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "Millie Shorter",
+      "winery_name": "Majama",
+      "phone": "0438482554",
+      "email": "millie@majama.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 10. Hunter Valley.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "Rojer",
+      "winery_name": "Majama",
+      "phone": "0406562502",
+      "email": "rojer@majama.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 10. Hunter Valley.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "Sarah Shrapnel",
+      "winery_name": "Colmar Estate",
+      "phone": "0418208844",
+      "email": "sarah@colmarestate.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 11. Orange.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"orange\"]"
+    },
+    {
+      "name": "Jonathon Mattick",
+      "winery_name": "Canobolas Wines",
+      "phone": "0403581312",
+      "email": "jonathon@canobolaswines.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 12. Orange.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"orange\"]"
+    },
+    {
+      "name": "Rebecca Milne",
+      "winery_name": "Grape Pirates",
+      "phone": "0497133247",
+      "email": "rebecca@grapepirates.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 13. Orange.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"orange\"]"
+    },
+    {
+      "name": "Sam Statham",
+      "winery_name": "Rosnay",
+      "phone": "0428667317",
+      "email": "sam@rosnay.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 14. Central Ranges.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"central-ranges\"]"
+    },
+    {
+      "name": "Hamish Young",
+      "winery_name": "Mada Wines",
+      "phone": "NULL",
+      "email": "hamish@madawines.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 15. Canberra.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"canberra\"]"
+    },
+    {
+      "name": "Matt Carr",
+      "winery_name": "Mada Wines",
+      "phone": "0491818532",
+      "email": "matt@madawines.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 15. Canberra.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"canberra\"]"
+    },
+    {
+      "name": "Bryan Martin",
+      "winery_name": "Ravensworth Wines",
+      "phone": "0417028335",
+      "email": "bryan@ravensworthwines.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 16. Canberra.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"canberra\"]"
+    },
+    {
+      "name": "Paul Starr",
+      "winery_name": "Sassafras",
+      "phone": "0476413974",
+      "email": "paul@sassafras.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 17. Canberra.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"canberra\"]"
+    },
+    {
+      "name": "Jared Dixon",
+      "winery_name": "Jilly Wines",
+      "phone": "0414904478",
+      "email": "jared@jillywines.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 18. Northern Rivers.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"northern-rivers\"]"
+    },
+    {
+      "name": "Tim Ward",
+      "winery_name": "Tim Ward",
+      "phone": "0404222835",
+      "email": "tim@timward.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 19. Various regions.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"various\"]"
+    },
+    {
+      "name": "Jan Taborsky",
+      "winery_name": "Toppers Mountain",
+      "phone": "0431752910",
+      "email": "jan@toppersmountain.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 20. New England.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"new-england\"]"
+    },
+    {
+      "name": "Tom",
+      "winery_name": "Frankly, Wine by BoB",
+      "phone": "NULL",
+      "email": "tom@franklywine.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 21. Contact TBC.",
+      "tags_json": "[\"vivid\",\"winemaker\"]"
+    },
+    {
+      "name": "Jackie Paradoxa",
+      "winery_name": "Pride of Lunatics",
+      "phone": "0422793327",
+      "email": "jackie@prideoflunatics.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 22.",
+      "tags_json": "[\"vivid\",\"winemaker\"]"
+    },
+    {
+      "name": "Hamish",
+      "winery_name": "Hopeless Thoughtful",
+      "phone": "0478825852",
+      "email": "hamish@hopelessthoughtful.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 23.",
+      "tags_json": "[\"vivid\",\"winemaker\"]"
+    },
+    {
+      "name": "James Agnew",
+      "winery_name": "Audrey Wilkinson",
+      "phone": "0410375045",
+      "email": "james@audreywilkinson.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 24. Hunter Valley.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "James Agnew",
+      "winery_name": "Pooles Rock",
+      "phone": "0410375045",
+      "email": "james@poolesrock.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 25.",
+      "tags_json": "[\"vivid\",\"winemaker\",\"hunter\"]"
+    },
+    {
+      "name": "Simon",
+      "winery_name": "Château Acid",
+      "phone": "+61404201005",
+      "email": "simon@chateauacid.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 26.",
+      "tags_json": "[\"vivid\",\"winemaker\"]"
+    },
+    {
+      "name": "Charlie",
+      "winery_name": "Château Acid",
+      "phone": "+61422215977",
+      "email": "charlie@chateauacid.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 26.",
+      "tags_json": "[\"vivid\",\"winemaker\"]"
+    },
+    {
+      "name": "Sally",
+      "winery_name": "Ur 1st Luv",
+      "phone": "0481564796",
+      "email": "sally@ur1stluv.com.au",
+      "source": "vivid-event",
+      "notes": "Stall 27.",
+      "tags_json": "[\"vivid\",\"winemaker\"]"
+    },
+    {
+      "name": "Guillermo Arnal-Machado",
+      "winery_name": "Archie Rose Spirits",
+      "phone": "+61411796630",
+      "email": "guillermo@archierose.com.au",
+      "source": "vivid-event",
+      "notes": "Wine Bar stall.",
+      "tags_json": "[\"vivid\",\"spirits\",\"bar\"]"
+    },
+    {
+      "name": "Matt",
+      "winery_name": "Manly Spirits",
+      "phone": "+61427732542",
+      "email": "matt@manlyspirits.com.au",
+      "source": "vivid-event",
+      "notes": "Panorama bar stall.",
+      "tags_json": "[\"vivid\",\"spirits\",\"bar\"]"
+    },
+    {
+      "name": "NULL",
+      "winery_name": "NULL",
+      "phone": "NULL",
+      "email": "iamrjpurr@gmail.com",
+      "source": "preview",
+      "notes": "NULL",
+      "tags_json": "[\"preview\",\"event-handout\"]"
+    },
+    {
+      "name": "RP",
+      "winery_name": "RP wine",
+      "phone": "NULL",
+      "email": "iamrjpurr+ownology@gmail.com",
+      "source": "preview",
+      "notes": "NULL",
+      "tags_json": "[\"preview\",\"event-handout\"]"
+    },
+    {
+      "name": "r",
+      "winery_name": "rpj",
+      "phone": "NULL",
+      "email": "rpurr@hotmail.com",
+      "source": "preview",
+      "notes": "NULL",
+      "tags_json": "[\"preview\",\"event-handout\"]"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\twinery_name\tphone\temail\tsource\tnotes\ttags_json\nLou (PnV)\tP&V + Meredith\t0413958717\tlou@pnv.com.au\tvivid-event\tLobby stall. Delivery 12:30 via loading dock.\t[\"vivid\",\"winemaker\",\"hunter\"]\nMem Hemmings\tP&V + Meredith\t0434886456\tmem@pnv.com.au\tvivid-event\tLobby stall.\t[\"vivid\",\"winemaker\",\"hunter\"]\nNathan\tBrokenwood Wines\t0413970167\tnathan@brokenwood.com.au\tvivid-event\tStall 1. Hunter Valley.\t[\"vivid\",\"winemaker\",\"hunter\"]\nJane\tTyrrells\t0408670786\tjane@tyrrells.com.au\tvivid-event\tStall 2. Hunter Valley.\t[\"vivid\",\"winemaker\",\"hunter\"]\nOlllie\tMargan Wines\t0432977226\tolllie@marganwines.com.au\tvivid-event\tStall 3. Hunter Valley.\t[\"vivid\",\"winemaker\",\"hunter\"]\nSarah\tMount Pleasant\t0491029549\tsarah@mountpleasant.com.au\tvivid-event\tStall 4. Hunter Valley.\t[\"vivid\",\"winemaker\",\"hunter\"]\nAllanna Wells\tDe Iuliis\t0249938000\tallanna@deiuliis.com.au\tvivid-event\tStall 5. Hunter Valley. Ext 2.\t[\"vivid\",\"winemaker\",\"hunter\"]\nDan Simmons\tM+J Becker Wines / Sabi Wabi / Balmy Nights\t0456091746\tdan@mjbecker.com.au\tvivid-event\tStall 6. Hunter Valley.\t[\"vivid\",\"winemaker\",\"hunter\"]\nMichael\tUsher Tinkler\t0412249845\tmichael@ushertinkler.com.au\tvivid-event\tStall 7. Hunter Valley.\t[\"vivid\",\"winemaker\",\"hunter\"]\nPJ\tCharteris\t0409981385\tpj@charteris.com.au\tvivid-event\tStall 8. Hunter Valley.\t[\"vivid\",\"winemaker\",\"hunter\"]\nAndrew Thomas\tThomas Wines\t0418456853\tandrew@thomaswines.com.au\tvivid-event\tStall 9. Hunter Valley.\t[\"vivid\",\"winemaker\",\"hunter\"]\nMillie Shorter\tMajama\t0438482554\tmillie@majama.com.au\tvivid-event\tStall 10. Hunter Valley.\t[\"vivid\",\"winemaker\",\"hunter\"]\nRojer\tMajama\t0406562502\trojer@majama.com.au\tvivid-event\tStall 10. Hunter Valley.\t[\"vivid\",\"winemaker\",\"hunter\"]\nSarah Shrapnel\tColmar Estate\t0418208844\tsarah@colmarestate.com.au\tvivid-event\tStall 11. Orange.\t[\"vivid\",\"winemaker\",\"orange\"]\nJonathon Mattick\tCanobolas Wines\t0403581312\tjonathon@canobolaswines.com.au\tvivid-event\tStall 12. Orange.\t[\"vivid\",\"winemaker\",\"orange\"]\nRebecca Milne\tGrape Pirates\t0497133247\trebecca@grapepirates.com.au\tvivid-event\tStall 13. Orange.\t[\"vivid\",\"winemaker\",\"orange\"]\nSam Statham\tRosnay\t0428667317\tsam@rosnay.com.au\tvivid-event\tStall 14. Central Ranges.\t[\"vivid\",\"winemaker\",\"central-ranges\"]\nHamish Young\tMada Wines\tNULL\thamish@madawines.com.au\tvivid-event\tStall 15. Canberra.\t[\"vivid\",\"winemaker\",\"canberra\"]\nMatt Carr\tMada Wines\t0491818532\tmatt@madawines.com.au\tvivid-event\tStall 15. Canberra.\t[\"vivid\",\"winemaker\",\"canberra\"]\nBryan Martin\tRavensworth Wines\t0417028335\tbryan@ravensworthwines.com.au\tvivid-event\tStall 16. Canberra.\t[\"vivid\",\"winemaker\",\"canberra\"]\nPaul Starr\tSassafras\t0476413974\tpaul@sassafras.com.au\tvivid-event\tStall 17. Canberra.\t[\"vivid\",\"winemaker\",\"canberra\"]\nJared Dixon\tJilly Wines\t0414904478\tjared@jillywines.com.au\tvivid-event\tStall 18. Northern Rivers.\t[\"vivid\",\"winemaker\",\"northern-rivers\"]\nTim Ward\tTim Ward\t0404222835\ttim@timward.com.au\tvivid-event\tStall 19. Various regions.\t[\"vivid\",\"winemaker\",\"various\"]\nJan Taborsky\tToppers Mountain\t0431752910\tjan@toppersmountain.com.au\tvivid-event\tStall 20. New England.\t[\"vivid\",\"winemaker\",\"new-england\"]\nTom\tFrankly, Wine by BoB\tNULL\ttom@franklywine.com.au\tvivid-event\tStall 21. Contact TBC.\t[\"vivid\",\"winemaker\"]\nJackie Paradoxa\tPride of Lunatics\t0422793327\tjackie@prideoflunatics.com.au\tvivid-event\tStall 22.\t[\"vivid\",\"winemaker\"]\nHamish\tHopeless Thoughtful\t0478825852\thamish@hopelessthoughtful.com.au\tvivid-event\tStall 23.\t[\"vivid\",\"winemaker\"]\nJames Agnew\tAudrey Wilkinson\t0410375045\tjames@audreywilkinson.com.au\tvivid-event\tStall 24. Hunter Valley.\t[\"vivid\",\"winemaker\",\"hunter\"]\nJames Agnew\tPooles Rock\t0410375045\tjames@poolesrock.com.au\tvivid-event\tStall 25.\t[\"vivid\",\"winemaker\",\"hunter\"]\nSimon\tChâteau Acid\t+61404201005\tsimon@chateauacid.com.au\tvivid-event\tStall 26.\t[\"vivid\",\"winemaker\"]\nCharlie\tChâteau Acid\t+61422215977\tcharlie@chateauacid.com.au\tvivid-event\tStall 26.\t[\"vivid\",\"winemaker\"]\nSally\tUr 1st Luv\t0481564796\tsally@ur1stluv.com.au\tvivid-event\tStall 27.\t[\"vivid\",\"winemaker\"]\nGuillermo Arnal-Machado\tArchie Rose Spirits\t+61411796630\tguillermo@archierose.com.au\tvivid-event\tWine Bar stall.\t[\"vivid\",\"spirits\",\"bar\"]\nMatt\tManly Spirits\t+61427732542\tmatt@manlyspirits.com.au\tvivid-event\tPanorama bar stall.\t[\"vivid\",\"spirits\",\"bar\"]\nNULL\tNULL\tNULL\tiamrjpurr@gmail.com\tpreview\tNULL\t[\"preview\",\"event-handout\"]\nRP\tRP wine\tNULL\tiamrjpurr+ownology@gmail.com\tpreview\tNULL\t[\"preview\",\"event-handout\"]\nr\trpj\tNULL\trpurr@hotmail.com\tpreview\tNULL\t[\"preview\",\"event-handout\"]\n",
+  "stderr": "",
+  "execution_time_ms": 1821
+}
