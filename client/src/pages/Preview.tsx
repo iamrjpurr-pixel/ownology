@@ -256,7 +256,7 @@ function PreviewContent() {
         style={{ background: C.headerBg, borderBottom: `1px solid ${C.border}` }}
       >
         <OwnologyLogo size={32} variant="dark" />
-        <Link href="/" style={{
+        <Link href="/home" style={{
           fontFamily: "'Lato', sans-serif",
           fontWeight: 300,
           fontSize: "0.8125rem",
