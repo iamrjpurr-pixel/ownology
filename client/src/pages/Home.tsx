@@ -11,6 +11,7 @@ import FAQ from "@/components/FAQ";
 import { Link } from "wouter";
 import ThemeToggle, { useOwnologyTheme } from "@/components/ThemeToggle";
 import { trpc } from "@/lib/trpc";
+import { EditableText, useSiteContent } from "@/components/EditableText";
 
 // ─── Image URLs ───────────────────────────────────────────────────────────────
 const HERO_IMG    = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-hero-HqkryW7dQ2C9TbhdmJ8Kff.webp";
@@ -408,6 +409,7 @@ function Nav() {
 function Hero() {
   const aiResponse = "Based on your current YAN of 120ppm and a starting Brix of 24.3, I recommend adding 2.6 kg of DAP to Tank 7 — split 50% at inoculation, 50% at ⅓ sugar depletion. This targets a YAN of 200ppm, optimal for your Shiraz house style.";
   const { displayed, done } = useTypewriter(aiResponse, 22, 1200);
+  const { contentMap } = useSiteContent();
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden grain-overlay">
@@ -422,17 +424,12 @@ function Hero() {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left — copy */}
           <div>
-            <p className="section-label mb-6 fade-up">AI Knowledge Assistant for Winemakers</p>
+            <EditableText contentKey="home.hero.label" defaultValue="AI Knowledge Assistant for Winemakers" as="p" className="section-label mb-6 fade-up" contentMap={contentMap} />
             <h1 className="fade-up fade-up-delay-1"
               style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,4rem)", lineHeight:1.1, color:"var(--ow-text-hi)", letterSpacing:"-0.02em"}}>
-              Your cellar's<br/>
-              <em style={{color:"var(--ow-amber)", fontStyle:"italic"}}>most knowledgeable</em><br/>
-              apprentice.
+              <EditableText contentKey="home.hero.headline" defaultValue="Your cellar's most knowledgeable apprentice." contentMap={contentMap} />
             </h1>
-            <p className="mt-6 fade-up fade-up-delay-2"
-              style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}}>
-              Ownology gives boutique winery teams instant, document-grounded answers to their toughest cellar questions — from a mobile phone, in seconds, during harvest.
-            </p>
+            <EditableText contentKey="home.hero.subheading" defaultValue="Ownology gives boutique winery teams instant, document-grounded answers to their toughest cellar questions — from a mobile phone, in seconds, during harvest." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-10 fade-up fade-up-delay-3">
               <a href="/pricing" className="btn-amber text-center">Start 14-Day Free Trial</a>
               <a href="#how-it-works" className="btn-ghost text-center">See How It Works</a>
@@ -544,6 +541,7 @@ function PainPoints() {
 // ─── Features (Bento Grid) ────────────────────────────────────────────────────
 function Features() {
   const { ref, inView } = useInView();
+  const { contentMap } = useSiteContent();
   return (
     <section id="features" className="py-28">
       <div className="container" ref={ref}>
@@ -564,10 +562,8 @@ function Features() {
                   <path d="M3 9h12M9 3l6 6-6 6" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.375rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>AI Knowledge Assistant</h3>
-              <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7, maxWidth:"420px"}}>
-                Ask anything — from complex SO2 calculations to your own harvest protocols. The assistant searches your uploaded documents and world-class wine science literature, then delivers a precise, cited answer in seconds.
-              </p>
+              <EditableText contentKey="home.features.ask.title" defaultValue="AI Knowledge Assistant" as="h3" style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.375rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}} contentMap={contentMap} />
+              <EditableText contentKey="home.features.ask.body" defaultValue="Ask anything — from complex SO2 calculations to your own harvest protocols. The assistant searches your uploaded documents and world-class wine science literature, then delivers a precise, cited answer in seconds." as="p" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7, maxWidth:"420px"}} multiline contentMap={contentMap} />
               <div className="mt-6 p-4 rounded-sm" style={{background:"var(--ow-bg-base)", border:"1px solid var(--ow-border)"}}>
                 <p className="data-readout text-xs mb-2" style={{color:"oklch(0.72 0.12 75 / 60%)"}}>EXAMPLE QUERY</p>
                 <p style={{fontFamily:"'Fira Code',monospace", fontSize:"0.8125rem", color:"oklch(0.72 0.12 75)", lineHeight:1.6}}>
@@ -586,10 +582,8 @@ function Features() {
                 <path d="M6 9h6M6 6h6M6 12h4" stroke="oklch(0.62 0.10 45)" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
             </div>
-              <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.25rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>Smart Cellar Logbook</h3>
-            <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7}}>
-              Log by voice or photo. Snap a handwritten lab slip — Ownology extracts and structures the data automatically. No keyboard. No delay.
-            </p>
+              <EditableText contentKey="home.features.log.title" defaultValue="Smart Cellar Logbook" as="h3" style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.25rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}} contentMap={contentMap} />
+            <EditableText contentKey="home.features.log.body" defaultValue="Log by voice or photo. Snap a handwritten lab slip — Ownology extracts and structures the data automatically. No keyboard. No delay." as="p" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7}} multiline contentMap={contentMap} />
             <div className="mt-6 flex flex-col gap-2">
               {[["Brix","14.2"],["Temp","22°C"],["pH","3.61"],["Free SO₂","28ppm"]].map(([k,v])=>(
                 <div key={k} className="flex justify-between items-center px-3 py-2 rounded-sm" style={{background:"var(--ow-bg-base)"}}>
@@ -608,10 +602,8 @@ function Features() {
                 <circle cx="15" cy="9" r="1.5" fill="oklch(0.72 0.12 75)"/>
               </svg>
             </div>
-              <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.25rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>Fermentation Dashboard</h3>
-            <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7}}>
-              Monitor all active fermentations at a glance. Proactive alerts when a tank deviates from its expected Brix trajectory — before a problem becomes a crisis.
-            </p>
+              <EditableText contentKey="home.features.comply.title" defaultValue="Fermentation Dashboard" as="h3" style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.25rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}} contentMap={contentMap} />
+            <EditableText contentKey="home.features.comply.body" defaultValue="Monitor all active fermentations at a glance. Proactive alerts when a tank deviates from its expected Brix trajectory — before a problem becomes a crisis." as="p" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7}} multiline contentMap={contentMap} />
             {/* Mini chart */}
             <div className="mt-6 p-3 rounded-sm" style={{background:"var(--ow-bg-base)"}}>
               <div className="flex justify-between mb-2">

@@ -180,3 +180,14 @@ export const vintageLogEntries = mysqlTable(
     index("vle_tank_idx").on(t.tankName),
   ]
 );
+
+// ─── Site Content (Owner Inline Editing) ─────────────────────────────────────
+// Stores owner-editable text overrides keyed by a content_key string.
+// If no row exists for a key, the hardcoded default in the component is used.
+
+export const siteContent = mysqlTable("site_content", {
+  id: int("id").autoincrement().primaryKey(),
+  contentKey: varchar("content_key", { length: 256 }).notNull().unique(),
+  value: text("value").notNull(),
+  updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+});

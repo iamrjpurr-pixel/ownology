@@ -73,7 +73,7 @@ function Hero() {
           The AI knowledge layer your production software was never designed to be.
         </h1>
         <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.125rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "640px" }}>
-          Ownology does not replace InnoVint, vintrace, or WineDirect. It sits on top of them — answering the questions your production system records but cannot answer, grounded in your own documents, accessible from your phone in the cellar.
+          Ownology does not replace InnoVint, Vintrace, or WineDirect. It sits on top of them — answering the questions your production system records but cannot answer, grounded in your own documents, accessible from your phone in the cellar.
         </p>
       </div>
     </section>
@@ -90,7 +90,7 @@ function TwoSystems() {
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           <div className={`p-8 rounded-sm ${inView ? "fade-up" : "opacity-0"}`} style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
             <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: BLUE, marginBottom: "0.75rem" }}>Your Production System</p>
-            <h3 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1.375rem", color: TEXT_HI, marginBottom: "0.75rem" }}>InnoVint, vintrace, WineDirect</h3>
+            <h3 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1.375rem", color: TEXT_HI, marginBottom: "0.75rem" }}>InnoVint, Vintrace, WineDirect</h3>
             <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9375rem", color: TEXT_MID, lineHeight: 1.75, marginBottom: "1.5rem" }}>
               Your production system is your <strong style={{ color: TEXT_HI, fontWeight: 400 }}>record-keeper</strong>. It logs what happened, tracks compliance, manages inventory, and produces the reports your accountant and regulator need.
             </p>
@@ -184,7 +184,7 @@ function ComparisonTable() {
                   <th style={{ fontFamily: SANS, fontWeight: 400, fontSize: "0.8125rem", color: TEXT_LO, textAlign: "left", paddingBottom: "1rem", paddingRight: "2rem", width: "46%" }}>Capability</th>
                   <th style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.8125rem", color: AMBER, textAlign: "center", paddingBottom: "1rem", paddingRight: "1.5rem", width: "18%" }}>Ownology</th>
                   <th style={{ fontFamily: SANS, fontWeight: 400, fontSize: "0.8125rem", color: TEXT_LO, textAlign: "center", paddingBottom: "1rem", paddingRight: "1.5rem", width: "18%" }}>
-                    Production ERP<br/><span style={{ fontSize: "0.7rem", fontWeight: 300 }}>(InnoVint, vintrace)</span>
+                    Production ERP<br/><span style={{ fontSize: "0.7rem", fontWeight: 300 }}>(InnoVint, Vintrace)</span>
                   </th>
                   <th style={{ fontFamily: SANS, fontWeight: 400, fontSize: "0.8125rem", color: TEXT_LO, textAlign: "center", paddingBottom: "1rem", width: "18%" }}>
                     Marketing AI<br/><span style={{ fontSize: "0.7rem", fontWeight: 300 }}>(WineryCopilot, etc.)</span>

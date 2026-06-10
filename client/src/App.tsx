@@ -30,7 +30,7 @@ import AdminLeads from "./pages/AdminLeads";
 function Router() {
   return (
     <Switch>
-      <Route path={"/"}><Redirect to="/preview" /></Route>
+      <Route path={"/"} component={Home} />
       <Route path={"/home"} component={Home} />
       <Route path={"/why-ownology"} component={WhyOwnology} />
       <Route path={"/for-innovint-users"} component={ForInnoVintUsers} />

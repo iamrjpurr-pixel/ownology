@@ -23,7 +23,9 @@ import {
   updateLeadNotes,
   updateLead,
   deleteLead,
+  db,
 } from "./db.js";
+import * as schema from "../drizzle/schema.js";
 
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -496,6 +498,29 @@ const leadsRouter = router({
     }),
 });
 
+// ─── Site Content Router (Owner Inline Editing) ─────────────────────────────
+
+const siteContentRouter = router({
+  // Public: get all content overrides as a key→value map
+  getAll: publicProcedure.query(async () => {
+    const rows = await db.query.siteContent.findMany();
+    const map: Record<string, string> = {};
+    for (const row of rows) map[row.contentKey] = row.value;
+    return map;
+  }),
+
+  // Owner only: upsert a content key
+  set: ownerProcedure
+    .input(z.object({ key: z.string().max(256), value: z.string().max(10000) }))
+    .mutation(async ({ input }) => {
+      await db
+        .insert(schema.siteContent)
+        .values({ contentKey: input.key, value: input.value, updatedAt: Date.now() })
+        .onDuplicateKeyUpdate({ set: { value: input.value, updatedAt: Date.now() } });
+      return { ok: true };
+    }),
+});
+
 // ─── App Router ──────────────────────────────────────────────────────────────────────────────
 
 export const appRouter = router({
@@ -507,6 +532,7 @@ export const appRouter = router({
   vintageReminder: vintageReminderRouter,
   email: emailRouter,
   leads: leadsRouter,
+  siteContent: siteContentRouter,
 });
 
 export type AppRouter = typeof appRouter;
