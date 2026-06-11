@@ -2,6 +2,7 @@ import { z } from "zod";
 import Stripe from "stripe";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
 import { buildScopedKnowledgeBase, buildSourceDoctrineSummary } from "./complianceKnowledgeBase.js";
+import { buildQADoctrineSummary } from "./complianceQADoctrine.js";
 import {
   getCampaignMetricsHistory,
   getLatestCampaignMetrics,
@@ -636,6 +637,8 @@ Rules for citations:
 - For the url field: use ONLY the verified URLs listed in the VERIFIED SOURCE URLS section below. Do NOT fabricate or guess URLs. If the act is not in the list, set url to null.
 
 ${buildSourceDoctrineSummary()}
+
+${buildQADoctrineSummary(scopeJurisdictions)}
 
 KNOWLEDGE BASE:
 ${scopedKB}`;
