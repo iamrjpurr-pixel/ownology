@@ -166,6 +166,13 @@ Administered by the EPA Victoria.
 - Winery and cellar door development requires a planning permit from the local council.
 - Significant expansions require a planning permit amendment.
 - Green Wedge and farming zones have specific rules for cellar door and event activities.
+### Work Health and Safety (Occupational Health and Safety Act 2004 VIC)
+Administered by WorkSafe Victoria.
+- VIC uses the Occupational Health and Safety Act 2004 (OHS Act) rather than the Model WHS Act; obligations are substantively equivalent.
+- Employers must provide and maintain a safe working environment, safe systems of work, and adequate information, instruction, training and supervision.
+- Key winery-specific obligations: confined space management (fermentation tanks, underground cellars), CO2 monitoring during fermentation, manual handling (barrels, cases), chemical handling (SO2, cleaning chemicals), working at heights.
+- Incident reporting: serious injuries, dangerous incidents, and deaths must be reported to WorkSafe Victoria immediately.
+- Improvement and prohibition notices may be issued by WorkSafe inspectors.
 
 ---
 
@@ -212,6 +219,12 @@ Administered by the EPA NSW.
 - Winery and cellar door development requires development consent from the local council.
 - State Environmental Planning Policy (Primary Production and Rural Development) 2019 applies to rural winery developments.
 - Significant expansions require a development application.
+### Work Health and Safety (Work Health and Safety Act 2011 NSW)
+Administered by SafeWork NSW.
+- NSW adopted the Model WHS Act — PCBU duty to eliminate or minimise risks so far as reasonably practicable.
+- Key winery-specific obligations: confined space management (fermentation tanks), CO2 monitoring during fermentation, manual handling (barrels, cases), chemical handling (SO2, tartaric acid, cleaning chemicals), working at heights.
+- Incident reporting: serious injuries, dangerous incidents, and deaths must be reported to SafeWork NSW immediately.
+- Improvement and prohibition notices may be issued by SafeWork NSW inspectors.
 
 ---
 
@@ -254,6 +267,14 @@ Administered by the Department of Water and Environmental Regulation (DWER).
 ### Planning (Planning and Development Act 2005 WA)
 - Winery and cellar door development requires development approval from the local council or WAPC.
 - Significant expansions require a development application.
+- Margaret River and Swan Valley regions have specific local planning policies for wineries.
+- Cellar doors in rural zones may require a change of use approval.
+### Work Health and Safety (Work Health and Safety Act 2020 WA)
+Administered by WorkSafe WA.
+- WA adopted the Model WHS Act in 2020 (later than other states) — PCBU duty to eliminate or minimise risks so far as reasonably practicable.
+- Key winery-specific obligations: confined space management (fermentation tanks), CO2 monitoring during fermentation, manual handling (barrels, cases), chemical handling (SO2, cleaning chemicals), working at heights.
+- Incident reporting: serious injuries, dangerous incidents, and deaths must be reported to WorkSafe WA immediately.
+- Improvement and prohibition notices may be issued by WorkSafe WA inspectors.
 
 ---
 
@@ -296,6 +317,14 @@ Administered by the Department of Environment and Science (DES).
 ### Planning (Planning Act 2016 QLD)
 - Winery and cellar door development requires development approval from the local council.
 - Significant expansions require a development application.
+- Granite Belt and Scenic Rim regions have specific planning overlays for wineries.
+- Cellar doors may require a material change of use approval.
+### Work Health and Safety (Work Health and Safety Act 2011 QLD)
+Administered by Workplace Health and Safety Queensland (WHSQ).
+- QLD adopted the Model WHS Act — PCBU duty to eliminate or minimise risks so far as reasonably practicable.
+- Key winery-specific obligations: confined space management (fermentation tanks), CO2 monitoring during fermentation, manual handling (barrels, cases), chemical handling (SO2, cleaning chemicals), working at heights.
+- Incident reporting: serious injuries, dangerous incidents, and deaths must be reported to WHSQ immediately.
+- Improvement and prohibition notices may be issued by WHSQ inspectors.
 
 ---
 
@@ -337,9 +366,89 @@ Administered by the Environment Protection Authority Tasmania (EPA TAS).
 - Water licences are issued under a water management plan for the relevant catchment.
 - Contact NRE Tasmania for licence applications and current allocation status in your catchment.
 
-### Planning (Land Use Planning and Approvals Act 1993 TAS)
+### Planning (Land Use Planning and Approvals Act 1993 TAS / Tasmanian Planning Scheme)
 - Winery and cellar door development requires a planning permit from the local council.
 - Significant expansions require a planning permit application.
+- The Tasmanian Planning Scheme (TPS) applies from 2022 — rural resource zone typically permits wineries as permitted or discretionary use.
+- Derwent Valley, Huon Valley, and Coal River Valley regions have specific planning considerations.
+### Work Health and Safety (Work Health and Safety Act 2012 TAS)
+Administered by WorkSafe Tasmania.
+- TAS adopted the Model WHS Act — PCBU duty to eliminate or minimise risks so far as reasonably practicable.
+- Key winery-specific obligations: confined space management (fermentation tanks), CO2 monitoring during fermentation, manual handling (barrels, cases), chemical handling (SO2, cleaning chemicals), working at heights.
+- Incident reporting: serious injuries, dangerous incidents, and deaths must be reported to WorkSafe Tasmania immediately.
+- Improvement and prohibition notices may be issued by WorkSafe Tasmania inspectors.
+
+---
+
+## NEW ZEALAND REGULATIONS
+
+### Winemaking Registration (Wine Act 2003 NZ)
+Administered by the Ministry for Primary Industries (MPI).
+- All winemakers making wine for trade or retail sale must register a Wine Standards Management Plan (WSMP) with MPI before commencing production.
+- The WSMP must be annually audited (verified) by an MPI-approved verifier.
+- No winemaking licence is required — the WSMP is the primary compliance mechanism.
+- Exemption: winemakers producing fewer than 20,000 litres over a two-year period AND not exporting may apply to MPI for an exemption.
+- The WSMP comprises: WSMP outline, NZ Winegrowers Code of Practice, HACCP plan, winery site plan, and records.
+- Contract winemakers must ensure WSMP records are maintained by contractors.
+- Non-compliance must be reported to MPI within 24 hours of discovery.
+
+### Cellar Door and Retail Sales (Sale and Supply of Alcohol Act 2012 NZ)
+Administered by local councils (District Licensing Committees) and the Alcohol Regulatory and Licensing Authority (ARLA).
+- On-Licence: required for cellar door tastings and on-site consumption.
+- Off-Licence: required for retail sales to take away.
+- Applications are made to the local District Licensing Committee.
+- Licence holders must comply with host responsibility obligations, display licences, and maintain records.
+- Remote sale licences are available for direct-to-consumer online sales.
+
+### Labelling (Food (Safety) Regulations 2002 NZ and FSANZ Food Standards Code)
+- Wine labels must comply with both the NZ Food (Safety) Regulations 2002 and the FSANZ Food Standards Code.
+- Variety claims: wine must contain at least 75% of the stated grape variety.
+- Vintage claims: wine must contain at least 75% from the stated vintage year.
+- Geographical Indication (GI) claims: wine must contain at least 85% from the stated region.
+- Pregnancy warning label: mandatory from 31 July 2023 (same as Australia).
+- Allergen declarations: sulphites must be declared if present above 10mg/kg.
+
+### Geographical Indications (Geographical Indications (Wine and Spirits) Registration Act 2006 NZ)
+Administered by IPONZ (Intellectual Property Office of New Zealand).
+- 18 NZ wine regions are registered as Geographical Indications including Marlborough, Hawke's Bay, Central Otago, Wairarapa, Nelson, Gisborne, and others.
+- Use of a registered GI on a wine label requires the wine to contain at least 85% from that region.
+
+### Export Requirements (Wine Act 2003 NZ and MPI Trade Certification)
+Administered by MPI.
+- All wine for export must comply with the Wine Act 2003 and have current export eligibility.
+- Exporters must register with MPI and use the MPI Trade Certification system (formerly Wine e-Cert).
+- All wine in a direct-to-consumer (DTC) consignment must be registered in MPI Trade Certification prior to export.
+- Destination market requirements vary — check MPI's market access database for specific country requirements.
+- Export documentation: Certificate of Analysis, Certificate of Origin, and phytosanitary certificate may be required depending on destination.
+
+### Food Safety (Food Act 2014 NZ)
+Administered by MPI.
+- Applies to certain winemaking extension activities and partial processing (e.g., adding flavours, producing wine-based beverages).
+- Requires a food control plan for activities that extend beyond standard winemaking under the Wine Act 2003.
+- Wineries that also produce food products (e.g., wine vinegar, wine-based sauces) must register under the Food Act 2014.
+
+### Work Health and Safety (Health and Safety at Work Act 2015 NZ)
+Administered by WorkSafe New Zealand.
+- PCBU (Person Conducting a Business or Undertaking) duty to eliminate or minimise risks so far as reasonably practicable.
+- Key winery-specific obligations: confined space management (fermentation tanks), CO2 monitoring during fermentation, manual handling (barrels, cases), chemical handling (SO2, cleaning chemicals), working at heights.
+- Incident reporting: serious injuries, dangerous incidents, and deaths must be notified to WorkSafe NZ immediately.
+- Hazardous substances (SO2, pesticides, cleaning chemicals) must be managed under the Hazardous Substances and New Organisms Act 1996 (HSNO Act) administered by WorkSafe NZ and EPA NZ.
+
+### Environmental and Planning (Resource Management Act 1991 NZ)
+Administered by regional councils and district councils.
+- Winery wastewater discharge to land or water requires a discharge permit from the relevant regional council.
+- New national wastewater discharge standards took effect from December 2025.
+- Land use consent is required for new winery buildings or significant expansions in rural zones.
+- Water extraction (irrigation) requires a water permit from the regional council.
+- Regional plans set specific rules for discharge volumes, treatment standards, and setback distances from waterways.
+- Key regions: Marlborough District Council (MDC), Hawke's Bay Regional Council (HBRC), Otago Regional Council (ORC), Environment Canterbury (ECan).
+
+### Biosecurity (Biosecurity Act 1993 NZ)
+Administered by MPI Biosecurity New Zealand.
+- Phylloxera management plans are required in affected regions (Marlborough, Hawke's Bay, Central Otago).
+- Movement of plant material (cuttings, rootstocks) between regions is regulated.
+- Biosecurity levy applies to grape growers.
+- Freshwater Farm Plans are being introduced for properties with significant water use or discharge.
 
 ---
 
@@ -382,6 +491,14 @@ Administered by the Environment Protection Authority Tasmania (EPA TAS).
 - Commissioner for Licensing (Liquor): cbos.tas.gov.au | 1300 654 499
 - EPA Tasmania (Environment): epa.tas.gov.au | 1800 005 171
 - WorkSafe Tasmania (WHS): worksafe.tas.gov.au | 1300 366 322
+
+### New Zealand
+- MPI (Wine Act, WSMP, Export): mpi.govt.nz | 0800 00 83 33
+- ARLA (Alcohol Licensing): justice.govt.nz/tribunals/arla
+- NZ Winegrowers (Industry Body): nzwine.com | 09 303 3527
+- WorkSafe NZ (WHS): worksafe.govt.nz | 0800 030 040
+- IPONZ (Geographical Indications): iponz.govt.nz
+- EPA NZ (Hazardous Substances): epa.govt.nz | 0800 376 234
 `;
 
 // ─── Jurisdiction section splitter ───────────────────────────────────────────
@@ -416,6 +533,11 @@ const KB_SECTIONS: Record<string, string> = {
   TAS:
     "## TASMANIA (TAS) REGULATIONS" +
     (COMPLIANCE_KNOWLEDGE_BASE.split("## TASMANIA (TAS) REGULATIONS")[1]?.split(
+      "## NEW ZEALAND REGULATIONS"
+    )[0] ?? ""),
+  NZ:
+    "## NEW ZEALAND REGULATIONS" +
+    (COMPLIANCE_KNOWLEDGE_BASE.split("## NEW ZEALAND REGULATIONS")[1]?.split(
       "## KEY CONTACTS"
     )[0] ?? ""),
   Contacts: "## KEY CONTACTS" + (COMPLIANCE_KNOWLEDGE_BASE.split("## KEY CONTACTS")[1] ?? ""),
@@ -647,6 +769,151 @@ export const SOURCE_DOCTRINE: SourceDoctrineEntry[] = [
     officialUrl: "https://www.legislation.tas.gov.au/view/html/inforce/current/act-1990-062",
     monitorUrl: "https://www.cbos.tas.gov.au/",
     monitorChannel: "CBOS TAS website; legislation.tas.gov.au",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+  {
+    title: "Work Health and Safety Act 2012 (TAS)",
+    jurisdiction: "TAS",
+    category: "legislation",
+    administeringAgency: "WorkSafe Tasmania",
+    officialUrl: "https://www.legislation.tas.gov.au/view/html/inforce/current/act-2012-001",
+    monitorUrl: "https://worksafe.tas.gov.au/",
+    monitorChannel: "WorkSafe Tasmania website; legislation.tas.gov.au",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+
+  // ── VICTORIA (additional) ─────────────────────────────────────────────────────
+  {
+    title: "Occupational Health and Safety Act 2004 (VIC)",
+    jurisdiction: "VIC",
+    category: "legislation",
+    administeringAgency: "WorkSafe Victoria",
+    officialUrl: "https://www.legislation.vic.gov.au/in-force/acts/occupational-health-and-safety-act-2004",
+    monitorUrl: "https://www.worksafe.vic.gov.au/",
+    monitorChannel: "WorkSafe Victoria website; legislation.vic.gov.au",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+
+  // ── NEW SOUTH WALES (additional) ──────────────────────────────────────────────
+  {
+    title: "Work Health and Safety Act 2011 (NSW)",
+    jurisdiction: "NSW",
+    category: "legislation",
+    administeringAgency: "SafeWork NSW",
+    officialUrl: "https://legislation.nsw.gov.au/view/html/inforce/current/act-2011-010",
+    monitorUrl: "https://www.safework.nsw.gov.au/",
+    monitorChannel: "SafeWork NSW website; legislation.nsw.gov.au",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+
+  // ── WESTERN AUSTRALIA (additional) ────────────────────────────────────────────
+  {
+    title: "Work Health and Safety Act 2020 (WA)",
+    jurisdiction: "WA",
+    category: "legislation",
+    administeringAgency: "WorkSafe WA",
+    officialUrl: "https://www.legislation.wa.gov.au/legislation/statutes.nsf/main_mrtitle_14082_homepage.html",
+    monitorUrl: "https://www.worksafe.wa.gov.au/",
+    monitorChannel: "WorkSafe WA website; legislation.wa.gov.au",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+    notes: "WA adopted the Model WHS Act in 2020, later than other states.",
+  },
+
+  // ── QUEENSLAND (additional) ────────────────────────────────────────────────────
+  {
+    title: "Work Health and Safety Act 2011 (QLD)",
+    jurisdiction: "QLD",
+    category: "legislation",
+    administeringAgency: "Workplace Health and Safety Queensland (WHSQ)",
+    officialUrl: "https://www.legislation.qld.gov.au/view/html/inforce/current/act-2011-018",
+    monitorUrl: "https://www.worksafe.qld.gov.au/",
+    monitorChannel: "WHSQ website; legislation.qld.gov.au",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+
+  // ── NEW ZEALAND ───────────────────────────────────────────────────────────────
+  {
+    title: "Wine Act 2003 (NZ)",
+    jurisdiction: "NZ",
+    category: "legislation",
+    administeringAgency: "Ministry for Primary Industries (MPI)",
+    officialUrl: "https://www.legislation.govt.nz/act/public/2003/0114/latest/whole.html",
+    monitorUrl: "https://www.mpi.govt.nz/wine/",
+    monitorChannel: "MPI wine page; legislation.govt.nz email alerts",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+  {
+    title: "Sale and Supply of Alcohol Act 2012 (NZ)",
+    jurisdiction: "NZ",
+    category: "legislation",
+    administeringAgency: "Alcohol Regulatory and Licensing Authority (ARLA)",
+    officialUrl: "https://www.legislation.govt.nz/act/public/2012/0120/latest/whole.html",
+    monitorUrl: "https://www.justice.govt.nz/tribunals/arla/",
+    monitorChannel: "ARLA website; legislation.govt.nz email alerts",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+    notes: "Alcohol Licensing Reform Bill 2026 may amend this act.",
+  },
+  {
+    title: "Geographical Indications (Wine and Spirits) Registration Act 2006 (NZ)",
+    jurisdiction: "NZ",
+    category: "legislation",
+    administeringAgency: "Intellectual Property Office of New Zealand (IPONZ)",
+    officialUrl: "https://www.legislation.govt.nz/act/public/2006/0060/latest/whole.html",
+    monitorUrl: "https://www.iponz.govt.nz/manage-ip/geographical-indications/",
+    monitorChannel: "IPONZ GI register; legislation.govt.nz email alerts",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+  {
+    title: "Health and Safety at Work Act 2015 (NZ)",
+    jurisdiction: "NZ",
+    category: "legislation",
+    administeringAgency: "WorkSafe New Zealand",
+    officialUrl: "https://www.legislation.govt.nz/act/public/2015/0070/latest/whole.html",
+    monitorUrl: "https://www.worksafe.govt.nz/",
+    monitorChannel: "WorkSafe NZ website; legislation.govt.nz email alerts",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+  {
+    title: "Resource Management Act 1991 (NZ)",
+    jurisdiction: "NZ",
+    category: "legislation",
+    administeringAgency: "Regional and District Councils (NZ)",
+    officialUrl: "https://www.legislation.govt.nz/act/public/1991/0069/latest/whole.html",
+    monitorUrl: "https://environment.govt.nz/acts-and-regulations/acts/resource-management-act/",
+    monitorChannel: "Ministry for the Environment website; legislation.govt.nz email alerts",
+    updateFrequency: "Frequent (under reform)",
+    lastKnownUpdate: "May 2026",
+    notes: "RMA reform ongoing; Natural and Built Environments Act (NBA) may replace RMA.",
+  },
+  {
+    title: "Food Act 2014 (NZ)",
+    jurisdiction: "NZ",
+    category: "legislation",
+    administeringAgency: "Ministry for Primary Industries (MPI)",
+    officialUrl: "https://www.legislation.govt.nz/act/public/2014/0032/latest/whole.html",
+    monitorUrl: "https://www.mpi.govt.nz/food-safety/food-act-2014/",
+    monitorChannel: "MPI food safety page; legislation.govt.nz email alerts",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+  {
+    title: "Biosecurity Act 1993 (NZ)",
+    jurisdiction: "NZ",
+    category: "legislation",
+    administeringAgency: "MPI Biosecurity New Zealand",
+    officialUrl: "https://www.legislation.govt.nz/act/public/1993/0095/latest/whole.html",
+    monitorUrl: "https://www.mpi.govt.nz/biosecurity/",
+    monitorChannel: "MPI Biosecurity website; legislation.govt.nz email alerts",
     updateFrequency: "Occasional",
     lastKnownUpdate: "May 2026",
   },

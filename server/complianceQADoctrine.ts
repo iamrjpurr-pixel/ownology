@@ -491,6 +491,181 @@ export const QA_DOCTRINE: QAEntry[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // 7b. WHS — STATE-SPECIFIC (WA, QLD, TAS, VIC, NSW)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: "wa-whs",
+    topic: "Work Health & Safety",
+    jurisdiction: "WA",
+    question: "What are the WHS obligations for a winery in Western Australia?",
+    keywords: ["WHS", "work health", "safety", "WorkSafe", "WA", "Western Australia", "confined space", "CO2", "SO2"],
+    answer:
+      "Western Australia adopted the Model WHS Act as the Work Health and Safety Act 2020 (WA), administered by WorkSafe WA. Key obligations for wineries: (1) PCBU duty to eliminate or minimise risks so far as reasonably practicable; (2) Confined space management for fermentation tanks and underground cellars — entry permits, atmospheric testing for CO2, and rescue procedures are mandatory; (3) CO2 monitoring during fermentation — CO2 can reach lethal concentrations in enclosed spaces; (4) Manual handling risk management for barrels and cases; (5) Chemical handling procedures for SO2, tartaric acid, and cleaning chemicals under the WHS (Hazardous Chemicals) Regulations; (6) Working at heights procedures for tank access; (7) Incident reporting — serious injuries, dangerous incidents, and deaths must be notified to WorkSafe WA immediately. Note: WA adopted the Model WHS Act in 2020, later than all other states — if your business previously operated under the Occupational Safety and Health Act 1984 (WA), ensure your systems have been updated to the 2020 Act requirements.",
+    citations: [
+      {
+        title: "Work Health and Safety Act 2020 (WA)",
+        section: "Part 2 — Health and safety duties",
+        jurisdiction: "WA",
+        url: "https://www.legislation.wa.gov.au/legislation/statutes.nsf/main_mrtitle_14082_homepage.html",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "wa-wastewater",
+    topic: "Environmental",
+    jurisdiction: "WA",
+    question: "What are the wastewater and environmental discharge requirements for a winery in Western Australia?",
+    keywords: ["wastewater", "discharge", "environment", "WA", "Western Australia", "DWER", "EPA", "licence"],
+    answer:
+      "In Western Australia, winery wastewater discharge is regulated by the Department of Water and Environmental Regulation (DWER) under the Environmental Protection Act 1986 (WA). Key requirements: (1) A works approval and operating licence from DWER is required for any discharge of winery wastewater to land or water; (2) Discharge to land (irrigation) must comply with DWER guidelines for winery wastewater — typically requires a nutrient management plan and setback distances from waterways; (3) Discharge to sewer requires a trade waste agreement with the relevant water utility (Water Corporation in most of WA); (4) Wineries in the Swan Valley and Margaret River regions may have additional local planning and environmental requirements; (5) Groundwater extraction requires a licence from DWER; (6) Non-compliance can result in significant penalties under the Environmental Protection Act 1986.",
+    citations: [
+      {
+        title: "Environmental Protection Act 1986 (WA)",
+        section: "Part V — Environmental Protection (Noise) Regulations; works approvals and licences",
+        jurisdiction: "WA",
+        url: "https://www.legislation.wa.gov.au/legislation/statutes.nsf/main_mrtitle_304_homepage.html",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "wa-planning",
+    topic: "Planning",
+    jurisdiction: "WA",
+    question: "What planning approvals does a winery in Western Australia need?",
+    keywords: ["planning", "development approval", "WA", "Western Australia", "WAPC", "cellar door", "Margaret River", "Swan Valley"],
+    answer:
+      "In Western Australia, winery and cellar door development is regulated under the Planning and Development Act 2005 (WA) and administered by local councils and the Western Australian Planning Commission (WAPC). Key requirements: (1) Development approval from the local council is required for new winery buildings, cellar doors, and significant expansions; (2) In rural zones, a change of use approval may be required to operate a cellar door or function centre; (3) Margaret River region: the Shire of Augusta-Margaret River has specific local planning policies for wineries and cellar doors — check the Local Planning Policy for Winery and Cellar Door Development; (4) Swan Valley: the Swan Valley Planning Act 1995 applies — development must be consistent with the Swan Valley Planning Scheme; (5) Event activities at wineries may require a separate development approval or a planning permit; (6) Significant expansions require a development application to the local council, potentially with referral to WAPC.",
+    citations: [
+      {
+        title: "Planning and Development Act 2005 (WA)",
+        section: "Part 10 — Development applications",
+        jurisdiction: "WA",
+        url: "https://www.legislation.wa.gov.au/legislation/statutes.nsf/main_mrtitle_1412_homepage.html",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "qld-whs",
+    topic: "Work Health & Safety",
+    jurisdiction: "QLD",
+    question: "What are the WHS obligations for a winery in Queensland?",
+    keywords: ["WHS", "work health", "safety", "WHSQ", "QLD", "Queensland", "confined space", "CO2", "SO2"],
+    answer:
+      "Queensland adopted the Model WHS Act as the Work Health and Safety Act 2011 (QLD), administered by Workplace Health and Safety Queensland (WHSQ). Key obligations for wineries: (1) PCBU duty to eliminate or minimise risks so far as reasonably practicable; (2) Confined space management for fermentation tanks — entry permits, atmospheric testing for CO2, and rescue procedures are mandatory; (3) CO2 monitoring during fermentation — CO2 can reach lethal concentrations in enclosed spaces; (4) Manual handling risk management for barrels and cases; (5) Chemical handling procedures for SO2 and cleaning chemicals under the WHS (Hazardous Chemicals) Regulations; (6) Working at heights procedures for tank access; (7) Incident reporting — serious injuries, dangerous incidents, and deaths must be notified to WHSQ immediately. The Granite Belt wine region (Stanthorpe area) is subject to the same QLD WHS Act requirements as all other QLD wineries.",
+    citations: [
+      {
+        title: "Work Health and Safety Act 2011 (QLD)",
+        section: "Part 2 — Health and safety duties",
+        jurisdiction: "QLD",
+        url: "https://www.legislation.qld.gov.au/view/html/inforce/current/act-2011-018",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "qld-wastewater",
+    topic: "Environmental",
+    jurisdiction: "QLD",
+    question: "What are the wastewater and environmental discharge requirements for a winery in Queensland?",
+    keywords: ["wastewater", "discharge", "environment", "QLD", "Queensland", "DES", "EPA", "licence"],
+    answer:
+      "In Queensland, winery wastewater discharge is regulated by the Department of Environment and Science (DES) under the Environmental Protection Act 1994 (QLD). Key requirements: (1) An environmental authority (EA) from DES is required for any discharge of winery wastewater to land or water above threshold volumes; (2) Discharge to land (irrigation) must comply with DES guidelines — typically requires a nutrient management plan and setback distances from waterways; (3) Discharge to sewer requires a trade waste agreement with the relevant local water utility; (4) Wineries in the Granite Belt region should check with the Southern Downs Regional Council and DES for specific local requirements; (5) Water extraction (irrigation) requires a water licence from the Department of Regional Development, Manufacturing and Water; (6) Non-compliance can result in significant penalties under the Environmental Protection Act 1994.",
+    citations: [
+      {
+        title: "Environmental Protection Act 1994 (QLD)",
+        section: "Chapter 4 — Environmental authorities; Chapter 5 — Environmental obligations",
+        jurisdiction: "QLD",
+        url: "https://www.legislation.qld.gov.au/view/html/inforce/current/act-1994-062",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "qld-planning",
+    topic: "Planning",
+    jurisdiction: "QLD",
+    question: "What planning approvals does a winery in Queensland need?",
+    keywords: ["planning", "development approval", "QLD", "Queensland", "Granite Belt", "cellar door", "material change of use"],
+    answer:
+      "In Queensland, winery and cellar door development is regulated under the Planning Act 2016 (QLD) and administered by local councils. Key requirements: (1) A development approval (material change of use) from the local council is required for new winery buildings, cellar doors, and significant expansions; (2) In rural zones, a material change of use approval is required to operate a cellar door or function centre; (3) Granite Belt region: the Southern Downs Regional Council has specific planning overlays for wineries — check the Southern Downs Regional Council Planning Scheme; (4) Scenic Rim region: the Scenic Rim Regional Council Planning Scheme applies; (5) Event activities at wineries may require a separate development approval; (6) Significant expansions require a development application to the local council. The Planning Act 2016 replaced the Sustainable Planning Act 2009 — ensure your approvals reference the current Act.",
+    citations: [
+      {
+        title: "Planning Act 2016 (QLD)",
+        section: "Chapter 3 — Development assessment",
+        jurisdiction: "QLD",
+        url: "https://www.legislation.qld.gov.au/view/html/inforce/current/act-2016-025",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "tas-whs",
+    topic: "Work Health & Safety",
+    jurisdiction: "TAS",
+    question: "What are the WHS obligations for a winery in Tasmania?",
+    keywords: ["WHS", "work health", "safety", "WorkSafe Tasmania", "TAS", "Tasmania", "confined space", "CO2", "SO2"],
+    answer:
+      "Tasmania adopted the Model WHS Act as the Work Health and Safety Act 2012 (TAS), administered by WorkSafe Tasmania. Key obligations for wineries: (1) PCBU duty to eliminate or minimise risks so far as reasonably practicable; (2) Confined space management for fermentation tanks and underground cellars — entry permits, atmospheric testing for CO2, and rescue procedures are mandatory; (3) CO2 monitoring during fermentation — CO2 can reach lethal concentrations in enclosed spaces; (4) Manual handling risk management for barrels and cases; (5) Chemical handling procedures for SO2 and cleaning chemicals under the WHS (Hazardous Chemicals) Regulations; (6) Working at heights procedures for tank access; (7) Incident reporting — serious injuries, dangerous incidents, and deaths must be notified to WorkSafe Tasmania immediately. Tasmania's wine regions (Derwent Valley, Huon Valley, Coal River Valley, Tamar Valley) are all subject to the same TAS WHS Act requirements.",
+    citations: [
+      {
+        title: "Work Health and Safety Act 2012 (TAS)",
+        section: "Part 2 — Health and safety duties",
+        jurisdiction: "TAS",
+        url: "https://www.legislation.tas.gov.au/view/html/inforce/current/act-2012-001",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "tas-wastewater",
+    topic: "Environmental",
+    jurisdiction: "TAS",
+    question: "What are the wastewater and environmental discharge requirements for a winery in Tasmania?",
+    keywords: ["wastewater", "discharge", "environment", "TAS", "Tasmania", "EPA", "licence"],
+    answer:
+      "In Tasmania, winery wastewater discharge is regulated by the Environment Protection Authority (EPA Tasmania) under the Environmental Management and Pollution Control Act 1994 (TAS). Key requirements: (1) An environment protection notice or permit from EPA Tasmania is required for any discharge of winery wastewater to land or water above threshold volumes; (2) Discharge to land (irrigation) must comply with EPA Tasmania guidelines — typically requires a nutrient management plan and setback distances from waterways; (3) Discharge to sewer requires a trade waste agreement with TasWater; (4) Wineries in the Derwent Valley and Huon Valley should check with the relevant council and EPA Tasmania for specific local requirements; (5) Water extraction (irrigation) requires a water licence from NRE Tasmania; (6) Non-compliance can result in significant penalties under the Environmental Management and Pollution Control Act 1994.",
+    citations: [
+      {
+        title: "Environmental Management and Pollution Control Act 1994 (TAS)",
+        section: "Part 5 — Environmental licences and permits",
+        jurisdiction: "TAS",
+        url: "https://www.legislation.tas.gov.au/view/html/inforce/current/act-1994-044",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "tas-planning",
+    topic: "Planning",
+    jurisdiction: "TAS",
+    question: "What planning approvals does a winery in Tasmania need?",
+    keywords: ["planning", "development approval", "TAS", "Tasmania", "cellar door", "planning permit", "Tasmanian Planning Scheme"],
+    answer:
+      "In Tasmania, winery and cellar door development is regulated under the Land Use Planning and Approvals Act 1993 (TAS) and the Tasmanian Planning Scheme (TPS), which applies statewide from 2022. Key requirements: (1) A planning permit from the local council is required for new winery buildings, cellar doors, and significant expansions; (2) In rural resource zones, wineries are typically a permitted or discretionary use — check the specific zone provisions in the TPS; (3) Derwent Valley: the Derwent Valley Council Planning Scheme applies; (4) Huon Valley: the Huon Valley Council Planning Scheme applies; (5) Coal River Valley: the Clarence City Council Planning Scheme applies; (6) Event activities at wineries may require a separate planning permit; (7) The TPS replaced individual council planning schemes from 2022 — ensure your approvals reference the current TPS provisions.",
+    citations: [
+      {
+        title: "Land Use Planning and Approvals Act 1993 (TAS)",
+        section: "Part 3 — Planning schemes; Tasmanian Planning Scheme",
+        jurisdiction: "TAS",
+        url: "https://www.legislation.tas.gov.au/view/html/inforce/current/act-1993-070",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // 8. BIOSECURITY
   // ═══════════════════════════════════════════════════════════════════════════
 
@@ -508,6 +683,149 @@ export const QA_DOCTRINE: QAEntry[] = [
         section: "Part 3 — Biosecurity measures; DAFF Grapevine import conditions",
         jurisdiction: "Federal",
         url: "https://www.legislation.gov.au/Details/C2022C00148",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 9. NEW ZEALAND
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: "nz-wsmp",
+    topic: "Winemaking Registration",
+    jurisdiction: "Federal",
+    question: "Do I need a licence or registration to make wine in New Zealand?",
+    keywords: ["NZ", "New Zealand", "WSMP", "Wine Standards Management Plan", "MPI", "register", "licence", "winemaker"],
+    answer:
+      "In New Zealand, there is no winemaking licence as such. Instead, all winemakers making wine for trade or retail sale must register a Wine Standards Management Plan (WSMP) with the Ministry for Primary Industries (MPI) before commencing production. The WSMP is the primary compliance mechanism under the Wine Act 2003 (NZ). Key requirements: (1) The WSMP must be registered with MPI before you start making wine for sale; (2) The WSMP must be annually verified (audited) by an MPI-approved verifier; (3) The WSMP must include: a WSMP outline, the NZ Winegrowers Code of Practice, a HACCP plan, a winery site plan, and records; (4) Contract winemakers must ensure WSMP records are maintained; (5) Non-compliance must be reported to MPI within 24 hours of discovery; (6) Exemption: winemakers producing fewer than 20,000 litres over a two-year period AND not exporting may apply to MPI for an exemption from full WSMP registration. Contact MPI Wine at mpi.govt.nz for registration forms and current WSMP templates.",
+    citations: [
+      {
+        title: "Wine Act 2003 (NZ)",
+        section: "Part 2 — Wine standards management plans; ss.9-25",
+        jurisdiction: "Federal",
+        url: "https://www.legislation.govt.nz/act/public/2003/0114/latest/whole.html",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "nz-cellar-door",
+    topic: "Licensing",
+    jurisdiction: "Federal",
+    question: "What licences do I need to open a cellar door in New Zealand?",
+    keywords: ["NZ", "New Zealand", "cellar door", "licence", "on-licence", "off-licence", "ARLA", "Sale and Supply of Alcohol"],
+    answer:
+      "In New Zealand, cellar door operations require licences under the Sale and Supply of Alcohol Act 2012 (NZ), administered by local District Licensing Committees (DLCs) and the Alcohol Regulatory and Licensing Authority (ARLA). Key requirements: (1) On-Licence: required for cellar door tastings and on-site consumption of wine; (2) Off-Licence: required for retail sales of wine to take away; (3) Applications are made to the local DLC — contact your local council for the relevant DLC; (4) Licence holders must comply with host responsibility obligations (e.g. not serving intoxicated persons, providing food and water, displaying licence); (5) Licences must be displayed on the premises; (6) Remote sale licences are available for direct-to-consumer online sales; (7) Licence renewal is required every three years. Note: unlike Australia, NZ does not have a separate producer's licence — the WSMP registration covers production, and the Sale and Supply of Alcohol Act licences cover sales.",
+    citations: [
+      {
+        title: "Sale and Supply of Alcohol Act 2012 (NZ)",
+        section: "Part 1 — Licences; ss.34-100",
+        jurisdiction: "Federal",
+        url: "https://www.legislation.govt.nz/act/public/2012/0120/latest/whole.html",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "nz-labelling",
+    topic: "Labelling",
+    jurisdiction: "Federal",
+    question: "What are the wine labelling requirements in New Zealand?",
+    keywords: ["NZ", "New Zealand", "label", "labelling", "variety", "vintage", "GI", "geographical indication", "pregnancy warning", "sulphites"],
+    answer:
+      "Wine labels in New Zealand must comply with both the NZ Food (Safety) Regulations 2002 and the FSANZ Food Standards Code (which applies in both Australia and NZ). Key requirements: (1) Variety claims: wine must contain at least 75% of the stated grape variety; (2) Vintage claims: wine must contain at least 75% from the stated vintage year; (3) Geographical Indication (GI) claims: wine must contain at least 85% from the stated region (e.g. Marlborough, Hawke's Bay, Central Otago); (4) Pregnancy warning label: mandatory from 31 July 2023 — the label must include the pregnancy warning symbol and text; (5) Allergen declarations: sulphites must be declared if present above 10mg/kg; (6) Alcohol content must be stated; (7) Country of origin must be stated; (8) Importer details must be on labels for imported wine. NZ wine exported to Australia must comply with Australian labelling requirements in addition to NZ requirements.",
+    citations: [
+      {
+        title: "Wine Act 2003 (NZ)",
+        section: "Part 3 — Wine standards; labelling requirements",
+        jurisdiction: "Federal",
+        url: "https://www.legislation.govt.nz/act/public/2003/0114/latest/whole.html",
+      },
+      {
+        title: "Geographical Indications (Wine and Spirits) Registration Act 2006 (NZ)",
+        section: "Part 2 — Registered geographical indications",
+        jurisdiction: "Federal",
+        url: "https://www.legislation.govt.nz/act/public/2006/0060/latest/whole.html",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "nz-export",
+    topic: "Export",
+    jurisdiction: "Federal",
+    question: "What are the export requirements for New Zealand wine?",
+    keywords: ["NZ", "New Zealand", "export", "MPI", "Trade Certification", "Wine e-Cert", "certificate", "market access"],
+    answer:
+      "All wine exported from New Zealand must comply with the Wine Act 2003 (NZ) and MPI Trade Certification requirements. Key requirements: (1) Exporters must register with MPI and use the MPI Trade Certification system (formerly Wine e-Cert) for all export consignments; (2) All wine in an export consignment must be registered in MPI Trade Certification prior to export; (3) Export documentation: a Certificate of Analysis (CoA) and Certificate of Origin may be required depending on the destination market; (4) Destination market requirements vary significantly — check MPI's market access database for specific country requirements (e.g. EU requires a VI-1 certificate, USA requires TTB label approval); (5) Phytosanitary certificates may be required for some markets; (6) Wine must comply with the importing country's labelling, additive, and alcohol content requirements; (7) Organic wine exports require additional certification. Contact MPI Trade Certification at mpi.govt.nz for current requirements and to register as an exporter.",
+    citations: [
+      {
+        title: "Wine Act 2003 (NZ)",
+        section: "Part 4 — Export of wine; MPI Trade Certification",
+        jurisdiction: "Federal",
+        url: "https://www.legislation.govt.nz/act/public/2003/0114/latest/whole.html",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "nz-whs",
+    topic: "Work Health & Safety",
+    jurisdiction: "Federal",
+    question: "What are the WHS obligations for a winery in New Zealand?",
+    keywords: ["NZ", "New Zealand", "WHS", "health and safety", "WorkSafe NZ", "HSWA", "confined space", "CO2", "SO2", "HSNO"],
+    answer:
+      "In New Zealand, workplace health and safety for wineries is governed by the Health and Safety at Work Act 2015 (NZ) (HSWA), administered by WorkSafe New Zealand. Key obligations: (1) PCBU duty to eliminate or minimise risks so far as reasonably practicable; (2) Confined space management for fermentation tanks — entry permits, atmospheric testing for CO2, and rescue procedures are mandatory; (3) CO2 monitoring during fermentation — CO2 can reach lethal concentrations in enclosed spaces; (4) Manual handling risk management for barrels and cases; (5) Chemical handling: SO2, pesticides, and cleaning chemicals must be managed under the Hazardous Substances and New Organisms Act 1996 (HSNO Act), administered by WorkSafe NZ and EPA NZ — hazardous substance location certificates may be required; (6) Working at heights procedures for tank access; (7) Incident reporting — serious injuries, dangerous incidents, and deaths must be notified to WorkSafe NZ immediately. WorkSafe NZ has published specific guidance for the agriculture and horticulture sectors that applies to wineries.",
+    citations: [
+      {
+        title: "Health and Safety at Work Act 2015 (NZ)",
+        section: "Part 2 — Health and safety duties; ss.36-48",
+        jurisdiction: "Federal",
+        url: "https://www.legislation.govt.nz/act/public/2015/0070/latest/whole.html",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "nz-environment",
+    topic: "Environmental",
+    jurisdiction: "Federal",
+    question: "What are the environmental and wastewater requirements for a winery in New Zealand?",
+    keywords: ["NZ", "New Zealand", "wastewater", "discharge", "RMA", "Resource Management Act", "regional council", "consent", "permit"],
+    answer:
+      "In New Zealand, winery environmental and wastewater obligations are governed by the Resource Management Act 1991 (RMA), administered by regional councils and district councils. Key requirements: (1) Winery wastewater discharge to land or water requires a discharge permit from the relevant regional council (e.g. Marlborough District Council, Hawke's Bay Regional Council, Otago Regional Council, Environment Canterbury); (2) New national wastewater discharge standards took effect from December 2025 — check with your regional council for current requirements; (3) Land use consent is required from the district council for new winery buildings or significant expansions in rural zones; (4) Water extraction (irrigation) requires a water permit from the regional council; (5) Regional plans set specific rules for discharge volumes, treatment standards, and setback distances from waterways; (6) Marlborough wineries: the Marlborough Environment Plan sets specific rules for winery wastewater discharge; (7) Non-compliance can result in significant penalties under the RMA. Note: RMA reform is ongoing — the Natural and Built Environments Act (NBA) may replace the RMA; check with your regional council for the latest requirements.",
+    citations: [
+      {
+        title: "Resource Management Act 1991 (NZ)",
+        section: "Part 3 — Duties and restrictions; ss.9-20; discharge consents",
+        jurisdiction: "Federal",
+        url: "https://www.legislation.govt.nz/act/public/1991/0069/latest/whole.html",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "nz-biosecurity",
+    topic: "Biosecurity",
+    jurisdiction: "Federal",
+    question: "What are the biosecurity obligations for a winery or vineyard in New Zealand?",
+    keywords: ["NZ", "New Zealand", "biosecurity", "phylloxera", "grapevine", "MPI", "Biosecurity Act", "movement", "plant material"],
+    answer:
+      "In New Zealand, vineyard and winery biosecurity is governed by the Biosecurity Act 1993 (NZ), administered by MPI Biosecurity New Zealand. Key requirements: (1) Phylloxera management plans are required in affected regions — Marlborough, Hawke's Bay, and Central Otago all have active phylloxera management programmes; (2) Movement of plant material (cuttings, rootstocks, budwood) between regions is regulated — contact MPI Biosecurity before moving any grapevine material; (3) A biosecurity levy applies to grape growers — this funds the national phylloxera and disease management programme; (4) Freshwater Farm Plans are being introduced for properties with significant water use or discharge; (5) Imported grapevine material must comply with MPI biosecurity import conditions and must be accompanied by appropriate phytosanitary certificates; (6) Growers must report any suspected new pest or disease to MPI Biosecurity immediately. The NZ Winegrowers Biosecurity programme provides practical guidance and is available to all NZ Winegrowers members.",
+    citations: [
+      {
+        title: "Biosecurity Act 1993 (NZ)",
+        section: "Part 5 — Pest management; s.70 movement controls",
+        jurisdiction: "Federal",
+        url: "https://www.legislation.govt.nz/act/public/1993/0095/latest/whole.html",
       },
     ],
     lastVerified: "2026-05-01",
