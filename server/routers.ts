@@ -612,8 +612,28 @@ You have been given a targeted knowledge base covering: ${jurisdictionLabel}.
 
 Answer questions accurately and concisely based ONLY on the knowledge base provided below.
 If a question falls outside the knowledge base, say so clearly and suggest the relevant agency to contact.
-Always cite the relevant legislation or regulation name when giving an answer.
-End every response with a brief disclaimer that the user should verify current requirements with the relevant agency or a qualified compliance professional.
+
+You MUST respond with a JSON object only — no markdown fences, no explanation outside the JSON.
+The JSON must have exactly this shape:
+{
+  "answer": "<your full answer text, may include newlines>",
+  "disclaimer": "Always verify current requirements with the relevant agency or a qualified compliance professional.",
+  "citations": [
+    {
+      "title": "<Full act or standard name>",
+      "section": "<Specific section, clause, or standard number if applicable, otherwise null>",
+      "jurisdiction": "<Federal | SA | VIC | NSW | WA | QLD | TAS>",
+      "url": "<Official URL to the legislation or agency page if you are confident it is correct, otherwise null>"
+    }
+  ]
+}
+
+Rules for citations:
+- Include one citation object per distinct piece of legislation, standard, or regulation referenced in your answer.
+- Use the exact act name as it appears in the knowledge base (e.g. "Liquor Licensing Act 1997 (SA)", "Food Standards Code — Standard 4.5.1", "Wine Australia Act 2013").
+- If the answer draws on multiple acts, list each separately.
+- If no specific legislation applies, return an empty citations array.
+- Do NOT fabricate URLs — only include a url if you are certain it is correct.
 
 KNOWLEDGE BASE:
 ${scopedKB}`;
@@ -627,7 +647,11 @@ ${scopedKB}`;
       const response = await fetch(`${forgeUrl}/v1/chat/completions`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
-        body: JSON.stringify({ messages, stream: false }),
+        body: JSON.stringify({
+          messages,
+          stream: false,
+          response_format: { type: "json_object" },
+        }),
       });
 
       if (!response.ok) {
@@ -637,8 +661,23 @@ ${scopedKB}`;
       }
 
       const data = await response.json();
-      const answer = data.choices?.[0]?.message?.content || "No response received.";
-      return { answer, outOfScope: false };
+      const rawContent = data.choices?.[0]?.message?.content || "{}";
+
+      let answer = "No response received.";
+      let disclaimer = "Always verify current requirements with the relevant agency or a qualified compliance professional.";
+      let citations: Array<{ title: string; section: string | null; jurisdiction: string; url: string | null }> = [];
+
+      try {
+        const parsed = JSON.parse(rawContent);
+        if (parsed.answer) answer = parsed.answer;
+        if (parsed.disclaimer) disclaimer = parsed.disclaimer;
+        if (Array.isArray(parsed.citations)) citations = parsed.citations;
+      } catch {
+        // JSON parse failed — treat raw content as plain answer
+        answer = rawContent;
+      }
+
+      return { answer, disclaimer, citations, outOfScope: false };
     }),
 });
 

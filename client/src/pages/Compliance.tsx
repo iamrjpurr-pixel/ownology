@@ -13,7 +13,19 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 // ─── Types & constants ───────────────────────────────────────────────────────
 type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW" | "WA" | "QLD" | "TAS";
-type Message = { role: "user" | "assistant"; content: string };
+type Citation = {
+  title: string;
+  section: string | null;
+  jurisdiction: string;
+  url: string | null;
+};
+
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+  citations?: Citation[];
+  disclaimer?: string;
+};
 
 const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS"];
 
@@ -139,7 +151,12 @@ export default function Compliance() {
         history: messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
       });
 
-      setMessages(prev => [...prev, { role: "assistant", content: result.answer }]);
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: result.answer,
+        citations: result.citations ?? [],
+        disclaimer: result.disclaimer,
+      }]);
     } catch (err) {
       setError("Unable to get a response. Please try again.");
       console.error("Compliance agent error:", err);
@@ -159,6 +176,80 @@ export default function Compliance() {
       e.preventDefault();
       ask(input);
     }
+  };
+
+  const downloadPdf = () => {
+    const date = new Date().toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
+    const escHtml = (s: string) =>
+      s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+    const threadHtml = messages
+      .map((msg, i) => {
+        if (msg.role === "user") {
+          return `<div class="msg user"><div class="label">Question ${Math.ceil((i + 1) / 2)}</div><p>${escHtml(msg.content)}</p></div>`;
+        }
+        const citationsHtml =
+          msg.citations && msg.citations.length > 0
+            ? `<div class="citations">
+                <div class="citations-heading">Source References</div>
+                <ol>${msg.citations
+                  .map(
+                    (c) =>
+                      `<li><span class="jur">${escHtml(c.jurisdiction)}</span> <strong>${escHtml(c.title)}</strong>${c.section ? ` &mdash; ${escHtml(c.section)}` : ""}${c.url ? ` <a href="${escHtml(c.url)}">${escHtml(c.url)}</a>` : ""}</li>`
+                  )
+                  .join("")}</ol>
+              </div>`
+            : "";
+        const disclaimerHtml = msg.disclaimer
+          ? `<p class="disclaimer">${escHtml(msg.disclaimer)}</p>`
+          : "";
+        return `<div class="msg assistant"><div class="label">Answer</div><p>${escHtml(msg.content)}</p>${citationsHtml}${disclaimerHtml}</div>`;
+      })
+      .join("");
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Ownology Compliance Q&amp;A — ${date}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@700&family=Lato:wght@300;400;600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Lato', sans-serif; font-weight: 300; font-size: 11pt; color: #1a1410; background: #fff; padding: 48px 56px; max-width: 820px; margin: 0 auto; }
+  h1 { font-family: 'Fraunces', serif; font-weight: 700; font-size: 22pt; color: #1a1410; margin-bottom: 4px; }
+  .meta { font-size: 9pt; color: #888; margin-bottom: 32px; border-bottom: 1px solid #e8e0d4; padding-bottom: 16px; }
+  .msg { margin-bottom: 24px; page-break-inside: avoid; }
+  .label { font-size: 8pt; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #b8860b; margin-bottom: 6px; }
+  .msg.user p { background: #f7f4ef; border: 1px solid #e8e0d4; border-radius: 4px; padding: 12px 16px; line-height: 1.6; }
+  .msg.assistant p { line-height: 1.75; white-space: pre-wrap; }
+  .citations { margin-top: 16px; padding-top: 14px; border-top: 1px solid #e8e0d4; }
+  .citations-heading { font-size: 8pt; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #b8860b; margin-bottom: 8px; }
+  .citations ol { padding-left: 18px; }
+  .citations li { font-size: 9.5pt; line-height: 1.55; margin-bottom: 5px; color: #444; }
+  .jur { display: inline-block; font-size: 7.5pt; font-family: monospace; background: #fdf5e6; border: 1px solid #e8c97a; color: #b8860b; padding: 1px 5px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+  .citations a { color: #555; font-size: 8.5pt; word-break: break-all; }
+  .disclaimer { margin-top: 10px; font-size: 8.5pt; color: #999; font-style: italic; line-height: 1.5; }
+  .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #e8e0d4; font-size: 8pt; color: #aaa; text-align: center; }
+  @media print { body { padding: 0; } }
+</style>
+</head>
+<body>
+  <h1>Ownology Compliance Q&amp;A</h1>
+  <div class="meta">Generated ${date} &bull; Knowledge base: Federal &bull; SA &bull; VIC &bull; NSW &bull; WA &bull; QLD &bull; TAS (last updated May 2026)</div>
+  ${threadHtml}
+  <div class="footer">Ownology &mdash; AI Knowledge Assistant for Winemakers &bull; ownology.ai &bull; Always verify with the relevant agency or a qualified compliance professional.</div>
+</body>
+</html>`;
+
+    const win = window.open("", "_blank");
+    if (!win) {
+      toast.error("Pop-up blocked — please allow pop-ups for this site and try again.");
+      return;
+    }
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 600);
   };
 
   return (
@@ -354,6 +445,68 @@ export default function Compliance() {
                   }}
                 >
                   {msg.content}
+
+                  {/* Citations reference list */}
+                  {msg.role === "assistant" && msg.citations && msg.citations.length > 0 && (
+                    <div
+                      className="mt-4 pt-4"
+                      style={{ borderTop: "1px solid var(--ow-border)" }}
+                    >
+                      <p
+                        className="mb-2 text-xs tracking-wider uppercase"
+                        style={{ color: "var(--ow-amber)", fontFamily: "'Lato',sans-serif", letterSpacing: "0.1em", fontWeight: 600 }}
+                      >
+                        Source References
+                      </p>
+                      <ol className="space-y-1.5" style={{ paddingLeft: "1.25rem", margin: 0 }}>
+                        {msg.citations.map((c, ci) => (
+                          <li key={ci} style={{ color: "var(--ow-text-mid)", fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", lineHeight: 1.5 }}>
+                            <span
+                              className="inline-block mr-1.5 px-1 py-0.5 rounded-sm text-xs"
+                              style={{
+                                background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+                                border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
+                                color: "var(--ow-amber)",
+                                fontFamily: "'Fira Code',monospace",
+                                fontSize: "0.62rem",
+                                letterSpacing: "0.04em",
+                                verticalAlign: "middle",
+                              }}
+                            >
+                              {c.jurisdiction}
+                            </span>
+                            {c.url ? (
+                              <a
+                                href={c.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: "var(--ow-text-hi)", textDecoration: "underline", textUnderlineOffset: "3px" }}
+                              >
+                                <strong style={{ fontWeight: 500 }}>{c.title}</strong>
+                                {c.section ? ` — ${c.section}` : ""}
+                              </a>
+                            ) : (
+                              <span>
+                                <strong style={{ fontWeight: 500 }}>{c.title}</strong>
+                                {c.section ? ` — ${c.section}` : ""}
+                              </span>
+                            )}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
+
+                  {/* Disclaimer */}
+                  {msg.role === "assistant" && msg.disclaimer && (
+                    <p
+                      className="mt-3 text-xs"
+                      style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", fontStyle: "italic", lineHeight: 1.5 }}
+                    >
+                      {msg.disclaimer}
+                    </p>
+                  )}
+
                   {msg.role === "assistant" && (
                     <CopyButton text={msg.content} />
                   )}
@@ -456,9 +609,9 @@ export default function Compliance() {
           </p>
         </form>
 
-        {/* Clear conversation */}
+        {/* Clear conversation + Download PDF */}
         {messages.length > 0 && (
-          <div className="mt-4 text-center">
+          <div className="mt-4 flex items-center justify-center gap-6">
             <button
               onClick={() => { setMessages([]); setError(null); }}
               className="text-xs transition-colors"
@@ -467,6 +620,19 @@ export default function Compliance() {
               onMouseLeave={e => (e.currentTarget.style.color = "var(--ow-text-lo)")}
             >
               Clear conversation
+            </button>
+            <button
+              onClick={downloadPdf}
+              className="text-xs transition-colors flex items-center gap-1.5"
+              style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", background: "none", border: "none", cursor: "pointer" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "var(--ow-amber)")}
+              onMouseLeave={e => (e.currentTarget.style.color = "var(--ow-text-lo)")}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M6 1v7M3.5 6l2.5 2.5L8.5 6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M1.5 10h9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+              </svg>
+              Download PDF
             </button>
           </div>
         )}
