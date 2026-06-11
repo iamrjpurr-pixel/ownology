@@ -831,6 +831,154 @@ export const QA_DOCTRINE: QAEntry[] = [
     lastVerified: "2026-05-01",
   },
 
+  // ══════════════════════════════════════════════════════════════════════════
+  // 11. ISO & QUALITY MANAGEMENT STANDARDS
+  // ══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: "iso-9001-overview",
+    topic: "ISO & Quality Management",
+    jurisdiction: "All",
+    question: "What is ISO 9001 and why should a winery pursue certification?",
+    keywords: ["ISO 9001", "ISO 9000", "quality management", "QMS", "certification", "batch consistency", "export", "traceability"],
+    answer:
+      "ISO 9001:2015 is the international standard for Quality Management Systems (QMS). For wineries, it provides a framework to standardise every stage of production from grape receival and fermentation through to bottling and dispatch, ensuring consistent taste, safety, and regulatory compliance across all batches.\n\nKey benefits for boutique wineries:\n- Batch Consistency: Standardises fermentation, aging, and bottling procedures so wine quality remains uniform year to year.\n- Global Market Access: EU, UK, and USA supermarket chains increasingly require ISO 9001 or equivalent as a supply condition. Certification removes a significant barrier to retail and wholesale export contracts.\n- Waste Reduction: Streamlines cellar and vineyard operations to reduce operational costs and spoilage.\n- Customer Confidence: Demonstrates a verifiable commitment to quality, critical for hospitality and tourism.\n- Label Integrity Program alignment: Wine Australia's LIP audit trail requirements (traceability from grape to bottle) align directly with ISO 9001 Clause 8.5.2 (Identification and Traceability).\n- NZ WSMP alignment: The NZ Wine Standards Management Plan required under the Wine Act 2003 (NZ) is structurally equivalent to an ISO 9001 QMS; some certifiers accept a validated WSMP as partial evidence toward ISO 9001 certification.\n\nCertification bodies in Australia: SAI Global, Bureau Veritas, SGS, DNV, LRQA. Typical cost: $3,000-$8,000/year. Timeframe: 6-18 months to initial certification.",
+    citations: [
+      {
+        title: "ISO 9001:2015 — Quality Management Systems",
+        section: "Clause 8.5.2 — Identification and Traceability; Clause 9.1 — Monitoring and Measurement",
+        jurisdiction: "Federal",
+        url: "https://www.iso.org/iso-9001-quality-management.html",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "iso-22000-haccp",
+    topic: "ISO & Quality Management",
+    jurisdiction: "All",
+    question: "What is ISO 22000 and how does it relate to HACCP requirements for wineries?",
+    keywords: ["ISO 22000", "HACCP", "food safety", "food safety management", "hazard analysis", "critical control points", "FSANZ", "Standard 3.2.1"],
+    answer:
+      "ISO 22000:2018 is the international standard for Food Safety Management Systems. It integrates HACCP (Hazard Analysis Critical Control Points) principles into a full management system framework, and is directly applicable to winery food safety obligations under FSANZ Standard 3.2.1.\n\nISO 22000 certification is accepted as an alternative compliance pathway to a standalone HACCP plan under FSANZ Standard 3.2.1 (Food Safety Programs).\n\nKey HACCP Critical Control Points (CCPs) for wineries:\n- Grape receival: Pesticide residue testing; foreign matter inspection\n- SO2 addition: Allergen control — must not exceed 10 mg/L in finished wine without mandatory allergen declaration on label\n- Filtration: Microbiological control — Brettanomyces, acetic acid bacteria\n- Bottling line: Fill level accuracy; closure integrity (cork taint, screw cap torque)\n- Labelling: Allergen declaration accuracy; vintage/variety/GI compliance\n\nKey winery hazards addressed: SO2 allergen declaration, histamine/biogenic amines, pesticide residues, glass contamination, microbiological hazards. Typical cost: $4,000-$10,000/year. Timeframe: 6-18 months.",
+    citations: [
+      {
+        title: "ISO 22000:2018 — Food Safety Management Systems",
+        section: "Clause 8 — Operation; HACCP principles integration",
+        jurisdiction: "Federal",
+        url: "https://www.iso.org/iso-22000-food-safety-management.html",
+      },
+      {
+        title: "Food Standards Code — Standard 3.2.1 (Food Safety Programs)",
+        section: "Standard 3.2.1 — Food Safety Programs",
+        jurisdiction: "Federal",
+        url: "https://www.foodstandards.gov.au/food-standards-code",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "iso-14001-environmental",
+    topic: "ISO & Quality Management",
+    jurisdiction: "All",
+    question: "How does ISO 14001 apply to winery environmental management and how does it relate to AWISSP?",
+    keywords: ["ISO 14001", "environmental management", "EMS", "AWISSP", "Entwine", "sustainability", "wastewater", "water", "energy"],
+    answer:
+      "ISO 14001:2015 is the international standard for Environmental Management Systems (EMS). For wineries, it formalises sustainable viticulture, water usage, wastewater management, chemical storage, and waste management obligations, many of which are also regulated under state EPA legislation.\n\nRelationship to AWISSP: The Australian Wine Industry Standard of Sustainable Practice (AWISSP / Entwine Australia) incorporates ISO 14001 principles and is accepted as a complementary framework. Many wineries use AWISSP as a stepping stone to full ISO 14001 certification. AWISSP certification is recognised by major EU and UK export markets as a credible sustainability credential.\n\nKey implementation elements for wineries:\n- Environmental aspects register: water consumption, energy use, wastewater volumes, chemical use, waste generation\n- Legal register: state EPA licence conditions, water licence conditions, council planning conditions\n- Emergency response plans: chemical spill procedures, SO2 release protocols\n- Supplier environmental requirements: chemical suppliers, packaging suppliers\n\nAustralian winery adoption: Taylors Wines (Clare Valley) has held ISO 14001 certification since 2009. Typical cost: $3,000-$8,000/year. Timeframe: 6-12 months.",
+    citations: [
+      {
+        title: "ISO 14001:2015 — Environmental Management Systems",
+        section: "Clause 6.1.2 — Environmental aspects; Clause 6.1.3 — Compliance obligations",
+        jurisdiction: "Federal",
+        url: "https://www.iso.org/iso-14001-environmental-management.html",
+      },
+      {
+        title: "AWISSP — Entwine Australia",
+        section: "Winery sustainability module",
+        jurisdiction: "Federal",
+        url: "https://entwine.com.au",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "iso-45001-whs",
+    topic: "ISO & Quality Management",
+    jurisdiction: "All",
+    question: "What is ISO 45001 and how does it relate to WHS obligations for Australian wineries?",
+    keywords: ["ISO 45001", "AS/NZS 45001", "OHS", "WHS", "occupational health", "safety management", "confined space", "CO2", "barrel"],
+    answer:
+      "ISO 45001:2018 is the international standard for Occupational Health and Safety Management Systems, adopted in Australia as AS/NZS 45001:2018. It replaces the former AS/NZS 4801 standard.\n\nISO 45001 certification does not replace WHS Act compliance obligations, but provides a documented management system that demonstrates due diligence to regulators (SafeWork SA, WorkSafe VIC, WorkSafe WA, etc.).\n\nKey winery-specific hazards addressed by ISO 45001:\n- Confined space entry: Fermentation tanks and underground cellars — CO2 asphyxiation risk. Requires confined space register, entry permits, atmospheric testing, rescue procedures.\n- Manual handling: Barrel handling (225L barrels = approx. 300kg full), bin tipping, case stacking — requires manual handling risk assessments and mechanical aids.\n- Chemical handling: SO2 (gas and solution), caustic cleaning agents (CIP), pesticides — requires SDS management, PPE, emergency eyewash stations.\n- Noise: Bottling lines, pumps, crushers — requires noise monitoring and hearing protection programs.\n- Working at heights: Tank access platforms, mezzanines — requires fall protection systems.\n- Seasonal worker management: Harvest casual workers require induction, training records, and supervision.\n\nCertification bodies: SAI Global, Bureau Veritas, SGS, DNV. Typical cost: $3,000-$7,000/year.",
+    citations: [
+      {
+        title: "ISO 45001:2018 — Occupational Health and Safety Management Systems",
+        section: "Clause 6.1.2 — Hazard identification; Clause 8.1.4 — Procurement",
+        jurisdiction: "Federal",
+        url: "https://www.iso.org/iso-45001-occupational-health-and-safety.html",
+      },
+      {
+        title: "Safe Work Australia — Model WHS Act",
+        section: "Part 2 — Health and Safety Duties; s.19 Primary duty of care",
+        jurisdiction: "Federal",
+        url: "https://www.safeworkaustralia.gov.au/law-and-regulation/model-whs-laws",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "awissp-entwine",
+    topic: "ISO & Quality Management",
+    jurisdiction: "Federal",
+    question: "What is AWISSP / Entwine Australia and is it mandatory for Australian wineries?",
+    keywords: ["AWISSP", "Entwine", "sustainable practice", "sustainability", "Australian Wine Industry Standard", "AGW", "Wine Australia", "export"],
+    answer:
+      "AWISSP (Australian Wine Industry Standard of Sustainable Practice), delivered through the Entwine Australia program, is an industry-specific sustainability certification administered by Australian Grape and Wine (AGW) and Wine Australia. It is not legally mandatory, but is effectively required for export to major EU and UK retail markets.\n\nKey modules: Vineyard sustainability, winery sustainability, chemical use, water management, energy, waste, biodiversity, and social responsibility.\n\nRelationship to ISO standards: AWISSP is designed to complement ISO 14001 (Environmental Management) and can be used as evidence toward ISO 14001 certification. It does not replace ISO 9001 or ISO 22000.\n\nExport market recognition: The AWISSP/Entwine certification is recognised by major EU and UK buyers as a credible sustainability credential. For NZ wineries, the equivalent is Sustainable Winegrowing New Zealand (SWNZ), which appears on approximately 95% of NZ wine exported.\n\nCost: Approximately $500-$2,000/year depending on winery size. Timeframe: 3-6 months to initial certification. To enrol: visit entwine.com.au and complete the online self-assessment.",
+    citations: [
+      {
+        title: "AWISSP — Entwine Australia",
+        section: "Program overview and module requirements",
+        jurisdiction: "Federal",
+        url: "https://entwine.com.au",
+      },
+      {
+        title: "Wine Australia — Sustainability",
+        section: "Sustainability guidance for Australian wineries",
+        jurisdiction: "Federal",
+        url: "https://www.wineaustralia.com/growing-making/sustainability",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
+  {
+    id: "iso-certification-pathway",
+    topic: "ISO & Quality Management",
+    jurisdiction: "All",
+    question: "What is the recommended ISO certification pathway for a boutique winery?",
+    keywords: ["ISO certification", "pathway", "which ISO", "start", "first", "priority", "boutique winery", "small winery", "certification order"],
+    answer:
+      "For a boutique winery, the recommended ISO certification pathway depends on your primary business goal:\n\nIf your priority is export market access (EU/UK retail):\n1. AWISSP/Entwine Australia first — lowest cost ($500-$2,000/yr), fastest (3-6 months), directly recognised by EU/UK buyers, and builds the foundation for ISO 14001.\n2. ISO 9001:2015 — adds QMS framework for batch consistency and traceability; required by some major retail buyers.\n3. ISO 14001:2015 — environmental management; can leverage AWISSP evidence.\n\nIf your priority is food safety compliance:\n1. HACCP plan (mandatory under FSANZ Standard 3.2.1 for some winery classifications) — implement this first as it is legally required.\n2. ISO 22000:2018 — formalises the HACCP plan into a full food safety management system; accepted as alternative to standalone HACCP.\n\nIf your priority is WHS compliance:\n1. WHS Act compliance (mandatory) — ensure all legal obligations are met first.\n2. ISO 45001:2018 — formalises WHS management; demonstrates due diligence to regulators.\n\nCertification cost summary (AU):\nAWISSP/Entwine: $500-$2,000/yr, 3-6 months\nISO 9001:2015: $3,000-$8,000/yr, 6-18 months\nISO 22000:2018: $4,000-$10,000/yr, 6-18 months\nISO 14001:2015: $3,000-$8,000/yr, 6-12 months\nISO 45001:2018: $3,000-$7,000/yr, 6-12 months",
+    citations: [
+      {
+        title: "ISO 9001:2015 — Quality Management Systems",
+        section: "Overview",
+        jurisdiction: "Federal",
+        url: "https://www.iso.org/iso-9001-quality-management.html",
+      },
+      {
+        title: "AWISSP — Entwine Australia",
+        section: "Program overview",
+        jurisdiction: "Federal",
+        url: "https://entwine.com.au",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
 ];
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────

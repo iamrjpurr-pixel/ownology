@@ -452,6 +452,84 @@ Administered by MPI Biosecurity New Zealand.
 
 ---
 
+## ISO & QUALITY MANAGEMENT STANDARDS
+
+### Overview
+ISO 9000 defines the concepts underpinning Quality Management Systems (QMS). Wineries specifically seek **ISO 9001:2015** certification to standardise every stage of production — from grape harvesting and fermentation through to bottling and dispatch — ensuring consistent taste, safety, and regulatory compliance across all production batches.
+
+### Why Wineries Use ISO 9001
+- **Batch Consistency:** Standardises fermentation, aging, and bottling procedures so wine quality remains uniform year to year.
+- **Global Market Access:** Proves adherence to strict international standards, easing export processes and satisfying major retail and wholesale buyers (EU, UK, USA supermarket chains increasingly require ISO 9001 or equivalent as a supply condition).
+- **Waste Reduction:** Streamlines cellar and vineyard operations to reduce operational costs and spoilage.
+- **Customer Confidence:** Demonstrates a verifiable commitment to quality — critical for retail consumers and hospitality/tourism.
+- **Label Integrity Program alignment:** Wine Australia's LIP audit trail requirements (traceability from grape to bottle) align directly with ISO 9001 Clause 8.5.2 (Identification and Traceability).
+
+### ISO 9001:2015 — Quality Management Systems
+- **Standard:** ISO 9001:2015 (Quality Management Systems — Requirements)
+- **Administering body (AU):** Standards Australia / SAI Global
+- **Certification bodies (AU):** SAI Global, Bureau Veritas, SGS, DNV, LRQA
+- **Key clauses relevant to wineries:**
+  - Clause 7.1.5: Monitoring and measuring resources (lab equipment calibration)
+  - Clause 8.5.2: Identification and traceability (batch/lot traceability from grape to bottle)
+  - Clause 8.6: Release of products and services (pre-release quality checks)
+  - Clause 8.7: Control of nonconforming outputs (off-spec wine management)
+  - Clause 9.1: Monitoring, measurement, analysis and evaluation (sensory panels, analytical testing)
+- **Relationship to NZ Wine WSMP:** The Wine Standards Management Plan required under the Wine Act 2003 (NZ) is structurally equivalent to an ISO 9001 QMS; some NZ certifiers accept a validated WSMP as partial evidence toward ISO 9001 certification.
+- **Official URL:** https://www.iso.org/iso-9001-quality-management.html
+- **Standards Australia:** https://www.standards.org.au
+
+### ISO 22000:2018 — Food Safety Management Systems
+- **Standard:** ISO 22000:2018 (Food Safety Management Systems — Requirements for any organisation in the food chain)
+- **Relevance:** Directly applicable to winery food safety obligations under FSANZ Standard 3.2.1. Integrates HACCP principles (Hazard Analysis Critical Control Points) into a full management system framework.
+- **Key winery hazards addressed:** SO2 allergen declaration, histamine/biogenic amines, pesticide residues, glass/cork contamination, microbiological hazards (Brettanomyces, acetic acid bacteria).
+- **Relationship to FSANZ:** ISO 22000 certification is accepted as an alternative compliance pathway to a standalone HACCP plan under FSANZ Standard 3.2.1 (Food Safety Programs).
+- **HACCP Critical Control Points for wineries:** Grape receival (pesticide/foreign matter), SO2 addition (allergen control), filtration (microbiological control), bottling line (fill level, closure integrity), labelling (allergen declaration accuracy).
+- **Official URL:** https://www.iso.org/iso-22000-food-safety-management.html
+
+### ISO 14001:2015 — Environmental Management Systems
+- **Standard:** ISO 14001:2015 (Environmental Management Systems — Requirements with guidance for use)
+- **Relevance:** Formalises sustainable viticulture, water usage, wastewater management, chemical storage, and waste management obligations that are also regulated under state environmental protection legislation.
+- **Australian winery adoption:** Taylors Wines (Clare Valley) has held ISO 14001 certification since 2009; Wakefield Wines also certified. Wine Australia funded a McLaren Vale consortium ISO 14001 scoping study.
+- **Relationship to AWISSP:** The Australian Wine Industry Standard of Sustainable Practice (AWISSP / Entwine Australia) incorporates ISO 14001 principles and is accepted as a complementary framework. Many wineries use AWISSP as a stepping stone to full ISO 14001 certification.
+- **Key aspects for wineries:** Environmental aspects register (water, energy, waste, emissions), legal register (state EPA licence conditions), emergency response plans (chemical spills), supplier environmental requirements.
+- **Official URL:** https://www.iso.org/iso-14001-environmental-management.html
+- **Entwine Australia (AWISSP):** https://entwine.com.au
+
+### ISO 45001:2018 — Occupational Health and Safety Management Systems
+- **Standard:** ISO 45001:2018 (Occupational Health and Safety Management Systems — Requirements with guidance for use); adopted in Australia as AS/NZS 45001:2018.
+- **Relevance:** Directly maps to WHS Act obligations across all Australian states and territories. Replaces the former AS/NZS 4801 standard.
+- **Key winery hazards:** Confined space entry (fermentation tanks, storage vessels — CO2 asphyxiation risk), manual handling (barrel handling, bin tipping), chemical handling (SO2, caustic cleaning agents, pesticides), noise (bottling lines, pumps), working at heights (tank access platforms), seasonal worker management.
+- **Certification bodies (AU):** SAI Global, Bureau Veritas, SGS, DNV, Safety Solutions WA
+- **Relationship to WHS legislation:** ISO 45001 certification does not replace WHS Act compliance obligations but provides a documented management system that demonstrates due diligence to regulators (SafeWork SA, WorkSafe VIC, WorkSafe WA, etc.).
+- **Official URL:** https://www.iso.org/iso-45001-occupational-health-and-safety.html
+
+### AWISSP — Australian Wine Industry Standard of Sustainable Practice
+- **Program:** Entwine Australia — the Australian Wine Industry Standard of Sustainable Practice (AWISSP)
+- **Administering body:** Australian Grape and Wine (AGW) and Wine Australia
+- **Relevance:** Industry-specific sustainability certification that integrates environmental, social, and quality management. Recognised by major export markets (EU, UK) as a credible sustainability credential alongside ISO 14001.
+- **Key modules:** Vineyard sustainability, winery sustainability, chemical use, water management, energy, waste, biodiversity, social responsibility.
+- **Relationship to ISO standards:** AWISSP is designed to complement ISO 14001 (environmental) and can be used as evidence toward ISO 14001 certification. It does not replace ISO 9001 or ISO 22000.
+- **Official URL:** https://entwine.com.au
+- **Wine Australia guidance:** https://www.wineaustralia.com/growing-making/sustainability
+
+### Sustainable Winegrowing New Zealand (SWNZ)
+- **Program:** Sustainable Winegrowing New Zealand (SWNZ) — administered by New Zealand Winegrowers
+- **Relevance:** NZ equivalent of AWISSP. Membership is effectively mandatory for NZ wine export — the SWNZ logo appears on approximately 95% of NZ wine exported. Required by major UK and EU retail buyers.
+- **Relationship to ISO 14001:** SWNZ has been evaluated against ISO 14001 and is accepted as equivalent by many international buyers.
+- **Official URL:** https://www.nzwine.com/en/sustainability/sustainable-winegrowing-nz/
+
+### Certification Pathway Summary
+| Standard | Mandatory? | Export Benefit | Typical Cost (AU) | Timeframe |
+|---|---|---|---|---|
+| ISO 9001:2015 | No | High — EU/UK retail | $3,000–$8,000/yr | 6–18 months |
+| ISO 22000:2018 | No (HACCP is) | High — food safety credibility | $4,000–$10,000/yr | 6–18 months |
+| ISO 14001:2015 | No | Medium — sustainability claims | $3,000–$8,000/yr | 6–12 months |
+| ISO 45001:2018 | No | Low (WHS compliance) | $3,000–$7,000/yr | 6–12 months |
+| AWISSP/Entwine | No | High — AU/NZ export markets | ~$500–$2,000/yr | 3–6 months |
+| SWNZ | Effectively yes (NZ) | Very High — NZ export | NZD ~$500/yr | 3–6 months |
+
+---
+
 ## KEY CONTACTS
 
 ### Federal
@@ -538,6 +616,11 @@ const KB_SECTIONS: Record<string, string> = {
   NZ:
     "## NEW ZEALAND REGULATIONS" +
     (COMPLIANCE_KNOWLEDGE_BASE.split("## NEW ZEALAND REGULATIONS")[1]?.split(
+      "## ISO & QUALITY MANAGEMENT STANDARDS"
+    )[0] ?? ""),
+  ISO:
+    "## ISO & QUALITY MANAGEMENT STANDARDS" +
+    (COMPLIANCE_KNOWLEDGE_BASE.split("## ISO & QUALITY MANAGEMENT STANDARDS")[1]?.split(
       "## KEY CONTACTS"
     )[0] ?? ""),
   Contacts: "## KEY CONTACTS" + (COMPLIANCE_KNOWLEDGE_BASE.split("## KEY CONTACTS")[1] ?? ""),
@@ -917,9 +1000,81 @@ export const SOURCE_DOCTRINE: SourceDoctrineEntry[] = [
     updateFrequency: "Occasional",
     lastKnownUpdate: "May 2026",
   },
+  // ── ISO & QUALITY STANDARDS ──────────────────────────────────────────────────
+  {
+    title: "ISO 9001:2015 — Quality Management Systems",
+    jurisdiction: "International",
+    category: "standard",
+    administeringAgency: "International Organisation for Standardisation (ISO) / Standards Australia / SAI Global",
+    officialUrl: "https://www.iso.org/iso-9001-quality-management.html",
+    monitorUrl: "https://www.iso.org/iso-9001-quality-management.html",
+    monitorChannel: "ISO website; Standards Australia newsletter",
+    updateFrequency: "Major revision every ~7 years; current version 2015",
+    lastKnownUpdate: "2015 (ISO 9001:2015 current)",
+    notes: "Wineries use for batch consistency, export market access, and LIP traceability alignment (Clause 8.5.2). NZ WSMP accepted as partial evidence toward ISO 9001 by some certifiers.",
+  },
+  {
+    title: "ISO 22000:2018 — Food Safety Management Systems",
+    jurisdiction: "International",
+    category: "standard",
+    administeringAgency: "International Organisation for Standardisation (ISO) / Standards Australia",
+    officialUrl: "https://www.iso.org/iso-22000-food-safety-management.html",
+    monitorUrl: "https://www.iso.org/iso-22000-food-safety-management.html",
+    monitorChannel: "ISO website; FSANZ newsletter for related regulatory updates",
+    updateFrequency: "Major revision every ~7 years; current version 2018",
+    lastKnownUpdate: "2018 (ISO 22000:2018 current)",
+    notes: "Integrates HACCP. Accepted as alternative compliance pathway to standalone HACCP plan under FSANZ Standard 3.2.1. Key CCPs: SO2 allergen, pesticide residues, bottling line.",
+  },
+  {
+    title: "ISO 14001:2015 — Environmental Management Systems",
+    jurisdiction: "International",
+    category: "standard",
+    administeringAgency: "International Organisation for Standardisation (ISO) / Standards Australia",
+    officialUrl: "https://www.iso.org/iso-14001-environmental-management.html",
+    monitorUrl: "https://www.iso.org/iso-14001-environmental-management.html",
+    monitorChannel: "ISO website; Entwine Australia newsletter",
+    updateFrequency: "Major revision every ~7 years; current version 2015",
+    lastKnownUpdate: "2015 (ISO 14001:2015 current)",
+    notes: "Complements AWISSP/Entwine Australia. Taylors Wines (Clare Valley) certified since 2009. Formalises wastewater, water, energy, and waste obligations already regulated under state EPA legislation.",
+  },
+  {
+    title: "ISO 45001:2018 — Occupational Health and Safety Management Systems",
+    jurisdiction: "International",
+    category: "standard",
+    administeringAgency: "International Organisation for Standardisation (ISO) / Standards Australia (AS/NZS 45001:2018)",
+    officialUrl: "https://www.iso.org/iso-45001-occupational-health-and-safety.html",
+    monitorUrl: "https://www.iso.org/iso-45001-occupational-health-and-safety.html",
+    monitorChannel: "ISO website; Safe Work Australia newsletter",
+    updateFrequency: "Major revision every ~7 years; current version 2018",
+    lastKnownUpdate: "2018 (ISO 45001:2018 current; replaces AS/NZS 4801)",
+    notes: "Maps to WHS Act obligations across all AU states. Key winery hazards: CO2 confined space, barrel manual handling, SO2 chemical handling, bottling line noise.",
+  },
+  {
+    title: "AWISSP — Australian Wine Industry Standard of Sustainable Practice (Entwine Australia)",
+    jurisdiction: "Federal",
+    category: "standard",
+    administeringAgency: "Australian Grape and Wine (AGW) / Wine Australia",
+    officialUrl: "https://entwine.com.au",
+    monitorUrl: "https://entwine.com.au/news",
+    monitorChannel: "Entwine Australia newsletter; Wine Australia sustainability updates",
+    updateFrequency: "Annual program updates",
+    lastKnownUpdate: "May 2026",
+    notes: "Industry-specific sustainability certification. Complements ISO 14001. Recognised by EU/UK export markets. Modules: vineyard, winery, chemicals, water, energy, waste, biodiversity, social.",
+  },
+  {
+    title: "Sustainable Winegrowing New Zealand (SWNZ)",
+    jurisdiction: "NZ",
+    category: "standard",
+    administeringAgency: "New Zealand Winegrowers",
+    officialUrl: "https://www.nzwine.com/en/sustainability/sustainable-winegrowing-nz/",
+    monitorUrl: "https://www.nzwine.com/en/sustainability/sustainable-winegrowing-nz/",
+    monitorChannel: "NZ Winegrowers newsletter",
+    updateFrequency: "Annual program updates",
+    lastKnownUpdate: "May 2026",
+    notes: "Effectively mandatory for NZ wine export — ~95% of NZ wine exported carries SWNZ logo. Required by major UK and EU retail buyers. Accepted as equivalent to ISO 14001 by many international buyers.",
+  },
 ];
-
-// ─── SOURCE DOCTRINE HELPERS ─────────────────────────────────────────────────
+// ─── SOURCE DOCTRINE HELPERS ──────────────────────────────────────────────────
 
 /** Returns the doctrine entry for a given act title (case-insensitive partial match). */
 export function findSourceEntry(title: string): SourceDoctrineEntry | undefined {
