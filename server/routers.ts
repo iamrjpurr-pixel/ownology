@@ -1,7 +1,7 @@
 import { z } from "zod";
 import Stripe from "stripe";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
-import { buildScopedKnowledgeBase } from "./complianceKnowledgeBase.js";
+import { buildScopedKnowledgeBase, buildSourceDoctrineSummary } from "./complianceKnowledgeBase.js";
 import {
   getCampaignMetricsHistory,
   getLatestCampaignMetrics,
@@ -633,7 +633,9 @@ Rules for citations:
 - Use the exact act name as it appears in the knowledge base (e.g. "Liquor Licensing Act 1997 (SA)", "Food Standards Code — Standard 4.5.1", "Wine Australia Act 2013").
 - If the answer draws on multiple acts, list each separately.
 - If no specific legislation applies, return an empty citations array.
-- Do NOT fabricate URLs — only include a url if you are certain it is correct.
+- For the url field: use ONLY the verified URLs listed in the VERIFIED SOURCE URLS section below. Do NOT fabricate or guess URLs. If the act is not in the list, set url to null.
+
+${buildSourceDoctrineSummary()}
 
 KNOWLEDGE BASE:
 ${scopedKB}`;

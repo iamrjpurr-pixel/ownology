@@ -191,3 +191,28 @@ export const siteContent = mysqlTable("site_content", {
   value: text("value").notNull(),
   updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
 });
+
+// ─── Regulation Monitor — Seen Publications ─────────────────────────────────
+// Tracks which regulation update URLs have already been notified to the owner.
+// The weekly scheduled monitor inserts a row when it first sees a new publication,
+// preventing duplicate notifications across runs.
+export const regulationMonitorSeen = mysqlTable(
+  "regulation_monitor_seen",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // Unique identifier for the publication — typically the URL or a stable ID
+    publicationUrl: varchar("publication_url", { length: 1024 }).notNull().unique(),
+    // Human-readable title of the publication
+    title: varchar("title", { length: 512 }).notNull(),
+    // Source feed (e.g. "FSANZ", "WineAustralia", "legislation.gov.au")
+    source: varchar("source", { length: 128 }).notNull(),
+    // UTC ms timestamp when this publication was first seen
+    firstSeenAt: bigint("first_seen_at", { mode: "number" }).notNull(),
+    // Whether the owner has been notified (1 = yes, 0 = no)
+    notified: int("notified").notNull().default(0),
+  },
+  (t) => [
+    index("rms_source_idx").on(t.source),
+    index("rms_seen_at_idx").on(t.firstSeenAt),
+  ]
+);

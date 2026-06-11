@@ -421,6 +421,259 @@ const KB_SECTIONS: Record<string, string> = {
   Contacts: "## KEY CONTACTS" + (COMPLIANCE_KNOWLEDGE_BASE.split("## KEY CONTACTS")[1] ?? ""),
 };
 
+// ─── SOURCE DOCTRINE ─────────────────────────────────────────────────────────
+// Authoritative map of every regulation in the knowledge base.
+// Each entry carries: the official legislation URL, the monitoring/update channel,
+// update frequency, and the administering agency.
+// Used by:
+//   1. The LLM citation prompt (verified URLs only — no hallucinated links)
+//   2. The scheduled regulation monitor (feeds to check for new publications)
+//   3. The Admin KB management page (shows what to check and when)
+
+export type SourceDoctrineEntry = {
+  title: string;
+  jurisdiction: string;
+  category: "legislation" | "standard" | "code" | "guidance";
+  administeringAgency: string;
+  officialUrl: string;
+  monitorUrl: string;       // The page/feed to check for updates
+  monitorChannel: string;   // How to subscribe: email, RSS, manual check
+  updateFrequency: string;  // How often changes typically occur
+  lastKnownUpdate: string;  // Last update reflected in this knowledge base
+  notes?: string;
+};
+
+export const SOURCE_DOCTRINE: SourceDoctrineEntry[] = [
+  // ── FEDERAL ──────────────────────────────────────────────────────────────────
+  {
+    title: "Wine Australia Act 2013",
+    jurisdiction: "Federal",
+    category: "legislation",
+    administeringAgency: "Wine Australia",
+    officialUrl: "https://www.legislation.gov.au/C2013A00051/latest/text",
+    monitorUrl: "https://www.legislation.gov.au/C2013A00051",
+    monitorChannel: "Free email alert — create account at legislation.gov.au/sign-up and subscribe to this act",
+    updateFrequency: "Infrequent (major amendments every 2–5 years)",
+    lastKnownUpdate: "May 2026",
+  },
+  {
+    title: "Wine Australia Regulations 2018",
+    jurisdiction: "Federal",
+    category: "legislation",
+    administeringAgency: "Wine Australia",
+    officialUrl: "https://www.legislation.gov.au/F2018L00567/latest/text",
+    monitorUrl: "https://www.legislation.gov.au/F2018L00567",
+    monitorChannel: "Free email alert — legislation.gov.au/sign-up",
+    updateFrequency: "Occasional (1–2 amendments per year)",
+    lastKnownUpdate: "May 2026",
+  },
+  {
+    title: "Food Standards Code — Standard 4.5.1 (Wine Production Requirements)",
+    jurisdiction: "Federal",
+    category: "standard",
+    administeringAgency: "Food Standards Australia New Zealand (FSANZ)",
+    officialUrl: "https://www.legislation.gov.au/F2015L00403/latest/text",
+    monitorUrl: "https://www.foodstandards.gov.au/food-standards-code/circulars",
+    monitorChannel: "Free email subscription — foodstandards.gov.au/subscribe → 'Food Standards News'",
+    updateFrequency: "Occasional (amendments gazetted via Notification Circulars)",
+    lastKnownUpdate: "May 2026",
+    notes: "FSANZ Notification Circulars are the authoritative update channel. Each circular is published at foodstandards.gov.au/food-standards-code/circulars.",
+  },
+  {
+    title: "Food Standards Code — Standard 3.2.2 (Food Safety Practices)",
+    jurisdiction: "Federal",
+    category: "standard",
+    administeringAgency: "Food Standards Australia New Zealand (FSANZ)",
+    officialUrl: "https://www.legislation.gov.au/F2015L00404/latest/text",
+    monitorUrl: "https://www.foodstandards.gov.au/food-standards-code/circulars",
+    monitorChannel: "Free email subscription — foodstandards.gov.au/subscribe",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+  {
+    title: "Food Standards Code — Standard 3.2.2A (Food Safety Management Statements)",
+    jurisdiction: "Federal",
+    category: "standard",
+    administeringAgency: "Food Standards Australia New Zealand (FSANZ)",
+    officialUrl: "https://www.legislation.gov.au/F2021L01342/latest/text",
+    monitorUrl: "https://www.foodstandards.gov.au/food-standards-code/circulars",
+    monitorChannel: "Free email subscription — foodstandards.gov.au/subscribe",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+    notes: "Mandatory food safety management statements for certain food businesses from December 2023.",
+  },
+  {
+    title: "A New Tax System (Wine Equalisation Tax) Act 1999",
+    jurisdiction: "Federal",
+    category: "legislation",
+    administeringAgency: "Australian Taxation Office (ATO)",
+    officialUrl: "https://www.legislation.gov.au/C2004A00451/latest/text",
+    monitorUrl: "https://www.ato.gov.au/businesses-and-organisations/income-deductions-and-concessions/wine-equalisation-tax",
+    monitorChannel: "ATO website updates; Federal Budget announcements for rebate cap changes",
+    updateFrequency: "Annual (rebate cap adjusted in Federal Budget)",
+    lastKnownUpdate: "May 2026",
+    notes: "WET Producer Rebate cap: $350,000 FY2025–26, rising to $400,000 from 1 July 2026.",
+  },
+  {
+    title: "Work Health and Safety Act 2011 (Cth) — Model WHS Act",
+    jurisdiction: "Federal",
+    category: "legislation",
+    administeringAgency: "Safe Work Australia",
+    officialUrl: "https://www.legislation.gov.au/C2011A00137/latest/text",
+    monitorUrl: "https://www.safeworkaustralia.gov.au/law-and-regulation/model-whs-laws",
+    monitorChannel: "Safe Work Australia website; free email updates via safeworkaustralia.gov.au",
+    updateFrequency: "Infrequent (major reviews every 5 years)",
+    lastKnownUpdate: "May 2026",
+  },
+  {
+    title: "Wine Australia Licensing and Compliance Guide",
+    jurisdiction: "Federal",
+    category: "guidance",
+    administeringAgency: "Wine Australia",
+    officialUrl: "https://www.wineaustralia.com/selling/regulatory-services",
+    monitorUrl: "https://www.wineaustralia.com/news",
+    monitorChannel: "Free Wine Australia newsletter — wineaustralia.com (create free account)",
+    updateFrequency: "Annual (guide updated; news published continuously)",
+    lastKnownUpdate: "May 2026",
+  },
+  {
+    title: "AWRI Regulatory Assistance — Fact Sheets and Helpdesk",
+    jurisdiction: "Federal",
+    category: "guidance",
+    administeringAgency: "Australian Wine Research Institute (AWRI)",
+    officialUrl: "https://www.awri.com.au/industry_support/regulatory_assistance/",
+    monitorUrl: "https://www.awri.com.au/industry_support/regulatory_assistance/",
+    monitorChannel: "AWRI website — free fact sheets; free helpdesk for levy payers",
+    updateFrequency: "Continuous (fact sheets updated as standards change)",
+    lastKnownUpdate: "May 2026",
+    notes: "Free to all Australian grapegrowers and winemakers who pay the Winegrapes and/or Grape Research levies.",
+  },
+
+  // ── SOUTH AUSTRALIA ───────────────────────────────────────────────────────────
+  {
+    title: "Liquor Licensing Act 1997 (SA)",
+    jurisdiction: "SA",
+    category: "legislation",
+    administeringAgency: "Consumer and Business Services (CBS) SA",
+    officialUrl: "https://www.legislation.sa.gov.au/LZ/C/A/LIQUOR%20LICENSING%20ACT%201997.aspx",
+    monitorUrl: "https://legislation.sa.gov.au/about-this-site/subscribe-to-updates",
+    monitorChannel: "Free email alert — legislation.sa.gov.au/about-this-site/subscribe-to-updates",
+    updateFrequency: "Occasional (Stage 2 reforms underway as of 2026)",
+    lastKnownUpdate: "May 2026",
+    notes: "CBS SA administers licensing. Stage 2 reforms introduce tougher penalties and expanded minor protections.",
+  },
+  {
+    title: "Environment Protection Act 1993 (SA)",
+    jurisdiction: "SA",
+    category: "legislation",
+    administeringAgency: "Environment Protection Authority (EPA) SA",
+    officialUrl: "https://www.legislation.sa.gov.au/LZ/C/A/ENVIRONMENT%20PROTECTION%20ACT%201993.aspx",
+    monitorUrl: "https://www.epa.sa.gov.au/",
+    monitorChannel: "EPA SA website; legislation.sa.gov.au email alerts",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+  {
+    title: "Work Health and Safety Act 2012 (SA)",
+    jurisdiction: "SA",
+    category: "legislation",
+    administeringAgency: "SafeWork SA",
+    officialUrl: "https://www.legislation.sa.gov.au/LZ/C/A/WORK%20HEALTH%20AND%20SAFETY%20ACT%202012.aspx",
+    monitorUrl: "https://www.safework.sa.gov.au/",
+    monitorChannel: "SafeWork SA website; legislation.sa.gov.au email alerts",
+    updateFrequency: "Infrequent",
+    lastKnownUpdate: "May 2026",
+  },
+
+  // ── VICTORIA ──────────────────────────────────────────────────────────────────
+  {
+    title: "Liquor Control Reform Act 1998 (VIC)",
+    jurisdiction: "VIC",
+    category: "legislation",
+    administeringAgency: "Victorian Commission for Gambling and Liquor Regulation (VCGLR)",
+    officialUrl: "https://www.legislation.vic.gov.au/in-force/acts/liquor-control-reform-act-1998",
+    monitorUrl: "https://www.vcglr.vic.gov.au/",
+    monitorChannel: "VCGLR website updates; legislation.vic.gov.au",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+
+  // ── NEW SOUTH WALES ───────────────────────────────────────────────────────────
+  {
+    title: "Liquor Act 2007 (NSW)",
+    jurisdiction: "NSW",
+    category: "legislation",
+    administeringAgency: "Liquor & Gaming NSW",
+    officialUrl: "https://legislation.nsw.gov.au/view/html/inforce/current/act-2007-090",
+    monitorUrl: "https://www.liquorandgaming.nsw.gov.au/",
+    monitorChannel: "Liquor & Gaming NSW website; legislation.nsw.gov.au",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+
+  // ── WESTERN AUSTRALIA ─────────────────────────────────────────────────────────
+  {
+    title: "Liquor Control Act 1988 (WA)",
+    jurisdiction: "WA",
+    category: "legislation",
+    administeringAgency: "Department of Local Government, Sport and Cultural Industries (DLGSC)",
+    officialUrl: "https://www.legislation.wa.gov.au/legislation/statutes.nsf/main_mrtitle_540_homepage.html",
+    monitorUrl: "https://www.cits.wa.gov.au/department",
+    monitorChannel: "DLGSC website; legislation.wa.gov.au",
+    updateFrequency: "Occasional (2025 amendments in effect)",
+    lastKnownUpdate: "May 2026",
+    notes: "2025 amendments include acceptance of digital ID forms.",
+  },
+
+  // ── QUEENSLAND ────────────────────────────────────────────────────────────────
+  {
+    title: "Liquor Act 1992 (QLD)",
+    jurisdiction: "QLD",
+    category: "legislation",
+    administeringAgency: "Office of Liquor and Gaming Regulation (OLGR) QLD",
+    officialUrl: "https://www.legislation.qld.gov.au/view/html/inforce/current/act-1992-055",
+    monitorUrl: "https://www.olgr.qld.gov.au/",
+    monitorChannel: "OLGR QLD website; legislation.qld.gov.au",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+
+  // ── TASMANIA ──────────────────────────────────────────────────────────────────
+  {
+    title: "Liquor Licensing Act 1990 (TAS)",
+    jurisdiction: "TAS",
+    category: "legislation",
+    administeringAgency: "Consumer, Building and Occupational Services (CBOS) TAS",
+    officialUrl: "https://www.legislation.tas.gov.au/view/html/inforce/current/act-1990-062",
+    monitorUrl: "https://www.cbos.tas.gov.au/",
+    monitorChannel: "CBOS TAS website; legislation.tas.gov.au",
+    updateFrequency: "Occasional",
+    lastKnownUpdate: "May 2026",
+  },
+];
+
+// ─── SOURCE DOCTRINE HELPERS ─────────────────────────────────────────────────
+
+/** Returns the doctrine entry for a given act title (case-insensitive partial match). */
+export function findSourceEntry(title: string): SourceDoctrineEntry | undefined {
+  const lower = title.toLowerCase();
+  return SOURCE_DOCTRINE.find(
+    (e) => e.title.toLowerCase().includes(lower) || lower.includes(e.title.toLowerCase())
+  );
+}
+
+/** Builds a compact URL reference block to inject into the LLM system prompt. */
+export function buildSourceDoctrineSummary(): string {
+  const lines = SOURCE_DOCTRINE.map(
+    (e) => `- ${e.title} [${e.jurisdiction}]: ${e.officialUrl}`
+  );
+  return [
+    "## VERIFIED SOURCE URLS",
+    "Use ONLY these verified URLs when populating the url field in citations. Do not invent URLs.",
+    ...lines,
+  ].join("\n");
+}
+
 export function buildScopedKnowledgeBase(jurisdictions: string[]): string {
   const parts: string[] = [KB_SECTIONS.Federal];
   for (const j of jurisdictions) {

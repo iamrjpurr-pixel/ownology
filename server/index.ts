@@ -9,6 +9,7 @@ import { createContext } from "./trpc.js";
 import merchRouter from "./merch/api.js";
 import { campaignMetricsHandler } from "./scheduled/campaignMetrics.js";
 import { vintageRemindersHandler } from "./scheduled/vintageReminders.js";
+import { regulationMonitorHandler } from "./scheduled/regulationMonitor.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,6 +27,7 @@ async function startServer() {
   // ── Scheduled Heartbeat handler ──────────────────────────────────────────────
   app.post("/api/scheduled/campaign-metrics", express.json(), campaignMetricsHandler);
   app.post("/api/scheduled/vintage-reminders", express.json(), vintageRemindersHandler);
+  app.post("/api/scheduled/regulation-monitor", express.json(), regulationMonitorHandler);
 
   // ── JSON body parser ─────────────────────────────────────────────────────────
   app.use(express.json());

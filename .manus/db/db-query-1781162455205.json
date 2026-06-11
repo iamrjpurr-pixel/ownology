@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `regulation_monitor_seen` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `publication_url` varchar(1024) NOT NULL,\n  `title` varchar(512) NOT NULL,\n  `source` varchar(128) NOT NULL,\n  `first_seen_at` bigint NOT NULL,\n  `notified` int NOT NULL DEFAULT 0,\n  UNIQUE KEY `regulation_monitor_seen_publication_url_unique` (`publication_url`(512)),\n  INDEX `rms_source_idx` (`source`),\n  INDEX `rms_seen_at_idx` (`first_seen_at`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4HByWUH885AfJUE.9472483f21d7 --database kjXA9MRaPtPLGHog5yynHZ --execute CREATE TABLE IF NOT EXISTS `regulation_monitor_seen` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `publication_url` varchar(1024) NOT NULL,\n  `title` varchar(512) NOT NULL,\n  `source` varchar(128) NOT NULL,\n  `first_seen_at` bigint NOT NULL,\n  `notified` int NOT NULL DEFAULT 0,\n  UNIQUE KEY `regulation_monitor_seen_publication_url_unique` (`publication_url`(512)),\n  INDEX `rms_source_idx` (`source`),\n  INDEX `rms_seen_at_idx` (`first_seen_at`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1981
+}
