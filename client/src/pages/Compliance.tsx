@@ -12,7 +12,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 
 // ─── Types & constants ───────────────────────────────────────────────────────
-type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW" | "WA" | "QLD" | "TAS";
+type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW" | "WA" | "QLD" | "TAS" | "NZ";
 type Citation = {
   title: string;
   section: string | null;
@@ -27,7 +27,7 @@ type Message = {
   disclaimer?: string;
 };
 
-const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS"];
+const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS", "NZ"];
 
 const STATE_LABELS: Record<StateFilter, string> = {
   All: "All Jurisdictions",
@@ -38,6 +38,7 @@ const STATE_LABELS: Record<StateFilter, string> = {
   WA: "Western Australia",
   QLD: "Queensland",
   TAS: "Tasmania",
+  NZ: "New Zealand",
 };
 
 const SAMPLE_QUESTIONS: { q: string; state: StateFilter }[] = [
@@ -53,6 +54,9 @@ const SAMPLE_QUESTIONS: { q: string; state: StateFilter }[] = [
   { q: "What is a WA Producer's Licence and what trading hours apply?", state: "WA" },
   { q: "What wine producer licence do I need to operate a winery in Queensland?", state: "QLD" },
   { q: "What liquor licence do I need to operate a cellar door in Tasmania?", state: "TAS" },
+  { q: "What is a Wine Standards Management Plan (WSMP) and is it mandatory in NZ?", state: "NZ" },
+  { q: "What licences do I need to sell wine from a cellar door in New Zealand?", state: "NZ" },
+  { q: "What are the NZ wine labelling requirements for export to Australia?", state: "NZ" },
 ];
 
 // ─── CopyButton — clipboard icon with animated checkmark feedback ─────────────
@@ -235,7 +239,7 @@ export default function Compliance() {
 </head>
 <body>
   <h1>Ownology Compliance Q&amp;A</h1>
-  <div class="meta">Generated ${date} &bull; Knowledge base: Federal &bull; SA &bull; VIC &bull; NSW &bull; WA &bull; QLD &bull; TAS (last updated May 2026)</div>
+  <div class="meta">Generated ${date} &bull; Knowledge base: Federal &bull; SA &bull; VIC &bull; NSW &bull; WA &bull; QLD &bull; TAS &bull; NZ (last updated May 2026)</div>
   ${threadHtml}
   <div class="footer">Ownology &mdash; AI Knowledge Assistant for Winemakers &bull; ownology.ai &bull; Always verify with the relevant agency or a qualified compliance professional.</div>
 </body>
@@ -306,7 +310,7 @@ export default function Compliance() {
               maxWidth: "560px",
             }}
           >
-            Ask any question about Australian winery regulations — federal (Wine Australia, FSANZ, WET, WHS, biosecurity) or state-specific rules for South Australia, Victoria, New South Wales, and Western Australia. Use the jurisdiction filter below to focus on your state.
+            Ask any question about Australian and New Zealand winery regulations — federal (Wine Australia, FSANZ, WET, WHS, biosecurity), state-specific rules for all Australian states, or New Zealand regulations (Wine Act 2003, WSMP, Food Act 2014, RMA). Use the jurisdiction filter below to focus on your region.
           </p>
           <div
             className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-sm text-xs"
@@ -321,7 +325,7 @@ export default function Compliance() {
               <circle cx="6" cy="6" r="5" stroke="var(--ow-amber)" strokeWidth="1.2" />
               <path d="M6 4v3M6 8.5v.5" stroke="var(--ow-amber)" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
-            Knowledge base: Federal · SA · VIC · NSW · WA · QLD · TAS — last updated May 2026
+            Knowledge base: Federal · SA · VIC · NSW · WA · QLD · TAS · NZ — last updated May 2026
           </div>
         </div>
 
@@ -605,7 +609,7 @@ export default function Compliance() {
             className="mt-2 text-center text-xs"
             style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif" }}
           >
-            Answers are AI-generated from our curated knowledge base (Federal, SA, VIC, NSW, WA, QLD, TAS). Always verify with the relevant agency or a qualified compliance professional.
+            Answers are AI-generated from our curated knowledge base (Federal, SA, VIC, NSW, WA, QLD, TAS, NZ). Always verify with the relevant agency or a qualified compliance professional.
           </p>
         </form>
 
