@@ -1,0 +1,431 @@
+/**
+ * OWNOLOGY — Compliance Knowledge Base (server-side)
+ * Australian winery regulatory knowledge base: Federal + all states.
+ * Kept server-side so the full text is never exposed to the browser and
+ * LLM calls use the high-capacity BUILT_IN_FORGE_API_KEY.
+ */
+
+export const COMPLIANCE_KNOWLEDGE_BASE = `
+# Australian Winery Regulatory Knowledge Base
+Covers: Federal, South Australia (SA), Victoria (VIC), New South Wales (NSW), Western Australia (WA), Queensland (QLD), Tasmania (TAS)
+
+## FEDERAL REGULATIONS
+
+### Wine Australia Registration (Wine Australia Act 2013)
+- Any person producing, exporting, or making wholesale sales of grape wine must register with Wine Australia before commencing commercial activity.
+- No minimum production volume — even single-case boutique producers selling wholesale must register.
+- Annual grape grower and winemaker levy applies, calculated on volume of grapes crushed or purchased.
+
+### Label Integrity Program (LIP)
+- Mandatory record-keeping and audit system for all label claims.
+- Vintage year: ≥85% of wine must be from that vintage.
+- Single variety: ≥85% must be from that variety.
+- Blend varieties: listed in descending order; each ≥5%.
+- Geographical Indication (GI): ≥85% must be sourced from that GI.
+- LIP records must be retained for 5 years and include: grape receival records (variety, GI, vintage, weight), tank/barrel movement records, blending records, bottling records.
+- Failure to maintain LIP records can result in deregistration and prosecution.
+
+### Export Licensing
+- Separate Wine Australia export licence required for any winery exporting wine.
+- Each export shipment requires a Wine Australia export permit and Certificate of Origin or Health Certificate.
+- Labels for export must be pre-registered in the Wine Australia Label Directory before shipment.
+- EU, UK, USA, and China each have specific documentation and compositional rules.
+
+### Food Standards Code — Standard 4.5.1 (Wine Production Requirements)
+Administered by FSANZ. Governs composition, additives, and processing aids.
+
+Permitted additives:
+- Sulphur dioxide (wine <35 g/L sugars): maximum 250 mg/L
+- Sulphur dioxide (wine >35 g/L sugars): maximum 300 mg/L
+- Sorbic acid / Potassium sorbate: maximum 200 mg/L
+- Potassium polyaspartate: maximum 100 mg/L
+- Tartaric acid, Malic acid, Lactic acid, Citric acid, Tannins, Gum Arabic, Metatartaric acid, Yeast mannoproteins, Carbon dioxide: GMP (Good Manufacturing Practice — lowest level necessary)
+
+Permitted processing aids: bentonite, gelatin, isinglass, egg white, casein, activated carbon, PVPP, diatomaceous earth, perlite, enzymes, oak, nitrogen, argon, oxygen, copper sulphate (GMP), dimethyl dicarbonate (max 200 mg/L), potassium ferrocyanide (GMP), yeast and bacterial cultures.
+
+Water additions: may only be added to incorporate an additive, facilitate fermentation by diluting high-sugar must (not below 13.5° Brix), or incidentally. Total added water must not exceed 70 mL/L (7%) of final wine volume.
+
+### Food Business Registration (Standards 3.2.2 and 3.2.3)
+- Wineries are food businesses and must register with the relevant local council as a food premises.
+- Must maintain food safety practices, adequate water supply, drainage, pest control, cleaning and sanitising procedures.
+- Standard 3.2.2A (mandatory from December 2023) may require a food safety management system depending on winery classification.
+
+### Wine Equalisation Tax (WET)
+- WET is a 29% tax on the wholesale value of wine, applied at the last wholesale sale.
+- Administered by the ATO.
+- Wine producers, wholesalers, and retailers may be liable depending on their role in the supply chain.
+- Wine Producer Rebate: eligible producers can claim a rebate of WET paid, up to a cap of $350,000 per financial year (rising to $400,000 from 1 July 2026).
+- Eligibility: must be an Australian resident, produce wine from grapes, honey, fruit, or vegetables, and sell under their own brand or in bulk.
+- Ineligible if: associated with another wine producer that has already claimed the full rebate, or if the wine is sold in bulk to another producer who will rebrand it.
+- WET registration required if annual WET liability exceeds $1,000.
+
+### Biosecurity and Imports (DAFF)
+- Phylloxera: all plant material (grapevines, cuttings, rootlings) must comply with state and federal biosecurity requirements. Interstate movement of grapevine material is regulated.
+- Imported winemaking inputs (oak barrels, corks, additives) must comply with Australian biosecurity import conditions.
+- Winery waste (marc, lees, grape skins) must be managed to prevent pest and disease spread.
+
+### Work Health and Safety (WHS)
+- Model WHS Act and Regulations apply federally; SA has adopted these as the Work Health and Safety Act 2012 (SA).
+- Key winery-specific obligations: confined space management (fermentation tanks, underground cellars), CO₂ monitoring (fermentation produces dangerous CO₂ levels), manual handling (barrels, cases), chemical handling (SO₂, cleaning chemicals), and working at heights (barrel stacks, mezzanines).
+- Duty of care extends to workers, contractors, visitors, and cellar door customers.
+- Incident reporting: serious injuries, dangerous incidents, and deaths must be reported to SafeWork SA immediately.
+
+---
+
+## SOUTH AUSTRALIA REGULATIONS
+
+### Liquor Licensing (Liquor Licensing Act 1997 SA)
+Administered by Consumer and Business Services (CBS).
+
+Producer's Licence classes:
+- Class 1: Production and wholesale/direct sales only; no on-site consumption.
+- Class 2: Cellar door — tastings and sales; on-site consumption permitted. Most common for boutique wineries.
+- Class 3: Full retail and on-site consumption including restaurant/dining.
+
+Application requirements for Class 2:
+- Completed application via Liquor and Gaming Online (LGO) portal
+- Proof of production premises (lease or title)
+- Floor plan of premises
+- Council development consent for the use
+- Evidence of production capacity and intent
+- RSA certification for all staff serving alcohol
+- Application fee approximately $1,000–$2,500 for Class 2
+
+Ongoing obligations:
+- Annual licence renewal and fee payment
+- Responsible Service of Alcohol (RSA) training for all staff
+- Maintain a register of incidents (intoxication, refusals, disturbances)
+- Display licence and trading hours prominently
+- Minors: no minors on licensed premises unless accompanied by a responsible adult; no service to minors
+
+Extended trading: requires a separate Extended Trading Authorisation (ETA) for trading beyond standard hours.
+
+### Environmental Protection (Environment Protection Act 1993 SA)
+Administered by the EPA SA.
+
+Winery-specific obligations:
+- Winery wastewater (winery wash water, grape marc, lees) must be managed under an Environment Protection Policy.
+- Discharge to land: requires an EPA licence if volumes exceed prescribed thresholds; must comply with the Winery and Distillery Wastewater EPA guidelines.
+- Irrigation of wastewater: must comply with soil application rates; no discharge to waterways.
+- Air emissions: SO₂ fumigation must comply with ambient air quality standards.
+- Noise: must comply with the Environment Protection (Noise) Policy 2007.
+- Prescribed activities (large wineries): require an Environment Protection Licence (EPL).
+
+### Water Licensing (Natural Resources Management Act 2004 SA)
+- Extraction of groundwater or surface water for winery operations requires a water licence from the relevant NRM Board.
+- Water allocation trading is permitted within prescribed water resource areas.
+- Metering and reporting of water use is mandatory for licensed water users.
+
+### Development Approval (Development Act 1993 SA / Planning, Development and Infrastructure Act 2016 SA)
+- Change of use to winery or cellar door requires development approval from the relevant council.
+- Significant expansions (new buildings, car parks, event spaces) require a development application.
+- Heritage-listed properties have additional requirements.
+
+---
+
+## VICTORIA (VIC) REGULATIONS
+
+### Liquor Licensing (Liquor Control Reform Act 1998 VIC)
+Administered by the Victorian Commission for Gambling and Liquor Regulation (VCGLR).
+
+Relevant licence types for wineries:
+- Producer's Licence: allows production, wholesale, and cellar door sales and tastings.
+- General Licence: required for restaurants, bars, or events open to the public.
+
+Application requirements:
+- Online application via VCGLR portal
+- Proof of production premises
+- Floor plan
+- Planning permit (if required by local council)
+- RSA training for all staff
+- Community impact statement (for some applications)
+- Application fee: approximately $500–$2,000 depending on licence type
+
+Ongoing obligations:
+- Annual renewal and fee
+- RSA compliance
+- Minors policy compliance
+- Incident register
+
+Extended trading: Authorisation required for trading beyond standard hours (Sunday–Thursday 11pm; Friday–Saturday 1am).
+
+### Environmental Regulations (Environment Protection Act 2017 VIC)
+Administered by the EPA Victoria.
+
+- General Environmental Duty (GED): all businesses must take reasonably practicable steps to minimise risks of harm to human health and the environment.
+- Winery wastewater: must be managed to prevent discharge to waterways or groundwater.
+- Scheduled premises: large wineries may be scheduled premises requiring an EPA licence.
+- Noise: must comply with the Noise Protocol for Industry.
+
+### Water Licensing (Water Act 1989 VIC)
+- Groundwater and surface water extraction requires a licence from the relevant water corporation or Catchment Management Authority.
+- Irrigation of winery wastewater to land must comply with EPA guidelines.
+- Water licences are issued under a water management plan for the relevant catchment.
+
+### Planning (Planning and Environment Act 1987 VIC)
+- Winery and cellar door development requires a planning permit from the local council.
+- Significant expansions require a planning permit amendment.
+- Green Wedge and farming zones have specific rules for cellar door and event activities.
+
+---
+
+## NEW SOUTH WALES (NSW) REGULATIONS
+
+### Liquor Licensing (Liquor Act 2007 NSW)
+Administered by Liquor & Gaming NSW.
+
+Relevant licence types:
+- Producer/Wholesaler Licence: allows production, wholesale, and limited retail sales from the winery.
+- Hotel Licence / Small Bar Licence: required for cellar door with on-premises consumption.
+
+Application requirements:
+- Online application via Liquor & Gaming NSW portal
+- Proof of production premises
+- Floor plan
+- Community impact statement (for some applications)
+- RSA training for all staff
+- Local council development consent
+- Application fee: approximately $500–$2,500
+
+Ongoing obligations:
+- Annual renewal and fee
+- RSA compliance
+- Minors policy compliance
+- Incident register
+
+Extended trading: Authorisation required for trading beyond standard hours.
+
+### Environmental Regulations (Protection of the Environment Operations Act 1997 NSW)
+Administered by the EPA NSW.
+
+- Scheduled activities: large wineries may be scheduled premises requiring an Environment Protection Licence (EPL).
+- Winery wastewater: must be managed to prevent pollution of waterways or groundwater.
+- Noise: must comply with the NSW Industrial Noise Policy.
+- Air emissions: SO₂ and other emissions must comply with ambient air quality standards.
+
+### Water Licensing (Water Management Act 2000 NSW)
+- Extraction of groundwater or surface water requires a water access licence from WaterNSW or the relevant water authority.
+- Metering and reporting of water use is mandatory.
+- Irrigation of winery wastewater to land must comply with EPA guidelines.
+
+### Planning (Environmental Planning and Assessment Act 1979 NSW)
+- Winery and cellar door development requires development consent from the local council.
+- State Environmental Planning Policy (Primary Production and Rural Development) 2019 applies to rural winery developments.
+- Significant expansions require a development application.
+
+---
+
+## WESTERN AUSTRALIA (WA) REGULATIONS
+
+### Liquor Licensing (Liquor Control Act 1988 WA)
+Administered by the Department of Local Government, Sport and Cultural Industries (Racing, Gaming and Liquor).
+
+Relevant licence types:
+- Producer's Licence: allows production, wholesale, and cellar door sales and tastings.
+- Restaurant Licence: required for cellar door with meals and on-premises consumption.
+
+Application requirements:
+- Application via the Liquor Licensing Portal
+- Proof of production premises
+- Floor plan
+- Local council approval
+- RSA training for all staff
+- Application fee: approximately $500–$2,000
+
+Ongoing obligations:
+- Annual renewal and fee
+- RSA compliance
+- Minors policy compliance
+- Incident register
+
+Extended trading: Authorisation required for trading beyond standard hours.
+
+### Environmental Regulations (Environmental Protection Act 1986 WA)
+Administered by the Department of Water and Environmental Regulation (DWER).
+
+- Works approval and licence: large wineries may require a works approval and operating licence.
+- Winery wastewater: must be managed to prevent discharge to waterways or groundwater.
+- Noise: must comply with the Environmental Protection (Noise) Regulations 1997.
+
+### Water Licensing (Rights in Water and Irrigation Act 1914 WA)
+- Extraction of groundwater or surface water requires a licence from DWER.
+- Metering and reporting of water use is mandatory for licensed water users.
+
+### Planning (Planning and Development Act 2005 WA)
+- Winery and cellar door development requires development approval from the local council or WAPC.
+- Significant expansions require a development application.
+
+---
+
+## QUEENSLAND (QLD) REGULATIONS
+
+### Liquor Licensing (Liquor Act 1992 QLD)
+Administered by the Office of Liquor and Gaming Regulation (OLGR).
+
+Relevant licence types:
+- Producer/Wholesaler Licence: allows production, wholesale, and cellar door sales and tastings.
+- Commercial Hotel Licence / Subsidiary on-premises licence: required for cellar door with on-premises consumption.
+
+Application requirements:
+- Online application via OLGR portal
+- Proof of production premises
+- Floor plan
+- Local government approval
+- RSA training for all staff
+- Application fee: approximately $500–$2,000
+
+Ongoing obligations:
+- Annual renewal and fee
+- RSA compliance
+- Minors policy compliance
+- Incident register
+
+Extended trading: Authorisation required for trading beyond standard hours.
+
+### Environmental Regulations (Environmental Protection Act 1994 QLD)
+Administered by the Department of Environment and Science (DES).
+
+- Environmentally relevant activities (ERAs): large wineries may be ERAs requiring an environmental authority.
+- Winery wastewater: must be managed to prevent discharge to waterways or groundwater.
+- Noise: must comply with the Environmental Protection (Noise) Policy 2008.
+
+### Water Licensing (Water Act 2000 QLD)
+- Extraction of groundwater or surface water requires a water licence from the Department of Regional Development, Manufacturing and Water.
+- Metering and reporting of water use is mandatory.
+
+### Planning (Planning Act 2016 QLD)
+- Winery and cellar door development requires development approval from the local council.
+- Significant expansions require a development application.
+
+---
+
+## TASMANIA (TAS) REGULATIONS
+
+### Liquor Licensing (Liquor Licensing Act 1990 TAS)
+Administered by the Commissioner for Licensing.
+
+Relevant licence types:
+- Winery Licence: allows production, wholesale, and cellar door sales and tastings.
+- On-licence: required for cellar door with on-premises consumption.
+
+Application requirements:
+- Application via the Commissioner for Licensing
+- Proof of production premises
+- Floor plan
+- Local council development approval
+- RSA training for all staff
+- Application fee: approximately $500–$1,500
+
+Ongoing obligations:
+- Annual renewal and fee
+- RSA compliance
+- Minors policy compliance
+- Incident register
+
+Extended trading: Authorisation required for trading beyond standard hours.
+
+### Environmental Regulations (Environmental Management and Pollution Control Act 1994 TAS)
+Administered by the Environment Protection Authority Tasmania (EPA TAS).
+
+- Scheduled activities: large wineries may be scheduled activities requiring an environment protection notice.
+- Winery wastewater: must be managed to prevent discharge to waterways or groundwater.
+- Noise: must comply with the Environmental Management and Pollution Control (Noise) Regulations 2016.
+
+### Water Licensing (Water Management Act 1999 TAS)
+- Extraction of groundwater or surface water requires a water licence from NRE Tasmania.
+- Metering and reporting of water use is mandatory.
+- Water licences are issued under a water management plan for the relevant catchment.
+- Contact NRE Tasmania for licence applications and current allocation status in your catchment.
+
+### Planning (Land Use Planning and Approvals Act 1993 TAS)
+- Winery and cellar door development requires a planning permit from the local council.
+- Significant expansions require a planning permit application.
+
+---
+
+## KEY CONTACTS
+
+### Federal
+- Wine Australia: wineaustralia.com | 1300 363 959
+- FSANZ (Food Standards Australia New Zealand): foodstandards.gov.au
+- ATO (Wine Equalisation Tax): ato.gov.au/business/wine-equalisation-tax
+- DAFF (Biosecurity): agriculture.gov.au/biosecurity
+- Safe Work Australia (WHS model laws): safeworkaustralia.gov.au
+
+### South Australia
+- Consumer and Business Services (Liquor Licensing): cbs.sa.gov.au | 131 882
+- EPA SA (Environment): epa.sa.gov.au | 1800 623 445
+- SafeWork SA (WHS): safework.sa.gov.au | 1300 365 255
+- NRM Boards (Water): naturalresources.sa.gov.au
+
+### Victoria
+- VCGLR (Liquor Licensing): vcglr.vic.gov.au | 1300 182 457
+- EPA Victoria (Environment): epa.vic.gov.au | 1300 372 842
+- WorkSafe Victoria (WHS): worksafe.vic.gov.au | 1800 136 089
+
+### New South Wales
+- Liquor & Gaming NSW: liquorandgaming.nsw.gov.au | 1300 024 720
+- EPA NSW (Environment): epa.nsw.gov.au | 131 555
+- SafeWork NSW (WHS): safework.nsw.gov.au | 13 10 50
+
+### Western Australia
+- Racing, Gaming and Liquor (Liquor Licensing): dlgsc.wa.gov.au | 1800 634 541
+- DWER (Environment and Water): dwer.wa.gov.au | 6364 7000
+- WorkSafe WA (WHS): worksafe.wa.gov.au | 1300 307 877
+
+### Queensland
+- OLGR (Liquor Licensing): olgr.qld.gov.au | 13 74 68
+- DES (Environment): des.qld.gov.au | 13 74 68
+- Workplace Health and Safety QLD: worksafe.qld.gov.au | 1300 362 128
+
+### Tasmania
+- Commissioner for Licensing (Liquor): cbos.tas.gov.au | 1300 654 499
+- EPA Tasmania (Environment): epa.tas.gov.au | 1800 005 171
+- WorkSafe Tasmania (WHS): worksafe.tas.gov.au | 1300 366 322
+`;
+
+// ─── Jurisdiction section splitter ───────────────────────────────────────────
+
+const KB_SECTIONS: Record<string, string> = {
+  Federal: COMPLIANCE_KNOWLEDGE_BASE.split("## SOUTH AUSTRALIA REGULATIONS")[0],
+  SA:
+    "## SOUTH AUSTRALIA REGULATIONS" +
+    (COMPLIANCE_KNOWLEDGE_BASE.split("## SOUTH AUSTRALIA REGULATIONS")[1]?.split(
+      "## VICTORIA (VIC) REGULATIONS"
+    )[0] ?? ""),
+  VIC:
+    "## VICTORIA (VIC) REGULATIONS" +
+    (COMPLIANCE_KNOWLEDGE_BASE.split("## VICTORIA (VIC) REGULATIONS")[1]?.split(
+      "## NEW SOUTH WALES (NSW) REGULATIONS"
+    )[0] ?? ""),
+  NSW:
+    "## NEW SOUTH WALES (NSW) REGULATIONS" +
+    (COMPLIANCE_KNOWLEDGE_BASE.split("## NEW SOUTH WALES (NSW) REGULATIONS")[1]?.split(
+      "## WESTERN AUSTRALIA (WA) REGULATIONS"
+    )[0] ?? ""),
+  WA:
+    "## WESTERN AUSTRALIA (WA) REGULATIONS" +
+    (COMPLIANCE_KNOWLEDGE_BASE.split("## WESTERN AUSTRALIA (WA) REGULATIONS")[1]?.split(
+      "## QUEENSLAND (QLD) REGULATIONS"
+    )[0] ?? ""),
+  QLD:
+    "## QUEENSLAND (QLD) REGULATIONS" +
+    (COMPLIANCE_KNOWLEDGE_BASE.split("## QUEENSLAND (QLD) REGULATIONS")[1]?.split(
+      "## TASMANIA (TAS) REGULATIONS"
+    )[0] ?? ""),
+  TAS:
+    "## TASMANIA (TAS) REGULATIONS" +
+    (COMPLIANCE_KNOWLEDGE_BASE.split("## TASMANIA (TAS) REGULATIONS")[1]?.split(
+      "## KEY CONTACTS"
+    )[0] ?? ""),
+  Contacts: "## KEY CONTACTS" + (COMPLIANCE_KNOWLEDGE_BASE.split("## KEY CONTACTS")[1] ?? ""),
+};
+
+export function buildScopedKnowledgeBase(jurisdictions: string[]): string {
+  const parts: string[] = [KB_SECTIONS.Federal];
+  for (const j of jurisdictions) {
+    if (j !== "Federal" && KB_SECTIONS[j]) parts.push(KB_SECTIONS[j]);
+  }
+  parts.push(KB_SECTIONS.Contacts);
+  return parts.join("\n\n");
+}

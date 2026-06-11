@@ -1,6 +1,7 @@
 import { z } from "zod";
 import Stripe from "stripe";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
+import { buildScopedKnowledgeBase } from "./complianceKnowledgeBase.js";
 import {
   getCampaignMetricsHistory,
   getLatestCampaignMetrics,
@@ -521,8 +522,127 @@ const siteContentRouter = router({
     }),
 });
 
-// ─── App Router ──────────────────────────────────────────────────────────────────────────────
+// ─── Compliance Router ──────────────────────────────────────────────────────
 
+const complianceRouter = router({
+  ask: publicProcedure
+    .input(
+      z.object({
+        question: z.string().min(1).max(2000),
+        jurisdictions: z.array(z.string()).optional(),
+        stateFilter: z.string().optional(),
+        history: z
+          .array(z.object({ role: z.enum(["user", "assistant"]), content: z.string() }))
+          .max(20)
+          .optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+
+      if (!forgeUrl || !forgeKey) {
+        throw new Error("LLM service not configured");
+      }
+
+      // ── Stage 1: Jurisdiction classifier ──────────────────────────────────
+      const classifierPrompt = `You are a jurisdiction classifier for Australian winery regulatory questions.
+Given a user question, identify which Australian jurisdictions it relates to.
+Respond with a JSON object only, no explanation:
+{"jurisdictions": ["Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS"], "inScope": true}
+
+Rules:
+- "jurisdictions" must be an array containing only values from: "Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS"
+- Always include "Federal" if the question touches on Wine Australia, FSANZ, WET, biosecurity, or WHS model law
+- "inScope" must be false if the question is completely unrelated to Australian winery regulations
+- If the user filter is not "All", bias toward that jurisdiction but include Federal if relevant
+
+User jurisdiction filter: ${input.stateFilter === "All" || !input.stateFilter ? "All jurisdictions" : input.stateFilter}
+User question: ${input.question}`;
+
+      let detectedJurisdictions: string[] = ["Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS"];
+      let inScope = true;
+
+      try {
+        const classifierResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
+          body: JSON.stringify({
+            messages: [{ role: "user", content: classifierPrompt }],
+            response_format: { type: "json_object" },
+            stream: false,
+          }),
+        });
+        if (classifierResp.ok) {
+          const classifierData = await classifierResp.json();
+          const parsed = JSON.parse(classifierData.choices?.[0]?.message?.content || "{}");
+          if (Array.isArray(parsed.jurisdictions) && parsed.jurisdictions.length > 0) {
+            detectedJurisdictions = parsed.jurisdictions;
+          }
+          if (parsed.inScope === false) inScope = false;
+        }
+      } catch {
+        // classifier failed — fall back to full knowledge base
+      }
+
+      if (!inScope) {
+        return {
+          answer:
+            "That question appears to be outside the scope of Australian winery compliance. " +
+            "I can help with topics such as liquor licensing, environmental obligations, WHS, " +
+            "food safety, water licensing, Wine Australia registration, FSANZ standards, and WET. " +
+            "Please ask a question related to these areas.",
+          outOfScope: true,
+        };
+      }
+
+      // ── Stage 2: Focused answer with scoped knowledge base ────────────────
+      const scopeJurisdictions =
+        input.stateFilter && input.stateFilter !== "All" && input.stateFilter !== "Federal"
+          ? ["Federal", input.stateFilter]
+          : input.stateFilter === "Federal"
+          ? ["Federal"]
+          : detectedJurisdictions;
+
+      const scopedKB = buildScopedKnowledgeBase(scopeJurisdictions);
+      const jurisdictionLabel = scopeJurisdictions.join(", ");
+
+      const systemPrompt = `You are a regulatory compliance assistant specialising in Australian winery regulations.
+You have been given a targeted knowledge base covering: ${jurisdictionLabel}.
+
+Answer questions accurately and concisely based ONLY on the knowledge base provided below.
+If a question falls outside the knowledge base, say so clearly and suggest the relevant agency to contact.
+Always cite the relevant legislation or regulation name when giving an answer.
+End every response with a brief disclaimer that the user should verify current requirements with the relevant agency or a qualified compliance professional.
+
+KNOWLEDGE BASE:
+${scopedKB}`;
+
+      const messages = [
+        { role: "system" as const, content: systemPrompt },
+        ...(input.history ?? []).map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+        { role: "user" as const, content: input.question },
+      ];
+
+      const response = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
+        body: JSON.stringify({ messages, stream: false }),
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error("[Compliance] LLM error:", response.status, errText);
+        throw new Error(`LLM error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const answer = data.choices?.[0]?.message?.content || "No response received.";
+      return { answer, outOfScope: false };
+    }),
+});
+
+// ─── App Router ──────────────────────────────────────────────────────────────────────────────
 export const appRouter = router({
   campaignMetrics: campaignMetricsRouter,
   foundingMembers: foundingMembersRouter,
@@ -533,6 +653,7 @@ export const appRouter = router({
   email: emailRouter,
   leads: leadsRouter,
   siteContent: siteContentRouter,
+  compliance: complianceRouter,
 });
 
 export type AppRouter = typeof appRouter;
