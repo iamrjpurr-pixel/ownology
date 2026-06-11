@@ -19,6 +19,9 @@ interface Lead {
   tags: string[];
   name: string | null;
   wineryName: string | null;
+  phone: string | null;
+  stripePaid: boolean;
+  stripeCustomerId: string | null;
   notes: string | null;
   createdAt: number;
   updatedAt: number;
@@ -524,7 +527,7 @@ export default function AdminLeads() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'Lato',sans-serif" }}>
               <thead>
                 <tr style={{ background: "var(--ow-bg-raised)", borderBottom: "1px solid var(--ow-border)" }}>
-                  {["Email", "Source", "Name / Winery", "Date", "Notes", ""].map((h) => (
+                  {["Email", "Source", "Name / Winery", "Phone", "Paid", "Date", "Notes", ""].map((h) => (
                     <th
                       key={h}
                       style={{
@@ -602,6 +605,24 @@ export default function AdminLeads() {
                         </div>
                       ) : (
                         <span style={{ color: "var(--ow-text-lo)", opacity: 0.5 }}>—</span>
+                      )}
+                    </td>
+
+                    {/* Phone */}
+                    <td style={{ padding: "0.85rem 1rem", fontSize: "0.82rem", color: "var(--ow-text-mid)", whiteSpace: "nowrap" }}>
+                      {lead.phone ? (
+                        <a href={`tel:${lead.phone}`} style={{ color: "var(--ow-text-mid)", textDecoration: "none" }}>{lead.phone}</a>
+                      ) : (
+                        <span style={{ color: "var(--ow-text-lo)", opacity: 0.4 }}>—</span>
+                      )}
+                    </td>
+
+                    {/* Paid */}
+                    <td style={{ padding: "0.85rem 1rem", whiteSpace: "nowrap" }}>
+                      {lead.stripePaid ? (
+                        <span className="px-2 py-0.5 rounded-full text-xs" style={{ background: "oklch(0.55 0.18 150 / 20%)", color: "oklch(0.65 0.18 150)", fontFamily: "'Lato',sans-serif", fontSize: "0.68rem", letterSpacing: "0.06em", textTransform: "uppercase" }}>Paid</span>
+                      ) : (
+                        <span style={{ color: "var(--ow-text-lo)", opacity: 0.4, fontSize: "0.78rem" }}>—</span>
                       )}
                     </td>
 

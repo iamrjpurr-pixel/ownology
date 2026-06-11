@@ -519,7 +519,7 @@ function PainPoints() {
     <section className="py-28" style={{background:"var(--ow-bg-raised)"}}>
       <div className="container" ref={ref}>
         <p className="section-label mb-4">The Problem</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"480px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.25rem,2.2vw,2rem)", color:"var(--ow-text-hi)", maxWidth:"420px", lineHeight:1.2, letterSpacing:"-0.01em", textWrap:"balance"} as React.CSSProperties}>
           Four problems every boutique winery knows too well.
         </h2>
         <div className="amber-rule mt-8 mb-12" />
