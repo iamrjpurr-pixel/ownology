@@ -519,7 +519,7 @@ function PainPoints() {
     <section className="py-28" style={{background:"var(--ow-bg-raised)"}}>
       <div className="container" ref={ref}>
         <p className="section-label mb-4">The Problem</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"var(--ow-text-hi)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"480px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
           Four problems every boutique winery knows too well.
         </h2>
         <div className="amber-rule mt-8 mb-12" />
@@ -546,7 +546,7 @@ function Features() {
     <section id="features" className="py-28">
       <div className="container" ref={ref}>
         <p className="section-label mb-4">Features</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"var(--ow-text-hi)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
           Everything your team needs. Nothing they don't.
         </h2>
         <div className="amber-rule mt-8 mb-12" />
@@ -678,7 +678,7 @@ function HowItWorks() {
       </div>
       <div className="container relative z-10" ref={ref}>
         <p className="section-label mb-4">How It Works</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"var(--ow-text-hi)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
           From upload to answer in under a minute.
         </h2>
         <div className="amber-rule mt-8 mb-16" />
@@ -732,7 +732,7 @@ function DemoVideo() {
     <section id="demo" className="py-28" style={{background:"var(--ow-bg-raised)"}}>
       <div className="container" ref={ref}>
         <p className="section-label mb-4">See It In Action</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"var(--ow-text-hi)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
           60 seconds. A real cellar question. A real answer.
         </h2>
         <div className="amber-rule mt-8 mb-12" />
@@ -787,7 +787,7 @@ function Testimonials() {
     <section className="py-28">
       <div className="container" ref={ref}>
         <p className="section-label mb-4">From the Cellar</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"var(--ow-text-hi)", maxWidth:"480px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"480px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
           What winemakers are saying.
         </h2>
         <div className="amber-rule mt-8 mb-12" />
@@ -834,7 +834,7 @@ function Pricing() {
     <section id="pricing" className="py-28" style={{background:"var(--ow-bg-raised)"}}>
       <div className="container" ref={ref}>
         <p className="section-label mb-4">Pricing</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.75rem,3.5vw,2.75rem)", color:"var(--ow-text-hi)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
           Priced by production scale. No surprises.
         </h2>
         <p className="mt-4" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, color:"var(--ow-text-mid)", fontSize:"1rem"}}>
