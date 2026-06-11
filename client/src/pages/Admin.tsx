@@ -344,6 +344,13 @@ const TOOLS: AdminTool[] = [
     icon: <IconLeads />,
     badge: "New",
   },
+  {
+    label: "Compliance Doctrine Map",
+    description: "Read-only view of all canonical Q&A doctrine entries — grouped by topic, with jurisdiction badges, citations, keywords, and last-verified dates.",
+    href: "/admin/compliance-doctrine",
+    icon: <IconCompliance />,
+    badge: "Doctrine",
+  },
 ];
 
 export default function Admin() {

@@ -192,6 +192,26 @@ export const siteContent = mysqlTable("site_content", {
   updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
 });
 
+// ─── Compliance Doctrine — Verified Dates ───────────────────────────────────
+// Tracks when each Q&A doctrine entry was last manually verified by the owner.
+// One row per doctrine entry ID. If no row exists, the entry is unverified.
+export const doctrineVerified = mysqlTable(
+  "doctrine_verified",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // The doctrine entry ID from complianceQADoctrine.ts (e.g. "sa-cellar-door")
+    doctrineId: varchar("doctrine_id", { length: 128 }).notNull().unique(),
+    // UTC ms timestamp of the last verification
+    verifiedAt: bigint("verified_at", { mode: "number" }).notNull(),
+    // Optional note about what was checked (e.g. "Confirmed SA Liquor Licensing Act unchanged")
+    notes: text("notes"),
+  },
+  (t) => [
+    index("dv_doctrine_id_idx").on(t.doctrineId),
+    index("dv_verified_at_idx").on(t.verifiedAt),
+  ]
+);
+
 // ─── Regulation Monitor — Seen Publications ─────────────────────────────────
 // Tracks which regulation update URLs have already been notified to the owner.
 // The weekly scheduled monitor inserts a row when it first sees a new publication,

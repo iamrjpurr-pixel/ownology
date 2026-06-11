@@ -6,6 +6,7 @@
 import express from "express";
 import Stripe from "stripe";
 import { MERCH_PRODUCTS, getProductById } from "./products.js";
+import { addFoundingMember } from "../db.js";
 
 const router = express.Router();
 
@@ -139,34 +140,78 @@ router.post(
       const session = event.data.object as Stripe.Checkout.Session;
       const meta = session.metadata ?? {};
 
-      console.log(
-        `[Webhook] Order completed — product: ${meta.product_id}, qty: ${meta.quantity}, email: ${meta.customer_email}`
-      );
+      // ── Founding Member subscription checkout ─────────────────────────────
+      if (meta.founding_member === "true" && session.mode === "subscription") {
+        const email = meta.customer_email || session.customer_email || "";
+        const tier = (meta.tier as "cellar" | "press" | "cellar_master") ?? "cellar";
+        const stripeCustomerId = typeof session.customer === "string" ? session.customer : undefined;
 
-      // Notify the owner
-      try {
-        const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
-        const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
-        const appId = process.env.VITE_APP_ID;
-        const ownerOpenId = process.env.OWNER_OPEN_ID;
+        console.log(`[Webhook] Founding member subscription — tier: ${tier}, email: ${email}`);
 
-        if (forgeUrl && forgeKey && appId && ownerOpenId) {
-          await fetch(`${forgeUrl}/v1/notification/send`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${forgeKey}`,
-            },
-            body: JSON.stringify({
-              app_id: appId,
-              open_id: ownerOpenId,
-              title: `New Merch Order — ${meta.product_name}`,
-              content: `${meta.quantity}× ${meta.product_name} ordered by ${meta.customer_email || "guest"}. Session: ${session.id}`,
-            }),
-          });
+        if (email) {
+          try {
+            await addFoundingMember({ email, tier, stripeCustomerId });
+          } catch (dbErr) {
+            // Duplicate email is fine — member already exists
+            console.warn("[Webhook] addFoundingMember skipped (may already exist):", dbErr);
+          }
         }
-      } catch (notifyErr) {
-        console.error("[Webhook] Owner notification failed:", notifyErr);
+
+        // Notify owner
+        try {
+          const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+          const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+          const appId = process.env.VITE_APP_ID;
+          const ownerOpenId = process.env.OWNER_OPEN_ID;
+
+          if (forgeUrl && forgeKey && appId && ownerOpenId) {
+            await fetch(`${forgeUrl}/v1/notification/send`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${forgeKey}`,
+              },
+              body: JSON.stringify({
+                app_id: appId,
+                open_id: ownerOpenId,
+                title: `🍷 New Founding Member — ${meta.tier_label ?? tier}`,
+                content: `${email} subscribed to ${meta.tier_label ?? tier} (${meta.cycle ?? "monthly"}). Session: ${session.id}`,
+              }),
+            });
+          }
+        } catch (notifyErr) {
+          console.error("[Webhook] Owner notification failed:", notifyErr);
+        }
+      } else {
+        // ── Merch order ──────────────────────────────────────────────────────
+        console.log(
+          `[Webhook] Merch order completed — product: ${meta.product_id}, qty: ${meta.quantity}, email: ${meta.customer_email}`
+        );
+
+        try {
+          const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+          const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+          const appId = process.env.VITE_APP_ID;
+          const ownerOpenId = process.env.OWNER_OPEN_ID;
+
+          if (forgeUrl && forgeKey && appId && ownerOpenId) {
+            await fetch(`${forgeUrl}/v1/notification/send`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${forgeKey}`,
+              },
+              body: JSON.stringify({
+                app_id: appId,
+                open_id: ownerOpenId,
+                title: `New Merch Order — ${meta.product_name}`,
+                content: `${meta.quantity}× ${meta.product_name} ordered by ${meta.customer_email || "guest"}. Session: ${session.id}`,
+              }),
+            });
+          }
+        } catch (notifyErr) {
+          console.error("[Webhook] Owner notification failed:", notifyErr);
+        }
       }
     }
 

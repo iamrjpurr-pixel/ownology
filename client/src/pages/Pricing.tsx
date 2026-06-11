@@ -472,6 +472,34 @@ function TierCard({
     };
   }, [flashRef]);
 
+  // Stripe checkout for paid tiers
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const checkoutMutation = trpc.foundingMembers.createCheckout.useMutation();
+
+  const handleCheckout = async () => {
+    if (tier.monthlyPrice === 0) {
+      // Free tier — scroll to waitlist
+      document.querySelector("#waitlist")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    setCheckoutLoading(true);
+    try {
+      const tierId = tier.id as "cellar" | "press" | "cellar_master";
+      const result = await checkoutMutation.mutateAsync({
+        tier: tierId,
+        cycle: cycle === "annual" ? "annual" : "monthly",
+        origin: window.location.origin,
+      });
+      if (result.url) {
+        window.open(result.url, "_blank");
+      }
+    } catch (err) {
+      console.error("[Checkout Error]", err);
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
   return (
     <div
       ref={cardRef}
@@ -595,18 +623,21 @@ function TierCard({
         )}
 
         {/* CTA */}
-        <a
-          href={tier.ctaHref}
-          className="block text-center py-3 rounded-sm text-sm mt-3 transition-all duration-200"
+        <button
+          onClick={handleCheckout}
+          disabled={checkoutLoading}
+          className="block w-full text-center py-3 rounded-sm text-sm mt-3 transition-all duration-200 cursor-pointer"
           style={
             tier.highlight
               ? {
-                  background: "oklch(0.72 0.12 75)",
+                  background: checkoutLoading ? "oklch(0.60 0.10 75)" : "oklch(0.72 0.12 75)",
                   color: "oklch(0.11 0.008 60)",
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 600,
                   letterSpacing: "0.06em",
                   textTransform: "uppercase",
+                  border: "none",
+                  opacity: checkoutLoading ? 0.8 : 1,
                 }
               : {
                   background: "transparent",
@@ -616,11 +647,12 @@ function TierCard({
                   letterSpacing: "0.06em",
                   textTransform: "uppercase",
                   border: "1px solid oklch(0.72 0.12 75 / 35%)",
+                  opacity: checkoutLoading ? 0.7 : 1,
                 }
           }
         >
-          {tier.cta}
-        </a>
+          {checkoutLoading ? "Opening checkout…" : tier.cta}
+        </button>
       </div>
 
       {/* ── Desktop layout ── */}
@@ -667,18 +699,21 @@ function TierCard({
             </li>
           ))}
         </ul>
-        <a
-          href={tier.ctaHref}
-          className="block text-center py-3 rounded-sm text-sm transition-all duration-200"
+        <button
+          onClick={handleCheckout}
+          disabled={checkoutLoading}
+          className="block w-full text-center py-3 rounded-sm text-sm transition-all duration-200 cursor-pointer"
           style={
             tier.highlight
               ? {
-                  background: "oklch(0.72 0.12 75)",
+                  background: checkoutLoading ? "oklch(0.60 0.10 75)" : "oklch(0.72 0.12 75)",
                   color: "oklch(0.11 0.008 60)",
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 600,
                   letterSpacing: "0.06em",
                   textTransform: "uppercase",
+                  border: "none",
+                  opacity: checkoutLoading ? 0.8 : 1,
                 }
               : {
                   background: "transparent",
@@ -688,13 +723,14 @@ function TierCard({
                   letterSpacing: "0.06em",
                   textTransform: "uppercase",
                   border: "1px solid oklch(0.72 0.12 75 / 35%)",
+                  opacity: checkoutLoading ? 0.7 : 1,
                 }
           }
-          onMouseEnter={e => { if (!tier.highlight) (e.currentTarget as HTMLAnchorElement).style.background = "oklch(0.72 0.12 75 / 10%)"; }}
-          onMouseLeave={e => { if (!tier.highlight) (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}
+          onMouseEnter={e => { if (!tier.highlight) (e.currentTarget as HTMLButtonElement).style.background = "oklch(0.72 0.12 75 / 10%)"; }}
+          onMouseLeave={e => { if (!tier.highlight) (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
         >
-          {tier.cta}
-        </a>
+          {checkoutLoading ? "Opening checkout…" : tier.cta}
+        </button>
       </div>
     </div>
   );

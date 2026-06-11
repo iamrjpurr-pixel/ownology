@@ -979,6 +979,239 @@ export const QA_DOCTRINE: QAEntry[] = [
     lastVerified: "2026-05-01",
   },
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 11. OPERATIONAL COMPLIANCE
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: "confined-space-tank-entry",
+    topic: "Operational Compliance",
+    jurisdiction: "All",
+    question: "What are the legal requirements before a worker enters a wine tank for cleaning?",
+    keywords: ["tank entry", "confined space", "wine tank", "cleaning tank", "enter tank", "tank cleaning", "confined space permit", "CO2 tank", "oxygen tank", "tank safety"],
+    answer:
+      "Before any worker enters a wine tank (which is a confined space under WHS Regulation 2011 Part 4.1), the following steps are legally required:\n\n1. Confined Space Entry Permit: A written entry permit must be issued and authorised before entry (WHS Reg s.66). The permit must identify the space, work to be done, hazards, control measures, atmospheric test results, authorised entrants, standby person, and emergency procedures.\n\n2. Atmospheric Testing: A competent person must test the atmosphere before entry and continuously during work (WHS Reg s.70):\n   - Oxygen: 19.5%-23.5% (below 19.5% = oxygen-deficient, immediately dangerous)\n   - CO2: below 0.5% (5,000 ppm) — CO2 from fermentation can be lethal at >5%\n   - Flammable gases: below 5% of the Lower Explosive Limit (LEL)\n\n3. Energy Isolation (Lock-out/Tag-out): All energy sources (electrical, pneumatic, hydraulic) must be isolated and locked out. All inlet/outlet valves must be closed, locked, and tagged. Refrigeration must be isolated (WHS Reg ss.208-215).\n\n4. Standby Person: A trained standby person must remain outside the space at all times, maintaining communication and monitoring conditions (WHS Reg s.71). The standby person must NOT enter the space to rescue without air-supplied respiratory protection.\n\n5. PPE: Workers must be provided with appropriate PPE for the chemicals used in cleaning (chemical-resistant gloves, eye protection, apron, respiratory protection if required).\n\n6. Training: All workers entering confined spaces must be trained in confined space hazards, the entry permit system, and emergency procedures (WHS Reg s.79).\n\nIn Victoria, equivalent obligations apply under the OHS Regulations 2017. In New Zealand, the Health and Safety at Work (General Risk and Workplace Management) Regulations 2016 apply.",
+    citations: [
+      {
+        title: "Work Health and Safety Regulation 2011 (NSW) — Part 4.1 Confined Spaces",
+        section: "ss.60-79 (entry permits, atmospheric testing, standby persons, training)",
+        jurisdiction: "NSW",
+        url: "https://legislation.nsw.gov.au/view/html/inforce/current/sl-2011-0674#pt.4.1",
+      },
+      {
+        title: "Safe Work Australia Code of Practice: Confined Spaces",
+        section: "Sections 3-6 (entry permits, atmospheric testing, emergency procedures)",
+        jurisdiction: "Federal",
+        url: "https://www.safeworkaustralia.gov.au/doc/model-code-practice-confined-spaces",
+      },
+      {
+        title: "SafeWork NSW Guide to Managing Risks in Wineries",
+        section: "Section 10 (Confined Spaces)",
+        jurisdiction: "NSW",
+        url: "https://www.safework.nsw.gov.au/resource-library/list-of-all-resources/publications/guide-to-managing-risks-in-wineries",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+  {
+    id: "co2-asphyxiation-risks",
+    topic: "Operational Compliance",
+    jurisdiction: "All",
+    question: "How dangerous is CO2 in a winery and what monitoring is required?",
+    keywords: ["CO2", "carbon dioxide", "fermentation gas", "asphyxiation", "oxygen depletion", "CO2 monitoring", "barrel hall", "CO2 danger", "fermentation CO2", "CO2 levels"],
+    answer:
+      "CO2 is one of the most serious hazards in a winery. During fermentation, CO2 is produced in large quantities (approximately 46 g CO2 per 100 g of sugar fermented). CO2 is heavier than air and accumulates at low points — inside tanks, in barrel halls, and in underground cellars.\n\nCO2 concentration effects:\n- 1-2%: Headaches, shortness of breath\n- 3-4%: Dizziness, rapid breathing, impaired judgment\n- >5%: Unconsciousness within minutes\n- >10%: Death within minutes\n\nOxygen depletion: CO2 displaces oxygen. Normal atmospheric oxygen is 20.9%. Below 19.5% is oxygen-deficient; below 16% causes impaired judgment; below 6% causes death.\n\nLegal requirements (WHS Regulation 2011 Part 4.1):\n- Any enclosed or partially enclosed space where CO2 may accumulate is a confined space and requires a confined space entry permit before entry.\n- Atmospheric testing must confirm O2 is between 19.5%-23.5% and CO2 is below 0.5% (5,000 ppm) before entry.\n- Continuous atmospheric monitoring during work in the space is required.\n- Barrel halls and underground cellars must be adequately ventilated, particularly during and after fermentation.\n- Workers must be trained to recognise CO2 hazards and never enter a tank or enclosed space without testing.\n\nBest practice: Install fixed CO2 monitors in barrel halls and fermentation areas with audible alarms. Portable multi-gas detectors should be used before and during any confined space entry.",
+    citations: [
+      {
+        title: "Work Health and Safety Regulation 2011 (NSW) — Part 4.1 Confined Spaces",
+        section: "s.70 (atmospheric testing requirements)",
+        jurisdiction: "NSW",
+        url: "https://legislation.nsw.gov.au/view/html/inforce/current/sl-2011-0674#pt.4.1",
+      },
+      {
+        title: "SafeWork NSW Guide to Managing Risks in Wineries",
+        section: "Section 10.1 (CO2 and asphyxiant risks in confined spaces)",
+        jurisdiction: "NSW",
+        url: "https://www.safework.nsw.gov.au/resource-library/list-of-all-resources/publications/guide-to-managing-risks-in-wineries",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+  {
+    id: "lockout-tagout-maintenance",
+    topic: "Operational Compliance",
+    jurisdiction: "All",
+    question: "What is the lock-out/tag-out procedure for winery equipment maintenance?",
+    keywords: ["lock out", "tag out", "LOTO", "isolation procedure", "plant maintenance", "equipment isolation", "personal danger lock", "out of service", "pump maintenance", "press maintenance"],
+    answer:
+      "Lock-out/tag-out (LOTO) is a mandatory isolation procedure that must be followed before any maintenance, cleaning, or non-production work on plant and equipment (WHS Regulation 2011 Part 5.1, ss.208-215).\n\nThe 7-step LOTO procedure for winery equipment:\n\n1. Shut down plant: Notify the plant operator. Shut down all energy sources in the correct sequence (electrical, pneumatic, hydraulic, chemical).\n\n2. Isolate energy sources: Isolate at the main isolation point — circuit breaker or main switch for electrical; close and lock valves for pneumatic/hydraulic.\n\n3. De-energise stored energy: Release or restrain all stored energy (capacitors, springs, hydraulic accumulators, gravity-loaded components). Allow rotating parts to stop completely.\n\n4. Lock out — personal danger locks: Each person performing maintenance attaches their own personal danger lock to every isolation point. One lock per person per isolation point. Locks remain on until work is complete.\n\n5. Lock out — out of service locks: For work spanning multiple shifts or days, a supervisor applies an out-of-service lock (yellow/black) in addition to personal danger locks.\n\n6. Tag out: Attach personal danger tags (red/white) to all isolation points after locking out. Tags identify who is working on the plant and must not be removed by anyone other than the person who attached them.\n\n7. Confirm isolation: Test that the plant cannot be energised. Check for residual pressure/voltage. Confirm all stored energy has been dissipated.\n\nNote: Tagging alone is NOT sufficient — locking out must always precede tagging. Emergency stop buttons are NOT isolation devices and cannot be used for LOTO.",
+    citations: [
+      {
+        title: "Work Health and Safety Regulation 2011 (NSW) — Part 5.1 Plant Management",
+        section: "ss.208-215 (isolation of plant, lock-out/tag-out requirements)",
+        jurisdiction: "NSW",
+        url: "https://legislation.nsw.gov.au/view/html/inforce/current/sl-2011-0674#pt.5.1",
+      },
+      {
+        title: "SafeWork NSW Guide to Managing Risks in Wineries",
+        section: "Section 13 (Plant Maintenance — isolation procedures, LOTO steps)",
+        jurisdiction: "NSW",
+        url: "https://www.safework.nsw.gov.au/resource-library/list-of-all-resources/publications/guide-to-managing-risks-in-wineries",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+  {
+    id: "hazardous-chemicals-register-sds",
+    topic: "Operational Compliance",
+    jurisdiction: "All",
+    question: "What are the requirements for a winery's hazardous chemicals register and Safety Data Sheets?",
+    keywords: ["hazardous chemicals", "chemical register", "SDS", "safety data sheet", "GHS", "caustic", "SO2", "peracetic acid", "chemical storage", "chemical labelling"],
+    answer:
+      "Under WHS Regulation 2011 (NSW) Part 7.1, wineries that use, store, or handle hazardous chemicals must:\n\n1. Maintain a Hazardous Chemicals Register (WHS Reg s.346): List all hazardous chemicals used, stored, or handled at the winery. Include: chemical name, GHS classification, quantity stored, location, SDS reference. Keep the register accessible to all workers. Update whenever chemicals are added or removed.\n\n2. Obtain and maintain Safety Data Sheets (SDS) (WHS Reg s.340): Obtain SDS from the manufacturer or supplier for every hazardous chemical. SDS must be in the 16-section Australian/GHS format. Keep SDS accessible near the work area where the chemical is used. Review and update SDS at least every 5 years.\n\n3. GHS Labelling (mandatory from 1 January 2017): All containers must display GHS-compliant labels with: signal word (Danger/Warning), hazard statements, precautionary statements, and GHS pictograms. Labels must be in English and legible.\n\n4. Chemical Storage: Store chemicals in accordance with SDS requirements (segregation, ventilation, containment, temperature). Incompatible chemicals must be segregated (e.g., oxidisers separate from flammables).\n\nCommon winery hazardous chemicals requiring SDS and register entries: caustic soda (NaOH) — cleaning; peracetic acid (PAA) — sanitising; sodium/potassium metabisulphite (SO2 source) — winemaking; citric acid — cleaning; sodium hypochlorite — sanitising; hydrochloric acid — cleaning; tartaric acid — winemaking; diatomaceous earth — filtration (inhalation hazard).",
+    citations: [
+      {
+        title: "Work Health and Safety Regulation 2011 (NSW) — Part 7.1 Hazardous Chemicals",
+        section: "ss.340-349 (SDS, register, labelling, notification)",
+        jurisdiction: "NSW",
+        url: "https://legislation.nsw.gov.au/view/html/inforce/current/sl-2011-0674#pt.7.1",
+      },
+      {
+        title: "SafeWork NSW Guide to Managing Risks in Wineries",
+        section: "Section 7 (Hazardous Chemicals)",
+        jurisdiction: "NSW",
+        url: "https://www.safework.nsw.gov.au/resource-library/list-of-all-resources/publications/guide-to-managing-risks-in-wineries",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+  {
+    id: "electrical-equipment-testing-rcd",
+    topic: "Operational Compliance",
+    jurisdiction: "All",
+    question: "How often must electrical equipment be tested in a winery and are RCDs required?",
+    keywords: ["electrical testing", "test and tag", "RCD", "residual current device", "safety switch", "AS/NZS 3760", "electrical inspection", "plug in equipment", "electrical safety", "winery electrical"],
+    answer:
+      "Under WHS Regulation 2011 (NSW) Part 4.7 (Electrical Risks), electrical equipment used in a winery must be regularly inspected and tested because wineries are a 'hostile operating environment' (exposure to moisture, heat, vibration, and corrosive chemicals).\n\nInspection and testing intervals (per AS/NZS 3760:2022):\n- Portable electrical equipment (leads, power tools, pumps): every 6 months in hostile environments\n- Fixed electrical equipment: every 12 months\n- RCDs (residual current devices): push-button test monthly; full electrical test every 12 months\n\nRecord-keeping requirements (WHS Reg s.152): Records must be kept until the equipment is next tested or permanently removed from service. Records must specify: tester's name, date of test, outcome (pass/fail), and next test due date. Records may be in the form of a tag attached to the equipment (test-and-tag label).\n\nRCD requirements (WHS Reg s.154): RCDs (safety switches) must be used for all plug-in electrical equipment in winery environments. This includes pumps, motors, lighting, power tools, and any equipment connected via socket outlets in areas exposed to moisture, heat, vibration, or corrosive chemicals. Type II RCDs (tripping current <=30 mA, tripping time <=300 ms) are required for personal protection. RCDs must be tested regularly by a competent person (WHS Reg s.155).\n\nIn Victoria, equivalent obligations apply under the OHS Regulations 2017. In New Zealand, the Health and Safety at Work (Electrical) Regulations 2016 apply.",
+    citations: [
+      {
+        title: "Work Health and Safety Regulation 2011 (NSW) — Part 4.1 Confined Spaces",
+        section: "ss.150-155 (inspection, testing, records, RCDs)",
+        jurisdiction: "NSW",
+        url: "https://legislation.nsw.gov.au/view/html/inforce/current/sl-2011-0674#pt.4.1",
+      },
+      {
+        title: "AS/NZS 3760:2022 — In-service Safety Inspection and Testing of Electrical Equipment",
+        section: "Table 4 (inspection and testing intervals for hostile environments)",
+        jurisdiction: "Federal",
+        url: "https://www.standards.org.au/standards-catalogue/sa-snz/electrotechnology/el-043/as-nzs-3760-2022",
+      },
+      {
+        title: "SafeWork NSW Guide to Managing Risks in Wineries",
+        section: "Section 11 (Electrical Safety — RCDs, testing, records)",
+        jurisdiction: "NSW",
+        url: "https://www.safework.nsw.gov.au/resource-library/list-of-all-resources/publications/guide-to-managing-risks-in-wineries",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+  {
+    id: "cip-cleaning-protocol",
+    topic: "Operational Compliance",
+    jurisdiction: "All",
+    question: "What is the correct CIP (Clean-in-Place) sequence for winery tanks and what are the food safety obligations?",
+    keywords: ["CIP", "clean in place", "tank cleaning", "caustic wash", "sanitise", "peracetic acid", "SO2 rinse", "cleaning sequence", "food safety cleaning", "FSANZ cleaning"],
+    answer:
+      "CIP (Clean-in-Place) is the standard method for cleaning wine tanks, pipework, heat exchangers, and bottling lines without disassembly. Food safety obligations for cleaning are set out in FSANZ Standard 3.2.2 (Food Safety Practices and General Requirements).\n\nStandard CIP sequence for winery tanks:\n1. Pre-rinse with water: Remove gross soils (marc residues, tartrate deposits, lees). Drain completely.\n2. Caustic wash: 1-2% NaOH (caustic soda) at 60-80 degrees C for 15-30 minutes. Removes organic soils, proteins, polysaccharides. Drain and collect for disposal.\n3. Intermediate rinse: Flush with water to remove caustic residues. Check pH of rinse water (should be neutral, ~7.0).\n4. Acid wash: 0.5-1% citric or nitric acid. Removes mineral deposits and tartrate scale. Drain.\n5. Final rinse: Potable water. Drain completely.\n6. Sanitise: Peracetic acid (PAA) at 100-200 ppm, or SO2 solution (50-100 ppm potassium metabisulphite), or hot water (>80 degrees C for 5 min). Leave in contact for the required contact time per the SDS.\n\nFor oak barrels: hot water rinse (80 degrees C), SO2 fumigation (5g sulphur wicks), or ozone treatment. Store bung-down or with SO2 solution.\n\nFSANZ Standard 3.2.2 obligations: Clause 19 requires food contact surfaces to be cleaned and sanitised as often as necessary to prevent contamination, and cleaned before use after any period of disuse. Cleaning efficacy should be validated periodically (ATP bioluminescence testing, microbiological swabs).\n\nChemical safety: All cleaning chemicals must be handled in accordance with their SDS. Workers must wear appropriate PPE (chemical-resistant gloves, eye protection, apron). Caustic and acid solutions must never be mixed.",
+    citations: [
+      {
+        title: "Food Standards Code — Standard 3.2.2 (Food Safety Practices and General Requirements)",
+        section: "Clauses 19-20 (cleaning, sanitising, and single-use items)",
+        jurisdiction: "Federal",
+        url: "https://www.legislation.gov.au/F2015L00404/latest/text",
+      },
+      {
+        title: "Work Health and Safety Regulation 2011 (NSW) — Part 7.1 Hazardous Chemicals",
+        section: "ss.340-346 (SDS and chemical register for cleaning chemicals)",
+        jurisdiction: "NSW",
+        url: "https://legislation.nsw.gov.au/view/html/inforce/current/sl-2011-0674#pt.7.1",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+  {
+    id: "plant-register-maintenance-records",
+    topic: "Operational Compliance",
+    jurisdiction: "All",
+    question: "What plant must be registered and what maintenance records must a winery keep?",
+    keywords: ["plant register", "registered plant", "pressure vessel", "forklift", "maintenance records", "plant inspection", "boiler registration", "equipment register", "WHS plant"],
+    answer:
+      "Under WHS Regulation 2011 (NSW) Part 5.1, wineries must maintain a register of plant and keep maintenance records.\n\nRegistered plant in wineries (requires design registration and item registration with SafeWork NSW): pressure vessels with design pressure >50 kPa or capacity >500 L (includes most wine storage tanks with pressure fittings); boilers; forklifts and other powered mobile plant (e.g., pallet jacks, telehandlers); cranes and hoists; certain pumps and compressors above prescribed thresholds.\n\nPlant register must record (WHS Reg s.246): plant item description and serial/identification number; design registration number; date of last inspection; next inspection due date; any defects identified.\n\nMaintenance records must be kept for all plant (WHS Reg s.247): description of maintenance work performed; date of maintenance; name of person who performed maintenance; any defects identified and corrective actions taken; next scheduled maintenance date.\n\nInspection intervals: registered plant at intervals specified by the designer/manufacturer, or at least every 2 years for pressure vessels; electrical equipment every 6-12 months.\n\nRecord retention: maintenance records for registered plant for the life of the plant; electrical equipment test records until next test or disposal.\n\nIn Victoria, equivalent obligations apply under OHS Regulations 2017. In New Zealand, the Health and Safety at Work (General Risk and Workplace Management) Regulations 2016 apply.",
+    citations: [
+      {
+        title: "Work Health and Safety Regulation 2011 (NSW) — Part 5.1 Plant Management",
+        section: "ss.246-247 (plant register and maintenance records)",
+        jurisdiction: "NSW",
+        url: "https://legislation.nsw.gov.au/view/html/inforce/current/sl-2011-0674#pt.5.1",
+      },
+      {
+        title: "SafeWork NSW Guide to Managing Risks in Wineries",
+        section: "Section 13 (Plant Maintenance — plant register, maintenance records)",
+        jurisdiction: "NSW",
+        url: "https://www.safework.nsw.gov.au/resource-library/list-of-all-resources/publications/guide-to-managing-risks-in-wineries",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+  {
+    id: "calibration-records-winery",
+    topic: "Operational Compliance",
+    jurisdiction: "All",
+    question: "What winery measuring equipment must be calibrated and what records are required?",
+    keywords: ["calibration", "refractometer", "pH meter", "scales", "calibration records", "Brix meter", "SO2 titration", "measuring equipment", "ISO 9001 calibration", "NATA calibration"],
+    answer:
+      "Under ISO 9001:2015 Clause 7.1.5 (Monitoring and Measuring Resources) and ISO 22000:2018 Clause 8.7, measuring equipment used for critical process control must be calibrated at defined intervals. Even for wineries not ISO-certified, calibration records are best practice and support compliance with FSANZ Standard 3.2.2 (food safety) and Wine Australia Label Integrity Program (LIP) traceability requirements.\n\nWinery measuring equipment requiring calibration records:\n- Refractometer (Brix): before each use (distilled water zero check); annual NATA calibration\n- pH meter: before each use (2-point calibration with pH 4.0 and 7.0 buffers); electrode replacement 12-monthly\n- Free SO2 titration (Ripper/AO method): each use; annual verification with known SO2 standard\n- Scales/balances: annual NATA calibration with certified reference weights\n- Thermometers: annual verification against reference thermometer\n- Dissolved oxygen meter: per manufacturer instructions before each use\n- Turbidity meter (NTU): annual calibration with formazin standards\n\nCalibration records must include: equipment ID and description; calibration date; calibration method and reference standard used; result (pass/fail, measured value vs. reference); next calibration due date; name of person who performed calibration.\n\nRecord retention: at least 3 years (ISO 9001 Clause 7.5; Wine Australia LIP records 5 years).",
+    citations: [
+      {
+        title: "ISO 9001:2015 — Quality Management Systems",
+        section: "Clause 7.1.5 (Monitoring and measuring resources — calibration)",
+        jurisdiction: "Federal",
+        url: "https://www.iso.org/iso-9001-quality-management.html",
+      },
+      {
+        title: "ISO 22000:2018 — Food Safety Management Systems",
+        section: "Clause 8.7 (Control of monitoring and measuring)",
+        jurisdiction: "Federal",
+        url: "https://www.iso.org/standard/65464.html",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+  {
+    id: "whs-incident-reporting",
+    topic: "Operational Compliance",
+    jurisdiction: "All",
+    question: "What WHS incidents must be reported to SafeWork NSW and what records must be kept?",
+    keywords: ["incident reporting", "notifiable incident", "serious injury", "dangerous incident", "WHS reporting", "SafeWork notification", "incident register", "near miss", "workplace injury", "WHS records"],
+    answer:
+      "Under the Work Health and Safety Act 2011 (NSW) s.38, certain incidents must be notified to SafeWork NSW immediately (by the fastest means possible, e.g., phone 13 10 50).\n\nNotifiable incidents requiring immediate notification:\n1. Death of a person at the workplace.\n2. Serious injury or illness: immediate treatment as an in-patient in a hospital; amputation of any part of the body; serious head or eye injury; serious burns; loss of bodily function (e.g., loss of consciousness, loss of movement); serious lacerations requiring immediate medical treatment.\n3. Dangerous incident (near miss with potential for serious injury): uncontrolled escape, spillage, or leakage of a substance (e.g., chemical spill, SO2 release); implosion, explosion, or fire; electric shock; collapse or failure of an excavation or structure; uncontrolled collapse or failure of any plant; inrush of water, mud, or gas in any underground workings.\n\nRecord-keeping requirements (WHS Act s.38(6)): records of all notifiable incidents must be kept for at least 5 years. The incident scene must be preserved until an inspector arrives or SafeWork NSW gives permission to disturb it.\n\nBest practice — WHS Incident Register: record ALL workplace injuries, near misses, and hazard reports (not just notifiable incidents). Include: date, time, location, persons involved, description, immediate cause, contributing factors, corrective actions. Review incident register regularly to identify trends and implement preventive measures.\n\nIn Victoria, notify WorkSafe Victoria (1800 136 089) under the OHS Act 2004. In New Zealand, notify WorkSafe NZ (0800 030 040) under the Health and Safety at Work Act 2015.",
+    citations: [
+      {
+        title: "Work Health and Safety Act 2011 (NSW)",
+        section: "s.38 (duty to notify notifiable incidents)",
+        jurisdiction: "NSW",
+        url: "https://legislation.nsw.gov.au/view/html/inforce/current/act-2011-010",
+      },
+      {
+        title: "ISO 45001:2018 — Occupational Health and Safety Management Systems",
+        section: "Clause 9.1.1 (monitoring, measurement, analysis and performance evaluation)",
+        jurisdiction: "Federal",
+        url: "https://www.iso.org/iso-45001-occupational-health-and-safety.html",
+      },
+    ],
+    lastVerified: "2026-05-01",
+  },
+
 ];
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────

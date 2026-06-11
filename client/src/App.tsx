@@ -25,6 +25,8 @@ import QuickEntry from "./pages/QuickEntry";
 import CompetitiveAdvantage from "./pages/CompetitiveAdvantage";
 import Preview from "./pages/Preview";
 import AdminLeads from "./pages/AdminLeads";
+import AdminComplianceDoctrine from "./pages/AdminComplianceDoctrine";
+import FoundingMemberSuccess from "./pages/FoundingMemberSuccess";
 
 
 function Router() {
@@ -52,6 +54,8 @@ function Router() {
       <Route path={"/competitive-advantage"} component={CompetitiveAdvantage} />
       <Route path={"/preview"} component={Preview} />
       <Route path={"/admin/leads"} component={AdminLeads} />
+      <Route path={"/admin/compliance-doctrine"} component={AdminComplianceDoctrine} />
+      <Route path={"/founding-member/success"} component={FoundingMemberSuccess} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

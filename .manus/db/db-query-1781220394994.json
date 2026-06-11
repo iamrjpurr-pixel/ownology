@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS doctrine_verified (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  doctrine_id VARCHAR(128) NOT NULL UNIQUE,\n  verified_at BIGINT NOT NULL,\n  notes TEXT,\n  INDEX dv_doctrine_id_idx (doctrine_id),\n  INDEX dv_verified_at_idx (verified_at)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4HByWUH885AfJUE.9472483f21d7 --database kjXA9MRaPtPLGHog5yynHZ --execute CREATE TABLE IF NOT EXISTS doctrine_verified (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  doctrine_id VARCHAR(128) NOT NULL UNIQUE,\n  verified_at BIGINT NOT NULL,\n  notes TEXT,\n  INDEX dv_doctrine_id_idx (doctrine_id),\n  INDEX dv_verified_at_idx (verified_at)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1858
+}

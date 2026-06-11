@@ -2,7 +2,7 @@ import { z } from "zod";
 import Stripe from "stripe";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
 import { buildScopedKnowledgeBase, buildSourceDoctrineSummary } from "./complianceKnowledgeBase.js";
-import { buildQADoctrineSummary } from "./complianceQADoctrine.js";
+import { buildQADoctrineSummary, QA_DOCTRINE, getTopics } from "./complianceQADoctrine.js";
 import {
   getCampaignMetricsHistory,
   getLatestCampaignMetrics,
@@ -108,6 +108,78 @@ const foundingMembersRouter = router({
       await addFoundingMember(input);
       return { ok: true };
     }),
+
+  // Public: create a Stripe Checkout session for a founding member subscription.
+  // Uses price_data so no pre-created Stripe products are needed.
+  // Cycle: 'monthly' = $19/mo, 'annual' = $190/yr.
+  createCheckout: publicProcedure
+    .input(
+      z.object({
+        tier: z.enum(["cellar", "press", "cellar_master"]).default("cellar"),
+        cycle: z.enum(["monthly", "annual"]).default("monthly"),
+        customerEmail: z.string().email().optional(),
+        origin: z.string().url(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const stripe = getStripe();
+
+      // Tier pricing (AUD cents)
+      const TIER_PRICES: Record<string, { monthly: number; annual: number; name: string }> = {
+        cellar: { monthly: 1900, annual: 19000, name: "Ownology — The Cellar" },
+        press: { monthly: 4900, annual: 49000, name: "Ownology — The Press" },
+        cellar_master: { monthly: 9900, annual: 99000, name: "Ownology — Cellar Master" },
+      };
+
+      const tierInfo = TIER_PRICES[input.tier];
+      const unitAmount = input.cycle === "annual" ? tierInfo.annual : tierInfo.monthly;
+      const interval = input.cycle === "annual" ? "year" : "month";
+      const tierLabel = input.tier === "cellar" ? "The Cellar" : input.tier === "press" ? "The Press" : "Cellar Master";
+      const cycleLabel = input.cycle === "annual" ? "Annual" : "Monthly";
+
+      const session = await stripe.checkout.sessions.create({
+        mode: "subscription",
+        payment_method_types: ["card"],
+        allow_promotion_codes: true,
+        ...(input.customerEmail ? { customer_email: input.customerEmail } : {}),
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: "aud",
+              unit_amount: unitAmount,
+              recurring: { interval },
+              product_data: {
+                name: `${tierInfo.name} (${cycleLabel})`,
+                description:
+                  input.tier === "cellar"
+                    ? "Unlimited Compliance Agent queries, Full Free Run lesson library, 30 AI tutor credits/mo, The Press working board. Founding member pricing locked for life."
+                    : input.tier === "press"
+                    ? "Everything in The Cellar + 150 AI tutor credits/mo, custom document upload, priority responses, vintage log PDF export."
+                    : "Everything in The Press + unlimited AI credits, 3 team seats, dedicated onboarding call, annual knowledge base review alert.",
+              },
+            },
+          },
+        ],
+        metadata: {
+          tier: input.tier,
+          tier_label: tierLabel,
+          cycle: input.cycle,
+          customer_email: input.customerEmail ?? "",
+          founding_member: "true",
+        },
+        subscription_data: {
+          metadata: {
+            tier: input.tier,
+            founding_member: "true",
+          },
+        },
+        success_url: `${input.origin}/founding-member/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${input.origin}/pricing?cancelled=1`,
+      });
+
+      return { url: session.url };
+    }),
 });
 
 // ─── Orders Router ───────────────────────────────────────────────────────────
@@ -202,6 +274,20 @@ const ordersRouter = router({
 // summary for the /admin hub page (avoids multiple round-trips).
 
 const adminRouter = router({
+  complianceDoctrine: ownerProcedure.query(() => {
+    const topics = getTopics();
+    const entries = QA_DOCTRINE.map((e) => ({
+      id: e.id,
+      topic: e.topic,
+      jurisdiction: e.jurisdiction,
+      question: e.question,
+      keywords: e.keywords,
+      answer: e.answer,
+      citations: e.citations,
+      lastVerified: e.lastVerified,
+    }));
+    return { topics, entries, total: entries.length };
+  }),
   summary: ownerProcedure.query(async () => {
     // Latest campaign snapshot
     const latest = await getLatestCampaignMetrics();
