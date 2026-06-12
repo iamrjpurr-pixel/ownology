@@ -310,7 +310,7 @@ function PreviewContent() {
             Winemaker Overview
           </button>
           <button style={tabStyle(activeTab === "resources")} onClick={() => setActiveTab("resources")}>
-            Resources
+            Regulations
           </button>
         </div>
 

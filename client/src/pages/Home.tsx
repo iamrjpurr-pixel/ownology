@@ -67,7 +67,7 @@ const PRIMARY_NAV: NavItem[] = [
 const VINTAGE_NAV: NavItem[] = [
   { label: "Quick Entry",  href: "/quick-entry" },
   { label: "Free Run",     href: "/free-run" },
-  { label: "Resources",    href: "/resources" },
+  { label: "Regulations",  href: "/regulations" },
   { label: "Competitive Advantage", href: "/competitive-advantage" },
 ];
 const BUSINESS_NAV: NavItem[] = [
@@ -1316,9 +1316,9 @@ function Footer() {
           <Link href="/blog" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
             onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
             onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Blog</Link>
-          <Link href="/resources" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
+          <Link href="/regulations" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
             onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Resources</Link>
+            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Regulations</Link>
           <Link href="/compliance" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
             onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
             onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Compliance</Link>
