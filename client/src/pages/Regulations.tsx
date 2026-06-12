@@ -1175,7 +1175,7 @@ export default function Resources() {
               marginBottom: "1.25rem",
             }}
           >
-            Regulatory Reference Library
+            The Rules
           </p>
           <h1
             style={{
@@ -1189,7 +1189,7 @@ export default function Resources() {
             }}
           >
             Australian Winery<br />
-            <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>Compliance Resources</em>
+            <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>Regulations</em>
           </h1>
           <p
             style={{
@@ -1201,8 +1201,43 @@ export default function Resources() {
               maxWidth: "560px",
             }}
           >
-            A structured reference covering federal and state regulatory requirements for boutique wine producers across South Australia, Victoria, New South Wales, Western Australia, and Queensland. Use the Compliance Agent to ask specific questions.
+            The authoritative reference library — federal and state regulatory requirements for boutique wine producers across Australia and New Zealand. Browse by jurisdiction, search by keyword, and follow source links directly to the legislation.
           </p>
+          {/* Crosslink to Compliance */}
+          <div className="mt-6 flex items-center gap-3">
+            <Link
+              href="/compliance"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                fontFamily: SANS,
+                fontWeight: 600,
+                fontSize: "0.875rem",
+                color: "var(--ow-amber)",
+                letterSpacing: "0.01em",
+                textDecoration: "none",
+                borderBottom: "1px solid var(--ow-amber)",
+                paddingBottom: "1px",
+              }}
+            >
+              Know the rules. Now confirm you&rsquo;re meeting them
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M3 7h8M8 4l3 3-3 3" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </Link>
+            <span
+              style={{
+                fontFamily: SANS,
+                fontSize: "0.75rem",
+                color: "var(--ow-text-lo)",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
+            >
+              Compliance Assistant
+            </span>
+          </div>
         </div>
       </section>
 

@@ -64,15 +64,20 @@ const PRIMARY_NAV: NavItem[] = [
   { label: "Why Ownology", href: "/why-ownology" },
 ];
 // Secondary links — grouped by product pillar
+// Operational: cellar tools
 const VINTAGE_NAV: NavItem[] = [
+  { label: "The Press",    href: "/the-press" },
   { label: "Quick Entry",  href: "/quick-entry" },
   { label: "Free Run",     href: "/free-run" },
-  { label: "Regulations",  href: "/regulations" },
-  { label: "Competitive Advantage", href: "/competitive-advantage" },
 ];
-const BUSINESS_NAV: NavItem[] = [
+// Knowledge: regulatory intelligence
+const KNOWLEDGE_NAV: NavItem[] = [
+  { label: "Regulations",  href: "/regulations" },
   { label: "Compliance",   href: "/compliance" },
-  { label: "The Press",    href: "/the-press" },
+];
+// Business: brand and commercial
+const BUSINESS_NAV: NavItem[] = [
+  { label: "Why Ownology", href: "/why-ownology" },
   { label: "Blog",         href: "/blog" },
   { label: "Merch",        href: "/merch" },
 ];
@@ -81,6 +86,7 @@ const MORE_NAV: NavItem[] = [
   { label: "Pricing",      href: "/pricing" },
   { label: "FAQ",          href: "#faq" },
   ...VINTAGE_NAV,
+  ...KNOWLEDGE_NAV,
   ...BUSINESS_NAV,
 ];
 const NAV_LINKS: NavItem[] = [...PRIMARY_NAV, ...MORE_NAV];
@@ -142,14 +148,18 @@ function MoreDropdown({ extraItems }: { extraItems?: NavItem[] }) {
           <div className="py-2 px-1">
             {generalLinks.map(item => <NavLink key={item.label} item={item} close={close} />)}
           </div>
-          {/* Two-column pillar section */}
-          <div className="grid grid-cols-2" style={{borderTop: "1px solid var(--ow-border)"}}>
+          {/* Three-column pillar section */}
+          <div className="grid grid-cols-3" style={{borderTop: "1px solid var(--ow-border)"}}>
             <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Help at Vintage</p>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>In the Cellar</p>
               {VINTAGE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
             </div>
+            <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Compliance</p>
+              {KNOWLEDGE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
+            </div>
             <div className="py-3 px-1">
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Business &amp; Science</p>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>About &amp; More</p>
               {BUSINESS_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
               {extraItems?.map(item => <NavLink key={item.label} item={item} close={close} />)}
             </div>

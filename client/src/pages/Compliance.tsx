@@ -286,7 +286,7 @@ export default function Compliance() {
             className="section-label mb-3"
             style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", letterSpacing: "0.12em" }}
           >
-            Australian Winery Regulatory Intelligence
+            Stay Compliant
           </p>
           <h1
             style={{
@@ -297,7 +297,7 @@ export default function Compliance() {
               color: "var(--ow-text-hi)",
             }}
           >
-            Compliance <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>Search</em>
+            Compliance <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>Assistant</em>
           </h1>
           <p
             className="mt-3"
@@ -310,8 +310,32 @@ export default function Compliance() {
               maxWidth: "560px",
             }}
           >
-            Ask any question about Australian and New Zealand winery regulations — federal (Wine Australia, FSANZ, WET, WHS, biosecurity), state-specific rules for all Australian states, or New Zealand regulations (Wine Act 2003, WSMP, Food Act 2014, RMA). Use the jurisdiction filter below to focus on your region.
+            Ask any question about Australian and New Zealand winery regulations and get a cited, jurisdiction-specific answer instantly. Federal (Wine Australia, FSANZ, WET, WHS, biosecurity), all Australian states, and New Zealand covered. You stay compliant — we keep track of the rules.
           </p>
+          {/* Crosslink to Regulations */}
+          <div className="mt-4 flex items-center gap-3">
+            <Link
+              href="/regulations"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                fontFamily: "'Lato',sans-serif",
+                fontWeight: 600,
+                fontSize: "0.8125rem",
+                color: "var(--ow-text-lo)",
+                letterSpacing: "0.01em",
+                textDecoration: "none",
+                borderBottom: "1px solid var(--ow-border)",
+                paddingBottom: "1px",
+              }}
+            >
+              Browse the full regulations library
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M3 7h8M8 4l3 3-3 3" stroke="var(--ow-text-lo)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </Link>
+          </div>
           <div
             className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-sm text-xs"
             style={{
