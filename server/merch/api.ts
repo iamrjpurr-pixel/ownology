@@ -6,7 +6,9 @@
 import express from "express";
 import Stripe from "stripe";
 import { MERCH_PRODUCTS, getProductById } from "./products.js";
-import { addFoundingMember } from "../db.js";
+// NOTE: db.ts is NOT imported at the top level — doing so would pull mysql2 pool
+// creation into the Vite config evaluation path and break `vite build`.
+// Instead, addFoundingMember is dynamically imported inside the webhook handler.
 
 const router = express.Router();
 
@@ -150,6 +152,8 @@ router.post(
 
         if (email) {
           try {
+            // Dynamic import keeps mysql2 pool creation out of Vite config evaluation
+            const { addFoundingMember } = await import("../db.js");
             await addFoundingMember({ email, tier, stripeCustomerId });
           } catch (dbErr) {
             // Duplicate email is fine — member already exists
