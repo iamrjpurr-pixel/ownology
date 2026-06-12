@@ -50,6 +50,13 @@
       "when": 1781220383611,
       "tag": "0006_hot_scarlet_spider",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1781226415053,
+      "tag": "0007_complex_siren",
+      "breakpoints": true
     }
   ]
 }

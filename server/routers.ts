@@ -20,6 +20,11 @@ import {
   listTankReminders,
   deleteTankReminder,
   type ReminderEventType,
+  createWineBatch,
+  listWineBatches,
+  updateWineBatchNotes,
+  updateWineBatch,
+  deleteWineBatch,
   addLead,
   listLeads,
   updateLeadNotes,
@@ -453,9 +458,80 @@ const vintageReminderRouter = router({
     }),
 });
 
-// ─── Email Subscribe Router ─────────────────────────────────────────────────
-// Server-side Buttondown subscription — keeps the API key off the frontend.
+// ─── Wine Batch Router (Winemaker's Batch Book) ──────────────────────────────────────────────────
+const wineBatchRouter = router({
+  list: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return [];
+    return listWineBatches(dbUser.id);
+  }),
+  create: protectedProcedure
+    .input(
+      z.object({
+        batchId: z.string().min(1).max(32),
+        vintage: z.number().int().min(1900).max(2100),
+        variety: z.string().min(1).max(128),
+        gi: z.string().max(128).default(""),
+        growerDetails: z.string().max(1000).optional(),
+        receivedAt: z.number().optional(),
+        quantityValue: z.string().max(32).optional(),
+        quantityUnit: z.enum(["kg", "t", "L"]).optional(),
+        tankName: z.string().max(128).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const id = await createWineBatch({ userId: dbUser.id, ...input });
+      return { success: true, id };
+    }),
+  updateNotes: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        notesJson: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await updateWineBatchNotes(input.id, dbUser.id, input.notesJson);
+      return { success: true };
+    }),
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        batchId: z.string().min(1).max(32).optional(),
+        vintage: z.number().int().min(1900).max(2100).optional(),
+        variety: z.string().min(1).max(128).optional(),
+        gi: z.string().max(128).optional(),
+        growerDetails: z.string().max(1000).optional(),
+        receivedAt: z.number().optional(),
+        quantityValue: z.string().max(32).optional(),
+        quantityUnit: z.enum(["kg", "t", "L"]).optional(),
+        tankName: z.string().max(128).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const { id, ...data } = input;
+      await updateWineBatch(id, dbUser.id, data);
+      return { success: true };
+    }),
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await deleteWineBatch(input.id, dbUser.id);
+      return { success: true };
+    }),
+});
 
+// ─── Email Subscribe Router ──────────────────────────────────────────────────
+// Server-side Buttondown subscription — keeps the API key off the frontend.
 const emailRouter = router({
   subscribe: publicProcedure
     .input(
@@ -780,6 +856,7 @@ export const appRouter = router({
   admin: adminRouter,
   vintageLog: vintageLogRouter,
   vintageReminder: vintageReminderRouter,
+  wineBatch: wineBatchRouter,
   email: emailRouter,
   leads: leadsRouter,
   siteContent: siteContentRouter,

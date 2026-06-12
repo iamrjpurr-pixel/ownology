@@ -181,6 +181,47 @@ export const vintageLogEntries = mysqlTable(
   ]
 );
 
+// ─── Wine Batches (Winemaker's Batch Book) ──────────────────────────────────────
+// One row per wine batch. Satisfies LIP (Wine Australia Act 2013 s.39F) mandatory
+// fields: vintage, variety, GI, supplier, receival date, quantity.
+// notesJson stores per-phase notes: { receival, fermentation, postFerment, stabilising, bottling }
+export const wineBatches = mysqlTable(
+  "wine_batches",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // Owner of this batch — links to users.id
+    userId: int("user_id").notNull(),
+    // LIP-mandatory: Wine Batch ID (e.g. "26SHZ-001")
+    batchId: varchar("batch_id", { length: 32 }).notNull(),
+    // LIP-mandatory: vintage year (e.g. 2026)
+    vintage: int("vintage").notNull(),
+    // LIP-mandatory: full variety name (e.g. "Shiraz", not "Shz")
+    variety: varchar("variety", { length: 128 }).notNull(),
+    // LIP-mandatory: Geographical Indication (e.g. "Barossa Valley")
+    gi: varchar("gi", { length: 128 }).notNull().default(""),
+    // LIP-mandatory: grower/supplier name and address
+    growerDetails: text("grower_details"),
+    // LIP-mandatory: date fruit/juice was received (UTC ms)
+    receivedAt: bigint("received_at", { mode: "number" }),
+    // LIP-mandatory: quantity received (kg for grapes, L for juice/wine)
+    quantityValue: varchar("quantity_value", { length: 32 }),
+    quantityUnit: mysqlEnum("quantity_unit", ["kg", "t", "L"]).default("kg"),
+    // Optional: linked tank name from the vintage log
+    tankName: varchar("tank_name", { length: 128 }),
+    // Per-phase winemaker notes stored as JSON:
+    // { receival: string, fermentation: string, postFerment: string, stabilising: string, bottling: string }
+    notesJson: text("notes_json").notNull(),
+    // UTC ms timestamps
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("wb_user_idx").on(t.userId),
+    index("wb_vintage_idx").on(t.vintage),
+    index("wb_batch_id_idx").on(t.batchId),
+  ]
+);
+
 // ─── Site Content (Owner Inline Editing) ─────────────────────────────────────
 // Stores owner-editable text overrides keyed by a content_key string.
 // If no row exists for a key, the hardcoded default in the component is used.

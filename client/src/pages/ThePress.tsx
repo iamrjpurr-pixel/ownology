@@ -6,12 +6,13 @@
  * Full functionality wired in the 4-week education build.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
 import VintageEntrySheet from "@/components/VintageEntrySheet";
 import TankReminderSheet from "@/components/TankReminderSheet";
+import WineBatchSheet from "@/components/WineBatchSheet";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface VintageEntry {
@@ -136,7 +137,13 @@ function SectionHeader({ label, title, subtitle }: { label: string; title: strin
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function ThePress() {
   const [activeTab, setActiveTab] = useState<"log" | "calcs" | "scenarios" | "notes">("log");
-  const [noteText, setNoteText] = useState("");
+  // Batch Book state
+  const [batchSheetOpen, setBatchSheetOpen] = useState(false);
+  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
+  const [expandedPhase, setExpandedPhase] = useState<string | null>("fermentation");
+  const [savingPhase, setSavingPhase] = useState<string | null>(null);
+  const [localNotes, setLocalNotes] = useState<Record<string, string>>({});
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [entrySheetOpen, setEntrySheetOpen] = useState(false);
   const [quickEntryTank, setQuickEntryTank] = useState<string | undefined>(undefined);
   const [reminderSheetOpen, setReminderSheetOpen] = useState(false);
@@ -155,7 +162,43 @@ export default function ThePress() {
     { limit: 100 },
     { retry: false }
   );
-  const isLoggedIn = logEntries !== undefined || false;
+
+  const isLoggedIn = logEntries !== undefined;
+
+  // Wine batch data
+  const { data: wineBatches, refetch: refetchBatches } = trpc.wineBatch.list.useQuery(
+    undefined,
+    { retry: false, enabled: isLoggedIn }
+  );
+  const selectedBatch = wineBatches?.find((b) => b.batchId === selectedBatchId) ?? wineBatches?.[0] ?? null;
+  const updateNotesMutation = trpc.wineBatch.updateNotes.useMutation({
+    onMutate: () => setSavingPhase("saving"),
+    onSettled: () => setSavingPhase(null),
+  });
+
+  // Sync local notes when batch changes
+  useEffect(() => {
+    if (selectedBatch) {
+      try {
+        const parsed = JSON.parse(selectedBatch.notesJson ?? "{}") as Record<string, string>;
+        setLocalNotes(parsed);
+      } catch {
+        setLocalNotes({});
+      }
+    } else {
+      setLocalNotes({});
+    }
+  }, [selectedBatch?.batchId]);
+
+  const handleNoteChange = useCallback((phase: string, value: string) => {
+    setLocalNotes((prev) => ({ ...prev, [phase]: value }));
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      if (!selectedBatch) return;
+      const updated = { ...localNotes, [phase]: value };
+      updateNotesMutation.mutate({ id: selectedBatch.id, notesJson: JSON.stringify(updated) });
+    }, 900);
+  }, [selectedBatch, localNotes, updateNotesMutation]);
   const hasEntries = logEntries && logEntries.length > 0;
 
   // Derived filter options from live data
@@ -452,31 +495,73 @@ export default function ThePress() {
 
               {/* Empty state — logged in but no entries yet */}
               {logEntries !== undefined && !hasEntries && (
-                <button
-                  type="button"
-                  onClick={() => { setQuickEntryTank(undefined); setEntrySheetOpen(true); }}
-                  className="w-full mb-6 p-6 rounded-sm flex flex-col items-center gap-3 transition-all"
-                  style={{
-                    background: "var(--ow-bg-card)",
-                    border: "1px dashed var(--ow-border-md)",
-                    cursor: "pointer",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--ow-amber)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--ow-border-md)")}
-                >
-                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                    <circle cx="16" cy="16" r="14" stroke="var(--ow-border-md)" strokeWidth="1.5" />
-                    <path d="M16 10v12M10 16h12" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
-                  <div className="text-center">
-                    <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.9rem", fontWeight: 600, color: "var(--ow-text-hi)" }}>
-                      Log your first entry
+                <div className="mb-6">
+                  {/* Welcome banner */}
+                  <div
+                    className="rounded-sm p-6 mb-4"
+                    style={{ background: "var(--ow-bg-card)", border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
+                  >
+                    <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "var(--ow-amber)", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>WELCOME TO THE PRESS</p>
+                    <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "1.25rem", color: "var(--ow-text-hi)", marginBottom: "0.5rem" }}>
+                      Your vintage log is ready.
                     </p>
-                    <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem", color: "var(--ow-text-lo)", marginTop: "0.25rem" }}>
-                      Tap to open the guided entry sheet
+                    <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.875rem", lineHeight: 1.7, color: "var(--ow-text-lo)", maxWidth: "520px", marginBottom: "1.25rem" }}>
+                      Log every cellar event — additions, measurements, rackings, inoculations — and Ownology builds a permanent, searchable record of your vintage. Start with your first tank below.
                     </p>
+                    <button
+                      type="button"
+                      onClick={() => { setQuickEntryTank(undefined); setEntrySheetOpen(true); }}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm text-sm font-semibold"
+                      style={{ background: "var(--ow-amber)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato',sans-serif", cursor: "pointer", border: "none" }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                      Log First Entry
+                    </button>
                   </div>
-                </button>
+
+                  {/* Quick-start guide */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {[
+                      { icon: "✦", label: "Inoculation", hint: "Record yeast strain, rate, YAN, and must temperature at pitch." },
+                      { icon: "◎", label: "Measurement", hint: "Log Brix, pH, TA, free SO₂, temperature — any parameter, any time." },
+                      { icon: "⊕", label: "Addition", hint: "Record DAP, SO₂, tartaric, bentonite — quantity, rate, and timing." },
+                    ].map((item) => (
+                      <button
+                        key={item.label}
+                        type="button"
+                        onClick={() => { setQuickEntryTank(undefined); setEntrySheetOpen(true); }}
+                        className="text-left p-4 rounded-sm transition-all"
+                        style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)", cursor: "pointer" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = "color-mix(in oklch, var(--ow-amber) 40%, transparent)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--ow-border)")}
+                      >
+                        <span style={{ fontSize: "1.1rem", color: "var(--ow-amber)", display: "block", marginBottom: "0.5rem" }}>{item.icon}</span>
+                        <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "0.875rem", color: "var(--ow-text-hi)", marginBottom: "0.25rem" }}>{item.label}</p>
+                        <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.75rem", lineHeight: 1.6, color: "var(--ow-text-lo)" }}>{item.hint}</p>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Batch Book nudge */}
+                  <div
+                    className="mt-3 px-4 py-3 rounded-sm flex items-center justify-between gap-4"
+                    style={{ background: "var(--ow-bg-inset)", border: "1px solid var(--ow-border)" }}
+                  >
+                    <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.8125rem", color: "var(--ow-text-lo)" }}>
+                      <strong style={{ color: "var(--ow-text-mid)" }}>Also:</strong> Register a wine batch in the <em>Batch Book</em> tab to create your LIP-compliant Winemaker's Log with vintage, variety, GI, and grower details.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("notes")}
+                      className="flex-shrink-0 text-xs px-3 py-1.5 rounded-sm"
+                      style={{ background: "transparent", border: "1px solid var(--ow-border)", color: "var(--ow-amber)", fontFamily: "'Lato',sans-serif", cursor: "pointer" }}
+                    >
+                      Open Batch Book
+                    </button>
+                  </div>
+                </div>
               )}
 
               {/* Filter bar — only shown when there are entries */}
@@ -882,124 +967,310 @@ export default function ThePress() {
             </div>
           )}
 
-          {/* Notes */}
+          {/* Notes — The Batch Book */}
           {activeTab === "notes" && (
             <div>
-              <SectionHeader
-                label="The Chalk"
-                title="Your Notes"
-                subtitle="Write it, test it, wipe it, learn it. Nothing here is permanent."
-              />
-
-              <div
-                className="rounded-sm overflow-hidden"
-                style={{ border: "1px solid var(--ow-border)" }}
-              >
-                {/* Notes toolbar */}
-                <div
-                  className="flex items-center gap-2 px-4 py-2.5"
-                  style={{ background: "var(--ow-bg-card)", borderBottom: "1px solid var(--ow-border)" }}
-                >
-                  {["B", "I", "—", "•", "⚗"].map(tool => (
-                    <button
-                      key={tool}
-                      className="w-7 h-7 rounded-sm flex items-center justify-center text-xs transition-colors"
-                      style={{
-                        fontFamily: tool === "⚗" ? "inherit" : "'Fira Code',monospace",
-                        color: "var(--ow-text-lo)",
-                        background: "transparent",
-                        border: "1px solid transparent",
-                        cursor: "pointer",
-                      }}
-                      onMouseEnter={e => {
-                        (e.currentTarget as HTMLButtonElement).style.background = "var(--ow-bg-inset)";
-                        (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--ow-border)";
-                      }}
-                      onMouseLeave={e => {
-                        (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-                        (e.currentTarget as HTMLButtonElement).style.borderColor = "transparent";
-                      }}
-                    >
-                      {tool}
-                    </button>
-                  ))}
-                  <div className="ml-auto flex items-center gap-2">
-                    <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "var(--ow-text-lo)" }}>
-                      {noteText.length} chars
-                    </span>
-                  </div>
-                </div>
-
-                {/* Notes textarea */}
-                <textarea
-                  value={noteText}
-                  onChange={e => setNoteText(e.target.value)}
-                  placeholder={"Write it here. Test it. Wipe it. Learn it.\n\nYour notes are your chalk — tentative, erasable, forgiving.\nWhen understanding is earned, it moves to the vintage log.\n\n— Start with a question you cannot answer yet."}
-                  className="w-full resize-none outline-none"
-                  rows={14}
-                  style={{
-                    fontFamily: "'Lato',sans-serif",
-                    fontWeight: 300,
-                    fontSize: "0.9375rem",
-                    lineHeight: 1.75,
-                    color: "var(--ow-text-mid)",
-                    background: "var(--ow-bg-base)",
-                    padding: "1.25rem 1.5rem",
-                    border: "none",
-                  }}
+              <div className="flex items-start justify-between mb-6">
+                <SectionHeader
+                  label="The Batch Book"
+                  title="Winemaker's Log"
+                  subtitle="Structured, persisted records for every wine batch — LIP-compliant and yours forever."
                 />
-
-                {/* Notes footer */}
-                <div
-                  className="flex items-center justify-between px-4 py-2.5"
-                  style={{ background: "var(--ow-bg-card)", borderTop: "1px solid var(--ow-border)" }}
-                >
-                  <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)", fontStyle: "italic" }}>
-                    Notes persist locally — cloud sync available in the education build
-                  </span>
+                {isLoggedIn && (
                   <button
-                    className="px-3 py-1.5 rounded-sm text-xs transition-all"
+                    type="button"
+                    onClick={() => setBatchSheetOpen(true)}
+                    className="flex-shrink-0 mt-1 flex items-center gap-2 px-4 py-2.5 rounded-sm text-sm font-medium transition-all"
                     style={{
-                      fontFamily: "'Lato',sans-serif",
+                      background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
+                      border: "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)",
                       color: "var(--ow-amber)",
-                      background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
-                      border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
+                      fontFamily: "'Lato',sans-serif",
                       cursor: "pointer",
                     }}
-                    onClick={() => setNoteText("")}
                   >
-                    Clear
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                    New Batch
                   </button>
-                </div>
+                )}
               </div>
 
-              {/* Ask Ownology about your notes */}
-              <div
-                className="mt-6 p-5 rounded-sm flex items-start gap-4"
-                style={{ background: "var(--ow-bg-card)", border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
-              >
+              {/* Not logged in */}
+              {!isLoggedIn && (
                 <div
-                  className="w-8 h-8 rounded-sm flex items-center justify-center flex-shrink-0"
-                  style={{ background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)" }}
+                  className="rounded-sm p-8 text-center"
+                  style={{ border: "1px dashed color-mix(in oklch, var(--ow-amber) 25%, transparent)", background: "color-mix(in oklch, var(--ow-amber) 4%, transparent)" }}
                 >
-                  <span style={{ fontSize: "1rem" }}>◈</span>
-                </div>
-                <div>
-                  <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "0.9375rem", color: "var(--ow-text-hi)", marginBottom: "0.375rem" }}>
-                    Ask Ownology about your notes
+                  <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "1.125rem", color: "var(--ow-text-hi)", marginBottom: "0.5rem" }}>
+                    Sign in to open your Batch Book
                   </p>
-                  <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.8125rem", lineHeight: 1.65, color: "var(--ow-text-mid)", marginBottom: "0.75rem" }}>
-                    Paste a question from your notes into the Compliance agent and get a grounded answer from the knowledge base.
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.875rem", color: "var(--ow-text-lo)", marginBottom: "1.5rem" }}>
+                    Your Winemaker's Log is private to your account and persists across every session.
                   </p>
-                  <Link
-                    href="/compliance"
-                    className="text-xs"
-                    style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-amber)", textDecoration: "none" }}
+                  <a
+                    href={getLoginUrl("/the-press")}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm text-sm font-medium"
+                    style={{ background: "var(--ow-amber)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato',sans-serif", textDecoration: "none" }}
                   >
-                    Open Compliance Agent →
-                  </Link>
+                    Sign in
+                  </a>
                 </div>
-              </div>
+              )}
+
+              {/* Logged in — no batches yet */}
+              {isLoggedIn && (!wineBatches || wineBatches.length === 0) && (
+                <div
+                  className="rounded-sm p-8 text-center"
+                  style={{ border: "1px dashed color-mix(in oklch, var(--ow-amber) 25%, transparent)", background: "color-mix(in oklch, var(--ow-amber) 4%, transparent)" }}
+                >
+                  <div className="text-3xl mb-4">📖</div>
+                  <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "1.125rem", color: "var(--ow-text-hi)", marginBottom: "0.5rem" }}>
+                    Start your first batch record
+                  </p>
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.875rem", lineHeight: 1.7, color: "var(--ow-text-lo)", maxWidth: "420px", margin: "0 auto 1.5rem" }}>
+                    Register a wine batch with its LIP-required details — vintage, variety, GI, and grower — then write your notes by phase from receival through to bottling.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setBatchSheetOpen(true)}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm text-sm font-medium"
+                    style={{ background: "var(--ow-amber)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato',sans-serif", cursor: "pointer", border: "none" }}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                    Register First Batch
+                  </button>
+                </div>
+              )}
+
+              {/* Logged in — batches exist */}
+              {isLoggedIn && wineBatches && wineBatches.length > 0 && (() => {
+                const batch = selectedBatch ?? wineBatches[0];
+                const phases = [
+                  { id: "receival", label: "Receival & Crush", icon: "⊞", prompt: "Date received, quantity, Brix at crush, temperature, any receival observations…" },
+                  { id: "fermentation", label: "Fermentation", icon: "✦", prompt: "Inoculation date, yeast strain, YAN, DAP additions, Brix progression, temperature, observations…" },
+                  { id: "racking", label: "Post-Ferment & Racking", icon: "⇄", prompt: "Racking date, destination tank, lees status, volume, free SO₂, any fining additions…" },
+                  { id: "stabilising", label: "Stabilising & Clarifying", icon: "◎", prompt: "Cold stab temp, bentonite rate, filtration, pH, TA, free SO₂ at this stage…" },
+                  { id: "bottling", label: "Bottling", icon: "◈", prompt: "Bottling date, volume, free SO₂, pH, TA, alcohol, closure type, label batch code…" },
+                  { id: "general", label: "General Notes", icon: "✏", prompt: "Any other observations, decisions, or things worth remembering for this batch…" },
+                ];
+                return (
+                  <>
+                    {/* Batch selector tabs */}
+                    <div className="flex items-center gap-2 mb-5 overflow-x-auto pb-1">
+                      {wineBatches.map((b) => (
+                        <button
+                          key={b.batchId}
+                          type="button"
+                          onClick={() => setSelectedBatchId(b.batchId)}
+                          className="flex-shrink-0 px-3 py-2 rounded-sm text-xs font-medium transition-all"
+                          style={{
+                            background: (selectedBatchId ?? wineBatches[0].batchId) === b.batchId
+                              ? "color-mix(in oklch, var(--ow-amber) 15%, transparent)"
+                              : "var(--ow-bg-card)",
+                            border: (selectedBatchId ?? wineBatches[0].batchId) === b.batchId
+                              ? "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)"
+                              : "1px solid var(--ow-border)",
+                            color: (selectedBatchId ?? wineBatches[0].batchId) === b.batchId
+                              ? "var(--ow-amber)"
+                              : "var(--ow-text-mid)",
+                            fontFamily: "'Fira Code',monospace",
+                            letterSpacing: "0.04em",
+                            cursor: "pointer",
+                          }}
+                        >
+                          {b.batchId}
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => setBatchSheetOpen(true)}
+                        className="flex-shrink-0 w-7 h-7 rounded-sm flex items-center justify-center transition-colors"
+                        style={{ background: "var(--ow-bg-inset)", border: "1px solid var(--ow-border)", color: "var(--ow-text-lo)", cursor: "pointer" }}
+                        title="Register new batch"
+                      >
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                          <path d="M5 1v8M1 5h8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Batch header card */}
+                    <div
+                      className="rounded-sm p-4 mb-5"
+                      style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}
+                    >
+                      <div className="flex items-start justify-between gap-4 flex-wrap">
+                        <div>
+                          <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", marginBottom: "0.25rem" }}>WINE BATCH ID</p>
+                          <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "1.25rem", color: "var(--ow-amber)" }}>{batch.batchId}</p>
+                        </div>
+                        <div className="flex flex-wrap gap-4">
+                          <div>
+                            <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", marginBottom: "0.2rem" }}>VINTAGE</p>
+                            <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.875rem", color: "var(--ow-text-hi)" }}>{batch.vintage}</p>
+                          </div>
+                          <div>
+                            <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", marginBottom: "0.2rem" }}>VARIETY</p>
+                            <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.875rem", color: "var(--ow-text-hi)" }}>{batch.variety}</p>
+                          </div>
+                          {batch.gi && (
+                            <div>
+                              <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", marginBottom: "0.2rem" }}>GI</p>
+                              <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.875rem", color: "var(--ow-text-hi)" }}>{batch.gi}</p>
+                            </div>
+                          )}
+                          {batch.quantityValue && (
+                            <div>
+                              <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", marginBottom: "0.2rem" }}>QTY</p>
+                              <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.875rem", color: "var(--ow-text-hi)" }}>{batch.quantityValue}{batch.quantityUnit}</p>
+                            </div>
+                          )}
+                          {batch.tankName && (
+                            <div>
+                              <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", marginBottom: "0.2rem" }}>TANK</p>
+                              <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.875rem", color: "var(--ow-text-hi)" }}>{batch.tankName}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {batch.growerDetails && (
+                        <div className="mt-3 pt-3" style={{ borderTop: "1px solid var(--ow-border)" }}>
+                          <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", marginBottom: "0.25rem" }}>GROWER / SUPPLIER</p>
+                          <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.8125rem", color: "var(--ow-text-mid)", lineHeight: 1.6 }}>{batch.growerDetails}</p>
+                        </div>
+                      )}
+                      {/* Auto-save indicator */}
+                      {savingPhase === "saving" && (
+                        <div className="mt-2 text-right">
+                          <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "var(--ow-text-lo)", fontStyle: "italic" }}>saving…</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Phase accordion */}
+                    <div className="flex flex-col gap-2">
+                      {phases.map((phase) => {
+                        const isOpen = expandedPhase === phase.id;
+                        const noteVal = localNotes[phase.id] ?? "";
+                        // Pull context from Vintage Log for this batch's tank
+                        const relatedEntries = batch.tankName
+                          ? (logEntries ?? []).filter((e) => e.tankName === batch.tankName).slice(0, 3)
+                          : [];
+                        return (
+                          <div
+                            key={phase.id}
+                            className="rounded-sm overflow-hidden"
+                            style={{ border: "1px solid var(--ow-border)" }}
+                          >
+                            {/* Phase header */}
+                            <button
+                              type="button"
+                              onClick={() => setExpandedPhase(isOpen ? null : phase.id)}
+                              className="w-full flex items-center justify-between px-4 py-3 text-left transition-colors"
+                              style={{
+                                background: isOpen ? "color-mix(in oklch, var(--ow-amber) 6%, var(--ow-bg-card))" : "var(--ow-bg-card)",
+                                cursor: "pointer",
+                                border: "none",
+                              }}
+                            >
+                              <div className="flex items-center gap-3">
+                                <span style={{ fontSize: "0.9rem", color: isOpen ? "var(--ow-amber)" : "var(--ow-text-lo)" }}>{phase.icon}</span>
+                                <span style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "0.9375rem", color: isOpen ? "var(--ow-text-hi)" : "var(--ow-text-mid)" }}>
+                                  {phase.label}
+                                </span>
+                                {noteVal.trim() && (
+                                  <span
+                                    className="px-1.5 py-0.5 rounded-sm text-xs"
+                                    style={{ background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", color: "var(--ow-amber)", fontFamily: "'Fira Code',monospace", fontSize: "0.6rem" }}
+                                  >
+                                    ✓
+                                  </span>
+                                )}
+                              </div>
+                              <svg
+                                width="12" height="12" viewBox="0 0 12 12" fill="none"
+                                style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", color: "var(--ow-text-lo)" }}
+                              >
+                                <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </button>
+
+                            {/* Phase content */}
+                            {isOpen && (
+                              <div style={{ background: "var(--ow-bg-base)", borderTop: "1px solid var(--ow-border)" }}>
+                                {/* Related log entries context */}
+                                {phase.id === "fermentation" && relatedEntries.length > 0 && (
+                                  <div className="px-4 pt-3 pb-1">
+                                    <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>FROM VINTAGE LOG — {batch.tankName}</p>
+                                    <div className="flex flex-col gap-1.5">
+                                      {relatedEntries.map((e) => (
+                                        <div key={e.id} className="flex items-center gap-2 text-xs" style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-text-lo)" }}>
+                                          <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "var(--ow-text-lo)" }}>
+                                            {new Date(e.entryAt).toLocaleDateString("en-AU", { day: "numeric", month: "short" })}
+                                          </span>
+                                          <span style={{ color: "var(--ow-amber)", fontSize: "0.7rem" }}>{e.eventType}</span>
+                                          <span>{e.noteText ?? Object.values(e.details as Record<string, string>).slice(0, 2).join(" · ")}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                <textarea
+                                  value={noteVal}
+                                  onChange={(e) => handleNoteChange(phase.id, e.target.value)}
+                                  placeholder={phase.prompt}
+                                  rows={5}
+                                  className="w-full resize-none outline-none"
+                                  style={{
+                                    fontFamily: "'Lato',sans-serif",
+                                    fontWeight: 300,
+                                    fontSize: "0.9rem",
+                                    lineHeight: 1.75,
+                                    color: "var(--ow-text-mid)",
+                                    background: "transparent",
+                                    padding: "0.875rem 1rem",
+                                    border: "none",
+                                  }}
+                                />
+                                <div
+                                  className="flex items-center justify-between px-4 py-2"
+                                  style={{ borderTop: "1px solid var(--ow-border)" }}
+                                >
+                                  <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)" }}>
+                                    {noteVal.length} chars · auto-saved
+                                  </span>
+                                  <Link
+                                    href="/compliance"
+                                    className="text-xs"
+                                    style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-amber)", textDecoration: "none", fontSize: "0.75rem" }}
+                                  >
+                                    Ask Ownology ◈
+                                  </Link>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* LIP reminder footer */}
+                    <div
+                      className="mt-5 px-4 py-3 rounded-sm flex items-start gap-3"
+                      style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}
+                    >
+                      <span style={{ fontSize: "0.9rem", color: "var(--ow-amber)" }}>⚖</span>
+                      <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.8rem", lineHeight: 1.65, color: "var(--ow-text-lo)" }}>
+                        <strong style={{ color: "var(--ow-text-mid)" }}>LIP reminder:</strong> All batch records must be retained for 7 years under the Wine Australia Act 2013. Ensure vintage, variety, GI, and grower details are complete for every batch.
+                      </p>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           )}
         </div>
@@ -1047,6 +1318,17 @@ export default function ThePress() {
         onClose={() => { setReminderSheetOpen(false); setReminderDefaultTank(undefined); }}
         defaultTankName={reminderDefaultTank}
         tankNames={allTanks}
+      />
+
+      {/* Wine Batch Sheet */}
+      <WineBatchSheet
+        open={batchSheetOpen}
+        onClose={() => setBatchSheetOpen(false)}
+        onSaved={(newBatchId) => {
+          refetchBatches();
+          setBatchSheetOpen(false);
+          if (newBatchId) setSelectedBatchId(newBatchId);
+        }}
       />
     </div>
   );

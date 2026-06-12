@@ -400,3 +400,87 @@ export async function updateLead(id: number, data: {
 export async function deleteLead(id: number) {
   await db.delete(schema.leads).where(eq(schema.leads.id, id));
 }
+
+// ─── Wine Batches ─────────────────────────────────────────────────────────────
+
+export type WineBatchPhaseNotes = {
+  receival?: string;
+  fermentation?: string;
+  postFerment?: string;
+  stabilising?: string;
+  bottling?: string;
+};
+
+export async function createWineBatch(data: {
+  userId: number;
+  batchId: string;
+  vintage: number;
+  variety: string;
+  gi: string;
+  growerDetails?: string;
+  receivedAt?: number;
+  quantityValue?: string;
+  quantityUnit?: "kg" | "t" | "L";
+  tankName?: string;
+}) {
+  const now = Date.now();
+  const result = await db.insert(schema.wineBatches).values({
+    userId: data.userId,
+    batchId: data.batchId,
+    vintage: data.vintage,
+    variety: data.variety,
+    gi: data.gi,
+    growerDetails: data.growerDetails ?? null,
+    receivedAt: data.receivedAt ?? null,
+    quantityValue: data.quantityValue ?? null,
+    quantityUnit: data.quantityUnit ?? "kg",
+    tankName: data.tankName ?? null,
+    notesJson: "{}",
+    createdAt: now,
+    updatedAt: now,
+  });
+  return (result as unknown as { insertId: number }).insertId;
+}
+
+export async function listWineBatches(userId: number) {
+  return db.query.wineBatches.findMany({
+    where: eq(schema.wineBatches.userId, userId),
+    orderBy: [desc(schema.wineBatches.vintage), desc(schema.wineBatches.createdAt)],
+  });
+}
+
+export async function getWineBatch(id: number, userId: number) {
+  return db.query.wineBatches.findFirst({
+    where: and(eq(schema.wineBatches.id, id), eq(schema.wineBatches.userId, userId)),
+  });
+}
+
+export async function updateWineBatchNotes(id: number, userId: number, notesJson: string) {
+  await db
+    .update(schema.wineBatches)
+    .set({ notesJson, updatedAt: Date.now() })
+    .where(and(eq(schema.wineBatches.id, id), eq(schema.wineBatches.userId, userId)));
+}
+
+export async function updateWineBatch(id: number, userId: number, data: {
+  batchId?: string;
+  vintage?: number;
+  variety?: string;
+  gi?: string;
+  growerDetails?: string;
+  receivedAt?: number;
+  quantityValue?: string;
+  quantityUnit?: "kg" | "t" | "L";
+  tankName?: string;
+}) {
+  await db
+    .update(schema.wineBatches)
+    .set({ ...data, updatedAt: Date.now() })
+    .where(and(eq(schema.wineBatches.id, id), eq(schema.wineBatches.userId, userId)));
+}
+
+export async function deleteWineBatch(id: number, userId: number) {
+  await db.delete(schema.wineBatches).where(
+    and(eq(schema.wineBatches.id, id), eq(schema.wineBatches.userId, userId))
+  );
+}
