@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "wouter";
+import { Link, useSearch } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
@@ -1000,6 +1000,11 @@ export default function Pricing() {
   // can position itself correctly (above the bar vs. near the bottom edge)
   const [stickyBarVisible, setStickyBarVisible] = useState(true);
 
+  // Abandoned Stripe checkout — show a dismissible inline notice
+  const search = useSearch();
+  const wasCancelled = new URLSearchParams(search).get("cancelled") === "1";
+  const [showCancelledBanner, setShowCancelledBanner] = useState(wasCancelled);
+
   const handleFlashPress = () => {
     // Small delay to let scroll animation finish before flashing
     setTimeout(() => {
@@ -1016,6 +1021,65 @@ export default function Pricing() {
       }}
     >
       <Nav />
+
+      {/* Abandoned checkout notice */}
+      {showCancelledBanner && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            background: "oklch(0.15 0.010 60)",
+            borderBottom: "1px solid oklch(0.72 0.12 75 / 20%)",
+          }}
+        >
+          <div
+            className="container max-w-5xl mx-auto"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "1rem",
+              padding: "0.875rem 1rem",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+                <circle cx="8" cy="8" r="7" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" />
+                <path d="M8 5v3.5" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" />
+                <circle cx="8" cy="11" r="0.75" fill="oklch(0.72 0.12 75)" />
+              </svg>
+              <p
+                style={{
+                  fontFamily: "'Lato', sans-serif",
+                  fontWeight: 300,
+                  fontSize: "0.875rem",
+                  color: "oklch(0.75 0.015 75)",
+                  lineHeight: 1.5,
+                }}
+              >
+                No charge was made — you can subscribe any time.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowCancelledBanner(false)}
+              aria-label="Dismiss"
+              style={{
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                padding: "0.25rem",
+                color: "oklch(0.50 0.012 75)",
+                flexShrink: 0,
+                lineHeight: 0,
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Hero */}
       <section className="pt-32 pb-16 text-center">
