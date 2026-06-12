@@ -635,7 +635,7 @@ const AU_STATES: StateData[] = [
   {
     code: "SA",
     name: "South Australia",
-    items: ["Liquor licensing (LBSA)", "EPA environmental authority", "SafeWork SA WHS"],
+    items: ["CBS SA liquor licensing", "EPA SA environmental authority", "SafeWork SA WHS"],
     path: "M 175 260 L 295 260 L 320 340 L 295 420 L 175 420 Z",
     labelX: 237,
     labelY: 345,
@@ -643,7 +643,7 @@ const AU_STATES: StateData[] = [
   {
     code: "QLD",
     name: "Queensland",
-    items: ["OLGR licensing", "DESI environmental authority", "WorkSafe QLD"],
+    items: ["OLGR liquor licensing", "DES environmental authority", "WHSQ work health & safety"],
     path: "M 295 60 L 430 60 L 430 280 L 295 280 L 295 60 Z",
     labelX: 362,
     labelY: 165,
@@ -667,7 +667,7 @@ const AU_STATES: StateData[] = [
   {
     code: "TAS",
     name: "Tasmania",
-    items: ["CBOS licensing", "EPA Tasmania", "WorkSafe Tasmania"],
+    items: ["Tas Liquor & Gaming Commission", "EPA Tasmania", "WorkSafe Tasmania"],
     path: "M 340 460 L 390 460 L 410 500 L 360 510 L 330 490 Z",
     labelX: 368,
     labelY: 483,

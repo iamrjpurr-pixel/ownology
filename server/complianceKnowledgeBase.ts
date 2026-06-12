@@ -451,14 +451,14 @@ Administered by Workplace Health and Safety Queensland (WHSQ).
 ## TASMANIA (TAS) REGULATIONS
 
 ### Liquor Licensing (Liquor Licensing Act 1990 TAS)
-Administered by the Commissioner for Licensing.
+Administered by the Tasmanian Liquor and Gaming Commission (Treasury and Finance Tasmania). Note: as of 2025–26, liquor licensing in Tasmania has been restructured — the Commission is the regulatory body; CBOS no longer administers liquor licences.
 
 Relevant licence types:
 - Winery Licence: allows production, wholesale, and cellar door sales and tastings.
 - On-licence: required for cellar door with on-premises consumption.
 
 Application requirements:
-- Application via the Commissioner for Licensing
+- Application via the Tasmanian Liquor and Gaming Commission (treasury.tas.gov.au/liquor-and-gaming)
 - Proof of production premises
 - Floor plan
 - Local council development approval
@@ -931,7 +931,7 @@ All other workplace injuries, near misses, and hazard reports should be recorded
 - Workplace Health and Safety QLD: worksafe.qld.gov.au | 1300 362 128
 
 ### Tasmania
-- Commissioner for Licensing (Liquor): cbos.tas.gov.au | 1300 654 499
+- Tasmanian Liquor and Gaming Commission: treasury.tas.gov.au/liquor-and-gaming | (03) 6166 4040
 - EPA Tasmania (Environment): epa.tas.gov.au | 1800 005 171
 - WorkSafe Tasmania (WHS): worksafe.tas.gov.au | 1300 366 322
 
@@ -1218,10 +1218,10 @@ export const SOURCE_DOCTRINE: SourceDoctrineEntry[] = [
     title: "Liquor Licensing Act 1990 (TAS)",
     jurisdiction: "TAS",
     category: "legislation",
-    administeringAgency: "Consumer, Building and Occupational Services (CBOS) TAS",
+    administeringAgency: "Tasmanian Liquor and Gaming Commission (Treasury and Finance Tasmania)",
     officialUrl: "https://www.legislation.tas.gov.au/view/html/inforce/current/act-1990-062",
-    monitorUrl: "https://www.cbos.tas.gov.au/",
-    monitorChannel: "CBOS TAS website; legislation.tas.gov.au",
+    monitorUrl: "https://www.treasury.tas.gov.au/liquor-and-gaming",
+    monitorChannel: "Treasury TAS liquor-and-gaming page; legislation.tas.gov.au",
     updateFrequency: "Occasional",
     lastKnownUpdate: "May 2026",
   },
