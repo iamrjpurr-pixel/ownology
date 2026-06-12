@@ -165,10 +165,10 @@ export default function ThePress() {
 
   const isLoggedIn = logEntries !== undefined;
 
-  // Wine batch data
+  // Wine batch data — always fetch (no auth gate while building)
   const { data: wineBatches, refetch: refetchBatches } = trpc.wineBatch.list.useQuery(
     undefined,
-    { retry: false, enabled: isLoggedIn }
+    { retry: false }
   );
   const selectedBatch = wineBatches?.find((b) => b.batchId === selectedBatchId) ?? wineBatches?.[0] ?? null;
   const updateNotesMutation = trpc.wineBatch.updateNotes.useMutation({
@@ -464,37 +464,10 @@ export default function ThePress() {
                 )}
               </div>
 
-              {/* Not logged in — prompt to sign in */}
-              {logEntries === undefined && (
-                <div
-                  className="mb-6 p-5 rounded-sm flex items-center justify-between gap-4"
-                  style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}
-                >
-                  <div>
-                    <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.9rem", fontWeight: 600, color: "var(--ow-text-hi)" }}>
-                      Sign in to start your Vintage Log
-                    </p>
-                    <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem", color: "var(--ow-text-lo)", marginTop: "0.25rem" }}>
-                      Your log is private to your account and persists across sessions.
-                    </p>
-                  </div>
-                  <a
-                    href={getLoginUrl()}
-                    className="flex-shrink-0 px-4 py-2.5 rounded-sm text-sm font-semibold"
-                    style={{
-                      background: "var(--ow-amber)",
-                      color: "oklch(0.11 0.008 60)",
-                      fontFamily: "'Lato',sans-serif",
-                      textDecoration: "none",
-                    }}
-                  >
-                    Sign in
-                  </a>
-                </div>
-              )}
+              {/* Sign-in gate removed during development */}
 
-              {/* Empty state — logged in but no entries yet */}
-              {logEntries !== undefined && !hasEntries && (
+              {/* Empty state — no entries yet */}
+              {!hasEntries && (
                 <div className="mb-6">
                   {/* Welcome banner */}
                   <div
@@ -976,8 +949,7 @@ export default function ThePress() {
                   title="Winemaker's Log"
                   subtitle="Structured, persisted records for every wine batch — LIP-compliant and yours forever."
                 />
-                {isLoggedIn && (
-                  <button
+                <button
                     type="button"
                     onClick={() => setBatchSheetOpen(true)}
                     className="flex-shrink-0 mt-1 flex items-center gap-2 px-4 py-2.5 rounded-sm text-sm font-medium transition-all"
@@ -994,33 +966,12 @@ export default function ThePress() {
                     </svg>
                     New Batch
                   </button>
-                )}
               </div>
 
-              {/* Not logged in */}
-              {!isLoggedIn && (
-                <div
-                  className="rounded-sm p-8 text-center"
-                  style={{ border: "1px dashed color-mix(in oklch, var(--ow-amber) 25%, transparent)", background: "color-mix(in oklch, var(--ow-amber) 4%, transparent)" }}
-                >
-                  <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "1.125rem", color: "var(--ow-text-hi)", marginBottom: "0.5rem" }}>
-                    Sign in to open your Batch Book
-                  </p>
-                  <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.875rem", color: "var(--ow-text-lo)", marginBottom: "1.5rem" }}>
-                    Your Winemaker's Log is private to your account and persists across every session.
-                  </p>
-                  <a
-                    href={getLoginUrl("/the-press")}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm text-sm font-medium"
-                    style={{ background: "var(--ow-amber)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato',sans-serif", textDecoration: "none" }}
-                  >
-                    Sign in
-                  </a>
-                </div>
-              )}
+              {/* Sign-in gate removed during development */}
 
-              {/* Logged in — no batches yet */}
-              {isLoggedIn && (!wineBatches || wineBatches.length === 0) && (
+              {/* No batches yet */}
+              {(!wineBatches || wineBatches.length === 0) && (
                 <div
                   className="rounded-sm p-8 text-center"
                   style={{ border: "1px dashed color-mix(in oklch, var(--ow-amber) 25%, transparent)", background: "color-mix(in oklch, var(--ow-amber) 4%, transparent)" }}
@@ -1046,8 +997,8 @@ export default function ThePress() {
                 </div>
               )}
 
-              {/* Logged in — batches exist */}
-              {isLoggedIn && wineBatches && wineBatches.length > 0 && (() => {
+              {/* Batches exist */}
+              {wineBatches && wineBatches.length > 0 && (() => {
                 const batch = selectedBatch ?? wineBatches[0];
                 const phases = [
                   { id: "receival", label: "Receival & Crush", icon: "⊞", prompt: "Date received, quantity, Brix at crush, temperature, any receival observations…" },
