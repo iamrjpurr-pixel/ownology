@@ -86,9 +86,9 @@ export const QA_DOCTRINE: QAEntry[] = [
       },
       {
         title: "Wine Australia Regulations 2018",
-        section: "Division 2.1 — Producer registration",
+        section: "Part 1 (s.4 definitions); Part 2 (s.5–6 grape product and prescribed GI definitions)",
         jurisdiction: "Federal",
-        url: "https://www.legislation.gov.au/Details/F2018L00960",
+        url: "https://www.legislation.gov.au/current/F2018L00286",
       },
     ],
     lastVerified: "2026-05-01",
@@ -328,24 +328,31 @@ export const QA_DOCTRINE: QAEntry[] = [
     topic: "Wine Labelling",
     jurisdiction: "Federal",
     question: "What are the rules for claiming a vintage, variety, or geographic indication on a label?",
-    keywords: ["vintage", "variety", "geographic indication", "GI", "region", "label claim", "85%", "Label Integrity"],
+    keywords: ["vintage", "variety", "geographic indication", "GI", "region", "label claim", "85%", "850ml", "Label Integrity", "LIP"],
     answer:
-      "Under the Label Integrity Program (LIP) administered by Wine Australia: (1) Vintage claim: at least 85% of the wine must be made from grapes harvested in the stated vintage year. (2) Variety claim: at least 85% of the wine must be made from the stated grape variety. (3) Geographic Indication (GI) claim: at least 85% of the wine must be made from grapes grown in the stated GI region. For blends of two or three varieties or regions, each component must be listed in descending order of proportion, and the 85% rule applies to the total blend. Producers must maintain records sufficient to substantiate all label claims for at least seven years. Wine Australia audits producers and can require label amendments or impose penalties for non-compliance.",
+      "The precise thresholds are set by the Wine Australia Regulations 2018 (F2018L00286), Parts 4 and 5, made under the Wine Australia Act 2013.\n\n" +
+      "VINTAGE (s.27 of the Regulations): Wine may be labelled as a single vintage if at least 850 mL/L (85%) is obtained from grapes harvested in that vintage. If wine is made from multiple vintages and any vintage is mentioned on the label, ALL vintages must be listed in descending order of proportion. For fortified wine, volume is calculated exclusive of added grape spirit or brandy.\n\n" +
+      "GRAPE VARIETY (s.25): Variety names must be recognised by OIV, UPOV, or IPGRI. Single variety claim: at least 850 mL/L (85%) must be from that variety. Multi-variety blend: varieties listed in descending order; each named variety must be present in greater proportion than any unnamed variety; in total at least 850 mL/L (85%) must come from the named varieties. Sweetening products and microorganism cultures up to 50 mL/L are excluded from calculations.\n\n" +
+      "GEOGRAPHICAL INDICATION — Single Australian GI (s.26(2)): at least 850 mL/L (85%) must come from grapes grown in the GI region.\n\n" +
+      "GEOGRAPHICAL INDICATION — Multiple GIs (s.26(4)–(5)): when 2 or 3 registered GIs are used (at least one Australian), total from all named GIs must be at least 950 mL/L (95%); at least 50 mL/L from each GI; listed in descending order.\n\n" +
+      "MAXIMUM GIs ON A LABEL (s.26(1)): no more than 3 registered GIs and foreign place names in total on any label.\n\n" +
+      "MULTI-COUNTRY WINE (s.24): if wine is made from grapes grown in more than one country, the label must identify the proportion from each country (grape-derived additives up to 20 mL/L excluded).\n\n" +
+      "LIP RECORDS: must be retained for 5 years and include grape receival records, tank/barrel movement records, blending records, and bottling records. Wine Australia may request records to verify any label claim.",
     citations: [
       {
+        title: "Wine Australia Regulations 2018",
+        section: "s.24 (multi-country), s.25 (variety), s.26 (GI), s.27 (vintage) — Part 4 Description and Presentation of Wine",
+        jurisdiction: "Federal",
+        url: "https://www.legislation.gov.au/current/F2018L00286",
+      },
+      {
         title: "Wine Australia Act 2013",
-        section: "Part 5 — Label Integrity Program; s.40C — Percentage rules",
+        section: "s.39F — Label Integrity Program record-keeping; s.40F — Description and presentation requirements",
         jurisdiction: "Federal",
         url: "https://www.legislation.gov.au/Details/C2022C00326",
       },
-      {
-        title: "Wine Australia Regulations 2018",
-        section: "Part 4 — Label Integrity",
-        jurisdiction: "Federal",
-        url: "https://www.legislation.gov.au/Details/F2018L00960",
-      },
     ],
-    lastVerified: "2026-05-01",
+    lastVerified: "2026-06-12",
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -357,24 +364,78 @@ export const QA_DOCTRINE: QAEntry[] = [
     topic: "Export Compliance",
     jurisdiction: "Federal",
     question: "What do I need to export wine from Australia?",
-    keywords: ["export", "licence", "Wine Australia", "export permit", "certificate", "overseas", "international"],
+    keywords: ["export", "licence", "Wine Australia", "export permit", "certificate", "overseas", "international", "export conditions"],
     answer:
-      "To export wine from Australia you need: (1) An Export Licence from Wine Australia under the Wine Australia Act 2013 — this is separate from your producer registration. (2) An Export Permit for each shipment, obtained through the Wine Australia portal. (3) A Certificate of Origin or Health Certificate (depending on the destination country's requirements) — issued by Wine Australia. (4) Labels for export must be pre-registered in the Wine Australia Label Directory before shipment. Some destination countries have additional requirements (e.g. EU requires a VI-1 certificate; China requires specific label registration). Contact Wine Australia's export team for country-specific requirements.",
+      "Under the Wine Australia Regulations 2018 (F2018L00286), Part 3, the export of any grape product consignment is prohibited unless ALL of the following conditions are met (s.7):\n\n" +
+      "1. You hold a current Wine Australia export licence (s.9). Apply to Wine Australia in the approved form. The licence is granted for up to 3 years and may be extended in further periods of up to 3 years (s.11). Wine Australia assesses financial standing, Australian place of business, ability to source Australian grape products, and whether you are a fit and proper person.\n\n" +
+      "2. The specific grape product is approved for export by you under s.14. You must apply separately for each product. Wine Australia must be satisfied the product: complies with the Australia New Zealand Food Standards Code (or any non-compliance will not compromise Australian grape product reputation); is sound and merchantable; and has appropriate description and presentation under Australian and destination-country laws.\n\n" +
+      "3. A current export certificate for the consignment is in force (s.20). Application must be lodged at least 5 days before the export date, identifying the export date, destination country, and consignee. Wine Australia must issue or refuse before the export date. Wine Australia must refuse if it reasonably believes the product cannot lawfully be sold in the destination country.\n\n" +
+      "4. If Wine Australia has issued a quantity direction (s.22), the export complies with it.\n\n" +
+      "EXEMPTIONS (s.8): The export licence/approval/certificate requirements do NOT apply to: consignments of 100 litres or less; traveller's personal luggage; house-moving wine for domestic use; trade fair display samples; scientific/technical purpose exports; diplomatic duty-free allowances; victualling supplies; or commercial samples for a prospective buyer.\n\n" +
+      "REVIEW: Refusals and adverse decisions are reviewable by the Administrative Appeals Tribunal (s.23).",
     citations: [
       {
+        title: "Wine Australia Regulations 2018",
+        section: "Part 3 — Export controls (ss.7–23): conditions, exemptions, licences, product approvals, export certificates, quantity directions, AAT review",
+        jurisdiction: "Federal",
+        url: "https://www.legislation.gov.au/current/F2018L00286",
+      },
+      {
         title: "Wine Australia Act 2013",
-        section: "Part 3 — Export licences; Part 4 — Export permits",
+        section: "s.46 — Export offence; Part 3 — Export licensing",
         jurisdiction: "Federal",
         url: "https://www.legislation.gov.au/Details/C2022C00326",
       },
+    ],
+    lastVerified: "2026-06-12",
+  },
+
+  {
+    id: "fed-export-product-approval",
+    topic: "Export Compliance",
+    jurisdiction: "Federal",
+    question: "How do I get a grape product approved for export by Wine Australia?",
+    keywords: ["export approval", "product approval", "approved grape product", "s.14", "sound merchantable", "export label"],
+    answer:
+      "Under s.14 of the Wine Australia Regulations 2018 (F2018L00286), a licensee must apply to Wine Australia (in the approved form) for each grape product to be approved for export.\n\n" +
+      "Wine Australia may approve the product if satisfied that: (a) it complies with the Australia New Zealand Food Standards Code, or any non-compliance will not compromise the reputation of Australian grape products; (b) it is sound and merchantable; and (c) its description and presentation is appropriate under the Act, Australian laws, and the laws of the destination country.\n\n" +
+      "RESTRICTION: Wine Australia must NOT approve a non-wine/brandy/grape spirit product if its label uses a registered GI other than 'Australia' or a registered translation (s.14(4)).\n\n" +
+      "CONDITIONS: Approval may be subject to conditions, including country-specific restrictions (e.g. approved only for export to specified countries).\n\n" +
+      "AUTHORISING OTHERS: An approval holder may authorise another licensee in writing to export the same product (s.15). The authorised licensee cannot further sub-authorise.\n\n" +
+      "INFORMATION REQUESTS: Wine Australia may request records demonstrating Food Standards Code compliance, soundness and merchantability, or copies of LIP records to verify label claims (s.16). Failure to comply triggers mandatory suspension of the approval (s.17).",
+    citations: [
       {
         title: "Wine Australia Regulations 2018",
-        section: "Part 3 — Export",
+        section: "ss.14–17 — Division 3: Approved grape products",
         jurisdiction: "Federal",
-        url: "https://www.legislation.gov.au/Details/F2018L00960",
+        url: "https://www.legislation.gov.au/current/F2018L00286",
       },
     ],
-    lastVerified: "2026-05-01",
+    lastVerified: "2026-06-12",
+  },
+
+  {
+    id: "fed-export-certificate",
+    topic: "Export Compliance",
+    jurisdiction: "Federal",
+    question: "How do I obtain an export certificate for a wine shipment?",
+    keywords: ["export certificate", "export permit", "shipment", "consignment", "5 days", "s.18", "s.20"],
+    answer:
+      "Under the Wine Australia Regulations 2018 (F2018L00286), ss.18–21, a licensee must apply for an export certificate for each consignment.\n\n" +
+      "APPLICATION (s.18): Must be lodged at least 5 days before the export date, in the form approved by Wine Australia. The application must identify: (a) the export date; (b) the destination country; and (c) the consignee.\n\n" +
+      "ISSUE (s.20): Wine Australia must issue or refuse before the export date. Wine Australia may issue if satisfied that: the product is approved for export by the licensee; any approval conditions would be met; any labelling compliance information requested under s.19 has been provided; and any quantity direction would be complied with.\n\n" +
+      "REFUSAL (s.20(4)): Wine Australia must refuse if it reasonably believes the product cannot lawfully be sold in the destination country, or if the licensee fails to provide requested compliance information.\n\n" +
+      "INFORMATION REQUESTS (s.19): Wine Australia may ask the licensee to demonstrate compliance with Australian labelling laws (e.g. organic certification) at least 2 days before the export date.\n\n" +
+      "REVOCATION (s.21): Wine Australia may revoke an export certificate if the export no longer meets the conditions under s.20(2).",
+    citations: [
+      {
+        title: "Wine Australia Regulations 2018",
+        section: "ss.18–21 — Division 4: Export certificates",
+        jurisdiction: "Federal",
+        url: "https://www.legislation.gov.au/current/F2018L00286",
+      },
+    ],
+    lastVerified: "2026-06-12",
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
