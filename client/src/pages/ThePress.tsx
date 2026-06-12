@@ -474,6 +474,26 @@ export default function ThePress() {
                     className="rounded-sm p-6 mb-4"
                     style={{ background: "var(--ow-bg-card)", border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
                   >
+                    {/* Press illustration */}
+                    <svg width="72" height="56" viewBox="0 0 72 56" fill="none" aria-hidden="true" style={{ marginBottom: "1.25rem", opacity: 0.5 }}>
+                      {/* Basket slats */}
+                      <rect x="14" y="32" width="44" height="16" rx="1" stroke="var(--ow-amber)" strokeWidth="1.3" />
+                      <line x1="22" y1="32" x2="22" y2="48" stroke="var(--ow-amber)" strokeWidth="0.9" strokeDasharray="2.5 2" />
+                      <line x1="30" y1="32" x2="30" y2="48" stroke="var(--ow-amber)" strokeWidth="0.9" strokeDasharray="2.5 2" />
+                      <line x1="38" y1="32" x2="38" y2="48" stroke="var(--ow-amber)" strokeWidth="0.9" strokeDasharray="2.5 2" />
+                      <line x1="46" y1="32" x2="46" y2="48" stroke="var(--ow-amber)" strokeWidth="0.9" strokeDasharray="2.5 2" />
+                      {/* Press plate */}
+                      <rect x="11" y="25" width="50" height="7" rx="1" stroke="var(--ow-amber)" strokeWidth="1.3" />
+                      {/* Screw shaft */}
+                      <line x1="36" y1="3" x2="36" y2="25" stroke="var(--ow-amber)" strokeWidth="1.6" strokeLinecap="round" />
+                      {/* Cross handle */}
+                      <line x1="26" y1="7" x2="46" y2="7" stroke="var(--ow-amber)" strokeWidth="1.3" strokeLinecap="round" />
+                      <line x1="36" y1="3" x2="36" y2="11" stroke="var(--ow-amber)" strokeWidth="1.3" strokeLinecap="round" />
+                      {/* Drip lines */}
+                      <path d="M20 48 Q20 53 18 53" stroke="var(--ow-amber)" strokeWidth="1" strokeLinecap="round" opacity="0.5" />
+                      <path d="M52 48 Q52 53 54 53" stroke="var(--ow-amber)" strokeWidth="1" strokeLinecap="round" opacity="0.5" />
+                      <path d="M36 48 Q36 54 36 54" stroke="var(--ow-amber)" strokeWidth="1" strokeLinecap="round" opacity="0.35" />
+                    </svg>
                     <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "var(--ow-amber)", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>WELCOME TO THE PRESS</p>
                     <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "1.25rem", color: "var(--ow-text-hi)", marginBottom: "0.5rem" }}>
                       Your vintage log is ready.

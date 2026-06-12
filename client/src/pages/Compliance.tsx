@@ -12,7 +12,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 
 // ─── Types & constants ───────────────────────────────────────────────────────
-type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW" | "WA" | "QLD" | "TAS" | "NZ";
+type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW" | "WA" | "QLD" | "TAS" | "NT" | "NZ";
 type Citation = {
   title: string;
   section: string | null;
@@ -27,7 +27,7 @@ type Message = {
   disclaimer?: string;
 };
 
-const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS", "NZ"];
+const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS", "NT", "NZ"];
 
 const STATE_LABELS: Record<StateFilter, string> = {
   All: "All Jurisdictions",
@@ -38,6 +38,7 @@ const STATE_LABELS: Record<StateFilter, string> = {
   WA: "Western Australia",
   QLD: "Queensland",
   TAS: "Tasmania",
+  NT: "Northern Territory",
   NZ: "New Zealand",
 };
 
@@ -54,6 +55,7 @@ const SAMPLE_QUESTIONS: { q: string; state: StateFilter }[] = [
   { q: "What is a WA Producer's Licence and what trading hours apply?", state: "WA" },
   { q: "What wine producer licence do I need to operate a winery in Queensland?", state: "QLD" },
   { q: "What liquor licence do I need to operate a cellar door in Tasmania?", state: "TAS" },
+  { q: "What liquor producer authority do I need to sell wine in the Northern Territory?", state: "NT" },
   { q: "What is a Wine Standards Management Plan (WSMP) and is it mandatory in NZ?", state: "NZ" },
   { q: "What licences do I need to sell wine from a cellar door in New Zealand?", state: "NZ" },
   { q: "What are the NZ wine labelling requirements for export to Australia?", state: "NZ" },
@@ -239,7 +241,7 @@ export default function Compliance() {
 </head>
 <body>
   <h1>Ownology Compliance Q&amp;A</h1>
-  <div class="meta">Generated ${date} &bull; Knowledge base: Federal &bull; SA &bull; VIC &bull; NSW &bull; WA &bull; QLD &bull; TAS &bull; NZ (last updated May 2026)</div>
+  <div class="meta">Generated ${date} &bull; Knowledge base: Federal &bull; SA &bull; VIC &bull; NSW &bull; WA &bull; QLD &bull; TAS &bull; NT &bull; NZ (last updated June 2026)</div>
   ${threadHtml}
   <div class="footer">Ownology &mdash; AI Knowledge Assistant for Winemakers &bull; ownology.ai &bull; Always verify with the relevant agency or a qualified compliance professional.</div>
 </body>
@@ -279,7 +281,7 @@ export default function Compliance() {
         </div>
       </nav>
 
-      <div className="container pt-24 pb-8" style={{ maxWidth: "860px", margin: "0 auto" }}>
+      <div className="container pt-24 pb-8" style={{ maxWidth: "860px", margin: "0 auto", animation: "owFadeIn 0.3s ease forwards" }}>
         {/* Header */}
         <div className="mb-8">
           <p
@@ -310,7 +312,7 @@ export default function Compliance() {
               maxWidth: "560px",
             }}
           >
-            Ask any question about Australian and New Zealand winery regulations and get a cited, jurisdiction-specific answer instantly. Federal (Wine Australia, FSANZ, WET, WHS, biosecurity), all Australian states, and New Zealand covered. You stay compliant — we keep track of the rules.
+            Ask any question about Australian and New Zealand winery regulations and get a cited, jurisdiction-specific answer instantly. Federal (Wine Australia, FSANZ, WET, WHS, biosecurity), all Australian states and territories, and New Zealand covered. You stay compliant — we keep track of the rules.
           </p>
           {/* Crosslink to Regulations */}
           <div className="mt-4 flex items-center gap-3">
@@ -349,12 +351,12 @@ export default function Compliance() {
               <circle cx="6" cy="6" r="5" stroke="var(--ow-amber)" strokeWidth="1.2" />
               <path d="M6 4v3M6 8.5v.5" stroke="var(--ow-amber)" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
-            Knowledge base: Federal · SA · VIC · NSW · WA · QLD · TAS · NZ — last updated May 2026
+            Knowledge base: Federal · SA · VIC · NSW · WA · QLD · TAS · NT · NZ — last updated June 2026
           </div>
         </div>
 
-        {/* State selector */}
-        <div className="mb-6">
+        {/* State selector — sticky below nav */}
+        <div className="mb-6" style={{ position: "sticky", top: "61px", zIndex: 30, background: "var(--ow-bg-base)", paddingTop: "0.75rem", paddingBottom: "0.75rem", marginLeft: "-1rem", marginRight: "-1rem", paddingLeft: "1rem", paddingRight: "1rem", borderBottom: "1px solid var(--ow-border)" }}>
           <p
             className="mb-2 text-xs tracking-wider uppercase"
             style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", letterSpacing: "0.1em" }}
@@ -633,7 +635,7 @@ export default function Compliance() {
             className="mt-2 text-center text-xs"
             style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif" }}
           >
-            Answers are AI-generated from our curated knowledge base (Federal, SA, VIC, NSW, WA, QLD, TAS, NZ). Always verify with the relevant agency or a qualified compliance professional.
+            Answers are AI-generated from our curated knowledge base (Federal, SA, VIC, NSW, WA, QLD, TAS, NT, NZ). Always verify with the relevant agency or a qualified compliance professional.
           </p>
         </form>
 

@@ -500,6 +500,36 @@ Administered by WorkSafe Tasmania.
 
 ---
 
+## NORTHERN TERRITORY REGULATIONS
+
+### Liquor Licensing — Liquor Producer Authority (Liquor Act 2019 NT)
+Administered by the Director of Liquor Licensing, Department of Industry, Tourism and Trade (DITT NT).
+- A **Liquor Producer Authority** is required for any winery or wine producer wishing to sell wine produced on-premises for on-site consumption or off-premises takeaway sales.
+- Standard trading hours: 10am–10pm daily (except Good Friday and Christmas Day).
+- Kitchen requirement: a light meal must be available for purchase during operating hours.
+- **Off-premises event sales:** The producer must notify the Director of Liquor Licensing at least 7 days before attending any event where alcohol will be sold or supplied (Notice to Director for Producers Off Premises Sales form required).
+- Risk classification: Low.
+- Applications are made through the NT Government's online licensing portal.
+- Source: Liquor Act 2019 (NT); NT.GOV.AU Liquor Producer Authority — https://nt.gov.au/industry/liquor/sell-supply-serve/licence-authorities
+
+### Environmental Regulation — NT EPA (Environment Protection Act 2019 NT)
+Administered by the Northern Territory Environment Protection Authority (NT EPA).
+- The NT EPA was established under the Environment Protection Act 2019 (NT), which modernised the Territory's environmental impact assessment and approval system.
+- Wineries with significant wastewater discharge, chemical storage, or land disturbance may require an environmental authorisation or be subject to NT EPA environmental impact assessment.
+- Winery wastewater (winemaking effluent, cleaning chemicals) must be managed in accordance with NT EPA guidelines; discharge to waterways without authorisation is prohibited.
+- Pollution incidents must be reported to the NT EPA immediately.
+- Source: NT EPA — https://ntepa.nt.gov.au/
+
+### Work Health and Safety — NT WorkSafe (Work Health and Safety (National Uniform Legislation) Act 2011 NT)
+Administered by NT WorkSafe.
+- The NT adopted the Model WHS Act (Work Health and Safety (National Uniform Legislation) Act 2011 NT) — PCBU duty to eliminate or minimise risks so far as reasonably practicable.
+- Key winery-specific obligations: confined space management (fermentation tanks), CO2 monitoring during active fermentation, manual handling (barrels, cases), chemical handling (SO2, cleaning chemicals, caustic), working at heights.
+- Incident reporting: serious injuries, dangerous incidents, and deaths must be reported to NT WorkSafe immediately.
+- Improvement and prohibition notices may be issued by NT WorkSafe inspectors.
+- Source: NT WorkSafe — https://worksafe.nt.gov.au/
+
+---
+
 ## NEW ZEALAND REGULATIONS
 
 ### Winemaking Registration (Wine Act 2003 NZ)

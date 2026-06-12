@@ -627,7 +627,7 @@ const AU_STATES: StateData[] = [
   {
     code: "NT",
     name: "Northern Territory",
-    items: ["NT Liquor Commission", "NT EPA", "NT WorkSafe"],
+    items: ["NT Liquor Producer Authority (DITT)", "NT EPA environmental authority", "NT WorkSafe WHS"],
     path: "M 175 60 L 295 60 L 295 260 L 175 260 Z",
     labelX: 234,
     labelY: 155,
@@ -675,7 +675,7 @@ const AU_STATES: StateData[] = [
 ];
 
 // States covered by Ownology
-const COVERED = new Set(["SA", "VIC", "NSW", "WA", "QLD", "TAS"]);
+const COVERED = new Set(["SA", "VIC", "NSW", "WA", "QLD", "TAS", "NT"]);
 
 function AustralianMoat() {
   const { ref, inView } = useInView();
@@ -696,7 +696,7 @@ function AustralianMoat() {
             No competitor has this. Not one.
           </h2>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "600px", marginBottom: "3rem" }}>
-            InnoVint automates US TTB form-filling. Every other product on the list has zero compliance features. Ownology is the only tool with deep, state-by-state Australian regulatory intelligence — covering liquor licensing, environmental authority obligations, and WHS requirements across all six major wine states.
+            InnoVint automates US TTB form-filling. Every other product on the list has zero compliance features. Ownology is the only tool with deep, state-by-state Australian regulatory intelligence — covering liquor licensing, environmental authority obligations, and WHS requirements across all seven Australian states and territories.
           </p>
 
           {/* Interactive map + panel */}
@@ -848,7 +848,7 @@ function InvestmentThesis() {
           <div className="grid sm:grid-cols-3 gap-5">
             {[
               { stat: "0", label: "Direct competitors", sub: "No product occupies the same market position" },
-              { stat: "6", label: "Australian states covered", sub: "SA · VIC · NSW · WA · QLD · TAS" },
+              { stat: "7", label: "Australian states & territories covered", sub: "SA · VIC · NSW · WA · QLD · TAS · NT" },
               { stat: "1", label: "Product to watch", sub: "InnoVint — no AI yet, but the distribution exists" },
             ].map((s, i) => (
               <div key={i} className="text-center p-6 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>

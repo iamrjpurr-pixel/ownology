@@ -951,6 +951,37 @@ function RegCard({
               Official source ↗
             </a>
           </div>
+          {/* Compliance CTA strip */}
+          <div style={{
+            marginTop: "1rem",
+            padding: "0.75rem 1.25rem",
+            background: "color-mix(in oklch, var(--ow-amber) 6%, transparent)",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 22%, transparent)",
+            borderRadius: "2px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "1rem",
+            flexWrap: "wrap",
+          }}>
+            <span style={{ fontFamily: SANS, fontSize: "0.8125rem", color: "var(--ow-text-mid)", fontWeight: 300 }}>
+              Not sure if you’re meeting this requirement?
+            </span>
+            <a
+              href="/compliance"
+              style={{
+                fontFamily: SANS,
+                fontSize: "0.8125rem",
+                fontWeight: 600,
+                color: "var(--ow-amber)",
+                whiteSpace: "nowrap",
+                textDecoration: "none",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              Ask the Compliance Assistant →
+            </a>
+          </div>
         </div>
       )}
     </div>
@@ -1096,6 +1127,15 @@ const TAB_LABELS: Record<ResourceTab, string> = {
   wa: "Western Australia",
   qld: "Queensland",
   tas: "Tasmania",
+};
+const TAB_COUNTS: Record<ResourceTab, number> = {
+  federal: FEDERAL_SECTIONS.length,
+  sa: SA_SECTIONS.length,
+  vic: VIC_SECTIONS.length,
+  nsw: NSW_SECTIONS.length,
+  wa: WA_SECTIONS.length,
+  qld: QLD_SECTIONS.length,
+  tas: TAS_SECTIONS.length,
 };
 
 export default function Resources() {
@@ -1272,6 +1312,15 @@ export default function Resources() {
                   }}
                 >
                   {TAB_LABELS[tab]}
+                  <span style={{
+                    marginLeft: "0.4rem",
+                    fontFamily: "'Fira Code', monospace",
+                    fontSize: "0.6rem",
+                    opacity: 0.7,
+                    background: activeTab === tab ? "color-mix(in oklch, var(--ow-amber) 20%, transparent)" : "var(--ow-bg-raised)",
+                    padding: "0.05rem 0.35rem",
+                    borderRadius: "2px",
+                  }}>{TAB_COUNTS[tab]}</span>
                 </button>
               ))}
             </div>

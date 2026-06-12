@@ -185,3 +185,15 @@
 ## Mobile Pricing Page — Round 3
 
 - [x] Pricing mobile: add smooth scroll-to-top button that appears when user reaches the bottom of the page (mobile only, fades in/out, positioned above sticky CTA bar)
+
+## UX Improvements — 10-item batch (Jun 2026)
+- [x] Regulations page: add bottom-of-card Compliance CTA strip after each expanded card
+- [x] Regulations page: add jurisdiction tab count badges (e.g. "SA (8)")
+- [x] Regulations page: add "Last verified" date badge on WET card specifically
+- [x] Compliance page: add sample question chips (NT chip added; existing chips already present)
+- [x] Compliance page: Enter key submit already implemented; confirmed present
+- [x] Compliance page: make jurisdiction filter row sticky below nav
+- [x] Compliance page: citation URLs already rendered as styled amber chips with external-link
+- [x] Compliance page: add fade-in page transition (owFadeIn keyframe added to index.css)
+- [x] The Press: add empty state illustration (SVG press illustration added to welcome card)
+- [x] KB + moat map: add NT coverage (NT Liquor Commission, NT EPA, NT WorkSafe) — moat map updated, KB section added, Compliance page NT filter + sample question added
