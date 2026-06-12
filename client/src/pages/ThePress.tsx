@@ -231,7 +231,7 @@ export default function ThePress() {
     { id: "log" as const, label: "Vintage Log", icon: "📋" },
     { id: "calcs" as const, label: "Calculations", icon: "⚗" },
     { id: "scenarios" as const, label: "Cellar Scenarios", icon: "🔬" },
-    { id: "notes" as const, label: "Notes", icon: "✏" },
+    { id: "notes" as const, label: "Batch Book", icon: "📖" },
   ];
 
   return (
