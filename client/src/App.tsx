@@ -27,6 +27,7 @@ import Preview from "./pages/Preview";
 import AdminLeads from "./pages/AdminLeads";
 import AdminComplianceDoctrine from "./pages/AdminComplianceDoctrine";
 import FoundingMemberSuccess from "./pages/FoundingMemberSuccess";
+import OAuthCallback from "./pages/OAuthCallback";
 
 
 function Router() {
@@ -56,6 +57,7 @@ function Router() {
       <Route path={"/admin/leads"} component={AdminLeads} />
       <Route path={"/admin/compliance-doctrine"} component={AdminComplianceDoctrine} />
       <Route path={"/founding-member/success"} component={FoundingMemberSuccess} />
+      <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
