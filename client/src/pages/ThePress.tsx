@@ -673,6 +673,114 @@ export default function ThePress() {
                 </div>
               )}
 
+              {/* Batch summary cards — one per tank */}
+              {hasEntries && allTanks.length > 0 && (
+                <div className="mb-6">
+                  <p
+                    className="mb-3 text-xs tracking-wider uppercase"
+                    style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", letterSpacing: "0.1em" }}
+                  >
+                    Tank Summary
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {allTanks.map((tank) => {
+                      const tankEntries = (logEntries ?? []).filter((e) => e.tankName === tank);
+                      const totalAdditions = tankEntries.filter((e) => e.eventType === "addition").length;
+                      const lastEntry = tankEntries.reduce<(typeof tankEntries)[0] | null>((latest, e) =>
+                        !latest || new Date(e.entryAt) > new Date(latest.entryAt) ? e : latest, null
+                      );
+                      const inoculationEntry = tankEntries.find((e) => e.eventType === "inoculation");
+                      const daysSinceInoculation = inoculationEntry
+                        ? Math.floor((Date.now() - new Date(inoculationEntry.entryAt).getTime()) / (1000 * 60 * 60 * 24))
+                        : null;
+                      const lastEventDate = lastEntry
+                        ? new Date(lastEntry.entryAt).toLocaleDateString("en-AU", { day: "numeric", month: "short" })
+                        : null;
+                      const variety = lastEntry?.variety ?? "";
+
+                      return (
+                        <button
+                          key={tank}
+                          type="button"
+                          onClick={() => setFilterTank(filterTank === tank ? "" : tank)}
+                          className="text-left p-4 rounded-sm transition-all"
+                          style={{
+                            background: filterTank === tank
+                              ? "color-mix(in oklch, var(--ow-amber) 10%, var(--ow-bg-card))"
+                              : "var(--ow-bg-card)",
+                            border: filterTank === tank
+                              ? "1px solid color-mix(in oklch, var(--ow-amber) 50%, transparent)"
+                              : "1px solid var(--ow-border)",
+                            cursor: "pointer",
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.borderColor = "color-mix(in oklch, var(--ow-amber) 40%, transparent)")}
+                          onMouseLeave={(e) => (e.currentTarget.style.borderColor = filterTank === tank ? "color-mix(in oklch, var(--ow-amber) 50%, transparent)" : "var(--ow-border)")}
+                        >
+                          {/* Tank name + variety */}
+                          <div className="flex items-center justify-between gap-2 mb-3">
+                            <span
+                              className="px-2 py-0.5 rounded-sm"
+                              style={{
+                                fontFamily: "'Fira Code',monospace",
+                                fontSize: "0.7rem",
+                                color: "var(--ow-amber)",
+                                background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+                                border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
+                                letterSpacing: "0.06em",
+                              }}
+                            >
+                              {tank}
+                            </span>
+                            {variety && (
+                              <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", fontWeight: 600, color: "var(--ow-text-mid)" }}>
+                                {variety}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Stats row */}
+                          <div className="flex flex-wrap gap-3">
+                            {/* Total additions */}
+                            <div>
+                              <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.08em", marginBottom: "0.15rem" }}>ADDITIONS</p>
+                              <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "1.1rem", color: "var(--ow-text-hi)", lineHeight: 1 }}>{totalAdditions}</p>
+                            </div>
+
+                            {/* Last event */}
+                            {lastEntry && (
+                              <div>
+                                <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.08em", marginBottom: "0.15rem" }}>LAST EVENT</p>
+                                <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", color: "var(--ow-text-mid)", lineHeight: 1.2 }}>
+                                  <span style={{ textTransform: "capitalize" }}>{lastEntry.eventType}</span>
+                                  {lastEventDate && (
+                                    <span style={{ color: "var(--ow-text-lo)", marginLeft: "0.35rem" }}>{lastEventDate}</span>
+                                  )}
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Days since inoculation */}
+                            {daysSinceInoculation !== null && (
+                              <div>
+                                <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.08em", marginBottom: "0.15rem" }}>SINCE INOC.</p>
+                                <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "1.1rem", color: daysSinceInoculation > 21 ? "oklch(0.65 0.10 145)" : "var(--ow-amber)", lineHeight: 1 }}>
+                                  {daysSinceInoculation}d
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Entry count */}
+                          <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", color: "var(--ow-text-lo)", marginTop: "0.75rem" }}>
+                            {tankEntries.length} {tankEntries.length === 1 ? "entry" : "entries"} · tap to filter
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Live entries */}
               {hasEntries && (
                 <div className="flex flex-col gap-4">

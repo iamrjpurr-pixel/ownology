@@ -54,6 +54,84 @@ function useInView(threshold = 0.15) {
   return { ref, inView };
 }
 
+// ─── What's New ribbon ──────────────────────────────────────────────────────
+const WHATS_NEW_KEY = "ownology-whats-new-v1";
+
+function WhatsNewRibbon() {
+  const [dismissed, setDismissed] = useState(() => {
+    try { return localStorage.getItem(WHATS_NEW_KEY) === "1"; } catch { return false; }
+  });
+
+  const dismiss = useCallback(() => {
+    setDismissed(true);
+    try { localStorage.setItem(WHATS_NEW_KEY, "1"); } catch { /* ignore */ }
+  }, []);
+
+  if (dismissed) return null;
+
+  return (
+    <div
+      className="relative z-40 flex items-center justify-center gap-3 px-4 py-2.5"
+      style={{
+        background: "color-mix(in oklch, var(--ow-amber) 12%, var(--ow-bg-base))",
+        borderBottom: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+      }}
+    >
+      <span
+        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm"
+        style={{
+          fontFamily: "'Fira Code',monospace",
+          fontSize: "0.6rem",
+          letterSpacing: "0.12em",
+          color: "oklch(0.11 0.008 60)",
+          background: "var(--ow-amber)",
+          fontWeight: 700,
+          whiteSpace: "nowrap",
+        }}
+      >
+        NEW
+      </span>
+      <p
+        style={{
+          fontFamily: "'Lato',sans-serif",
+          fontSize: "0.8125rem",
+          fontWeight: 300,
+          color: "var(--ow-text-mid)",
+          lineHeight: 1.4,
+          margin: 0,
+        }}
+      >
+        <strong style={{ fontWeight: 600, color: "var(--ow-text-hi)" }}>Vintage Log &amp; Batch Book</strong> are live —
+        {" "}
+        <Link
+          href="/the-press"
+          style={{ color: "var(--ow-amber)", textDecoration: "none", borderBottom: "1px solid var(--ow-amber)" }}
+        >
+          start logging your 2026 vintage
+        </Link>
+      </p>
+      <button
+        onClick={dismiss}
+        aria-label="Dismiss announcement"
+        style={{
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          color: "var(--ow-text-lo)",
+          fontFamily: "'Lato',sans-serif",
+          fontSize: "1.1rem",
+          lineHeight: 1,
+          padding: "0.25rem 0.5rem",
+          marginLeft: "auto",
+          flexShrink: 0,
+        }}
+      >
+        ×
+      </button>
+    </div>
+  );
+}
+
 // ─── Nav ──────────────────────────────────────────────────────────────────────
 type NavItem = { label: string; href: string; external?: boolean };
 // Primary links — always visible in desktop nav
@@ -1346,6 +1424,7 @@ export default function Home() {
   return (
     <div className="min-h-screen" style={{background:"var(--ow-bg-base)"}}>
       <Nav />
+      <WhatsNewRibbon />
       <Hero />
       <PainPoints />
       <Features />

@@ -197,3 +197,15 @@
 - [x] Compliance page: add fade-in page transition (owFadeIn keyframe added to index.css)
 - [x] The Press: add empty state illustration (SVG press illustration added to welcome card)
 - [x] KB + moat map: add NT coverage (NT Liquor Commission, NT EPA, NT WorkSafe) — moat map updated, KB section added, Compliance page NT filter + sample question added
+
+## UX Improvements — 10-item batch 2 (Jun 2026)
+- [x] Regulations page: add NT tab with cards (NT Liquor Commission, NT EPA, NT WorkSafe, NT Planning)
+- [x] Compliance page: read ?q= query param on mount and pre-fill the question input
+- [x] Compliance page: add "Recently asked" section using localStorage (last 5 questions as chips)
+- [x] Compliance page: add answer confidence indicator badge (sources matched count)
+- [x] Regulations page: add cross-tab search bar (client-side filter across all card titles and key points)
+- [x] Regulations page: add print/PDF export button (print-optimised CSS stylesheet)
+- [x] Regulations page: add page-level freshness banner (last reviewed date + next review date)
+- [x] The Press: add batch summary card per tank (total additions, last event, days since inoculation)
+- [x] Compliance page: persist conversation to localStorage (restore on return visit, clear button)
+- [x] Home page: add "What's new" ribbon/badge (amber, latest KB update announcement)

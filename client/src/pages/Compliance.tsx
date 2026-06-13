@@ -1,15 +1,62 @@
 /**
  * OWNOLOGY — Compliance AI Search Agent
  * Knowledge base lives server-side; LLM calls use the server BUILT_IN_FORGE_API_KEY.
+ *
+ * Batch 2 additions:
+ *  - ?q= query param pre-fill & auto-submit on mount
+ *  - Recently asked chips (localStorage ow_recent_questions, last 5)
+ *  - Confidence indicator badge (sources matched count) on each assistant message
+ *  - Conversation persistence (localStorage ow_compliance_thread, clear button)
  */
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
-import { Link } from "wouter";
+import { Link, useSearch } from "wouter";
 import { toast } from "sonner";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import ThemeToggle from "@/components/ThemeToggle";
 
+// ─── localStorage helpers ────────────────────────────────────────────────────
+const LS_THREAD = "ow_compliance_thread";
+const LS_RECENT = "ow_recent_questions";
+
+function loadThread(): Message[] {
+  try {
+    const raw = localStorage.getItem(LS_THREAD);
+    if (!raw) return [];
+    return JSON.parse(raw) as Message[];
+  } catch {
+    return [];
+  }
+}
+
+function saveThread(msgs: Message[]) {
+  try {
+    localStorage.setItem(LS_THREAD, JSON.stringify(msgs));
+  } catch {
+    // quota exceeded — silently ignore
+  }
+}
+
+function loadRecentQuestions(): string[] {
+  try {
+    const raw = localStorage.getItem(LS_RECENT);
+    if (!raw) return [];
+    return JSON.parse(raw) as string[];
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentQuestion(question: string) {
+  try {
+    const existing = loadRecentQuestions();
+    const deduped = [question, ...existing.filter(q => q !== question)].slice(0, 5);
+    localStorage.setItem(LS_RECENT, JSON.stringify(deduped));
+  } catch {
+    // quota exceeded — silently ignore
+  }
+}
 
 // ─── Types & constants ───────────────────────────────────────────────────────
 type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW" | "WA" | "QLD" | "TAS" | "NT" | "NZ";
@@ -79,23 +126,15 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleCopy}
-      title={copied ? "Copied!" : "Copy answer"}
-      className="mt-3 flex items-center gap-1.5 transition-all"
+      className="mt-3 inline-flex items-center gap-1.5 text-xs transition-all"
       style={{
+        color: copied ? "var(--ow-amber)" : "var(--ow-text-lo)",
+        fontFamily: "'Lato',sans-serif",
         background: "none",
         border: "none",
         cursor: "pointer",
-        padding: "4px 8px",
-        borderRadius: "4px",
-        display: "flex",
-        alignItems: "center",
-        gap: "6px",
-        color: copied ? "var(--ow-amber)" : "var(--ow-text-lo)",
-        fontFamily: "'Lato',sans-serif",
-        fontSize: "0.72rem",
-        letterSpacing: "0.06em",
+        padding: 0,
         opacity: copied ? 1 : 0.7,
-        transition: "color 0.2s, opacity 0.2s",
       }}
       onMouseEnter={e => { if (!copied) (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
       onMouseLeave={e => { if (!copied) (e.currentTarget as HTMLButtonElement).style.opacity = "0.7"; }}
@@ -119,15 +158,66 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
+// ─── ConfidenceBadge — shows number of sources matched ───────────────────────
+function ConfidenceBadge({ count }: { count: number }) {
+  const isHigh = count >= 3;
+  const isMid = count >= 1 && count < 3;
+
+  const bg = isHigh
+    ? "color-mix(in oklch, var(--ow-amber) 15%, transparent)"
+    : isMid
+    ? "color-mix(in oklch, var(--ow-amber) 8%, transparent)"
+    : "var(--ow-bg-card)";
+
+  const borderColor = isHigh
+    ? "color-mix(in oklch, var(--ow-amber) 40%, transparent)"
+    : isMid
+    ? "color-mix(in oklch, var(--ow-amber) 20%, transparent)"
+    : "var(--ow-border)";
+
+  const textColor = isHigh
+    ? "var(--ow-amber)"
+    : isMid
+    ? "color-mix(in oklch, var(--ow-amber) 70%, var(--ow-text-lo))"
+    : "var(--ow-text-lo)";
+
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-xs ml-2"
+      style={{
+        background: bg,
+        border: `1px solid ${borderColor}`,
+        color: textColor,
+        fontFamily: "'Fira Code',monospace",
+        fontSize: "0.65rem",
+        letterSpacing: "0.04em",
+        verticalAlign: "middle",
+      }}
+      title={`${count} source${count !== 1 ? "s" : ""} matched in knowledge base`}
+    >
+      <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true">
+        <circle cx="4.5" cy="4.5" r="3.5" stroke="currentColor" strokeWidth="1.1" />
+        <path d="M4.5 3v2l1 1" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+      </svg>
+      {count} {count === 1 ? "source" : "sources"}
+    </span>
+  );
+}
+
 export default function Compliance() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const searchString = useSearch();
+
+  // Restore conversation from localStorage on mount
+  const [messages, setMessages] = useState<Message[]>(() => loadThread());
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingStage, setLoadingStage] = useState<"classifying" | "answering" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [stateFilter, setStateFilter] = useState<StateFilter>("All");
+  const [recentQuestions, setRecentQuestions] = useState<string[]>(() => loadRecentQuestions());
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const autoSubmittedRef = useRef(false);
 
   const filteredQuestions = stateFilter === "All"
     ? SAMPLE_QUESTIONS
@@ -139,7 +229,7 @@ export default function Compliance() {
 
   const askMutation = trpc.compliance.ask.useMutation();
 
-  const ask = async (question: string) => {
+  const ask = useCallback(async (question: string) => {
     if (!question.trim() || loading) return;
     setError(null);
 
@@ -150,27 +240,51 @@ export default function Compliance() {
     setLoading(true);
     setLoadingStage("classifying");
 
+    // Save to recently asked
+    saveRecentQuestion(question.trim());
+    setRecentQuestions(loadRecentQuestions());
+
     try {
+      setLoadingStage("answering");
       const result = await askMutation.mutateAsync({
         question: question.trim(),
         stateFilter: stateFilter,
         history: messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
       });
 
-      setMessages(prev => [...prev, {
+      const updatedMessages: Message[] = [...newMessages, {
         role: "assistant",
         content: result.answer,
         citations: result.citations ?? [],
         disclaimer: result.disclaimer,
-      }]);
+      }];
+      setMessages(updatedMessages);
+      // Persist conversation to localStorage
+      saveThread(updatedMessages);
     } catch (err) {
       setError("Unable to get a response. Please try again.");
       console.error("Compliance agent error:", err);
+      // Still persist what we have
+      saveThread(newMessages);
     } finally {
       setLoading(false);
       setLoadingStage(null);
     }
-  };
+  }, [loading, messages, stateFilter, askMutation]);
+
+  // ?q= query param pre-fill and auto-submit on mount
+  useEffect(() => {
+    if (autoSubmittedRef.current) return;
+    const params = new URLSearchParams(searchString);
+    const q = params.get("q");
+    if (q && q.trim()) {
+      autoSubmittedRef.current = true;
+      setInput(q.trim());
+      // Small delay to let the component fully mount
+      setTimeout(() => ask(q.trim()), 300);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchString]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,6 +296,12 @@ export default function Compliance() {
       e.preventDefault();
       ask(input);
     }
+  };
+
+  const clearConversation = () => {
+    setMessages([]);
+    setError(null);
+    localStorage.removeItem(LS_THREAD);
   };
 
   const downloadPdf = () => {
@@ -389,58 +509,123 @@ export default function Compliance() {
           </div>
         </div>
 
-        {/* Sample questions */}
+        {/* Empty state: recently asked + sample questions */}
         {messages.length === 0 && (
-          <div className="mb-8">
-            <p
-              className="mb-3 text-xs tracking-wider uppercase"
-              style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", letterSpacing: "0.1em" }}
-            >
-              Example questions
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {filteredQuestions.map(item => (
-                <button
-                  key={item.q}
-                  onClick={() => ask(item.q)}
-                  className="text-left px-4 py-3 rounded-sm transition-all text-sm"
-                  style={{
-                    background: "var(--ow-bg-card)",
-                    border: "1px solid var(--ow-border)",
-                    color: "var(--ow-text-mid)",
-                    fontFamily: "'Lato',sans-serif",
-                    fontWeight: 300,
-                    lineHeight: 1.5,
-                    cursor: "pointer",
-                    minHeight: "52px",
-                    touchAction: "manipulation",
-                  }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--ow-amber)";
-                    (e.currentTarget as HTMLButtonElement).style.color = "var(--ow-text-hi)";
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--ow-border)";
-                    (e.currentTarget as HTMLButtonElement).style.color = "var(--ow-text-mid)";
-                  }}
+          <div className="mb-8 space-y-6">
+            {/* Recently asked chips */}
+            {recentQuestions.length > 0 && (
+              <div>
+                <p
+                  className="mb-3 text-xs tracking-wider uppercase"
+                  style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", letterSpacing: "0.1em" }}
                 >
-                  <span
-                    className="inline-block mr-2 px-1.5 py-0.5 rounded-sm text-xs"
+                  Recently asked
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {recentQuestions.map(q => (
+                    <button
+                      key={q}
+                      onClick={() => ask(q)}
+                      className="px-3 py-1.5 rounded-sm text-xs transition-all text-left"
+                      style={{
+                        background: "color-mix(in oklch, var(--ow-amber) 6%, var(--ow-bg-card))",
+                        border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, var(--ow-border))",
+                        color: "var(--ow-text-mid)",
+                        fontFamily: "'Lato',sans-serif",
+                        fontWeight: 300,
+                        lineHeight: 1.5,
+                        cursor: "pointer",
+                        maxWidth: "100%",
+                      }}
+                      onMouseEnter={e => {
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--ow-amber)";
+                        (e.currentTarget as HTMLButtonElement).style.color = "var(--ow-text-hi)";
+                      }}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = "color-mix(in oklch, var(--ow-amber) 25%, var(--ow-border))";
+                        (e.currentTarget as HTMLButtonElement).style.color = "var(--ow-text-mid)";
+                      }}
+                    >
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true" style={{ display: "inline", marginRight: "6px", verticalAlign: "middle", opacity: 0.6 }}>
+                        <path d="M5 1a4 4 0 100 8A4 4 0 005 1zM5 3v2.5l1.5 1" stroke="var(--ow-amber)" strokeWidth="1.1" strokeLinecap="round" />
+                      </svg>
+                      {q}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem(LS_RECENT);
+                      setRecentQuestions([]);
+                    }}
+                    className="px-2 py-1 rounded-sm text-xs transition-all"
                     style={{
-                      background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
-                      border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
-                      color: "var(--ow-amber)",
-                      fontFamily: "'Fira Code',monospace",
-                      fontSize: "0.65rem",
-                      letterSpacing: "0.04em",
-                      verticalAlign: "middle",
+                      background: "none",
+                      border: "1px solid var(--ow-border)",
+                      color: "var(--ow-text-lo)",
+                      fontFamily: "'Lato',sans-serif",
+                      cursor: "pointer",
+                      opacity: 0.6,
+                    }}
+                    title="Clear recently asked"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Sample questions */}
+            <div>
+              <p
+                className="mb-3 text-xs tracking-wider uppercase"
+                style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", letterSpacing: "0.1em" }}
+              >
+                Example questions
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {filteredQuestions.map(item => (
+                  <button
+                    key={item.q}
+                    onClick={() => ask(item.q)}
+                    className="text-left px-4 py-3 rounded-sm transition-all text-sm"
+                    style={{
+                      background: "var(--ow-bg-card)",
+                      border: "1px solid var(--ow-border)",
+                      color: "var(--ow-text-mid)",
+                      fontFamily: "'Lato',sans-serif",
+                      fontWeight: 300,
+                      lineHeight: 1.5,
+                      cursor: "pointer",
+                      minHeight: "52px",
+                      touchAction: "manipulation",
+                    }}
+                    onMouseEnter={e => {
+                      (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--ow-amber)";
+                      (e.currentTarget as HTMLButtonElement).style.color = "var(--ow-text-hi)";
+                    }}
+                    onMouseLeave={e => {
+                      (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--ow-border)";
+                      (e.currentTarget as HTMLButtonElement).style.color = "var(--ow-text-mid)";
                     }}
                   >
-                    {item.state}
-                  </span>
-                  {item.q}
-                </button>
-              ))}
+                    <span
+                      className="inline-block mr-2 px-1.5 py-0.5 rounded-sm text-xs"
+                      style={{
+                        background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+                        border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
+                        color: "var(--ow-amber)",
+                        fontFamily: "'Fira Code',monospace",
+                        fontSize: "0.65rem",
+                        letterSpacing: "0.04em",
+                        verticalAlign: "middle",
+                      }}
+                    >
+                      {item.state}
+                    </span>
+                    {item.q}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -448,6 +633,28 @@ export default function Compliance() {
         {/* Conversation */}
         {messages.length > 0 && (
           <div className="mb-6 space-y-5">
+            {/* Restore notice — shown when conversation was loaded from storage */}
+            <div
+              className="flex items-center justify-between px-3 py-2 rounded-sm text-xs"
+              style={{
+                background: "var(--ow-bg-card)",
+                border: "1px solid var(--ow-border)",
+                color: "var(--ow-text-lo)",
+                fontFamily: "'Lato',sans-serif",
+              }}
+            >
+              <span>Conversation restored from your last visit</span>
+              <button
+                onClick={clearConversation}
+                className="transition-colors"
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", fontSize: "0.75rem" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "var(--ow-amber)")}
+                onMouseLeave={e => (e.currentTarget.style.color = "var(--ow-text-lo)")}
+              >
+                Clear history
+              </button>
+            </div>
+
             {messages.map((msg, i) => (
               <div key={i} className={msg.role === "user" ? "flex justify-end" : "flex justify-start"}>
                 {msg.role === "assistant" && (
@@ -537,8 +744,12 @@ export default function Compliance() {
                     </p>
                   )}
 
+                  {/* Copy button + confidence badge */}
                   {msg.role === "assistant" && (
-                    <CopyButton text={msg.content} />
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <CopyButton text={msg.content} />
+                      <ConfidenceBadge count={msg.citations?.length ?? 0} />
+                    </div>
                   )}
                 </div>
               </div>
@@ -643,7 +854,7 @@ export default function Compliance() {
         {messages.length > 0 && (
           <div className="mt-4 flex items-center justify-center gap-6">
             <button
-              onClick={() => { setMessages([]); setError(null); }}
+              onClick={clearConversation}
               className="text-xs transition-colors"
               style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", background: "none", border: "none", cursor: "pointer" }}
               onMouseEnter={e => (e.currentTarget.style.color = "var(--ow-amber)")}

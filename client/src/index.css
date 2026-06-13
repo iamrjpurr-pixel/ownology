@@ -319,3 +319,48 @@ html.light-mode {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
 }
+
+/* ─── Print / PDF styles for Regulations page ─────────────────────────────── */
+@media print {
+  /* Hide nav, search bar, print button, freshness banner, CTA strip, footer */
+  nav,
+  .sticky,
+  button,
+  input[type="text"],
+  a[href="/compliance"],
+  a[href="/"],
+  .btn-amber,
+  [class*="cta"],
+  [class*="compliance-cta"] {
+    display: none !important;
+  }
+
+  /* Expand all cards */
+  .regulations-page [data-expanded="false"] {
+    display: block !important;
+  }
+
+  /* Force light background for print */
+  .regulations-page {
+    background: #fff !important;
+    color: #1a1410 !important;
+  }
+
+  /* Page breaks */
+  .regulations-page > section {
+    page-break-inside: avoid;
+  }
+
+  /* Remove amber glow effects */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Ensure links are visible */
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.7em;
+    color: #666;
+  }
+}

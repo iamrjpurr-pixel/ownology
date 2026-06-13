@@ -4,9 +4,10 @@
  * Covers federal framework and South Australia state requirements.
  */
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Link } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const SERIF = "'Fraunces', serif";
 const SANS = "'Lato', sans-serif";
@@ -1117,7 +1118,96 @@ const TAS_SECTIONS = [
     verifiedDate: "May 2026",
   },
 ];
-type ResourceTab = "federal" | "sa" | "vic" | "nsw" | "wa" | "qld" | "tas";
+
+// ─── NT ──────────────────────────────────────────────────────────────────────
+const NT_SECTIONS = [
+  {
+    id: "nt-liquor",
+    title: "Liquor Producer Authority — NT Liquor Commission",
+    agency: "NT Liquor Commission",
+    tags: ["liquor licence", "producer authority", "cellar door", "Liquor Act 2019", "NT Liquor Commission"],
+    summary:
+      "Northern Territory wineries require a Producer Authority under the Liquor Act 2019 (NT) to manufacture and sell wine. The Producer Authority allows on-site sales at the production premises (cellar door) and authorises wholesale supply to licensed premises.",
+    keyPoints: [
+      "Producer Authority: authorises manufacture of liquor and sale from the production premises",
+      "Cellar door sales permitted under a Producer Authority — no separate licence required for on-site retail",
+      "Wholesale supply to other licensed premises also authorised under the Producer Authority",
+      "Applications lodged with the NT Liquor Commission via the Licensing NT portal",
+      "Responsible service of alcohol (RSA) training required for all staff serving or selling liquor",
+      "Liquor Act 2019 (NT) replaced the former Liquor Act 1978 — all new applications under the 2019 Act",
+      "Annual licence fee applies; fee schedule published by Licensing NT",
+      "Licence conditions may restrict trading hours, approved areas, and promotional activities",
+    ],
+    source: "Liquor Act 2019 (NT)",
+    sourceUrl: "https://licensing.nt.gov.au/liquor/apply-for-a-licence/producer-authority",
+    verifiedDate: "June 2026",
+  },
+  {
+    id: "nt-epa",
+    title: "Environmental Obligations — NT EPA",
+    agency: "Northern Territory Environment Protection Authority (NT EPA)",
+    tags: ["NT EPA", "environmental licence", "wastewater", "Environment Protection Act", "NT"],
+    summary:
+      "The NT Environment Protection Authority administers the Environment Protection Act 2019 (NT). Wineries must comply with the general environmental duty to prevent harm. Large-scale operations may require an Environment Protection Licence (EPL) for activities with significant environmental impact.",
+    keyPoints: [
+      "General environmental duty: all persons must take all reasonable and practicable measures to prevent environmental harm",
+      "Environment Protection Licence (EPL) required for prescribed activities — check Schedule 1 of the Act for thresholds",
+      "Most boutique NT wineries fall below EPL thresholds but must still comply with the general duty",
+      "Winery wastewater (marc, lees, wash-down water) must be managed to prevent harm to soil and groundwater",
+      "Land application of winery wastewater is the most common disposal method in the NT — must not cause nuisance or pollution",
+      "Incident reporting: serious environmental incidents must be reported to the NT EPA immediately",
+      "NT EPA can issue Environment Protection Notices (EPNs) requiring remediation of environmental harm",
+      "Relevant legislation: Environment Protection Act 2019 (NT), Waste Management and Pollution Control Act 1998 (NT)",
+    ],
+    source: "Environment Protection Act 2019 (NT)",
+    sourceUrl: "https://ntepa.nt.gov.au",
+    verifiedDate: "June 2026",
+  },
+  {
+    id: "nt-worksafe",
+    title: "NT WorkSafe — WHS Obligations",
+    agency: "NT WorkSafe",
+    tags: ["WHS", "safety", "CO2", "confined space", "NT WorkSafe", "Work Health and Safety Act 2011"],
+    summary:
+      "NT WorkSafe administers the Work Health and Safety (National Uniform Legislation) Act 2011 (NT). NT wineries have the same WHS obligations as other Australian states under the model WHS laws — including confined space entry, chemical handling, and incident notification.",
+    keyPoints: [
+      "Provide and maintain a safe working environment, so far as is reasonably practicable",
+      "Confined space entry: written permit system, atmospheric testing, and trained standby person required",
+      "CO₂ monitoring mandatory during active fermentation — fermentation tanks are classified confined spaces",
+      "Chemical register and SDS: all hazardous chemicals listed with current Safety Data Sheets",
+      "SO₂ handling: PPE mandatory; WES exposure standard 0.5 ppm TWA applies",
+      "Manual handling risk assessments required for barrel handling, bin work, and harvest activities",
+      "Forklift operators: must hold a High Risk Work Licence (HRWL)",
+      "Incident reporting: serious injuries, illnesses, and dangerous incidents must be notified to NT WorkSafe immediately (1800 019 115)",
+      "NT adopted the model WHS Act in 2011 — same framework as SA, NSW, QLD, ACT, TAS",
+    ],
+    source: "Work Health and Safety (National Uniform Legislation) Act 2011 (NT)",
+    sourceUrl: "https://worksafe.nt.gov.au",
+    verifiedDate: "June 2026",
+  },
+  {
+    id: "nt-planning",
+    title: "Planning and Development — NT Planning Commission",
+    agency: "NT Planning Commission / Department of Infrastructure, Planning and Logistics",
+    tags: ["planning permit", "development approval", "cellar door", "agritourism", "NT Planning Act"],
+    summary:
+      "Winery development and cellar door operations in the Northern Territory require development approval under the Planning Act 1999 (NT). The NT Planning Scheme zones rural and agricultural land, and agritourism uses such as cellar doors typically require a development permit.",
+    keyPoints: [
+      "Development approval required for new winery buildings, cellar doors, and significant expansions",
+      "NT Planning Scheme governs land use — rural zones generally permit primary production; cellar door/agritourism may require a permit",
+      "Applications lodged with the NT Planning Commission or local council (Darwin, Palmerston, Alice Springs)",
+      "Environmental impact assessment may be required for larger developments near sensitive areas",
+      "Building permits required for all new structures — issued by the Building Certifier",
+      "Heritage considerations: developments near Aboriginal sacred sites require additional approvals under the NT Aboriginal Sacred Sites Act",
+      "Water extraction licences required for irrigation — administered by the Department of Environment, Parks and Water Security",
+    ],
+    source: "Planning Act 1999 (NT)",
+    sourceUrl: "https://www.ntlis.nt.gov.au/planning",
+    verifiedDate: "June 2026",
+  },
+];
+
+type ResourceTab = "federal" | "sa" | "vic" | "nsw" | "wa" | "qld" | "tas" | "nt";
 
 const TAB_LABELS: Record<ResourceTab, string> = {
   federal: "Federal",
@@ -1127,6 +1217,7 @@ const TAB_LABELS: Record<ResourceTab, string> = {
   wa: "Western Australia",
   qld: "Queensland",
   tas: "Tasmania",
+  nt: "Northern Territory",
 };
 const TAB_COUNTS: Record<ResourceTab, number> = {
   federal: FEDERAL_SECTIONS.length,
@@ -1136,33 +1227,51 @@ const TAB_COUNTS: Record<ResourceTab, number> = {
   wa: WA_SECTIONS.length,
   qld: QLD_SECTIONS.length,
   tas: TAS_SECTIONS.length,
+  nt: NT_SECTIONS.length,
+};
+
+// ─── All sections map for cross-tab search ───────────────────────────────────
+const ALL_SECTIONS_MAP: Record<ResourceTab, typeof FEDERAL_SECTIONS> = {
+  federal: FEDERAL_SECTIONS,
+  sa: SA_SECTIONS,
+  vic: VIC_SECTIONS,
+  nsw: NSW_SECTIONS,
+  wa: WA_SECTIONS,
+  qld: QLD_SECTIONS,
+  tas: TAS_SECTIONS,
+  nt: NT_SECTIONS,
 };
 
 export default function Resources() {
   const [activeTab, setActiveTab] = useState<ResourceTab>("federal");
   const [search, setSearch] = useState("");
 
-  const sections =
-    activeTab === "federal" ? FEDERAL_SECTIONS
-    : activeTab === "sa" ? SA_SECTIONS
-    : activeTab === "vic" ? VIC_SECTIONS
-    : activeTab === "nsw" ? NSW_SECTIONS
-    : activeTab === "wa" ? WA_SECTIONS
-    : activeTab === "qld" ? QLD_SECTIONS
-    : TAS_SECTIONS;
+  const sections = ALL_SECTIONS_MAP[activeTab];
 
-  const filtered = search.trim()
-    ? sections.filter(
-        (s) =>
-          s.title.toLowerCase().includes(search.toLowerCase()) ||
-          s.summary.toLowerCase().includes(search.toLowerCase()) ||
-          s.tags.some((t) => t.toLowerCase().includes(search.toLowerCase())) ||
-          s.agency.toLowerCase().includes(search.toLowerCase())
+  // Cross-tab search: when search is active, search across ALL jurisdictions
+  const isSearching = search.trim().length > 0;
+  const searchLower = search.toLowerCase();
+
+  const filtered = isSearching
+    ? (Object.entries(ALL_SECTIONS_MAP) as [ResourceTab, typeof FEDERAL_SECTIONS][]).flatMap(
+        ([, secs]) =>
+          secs.filter(
+            (s) =>
+              s.title.toLowerCase().includes(searchLower) ||
+              s.summary.toLowerCase().includes(searchLower) ||
+              s.tags.some((t) => t.toLowerCase().includes(searchLower)) ||
+              s.agency.toLowerCase().includes(searchLower) ||
+              s.keyPoints.some((k) => k.toLowerCase().includes(searchLower))
+          )
       )
     : sections;
 
+  const handlePrint = useCallback(() => {
+    window.print();
+  }, []);
+
   return (
-    <div style={{ background: "var(--ow-bg-base)", minHeight: "100vh" }}>
+    <div style={{ background: "var(--ow-bg-base)", minHeight: "100vh" }} className="regulations-page">
       {/* Nav */}
       <nav
         className="sticky top-0 z-50 border-b"
@@ -1172,7 +1281,34 @@ export default function Resources() {
           <Link href="/">
             <OwnologyLogo size={32} />
           </Link>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handlePrint}
+              className="hidden sm:inline-flex items-center gap-1.5 text-xs transition-colors"
+              style={{
+                fontFamily: SANS,
+                fontWeight: 300,
+                fontSize: "0.8125rem",
+                color: "var(--ow-text-lo)",
+                background: "none",
+                border: "1px solid var(--ow-border)",
+                borderRadius: "2px",
+                padding: "0.35rem 0.85rem",
+                cursor: "pointer",
+                letterSpacing: "0.04em",
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--ow-amber)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--ow-amber)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--ow-text-lo)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--ow-border)"; }}
+              aria-label="Print or save as PDF"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <rect x="1" y="3" width="10" height="7" rx="1" stroke="currentColor" strokeWidth="1.2" />
+                <path d="M3 3V1.5h6V3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                <path d="M3 7.5h6M3 9.5h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                <circle cx="9" cy="5" r="0.7" fill="currentColor" />
+              </svg>
+              Print / PDF
+            </button>
             <Link
               href="/compliance"
               style={{
@@ -1197,9 +1333,41 @@ export default function Resources() {
             >
               ← Back to Ownology
             </Link>
+            <ThemeToggle compact />
           </div>
         </div>
       </nav>
+
+      {/* Freshness banner */}
+      <div
+        className="border-b"
+        style={{
+          background: "color-mix(in oklch, var(--ow-amber) 5%, var(--ow-bg-base))",
+          borderColor: "color-mix(in oklch, var(--ow-amber) 25%, var(--ow-border))",
+        }}
+      >
+        <div className="container max-w-4xl py-2.5 flex items-center gap-3">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+            <circle cx="6.5" cy="6.5" r="5.5" stroke="var(--ow-amber)" strokeWidth="1.2" />
+            <path d="M6.5 4v3M6.5 9v.5" stroke="var(--ow-amber)" strokeWidth="1.2" strokeLinecap="round" />
+          </svg>
+          <span
+            style={{
+              fontFamily: SANS,
+              fontSize: "0.78rem",
+              color: "var(--ow-text-mid)",
+              letterSpacing: "0.02em",
+              lineHeight: 1.5,
+            }}
+          >
+            Regulations last reviewed: <strong style={{ color: "var(--ow-amber)", fontWeight: 600 }}>June 2026</strong>
+            <span style={{ color: "var(--ow-border)", margin: "0 0.5rem" }}>·</span>
+            Next review scheduled: <strong style={{ fontWeight: 500 }}>September 2026</strong>
+            <span style={{ color: "var(--ow-border)", margin: "0 0.5rem" }}>·</span>
+            <span style={{ color: "var(--ow-text-lo)", fontSize: "0.72rem" }}>Always verify with the relevant agency before acting on this information</span>
+          </span>
+        </div>
+      </div>
 
       {/* Hero */}
       <section className="pt-20 pb-16 border-b" style={{ borderColor: "var(--ow-border)" }}>
@@ -1285,10 +1453,73 @@ export default function Resources() {
       <section className="py-12">
         <div className="container max-w-4xl">
           {/* Tab + Search row */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
-            {/* Tabs */}
+          <div className="flex flex-col gap-4 mb-8">
+            {/* Search bar — full width, cross-tab */}
+            <div className="relative">
+              <svg
+                width="14" height="14" viewBox="0 0 14 14" fill="none"
+                aria-hidden="true"
+                style={{ position: "absolute", left: "0.875rem", top: "50%", transform: "translateY(-50%)", color: "var(--ow-text-lo)", pointerEvents: "none" }}
+              >
+                <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.3" />
+                <path d="M9.5 9.5l2.5 2.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search across all jurisdictions…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{
+                  width: "100%",
+                  background: "var(--ow-bg-raised)",
+                  border: "1px solid var(--ow-border)",
+                  borderRadius: "2px",
+                  padding: "0.6rem 2.5rem 0.6rem 2.5rem",
+                  fontFamily: SANS,
+                  fontSize: "0.875rem",
+                  color: "var(--ow-text-hi)",
+                  outline: "none",
+                }}
+                onFocus={(e) => ((e.currentTarget as HTMLInputElement).style.borderColor = "var(--ow-amber)")}
+                onBlur={(e) => ((e.currentTarget as HTMLInputElement).style.borderColor = "var(--ow-border)")}
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  style={{
+                    position: "absolute",
+                    right: "0.75rem",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "var(--ow-text-lo)",
+                    fontFamily: SANS,
+                    fontSize: "1rem",
+                    lineHeight: 1,
+                    padding: "0.25rem",
+                  }}
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            {/* Search results count */}
+            {isSearching && (
+              <p style={{ fontFamily: SANS, fontSize: "0.8125rem", color: "var(--ow-text-lo)", margin: 0 }}>
+                {filtered.length === 0
+                  ? `No results for "${search}"`
+                  : `${filtered.length} result${filtered.length !== 1 ? "s" : ""} across all jurisdictions`}
+              </p>
+            )}
+
+            {/* Tabs — hidden when searching */}
+            {!isSearching && (
             <div className="flex flex-wrap gap-2">
-              {(["federal", "sa", "vic", "nsw", "wa", "qld", "tas"] as ResourceTab[]).map((tab) => (
+              {(["federal", "sa", "vic", "nsw", "wa", "qld", "tas", "nt"] as ResourceTab[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -1324,32 +1555,7 @@ export default function Resources() {
                 </button>
               ))}
             </div>
-
-            {/* Search */}
-            <input
-              type="text"
-              placeholder="Search regulations…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                flex: 1,
-                background: "var(--ow-bg-raised)",
-                border: "1px solid var(--ow-border)",
-                borderRadius: "2px",
-                padding: "0.5rem 1rem",
-                fontFamily: SANS,
-                fontSize: "0.875rem",
-                color: "var(--ow-text-hi)",
-                outline: "none",
-                minWidth: 0,
-              }}
-              onFocus={(e) =>
-                ((e.currentTarget as HTMLInputElement).style.borderColor = "var(--ow-amber)")
-              }
-              onBlur={(e) =>
-                ((e.currentTarget as HTMLInputElement).style.borderColor = "var(--ow-border)")
-              }
-            />
+            )}
           </div>
 
           {/* Cards */}
@@ -1364,7 +1570,7 @@ export default function Resources() {
                 padding: "3rem 0",
               }}
             >
-              No results for "{search}". Try a different search term.
+              {isSearching ? `No results for "${search}". Try a different search term.` : "No regulations found."}
             </p>
           ) : (
             <div className="flex flex-col gap-4">
