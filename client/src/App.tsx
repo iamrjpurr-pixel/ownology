@@ -22,6 +22,7 @@ import CampaignMetrics from "./pages/CampaignMetrics";
 import Orders from "./pages/Orders";
 import Admin from "./pages/Admin";
 import QuickEntry from "./pages/QuickEntry";
+import CellarTasks from "./pages/CellarTasks";
 import CompetitiveAdvantage from "./pages/CompetitiveAdvantage";
 import Preview from "./pages/Preview";
 import AdminLeads from "./pages/AdminLeads";
@@ -53,6 +54,7 @@ function Router() {
       <Route path={"/orders"} component={Orders} />
       <Route path={"/admin"} component={Admin} />
       <Route path={"/quick-entry"} component={QuickEntry} />
+      <Route path={"/cellar-tasks"} component={CellarTasks} />
       <Route path={"/competitive-advantage"} component={CompetitiveAdvantage} />
       <Route path={"/preview"} component={Preview} />
       <Route path={"/admin/leads"} component={AdminLeads} />

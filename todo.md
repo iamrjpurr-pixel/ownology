@@ -209,3 +209,13 @@
 - [x] The Press: add batch summary card per tank (total additions, last event, days since inoculation)
 - [x] Compliance page: persist conversation to localStorage (restore on return visit, clear button)
 - [x] Home page: add "What's new" ribbon/badge (amber, latest KB update announcement)
+
+## Cellar Tasks Feature (Jun 2026)
+- [x] Database: cellar_equipment and cellar_tasks tables added to schema and migrated
+- [x] Server: DB helpers for equipment and tasks (list, add, update, delete, complete, uncomplete)
+- [x] Server: cellarEquipmentRouter and cellarTasksRouter with AI task generation procedure
+- [x] Frontend: CellarTasks page with equipment register, task list, tick-off, and filter tabs
+- [x] Frontend: EquipmentSheet (add/edit equipment) with type, material, capacity, quantity fields
+- [x] Frontend: AI task generation per equipment item (LLM generates 3-6 cleaning/maintenance tasks)
+- [x] Frontend: Task tick-off with completedBy and timestamp, undo (uncomplete), and delete
+- [x] Navigation: /cellar-tasks route added to App.tsx; CELLAR TASKS link added to The Press header

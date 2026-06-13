@@ -253,6 +253,98 @@ export const doctrineVerified = mysqlTable(
   ]
 );
 
+// ─── Cellar Equipment Register ──────────────────────────────────────────────
+// One row per piece of equipment registered by a user.
+// material: stainless | wood | concrete | fibreglass | other
+// Tasks are generated from this register by the AI task generator.
+export const cellarEquipment = mysqlTable(
+  "cellar_equipment",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull(),
+    // Equipment name (e.g. "Tank 7", "Bladder Press", "Basket Press")
+    name: varchar("name", { length: 128 }).notNull(),
+    // Equipment type — drives default task templates
+    equipmentType: mysqlEnum("equipment_type", [
+      "fermentation_tank",
+      "barrel",
+      "press",
+      "pump",
+      "sorting_table",
+      "destemmer",
+      "cold_room",
+      "hose",
+      "other",
+    ]).notNull(),
+    // Material of construction
+    material: mysqlEnum("material", [
+      "stainless",
+      "wood",
+      "concrete",
+      "fibreglass",
+      "other",
+    ]).notNull().default("stainless"),
+    // Capacity in litres (optional)
+    capacityL: int("capacity_l"),
+    // Quantity of this item (e.g. 24 barrels)
+    quantity: int("quantity").notNull().default(1),
+    // Optional notes (e.g. "French oak, 2021 vintage, Seguin Moreau")
+    notes: text("notes"),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("ce_user_idx").on(t.userId),
+    index("ce_type_idx").on(t.equipmentType),
+  ]
+);
+
+// ─── Cellar Tasks ─────────────────────────────────────────────────────────────
+// One row per cleaning/maintenance task. Tasks are either AI-generated from the
+// equipment register or manually added by the user.
+// completedAt: null = pending, set = completed.
+export const cellarTasks = mysqlTable(
+  "cellar_tasks",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull(),
+    // Optional link to the equipment item that generated this task
+    equipmentId: int("equipment_id"),
+    // Equipment display name (denormalised for display without join)
+    equipmentName: varchar("equipment_name", { length: 128 }).notNull(),
+    // Task category
+    taskType: mysqlEnum("task_type", [
+      "clean",
+      "sanitise",
+      "inspect",
+      "maintain",
+      "other",
+    ]).notNull(),
+    // Short task title (e.g. "Post-ferment clean")
+    title: varchar("title", { length: 256 }).notNull(),
+    // Detailed method notes (AI-generated or user-written)
+    methodNotes: text("method_notes"),
+    // Frequency label (e.g. "Before use", "After use", "Weekly", "Monthly", "Annual")
+    frequency: varchar("frequency", { length: 64 }).notNull().default("After use"),
+    // Due date (UTC ms) — optional, set when task is scheduled
+    dueAt: bigint("due_at", { mode: "number" }),
+    // Completion timestamp (UTC ms) — null = pending
+    completedAt: bigint("completed_at", { mode: "number" }),
+    // Name of person who completed the task
+    completedBy: varchar("completed_by", { length: 256 }),
+    // Whether this task was AI-generated (1) or manually added (0)
+    aiGenerated: int("ai_generated").notNull().default(0),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("ct_user_idx").on(t.userId),
+    index("ct_equipment_idx").on(t.equipmentId),
+    index("ct_due_at_idx").on(t.dueAt),
+    index("ct_completed_at_idx").on(t.completedAt),
+  ]
+);
+
 // ─── Regulation Monitor — Seen Publications ─────────────────────────────────
 // Tracks which regulation update URLs have already been notified to the owner.
 // The weekly scheduled monitor inserts a row when it first sees a new publication,

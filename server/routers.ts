@@ -30,6 +30,19 @@ import {
   updateLeadNotes,
   updateLead,
   deleteLead,
+  listCellarEquipment,
+  addCellarEquipment,
+  updateCellarEquipment,
+  deleteCellarEquipment,
+  deleteTasksByEquipment,
+  listCellarTasks,
+  addCellarTask,
+  completeCellarTask,
+  uncompleteCellarTask,
+  deleteCellarTask,
+  type EquipmentType,
+  type EquipmentMaterial,
+  type TaskType,
   db,
 } from "./db.js";
 import * as schema from "../drizzle/schema.js";
@@ -848,7 +861,237 @@ ${scopedKB}`;
     }),
 });
 
-// ─── App Router ──────────────────────────────────────────────────────────────────────────────
+// ─── Cellar Equipment Router ──────────────────────────────────────────────────────────────────────────────────────────────
+
+const EQUIPMENT_TYPES = [
+  "fermentation_tank",
+  "barrel",
+  "press",
+  "pump",
+  "sorting_table",
+  "destemmer",
+  "cold_room",
+  "hose",
+  "other",
+] as const;
+
+const EQUIPMENT_MATERIALS = [
+  "stainless",
+  "wood",
+  "concrete",
+  "fibreglass",
+  "other",
+] as const;
+
+const TASK_TYPES = ["clean", "sanitise", "inspect", "maintain", "other"] as const;
+
+const cellarEquipmentRouter = router({
+  list: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return [];
+    return listCellarEquipment(dbUser.id);
+  }),
+
+  add: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().min(1).max(128),
+        equipmentType: z.enum(EQUIPMENT_TYPES),
+        material: z.enum(EQUIPMENT_MATERIALS).default("stainless"),
+        capacityL: z.number().int().positive().optional(),
+        quantity: z.number().int().min(1).max(9999).default(1),
+        notes: z.string().max(1000).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const id = await addCellarEquipment({
+        userId: dbUser.id,
+        name: input.name,
+        equipmentType: input.equipmentType as EquipmentType,
+        material: input.material as EquipmentMaterial,
+        capacityL: input.capacityL,
+        quantity: input.quantity,
+        notes: input.notes,
+      });
+      return { success: true, id };
+    }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string().min(1).max(128).optional(),
+        equipmentType: z.enum(EQUIPMENT_TYPES).optional(),
+        material: z.enum(EQUIPMENT_MATERIALS).optional(),
+        capacityL: z.number().int().positive().nullable().optional(),
+        quantity: z.number().int().min(1).max(9999).optional(),
+        notes: z.string().max(1000).nullable().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const { id, ...data } = input;
+      await updateCellarEquipment(id, dbUser.id, data as Parameters<typeof updateCellarEquipment>[2]);
+      return { success: true };
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await deleteTasksByEquipment(input.id, dbUser.id);
+      await deleteCellarEquipment(input.id, dbUser.id);
+      return { success: true };
+    }),
+});
+
+// ─── Cellar Tasks Router ──────────────────────────────────────────────────────────────────────────────────────────────
+
+const cellarTasksRouter = router({
+  list: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return [];
+    return listCellarTasks(dbUser.id);
+  }),
+
+  add: protectedProcedure
+    .input(
+      z.object({
+        equipmentId: z.number().optional(),
+        equipmentName: z.string().min(1).max(128),
+        taskType: z.enum(TASK_TYPES),
+        title: z.string().min(1).max(256),
+        methodNotes: z.string().max(2000).optional(),
+        frequency: z.string().max(64).optional(),
+        dueAt: z.number().optional(),
+        aiGenerated: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const id = await addCellarTask({
+        userId: dbUser.id,
+        equipmentId: input.equipmentId,
+        equipmentName: input.equipmentName,
+        taskType: input.taskType as TaskType,
+        title: input.title,
+        methodNotes: input.methodNotes,
+        frequency: input.frequency,
+        dueAt: input.dueAt,
+        aiGenerated: input.aiGenerated,
+      });
+      return { success: true, id };
+    }),
+
+  complete: protectedProcedure
+    .input(z.object({ id: z.number(), completedBy: z.string().max(256).default("Me") }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await completeCellarTask(input.id, dbUser.id, input.completedBy);
+      return { success: true };
+    }),
+
+  uncomplete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await uncompleteCellarTask(input.id, dbUser.id);
+      return { success: true };
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await deleteCellarTask(input.id, dbUser.id);
+      return { success: true };
+    }),
+
+  generateForEquipment: protectedProcedure
+    .input(
+      z.object({
+        equipmentId: z.number(),
+        equipmentName: z.string().min(1).max(128),
+        equipmentType: z.enum(EQUIPMENT_TYPES),
+        material: z.enum(EQUIPMENT_MATERIALS),
+        capacityL: z.number().optional(),
+        quantity: z.number().optional(),
+        notes: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      const equipmentDesc = [
+        `Name: ${input.equipmentName}`,
+        `Type: ${input.equipmentType.replace(/_/g, " ")}`,
+        `Material: ${input.material}`,
+        input.capacityL ? `Capacity: ${input.capacityL}L` : null,
+        input.quantity && input.quantity > 1 ? `Quantity: ${input.quantity}` : null,
+        input.notes ? `Notes: ${input.notes}` : null,
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      const prompt = `You are a cellar hygiene expert for boutique wineries. Given the following piece of winery equipment, generate 3-6 practical cleaning and maintenance tasks specific to this equipment type and material. For wood: include sulfur wick treatment and tartrate inspection. For stainless: include CIP protocols and cooling jacket flushing. For presses: include membrane/basket inspection. For pumps: include seal inspection and line flushing.\n\nEquipment:\n${equipmentDesc}\n\nRespond with a JSON array only:\n[{"taskType":"clean"|"sanitise"|"inspect"|"maintain","title":"<max 60 chars>","methodNotes":"<1-3 sentences>","frequency":"Before use"|"After use"|"Weekly"|"Monthly"|"Annual"|"Pre-vintage"|"Post-vintage"}]`;
+
+      const resp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: prompt }],
+          response_format: { type: "json_object" },
+          stream: false,
+        }),
+      });
+
+      if (!resp.ok) throw new Error("LLM request failed");
+      const data = await resp.json();
+      const rawContent = data.choices?.[0]?.message?.content || "[]";
+
+      let tasks: Array<{ taskType: string; title: string; methodNotes: string; frequency: string }>;
+      try {
+        const parsed = JSON.parse(rawContent);
+        tasks = Array.isArray(parsed) ? parsed : (parsed.tasks ?? parsed.items ?? []);
+      } catch {
+        tasks = [];
+      }
+
+      const validTypes = ["clean", "sanitise", "inspect", "maintain", "other"];
+      const insertedIds: number[] = [];
+      for (const t of tasks) {
+        const taskType = validTypes.includes(t.taskType) ? t.taskType : "other";
+        const id = await addCellarTask({
+          userId: dbUser.id,
+          equipmentId: input.equipmentId,
+          equipmentName: input.equipmentName,
+          taskType: taskType as TaskType,
+          title: t.title?.slice(0, 256) || "Untitled task",
+          methodNotes: t.methodNotes?.slice(0, 2000),
+          frequency: t.frequency || "After use",
+          aiGenerated: true,
+        });
+        insertedIds.push(id);
+      }
+
+      return { success: true, count: insertedIds.length, ids: insertedIds };
+    }),
+});
+
+// ─── App Router ──────────────────────────────────────────────────────────────────────────────────────────────
 export const appRouter = router({
   campaignMetrics: campaignMetricsRouter,
   foundingMembers: foundingMembersRouter,
@@ -861,6 +1104,8 @@ export const appRouter = router({
   leads: leadsRouter,
   siteContent: siteContentRouter,
   compliance: complianceRouter,
+  cellarEquipment: cellarEquipmentRouter,
+  cellarTasks: cellarTasksRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -484,3 +484,184 @@ export async function deleteWineBatch(id: number, userId: number) {
     and(eq(schema.wineBatches.id, id), eq(schema.wineBatches.userId, userId))
   );
 }
+
+// ─── Cellar Equipment Register ────────────────────────────────────────────────
+
+export type EquipmentType =
+  | "fermentation_tank"
+  | "barrel"
+  | "press"
+  | "pump"
+  | "sorting_table"
+  | "destemmer"
+  | "cold_room"
+  | "hose"
+  | "other";
+
+export type EquipmentMaterial =
+  | "stainless"
+  | "wood"
+  | "concrete"
+  | "fibreglass"
+  | "other";
+
+export async function listCellarEquipment(userId: number) {
+  return db.query.cellarEquipment.findMany({
+    where: eq(schema.cellarEquipment.userId, userId),
+    orderBy: [desc(schema.cellarEquipment.createdAt)],
+  });
+}
+
+export async function addCellarEquipment(data: {
+  userId: number;
+  name: string;
+  equipmentType: EquipmentType;
+  material: EquipmentMaterial;
+  capacityL?: number;
+  quantity?: number;
+  notes?: string;
+}) {
+  const now = Date.now();
+  const result = await db.insert(schema.cellarEquipment).values({
+    userId: data.userId,
+    name: data.name,
+    equipmentType: data.equipmentType,
+    material: data.material,
+    capacityL: data.capacityL ?? null,
+    quantity: data.quantity ?? 1,
+    notes: data.notes ?? null,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return (result as unknown as { insertId: number }).insertId;
+}
+
+export async function updateCellarEquipment(
+  id: number,
+  userId: number,
+  data: {
+    name?: string;
+    equipmentType?: EquipmentType;
+    material?: EquipmentMaterial;
+    capacityL?: number | null;
+    quantity?: number;
+    notes?: string | null;
+  }
+) {
+  await db
+    .update(schema.cellarEquipment)
+    .set({ ...data, updatedAt: Date.now() })
+    .where(
+      and(
+        eq(schema.cellarEquipment.id, id),
+        eq(schema.cellarEquipment.userId, userId)
+      )
+    );
+}
+
+export async function deleteCellarEquipment(id: number, userId: number) {
+  await db
+    .delete(schema.cellarEquipment)
+    .where(
+      and(
+        eq(schema.cellarEquipment.id, id),
+        eq(schema.cellarEquipment.userId, userId)
+      )
+    );
+}
+
+// ─── Cellar Tasks ─────────────────────────────────────────────────────────────
+
+export type TaskType = "clean" | "sanitise" | "inspect" | "maintain" | "other";
+
+export async function listCellarTasks(userId: number) {
+  return db.query.cellarTasks.findMany({
+    where: eq(schema.cellarTasks.userId, userId),
+    orderBy: [desc(schema.cellarTasks.createdAt)],
+  });
+}
+
+export async function addCellarTask(data: {
+  userId: number;
+  equipmentId?: number;
+  equipmentName: string;
+  taskType: TaskType;
+  title: string;
+  methodNotes?: string;
+  frequency?: string;
+  dueAt?: number;
+  aiGenerated?: boolean;
+}) {
+  const now = Date.now();
+  const result = await db.insert(schema.cellarTasks).values({
+    userId: data.userId,
+    equipmentId: data.equipmentId ?? null,
+    equipmentName: data.equipmentName,
+    taskType: data.taskType,
+    title: data.title,
+    methodNotes: data.methodNotes ?? null,
+    frequency: data.frequency ?? "After use",
+    dueAt: data.dueAt ?? null,
+    completedAt: null,
+    completedBy: null,
+    aiGenerated: data.aiGenerated ? 1 : 0,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return (result as unknown as { insertId: number }).insertId;
+}
+
+export async function completeCellarTask(
+  id: number,
+  userId: number,
+  completedBy: string
+) {
+  const now = Date.now();
+  await db
+    .update(schema.cellarTasks)
+    .set({ completedAt: now, completedBy, updatedAt: now })
+    .where(
+      and(
+        eq(schema.cellarTasks.id, id),
+        eq(schema.cellarTasks.userId, userId)
+      )
+    );
+}
+
+export async function uncompleteCellarTask(id: number, userId: number) {
+  const now = Date.now();
+  await db
+    .update(schema.cellarTasks)
+    .set({ completedAt: null, completedBy: null, updatedAt: now })
+    .where(
+      and(
+        eq(schema.cellarTasks.id, id),
+        eq(schema.cellarTasks.userId, userId)
+      )
+    );
+}
+
+export async function deleteCellarTask(id: number, userId: number) {
+  await db
+    .delete(schema.cellarTasks)
+    .where(
+      and(
+        eq(schema.cellarTasks.id, id),
+        eq(schema.cellarTasks.userId, userId)
+      )
+    );
+}
+
+export async function deleteTasksByEquipment(
+  equipmentId: number,
+  userId: number
+) {
+  await db
+    .delete(schema.cellarTasks)
+    .where(
+      and(
+        eq(schema.cellarTasks.equipmentId, equipmentId),
+        eq(schema.cellarTasks.userId, userId)
+      )
+    );
+}

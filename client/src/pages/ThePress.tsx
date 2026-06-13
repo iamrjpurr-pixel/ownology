@@ -284,6 +284,21 @@ export default function ThePress() {
               <span style={{ fontSize: "0.8rem" }}>⊞</span>
               THE PRESS
             </div>
+            <Link
+              href="/cellar-tasks"
+              className="px-3 py-1.5 rounded-sm text-xs flex items-center gap-2 transition-all"
+              style={{
+                background: "var(--ow-bg-card)",
+                border: "1px solid var(--ow-border)",
+                fontFamily: "'Fira Code',monospace",
+                color: "var(--ow-text-lo)",
+                letterSpacing: "0.06em",
+                textDecoration: "none",
+              }}
+            >
+              <span style={{ fontSize: "0.8rem" }}>🧹</span>
+              CELLAR TASKS
+            </Link>
           </div>
 
           <p className="section-label mb-4" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", letterSpacing: "0.12em" }}>
