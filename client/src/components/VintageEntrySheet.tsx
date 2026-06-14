@@ -32,7 +32,7 @@ function useIsDesktop() {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "pre_harvest_sample" | "bottling_run" | "other";
+type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "pre_harvest_sample" | "bottling_run" | "weather_event" | "other";
 
 interface Props {
   open: boolean;
@@ -67,8 +67,9 @@ const EVENT_TYPES: { id: EventType; label: string; icon: string; description: st
   { id: "inoculation", label: "Inoculation", icon: "✦", description: "Yeast, MLF bacteria inoculation" },
   { id: "observation",       label: "Observation",       icon: "◉", description: "Sensory note, colour, aroma, visual" },
   { id: "pre_harvest_sample", label: "Pre-Harvest Sample", icon: "🌿", description: "Block sample: Brix, TA, pH, phenolics" },
-  { id: "bottling_run",       label: "Bottling Run",       icon: "🍾", description: "Volume, format, lot number, label" },
-  { id: "other",              label: "Other",              icon: "◈", description: "Anything else worth recording" },
+  { id: "bottling_run",    label: "Bottling Run",    icon: "🍾", description: "Volume, format, lot number, label" },
+  { id: "weather_event",   label: "Weather Event",   icon: "⛈", description: "Frost, heat wave, hail, smoke, rain" },
+  { id: "other",           label: "Other",           icon: "◈", description: "Anything else worth recording" },
 ];
 
 const ADDITION_WHAT = ["DAP", "Fermaid-O", "Fermaid-K", "SO₂ (sulfite)", "Tartaric acid", "Citric acid", "Bentonite", "Egg white fining", "Gelatin", "Oak chips", "Oak staves", "Tannin", "Yeast hulls", "Other"];
@@ -258,6 +259,37 @@ function AdditionDetails({
             </OptionButton>
           ))}
         </div>
+      </div>
+      <div>
+        <FieldLabel>Cost per unit <span style={{fontWeight:400, opacity:0.6}}>(optional — for cost tracking)</span></FieldLabel>
+        <div className="flex gap-2">
+          <select
+            value={details.costCurrency ?? "AUD"}
+            onChange={(e) => set("costCurrency", e.target.value)}
+            className="px-3 py-3 rounded"
+            style={{
+              background: "var(--ow-bg-inset)",
+              border: "1px solid var(--ow-border-md)",
+              color: "var(--ow-text-hi)",
+              fontFamily: "'Fira Code', monospace",
+              fontSize: "max(0.85rem, 16px)",
+              minWidth: "5rem",
+            }}
+          >
+            {["AUD","NZD","USD","EUR","GBP","ZAR"].map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <TextInput
+            value={details.costPerUnit ?? ""}
+            onChange={(v) => set("costPerUnit", v)}
+            placeholder="e.g. 4.50"
+            type="number"
+          />
+        </div>
+        {details.costPerUnit && details.quantity && (
+          <p style={{fontSize:"0.78rem", color:"var(--ow-text-lo)", marginTop:"0.4rem"}}>
+            Total: {details.costCurrency ?? "AUD"} {(parseFloat(details.costPerUnit) * parseFloat(details.quantity)).toFixed(2)} {details.unit ?? ""}
+          </p>
+        )}
       </div>
     </div>
   );

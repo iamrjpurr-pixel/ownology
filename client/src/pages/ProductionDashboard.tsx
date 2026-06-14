@@ -13,6 +13,9 @@ import {
   Activity,
   BarChart3,
   Layers,
+  CalendarDays,
+  DollarSign,
+  Boxes,
 } from "lucide-react";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -459,6 +462,92 @@ export default function ProductionDashboard() {
                   View Batch Book →
                 </Link>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── DR-15: Production Planning ── */}
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <CalendarDays className="w-4 h-4" style={{ color: "oklch(0.72 0.12 75)" }} />
+            <h2 className="text-sm tracking-widest uppercase" style={{ color: "oklch(0.55 0.012 75)" }}>
+              Production Planning
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Approaching bottling */}
+            <div className="rounded-xl border p-5" style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <Package className="w-4 h-4" style={{ color: "oklch(0.65 0.15 160)" }} />
+                <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.50 0.010 75)" }}>Bottling Queue</span>
+              </div>
+              <p className="text-3xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}>
+                {approachingBottlingCount}
+              </p>
+              <p className="text-xs mt-1" style={{ color: "oklch(0.50 0.010 75)" }}>tanks 60–120 days post-inoculation</p>
+              <Link href="/the-press" className="mt-3 block text-xs" style={{ color: "oklch(0.72 0.12 75)" }}>Schedule bottling runs →</Link>
+            </div>
+            {/* Active ferments */}
+            <div className="rounded-xl border p-5" style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <Activity className="w-4 h-4" style={{ color: "oklch(0.72 0.12 75)" }} />
+                <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.50 0.010 75)" }}>Active Ferments</span>
+              </div>
+              <p className="text-3xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}>
+                {activeFermentCount}
+              </p>
+              <p className="text-xs mt-1" style={{ color: "oklch(0.50 0.010 75)" }}>tanks ≤14 days since inoculation</p>
+              <Link href="/the-press" className="mt-3 block text-xs" style={{ color: "oklch(0.72 0.12 75)" }}>View fermentation log →</Link>
+            </div>
+            {/* Cellar tasks */}
+            <div className="rounded-xl border p-5" style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <CheckCircle2 className="w-4 h-4" style={{ color: "oklch(0.65 0.12 250)" }} />
+                <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.50 0.010 75)" }}>Task Planner</span>
+              </div>
+              <p className="text-3xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}>AI</p>
+              <p className="text-xs mt-1" style={{ color: "oklch(0.50 0.010 75)" }}>Generate cellar tasks from your log</p>
+              <Link href="/cellar-tasks" className="mt-3 block text-xs" style={{ color: "oklch(0.72 0.12 75)" }}>Open Cellar Tasks →</Link>
+            </div>
+          </div>
+        </div>
+
+        {/* ── DR-17: Cellar Value ── */}
+        {totalActiveFermentLitres > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <DollarSign className="w-4 h-4" style={{ color: "oklch(0.72 0.12 75)" }} />
+              <h2 className="text-sm tracking-widest uppercase" style={{ color: "oklch(0.55 0.012 75)" }}>
+                Cellar Value Estimate
+              </h2>
+            </div>
+            <div className="rounded-xl border p-5" style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>Volume in Cellar</span>
+                  <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.65 0.15 160)" }}>
+                    {totalActiveFermentLitres.toLocaleString()} L
+                  </span>
+                  <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>active ferment only</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>Est. Bottles (750mL)</span>
+                  <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}>
+                    {Math.round(totalActiveFermentLitres / 0.75 * 0.85).toLocaleString()}
+                  </span>
+                  <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>at 85% fill efficiency</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>Tied Capital Range</span>
+                  <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.72 0.12 75)" }}>
+                    ${Math.round(totalActiveFermentLitres * 8).toLocaleString()}–${Math.round(totalActiveFermentLitres * 25).toLocaleString()}
+                  </span>
+                  <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>est. at $8–$25/L bulk value · update in Batch Book</span>
+                </div>
+              </div>
+              <p className="text-xs mt-4 pt-4" style={{ color: "oklch(0.38 0.008 75)", borderTop: "1px solid oklch(1 0 0 / 6%)" }}>
+                Cellar value is an indicative estimate based on volume and industry bulk wine price ranges. Enter actual cost-per-litre in the Batch Book for precise figures.
+              </p>
             </div>
           </div>
         )}

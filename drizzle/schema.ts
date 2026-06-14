@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, int, bigint, text, mysqlEnum, index, boolean } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, int, bigint, text, mysqlEnum, index, boolean, float } from "drizzle-orm/mysql-core";
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
@@ -157,6 +157,7 @@ export const vintageLogEntries = mysqlTable(
       "observation",
       "pre_harvest_sample",
       "bottling_run",
+      "weather_event",
       "other",
     ]).notNull(),
     // Structured event-specific fields stored as JSON string
@@ -429,5 +430,118 @@ export const barrels = mysqlTable(
   (t) => [
     index("barrel_user_idx").on(t.userId),
     index("barrel_id_user_idx").on(t.barrelId, t.userId),
+  ]
+);
+
+// ─── Packaging Inventory (DR-13) ─────────────────────────────────────────────
+// Tracks consumable packaging stock: bottles, labels, capsules, corks, boxes.
+
+export const packagingInventory = mysqlTable(
+  "packaging_inventory",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    userId: int("user_id").notNull(),
+    // Item name e.g. "750mL Bordeaux Bottle", "Screwcap 30mm", "Shiraz Front Label"
+    itemName: varchar("item_name", { length: 256 }).notNull(),
+    // Category for filtering
+    category: mysqlEnum("category", [
+      "bottle",
+      "label",
+      "capsule",
+      "cork",
+      "box",
+      "other",
+    ]).notNull().default("other"),
+    // Current stock quantity
+    quantityOnHand: int("quantity_on_hand").notNull().default(0),
+    // Reorder trigger level — alert when stock falls below this
+    reorderLevel: int("reorder_level").notNull().default(0),
+    // Unit of measure (e.g. "units", "sheets", "rolls")
+    unit: varchar("unit", { length: 32 }).notNull().default("units"),
+    // Supplier / notes
+    notes: text("notes"),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("pkg_user_idx").on(t.userId),
+    index("pkg_category_idx").on(t.category),
+  ]
+);
+
+// ─── Vineyard Blocks (DR-06) ──────────────────────────────────────────────────
+// Tracks individual vineyard blocks: variety, area, rootstock, training system,
+// soil type, and key phenological observations per block per season.
+export const vineyardBlocks = mysqlTable(
+  "vineyard_blocks",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull(),
+    // User-facing block identifier, e.g. "Block A", "North Slope"
+    blockName: varchar("block_name", { length: 128 }).notNull(),
+    variety: varchar("variety", { length: 128 }).notNull(),
+    // Area in hectares
+    areaHa: float("area_ha"),
+    // Planting year
+    plantingYear: int("planting_year"),
+    rootstock: varchar("rootstock", { length: 128 }),
+    trainingSystem: mysqlEnum("training_system", [
+      "VSP",
+      "Scott Henry",
+      "Smart-Dyson",
+      "Pergola",
+      "Bush Vine",
+      "Other",
+    ]).default("VSP"),
+    soilType: varchar("soil_type", { length: 256 }),
+    // Aspect / orientation (free text, e.g. "North-facing slope")
+    aspect: varchar("aspect", { length: 256 }),
+    // General notes
+    notes: text("notes"),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("vb_user_idx").on(t.userId),
+    index("vb_block_name_idx").on(t.blockName, t.userId),
+  ]
+);
+
+// ─── Vineyard Block Observations (DR-06) ──────────────────────────────────────
+// Phenological and agronomic observations per block per season.
+export const vineyardObservations = mysqlTable(
+  "vineyard_observations",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull(),
+    blockId: int("block_id").notNull(),
+    // Observation type
+    observationType: mysqlEnum("observation_type", [
+      "budburst",
+      "flowering",
+      "veraison",
+      "harvest_date",
+      "spray_application",
+      "irrigation",
+      "canopy_management",
+      "disease_scouting",
+      "yield_estimate",
+      "other",
+    ]).notNull(),
+    // UTC ms timestamp of the observation
+    observedAt: bigint("observed_at", { mode: "number" }).notNull(),
+    // Vintage year (e.g. 2026)
+    vintageYear: int("vintage_year").notNull(),
+    // Numeric value if applicable (e.g. Brix at harvest, kg/vine yield)
+    value: float("value"),
+    unit: varchar("unit", { length: 32 }),
+    notes: text("notes"),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("vo_user_idx").on(t.userId),
+    index("vo_block_idx").on(t.blockId),
+    index("vo_vintage_idx").on(t.vintageYear),
   ]
 );

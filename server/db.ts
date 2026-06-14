@@ -126,7 +126,7 @@ export async function addFoundingMember(data: {
 
 // ─── Vintage Log ──────────────────────────────────────────────────────────────
 
-export type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "pre_harvest_sample" | "bottling_run" | "other";
+export type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "pre_harvest_sample" | "bottling_run" | "weather_event" | "other";
 
 export async function addVintageLogEntry(data: {
   userId: number;
@@ -742,4 +742,173 @@ export async function deleteBarrel(id: number, userId: number) {
   await db
     .delete(schema.barrels)
     .where(and(eq(schema.barrels.id, id), eq(schema.barrels.userId, userId)));
+}
+
+// ─── Packaging Inventory (DR-13) ─────────────────────────────────────────────
+
+export type PackagingCategory = "bottle" | "label" | "capsule" | "cork" | "box" | "other";
+
+export async function listPackagingInventory(userId: number) {
+  return db.query.packagingInventory.findMany({
+    where: eq(schema.packagingInventory.userId, userId),
+    orderBy: [desc(schema.packagingInventory.category)],
+  });
+}
+
+export async function addPackagingItem(data: {
+  userId: number;
+  itemName: string;
+  category: PackagingCategory;
+  quantityOnHand: number;
+  reorderLevel: number;
+  unit: string;
+  notes?: string;
+}) {
+  const now = Date.now();
+  const result = await db.insert(schema.packagingInventory).values({
+    userId: data.userId,
+    itemName: data.itemName,
+    category: data.category,
+    quantityOnHand: data.quantityOnHand,
+    reorderLevel: data.reorderLevel,
+    unit: data.unit,
+    notes: data.notes ?? null,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return (result as unknown as { insertId: number }).insertId;
+}
+
+export async function updatePackagingItem(
+  id: number,
+  userId: number,
+  input: Partial<{
+    itemName: string;
+    category: PackagingCategory;
+    quantityOnHand: number;
+    reorderLevel: number;
+    unit: string;
+    notes: string | null;
+  }>
+) {
+  await db
+    .update(schema.packagingInventory)
+    .set({ ...input, updatedAt: Date.now() })
+    .where(and(eq(schema.packagingInventory.id, id), eq(schema.packagingInventory.userId, userId)));
+}
+
+export async function deletePackagingItem(id: number, userId: number) {
+  await db
+    .delete(schema.packagingInventory)
+    .where(and(eq(schema.packagingInventory.id, id), eq(schema.packagingInventory.userId, userId)));
+}
+
+// ─── Vineyard Blocks (DR-06) ──────────────────────────────────────────────────
+
+export async function listVineyardBlocks(userId: number) {
+  return db.query.vineyardBlocks.findMany({
+    where: eq(schema.vineyardBlocks.userId, userId),
+    orderBy: [schema.vineyardBlocks.blockName],
+  });
+}
+
+export async function createVineyardBlock(
+  userId: number,
+  data: {
+    blockName: string;
+    variety: string;
+    areaHa?: number | null;
+    plantingYear?: number | null;
+    rootstock?: string | null;
+    trainingSystem?: "VSP" | "Scott Henry" | "Smart-Dyson" | "Pergola" | "Bush Vine" | "Other";
+    soilType?: string | null;
+    aspect?: string | null;
+    notes?: string | null;
+  }
+) {
+  const now = Date.now();
+  await db.insert(schema.vineyardBlocks).values({
+    userId,
+    blockName: data.blockName,
+    variety: data.variety,
+    areaHa: data.areaHa ?? null,
+    plantingYear: data.plantingYear ?? null,
+    rootstock: data.rootstock ?? null,
+    trainingSystem: data.trainingSystem ?? "VSP",
+    soilType: data.soilType ?? null,
+    aspect: data.aspect ?? null,
+    notes: data.notes ?? null,
+    isActive: true,
+    createdAt: now,
+    updatedAt: now,
+  });
+}
+
+export async function updateVineyardBlock(
+  id: number,
+  userId: number,
+  data: Partial<{
+    blockName: string;
+    variety: string;
+    areaHa: number | null;
+    plantingYear: number | null;
+    rootstock: string | null;
+    trainingSystem: "VSP" | "Scott Henry" | "Smart-Dyson" | "Pergola" | "Bush Vine" | "Other";
+    soilType: string | null;
+    aspect: string | null;
+    notes: string | null;
+    isActive: boolean;
+  }>
+) {
+  await db
+    .update(schema.vineyardBlocks)
+    .set({ ...data, updatedAt: Date.now() })
+    .where(and(eq(schema.vineyardBlocks.id, id), eq(schema.vineyardBlocks.userId, userId)));
+}
+
+export async function deleteVineyardBlock(id: number, userId: number) {
+  await db
+    .delete(schema.vineyardBlocks)
+    .where(and(eq(schema.vineyardBlocks.id, id), eq(schema.vineyardBlocks.userId, userId)));
+}
+
+export async function listVineyardObservations(userId: number, blockId?: number, vintageYear?: number) {
+  const conditions: ReturnType<typeof eq>[] = [eq(schema.vineyardObservations.userId, userId)];
+  if (blockId !== undefined) conditions.push(eq(schema.vineyardObservations.blockId, blockId));
+  if (vintageYear !== undefined) conditions.push(eq(schema.vineyardObservations.vintageYear, vintageYear));
+  return db.query.vineyardObservations.findMany({
+    where: and(...conditions),
+    orderBy: [desc(schema.vineyardObservations.observedAt)],
+  });
+}
+
+export async function createVineyardObservation(
+  userId: number,
+  data: {
+    blockId: number;
+    observationType: "budburst" | "flowering" | "veraison" | "harvest_date" | "spray_application" | "irrigation" | "canopy_management" | "disease_scouting" | "yield_estimate" | "other";
+    observedAt: number;
+    vintageYear: number;
+    value?: number | null;
+    unit?: string | null;
+    notes?: string | null;
+  }
+) {
+  await db.insert(schema.vineyardObservations).values({
+    userId,
+    blockId: data.blockId,
+    observationType: data.observationType,
+    observedAt: data.observedAt,
+    vintageYear: data.vintageYear,
+    value: data.value ?? null,
+    unit: data.unit ?? null,
+    notes: data.notes ?? null,
+    createdAt: Date.now(),
+  });
+}
+
+export async function deleteVineyardObservation(id: number, userId: number) {
+  await db
+    .delete(schema.vineyardObservations)
+    .where(and(eq(schema.vineyardObservations.id, id), eq(schema.vineyardObservations.userId, userId)));
 }

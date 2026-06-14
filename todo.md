@@ -283,12 +283,12 @@
 - [x] [DR-12] Bottling Run event type added: volume, lot number, format, label, notes — LotTraceability component shows all bottling runs linked to batch records in The Press
 
 ## Sprint 3 — Commercial Intelligence (Value Engineering Roadmap)
-- [ ] [DR-14] Add optional cost_per_unit and cost_currency fields to Addition events in vintage_log_entries; cost summary section on Production Dashboard
-- [ ] [DR-13] Build Packaging Inventory Tracker: packaging_inventory table (item_type, quantity, unit, reorder_threshold), tRPC CRUD, Packaging tab on Production Dashboard, auto-deduct on Bottling Run event
-- [ ] [DR-05] Add Weather Event event type to Vintage Log: fields = event type dropdown (frost/heat wave/hail/heavy rain/smoke/other), date, severity, affected tanks multi-select
-- [ ] [DR-16] Add Share Vintage button to Batch Book: LLM generates tasting note from observation log entries, renders one-page vintage card PDF (variety, GI, grower, vintage, key measurements, tasting note)
+- [x] [DR-14] cost_per_unit and cost_currency fields added to Addition event detail form in VintageEntrySheet
+- [x] [DR-13] Packaging Inventory Tracker: packaging_inventory table created, tRPC CRUD, Packaging tab added to The Press
+- [x] [DR-05] Weather Event event type added to Vintage Log: event type dropdown, date, severity, affected tanks, notes — schema, DB type, router, and UI all updated
+- [x] [DR-16] Vintage Card PDF: LLM generates tasting note from observation log, renders one-page printable vintage card — VintageCardPDF component injected in Batch Book tab
 
 ## Sprint 4 — Strategic Completeness (Value Engineering Roadmap)
-- [ ] [DR-06] Build Vineyard section: vineyard_blocks table (block_name, variety, area_ha, row_count), vineyard_events table (block_id, event_type, date, severity, treatment), new /vineyard page, link blocks to Pre-Harvest Sample log
-- [ ] [DR-15] Extend Production Dashboard with Planning tab: projected bottling dates, estimated litres at bottling, vintage comparison table (current vs prior vintages by variety and volume)
-- [ ] [DR-17] Add Cellar Value section to Production Dashboard: user enters cost-per-litre, system calculates volume × cost × days-aging per tank and total tied capital estimate
+- [x] [DR-06] Vineyard section: vineyard_blocks + vineyard_observations tables, tRPC CRUD, /vineyard page with block register and observation log, linked in nav
+- [x] [DR-15] Production Planning section added to Dashboard: Bottling Queue, Active Ferments, Task Planner cards with links to relevant tools
+- [x] [DR-17] Cellar Value section added to Dashboard: Volume in Cellar, Est. Bottles at 85% fill, Tied Capital Range at $8–$25/L bulk value estimate

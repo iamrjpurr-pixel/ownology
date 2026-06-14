@@ -35,6 +35,7 @@ import FoundingMemberSuccess from "./pages/FoundingMemberSuccess";
 import OAuthCallback from "./pages/OAuthCallback";
 import ProductionDashboard from "./pages/ProductionDashboard";
 import BuildIndex from "./pages/BuildIndex";
+import Vineyard from "./pages/Vineyard";
 
 
 function Router() {
@@ -71,6 +72,7 @@ function Router() {
       <Route path={"/admin/compliance-doctrine"} component={AdminComplianceDoctrine} />
       <Route path={"/founding-member/success"} component={FoundingMemberSuccess} />
       <Route path={"/dashboard"} component={ProductionDashboard} />
+      <Route path={"/vineyard"} component={Vineyard} />
       <Route path={"/build-index"} component={BuildIndex} />
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />

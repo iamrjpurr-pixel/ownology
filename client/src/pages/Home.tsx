@@ -148,6 +148,7 @@ const VINTAGE_NAV: NavItem[] = [
   { label: "Dashboard",    href: "/dashboard" },
   { label: "The Press",    href: "/the-press" },
   { label: "Cellar Tasks", href: "/cellar-tasks" },
+  { label: "Vineyard",     href: "/vineyard" },
   { label: "Quick Entry",  href: "/quick-entry" },
   { label: "Free Run",     href: "/free-run" },
 ];

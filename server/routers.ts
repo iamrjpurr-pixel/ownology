@@ -8,6 +8,10 @@ import {
   createBarrel,
   updateBarrel,
   deleteBarrel,
+  listPackagingInventory,
+  addPackagingItem,
+  updatePackagingItem,
+  deletePackagingItem,
   getCampaignMetricsHistory,
   getLatestCampaignMetrics,
   upsertCampaignMetricsSnapshot,
@@ -48,6 +52,13 @@ import {
   type EquipmentMaterial,
   type TaskType,
   db,
+  listVineyardBlocks,
+  createVineyardBlock,
+  updateVineyardBlock,
+  deleteVineyardBlock,
+  listVineyardObservations,
+  createVineyardObservation,
+  deleteVineyardObservation,
 } from "./db.js";
 import * as schema from "../drizzle/schema.js";
 
@@ -344,7 +355,7 @@ const adminRouter = router({
 // All procedures are protectedProcedure — any authenticated user can log entries.
 // Entries are scoped to ctx.user.id so users only see their own log.
 
-const EVENT_TYPES = ["addition", "measurement", "racking", "inoculation", "observation", "pre_harvest_sample", "bottling_run", "other"] as const;
+const EVENT_TYPES = ["addition", "measurement", "racking", "inoculation", "observation", "pre_harvest_sample", "bottling_run", "weather_event", "other"] as const;
 
 /**
  * Auto-generate searchable tags from event type + details.
@@ -380,7 +391,7 @@ const vintageLogRouter = router({
       z.object({
         tankName: z.string().min(1).max(128),
         variety: z.string().min(1).max(128),
-        eventType: z.enum(["addition", "measurement", "racking", "inoculation", "observation", "pre_harvest_sample", "bottling_run", "other"]),
+        eventType: z.enum(["addition", "measurement", "racking", "inoculation", "observation", "pre_harvest_sample", "bottling_run", "weather_event", "other"]),
         details: z.record(z.string(), z.unknown()),
         noteText: z.string().max(2000).optional(),
         entryAt: z.number().optional(),
@@ -476,6 +487,69 @@ Measurement: ${detailsText}${input.recentContext ? `\nRecent context: ${input.re
       const data = await resp.json();
       const interpretation = data.choices?.[0]?.message?.content ?? "Unable to interpret this measurement.";
       return { interpretation };
+    }),
+
+  generateVintageCard: protectedProcedure
+    .input(z.object({ batchId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+
+      // Fetch batch details
+      const allBatches = await listWineBatches(dbUser.id);
+      const batch = allBatches.find((b) => b.batchId === input.batchId);
+      if (!batch) throw new Error("Batch not found");
+
+      // Fetch all log entries for this tank
+      const allEntries = (await listVintageLogEntries(dbUser.id, 200)).filter(
+        (e) => e.tankName === batch.tankName
+      );
+
+      // Build a compact summary of the log
+      const logSummary = allEntries
+        .slice(0, 40)
+        .map((e) => {
+          const d = new Date(e.entryAt).toLocaleDateString("en-AU", { day: "numeric", month: "short" });
+          const details = (e as unknown as { details?: Record<string, unknown> }).details ? Object.entries((e as unknown as { details: Record<string, unknown> }).details).map(([k, v]) => `${k}: ${v}`).join(", ") : "";
+          return `${d} [${e.eventType}] ${details}${e.noteText ? " — " + e.noteText : ""}`;
+        })
+        .join("\n");
+
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      const systemPrompt = `You are a winemaker writing a professional vintage card narrative for a wine batch. Write in an authoritative, evocative style — like a back-label story combined with a technical winemaker's note. Structure your response as:
+
+## Vintage Story
+[2-3 sentences: evocative narrative about this vintage, the variety, and the season]
+
+## Winemaking Notes
+[3-5 bullet points: key decisions made during fermentation and maturation, referencing actual data from the log]
+
+## Profile
+[2-3 sentences: expected flavour profile, structure, and drinking window]
+
+Be specific and use real data from the log. Keep the total length to 200-280 words.`;
+
+      const userMessage = `Batch: ${batch.batchId}\nTank: ${batch.tankName ?? "unknown"}\nVariety: ${batch.variety}\nVolume: ${batch.volumeLitres ? batch.volumeLitres + "L" : "unknown"}\nGrower: ${batch.growerDetails ?? "estate"}\nRegion: ${batch.gi ?? "unknown"}\n\nVintage Log:\n${logSummary || "No log entries recorded yet."}`;
+
+      const resp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userMessage },
+          ],
+          stream: false,
+        }),
+      });
+
+      if (!resp.ok) throw new Error("LLM request failed");
+      const llmData = await resp.json();
+      const content = llmData.choices?.[0]?.message?.content ?? "Unable to generate vintage card.";
+      return { content };
     }),
 });
 
@@ -1371,6 +1445,154 @@ const barrelRouter = router({
     }),
 });
 
+// ─── Packaging Inventory Router (DR-13) ────────────────────────────────────
+
+const packagingRouter = router({
+  list: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return [];
+    return listPackagingInventory(dbUser.id);
+  }),
+
+  add: protectedProcedure
+    .input(z.object({
+      itemName: z.string().min(1).max(256),
+      category: z.enum(["bottle", "label", "capsule", "cork", "box", "other"]),
+      quantityOnHand: z.number().int().min(0),
+      reorderLevel: z.number().int().min(0),
+      unit: z.string().min(1).max(32).default("units"),
+      notes: z.string().max(1000).optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const id = await addPackagingItem({ userId: dbUser.id, ...input });
+      return { id };
+    }),
+
+  update: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      itemName: z.string().min(1).max(256).optional(),
+      category: z.enum(["bottle", "label", "capsule", "cork", "box", "other"]).optional(),
+      quantityOnHand: z.number().int().min(0).optional(),
+      reorderLevel: z.number().int().min(0).optional(),
+      unit: z.string().min(1).max(32).optional(),
+      notes: z.string().max(1000).nullable().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const { id, ...rest } = input;
+      await updatePackagingItem(id, dbUser.id, rest);
+      return { success: true };
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await deletePackagingItem(input.id, dbUser.id);
+      return { success: true };
+    }),
+});
+
+// ─── Vineyard Router (DR-06) ─────────────────────────────────────────────────
+
+const TRAINING_SYSTEMS = ["VSP", "Scott Henry", "Smart-Dyson", "Pergola", "Bush Vine", "Other"] as const;
+const OBSERVATION_TYPES = ["budburst", "flowering", "veraison", "harvest_date", "spray_application", "irrigation", "canopy_management", "disease_scouting", "yield_estimate", "other"] as const;
+
+const vineyardRouter = router({
+  listBlocks: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return [];
+    return listVineyardBlocks(dbUser.id);
+  }),
+
+  addBlock: protectedProcedure
+    .input(z.object({
+      blockName: z.string().min(1).max(128),
+      variety: z.string().min(1).max(128),
+      areaHa: z.number().positive().optional(),
+      plantingYear: z.number().int().min(1800).max(2100).optional(),
+      rootstock: z.string().max(128).optional(),
+      trainingSystem: z.enum(TRAINING_SYSTEMS).optional(),
+      soilType: z.string().max(256).optional(),
+      aspect: z.string().max(256).optional(),
+      notes: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await createVineyardBlock(dbUser.id, input);
+    }),
+
+  updateBlock: protectedProcedure
+    .input(z.object({
+      id: z.number().int(),
+      blockName: z.string().min(1).max(128).optional(),
+      variety: z.string().min(1).max(128).optional(),
+      areaHa: z.number().positive().nullable().optional(),
+      plantingYear: z.number().int().min(1800).max(2100).nullable().optional(),
+      rootstock: z.string().max(128).nullable().optional(),
+      trainingSystem: z.enum(TRAINING_SYSTEMS).optional(),
+      soilType: z.string().max(256).nullable().optional(),
+      aspect: z.string().max(256).nullable().optional(),
+      notes: z.string().nullable().optional(),
+      isActive: z.boolean().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const { id, ...data } = input;
+      await updateVineyardBlock(id, dbUser.id, data);
+    }),
+
+  deleteBlock: protectedProcedure
+    .input(z.object({ id: z.number().int() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await deleteVineyardBlock(input.id, dbUser.id);
+    }),
+
+  listObservations: protectedProcedure
+    .input(z.object({
+      blockId: z.number().int().optional(),
+      vintageYear: z.number().int().optional(),
+    }).optional())
+    .query(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) return [];
+      return listVineyardObservations(dbUser.id, input?.blockId, input?.vintageYear);
+    }),
+
+  addObservation: protectedProcedure
+    .input(z.object({
+      blockId: z.number().int(),
+      observationType: z.enum(OBSERVATION_TYPES),
+      observedAt: z.number().int(),
+      vintageYear: z.number().int().min(2000).max(2100),
+      value: z.number().optional(),
+      unit: z.string().max(32).optional(),
+      notes: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await createVineyardObservation(dbUser.id, input);
+    }),
+
+  deleteObservation: protectedProcedure
+    .input(z.object({ id: z.number().int() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await deleteVineyardObservation(input.id, dbUser.id);
+    }),
+});
+
 // ─── App Router ──────────────────────────────────────────────────────────────────────────────────────────────
 export const appRouter = router({
   campaignMetrics: campaignMetricsRouter,
@@ -1388,6 +1610,8 @@ export const appRouter = router({
   cellarTasks: cellarTasksRouter,
   dashboard: dashboardRouter,
   barrel: barrelRouter,
+  packaging: packagingRouter,
+  vineyard: vineyardRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -15,10 +15,12 @@ import MilestoneCalendar from "@/components/MilestoneCalendar";
 import TankReminderSheet from "@/components/TankReminderSheet";
 import WineBatchSheet from "@/components/WineBatchSheet";
 import LotTraceability from "@/components/LotTraceability";
+import VintageCardPDF from "@/components/VintageCardPDF";
 import KitWineTracker from "@/components/KitWineTracker";
 import MeasurementInterpretation from "@/components/MeasurementInterpretation";
 import ExportLogPDF from "@/components/ExportLogPDF";
 import BarrelsTab from "@/components/BarrelsTab";
+import PackagingInventory from "@/components/PackagingInventory";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface VintageEntry {
@@ -142,7 +144,7 @@ function SectionHeader({ label, title, subtitle }: { label: string; title: strin
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function ThePress() {
-  const [activeTab, setActiveTab] = useState<"log" | "calcs" | "scenarios" | "notes" | "calendar" | "barrels">("log");
+  const [activeTab, setActiveTab] = useState<"log" | "calcs" | "scenarios" | "notes" | "calendar" | "barrels" | "packaging">("log");
   // Batch Book state
   const [batchSheetOpen, setBatchSheetOpen] = useState(false);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
@@ -290,6 +292,7 @@ export default function ThePress() {
     { id: "log" as const, label: "Vintage Log", icon: "📋" },
     { id: "calendar" as const, label: "Milestones", icon: "📅" },
     { id: "barrels" as const, label: "Barrels", icon: "🪵" },
+    { id: "packaging" as const, label: "Packaging", icon: "📦" },
     { id: "calcs" as const, label: "Calculations", icon: "⚗" },
     { id: "scenarios" as const, label: "Cellar Scenarios", icon: "🔬" },
     { id: "notes" as const, label: "Batch Book", icon: "📖" },
@@ -1344,6 +1347,13 @@ export default function ThePress() {
             </div>
           )}
 
+          {/* Packaging Inventory */}
+          {activeTab === "packaging" && (
+            <div className="pt-2">
+              <PackagingInventory />
+            </div>
+          )}
+
           {/* Calculations */}
           {activeTab === "calcs" && (
             <div>
@@ -1800,6 +1810,14 @@ export default function ThePress() {
             Lot Traceability
           </div>
           <LotTraceability />
+        </div>
+
+        {/* Vintage Card PDF */}
+        <div className="mt-10 p-6 rounded-lg" style={{ background: "oklch(0.12 0.008 60)", border: "1px solid oklch(0.72 0.12 75 / 15%)" }}>
+          <div className="mb-1" style={{ fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "oklch(0.50 0.012 75)" }}>
+            DR-16 · Vintage Card
+          </div>
+          <VintageCardPDF />
         </div>
 
         {/* ── Footer quote ── */}
