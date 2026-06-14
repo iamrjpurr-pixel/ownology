@@ -144,6 +144,17 @@ const SECTIONS: Section[] = [
       { label: "PWA Install Prompt",          anchor: "Visit the app on mobile Chrome/Edge → install banner appears at bottom", sprint: "S5", dr: "DR-23", desc: "manifest.json, theme-color meta, Apple PWA tags, and custom install banner with localStorage dismiss.", status: "live" },
     ],
   },
+  {
+    title: "Sprint 6 — Planned (5 Partial DRs remaining)",
+    icon: "🔧",
+    items: [
+      { label: "Live tank volume balance",         anchor: "Not yet built — Sprint 6 candidate", sprint: "S6", dr: "DR-04", desc: "Auto-decrement source tank and auto-increment destination tank volume on each Racking log entry; live inventory balance per vessel.", status: "stub" },
+      { label: "Sanitation event type",            anchor: "Not yet built — Sprint 6 candidate", sprint: "S6", dr: "DR-03", desc: "\u2018Sanitation\u2019 event type in VintageEntrySheet with fields: equipment cleaned, sanitant used, contact time — creates a traceable cleaning record against a tank ID.", status: "stub" },
+      { label: "Export documentation generator",  anchor: "Not yet built — Sprint 6 candidate", sprint: "S6", dr: "DR-11", desc: "Pre-filled AWBC movement advice and label compliance checklist generated from batch data; closes the automated export documentation gap.", status: "stub" },
+      { label: "Vineyard disease/pest event type", anchor: "Not yet built — Sprint 6 candidate", sprint: "S6", dr: "DR-06", desc: "Structured disease/pest event in Vineyard block observations: pathogen, affected area, treatment applied, re-entry interval.", status: "stub" },
+      { label: "Equipment fault log",              anchor: "Not yet built — Sprint 6 candidate", sprint: "S6", dr: "DR-10", desc: "\u2018Fault\u2019 task type in Cellar Tasks with fault description, resolution, and downtime duration fields; enables pattern analysis across vintages.", status: "stub" },
+    ],
+  },
 ];
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
@@ -240,7 +251,7 @@ export default function BuildIndex() {
             BUILD INDEX
           </span>
           <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", color: TEXT_LO, letterSpacing: "0.08em" }}>
-            — remove before launch
+            v2 · 5 sprints · 22/27 DRs met — remove before launch
           </span>
         </div>
         <Link href="/" style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", fontWeight: 300, color: TEXT_LO, textDecoration: "none" }}>
