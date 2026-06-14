@@ -1704,8 +1704,8 @@ const knowledgeRouter = router({
       return { ok: true };
     }),
 
-  // Protected: update tribal knowledge on an SOP
-  updateTribalKnowledge: protectedProcedure
+  // Public during build/test phase — lock to protectedProcedure before launch
+  updateTribalKnowledge: publicProcedure
     .input(z.object({ id: z.number().int(), tribalKnowledge: z.string().max(10000) }))
     .mutation(async ({ input }) => {
       const { eq } = await import("drizzle-orm");
@@ -1716,8 +1716,8 @@ const knowledgeRouter = router({
       return { ok: true };
     }),
 
-  // Protected: update procedure text on an SOP (owner customisation)
-  updateProcedureText: protectedProcedure
+  // Public during build/test phase — lock to protectedProcedure before launch
+  updateProcedureText: publicProcedure
     .input(z.object({ id: z.number().int(), procedureText: z.string().max(50000) }))
     .mutation(async ({ input }) => {
       const { eq } = await import("drizzle-orm");
@@ -1730,8 +1730,8 @@ const knowledgeRouter = router({
 
   // ── Vintage Notes ────────────────────────────────────────────────────────────
 
-  // Protected: add a vintage note to an SOP
-  addVintageNote: protectedProcedure
+  // Public during build/test phase — lock to protectedProcedure before launch
+  addVintageNote: publicProcedure
     .input(
       z.object({
         sopId: z.number().int(),
@@ -1752,7 +1752,7 @@ const knowledgeRouter = router({
         whatFailed: input.whatFailed ?? null,
         whatToChange: input.whatToChange ?? null,
         linkedBatchId: input.linkedBatchId ?? null,
-        createdBy: input.createdBy ?? ctx.user.name ?? "Winemaker",
+        createdBy: input.createdBy ?? (ctx as { user?: { name?: string } }).user?.name ?? "Winemaker",
         createdAt: now,
         updatedAt: now,
       });

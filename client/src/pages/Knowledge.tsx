@@ -106,14 +106,26 @@ const CATEGORY_META: Record<string, {
 
 const ALL_CATEGORIES = Object.keys(CATEGORY_META);
 
+// Categories that contain DIY home winemaker SOPs
+const DIY_CATEGORIES = new Set([
+  "Fermentation Management",
+  "Tank Cleaning & Sanitation",
+  "Bottling Procedures",
+]);
+
 // ─── Knowledge Home ───────────────────────────────────────────────────────────
 
 function KnowledgeHome() {
   const [search, setSearch] = useState("");
+  const [audienceFilter, setAudienceFilter] = useState<"all" | "diy">("all");
   const { data: allSops = [] } = trpc.knowledge.listSops.useQuery(undefined);
 
+  const baseCategories = audienceFilter === "diy"
+    ? ALL_CATEGORIES.filter(cat => DIY_CATEGORIES.has(cat))
+    : ALL_CATEGORIES;
+
   const filteredCategories = search.trim()
-    ? ALL_CATEGORIES.filter((cat) => {
+    ? baseCategories.filter((cat) => {
         const meta = CATEGORY_META[cat];
         const matchCat = cat.toLowerCase().includes(search.toLowerCase());
         const matchSop = allSops.some(
@@ -123,7 +135,7 @@ function KnowledgeHome() {
         );
         return matchCat || matchSop || meta?.description.toLowerCase().includes(search.toLowerCase());
       })
-    : ALL_CATEGORIES;
+    : baseCategories;
 
   return (
     <div
@@ -186,15 +198,43 @@ function KnowledgeHome() {
             </div>
           </div>
 
-          {/* Search */}
-          <div className="mt-6 max-w-md">
+          {/* Search + audience filter */}
+          <div className="mt-6 flex flex-wrap gap-3 items-center">
             <Input
               placeholder="Search SOPs, categories, or topics…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-transparent border-white/10 text-sm"
+              className="bg-transparent border-white/10 text-sm max-w-sm"
               style={{ color: "oklch(0.88 0.015 75)" }}
             />
+            <div className="flex gap-2">
+              <button
+                onClick={() => setAudienceFilter("all")}
+                className="px-3 py-1.5 text-xs rounded transition-all"
+                style={{
+                  fontFamily: "'Lato', sans-serif",
+                  fontWeight: audienceFilter === "all" ? 600 : 300,
+                  background: audienceFilter === "all" ? "oklch(0.72 0.12 75 / 15%)" : "transparent",
+                  border: audienceFilter === "all" ? "1px solid oklch(0.72 0.12 75 / 40%)" : "1px solid oklch(1 0 0 / 12%)",
+                  color: audienceFilter === "all" ? "oklch(0.72 0.12 75)" : "oklch(0.55 0.015 75)",
+                }}
+              >
+                All SOPs
+              </button>
+              <button
+                onClick={() => setAudienceFilter("diy")}
+                className="px-3 py-1.5 text-xs rounded transition-all"
+                style={{
+                  fontFamily: "'Lato', sans-serif",
+                  fontWeight: audienceFilter === "diy" ? 600 : 300,
+                  background: audienceFilter === "diy" ? "oklch(0.65 0.10 220 / 15%)" : "transparent",
+                  border: audienceFilter === "diy" ? "1px solid oklch(0.65 0.10 220 / 40%)" : "1px solid oklch(1 0 0 / 12%)",
+                  color: audienceFilter === "diy" ? "oklch(0.65 0.10 220)" : "oklch(0.55 0.015 75)",
+                }}
+              >
+                🍷 DIY Home Winemaker
+              </button>
+            </div>
           </div>
         </div>
       </div>
