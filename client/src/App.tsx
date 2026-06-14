@@ -37,6 +37,7 @@ import ProductionDashboard from "./pages/ProductionDashboard";
 import BuildIndex from "./pages/BuildIndex";
 import Vineyard from "./pages/Vineyard";
 import PwaInstallBanner from "./components/PwaInstallBanner";
+import Knowledge from "./pages/Knowledge";
 
 
 function Router() {
@@ -75,6 +76,8 @@ function Router() {
       <Route path={"/dashboard"} component={ProductionDashboard} />
       <Route path={"/vineyard"} component={Vineyard} />
       <Route path={"/build-index"} component={BuildIndex} />
+      <Route path={"/knowledge"} component={Knowledge} />
+      <Route path={"/knowledge/:rest*"} component={Knowledge} />
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

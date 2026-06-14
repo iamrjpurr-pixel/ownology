@@ -9,6 +9,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
+import { BookOpen, FlaskConical, Microscope, Beaker, Cog, GraduationCap, ExternalLink } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Domain = "All" | "Chemistry" | "Microbiology" | "Sensory" | "Viticulture" | "Operations" | "Regulatory" | "Business";
@@ -220,6 +221,239 @@ function LessonCardItem({ lesson }: { lesson: LessonCard }) {
             Begin →
           </span>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ─── CSU Subject Cards ────────────────────────────────────────────────────────
+interface CsuSubject {
+  code: string;
+  name: string;
+  level: "Foundation" | "Intermediate" | "Advanced";
+  keyTopics: string[];
+  ownologyLink: string;
+  ownologyLabel: string;
+  handbookUrl: string;
+}
+
+const CSU_SUBJECTS: CsuSubject[] = [
+  {
+    code: "WSC202",
+    name: "Wine Production 1",
+    level: "Intermediate",
+    keyTopics: [
+      "Fruit quality, maturity patterns, picking criteria",
+      "Grape processing: crushing, pressing, juice clarification",
+      "White wine fermentation control",
+      "Red wine: skin fermentation, colour and flavour extraction",
+      "Post-fermentation: fining, MLF, stabilisation, blending",
+      "Bottling: filtration, wine protection",
+    ],
+    ownologyLink: "/knowledge/category/Crushing%20%26%20Fermentation",
+    ownologyLabel: "Fermentation SOPs →",
+    handbookUrl: "https://handbook.csu.edu.au/subject/2024/wsc202",
+  },
+  {
+    code: "WSC318",
+    name: "Wine Microbiology",
+    level: "Advanced",
+    keyTopics: [
+      "Yeast ecology during alcoholic fermentation",
+      "MLF organisms, conditions, and wine quality impact",
+      "Spoilage organisms: Brett, acetic acid bacteria, Pediococcus",
+      "SO₂ as microbial control: molecular SO₂ calculation",
+      "YAN and yeast nutrition — stuck ferment causes",
+      "Microbiological analysis techniques",
+    ],
+    ownologyLink: "/knowledge/category/Laboratory%20Testing",
+    ownologyLabel: "Lab Testing SOPs →",
+    handbookUrl: "https://handbook.csu.edu.au/subject/2026/wsc318",
+  },
+  {
+    code: "WSC319",
+    name: "Wine Chemistry",
+    level: "Advanced",
+    keyTopics: [
+      "Protein stability, acidification, bitartrate stability",
+      "Fining agents: bentonite, egg white, PVPP, copper sulphate",
+      "Bitartrate stabilisation: cold stab, KHT seeding",
+      "Wine oxidation chemistry and SO₂ as antioxidant",
+      "Enzyme treatments: pectolytic, glucanase, glycosidase",
+    ],
+    ownologyLink: "/knowledge/category/Tank%20Cleaning%20%26%20Sanitation",
+    ownologyLabel: "Cellar Operations SOPs →",
+    handbookUrl: "https://handbook.csu.edu.au/subject/2026/wsc319",
+  },
+  {
+    code: "WSC303",
+    name: "Wine Production 2",
+    level: "Advanced",
+    keyTopics: [
+      "Sparkling wine: Méthode Champenoise, tank fermentation",
+      "Fortified wine: Port, Muscat, Tokay, Sherry styles",
+      "NOLO (no/low alcohol) wine production",
+      "Blending, fining, and ageing for style development",
+      "Distillation methods and fortifying spirit quality",
+    ],
+    ownologyLink: "/knowledge/category/Bottling%20Procedures",
+    ownologyLabel: "Bottling SOPs →",
+    handbookUrl: "https://handbook.csu.edu.au/subject/2026/wsc303",
+  },
+  {
+    code: "WSC321",
+    name: "Winery Engineering",
+    level: "Advanced",
+    keyTopics: [
+      "Pump types, selection, and maintenance",
+      "Heat exchangers and temperature control systems",
+      "CIP (Clean-In-Place) system design and operation",
+      "Press types: pneumatic, membrane, basket",
+      "Tank design, materials, and cleaning protocols",
+    ],
+    ownologyLink: "/knowledge/category/Equipment%20Maintenance",
+    ownologyLabel: "Equipment SOPs →",
+    handbookUrl: "https://handbook.csu.edu.au/subject/2026/wsc321",
+  },
+  {
+    code: "MCR101",
+    name: "Introduction to Microbiology",
+    level: "Foundation",
+    keyTopics: [
+      "Microbial cell structure and function",
+      "Bacterial and yeast growth kinetics",
+      "Fermentation pathways: glycolysis, ethanol production",
+      "Microbial control methods: heat, chemicals, pH",
+      "Food safety microbiology fundamentals",
+    ],
+    ownologyLink: "/knowledge/category/Food%20Safety%20%26%20Compliance",
+    ownologyLabel: "Food Safety SOPs →",
+    handbookUrl: "https://handbook.csu.edu.au/subject/2026/mcr101",
+  },
+];
+
+const CSU_LEVEL_COLORS: Record<"Foundation" | "Intermediate" | "Advanced", string> = {
+  Foundation: "oklch(0.72 0.12 75)",
+  Intermediate: "oklch(0.65 0.10 230)",
+  Advanced: "oklch(0.62 0.10 45)",
+};
+
+function CsuSubjectCard({ subject }: { subject: CsuSubject }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div
+      className="cellar-card p-5 flex flex-col gap-3"
+      style={{ border: "1px solid var(--ow-border)" }}
+    >
+      {/* Header row */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <span
+              style={{
+                fontFamily: "'Fira Code',monospace",
+                fontSize: "0.7rem",
+                color: "var(--ow-amber)",
+                letterSpacing: "0.08em",
+              }}
+            >
+              {subject.code}
+            </span>
+            <span
+              className="text-xs px-2 py-0.5 rounded-sm"
+              style={{
+                fontFamily: "'Fira Code',monospace",
+                fontSize: "0.65rem",
+                color: CSU_LEVEL_COLORS[subject.level],
+                background: `color-mix(in oklch, ${CSU_LEVEL_COLORS[subject.level]} 12%, transparent)`,
+                border: `1px solid color-mix(in oklch, ${CSU_LEVEL_COLORS[subject.level]} 25%, transparent)`,
+              }}
+            >
+              {subject.level}
+            </span>
+          </div>
+          <h3
+            style={{
+              fontFamily: "'Fraunces',serif",
+              fontWeight: 600,
+              fontSize: "1rem",
+              lineHeight: 1.25,
+              color: "var(--ow-text-hi)",
+            }}
+          >
+            {subject.name}
+          </h3>
+        </div>
+        <div
+          className="flex-shrink-0 w-8 h-8 rounded-sm flex items-center justify-center"
+          style={{ background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
+        >
+          <GraduationCap size={14} style={{ color: "var(--ow-amber)" }} />
+        </div>
+      </div>
+
+      {/* Key topics toggle */}
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="flex items-center gap-2 text-xs transition-colors"
+        style={{
+          fontFamily: "'Lato',sans-serif",
+          color: "var(--ow-text-lo)",
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          padding: 0,
+        }}
+      >
+        <span>{expanded ? "▾" : "▸"}</span>
+        {expanded ? "Hide" : "Show"} key topics ({subject.keyTopics.length})
+      </button>
+
+      {expanded && (
+        <ul className="flex flex-col gap-1.5 pl-3">
+          {subject.keyTopics.map((t, i) => (
+            <li
+              key={i}
+              className="flex items-start gap-2"
+              style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem", lineHeight: 1.55, color: "var(--ow-text-mid)" }}
+            >
+              <span style={{ color: "var(--ow-amber)", flexShrink: 0, marginTop: "0.15rem" }}>·</span>
+              {t}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Footer links */}
+      <div className="flex items-center gap-3 mt-auto pt-3" style={{ borderTop: "1px solid var(--ow-border)" }}>
+        <Link
+          href={subject.ownologyLink}
+          className="text-xs px-3 py-1 rounded-sm transition-all"
+          style={{
+            fontFamily: "'Lato',sans-serif",
+            color: "var(--ow-amber)",
+            background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
+            textDecoration: "none",
+          }}
+        >
+          {subject.ownologyLabel}
+        </Link>
+        <a
+          href={subject.handbookUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-auto flex items-center gap-1 text-xs"
+          style={{
+            fontFamily: "'Fira Code',monospace",
+            fontSize: "0.65rem",
+            color: "var(--ow-text-lo)",
+            textDecoration: "none",
+            letterSpacing: "0.05em",
+          }}
+        >
+          CSU Handbook <ExternalLink size={10} />
+        </a>
       </div>
     </div>
   );
@@ -495,6 +729,53 @@ export default function FreeRun() {
               </a>
             </div>
           </div>
+        </div>
+
+        {/* ── Knowledge Platform bridge ── */}
+        <div className="mt-16 p-6 rounded-sm flex flex-col md:flex-row md:items-center gap-5" style={{ background: "var(--ow-bg-inset)", border: "1px solid var(--ow-border)" }}>
+          <div className="flex-shrink-0 w-10 h-10 rounded-sm flex items-center justify-center" style={{ background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)" }}>
+            <BookOpen size={18} style={{ color: "var(--ow-amber)" }} />
+          </div>
+          <div className="flex-1">
+            <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "1rem", color: "var(--ow-text-hi)", lineHeight: 1.25 }}>
+              From learning to doing
+            </p>
+            <p className="mt-1" style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.875rem", lineHeight: 1.65, color: "var(--ow-text-mid)", maxWidth: "520px" }}>
+              Every lesson here connects to a live SOP in the Knowledge Platform — your winery’s operational procedures, decision logic, and vintage lessons in one place.
+            </p>
+          </div>
+          <Link
+            href="/knowledge"
+            className="flex-shrink-0 text-sm px-4 py-2 rounded-sm transition-all"
+            style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-amber)", background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)", textDecoration: "none", whiteSpace: "nowrap" }}
+          >
+            Open Knowledge Platform →
+          </Link>
+        </div>
+
+        {/* ── CSU Academic Backbone ── */}
+        <div className="mt-16">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-6 h-6 rounded-sm flex items-center justify-center flex-shrink-0" style={{ background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}>
+              <GraduationCap size={12} style={{ color: "var(--ow-amber)" }} />
+            </div>
+            <h2 style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "clamp(1.2rem,2.5vw,1.6rem)", lineHeight: 1.15, color: "var(--ow-text-hi)" }}>
+              The Academic Backbone
+            </h2>
+          </div>
+          <p className="mb-6" style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.9rem", lineHeight: 1.7, color: "var(--ow-text-mid)", maxWidth: "580px" }}>
+            The oenology content on this platform draws on the publicly available curriculum of Charles Sturt University’s Bachelor of Wine Science — Australia’s leading wine science degree. Each card below references the relevant CSU subject and links directly to the corresponding Ownology SOPs.
+          </p>
+          <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
+            {CSU_SUBJECTS.map(s => (
+              <CsuSubjectCard key={s.code} subject={s} />
+            ))}
+          </div>
+          <p className="mt-4 text-xs" style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-text-lo)", fontStyle: "italic" }}>
+            Subject outlines sourced from the{" "}
+            <a href="https://handbook.csu.edu.au/course/2026/4410ws01" target="_blank" rel="noopener noreferrer" style={{ color: "var(--ow-amber)", textDecoration: "none" }}>CSU Handbook 2026</a>
+            {" "}— publicly available information only. All SOP content is original and independently authored.
+          </p>
         </div>
 
         {/* ── Vocabulary section ── */}

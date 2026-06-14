@@ -155,6 +155,19 @@ const SECTIONS: Section[] = [
       { label: "Equipment fault log",              href: "/cellar-tasks",  anchor: "Cellar Tasks → expand equipment → Log Fault button", sprint: "S6", dr: "DR-10", desc: "Fault log task type (red badge) with fault description, downtime hours, resolution, and notes fields. Inline form per equipment item.", status: "live" },
     ],
   },
+  {
+    title: "Sprint 7 — Knowledge Platform (SOP Library, Decision Logic, Vintage Notes, Training Records)",
+    icon: "📚",
+    items: [
+      { label: "Knowledge Platform home",        href: "/knowledge",      sprint: "S7", desc: "8-category SOP library grid with search, category filter, and quick-access cards. Seeded with 31 pre-written SOPs across Fermentation, Sanitation, Barrels, Bottling, Lab, Onboarding, Food Safety, and Traceability.", status: "live" },
+      { label: "SOP detail view",                href: "/knowledge",      anchor: "Knowledge → any category → click any SOP card", sprint: "S7", desc: "Full SOP procedure text, Decision Logic notes (winemaker reasoning), Tribal Knowledge field (equipment quirks, supplier preferences), and Vintage Notes history.", status: "live" },
+      { label: "Vintage Lessons Log",            href: "/knowledge",      anchor: "Knowledge → any SOP → Vintage Notes tab → Add Note", sprint: "S7", desc: "Per-SOP vintage notes with What Worked, What Failed, Seasonal Observations, and Winemaker Notes fields. Grouped by vintage year.", status: "live" },
+      { label: "Training Records module",        href: "/knowledge",      anchor: "Knowledge → Training Records tab → New Session", sprint: "S7", desc: "Create training sessions with title, date, trainer, trainees, and topics covered. Downloadable sign-off record. Full session history.", status: "live" },
+      { label: "Tribal Knowledge capture",       href: "/knowledge",      anchor: "Knowledge → any SOP → Tribal Knowledge field → Edit", sprint: "S7", desc: "Per-SOP free-text field for equipment quirks, preferred suppliers, site-specific practices, and winemaker preferences — the knowledge that never makes it into formal SOPs.", status: "live" },
+      { label: "CSU Academic Backbone",          href: "/free-run",       anchor: "Free Run → scroll to 'The Academic Backbone' section", sprint: "S7", desc: "6 CSU Bachelor of Wine Science subject cards (WSC202, WSC318, WSC319, WSC303, WSC321, MCR101) with key topics and links to corresponding Ownology SOPs. Sourced from CSU Handbook 2026 (public information only).", status: "live" },
+      { label: "Free Run → Knowledge bridge",    href: "/free-run",       anchor: "Free Run → 'From learning to doing' banner", sprint: "S7", desc: "Banner linking Free Run lessons to live SOPs in the Knowledge Platform — closing the loop between education and operations.", status: "live" },
+    ],
+  },
 ];
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
@@ -251,7 +264,7 @@ export default function BuildIndex() {
             BUILD INDEX
           </span>
           <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", color: TEXT_LO, letterSpacing: "0.08em" }}>
-            v3 · 6 sprints · 27/27 DRs met — remove before launch
+            v4 · 7 sprints · 27/27 DRs met · 31 SOPs seeded — remove before launch
           </span>
         </div>
         <Link href="/" style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", fontWeight: 300, color: TEXT_LO, textDecoration: "none" }}>
@@ -266,10 +279,10 @@ export default function BuildIndex() {
           style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
         >
           {[
-            { label: "Pages & Features", value: "55" },
-            { label: "Sprints completed", value: "6" },
+            { label: "Pages & Features", value: "62" },
+            { label: "Sprints completed", value: "7" },
             { label: "DRs fully met", value: "27 / 27" },
-            { label: "Build status", value: "COMPLETE" },
+            { label: "SOPs seeded", value: "31" },
           ].map(s => (
             <div key={s.label} className="flex flex-col">
               <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "1.1rem", color: AMBER, fontWeight: 700 }}>{s.value}</span>

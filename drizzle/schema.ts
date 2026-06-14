@@ -555,3 +555,88 @@ export const vineyardObservations = mysqlTable(
     index("vo_vintage_idx").on(t.vintageYear),
   ]
 );
+
+// ─── Knowledge Platform — SOP Library (Sprint 7) ────────────────────────────
+// One row per SOP. Pre-seeded with 8 categories × 4–6 SOPs each.
+// is_template = true means the procedure_text was platform-authored and can be
+// overridden by the winery owner. decision_logic and tribal_knowledge are always
+// owner-authored.
+export const sopLibrary = mysqlTable(
+  "sop_library",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // SOP category (one of the 8 high-value categories)
+    category: varchar("category", { length: 100 }).notNull(),
+    // Sort order within category (1-based)
+    sortOrder: int("sort_order").notNull().default(1),
+    // Short title (e.g. "Yeast Selection Criteria")
+    title: varchar("title", { length: 255 }).notNull(),
+    // Full step-by-step procedure text (Markdown)
+    procedureText: text("procedure_text"),
+    // Winemaker's decision logic — why this approach was chosen
+    decisionLogic: text("decision_logic"),
+    // Tribal knowledge — equipment quirks, supplier preferences, site practices
+    tribalKnowledge: text("tribal_knowledge"),
+    // CSU subject reference code(s) e.g. "WSC202, WSC318"
+    csuSubjectRef: varchar("csu_subject_ref", { length: 100 }),
+    // Whether this SOP was platform-authored (true) or fully custom (false)
+    isTemplate: boolean("is_template").notNull().default(true),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("sop_category_idx").on(t.category),
+    index("sop_sort_idx").on(t.category, t.sortOrder),
+  ]
+);
+
+// ─── Knowledge Platform — SOP Vintage Notes (Sprint 7) ──────────────────────
+// One row per (sop_id, vintage_year) entry. Captures what worked, what failed,
+// and what to change next vintage. Optionally linked to a wine batch.
+export const sopVintageNotes = mysqlTable(
+  "sop_vintage_notes",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    sopId: int("sop_id").notNull(),
+    vintageYear: int("vintage_year").notNull(),
+    whatWorked: text("what_worked"),
+    whatFailed: text("what_failed"),
+    whatToChange: text("what_to_change"),
+    // Optional link to a wine_batches row
+    linkedBatchId: int("linked_batch_id"),
+    createdBy: varchar("created_by", { length: 255 }),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("svn_sop_idx").on(t.sopId),
+    index("svn_vintage_idx").on(t.vintageYear),
+  ]
+);
+
+// ─── Knowledge Platform — SOP Training Records (Sprint 7) ───────────────────
+// One row per trainee per training session. Multiple trainees per session are
+// stored as multiple rows sharing the same sop_id + trained_at + trainer_name.
+export const sopTrainingRecords = mysqlTable(
+  "sop_training_records",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    sopId: int("sop_id").notNull(),
+    // UTC ms timestamp of the training session
+    trainedAt: bigint("trained_at", { mode: "number" }).notNull(),
+    trainerName: varchar("trainer_name", { length: 255 }).notNull(),
+    traineeName: varchar("trainee_name", { length: 255 }).notNull(),
+    traineeRole: varchar("trainee_role", { length: 100 }),
+    // completed | in_progress | not_started
+    status: mysqlEnum("status", ["completed", "in_progress", "not_started"])
+      .notNull()
+      .default("completed"),
+    notes: text("notes"),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("str_sop_idx").on(t.sopId),
+    index("str_trainee_idx").on(t.traineeName),
+    index("str_trained_at_idx").on(t.trainedAt),
+  ]
+);
