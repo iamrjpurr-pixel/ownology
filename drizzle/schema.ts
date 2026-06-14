@@ -208,6 +208,8 @@ export const wineBatches = mysqlTable(
     quantityUnit: mysqlEnum("quantity_unit", ["kg", "t", "L"]).default("kg"),
     // Optional: linked tank name from the vintage log
     tankName: varchar("tank_name", { length: 128 }),
+    // Volume in litres at start of fermentation (optional — entered by winemaker)
+    volumeLitres: int("volume_litres"),
     // Per-phase winemaker notes stored as JSON:
     // { receival: string, fermentation: string, postFerment: string, stabilising: string, bottling: string }
     notesJson: text("notes_json").notNull(),

@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `wine_batches` ADD `volume_litres` int;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4HByWUH885AfJUE.9472483f21d7 --database kjXA9MRaPtPLGHog5yynHZ --execute ALTER TABLE `wine_batches` ADD `volume_litres` int;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2011
+}

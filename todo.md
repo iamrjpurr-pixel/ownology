@@ -266,3 +266,29 @@
 - [x] Build /for-home-winemakers/troubleshooting page (8 common faults, causes, fixes — searchable accordion)
 - [x] Build /for-home-winemakers/glossary page (50+ terms, A-Z filter, search — SEO-optimised)
 - [x] Wire all new resource routes in App.tsx
+
+## Sprint 1 — Visibility & Intelligence Layer (Value Engineering Roadmap)
+- [x] [DR-19] Build /dashboard Production Dashboard page: tank count, active ferment count, bottling queue, compact tank status grid — queries existing tRPC procedures, no new schema
+- [x] [DR-04] Add volumeLitres field to vintage_batches table, surface in VintageEntrySheet and Tank Summary cards, push migration
+- [x] [DR-01] Add vintageLog.interpretMeasurement tRPC procedure: calls LLM with measurement value + variety + days-since-inoculation, returns one-sentence interpretation shown inline on log entry card
+- [x] [DR-20] Add Export Log button to The Press: client-side print-to-PDF of all log entries for selected tank + vintage period
+- [x] [DR-11] Format Export Log PDF as LIP-compliant Winemaker's Log (lot number, variety, GI, grower, additions with quantities and dates, racking history)
+
+## Sprint 2 — Operational Depth (Value Engineering Roadmap)
+- [ ] [DR-02] Build Reminders & Alarms: tank_reminders table (tank_id, event_type, interval_hours, last_triggered), tRPC CRUD, UI in The Press to set reminders per tank, Heartbeat handler fires notifyOwner for overdue reminders
+- [ ] [DR-08] Build Barrel sub-module: barrels table (barrel_id, oak_type, age_years, fill_date, last_topped_date, wine_lot, notes), tRPC CRUD, new Barrels tab in The Press, topping event logging
+- [ ] [DR-03] Extend Cellar Tasks: add vessel_id nullable field to cellar_tasks, vessel selector in task creation UI, task history filter by vessel — links cleaning events to tank/barrel IDs
+- [ ] [DR-07] Add Pre-Harvest Sample event type to Vintage Log: fields = block name, sample date, Brix, TA, pH, phenolic assessment dropdown (unripe/developing/ripe/over-ripe)
+- [ ] [DR-10] Extend Cellar Tasks with Maintenance category: add fault_type, resolution_notes, downtime_hours fields, maintenance history view on equipment record
+- [ ] [DR-12] Add Bottling Run event type to Vintage Log: fields = bottling date, volume litres, bottle format, lot number, label name; Trace Lot query UI in The Press
+
+## Sprint 3 — Commercial Intelligence (Value Engineering Roadmap)
+- [ ] [DR-14] Add optional cost_per_unit and cost_currency fields to Addition events in vintage_log_entries; cost summary section on Production Dashboard
+- [ ] [DR-13] Build Packaging Inventory Tracker: packaging_inventory table (item_type, quantity, unit, reorder_threshold), tRPC CRUD, Packaging tab on Production Dashboard, auto-deduct on Bottling Run event
+- [ ] [DR-05] Add Weather Event event type to Vintage Log: fields = event type dropdown (frost/heat wave/hail/heavy rain/smoke/other), date, severity, affected tanks multi-select
+- [ ] [DR-16] Add Share Vintage button to Batch Book: LLM generates tasting note from observation log entries, renders one-page vintage card PDF (variety, GI, grower, vintage, key measurements, tasting note)
+
+## Sprint 4 — Strategic Completeness (Value Engineering Roadmap)
+- [ ] [DR-06] Build Vineyard section: vineyard_blocks table (block_name, variety, area_ha, row_count), vineyard_events table (block_id, event_type, date, severity, treatment), new /vineyard page, link blocks to Pre-Harvest Sample log
+- [ ] [DR-15] Extend Production Dashboard with Planning tab: projected bottling dates, estimated litres at bottling, vintage comparison table (current vs prior vintages by variety and volume)
+- [ ] [DR-17] Add Cellar Value section to Production Dashboard: user enters cost-per-litre, system calculates volume × cost × days-aging per tank and total tied capital estimate

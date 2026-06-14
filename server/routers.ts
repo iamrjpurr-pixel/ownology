@@ -426,6 +426,53 @@ const vintageLogRouter = router({
       await deleteVintageLogEntry(input.id, dbUser.id);
       return { success: true };
     }),
+
+  // ── DR-01: Inline AI interpretation of measurement log entries ──────────────
+  interpretMeasurement: protectedProcedure
+    .input(
+      z.object({
+        tankName: z.string(),
+        variety: z.string(),
+        details: z.record(z.string(), z.unknown()),
+        // Optional context: recent entries for the same tank
+        recentContext: z.string().max(2000).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      const detailsText = Object.entries(input.details)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join(", ");
+
+      const systemPrompt = `You are a concise winemaking assistant. Given a measurement log entry, provide a brief (2-4 sentence) professional interpretation. Focus on:
+- Whether the reading is within normal range for this stage of winemaking
+- Any immediate action recommended (e.g., SO₂ addition, nutrient addition, racking)
+- Any risk flag if the value is outside acceptable range
+Be direct and practical. Use winemaking terminology. Do not repeat the values back verbatim.`;
+
+      const userMessage = `Tank: ${input.tankName} (${input.variety})
+Measurement: ${detailsText}${input.recentContext ? `\nRecent context: ${input.recentContext}` : ""}`;
+
+      const resp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userMessage },
+          ],
+          stream: false,
+        }),
+      });
+
+      if (!resp.ok) throw new Error("LLM request failed");
+      const data = await resp.json();
+      const interpretation = data.choices?.[0]?.message?.content ?? "Unable to interpret this measurement.";
+      return { interpretation };
+    }),
 });
 
 // ─── Tank Reminders Router ──────────────────────────────────────────────────────────────────────────────
@@ -490,6 +537,7 @@ const wineBatchRouter = router({
         quantityValue: z.string().max(32).optional(),
         quantityUnit: z.enum(["kg", "t", "L"]).optional(),
         tankName: z.string().max(128).optional(),
+        volumeLitres: z.number().int().min(1).max(1000000).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -524,6 +572,7 @@ const wineBatchRouter = router({
         quantityValue: z.string().max(32).optional(),
         quantityUnit: z.enum(["kg", "t", "L"]).optional(),
         tankName: z.string().max(128).optional(),
+        volumeLitres: z.number().int().min(1).max(1000000).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -1150,6 +1199,97 @@ const cellarTasksRouter = router({
     }),
 });
 
+// ─── Production Dashboard Router ──────────────────────────────────────────────
+// Aggregates across all vintage log entries and wine batches for the dashboard.
+
+const dashboardRouter = router({
+  getStats: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return null;
+
+    const now = Date.now();
+    const fourteenDaysAgo = now - 14 * 24 * 60 * 60 * 1000;
+
+    // All log entries for this user (up to 500 for aggregation)
+    const allEntries = await listVintageLogEntries(dbUser.id, 500);
+
+    // All wine batches
+    const batches = await listWineBatches(dbUser.id);
+
+    // Unique tank names from log entries
+    const tankNames = Array.from(new Set(allEntries.map((e) => e.tankName))).sort();
+
+    // Per-tank summary
+    const tankSummaries = tankNames.map((tankName) => {
+      const entries = allEntries.filter((e) => e.tankName === tankName);
+      const inoculationEntry = entries.find((e) => e.eventType === "inoculation");
+      const lastEntry = entries[0]; // already sorted desc by entryAt
+      const variety = lastEntry?.variety ?? "Unknown";
+
+      // Days since inoculation
+      let daysSinceInoculation: number | null = null;
+      if (inoculationEntry) {
+        daysSinceInoculation = Math.floor((now - inoculationEntry.entryAt) / (24 * 60 * 60 * 1000));
+      }
+
+      // Active ferment = inoculated within 14 days
+      const isActiveFerment = daysSinceInoculation !== null && daysSinceInoculation <= 14;
+
+      // Last event type
+      const lastEventType = lastEntry?.eventType ?? null;
+      const lastEventAt = lastEntry?.entryAt ?? null;
+
+      // Linked batch volume
+      const linkedBatch = batches.find((b) => b.tankName === tankName);
+      const volumeLitres = linkedBatch?.volumeLitres ?? null;
+
+      return {
+        tankName,
+        variety,
+        daysSinceInoculation,
+        isActiveFerment,
+        lastEventType,
+        lastEventAt,
+        volumeLitres,
+        entryCount: entries.length,
+      };
+    });
+
+    // Aggregate counts
+    const activeFermentCount = tankSummaries.filter((t) => t.isActiveFerment).length;
+    const totalTanks = tankSummaries.length;
+    const totalLogEntries = allEntries.length;
+    const totalBatches = batches.length;
+
+    // Total litres in active ferment
+    const totalActiveFermentLitres = tankSummaries
+      .filter((t) => t.isActiveFerment && t.volumeLitres)
+      .reduce((sum, t) => sum + (t.volumeLitres ?? 0), 0);
+
+    // Tanks approaching bottling: inoculated 60-120 days ago (post-ferment window)
+    const approachingBottlingCount = tankSummaries.filter(
+      (t) => t.daysSinceInoculation !== null && t.daysSinceInoculation >= 60 && t.daysSinceInoculation <= 120
+    ).length;
+
+    // Recent additions (last 7 days)
+    const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+    const recentAdditions = allEntries.filter(
+      (e) => e.eventType === "addition" && e.entryAt >= sevenDaysAgo
+    ).length;
+
+    return {
+      totalTanks,
+      activeFermentCount,
+      totalActiveFermentLitres,
+      approachingBottlingCount,
+      totalLogEntries,
+      totalBatches,
+      recentAdditions,
+      tankSummaries,
+    };
+  }),
+});
+
 // ─── App Router ──────────────────────────────────────────────────────────────────────────────────────────────
 export const appRouter = router({
   campaignMetrics: campaignMetricsRouter,
@@ -1165,6 +1305,7 @@ export const appRouter = router({
   compliance: complianceRouter,
   cellarEquipment: cellarEquipmentRouter,
   cellarTasks: cellarTasksRouter,
+  dashboard: dashboardRouter,
 });
 
 export type AppRouter = typeof appRouter;

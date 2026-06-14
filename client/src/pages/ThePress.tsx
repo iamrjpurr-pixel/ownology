@@ -15,6 +15,8 @@ import MilestoneCalendar from "@/components/MilestoneCalendar";
 import TankReminderSheet from "@/components/TankReminderSheet";
 import WineBatchSheet from "@/components/WineBatchSheet";
 import KitWineTracker from "@/components/KitWineTracker";
+import MeasurementInterpretation from "@/components/MeasurementInterpretation";
+import ExportLogPDF from "@/components/ExportLogPDF";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface VintageEntry {
@@ -986,6 +988,25 @@ export default function ThePress() {
                 );
               })()}
 
+              {/* DR-20: Export Log PDF button */}
+              {hasEntries && (
+                <div className="flex justify-end mb-3">
+                  <ExportLogPDF
+                    entries={(filteredEntries).map((e) => ({
+                      id: e.id,
+                      entryAt: typeof e.entryAt === "number" ? e.entryAt : new Date(e.entryAt).getTime(),
+                      tankName: e.tankName,
+                      variety: e.variety,
+                      eventType: e.eventType,
+                      details: e.details as Record<string, unknown>,
+                      noteText: e.noteText,
+                      tags: e.tags,
+                    }))}
+                    tankFilter={filterTank || undefined}
+                  />
+                </div>
+              )}
+
               {/* Live entries with pull-to-refresh */}
               {hasEntries && (
                 <div
@@ -1173,6 +1194,15 @@ export default function ThePress() {
                                   </span>
                                 ))}
                               </div>
+                            )}
+
+                            {/* DR-01: Inline AI interpretation for measurement entries */}
+                            {entry.eventType === "measurement" && (
+                              <MeasurementInterpretation
+                                tankName={entry.tankName}
+                                variety={entry.variety}
+                                details={entry.details as Record<string, unknown>}
+                              />
                             )}
                           </div>
                         </div>

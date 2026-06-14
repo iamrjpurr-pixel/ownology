@@ -1,0 +1,1 @@
+ALTER TABLE `wine_batches` ADD `volume_litres` int;
