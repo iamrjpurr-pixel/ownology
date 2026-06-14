@@ -332,3 +332,6 @@
 
 ### Free Run page — ?q= param support
 - [x] Free Run page: read ?q= query param on mount, pre-fill question input, auto-submit once
+
+## SOP Database Seeding (Jun 2026)
+- [x] Seed sop_library table with 7 core DIY winemaker SOPs from references/diy-sops-content.md (Tank Cleaning, Red Wine Fermentation, Yeast Rehydration, Pump-Over, MLF Management, Pressing, Bottling)
