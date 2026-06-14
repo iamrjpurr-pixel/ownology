@@ -231,3 +231,10 @@
 - [x] Voice-to-text dictation button in note field (SpeechRecognition API, conditional render)
 - [x] Load-more pagination (20 entries at a time, shows remaining count)
 - [x] Mobile bottom tab bar (Log / Calc / Batches / More, hidden when any sheet is open, safe-area aware)
+
+## Milestone Calendar Feature (Jun 2026)
+- [x] MilestoneCalendar component: variety-aware date logic (red/white/rosé), per-tank timeline bars, status badges (NOW/OVERDUE/UPCOMING), completed milestone detection from log events
+- [x] Calendar tab added to The Press (desktop tab bar + mobile bottom tab bar)
+- [x] Log Entry shortcut from calendar card opens VintageEntrySheet pre-filled for that tank
+- [x] Empty state when no inoculation events logged
+- [x] Sources cited: Iland et al. (2004), Zoecklein et al. (1999), Ownology Field to Glass KB

@@ -11,6 +11,7 @@ import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
 import VintageEntrySheet from "@/components/VintageEntrySheet";
+import MilestoneCalendar from "@/components/MilestoneCalendar";
 import TankReminderSheet from "@/components/TankReminderSheet";
 import WineBatchSheet from "@/components/WineBatchSheet";
 
@@ -136,7 +137,7 @@ function SectionHeader({ label, title, subtitle }: { label: string; title: strin
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function ThePress() {
-  const [activeTab, setActiveTab] = useState<"log" | "calcs" | "scenarios" | "notes">("log");
+  const [activeTab, setActiveTab] = useState<"log" | "calcs" | "scenarios" | "notes" | "calendar">("log");
   // Batch Book state
   const [batchSheetOpen, setBatchSheetOpen] = useState(false);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
@@ -282,6 +283,7 @@ export default function ThePress() {
 
   const tabs = [
     { id: "log" as const, label: "Vintage Log", icon: "📋" },
+    { id: "calendar" as const, label: "Milestones", icon: "📅" },
     { id: "calcs" as const, label: "Calculations", icon: "⚗" },
     { id: "scenarios" as const, label: "Cellar Scenarios", icon: "🔬" },
     { id: "notes" as const, label: "Batch Book", icon: "📖" },
@@ -1153,6 +1155,30 @@ export default function ThePress() {
             </div>
           )}
 
+          {/* Milestone Calendar */}
+          {activeTab === "calendar" && (
+            <div>
+              <SectionHeader
+                label="Projected Timeline"
+                title="Milestone Calendar"
+                subtitle="Auto-calculated racking, pressing, and bottling windows for each tank — based on inoculation date and variety."
+              />
+              <MilestoneCalendar
+                logEntries={(logEntries ?? []).map((e) => ({
+                  id: e.id,
+                  tankName: e.tankName,
+                  variety: e.variety,
+                  eventType: e.eventType,
+                  entryAt: typeof e.entryAt === "number" ? e.entryAt : new Date(e.entryAt).getTime(),
+                  noteText: e.noteText,
+                  tags: e.tags ?? [],
+                  details: (e.details as Record<string, unknown>) ?? {},
+                }))}
+                onAddEntry={(tankName) => { setQuickEntryTank(tankName); setEntrySheetOpen(true); }}
+              />
+            </div>
+          )}
+
           {/* Calculations */}
           {activeTab === "calcs" && (
             <div>
@@ -1679,6 +1705,15 @@ export default function ThePress() {
                   <path d="M4 4h10v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4z" stroke="currentColor" strokeWidth="1.3" />
                   <path d="M7 4V2h4v2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
                   <path d="M6 8h6M6 11h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
+              )},
+              { id: "calendar" as const, label: "Calendar", icon: (
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <rect x="2" y="4" width="14" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
+                  <path d="M6 2v4M12 2v4M2 8h14" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                  <circle cx="6" cy="12" r="1" fill="currentColor" />
+                  <circle cx="9" cy="12" r="1" fill="currentColor" />
+                  <circle cx="12" cy="12" r="1" fill="currentColor" />
                 </svg>
               )},
               { id: "scenarios" as const, label: "More", icon: (
