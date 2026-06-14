@@ -52,7 +52,7 @@ const FAQS = [
   },
   {
     q: "How long does setup take? We are flat out during vintage.",
-    a: "Most wineries are up and running in under two hours. You upload your existing SOPs and protocols (even rough Word documents or PDFs work), and Ownology indexes them immediately. There is no lengthy onboarding, no IT project, and no hardware to install. The system is designed to be useful from day one — and to get smarter the more you use it.",
+    a: "Most wineries are up and running in under two hours. Ownology ships with 31 industry-standard SOPs already loaded — so the Knowledge Platform is useful from the moment you log in, before you've added a single document of your own. Add your own protocols and vintage records at any pace. There is no lengthy onboarding, no IT project, and no hardware to install.",
   },
   {
     q: "Do I need to be tech-savvy to use this?",
@@ -60,7 +60,7 @@ const FAQS = [
   },
   {
     q: "What happens if the AI gives a wrong answer?",
-    a: "Every answer Ownology provides is grounded in your documents and verified wine science literature — it cannot invent a protocol that does not exist in your vault. Every response includes a source citation so you can verify it instantly. The system is also designed to say 'I don't know' rather than guess. And critically, Ownology never makes a decision — it informs yours. The winemaker always has the final call.",
+    a: "Every answer Free Run provides is grounded in your winery's own SOPs and verified wine science literature — it cannot invent a protocol that does not exist in your Knowledge Platform. Every response includes a source citation so you can verify it instantly. The system is also designed to say 'I don't know' rather than guess. And critically, Ownology never makes a decision — it informs yours. The winemaker always has the final call.",
   },
   {
     q: "Will Ownology replace me as the winemaker?",
@@ -72,7 +72,7 @@ const FAQS = [
   },
   {
     q: "What does it cost, and is there a free trial?",
-    a: "Ownology starts at $99/month for the Cellar tier (up to 3 users, full Knowledge Assistant and Smart Logbook). All plans include a 14-day free trial — no credit card required. If you are a consulting winemaker managing multiple clients, contact us about the Consultant tier, which is purpose-built for your workflow.",
+    a: "Ownology starts at $99/month for the Harvest tier — full access to The Press, the Knowledge Platform (31 SOPs), Free Run AI assistant, and Compliance AI, for up to 2 users. The Cellar tier ($249/month) adds Vineyard, Cellar Tasks, and Decision Logic capture for up to 5 users. All plans include a 14-day free trial — no credit card required. Consulting winemakers managing multiple clients should contact us about the Consultant tier.",
   },
 ];
 

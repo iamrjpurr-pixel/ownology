@@ -55,7 +55,7 @@ function useInView(threshold = 0.15) {
 }
 
 // ─── What's New ribbon ──────────────────────────────────────────────────────
-const WHATS_NEW_KEY = "ownology-whats-new-v1";
+const WHATS_NEW_KEY = "ownology-whats-new-v2";
 
 function WhatsNewRibbon() {
   const [dismissed, setDismissed] = useState(() => {
@@ -101,13 +101,13 @@ function WhatsNewRibbon() {
           margin: 0,
         }}
       >
-        <strong style={{ fontWeight: 600, color: "var(--ow-text-hi)" }}>Vintage Log &amp; Batch Book</strong> are live —
+        <strong style={{ fontWeight: 600, color: "var(--ow-text-hi)" }}>Knowledge Platform</strong> is live — 31 industry SOPs, Decision Logic &amp; Tribal Knowledge capture.
         {" "}
         <Link
-          href="/the-press"
+          href="/knowledge"
           style={{ color: "var(--ow-amber)", textDecoration: "none", borderBottom: "1px solid var(--ow-amber)" }}
         >
-          start logging your 2026 vintage
+          Explore the platform
         </Link>
       </p>
       <button
@@ -140,29 +140,27 @@ const PRIMARY_NAV: NavItem[] = [
   { label: "How It Works", href: "#how-it-works" },
   { label: "See Demo",     href: "#demo" },
   { label: "Why Ownology", href: "/why-ownology" },
-  { label: "⚙ Build Index", href: "/build-index" }, // REMOVE BEFORE LAUNCH
 ];
-// Secondary links — grouped by product pillar
-// Operational: cellar tools
+// Secondary links — grouped by four product pillars
+// DO pillar: operational cellar tools
 const VINTAGE_NAV: NavItem[] = [
   { label: "Dashboard",    href: "/dashboard" },
   { label: "The Press",    href: "/the-press" },
   { label: "Cellar Tasks", href: "/cellar-tasks" },
   { label: "Vineyard",     href: "/vineyard" },
   { label: "Quick Entry",  href: "/quick-entry" },
-  { label: "Free Run",     href: "/free-run" },
 ];
-// Knowledge: regulatory intelligence
+// KNOW pillar: knowledge platform + compliance
 const KNOWLEDGE_NAV: NavItem[] = [
-  { label: "Regulations",  href: "/regulations" },
-  { label: "Compliance",   href: "/compliance" },
+  { label: "Knowledge Platform", href: "/knowledge" },
+  { label: "Compliance AI",      href: "/compliance" },
 ];
-// Business: brand and commercial
+// LEARN pillar + business
 const BUSINESS_NAV: NavItem[] = [
+  { label: "Free Run",            href: "/free-run" },
   { label: "Why Ownology",        href: "/why-ownology" },
   { label: "For Home Winemakers", href: "/for-home-winemakers" },
   { label: "Blog",                href: "/blog" },
-  { label: "Merch",               href: "/merch" },
 ];
 const MORE_NAV: NavItem[] = [
   { label: "Our Story",    href: "#our-story" },
@@ -234,15 +232,15 @@ function MoreDropdown({ extraItems }: { extraItems?: NavItem[] }) {
           {/* Three-column pillar section */}
           <div className="grid grid-cols-3" style={{borderTop: "1px solid var(--ow-border)"}}>
             <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>In the Cellar</p>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Do — Cellar Tools</p>
               {VINTAGE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
             </div>
             <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Compliance</p>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Know — Knowledge</p>
               {KNOWLEDGE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
             </div>
             <div className="py-3 px-1">
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>About &amp; More</p>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Learn &amp; More</p>
               {BUSINESS_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
               {extraItems?.map(item => <NavLink key={item.label} item={item} close={close} />)}
             </div>
@@ -517,12 +515,12 @@ function Hero() {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left — copy */}
           <div>
-            <EditableText contentKey="home.hero.label" defaultValue="AI Knowledge Assistant for Winemakers" as="p" className="section-label mb-6 fade-up" contentMap={contentMap} />
+            <EditableText contentKey="home.hero.label" defaultValue="Cellar Intelligence Platform for Winemakers" as="p" className="section-label mb-6 fade-up" contentMap={contentMap} />
             <h1 className="fade-up fade-up-delay-1"
               style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,4rem)", lineHeight:1.1, color:"var(--ow-text-hi)", letterSpacing:"-0.02em"}}>
               <EditableText contentKey="home.hero.headline" defaultValue="Your cellar's most knowledgeable apprentice." contentMap={contentMap} />
             </h1>
-            <EditableText contentKey="home.hero.subheading" defaultValue="Ownology gives boutique winery teams instant, document-grounded answers to their toughest cellar questions — from a mobile phone, in seconds, during harvest." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
+            <EditableText contentKey="home.hero.subheading" defaultValue="Log cellar readings. Access 31 industry SOPs. Ask the AI anything. Stay compliant. Ownology is the complete intelligence platform for boutique winery teams — on a mobile phone, during harvest." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-10 fade-up fade-up-delay-3">
               <a href="/pricing" className="btn-amber text-center">Start 14-Day Free Trial</a>
               <a href="#how-it-works" className="btn-ghost text-center">See How It Works</a>
@@ -715,23 +713,23 @@ function Features() {
             </div>
           </div>
 
-          {/* Feature 4 — Document Vault */}
+          {/* Feature 4 — Knowledge Platform */}
           <div className={`md:col-span-2 cellar-card overflow-hidden ${inView ? "fade-up fade-up-delay-3" : "opacity-0"}`}>
             <div className="grid md:grid-cols-2 gap-0 h-full">
               <div className="p-8">
                 <div className="w-10 h-10 rounded-sm flex items-center justify-center mb-5" style={{background:"oklch(0.62 0.10 45 / 12%)", border:"1px solid oklch(0.62 0.10 45 / 25%)"}}>
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <path d="M4 3h7l3 3v9a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="oklch(0.62 0.10 45)" strokeWidth="1.5"/>
-                    <path d="M11 3v4h3" stroke="oklch(0.62 0.10 45)" strokeWidth="1.5" strokeLinejoin="round"/>
-                    <path d="M6 10h6M6 13h4" stroke="oklch(0.62 0.10 45)" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M3 4h12v10H3z" stroke="oklch(0.62 0.10 45)" strokeWidth="1.5" strokeLinejoin="round"/>
+                    <path d="M7 4V2M11 4V2" stroke="oklch(0.62 0.10 45)" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M6 8h6M6 11h4" stroke="oklch(0.62 0.10 45)" strokeWidth="1.5" strokeLinecap="round"/>
                   </svg>
                 </div>
-                <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.375rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>Document Vault</h3>
+                <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.375rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>Knowledge Platform</h3>
                 <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7}}>
-                  Upload your SOPs, vintage reports, sensory notes, and protocols. Ownology indexes them instantly — making every document searchable through natural conversation. Your institutional memory, finally accessible.
+                  31 industry-standard SOPs across 8 categories — from fermentation management to bottling. Capture the reasoning behind every decision in Decision Logic. Preserve your team's accumulated experience in Tribal Knowledge. Your winery's institutional memory, searchable and permanent.
                 </p>
                 <div className="mt-6 flex flex-col gap-2">
-                  {["Shiraz Harvest Protocol 2024.pdf","SO2 Management SOP.docx","Fermentation Targets — All Varieties.pdf","Bottling Line Cleaning Procedure.pdf"].map(f=>(
+                  {["Fermentation Management · 6 SOPs","Additions & Nutrients · 5 SOPs","Cleaning & Sanitation · 4 SOPs","Packaging & Bottling · 4 SOPs"].map(f=>(
                     <div key={f} className="flex items-center gap-3 px-3 py-2 rounded-sm" style={{background:"var(--ow-bg-base)"}}>
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                         <path d="M3 2h5l2 2v6a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="oklch(0.62 0.10 45)" strokeWidth="1"/>
@@ -759,10 +757,10 @@ function Features() {
 function HowItWorks() {
   const { ref, inView } = useInView();
   const steps = [
-    { n:"01", title:"Upload Your Documents", body:"Add your SOPs, vintage reports, and protocols to the Document Vault. Ownology indexes them automatically — no setup required." },
-    { n:"02", title:"Ask Anything", body:"Open the assistant on your phone in the cellar or vineyard. Ask in plain language — voice or text. No special commands, no menus." },
-    { n:"03", title:"Get Grounded Answers", body:"The assistant searches your documents and wine science literature simultaneously, then generates a precise, cited answer. Every response shows its source." },
-    { n:"04", title:"Log and Track", body:"Use the Smart Logbook to record daily readings by voice or photo. The Fermentation Dashboard tracks all active tanks and alerts you to anomalies." },
+    { n:"01", title:"Do — Log and Track", body:"Record cellar readings by voice or photo in The Press. The Fermentation Dashboard tracks all active tanks. Vineyard and Cellar Tasks keep your team aligned in real time." },
+    { n:"02", title:"Know — Access Your SOPs", body:"31 industry-standard SOPs across 8 categories, ready to use on day one. Add your own Decision Logic and Tribal Knowledge. Every protocol is searchable, every decision is documented." },
+    { n:"03", title:"Learn — Ask the AI", body:"Open Free Run and ask anything — from SO₂ calculations to stuck fermentation triage. The AI draws on your winery's own SOPs and world-class wine science, then delivers a precise, cited answer." },
+    { n:"04", title:"Guide — Stay Compliant", body:"The Compliance AI answers regulatory questions across LIP, FSANZ, and state licensing. Every answer is grounded in current legislation — not generic internet content." },
   ];
   return (
     <section id="how-it-works" className="py-28 relative overflow-hidden" style={{background:"var(--ow-bg-raised)"}}>
@@ -772,7 +770,7 @@ function HowItWorks() {
       <div className="container relative z-10" ref={ref}>
         <p className="section-label mb-4">How It Works</p>
         <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
-          From upload to answer in under a minute.
+          Do. Know. Learn. Guide.
         </h2>
         <div className="amber-rule mt-8 mb-16" />
 
@@ -909,17 +907,17 @@ function Pricing() {
   const tiers = [
     {
       name:"Harvest", price:"$99", period:"/month", cases:"Up to 5,000 cases",
-      features:["AI Knowledge Assistant","Document Vault (10 documents)","Smart Cellar Logbook","Fermentation Dashboard","2 user seats","14-day free trial"],
+      features:["The Press — cellar logbook & fermentation tracking","Knowledge Platform — 31 industry SOPs","Free Run — AI assistant","Compliance AI — regulatory Q&A","2 user seats","14-day free trial"],
       cta:"Start Free Trial", highlight:false,
     },
     {
       name:"Cellar", price:"$249", period:"/month", cases:"5,001–20,000 cases",
-      features:["Everything in Harvest","Unlimited documents","Fermentation anomaly alerts","5 user seats","Email & SMS notifications","Priority support"],
+      features:["Everything in Harvest","Vineyard & Cellar Tasks modules","Fermentation anomaly alerts","Decision Logic & Tribal Knowledge capture","5 user seats","Priority support"],
       cta:"Start Free Trial", highlight:true,
     },
     {
       name:"Estate", price:"$499", period:"/month", cases:"20,001+ cases",
-      features:["Everything in Cellar","Unlimited user seats","API access","Custom knowledge corpus","Dedicated onboarding","SLA guarantee"],
+      features:["Everything in Cellar","Unlimited user seats","Custom SOP library","Dedicated onboarding","API access","SLA guarantee"],
       cta:"Contact Us", highlight:false,
     },
   ];
