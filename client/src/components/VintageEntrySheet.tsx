@@ -32,7 +32,7 @@ function useIsDesktop() {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "other";
+type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "pre_harvest_sample" | "bottling_run" | "other";
 
 interface Props {
   open: boolean;
@@ -65,8 +65,10 @@ const EVENT_TYPES: { id: EventType; label: string; icon: string; description: st
   { id: "measurement", label: "Measurement", icon: "◎", description: "Brix, YAN, SO₂, TA, pH, VA, temp" },
   { id: "racking",     label: "Racking",     icon: "⇄", description: "Transfer between vessels" },
   { id: "inoculation", label: "Inoculation", icon: "✦", description: "Yeast, MLF bacteria inoculation" },
-  { id: "observation", label: "Observation", icon: "◉", description: "Sensory note, colour, aroma, visual" },
-  { id: "other",       label: "Other",       icon: "◈", description: "Anything else worth recording" },
+  { id: "observation",       label: "Observation",       icon: "◉", description: "Sensory note, colour, aroma, visual" },
+  { id: "pre_harvest_sample", label: "Pre-Harvest Sample", icon: "🌿", description: "Block sample: Brix, TA, pH, phenolics" },
+  { id: "bottling_run",       label: "Bottling Run",       icon: "🍾", description: "Volume, format, lot number, label" },
+  { id: "other",              label: "Other",              icon: "◈", description: "Anything else worth recording" },
 ];
 
 const ADDITION_WHAT = ["DAP", "Fermaid-O", "Fermaid-K", "SO₂ (sulfite)", "Tartaric acid", "Citric acid", "Bentonite", "Egg white fining", "Gelatin", "Oak chips", "Oak staves", "Tannin", "Yeast hulls", "Other"];
@@ -400,6 +402,91 @@ function ObservationDetails({
   );
 }
 
+function PreHarvestSampleDetails({
+  details,
+  onChange,
+}: {
+  details: Record<string, string>;
+  onChange: (d: Record<string, string>) => void;
+}) {
+  const set = (k: string, v: string) => onChange({ ...details, [k]: v });
+  return (
+    <div className="flex flex-col gap-4">
+      <div>
+        <FieldLabel>Block / Vineyard name</FieldLabel>
+        <TextInput value={details.blockName ?? ""} onChange={(v) => set("blockName", v)} placeholder="e.g. Block 3A, Home Vineyard" autoFocus />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <FieldLabel>Brix</FieldLabel>
+          <TextInput value={details.brix ?? ""} onChange={(v) => set("brix", v)} placeholder="e.g. 24.5" type="number" unit="°Bx" />
+        </div>
+        <div>
+          <FieldLabel>TA</FieldLabel>
+          <TextInput value={details.ta ?? ""} onChange={(v) => set("ta", v)} placeholder="e.g. 6.2" type="number" unit="g/L" />
+        </div>
+        <div>
+          <FieldLabel>pH</FieldLabel>
+          <TextInput value={details.ph ?? ""} onChange={(v) => set("ph", v)} placeholder="e.g. 3.45" type="number" />
+        </div>
+        <div>
+          <FieldLabel>YAN (mg/L)</FieldLabel>
+          <TextInput value={details.yan ?? ""} onChange={(v) => set("yan", v)} placeholder="e.g. 150" type="number" unit="mg/L" />
+        </div>
+      </div>
+      <div>
+        <FieldLabel>Phenolics / colour notes</FieldLabel>
+        <TextInput value={details.phenolics ?? ""} onChange={(v) => set("phenolics", v)} placeholder="e.g. Good colour, seeds browning 80%" />
+      </div>
+      <div>
+        <FieldLabel>Additional notes</FieldLabel>
+        <TextInput value={details.notes ?? ""} onChange={(v) => set("notes", v)} placeholder="e.g. Flavour development excellent, picking in 5 days" />
+      </div>
+    </div>
+  );
+}
+
+function BottlingRunDetails({
+  details,
+  onChange,
+}: {
+  details: Record<string, string>;
+  onChange: (d: Record<string, string>) => void;
+}) {
+  const set = (k: string, v: string) => onChange({ ...details, [k]: v });
+  const BOTTLE_FORMATS = ["750 mL", "375 mL (half)", "1.5 L (magnum)", "3 L (double magnum)", "Bag-in-box", "Other"];
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <FieldLabel>Volume bottled</FieldLabel>
+          <TextInput value={details.volumeL ?? ""} onChange={(v) => set("volumeL", v)} placeholder="e.g. 850" type="number" unit="L" autoFocus />
+        </div>
+        <div>
+          <FieldLabel>Lot / Batch number</FieldLabel>
+          <TextInput value={details.lotNumber ?? ""} onChange={(v) => set("lotNumber", v)} placeholder="e.g. SH-2024-001" />
+        </div>
+      </div>
+      <div>
+        <FieldLabel>Bottle format</FieldLabel>
+        <div className="flex flex-col gap-2">
+          {BOTTLE_FORMATS.map((f) => (
+            <OptionButton key={f} selected={details.format === f} onClick={() => set("format", f)}>{f}</OptionButton>
+          ))}
+        </div>
+      </div>
+      <div>
+        <FieldLabel>Label name</FieldLabel>
+        <TextInput value={details.labelName ?? ""} onChange={(v) => set("labelName", v)} placeholder="e.g. Reserve Shiraz 2024" />
+      </div>
+      <div>
+        <FieldLabel>Notes</FieldLabel>
+        <TextInput value={details.notes ?? ""} onChange={(v) => set("notes", v)} placeholder="e.g. Free SO₂ at bottling: 32 mg/L" />
+      </div>
+    </div>
+  );
+}
+
 function OtherDetails({
   details,
   onChange,
@@ -537,6 +624,8 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
       if (eventType === "racking") return !!details.fromLocation && !!details.toLocation;
       if (eventType === "inoculation") return !!details.what && !!details.productName;
       if (eventType === "observation" || eventType === "other") return !!details.text?.trim();
+      if (eventType === "pre_harvest_sample") return !!details.blockName && !!details.brix;
+      if (eventType === "bottling_run") return !!details.volumeL && !!details.lotNumber;
       return false;
     }
     return true;
@@ -792,8 +881,10 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
               {eventType === "measurement" && <MeasurementDetails details={details} onChange={setDetails} />}
               {eventType === "racking"     && <RackingDetails     details={details} onChange={setDetails} />}
               {eventType === "inoculation" && <InoculationDetails details={details} onChange={setDetails} />}
-              {eventType === "observation" && <ObservationDetails details={details} onChange={setDetails} />}
-              {eventType === "other"       && <OtherDetails       details={details} onChange={setDetails} />}
+              {eventType === "observation"       && <ObservationDetails       details={details} onChange={setDetails} />}
+              {eventType === "pre_harvest_sample" && <PreHarvestSampleDetails details={details} onChange={setDetails} />}
+              {eventType === "bottling_run"       && <BottlingRunDetails       details={details} onChange={setDetails} />}
+              {eventType === "other"              && <OtherDetails             details={details} onChange={setDetails} />}
             </>
           )}
 

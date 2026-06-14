@@ -4,6 +4,10 @@ import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./t
 import { buildScopedKnowledgeBase, buildSourceDoctrineSummary } from "./complianceKnowledgeBase.js";
 import { buildQADoctrineSummary, QA_DOCTRINE, getTopics } from "./complianceQADoctrine.js";
 import {
+  listBarrels,
+  createBarrel,
+  updateBarrel,
+  deleteBarrel,
   getCampaignMetricsHistory,
   getLatestCampaignMetrics,
   upsertCampaignMetricsSnapshot,
@@ -340,7 +344,7 @@ const adminRouter = router({
 // All procedures are protectedProcedure — any authenticated user can log entries.
 // Entries are scoped to ctx.user.id so users only see their own log.
 
-const EVENT_TYPES = ["addition", "measurement", "racking", "inoculation", "observation", "other"] as const;
+const EVENT_TYPES = ["addition", "measurement", "racking", "inoculation", "observation", "pre_harvest_sample", "bottling_run", "other"] as const;
 
 /**
  * Auto-generate searchable tags from event type + details.
@@ -376,7 +380,7 @@ const vintageLogRouter = router({
       z.object({
         tankName: z.string().min(1).max(128),
         variety: z.string().min(1).max(128),
-        eventType: z.enum(["addition", "measurement", "racking", "inoculation", "observation", "other"]),
+        eventType: z.enum(["addition", "measurement", "racking", "inoculation", "observation", "pre_harvest_sample", "bottling_run", "other"]),
         details: z.record(z.string(), z.unknown()),
         noteText: z.string().max(2000).optional(),
         entryAt: z.number().optional(),
@@ -1077,6 +1081,9 @@ const cellarTasksRouter = router({
         frequency: z.string().max(64).optional(),
         dueAt: z.number().optional(),
         aiGenerated: z.boolean().optional(),
+        // DR-03: vessel linkage
+        vesselId: z.string().max(128).optional(),
+        vesselType: z.enum(["tank", "barrel", "other"]).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -1092,6 +1099,8 @@ const cellarTasksRouter = router({
         frequency: input.frequency,
         dueAt: input.dueAt,
         aiGenerated: input.aiGenerated,
+        vesselId: input.vesselId,
+        vesselType: input.vesselType,
       });
       return { success: true, id };
     }),
@@ -1290,6 +1299,78 @@ const dashboardRouter = router({
   }),
 });
 
+// ─── Barrel Router (DR-08) ──────────────────────────────────────────────────
+const OAK_TYPES = ["French", "American", "Hungarian", "Slavonian", "Other"] as const;
+const BARREL_FORMATS = ["Barrique (225L)", "Hogshead (300L)", "Puncheon (500L)", "Foudre (>500L)", "Other"] as const;
+
+const barrelRouter = router({
+  list: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return [];
+    return listBarrels(dbUser.id);
+  }),
+
+  create: protectedProcedure
+    .input(
+      z.object({
+        barrelId: z.string().min(1).max(64),
+        oakType: z.enum(OAK_TYPES),
+        format: z.enum(BARREL_FORMATS),
+        ageYears: z.number().int().min(0).max(100),
+        fillDate: z.number().optional(),
+        wineLot: z.string().max(256).optional(),
+        notes: z.string().max(2000).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const id = await createBarrel({ userId: dbUser.id, ...input });
+      return { success: true, id };
+    }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        barrelId: z.string().min(1).max(64).optional(),
+        oakType: z.enum(OAK_TYPES).optional(),
+        format: z.enum(BARREL_FORMATS).optional(),
+        ageYears: z.number().int().min(0).max(100).optional(),
+        fillDate: z.number().nullable().optional(),
+        lastToppedDate: z.number().nullable().optional(),
+        wineLot: z.string().max(256).nullable().optional(),
+        notes: z.string().max(2000).nullable().optional(),
+        isActive: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const { id, ...rest } = input;
+      await updateBarrel(id, dbUser.id, rest);
+      return { success: true };
+    }),
+
+  recordTopping: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await updateBarrel(input.id, dbUser.id, { lastToppedDate: Date.now() });
+      return { success: true };
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await deleteBarrel(input.id, dbUser.id);
+      return { success: true };
+    }),
+});
+
 // ─── App Router ──────────────────────────────────────────────────────────────────────────────────────────────
 export const appRouter = router({
   campaignMetrics: campaignMetricsRouter,
@@ -1306,6 +1387,7 @@ export const appRouter = router({
   cellarEquipment: cellarEquipmentRouter,
   cellarTasks: cellarTasksRouter,
   dashboard: dashboardRouter,
+  barrel: barrelRouter,
 });
 
 export type AppRouter = typeof appRouter;

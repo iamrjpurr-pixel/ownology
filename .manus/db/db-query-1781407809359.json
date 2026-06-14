@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `cellar_tasks` ADD COLUMN `vessel_id` varchar(128) DEFAULT NULL;\nALTER TABLE `cellar_tasks` ADD COLUMN `vessel_type` enum('tank','barrel','other') DEFAULT NULL;\nALTER TABLE `cellar_tasks` ADD KEY `ct_vessel_idx` (`vessel_id`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4HByWUH885AfJUE.9472483f21d7 --database kjXA9MRaPtPLGHog5yynHZ --execute ALTER TABLE `cellar_tasks` ADD COLUMN `vessel_id` varchar(128) DEFAULT NULL;\nALTER TABLE `cellar_tasks` ADD COLUMN `vessel_type` enum('tank','barrel','other') DEFAULT NULL;\nALTER TABLE `cellar_tasks` ADD KEY `ct_vessel_idx` (`vessel_id`);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2878
+}

@@ -14,9 +14,11 @@ import VintageEntrySheet from "@/components/VintageEntrySheet";
 import MilestoneCalendar from "@/components/MilestoneCalendar";
 import TankReminderSheet from "@/components/TankReminderSheet";
 import WineBatchSheet from "@/components/WineBatchSheet";
+import LotTraceability from "@/components/LotTraceability";
 import KitWineTracker from "@/components/KitWineTracker";
 import MeasurementInterpretation from "@/components/MeasurementInterpretation";
 import ExportLogPDF from "@/components/ExportLogPDF";
+import BarrelsTab from "@/components/BarrelsTab";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface VintageEntry {
@@ -140,7 +142,7 @@ function SectionHeader({ label, title, subtitle }: { label: string; title: strin
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function ThePress() {
-  const [activeTab, setActiveTab] = useState<"log" | "calcs" | "scenarios" | "notes" | "calendar">("log");
+  const [activeTab, setActiveTab] = useState<"log" | "calcs" | "scenarios" | "notes" | "calendar" | "barrels">("log");
   // Batch Book state
   const [batchSheetOpen, setBatchSheetOpen] = useState(false);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
@@ -287,6 +289,7 @@ export default function ThePress() {
   const tabs = [
     { id: "log" as const, label: "Vintage Log", icon: "📋" },
     { id: "calendar" as const, label: "Milestones", icon: "📅" },
+    { id: "barrels" as const, label: "Barrels", icon: "🪵" },
     { id: "calcs" as const, label: "Calculations", icon: "⚗" },
     { id: "scenarios" as const, label: "Cellar Scenarios", icon: "🔬" },
     { id: "notes" as const, label: "Batch Book", icon: "📖" },
@@ -1334,6 +1337,13 @@ export default function ThePress() {
             </div>
           )}
 
+          {/* Barrels */}
+          {activeTab === "barrels" && (
+            <div className="pt-2">
+              <BarrelsTab />
+            </div>
+          )}
+
           {/* Calculations */}
           {activeTab === "calcs" && (
             <div>
@@ -1773,6 +1783,23 @@ export default function ThePress() {
               })()}
             </div>
           )}
+        </div>
+
+        {/* ── DR-12: Lot Traceability ── */}
+        <div className="mt-10 mb-2">
+          <div
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.75rem",
+              color: "oklch(0.50 0.012 75)",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              marginBottom: "1rem",
+            }}
+          >
+            Lot Traceability
+          </div>
+          <LotTraceability />
         </div>
 
         {/* ── Footer quote ── */}

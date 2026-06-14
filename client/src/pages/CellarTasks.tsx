@@ -490,7 +490,9 @@ interface EquipmentCardProps {
     completedAt: number | null;
     completedBy: string | null;
     aiGenerated: number;
-  }>;
+    vesselId: string | null;
+    vesselType: string | null;
+  }>
   userName: string;
   onEdit: () => void;
   onDelete: () => void;
@@ -817,6 +819,19 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                         }}
                       >
                         {task.methodNotes}
+                      </p>
+                    )}
+
+                    {task.vesselId && (
+                      <p
+                        style={{
+                          fontFamily: "'Fira Code', monospace",
+                          fontSize: "0.7rem",
+                          color: "oklch(0.55 0.12 75)",
+                          margin: "0.25rem 0 0",
+                        }}
+                      >
+                        {task.vesselType === "barrel" ? "🪵" : task.vesselType === "tank" ? "🛢" : "📦"} {task.vesselId}
                       </p>
                     )}
 

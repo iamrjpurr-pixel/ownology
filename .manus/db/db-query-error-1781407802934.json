@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE `cellar_tasks`\n  ADD COLUMN `vessel_id` varchar(128) DEFAULT NULL,\n  ADD COLUMN `vessel_type` enum('tank','barrel','other') DEFAULT NULL,\n  ADD KEY `ct_vessel_idx` (`vessel_id`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4HByWUH885AfJUE.9472483f21d7 --database kjXA9MRaPtPLGHog5yynHZ --execute ALTER TABLE `cellar_tasks`\n  ADD COLUMN `vessel_id` varchar(128) DEFAULT NULL,\n  ADD COLUMN `vessel_type` enum('tank','barrel','other') DEFAULT NULL,\n  ADD KEY `ct_vessel_idx` (`vessel_id`);",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1072 (42000) at line 1: column does not exist: vessel_id"
+  ]
+}

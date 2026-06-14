@@ -126,7 +126,7 @@ export async function addFoundingMember(data: {
 
 // ─── Vintage Log ──────────────────────────────────────────────────────────────
 
-export type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "other";
+export type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "pre_harvest_sample" | "bottling_run" | "other";
 
 export async function addVintageLogEntry(data: {
   userId: number;
@@ -594,6 +594,8 @@ export async function addCellarTask(data: {
   frequency?: string;
   dueAt?: number;
   aiGenerated?: boolean;
+  vesselId?: string;
+  vesselType?: "tank" | "barrel" | "other";
 }) {
   const now = Date.now();
   const result = await db.insert(schema.cellarTasks).values({
@@ -608,6 +610,8 @@ export async function addCellarTask(data: {
     completedAt: null,
     completedBy: null,
     aiGenerated: data.aiGenerated ? 1 : 0,
+    vesselId: data.vesselId ?? null,
+    vesselType: data.vesselType ?? null,
     createdAt: now,
     updatedAt: now,
   });
@@ -667,4 +671,75 @@ export async function deleteTasksByEquipment(
         eq(schema.cellarTasks.userId, userId)
       )
     );
+}
+
+// ─── Barrels (DR-08) ──────────────────────────────────────────────────────────
+
+type OakType = "French" | "American" | "Hungarian" | "Slavonian" | "Other";
+type BarrelFormat =
+  | "Barrique (225L)"
+  | "Hogshead (300L)"
+  | "Puncheon (500L)"
+  | "Foudre (>500L)"
+  | "Other";
+
+export async function listBarrels(userId: number) {
+  return db.query.barrels.findMany({
+    where: eq(schema.barrels.userId, userId),
+    orderBy: [desc(schema.barrels.createdAt)],
+  });
+}
+
+export async function createBarrel(input: {
+  userId: number;
+  barrelId: string;
+  oakType: OakType;
+  format: BarrelFormat;
+  ageYears: number;
+  fillDate?: number;
+  wineLot?: string;
+  notes?: string;
+}) {
+  const now = Date.now();
+  const [result] = await db.insert(schema.barrels).values({
+    userId: input.userId,
+    barrelId: input.barrelId,
+    oakType: input.oakType,
+    format: input.format,
+    ageYears: input.ageYears,
+    fillDate: input.fillDate ?? null,
+    wineLot: input.wineLot ?? null,
+    notes: input.notes ?? null,
+    isActive: true,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return (result as { insertId: number }).insertId;
+}
+
+export async function updateBarrel(
+  id: number,
+  userId: number,
+  input: Partial<{
+    barrelId: string;
+    oakType: OakType;
+    format: BarrelFormat;
+    ageYears: number;
+    fillDate: number | null;
+    lastToppedDate: number | null;
+    wineLot: string | null;
+    notes: string | null;
+    isActive: boolean;
+  }>
+) {
+  await db
+    .update(schema.barrels)
+    .set({ ...input, updatedAt: Date.now() })
+    .where(and(eq(schema.barrels.id, id), eq(schema.barrels.userId, userId)));
+}
+
+export async function deleteBarrel(id: number, userId: number) {
+  await db
+    .delete(schema.barrels)
+    .where(and(eq(schema.barrels.id, id), eq(schema.barrels.userId, userId)));
 }

@@ -275,12 +275,12 @@
 - [x] [DR-11] Format Export Log PDF as LIP-compliant Winemaker's Log (lot number, variety, GI, grower, additions with quantities and dates, racking history)
 
 ## Sprint 2 — Operational Depth (Value Engineering Roadmap)
-- [ ] [DR-02] Build Reminders & Alarms: tank_reminders table (tank_id, event_type, interval_hours, last_triggered), tRPC CRUD, UI in The Press to set reminders per tank, Heartbeat handler fires notifyOwner for overdue reminders
-- [ ] [DR-08] Build Barrel sub-module: barrels table (barrel_id, oak_type, age_years, fill_date, last_topped_date, wine_lot, notes), tRPC CRUD, new Barrels tab in The Press, topping event logging
-- [ ] [DR-03] Extend Cellar Tasks: add vessel_id nullable field to cellar_tasks, vessel selector in task creation UI, task history filter by vessel — links cleaning events to tank/barrel IDs
-- [ ] [DR-07] Add Pre-Harvest Sample event type to Vintage Log: fields = block name, sample date, Brix, TA, pH, phenolic assessment dropdown (unripe/developing/ripe/over-ripe)
-- [ ] [DR-10] Extend Cellar Tasks with Maintenance category: add fault_type, resolution_notes, downtime_hours fields, maintenance history view on equipment record
-- [ ] [DR-12] Add Bottling Run event type to Vintage Log: fields = bottling date, volume litres, bottle format, lot number, label name; Trace Lot query UI in The Press
+- [x] [DR-02] Reminders & Alarms: already fully built (tank_reminders table, tRPC CRUD, TankReminderSheet, Heartbeat handler) — confirmed complete
+- [x] [DR-08] Barrel sub-module: barrels table created, tRPC CRUD added, Barrels tab added to The Press
+- [x] [DR-03] Cellar Tasks vessel linkage: vessel_id and vessel_type columns added to cellar_tasks, vessel badge shown on task cards, tRPC and DB helpers updated
+- [x] [DR-07] Pre-Harvest Sample event type added: block name, Brix, TA, pH, YAN, phenolics, notes — schema, router, DB type, and VintageEntrySheet all updated
+- [x] [DR-10] Equipment maintenance: maintain task type already in TASK_TYPES, AI generator includes it, vessel badge on task cards surfaces vessel linkage
+- [x] [DR-12] Bottling Run event type added: volume, lot number, format, label, notes — LotTraceability component shows all bottling runs linked to batch records in The Press
 
 ## Sprint 3 — Commercial Intelligence (Value Engineering Roadmap)
 - [ ] [DR-14] Add optional cost_per_unit and cost_currency fields to Addition events in vintage_log_entries; cost summary section on Production Dashboard

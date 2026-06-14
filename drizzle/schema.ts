@@ -155,15 +155,19 @@ export const vintageLogEntries = mysqlTable(
       "racking",
       "inoculation",
       "observation",
+      "pre_harvest_sample",
+      "bottling_run",
       "other",
     ]).notNull(),
     // Structured event-specific fields stored as JSON string
-    // Addition:    { what, quantity, unit, timing }
-    // Measurement: { what, value, unit }
-    // Racking:     { fromLocation, toLocation, volumeL, leesStatus }
-    // Inoculation: { what, productName, ratePerHL }
-    // Observation: { text }
-    // Other:       { text }
+    // Addition:          { what, quantity, unit, timing }
+    // Measurement:       { what, value, unit }
+    // Racking:           { fromLocation, toLocation, volumeL, leesStatus }
+    // Inoculation:       { what, productName, ratePerHL }
+    // Observation:       { text }
+    // PreHarvestSample:  { blockName, brix, ta, ph, phenolics, notes }
+    // BottlingRun:       { volumeL, lotNumber, format, labelName, notes }
+    // Other:             { text }
     detailsJson: text("details_json").notNull(),
     // Optional free-text note appended to the entry
     noteText: text("note_text"),
@@ -336,6 +340,9 @@ export const cellarTasks = mysqlTable(
     completedBy: varchar("completed_by", { length: 256 }),
     // Whether this task was AI-generated (1) or manually added (0)
     aiGenerated: int("ai_generated").notNull().default(0),
+    // DR-03: Optional vessel linkage — links cleaning/sanitation events to a specific tank or barrel
+    vesselId: varchar("vessel_id", { length: 128 }),
+    vesselType: mysqlEnum("vessel_type", ["tank", "barrel", "other"]),
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
     updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
   },
@@ -344,6 +351,7 @@ export const cellarTasks = mysqlTable(
     index("ct_equipment_idx").on(t.equipmentId),
     index("ct_due_at_idx").on(t.dueAt),
     index("ct_completed_at_idx").on(t.completedAt),
+    index("ct_vessel_idx").on(t.vesselId),
   ]
 );
 
@@ -369,5 +377,57 @@ export const regulationMonitorSeen = mysqlTable(
   (t) => [
     index("rms_source_idx").on(t.source),
     index("rms_seen_at_idx").on(t.firstSeenAt),
+  ]
+);
+
+// ─── Barrels ──────────────────────────────────────────────────────────────────
+// DR-08: Barrel sub-module. One row per barrel. Topping, fill, and wine lot
+// tracked here; cellar events are logged via vintage_log_entries with
+// tankName set to the barrel's barrelId.
+export const barrels = mysqlTable(
+  "barrels",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull(),
+    // User-facing barrel identifier, e.g. "B-001" or "FR-2024-01"
+    barrelId: varchar("barrel_id", { length: 64 }).notNull(),
+    // Oak origin / type
+    oakType: mysqlEnum("oak_type", [
+      "French",
+      "American",
+      "Hungarian",
+      "Slavonian",
+      "Other",
+    ])
+      .notNull()
+      .default("French"),
+    // Barrel format
+    format: mysqlEnum("format", [
+      "Barrique (225L)",
+      "Hogshead (300L)",
+      "Puncheon (500L)",
+      "Foudre (>500L)",
+      "Other",
+    ])
+      .notNull()
+      .default("Barrique (225L)"),
+    // Age in years at time of first fill (0 = new oak)
+    ageYears: int("age_years").notNull().default(0),
+    // UTC ms timestamp of first fill
+    fillDate: bigint("fill_date", { mode: "number" }),
+    // UTC ms timestamp of most recent topping
+    lastToppedDate: bigint("last_topped_date", { mode: "number" }),
+    // Wine lot / batch currently in barrel (free text)
+    wineLot: varchar("wine_lot", { length: 256 }),
+    // Free-form notes
+    notes: text("notes"),
+    // Whether barrel is currently in use
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("barrel_user_idx").on(t.userId),
+    index("barrel_id_user_idx").on(t.barrelId, t.userId),
   ]
 );
