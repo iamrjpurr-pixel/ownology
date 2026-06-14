@@ -255,11 +255,11 @@ export default function BuildIndex() {
           style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
         >
           {[
-            { label: "Pages", value: "30+" },
-            { label: "Sprint 1 features", value: "5" },
-            { label: "Sprint 2 features", value: "6" },
-            { label: "DRs fully met", value: "15 / 27" },
-            { label: "Sprint 3 next", value: "4 items" },
+            { label: "Pages & Features", value: "50" },
+            { label: "Sprints completed", value: "5" },
+            { label: "DRs fully met", value: "22 / 27" },
+            { label: "Partial DRs remain", value: "5" },
+            { label: "Sprint 6 candidates", value: "5 items" },
           ].map(s => (
             <div key={s.label} className="flex flex-col">
               <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "1.1rem", color: AMBER, fontWeight: 700 }}>{s.value}</span>
