@@ -71,11 +71,23 @@ const t = initTRPC.context<Context>().create({
 export const router = t.router;
 export const publicProcedure = t.procedure;
 
+// DEV BYPASS: In development mode, if no authenticated user is present,
+// inject the seed owner account so all features are testable without login.
+// This bypass is ONLY active when NODE_ENV=development.
+const DEV_BYPASS_USER: User = {
+  openId: "seed-owner-001",
+  name: "Redstone Ridge Wines",
+  email: "cellar@redstoneridge.com.au",
+  role: "admin",
+};
+
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
-  if (!ctx.user) {
+  const isDev = process.env.NODE_ENV === "development";
+  const user = ctx.user ?? (isDev ? DEV_BYPASS_USER : null);
+  if (!user) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: "Please login (10001)" });
   }
-  return next({ ctx: { ...ctx, user: ctx.user } });
+  return next({ ctx: { ...ctx, user } });
 });
 
 export const ownerProcedure = t.procedure.use(({ ctx, next }) => {
