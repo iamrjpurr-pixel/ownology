@@ -18,6 +18,12 @@ export default function OAuthCallback() {
   const [, navigate] = useLocation();
 
   useEffect(() => {
+    // S8-I: New users (no 'ownology_guide_seen' flag) are redirected to /guide
+    // after login, unless they have a specific returnPath set.
+    const isNewUser = (() => {
+      try { return !localStorage.getItem("ownology_guide_seen"); } catch { return false; }
+    })();
+
     try {
       const params = new URLSearchParams(window.location.search);
       const rawState = params.get("state");
@@ -28,14 +34,17 @@ export default function OAuthCallback() {
           typeof decoded?.returnPath === "string" && decoded.returnPath.startsWith("/")
             ? decoded.returnPath
             : "/";
-        navigate(returnPath, { replace: true });
+        // Only redirect new users to /guide if they have no specific returnPath
+        const destination = (isNewUser && returnPath === "/") ? "/guide" : returnPath;
+        navigate(destination, { replace: true });
         return;
       }
     } catch {
       // Malformed state — fall through to safe default
     }
 
-    navigate("/", { replace: true });
+    // No state — redirect new users to /guide, returning users to /
+    navigate(isNewUser ? "/guide" : "/", { replace: true });
   }, [navigate]);
 
   return (

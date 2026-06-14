@@ -162,6 +162,12 @@ const BUSINESS_NAV: NavItem[] = [
   { label: "For Home Winemakers", href: "/for-home-winemakers" },
   { label: "Blog",                href: "/blog" },
 ];
+// GUIDE pillar
+const GUIDE_NAV: NavItem[] = [
+  { label: "Guide — Getting Started", href: "/guide" },
+  { label: "Compliance AI",           href: "/compliance" },
+  { label: "Regulations Library",     href: "/regulations" },
+];
 const MORE_NAV: NavItem[] = [
   { label: "Our Story",    href: "#our-story" },
   { label: "Pricing",      href: "/pricing" },
@@ -229,19 +235,23 @@ function MoreDropdown({ extraItems }: { extraItems?: NavItem[] }) {
           <div className="py-2 px-1">
             {generalLinks.map(item => <NavLink key={item.label} item={item} close={close} />)}
           </div>
-          {/* Three-column pillar section */}
-          <div className="grid grid-cols-3" style={{borderTop: "1px solid var(--ow-border)"}}>
+          {/* Four-column pillar section */}
+          <div className="grid grid-cols-4" style={{borderTop: "1px solid var(--ow-border)", minWidth: "420px"}}>
             <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Do — Cellar Tools</p>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Do</p>
               {VINTAGE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
             </div>
             <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Know — Knowledge</p>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Know</p>
               {KNOWLEDGE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
             </div>
-            <div className="py-3 px-1">
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Learn &amp; More</p>
+            <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Learn</p>
               {BUSINESS_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
+            </div>
+            <div className="py-3 px-1">
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Guide</p>
+              {GUIDE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
               {extraItems?.map(item => <NavLink key={item.label} item={item} close={close} />)}
             </div>
           </div>

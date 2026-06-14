@@ -38,9 +38,13 @@ import BuildIndex from "./pages/BuildIndex";
 import Vineyard from "./pages/Vineyard";
 import PwaInstallBanner from "./components/PwaInstallBanner";
 import Knowledge from "./pages/Knowledge";
+import Guide from "./pages/Guide";
 
 
 function Router() {
+  // S8-I: Post-login redirect to /guide for new users
+  // The Guide page sets 'ownology_guide_seen' in localStorage on mount.
+  // We only redirect on the root path so deep-links are not interrupted.
   return (
     <Switch>
       <Route path={"/"} component={Home} />
@@ -78,6 +82,7 @@ function Router() {
       <Route path={"/build-index"} component={BuildIndex} />
       <Route path={"/knowledge"} component={Knowledge} />
       <Route path={"/knowledge/:rest*"} component={Knowledge} />
+      <Route path={"/guide"} component={Guide} />
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
