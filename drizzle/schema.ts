@@ -215,6 +215,8 @@ export const wineBatches = mysqlTable(
     tankName: varchar("tank_name", { length: 128 }),
     // Volume in litres at start of fermentation (optional — entered by winemaker)
     volumeLitres: int("volume_litres"),
+    // Cost per litre (AUD) — entered by owner for Cellar Value calculation
+    costPerLitre: int("cost_per_litre"),
     // Per-phase winemaker notes stored as JSON:
     // { receival: string, fermentation: string, postFerment: string, stabilising: string, bottling: string }
     notesJson: text("notes_json").notNull(),

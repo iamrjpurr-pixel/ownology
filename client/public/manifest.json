@@ -1,0 +1,43 @@
+{
+  "name": "Ownology — AI for Winemakers",
+  "short_name": "Ownology",
+  "description": "AI Knowledge Assistant for boutique winemakers. Cellar log, batch book, compliance, and more.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1a1512",
+  "theme_color": "#b8860b",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "The Press",
+      "short_name": "Press",
+      "description": "Open the vintage log and batch book",
+      "url": "/the-press",
+      "icons": []
+    },
+    {
+      "name": "Quick Entry",
+      "short_name": "Log",
+      "description": "Rapid cellar log entry",
+      "url": "/quick-entry",
+      "icons": []
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Production dashboard",
+      "url": "/dashboard",
+      "icons": []
+    }
+  ]
+}

@@ -71,6 +71,13 @@
       "when": 1781405849334,
       "tag": "0009_last_spyke",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1781419840477,
+      "tag": "0010_silent_lionheart",
+      "breakpoints": true
     }
   ]
 }

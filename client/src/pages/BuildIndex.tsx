@@ -118,13 +118,30 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    title: "Sprint 3 — Next (not yet built)",
-    icon: "🔜",
+    title: "Sprint 3 — Completed",
+    icon: "✅",
     items: [
-      { label: "Cost-per-unit on additions", anchor: "Not yet built", sprint: "S3", dr: "DR-14", desc: "Cost field on addition log entries; cost-per-litre summary on Batch Book.", status: "stub" },
-      { label: "Packaging inventory",        anchor: "Not yet built", sprint: "S3", dr: "DR-15", desc: "Bottle/closure/label stock tracking with low-stock alerts.", status: "stub" },
-      { label: "Weather event logging",       anchor: "Not yet built", sprint: "S3", dr: "DR-16", desc: "Structured weather event type in Vintage Log (frost, hail, heat event).", status: "stub" },
-      { label: "Vintage card PDF",            anchor: "Not yet built", sprint: "S3", dr: "DR-18", desc: "LLM-generated shareable vintage summary PDF from observation log.", status: "stub" },
+      { label: "Packaging Inventory",         href: "/the-press",         anchor: "Open The Press → Packaging tab", sprint: "S3", dr: "DR-15", desc: "Bottle/closure/label/capsule/carton stock tracking with low-stock alerts and usage log.", status: "live" },
+      { label: "Weather Event logging",       href: "/the-press",         anchor: "New Log Entry → Event Type → Weather Event", sprint: "S3", dr: "DR-16", desc: "Structured weather event: frost, hail, heat event, rain, wind, other — with severity and affected area.", status: "live" },
+      { label: "Vintage Card PDF",            href: "/the-press",         anchor: "Batch Book tab → select a batch → 'Vintage Card' button", sprint: "S3", dr: "DR-18", desc: "LLM-generated shareable vintage summary PDF from the batch's observation log.", status: "live" },
+      { label: "Cellar Value widget",         href: "/dashboard",         anchor: "Production Dashboard → scroll to Cellar Value section", sprint: "S3", dr: "DR-17", desc: "Tied capital estimate from active ferment volumes × cost-per-litre (industry range or user-entered).", status: "live" },
+    ],
+  },
+  {
+    title: "Sprint 4 — Completed",
+    icon: "✅",
+    items: [
+      { label: "Vineyard page",               href: "/vineyard",          sprint: "S4", dr: "DR-21", desc: "Vineyard block register with variety, area, rootstock, trellis, irrigation, soil type.", status: "live" },
+      { label: "Production Planning cards",   href: "/dashboard",         anchor: "Production Dashboard → Production Planning section", sprint: "S4", dr: "DR-19", desc: "Bottling Queue, Active Ferments, and AI Cellar Tasks cards on the Dashboard.", status: "live" },
+    ],
+  },
+  {
+    title: "Sprint 5 — Completed",
+    icon: "✅",
+    items: [
+      { label: "Cost-per-litre on batches",   href: "/the-press",         anchor: "Batch Book tab → register a batch → Cost Per Litre field", sprint: "S5", dr: "DR-17", desc: "Optional $/L field on every wine batch; Dashboard Cellar Value shows ACTUAL vs estimate when set.", status: "live" },
+      { label: "Multi-Vintage Comparison",    href: "/dashboard",         anchor: "Production Dashboard → Multi-Vintage Comparison section", sprint: "S5", dr: "DR-15", desc: "Table grouping all batches by vintage with variety, tank, volume, inoculation date, and status badge.", status: "live" },
+      { label: "PWA Install Prompt",          anchor: "Visit the app on mobile Chrome/Edge → install banner appears at bottom", sprint: "S5", dr: "DR-23", desc: "manifest.json, theme-color meta, Apple PWA tags, and custom install banner with localStorage dismiss.", status: "live" },
     ],
   },
 ];

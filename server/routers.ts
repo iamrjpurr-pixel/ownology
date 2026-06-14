@@ -616,6 +616,7 @@ const wineBatchRouter = router({
         quantityUnit: z.enum(["kg", "t", "L"]).optional(),
         tankName: z.string().max(128).optional(),
         volumeLitres: z.number().int().min(1).max(1000000).optional(),
+        costPerLitre: z.number().int().min(0).max(100000).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -651,6 +652,7 @@ const wineBatchRouter = router({
         quantityUnit: z.enum(["kg", "t", "L"]).optional(),
         tankName: z.string().max(128).optional(),
         volumeLitres: z.number().int().min(1).max(1000000).optional(),
+        costPerLitre: z.number().int().min(0).max(100000).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -1322,9 +1324,12 @@ const dashboardRouter = router({
       const lastEventType = lastEntry?.eventType ?? null;
       const lastEventAt = lastEntry?.entryAt ?? null;
 
-      // Linked batch volume
+      // Linked batch volume and cost
       const linkedBatch = batches.find((b) => b.tankName === tankName);
       const volumeLitres = linkedBatch?.volumeLitres ?? null;
+      const costPerLitre = linkedBatch?.costPerLitre ?? null;
+      const batchId = linkedBatch?.batchId ?? null;
+      const vintage = linkedBatch?.vintage ?? null;
 
       return {
         tankName,
@@ -1334,6 +1339,9 @@ const dashboardRouter = router({
         lastEventType,
         lastEventAt,
         volumeLitres,
+        costPerLitre,
+        batchId,
+        vintage,
         entryCount: entries.length,
       };
     });
@@ -1360,6 +1368,42 @@ const dashboardRouter = router({
       (e) => e.eventType === "addition" && e.entryAt >= sevenDaysAgo
     ).length;
 
+    // Build per-vintage summary for the multi-vintage comparison table
+    const vintageGroups: Record<number, { variety: string; volumeLitres: number | null; inoculationDate: number | null; bottlingDate: number | null; status: string; batchId: string; tankName: string | null }[]> = {};
+    for (const b of batches) {
+      if (!vintageGroups[b.vintage]) vintageGroups[b.vintage] = [];
+      // Find inoculation and bottling dates from log entries for this batch's tank
+      const batchEntries = b.tankName ? allEntries.filter((e) => e.tankName === b.tankName) : [];
+      const inoculationEntry = batchEntries.find((e) => e.eventType === "inoculation");
+      const bottlingEntry = batchEntries.find((e) => e.eventType === "bottling_run");
+      const lastEntry = batchEntries[0];
+      let status = "Registered";
+      if (bottlingEntry) status = "Bottled";
+      else if (lastEntry?.eventType === "racking") status = "Post-Ferment";
+      else if (inoculationEntry) {
+        const daysSince = Math.floor((now - inoculationEntry.entryAt) / (24 * 60 * 60 * 1000));
+        if (daysSince <= 14) status = "Fermenting";
+        else if (daysSince <= 120) status = "Maturing";
+        else status = "Awaiting Bottling";
+      }
+      vintageGroups[b.vintage].push({
+        variety: b.variety,
+        volumeLitres: b.volumeLitres ?? null,
+        inoculationDate: inoculationEntry?.entryAt ?? null,
+        bottlingDate: bottlingEntry?.entryAt ?? null,
+        status,
+        batchId: b.batchId,
+        tankName: b.tankName ?? null,
+      });
+    }
+    const vintageComparison = Object.entries(vintageGroups)
+      .sort(([a], [b]) => Number(b) - Number(a))
+      .map(([year, batchList]) => ({
+        vintage: Number(year),
+        batches: batchList,
+        totalVolume: batchList.reduce((s, b) => s + (b.volumeLitres ?? 0), 0),
+      }));
+
     return {
       totalTanks,
       activeFermentCount,
@@ -1369,6 +1413,7 @@ const dashboardRouter = router({
       totalBatches,
       recentAdditions,
       tankSummaries,
+      vintageComparison,
     };
   }),
 });

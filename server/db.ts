@@ -423,6 +423,7 @@ export async function createWineBatch(data: {
   quantityUnit?: "kg" | "t" | "L";
   tankName?: string;
   volumeLitres?: number;
+  costPerLitre?: number;
 }) {
   const now = Date.now();
   const result = await db.insert(schema.wineBatches).values({
@@ -437,6 +438,7 @@ export async function createWineBatch(data: {
     quantityUnit: data.quantityUnit ?? "kg",
     tankName: data.tankName ?? null,
     volumeLitres: data.volumeLitres ?? null,
+    costPerLitre: data.costPerLitre ?? null,
     notesJson: "{}",
     createdAt: now,
     updatedAt: now,
@@ -475,6 +477,7 @@ export async function updateWineBatch(id: number, userId: number, data: {
   quantityUnit?: "kg" | "t" | "L";
   tankName?: string;
   volumeLitres?: number;
+  costPerLitre?: number;
 }) {
   await db
     .update(schema.wineBatches)

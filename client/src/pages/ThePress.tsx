@@ -1655,6 +1655,12 @@ export default function ThePress() {
                               <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.875rem", color: "var(--ow-text-hi)" }}>{batch.tankName}</p>
                             </div>
                           )}
+                          {batch.costPerLitre != null && (
+                            <div>
+                              <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", marginBottom: "0.2rem" }}>COST/L</p>
+                              <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.875rem", color: "oklch(0.72 0.12 75)" }}>${batch.costPerLitre}/L</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                       {batch.growerDetails && (

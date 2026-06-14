@@ -36,6 +36,7 @@ import OAuthCallback from "./pages/OAuthCallback";
 import ProductionDashboard from "./pages/ProductionDashboard";
 import BuildIndex from "./pages/BuildIndex";
 import Vineyard from "./pages/Vineyard";
+import PwaInstallBanner from "./components/PwaInstallBanner";
 
 
 function Router() {
@@ -97,6 +98,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          <PwaInstallBanner />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

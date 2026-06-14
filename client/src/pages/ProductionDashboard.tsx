@@ -162,6 +162,7 @@ export default function ProductionDashboard() {
     totalBatches,
     recentAdditions,
     tankSummaries,
+    vintageComparison,
   } = stats;
 
   return (
@@ -512,45 +513,175 @@ export default function ProductionDashboard() {
           </div>
         </div>
 
-        {/* ── DR-17: Cellar Value ── */}
-        {totalActiveFermentLitres > 0 && (
+        {/* ── DR-15: Multi-Vintage Comparison Table ── */}
+        {vintageComparison && vintageComparison.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <DollarSign className="w-4 h-4" style={{ color: "oklch(0.72 0.12 75)" }} />
+              <Layers className="w-4 h-4" style={{ color: "oklch(0.72 0.12 75)" }} />
               <h2 className="text-sm tracking-widest uppercase" style={{ color: "oklch(0.55 0.012 75)" }}>
-                Cellar Value Estimate
+                Multi-Vintage Comparison
               </h2>
             </div>
-            <div className="rounded-xl border p-5" style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>Volume in Cellar</span>
-                  <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.65 0.15 160)" }}>
-                    {totalActiveFermentLitres.toLocaleString()} L
-                  </span>
-                  <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>active ferment only</span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>Est. Bottles (750mL)</span>
-                  <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}>
-                    {Math.round(totalActiveFermentLitres / 0.75 * 0.85).toLocaleString()}
-                  </span>
-                  <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>at 85% fill efficiency</span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>Tied Capital Range</span>
-                  <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.72 0.12 75)" }}>
-                    ${Math.round(totalActiveFermentLitres * 8).toLocaleString()}–${Math.round(totalActiveFermentLitres * 25).toLocaleString()}
-                  </span>
-                  <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>est. at $8–$25/L bulk value · update in Batch Book</span>
-                </div>
+            <div className="rounded-xl border overflow-hidden" style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}>
+              {/* Table header */}
+              <div
+                className="grid gap-0 text-xs uppercase tracking-widest px-4 py-3"
+                style={{
+                  gridTemplateColumns: "80px 1fr 1fr 90px 110px 100px",
+                  background: "oklch(0.12 0.008 60)",
+                  color: "oklch(0.45 0.010 75)",
+                  borderBottom: "1px solid oklch(1 0 0 / 8%)",
+                  fontFamily: "'Fira Code', monospace",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                <span>Vintage</span>
+                <span>Batch / Variety</span>
+                <span>Tank</span>
+                <span>Volume</span>
+                <span>Inoculation</span>
+                <span>Status</span>
               </div>
-              <p className="text-xs mt-4 pt-4" style={{ color: "oklch(0.38 0.008 75)", borderTop: "1px solid oklch(1 0 0 / 6%)" }}>
-                Cellar value is an indicative estimate based on volume and industry bulk wine price ranges. Enter actual cost-per-litre in the Batch Book for precise figures.
-              </p>
+              {/* Table rows */}
+              {vintageComparison.flatMap((vc) =>
+                vc.batches.map((b, i) => {
+                  const statusColors: Record<string, { bg: string; text: string }> = {
+                    "Fermenting":        { bg: "oklch(0.22 0.06 75)",  text: "oklch(0.72 0.12 75)" },
+                    "Maturing":          { bg: "oklch(0.22 0.06 250)", text: "oklch(0.70 0.12 250)" },
+                    "Post-Ferment":      { bg: "oklch(0.22 0.06 250)", text: "oklch(0.70 0.12 250)" },
+                    "Awaiting Bottling": { bg: "oklch(0.22 0.06 30)",  text: "oklch(0.70 0.12 30)" },
+                    "Bottled":           { bg: "oklch(0.22 0.06 145)", text: "oklch(0.75 0.15 145)" },
+                    "Registered":        { bg: "oklch(0.18 0.005 60)", text: "oklch(0.50 0.010 75)" },
+                  };
+                  const sc = statusColors[b.status] ?? statusColors["Registered"];
+                  return (
+                    <div
+                      key={b.batchId}
+                      className="grid gap-0 px-4 py-3 items-center"
+                      style={{
+                        gridTemplateColumns: "80px 1fr 1fr 90px 110px 100px",
+                        borderBottom: "1px solid oklch(1 0 0 / 5%)",
+                        background: i % 2 === 0 ? "transparent" : "oklch(0.13 0.008 60 / 40%)",
+                      }}
+                    >
+                      {/* Vintage — only show on first row of each vintage group */}
+                      <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "1rem", color: i === 0 ? "oklch(0.72 0.12 75)" : "transparent" }}>
+                        {vc.vintage}
+                      </span>
+                      {/* Batch / Variety */}
+                      <div>
+                        <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "oklch(0.72 0.12 75)", letterSpacing: "0.06em" }}>{b.batchId}</p>
+                        <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", color: "oklch(0.82 0.015 75)" }}>{b.variety}</p>
+                      </div>
+                      {/* Tank */}
+                      <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", color: "oklch(0.65 0.015 75)" }}>
+                        {b.tankName ?? "—"}
+                      </span>
+                      {/* Volume */}
+                      <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.8rem", color: b.volumeLitres ? "oklch(0.65 0.15 160)" : "oklch(0.40 0.008 75)" }}>
+                        {b.volumeLitres ? `${b.volumeLitres.toLocaleString()} L` : "—"}
+                      </span>
+                      {/* Inoculation date */}
+                      <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.75rem", color: "oklch(0.55 0.012 75)" }}>
+                        {b.inoculationDate
+                          ? new Date(b.inoculationDate).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "2-digit" })
+                          : "—"}
+                      </span>
+                      {/* Status badge */}
+                      <span
+                        className="inline-block px-2 py-0.5 rounded-sm text-xs"
+                        style={{ background: sc.bg, color: sc.text, fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", letterSpacing: "0.06em" }}
+                      >
+                        {b.status.toUpperCase()}
+                      </span>
+                    </div>
+                  );
+                })
+              )}
+              {/* Totals footer */}
+              <div
+                className="px-4 py-3 flex items-center justify-between"
+                style={{ background: "oklch(0.12 0.008 60)", borderTop: "1px solid oklch(1 0 0 / 8%)" }}
+              >
+                <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "oklch(0.45 0.010 75)", letterSpacing: "0.08em" }}>
+                  {vintageComparison.length} VINTAGE{vintageComparison.length !== 1 ? "S" : ""} · {vintageComparison.reduce((s, v) => s + v.batches.length, 0)} BATCH{vintageComparison.reduce((s, v) => s + v.batches.length, 0) !== 1 ? "ES" : ""}
+                </span>
+                <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "oklch(0.65 0.15 160)", letterSpacing: "0.08em" }}>
+                  {vintageComparison.reduce((s, v) => s + v.totalVolume, 0).toLocaleString()} L TOTAL
+                </span>
+              </div>
             </div>
           </div>
         )}
+
+        {/* ── DR-17: Cellar Value ── */}
+        {totalActiveFermentLitres > 0 && (() => {
+          // Calculate weighted average cost per litre from tanks that have it set
+          const tanksWithCost = tankSummaries.filter((t) => t.isActiveFerment && t.volumeLitres && t.costPerLitre);
+          const tanksWithoutCost = tankSummaries.filter((t) => t.isActiveFerment && t.volumeLitres && !t.costPerLitre);
+          const hasUserCost = tanksWithCost.length > 0;
+          const weightedCostTotal = tanksWithCost.reduce((sum, t) => sum + (t.volumeLitres! * t.costPerLitre!), 0);
+          const weightedCostVolume = tanksWithCost.reduce((sum, t) => sum + t.volumeLitres!, 0);
+          const avgCostPerLitre = weightedCostVolume > 0 ? weightedCostTotal / weightedCostVolume : null;
+          const preciseTiedCapital = avgCostPerLitre ? Math.round(totalActiveFermentLitres * avgCostPerLitre) : null;
+          return (
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <DollarSign className="w-4 h-4" style={{ color: "oklch(0.72 0.12 75)" }} />
+                <h2 className="text-sm tracking-widest uppercase" style={{ color: "oklch(0.55 0.012 75)" }}>
+                  Cellar Value Estimate
+                </h2>
+                {hasUserCost && (
+                  <span className="text-xs px-2 py-0.5 rounded" style={{ background: "oklch(0.22 0.06 145)", color: "oklch(0.75 0.15 145)", fontFamily: "'Fira Code', monospace", letterSpacing: "0.05em" }}>ACTUAL</span>
+                )}
+              </div>
+              <div className="rounded-xl border p-5" style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>Volume in Cellar</span>
+                    <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.65 0.15 160)" }}>
+                      {totalActiveFermentLitres.toLocaleString()} L
+                    </span>
+                    <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>active ferment only</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>Est. Bottles (750mL)</span>
+                    <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}>
+                      {Math.round(totalActiveFermentLitres / 0.75 * 0.85).toLocaleString()}
+                    </span>
+                    <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>at 85% fill efficiency</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>Tied Capital</span>
+                    {preciseTiedCapital !== null ? (
+                      <>
+                        <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.72 0.12 75)" }}>
+                          ${preciseTiedCapital.toLocaleString()}
+                        </span>
+                        <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>
+                          at ${avgCostPerLitre!.toFixed(0)}/L (your cost)
+                          {tanksWithoutCost.length > 0 && ` · ${tanksWithoutCost.length} tank${tanksWithoutCost.length > 1 ? 's' : ''} using estimate`}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.72 0.12 75)" }}>
+                          ${Math.round(totalActiveFermentLitres * 8).toLocaleString()}–${Math.round(totalActiveFermentLitres * 25).toLocaleString()}
+                        </span>
+                        <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>est. at $8–$25/L · set cost in Batch Book</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs mt-4 pt-4" style={{ color: "oklch(0.38 0.008 75)", borderTop: "1px solid oklch(1 0 0 / 6%)" }}>
+                  {hasUserCost
+                    ? `Tied capital calculated from your cost-per-litre entries in the Batch Book. ${tanksWithoutCost.length > 0 ? `${tanksWithoutCost.length} tank${tanksWithoutCost.length > 1 ? 's' : ''} without a cost entry use the $8–$25/L industry range.` : 'All active tanks have cost-per-litre set.'}`
+                    : 'Indicative estimate based on industry bulk wine price ranges. Set a cost-per-litre in the Batch Book for precise figures.'}
+                </p>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ── Footer note ── */}
         <p className="text-xs text-center pb-4" style={{ color: "oklch(0.38 0.008 75)" }}>

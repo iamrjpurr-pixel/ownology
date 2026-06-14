@@ -292,3 +292,10 @@
 - [x] [DR-06] Vineyard section: vineyard_blocks + vineyard_observations tables, tRPC CRUD, /vineyard page with block register and observation log, linked in nav
 - [x] [DR-15] Production Planning section added to Dashboard: Bottling Queue, Active Ferments, Task Planner cards with links to relevant tools
 - [x] [DR-17] Cellar Value section added to Dashboard: Volume in Cellar, Est. Bottles at 85% fill, Tied Capital Range at $8–$25/L bulk value estimate
+
+## Sprint 5 — Depth & Polish (Post Sprint 4)
+
+- [x] [DR-17] Add user-entered cost-per-litre field to wine_batches schema and Batch Book UI; use it in Cellar Value section on Dashboard instead of industry estimate range
+- [x] [DR-15] Add multi-vintage comparison table to Production Planning section on Dashboard: variety, volume, inoculation date, projected bottling, status per vintage
+- [x] [DR-23] PWA: add manifest.json (name, icons, theme_color, display=standalone), theme-color meta tag, and install prompt banner on mobile
+- [x] Update Build Index page: mark Sprint 3/4 features as LIVE (cost-per-unit, packaging, weather event, vintage card, vineyard, production planning, cellar value)

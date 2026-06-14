@@ -101,6 +101,7 @@ export default function WineBatchSheet({ open, onClose, onSaved, prefillTank, su
   const [tankName, setTankName] = useState(prefillTank ?? "");
   const [batchId, setBatchId] = useState("");
   const [batchIdManual, setBatchIdManual] = useState(false);
+  const [costPerLitre, setCostPerLitre] = useState("");
   const [varietyOpen, setVarietyOpen] = useState(false);
   const [giOpen, setGiOpen] = useState(false);
 
@@ -128,6 +129,7 @@ export default function WineBatchSheet({ open, onClose, onSaved, prefillTank, su
       setTankName(prefillTank ?? "");
       setBatchId("");
       setBatchIdManual(false);
+      setCostPerLitre("");
     }
   }, [open]);
 
@@ -158,6 +160,7 @@ export default function WineBatchSheet({ open, onClose, onSaved, prefillTank, su
       quantityValue: quantityValue.trim() || undefined,
       quantityUnit: quantityValue.trim() ? quantityUnit : undefined,
       tankName: tankName.trim() || undefined,
+      costPerLitre: costPerLitre.trim() ? Math.round(parseFloat(costPerLitre)) : undefined,
     });
   }
 
@@ -411,6 +414,26 @@ export default function WineBatchSheet({ open, onClose, onSaved, prefillTank, su
             className="press-input w-full"
           />
           <p className="field-hint">All vessels must be numbered or named for LIP compliance.</p>
+        </div>
+
+        {/* Cost Per Litre */}
+        <div>
+          <label className="field-label">Cost Per Litre (AUD)</label>
+          <div className="flex items-center gap-2">
+            <span className="text-sm" style={{ color: "oklch(0.55 0.012 75)" }}>$</span>
+            <input
+              type="number"
+              value={costPerLitre}
+              onChange={(e) => setCostPerLitre(e.target.value)}
+              placeholder="e.g. 12"
+              min={0}
+              max={100000}
+              step={1}
+              className="press-input flex-1"
+            />
+            <span className="text-sm" style={{ color: "oklch(0.55 0.012 75)" }}>/L</span>
+          </div>
+          <p className="field-hint">Optional. Used by the Production Dashboard to calculate tied capital with your actual cost instead of the industry estimate range.</p>
         </div>
       </div>
 
