@@ -24,6 +24,9 @@ import Admin from "./pages/Admin";
 import QuickEntry from "./pages/QuickEntry";
 import CellarTasks from "./pages/CellarTasks";
 import HomeWineryKit from "./pages/HomeWineryKit";
+import ForHomeWinemakers from "./pages/ForHomeWinemakers";
+import HomeWinemakerTroubleshooting from "./pages/HomeWinemakerTroubleshooting";
+import HomeWinemakerGlossary from "./pages/HomeWinemakerGlossary";
 import CompetitiveAdvantage from "./pages/CompetitiveAdvantage";
 import Preview from "./pages/Preview";
 import AdminLeads from "./pages/AdminLeads";
@@ -40,6 +43,9 @@ function Router() {
       <Route path={"/why-ownology"} component={WhyOwnology} />
       <Route path={"/for-innovint-users"} component={ForInnoVintUsers} />
       <Route path={"/for-vintrace-users"} component={ForVintraceUsers} />
+      <Route path={"/for-home-winemakers"} component={ForHomeWinemakers} />
+      <Route path={"/for-home-winemakers/troubleshooting"} component={HomeWinemakerTroubleshooting} />
+      <Route path={"/for-home-winemakers/glossary"} component={HomeWinemakerGlossary} />
       <Route path={"/blog"} component={Blog} />
       <Route path={"/blog/:slug"} component={BlogArticle} />
       <Route path={"/regulations"} component={Regulations} />

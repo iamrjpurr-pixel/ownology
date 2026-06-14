@@ -1290,6 +1290,108 @@ export default function Resources() {
             </div>
           )}
 
+          {/* Home Winemaker section */}
+          <div className="mt-12 mb-6">
+            <div
+              style={{
+                borderLeft: "3px solid var(--ow-amber)",
+                paddingLeft: "1.25rem",
+                marginBottom: "1.25rem",
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: SANS,
+                  fontWeight: 700,
+                  fontSize: "0.7rem",
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  color: "var(--ow-amber)",
+                  marginBottom: "0.35rem",
+                }}
+              >
+                Home Winemaker Resources
+              </p>
+              <p
+                style={{
+                  fontFamily: SANS,
+                  fontWeight: 300,
+                  fontSize: "0.9rem",
+                  color: "var(--ow-text-mid)",
+                  lineHeight: 1.6,
+                }}
+              >
+                Making wine at home? These guides are written for the DIY winemaker — no commercial licence required.
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {[
+                {
+                  href: "/resources/home-winery-kit",
+                  icon: "🧰",
+                  title: "Equipment Checklist",
+                  desc: "Complete shopping list for a 30-bottle home winery kit setup, with categories and a tick-off progress tracker.",
+                },
+                {
+                  href: "/resources/home-winemaking-troubleshooting",
+                  icon: "🔧",
+                  title: "Troubleshooting Guide",
+                  desc: "7 common home winemaking faults — stuck ferment, VA, cloudiness, re-fermentation — with causes and fixes.",
+                },
+                {
+                  href: "/resources/home-winemaking-glossary",
+                  icon: "📖",
+                  title: "Glossary",
+                  desc: "Plain-English definitions for Brix, SG, MLF, K-meta, bentonite, lees, racking, fining, and more.",
+                },
+              ].map((card) => (
+                <Link
+                  key={card.href}
+                  href={card.href}
+                  style={{
+                    display: "block",
+                    background: "var(--ow-bg-raised)",
+                    border: "1px solid var(--ow-border)",
+                    borderRadius: "2px",
+                    padding: "1.25rem",
+                    textDecoration: "none",
+                    transition: "border-color 0.15s ease",
+                  }}
+                  onMouseEnter={(e) =>
+                    ((e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--ow-amber)")
+                  }
+                  onMouseLeave={(e) =>
+                    ((e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--ow-border)")
+                  }
+                >
+                  <div style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>{card.icon}</div>
+                  <p
+                    style={{
+                      fontFamily: SERIF,
+                      fontWeight: 600,
+                      fontSize: "1rem",
+                      color: "var(--ow-text-hi)",
+                      marginBottom: "0.4rem",
+                    }}
+                  >
+                    {card.title}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: SANS,
+                      fontWeight: 300,
+                      fontSize: "0.8125rem",
+                      color: "var(--ow-text-lo)",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {card.desc}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+
           {/* Compliance agent CTA */}
           <div
             className="mt-12 p-8 text-center"

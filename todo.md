@@ -254,3 +254,15 @@
 - [x] Compliance KB: extend HOME_WINEMAKER_KB with equipment-specific cleaning and sanitising protocols (16 items)
 - [x] Build /resources/home-winery-kit page (printable shopping checklist, progress bar, PDF export, CTA to Compliance)
 - [x] Wire /resources/home-winery-kit route in App.tsx
+
+## Home Winemaker DIY — Completion Batch (Jun 2026)
+- [x] Resources page: add "Home Winemaker" card linking to /resources/home-winery-kit
+- [x] HomeWineryKit page: add pre-filled "Ask Ownology" CTA that opens Compliance with HomeWinemaker filter and a starter question
+- [x] Build /for-home-winemakers landing page (dedicated entry point, links to kit checklist and Compliance AI)
+- [x] Wire /for-home-winemakers route in App.tsx and add to footer/nav
+- [x] VintageEntrySheet: add vessel type toggle (Tank / Carboy / Barrel / Demijohn) for home winemaker scale
+- [x] MilestoneCalendar: add "Kit Wine" variety option with home-scale timeline (4-6 week ferment, 6-8 week secondary, 4 month racking, 12 month bottle)
+- [x] Build wine kit ingredient tracker tab in The Press (kit steps checklist: bentonite day 1, sorbate+K-meta day 28, fining day 30, etc.)
+- [x] Build /for-home-winemakers/troubleshooting page (8 common faults, causes, fixes — searchable accordion)
+- [x] Build /for-home-winemakers/glossary page (50+ terms, A-Z filter, search — SEO-optimised)
+- [x] Wire all new resource routes in App.tsx

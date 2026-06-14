@@ -68,7 +68,7 @@ interface TankMilestones {
   tankName: string;
   variety: string;
   inoculationDate: number; // UTC ms
-  style: "red" | "white" | "rosé" | "unknown";
+  style: "red" | "white" | "rosé" | "kit_wine" | "unknown";
   milestones: Milestone[];
   /** Days since inoculation */
   daysSinceInoculation: number;
@@ -97,8 +97,9 @@ const ROSÉ_VARIETIES = new Set([
   "rosé", "rose", "rosato", "rosado",
 ]);
 
-function classifyVariety(variety: string): "red" | "white" | "rosé" | "unknown" {
+function classifyVariety(variety: string): "red" | "white" | "rosé" | "kit_wine" | "unknown" {
   const v = variety.toLowerCase().trim();
+  if (v === "kit wine" || v.includes("kit wine")) return "kit_wine";
   if (ROSÉ_VARIETIES.has(v) || v.includes("rosé") || v.includes("rose")) return "rosé";
   if (RED_VARIETIES.has(v)) return "red";
   if (WHITE_VARIETIES.has(v)) return "white";
@@ -117,7 +118,7 @@ function addDays(base: number, days: number): number {
 }
 
 function buildMilestones(
-  style: "red" | "white" | "rosé" | "unknown",
+  style: "red" | "white" | "rosé" | "kit_wine" | "unknown",
   inoculationDate: number,
   entries: LogEntry[],
 ): Milestone[] {
@@ -259,6 +260,62 @@ function buildMilestones(
     ];
   }
 
+  // Kit Wine — home winemaking kit timeline (4–6 week primary, 6–8 week secondary, 4 month racking, 12 month bottling)
+  if (style === "kit_wine") {
+    return [
+      {
+        id: "first-racking",
+        label: "First Racking (end of primary ferment)",
+        shortLabel: "Rack 1",
+        earliest: addDays(inoculationDate, 28),
+        latest: addDays(inoculationDate, 42),
+        completed: hasEvent("racking"),
+        completedByEvent: "racking",
+        color: "oklch(0.65 0.15 200)",
+      },
+      {
+        id: "fining-additions",
+        label: "Fining Additions (sorbate, K-meta, fining agent)",
+        shortLabel: "Finings",
+        earliest: addDays(inoculationDate, 28),
+        latest: addDays(inoculationDate, 35),
+        completed: hasTag("sorbate") || hasTag("fining") || hasTag("k-meta") || hasTag("kmeta"),
+        completedByEvent: "addition",
+        color: "oklch(0.72 0.12 75)",
+      },
+      {
+        id: "second-racking",
+        label: "Second Racking (off fine lees)",
+        shortLabel: "Rack 2",
+        earliest: addDays(inoculationDate, 56),
+        latest: addDays(inoculationDate, 70),
+        completed: entries.filter((e) => e.eventType === "racking").length >= 2,
+        completedByEvent: "racking",
+        color: "oklch(0.65 0.15 200)",
+      },
+      {
+        id: "clearing-check",
+        label: "Clearing Check (wine should be clear)",
+        shortLabel: "Clear?",
+        earliest: addDays(inoculationDate, 90),
+        latest: addDays(inoculationDate, 120),
+        completed: hasTag("clear") || hasTag("clearing") || hasTag("fining complete"),
+        completedByEvent: "observation",
+        color: "oklch(0.60 0.18 220)",
+      },
+      {
+        id: "bottling",
+        label: "Bottling Window",
+        shortLabel: "Bottle",
+        earliest: addDays(inoculationDate, 270),
+        latest: addDays(inoculationDate, 365),
+        completed: hasTag("bottling") || hasTag("bottle"),
+        completedByEvent: "other",
+        color: "oklch(0.55 0.20 150)",
+      },
+    ];
+  }
+
   // Unknown variety — use red defaults with wider windows
   return [
     {
@@ -388,6 +445,7 @@ export default function MilestoneCalendar({ logEntries, onAddEntry }: Props) {
     red: "Red",
     white: "White",
     "rosé": "Rosé",
+    kit_wine: "Kit Wine 🍷",
     unknown: "Unknown",
   };
 
@@ -395,6 +453,7 @@ export default function MilestoneCalendar({ logEntries, onAddEntry }: Props) {
     red: "oklch(0.55 0.20 25)",
     white: "oklch(0.75 0.12 95)",
     "rosé": "oklch(0.70 0.18 350)",
+    kit_wine: "oklch(0.72 0.12 75)",
     unknown: "var(--ow-text-lo)",
   };
 

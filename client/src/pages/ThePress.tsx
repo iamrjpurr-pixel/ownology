@@ -14,6 +14,7 @@ import VintageEntrySheet from "@/components/VintageEntrySheet";
 import MilestoneCalendar from "@/components/MilestoneCalendar";
 import TankReminderSheet from "@/components/TankReminderSheet";
 import WineBatchSheet from "@/components/WineBatchSheet";
+import KitWineTracker from "@/components/KitWineTracker";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface VintageEntry {
@@ -960,6 +961,30 @@ export default function ThePress() {
                   </div>
                 </div>
               )}
+
+              {/* Kit Wine Tracker — shown when any active Kit Wine tank has an inoculation logged */}
+              {hasEntries && (() => {
+                const kitTanks = sortedTanks
+                  .map((tank) => {
+                    const entries = (logEntries ?? []).filter((e) => e.tankName === tank);
+                    const inocEntry = entries.find((e) => e.eventType === "inoculation");
+                    const variety = inocEntry?.variety ?? entries[0]?.variety ?? "";
+                    if (!inocEntry || variety.toLowerCase() !== "kit wine") return null;
+                    return { tank, inoculationDate: new Date(inocEntry.entryAt).getTime() };
+                  })
+                  .filter(Boolean) as { tank: string; inoculationDate: number }[];
+                if (kitTanks.length === 0) return null;
+                return (
+                  <div className="mb-6">
+                    <p className="text-xs tracking-wider uppercase mb-3" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", letterSpacing: "0.1em" }}>
+                      Kit Wine Tracker
+                    </p>
+                    {kitTanks.map(({ tank, inoculationDate }) => (
+                      <KitWineTracker key={tank} tankName={tank} inoculationDate={inoculationDate} />
+                    ))}
+                  </div>
+                );
+              })()}
 
               {/* Live entries with pull-to-refresh */}
               {hasEntries && (

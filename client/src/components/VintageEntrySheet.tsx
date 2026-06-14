@@ -5,8 +5,8 @@
  * Renders as a bottom-sheet on mobile, centred modal on desktop.
  *
  * Steps:
- *   1. Tank — select from previous tanks or type a new one
- *   2. Variety — select common varieties or type free text
+ *   1. Tank — select from previous tanks or type a new one (+ vessel type selector)
+ *   2. Variety — select common varieties or type free text (includes Kit Wine)
  *   3. Event type — Addition / Measurement / Racking / Inoculation / Observation / Other
  *   4. Details — contextual fields driven by event type
  *   5. Note — optional free-text note + confirm
@@ -48,6 +48,16 @@ const COMMON_VARIETIES = [
   "Shiraz", "Cabernet Sauvignon", "Merlot", "Pinot Noir", "Grenache",
   "Tempranillo", "Sangiovese", "Nebbiolo", "Chardonnay", "Sauvignon Blanc",
   "Riesling", "Pinot Gris", "Viognier", "Semillon", "Gewürztraminer",
+  "Kit Wine",
+];
+
+const VESSEL_TYPES: { id: string; label: string; icon: string }[] = [
+  { id: "stainless_tank",    label: "Stainless Tank",      icon: "🥛" },
+  { id: "open_fermenter",    label: "Open-top Fermenter",  icon: "🪣" },
+  { id: "barrel",            label: "Barrel",              icon: "🛢" },
+  { id: "demijohn",          label: "Demijohn",            icon: "🫙" },
+  { id: "carboy",            label: "Carboy",              icon: "🧴" },
+  { id: "big_mouth_bubbler", label: "Big Mouth Bubbler",   icon: "🫧" },
 ];
 
 const EVENT_TYPES: { id: EventType; label: string; icon: string; description: string }[] = [
@@ -347,11 +357,11 @@ function InoculationDetails({
       </div>
       <div>
         <FieldLabel>Product name</FieldLabel>
-        <TextInput value={details.productName ?? ""} onChange={(v) => set("productName", v)} placeholder="e.g. EC1118, Enoferm Alpha" autoFocus />
+        <TextInput value={details.productName ?? ""} onChange={(v) => set("productName", v)} placeholder="e.g. EC-1118, Lalvin 71B, Viniflora CH11" autoFocus={!!details.what} />
       </div>
       <div>
-        <FieldLabel>Rate</FieldLabel>
-        <TextInput value={details.rate ?? ""} onChange={(v) => set("rate", v)} placeholder="Rate" type="number" unit="g/hL" />
+        <FieldLabel>Rate (g/hL)</FieldLabel>
+        <TextInput value={details.rate ?? ""} onChange={(v) => set("rate", v)} placeholder="e.g. 20" type="number" unit="g/hL" />
       </div>
     </div>
   );
@@ -364,13 +374,14 @@ function ObservationDetails({
   details: Record<string, string>;
   onChange: (d: Record<string, string>) => void;
 }) {
+  const set = (k: string, v: string) => onChange({ ...details, [k]: v });
   return (
     <div>
-      <FieldLabel>Sensory observation</FieldLabel>
+      <FieldLabel>Observation</FieldLabel>
       <textarea
         value={details.text ?? ""}
-        onChange={(e) => onChange({ ...details, text: e.target.value })}
-        placeholder="Colour, clarity, aroma, taste, visual observation…"
+        onChange={(e) => set("text", e.target.value)}
+        placeholder="Describe colour, aroma, clarity, cap activity, any sensory notes…"
         rows={5}
         autoFocus
         className="w-full px-4 py-3 rounded resize-none outline-none transition-all"
@@ -396,12 +407,13 @@ function OtherDetails({
   details: Record<string, string>;
   onChange: (d: Record<string, string>) => void;
 }) {
+  const set = (k: string, v: string) => onChange({ ...details, [k]: v });
   return (
     <div>
-      <FieldLabel>Description</FieldLabel>
+      <FieldLabel>Notes</FieldLabel>
       <textarea
         value={details.text ?? ""}
-        onChange={(e) => onChange({ ...details, text: e.target.value })}
+        onChange={(e) => set("text", e.target.value)}
         placeholder="Describe what happened…"
         rows={5}
         autoFocus
@@ -422,33 +434,29 @@ function OtherDetails({
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-
 export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank }: Props) {
   const isDesktop = useIsDesktop();
   const totalSteps = prefillTank ? 4 : 5;
   const [step, setStep] = useState(0);
-
   // Form state
   const [tankName, setTankName] = useState(prefillTank ?? "");
   const [tankInput, setTankInput] = useState(prefillTank ?? "");
+  const [vesselType, setVesselType] = useState("");
   const [variety, setVariety] = useState("");
   const [varietyInput, setVarietyInput] = useState("");
   const [eventType, setEventType] = useState<EventType | "">("");
   const [details, setDetails] = useState<Record<string, string>>({});
   const [noteText, setNoteText] = useState("");
-
   const { data: usedTanks = [] } = trpc.vintageLog.getUsedTanks.useQuery();
   // Fetch last entry for repeat-last-entry chip
   const { data: lastEntries } = trpc.vintageLog.list.useQuery({ limit: 1 }, { enabled: !!open });
   const lastEntry = lastEntries?.[0];
   const [showRepeatChip, setShowRepeatChip] = useState(false);
-
   // Voice-to-text
   const [isListening, setIsListening] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
   const hasSpeechRecognition = typeof window !== "undefined" && ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
-
   const startListening = useCallback(() => {
     if (!hasSpeechRecognition) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -470,12 +478,10 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
     rec.start();
     setIsListening(true);
   }, [hasSpeechRecognition]);
-
   const stopListening = useCallback(() => {
     recognitionRef.current?.stop();
     setIsListening(false);
   }, []);
-
   const utils = trpc.useUtils();
   const addEntry = trpc.vintageLog.add.useMutation({
     onSuccess: () => {
@@ -487,13 +493,13 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
     },
     onError: (e) => toast.error(e.message),
   });
-
   // Reset when opened
   useEffect(() => {
     if (open) {
       setStep(prefillTank ? 1 : 0);
       setTankName(prefillTank ?? "");
       setTankInput(prefillTank ?? "");
+      setVesselType("");
       setVariety("");
       setVarietyInput("");
       setEventType("");
@@ -501,18 +507,17 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
       setNoteText("");
     }
   }, [open, prefillTank]);
-
   function resetForm() {
     setStep(prefillTank ? 1 : 0);
     setTankName(prefillTank ?? "");
     setTankInput(prefillTank ?? "");
+    setVesselType("");
     setVariety("");
     setVarietyInput("");
     setEventType("");
     setDetails({});
     setNoteText("");
   }
-
   // Step labels (adjusted for prefillTank)
   const stepLabels = prefillTank
     ? ["Variety", "Event type", "Details", "Note"]
@@ -544,11 +549,15 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
 
   function handleSubmit() {
     if (!eventType) return;
+    // Merge vesselType into details so it's persisted without schema change
+    const mergedDetails = vesselType
+      ? { ...details, vesselType }
+      : details;
     addEntry.mutate({
       tankName: tankName.trim(),
       variety: variety.trim(),
       eventType,
-      details,
+      details: mergedDetails,
       noteText: noteText.trim() || undefined,
     });
   }
@@ -672,6 +681,31 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
                   </div>
                 </>
               )}
+
+              {/* Vessel type selector */}
+              <p className="text-xs mt-3" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato', sans-serif" }}>
+                Vessel type <span style={{ opacity: 0.5 }}>(optional)</span>
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {VESSEL_TYPES.map((vt) => (
+                  <button
+                    key={vt.id}
+                    type="button"
+                    onClick={() => setVesselType(vesselType === vt.id ? "" : vt.id)}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-sm text-sm transition-all text-left"
+                    style={{
+                      background: vesselType === vt.id ? "oklch(from var(--ow-amber) l c h / 15%)" : "var(--ow-bg-inset)",
+                      border: `1px solid ${vesselType === vt.id ? "var(--ow-amber)" : "var(--ow-border)"}`,
+                      color: vesselType === vt.id ? "var(--ow-amber)" : "var(--ow-text-mid)",
+                      fontFamily: "'Lato', sans-serif",
+                      fontSize: "0.8rem",
+                    }}
+                  >
+                    <span style={{ fontSize: "1rem" }}>{vt.icon}</span>
+                    {vt.label}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -777,10 +811,24 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
                   </span>
                   <span
                     className="text-xs uppercase tracking-widest"
-                    style={{ color: "var(--ow-amber)", fontFamily: "'Fira Code', monospace" }}
+                    style={{ color: "var(--ow-text-lo)", fontFamily: "'Fira Code', monospace" }}
                   >
                     {eventType}
                   </span>
+                  {vesselType && (
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-full ml-auto"
+                      style={{
+                        background: "oklch(from var(--ow-amber) l c h / 10%)",
+                        border: "1px solid oklch(from var(--ow-amber) l c h / 25%)",
+                        color: "var(--ow-amber)",
+                        fontFamily: "'Lato', sans-serif",
+                      }}
+                    >
+                      {VESSEL_TYPES.find((v) => v.id === vesselType)?.icon}{" "}
+                      {VESSEL_TYPES.find((v) => v.id === vesselType)?.label}
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm font-semibold" style={{ color: "var(--ow-text-hi)", fontFamily: "'Lato', sans-serif" }}>
                   {tankName} · {variety}

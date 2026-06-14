@@ -341,29 +341,43 @@ export default function HomeWineryKit() {
         </div>
 
         {/* ── CTA ── */}
-        <div className="no-print" style={{ marginTop: "2.5rem", textAlign: "center" }}>
-          <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.015 75)", marginBottom: "0.75rem" }}>
-            Want AI-powered answers to your home winemaking questions?
+        <div className="no-print" style={{ marginTop: "2.5rem", padding: "1.75rem", background: "oklch(0.15 0.010 60)", borderRadius: "8px", border: "1px solid oklch(0.72 0.12 75 / 20%)" }}>
+          <p style={{ fontSize: "0.9rem", fontWeight: 700, color: "oklch(0.92 0.018 75)", marginBottom: "0.4rem" }}>
+            Have a question about your kit?
           </p>
-          <Link href="/compliance">
-            <a
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.4rem",
-                padding: "0.625rem 1.25rem",
-                borderRadius: "8px",
-                background: "oklch(0.72 0.12 75)",
-                color: "oklch(0.10 0.008 60)",
-                fontWeight: 700,
-                fontSize: "0.9rem",
-                textDecoration: "none",
-              }}
-            >
-              Ask Ownology
-              <ExternalLink size={14} />
-            </a>
-          </Link>
+          <p style={{ fontSize: "0.8125rem", color: "oklch(0.55 0.015 75)", marginBottom: "1.25rem", lineHeight: 1.6 }}>
+            Ask Ownology's Home Winemaker AI — it knows your equipment, your kit schedule, and common faults.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            {[
+              { q: "My fermentation has stalled at 1.020 SG — what should I do?", label: "Stuck ferment" },
+              { q: "How do I know when my wine is ready to rack for the first time?", label: "First racking timing" },
+              { q: "What is the correct way to sanitise my Big Mouth Bubbler and carboy?", label: "Equipment sanitising" },
+            ].map(({ q, label }) => (
+              <Link
+                key={label}
+                href={`/compliance?q=${encodeURIComponent(q)}&state=HomeWinemaker`}
+              >
+                <a
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "0.6rem 1rem",
+                    background: "oklch(0.18 0.010 60)",
+                    border: "1px solid oklch(0.72 0.12 75 / 15%)",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    gap: "0.75rem",
+                  }}
+                >
+                  <span style={{ fontSize: "0.8125rem", color: "oklch(0.72 0.12 75)", fontWeight: 600 }}>{label}</span>
+                  <span style={{ fontSize: "0.75rem", color: "oklch(0.50 0.012 75)", flex: 1, textAlign: "left" }}>{q}</span>
+                  <ExternalLink size={12} color="oklch(0.72 0.12 75)" style={{ flexShrink: 0 }} />
+                </a>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
