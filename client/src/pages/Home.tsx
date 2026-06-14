@@ -140,6 +140,7 @@ const PRIMARY_NAV: NavItem[] = [
   { label: "How It Works", href: "#how-it-works" },
   { label: "See Demo",     href: "#demo" },
   { label: "Why Ownology", href: "/why-ownology" },
+  { label: "⚙ Build Index", href: "/build-index" }, // REMOVE BEFORE LAUNCH
 ];
 // Secondary links — grouped by product pillar
 // Operational: cellar tools
