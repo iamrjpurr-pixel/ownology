@@ -219,3 +219,15 @@
 - [x] Frontend: AI task generation per equipment item (LLM generates 3-6 cleaning/maintenance tasks)
 - [x] Frontend: Task tick-off with completedBy and timestamp, undo (uncomplete), and delete
 - [x] Navigation: /cellar-tasks route added to App.tsx; CELLAR TASKS link added to The Press header
+
+## The Press — UX Batch 3: Phone-First (Jun 2026)
+- [x] Sort dropdown for batch summary cards (urgency default, persisted to localStorage)
+- [x] Status colour ring on summary cards (amber=active ferment ≤14d, green=stable, grey=no inoculation)
+- [x] "+" Add Entry button on each summary card (large touch target, pre-fills tank)
+- [x] Sticky FAB "Add Entry" button (bottom-right, hidden when any sheet is open)
+- [x] Pull-to-refresh on log entries list (touch gesture, spinner indicator)
+- [x] Swipe-to-delete on log entries (60px threshold, optimistic removal)
+- [x] Repeat last entry chip in VintageEntrySheet (pre-fills all fields from most recent entry)
+- [x] Voice-to-text dictation button in note field (SpeechRecognition API, conditional render)
+- [x] Load-more pagination (20 entries at a time, shows remaining count)
+- [x] Mobile bottom tab bar (Log / Calc / Batches / More, hidden when any sheet is open, safe-area aware)

@@ -12,7 +12,7 @@
  *   5. Note — optional free-text note + confirm
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -438,6 +438,44 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
   const [noteText, setNoteText] = useState("");
 
   const { data: usedTanks = [] } = trpc.vintageLog.getUsedTanks.useQuery();
+  // Fetch last entry for repeat-last-entry chip
+  const { data: lastEntries } = trpc.vintageLog.list.useQuery({ limit: 1 }, { enabled: !!open });
+  const lastEntry = lastEntries?.[0];
+  const [showRepeatChip, setShowRepeatChip] = useState(false);
+
+  // Voice-to-text
+  const [isListening, setIsListening] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+  const hasSpeechRecognition = typeof window !== "undefined" && ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
+
+  const startListening = useCallback(() => {
+    if (!hasSpeechRecognition) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const W = window as any;
+    const SpeechRecognitionAPI = W.SpeechRecognition ?? W.webkitSpeechRecognition;
+    if (!SpeechRecognitionAPI) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rec: any = new SpeechRecognitionAPI();
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.lang = "en-AU";
+    rec.onresult = (e: { results: { [k: number]: { [k: number]: { transcript: string } } } }) => {
+      const transcript = e.results[0]?.[0]?.transcript ?? "";
+      setNoteText((prev) => prev ? prev + " " + transcript : transcript);
+    };
+    rec.onend = () => setIsListening(false);
+    rec.onerror = () => setIsListening(false);
+    recognitionRef.current = rec;
+    rec.start();
+    setIsListening(true);
+  }, [hasSpeechRecognition]);
+
+  const stopListening = useCallback(() => {
+    recognitionRef.current?.stop();
+    setIsListening(false);
+  }, []);
+
   const utils = trpc.useUtils();
   const addEntry = trpc.vintageLog.add.useMutation({
     onSuccess: () => {
@@ -774,8 +812,67 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
                 )}
               </div>
 
+              {/* Repeat last entry chip */}
+              {lastEntry && !showRepeatChip && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVariety(lastEntry.variety);
+                    setVarietyInput(lastEntry.variety);
+                    setEventType(lastEntry.eventType as EventType);
+                    setDetails(lastEntry.details as Record<string, string>);
+                    setNoteText(lastEntry.noteText ?? "");
+                    setShowRepeatChip(true);
+                    // Jump to note step
+                    setStep(prefillTank ? 3 : 4);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-sm mb-3"
+                  style={{
+                    background: "color-mix(in oklch, var(--ow-amber) 6%, var(--ow-bg-inset))",
+                    border: "1px dashed color-mix(in oklch, var(--ow-amber) 35%, transparent)",
+                    color: "var(--ow-text-mid)",
+                    fontFamily: "'Lato',sans-serif",
+                    fontSize: "0.8125rem",
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                >
+                  <span style={{ color: "var(--ow-amber)", fontSize: "0.9rem" }}>↺</span>
+                  <div>
+                    <p style={{ fontWeight: 600, color: "var(--ow-text-hi)", marginBottom: "0.1rem" }}>Repeat last entry</p>
+                    <p style={{ fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
+                      {lastEntry.eventType} · {lastEntry.variety} · {lastEntry.tankName}
+                    </p>
+                  </div>
+                </button>
+              )}
+
               <div>
-                <FieldLabel>Optional note</FieldLabel>
+                <div className="flex items-center justify-between mb-2">
+                  <FieldLabel>Optional note</FieldLabel>
+                  {hasSpeechRecognition && (
+                    <button
+                      type="button"
+                      onClick={isListening ? stopListening : startListening}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm touch-target"
+                      style={{
+                        background: isListening ? "color-mix(in oklch, var(--ow-amber) 15%, transparent)" : "var(--ow-bg-inset)",
+                        border: isListening ? "1px solid var(--ow-amber)" : "1px solid var(--ow-border)",
+                        color: isListening ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                        fontFamily: "'Lato',sans-serif",
+                        fontSize: "0.75rem",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <rect x="4" y="1" width="4" height="6" rx="2" stroke="currentColor" strokeWidth="1.2" />
+                        <path d="M2 6.5a4 4 0 0 0 8 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                        <path d="M6 10.5v1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                      </svg>
+                      {isListening ? "Stop" : "Dictate"}
+                    </button>
+                  )}
+                </div>
                 <textarea
                   value={noteText}
                   onChange={(e) => setNoteText(e.target.value)}
@@ -784,14 +881,14 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
                   className="w-full px-4 py-3 rounded resize-none outline-none transition-all"
                   style={{
                     background: "var(--ow-bg-inset)",
-                    border: "1px solid var(--ow-border-md)",
+                    border: isListening ? "1px solid var(--ow-amber)" : "1px solid var(--ow-border-md)",
                     color: "var(--ow-text-hi)",
                     fontFamily: "'Lato', sans-serif",
                     fontSize: "max(1rem, 16px)",
                     lineHeight: 1.6,
                   }}
                   onFocus={(e) => (e.currentTarget.style.borderColor = "var(--ow-amber)")}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = "var(--ow-border-md)")}
+                  onBlur={(e) => { if (!isListening) e.currentTarget.style.borderColor = "var(--ow-border-md)"; }}
                 />
               </div>
             </div>

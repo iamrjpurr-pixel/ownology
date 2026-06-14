@@ -6,7 +6,7 @@
  * Full functionality wired in the 4-week education build.
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
@@ -154,6 +154,16 @@ export default function ThePress() {
   const [filterEventType, setFilterEventType] = useState("");
   const [filterText, setFilterText] = useState("");
   const [filterTag, setFilterTag] = useState("");
+  // Sort + pagination
+  const [sortBy, setSortBy] = useState<"urgency" | "lastEvent" | "tank" | "additions">(() => {
+    try { return (localStorage.getItem("press_sortBy") as "urgency" | "lastEvent" | "tank" | "additions") ?? "urgency"; } catch { return "urgency"; }
+  });
+  const [displayLimit, setDisplayLimit] = useState(20);
+  // Pull-to-refresh
+  const [isPulling, setIsPulling] = useState(false);
+  const [pullY, setPullY] = useState(0);
+  const pullStartY = useRef(0);
+  const logListRef = useRef<HTMLDivElement>(null);
   const headerRef = useInView(0.1);
   const contentRef = useInView(0.05);
 
@@ -164,6 +174,21 @@ export default function ThePress() {
   );
 
   const isLoggedIn = logEntries !== undefined;
+
+  // Delete mutation
+  const utils = trpc.useUtils();
+  const deleteEntry = trpc.vintageLog.delete.useMutation({
+    onSuccess: () => {
+      utils.vintageLog.list.invalidate();
+      utils.vintageLog.getUsedTanks.invalidate();
+    },
+  });
+
+  // Swipe-to-delete state per entry
+  const [swipedEntryId, setSwipedEntryId] = useState<number | null>(null);
+  const [deletedIds, setDeletedIds] = useState<Set<number>>(new Set());
+  const swipeStartX = useRef(0);
+  const swipeCurrentX = useRef(0);
 
   // Wine batch data — always fetch (no auth gate while building)
   const { data: wineBatches, refetch: refetchBatches } = trpc.wineBatch.list.useQuery(
@@ -200,6 +225,34 @@ export default function ThePress() {
     }, 900);
   }, [selectedBatch, localNotes, updateNotesMutation]);
   const hasEntries = logEntries && logEntries.length > 0;
+
+  // Sorted tank cards
+  const sortedTanks = useMemo(() => {
+    if (!logEntries || logEntries.length === 0) return [];
+    const tanks = Array.from(new Set(logEntries.map((e) => e.tankName)));
+    return tanks.sort((a, b) => {
+      const aEntries = logEntries.filter((e) => e.tankName === a);
+      const bEntries = logEntries.filter((e) => e.tankName === b);
+      if (sortBy === "tank") return a.localeCompare(b);
+      if (sortBy === "additions") {
+        return bEntries.filter((e) => e.eventType === "addition").length - aEntries.filter((e) => e.eventType === "addition").length;
+      }
+      const aLast = aEntries.reduce<Date | null>((d, e) => { const t = new Date(e.entryAt); return !d || t > d ? t : d; }, null);
+      const bLast = bEntries.reduce<Date | null>((d, e) => { const t = new Date(e.entryAt); return !d || t > d ? t : d; }, null);
+      if (sortBy === "lastEvent") {
+        if (!aLast && !bLast) return 0;
+        if (!aLast) return 1;
+        if (!bLast) return -1;
+        return bLast.getTime() - aLast.getTime();
+      }
+      // urgency: sort by days since inoculation DESC (most urgent = most days active)
+      const aInoc = aEntries.find((e) => e.eventType === "inoculation");
+      const bInoc = bEntries.find((e) => e.eventType === "inoculation");
+      const aDays = aInoc ? Math.floor((Date.now() - new Date(aInoc.entryAt).getTime()) / 86400000) : -1;
+      const bDays = bInoc ? Math.floor((Date.now() - new Date(bInoc.entryAt).getTime()) / 86400000) : -1;
+      return bDays - aDays;
+    });
+  }, [logEntries, sortBy]);
 
   // Derived filter options from live data
   const allTanks = logEntries ? Array.from(new Set(logEntries.map((e) => e.tankName))) : [];
@@ -246,7 +299,7 @@ export default function ThePress() {
         </Link>
       </div>
 
-      <div className="container pt-10 pb-24" style={{ maxWidth: "960px", margin: "0 auto" }}>
+      <div className="container pt-10 pb-24 md:pb-24" style={{ maxWidth: "960px", margin: "0 auto", paddingBottom: "calc(6rem + env(safe-area-inset-bottom, 0px))" }}>
 
         {/* ── Header ── */}
         <div ref={headerRef.ref} className={`mb-10 ${headerRef.inView ? "fade-up" : "opacity-0"}`}>
@@ -689,16 +742,38 @@ export default function ThePress() {
               )}
 
               {/* Batch summary cards — one per tank */}
-              {hasEntries && allTanks.length > 0 && (
+              {hasEntries && sortedTanks.length > 0 && (
                 <div className="mb-6">
-                  <p
-                    className="mb-3 text-xs tracking-wider uppercase"
-                    style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", letterSpacing: "0.1em" }}
-                  >
-                    Tank Summary
-                  </p>
+                  {/* Header row: label + sort dropdown */}
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <p className="text-xs tracking-wider uppercase" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", letterSpacing: "0.1em" }}>
+                      Tank Summary
+                    </p>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => {
+                        const v = e.target.value as typeof sortBy;
+                        setSortBy(v);
+                        try { localStorage.setItem("press_sortBy", v); } catch {}
+                      }}
+                      className="px-3 py-1.5 rounded-sm text-xs"
+                      style={{
+                        background: "var(--ow-bg-inset)",
+                        border: "1px solid var(--ow-border)",
+                        color: "var(--ow-text-lo)",
+                        fontFamily: "'Fira Code',monospace",
+                        cursor: "pointer",
+                        minHeight: "36px",
+                      }}
+                    >
+                      <option value="urgency">Sort: Urgency</option>
+                      <option value="lastEvent">Sort: Last event</option>
+                      <option value="tank">Sort: Tank name</option>
+                      <option value="additions">Sort: Additions</option>
+                    </select>
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {allTanks.map((tank) => {
+                    {sortedTanks.map((tank) => {
                       const tankEntries = (logEntries ?? []).filter((e) => e.tankName === tank);
                       const totalAdditions = tankEntries.filter((e) => e.eventType === "addition").length;
                       const lastEntry = tankEntries.reduce<(typeof tankEntries)[0] | null>((latest, e) =>
@@ -713,12 +788,17 @@ export default function ThePress() {
                         : null;
                       const variety = lastEntry?.variety ?? "";
 
+                      // Status colour ring: amber = active (≤14d), green = stable (>14d), grey = no inoc
+                      const statusColor = daysSinceInoculation === null
+                        ? "oklch(0.40 0.005 60)"   // grey — no inoculation recorded
+                        : daysSinceInoculation <= 14
+                        ? "var(--ow-amber)"         // amber — active ferment
+                        : "oklch(0.62 0.14 145)";   // green — stable
+
                       return (
-                        <button
+                        <div
                           key={tank}
-                          type="button"
-                          onClick={() => setFilterTank(filterTank === tank ? "" : tank)}
-                          className="text-left p-4 rounded-sm transition-all"
+                          className="rounded-sm overflow-hidden"
                           style={{
                             background: filterTank === tank
                               ? "color-mix(in oklch, var(--ow-amber) 10%, var(--ow-bg-card))"
@@ -726,11 +806,16 @@ export default function ThePress() {
                             border: filterTank === tank
                               ? "1px solid color-mix(in oklch, var(--ow-amber) 50%, transparent)"
                               : "1px solid var(--ow-border)",
-                            cursor: "pointer",
+                            borderTop: `3px solid ${statusColor}`,
                           }}
-                          onMouseEnter={(e) => (e.currentTarget.style.borderColor = "color-mix(in oklch, var(--ow-amber) 40%, transparent)")}
-                          onMouseLeave={(e) => (e.currentTarget.style.borderColor = filterTank === tank ? "color-mix(in oklch, var(--ow-amber) 50%, transparent)" : "var(--ow-border)")}
                         >
+                          {/* Tap-to-filter area */}
+                          <button
+                            type="button"
+                            onClick={() => setFilterTank(filterTank === tank ? "" : tank)}
+                            className="text-left p-4 w-full transition-all"
+                            style={{ background: "transparent", border: "none", cursor: "pointer" }}
+                          >
                           {/* Tank name + variety */}
                           <div className="flex items-center justify-between gap-2 mb-3">
                             <span
@@ -789,132 +874,248 @@ export default function ThePress() {
                           <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", color: "var(--ow-text-lo)", marginTop: "0.75rem" }}>
                             {tankEntries.length} {tankEntries.length === 1 ? "entry" : "entries"} · tap to filter
                           </p>
-                        </button>
+                          </button>
+
+                          {/* Quick-add entry button — large touch target */}
+                          <button
+                            type="button"
+                            onClick={(ev) => { ev.stopPropagation(); setQuickEntryTank(tank); setEntrySheetOpen(true); }}
+                            className="w-full flex items-center justify-center gap-2 py-2.5 touch-target"
+                            style={{
+                              background: "color-mix(in oklch, var(--ow-amber) 6%, transparent)",
+                              borderTop: "1px solid color-mix(in oklch, var(--ow-amber) 15%, transparent)",
+                              borderLeft: "none",
+                              borderRight: "none",
+                              borderBottom: "none",
+                              color: "var(--ow-amber)",
+                              fontFamily: "'Lato',sans-serif",
+                              fontSize: "0.75rem",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                              <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                            </svg>
+                            Add entry
+                          </button>
+                        </div>
                       );
                     })}
                   </div>
                 </div>
               )}
 
-              {/* Live entries */}
+              {/* Live entries with pull-to-refresh */}
               {hasEntries && (
-                <div className="flex flex-col gap-4">
-                  {filteredEntries.length === 0 && isFiltered && (
-                    <p className="text-center py-8" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", color: "var(--ow-text-lo)", fontStyle: "italic" }}>
-                      No entries match your filters.
-                    </p>
+                <div
+                  ref={logListRef}
+                  onTouchStart={(e) => {
+                    const el = logListRef.current;
+                    if (!el || el.scrollTop > 0) return;
+                    pullStartY.current = e.touches[0].clientY;
+                  }}
+                  onTouchMove={(e) => {
+                    const el = logListRef.current;
+                    if (!el || el.scrollTop > 0) return;
+                    const dy = e.touches[0].clientY - pullStartY.current;
+                    if (dy > 0) setPullY(Math.min(dy, 80));
+                  }}
+                  onTouchEnd={() => {
+                    if (pullY > 50) { setIsPulling(true); refetchLog().finally(() => { setIsPulling(false); setPullY(0); }); }
+                    else setPullY(0);
+                  }}
+                >
+                  {/* Pull-to-refresh indicator */}
+                  {(pullY > 0 || isPulling) && (
+                    <div className="flex items-center justify-center py-3" style={{ height: `${Math.max(pullY, isPulling ? 40 : 0)}px`, overflow: "hidden" }}>
+                      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ animation: isPulling ? "spin 0.8s linear infinite" : "none", color: "var(--ow-amber)" }}>
+                        <path d="M9 2v4M9 12v4M2 9h4M12 9h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                      <span className="ml-2" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
+                        {isPulling ? "Refreshing…" : "Release to refresh"}
+                      </span>
+                    </div>
                   )}
-                  {filteredEntries.map((entry) => {
-                    const EVENT_ICONS: Record<string, string> = {
-                      addition: "⊕", measurement: "◎", racking: "⇄",
-                      inoculation: "✦", observation: "◉", other: "◈",
-                    };
-                    const icon = EVENT_ICONS[entry.eventType] ?? "◈";
-                    const dateStr = new Date(entry.entryAt).toLocaleDateString("en-AU", { day: "numeric", month: "short" });
 
-                    // Build a human-readable summary line from details
-                    let summaryLine = "";
-                    const d = entry.details as Record<string, string>;
-                    if (entry.eventType === "addition" && d.what) {
-                      summaryLine = `${d.what}${d.quantity ? " · " + d.quantity + (d.unit ?? "") : ""}${d.timing ? " · " + d.timing : ""}`;
-                    } else if (entry.eventType === "measurement" && d.what) {
-                      summaryLine = `${d.what}: ${d.value ?? ""}`;
-                    } else if (entry.eventType === "racking") {
-                      summaryLine = `${d.fromLocation ?? ""} → ${d.toLocation ?? ""}${d.volumeL ? " · " + d.volumeL + "L" : ""}`;
-                    } else if (entry.eventType === "inoculation" && d.what) {
-                      summaryLine = `${d.what} · ${d.productName ?? ""}${d.rate ? " · " + d.rate + " g/hL" : ""}`;
-                    } else if ((entry.eventType === "observation" || entry.eventType === "other") && d.text) {
-                      summaryLine = d.text.slice(0, 120);
-                    }
+                  <div className="flex flex-col gap-4">
+                    {filteredEntries.length === 0 && isFiltered && (
+                      <p className="text-center py-8" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", color: "var(--ow-text-lo)", fontStyle: "italic" }}>
+                        No entries match your filters.
+                      </p>
+                    )}
+                    {filteredEntries.slice(0, displayLimit).filter((e) => !deletedIds.has(Number(e.id))).map((entry) => {
+                      const EVENT_ICONS: Record<string, string> = {
+                        addition: "⊕", measurement: "◎", racking: "⇄",
+                        inoculation: "✦", observation: "◉", other: "◈",
+                      };
+                      const icon = EVENT_ICONS[entry.eventType] ?? "◈";
+                      const dateStr = new Date(entry.entryAt).toLocaleDateString("en-AU", { day: "numeric", month: "short" });
+                      const isSwiped = swipedEntryId === Number(entry.id);
 
-                    return (
-                      <div
-                        key={entry.id}
-                        className="cellar-card p-5"
-                        style={{ border: "1px solid var(--ow-border)" }}
-                      >
-                        <div className="flex items-start justify-between gap-4 mb-2">
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.7rem", color: "var(--ow-text-lo)", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>
-                              {dateStr}
-                            </span>
-                            <span
-                              className="px-2 py-0.5 rounded-sm"
-                              style={{
-                                fontFamily: "'Fira Code',monospace", fontSize: "0.7rem",
-                                color: "var(--ow-amber)",
-                                background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
-                                border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
-                              }}
-                            >
-                              {entry.tankName}
-                            </span>
-                            <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem", fontWeight: 600, color: "var(--ow-text-hi)" }}>
-                              {entry.variety}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <span
-                              className="px-2 py-0.5 rounded-sm text-xs flex items-center gap-1"
-                              style={{
-                                fontFamily: "'Fira Code',monospace", fontSize: "0.65rem",
-                                color: "var(--ow-text-mid)",
-                                background: "var(--ow-bg-inset)",
-                                border: "1px solid var(--ow-border)",
-                              }}
-                            >
-                              <span>{icon}</span>
-                              {entry.eventType}
-                            </span>
-                            {/* Quick-entry button: add another entry for same tank */}
+                      // Build a human-readable summary line from details
+                      let summaryLine = "";
+                      const d = entry.details as Record<string, string>;
+                      if (entry.eventType === "addition" && d.what) {
+                        summaryLine = `${d.what}${d.quantity ? " · " + d.quantity + (d.unit ?? "") : ""}${d.timing ? " · " + d.timing : ""}`;
+                      } else if (entry.eventType === "measurement" && d.what) {
+                        summaryLine = `${d.what}: ${d.value ?? ""}`;
+                      } else if (entry.eventType === "racking") {
+                        summaryLine = `${d.fromLocation ?? ""} → ${d.toLocation ?? ""}${d.volumeL ? " · " + d.volumeL + "L" : ""}`;
+                      } else if (entry.eventType === "inoculation" && d.what) {
+                        summaryLine = `${d.what} · ${d.productName ?? ""}${d.rate ? " · " + d.rate + " g/hL" : ""}`;
+                      } else if ((entry.eventType === "observation" || entry.eventType === "other") && d.text) {
+                        summaryLine = d.text.slice(0, 120);
+                      }
+
+                      return (
+                        <div key={entry.id} className="relative overflow-hidden rounded-sm">
+                          {/* Swipe-to-delete: red reveal layer */}
+                          <div
+                            className="absolute inset-y-0 right-0 flex items-center px-5"
+                            style={{
+                              background: "oklch(0.45 0.18 25)",
+                              width: "80px",
+                              opacity: isSwiped ? 1 : 0,
+                              transition: "opacity 0.15s",
+                            }}
+                          >
                             <button
                               type="button"
-                              onClick={() => { setQuickEntryTank(entry.tankName); setEntrySheetOpen(true); }}
-                              title={`Add entry for ${entry.tankName}`}
-                              className="w-6 h-6 rounded-sm flex items-center justify-center transition-colors"
-                              style={{ background: "var(--ow-bg-inset)", border: "1px solid var(--ow-border)", color: "var(--ow-text-lo)", cursor: "pointer" }}
+                              onClick={() => {
+                                const id = Number(entry.id);
+                                setDeletedIds((prev) => { const s = new Set(prev); s.add(id); return s; });
+                                setSwipedEntryId(null);
+                                deleteEntry.mutate({ id: entry.id });
+                              }}
+                              className="flex flex-col items-center gap-1"
+                              style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}
                             >
-                              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                <path d="M5 2v6M2 5h6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2 4h10M5 4V2.5h4V4M5.5 6.5v4M8.5 6.5v4M3 4l.5 7.5h7L11 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
                               </svg>
+                              <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.6rem", letterSpacing: "0.06em" }}>DELETE</span>
                             </button>
                           </div>
-                        </div>
 
-                        {summaryLine && (
-                          <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 400, fontSize: "0.875rem", lineHeight: 1.65, color: "var(--ow-text-mid)", marginBottom: "0.5rem" }}>
-                            {summaryLine}
-                          </p>
-                        )}
+                          {/* Entry card — slides left on swipe */}
+                          <div
+                            className="cellar-card p-5"
+                            style={{
+                              border: "1px solid var(--ow-border)",
+                              transform: isSwiped ? "translateX(-80px)" : "translateX(0)",
+                              transition: "transform 0.2s ease",
+                              position: "relative",
+                            }}
+                            onTouchStart={(e) => { swipeStartX.current = e.touches[0].clientX; swipeCurrentX.current = e.touches[0].clientX; }}
+                            onTouchMove={(e) => { swipeCurrentX.current = e.touches[0].clientX; }}
+                            onTouchEnd={() => {
+                              const dx = swipeStartX.current - swipeCurrentX.current;
+                              if (dx > 60) setSwipedEntryId(Number(entry.id));
+                              else if (dx < -20) setSwipedEntryId(null);
+                            }}
+                          >
+                            <div className="flex items-start justify-between gap-4 mb-2">
+                              <div className="flex items-center gap-3 flex-wrap">
+                                <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.7rem", color: "var(--ow-text-lo)", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>
+                                  {dateStr}
+                                </span>
+                                <span
+                                  className="px-2 py-0.5 rounded-sm"
+                                  style={{
+                                    fontFamily: "'Fira Code',monospace", fontSize: "0.7rem",
+                                    color: "var(--ow-amber)",
+                                    background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+                                    border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
+                                  }}
+                                >
+                                  {entry.tankName}
+                                </span>
+                                <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem", fontWeight: 600, color: "var(--ow-text-hi)" }}>
+                                  {entry.variety}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <span
+                                  className="px-2 py-0.5 rounded-sm text-xs flex items-center gap-1"
+                                  style={{
+                                    fontFamily: "'Fira Code',monospace", fontSize: "0.65rem",
+                                    color: "var(--ow-text-mid)",
+                                    background: "var(--ow-bg-inset)",
+                                    border: "1px solid var(--ow-border)",
+                                  }}
+                                >
+                                  <span>{icon}</span>
+                                  {entry.eventType}
+                                </span>
+                                {/* Quick-entry button: add another entry for same tank */}
+                                <button
+                                  type="button"
+                                  onClick={() => { setQuickEntryTank(entry.tankName); setEntrySheetOpen(true); }}
+                                  title={`Add entry for ${entry.tankName}`}
+                                  className="w-7 h-7 rounded-sm flex items-center justify-center transition-colors touch-target"
+                                  style={{ background: "var(--ow-bg-inset)", border: "1px solid var(--ow-border)", color: "var(--ow-text-lo)", cursor: "pointer" }}
+                                >
+                                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                    <path d="M5 2v6M2 5h6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
 
-                        {entry.noteText && (
-                          <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.8125rem", lineHeight: 1.65, color: "var(--ow-text-lo)", fontStyle: "italic" }}>
-                            {entry.noteText}
-                          </p>
-                        )}
+                            {summaryLine && (
+                              <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 400, fontSize: "0.875rem", lineHeight: 1.65, color: "var(--ow-text-mid)", marginBottom: "0.5rem" }}>
+                                {summaryLine}
+                              </p>
+                            )}
 
-                        {entry.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            {entry.tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="px-2 py-0.5 rounded-sm"
-                                style={{
-                                  fontFamily: "'Fira Code',monospace", fontSize: "0.65rem",
-                                  color: "var(--ow-text-lo)",
-                                  background: "var(--ow-bg-inset)",
-                                  border: "1px solid var(--ow-border)",
-                                  letterSpacing: "0.04em",
-                                }}
-                              >
-                                {tag}
-                              </span>
-                            ))}
+                            {entry.noteText && (
+                              <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.8125rem", lineHeight: 1.65, color: "var(--ow-text-lo)", fontStyle: "italic" }}>
+                                {entry.noteText}
+                              </p>
+                            )}
+
+                            {entry.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-2 mt-3">
+                                {entry.tags.map((tag) => (
+                                  <span
+                                    key={tag}
+                                    className="px-2 py-0.5 rounded-sm"
+                                    style={{
+                                      fontFamily: "'Fira Code',monospace", fontSize: "0.65rem",
+                                      color: "var(--ow-text-lo)",
+                                      background: "var(--ow-bg-inset)",
+                                      border: "1px solid var(--ow-border)",
+                                      letterSpacing: "0.04em",
+                                    }}
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                        </div>
+                      );
+                    })}
+
+                    {/* Load more button */}
+                    {filteredEntries.length > displayLimit && (
+                      <button
+                        type="button"
+                        onClick={() => setDisplayLimit((n) => n + 20)}
+                        className="w-full py-3 rounded-sm text-sm"
+                        style={{
+                          background: "var(--ow-bg-inset)",
+                          border: "1px solid var(--ow-border)",
+                          color: "var(--ow-text-lo)",
+                          fontFamily: "'Lato',sans-serif",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Load 20 more · {filteredEntries.length - displayLimit} remaining
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -925,6 +1126,30 @@ export default function ThePress() {
                 onSaved={() => { setEntrySheetOpen(false); refetchLog(); }}
                 prefillTank={quickEntryTank}
               />
+
+              {/* Sticky FAB — Add Entry (hidden when sheet is open) */}
+              {!entrySheetOpen && (
+                <button
+                  type="button"
+                  onClick={() => { setQuickEntryTank(undefined); setEntrySheetOpen(true); }}
+                  className="sticky-bottom-safe fixed bottom-6 right-5 z-30 flex items-center gap-2 px-5 py-3.5 rounded-full shadow-lg touch-target"
+                  style={{
+                    background: "var(--ow-amber)",
+                    color: "oklch(0.11 0.008 60)",
+                    fontFamily: "'Lato',sans-serif",
+                    fontWeight: 700,
+                    fontSize: "0.875rem",
+                    border: "none",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 20px oklch(0.72 0.12 75 / 40%)",
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                  Add Entry
+                </button>
+              )}
             </div>
           )}
 
@@ -1424,6 +1649,74 @@ export default function ThePress() {
           if (newBatchId) setSelectedBatchId(newBatchId);
         }}
       />
+
+      {/* ── Mobile bottom tab bar (hidden when any sheet is open) ── */}
+      {!entrySheetOpen && !reminderSheetOpen && !batchSheetOpen && (
+        <nav
+          className="md:hidden fixed bottom-0 left-0 right-0 z-20"
+          style={{
+            background: "var(--ow-bg-card)",
+            borderTop: "1px solid var(--ow-border)",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          }}
+        >
+          <div className="flex">
+            {[
+              { id: "log" as const, label: "Log", icon: (
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <rect x="3" y="2" width="12" height="14" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
+                  <path d="M6 6h6M6 9h6M6 12h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
+              )},
+              { id: "calcs" as const, label: "Calc", icon: (
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <rect x="3" y="2" width="12" height="14" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
+                  <path d="M6 6h6M6 9h2M10 9h2M6 12h2M10 12h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
+              )},
+              { id: "notes" as const, label: "Batches", icon: (
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M4 4h10v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4z" stroke="currentColor" strokeWidth="1.3" />
+                  <path d="M7 4V2h4v2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                  <path d="M6 8h6M6 11h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
+              )},
+              { id: "scenarios" as const, label: "More", icon: (
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <circle cx="5" cy="9" r="1.2" fill="currentColor" />
+                  <circle cx="9" cy="9" r="1.2" fill="currentColor" />
+                  <circle cx="13" cy="9" r="1.2" fill="currentColor" />
+                </svg>
+              )},
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className="flex-1 flex flex-col items-center justify-center gap-1 py-2.5 touch-target"
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: activeTab === tab.id ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                  transition: "color 0.15s",
+                }}
+              >
+                {tab.icon}
+                <span style={{
+                  fontFamily: "'Lato',sans-serif",
+                  fontSize: "0.6rem",
+                  letterSpacing: "0.06em",
+                  fontWeight: activeTab === tab.id ? 700 : 400,
+                  textTransform: "uppercase",
+                }}>
+                  {tab.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </nav>
+      )}
     </div>
   );
 }
