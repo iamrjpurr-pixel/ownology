@@ -1,7 +1,10 @@
 /**
  * OwnologyLogo — Cellar Key Brand Mark
  * Design: Vintage skeleton key with neural network node pattern in the bow.
- * Amber gold (#D4A853) key + cream (#F0E6D3) wordmark on transparent background.
+ * Key icon: always amber gold.
+ * Wordmark: theme-aware via CSS variable --ow-logo-wordmark
+ *   dark mode  → cream  (oklch(0.92 0.018 75))
+ *   light mode → warm dark grey (oklch(0.28 0.012 60))
  * Scales cleanly at any size. Use `size` prop to control height in px.
  */
 
@@ -10,8 +13,10 @@ interface OwnologyLogoProps {
   size?: number;
   /** Show wordmark beside the icon. Default: true */
   showWordmark?: boolean;
-  /** Colour variant. Default: "gold" */
+  /** Colour variant for the key icon. Default: "gold" */
   variant?: "gold" | "light" | "dark";
+  /** Override wordmark colour. Defaults to CSS var --ow-logo-wordmark. */
+  wordmarkColor?: string;
 }
 
 const AMBER  = "#D4A853";
@@ -22,9 +27,11 @@ export default function OwnologyLogo({
   size = 32,
   showWordmark = true,
   variant = "gold",
+  wordmarkColor,
 }: OwnologyLogoProps) {
-  const keyColor      = variant === "dark" ? DARK   : AMBER;
-  const wordmarkColor = variant === "dark" ? DARK   : CREAM;
+  const keyColor = variant === "dark" ? DARK : variant === "light" ? CREAM : AMBER;
+  // Use explicit override, or fall back to the CSS variable set per-theme in index.css
+  const wmColor  = wordmarkColor ?? "var(--ow-logo-wordmark)";
 
   // Key icon proportions: 20 wide × 44 tall viewBox
   const iconH = size;
@@ -95,7 +102,7 @@ export default function OwnologyLogo({
             fontStyle="italic"
             fontWeight="400"
             fontSize="28"
-            fill={wordmarkColor}
+            fill={wmColor}
             letterSpacing="-0.5"
           >
             Ownology

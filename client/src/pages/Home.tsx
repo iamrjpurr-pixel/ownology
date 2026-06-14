@@ -319,7 +319,7 @@ function Nav() {
               )
             ))}
             {/* More dropdown */}
-            <MoreDropdown extraItems={isOwner ? [{ label: "Admin", href: "/admin" }] : undefined} />
+            <MoreDropdown extraItems={isOwner ? [{ label: "Admin", href: "/admin" }, { label: "⚙ Build Index", href: "/build-index" }] : undefined} />
           </div>
 
           <div className="hidden md:flex items-center gap-3">
@@ -478,6 +478,18 @@ function Nav() {
                   Admin
                 </span>
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </Link>
+              <Link
+                href="/build-index"
+                onClick={handleNavClick}
+                className="flex items-center justify-between transition-colors"
+                style={{ fontFamily: "'Lato',sans-serif", fontWeight: 400, fontSize: "0.9375rem", color: "var(--ow-text-mid)", borderBottom: "1px solid var(--ow-border)", letterSpacing: "0.01em", minHeight: "48px" }}
+              >
+                <span className="flex items-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3"/><path d="M5 7h4M7 5v4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                  Build Index
+                </span>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="var(--ow-border)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </Link>
             </div>
           )}

@@ -107,32 +107,51 @@ const FOUNDING_SPOTS_REMAINING = 99;
 
 // Feature explanations for info icon popovers — keyed by exact feature string
 const FEATURE_EXPLANATIONS: Record<string, string> = {
+  // Free Run
+  "5 Compliance AI queries per month": "Ask up to 5 regulatory questions per month across LIP, FSANZ, and state liquor licensing — no credit card required.",
+  "Vintage log (5 entries per month)": "Log up to 5 cellar events per month — enough to follow a single fermentation from inoculation to press.",
+  // The Cellar
+  "Full Free Run AI tutor — 40+ subjects": "Unlimited access to the full lesson library covering fermentation chemistry, microbiology, sensory science, viticulture, and regulatory compliance.",
   "30 AI tutor credits per month": "Credits power AI tutor interactions — questions, quizzes, and 'explain it differently' requests. 30 credits ≈ 30 lesson conversations per month.",
-  "150 AI tutor credits per month": "150 credits per month — enough for daily lesson questions, quizzes, and deep-dives throughout the vintage.",
-  "Unlimited AI tutor credits": "No monthly cap. Ask as many questions, run as many quizzes, and request as many explanations as your team needs.",
-  "Custom document upload (your SOPs)": "Upload your winery's own SOPs, recipes, and protocols. Ownology will answer questions grounded in your specific documents, not just general knowledge.",
-  "Priority Compliance Agent responses": "Your compliance queries jump the queue — faster response times during busy harvest periods when you need answers in seconds, not minutes.",
+  "Unlimited Compliance AI queries": "No monthly cap on regulatory questions. Ask anything across LIP, FSANZ, state licensing, and export requirements.",
+  // The Press
+  "Full cellar operations suite": "The complete Do pillar: The Press (Vintage Log, Batch Book, Barrels, Packaging, Calculations, Export Docs), Cellar Tasks, Vineyard, Quick Entry, and Dashboard.",
+  "Knowledge Platform — 31 SOPs, 8 categories": "The full Know pillar: 31 industry-standard SOPs across Fermentation, Sanitation, Barrels, Bottling, Lab, Onboarding, Food Safety, and Traceability. Add Decision Logic, Tribal Knowledge, and Vintage Notes to each SOP.",
+  "Priority Compliance AI responses": "Your compliance queries jump the queue — faster response times during busy harvest periods when you need answers in seconds, not minutes.",
+  "Vintage log PDF export": "Export your full vintage log as a formatted PDF — useful for audits, cellar notes, and end-of-vintage records.",
+  // Cellar Master
   "3 team seats (winemaker + 2 staff)": "One Cellar Master account covers you plus two additional team members — cellar hands, assistant winemakers, or vineyard staff.",
   "Annual knowledge base review alert": "Each year, Ownology flags any regulatory changes in your state jurisdictions so your compliance knowledge stays current without manual checking.",
-  "Dedicated onboarding call (30 min)": "A 30-minute video call with the Ownology team to configure your document library, set up team seats, and walk through the platform for your specific winery.",
+  "Dedicated onboarding call (30 min)": "A 30-minute video call with the Ownology team to configure your Knowledge Platform, set up team seats, and walk through the platform for your specific winery.",
+  "Unlimited AI tutor credits": "No monthly cap. Ask as many questions, run as many quizzes, and request as many explanations as your team needs.",
+};
+
+// Pillar tags shown on each tier card
+type PillarTag = { label: string; color: string };
+const PILLAR_TAGS: Record<string, PillarTag[]> = {
+  free_run:     [{ label: "GUIDE", color: "oklch(0.65 0.10 160)" }],
+  cellar:       [{ label: "LEARN", color: "oklch(0.65 0.10 220)" }, { label: "GUIDE", color: "oklch(0.65 0.10 160)" }],
+  press:        [{ label: "DO", color: "oklch(0.72 0.12 75)" }, { label: "KNOW", color: "oklch(0.62 0.10 45)" }, { label: "GUIDE", color: "oklch(0.65 0.10 160)" }],
+  cellar_master:[{ label: "DO", color: "oklch(0.72 0.12 75)" }, { label: "KNOW", color: "oklch(0.62 0.10 45)" }, { label: "LEARN", color: "oklch(0.65 0.10 220)" }, { label: "GUIDE", color: "oklch(0.65 0.10 160)" }],
 };
 
 const TIERS = [
   {
     id: "free_run",
     name: "Free Run",
-    tagline: "Unforced. Natural. The first flow.",
+    tagline: "Orientation & compliance basics. No card required.",
+    audience: "Curious about winemaking or exploring Ownology.",
     monthlyPrice: 0,
     annualPrice: 0,
     highlight: false,
     badge: null,
     color: "oklch(0.55 0.015 75)",
     features: [
-      "5 Compliance Agent queries per month",
+      "5 Compliance AI queries per month",
       "3 Free Run lesson previews",
+      "Vintage log (5 entries per month)",
+      "Getting Started Guide",
       "Full public Resources library",
-      "Waitlist priority for new features",
-      "Access to all 5 state jurisdictions",
     ],
     cta: "Start Free",
     ctaHref: "#waitlist",
@@ -141,17 +160,18 @@ const TIERS = [
   {
     id: "cellar",
     name: "The Cellar",
-    tagline: "Where knowledge is stored and matures.",
+    tagline: "Learn the science. Stay compliant. For home winemakers.",
+    audience: "Home winemakers and wine students who want to learn.",
     monthlyPrice: 19,
     annualPrice: 190,
     highlight: false,
     badge: "FOUNDING MEMBER",
     color: "oklch(0.65 0.08 75)",
     features: [
-      "Unlimited Compliance Agent queries",
-      "Full Free Run lesson library (40+ subjects)",
+      "Full Free Run AI tutor — 40+ subjects",
       "30 AI tutor credits per month",
-      "The Press working board",
+      "Unlimited Compliance AI queries",
+      "Vintage log (unlimited entries)",
       "Email support",
       "Founding member badge (first 99)",
     ],
@@ -162,20 +182,20 @@ const TIERS = [
   {
     id: "press",
     name: "The Press",
-    tagline: "Deeper extraction. The full depth.",
+    tagline: "Full cellar operations + institutional knowledge. For boutique wineries.",
+    audience: "Boutique winery teams who need operations and protocol management.",
     monthlyPrice: 49,
     annualPrice: 490,
     highlight: true,
     badge: "MOST POPULAR",
     color: "oklch(0.72 0.12 75)",
     features: [
-      "Everything in The Cellar",
-      "150 AI tutor credits per month",
-      "Custom document upload (your SOPs)",
-      "Priority Compliance Agent responses",
+      "Full cellar operations suite",
+      "Knowledge Platform — 31 SOPs, 8 categories",
+      "Decision Logic + Tribal Knowledge capture",
+      "Priority Compliance AI responses",
       "Vintage log PDF export",
       "Phone & chat support (business hours)",
-      "The Press member badge",
     ],
     cta: "Enter The Press",
     ctaHref: "#waitlist",
@@ -184,7 +204,8 @@ const TIERS = [
   {
     id: "cellar_master",
     name: "Cellar Master",
-    tagline: "The authoritative record. The full system.",
+    tagline: "All four pillars. For multi-person winery teams.",
+    audience: "Winery teams with cellar hands, assistant winemakers, or vineyard staff.",
     monthlyPrice: 99,
     annualPrice: 990,
     highlight: false,
@@ -192,9 +213,8 @@ const TIERS = [
     color: "oklch(0.80 0.14 75)",
     features: [
       "Everything in The Press",
-      "Unlimited AI tutor credits",
+      "Full Free Run AI tutor — unlimited credits",
       "3 team seats (winemaker + 2 staff)",
-      "Early access to all new features",
       "Dedicated onboarding call (30 min)",
       "Annual knowledge base review alert",
       "Cellar Master badge + member number",
@@ -661,9 +681,22 @@ function TierCard({
           <h3 className="mb-1" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.375rem", fontWeight: 600, color: tier.color }}>
             {tier.name}
           </h3>
+          {/* Pillar tags */}
+          <div className="flex flex-wrap gap-1 mb-2">
+            {(PILLAR_TAGS[tier.id] ?? []).map(tag => (
+              <span key={tag.label} style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.6rem", letterSpacing: "0.1em", color: tag.color, border: `1px solid ${tag.color}`, borderRadius: "2px", padding: "1px 5px" }}>
+                {tag.label}
+              </span>
+            ))}
+          </div>
           <p className="text-sm" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "oklch(0.55 0.012 75)", fontStyle: "italic" }}>
             {tier.tagline}
           </p>
+          {(tier as typeof TIERS[0] & { audience?: string }).audience && (
+            <p className="text-xs mt-1" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400, color: "oklch(0.48 0.010 75)" }}>
+              {(tier as typeof TIERS[0] & { audience?: string }).audience}
+            </p>
+          )}
         </div>
         <div className="mb-6">
           {tier.monthlyPrice === 0 ? (

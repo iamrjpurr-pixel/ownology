@@ -719,6 +719,128 @@ export default function Guide() {
           </div>
         </section>
 
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* Section 5 — Pillar Access by Tier                                    */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <section className="mb-16">
+          <div className="flex items-center gap-3 mb-6">
+            <div style={{ width: "1px", height: "1.5rem", background: AMBER }} />
+            <p style={{ fontFamily: MONO, fontSize: "0.65rem", letterSpacing: "0.14em", color: AMBER, textTransform: "uppercase" }}>
+              Membership
+            </p>
+          </div>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1.5rem", color: TEXT_HI, marginBottom: "0.5rem" }}>
+            Which pillars do you need?
+          </h2>
+          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9375rem", color: TEXT_MID, lineHeight: 1.7, marginBottom: "1.75rem", maxWidth: "560px" }}>
+            Not every winery needs every pillar. Your membership tier determines which pillars you can access — so you only pay for what your operation actually uses.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {([
+              {
+                tier: "Free Run",
+                price: "Free",
+                audience: "Curious about winemaking",
+                highlight: false,
+                pillars: [
+                  { label: "GUIDE", color: "oklch(0.65 0.10 160)", desc: "Orientation, compliance basics, 5 queries/mo" },
+                ],
+                href: "/pricing",
+                cta: "Start free",
+              },
+              {
+                tier: "The Cellar",
+                price: "$19/mo",
+                audience: "Home winemakers & wine students",
+                highlight: false,
+                pillars: [
+                  { label: "LEARN", color: "oklch(0.65 0.10 220)", desc: "Full Free Run AI tutor, 40+ subjects" },
+                  { label: "GUIDE", color: "oklch(0.65 0.10 160)", desc: "Unlimited Compliance AI queries" },
+                ],
+                href: "/pricing",
+                cta: "Join The Cellar",
+              },
+              {
+                tier: "The Press",
+                price: "$49/mo",
+                audience: "Boutique winery teams",
+                highlight: true,
+                pillars: [
+                  { label: "DO",    color: "oklch(0.72 0.12 75)",  desc: "Full cellar operations suite" },
+                  { label: "KNOW",  color: "oklch(0.62 0.10 45)",  desc: "31 SOPs, Decision Logic, Tribal Knowledge" },
+                  { label: "GUIDE", color: "oklch(0.65 0.10 160)", desc: "Priority Compliance AI" },
+                ],
+                href: "/pricing",
+                cta: "Enter The Press",
+              },
+              {
+                tier: "Cellar Master",
+                price: "$99/mo",
+                audience: "Multi-person winery teams",
+                highlight: false,
+                pillars: [
+                  { label: "DO",    color: "oklch(0.72 0.12 75)",  desc: "Full cellar operations + 3 team seats" },
+                  { label: "KNOW",  color: "oklch(0.62 0.10 45)",  desc: "Knowledge Platform + team editing" },
+                  { label: "LEARN", color: "oklch(0.65 0.10 220)", desc: "Unlimited AI tutor credits" },
+                  { label: "GUIDE", color: "oklch(0.65 0.10 160)", desc: "Onboarding call + annual review" },
+                ],
+                href: "/pricing",
+                cta: "Claim Cellar Master",
+              },
+            ] as Array<{ tier: string; price: string; audience: string; highlight: boolean; pillars: Array<{ label: string; color: string; desc: string }>; href: string; cta: string }>).map(t => (
+              <div key={t.tier} style={{
+                background: t.highlight ? "oklch(0.16 0.012 60)" : BG_CARD,
+                border: t.highlight ? "1px solid oklch(0.72 0.12 75 / 40%)" : `1px solid ${BORDER}`,
+                borderRadius: "4px",
+                padding: "1.25rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.75rem",
+              }}>
+                <div>
+                  <div className="flex items-baseline justify-between gap-2 mb-0.5">
+                    <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1.0625rem", color: TEXT_HI }}>{t.tier}</span>
+                    <span style={{ fontFamily: MONO, fontSize: "0.75rem", color: t.highlight ? AMBER : TEXT_MID }}>{t.price}</span>
+                  </div>
+                  <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.75rem", color: TEXT_LO, fontStyle: "italic" }}>{t.audience}</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {t.pillars.map(p => (
+                    <div key={p.label} className="flex items-start gap-2">
+                      <span style={{ fontFamily: MONO, fontSize: "0.58rem", letterSpacing: "0.1em", color: p.color, border: `1px solid ${p.color}`, borderRadius: "2px", padding: "1px 5px", flexShrink: 0, marginTop: "2px" }}>
+                        {p.label}
+                      </span>
+                      <span style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.78125rem", color: TEXT_MID, lineHeight: 1.5 }}>{p.desc}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link href={t.href} style={{
+                  display: "block",
+                  textAlign: "center",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "2px",
+                  fontFamily: SANS,
+                  fontWeight: 600,
+                  fontSize: "0.75rem",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase" as const,
+                  textDecoration: "none",
+                  marginTop: "auto",
+                  background: t.highlight ? AMBER : "transparent",
+                  color: t.highlight ? "oklch(0.11 0.008 60)" : AMBER,
+                  border: t.highlight ? "none" : "1px solid oklch(0.72 0.12 75 / 35%)",
+                }}>
+                  {t.cta}
+                </Link>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.8125rem", color: TEXT_LO, marginTop: "1rem" }}>
+            All tiers include the Getting Started Guide and the public Resources library.{" "}
+            <Link href="/pricing" style={{ color: AMBER, textDecoration: "none" }}>See full pricing →</Link>
+          </p>
+        </section>
+
         {/* ── Footer note ── */}
         <div style={{
           background: BG_CARD, border: `1px solid ${BORDER}`, borderRadius: "4px",
