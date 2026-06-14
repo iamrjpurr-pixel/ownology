@@ -59,7 +59,7 @@ function saveRecentQuestion(question: string) {
 }
 
 // ─── Types & constants ───────────────────────────────────────────────────────
-type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW" | "WA" | "QLD" | "TAS" | "NT" | "NZ";
+type StateFilter = "All" | "Federal" | "SA" | "VIC" | "NSW" | "WA" | "QLD" | "TAS" | "NT" | "NZ" | "HomeWinemaker";
 type Citation = {
   title: string;
   section: string | null;
@@ -74,7 +74,7 @@ type Message = {
   disclaimer?: string;
 };
 
-const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS", "NT", "NZ"];
+const STATE_FILTERS: StateFilter[] = ["All", "Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS", "NT", "NZ", "HomeWinemaker"];
 
 const STATE_LABELS: Record<StateFilter, string> = {
   All: "All Jurisdictions",
@@ -87,9 +87,17 @@ const STATE_LABELS: Record<StateFilter, string> = {
   TAS: "Tasmania",
   NT: "Northern Territory",
   NZ: "New Zealand",
+  HomeWinemaker: "🍇 Home Winemaker",
 };
 
 const SAMPLE_QUESTIONS: { q: string; state: StateFilter }[] = [
+  { q: "How do I know when my cap is ready to fall and it's time to press?", state: "HomeWinemaker" },
+  { q: "What is the marbles trick for topping up a demijohn?", state: "HomeWinemaker" },
+  { q: "What yeast strain should I use for a Shiraz?", state: "HomeWinemaker" },
+  { q: "How often should I punchdown during active fermentation?", state: "HomeWinemaker" },
+  { q: "When should I do my first racking after pressing?", state: "HomeWinemaker" },
+  { q: "What Brix should I target when picking grapes for a home red wine?", state: "HomeWinemaker" },
+  { q: "How do I calculate the approximate alcohol from my starting Brix?", state: "HomeWinemaker" },
   { q: "What licences do I need to open a cellar door in South Australia?", state: "SA" },
   { q: "What is the Wine Producer Rebate cap for 2026?", state: "Federal" },
   { q: "What are the WET registration thresholds?", state: "Federal" },

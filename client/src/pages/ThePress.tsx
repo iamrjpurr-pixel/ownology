@@ -398,6 +398,60 @@ export default function ThePress() {
             *Le pressoir extrait ce que le jus de goutte ne peut atteindre.*
           </p>
 
+          {/* ── Fermentation Watch Banner ── */}
+          {(() => {
+            const activeFermentTanks = logEntries
+              ? Array.from(new Set(logEntries.map((e) => e.tankName)))
+                  .map((tank) => {
+                    const entries = logEntries.filter((e) => e.tankName === tank);
+                    const inoc = entries.find((e) => e.eventType === "inoculation");
+                    const hasRacking = entries.some((e) => e.eventType === "racking");
+                    if (!inoc || hasRacking) return null;
+                    const days = Math.floor((Date.now() - new Date(inoc.entryAt).getTime()) / 86400000);
+                    if (days > 14) return null;
+                    const variety = inoc.variety;
+                    return { tank, variety, days };
+                  })
+                  .filter(Boolean) as { tank: string; variety: string; days: number }[]
+              : [];
+            if (!isLoggedIn || activeFermentTanks.length === 0) return null;
+            const urgent = activeFermentTanks.filter((t) => t.days >= 10);
+            return (
+              <div
+                className="mt-6 rounded-sm px-4 py-3 flex items-start gap-3"
+                style={{
+                  background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)",
+                  border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
+                }}
+              >
+                <span style={{ fontSize: "1.1rem", lineHeight: 1 }}>🍇</span>
+                <div className="flex-1 min-w-0">
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.8rem", color: "var(--ow-amber)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                    Fermentation Watch
+                    {urgent.length > 0 && (
+                      <span
+                        className="ml-2 px-1.5 py-0.5 rounded-sm text-xs"
+                        style={{ background: "color-mix(in oklch, var(--ow-amber) 20%, transparent)", color: "var(--ow-amber)", fontFamily: "'Fira Code',monospace", fontSize: "0.65rem" }}
+                      >
+                        {urgent.length} APPROACHING PRESS
+                      </span>
+                    )}
+                  </p>
+                  <p className="mt-1" style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.8125rem", color: "var(--ow-text-mid)", lineHeight: 1.55 }}>
+                    {activeFermentTanks.map((t) => `${t.tank} (${t.variety}) — Day ${t.days}`).join(" · ")}
+                  </p>
+                  <button
+                    onClick={() => { setActiveTab("log"); setEntrySheetOpen(true); }}
+                    className="mt-2 text-xs"
+                    style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-amber)", background: "none", border: "none", cursor: "pointer", padding: 0, opacity: 0.85 }}
+                  >
+                    Log today's pump-over →
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Vintage season indicator */}
           <div className="mt-6 flex items-center gap-4 flex-wrap">
             <div
@@ -1158,11 +1212,56 @@ export default function ThePress() {
           {/* Milestone Calendar */}
           {activeTab === "calendar" && (
             <div>
-              <SectionHeader
-                label="Projected Timeline"
-                title="Milestone Calendar"
-                subtitle="Auto-calculated racking, pressing, and bottling windows for each tank — based on inoculation date and variety."
-              />
+              <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
+                <SectionHeader
+                  label="Projected Timeline"
+                  title="Milestone Calendar"
+                  subtitle="Auto-calculated racking, pressing, and bottling windows for each tank — based on inoculation date and variety."
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Inject print-specific styles, trigger print, then remove
+                    const style = document.createElement("style");
+                    style.id = "milestone-print-style";
+                    style.textContent = `
+                      @media print {
+                        body * { visibility: hidden !important; }
+                        .milestone-print-area, .milestone-print-area * { visibility: visible !important; }
+                        .milestone-print-area { position: fixed !important; inset: 0 !important; background: #fff !important; color: #111 !important; padding: 2rem !important; overflow: auto !important; }
+                        .milestone-print-area h2, .milestone-print-area h3, .milestone-print-area p, .milestone-print-area span, .milestone-print-area div { color: #111 !important; border-color: #ccc !important; background: transparent !important; }
+                        .milestone-no-print { display: none !important; }
+                      }
+                    `;
+                    document.head.appendChild(style);
+                    // Mark the calendar area for print
+                    const calArea = document.querySelector(".milestone-calendar-root");
+                    if (calArea) calArea.classList.add("milestone-print-area");
+                    window.print();
+                    setTimeout(() => {
+                      document.getElementById("milestone-print-style")?.remove();
+                      calArea?.classList.remove("milestone-print-area");
+                    }, 500);
+                  }}
+                  className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-sm text-sm milestone-no-print"
+                  style={{
+                    background: "var(--ow-bg-card)",
+                    border: "1px solid var(--ow-border)",
+                    color: "var(--ow-text-mid)",
+                    fontFamily: "'Lato',sans-serif",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M3 9H2a1 1 0 00-1 1v2a1 1 0 001 1h10a1 1 0 001-1v-2a1 1 0 00-1-1h-1" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                    <path d="M7 1v7M4.5 5.5L7 8l2.5-2.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="11" cy="11" r="0.8" fill="currentColor"/>
+                  </svg>
+                  Print / PDF
+                </button>
+              </div>
+              <div className="milestone-calendar-root">
               <MilestoneCalendar
                 logEntries={(logEntries ?? []).map((e) => ({
                   id: e.id,
@@ -1176,6 +1275,7 @@ export default function ThePress() {
                 }))}
                 onAddEntry={(tankName) => { setQuickEntryTank(tankName); setEntrySheetOpen(true); }}
               />
+              </div>
             </div>
           )}
 

@@ -772,18 +772,45 @@ User question: ${input.question}`;
         };
       }
 
-      // ── Stage 2: Focused answer with scoped knowledge base ────────────────
-      const scopeJurisdictions =
-        input.stateFilter && input.stateFilter !== "All" && input.stateFilter !== "Federal"
+      // ── Stage 2: Focused answer with scoped knowledge base ────────────────────────────────────────
+      const isHomeWinemaker = input.stateFilter === "HomeWinemaker";
+      const scopeJurisdictions = isHomeWinemaker
+        ? ["HomeWinemaker"]
+        : input.stateFilter && input.stateFilter !== "All" && input.stateFilter !== "Federal"
           ? ["Federal", input.stateFilter]
           : input.stateFilter === "Federal"
           ? ["Federal"]
           : detectedJurisdictions;
 
       const scopedKB = buildScopedKnowledgeBase(scopeJurisdictions);
-      const jurisdictionLabel = scopeJurisdictions.join(", ");
+      const jurisdictionLabel = isHomeWinemaker ? "Home Winemaker Practical Guide" : scopeJurisdictions.join(", ");
 
-      const systemPrompt = `You are a regulatory compliance assistant specialising in Australian winery regulations.
+      const systemPrompt = isHomeWinemaker
+        ? `You are a practical home winemaking assistant. You help home winemakers with hands-on questions about the winemaking process.
+You have been given a Home Winemaker Practical Guide as your knowledge base.
+
+Answer questions accurately and helpfully based ONLY on the knowledge base provided below.
+If a question falls outside home winemaking (e.g. commercial licensing, export regulations), say so clearly.
+Keep answers practical, specific, and actionable — the user is likely standing in their garage or cellar.
+
+You MUST respond with a JSON object only — no markdown fences, no explanation outside the JSON.
+The JSON must have exactly this shape:
+{
+  "answer": "<your full answer text, may include newlines>",
+  "disclaimer": "Home winemaking practices vary — always taste and judge your wine yourself. For commercial production, consult a qualified winemaker.",
+  "citations": [
+    {
+      "title": "Home Winemaker Practical Guide",
+      "section": "<Relevant section name, e.g. Cap Management, Racking and Free-Run>",
+      "jurisdiction": "Home Winemaker",
+      "url": null
+    }
+  ]
+}
+
+Knowledge base:
+${scopedKB}`
+        : `You are a regulatory compliance assistant specialising in Australian winery regulations.
 You have been given a targeted knowledge base covering: ${jurisdictionLabel}.
 
 Answer questions accurately and concisely based ONLY on the knowledge base provided below.

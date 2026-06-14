@@ -974,6 +974,124 @@ All other workplace injuries, near misses, and hazard reports should be recorded
 - EPA NZ (Hazardous Substances): epa.govt.nz | 0800 376 234
 `;
 
+// ─── Home Winemaker Knowledge Base ──────────────────────────────────────────
+// Sourced from: Ivo's Home Winemaking Tutorial (pasted_content_3.txt) and
+// Field to Glass documentary (pasted_content_2.txt).
+// Scope: practical home-scale winemaking — no regulatory compliance content.
+
+const HOME_WINEMAKER_KB = `
+## HOME WINEMAKER PRACTICAL GUIDE
+
+This section covers practical home-scale winemaking knowledge. It is NOT regulatory compliance content.
+All information is sourced from experienced home winemakers and boutique winery practitioners.
+
+### GRAPE SELECTION
+- Taste grapes before buying: look for sweetness, balanced acidity, no rot or mould
+- Target Brix: 22–25 for most red varieties; 20–23 for whites
+- Refrigerate grapes immediately after picking or delivery
+- California and Australian wine grapes are commonly available for home winemakers
+- Varieties: Cabernet Sauvignon, Merlot, Shiraz, Zinfandel, Chardonnay, Sauvignon Blanc
+
+### DESTEMMING AND CRUSHING
+- Always destem before crushing — stems add harsh tannins and bitterness
+- Machine destemmer/crusher available at home winemaking supply stores or garden centres
+- Red wine: crush and keep skins for fermentation (skin contact = colour, tannin, flavour)
+- White wine: crush and press immediately — no skin contact
+- Rosé: brief skin contact (2–12 hours) then press off
+
+### SULFITES (SO₂)
+- Commercial rate: 50–100ppm at crush (1/4 tsp potassium metabisulfite per 20L)
+- Sulfite-free approach: possible but higher spoilage risk; use only with very clean fruit
+- Sulfites prevent oxidation and inhibit wild yeast and bacteria
+- The headache myth: sulfites are not the primary cause of wine headaches; histamines and tannins are more likely
+
+### YEAST
+- Wild (ambient) yeast: unpredictable, can stall or produce off-flavours; not recommended for beginners
+- Commercial yeast: consistent, predictable, variety-specific strains available
+- Rate: 0.073g per pound of grapes (approx 1g per 14kg)
+- Rehydrate in warm water (38–40°C) before adding to must
+- Popular strains: EC-1118 (Champagne — neutral, reliable), RC-212 (Burgundy — Pinot/Shiraz), 71B (fruity whites)
+
+### FERMENTATION VESSEL SETUP
+- Open-top vat or food-grade plastic bin for reds
+- Loose cover — fermentation produces CO₂ which must escape
+- Temperature: 70–85°F (21–29°C) for reds; 55–65°F (13–18°C) for whites
+- Insulated garage or temperature-controlled space ideal
+- Ventilate the space — CO₂ accumulation is a safety risk
+
+### HYDROMETER AND BRIX TRACKING
+- Hydrometer measures specific gravity (SG) or Brix (sugar content)
+- Starting Brix × 0.6 = approximate final alcohol %
+- Track Brix daily during active fermentation
+- Fermentation complete when SG reaches 0.990–0.998 (dry)
+- Take readings at the same temperature for accuracy
+
+### CAP MANAGEMENT
+- Red wine skins float to form a cap — must be broken twice daily
+- Punchdown: push cap under with a tool (gentle, good for Pinot)
+- Pumpover: pump juice from bottom over the cap (more extraction, good for Cab/Shiraz)
+- Frequency: twice daily minimum during active ferment
+- Skin contact time: 5–7 days = lighter style; 10–14 days = fuller, more tannic
+- When cap starts to fall (no longer floating firm), it is time to press
+
+### RACKING AND FREE-RUN
+- Free-run: juice that flows out before pressing — highest quality
+- Rack (siphon) the free-run off the gross lees before pressing
+- Use a siphon with a bottom cap to avoid disturbing sediment
+- Press cake (pomace) goes to compost or distillery
+- First racking: 6–8 weeks post-press (November for September vintage)
+- Second racking: 3–4 months later (March)
+- Always top up vessel after racking to minimise headspace
+
+### PRESSING
+- Basket press: traditional, gentle; ratchet straps hold slats together
+- Stop pressing when flow slows significantly — last press fractions are harsh
+- Press wine can be kept separate and blended back in small amounts for structure
+- Clean the press immediately after use
+
+### DEMIJOHN AND AIRLOCK SETUP
+- Fill demijohn to 7/8 capacity — leave room for CO₂ but minimise headspace
+- Water airlock: allows CO₂ out, prevents oxygen in
+- The marbles trick: if short on wine after racking, add clean glass marbles to raise the level
+- Never use tap water in the airlock — use a dilute sulfite solution
+- Store in a cool, dark place (55–65°F / 13–18°C)
+
+### APPROXIMATE HOME WINEMAKING TIMELINE
+- September: Crush, inoculate, ferment (7–10 days)
+- October: Press, transfer to demijohn, airlock
+- November: First racking (remove heavy lees)
+- March: Second racking (clarification)
+- August: Bottle (10–11 months after crush)
+- Note: this is a guide — taste and judge readiness yourself
+
+### BOTTLING
+- Wine should be clear and stable before bottling
+- Use a stop-valve bottle filler for clean, consistent fills
+- Corks: natural cork for long-term aging; synthetic or screwcap for early drinking
+- Leave 1.5–2cm headspace under the cork
+- Any sediment in the bottle can be decanted off or used to make wine vinegar
+- Label with variety, vintage year, and bottling date
+
+### COMMON TROUBLESHOOTING
+| Problem | Likely Cause | Solution |
+|---|---|---|
+| Fermentation won't start | Yeast too old, must too cold, sulfites too high | Re-pitch fresh yeast; warm to 21°C; wait 24h after sulfite addition |
+| Fermentation stalls | Nutrient deficiency, temperature drop, alcohol toxicity | Add DAP (yeast nutrient); warm gently; rack and re-pitch |
+| Vinegar smell (VA) | Acetic acid bacteria from oxygen exposure | Prevention only — keep vessels topped up and airlocked |
+| Cloudy wine | Protein haze, yeast in suspension, pectin | Cold stabilise; use bentonite fining; allow more time |
+| Flat/thin flavour | Under-extraction, early pressing | Extend skin contact next vintage; blend in press wine |
+| Bitter/harsh tannins | Stems included, over-extraction, seeds crushed | Destem fully; press gently; age longer |
+| Mousy off-flavour | Brettanomyces (Brett) contamination | Strict sanitation; SO₂ management; may be unrecoverable |
+
+### PRACTICAL TIPS
+- Listen to your fermentation — active bubbling is a good sign
+- Taste frequently — your palate is the best instrument
+- Keep detailed notes: date, Brix, temperature, additions, observations
+- Sanitation is the single most important factor in home winemaking
+- Start simple: one variety, one tank, learn the process before scaling up
+- The marbles trick for headspace is a genuine solution used by experienced home winemakers
+`;
+
 // ─── Jurisdiction section splitter ───────────────────────────────────────────
 
 const KB_SECTIONS: Record<string, string> = {
@@ -1024,6 +1142,7 @@ const KB_SECTIONS: Record<string, string> = {
       "## KEY CONTACTS"
     )[0] ?? ""),
   Contacts: "## KEY CONTACTS" + (COMPLIANCE_KNOWLEDGE_BASE.split("## KEY CONTACTS")[1] ?? ""),
+  HomeWinemaker: HOME_WINEMAKER_KB,
 };
 
 // ─── SOURCE DOCTRINE ─────────────────────────────────────────────────────────
@@ -1570,6 +1689,10 @@ export function buildSourceDoctrineSummary(): string {
 }
 
 export function buildScopedKnowledgeBase(jurisdictions: string[]): string {
+  // HomeWinemaker is a separate, non-regulatory KB — return it exclusively when selected
+  if (jurisdictions.includes("HomeWinemaker")) {
+    return HOME_WINEMAKER_KB;
+  }
   const parts: string[] = [KB_SECTIONS.Federal];
   for (const j of jurisdictions) {
     if (j !== "Federal" && KB_SECTIONS[j]) parts.push(KB_SECTIONS[j]);

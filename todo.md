@@ -238,3 +238,12 @@
 - [x] Log Entry shortcut from calendar card opens VintageEntrySheet pre-filled for that tank
 - [x] Empty state when no inoculation events logged
 - [x] Sources cited: Iland et al. (2004), Zoecklein et al. (1999), Ownology Field to Glass KB
+
+## Three Concrete Next Steps (Jun 2026)
+- [x] Fermentation Watch: daily in-app banner on The Press when any tank is in active ferment (≤14 days since inoculation) — one-tap to open entry sheet for that tank
+- [x] Fermentation Watch: Heartbeat handler (daily 07:00 AEST) sends owner notification listing all active ferment tanks
+- [x] Milestone Calendar: single-tap PDF/print export of projected timeline for all tanks (print-formatted harvest schedule)
+- [x] Compliance page: add "Home Winemaker" filter pill — scopes KB answers to practical guide (Ivo's transcript), separate from commercial regulatory content
+- [x] Compliance page: update tRPC procedure to include home winemaking KB when "home" scope is selected
+- [x] Compliance page: 7 home winemaker sample questions added (cap fall, marbles trick, yeast strain, punchdown frequency, racking timing, Brix targets, alcohol calculation)
+- [x] complianceKnowledgeBase.ts: HOME_WINEMAKER_KB section added from Ivo's practical guide transcript
