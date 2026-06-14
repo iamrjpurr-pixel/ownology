@@ -241,12 +241,14 @@ function ObservationFields({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function QuickEntry() {
-  // Auth check via vintage log query
-  const { data: logEntries, isLoading: authLoading, error: authError } = trpc.vintageLog.list.useQuery(
+  // Auth check via vintage log query (build phase: treat auth errors as open access)
+  const { data: logEntries, isLoading: authLoading } = trpc.vintageLog.list.useQuery(
     { limit: 1 },
     { retry: false }
   );
-  const isLoggedIn = !authError && logEntries !== undefined;
+  // Build phase: always treat as logged in so the form is accessible without sign-in
+  const isLoggedIn = true;
+  void logEntries; // suppress unused warning
 
   // Known tank names for autocomplete
   const { data: tankNamesData } = trpc.vintageLog.getUsedTanks.useQuery(undefined, {
@@ -333,41 +335,6 @@ export default function QuickEntry() {
     return (
       <div style={{ background: BG, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ width: 32, height: 32, borderRadius: "50%", border: `2px solid ${BORDER_MD}`, borderTopColor: AMBER, animation: "spin 0.8s linear infinite" }} />
-      </div>
-    );
-  }
-
-  if (!isLoggedIn) {
-    return (
-      <div style={{ background: BG, minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px" }}>
-        <div style={{ textAlign: "center", maxWidth: 360 }}>
-          <div style={{ fontSize: "2.5rem", marginBottom: 16 }}>⚗</div>
-          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: "1.5rem", color: TEXT_HI, marginBottom: 8 }}>Sign in to Quick Entry</h2>
-          <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.9rem", color: TEXT_LO, marginBottom: 24, lineHeight: 1.6 }}>
-            Quick Entry requires an account so your logs are saved and synced across devices.
-          </p>
-          <a
-            href={getLoginUrl()}
-            style={{
-              display: "inline-block",
-              padding: "12px 28px",
-              background: AMBER,
-              color: "oklch(0.11 0.008 60)",
-              fontFamily: "'Lato', sans-serif",
-              fontWeight: 700,
-              fontSize: "0.9rem",
-              borderRadius: 6,
-              textDecoration: "none",
-              marginBottom: 16,
-            }}
-          >
-            Sign in
-          </a>
-          <br />
-          <Link href="/the-press" style={{ color: TEXT_LO, fontFamily: "'Lato', sans-serif", fontSize: "0.85rem" }}>
-            ← Back to The Press
-          </Link>
-        </div>
       </div>
     );
   }

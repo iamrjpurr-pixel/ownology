@@ -124,8 +124,7 @@ export default function ProductionDashboard() {
     retry: false,
   });
 
-  const isUnauthorized = error?.message?.includes("login") || error?.message?.includes("10001");
-
+  // Build phase: show loading spinner while fetching, empty state if no data (no login wall)
   if (isLoading) {
     return (
       <div
@@ -137,33 +136,16 @@ export default function ProductionDashboard() {
     );
   }
 
-  if (isUnauthorized || (!isLoading && !stats)) {
+  if (!stats) {
     return (
       <div
-        className="min-h-screen flex flex-col items-center justify-center gap-4"
+        className="min-h-screen flex flex-col items-center justify-center gap-3"
         style={{ background: "oklch(0.11 0.008 60)" }}
       >
-        <p style={{ color: "oklch(0.65 0.015 75)", fontFamily: "'Lato',sans-serif" }}>
-          Sign in to view your production dashboard.
+        <p style={{ color: "oklch(0.65 0.015 75)", fontFamily: "'Lato',sans-serif", fontSize: "0.9rem" }}>
+          No production data yet — log your first vintage entry in{" "}
+          <a href="/the-press" style={{ color: "oklch(0.72 0.12 75)" }}>The Press</a>.
         </p>
-        <a
-          href={getLoginUrl()}
-          className="px-5 py-2.5 rounded text-sm font-medium"
-          style={{ background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)" }}
-        >
-          Sign In
-        </a>
-      </div>
-    );
-  }
-
-  if (isLoading || !stats) {
-    return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ background: "oklch(0.11 0.008 60)" }}
-      >
-        <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "oklch(0.72 0.12 75)" }} />
       </div>
     );
   }

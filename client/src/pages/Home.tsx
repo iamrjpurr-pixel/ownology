@@ -144,7 +144,9 @@ const PRIMARY_NAV: NavItem[] = [
 // Secondary links — grouped by product pillar
 // Operational: cellar tools
 const VINTAGE_NAV: NavItem[] = [
+  { label: "Dashboard",    href: "/dashboard" },
   { label: "The Press",    href: "/the-press" },
+  { label: "Cellar Tasks", href: "/cellar-tasks" },
   { label: "Quick Entry",  href: "/quick-entry" },
   { label: "Free Run",     href: "/free-run" },
 ];
@@ -155,9 +157,10 @@ const KNOWLEDGE_NAV: NavItem[] = [
 ];
 // Business: brand and commercial
 const BUSINESS_NAV: NavItem[] = [
-  { label: "Why Ownology", href: "/why-ownology" },
-  { label: "Blog",         href: "/blog" },
-  { label: "Merch",        href: "/merch" },
+  { label: "Why Ownology",        href: "/why-ownology" },
+  { label: "For Home Winemakers", href: "/for-home-winemakers" },
+  { label: "Blog",                href: "/blog" },
+  { label: "Merch",               href: "/merch" },
 ];
 const MORE_NAV: NavItem[] = [
   { label: "Our Story",    href: "#our-story" },
