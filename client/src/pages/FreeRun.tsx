@@ -32,7 +32,7 @@ const LESSONS: LessonCard[] = [
   { id: "chem-foundations", title: "The Chemistry of Wine", domain: "Chemistry", level: "Foundation", duration: "8 min", tagline: "Why pH matters more than you think at 2am during vintage", locked: false, completed: false },
   { id: "fermentation-basics", title: "How Fermentation Actually Works", domain: "Chemistry", level: "Foundation", duration: "10 min", tagline: "Sugar to alcohol — the process your wine depends on", locked: false, completed: false },
   { id: "wine-microbiology-intro", title: "The Invisible Workforce", domain: "Microbiology", level: "Foundation", duration: "9 min", tagline: "Yeast, bacteria, and the organisms running your cellar", locked: false, completed: false },
-  // Intermediate — locked (The Press tier)
+  // Intermediate — locked (The Cellar tier)
   { id: "yan-management", title: "YAN and Yeast Nutrition", domain: "Chemistry", level: "Intermediate", duration: "12 min", tagline: "Feed your yeast right or pay for it at 3am", locked: true, completed: false },
   { id: "so2-chemistry", title: "SO₂ — Free, Bound, and Molecular", domain: "Chemistry", level: "Intermediate", duration: "11 min", tagline: "The most important number in your cellar explained simply", locked: true, completed: false },
   { id: "mlf-management", title: "Malolactic Fermentation", domain: "Microbiology", level: "Intermediate", duration: "10 min", tagline: "When to encourage it, when to stop it, and how to know the difference", locked: true, completed: false },
@@ -42,7 +42,7 @@ const LESSONS: LessonCard[] = [
   { id: "viticultural-science", title: "Vine Physiology for Winemakers", domain: "Viticulture", level: "Intermediate", duration: "11 min", tagline: "What happens in the vineyard that you can't fix in the cellar", locked: true, completed: false },
   { id: "sensory-faults", title: "Identifying Wine Faults", domain: "Sensory", level: "Intermediate", duration: "12 min", tagline: "Brett, VA, reduction, oxidation — find them before your customer does", locked: true, completed: false },
   { id: "liquor-licensing", title: "Liquor Licensing for Winemakers", domain: "Regulatory", level: "Intermediate", duration: "10 min", tagline: "What you legally need to produce and sell wine in Australia", locked: true, completed: false },
-  // Advanced — locked (The Press tier)
+  // Advanced — locked (The Cellar tier)
   { id: "fermentation-technology", title: "Advanced Fermentation Technology", domain: "Chemistry", level: "Advanced", duration: "16 min", tagline: "Stuck ferments, heat spikes, and the science of rescue", locked: true, completed: false },
   { id: "stabilisation-clarification", title: "Stabilisation and Clarification", domain: "Operations", level: "Advanced", duration: "14 min", tagline: "Cold stabilisation, heat stability, and protein haze prevention", locked: true, completed: false },
   { id: "sparkling-fortified", title: "Sparkling and Fortified Winemaking", domain: "Operations", level: "Advanced", duration: "15 min", tagline: "Traditional method, tank method, and the art of fortification", locked: true, completed: false },
@@ -207,7 +207,7 @@ function LessonCardItem({ lesson }: { lesson: LessonCard }) {
               border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
             }}
           >
-            The Press →
+            The Cellar →
           </span>
         ) : (
           <span
@@ -566,7 +566,7 @@ export default function FreeRun() {
               fontStyle: "italic",
             }}
           >
-            The equivalent of a Bachelor of Oenology — rewritten for the cellar floor, not the lecture hall.
+            The science behind every cellar decision — explained for the floor, not the lecture hall.
           </p>
 
           {/* Progress bar */}
@@ -599,9 +599,9 @@ export default function FreeRun() {
               <path d="M7 5v4M7 10.5v.5" stroke="var(--ow-amber)" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
             <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem", lineHeight: 1.6, color: "var(--ow-text-mid)" }}>
-              <strong style={{ color: "var(--ow-text-hi)" }}>{freeCount} lessons are free.</strong> The remaining {totalCount - freeCount} require{" "}
-              <Link href="/the-press" style={{ color: "var(--ow-amber)", textDecoration: "none" }}>The Press</Link>
-              {" "}— your working board and full cellar science library.
+              <strong style={{ color: "var(--ow-text-hi)" }}>{freeCount} lessons are free.</strong> The remaining {totalCount - freeCount} are included in{" "}
+              <Link href="/pricing" style={{ color: "var(--ow-amber)", textDecoration: "none" }}>The Cellar</Link>
+              {" "}— full education library for $19/mo.
             </p>
           </div>
         </div>
@@ -691,8 +691,8 @@ export default function FreeRun() {
                   color: "var(--ow-text-hi)",
                 }}
               >
-                Step into{" "}
-                <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>The Press</em>
+                Join{" "}
+                <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>The Cellar</em>
               </h2>
               <p
                 className="mt-2"
@@ -705,7 +705,7 @@ export default function FreeRun() {
                   maxWidth: "440px",
                 }}
               >
-                The press extracts what free run cannot reach. The full cellar science library. Your working board for the vintage. Every calculation saved.
+                All 19 lessons. Every domain. From fermentation chemistry to regulatory compliance — the full education library for home winemakers and wine students.
               </p>
               <p
                 className="mt-2"
@@ -717,12 +717,12 @@ export default function FreeRun() {
                   color: "var(--ow-text-lo)",
                 }}
               >
-                *Le pressoir extrait ce que le jus de goutte ne peut atteindre.*
+                *La connaissance est le premier outil du vigneron.* — Knowledge is the winemaker's first tool.
               </p>
             </div>
             <div className="flex flex-col gap-3">
-              <Link href="/the-press" className="btn-amber text-sm text-center" style={{ textDecoration: "none", whiteSpace: "nowrap" }}>
-                Open The Press →
+              <Link href="/pricing" className="btn-amber text-sm text-center" style={{ textDecoration: "none", whiteSpace: "nowrap" }}>
+                Join The Cellar — $19/mo →
               </Link>
               <a href="#pricing" className="btn-ghost text-sm text-center" style={{ textDecoration: "none", whiteSpace: "nowrap" }}>
                 View Pricing
