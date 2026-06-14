@@ -23,6 +23,7 @@ import Orders from "./pages/Orders";
 import Admin from "./pages/Admin";
 import QuickEntry from "./pages/QuickEntry";
 import CellarTasks from "./pages/CellarTasks";
+import HomeWineryKit from "./pages/HomeWineryKit";
 import CompetitiveAdvantage from "./pages/CompetitiveAdvantage";
 import Preview from "./pages/Preview";
 import AdminLeads from "./pages/AdminLeads";
@@ -43,6 +44,7 @@ function Router() {
       <Route path={"/blog/:slug"} component={BlogArticle} />
       <Route path={"/regulations"} component={Regulations} />
       <Route path={"/resources"} component={Regulations} />
+      <Route path={"/resources/home-winery-kit"} component={HomeWineryKit} />
       <Route path={"/compliance"} component={Compliance} />
       <Route path={"/free-run"} component={FreeRun} />
       <Route path={"/the-press"} component={ThePress} />

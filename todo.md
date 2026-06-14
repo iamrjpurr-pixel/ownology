@@ -247,3 +247,10 @@
 - [x] Compliance page: update tRPC procedure to include home winemaking KB when "home" scope is selected
 - [x] Compliance page: 7 home winemaker sample questions added (cap fall, marbles trick, yeast strain, punchdown frequency, racking timing, Brix targets, alcohol calculation)
 - [x] complianceKnowledgeBase.ts: HOME_WINEMAKER_KB section added from Ivo's practical guide transcript
+
+## Home Winery Kit Feature Batch (Jun 2026)
+- [x] Save home DIY winemaker equipment list as references/home-winery-equipment-list.md
+- [x] Cellar Tasks: add "Load Home Winery Kit" preset button that populates all 20 equipment items with categories
+- [x] Compliance KB: extend HOME_WINEMAKER_KB with equipment-specific cleaning and sanitising protocols (16 items)
+- [x] Build /resources/home-winery-kit page (printable shopping checklist, progress bar, PDF export, CTA to Compliance)
+- [x] Wire /resources/home-winery-kit route in App.tsx

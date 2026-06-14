@@ -77,7 +77,37 @@ const TASK_TYPE_COLOURS: Record<string, string> = {
   other: "bg-zinc-500/15 text-zinc-300 border-zinc-500/20",
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+/// ─── Home Winery Kit Preset ──────────────────────────────────────────────────
+
+const HOME_WINERY_KIT_PRESET = [
+  // Fermentation & Storage
+  { name: "Big Mouth Bubbler (6.5 gal)", equipmentType: "fermentation_tank" as const, material: "other" as const, capacityL: 25, quantity: 1, notes: "Plastic primary fermenter. Wide-mouth for easy cleaning and punchdowns. Category: Fermentation & Storage" },
+  { name: "Glass Carboy (6 gal)", equipmentType: "fermentation_tank" as const, material: "other" as const, capacityL: 23, quantity: 1, notes: "Secondary fermentation and clearing vessel. Category: Fermentation & Storage" },
+  { name: "Airlock", equipmentType: "other" as const, material: "other" as const, quantity: 2, notes: "One-way CO₂ valve. Fill with sulphite solution (not plain water). Category: Fermentation & Storage" },
+  { name: "Bung (Rubber Stopper)", equipmentType: "other" as const, material: "other" as const, quantity: 2, notes: "Seals carboy neck. Replace if cracked or hardened. Category: Fermentation & Storage" },
+  { name: "Fermenter Lid", equipmentType: "other" as const, material: "other" as const, quantity: 1, notes: "Seals primary fermenter. Category: Fermentation & Storage" },
+  // Transfer & Bottling
+  { name: "Auto Siphon", equipmentType: "hose" as const, material: "other" as const, quantity: 1, notes: "Spring-loaded racking cane. Avoids disturbing lees. Category: Transfer & Bottling" },
+  { name: "5 ft Food-Grade Tubing", equipmentType: "hose" as const, material: "other" as const, quantity: 1, notes: "Connects siphon to carboy or bottle filler. Replace every 1–2 years or if discoloured. Category: Transfer & Bottling" },
+  { name: "Bottle Filler (Needle Valve)", equipmentType: "other" as const, material: "other" as const, quantity: 1, notes: "Spring-tip valve fills to correct headspace automatically. Category: Transfer & Bottling" },
+  { name: "Impact Corker", equipmentType: "other" as const, material: "other" as const, quantity: 1, notes: "Mallet-style corking machine. Drives #9 straight corks flush with bottle top. Category: Transfer & Bottling" },
+  // Measuring & Testing
+  { name: "Hydrometer", equipmentType: "other" as const, material: "other" as const, quantity: 1, notes: "Measures specific gravity (Brix/sugar). Check for chips — affects accuracy. Category: Measuring & Testing" },
+  { name: "Hydrometer Test Jar", equipmentType: "other" as const, material: "other" as const, quantity: 1, notes: "Tall cylinder holds sample for hydrometer float. Category: Measuring & Testing" },
+  { name: "Wine Thief (3-piece sampler)", equipmentType: "other" as const, material: "other" as const, quantity: 1, notes: "Extracts sample from carboy without disturbing lees. Disassemble for cleaning. Category: Measuring & Testing" },
+  { name: "Thermometer", equipmentType: "other" as const, material: "other" as const, quantity: 1, notes: "Digital or glass. Check fermentation temperature daily. Category: Measuring & Testing" },
+  { name: "Stick-on Fermenter Thermometer", equipmentType: "other" as const, material: "other" as const, quantity: 2, notes: "Adhesive strip on outside of fermenter. Continuous temperature read. Category: Measuring & Testing" },
+  // Mixing & Processing
+  { name: "Plastic Stirring Spoon (Long-handle)", equipmentType: "other" as const, material: "other" as const, quantity: 1, notes: "Sanitise before each use. Category: Mixing & Processing" },
+  { name: "Degassing Whip + Electric Drill", equipmentType: "other" as const, material: "other" as const, quantity: 1, notes: "Removes dissolved CO₂ after fermentation. Use on low speed. Check blades for cracks. Category: Mixing & Processing" },
+  // Cleaning
+  { name: "Carboy Brush", equipmentType: "other" as const, material: "other" as const, quantity: 1, notes: "Long-handle brush reaches bottom of carboy. Category: Cleaning" },
+  { name: "Bottle Brush", equipmentType: "other" as const, material: "other" as const, quantity: 1, notes: "Cleans inside wine bottles before sanitising. Category: Cleaning" },
+  { name: "Funnel", equipmentType: "other" as const, material: "other" as const, quantity: 1, notes: "Used to pour sanitiser into bottles. Category: Cleaning" },
+  { name: "Trigger Spray Bottle (Sanitiser)", equipmentType: "other" as const, material: "other" as const, quantity: 1, notes: "Fill with potassium metabisulfite solution. Spray all contact surfaces before use. Category: Cleaning" },
+];
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function useIsDesktop() {
   const [isDesktop, setIsDesktop] = useState(false);
@@ -837,6 +867,25 @@ export default function CellarTasks() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<EquipmentCardProps["item"] | null>(null);
   const [filter, setFilter] = useState<"all" | "pending" | "done">("all");
+  const [loadingPreset, setLoadingPreset] = useState(false);
+  const utils = trpc.useUtils();
+
+  const batchAddMutation = trpc.cellarEquipment.batchAdd.useMutation({
+    onSuccess: (data) => {
+      utils.cellarEquipment.list.invalidate();
+      setLoadingPreset(false);
+      toast.success(`Home Winery Kit loaded — ${data.count} items added. Tap “Generate Tasks” on each item to create cleaning tasks.`);
+    },
+    onError: (e) => {
+      setLoadingPreset(false);
+      toast.error(e.message);
+    },
+  });
+
+  function handleLoadPreset() {
+    setLoadingPreset(true);
+    batchAddMutation.mutate(HOME_WINERY_KIT_PRESET);
+  }
 
   const { data: equipment = [], isLoading: equipLoading } = trpc.cellarEquipment.list.useQuery(
     undefined,
@@ -1048,6 +1097,65 @@ export default function CellarTasks() {
             >
               Add your cellar equipment and Ownology will generate cleaning and maintenance tasks specific to each item.
             </p>
+            {/* Home Winery Kit preset loader */}
+            <div
+              style={{
+                background: "oklch(0.72 0.12 75 / 8%)",
+                border: "1px solid oklch(0.72 0.12 75 / 25%)",
+                borderRadius: "10px",
+                padding: "1rem 1.25rem",
+                maxWidth: "340px",
+                margin: "0 auto 1.25rem",
+                textAlign: "left",
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: "'Lato', sans-serif",
+                  fontSize: "0.8rem",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: "oklch(0.72 0.12 75)",
+                  margin: "0 0 0.4rem",
+                }}
+              >
+                🍇 Home Winery Kit
+              </p>
+              <p
+                style={{
+                  fontFamily: "'Lato', sans-serif",
+                  fontSize: "0.85rem",
+                  color: "oklch(0.65 0.015 75)",
+                  margin: "0 0 0.875rem",
+                  lineHeight: 1.5,
+                }}
+              >
+                Using a 6-gallon wine kit? Load all 20 standard home winery items in one tap.
+              </p>
+              <button
+                onClick={handleLoadPreset}
+                disabled={loadingPreset}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "6px",
+                  border: "1px solid oklch(0.72 0.12 75 / 40%)",
+                  background: "oklch(0.72 0.12 75 / 15%)",
+                  color: "oklch(0.72 0.12 75)",
+                  fontFamily: "'Lato', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "0.85rem",
+                  cursor: loadingPreset ? "not-allowed" : "pointer",
+                  opacity: loadingPreset ? 0.6 : 1,
+                }}
+              >
+                {loadingPreset ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                {loadingPreset ? "Loading kit..." : "Load Home Winery Kit"}
+              </button>
+            </div>
+
             <button
               onClick={() => { setEditItem(null); setSheetOpen(true); }}
               style={{

@@ -974,6 +974,38 @@ const cellarEquipmentRouter = router({
       await deleteCellarEquipment(input.id, dbUser.id);
       return { success: true };
     }),
+
+  batchAdd: protectedProcedure
+    .input(
+      z.array(
+        z.object({
+          name: z.string().min(1).max(128),
+          equipmentType: z.enum(EQUIPMENT_TYPES),
+          material: z.enum(EQUIPMENT_MATERIALS).default("other"),
+          capacityL: z.number().int().positive().optional(),
+          quantity: z.number().int().min(1).max(9999).default(1),
+          notes: z.string().max(1000).optional(),
+        })
+      ).max(50)
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const ids: number[] = [];
+      for (const item of input) {
+        const id = await addCellarEquipment({
+          userId: dbUser.id,
+          name: item.name,
+          equipmentType: item.equipmentType as EquipmentType,
+          material: item.material as EquipmentMaterial,
+          capacityL: item.capacityL,
+          quantity: item.quantity,
+          notes: item.notes,
+        });
+        ids.push(id);
+      }
+      return { success: true, count: ids.length, ids };
+    }),
 });
 
 // ─── Cellar Tasks Router ──────────────────────────────────────────────────────────────────────────────────────────────

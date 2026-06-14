@@ -1090,6 +1090,99 @@ All information is sourced from experienced home winemakers and boutique winery 
 - Sanitation is the single most important factor in home winemaking
 - Start simple: one variety, one tank, learn the process before scaling up
 - The marbles trick for headspace is a genuine solution used by experienced home winemakers
+
+### EQUIPMENT CLEANING & SANITISING PROTOCOLS
+
+The two-step rule for all home winery equipment: **Clean first, then sanitise.** Cleaning removes physical residue; sanitising kills microorganisms. Skipping cleaning makes sanitising ineffective.
+
+**Cleaning agent:** One Step No-Rinse Cleaner/Sanitizer (or equivalent oxygen-based cleaner). Mix per label instructions (typically 1 tbsp per gallon of warm water). Soak, scrub, drain. No rinse required.
+
+**Sanitising solution:** Potassium metabisulfite (K-meta) powder. Mix 1 tsp per 4 litres (1 US gallon) of cool water. This produces approximately 50–75 ppm free SO₂ in solution — enough to sanitise contact surfaces. Rinse is optional but recommended for large vessels.
+
+#### Per-Equipment Protocols
+
+**Big Mouth Bubbler (6.5 gal plastic primary fermenter)**
+- After each use: rinse immediately with warm water to remove gross residue. Fill with One Step solution, soak 10 min, drain, air dry.
+- Before next use: fill with K-meta solution, swirl to coat all surfaces, drain. Do not rinse.
+- Inspect: check for scratches (harbour bacteria). Replace if heavily scratched.
+- Frequency: clean after every use; sanitise immediately before every use.
+
+**Glass Carboy (6 gal)**
+- After racking: rinse immediately. Fill with One Step solution, use carboy brush to scrub neck and shoulders. Soak 20 min, drain, invert to dry.
+- Before use: fill with K-meta solution, swirl, drain. Inspect for chips or cracks — discard if found.
+- Storage: store dry with bung loosely inserted to keep out dust.
+
+**Airlock**
+- Disassemble fully (3-piece airlocks have a cap, float, and body). Soak all parts in One Step solution 10 min. Rinse. Reassemble.
+- Fill with K-meta solution (not plain water) — this sanitises any splash-back.
+- Replace if discoloured or cracked.
+
+**Bung (Rubber Stopper)**
+- Soak in K-meta solution before each use. Inspect for cracks or hardening — replace annually or if compromised.
+
+**Auto Siphon**
+- Disassemble after each use. Flush tubing with warm water, then One Step solution. Soak 10 min. Rinse and air dry.
+- Before use: flush with K-meta solution.
+
+**5 ft Food-Grade Tubing**
+- Flush with warm water immediately after use. Run One Step solution through, then rinse.
+- Inspect for discolouration, cloudiness, or off-smell. Replace every 1–2 years or if compromised.
+- Store coiled and dry.
+
+**Bottle Filler (Needle Valve)**
+- Disassemble spring mechanism. Soak all parts in One Step solution. Rinse. Reassemble.
+- Before bottling: flush with K-meta solution.
+
+**Impact Corker**
+- Wipe contact surfaces with K-meta solution on a cloth. Do not submerge the mechanical parts.
+- Soak corks in K-meta solution for 20 min before corking to soften and sanitise.
+
+**Hydrometer**
+- Rinse with cool water after each use (hot water can crack glass). Wipe dry. Store in protective tube.
+- Never leave in fermenting must — it will stain and become inaccurate.
+
+**Hydrometer Test Jar**
+- Rinse after each use. Soak in One Step solution if stained. Air dry upright.
+
+**Wine Thief (3-piece sampler)**
+- Disassemble. Soak all parts in One Step solution 10 min. Rinse. Before use, dip in K-meta solution.
+
+**Thermometer**
+- Wipe probe with K-meta solution on a cloth before inserting into must. Rinse after use.
+
+**Plastic Stirring Spoon**
+- Soak in One Step solution before each use. Rinse. Replace if scratched or discoloured.
+
+**Degassing Whip + Drill**
+- Soak whip in One Step solution 10 min. Rinse. Inspect blades for cracks.
+- Wipe drill chuck with K-meta cloth. Never submerge the drill.
+
+**Carboy Brush / Bottle Brush**
+- Soak in One Step solution after each use. Rinse and air dry. Replace when bristles splay.
+
+**Funnel**
+- Soak in K-meta solution before use. Rinse after.
+
+**Trigger Spray Bottle**
+- Fill with fresh K-meta solution at the start of each winemaking session. Discard unused solution after 24 hours (potency degrades).
+- Label clearly: "SANITISER — K-meta solution".
+
+**Wine Bottles (30)**
+- Rinse immediately after emptying. Before bottling: run bottle brush through each, then fill with K-meta solution, swirl, drain inverted on bottle tree for 10 min.
+- Inspect for chips, cracks, or residue — discard any compromised bottles.
+
+**Corks (#9 straight)**
+- Soak in K-meta solution 20–30 min before corking. Do not boil (softens too much). Drain and use immediately.
+
+#### Common Sanitising Mistakes
+| Mistake | Consequence | Correct approach |
+|---|---|---|
+| Using plain water in airlock | Contamination risk if liquid is drawn back | Use K-meta solution |
+| Skipping the clean step | Sanitiser can't penetrate organic residue | Always clean before sanitising |
+| Reusing K-meta solution next day | Solution loses potency within 24 hours | Mix fresh each session |
+| Boiling corks | Over-softening, poor seal | Soak in K-meta solution instead |
+| Storing carboy wet | Mould growth | Always store dry with loose bung |
+| Using hot water on hydrometer | Thermal shock cracks glass | Use cool water only |
 `;
 
 // ─── Jurisdiction section splitter ───────────────────────────────────────────
