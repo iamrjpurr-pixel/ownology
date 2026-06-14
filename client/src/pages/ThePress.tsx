@@ -19,6 +19,7 @@ import VintageCardPDF from "@/components/VintageCardPDF";
 import KitWineTracker from "@/components/KitWineTracker";
 import MeasurementInterpretation from "@/components/MeasurementInterpretation";
 import ExportLogPDF from "@/components/ExportLogPDF";
+import ExportDocsGenerator from "@/components/ExportDocsGenerator";
 import BarrelsTab from "@/components/BarrelsTab";
 import PackagingInventory from "@/components/PackagingInventory";
 
@@ -144,7 +145,7 @@ function SectionHeader({ label, title, subtitle }: { label: string; title: strin
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function ThePress() {
-  const [activeTab, setActiveTab] = useState<"log" | "calcs" | "scenarios" | "notes" | "calendar" | "barrels" | "packaging">("log");
+  const [activeTab, setActiveTab] = useState<"log" | "calcs" | "scenarios" | "notes" | "calendar" | "barrels" | "packaging" | "exports">("log");
   // Batch Book state
   const [batchSheetOpen, setBatchSheetOpen] = useState(false);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
@@ -296,6 +297,7 @@ export default function ThePress() {
     { id: "calcs" as const, label: "Calculations", icon: "⚗" },
     { id: "scenarios" as const, label: "Cellar Scenarios", icon: "🔬" },
     { id: "notes" as const, label: "Batch Book", icon: "📖" },
+    { id: "exports" as const, label: "Export Docs", icon: "📄" },
   ];
 
   return (
@@ -1354,6 +1356,18 @@ export default function ThePress() {
             </div>
           )}
 
+          {/* Export Documentation — DR-11 */}
+          {activeTab === "exports" && (
+            <div>
+              <SectionHeader
+                label="Export Documentation"
+                title="Movement Advice & Label Compliance"
+                subtitle="Generate AWBC-style movement advice and a label compliance checklist from your batch data."
+              />
+              <ExportDocsGenerator batches={wineBatches ?? []} logEntries={logEntries ?? []} />
+            </div>
+          )}
+
           {/* Calculations */}
           {activeTab === "calcs" && (
             <div>
@@ -1659,6 +1673,18 @@ export default function ThePress() {
                             <div>
                               <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", marginBottom: "0.2rem" }}>COST/L</p>
                               <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.875rem", color: "oklch(0.72 0.12 75)" }}>${batch.costPerLitre}/L</p>
+                            </div>
+                          )}
+                          {/* DR-04: Live current volume — shown when set, with indicator if it differs from starting volume */}
+                          {(batch.currentVolumeLitres != null || batch.volumeLitres != null) && (
+                            <div>
+                              <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", marginBottom: "0.2rem" }}>LIVE VOL</p>
+                              <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.875rem", color: batch.currentVolumeLitres != null && batch.volumeLitres != null && batch.currentVolumeLitres !== batch.volumeLitres ? "oklch(0.72 0.12 75)" : "var(--ow-text-hi)" }}>
+                                {(batch.currentVolumeLitres ?? batch.volumeLitres)} L
+                                {batch.currentVolumeLitres != null && batch.volumeLitres != null && batch.currentVolumeLitres !== batch.volumeLitres && (
+                                  <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", marginLeft: "0.35rem" }}>({batch.currentVolumeLitres < batch.volumeLitres ? "-" : "+"}{Math.abs(batch.currentVolumeLitres - batch.volumeLitres)}L)</span>
+                                )}
+                              </p>
                             </div>
                           )}
                         </div>

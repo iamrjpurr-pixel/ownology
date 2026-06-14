@@ -66,6 +66,8 @@ const TASK_TYPE_ICONS: Record<string, React.ReactNode> = {
   sanitise: <Sparkles size={14} />,
   inspect: <Eye size={14} />,
   maintain: <Wrench size={14} />,
+  // DR-10: fault log
+  fault_log: <Wrench size={14} />,
   other: <ClipboardList size={14} />,
 };
 
@@ -74,6 +76,8 @@ const TASK_TYPE_COLOURS: Record<string, string> = {
   sanitise: "bg-purple-500/15 text-purple-300 border-purple-500/20",
   inspect: "bg-amber-500/15 text-amber-300 border-amber-500/20",
   maintain: "bg-green-500/15 text-green-300 border-green-500/20",
+  // DR-10: fault log — red-orange to signal an issue
+  fault_log: "bg-red-500/15 text-red-300 border-red-500/20",
   other: "bg-zinc-500/15 text-zinc-300 border-zinc-500/20",
 };
 
@@ -501,6 +505,12 @@ interface EquipmentCardProps {
 function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [generating, setGenerating] = useState(false);
+  // DR-10: fault log form state
+  const [faultFormOpen, setFaultFormOpen] = useState(false);
+  const [faultTitle, setFaultTitle] = useState("");
+  const [faultNotes, setFaultNotes] = useState("");
+  const [faultDowntime, setFaultDowntime] = useState("");
+  const [faultResolution, setFaultResolution] = useState("");
   const utils = trpc.useUtils();
 
   const completeMutation = trpc.cellarTasks.complete.useMutation({
@@ -515,6 +525,19 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
 
   const deleteTaskMutation = trpc.cellarTasks.delete.useMutation({
     onSuccess: () => utils.cellarTasks.list.invalidate(),
+    onError: (e) => toast.error(e.message),
+  });
+
+  const addFaultMutation = trpc.cellarTasks.add.useMutation({
+    onSuccess: () => {
+      utils.cellarTasks.list.invalidate();
+      setFaultFormOpen(false);
+      setFaultTitle("");
+      setFaultNotes("");
+      setFaultDowntime("");
+      setFaultResolution("");
+      toast.success("Fault logged");
+    },
     onError: (e) => toast.error(e.message),
   });
 
@@ -665,6 +688,27 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
               {generating ? "Generating…" : tasks.length > 0 ? "Regenerate tasks" : "Generate tasks"}
             </button>
 
+            {/* DR-10: Log Fault button */}
+            <button
+              onClick={(e) => { e.stopPropagation(); setFaultFormOpen(o => !o); }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.375rem",
+                padding: "0.5rem 0.875rem",
+                borderRadius: "6px",
+                border: "1px solid oklch(0.55 0.18 25 / 30%)",
+                background: faultFormOpen ? "oklch(0.55 0.18 25 / 10%)" : "transparent",
+                color: "oklch(0.65 0.18 25)",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.8rem",
+                cursor: "pointer",
+              }}
+            >
+              <Wrench size={13} />
+              Log Fault
+            </button>
+
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(); }}
               style={{
@@ -710,6 +754,99 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
               Remove
             </button>
           </div>
+
+          {/* DR-10: Fault Log Form */}
+          {faultFormOpen && (
+            <div
+              style={{
+                background: "oklch(0.14 0.008 60)",
+                border: "1px solid oklch(0.55 0.18 25 / 25%)",
+                borderRadius: "8px",
+                padding: "1rem",
+                marginBottom: "0.875rem",
+              }}
+            >
+              <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "oklch(0.65 0.18 25)", letterSpacing: "0.1em", marginBottom: "0.75rem", margin: "0 0 0.75rem" }}>LOG EQUIPMENT FAULT</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
+                <div>
+                  <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "oklch(0.50 0.010 60)", letterSpacing: "0.08em", marginBottom: "0.25rem" }}>FAULT DESCRIPTION *</p>
+                  <input
+                    type="text"
+                    value={faultTitle}
+                    onChange={e => setFaultTitle(e.target.value)}
+                    placeholder="e.g. Pump seal leaking, temperature probe fault"
+                    style={{ width: "100%", background: "oklch(0.11 0.006 60)", border: "1px solid oklch(0.22 0.010 60)", borderRadius: "6px", padding: "0.5rem 0.75rem", color: "oklch(0.88 0.015 75)", fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box" }}
+                  />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.625rem" }}>
+                  <div>
+                    <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "oklch(0.50 0.010 60)", letterSpacing: "0.08em", marginBottom: "0.25rem" }}>DOWNTIME (hrs)</p>
+                    <input
+                      type="number"
+                      value={faultDowntime}
+                      onChange={e => setFaultDowntime(e.target.value)}
+                      placeholder="0"
+                      min="0"
+                      step="0.5"
+                      style={{ width: "100%", background: "oklch(0.11 0.006 60)", border: "1px solid oklch(0.22 0.010 60)", borderRadius: "6px", padding: "0.5rem 0.75rem", color: "oklch(0.88 0.015 75)", fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box" }}
+                    />
+                  </div>
+                  <div>
+                    <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "oklch(0.50 0.010 60)", letterSpacing: "0.08em", marginBottom: "0.25rem" }}>RESOLUTION</p>
+                    <input
+                      type="text"
+                      value={faultResolution}
+                      onChange={e => setFaultResolution(e.target.value)}
+                      placeholder="e.g. Replaced seal, called technician"
+                      style={{ width: "100%", background: "oklch(0.11 0.006 60)", border: "1px solid oklch(0.22 0.010 60)", borderRadius: "6px", padding: "0.5rem 0.75rem", color: "oklch(0.88 0.015 75)", fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box" }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "oklch(0.50 0.010 60)", letterSpacing: "0.08em", marginBottom: "0.25rem" }}>ADDITIONAL NOTES</p>
+                  <textarea
+                    value={faultNotes}
+                    onChange={e => setFaultNotes(e.target.value)}
+                    placeholder="Any additional context, parts ordered, follow-up required..."
+                    rows={2}
+                    style={{ width: "100%", background: "oklch(0.11 0.006 60)", border: "1px solid oklch(0.22 0.010 60)", borderRadius: "6px", padding: "0.5rem 0.75rem", color: "oklch(0.88 0.015 75)", fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", outline: "none", resize: "vertical", boxSizing: "border-box" }}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+                  <button
+                    type="button"
+                    onClick={() => setFaultFormOpen(false)}
+                    style={{ padding: "0.5rem 1rem", borderRadius: "6px", border: "1px solid oklch(1 0 0 / 10%)", background: "transparent", color: "oklch(0.55 0.015 75)", fontFamily: "'Lato',sans-serif", fontSize: "0.8rem", cursor: "pointer" }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!faultTitle.trim() || addFaultMutation.isPending}
+                    onClick={() => {
+                      if (!faultTitle.trim()) return;
+                      const methodParts = [];
+                      if (faultDowntime) methodParts.push(`Downtime: ${faultDowntime} hrs`);
+                      if (faultResolution) methodParts.push(`Resolution: ${faultResolution}`);
+                      if (faultNotes) methodParts.push(faultNotes);
+                      addFaultMutation.mutate({
+                        equipmentId: item.id,
+                        equipmentName: item.name,
+                        taskType: "fault_log",
+                        title: faultTitle,
+                        methodNotes: methodParts.join(" | ") || undefined,
+                        frequency: "Once",
+                        aiGenerated: false,
+                      });
+                    }}
+                    style={{ padding: "0.5rem 1rem", borderRadius: "6px", border: "1px solid oklch(0.55 0.18 25 / 40%)", background: "oklch(0.55 0.18 25 / 15%)", color: "oklch(0.65 0.18 25)", fontFamily: "'Lato',sans-serif", fontSize: "0.8rem", cursor: faultTitle.trim() ? "pointer" : "not-allowed", opacity: faultTitle.trim() ? 1 : 0.5 }}
+                  >
+                    {addFaultMutation.isPending ? "Saving…" : "Log Fault"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Tasks */}
           {tasks.length === 0 ? (

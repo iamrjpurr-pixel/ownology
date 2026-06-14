@@ -126,7 +126,7 @@ export async function addFoundingMember(data: {
 
 // ─── Vintage Log ──────────────────────────────────────────────────────────────
 
-export type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "pre_harvest_sample" | "bottling_run" | "weather_event" | "other";
+export type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "pre_harvest_sample" | "bottling_run" | "weather_event" | "sanitation" | "other";
 
 export async function addVintageLogEntry(data: {
   userId: number;
@@ -438,6 +438,8 @@ export async function createWineBatch(data: {
     quantityUnit: data.quantityUnit ?? "kg",
     tankName: data.tankName ?? null,
     volumeLitres: data.volumeLitres ?? null,
+    // DR-04: initialise currentVolumeLitres to match volumeLitres at creation
+    currentVolumeLitres: data.volumeLitres ?? null,
     costPerLitre: data.costPerLitre ?? null,
     notesJson: "{}",
     createdAt: now,
@@ -477,12 +479,60 @@ export async function updateWineBatch(id: number, userId: number, data: {
   quantityUnit?: "kg" | "t" | "L";
   tankName?: string;
   volumeLitres?: number;
+  currentVolumeLitres?: number;
   costPerLitre?: number;
 }) {
   await db
     .update(schema.wineBatches)
     .set({ ...data, updatedAt: Date.now() })
     .where(and(eq(schema.wineBatches.id, id), eq(schema.wineBatches.userId, userId)));
+}
+
+/**
+ * DR-04: Auto-update currentVolumeLitres when a Racking event is logged.
+ * Finds the batch by tankName (source or destination) and adjusts volume.
+ * - source tank: decrement by volumeL (wine leaves)
+ * - destination tank: increment by volumeL (wine arrives)
+ */
+export async function updateTankVolumeOnRacking(
+  userId: number,
+  sourceTank: string,
+  destTank: string,
+  volumeL: number
+) {
+  const now = Date.now();
+  // Decrement source tank batch volume
+  const sourceBatch = await db.query.wineBatches.findFirst({
+    where: and(
+      eq(schema.wineBatches.userId, userId),
+      eq(schema.wineBatches.tankName, sourceTank)
+    ),
+    orderBy: [desc(schema.wineBatches.createdAt)],
+  });
+  if (sourceBatch) {
+    const newVol = Math.max(0, (sourceBatch.currentVolumeLitres ?? sourceBatch.volumeLitres ?? 0) - volumeL);
+    await db
+      .update(schema.wineBatches)
+      .set({ currentVolumeLitres: newVol, updatedAt: now })
+      .where(eq(schema.wineBatches.id, sourceBatch.id));
+  }
+  // Increment destination tank batch volume (if different tank)
+  if (destTank && destTank !== sourceTank) {
+    const destBatch = await db.query.wineBatches.findFirst({
+      where: and(
+        eq(schema.wineBatches.userId, userId),
+        eq(schema.wineBatches.tankName, destTank)
+      ),
+      orderBy: [desc(schema.wineBatches.createdAt)],
+    });
+    if (destBatch) {
+      const newVol = (destBatch.currentVolumeLitres ?? destBatch.volumeLitres ?? 0) + volumeL;
+      await db
+        .update(schema.wineBatches)
+        .set({ currentVolumeLitres: newVol, updatedAt: now })
+        .where(eq(schema.wineBatches.id, destBatch.id));
+    }
+  }
 }
 
 export async function deleteWineBatch(id: number, userId: number) {
@@ -578,7 +628,7 @@ export async function deleteCellarEquipment(id: number, userId: number) {
 
 // ─── Cellar Tasks ─────────────────────────────────────────────────────────────
 
-export type TaskType = "clean" | "sanitise" | "inspect" | "maintain" | "other";
+export type TaskType = "clean" | "sanitise" | "inspect" | "maintain" | "fault_log" | "other";
 
 export async function listCellarTasks(userId: number) {
   return db.query.cellarTasks.findMany({
@@ -889,7 +939,7 @@ export async function createVineyardObservation(
   userId: number,
   data: {
     blockId: number;
-    observationType: "budburst" | "flowering" | "veraison" | "harvest_date" | "spray_application" | "irrigation" | "canopy_management" | "disease_scouting" | "yield_estimate" | "other";
+    observationType: "budburst" | "flowering" | "veraison" | "harvest_date" | "spray_application" | "irrigation" | "canopy_management" | "disease_scouting" | "pest_scouting" | "disease_pest_event" | "yield_estimate" | "other";
     observedAt: number;
     vintageYear: number;
     value?: number | null;

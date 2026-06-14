@@ -299,3 +299,12 @@
 - [x] [DR-15] Add multi-vintage comparison table to Production Planning section on Dashboard: variety, volume, inoculation date, projected bottling, status per vintage
 - [x] [DR-23] PWA: add manifest.json (name, icons, theme_color, display=standalone), theme-color meta tag, and install prompt banner on mobile
 - [x] Update Build Index page: mark Sprint 3/4 features as LIVE (cost-per-unit, packaging, weather event, vintage card, vineyard, production planning, cellar value)
+
+## Sprint 6 — Close All Partial DRs
+
+- [x] [DR-04] Live tank volume balance: add currentVolumeLitres field to wine_batches; auto-decrement source and auto-increment destination on Racking log entries; surface live volume on Tank Summary cards and Dashboard
+- [x] [DR-03] Sanitation event type: add "Sanitation" to VintageEntrySheet event types with fields for equipment cleaned, sanitant used, contact time; display in Vintage Log with distinct icon
+- [x] [DR-11] Export documentation generator: LLM-generated AWBC movement advice and label compliance checklist from batch data, downloadable as PDF from Batch Book
+- [x] [DR-06] Vineyard disease/pest event type: add structured disease/pest observation to Vineyard block log with pathogen, affected area, treatment, re-entry interval fields
+- [x] [DR-10] Equipment fault log: add "Fault" task type to Cellar Tasks with fault description, resolution, and downtime duration fields
+- [x] Update Build Index Sprint 6 section from PLANNED to LIVE badges; stats bar updated to 27/27 DRs, 6 sprints, COMPLETE

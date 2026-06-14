@@ -18,6 +18,9 @@ const OBSERVATION_TYPES = [
   { value: "irrigation", label: "Irrigation" },
   { value: "canopy_management", label: "Canopy Management" },
   { value: "disease_scouting", label: "Disease Scouting" },
+  // DR-06: structured disease/pest event types
+  { value: "pest_scouting", label: "Pest Scouting" },
+  { value: "disease_pest_event", label: "Disease / Pest Event" },
   { value: "yield_estimate", label: "Yield Estimate" },
   { value: "other", label: "Other" },
 ] as const;

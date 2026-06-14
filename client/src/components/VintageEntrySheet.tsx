@@ -32,7 +32,7 @@ function useIsDesktop() {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "pre_harvest_sample" | "bottling_run" | "weather_event" | "other";
+type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "pre_harvest_sample" | "bottling_run" | "weather_event" | "sanitation" | "other";
 
 interface Props {
   open: boolean;
@@ -69,6 +69,7 @@ const EVENT_TYPES: { id: EventType; label: string; icon: string; description: st
   { id: "pre_harvest_sample", label: "Pre-Harvest Sample", icon: "🌿", description: "Block sample: Brix, TA, pH, phenolics" },
   { id: "bottling_run",    label: "Bottling Run",    icon: "🍾", description: "Volume, format, lot number, label" },
   { id: "weather_event",   label: "Weather Event",   icon: "⛈", description: "Frost, heat wave, hail, smoke, rain" },
+  { id: "sanitation",      label: "Sanitation",      icon: "✦", description: "Equipment cleaned, sanitant, contact time" },
   { id: "other",           label: "Other",           icon: "◈", description: "Anything else worth recording" },
 ];
 
@@ -519,6 +520,47 @@ function BottlingRunDetails({
   );
 }
 
+function SanitationDetails({
+  details,
+  onChange,
+}: {
+  details: Record<string, string>;
+  onChange: (d: Record<string, string>) => void;
+}) {
+  const set = (k: string, v: string) => onChange({ ...details, [k]: v });
+  const SANITANTS = ["Sodium metabisulfite (K-meta)", "Citric acid solution", "Peracetic acid", "Hot water (>80°C)", "Steam", "Ozone", "Other"];
+  return (
+    <div className="flex flex-col gap-4">
+      <div>
+        <FieldLabel>Equipment / vessel cleaned</FieldLabel>
+        <TextInput value={details.equipment ?? ""} onChange={(v) => set("equipment", v)} placeholder="e.g. Tank 7, hoses, pump" autoFocus />
+      </div>
+      <div>
+        <FieldLabel>Sanitant used</FieldLabel>
+        <div className="flex flex-col gap-2">
+          {SANITANTS.map((s) => (
+            <OptionButton key={s} selected={details.sanitant === s} onClick={() => set("sanitant", s)}>{s}</OptionButton>
+          ))}
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <FieldLabel>Concentration</FieldLabel>
+          <TextInput value={details.concentration ?? ""} onChange={(v) => set("concentration", v)} placeholder="e.g. 200 ppm" />
+        </div>
+        <div>
+          <FieldLabel>Contact time</FieldLabel>
+          <TextInput value={details.contactTime ?? ""} onChange={(v) => set("contactTime", v)} placeholder="e.g. 15 min" />
+        </div>
+      </div>
+      <div>
+        <FieldLabel>Notes</FieldLabel>
+        <TextInput value={details.notes ?? ""} onChange={(v) => set("notes", v)} placeholder="e.g. Rinsed 3× with cold water" />
+      </div>
+    </div>
+  );
+}
+
 function OtherDetails({
   details,
   onChange,
@@ -658,6 +700,7 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
       if (eventType === "observation" || eventType === "other") return !!details.text?.trim();
       if (eventType === "pre_harvest_sample") return !!details.blockName && !!details.brix;
       if (eventType === "bottling_run") return !!details.volumeL && !!details.lotNumber;
+      if (eventType === "sanitation") return !!details.equipment?.trim();
       return false;
     }
     return true;
@@ -916,6 +959,7 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
               {eventType === "observation"       && <ObservationDetails       details={details} onChange={setDetails} />}
               {eventType === "pre_harvest_sample" && <PreHarvestSampleDetails details={details} onChange={setDetails} />}
               {eventType === "bottling_run"       && <BottlingRunDetails       details={details} onChange={setDetails} />}
+              {eventType === "sanitation"         && <SanitationDetails        details={details} onChange={setDetails} />}
               {eventType === "other"              && <OtherDetails             details={details} onChange={setDetails} />}
             </>
           )}

@@ -145,14 +145,14 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    title: "Sprint 6 — Planned (5 Partial DRs remaining)",
-    icon: "🔧",
+    title: "Sprint 6 — Completed (All 27 DRs now Full coverage)",
+    icon: "✅",
     items: [
-      { label: "Live tank volume balance",         anchor: "Not yet built — Sprint 6 candidate", sprint: "S6", dr: "DR-04", desc: "Auto-decrement source tank and auto-increment destination tank volume on each Racking log entry; live inventory balance per vessel.", status: "stub" },
-      { label: "Sanitation event type",            anchor: "Not yet built — Sprint 6 candidate", sprint: "S6", dr: "DR-03", desc: "\u2018Sanitation\u2019 event type in VintageEntrySheet with fields: equipment cleaned, sanitant used, contact time — creates a traceable cleaning record against a tank ID.", status: "stub" },
-      { label: "Export documentation generator",  anchor: "Not yet built — Sprint 6 candidate", sprint: "S6", dr: "DR-11", desc: "Pre-filled AWBC movement advice and label compliance checklist generated from batch data; closes the automated export documentation gap.", status: "stub" },
-      { label: "Vineyard disease/pest event type", anchor: "Not yet built — Sprint 6 candidate", sprint: "S6", dr: "DR-06", desc: "Structured disease/pest event in Vineyard block observations: pathogen, affected area, treatment applied, re-entry interval.", status: "stub" },
-      { label: "Equipment fault log",              anchor: "Not yet built — Sprint 6 candidate", sprint: "S6", dr: "DR-10", desc: "\u2018Fault\u2019 task type in Cellar Tasks with fault description, resolution, and downtime duration fields; enables pattern analysis across vintages.", status: "stub" },
+      { label: "Live tank volume balance",         href: "/the-press",     anchor: "New Log Entry → Racking → log a racking event; Current Volume on batch header updates automatically", sprint: "S6", dr: "DR-04", desc: "Auto-update current volume on racking events; live CURRENT VOL badge on each batch header card in Batch Book.", status: "live" },
+      { label: "Sanitation event type",            href: "/the-press",     anchor: "New Log Entry → Event Type → Sanitation", sprint: "S6", dr: "DR-03", desc: "‘Sanitation’ event type with fields: equipment/vessel, sanitant, concentration, contact time, and notes.", status: "live" },
+      { label: "Export documentation generator",  href: "/the-press",     anchor: "The Press → Export Docs tab", sprint: "S6", dr: "DR-11", desc: "AWBC-style Movement Advice (pre-filled from batch data, downloadable .txt) and Label Compliance Checklist (15 items, progress bar).", status: "live" },
+      { label: "Vineyard disease/pest event type", href: "/vineyard",      anchor: "Vineyard → expand a block → Add Observation → Pest Scouting or Disease/Pest Event", sprint: "S6", dr: "DR-06", desc: "Two new structured observation types: Pest Scouting and Disease/Pest Event, alongside existing Disease Scouting.", status: "live" },
+      { label: "Equipment fault log",              href: "/cellar-tasks",  anchor: "Cellar Tasks → expand equipment → Log Fault button", sprint: "S6", dr: "DR-10", desc: "Fault log task type (red badge) with fault description, downtime hours, resolution, and notes fields. Inline form per equipment item.", status: "live" },
     ],
   },
 ];
@@ -251,7 +251,7 @@ export default function BuildIndex() {
             BUILD INDEX
           </span>
           <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", color: TEXT_LO, letterSpacing: "0.08em" }}>
-            v2 · 5 sprints · 22/27 DRs met — remove before launch
+            v3 · 6 sprints · 27/27 DRs met — remove before launch
           </span>
         </div>
         <Link href="/" style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", fontWeight: 300, color: TEXT_LO, textDecoration: "none" }}>
@@ -266,11 +266,10 @@ export default function BuildIndex() {
           style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
         >
           {[
-            { label: "Pages & Features", value: "50" },
-            { label: "Sprints completed", value: "5" },
-            { label: "DRs fully met", value: "22 / 27" },
-            { label: "Partial DRs remain", value: "5" },
-            { label: "Sprint 6 candidates", value: "5 items" },
+            { label: "Pages & Features", value: "55" },
+            { label: "Sprints completed", value: "6" },
+            { label: "DRs fully met", value: "27 / 27" },
+            { label: "Build status", value: "COMPLETE" },
           ].map(s => (
             <div key={s.label} className="flex flex-col">
               <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "1.1rem", color: AMBER, fontWeight: 700 }}>{s.value}</span>

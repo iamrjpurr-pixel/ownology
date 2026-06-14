@@ -158,6 +158,7 @@ export const vintageLogEntries = mysqlTable(
       "pre_harvest_sample",
       "bottling_run",
       "weather_event",
+      "sanitation",
       "other",
     ]).notNull(),
     // Structured event-specific fields stored as JSON string
@@ -215,6 +216,9 @@ export const wineBatches = mysqlTable(
     tankName: varchar("tank_name", { length: 128 }),
     // Volume in litres at start of fermentation (optional — entered by winemaker)
     volumeLitres: int("volume_litres"),
+    // DR-04: Live current volume — auto-updated on each Racking log entry.
+    // Starts equal to volumeLitres at inoculation; decremented on rack-out, incremented on rack-in.
+    currentVolumeLitres: int("current_volume_litres"),
     // Cost per litre (AUD) — entered by owner for Cellar Value calculation
     costPerLitre: int("cost_per_litre"),
     // Per-phase winemaker notes stored as JSON:
@@ -327,6 +331,8 @@ export const cellarTasks = mysqlTable(
       "sanitise",
       "inspect",
       "maintain",
+      // DR-10: Equipment fault log entry
+      "fault_log",
       "other",
     ]).notNull(),
     // Short task title (e.g. "Post-ferment clean")
@@ -528,6 +534,8 @@ export const vineyardObservations = mysqlTable(
       "irrigation",
       "canopy_management",
       "disease_scouting",
+      "pest_scouting",
+      "disease_pest_event",
       "yield_estimate",
       "other",
     ]).notNull(),

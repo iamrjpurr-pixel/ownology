@@ -33,6 +33,7 @@ import {
   updateWineBatchNotes,
   updateWineBatch,
   deleteWineBatch,
+  updateTankVolumeOnRacking,
   addLead,
   listLeads,
   updateLeadNotes,
@@ -391,7 +392,7 @@ const vintageLogRouter = router({
       z.object({
         tankName: z.string().min(1).max(128),
         variety: z.string().min(1).max(128),
-        eventType: z.enum(["addition", "measurement", "racking", "inoculation", "observation", "pre_harvest_sample", "bottling_run", "weather_event", "other"]),
+        eventType: z.enum(["addition", "measurement", "racking", "inoculation", "observation", "pre_harvest_sample", "bottling_run", "weather_event", "sanitation", "other"]),
         details: z.record(z.string(), z.unknown()),
         noteText: z.string().max(2000).optional(),
         entryAt: z.number().optional(),
@@ -411,6 +412,18 @@ const vintageLogRouter = router({
         tagsJson: JSON.stringify(tags),
         entryAt: input.entryAt,
       });
+      // DR-04: Auto-update live tank volume on Racking events
+      if (input.eventType === "racking") {
+        const d = input.details as { fromLocation?: string; toLocation?: string; volumeL?: number };
+        if (d.fromLocation && d.volumeL) {
+          await updateTankVolumeOnRacking(
+            dbUser.id,
+            d.fromLocation,
+            d.toLocation ?? "",
+            Number(d.volumeL)
+          ).catch(() => { /* non-fatal — volume update is best-effort */ });
+        }
+      }
       return { success: true };
     }),
 
@@ -1039,7 +1052,7 @@ const EQUIPMENT_MATERIALS = [
   "other",
 ] as const;
 
-const TASK_TYPES = ["clean", "sanitise", "inspect", "maintain", "other"] as const;
+const TASK_TYPES = ["clean", "sanitise", "inspect", "maintain", "fault_log", "other"] as const;
 
 const cellarEquipmentRouter = router({
   list: protectedProcedure.query(async ({ ctx }) => {
@@ -1263,7 +1276,7 @@ const cellarTasksRouter = router({
         tasks = [];
       }
 
-      const validTypes = ["clean", "sanitise", "inspect", "maintain", "other"];
+      const validTypes = ["clean", "sanitise", "inspect", "maintain", "fault_log", "other"];
       const insertedIds: number[] = [];
       for (const t of tasks) {
         const taskType = validTypes.includes(t.taskType) ? t.taskType : "other";
@@ -1546,7 +1559,7 @@ const packagingRouter = router({
 // ─── Vineyard Router (DR-06) ─────────────────────────────────────────────────
 
 const TRAINING_SYSTEMS = ["VSP", "Scott Henry", "Smart-Dyson", "Pergola", "Bush Vine", "Other"] as const;
-const OBSERVATION_TYPES = ["budburst", "flowering", "veraison", "harvest_date", "spray_application", "irrigation", "canopy_management", "disease_scouting", "yield_estimate", "other"] as const;
+const OBSERVATION_TYPES = ["budburst", "flowering", "veraison", "harvest_date", "spray_application", "irrigation", "canopy_management", "disease_scouting", "pest_scouting", "disease_pest_event", "yield_estimate", "other"] as const;
 
 const vineyardRouter = router({
   listBlocks: protectedProcedure.query(async ({ ctx }) => {
