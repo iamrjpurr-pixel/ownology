@@ -65,7 +65,7 @@ export default function ForHomeWinemakers() {
           </Link>
           <div className="flex items-center gap-6">
             <Link
-              href="/compliance?state=HomeWinemaker"
+              href="/free-run"
               style={{
                 fontFamily: SANS,
                 fontWeight: 300,
@@ -139,7 +139,7 @@ export default function ForHomeWinemakers() {
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
             <Link
-              href="/compliance?state=HomeWinemaker"
+              href="/free-run"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -259,7 +259,7 @@ export default function ForHomeWinemakers() {
             {SAMPLE_QUESTIONS.map((q) => (
               <Link
                 key={q}
-                href={`/compliance?q=${encodeURIComponent(q)}&state=HomeWinemaker`}
+                href={`/free-run?q=${encodeURIComponent(q)}`}
                 style={{
                   display: "flex",
                   alignItems: "center",

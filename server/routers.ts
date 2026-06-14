@@ -1,5 +1,6 @@
 import { z } from "zod";
 import Stripe from "stripe";
+import { eq, or, like } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
 import { buildScopedKnowledgeBase, buildSourceDoctrineSummary } from "./complianceKnowledgeBase.js";
 import { buildQADoctrineSummary, QA_DOCTRINE, getTopics } from "./complianceQADoctrine.js";
@@ -1866,6 +1867,249 @@ const knowledgeRouter = router({
     }),
 });
 
+// ─── Tutor Router (Scoped RAG — SOP-backed winemaking AI) ──────────────────────
+
+// Keyword → SOP category mapping for fast retrieval
+const KEYWORD_CATEGORY_MAP: Record<string, string[]> = {
+  // Fermentation
+  ferment: ["Fermentation Management", "Yeast & Fermentation"],
+  fermentation: ["Fermentation Management", "Yeast & Fermentation"],
+  stuck: ["Fermentation Management"],
+  stall: ["Fermentation Management"],
+  brix: ["Fermentation Management", "Harvest & Receival"],
+  sg: ["Fermentation Management"],
+  gravity: ["Fermentation Management"],
+  temperature: ["Fermentation Management"],
+  cap: ["Fermentation Management"],
+  punchdown: ["Fermentation Management"],
+  pump: ["Fermentation Management"],
+  // Yeast & Nutrition
+  yeast: ["Yeast & Fermentation", "Fermentation Management"],
+  yan: ["Yeast & Fermentation"],
+  dap: ["Yeast & Fermentation"],
+  nutrient: ["Yeast & Fermentation"],
+  inoculation: ["Yeast & Fermentation"],
+  rehydration: ["Yeast & Fermentation"],
+  strain: ["Yeast & Fermentation"],
+  // SO2 / Sulphur
+  so2: ["SO₂ Management", "Additions & Chemistry"],
+  sulphur: ["SO₂ Management"],
+  sulfur: ["SO₂ Management"],
+  "k-meta": ["SO₂ Management"],
+  kmeta: ["SO₂ Management"],
+  metabisulphite: ["SO₂ Management"],
+  molecular: ["SO₂ Management"],
+  // MLF
+  mlf: ["Malolactic Fermentation"],
+  malolactic: ["Malolactic Fermentation"],
+  malic: ["Malolactic Fermentation"],
+  lactic: ["Malolactic Fermentation"],
+  bacteria: ["Malolactic Fermentation"],
+  // Racking & Clarification
+  rack: ["Racking & Clarification"],
+  racking: ["Racking & Clarification"],
+  lees: ["Racking & Clarification"],
+  fining: ["Racking & Clarification", "Additions & Chemistry"],
+  bentonite: ["Racking & Clarification", "Additions & Chemistry"],
+  gelatin: ["Racking & Clarification"],
+  clarity: ["Racking & Clarification"],
+  haze: ["Racking & Clarification"],
+  filter: ["Racking & Clarification"],
+  // Additions & Chemistry
+  addition: ["Additions & Chemistry"],
+  tartaric: ["Additions & Chemistry"],
+  acid: ["Additions & Chemistry"],
+  ph: ["Additions & Chemistry"],
+  ta: ["Additions & Chemistry"],
+  tannin: ["Additions & Chemistry"],
+  oak: ["Additions & Chemistry"],
+  // Harvest
+  harvest: ["Harvest & Receival"],
+  pick: ["Harvest & Receival"],
+  receival: ["Harvest & Receival"],
+  crush: ["Harvest & Receival"],
+  press: ["Harvest & Receival", "Pressing & Free-Run"],
+  pressing: ["Pressing & Free-Run"],
+  "free-run": ["Pressing & Free-Run"],
+  // Bottling & Packaging
+  bottle: ["Bottling & Packaging"],
+  bottling: ["Bottling & Packaging"],
+  cork: ["Bottling & Packaging"],
+  label: ["Bottling & Packaging"],
+  packaging: ["Bottling & Packaging"],
+  // Sanitation & Equipment
+  sanitise: ["Sanitation & Equipment"],
+  sanitize: ["Sanitation & Equipment"],
+  sanitising: ["Sanitation & Equipment"],
+  clean: ["Sanitation & Equipment"],
+  cleaning: ["Sanitation & Equipment"],
+  equipment: ["Sanitation & Equipment"],
+  carboy: ["Sanitation & Equipment"],
+  bubbler: ["Sanitation & Equipment"],
+  demijohn: ["Sanitation & Equipment"],
+  // Faults
+  fault: ["Fault Diagnosis", "Fermentation Management"],
+  h2s: ["Fault Diagnosis"],
+  "rotten egg": ["Fault Diagnosis"],
+  brett: ["Fault Diagnosis"],
+  va: ["Fault Diagnosis"],
+  volatile: ["Fault Diagnosis"],
+  oxidation: ["Fault Diagnosis"],
+  oxidised: ["Fault Diagnosis"],
+};
+
+function detectSopCategories(question: string): string[] {
+  const lower = question.toLowerCase();
+  const matched = new Set<string>();
+  for (const [keyword, categories] of Object.entries(KEYWORD_CATEGORY_MAP)) {
+    if (lower.includes(keyword)) {
+      categories.forEach((c) => matched.add(c));
+    }
+  }
+  return Array.from(matched);
+}
+
+const tutorRouter = router({
+  ask: publicProcedure
+    .input(
+      z.object({
+        question: z.string().min(1).max(2000),
+        mode: z.enum(["winemaking", "home_winemaker"]).optional().default("winemaking"),
+        history: z
+          .array(z.object({ role: z.enum(["user", "assistant"]), content: z.string() }))
+          .max(10)
+          .optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      // ── Step 1: Detect relevant SOP categories from the question ────────────
+      const detectedCategories = detectSopCategories(input.question);
+
+      // ── Step 2: Retrieve up to 3 relevant SOPs from the database ────────────
+      let sops: Array<{ title: string; category: string; procedureText: string | null; decisionLogic: string | null; tribalKnowledge: string | null }> = [];
+
+      if (detectedCategories.length > 0) {
+        // Try exact category match first
+        const categoryConditions = detectedCategories.slice(0, 4).map((cat) =>
+          like(schema.sopLibrary.category, `%${cat}%`)
+        );
+        sops = await db
+          .select({
+            title: schema.sopLibrary.title,
+            category: schema.sopLibrary.category,
+            procedureText: schema.sopLibrary.procedureText,
+            decisionLogic: schema.sopLibrary.decisionLogic,
+            tribalKnowledge: schema.sopLibrary.tribalKnowledge,
+          })
+          .from(schema.sopLibrary)
+          .where(or(...categoryConditions))
+          .limit(3);
+      }
+
+      // Fallback: title keyword search if no category match
+      if (sops.length === 0) {
+        const words = input.question.toLowerCase().split(/\s+/).filter((w) => w.length > 4).slice(0, 3);
+        if (words.length > 0) {
+          const titleConditions = words.map((w) => like(schema.sopLibrary.title, `%${w}%`));
+          sops = await db
+            .select({
+              title: schema.sopLibrary.title,
+              category: schema.sopLibrary.category,
+              procedureText: schema.sopLibrary.procedureText,
+              decisionLogic: schema.sopLibrary.decisionLogic,
+              tribalKnowledge: schema.sopLibrary.tribalKnowledge,
+            })
+            .from(schema.sopLibrary)
+            .where(or(...titleConditions))
+            .limit(3);
+        }
+      }
+
+      // ── Step 3: Build scoped context from retrieved SOPs ────────────────────
+      const isHomeWinemaker = input.mode === "home_winemaker";
+      let sopContext = "";
+
+      if (sops.length > 0) {
+        sopContext = sops
+          .map((sop) => {
+            const parts = [`## ${sop.title} (${sop.category})`];
+            if (sop.procedureText) parts.push(`### Procedure\n${sop.procedureText.slice(0, 1500)}`);
+            if (sop.decisionLogic) parts.push(`### Decision Logic\n${sop.decisionLogic.slice(0, 800)}`);
+            if (sop.tribalKnowledge) parts.push(`### Tribal Knowledge\n${sop.tribalKnowledge.slice(0, 500)}`);
+            return parts.join("\n");
+          })
+          .join("\n\n---\n\n");
+      } else {
+        // No SOPs found — use general winemaking knowledge
+        sopContext = "No specific SOP found for this topic. Answer from general oenological knowledge.";
+      }
+
+      const personaLine = isHomeWinemaker
+        ? "You are a friendly, practical home winemaking assistant helping a home winemaker in their garage or cellar."
+        : "You are an expert winemaking assistant helping a professional winemaker or cellar hand.";
+
+      const systemPrompt = `${personaLine}
+You answer questions about winemaking based on the Standard Operating Procedures (SOPs) provided below.
+
+Rules:
+- Answer from the SOPs provided. If the SOPs don't cover the question, use sound oenological knowledge and say so.
+- Be specific and actionable. Give numbers, ranges, and decision criteria where relevant.
+- ${isHomeWinemaker ? "Keep language accessible — avoid jargon where possible, or explain it briefly." : "Use professional winemaking terminology."}
+- Do NOT answer questions about commercial licensing, export regulations, or legal compliance — redirect those to the Compliance AI.
+- Respond with a JSON object only, no markdown fences:
+{
+  "answer": "<your full answer, may include newlines>",
+  "sopTitles": ["<SOP title 1>", "<SOP title 2>"],
+  "disclaimer": "${isHomeWinemaker ? "Home winemaking practices vary — always taste and judge your wine yourself." : "Always validate decisions against your own vintage data and consult a qualified winemaker for critical decisions."}"
+}
+
+SOPs:
+${sopContext}`;
+
+      const messages = [
+        { role: "system" as const, content: systemPrompt },
+        ...(input.history ?? []).map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+        { role: "user" as const, content: input.question },
+      ];
+
+      const response = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
+        body: JSON.stringify({ messages, stream: false, response_format: { type: "json_object" } }),
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error("[Tutor] LLM error:", response.status, errText);
+        throw new Error(`LLM error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const rawContent = data.choices?.[0]?.message?.content || "{}";
+
+      let answer = "No response received.";
+      let sopTitles: string[] = [];
+      let disclaimer = isHomeWinemaker
+        ? "Home winemaking practices vary — always taste and judge your wine yourself."
+        : "Always validate decisions against your own vintage data.";
+
+      try {
+        const parsed = JSON.parse(rawContent);
+        if (parsed.answer) answer = parsed.answer;
+        if (Array.isArray(parsed.sopTitles)) sopTitles = parsed.sopTitles;
+        if (parsed.disclaimer) disclaimer = parsed.disclaimer;
+      } catch {
+        answer = rawContent;
+      }
+
+      return { answer, sopTitles, disclaimer };
+    }),
+});
+
 // ─── App Router (re-export with knowledge) ───────────────────────────────────
 export const appRouter = router({
   campaignMetrics: campaignMetricsRouter,
@@ -1886,5 +2130,6 @@ export const appRouter = router({
   packaging: packagingRouter,
   vineyard: vineyardRouter,
   knowledge: knowledgeRouter,
+  tutor: tutorRouter,
 });
 export type AppRouter = typeof appRouter;

@@ -1497,7 +1497,7 @@ export default function ThePress() {
                     </p>
                     <div className="mt-auto pt-3" style={{ borderTop: "1px solid var(--ow-border)" }}>
                       <Link
-                        href="/compliance"
+                        href={`/free-run?q=${encodeURIComponent(scenario.description)}`}
                         className="text-xs flex items-center gap-1.5 transition-colors"
                         style={{
                           fontFamily: "'Lato',sans-serif",
@@ -1796,7 +1796,7 @@ export default function ThePress() {
                                     {noteVal.length} chars · auto-saved
                                   </span>
                                   <Link
-                                    href="/compliance"
+                                    href="/free-run"
                                     className="text-xs"
                                     style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-amber)", textDecoration: "none", fontSize: "0.75rem" }}
                                   >

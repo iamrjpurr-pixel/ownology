@@ -304,7 +304,7 @@ export default function HomeWinemakerGlossary() {
             Ask Ownology any winemaking question — from nutrient calculations to troubleshooting off-flavours.
           </p>
           <Link
-            href="/compliance?state=HomeWinemaker"
+            href="/free-run"
             style={{
               display: "inline-block",
               padding: "0.6rem 1.5rem",

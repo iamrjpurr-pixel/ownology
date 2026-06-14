@@ -308,3 +308,27 @@
 - [x] [DR-06] Vineyard disease/pest event type: add structured disease/pest observation to Vineyard block log with pathogen, affected area, treatment, re-entry interval fields
 - [x] [DR-10] Equipment fault log: add "Fault" task type to Cellar Tasks with fault description, resolution, and downtime duration fields
 - [x] Update Build Index Sprint 6 section from PLANNED to LIVE badges; stats bar updated to 27/27 DRs, 6 sprints, COMPLETE
+
+## AI Tutor — Scoped RAG Wiring (Jun 2026)
+
+### Architecture
+- [x] Add `tutor.ask` tRPC procedure (publicProcedure): accepts question + optional context (mode: "winemaking" | "home_winemaker"), retrieves top 2 SOPs by keyword match from sop_library, builds scoped context (~2,600 tokens), returns answer + cited SOP titles
+- [x] Add keyword→SOP category mapping table in server (covers: fermentation, YAN, DAP, SO₂, MLF, racking, fining, sanitising, stuck ferment, temperature, yeast, equipment, harvest, pressing, bottling)
+
+### Free Run page — replace placeholder cards with live AI tutor
+- [x] Replace 19 placeholder lesson cards with a chat interface (AskTutor component)
+- [x] AskTutor: question input, submit, loading state, answer display with cited SOP title(s)
+- [x] AskTutor: 6 example prompt chips (stuck ferment, YAN addition, SO₂ management, MLF timing, racking decision, fining agent selection)
+- [x] AskTutor: persist last 5 Q&A pairs in localStorage (ow_tutor_thread)
+
+### Rewire existing touchpoints → /free-run (winemaking questions)
+- [x] ForHomeWinemakers.tsx: change all `/compliance?state=HomeWinemaker` links to `/free-run`
+- [x] HomeWineryKit.tsx: change 3 example question links from `/compliance?...` to `/free-run?q=...`
+- [x] HomeWinemakerGlossary.tsx: change "Ask Ownology →" link from `/compliance?state=HomeWinemaker` to `/free-run`
+- [x] HomeWinemakerTroubleshooting.tsx: change "Ask Ownology →" link from `/compliance?state=HomeWinemaker` to `/free-run`
+- [x] KitWineTracker.tsx: change "Ask Ownology a question →" link from `/compliance?state=HomeWinemaker` to `/free-run`
+- [x] ThePress.tsx: change "Ask Ownology ◈" link from `/compliance` to `/free-run` (winemaking questions go to tutor, not compliance)
+- [x] Guide.tsx: already links to `/free-run` — confirm it passes through correctly after tutor is live
+
+### Free Run page — ?q= param support
+- [x] Free Run page: read ?q= query param on mount, pre-fill question input, auto-submit once

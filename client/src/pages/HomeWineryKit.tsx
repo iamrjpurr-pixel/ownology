@@ -356,7 +356,7 @@ export default function HomeWineryKit() {
             ].map(({ q, label }) => (
               <Link
                 key={label}
-                href={`/compliance?q=${encodeURIComponent(q)}&state=HomeWinemaker`}
+                href={`/free-run?q=${encodeURIComponent(q)}`}
               >
                 <a
                   style={{

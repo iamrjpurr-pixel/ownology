@@ -1,232 +1,33 @@
 /**
- * FREE RUN — The Learning Board
- * "In the cellar, free run juice flows without force — the purest expression of the fruit.
- *  Your Free Run board works the same way."
- *
- * UI shell with placeholder lesson cards, domain filters, and vocabulary section.
- * Content will be populated in the 4-week education build.
+ * FREE RUN — AI Winemaking Tutor
+ * Scoped RAG: retrieves relevant SOPs from the knowledge base and answers from them.
+ * Replaces the placeholder lesson-card shell with a live question→answer interface.
  */
 
 import { useEffect, useRef, useState } from "react";
-import { Link } from "wouter";
-import { BookOpen, FlaskConical, Microscope, Beaker, Cog, GraduationCap, ExternalLink } from "lucide-react";
+import { Link, useSearch } from "wouter";
+import { Send, BookOpen, ExternalLink, GraduationCap } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type Domain = "All" | "Chemistry" | "Microbiology" | "Sensory" | "Viticulture" | "Operations" | "Regulatory" | "Business";
-type Level = "Foundation" | "Intermediate" | "Advanced";
-
-interface LessonCard {
-  id: string;
-  title: string;
-  domain: Domain;
-  level: Level;
-  duration: string;
-  tagline: string;
-  locked: boolean;
-  completed: boolean;
+interface QAPair {
+  question: string;
+  answer: string;
+  sopTitles: string[];
+  disclaimer: string;
 }
 
-// ─── Placeholder lesson data (UI shell — content populated in education build) ─
-const LESSONS: LessonCard[] = [
-  // Foundation — free preview
-  { id: "chem-foundations", title: "The Chemistry of Wine", domain: "Chemistry", level: "Foundation", duration: "8 min", tagline: "Why pH matters more than you think at 2am during vintage", locked: false, completed: false },
-  { id: "fermentation-basics", title: "How Fermentation Actually Works", domain: "Chemistry", level: "Foundation", duration: "10 min", tagline: "Sugar to alcohol — the process your wine depends on", locked: false, completed: false },
-  { id: "wine-microbiology-intro", title: "The Invisible Workforce", domain: "Microbiology", level: "Foundation", duration: "9 min", tagline: "Yeast, bacteria, and the organisms running your cellar", locked: false, completed: false },
-  // Intermediate — locked (The Cellar tier)
-  { id: "yan-management", title: "YAN and Yeast Nutrition", domain: "Chemistry", level: "Intermediate", duration: "12 min", tagline: "Feed your yeast right or pay for it at 3am", locked: true, completed: false },
-  { id: "so2-chemistry", title: "SO₂ — Free, Bound, and Molecular", domain: "Chemistry", level: "Intermediate", duration: "11 min", tagline: "The most important number in your cellar explained simply", locked: true, completed: false },
-  { id: "mlf-management", title: "Malolactic Fermentation", domain: "Microbiology", level: "Intermediate", duration: "10 min", tagline: "When to encourage it, when to stop it, and how to know the difference", locked: true, completed: false },
-  { id: "sensory-evaluation", title: "Building a Professional Palate", domain: "Sensory", level: "Intermediate", duration: "14 min", tagline: "How to taste wine like a winemaker, not a consumer", locked: true, completed: false },
-  { id: "fining-agents", title: "Fining Agents and Wine Clarity", domain: "Operations", level: "Intermediate", duration: "9 min", tagline: "Bentonite, egg white, PVPP — what they do and when to use them", locked: true, completed: false },
-  { id: "vintage-scheduling", title: "Running a Vintage", domain: "Operations", level: "Intermediate", duration: "13 min", tagline: "Tank allocation, pump-over regimes, and keeping your head above water", locked: true, completed: false },
-  { id: "viticultural-science", title: "Vine Physiology for Winemakers", domain: "Viticulture", level: "Intermediate", duration: "11 min", tagline: "What happens in the vineyard that you can't fix in the cellar", locked: true, completed: false },
-  { id: "sensory-faults", title: "Identifying Wine Faults", domain: "Sensory", level: "Intermediate", duration: "12 min", tagline: "Brett, VA, reduction, oxidation — find them before your customer does", locked: true, completed: false },
-  { id: "liquor-licensing", title: "Liquor Licensing for Winemakers", domain: "Regulatory", level: "Intermediate", duration: "10 min", tagline: "What you legally need to produce and sell wine in Australia", locked: true, completed: false },
-  // Advanced — locked (The Cellar tier)
-  { id: "fermentation-technology", title: "Advanced Fermentation Technology", domain: "Chemistry", level: "Advanced", duration: "16 min", tagline: "Stuck ferments, heat spikes, and the science of rescue", locked: true, completed: false },
-  { id: "stabilisation-clarification", title: "Stabilisation and Clarification", domain: "Operations", level: "Advanced", duration: "14 min", tagline: "Cold stabilisation, heat stability, and protein haze prevention", locked: true, completed: false },
-  { id: "sparkling-fortified", title: "Sparkling and Fortified Winemaking", domain: "Operations", level: "Advanced", duration: "15 min", tagline: "Traditional method, tank method, and the art of fortification", locked: true, completed: false },
-  { id: "wine-chemistry-advanced", title: "Wine Chemistry in Depth", domain: "Chemistry", level: "Advanced", duration: "18 min", tagline: "Phenolics, esters, and the molecular basis of wine quality", locked: true, completed: false },
-  { id: "winery-engineering", title: "Understanding Winery Equipment", domain: "Operations", level: "Advanced", duration: "13 min", tagline: "Pumps, heat exchangers, and the machines your wine depends on", locked: true, completed: false },
-  { id: "waste-management", title: "Winery Waste and EPA Compliance", domain: "Regulatory", level: "Advanced", duration: "11 min", tagline: "Marc, lees, wastewater — your legal obligations and best practice", locked: true, completed: false },
-  { id: "winery-business", title: "The Economics of a Boutique Winery", domain: "Business", level: "Advanced", duration: "15 min", tagline: "Cost of production, pricing, cash flow — the numbers behind the wine", locked: true, completed: false },
+// ─── Example prompt chips ─────────────────────────────────────────────────────
+const EXAMPLE_PROMPTS = [
+  { label: "Stuck ferment", q: "My fermentation has stalled at 1.020 SG — what should I do?" },
+  { label: "YAN addition", q: "My Shiraz is at 24.3 Brix and YAN is 120ppm. What DAP addition do I need?" },
+  { label: "SO₂ management", q: "How do I calculate my free SO₂ addition after racking?" },
+  { label: "MLF timing", q: "When should I inoculate for malolactic fermentation?" },
+  { label: "Racking decision", q: "How do I know when my wine is ready to rack for the first time?" },
+  { label: "Fining agents", q: "What fining agents should I use to improve clarity in my white wine?" },
 ];
 
-const DOMAINS: Domain[] = ["All", "Chemistry", "Microbiology", "Sensory", "Viticulture", "Operations", "Regulatory", "Business"];
-
-const DOMAIN_ICONS: Record<Domain, string> = {
-  All: "◈",
-  Chemistry: "⚗",
-  Microbiology: "🔬",
-  Sensory: "👁",
-  Viticulture: "🍇",
-  Operations: "⚙",
-  Regulatory: "📋",
-  Business: "📊",
-};
-
-const LEVEL_COLORS: Record<Level, string> = {
-  Foundation: "oklch(0.72 0.12 75)",   // amber
-  Intermediate: "oklch(0.65 0.10 230)", // blue
-  Advanced: "oklch(0.62 0.10 45)",      // terracotta
-};
-
-// ─── Vocabulary (wine wank layer) ─────────────────────────────────────────────
-const VOCABULARY = [
-  { word: "Free Run", meaning: "Juice that flows from the grape under its own weight, before pressing — the easiest, most natural first flow of knowledge." },
-  { word: "The Press", meaning: "The machine that extracts remaining juice under pressure. Deeper learning requires pressure — that is not a bad thing." },
-  { word: "Must", meaning: "Freshly crushed grape juice before fermentation begins. Every learner starts as must — raw, full of potential, not yet wine." },
-  { word: "The Barrel", meaning: "The oak vessel where wine matures and develops complexity. Mastery is not instant — it requires time in the barrel." },
-  { word: "Cahier", meaning: "French: exercise book, student's notebook. Your Free Run board is your cahier." },
-  { word: "Carnet de Cave", meaning: "French: cellar book, the winemaker's operational record. Your Press board is your Carnet de Cave." },
-  { word: "Terroir", meaning: "French: the complete natural environment of a vineyard. Your learning environment shapes your knowledge — your terroir." },
-  { word: "En Primeur", meaning: "French: wine sold before it is fully matured. You are en primeur — the learning is still in barrel." },
-  { word: "Lees", meaning: "Spent yeast and solids that settle after fermentation. Knowledge that has settled — the foundation everything else is racked off." },
-  { word: "Racking", meaning: "Moving clear wine off the lees into a clean vessel. Applying what you have learned — moving forward with clarity." },
-  { word: "Brix", meaning: "A measure of sugar concentration in grape juice. Where you start — the raw material of learning." },
-  { word: "YAN", meaning: "Yeast Assimilable Nitrogen — the nutrient yeast needs to ferment cleanly. What you feed your mind to keep it running." },
-];
-
-// ─── Intersection observer hook ───────────────────────────────────────────────
-function useInView(threshold = 0.12) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setInView(true); obs.disconnect(); }
-    }, { threshold });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [threshold]);
-  return { ref, inView };
-}
-
-// ─── Lesson Card ──────────────────────────────────────────────────────────────
-function LessonCardItem({ lesson }: { lesson: LessonCard }) {
-  return (
-    <div
-      className="cellar-card relative flex flex-col gap-3 p-5 cursor-pointer group"
-      style={{
-        opacity: lesson.locked ? 0.65 : 1,
-        border: lesson.completed
-          ? "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)"
-          : "1px solid var(--ow-border)",
-      }}
-    >
-      {/* Lock overlay */}
-      {lesson.locked && (
-        <div
-          className="absolute top-3 right-3 w-6 h-6 rounded-sm flex items-center justify-center"
-          style={{ background: "var(--ow-bg-inset)", border: "1px solid var(--ow-border)" }}
-        >
-          <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
-            <rect x="1" y="5" width="8" height="7" rx="1" stroke="var(--ow-text-lo)" strokeWidth="1.2" />
-            <path d="M3 5V3.5a2 2 0 0 1 4 0V5" stroke="var(--ow-text-lo)" strokeWidth="1.2" strokeLinecap="round" />
-          </svg>
-        </div>
-      )}
-
-      {/* Completed tick */}
-      {lesson.completed && (
-        <div
-          className="absolute top-3 right-3 w-6 h-6 rounded-sm flex items-center justify-center"
-          style={{ background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)", border: "1px solid var(--ow-amber)" }}
-        >
-          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-            <path d="M1 4l3 3 5-6" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-      )}
-
-      {/* Domain + Level */}
-      <div className="flex items-center gap-2">
-        <span style={{ fontSize: "0.9rem" }}>{DOMAIN_ICONS[lesson.domain]}</span>
-        <span
-          className="text-xs tracking-wider uppercase"
-          style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-text-lo)", letterSpacing: "0.08em" }}
-        >
-          {lesson.domain}
-        </span>
-        <span
-          className="ml-auto text-xs px-2 py-0.5 rounded-sm"
-          style={{
-            fontFamily: "'Fira Code',monospace",
-            fontSize: "0.65rem",
-            color: LEVEL_COLORS[lesson.level],
-            background: `color-mix(in oklch, ${LEVEL_COLORS[lesson.level]} 12%, transparent)`,
-            border: `1px solid color-mix(in oklch, ${LEVEL_COLORS[lesson.level]} 25%, transparent)`,
-          }}
-        >
-          {lesson.level}
-        </span>
-      </div>
-
-      {/* Title */}
-      <h3
-        style={{
-          fontFamily: "'Fraunces',serif",
-          fontWeight: 600,
-          fontSize: "1.0625rem",
-          lineHeight: 1.25,
-          color: "var(--ow-text-hi)",
-        }}
-      >
-        {lesson.title}
-      </h3>
-
-      {/* Tagline */}
-      <p
-        style={{
-          fontFamily: "'Lato',sans-serif",
-          fontWeight: 300,
-          fontSize: "0.875rem",
-          lineHeight: 1.6,
-          color: "var(--ow-text-mid)",
-          fontStyle: "italic",
-        }}
-      >
-        {lesson.tagline}
-      </p>
-
-      {/* Footer */}
-      <div className="flex items-center justify-between mt-auto pt-3" style={{ borderTop: "1px solid var(--ow-border)" }}>
-        <span
-          style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.7rem", color: "var(--ow-text-lo)" }}
-        >
-          {lesson.duration} read
-        </span>
-        {lesson.locked ? (
-          <span
-            className="text-xs px-3 py-1 rounded-sm"
-            style={{
-              fontFamily: "'Lato',sans-serif",
-              color: "var(--ow-amber)",
-              background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
-              border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
-            }}
-          >
-            The Cellar →
-          </span>
-        ) : (
-          <span
-            className="text-xs px-3 py-1 rounded-sm transition-all group-hover:bg-[color-mix(in_oklch,var(--ow-amber)_15%,transparent)]"
-            style={{
-              fontFamily: "'Lato',sans-serif",
-              color: "var(--ow-amber)",
-              border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
-            }}
-          >
-            Begin →
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─── CSU Subject Cards ────────────────────────────────────────────────────────
+// ─── CSU Academic Backbone (sourced from CSU Bachelor of Wine Science handbook) ─
 interface CsuSubject {
   code: string;
   name: string;
@@ -338,25 +139,31 @@ const CSU_LEVEL_COLORS: Record<"Foundation" | "Intermediate" | "Advanced", strin
   Advanced: "oklch(0.62 0.10 45)",
 };
 
+// ─── Intersection observer hook ───────────────────────────────────────────────
+function useInView(threshold = 0.12) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setInView(true); obs.disconnect(); }
+    }, { threshold });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return { ref, inView };
+}
+
+// ─── CSU Subject Card ─────────────────────────────────────────────────────────
 function CsuSubjectCard({ subject }: { subject: CsuSubject }) {
   const [expanded, setExpanded] = useState(false);
   return (
-    <div
-      className="cellar-card p-5 flex flex-col gap-3"
-      style={{ border: "1px solid var(--ow-border)" }}
-    >
-      {/* Header row */}
+    <div className="cellar-card p-5 flex flex-col gap-3" style={{ border: "1px solid var(--ow-border)" }}>
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <span
-              style={{
-                fontFamily: "'Fira Code',monospace",
-                fontSize: "0.7rem",
-                color: "var(--ow-amber)",
-                letterSpacing: "0.08em",
-              }}
-            >
+            <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.7rem", color: "var(--ow-amber)", letterSpacing: "0.08em" }}>
               {subject.code}
             </span>
             <span
@@ -372,15 +179,7 @@ function CsuSubjectCard({ subject }: { subject: CsuSubject }) {
               {subject.level}
             </span>
           </div>
-          <h3
-            style={{
-              fontFamily: "'Fraunces',serif",
-              fontWeight: 600,
-              fontSize: "1rem",
-              lineHeight: 1.25,
-              color: "var(--ow-text-hi)",
-            }}
-          >
+          <h3 style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "1rem", lineHeight: 1.25, color: "var(--ow-text-hi)" }}>
             {subject.name}
           </h3>
         </div>
@@ -392,50 +191,32 @@ function CsuSubjectCard({ subject }: { subject: CsuSubject }) {
         </div>
       </div>
 
-      {/* Key topics toggle */}
       <button
         onClick={() => setExpanded(e => !e)}
         className="flex items-center gap-2 text-xs transition-colors"
-        style={{
-          fontFamily: "'Lato',sans-serif",
-          color: "var(--ow-text-lo)",
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-          padding: 0,
-        }}
+        style={{ fontFamily: "'Lato',sans-serif", color: expanded ? "var(--ow-amber)" : "var(--ow-text-lo)", background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left" }}
       >
-        <span>{expanded ? "▾" : "▸"}</span>
-        {expanded ? "Hide" : "Show"} key topics ({subject.keyTopics.length})
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
+          <path d="M3 2l4 3-4 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        {expanded ? "Hide topics" : "Show key topics"}
       </button>
 
       {expanded && (
-        <ul className="flex flex-col gap-1.5 pl-3">
-          {subject.keyTopics.map((t, i) => (
-            <li
-              key={i}
-              className="flex items-start gap-2"
-              style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem", lineHeight: 1.55, color: "var(--ow-text-mid)" }}
-            >
-              <span style={{ color: "var(--ow-amber)", flexShrink: 0, marginTop: "0.15rem" }}>·</span>
+        <ul className="flex flex-col gap-1.5 pl-3" style={{ borderLeft: "2px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)" }}>
+          {subject.keyTopics.map((t) => (
+            <li key={t} style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.8rem", color: "var(--ow-text-mid)", lineHeight: 1.5 }}>
               {t}
             </li>
           ))}
         </ul>
       )}
 
-      {/* Footer links */}
       <div className="flex items-center gap-3 mt-auto pt-3" style={{ borderTop: "1px solid var(--ow-border)" }}>
         <Link
           href={subject.ownologyLink}
-          className="text-xs px-3 py-1 rounded-sm transition-all"
-          style={{
-            fontFamily: "'Lato',sans-serif",
-            color: "var(--ow-amber)",
-            background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
-            border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
-            textDecoration: "none",
-          }}
+          className="text-xs"
+          style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-amber)", textDecoration: "none" }}
         >
           {subject.ownologyLabel}
         </Link>
@@ -444,13 +225,7 @@ function CsuSubjectCard({ subject }: { subject: CsuSubject }) {
           target="_blank"
           rel="noopener noreferrer"
           className="ml-auto flex items-center gap-1 text-xs"
-          style={{
-            fontFamily: "'Fira Code',monospace",
-            fontSize: "0.65rem",
-            color: "var(--ow-text-lo)",
-            textDecoration: "none",
-            letterSpacing: "0.05em",
-          }}
+          style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "var(--ow-text-lo)", textDecoration: "none", letterSpacing: "0.05em" }}
         >
           CSU Handbook <ExternalLink size={10} />
         </a>
@@ -461,15 +236,108 @@ function CsuSubjectCard({ subject }: { subject: CsuSubject }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function FreeRun() {
-  const [domain, setDomain] = useState<Domain>("All");
-  const [vocabOpen, setVocabOpen] = useState(false);
-  const headerRef = useInView(0.1);
-  const gridRef = useInView(0.05);
-  const vocabRef = useInView(0.1);
+  const search = useSearch();
+  const [question, setQuestion] = useState("");
+  const [history, setHistory] = useState<QAPair[]>([]);
+  const [isAsking, setIsAsking] = useState(false);
+  const autoSubmittedRef = useRef(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
-  const filtered = domain === "All" ? LESSONS : LESSONS.filter(l => l.domain === domain);
-  const freeCount = LESSONS.filter(l => !l.locked).length;
-  const totalCount = LESSONS.length;
+  const headerRef = useInView(0.1);
+  const csuRef = useInView(0.05);
+
+  const askMutation = trpc.tutor.ask.useMutation();
+
+  // Load thread from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("ow_tutor_thread");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) setHistory(parsed);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  // Persist thread to localStorage
+  useEffect(() => {
+    if (history.length > 0) {
+      localStorage.setItem("ow_tutor_thread", JSON.stringify(history.slice(-5)));
+    }
+  }, [history]);
+
+  // Handle ?q= param — pre-fill and auto-submit once
+  useEffect(() => {
+    const params = new URLSearchParams(search);
+    const q = params.get("q");
+    if (q && !autoSubmittedRef.current) {
+      autoSubmittedRef.current = true;
+      setQuestion(q);
+      // Auto-submit after a short delay to let state settle
+      setTimeout(() => {
+        handleAsk(q);
+      }, 300);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
+  // Scroll to bottom after new answer
+  useEffect(() => {
+    if (history.length > 0) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [history]);
+
+  async function handleAsk(overrideQ?: string) {
+    const q = (overrideQ ?? question).trim();
+    if (!q || isAsking) return;
+    setIsAsking(true);
+    setQuestion("");
+    try {
+      const result = await askMutation.mutateAsync({
+        question: q,
+        mode: "winemaking",
+        history: history.slice(-4).map((h) => [
+          { role: "user" as const, content: h.question },
+          { role: "assistant" as const, content: h.answer },
+        ]).flat(),
+      });
+      setHistory((prev) => [
+        ...prev,
+        {
+          question: q,
+          answer: result.answer,
+          sopTitles: result.sopTitles,
+          disclaimer: result.disclaimer,
+        },
+      ]);
+    } catch (err) {
+      setHistory((prev) => [
+        ...prev,
+        {
+          question: q,
+          answer: "Something went wrong. Please try again.",
+          sopTitles: [],
+          disclaimer: "",
+        },
+      ]);
+    } finally {
+      setIsAsking(false);
+    }
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleAsk();
+    }
+  }
+
+  function clearThread() {
+    setHistory([]);
+    localStorage.removeItem("ow_tutor_thread");
+  }
 
   return (
     <div style={{ background: "var(--ow-bg-base)", minHeight: "100vh" }}>
@@ -487,7 +355,6 @@ export default function FreeRun() {
 
         {/* ── Header ── */}
         <div ref={headerRef.ref} className={`mb-10 ${headerRef.inView ? "fade-up" : "opacity-0"}`}>
-          {/* Board identity */}
           <div className="flex items-center gap-3 mb-6">
             <div
               className="px-3 py-1.5 rounded-sm text-xs flex items-center gap-2"
@@ -502,10 +369,7 @@ export default function FreeRun() {
               <span style={{ fontSize: "0.8rem" }}>◈</span>
               FREE RUN
             </div>
-            <div
-              className="h-px flex-1"
-              style={{ background: "linear-gradient(to right, color-mix(in oklch, var(--ow-amber) 20%, transparent), transparent)" }}
-            />
+            <div className="h-px flex-1" style={{ background: "linear-gradient(to right, color-mix(in oklch, var(--ow-amber) 20%, transparent), transparent)" }} />
             <Link
               href="/the-press"
               className="px-3 py-1.5 rounded-sm text-xs flex items-center gap-2 transition-all"
@@ -523,11 +387,8 @@ export default function FreeRun() {
             </Link>
           </div>
 
-          <p
-            className="section-label mb-4"
-            style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", letterSpacing: "0.12em" }}
-          >
-            Your Learning Board
+          <p className="section-label mb-4" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", letterSpacing: "0.12em" }}>
+            AI Winemaking Tutor
           </p>
           <h1
             style={{
@@ -552,350 +413,304 @@ export default function FreeRun() {
               maxWidth: "560px",
             }}
           >
-            In the cellar, free run juice flows without force — the purest expression of the fruit. Your Free Run board works the same way. Write it, test it, wipe it, learn it.
+            Ask any winemaking question. Answers are drawn directly from Ownology's SOP knowledge base — the same library your cellar team uses.
           </p>
+        </div>
+
+        {/* ── Example prompt chips ── */}
+        {history.length === 0 && !isAsking && (
+          <div className="mb-8">
+            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.75rem" }}>
+              Try asking
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {EXAMPLE_PROMPTS.map(({ label, q }) => (
+                <button
+                  key={label}
+                  onClick={() => { setQuestion(q); inputRef.current?.focus(); }}
+                  className="px-3 py-1.5 rounded-sm text-xs transition-all"
+                  style={{
+                    fontFamily: "'Lato',sans-serif",
+                    color: "var(--ow-amber)",
+                    background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)",
+                    border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
+                    cursor: "pointer",
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Conversation thread ── */}
+        {history.length > 0 && (
+          <div className="mb-8 flex flex-col gap-6">
+            {history.map((pair, i) => (
+              <div key={i} className="flex flex-col gap-3">
+                {/* Question bubble */}
+                <div className="flex justify-end">
+                  <div
+                    className="px-4 py-3 rounded-sm max-w-lg"
+                    style={{
+                      background: "var(--ow-bg-inset)",
+                      border: "1px solid var(--ow-border)",
+                      fontFamily: "'Lato',sans-serif",
+                      fontWeight: 300,
+                      fontSize: "0.9rem",
+                      color: "var(--ow-text-hi)",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {pair.question}
+                  </div>
+                </div>
+
+                {/* Answer */}
+                <div
+                  className="cellar-card p-5"
+                  style={{ border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
+                >
+                  {/* SOP source badges */}
+                  {pair.sopTitles.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {pair.sopTitles.map((t) => (
+                        <span
+                          key={t}
+                          className="px-2 py-0.5 rounded-sm text-xs flex items-center gap-1"
+                          style={{
+                            fontFamily: "'Fira Code',monospace",
+                            fontSize: "0.65rem",
+                            color: "var(--ow-amber)",
+                            background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+                            border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
+                          }}
+                        >
+                          <BookOpen size={9} />
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Answer text */}
+                  <div
+                    style={{
+                      fontFamily: "'Lato',sans-serif",
+                      fontWeight: 300,
+                      fontSize: "0.9375rem",
+                      color: "var(--ow-text-hi)",
+                      lineHeight: 1.75,
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {pair.answer}
+                  </div>
+
+                  {/* Disclaimer */}
+                  {pair.disclaimer && (
+                    <p
+                      className="mt-4 pt-3"
+                      style={{
+                        fontFamily: "'Lato',sans-serif",
+                        fontWeight: 300,
+                        fontSize: "0.75rem",
+                        color: "var(--ow-text-lo)",
+                        fontStyle: "italic",
+                        borderTop: "1px solid var(--ow-border)",
+                      }}
+                    >
+                      {pair.disclaimer}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {/* Loading state */}
+            {isAsking && (
+              <div className="flex justify-start">
+                <div
+                  className="cellar-card px-5 py-4 flex items-center gap-3"
+                  style={{ border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
+                >
+                  <div className="flex gap-1">
+                    {[0, 1, 2].map((i) => (
+                      <div
+                        key={i}
+                        className="w-1.5 h-1.5 rounded-full"
+                        style={{
+                          background: "var(--ow-amber)",
+                          animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8rem", color: "var(--ow-text-lo)" }}>
+                    Searching SOPs…
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div ref={bottomRef} />
+
+            {/* Thread controls */}
+            <div className="flex items-center justify-between pt-2">
+              <button
+                onClick={clearThread}
+                className="text-xs"
+                style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-text-lo)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+              >
+                Clear conversation
+              </button>
+              <div className="flex flex-wrap gap-2">
+                {EXAMPLE_PROMPTS.slice(0, 3).map(({ label, q }) => (
+                  <button
+                    key={label}
+                    onClick={() => { setQuestion(q); inputRef.current?.focus(); }}
+                    className="px-2.5 py-1 rounded-sm text-xs"
+                    style={{
+                      fontFamily: "'Lato',sans-serif",
+                      color: "var(--ow-text-lo)",
+                      background: "var(--ow-bg-inset)",
+                      border: "1px solid var(--ow-border)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Loading state when no history yet */}
+        {isAsking && history.length === 0 && (
+          <div className="mb-8 flex justify-start">
+            <div
+              className="cellar-card px-5 py-4 flex items-center gap-3"
+              style={{ border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
+            >
+              <div className="flex gap-1">
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{
+                      background: "var(--ow-amber)",
+                      animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
+                    }}
+                  />
+                ))}
+              </div>
+              <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8rem", color: "var(--ow-text-lo)" }}>
+                Searching SOPs…
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* ── Input box ── */}
+        <div
+          className="cellar-card p-4"
+          style={{ border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}
+        >
+          <textarea
+            ref={inputRef}
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask a winemaking question — stuck ferment, YAN addition, SO₂ management, MLF timing…"
+            rows={3}
+            disabled={isAsking}
+            style={{
+              width: "100%",
+              background: "transparent",
+              border: "none",
+              outline: "none",
+              resize: "none",
+              fontFamily: "'Lato',sans-serif",
+              fontWeight: 300,
+              fontSize: "0.9375rem",
+              color: "var(--ow-text-hi)",
+              lineHeight: 1.6,
+            }}
+          />
+          <div className="flex items-center justify-between pt-3" style={{ borderTop: "1px solid var(--ow-border)" }}>
+            <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "var(--ow-text-lo)" }}>
+              Enter to send · Shift+Enter for new line
+            </p>
+            <button
+              onClick={() => handleAsk()}
+              disabled={!question.trim() || isAsking}
+              className="flex items-center gap-2 px-4 py-2 rounded-sm text-sm transition-all"
+              style={{
+                fontFamily: "'Lato',sans-serif",
+                fontWeight: 700,
+                fontSize: "0.8125rem",
+                background: question.trim() && !isAsking ? "var(--ow-amber)" : "var(--ow-bg-inset)",
+                color: question.trim() && !isAsking ? "oklch(0.11 0.008 60)" : "var(--ow-text-lo)",
+                border: "none",
+                cursor: question.trim() && !isAsking ? "pointer" : "not-allowed",
+                letterSpacing: "0.04em",
+              }}
+            >
+              <Send size={13} />
+              Ask
+            </button>
+          </div>
+        </div>
+
+        {/* ── Compliance redirect notice ── */}
+        <div
+          className="mt-4 px-4 py-3 rounded-sm flex items-start gap-3"
+          style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="mt-0.5 flex-shrink-0">
+            <circle cx="7" cy="7" r="6" stroke="var(--ow-text-lo)" strokeWidth="1.2" />
+            <path d="M7 5v4M7 10.5v.5" stroke="var(--ow-text-lo)" strokeWidth="1.2" strokeLinecap="round" />
+          </svg>
+          <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.8rem", color: "var(--ow-text-lo)", lineHeight: 1.6 }}>
+            Free Run answers winemaking questions from the SOP knowledge base.{" "}
+            For <strong style={{ color: "var(--ow-text-mid)" }}>regulatory and compliance questions</strong>{" "}
+            (licensing, FSANZ, WET, EPA obligations),{" "}
+            <Link href="/compliance" style={{ color: "var(--ow-amber)", textDecoration: "none" }}>
+              use the Compliance AI →
+            </Link>
+          </p>
+        </div>
+
+        {/* ── CSU Academic Backbone ── */}
+        <div ref={csuRef.ref} className={`mt-16 ${csuRef.inView ? "fade-up" : "opacity-0"}`}>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-px flex-1" style={{ background: "var(--ow-border)" }} />
+            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+              CSU Academic Backbone
+            </p>
+            <div className="h-px flex-1" style={{ background: "var(--ow-border)" }} />
+          </div>
           <p
-            className="mt-2"
+            className="mb-6"
             style={{
               fontFamily: "'Lato',sans-serif",
               fontWeight: 300,
               fontSize: "0.875rem",
-              lineHeight: 1.7,
               color: "var(--ow-text-lo)",
-              maxWidth: "520px",
-              fontStyle: "italic",
+              lineHeight: 1.7,
+              maxWidth: "560px",
             }}
           >
-            The science behind every cellar decision — explained for the floor, not the lecture hall.
+            Ownology's knowledge base is structured around the Charles Sturt University Bachelor of Wine Science curriculum.
+            These subjects define the academic framework behind the SOPs Free Run draws from.
           </p>
-
-          {/* Progress bar */}
-          <div className="mt-8 flex items-center gap-4">
-            <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--ow-bg-inset)" }}>
-              <div
-                className="h-full rounded-full transition-all duration-700"
-                style={{
-                  width: "0%",
-                  background: "linear-gradient(to right, var(--ow-amber), color-mix(in oklch, var(--ow-amber) 60%, oklch(0.62 0.10 45)))",
-                }}
-              />
-            </div>
-            <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.75rem", color: "var(--ow-text-lo)", whiteSpace: "nowrap" }}>
-              0 / {totalCount} marks
-            </span>
-          </div>
-
-          {/* Free tier callout */}
-          <div
-            className="mt-6 inline-flex items-start gap-3 px-4 py-3 rounded-sm"
-            style={{
-              background: "var(--ow-bg-card)",
-              border: "1px solid var(--ow-border)",
-              maxWidth: "480px",
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="mt-0.5 flex-shrink-0">
-              <circle cx="7" cy="7" r="6" stroke="var(--ow-amber)" strokeWidth="1.2" />
-              <path d="M7 5v4M7 10.5v.5" stroke="var(--ow-amber)" strokeWidth="1.2" strokeLinecap="round" />
-            </svg>
-            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem", lineHeight: 1.6, color: "var(--ow-text-mid)" }}>
-              <strong style={{ color: "var(--ow-text-hi)" }}>{freeCount} lessons are free.</strong> The remaining {totalCount - freeCount} are included in{" "}
-              <Link href="/pricing" style={{ color: "var(--ow-amber)", textDecoration: "none" }}>The Cellar</Link>
-              {" "}— full education library for $19/mo.
-            </p>
-          </div>
-        </div>
-
-        {/* ── Domain filter ── */}
-        <div className="mb-8">
-          <p
-            className="mb-3 text-xs tracking-wider uppercase"
-            style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", letterSpacing: "0.1em" }}
-          >
-            Domain
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {DOMAINS.map(d => (
-              <button
-                key={d}
-                onClick={() => setDomain(d)}
-                className="px-3 py-1.5 rounded-sm text-xs transition-all flex items-center gap-1.5"
-                style={{
-                  fontFamily: "'Lato',sans-serif",
-                  letterSpacing: "0.05em",
-                  fontWeight: domain === d ? 600 : 300,
-                  background: domain === d
-                    ? "color-mix(in oklch, var(--ow-amber) 15%, transparent)"
-                    : "var(--ow-bg-card)",
-                  border: domain === d
-                    ? "1px solid var(--ow-amber)"
-                    : "1px solid var(--ow-border)",
-                  color: domain === d ? "var(--ow-amber)" : "var(--ow-text-lo)",
-                  cursor: "pointer",
-                }}
-              >
-                <span>{DOMAIN_ICONS[d]}</span>
-                {d}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Lesson grid ── */}
-        <div
-          ref={gridRef.ref}
-          className={`grid gap-4 ${gridRef.inView ? "fade-up" : "opacity-0"}`}
-          style={{ gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}
-        >
-          {filtered.map(lesson => (
-            <LessonCardItem key={lesson.id} lesson={lesson} />
-          ))}
-        </div>
-
-        {filtered.length === 0 && (
-          <div className="text-center py-16">
-            <p style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-text-lo)", fontStyle: "italic" }}>
-              No lessons in this domain yet — coming in the education build.
-            </p>
-          </div>
-        )}
-
-        {/* ── Upgrade CTA ── */}
-        <div
-          className="mt-16 p-8 rounded-sm relative overflow-hidden"
-          style={{
-            background: "var(--ow-bg-card)",
-            border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
-          }}
-        >
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: "radial-gradient(ellipse at top left, color-mix(in oklch, var(--ow-amber) 6%, transparent) 0%, transparent 60%)",
-            }}
-          />
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-6">
-            <div className="flex-1">
-              <p
-                className="section-label mb-2"
-                style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.65rem", letterSpacing: "0.14em" }}
-              >
-                Ready to go deeper?
-              </p>
-              <h2
-                style={{
-                  fontFamily: "'Fraunces',serif",
-                  fontWeight: 700,
-                  fontSize: "clamp(1.4rem,3vw,2rem)",
-                  lineHeight: 1.15,
-                  color: "var(--ow-text-hi)",
-                }}
-              >
-                Join{" "}
-                <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>The Cellar</em>
-              </h2>
-              <p
-                className="mt-2"
-                style={{
-                  fontFamily: "'Lato',sans-serif",
-                  fontWeight: 300,
-                  fontSize: "0.9375rem",
-                  lineHeight: 1.7,
-                  color: "var(--ow-text-mid)",
-                  maxWidth: "440px",
-                }}
-              >
-                All 19 lessons. Every domain. From fermentation chemistry to regulatory compliance — the full education library for home winemakers and wine students.
-              </p>
-              <p
-                className="mt-2"
-                style={{
-                  fontFamily: "'Lato',sans-serif",
-                  fontWeight: 300,
-                  fontSize: "0.8125rem",
-                  fontStyle: "italic",
-                  color: "var(--ow-text-lo)",
-                }}
-              >
-                *La connaissance est le premier outil du vigneron.* — Knowledge is the winemaker's first tool.
-              </p>
-            </div>
-            <div className="flex flex-col gap-3">
-              <Link href="/pricing" className="btn-amber text-sm text-center" style={{ textDecoration: "none", whiteSpace: "nowrap" }}>
-                Join The Cellar — $19/mo →
-              </Link>
-              <a href="#pricing" className="btn-ghost text-sm text-center" style={{ textDecoration: "none", whiteSpace: "nowrap" }}>
-                View Pricing
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Knowledge Platform bridge ── */}
-        <div className="mt-16 p-6 rounded-sm flex flex-col md:flex-row md:items-center gap-5" style={{ background: "var(--ow-bg-inset)", border: "1px solid var(--ow-border)" }}>
-          <div className="flex-shrink-0 w-10 h-10 rounded-sm flex items-center justify-center" style={{ background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)" }}>
-            <BookOpen size={18} style={{ color: "var(--ow-amber)" }} />
-          </div>
-          <div className="flex-1">
-            <p style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "1rem", color: "var(--ow-text-hi)", lineHeight: 1.25 }}>
-              From learning to doing
-            </p>
-            <p className="mt-1" style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.875rem", lineHeight: 1.65, color: "var(--ow-text-mid)", maxWidth: "520px" }}>
-              Every lesson here connects to a live SOP in the Knowledge Platform — your winery’s operational procedures, decision logic, and vintage lessons in one place.
-            </p>
-          </div>
-          <Link
-            href="/knowledge"
-            className="flex-shrink-0 text-sm px-4 py-2 rounded-sm transition-all"
-            style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-amber)", background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)", textDecoration: "none", whiteSpace: "nowrap" }}
-          >
-            Open Knowledge Platform →
-          </Link>
-        </div>
-
-        {/* ── CSU Academic Backbone ── */}
-        <div className="mt-16">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-6 h-6 rounded-sm flex items-center justify-center flex-shrink-0" style={{ background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}>
-              <GraduationCap size={12} style={{ color: "var(--ow-amber)" }} />
-            </div>
-            <h2 style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "clamp(1.2rem,2.5vw,1.6rem)", lineHeight: 1.15, color: "var(--ow-text-hi)" }}>
-              The Academic Backbone
-            </h2>
-          </div>
-          <p className="mb-6" style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.9rem", lineHeight: 1.7, color: "var(--ow-text-mid)", maxWidth: "580px" }}>
-            The oenology content on this platform draws on the publicly available curriculum of Charles Sturt University’s Bachelor of Wine Science — Australia’s leading wine science degree. Each card below references the relevant CSU subject and links directly to the corresponding Ownology SOPs.
-          </p>
-          <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
-            {CSU_SUBJECTS.map(s => (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {CSU_SUBJECTS.map((s) => (
               <CsuSubjectCard key={s.code} subject={s} />
             ))}
           </div>
-          <p className="mt-4 text-xs" style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-text-lo)", fontStyle: "italic" }}>
-            Subject outlines sourced from the{" "}
-            <a href="https://handbook.csu.edu.au/course/2026/4410ws01" target="_blank" rel="noopener noreferrer" style={{ color: "var(--ow-amber)", textDecoration: "none" }}>CSU Handbook 2026</a>
-            {" "}— publicly available information only. All SOP content is original and independently authored.
-          </p>
-        </div>
-
-        {/* ── Vocabulary section ── */}
-        <div ref={vocabRef.ref} className={`mt-16 ${vocabRef.inView ? "fade-up" : "opacity-0"}`}>
-          <button
-            onClick={() => setVocabOpen(v => !v)}
-            className="w-full flex items-center justify-between py-4 transition-colors"
-            style={{ borderTop: "1px solid var(--ow-border)", borderBottom: vocabOpen ? "none" : "1px solid var(--ow-border)", background: "transparent", cursor: "pointer" }}
-          >
-            <div className="flex items-center gap-3">
-              <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.7rem", color: "var(--ow-amber)", letterSpacing: "0.1em" }}>◈</span>
-              <span
-                style={{
-                  fontFamily: "'Fraunces',serif",
-                  fontWeight: 600,
-                  fontSize: "1.0625rem",
-                  color: "var(--ow-text-hi)",
-                }}
-              >
-                The Winemaker's Vocabulary
-              </span>
-              <span
-                style={{
-                  fontFamily: "'Lato',sans-serif",
-                  fontSize: "0.75rem",
-                  color: "var(--ow-text-lo)",
-                  fontStyle: "italic",
-                }}
-              >
-                — wine wank, explained plainly
-              </span>
-            </div>
-            <svg
-              width="16" height="16" viewBox="0 0 16 16" fill="none"
-              style={{ transform: vocabOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", color: "var(--ow-text-lo)", flexShrink: 0 }}
-            >
-              <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-
-          {vocabOpen && (
-            <div
-              className="py-6"
-              style={{ borderBottom: "1px solid var(--ow-border)" }}
-            >
-              <p
-                className="mb-6"
-                style={{
-                  fontFamily: "'Lato',sans-serif",
-                  fontWeight: 300,
-                  fontSize: "0.875rem",
-                  lineHeight: 1.7,
-                  color: "var(--ow-text-lo)",
-                  fontStyle: "italic",
-                  maxWidth: "560px",
-                }}
-              >
-                Every craft has its language. Winemaking has more than most — French, Latin, and technical terms layered over centuries of tradition. Here is what they actually mean.
-              </p>
-              <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
-                {VOCABULARY.map(v => (
-                  <div
-                    key={v.word}
-                    className="p-4 rounded-sm"
-                    style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}
-                  >
-                    <p
-                      style={{
-                        fontFamily: "'Fraunces',serif",
-                        fontWeight: 600,
-                        fontSize: "0.9375rem",
-                        color: "var(--ow-amber)",
-                        marginBottom: "0.5rem",
-                      }}
-                    >
-                      {v.word}
-                    </p>
-                    <p
-                      style={{
-                        fontFamily: "'Lato',sans-serif",
-                        fontWeight: 300,
-                        fontSize: "0.8125rem",
-                        lineHeight: 1.65,
-                        color: "var(--ow-text-mid)",
-                      }}
-                    >
-                      {v.meaning}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* ── Footer quote ── */}
-        <div className="mt-16 text-center">
-          <p
-            style={{
-              fontFamily: "'Fraunces',serif",
-              fontWeight: 400,
-              fontSize: "1.125rem",
-              fontStyle: "italic",
-              lineHeight: 1.6,
-              color: "var(--ow-text-lo)",
-            }}
-          >
-            "You are the must. Ownology is the ferment."
-          </p>
-          <p
-            className="mt-2"
-            style={{
-              fontFamily: "'Lato',sans-serif",
-              fontSize: "0.75rem",
-              color: "oklch(0.38 0.008 60)",
-              letterSpacing: "0.08em",
-            }}
-          >
-            — The Chalkboard
-          </p>
         </div>
 
       </div>

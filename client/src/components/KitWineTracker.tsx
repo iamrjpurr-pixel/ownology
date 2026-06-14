@@ -312,7 +312,7 @@ export default function KitWineTracker({ tankName, inoculationDate }: Props) {
         }}
       >
         Tap a step to mark it complete. Progress is saved locally on this device.{" "}
-        <Link href="/compliance?state=HomeWinemaker" style={{ color: "oklch(0.72 0.12 75)", textDecoration: "none" }}>
+        <Link href="/free-run" style={{ color: "oklch(0.72 0.12 75)", textDecoration: "none" }}>
           Ask Ownology a question →
         </Link>
       </p>

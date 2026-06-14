@@ -439,7 +439,7 @@ export default function HomeWinemakerTroubleshooting() {
             Ask Ownology a specific question about your wine — describe the symptoms, your current readings, and what you've tried.
           </p>
           <Link
-            href="/compliance?state=HomeWinemaker"
+            href="/free-run"
             style={{
               display: "inline-block",
               padding: "0.6rem 1.5rem",
