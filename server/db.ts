@@ -137,6 +137,8 @@ export async function addVintageLogEntry(data: {
   noteText?: string;
   tagsJson: string;
   entryAt?: number;
+  importSource?: string;
+  importBatchId?: string;
 }) {
   const now = Date.now();
   const result = await db.insert(schema.vintageLogEntries).values({
@@ -149,6 +151,8 @@ export async function addVintageLogEntry(data: {
     tagsJson: data.tagsJson,
     entryAt: data.entryAt ?? now,
     createdAt: now,
+    importSource: data.importSource ?? null,
+    importBatchId: data.importBatchId ?? null,
   });
   return result;
 }

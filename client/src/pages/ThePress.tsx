@@ -558,6 +558,20 @@ export default function ThePress() {
                       <span>⚡</span>
                       <span className="hidden sm:inline">Quick Entry</span>
                     </Link>
+                    <Link
+                      href="/import"
+                      className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 rounded-sm text-sm transition-all"
+                      style={{
+                        background: "var(--ow-bg-card)",
+                        color: "oklch(0.60 0.012 75)",
+                        border: "1px solid var(--ow-border-md)",
+                        fontFamily: "'Lato',sans-serif",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <span style={{ fontSize: "0.85rem" }}>📥</span>
+                      <span className="hidden sm:inline">Import</span>
+                    </Link>
                     <button
                       type="button"
                       onClick={() => { setReminderDefaultTank(undefined); setReminderSheetOpen(true); }}
@@ -1201,6 +1215,25 @@ export default function ThePress() {
                                     {tag}
                                   </span>
                                 ))}
+                              </div>
+                            )}
+
+                            {/* Import source badge */}
+                            {(entry as { importSource?: string }).importSource && (
+                              <div className="mt-2">
+                                <span
+                                  className="px-2 py-0.5 rounded-sm"
+                                  style={{
+                                    fontFamily: "'Fira Code',monospace", fontSize: "0.6rem",
+                                    color: "oklch(0.60 0.10 230)",
+                                    background: "oklch(0.60 0.10 230 / 10%)",
+                                    border: "1px solid oklch(0.60 0.10 230 / 25%)",
+                                    letterSpacing: "0.06em",
+                                    textTransform: "uppercase",
+                                  }}
+                                >
+                                  📥 imported · {(entry as { importSource?: string }).importSource}
+                                </span>
                               </div>
                             )}
 

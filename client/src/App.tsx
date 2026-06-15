@@ -40,6 +40,7 @@ import Vineyard from "./pages/Vineyard";
 import PwaInstallBanner from "./components/PwaInstallBanner";
 import Knowledge from "./pages/Knowledge";
 import Guide from "./pages/Guide";
+import Import from "./pages/Import";
 
 
 function Router() {
@@ -85,6 +86,7 @@ function Router() {
       <Route path={"/knowledge"} component={Knowledge} />
       <Route path={"/knowledge/:rest*"} component={Knowledge} />
       <Route path={"/guide"} component={Guide} />
+      <Route path={"/import"} component={Import} />
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

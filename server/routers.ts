@@ -565,6 +565,156 @@ Be specific and use real data from the log. Keep the total length to 200-280 wor
       const content = llmData.choices?.[0]?.message?.content ?? "Unable to generate vintage card.";
       return { content };
     }),
+
+  // ── Import: parse raw text (paste or CSV) into structured entries ──────────
+  parseFromText: protectedProcedure
+    .input(z.object({
+      rawText: z.string().min(1).max(50000),
+    }))
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      const systemPrompt = `You are a winery data extraction assistant. The user will paste raw text from their cellar records — this could be copied from Excel, typed notes, emails, or handwritten notes transcribed.
+
+Extract every cellar event you can identify and return a JSON array of entries. Each entry must have:
+- tankName: string (e.g. "Tank 7", "Barrel 12A", "Press Fraction")
+- variety: string (e.g. "Shiraz", "Chardonnay", "Cabernet Sauvignon")
+- eventType: one of: addition | measurement | racking | inoculation | observation | pre_harvest_sample | bottling_run | weather_event | sanitation | other
+- details: object with event-specific fields:
+  - addition: { what: string, quantity: string, unit: string, timing?: string }
+  - measurement: { what: string, value: string, unit: string }
+  - racking: { fromLocation: string, toLocation: string, volumeL?: string, leesStatus?: string }
+  - inoculation: { what: string, productName?: string, ratePerHL?: string }
+  - observation: { text: string }
+  - other: { text: string }
+- entryDate: ISO date string (YYYY-MM-DD) if identifiable, otherwise null
+- noteText: any additional context not captured in details, or null
+
+Return ONLY a valid JSON array. No markdown, no explanation. If you cannot identify any entries, return [].`;
+
+      const resp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: input.rawText },
+          ],
+          stream: false,
+        }),
+      });
+      if (!resp.ok) throw new Error("LLM request failed");
+      const llmData = await resp.json();
+      const raw = llmData.choices?.[0]?.message?.content ?? "[]";
+      try {
+        const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+        const entries = JSON.parse(cleaned);
+        return { entries: Array.isArray(entries) ? entries : [] };
+      } catch {
+        return { entries: [] };
+      }
+    }),
+
+  // ── Import: parse an image (camera/scan) into structured entries ─────────
+  parseFromImage: protectedProcedure
+    .input(z.object({
+      imageBase64: z.string().min(1),
+      mimeType: z.string().default("image/jpeg"),
+    }))
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      const systemPrompt = `You are a winery data extraction assistant. The user has photographed their cellar records — this could be a handwritten notebook, whiteboard, printed lab report, or any other document.
+
+Extract every cellar event you can identify from the image and return a JSON array of entries. Each entry must have:
+- tankName: string (e.g. "Tank 7", "Barrel 12A")
+- variety: string (e.g. "Shiraz", "Chardonnay")
+- eventType: one of: addition | measurement | racking | inoculation | observation | pre_harvest_sample | bottling_run | weather_event | sanitation | other
+- details: object with event-specific fields:
+  - addition: { what: string, quantity: string, unit: string, timing?: string }
+  - measurement: { what: string, value: string, unit: string }
+  - racking: { fromLocation: string, toLocation: string, volumeL?: string, leesStatus?: string }
+  - inoculation: { what: string, productName?: string, ratePerHL?: string }
+  - observation: { text: string }
+  - other: { text: string }
+- entryDate: ISO date string (YYYY-MM-DD) if identifiable, otherwise null
+- noteText: any additional context, or null
+
+Return ONLY a valid JSON array. No markdown, no explanation. If you cannot identify any entries, return [].`;
+
+      const resp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: systemPrompt },
+            {
+              role: "user",
+              content: [
+                {
+                  type: "image_url",
+                  image_url: { url: `data:${input.mimeType};base64,${input.imageBase64}`, detail: "high" },
+                },
+                { type: "text", text: "Please extract all cellar log entries from this image." },
+              ],
+            },
+          ],
+          stream: false,
+        }),
+      });
+      if (!resp.ok) throw new Error("LLM vision request failed");
+      const llmData = await resp.json();
+      const raw = llmData.choices?.[0]?.message?.content ?? "[]";
+      try {
+        const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+        const entries = JSON.parse(cleaned);
+        return { entries: Array.isArray(entries) ? entries : [] };
+      } catch {
+        return { entries: [] };
+      }
+    }),
+
+  // ── Import: bulk-save confirmed parsed entries ────────────────────────────
+  bulkSave: protectedProcedure
+    .input(z.object({
+      entries: z.array(z.object({
+        tankName: z.string().min(1).max(128),
+        variety: z.string().min(1).max(128),
+        eventType: z.enum(["addition", "measurement", "racking", "inoculation", "observation", "pre_harvest_sample", "bottling_run", "weather_event", "sanitation", "other"]),
+        details: z.record(z.string(), z.unknown()),
+        entryDate: z.string().nullable().optional(),
+        noteText: z.string().max(2000).nullable().optional(),
+      })),
+      importSource: z.enum(["paste", "csv", "image"]),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const batchId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      let saved = 0;
+      for (const entry of input.entries) {
+        const tags = generateTags(entry.eventType, entry.details, entry.variety, entry.tankName);
+        const entryAt = entry.entryDate ? new Date(entry.entryDate).getTime() : Date.now();
+        await addVintageLogEntry({
+          userId: dbUser.id,
+          tankName: entry.tankName,
+          variety: entry.variety,
+          eventType: entry.eventType,
+          detailsJson: JSON.stringify(entry.details),
+          noteText: entry.noteText ?? undefined,
+          tagsJson: JSON.stringify(tags),
+          entryAt: isNaN(entryAt) ? Date.now() : entryAt,
+          importSource: input.importSource,
+          importBatchId: batchId,
+        });
+        saved++;
+      }
+      return { saved, batchId };
+    }),
 });
 
 // ─── Tank Reminders Router ──────────────────────────────────────────────────────────────────────────────

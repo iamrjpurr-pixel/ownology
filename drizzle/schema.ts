@@ -179,6 +179,11 @@ export const vintageLogEntries = mysqlTable(
     entryAt: bigint("entry_at", { mode: "number" }).notNull(),
     // UTC ms timestamp of when the row was created
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    // Import provenance — null for live cellar entries
+    // "paste" = AI-assisted paste import, "csv" = CSV/Excel upload
+    importSource: varchar("import_source", { length: 32 }),
+    // UUID grouping all entries from a single import session
+    importBatchId: varchar("import_batch_id", { length: 64 }),
   },
   (t) => [
     index("vle_user_idx").on(t.userId),
