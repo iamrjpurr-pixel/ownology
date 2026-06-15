@@ -424,3 +424,204 @@ describe("AdminVintageIntelligence filter logic", () => {
     expect(result).toHaveLength(0);
   });
 });
+
+// ─── VintageDebrief page logic ────────────────────────────────────────────────
+
+describe("VintageDebrief state ordering", () => {
+  const STATE_ORDER = ["SA", "VIC", "NSW", "WA", "TAS", "QLD"];
+
+  function sortByStateOrder(rows: { state: string }[]) {
+    return [...rows].sort((a, b) => {
+      const ai = STATE_ORDER.indexOf(a.state);
+      const bi = STATE_ORDER.indexOf(b.state);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
+  }
+
+  it("sorts SA before VIC before NSW", () => {
+    const rows = [
+      { state: "NSW" },
+      { state: "SA" },
+      { state: "VIC" },
+    ];
+    const sorted = sortByStateOrder(rows);
+    expect(sorted[0].state).toBe("SA");
+    expect(sorted[1].state).toBe("VIC");
+    expect(sorted[2].state).toBe("NSW");
+  });
+
+  it("places TAS before QLD", () => {
+    const rows = [{ state: "QLD" }, { state: "TAS" }];
+    const sorted = sortByStateOrder(rows);
+    expect(sorted[0].state).toBe("TAS");
+    expect(sorted[1].state).toBe("QLD");
+  });
+
+  it("places unknown states at the end", () => {
+    const rows = [{ state: "ACT" }, { state: "SA" }];
+    const sorted = sortByStateOrder(rows);
+    expect(sorted[0].state).toBe("SA");
+    expect(sorted[1].state).toBe("ACT");
+  });
+
+  it("handles all 6 canonical states in correct order", () => {
+    const rows = STATE_ORDER.slice().reverse().map((s) => ({ state: s }));
+    const sorted = sortByStateOrder(rows);
+    sorted.forEach((row, i) => {
+      expect(row.state).toBe(STATE_ORDER[i]);
+    });
+  });
+});
+
+describe("VintageDebrief state filter", () => {
+  interface Row { id: number; state: string; year: number; }
+
+  const rows: Row[] = [
+    { id: 1, state: "SA", year: 2024 },
+    { id: 2, state: "SA", year: 2023 },
+    { id: 3, state: "VIC", year: 2024 },
+    { id: 4, state: "WA", year: 2024 },
+    { id: 5, state: "TAS", year: 2024 },
+  ];
+
+  function filterByState(all: Row[], selectedState: string | null) {
+    return selectedState ? all.filter((r) => r.state === selectedState) : all;
+  }
+
+  it("returns all rows when selectedState is null", () => {
+    expect(filterByState(rows, null)).toHaveLength(5);
+  });
+
+  it("filters to SA only", () => {
+    const result = filterByState(rows, "SA");
+    expect(result).toHaveLength(2);
+    result.forEach((r) => expect(r.state).toBe("SA"));
+  });
+
+  it("filters to WA only", () => {
+    const result = filterByState(rows, "WA");
+    expect(result).toHaveLength(1);
+    expect(result[0].state).toBe("WA");
+  });
+
+  it("returns empty array for state with no data", () => {
+    expect(filterByState(rows, "QLD")).toHaveLength(0);
+  });
+});
+
+describe("VintageDebrief available states extraction", () => {
+  it("extracts unique states from industry data", () => {
+    const rows = [
+      { state: "SA" }, { state: "SA" }, { state: "VIC" }, { state: "WA" },
+    ];
+    const available = Array.from(new Set(rows.map((r) => r.state)));
+    expect(available).toHaveLength(3);
+    expect(available).toContain("SA");
+    expect(available).toContain("VIC");
+    expect(available).toContain("WA");
+  });
+
+  it("returns empty array when no rows", () => {
+    const available = Array.from(new Set(([] as { state: string }[]).map((r) => r.state)));
+    expect(available).toHaveLength(0);
+  });
+});
+
+describe("VintageDebrief quality star rendering", () => {
+  const QUALITY_META: Record<number, { label: string; color: string }> = {
+    1: { label: "Poor", color: "oklch(0.55 0.18 30)" },
+    2: { label: "Below Average", color: "oklch(0.60 0.14 50)" },
+    3: { label: "Average", color: "oklch(0.65 0.12 75)" },
+    4: { label: "Excellent", color: "oklch(0.68 0.14 145)" },
+    5: { label: "Exceptional", color: "oklch(0.72 0.12 75)" },
+  };
+
+  it("maps rating 5 to Exceptional", () => {
+    expect(QUALITY_META[5].label).toBe("Exceptional");
+  });
+
+  it("maps rating 4 to Excellent", () => {
+    expect(QUALITY_META[4].label).toBe("Excellent");
+  });
+
+  it("maps rating 3 to Average", () => {
+    expect(QUALITY_META[3].label).toBe("Average");
+  });
+
+  it("maps rating 2 to Below Average", () => {
+    expect(QUALITY_META[2].label).toBe("Below Average");
+  });
+
+  it("maps rating 1 to Poor", () => {
+    expect(QUALITY_META[1].label).toBe("Poor");
+  });
+
+  it("filled stars count equals rating", () => {
+    const rating = 4;
+    const filledCount = Array.from({ length: 5 }).filter((_, i) => i < rating).length;
+    expect(filledCount).toBe(4);
+  });
+
+  it("empty stars count equals 5 minus rating", () => {
+    const rating = 3;
+    const emptyCount = Array.from({ length: 5 }).filter((_, i) => i >= rating).length;
+    expect(emptyCount).toBe(2);
+  });
+});
+
+describe("VintageDebrief state label mapping", () => {
+  const STATE_LABELS: Record<string, string> = {
+    SA: "South Australia",
+    VIC: "Victoria",
+    NSW: "New South Wales",
+    WA: "Western Australia",
+    TAS: "Tasmania",
+    QLD: "Queensland",
+  };
+
+  it("maps all 6 canonical state codes", () => {
+    expect(Object.keys(STATE_LABELS)).toHaveLength(6);
+  });
+
+  it("maps SA to South Australia", () => {
+    expect(STATE_LABELS["SA"]).toBe("South Australia");
+  });
+
+  it("maps TAS to Tasmania", () => {
+    expect(STATE_LABELS["TAS"]).toBe("Tasmania");
+  });
+
+  it("maps WA to Western Australia", () => {
+    expect(STATE_LABELS["WA"]).toBe("Western Australia");
+  });
+
+  it("returns undefined for unknown code", () => {
+    expect(STATE_LABELS["ACT"]).toBeUndefined();
+  });
+});
+
+describe("VintageDebrief text truncation", () => {
+  it("truncates conditions at 300 characters", () => {
+    const long = "x".repeat(400);
+    const truncated = long.length > 300 ? long.slice(0, 300) + "…" : long;
+    expect(truncated.length).toBe(301); // 300 chars + ellipsis
+  });
+
+  it("does not truncate conditions under 300 characters", () => {
+    const short = "x".repeat(200);
+    const truncated = short.length > 300 ? short.slice(0, 300) + "…" : short;
+    expect(truncated).toBe(short);
+  });
+
+  it("truncates winemaking notes at 220 characters", () => {
+    const long = "y".repeat(300);
+    const truncated = long.length > 220 ? long.slice(0, 220) + "…" : long;
+    expect(truncated.length).toBe(221);
+  });
+
+  it("does not truncate winemaking notes under 220 characters", () => {
+    const short = "y".repeat(100);
+    const truncated = short.length > 220 ? short.slice(0, 220) + "…" : short;
+    expect(truncated).toBe(short);
+  });
+});

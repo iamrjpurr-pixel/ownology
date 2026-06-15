@@ -927,15 +927,70 @@ function TrainingOverview() {
 
 // ─── Vintage Debrief ──────────────────────────────────────────────────────────
 
+// ─── Vintage Debrief helpers ──────────────────────────────────────────────────
+
+const STATE_ORDER = ["SA", "VIC", "NSW", "WA", "TAS", "QLD"];
+const STATE_LABELS: Record<string, string> = {
+  SA: "South Australia",
+  VIC: "Victoria",
+  NSW: "New South Wales",
+  WA: "Western Australia",
+  TAS: "Tasmania",
+  QLD: "Queensland",
+};
+
+const QUALITY_META: Record<number, { label: string; color: string }> = {
+  1: { label: "Poor", color: "oklch(0.55 0.18 30)" },
+  2: { label: "Below Average", color: "oklch(0.60 0.14 50)" },
+  3: { label: "Average", color: "oklch(0.65 0.12 75)" },
+  4: { label: "Excellent", color: "oklch(0.68 0.14 145)" },
+  5: { label: "Exceptional", color: "oklch(0.72 0.12 75)" },
+};
+
+function QualityStars({ rating }: { rating: number }) {
+  const info = QUALITY_META[rating] ?? QUALITY_META[3];
+  return (
+    <span className="flex items-center gap-1">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <span key={i} style={{ color: i < rating ? info.color : "oklch(0.28 0.008 60)", fontSize: "0.7rem" }}>★</span>
+      ))}
+      <span className="text-xs ml-1" style={{ color: info.color }}>{info.label}</span>
+    </span>
+  );
+}
+
 function VintageDebrief() {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear);
-  const { data: notes = [], isLoading } = trpc.knowledge.getVintageDebrief.useQuery({ vintageYear: selectedYear });
-
+  const [selectedState, setSelectedState] = useState<string | null>(null);
   const years = Array.from({ length: 6 }, (_, i) => currentYear - i);
+
+  // Industry intelligence from Wine Australia (state-level)
+  const { data: industryData = [], isLoading: loadingIndustry } =
+    trpc.vintageIntelligence.list.useQuery({ year: selectedYear });
+
+  // Member's own vintage notes (SOP-linked)
+  const { data: memberNotes = [], isLoading: loadingNotes } =
+    trpc.knowledge.getVintageDebrief.useQuery({ vintageYear: selectedYear });
+
+  const isLoading = loadingIndustry || loadingNotes;
+
+  // Sort industry data by canonical state order
+  const sortedIndustry = [...industryData].sort((a, b) => {
+    const ai = STATE_ORDER.indexOf(a.state);
+    const bi = STATE_ORDER.indexOf(b.state);
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+  });
+
+  const filteredIndustry = selectedState
+    ? sortedIndustry.filter((r) => r.state === selectedState)
+    : sortedIndustry;
+
+  const availableStates = Array.from(new Set(sortedIndustry.map((r) => r.state)));
 
   return (
     <div className="min-h-screen" style={{ background: "oklch(0.11 0.008 60)", color: "oklch(0.88 0.015 75)" }}>
+      {/* Header */}
       <div className="border-b" style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.13 0.008 60)" }}>
         <div className="container py-8">
           <Link href="/knowledge">
@@ -944,54 +999,194 @@ function VintageDebrief() {
               Knowledge Platform
             </button>
           </Link>
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-2">
             <BookMarked className="w-7 h-7" style={{ color: "oklch(0.72 0.12 75)" }} />
-            <h1 className="text-2xl font-bold" style={{ fontFamily: "'Fraunces', serif", color: "oklch(0.95 0.018 75)" }}>Vintage Debrief</h1>
+            <div>
+              <h1 className="text-2xl font-bold" style={{ fontFamily: "'Fraunces', serif", color: "oklch(0.95 0.018 75)" }}>Vintage Debrief</h1>
+              <p className="text-xs mt-0.5" style={{ color: "oklch(0.45 0.015 75)" }}>Industry intelligence from Wine Australia · layered with your cellar notes</p>
+            </div>
           </div>
-          <div className="flex gap-2 flex-wrap">
+
+          {/* Year tabs */}
+          <div className="flex gap-2 flex-wrap mt-5 mb-4">
             {years.map((y) => (
               <button
                 key={y}
-                onClick={() => setSelectedYear(y)}
+                onClick={() => { setSelectedYear(y); setSelectedState(null); }}
                 className="px-4 py-1.5 rounded text-sm transition-all"
                 style={{
                   background: selectedYear === y ? "oklch(0.72 0.12 75)" : "oklch(0.16 0.010 60)",
                   color: selectedYear === y ? "oklch(0.11 0.008 60)" : "oklch(0.65 0.015 75)",
                   border: "1px solid oklch(1 0 0 / 10%)",
+                  fontWeight: selectedYear === y ? 600 : 400,
                 }}
               >
                 {y}
               </button>
             ))}
           </div>
+
+          {/* State filter pills */}
+          {availableStates.length > 0 && (
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setSelectedState(null)}
+                className="px-3 py-1 rounded-full text-xs transition-all"
+                style={{
+                  background: selectedState === null ? "oklch(0.20 0.010 60)" : "transparent",
+                  color: selectedState === null ? "oklch(0.88 0.015 75)" : "oklch(0.50 0.015 75)",
+                  border: `1px solid ${selectedState === null ? "oklch(0.72 0.12 75 / 40%)" : "oklch(1 0 0 / 10%)"}`,
+                }}
+              >
+                All States
+              </button>
+              {availableStates.map((st) => (
+                <button
+                  key={st}
+                  onClick={() => setSelectedState(st === selectedState ? null : st)}
+                  className="px-3 py-1 rounded-full text-xs transition-all"
+                  style={{
+                    background: selectedState === st ? "oklch(0.20 0.010 60)" : "transparent",
+                    color: selectedState === st ? "oklch(0.88 0.015 75)" : "oklch(0.50 0.015 75)",
+                    border: `1px solid ${selectedState === st ? "oklch(0.72 0.12 75 / 40%)" : "oklch(1 0 0 / 10%)"}`,
+                  }}
+                >
+                  {st}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
+
       <div className="container py-8">
         {isLoading ? (
           <div className="text-center py-16" style={{ color: "oklch(0.50 0.015 75)" }}>Loading…</div>
-        ) : notes.length === 0 ? (
-          <div className="text-center py-16" style={{ color: "oklch(0.50 0.015 75)" }}>
-            <BookMarked className="w-10 h-10 mx-auto mb-3 opacity-40" />
-            <p>No vintage notes for {selectedYear}. Add notes from individual SOP pages.</p>
-          </div>
         ) : (
-          <div>
-            <p className="text-sm mb-6" style={{ color: "oklch(0.55 0.015 75)" }}>{notes.length} note{notes.length !== 1 ? "s" : ""} recorded for {selectedYear}</p>
-            <div className="space-y-4">
-              {notes.map((note) => (
-                <div key={note.id} className="rounded-lg p-5" style={{ background: "oklch(0.14 0.008 60)", border: "1px solid oklch(1 0 0 / 8%)" }}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="font-semibold text-sm" style={{ color: "oklch(0.72 0.12 75)" }}>{note.sopTitle}</span>
-                    <span style={{ color: "oklch(0.40 0.015 75)" }}>·</span>
-                    <span className="text-xs" style={{ color: "oklch(0.50 0.015 75)" }}>{note.sopCategory}</span>
-                  </div>
-                  {note.whatWorked && <div className="mb-2"><span className="text-xs font-medium" style={{ color: "oklch(0.65 0.10 160)" }}>Worked: </span><span className="text-sm" style={{ color: "oklch(0.75 0.015 75)" }}>{note.whatWorked}</span></div>}
-                  {note.whatFailed && <div className="mb-2"><span className="text-xs font-medium" style={{ color: "oklch(0.65 0.10 30)" }}>Failed: </span><span className="text-sm" style={{ color: "oklch(0.75 0.015 75)" }}>{note.whatFailed}</span></div>}
-                  {note.whatToChange && <div><span className="text-xs font-medium" style={{ color: "oklch(0.72 0.12 75)" }}>Change: </span><span className="text-sm" style={{ color: "oklch(0.75 0.015 75)" }}>{note.whatToChange}</span></div>}
-                  {note.createdBy && <p className="text-xs mt-3" style={{ color: "oklch(0.40 0.015 75)" }}>— {note.createdBy}</p>}
+          <div className="space-y-10">
+
+            {/* ── Industry Intelligence Layer ──────────────────────────────── */}
+            {filteredIndustry.length > 0 && (
+              <section>
+                <div className="flex items-center gap-2 mb-5">
+                  <div className="w-1 h-5 rounded-full" style={{ background: "oklch(0.72 0.12 75)" }} />
+                  <h2 className="text-xs font-semibold tracking-widest uppercase" style={{ color: "oklch(0.72 0.12 75)" }}>Industry Intelligence — {selectedYear}</h2>
+                  <span className="text-xs" style={{ color: "oklch(0.38 0.015 75)" }}>Wine Australia National Vintage Report</span>
                 </div>
-              ))}
-            </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {filteredIndustry.map((row) => (
+                    <div
+                      key={row.id}
+                      className="rounded-lg p-5"
+                      style={{ background: "oklch(0.14 0.008 60)", border: "1px solid oklch(1 0 0 / 8%)" }}
+                    >
+                      {/* State header */}
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span
+                              className="text-xs font-bold px-2 py-0.5 rounded"
+                              style={{ background: "oklch(0.72 0.12 75 / 12%)", color: "oklch(0.72 0.12 75)", letterSpacing: "0.08em" }}
+                            >
+                              {row.state}
+                            </span>
+                            <span className="font-semibold text-sm" style={{ color: "oklch(0.88 0.015 75)" }}>
+                              {STATE_LABELS[row.state] ?? row.region}
+                            </span>
+                          </div>
+                          <QualityStars rating={row.qualityRating} />
+                        </div>
+                      </div>
+
+                      {/* Yield */}
+                      {row.yieldAssessment && (
+                        <p className="text-xs mb-3 leading-relaxed" style={{ color: "oklch(0.58 0.015 75)" }}>
+                          <span style={{ color: "oklch(0.45 0.015 75)" }}>Yield: </span>{row.yieldAssessment}
+                        </p>
+                      )}
+
+                      {/* Standout varieties */}
+                      {row.standoutVarieties && (
+                        <div className="flex flex-wrap gap-1.5 mb-3">
+                          {row.standoutVarieties.split(",").map((v) => v.trim()).filter(Boolean).map((v) => (
+                            <span
+                              key={v}
+                              className="text-xs px-2 py-0.5 rounded-full"
+                              style={{ background: "oklch(0.18 0.010 60)", color: "oklch(0.68 0.015 75)", border: "1px solid oklch(1 0 0 / 8%)" }}
+                            >
+                              {v}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Conditions */}
+                      <p className="text-sm leading-relaxed" style={{ color: "oklch(0.70 0.015 75)" }}>
+                        {row.conditions.length > 300 ? row.conditions.slice(0, 300) + "…" : row.conditions}
+                      </p>
+
+                      {/* Winemaking notes */}
+                      {row.winemakingNotes && (
+                        <div className="mt-3 pt-3" style={{ borderTop: "1px solid oklch(1 0 0 / 6%)" }}>
+                          <p className="text-xs font-medium mb-1" style={{ color: "oklch(0.72 0.12 75)" }}>Winemaking Implications</p>
+                          <p className="text-xs leading-relaxed" style={{ color: "oklch(0.60 0.015 75)" }}>
+                            {row.winemakingNotes.length > 220 ? row.winemakingNotes.slice(0, 220) + "…" : row.winemakingNotes}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {filteredIndustry.length === 0 && !loadingIndustry && (
+              <div className="rounded-lg p-6 text-center" style={{ background: "oklch(0.14 0.008 60)", border: "1px solid oklch(1 0 0 / 8%)" }}>
+                <p className="text-sm" style={{ color: "oklch(0.50 0.015 75)" }}>
+                  No industry intelligence available for {selectedYear}{selectedState ? ` · ${selectedState}` : ""}.
+                </p>
+              </div>
+            )}
+
+            {/* ── Member Cellar Notes Layer ─────────────────────────────────── */}
+            <section>
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-1 h-5 rounded-full" style={{ background: "oklch(0.65 0.10 220)" }} />
+                <h2 className="text-xs font-semibold tracking-widest uppercase" style={{ color: "oklch(0.65 0.10 220)" }}>Your Cellar Notes — {selectedYear}</h2>
+              </div>
+              {loadingNotes ? (
+                <div style={{ color: "oklch(0.50 0.015 75)" }} className="text-sm">Loading…</div>
+              ) : memberNotes.length === 0 ? (
+                <div className="rounded-lg p-6 text-center" style={{ background: "oklch(0.14 0.008 60)", border: "1px solid oklch(0.65 0.10 220 / 15%)" }}>
+                  <BookMarked className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                  <p className="text-sm" style={{ color: "oklch(0.50 0.015 75)" }}>
+                    No cellar notes for {selectedYear}. Add notes from individual SOP pages.
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-sm mb-4" style={{ color: "oklch(0.55 0.015 75)" }}>
+                    {memberNotes.length} note{memberNotes.length !== 1 ? "s" : ""} recorded
+                  </p>
+                  <div className="space-y-3">
+                    {memberNotes.map((note) => (
+                      <div key={note.id} className="rounded-lg p-4" style={{ background: "oklch(0.14 0.008 60)", border: "1px solid oklch(0.65 0.10 220 / 20%)" }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-semibold text-sm" style={{ color: "oklch(0.65 0.10 220)" }}>{note.sopTitle}</span>
+                          <span style={{ color: "oklch(0.40 0.015 75)" }}>·</span>
+                          <span className="text-xs" style={{ color: "oklch(0.50 0.015 75)" }}>{note.sopCategory}</span>
+                        </div>
+                        {note.whatWorked && <div className="mb-1.5"><span className="text-xs font-medium" style={{ color: "oklch(0.65 0.10 160)" }}>✓ Worked: </span><span className="text-sm" style={{ color: "oklch(0.75 0.015 75)" }}>{note.whatWorked}</span></div>}
+                        {note.whatFailed && <div className="mb-1.5"><span className="text-xs font-medium" style={{ color: "oklch(0.65 0.10 30)" }}>✗ Failed: </span><span className="text-sm" style={{ color: "oklch(0.75 0.015 75)" }}>{note.whatFailed}</span></div>}
+                        {note.whatToChange && <div><span className="text-xs font-medium" style={{ color: "oklch(0.72 0.12 75)" }}>→ Change: </span><span className="text-sm" style={{ color: "oklch(0.75 0.015 75)" }}>{note.whatToChange}</span></div>}
+                        {note.createdBy && <p className="text-xs mt-2" style={{ color: "oklch(0.40 0.015 75)" }}>— {note.createdBy}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+
           </div>
         )}
       </div>
