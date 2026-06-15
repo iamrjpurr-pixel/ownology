@@ -344,3 +344,23 @@
 - [x] Fix App.tsx: /resources route now renders RegulatoryLinks
 - [x] Add Knowledge Platform to primary nav (currently buried in More dropdown)
 - [x] Remove CompetitiveAdvantage from footer — replaced with Knowledge link
+
+## DIY Knowledge Hub & Training Entry (Jun 2026)
+- [x] Create DIYKnowledge.tsx — dedicated DIY SOP hub at /for-home-winemakers/knowledge
+- [x] Add routes in App.tsx: /for-home-winemakers/knowledge, /for-home-winemakers/knowledge/category/:cat, /for-home-winemakers/knowledge/sop/:id
+- [x] Add "SOP Library / Knowledge Hub" card to ForHomeWinemakers.tsx
+- [x] Fix broken feature cards on ForHomeWinemakers page (show "coming soon" toast for unimplemented features)
+- [x] Add "Training" as first entry type in The Press Quick Entry
+- [x] Training entry: person/name field (who was trained)
+- [x] Training entry: link to SOP (which SOP was covered)
+- [x] Training entry: save with type='training' and trainee name in notes
+- [x] Show training entries in The Press log list with distinct styling
+## AI Architecture Sprints 3–4 (Jun 2026)
+- [x] Sprint 3: Query Router — LLM classifies question intent (SOP/vintage/live-data/compliance)
+- [x] Sprint 3: Route commercial questions via category-based SOP retrieval
+- [x] Sprint 3: Route DIY questions via semantic SOP search
+- [x] Sprint 3: Inject live cellar context (last 5 log entries) for authenticated users
+- [x] Sprint 4: sopEmbeddings.ts — LLM-based semantic SOP ranking for DIY mode
+- [x] Sprint 4: Audience filter fixed (diy not home_winemaker)
+- [x] Sprint 4: embedding_vector column added to sop_library (for future vector DB migration)
+- [x] Sprint 4: Forge API embeddings endpoint not available — LLM ranking used as equivalent

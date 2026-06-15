@@ -26,6 +26,7 @@ import QuickEntry from "./pages/QuickEntry";
 import CellarTasks from "./pages/CellarTasks";
 import HomeWineryKit from "./pages/HomeWineryKit";
 import ForHomeWinemakers from "./pages/ForHomeWinemakers";
+import DIYKnowledge from "./pages/DIYKnowledge";
 import HomeWinemakerTroubleshooting from "./pages/HomeWinemakerTroubleshooting";
 import HomeWinemakerGlossary from "./pages/HomeWinemakerGlossary";
 import CompetitiveAdvantage from "./pages/CompetitiveAdvantage";
@@ -58,6 +59,8 @@ function Router() {
       <Route path={"/for-home-winemakers"} component={ForHomeWinemakers} />
       <Route path={"/for-home-winemakers/troubleshooting"} component={HomeWinemakerTroubleshooting} />
       <Route path={"/for-home-winemakers/glossary"} component={HomeWinemakerGlossary} />
+      <Route path={"/for-home-winemakers/knowledge"} component={DIYKnowledge} />
+      <Route path={"/for-home-winemakers/knowledge/*"} component={DIYKnowledge} />
       <Route path={"/blog"} component={Blog} />
       <Route path={"/blog/:slug"} component={BlogArticle} />
       <Route path={"/regulations"} component={RegulatoryLinks} />

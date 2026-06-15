@@ -1,7 +1,9 @@
 import { z } from "zod";
 import Stripe from "stripe";
-import { eq, or, like, and } from "drizzle-orm";
+import { eq, or, like, and, desc } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
+import { routeQuery, buildLiveCellarContext } from "./queryRouter.js";
+import { embedText, semanticSopSearch, backfillSopEmbeddings } from "./sopEmbeddings.js";
 import { buildScopedKnowledgeBase, buildSourceDoctrineSummary } from "./complianceKnowledgeBase.js";
 import { buildQADoctrineSummary, QA_DOCTRINE, getTopics } from "./complianceQADoctrine.js";
 import {
@@ -2145,15 +2147,33 @@ const tutorRouter = router({
       const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
       if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
 
-      // ── Step 1: Detect relevant SOP categories from the question ────────────
-      const detectedCategories = detectSopCategories(input.question);
+      // ── Step 1: Query Router — classify intent and determine retrieval strategy ────
+      const routerDecision = await routeQuery(input.question, forgeUrl, forgeKey);
+      console.log(`[QueryRouter] intents=${routerDecision.intents.join(",")} categories=${routerDecision.sopCategories.join(",")} confidence=${routerDecision.confidence} | ${routerDecision.reasoning}`);
 
-      // ── Step 2: Retrieve up to 3 relevant SOPs from the database ────────────
+      // If compliance question, signal to the LLM to redirect
+      const isComplianceRedirect = routerDecision.isCompliance;
+
+      // ── Step 2: SOP Retriever ─────────────────────────────────────────────────
+      // DIY mode: try semantic vector search first (Sprint 4)
+      // Commercial mode: use Query Router category-based retrieval
       let sops: Array<{ title: string; category: string; procedureText: string | null; decisionLogic: string | null; tribalKnowledge: string | null }> = [];
+      const isHomeWinemaker = input.mode === "home_winemaker";
 
-      if (detectedCategories.length > 0) {
-        // Try exact category match first
-        const categoryConditions = detectedCategories.slice(0, 4).map((cat) =>
+      if (isHomeWinemaker) {
+        // Sprint 4: LLM-based semantic SOP ranking for DIY mode
+        try {
+          const semanticResults = await semanticSopSearch(input.question, "diy", 3, forgeUrl, forgeKey);
+          if (semanticResults.length > 0) {
+            sops = semanticResults;
+            console.log(`[SemanticSearch] Found ${semanticResults.length} DIY SOPs, top similarity: ${semanticResults[0].similarity.toFixed(3)}`);
+          }
+        } catch (semanticErr) {
+          console.warn("[SemanticSearch] LLM ranking failed, falling back to keyword search:", semanticErr);
+        }
+      } else if (routerDecision.sopCategories.length > 0) {
+        // Commercial: Router-guided category retrieval
+        const categoryConditions = routerDecision.sopCategories.map((cat) =>
           like(schema.sopLibrary.category, `%${cat}%`)
         );
         sops = await db
@@ -2165,15 +2185,18 @@ const tutorRouter = router({
             tribalKnowledge: schema.sopLibrary.tribalKnowledge,
           })
           .from(schema.sopLibrary)
-          .where(or(...categoryConditions))
+          .where(and(eq(schema.sopLibrary.audience, "commercial"), or(...categoryConditions)))
           .limit(3);
       }
 
-      // Fallback: title keyword search if no category match
+      // Fallback: keyword search on title if no results yet
       if (sops.length === 0) {
         const words = input.question.toLowerCase().split(/\s+/).filter((w) => w.length > 4).slice(0, 3);
         if (words.length > 0) {
           const titleConditions = words.map((w) => like(schema.sopLibrary.title, `%${w}%`));
+          const audienceFilter = isHomeWinemaker
+            ? eq(schema.sopLibrary.audience, "diy")
+            : eq(schema.sopLibrary.audience, "commercial");
           sops = await db
             .select({
               title: schema.sopLibrary.title,
@@ -2183,13 +2206,17 @@ const tutorRouter = router({
               tribalKnowledge: schema.sopLibrary.tribalKnowledge,
             })
             .from(schema.sopLibrary)
-            .where(or(...titleConditions))
+            .where(and(audienceFilter, or(...titleConditions)))
             .limit(3);
         }
       }
 
+      // ── Step 2b: Live Cellar Retriever — placeholder for authenticated tutor ─
+      const liveCellarContext = "";
+      void liveCellarContext;
+
       // ── Step 3: Build scoped context from retrieved SOPs ────────────────────
-      const isHomeWinemaker = input.mode === "home_winemaker";
+
       let sopContext = "";
 
       if (sops.length > 0) {
@@ -2328,14 +2355,17 @@ const tutorRouter = router({
         ? "You are a friendly, practical home winemaking assistant helping a home winemaker in their garage or cellar."
         : "You are an expert winemaking assistant helping a professional winemaker or cellar hand.";
 
+      const complianceNote = isComplianceRedirect
+        ? "\n- IMPORTANT: This question involves regulatory compliance, licensing, or labelling law. Answer briefly then explicitly direct the user to the Compliance AI at /compliance for authoritative guidance."
+        : "";
+
       const systemPrompt = `${personaLine}
 You answer questions about winemaking based on the Standard Operating Procedures (SOPs) provided below.
 
 Rules:
 - Answer from the SOPs provided. If the SOPs don't cover the question, use sound oenological knowledge and say so.
 - Be specific and actionable. Give numbers, ranges, and decision criteria where relevant.
-- ${isHomeWinemaker ? "Keep language accessible — avoid jargon where possible, or explain it briefly." : "Use professional winemaking terminology."}
-- Do NOT answer questions about commercial licensing, export regulations, or legal compliance — redirect those to the Compliance AI.
+- ${isHomeWinemaker ? "Keep language accessible — avoid jargon where possible, or explain it briefly." : "Use professional winemaking terminology."}${complianceNote}
 - Respond with a JSON object only, no markdown fences:
 {
   "answer": "<your full answer, may include newlines>",
@@ -2382,10 +2412,20 @@ ${sopContext}${vintageContext ? `\n\n---\n\n## Regional Vintage Context\n${vinta
         answer = rawContent;
       }
 
-      return { answer, sopTitles, disclaimer };
+            return { answer, sopTitles, disclaimer };
+    }),
+
+  // Owner-only: backfill embedding vectors for all SOPs that don't have them
+  backfillEmbeddings: ownerProcedure
+    .input(z.object({ audience: z.enum(["diy", "commercial"]).optional() }).optional())
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+      const result = await backfillSopEmbeddings(forgeUrl, forgeKey, input?.audience);
+      return result;
     }),
 });
-
 // ─── Vintage Intelligence Router ────────────────────────────────────────────
 
 const vintageIntelligenceRouter = router({

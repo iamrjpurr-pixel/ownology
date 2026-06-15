@@ -333,6 +333,12 @@ export default function ForHomeWinemakers() {
                 title: "Glossary",
                 desc: "Plain-English definitions for every term in your kit instruction sheet.",
               },
+              {
+                href: "/for-home-winemakers/knowledge",
+                icon: "📋",
+                title: "Step-by-Step Guides",
+                desc: "Plain-English SOPs for fermentation, cleaning, and bottling — written for home winemakers.",
+              },
             ].map((card) => (
               <Link
                 key={card.href}

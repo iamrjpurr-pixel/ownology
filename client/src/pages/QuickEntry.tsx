@@ -33,13 +33,14 @@ const GREEN       = "oklch(0.65 0.15 145)";
 const GREEN_DIM   = "oklch(0.65 0.15 145 / 15%)";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type EventTypeId = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "other";
-type Screen = "event" | "tank" | "detail" | "confirm" | "success";
+type EventTypeId = "training" | "addition" | "measurement" | "racking" | "inoculation" | "observation" | "other";
+type Screen = "event" | "training_person" | "training_sop" | "training_confirm" | "tank" | "detail" | "confirm" | "success";
 type AddStep = "type" | "qty" | "timing";
 type InoStep = "type" | "rate";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const EVENT_TILES: { id: EventTypeId; label: string; icon: string; color: string }[] = [
+  { id: "training",    label: "Training",    icon: "🎓", color: "oklch(0.62 0.14 260)" },
   { id: "addition",    label: "Addition",    icon: "＋", color: "oklch(0.62 0.14 150)" },
   { id: "measurement", label: "Measurement", icon: "◉",  color: "oklch(0.62 0.14 200)" },
   { id: "racking",     label: "Racking",     icon: "⇄",  color: "oklch(0.62 0.14 280)" },
@@ -137,6 +138,59 @@ function Header({ step, total, title, sub, onBack }: { step: number; total: numb
   );
 }
 
+// ─── Training SOP Picker ─────────────────────────────────────────────────────
+function TrainingSopPicker({
+  selected, onSelect, onBack, onNext, traineeName, trainingNotes, onNotesChange
+}: {
+  selected: number | null;
+  onSelect: (id: number, title: string) => void;
+  onBack: () => void;
+  onNext: () => void;
+  traineeName: string;
+  trainingNotes: string;
+  onNotesChange: (v: string) => void;
+}) {
+  const { data: sops = [], isLoading } = trpc.knowledge.listSops.useQuery({ audience: "commercial" });
+  return (
+    <div>
+      <Header step={3} total={4} title="Which SOP?" sub={`Trainee: ${traineeName}`} onBack={onBack} />
+      {isLoading ? (
+        <p style={{ color: TEXT_LO, fontFamily: "'Lato',sans-serif", fontSize: "0.9rem" }}>Loading SOPs…</p>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: "45dvh", overflowY: "auto" }}>
+          {sops.map(sop => (
+            <button key={sop.id} onClick={() => onSelect(sop.id, sop.title)}
+              style={{ minHeight: 64, borderRadius: 10, background: selected === sop.id ? AMBER_DIM : CARD, border: `1.5px solid ${selected === sop.id ? AMBER : BDR}`, color: selected === sop.id ? AMBER : TEXT_MID, fontFamily: "'Lato',sans-serif", fontSize: "0.9rem", fontWeight: selected === sop.id ? 600 : 400, cursor: "pointer", textAlign: "left", padding: "12px 16px", lineHeight: 1.3, WebkitTapHighlightColor: "transparent" }}
+            >
+              <span style={{ display: "block", fontSize: "0.7rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 3 }}>{sop.category}</span>
+              {sop.title}
+            </button>
+          ))}
+        </div>
+      )}
+      <div style={{ marginTop: 16 }}>
+        <p style={{ fontSize: "0.78rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Notes <span style={{ fontWeight: 300 }}>(optional)</span></p>
+        <textarea
+          placeholder="Any notes about this training session…"
+          value={trainingNotes}
+          onChange={e => onNotesChange(e.target.value)}
+          rows={2}
+          style={{ width: "100%", background: CARD, border: `1px solid ${BDR}`, borderRadius: 8, padding: "10px 14px", color: TEXT_HI, fontFamily: "'Lato',sans-serif", fontSize: "0.9rem", lineHeight: 1.5, resize: "none", outline: "none", boxSizing: "border-box" }}
+        />
+      </div>
+      <div style={{ marginTop: 16 }}>
+        <button
+          onClick={onNext}
+          disabled={!selected}
+          style={{ width: "100%", height: 72, background: AMBER, color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 12, fontFamily: "'Fraunces',serif", fontSize: "1.3rem", fontWeight: 700, letterSpacing: "0.04em", cursor: selected ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", WebkitTapHighlightColor: "transparent", opacity: selected ? 1 : 0.4 }}
+        >
+          Review →
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function QuickEntry() {
   // Data
@@ -185,8 +239,30 @@ export default function QuickEntry() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recRef = useRef<any>(null);
 
+  // Training state
+  const [traineeName, setTraineeName] = useState("");
+  const [trainerName, setTrainerName] = useState("");
+  const [trainingSopId, setTrainingSopId] = useState<number | null>(null);
+  const [trainingSopTitle, setTrainingSopTitle] = useState("");
+  const [trainingNotes, setTrainingNotes] = useState("");
+
   // Session log
   const [sessionLog, setSessionLog] = useState<{ tank: string; summary: string; ts: Date }[]>([]);
+
+  // Training mutation
+  const addTrainingMutation = trpc.knowledge.addTrainingRecord.useMutation({
+    onSuccess: () => {
+      const summary = `${trainingSopTitle} — ${traineeName}`;
+      setSessionLog(prev => [{ tank: "Training", summary, ts: new Date() }, ...prev]);
+      setScreen("success");
+      setTimeout(() => {
+        setScreen("event");
+        setEventType(null); setTraineeName(""); setTrainerName("");
+        setTrainingSopId(null); setTrainingSopTitle(""); setTrainingNotes("");
+      }, 1800);
+    },
+    onError: err => toast.error(err.message),
+  });
 
   // Mutation
   const addMutation = trpc.vintageLog.add.useMutation({
@@ -225,9 +301,20 @@ export default function QuickEntry() {
     return { note: noteText };
   }
 
+  function handleSubmitTraining() {
+    if (!traineeName.trim() || !trainingSopId) return;
+    addTrainingMutation.mutate({
+      sopId: trainingSopId,
+      trainedAt: Date.now(),
+      trainerName: trainerName.trim() || "Self-directed",
+      traineeName: traineeName.trim(),
+      notes: trainingNotes.trim() || undefined,
+    });
+  }
+
   function handleSubmit() {
     if (!tankName || !eventType) return;
-    addMutation.mutate({ tankName, variety: variety || "Unknown", eventType, details: buildDetails(), noteText: (eventType === "observation" || eventType === "other") ? noteText : undefined });
+    addMutation.mutate({ tankName, variety: variety || "Unknown", eventType: eventType as Exclude<EventTypeId, "training">, details: buildDetails(), noteText: (eventType === "observation" || eventType === "other") ? noteText : undefined });
   }
 
   function canProceed(): boolean {
@@ -304,7 +391,7 @@ export default function QuickEntry() {
             <Header step={1} total={4} title="What happened?" sub="Tap the event type" />
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {EVENT_TILES.map(tile => (
-                <button key={tile.id} onClick={() => { setEventType(tile.id); setScreen("tank"); }}
+                <button key={tile.id} onClick={() => { setEventType(tile.id); if (tile.id === "training") { setScreen("training_person"); } else { setScreen("tank"); } }}
                   style={{ height: 80, borderRadius: 12, background: CARD, border: `1.5px solid ${BDR}`, display: "flex", alignItems: "center", gap: 20, padding: "0 24px", cursor: "pointer", WebkitTapHighlightColor: "transparent" }}
                   onPointerDown={e => (e.currentTarget as HTMLButtonElement).style.background = CARD_ACT}
                   onPointerUp={e => (e.currentTarget as HTMLButtonElement).style.background = CARD}
@@ -329,6 +416,83 @@ export default function QuickEntry() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ── SCREEN T2: Training — person name ── */}
+        {screen === "training_person" && (
+          <div>
+            <Header step={2} total={4} title="Who was trained?" sub="Training record" onBack={() => setScreen("event")} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <p style={{ fontSize: "0.78rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Trainee name</p>
+                <input
+                  type="text"
+                  placeholder="e.g. Sarah Chen"
+                  value={traineeName}
+                  onChange={e => setTraineeName(e.target.value)}
+                  autoFocus
+                  style={{ width: "100%", background: CARD, border: `1.5px solid ${traineeName.trim() ? AMBER_BDR : BDR}`, borderRadius: 10, padding: "16px 18px", color: TEXT_HI, fontFamily: "'Fraunces',serif", fontSize: "1.2rem", fontWeight: 600, outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
+              <div>
+                <p style={{ fontSize: "0.78rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Trainer name <span style={{ color: TEXT_LO, fontWeight: 300 }}>(optional)</span></p>
+                <input
+                  type="text"
+                  placeholder="e.g. James Halliday"
+                  value={trainerName}
+                  onChange={e => setTrainerName(e.target.value)}
+                  style={{ width: "100%", background: CARD, border: `1px solid ${BDR}`, borderRadius: 10, padding: "14px 18px", color: TEXT_HI, fontFamily: "'Lato',sans-serif", fontSize: "1rem", outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
+              <div style={{ marginTop: 8 }}>
+                <button
+                  onClick={() => setScreen("training_sop")}
+                  disabled={!traineeName.trim()}
+                  style={{ ...primaryBtn, opacity: traineeName.trim() ? 1 : 0.4, cursor: traineeName.trim() ? "pointer" : "default" }}
+                >
+                  Select SOP →
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── SCREEN T3: Training — SOP selection ── */}
+        {screen === "training_sop" && (
+          <TrainingSopPicker
+            selected={trainingSopId}
+            onSelect={(id, title) => { setTrainingSopId(id); setTrainingSopTitle(title); }}
+            onBack={() => setScreen("training_person")}
+            onNext={() => setScreen("training_confirm")}
+            traineeName={traineeName}
+            trainingNotes={trainingNotes}
+            onNotesChange={setTrainingNotes}
+          />
+        )}
+
+        {/* ── SCREEN T4: Training — confirm ── */}
+        {screen === "training_confirm" && (
+          <div>
+            <Header step={4} total={4} title="Confirm training" onBack={() => setScreen("training_sop")} />
+            <div style={{ background: CARD, border: `1.5px solid ${AMBER_BDR}`, borderRadius: 16, padding: 24, marginBottom: 24 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                <span style={{ fontSize: "1.6rem" }}>🎓</span>
+                <div>
+                  <p style={{ fontFamily: "'Fraunces',serif", fontSize: "1.1rem", fontWeight: 700, color: TEXT_HI, margin: 0 }}>Training Record</p>
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.82rem", color: AMBER, margin: "2px 0 0" }}>{traineeName}</p>
+                </div>
+              </div>
+              <div style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.9rem", color: TEXT_HI, background: "oklch(0.10 0.008 60)", border: `1px solid ${BDR}`, borderRadius: 8, padding: "12px 14px", lineHeight: 1.6 }}>
+                <div><span style={{ color: TEXT_LO }}>SOP: </span>{trainingSopTitle}</div>
+                {trainerName && <div style={{ marginTop: 4 }}><span style={{ color: TEXT_LO }}>Trainer: </span>{trainerName}</div>}
+                {trainingNotes && <div style={{ marginTop: 4 }}><span style={{ color: TEXT_LO }}>Notes: </span>{trainingNotes.slice(0, 80)}{trainingNotes.length > 80 ? "…" : ""}</div>}
+              </div>
+            </div>
+            <button onClick={handleSubmitTraining} disabled={addTrainingMutation.isPending} style={{ ...primaryBtn, opacity: addTrainingMutation.isPending ? 0.7 : 1 }}>
+              {addTrainingMutation.isPending ? "Logging…" : "LOG IT"}
+            </button>
+            <button onClick={() => setScreen("event")} style={{ ...secondaryBtn, marginTop: 10 }}>Cancel</button>
           </div>
         )}
 

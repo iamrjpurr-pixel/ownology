@@ -1,0 +1,1 @@
+ALTER TABLE `sop_library` ADD `embedding_vector` text;

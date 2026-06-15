@@ -590,6 +590,9 @@ export const sopLibrary = mysqlTable(
     isTemplate: boolean("is_template").notNull().default(true),
     // Audience: 'commercial' = professional winery platform, 'diy' = home winemaker tier
     audience: varchar("audience", { length: 20 }).notNull().default("commercial"),
+    // Vector embedding for semantic search (JSON array of 1536 floats, text-embedding-3-small)
+    // Null until backfill script runs. Used for DIY semantic SOP retrieval.
+    embeddingVector: text("embedding_vector"),
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
     updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
   },
