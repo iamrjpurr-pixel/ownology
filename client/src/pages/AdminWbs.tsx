@@ -394,17 +394,200 @@ export default function AdminWbs() {
           }}
         >
           <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.8rem", color: "var(--ow-amber)", marginBottom: "0.375rem" }}>
-            White Wine Bible — pending upload
+            White Wine Bible — ingested
           </p>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.78rem", color: "oklch(0.48 0.010 75)", lineHeight: 1.6, margin: 0 }}>
-            Upload the White Wine Bible to <code style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ow-text-mid)" }}>/tmp/white_wine_bible.txt</code> then run{" "}
-            <code style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ow-text-mid)" }}>
-              node scripts/ingest-diy-bible.mjs --doc white_wine_bible
-            </code>{" "}
-            to ingest it. White Wine Bible chapters will appear here with the same WBS mapping and publish controls.
+            White Wine Bible (127 chunks) and MoreWine! White Outline (7 sections) are published and active.
           </p>
         </div>
+
+        {/* Ghost Questions section */}
+        <GhostQuestionsPanel />
       </div>
+    </div>
+  );
+}
+
+function GhostQuestionsPanel() {
+  const [wbsFilter, setWbsFilter] = useState("");
+  const [wineTypeFilter, setWineTypeFilter] = useState("");
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 50;
+
+  const { data: summary } = trpc.wbsAdmin.ghostQuestionsSummary.useQuery(undefined, { retry: false });
+  const { data, isLoading } = trpc.wbsAdmin.listGhostQuestions.useQuery(
+    {
+      wbsCode: wbsFilter || undefined,
+      wineType: wineTypeFilter || undefined,
+      limit: PAGE_SIZE,
+      offset: page * PAGE_SIZE,
+    },
+    { retry: false }
+  );
+
+  const SERIF = "'Fraunces', serif";
+  const SANS = "'Lato', sans-serif";
+  const MONO = "'Fira Code', monospace";
+
+  const totalPages = data ? Math.ceil(data.total / PAGE_SIZE) : 0;
+  const uniqueWbsCodes = summary ? Array.from(new Set(summary.map((s) => s.wbsCode))).sort() : [];
+
+  return (
+    <div style={{ marginTop: "3rem" }}>
+      <div style={{ marginBottom: "1.5rem", borderTop: "1px solid var(--ow-border-md)", paddingTop: "2rem" }}>
+        <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "1.4rem", color: "var(--ow-text-hi)", marginBottom: "0.4rem" }}>
+          Ghost Questions
+        </h2>
+        <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.85rem", color: "var(--ow-text-lo)", lineHeight: 1.6, margin: 0 }}>
+          {summary ? `${summary.reduce((a, s) => a + Number(s.cnt), 0)} AI-generated questions` : "Loading..."} mapped to WBS nodes.
+          These questions will surface contextually as users progress through the home winemaking journey.
+        </p>
+      </div>
+
+      {/* Summary pills */}
+      {summary && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1.25rem" }}>
+          <button
+            onClick={() => { setWbsFilter(""); setWineTypeFilter(""); setPage(0); }}
+            style={{
+              padding: "0.3rem 0.75rem",
+              borderRadius: "2px",
+              border: `1px solid ${!wbsFilter && !wineTypeFilter ? "var(--ow-amber)" : "var(--ow-border-md)"}`,
+              background: !wbsFilter && !wineTypeFilter ? "color-mix(in oklch, var(--ow-amber) 12%, transparent)" : "transparent",
+              color: !wbsFilter && !wineTypeFilter ? "var(--ow-amber)" : "var(--ow-text-lo)",
+              fontFamily: MONO,
+              fontSize: "0.72rem",
+              cursor: "pointer",
+            }}
+          >
+            All ({summary.reduce((a, s) => a + Number(s.cnt), 0)})
+          </button>
+          {["red", "white"].map((wt) => {
+            const cnt = summary.filter((s) => s.wineType === wt).reduce((a, s) => a + Number(s.cnt), 0);
+            return (
+              <button
+                key={wt}
+                onClick={() => { setWineTypeFilter(wineTypeFilter === wt ? "" : wt); setPage(0); }}
+                style={{
+                  padding: "0.3rem 0.75rem",
+                  borderRadius: "2px",
+                  border: `1px solid ${wineTypeFilter === wt ? "var(--ow-amber)" : "var(--ow-border-md)"}`,
+                  background: wineTypeFilter === wt ? "color-mix(in oklch, var(--ow-amber) 12%, transparent)" : "transparent",
+                  color: wineTypeFilter === wt ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                  fontFamily: MONO,
+                  fontSize: "0.72rem",
+                  cursor: "pointer",
+                  textTransform: "capitalize",
+                }}
+              >
+                {wt} ({cnt})
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* WBS code filter */}
+      <div style={{ marginBottom: "1rem", display: "flex", gap: "0.75rem", alignItems: "center" }}>
+        <select
+          value={wbsFilter}
+          onChange={(e) => { setWbsFilter(e.target.value); setPage(0); }}
+          style={{
+            fontFamily: MONO,
+            fontSize: "0.78rem",
+            padding: "0.4rem 0.75rem",
+            background: "var(--ow-bg-raised)",
+            border: "1px solid var(--ow-border-md)",
+            borderRadius: "2px",
+            color: "var(--ow-text-mid)",
+            cursor: "pointer",
+          }}
+        >
+          <option value="">All WBS nodes</option>
+          {uniqueWbsCodes.map((code) => (
+            <option key={code} value={code}>{code}</option>
+          ))}
+        </select>
+        {data && (
+          <span style={{ fontFamily: SANS, fontSize: "0.78rem", color: "var(--ow-text-lo)" }}>
+            {data.total} question{data.total !== 1 ? "s" : ""}
+          </span>
+        )}
+      </div>
+
+      {/* Questions list */}
+      {isLoading ? (
+        <p style={{ fontFamily: SANS, fontSize: "0.85rem", color: "var(--ow-text-lo)" }}>Loading questions...</p>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+          {(data?.questions ?? []).map((q, i) => (
+            <div
+              key={q.id}
+              style={{
+                display: "flex",
+                gap: "1rem",
+                padding: "0.6rem 0",
+                borderBottom: "1px solid var(--ow-border-lo)",
+                alignItems: "flex-start",
+              }}
+            >
+              <span style={{ fontFamily: MONO, fontSize: "0.68rem", color: "var(--ow-amber)", minWidth: "48px", paddingTop: "2px" }}>
+                {q.wbsCode}
+              </span>
+              <span
+                style={{
+                  fontFamily: SANS,
+                  fontWeight: 300,
+                  fontSize: "0.82rem",
+                  color: "var(--ow-text-mid)",
+                  lineHeight: 1.5,
+                  flex: 1,
+                }}
+              >
+                {q.question}
+              </span>
+              <span
+                style={{
+                  fontFamily: MONO,
+                  fontSize: "0.65rem",
+                  color: q.wineType === "red" ? "oklch(0.55 0.12 30)" : q.wineType === "white" ? "oklch(0.65 0.10 220)" : "var(--ow-text-lo)",
+                  minWidth: "40px",
+                  textAlign: "right",
+                  paddingTop: "2px",
+                }}
+              >
+                {q.wineType}
+              </span>
+            </div>
+          ))}
+          {(data?.questions ?? []).length === 0 && (
+            <p style={{ fontFamily: SANS, fontSize: "0.85rem", color: "var(--ow-text-lo)", padding: "1rem 0" }}>No questions found.</p>
+          )}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={{ display: "flex", gap: "0.5rem", marginTop: "1.25rem", alignItems: "center" }}>
+          <button
+            disabled={page === 0}
+            onClick={() => setPage((p) => p - 1)}
+            style={{ fontFamily: MONO, fontSize: "0.75rem", padding: "0.3rem 0.75rem", background: "var(--ow-bg-raised)", border: "1px solid var(--ow-border-md)", borderRadius: "2px", color: page === 0 ? "var(--ow-text-lo)" : "var(--ow-text-mid)", cursor: page === 0 ? "default" : "pointer" }}
+          >
+            ← Prev
+          </button>
+          <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ow-text-lo)" }}>
+            {page + 1} / {totalPages}
+          </span>
+          <button
+            disabled={page >= totalPages - 1}
+            onClick={() => setPage((p) => p + 1)}
+            style={{ fontFamily: MONO, fontSize: "0.75rem", padding: "0.3rem 0.75rem", background: "var(--ow-bg-raised)", border: "1px solid var(--ow-border-md)", borderRadius: "2px", color: page >= totalPages - 1 ? "var(--ow-text-lo)" : "var(--ow-text-mid)", cursor: page >= totalPages - 1 ? "default" : "pointer" }}
+          >
+            Next →
+          </button>
+        </div>
+      )}
     </div>
   );
 }

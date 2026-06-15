@@ -1,6 +1,6 @@
 import { z } from "zod";
 import Stripe from "stripe";
-import { eq, or, like, and, desc } from "drizzle-orm";
+import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
 import { routeQuery, buildLiveCellarContext } from "./queryRouter.js";
 import { embedText, semanticSopSearch, backfillSopEmbeddings } from "./sopEmbeddings.js";
@@ -2136,6 +2136,7 @@ const tutorRouter = router({
       z.object({
         question: z.string().min(1).max(2000),
         mode: z.enum(["winemaking", "home_winemaker"]).optional().default("winemaking"),
+        batchSizeLitres: z.number().min(1).max(9999).optional(),
         history: z
           .array(z.object({ role: z.enum(["user", "assistant"]), content: z.string() }))
           .max(10)
@@ -2381,12 +2382,17 @@ const tutorRouter = router({
 
         const sourceRefs = Array.from(new Set<string>(relevantChunks.map((c) => c.chapterTitle ?? `Chapter ${c.chapterRef}`))).slice(0, 4);
 
-        // Step 3: Batch size extraction — parse stated volume from question
-        const batchSizeMatch = questionLower.match(/(\d+(?:\.\d+)?)\s*(litre|liter|l\b|gallon|gal|L)/);
-        const batchSize = batchSizeMatch ? `${batchSizeMatch[1]} ${batchSizeMatch[2]}` : null;
-        const batchSizeContext = batchSize
-          ? `The user has stated their batch size is ${batchSize}. Scale all quantities and dosages to this volume.`
-          : `The user has not stated their batch size. Assume a standard home winemaker batch of 23 litres (5 gallons) and state this assumption in your answer.`;
+        // Step 3: Batch size extraction — use explicit input if provided, else parse from question text
+        let batchSizeContext: string;
+        if (input.batchSizeLitres) {
+          batchSizeContext = `The user has selected a batch size of ${input.batchSizeLitres} litres. Scale ALL quantities, dosages, and measurements to this exact volume. Always state "for your ${input.batchSizeLitres}L batch" when giving quantities.`;
+        } else {
+          const batchSizeMatch = questionLower.match(/(\d+(?:\.\d+)?)\s*(litre|liter|l\b|gallon|gal|L)/);
+          const batchSize = batchSizeMatch ? `${batchSizeMatch[1]} ${batchSizeMatch[2]}` : null;
+          batchSizeContext = batchSize
+            ? `The user has stated their batch size is ${batchSize}. Scale all quantities and dosages to this volume.`
+            : `The user has not stated their batch size. Assume a standard home winemaker batch of 23 litres (5 gallons) and state this assumption in your answer.`;
+        }
 
         // Step 4: Risk classification — detect high-risk topics
         const highRiskKeywords = ["so2", "sulfite", "sulphite", "metabisulphite", "metabisulfite",
@@ -2910,6 +2916,64 @@ const wbsAdminRouter = router({
         .where(and(...conditions));
       return { success: true, published: input.published, updatedAt: now };
     }),
+
+  // List ghost questions (paginated, filterable by wbs_code)
+  listGhostQuestions: ownerProcedure
+    .input(
+      z.object({
+        wbsCode: z.string().optional(),
+        wineType: z.string().optional(),
+        limit: z.number().min(1).max(200).optional().default(50),
+        offset: z.number().min(0).optional().default(0),
+      })
+    )
+    .query(async ({ input }) => {
+      const conditions = [eq(schema.ghostQuestions.active, true)];
+      if (input.wbsCode) conditions.push(eq(schema.ghostQuestions.wbsCode, input.wbsCode));
+      if (input.wineType) conditions.push(eq(schema.ghostQuestions.wineType, input.wineType));
+      const questions = await db
+        .select({
+          id: schema.ghostQuestions.id,
+          wbsCode: schema.ghostQuestions.wbsCode,
+          wineType: schema.ghostQuestions.wineType,
+          question: schema.ghostQuestions.question,
+          difficulty: schema.ghostQuestions.difficulty,
+          category: schema.ghostQuestions.category,
+          createdAt: schema.ghostQuestions.createdAt,
+        })
+        .from(schema.ghostQuestions)
+        .where(and(...conditions))
+        .orderBy(schema.ghostQuestions.wbsCode, schema.ghostQuestions.id)
+        .limit(input.limit)
+        .offset(input.offset);
+      // Count total matching
+      const allMatching = await db
+        .select({ id: schema.ghostQuestions.id })
+        .from(schema.ghostQuestions)
+        .where(and(...conditions));
+      return { questions, total: allMatching.length };
+    }),
+
+  // Get ghost questions summary by wbs_code
+  ghostQuestionsSummary: ownerProcedure.query(async () => {
+    const all = await db
+      .select({
+        wbsCode: schema.ghostQuestions.wbsCode,
+        wineType: schema.ghostQuestions.wineType,
+        category: schema.ghostQuestions.category,
+        id: schema.ghostQuestions.id,
+      })
+      .from(schema.ghostQuestions)
+      .where(eq(schema.ghostQuestions.active, true));
+    // Group by wbsCode + wineType
+    const grouped = all.reduce((acc, r) => {
+      const key = `${r.wbsCode}|${r.wineType}`;
+      if (!acc[key]) acc[key] = { wbsCode: r.wbsCode, wineType: r.wineType, category: r.category ?? "", cnt: 0 };
+      acc[key].cnt++;
+      return acc;
+    }, {} as Record<string, { wbsCode: string; wineType: string; category: string; cnt: number }>);
+    return Object.values(grouped).sort((a, b) => a.wbsCode.localeCompare(b.wbsCode));
+  }),
 
   // Get chunk count summary (for dashboard)
   summary: ownerProcedure.query(async () => {

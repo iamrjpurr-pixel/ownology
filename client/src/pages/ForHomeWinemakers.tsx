@@ -77,10 +77,9 @@ function InlineAskWidget() {
     const finalQ = (q ?? question).trim();
     if (!finalQ || isAsking) return;
     setIsAsking(true);
-    // Prepend batch size context to the question
-    const batchLitres = batchSize === "other" ? (customBatch.trim() || "unknown") : batchSize;
-    const batchContext = `[Batch size: ${batchLitres} litres] `;
-    const questionWithContext = batchContext + finalQ;
+    // Parse batch size as a number for the backend
+    const batchLitresRaw = batchSize === "other" ? customBatch.trim() : batchSize;
+    const batchSizeLitres = batchLitresRaw && batchLitresRaw !== "unknown" ? parseFloat(batchLitresRaw) : undefined;
     setAsked(finalQ);
     setAnswer("");
     setSourceChapters([]);
@@ -89,8 +88,9 @@ function InlineAskWidget() {
     setQuestion("");
     try {
       const result = await askMutation.mutateAsync({
-        question: questionWithContext,
+        question: finalQ,
         mode: "home_winemaker",
+        batchSizeLitres: batchSizeLitres && !isNaN(batchSizeLitres) ? batchSizeLitres : undefined,
         history: [],
       });
       setAnswer(result.answer);

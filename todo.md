@@ -386,7 +386,7 @@
 - [ ] Update DIY Knowledge Hub to show only published chunks/SOPs — NEXT SPRINT
 - [x] Build WBS admin panel — content tree with publish toggles (owner only)
 - [x] Wire ForHomeWinemakers inline chat to new DIY tutor procedure
-- [ ] Ghost questions: generate 1000 likely home winemaker questions mapped to WBS nodes (UI layer only) — NEXT SPRINT
+- [x] Ghost questions: generate 1000 likely home winemaker questions mapped to WBS nodes (UI layer only)
 - [x] White Wine Bible: ingestion pipeline ready (ingest when uploaded, same WBS structure)
 - [ ] Domain 1 (Vineyard) and Domain 9 (Maintenance) — PARKED, schema ready
 
@@ -404,7 +404,7 @@
 ### Entry point: /for-home-winemakers polish
 - [x] Replace current InlineAskWidget starter questions with colloquial real-world questions (not textbook language)
 - [x] Add "Powered by the Red Wine Bible & MoreWine! Outline" attribution line to the chat widget
-- [ ] Add batch size input field to chat widget (optional, pre-fills scale context) — NEXT SPRINT
+- [x] Add batch size input field to chat widget (optional, pre-fills scale context)
 - [x] Ensure /for-home-winemakers is linked from homepage nav (More dropdown) and footer
 
 ### Fixes
@@ -421,7 +421,7 @@
 - [x] Extend colloquial map with white wine terms (cold settling, reductive, sur-lie, bâtonnage, cold stabilisation, tartrate crystals, protein haze, press juice, free-run juice, etc.)
 - [x] Update starter questions to cover both red and white wine
 - [x] Review and refine starter questions now that white wine knowledge is live
-- [ ] Publish remaining red wine bible domains via WBS admin panel (D3 Harvest, D5 Post-Ferment, D6 Stabilisation, D7 Packaging) — NEXT SESSION
+- [x] Publish remaining red wine bible domains via WBS admin panel (D3 Harvest, D5 Post-Ferment, D6 Stabilisation, D7 Packaging) — already published in prior session
 
 ## Theme + Knowledge Hub UX Sprint (Jun 2026)
 - [x] Global floating ThemeToggle added to App.tsx (fixed bottom-right, all pages)
@@ -434,10 +434,10 @@
 - [x] Mark starter questions as removed from ForHomeWinemakers widget
 
 ## Red Wine Bible Expansion + Ghost Questions Sprint (Jun 2026)
-- [ ] Publish Red Wine Bible domains D3 Harvest, D5 Post-Ferment, D6 Stabilisation, D7 Packaging via SQL
-- [ ] Verify published chunk counts per domain after publish
-- [ ] Add optional batch size input field to ForHomeWinemakers chat widget (pre-fills scale context)
-- [ ] Wire batch size into tutor.ask system prompt context
-- [ ] Generate 1000 ghost questions mapped to WBS nodes (LLM batch generation)
-- [ ] Store ghost questions in database (ghost_questions table)
-- [ ] Build ghost questions admin view in AdminWbs page
+- [x] Publish Red Wine Bible domains D3 Harvest, D5 Post-Ferment, D6 Stabilisation, D7 Packaging via SQL (already published in prior session)
+- [x] Verify published chunk counts per domain after publish (all 141 red wine chunks published)
+- [x] Add optional batch size input field to ForHomeWinemakers chat widget (pre-fills scale context)
+- [x] Wire batch size into tutor.ask system prompt context
+- [x] Generate 1000 ghost questions mapped to WBS nodes (LLM batch generation — 930 questions across 31 WBS nodes)
+- [x] Store ghost questions in database (ghost_questions table)
+- [x] Build ghost questions admin view in AdminWbs page
