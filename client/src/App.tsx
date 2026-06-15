@@ -86,7 +86,7 @@ function Router() {
       <Route path={"/vineyard"} component={Vineyard} />
       <Route path={"/build-index"} component={BuildIndex} />
       <Route path={"/knowledge"} component={Knowledge} />
-      <Route path={"/knowledge/:rest*"} component={Knowledge} />
+      <Route path={"/knowledge/*"} component={Knowledge} />
       <Route path={"/guide"} component={Guide} />
       <Route path={"/import"} component={Import} />
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />

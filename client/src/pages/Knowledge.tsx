@@ -117,12 +117,9 @@ const DIY_CATEGORIES = new Set([
 
 function KnowledgeHome() {
   const [search, setSearch] = useState("");
-  const [audienceFilter, setAudienceFilter] = useState<"all" | "diy">("all");
-  const { data: allSops = [] } = trpc.knowledge.listSops.useQuery(undefined);
+  const { data: allSops = [] } = trpc.knowledge.listSops.useQuery({ audience: "commercial" });
 
-  const baseCategories = audienceFilter === "diy"
-    ? ALL_CATEGORIES.filter(cat => DIY_CATEGORIES.has(cat))
-    : ALL_CATEGORIES;
+  const baseCategories = ALL_CATEGORIES;
 
   const filteredCategories = search.trim()
     ? baseCategories.filter((cat) => {
@@ -207,34 +204,20 @@ function KnowledgeHome() {
               className="bg-transparent border-white/10 text-sm max-w-sm"
               style={{ color: "oklch(0.88 0.015 75)" }}
             />
-            <div className="flex gap-2">
+            <Link href="/for-home-winemakers">
               <button
-                onClick={() => setAudienceFilter("all")}
                 className="px-3 py-1.5 text-xs rounded transition-all"
                 style={{
                   fontFamily: "'Lato', sans-serif",
-                  fontWeight: audienceFilter === "all" ? 600 : 300,
-                  background: audienceFilter === "all" ? "oklch(0.72 0.12 75 / 15%)" : "transparent",
-                  border: audienceFilter === "all" ? "1px solid oklch(0.72 0.12 75 / 40%)" : "1px solid oklch(1 0 0 / 12%)",
-                  color: audienceFilter === "all" ? "oklch(0.72 0.12 75)" : "oklch(0.55 0.015 75)",
+                  fontWeight: 300,
+                  background: "transparent",
+                  border: "1px solid oklch(0.65 0.10 220 / 40%)",
+                  color: "oklch(0.65 0.10 220)",
                 }}
               >
-                All SOPs
+                🍷 DIY Home Winemaker →
               </button>
-              <button
-                onClick={() => setAudienceFilter("diy")}
-                className="px-3 py-1.5 text-xs rounded transition-all"
-                style={{
-                  fontFamily: "'Lato', sans-serif",
-                  fontWeight: audienceFilter === "diy" ? 600 : 300,
-                  background: audienceFilter === "diy" ? "oklch(0.65 0.10 220 / 15%)" : "transparent",
-                  border: audienceFilter === "diy" ? "1px solid oklch(0.65 0.10 220 / 40%)" : "1px solid oklch(1 0 0 / 12%)",
-                  color: audienceFilter === "diy" ? "oklch(0.65 0.10 220)" : "oklch(0.55 0.015 75)",
-                }}
-              >
-                🍷 DIY Home Winemaker
-              </button>
-            </div>
+            </Link>
           </div>
         </div>
       </div>
@@ -244,7 +227,7 @@ function KnowledgeHome() {
         {/* Stats row */}
         <div className="flex gap-8 mb-8 flex-wrap">
           {[
-            { label: "Categories", value: "8" },
+            { label: "Categories", value: baseCategories.length.toString() },
             { label: "SOPs", value: allSops.length.toString() },
             { label: "Knowledge Layers", value: "5" },
           ].map((s) => (
@@ -338,7 +321,7 @@ function KnowledgeHome() {
 function KnowledgeCategory({ category }: { category: string }) {
   const decodedCat = decodeURIComponent(category);
   const meta = CATEGORY_META[decodedCat];
-  const { data: sops = [], isLoading } = trpc.knowledge.listSops.useQuery({ category: decodedCat });
+  const { data: sops = [], isLoading } = trpc.knowledge.listSops.useQuery({ category: decodedCat, audience: "commercial" });
 
   return (
     <div className="min-h-screen" style={{ background: "oklch(0.11 0.008 60)", color: "oklch(0.88 0.015 75)" }}>
@@ -1197,21 +1180,27 @@ function VintageDebrief() {
 // ─── Router ───────────────────────────────────────────────────────────────────
 
 export default function Knowledge() {
-  const [location] = useLocation();
+  // wouter v3: useLocation returns the full path from the root
+  const [wouterLoc] = useLocation();
+  // Normalise: use wouter location but fall back to window.location.pathname
+  // to handle cases where wouter returns a sub-path in wildcard routes
+  const loc = (wouterLoc && wouterLoc.startsWith("/knowledge"))
+    ? wouterLoc
+    : (typeof window !== "undefined" ? window.location.pathname : "/knowledge");
 
   // /knowledge/sop/:id
-  const sopMatch = location.match(/^\/knowledge\/sop\/(\d+)$/);
+  const sopMatch = loc.match(/^\/knowledge\/sop\/(\d+)$/);
   if (sopMatch) return <SopDetail id={parseInt(sopMatch[1], 10)} />;
 
-  // /knowledge/category/:cat
-  const catMatch = location.match(/^\/knowledge\/category\/(.+)$/);
+  // /knowledge/category/:cat (handles URL-encoded category names)
+  const catMatch = loc.match(/^\/knowledge\/category\/(.+)$/);
   if (catMatch) return <KnowledgeCategory category={catMatch[1]} />;
 
   // /knowledge/training
-  if (location === "/knowledge/training") return <TrainingOverview />;
+  if (loc === "/knowledge/training") return <TrainingOverview />;
 
   // /knowledge/vintage-debrief
-  if (location === "/knowledge/vintage-debrief") return <VintageDebrief />;
+  if (loc === "/knowledge/vintage-debrief") return <VintageDebrief />;
 
   // /knowledge
   return <KnowledgeHome />;

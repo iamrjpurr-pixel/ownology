@@ -588,6 +588,8 @@ export const sopLibrary = mysqlTable(
     quickSteps: text("quick_steps"),
     // Whether this SOP was platform-authored (true) or fully custom (false)
     isTemplate: boolean("is_template").notNull().default(true),
+    // Audience: 'commercial' = professional winery platform, 'diy' = home winemaker tier
+    audience: varchar("audience", { length: 20 }).notNull().default("commercial"),
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
     updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
   },

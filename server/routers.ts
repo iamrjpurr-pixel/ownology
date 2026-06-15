@@ -1811,15 +1811,20 @@ const vineyardRouter = router({
 const knowledgeRouter = router({
   // ── SOP Library ─────────────────────────────────────────────────────────────
 
-  // Public: list all SOPs, optionally filtered by category
+  // Public: list SOPs, optionally filtered by category and/or audience ('commercial' | 'diy')
   listSops: publicProcedure
-    .input(z.object({ category: z.string().optional() }).optional())
+    .input(z.object({
+      category: z.string().optional(),
+      audience: z.enum(["commercial", "diy"]).optional(),
+    }).optional())
     .query(async ({ input }) => {
-      const { eq, asc } = await import("drizzle-orm");
+      const { eq, and: andOp, asc } = await import("drizzle-orm");
       let q = db.select().from(schema.sopLibrary).$dynamic();
-      if (input?.category) {
-        q = q.where(eq(schema.sopLibrary.category, input.category));
-      }
+      const conditions: any[] = [];
+      if (input?.category) conditions.push(eq(schema.sopLibrary.category, input.category));
+      if (input?.audience) conditions.push(eq(schema.sopLibrary.audience, input.audience));
+      if (conditions.length === 1) q = q.where(conditions[0]);
+      else if (conditions.length > 1) q = q.where(andOp(...conditions));
       return q.orderBy(asc(schema.sopLibrary.category), asc(schema.sopLibrary.sortOrder));
     }),
 
