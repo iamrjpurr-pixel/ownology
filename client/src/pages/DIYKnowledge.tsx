@@ -41,7 +41,7 @@ function DIYNav({ backHref, backLabel }: { backHref: string; backLabel: string }
   return (
     <nav
       className="sticky top-0 z-50 border-b"
-      style={{ background: "var(--ow-bg-base)", borderColor: "var(--ow-border)" }}
+      style={{ background: "oklch(0.11 0.008 60)", borderColor: "oklch(1 0 0 / 0.08)" }}
     >
       <div className="container flex items-center justify-between py-4">
         <Link href="/">
@@ -50,13 +50,13 @@ function DIYNav({ backHref, backLabel }: { backHref: string; backLabel: string }
         <div className="flex items-center gap-6">
           <Link
             href="/free-run"
-            style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: "var(--ow-amber)", letterSpacing: "0.02em" }}
+            style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: "oklch(0.72 0.12 75)", letterSpacing: "0.02em" }}
           >
             Ask a Question →
           </Link>
           <Link
             href={backHref}
-            style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: "var(--ow-text-lo)", letterSpacing: "0.02em" }}
+            style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: "oklch(0.50 0.010 75)", letterSpacing: "0.02em" }}
           >
             ← {backLabel}
           </Link>
@@ -73,27 +73,27 @@ function DIYKnowledgeHome() {
   const categories = Array.from(new Set(allSops.map((s) => s.category)));
 
   return (
-    <div style={{ background: "var(--ow-bg-base)", minHeight: "100vh" }}>
+    <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh" }}>
       <DIYNav backHref="/for-home-winemakers" backLabel="Home Winemakers" />
 
       {/* Hero */}
-      <section className="pt-16 pb-12 border-b" style={{ borderColor: "var(--ow-border)" }}>
+      <section className="pt-16 pb-12 border-b" style={{ borderColor: "oklch(1 0 0 / 0.08)" }}>
         <div className="container max-w-3xl">
-          <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--ow-amber)", marginBottom: "1rem" }}>
+          <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "oklch(0.72 0.12 75)", marginBottom: "1rem" }}>
             DIY Knowledge Hub
           </p>
-          <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 4vw, 2.75rem)", lineHeight: 1.1, color: "var(--ow-text-hi)", letterSpacing: "-0.02em", marginBottom: "1rem" }}>
+          <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 4vw, 2.75rem)", lineHeight: 1.1, color: "oklch(0.92 0.018 75)", letterSpacing: "-0.02em", marginBottom: "1rem" }}>
             Step-by-step guides for<br />
-            <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>home winemakers.</em>
+            <em style={{ color: "oklch(0.72 0.12 75)", fontStyle: "italic" }}>home winemakers.</em>
           </h1>
-          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1rem", lineHeight: 1.75, color: "var(--ow-text-mid)", maxWidth: "520px" }}>
+          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1rem", lineHeight: 1.75, color: "oklch(0.68 0.013 75)", maxWidth: "520px" }}>
             Plain-English procedures written for garage and kitchen winemakers — no commercial licence, no jargon. Each guide covers what to do, when to do it, and why it matters.
           </p>
         </div>
       </section>
 
       {/* Stats bar */}
-      <section className="py-6 border-b" style={{ borderColor: "var(--ow-border)" }}>
+      <section className="py-6 border-b" style={{ borderColor: "oklch(1 0 0 / 0.08)" }}>
         <div className="container max-w-3xl">
           <div className="flex items-center gap-8">
             {[
@@ -102,8 +102,8 @@ function DIYKnowledgeHome() {
               { label: "Audience", value: "Home winemakers" },
             ].map((s) => (
               <div key={s.label}>
-                <p style={{ fontFamily: MONO, fontSize: "1.25rem", fontWeight: 700, color: "var(--ow-amber)", margin: 0 }}>{s.value}</p>
-                <p style={{ fontFamily: SANS, fontSize: "0.75rem", color: "var(--ow-text-lo)", margin: "2px 0 0", letterSpacing: "0.06em", textTransform: "uppercase" }}>{s.label}</p>
+                <p style={{ fontFamily: MONO, fontSize: "1.25rem", fontWeight: 700, color: "oklch(0.72 0.12 75)", margin: 0 }}>{s.value}</p>
+                <p style={{ fontFamily: SANS, fontSize: "0.75rem", color: "oklch(0.50 0.010 75)", margin: "2px 0 0", letterSpacing: "0.06em", textTransform: "uppercase" }}>{s.label}</p>
               </div>
             ))}
           </div>
@@ -116,15 +116,15 @@ function DIYKnowledgeHome() {
           {isLoading ? (
             <div className="flex flex-col gap-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} style={{ height: 120, background: "var(--ow-bg-raised)", borderRadius: 4, border: "1px solid var(--ow-border)", opacity: 0.5 }} />
+                <div key={i} style={{ height: 120, background: "oklch(0.14 0.009 60)", borderRadius: 4, border: "1px solid oklch(1 0 0 / 0.08)", opacity: 0.5 }} />
               ))}
             </div>
           ) : categories.length === 0 ? (
-            <p style={{ fontFamily: SANS, color: "var(--ow-text-lo)", fontSize: "0.95rem" }}>No guides available yet.</p>
+            <p style={{ fontFamily: SANS, color: "oklch(0.50 0.010 75)", fontSize: "0.95rem" }}>No guides available yet.</p>
           ) : (
             <div className="flex flex-col gap-4">
               {categories.map((cat) => {
-                const meta = CAT_META[cat] ?? { icon: "📋", color: "var(--ow-amber)", description: "" };
+                const meta = CAT_META[cat] ?? { icon: "📋", color: "oklch(0.72 0.12 75)", description: "" };
                 const count = allSops.filter((s) => s.category === cat).length;
                 return (
                   <Link
@@ -134,8 +134,8 @@ function DIYKnowledgeHome() {
                   >
                     <div
                       style={{
-                        background: "var(--ow-bg-raised)",
-                        border: "1px solid var(--ow-border)",
+                        background: "oklch(0.14 0.009 60)",
+                        border: "1px solid oklch(1 0 0 / 0.08)",
                         borderRadius: 4,
                         padding: "1.5rem",
                         display: "flex",
@@ -144,20 +144,20 @@ function DIYKnowledgeHome() {
                         cursor: "pointer",
                         transition: "border-color 0.15s ease",
                       }}
-                      onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "var(--ow-amber)")}
-                      onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "var(--ow-border)")}
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "oklch(0.72 0.12 75)")}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "oklch(1 0 0 / 0.08)")}
                     >
                       <div style={{ fontSize: "2rem", width: 48, textAlign: "center", flexShrink: 0 }}>{meta.icon}</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="flex items-center gap-3 flex-wrap" style={{ marginBottom: "0.35rem" }}>
-                          <p style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1.1rem", color: "var(--ow-text-hi)", margin: 0 }}>{cat}</p>
+                          <p style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1.1rem", color: "oklch(0.92 0.018 75)", margin: 0 }}>{cat}</p>
                           <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: meta.color, background: `${meta.color.replace(")", " / 12%)")}`, padding: "2px 8px", borderRadius: 20 }}>
                             {count} {count === 1 ? "guide" : "guides"}
                           </span>
                         </div>
-                        <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: "var(--ow-text-lo)", lineHeight: 1.6, margin: 0 }}>{meta.description}</p>
+                        <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: "oklch(0.50 0.010 75)", lineHeight: 1.6, margin: 0 }}>{meta.description}</p>
                       </div>
-                      <span style={{ color: "var(--ow-amber)", fontSize: "1.2rem", flexShrink: 0 }}>→</span>
+                      <span style={{ color: "oklch(0.72 0.12 75)", fontSize: "1.2rem", flexShrink: 0 }}>→</span>
                     </div>
                   </Link>
                 );
@@ -168,16 +168,16 @@ function DIYKnowledgeHome() {
       </section>
 
       {/* CTA strip */}
-      <section className="py-12 border-t" style={{ borderColor: "var(--ow-border)" }}>
+      <section className="py-12 border-t" style={{ borderColor: "oklch(1 0 0 / 0.08)" }}>
         <div className="container max-w-3xl">
-          <div style={{ background: "var(--ow-bg-raised)", border: "1px solid var(--ow-border)", borderRadius: 4, padding: "1.75rem 2rem", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
+          <div style={{ background: "oklch(0.14 0.009 60)", border: "1px solid oklch(1 0 0 / 0.08)", borderRadius: 4, padding: "1.75rem 2rem", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
             <div>
-              <p style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1.1rem", color: "var(--ow-text-hi)", margin: 0, marginBottom: "0.35rem" }}>Can't find what you need?</p>
-              <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: "var(--ow-text-lo)", margin: 0 }}>Ask Ownology a question in plain English — it searches all guides for you.</p>
+              <p style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1.1rem", color: "oklch(0.92 0.018 75)", margin: 0, marginBottom: "0.35rem" }}>Can't find what you need?</p>
+              <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: "oklch(0.50 0.010 75)", margin: 0 }}>Ask Ownology a question in plain English — it searches all guides for you.</p>
             </div>
             <Link
               href="/free-run"
-              style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.65rem 1.25rem", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", fontFamily: SANS, fontWeight: 700, fontSize: "0.875rem", borderRadius: 2, textDecoration: "none", letterSpacing: "0.04em", textTransform: "uppercase", flexShrink: 0 }}
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.65rem 1.25rem", background: "oklch(0.72 0.12 75)", color: "oklch(0.10 0.008 60)", fontFamily: SANS, fontWeight: 700, fontSize: "0.875rem", borderRadius: 2, textDecoration: "none", letterSpacing: "0.04em", textTransform: "uppercase", flexShrink: 0 }}
             >
               Ask a Question
             </Link>
@@ -192,23 +192,23 @@ function DIYKnowledgeHome() {
 function DIYKnowledgeCategory({ category }: { category: string }) {
   const decodedCat = decodeURIComponent(category);
   const { data: sops = [], isLoading } = trpc.knowledge.listSops.useQuery({ category: decodedCat, audience: "diy" });
-  const meta = CAT_META[decodedCat] ?? { icon: "📋", color: "var(--ow-amber)", description: "" };
+  const meta = CAT_META[decodedCat] ?? { icon: "📋", color: "oklch(0.72 0.12 75)", description: "" };
 
   return (
-    <div style={{ background: "var(--ow-bg-base)", minHeight: "100vh" }}>
+    <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh" }}>
       <DIYNav backHref="/for-home-winemakers/knowledge" backLabel="Knowledge Hub" />
 
-      <section className="pt-14 pb-10 border-b" style={{ borderColor: "var(--ow-border)" }}>
+      <section className="pt-14 pb-10 border-b" style={{ borderColor: "oklch(1 0 0 / 0.08)" }}>
         <div className="container max-w-3xl">
-          <Link href="/for-home-winemakers/knowledge" style={{ fontFamily: SANS, fontSize: "0.8rem", color: "var(--ow-text-lo)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.3rem", marginBottom: "1.25rem" }}>
+          <Link href="/for-home-winemakers/knowledge" style={{ fontFamily: SANS, fontSize: "0.8rem", color: "oklch(0.50 0.010 75)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.3rem", marginBottom: "1.25rem" }}>
             ← All categories
           </Link>
           <div className="flex items-center gap-4" style={{ marginBottom: "0.75rem" }}>
             <span style={{ fontSize: "2rem" }}>{meta.icon}</span>
-            <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", lineHeight: 1.1, color: "var(--ow-text-hi)", letterSpacing: "-0.02em", margin: 0 }}>{decodedCat}</h1>
+            <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", lineHeight: 1.1, color: "oklch(0.92 0.018 75)", letterSpacing: "-0.02em", margin: 0 }}>{decodedCat}</h1>
           </div>
           {meta.description && (
-            <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.95rem", lineHeight: 1.7, color: "var(--ow-text-mid)", maxWidth: "520px", margin: 0 }}>{meta.description}</p>
+            <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.95rem", lineHeight: 1.7, color: "oklch(0.68 0.013 75)", maxWidth: "520px", margin: 0 }}>{meta.description}</p>
           )}
         </div>
       </section>
@@ -218,11 +218,11 @@ function DIYKnowledgeCategory({ category }: { category: string }) {
           {isLoading ? (
             <div className="flex flex-col gap-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} style={{ height: 80, background: "var(--ow-bg-raised)", borderRadius: 4, border: "1px solid var(--ow-border)", opacity: 0.5 }} />
+                <div key={i} style={{ height: 80, background: "oklch(0.14 0.009 60)", borderRadius: 4, border: "1px solid oklch(1 0 0 / 0.08)", opacity: 0.5 }} />
               ))}
             </div>
           ) : sops.length === 0 ? (
-            <p style={{ fontFamily: SANS, color: "var(--ow-text-lo)" }}>No guides in this category yet.</p>
+            <p style={{ fontFamily: SANS, color: "oklch(0.50 0.010 75)" }}>No guides in this category yet.</p>
           ) : (
             <div className="flex flex-col gap-3">
               {sops.map((sop, idx) => (
@@ -233,8 +233,8 @@ function DIYKnowledgeCategory({ category }: { category: string }) {
                 >
                   <div
                     style={{
-                      background: "var(--ow-bg-raised)",
-                      border: "1px solid var(--ow-border)",
+                      background: "oklch(0.14 0.009 60)",
+                      border: "1px solid oklch(1 0 0 / 0.08)",
                       borderRadius: 4,
                       padding: "1.25rem 1.5rem",
                       display: "flex",
@@ -243,21 +243,21 @@ function DIYKnowledgeCategory({ category }: { category: string }) {
                       cursor: "pointer",
                       transition: "border-color 0.15s ease",
                     }}
-                    onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "var(--ow-amber)")}
-                    onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "var(--ow-border)")}
+                    onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "oklch(0.72 0.12 75)")}
+                    onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = "oklch(1 0 0 / 0.08)")}
                   >
-                    <span style={{ fontFamily: MONO, fontSize: "0.75rem", color: "var(--ow-text-lo)", width: 24, flexShrink: 0, textAlign: "right" }}>{String(idx + 1).padStart(2, "0")}</span>
+                    <span style={{ fontFamily: MONO, fontSize: "0.75rem", color: "oklch(0.50 0.010 75)", width: 24, flexShrink: 0, textAlign: "right" }}>{String(idx + 1).padStart(2, "0")}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1rem", color: "var(--ow-text-hi)", margin: 0, lineHeight: 1.3 }}>
+                      <p style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1rem", color: "oklch(0.92 0.018 75)", margin: 0, lineHeight: 1.3 }}>
                         {sop.title.replace(/ — DIY Home Winemaker$/, "")}
                       </p>
                       {sop.procedureText && (
-                        <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.82rem", color: "var(--ow-text-lo)", margin: "4px 0 0", lineHeight: 1.5 }}>
+                        <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.82rem", color: "oklch(0.50 0.010 75)", margin: "4px 0 0", lineHeight: 1.5 }}>
                           {sop.procedureText.slice(0, 120).replace(/\n/g, " ")}{sop.procedureText.length > 120 ? "…" : ""}
                         </p>
                       )}
                     </div>
-                    <span style={{ color: "var(--ow-amber)", fontSize: "1rem", flexShrink: 0 }}>→</span>
+                    <span style={{ color: "oklch(0.72 0.12 75)", fontSize: "1rem", flexShrink: 0 }}>→</span>
                   </div>
                 </Link>
               ))}
@@ -276,10 +276,10 @@ function DIYSopDetail({ id }: { id: number }) {
 
   if (isLoading) {
     return (
-      <div style={{ background: "var(--ow-bg-base)", minHeight: "100vh" }}>
+      <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh" }}>
         <DIYNav backHref="/for-home-winemakers/knowledge" backLabel="Knowledge Hub" />
         <div className="container max-w-3xl pt-16">
-          <p style={{ fontFamily: SANS, color: "var(--ow-text-lo)" }}>Loading guide…</p>
+          <p style={{ fontFamily: SANS, color: "oklch(0.50 0.010 75)" }}>Loading guide…</p>
         </div>
       </div>
     );
@@ -287,17 +287,17 @@ function DIYSopDetail({ id }: { id: number }) {
 
   if (!sop) {
     return (
-      <div style={{ background: "var(--ow-bg-base)", minHeight: "100vh" }}>
+      <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh" }}>
         <DIYNav backHref="/for-home-winemakers/knowledge" backLabel="Knowledge Hub" />
         <div className="container max-w-3xl pt-16">
-          <p style={{ fontFamily: SANS, color: "var(--ow-text-lo)" }}>Guide not found.</p>
+          <p style={{ fontFamily: SANS, color: "oklch(0.50 0.010 75)" }}>Guide not found.</p>
         </div>
       </div>
     );
   }
 
   const displayTitle = sop.title.replace(/ — DIY Home Winemaker$/, "");
-  const meta = CAT_META[sop.category] ?? { icon: "📋", color: "var(--ow-amber)", description: "" };
+  const meta = CAT_META[sop.category] ?? { icon: "📋", color: "oklch(0.72 0.12 75)", description: "" };
 
   // Parse quick steps
   const quickSteps = sop.quickSteps
@@ -311,15 +311,15 @@ function DIYSopDetail({ id }: { id: number }) {
   ].filter((t) => t.available);
 
   return (
-    <div style={{ background: "var(--ow-bg-base)", minHeight: "100vh" }}>
+    <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh" }}>
       <DIYNav backHref={`/for-home-winemakers/knowledge/category/${encodeURIComponent(sop.category)}`} backLabel={sop.category} />
 
       {/* Header */}
-      <section className="pt-12 pb-8 border-b" style={{ borderColor: "var(--ow-border)" }}>
+      <section className="pt-12 pb-8 border-b" style={{ borderColor: "oklch(1 0 0 / 0.08)" }}>
         <div className="container max-w-3xl">
           <Link
             href={`/for-home-winemakers/knowledge/category/${encodeURIComponent(sop.category)}`}
-            style={{ fontFamily: SANS, fontSize: "0.8rem", color: "var(--ow-text-lo)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.3rem", marginBottom: "1.25rem" }}
+            style={{ fontFamily: SANS, fontSize: "0.8rem", color: "oklch(0.50 0.010 75)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.3rem", marginBottom: "1.25rem" }}
           >
             ← {sop.category}
           </Link>
@@ -329,11 +329,11 @@ function DIYSopDetail({ id }: { id: number }) {
               DIY Guide
             </span>
           </div>
-          <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", lineHeight: 1.1, color: "var(--ow-text-hi)", letterSpacing: "-0.02em", marginBottom: "0.75rem" }}>
+          <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", lineHeight: 1.1, color: "oklch(0.92 0.018 75)", letterSpacing: "-0.02em", marginBottom: "0.75rem" }}>
             {displayTitle}
           </h1>
           {sop.procedureText && (
-            <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1rem", lineHeight: 1.7, color: "var(--ow-text-mid)", maxWidth: "560px", margin: 0 }}>
+            <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1rem", lineHeight: 1.7, color: "oklch(0.68 0.013 75)", maxWidth: "560px", margin: 0 }}>
               {sop.procedureText.slice(0, 180).replace(/\n/g, " ")}{sop.procedureText.length > 180 ? "…" : ""}
             </p>
           )}
@@ -342,7 +342,7 @@ function DIYSopDetail({ id }: { id: number }) {
 
       {/* Tabs */}
       {TABS.length > 1 && (
-        <div className="border-b" style={{ borderColor: "var(--ow-border)" }}>
+        <div className="border-b" style={{ borderColor: "oklch(1 0 0 / 0.08)" }}>
           <div className="container max-w-3xl">
             <div className="flex gap-0">
               {TABS.map((tab) => (
@@ -353,10 +353,10 @@ function DIYSopDetail({ id }: { id: number }) {
                     fontFamily: SANS,
                     fontWeight: activeTab === tab.id ? 600 : 300,
                     fontSize: "0.875rem",
-                    color: activeTab === tab.id ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                    color: activeTab === tab.id ? "oklch(0.72 0.12 75)" : "oklch(0.50 0.010 75)",
                     background: "transparent",
                     border: "none",
-                    borderBottom: activeTab === tab.id ? "2px solid var(--ow-amber)" : "2px solid transparent",
+                    borderBottom: activeTab === tab.id ? "2px solid oklch(0.72 0.12 75)" : "2px solid transparent",
                     padding: "0.875rem 1.25rem",
                     cursor: "pointer",
                     letterSpacing: "0.02em",
@@ -378,7 +378,7 @@ function DIYSopDetail({ id }: { id: number }) {
           {/* Quick Steps */}
           {(activeTab === "steps" || TABS.length === 1) && quickSteps.length > 0 && (
             <div>
-              <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ow-amber)", marginBottom: "1.25rem" }}>
+              <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.16em", textTransform: "uppercase", color: "oklch(0.72 0.12 75)", marginBottom: "1.25rem" }}>
                 Step-by-step
               </p>
               <ol className="flex flex-col gap-3" style={{ listStyle: "none", padding: 0, margin: 0 }}>
@@ -389,14 +389,14 @@ function DIYSopDetail({ id }: { id: number }) {
                       display: "flex",
                       gap: "1rem",
                       alignItems: "flex-start",
-                      background: "var(--ow-bg-raised)",
-                      border: "1px solid var(--ow-border)",
+                      background: "oklch(0.14 0.009 60)",
+                      border: "1px solid oklch(1 0 0 / 0.08)",
                       borderRadius: 4,
                       padding: "1rem 1.25rem",
                     }}
                   >
-                    <span style={{ fontFamily: MONO, fontSize: "0.9rem", color: "var(--ow-amber)", fontWeight: 700, flexShrink: 0, minWidth: 24, paddingTop: 2 }}>{i + 1}.</span>
-                    <span style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.95rem", color: "var(--ow-text-mid)", lineHeight: 1.65 }}>{step}</span>
+                    <span style={{ fontFamily: MONO, fontSize: "0.9rem", color: "oklch(0.72 0.12 75)", fontWeight: 700, flexShrink: 0, minWidth: 24, paddingTop: 2 }}>{i + 1}.</span>
+                    <span style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.95rem", color: "oklch(0.68 0.013 75)", lineHeight: 1.65 }}>{step}</span>
                   </li>
                 ))}
               </ol>
@@ -406,11 +406,11 @@ function DIYSopDetail({ id }: { id: number }) {
           {/* Why It Matters */}
           {activeTab === "why" && sop.decisionLogic && (
             <div>
-              <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ow-amber)", marginBottom: "1.25rem" }}>
+              <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.16em", textTransform: "uppercase", color: "oklch(0.72 0.12 75)", marginBottom: "1.25rem" }}>
                 Why it matters
               </p>
-              <div style={{ background: "var(--ow-bg-raised)", border: "1px solid var(--ow-border)", borderRadius: 4, padding: "1.5rem" }}>
-                <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.95rem", color: "var(--ow-text-mid)", lineHeight: 1.8, margin: 0, whiteSpace: "pre-wrap" }}>
+              <div style={{ background: "oklch(0.14 0.009 60)", border: "1px solid oklch(1 0 0 / 0.08)", borderRadius: 4, padding: "1.5rem" }}>
+                <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.95rem", color: "oklch(0.68 0.013 75)", lineHeight: 1.8, margin: 0, whiteSpace: "pre-wrap" }}>
                   {sop.decisionLogic}
                 </p>
               </div>
@@ -420,11 +420,11 @@ function DIYSopDetail({ id }: { id: number }) {
           {/* Tips & Tricks */}
           {activeTab === "tips" && sop.tribalKnowledge && (
             <div>
-              <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ow-amber)", marginBottom: "1.25rem" }}>
+              <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.16em", textTransform: "uppercase", color: "oklch(0.72 0.12 75)", marginBottom: "1.25rem" }}>
                 Tips & tricks
               </p>
-              <div style={{ background: "var(--ow-bg-raised)", border: "1px solid var(--ow-border)", borderRadius: 4, padding: "1.5rem" }}>
-                <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.95rem", color: "var(--ow-text-mid)", lineHeight: 1.8, margin: 0, whiteSpace: "pre-wrap" }}>
+              <div style={{ background: "oklch(0.14 0.009 60)", border: "1px solid oklch(1 0 0 / 0.08)", borderRadius: 4, padding: "1.5rem" }}>
+                <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.95rem", color: "oklch(0.68 0.013 75)", lineHeight: 1.8, margin: 0, whiteSpace: "pre-wrap" }}>
                   {sop.tribalKnowledge}
                 </p>
               </div>
@@ -434,11 +434,11 @@ function DIYSopDetail({ id }: { id: number }) {
           {/* Full procedure (always shown below tabs) */}
           {sop.procedureText && (
             <div style={{ marginTop: "2.5rem" }}>
-              <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ow-amber)", marginBottom: "1.25rem" }}>
+              <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.16em", textTransform: "uppercase", color: "oklch(0.72 0.12 75)", marginBottom: "1.25rem" }}>
                 Full procedure
               </p>
-              <div style={{ background: "var(--ow-bg-raised)", border: "1px solid var(--ow-border)", borderRadius: 4, padding: "1.5rem" }}>
-                <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9rem", color: "var(--ow-text-mid)", lineHeight: 1.85, margin: 0, whiteSpace: "pre-wrap" }}>
+              <div style={{ background: "oklch(0.14 0.009 60)", border: "1px solid oklch(1 0 0 / 0.08)", borderRadius: 4, padding: "1.5rem" }}>
+                <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9rem", color: "oklch(0.68 0.013 75)", lineHeight: 1.85, margin: 0, whiteSpace: "pre-wrap" }}>
                   {sop.procedureText}
                 </p>
               </div>
@@ -446,14 +446,14 @@ function DIYSopDetail({ id }: { id: number }) {
           )}
 
           {/* Ask Ownology CTA */}
-          <div style={{ marginTop: "2.5rem", padding: "1.5rem", background: "var(--ow-bg-raised)", border: "1px solid var(--ow-border)", borderRadius: 4, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
+          <div style={{ marginTop: "2.5rem", padding: "1.5rem", background: "oklch(0.14 0.009 60)", border: "1px solid oklch(1 0 0 / 0.08)", borderRadius: 4, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
             <div>
-              <p style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1rem", color: "var(--ow-text-hi)", margin: 0, marginBottom: "0.3rem" }}>Have a question about this guide?</p>
-              <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.82rem", color: "var(--ow-text-lo)", margin: 0 }}>Ask Ownology — it will search this guide and all others to find the answer.</p>
+              <p style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1rem", color: "oklch(0.92 0.018 75)", margin: 0, marginBottom: "0.3rem" }}>Have a question about this guide?</p>
+              <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.82rem", color: "oklch(0.50 0.010 75)", margin: 0 }}>Ask Ownology — it will search this guide and all others to find the answer.</p>
             </div>
             <Link
               href={`/free-run?q=${encodeURIComponent(`Question about: ${displayTitle}`)}`}
-              style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.6rem 1.1rem", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", fontFamily: SANS, fontWeight: 700, fontSize: "0.82rem", borderRadius: 2, textDecoration: "none", letterSpacing: "0.04em", textTransform: "uppercase", flexShrink: 0 }}
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.6rem 1.1rem", background: "oklch(0.72 0.12 75)", color: "oklch(0.10 0.008 60)", fontFamily: SANS, fontWeight: 700, fontSize: "0.82rem", borderRadius: 2, textDecoration: "none", letterSpacing: "0.04em", textTransform: "uppercase", flexShrink: 0 }}
             >
               Ask Ownology →
             </Link>
