@@ -691,7 +691,7 @@ export default function Compliance() {
                 {msg.role === "assistant" && (
                   <div
                     className="w-6 h-6 rounded-sm flex-shrink-0 flex items-center justify-center mr-3 mt-1"
-                    style={{ background: "var(--ow-amber-dim, oklch(0.72 0.12 75 / 15%))", border: "1px solid var(--ow-amber)" }}
+                    style={{ background: "var(--ow-amber-dim, color-mix(in oklch, var(--ow-amber) 15%, transparent))", border: "1px solid var(--ow-amber)" }}
                   >
                     <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                       <circle cx="5" cy="5" r="3.5" stroke="var(--ow-amber)" strokeWidth="1.2" />
@@ -790,7 +790,7 @@ export default function Compliance() {
               <div className="flex justify-start">
                 <div
                   className="w-6 h-6 rounded-sm flex-shrink-0 flex items-center justify-center mr-3 mt-1"
-                  style={{ background: "oklch(0.72 0.12 75 / 15%)", border: "1px solid var(--ow-amber)" }}
+                  style={{ background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)", border: "1px solid var(--ow-amber)" }}
                 >
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                     <circle cx="5" cy="5" r="3.5" stroke="var(--ow-amber)" strokeWidth="1.2" />

@@ -74,12 +74,12 @@ export default function AdminWbs() {
   const isUnauthorized = error?.data?.code === "UNAUTHORIZED" || error?.message?.includes("login");
   if (isForbidden || isUnauthorized) {
     return (
-      <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "1rem" }}>
+      <div style={{ background: "var(--ow-bg-base)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "1rem" }}>
         <p style={{ fontFamily: SANS, color: "oklch(0.75 0.013 75)" }}>
           {isForbidden ? "This page is restricted to the site owner." : "Please log in to access this page."}
         </p>
         {isUnauthorized && (
-          <a href={getLoginUrl("/admin/wbs")} style={{ fontFamily: SANS, fontSize: "0.875rem", color: "oklch(0.72 0.12 75)" }}>Log in →</a>
+          <a href={getLoginUrl("/admin/wbs")} style={{ fontFamily: SANS, fontSize: "0.875rem", color: "var(--ow-amber)" }}>Log in →</a>
         )}
       </div>
     );
@@ -127,23 +127,23 @@ export default function AdminWbs() {
     groups.some((g) => g.publishedChunks > 0) && !isDomainFullyPublished(groups);
 
   return (
-    <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh" }}>
+    <div style={{ background: "var(--ow-bg-base)", minHeight: "100vh" }}>
       {/* Admin nav */}
       <nav
         style={{
           borderBottom: "1px solid oklch(1 0 0 / 0.08)",
-          background: "oklch(0.11 0.008 60)",
+          background: "var(--ow-bg-base)",
           position: "sticky",
           top: 0,
           zIndex: 50,
         }}
       >
         <div className="container" style={{ display: "flex", alignItems: "center", gap: "1.5rem", paddingTop: "1rem", paddingBottom: "1rem" }}>
-          <Link href="/admin" style={{ fontFamily: SANS, fontSize: "0.8rem", color: "oklch(0.55 0.012 75)", textDecoration: "none" }}>
+          <Link href="/admin" style={{ fontFamily: SANS, fontSize: "0.8rem", color: "var(--ow-text-lo)", textDecoration: "none" }}>
             ← Admin
           </Link>
           <span style={{ color: "oklch(0.30 0.008 75)" }}>|</span>
-          <span style={{ fontFamily: MONO, fontSize: "0.75rem", color: "oklch(0.72 0.12 75)", letterSpacing: "0.04em" }}>
+          <span style={{ fontFamily: MONO, fontSize: "0.75rem", color: "var(--ow-amber)", letterSpacing: "0.04em" }}>
             WBS Knowledge Publisher
           </span>
         </div>
@@ -157,13 +157,13 @@ export default function AdminWbs() {
               fontFamily: SERIF,
               fontWeight: 700,
               fontSize: "2rem",
-              color: "oklch(0.92 0.018 75)",
+              color: "var(--ow-text-hi)",
               marginBottom: "0.5rem",
             }}
           >
             WBS Knowledge Publisher
           </h1>
-          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9rem", color: "oklch(0.55 0.012 75)", lineHeight: 1.6 }}>
+          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9rem", color: "var(--ow-text-lo)", lineHeight: 1.6 }}>
             Control which bible chapters are visible in the DIY home winemaker tutor.
             Published chapters are retrieved when users ask questions. Unpublished chapters are hidden.
           </p>
@@ -178,13 +178,13 @@ export default function AdminWbs() {
               flexWrap: "wrap",
               marginBottom: "2rem",
               padding: "1rem 1.25rem",
-              background: "oklch(0.14 0.009 60)",
-              border: "1px solid oklch(0.72 0.12 75 / 15%)",
+              background: "var(--ow-bg-raised)",
+              border: "1px solid color-mix(in oklch, var(--ow-amber) 15%, transparent)",
               borderRadius: "4px",
             }}
           >
             <div>
-              <p style={{ fontFamily: MONO, fontSize: "1.5rem", color: "oklch(0.72 0.12 75)", margin: 0 }}>{summary.total}</p>
+              <p style={{ fontFamily: MONO, fontSize: "1.5rem", color: "var(--ow-amber)", margin: 0 }}>{summary.total}</p>
               <p style={{ fontFamily: SANS, fontSize: "0.72rem", color: "oklch(0.48 0.010 75)", margin: 0, letterSpacing: "0.06em", textTransform: "uppercase" }}>Total chunks</p>
             </div>
             <div>
@@ -192,12 +192,12 @@ export default function AdminWbs() {
               <p style={{ fontFamily: SANS, fontSize: "0.72rem", color: "oklch(0.48 0.010 75)", margin: 0, letterSpacing: "0.06em", textTransform: "uppercase" }}>Published</p>
             </div>
             <div>
-              <p style={{ fontFamily: MONO, fontSize: "1.5rem", color: "oklch(0.55 0.012 75)", margin: 0 }}>{summary.unpublished}</p>
+              <p style={{ fontFamily: MONO, fontSize: "1.5rem", color: "var(--ow-text-lo)", margin: 0 }}>{summary.unpublished}</p>
               <p style={{ fontFamily: SANS, fontSize: "0.72rem", color: "oklch(0.48 0.010 75)", margin: 0, letterSpacing: "0.06em", textTransform: "uppercase" }}>Unpublished</p>
             </div>
             {Object.entries(summary.byDoc).map(([doc, counts]) => (
               <div key={doc}>
-                <p style={{ fontFamily: MONO, fontSize: "1.5rem", color: "oklch(0.68 0.015 75)", margin: 0 }}>
+                <p style={{ fontFamily: MONO, fontSize: "1.5rem", color: "var(--ow-text-mid)", margin: 0 }}>
                   {counts.published}/{counts.total}
                 </p>
                 <p style={{ fontFamily: SANS, fontSize: "0.72rem", color: "oklch(0.48 0.010 75)", margin: 0, letterSpacing: "0.06em", textTransform: "uppercase" }}>
@@ -210,7 +210,7 @@ export default function AdminWbs() {
 
         {/* Loading / error */}
         {isLoading && (
-          <p style={{ fontFamily: SANS, color: "oklch(0.55 0.012 75)", fontStyle: "italic" }}>Loading knowledge map…</p>
+          <p style={{ fontFamily: SANS, color: "var(--ow-text-lo)", fontStyle: "italic" }}>Loading knowledge map…</p>
         )}
         {error && (
           <div style={{ padding: "1rem", background: "oklch(0.55 0.12 30 / 12%)", border: "1px solid oklch(0.55 0.12 30 / 35%)", borderRadius: "4px" }}>
@@ -235,7 +235,7 @@ export default function AdminWbs() {
               key={domain}
               style={{
                 marginBottom: "0.75rem",
-                border: `1px solid ${fullyPublished ? "oklch(0.60 0.14 145 / 30%)" : partiallyPublished ? "oklch(0.72 0.12 75 / 25%)" : "oklch(1 0 0 / 0.08)"}`,
+                border: `1px solid ${fullyPublished ? "oklch(0.60 0.14 145 / 30%)" : partiallyPublished ? "color-mix(in oklch, var(--ow-amber) 25%, transparent)" : "oklch(1 0 0 / 0.08)"}`,
                 borderRadius: "4px",
                 overflow: "hidden",
               }}
@@ -247,7 +247,7 @@ export default function AdminWbs() {
                   alignItems: "center",
                   justifyContent: "space-between",
                   padding: "0.875rem 1.25rem",
-                  background: "oklch(0.14 0.009 60)",
+                  background: "var(--ow-bg-raised)",
                   cursor: "pointer",
                   gap: "1rem",
                 }}
@@ -258,20 +258,20 @@ export default function AdminWbs() {
                     style={{
                       fontFamily: MONO,
                       fontSize: "0.7rem",
-                      color: fullyPublished ? "oklch(0.60 0.14 145)" : partiallyPublished ? "oklch(0.72 0.12 75)" : "oklch(0.40 0.008 75)",
+                      color: fullyPublished ? "oklch(0.60 0.14 145)" : partiallyPublished ? "var(--ow-amber)" : "oklch(0.40 0.008 75)",
                       letterSpacing: "0.04em",
-                      background: fullyPublished ? "oklch(0.60 0.14 145 / 12%)" : partiallyPublished ? "oklch(0.72 0.12 75 / 12%)" : "oklch(1 0 0 / 0.05)",
-                      border: `1px solid ${fullyPublished ? "oklch(0.60 0.14 145 / 30%)" : partiallyPublished ? "oklch(0.72 0.12 75 / 25%)" : "oklch(1 0 0 / 0.08)"}`,
+                      background: fullyPublished ? "oklch(0.60 0.14 145 / 12%)" : partiallyPublished ? "color-mix(in oklch, var(--ow-amber) 12%, transparent)" : "oklch(1 0 0 / 0.05)",
+                      border: `1px solid ${fullyPublished ? "oklch(0.60 0.14 145 / 30%)" : partiallyPublished ? "color-mix(in oklch, var(--ow-amber) 25%, transparent)" : "oklch(1 0 0 / 0.08)"}`,
                       borderRadius: "2px",
                       padding: "0.15rem 0.5rem",
                     }}
                   >
                     {fullyPublished ? "LIVE" : partiallyPublished ? "PARTIAL" : "HIDDEN"}
                   </span>
-                  <span style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.875rem", color: "oklch(0.82 0.015 75)" }}>
+                  <span style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.875rem", color: "var(--ow-text-hi)" }}>
                     {domainLabel}
                   </span>
-                  <span style={{ fontFamily: SANS, fontSize: "0.75rem", color: "oklch(0.45 0.010 75)" }}>
+                  <span style={{ fontFamily: SANS, fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
                     {groups.reduce((s, g) => s + g.publishedChunks, 0)}/{groups.reduce((s, g) => s + g.totalChunks, 0)} chunks published
                   </span>
                 </div>
@@ -307,7 +307,7 @@ export default function AdminWbs() {
 
               {/* Chapter rows */}
               {isExpanded && (
-                <div style={{ background: "oklch(0.12 0.008 60)" }}>
+                <div style={{ background: "var(--ow-bg-base)" }}>
                   {groups.map((group) => {
                     const chKey = `chapter::${group.chapterTitle}::${group.sourceDoc}`;
                     const isChapterPublished = group.publishedChunks === group.totalChunks;
@@ -331,7 +331,7 @@ export default function AdminWbs() {
                             {group.chapterTitle ?? "Unknown chapter"}
                           </p>
                           <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-                            <span style={{ fontFamily: MONO, fontSize: "0.68rem", color: "oklch(0.45 0.010 75)" }}>
+                            <span style={{ fontFamily: MONO, fontSize: "0.68rem", color: "var(--ow-text-lo)" }}>
                               WBS {group.wbsCode ?? "—"}
                             </span>
                             <span style={{ fontFamily: SANS, fontSize: "0.68rem", color: "oklch(0.40 0.008 75)" }}>
@@ -369,7 +369,7 @@ export default function AdminWbs() {
                               width: "16px",
                               height: "16px",
                               borderRadius: "50%",
-                              background: "oklch(0.92 0.018 75)",
+                              background: "var(--ow-text-hi)",
                               transition: "left 0.2s ease",
                             }}
                           />
@@ -388,17 +388,17 @@ export default function AdminWbs() {
           style={{
             marginTop: "2rem",
             padding: "1rem 1.25rem",
-            background: "oklch(0.14 0.009 60)",
-            border: "1px dashed oklch(0.72 0.12 75 / 20%)",
+            background: "var(--ow-bg-raised)",
+            border: "1px dashed color-mix(in oklch, var(--ow-amber) 20%, transparent)",
             borderRadius: "4px",
           }}
         >
-          <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.8rem", color: "oklch(0.72 0.12 75)", marginBottom: "0.375rem" }}>
+          <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.8rem", color: "var(--ow-amber)", marginBottom: "0.375rem" }}>
             White Wine Bible — pending upload
           </p>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.78rem", color: "oklch(0.48 0.010 75)", lineHeight: 1.6, margin: 0 }}>
-            Upload the White Wine Bible to <code style={{ fontFamily: MONO, fontSize: "0.72rem", color: "oklch(0.65 0.015 75)" }}>/tmp/white_wine_bible.txt</code> then run{" "}
-            <code style={{ fontFamily: MONO, fontSize: "0.72rem", color: "oklch(0.65 0.015 75)" }}>
+            Upload the White Wine Bible to <code style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ow-text-mid)" }}>/tmp/white_wine_bible.txt</code> then run{" "}
+            <code style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ow-text-mid)" }}>
               node scripts/ingest-diy-bible.mjs --doc white_wine_bible
             </code>{" "}
             to ingest it. White Wine Bible chapters will appear here with the same WBS mapping and publish controls.

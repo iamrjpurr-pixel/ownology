@@ -90,11 +90,11 @@ function StatCard({
       <div className="flex items-center gap-2">
         <Icon
           className="w-4 h-4 flex-shrink-0"
-          style={{ color: accent ?? "oklch(0.72 0.12 75)" }}
+          style={{ color: accent ?? "var(--ow-amber)" }}
         />
         <span
           className="text-xs tracking-widest uppercase"
-          style={{ fontFamily: "'Lato',sans-serif", color: "oklch(0.55 0.012 75)" }}
+          style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-text-lo)" }}
         >
           {label}
         </span>
@@ -102,14 +102,14 @@ function StatCard({
       <div>
         <p
           className="text-3xl font-bold leading-none"
-          style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}
+          style={{ fontFamily: "'Fraunces',serif", color: "var(--ow-text-hi)" }}
         >
           {value}
         </p>
         {sub && (
           <p
             className="mt-1 text-xs"
-            style={{ fontFamily: "'Lato',sans-serif", color: "oklch(0.55 0.012 75)" }}
+            style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-text-lo)" }}
           >
             {sub}
           </p>
@@ -132,9 +132,9 @@ export default function ProductionDashboard() {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
-        style={{ background: "oklch(0.11 0.008 60)" }}
+        style={{ background: "var(--ow-bg-base)" }}
       >
-        <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "oklch(0.72 0.12 75)" }} />
+        <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "var(--ow-amber)" }} />
       </div>
     );
   }
@@ -143,11 +143,11 @@ export default function ProductionDashboard() {
     return (
       <div
         className="min-h-screen flex flex-col items-center justify-center gap-3"
-        style={{ background: "oklch(0.11 0.008 60)" }}
+        style={{ background: "var(--ow-bg-base)" }}
       >
-        <p style={{ color: "oklch(0.65 0.015 75)", fontFamily: "'Lato',sans-serif", fontSize: "0.9rem" }}>
+        <p style={{ color: "var(--ow-text-mid)", fontFamily: "'Lato',sans-serif", fontSize: "0.9rem" }}>
           No production data yet — log your first vintage entry in{" "}
-          <a href="/the-press" style={{ color: "oklch(0.72 0.12 75)" }}>The Press</a>.
+          <a href="/the-press" style={{ color: "var(--ow-amber)" }}>The Press</a>.
         </p>
       </div>
     );
@@ -168,22 +168,22 @@ export default function ProductionDashboard() {
   return (
     <div
       className="min-h-screen"
-      style={{ background: "oklch(0.11 0.008 60)", fontFamily: "'Lato',sans-serif" }}
+      style={{ background: "var(--ow-bg-base)", fontFamily: "'Lato',sans-serif" }}
     >
       {/* ── Header ── */}
       <div
         className="border-b"
-        style={{ borderColor: "oklch(1 0 0 / 6%)", background: "oklch(0.12 0.008 60)" }}
+        style={{ borderColor: "var(--ow-border)", background: "var(--ow-bg-base)" }}
       >
         <div className="container py-6 flex items-center justify-between">
           <div>
             <h1
               className="text-2xl font-bold"
-              style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}
+              style={{ fontFamily: "'Fraunces',serif", color: "var(--ow-text-hi)" }}
             >
               Production Dashboard
             </h1>
-            <p className="text-sm mt-0.5" style={{ color: "oklch(0.55 0.012 75)" }}>
+            <p className="text-sm mt-0.5" style={{ color: "var(--ow-text-lo)" }}>
               Live cellar overview · refreshes every minute
             </p>
           </div>
@@ -191,9 +191,9 @@ export default function ProductionDashboard() {
             href="/the-press"
             className="flex items-center gap-2 px-4 py-2 rounded text-sm"
             style={{
-              background: "oklch(0.72 0.12 75 / 15%)",
-              color: "oklch(0.72 0.12 75)",
-              border: "1px solid oklch(0.72 0.12 75 / 30%)",
+              background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)",
+              color: "var(--ow-amber)",
+              border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
             }}
           >
             <Activity className="w-4 h-4" />
@@ -221,7 +221,7 @@ export default function ProductionDashboard() {
                 ? `${totalActiveFermentLitres.toLocaleString()} L active`
                 : "≤14 days since inoculation"
             }
-            accent="oklch(0.72 0.12 75)"
+            accent="var(--ow-amber)"
           />
           <StatCard
             icon={Package}
@@ -242,10 +242,10 @@ export default function ProductionDashboard() {
         {/* ── Tank Status Grid ── */}
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <Layers className="w-4 h-4" style={{ color: "oklch(0.72 0.12 75)" }} />
+            <Layers className="w-4 h-4" style={{ color: "var(--ow-amber)" }} />
             <h2
               className="text-sm tracking-widest uppercase"
-              style={{ color: "oklch(0.55 0.012 75)" }}
+              style={{ color: "var(--ow-text-lo)" }}
             >
               Tank Status
             </h2>
@@ -254,26 +254,26 @@ export default function ProductionDashboard() {
           {tankSummaries.length === 0 ? (
             <div
               className="rounded-xl border p-10 text-center"
-              style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}
+              style={{ borderColor: "var(--ow-border)", background: "var(--ow-bg-raised)" }}
             >
-              <FlaskConical className="w-10 h-10 mx-auto mb-3 opacity-30" style={{ color: "oklch(0.72 0.12 75)" }} />
-              <p style={{ color: "oklch(0.55 0.012 75)" }}>
+              <FlaskConical className="w-10 h-10 mx-auto mb-3 opacity-30" style={{ color: "var(--ow-amber)" }} />
+              <p style={{ color: "var(--ow-text-lo)" }}>
                 No tanks logged yet.{" "}
-                <Link href="/the-press" style={{ color: "oklch(0.72 0.12 75)" }}>
+                <Link href="/the-press" style={{ color: "var(--ow-amber)" }}>
                   Open The Press
                 </Link>{" "}
                 to add your first entry.
               </p>
             </div>
           ) : (
-            <div className="rounded-xl border overflow-hidden" style={{ borderColor: "oklch(1 0 0 / 8%)" }}>
+            <div className="rounded-xl border overflow-hidden" style={{ borderColor: "var(--ow-border)" }}>
               {/* Table header */}
               <div
                 className="grid grid-cols-6 gap-4 px-5 py-3 text-xs tracking-widest uppercase"
                 style={{
-                  background: "oklch(0.13 0.008 60)",
-                  color: "oklch(0.45 0.010 75)",
-                  borderBottom: "1px solid oklch(1 0 0 / 6%)",
+                  background: "var(--ow-bg-base)",
+                  color: "var(--ow-text-lo)",
+                  borderBottom: "1px solid var(--ow-border)",
                 }}
               >
                 <span className="col-span-2">Tank</span>
@@ -289,21 +289,21 @@ export default function ProductionDashboard() {
                   key={tank.tankName}
                   className="grid grid-cols-6 gap-4 px-5 py-4 items-center"
                   style={{
-                    background: i % 2 === 0 ? "oklch(0.14 0.008 60)" : "oklch(0.13 0.008 60)",
-                    borderBottom: i < tankSummaries.length - 1 ? "1px solid oklch(1 0 0 / 5%)" : "none",
+                    background: i % 2 === 0 ? "var(--ow-bg-raised)" : "var(--ow-bg-base)",
+                    borderBottom: i < tankSummaries.length - 1 ? "1px solid var(--ow-border)" : "none",
                   }}
                 >
                   {/* Tank name + variety */}
                   <div className="col-span-2 flex flex-col gap-0.5">
                     <span
                       className="font-medium text-sm"
-                      style={{ color: "oklch(0.88 0.015 75)" }}
+                      style={{ color: "var(--ow-text-hi)" }}
                     >
                       {tank.tankName}
                     </span>
                     <span
                       className="text-xs"
-                      style={{ color: "oklch(0.55 0.012 75)" }}
+                      style={{ color: "var(--ow-text-lo)" }}
                     >
                       {tank.variety}
                     </span>
@@ -316,7 +316,7 @@ export default function ProductionDashboard() {
                     />
                     <span
                       className="text-xs"
-                      style={{ color: "oklch(0.65 0.012 75)" }}
+                      style={{ color: "var(--ow-text-lo)" }}
                     >
                       {statusLabel(tank)}
                     </span>
@@ -327,7 +327,7 @@ export default function ProductionDashboard() {
                     className="text-sm"
                     style={{
                       color: tank.isActiveFerment
-                        ? "oklch(0.72 0.12 75)"
+                        ? "var(--ow-amber)"
                         : "oklch(0.60 0.012 75)",
                     }}
                   >
@@ -336,16 +336,16 @@ export default function ProductionDashboard() {
 
                   {/* Last event */}
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-xs" style={{ color: "oklch(0.65 0.012 75)" }}>
+                    <span className="text-xs" style={{ color: "var(--ow-text-lo)" }}>
                       {eventTypeLabel(tank.lastEventType)}
                     </span>
-                    <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>
+                    <span className="text-xs" style={{ color: "var(--ow-text-lo)" }}>
                       {relativeTime(tank.lastEventAt)}
                     </span>
                   </div>
 
                   {/* Volume */}
-                  <span className="text-sm" style={{ color: "oklch(0.65 0.012 75)" }}>
+                  <span className="text-sm" style={{ color: "var(--ow-text-lo)" }}>
                     {tank.volumeLitres ? `${tank.volumeLitres.toLocaleString()} L` : "—"}
                   </span>
                 </div>
@@ -357,10 +357,10 @@ export default function ProductionDashboard() {
         {/* ── Quick Links ── */}
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="w-4 h-4" style={{ color: "oklch(0.72 0.12 75)" }} />
+            <BarChart3 className="w-4 h-4" style={{ color: "var(--ow-amber)" }} />
             <h2
               className="text-sm tracking-widest uppercase"
-              style={{ color: "oklch(0.55 0.012 75)" }}
+              style={{ color: "var(--ow-text-lo)" }}
             >
               Quick Access
             </h2>
@@ -377,16 +377,16 @@ export default function ProductionDashboard() {
                 href={href}
                 className="rounded-xl border p-4 flex flex-col gap-2 transition-colors"
                 style={{
-                  borderColor: "oklch(1 0 0 / 8%)",
-                  background: "oklch(0.14 0.008 60)",
+                  borderColor: "var(--ow-border)",
+                  background: "var(--ow-bg-raised)",
                 }}
               >
-                <Icon className="w-5 h-5" style={{ color: "oklch(0.72 0.12 75)" }} />
+                <Icon className="w-5 h-5" style={{ color: "var(--ow-amber)" }} />
                 <div>
-                  <p className="text-sm font-medium" style={{ color: "oklch(0.88 0.015 75)" }}>
+                  <p className="text-sm font-medium" style={{ color: "var(--ow-text-hi)" }}>
                     {label}
                   </p>
-                  <p className="text-xs mt-0.5" style={{ color: "oklch(0.50 0.010 75)" }}>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--ow-text-lo)" }}>
                     {sub}
                   </p>
                 </div>
@@ -399,41 +399,41 @@ export default function ProductionDashboard() {
         {totalBatches > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="w-4 h-4" style={{ color: "oklch(0.72 0.12 75)" }} />
+              <TrendingUp className="w-4 h-4" style={{ color: "var(--ow-amber)" }} />
               <h2
                 className="text-sm tracking-widest uppercase"
-                style={{ color: "oklch(0.55 0.012 75)" }}
+                style={{ color: "var(--ow-text-lo)" }}
               >
                 Vintage Summary
               </h2>
             </div>
             <div
               className="rounded-xl border p-5 flex items-center gap-8"
-              style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}
+              style={{ borderColor: "var(--ow-border)", background: "var(--ow-bg-raised)" }}
             >
               <div className="flex flex-col gap-1">
-                <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>
+                <span className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-text-lo)" }}>
                   Batches
                 </span>
-                <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}>
+                <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "var(--ow-text-hi)" }}>
                   {totalBatches}
                 </span>
               </div>
               <div className="w-px h-10 bg-white/8" />
               <div className="flex flex-col gap-1">
-                <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>
+                <span className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-text-lo)" }}>
                   Total Entries
                 </span>
-                <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}>
+                <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "var(--ow-text-hi)" }}>
                   {totalLogEntries}
                 </span>
               </div>
               <div className="w-px h-10 bg-white/8" />
               <div className="flex flex-col gap-1">
-                <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>
+                <span className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-text-lo)" }}>
                   Active Ferment
                 </span>
-                <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.72 0.12 75)" }}>
+                <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "var(--ow-amber)" }}>
                   {activeFermentCount}
                 </span>
               </div>
@@ -441,7 +441,7 @@ export default function ProductionDashboard() {
                 <>
                   <div className="w-px h-10 bg-white/8" />
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>
+                    <span className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-text-lo)" }}>
                       Litres Fermenting
                     </span>
                     <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.65 0.15 160)" }}>
@@ -455,9 +455,9 @@ export default function ProductionDashboard() {
                   href="/batch-book"
                   className="text-sm px-4 py-2 rounded"
                   style={{
-                    background: "oklch(0.72 0.12 75 / 15%)",
-                    color: "oklch(0.72 0.12 75)",
-                    border: "1px solid oklch(0.72 0.12 75 / 30%)",
+                    background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)",
+                    color: "var(--ow-amber)",
+                    border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
                   }}
                 >
                   View Batch Book →
@@ -470,45 +470,45 @@ export default function ProductionDashboard() {
         {/* ── DR-15: Production Planning ── */}
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <CalendarDays className="w-4 h-4" style={{ color: "oklch(0.72 0.12 75)" }} />
-            <h2 className="text-sm tracking-widest uppercase" style={{ color: "oklch(0.55 0.012 75)" }}>
+            <CalendarDays className="w-4 h-4" style={{ color: "var(--ow-amber)" }} />
+            <h2 className="text-sm tracking-widest uppercase" style={{ color: "var(--ow-text-lo)" }}>
               Production Planning
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Approaching bottling */}
-            <div className="rounded-xl border p-5" style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}>
+            <div className="rounded-xl border p-5" style={{ borderColor: "var(--ow-border)", background: "var(--ow-bg-raised)" }}>
               <div className="flex items-center gap-2 mb-3">
                 <Package className="w-4 h-4" style={{ color: "oklch(0.65 0.15 160)" }} />
-                <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.50 0.010 75)" }}>Bottling Queue</span>
+                <span className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-text-lo)" }}>Bottling Queue</span>
               </div>
-              <p className="text-3xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}>
+              <p className="text-3xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "var(--ow-text-hi)" }}>
                 {approachingBottlingCount}
               </p>
-              <p className="text-xs mt-1" style={{ color: "oklch(0.50 0.010 75)" }}>tanks 60–120 days post-inoculation</p>
-              <Link href="/the-press" className="mt-3 block text-xs" style={{ color: "oklch(0.72 0.12 75)" }}>Schedule bottling runs →</Link>
+              <p className="text-xs mt-1" style={{ color: "var(--ow-text-lo)" }}>tanks 60–120 days post-inoculation</p>
+              <Link href="/the-press" className="mt-3 block text-xs" style={{ color: "var(--ow-amber)" }}>Schedule bottling runs →</Link>
             </div>
             {/* Active ferments */}
-            <div className="rounded-xl border p-5" style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}>
+            <div className="rounded-xl border p-5" style={{ borderColor: "var(--ow-border)", background: "var(--ow-bg-raised)" }}>
               <div className="flex items-center gap-2 mb-3">
-                <Activity className="w-4 h-4" style={{ color: "oklch(0.72 0.12 75)" }} />
-                <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.50 0.010 75)" }}>Active Ferments</span>
+                <Activity className="w-4 h-4" style={{ color: "var(--ow-amber)" }} />
+                <span className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-text-lo)" }}>Active Ferments</span>
               </div>
-              <p className="text-3xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}>
+              <p className="text-3xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "var(--ow-text-hi)" }}>
                 {activeFermentCount}
               </p>
-              <p className="text-xs mt-1" style={{ color: "oklch(0.50 0.010 75)" }}>tanks ≤14 days since inoculation</p>
-              <Link href="/the-press" className="mt-3 block text-xs" style={{ color: "oklch(0.72 0.12 75)" }}>View fermentation log →</Link>
+              <p className="text-xs mt-1" style={{ color: "var(--ow-text-lo)" }}>tanks ≤14 days since inoculation</p>
+              <Link href="/the-press" className="mt-3 block text-xs" style={{ color: "var(--ow-amber)" }}>View fermentation log →</Link>
             </div>
             {/* Cellar tasks */}
-            <div className="rounded-xl border p-5" style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}>
+            <div className="rounded-xl border p-5" style={{ borderColor: "var(--ow-border)", background: "var(--ow-bg-raised)" }}>
               <div className="flex items-center gap-2 mb-3">
                 <CheckCircle2 className="w-4 h-4" style={{ color: "oklch(0.65 0.12 250)" }} />
-                <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.50 0.010 75)" }}>Task Planner</span>
+                <span className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-text-lo)" }}>Task Planner</span>
               </div>
-              <p className="text-3xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}>AI</p>
-              <p className="text-xs mt-1" style={{ color: "oklch(0.50 0.010 75)" }}>Generate cellar tasks from your log</p>
-              <Link href="/cellar-tasks" className="mt-3 block text-xs" style={{ color: "oklch(0.72 0.12 75)" }}>Open Cellar Tasks →</Link>
+              <p className="text-3xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "var(--ow-text-hi)" }}>AI</p>
+              <p className="text-xs mt-1" style={{ color: "var(--ow-text-lo)" }}>Generate cellar tasks from your log</p>
+              <Link href="/cellar-tasks" className="mt-3 block text-xs" style={{ color: "var(--ow-amber)" }}>Open Cellar Tasks →</Link>
             </div>
           </div>
         </div>
@@ -517,20 +517,20 @@ export default function ProductionDashboard() {
         {vintageComparison && vintageComparison.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Layers className="w-4 h-4" style={{ color: "oklch(0.72 0.12 75)" }} />
-              <h2 className="text-sm tracking-widest uppercase" style={{ color: "oklch(0.55 0.012 75)" }}>
+              <Layers className="w-4 h-4" style={{ color: "var(--ow-amber)" }} />
+              <h2 className="text-sm tracking-widest uppercase" style={{ color: "var(--ow-text-lo)" }}>
                 Multi-Vintage Comparison
               </h2>
             </div>
-            <div className="rounded-xl border overflow-hidden" style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}>
+            <div className="rounded-xl border overflow-hidden" style={{ borderColor: "var(--ow-border)", background: "var(--ow-bg-raised)" }}>
               {/* Table header */}
               <div
                 className="grid gap-0 text-xs uppercase tracking-widest px-4 py-3"
                 style={{
                   gridTemplateColumns: "80px 1fr 1fr 90px 110px 100px",
-                  background: "oklch(0.12 0.008 60)",
-                  color: "oklch(0.45 0.010 75)",
-                  borderBottom: "1px solid oklch(1 0 0 / 8%)",
+                  background: "var(--ow-bg-base)",
+                  color: "var(--ow-text-lo)",
+                  borderBottom: "1px solid var(--ow-border)",
                   fontFamily: "'Fira Code', monospace",
                   letterSpacing: "0.08em",
                 }}
@@ -546,7 +546,7 @@ export default function ProductionDashboard() {
               {vintageComparison.flatMap((vc) =>
                 vc.batches.map((b, i) => {
                   const statusColors: Record<string, { bg: string; text: string }> = {
-                    "Fermenting":        { bg: "oklch(0.22 0.06 75)",  text: "oklch(0.72 0.12 75)" },
+                    "Fermenting":        { bg: "oklch(0.22 0.06 75)",  text: "var(--ow-amber)" },
                     "Maturing":          { bg: "oklch(0.22 0.06 250)", text: "oklch(0.70 0.12 250)" },
                     "Post-Ferment":      { bg: "oklch(0.22 0.06 250)", text: "oklch(0.70 0.12 250)" },
                     "Awaiting Bottling": { bg: "oklch(0.22 0.06 30)",  text: "oklch(0.70 0.12 30)" },
@@ -560,21 +560,21 @@ export default function ProductionDashboard() {
                       className="grid gap-0 px-4 py-3 items-center"
                       style={{
                         gridTemplateColumns: "80px 1fr 1fr 90px 110px 100px",
-                        borderBottom: "1px solid oklch(1 0 0 / 5%)",
+                        borderBottom: "1px solid var(--ow-border)",
                         background: i % 2 === 0 ? "transparent" : "oklch(0.13 0.008 60 / 40%)",
                       }}
                     >
                       {/* Vintage — only show on first row of each vintage group */}
-                      <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "1rem", color: i === 0 ? "oklch(0.72 0.12 75)" : "transparent" }}>
+                      <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "1rem", color: i === 0 ? "var(--ow-amber)" : "transparent" }}>
                         {vc.vintage}
                       </span>
                       {/* Batch / Variety */}
                       <div>
-                        <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "oklch(0.72 0.12 75)", letterSpacing: "0.06em" }}>{b.batchId}</p>
-                        <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", color: "oklch(0.82 0.015 75)" }}>{b.variety}</p>
+                        <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "var(--ow-amber)", letterSpacing: "0.06em" }}>{b.batchId}</p>
+                        <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", color: "var(--ow-text-hi)" }}>{b.variety}</p>
                       </div>
                       {/* Tank */}
-                      <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", color: "oklch(0.65 0.015 75)" }}>
+                      <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", color: "var(--ow-text-mid)" }}>
                         {b.tankName ?? "—"}
                       </span>
                       {/* Volume */}
@@ -582,7 +582,7 @@ export default function ProductionDashboard() {
                         {b.volumeLitres ? `${b.volumeLitres.toLocaleString()} L` : "—"}
                       </span>
                       {/* Inoculation date */}
-                      <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.75rem", color: "oklch(0.55 0.012 75)" }}>
+                      <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
                         {b.inoculationDate
                           ? new Date(b.inoculationDate).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "2-digit" })
                           : "—"}
@@ -601,9 +601,9 @@ export default function ProductionDashboard() {
               {/* Totals footer */}
               <div
                 className="px-4 py-3 flex items-center justify-between"
-                style={{ background: "oklch(0.12 0.008 60)", borderTop: "1px solid oklch(1 0 0 / 8%)" }}
+                style={{ background: "var(--ow-bg-base)", borderTop: "1px solid var(--ow-border)" }}
               >
-                <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "oklch(0.45 0.010 75)", letterSpacing: "0.08em" }}>
+                <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "var(--ow-text-lo)", letterSpacing: "0.08em" }}>
                   {vintageComparison.length} VINTAGE{vintageComparison.length !== 1 ? "S" : ""} · {vintageComparison.reduce((s, v) => s + v.batches.length, 0)} BATCH{vintageComparison.reduce((s, v) => s + v.batches.length, 0) !== 1 ? "ES" : ""}
                 </span>
                 <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "oklch(0.65 0.15 160)", letterSpacing: "0.08em" }}>
@@ -627,53 +627,53 @@ export default function ProductionDashboard() {
           return (
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <DollarSign className="w-4 h-4" style={{ color: "oklch(0.72 0.12 75)" }} />
-                <h2 className="text-sm tracking-widest uppercase" style={{ color: "oklch(0.55 0.012 75)" }}>
+                <DollarSign className="w-4 h-4" style={{ color: "var(--ow-amber)" }} />
+                <h2 className="text-sm tracking-widest uppercase" style={{ color: "var(--ow-text-lo)" }}>
                   Cellar Value Estimate
                 </h2>
                 {hasUserCost && (
                   <span className="text-xs px-2 py-0.5 rounded" style={{ background: "oklch(0.22 0.06 145)", color: "oklch(0.75 0.15 145)", fontFamily: "'Fira Code', monospace", letterSpacing: "0.05em" }}>ACTUAL</span>
                 )}
               </div>
-              <div className="rounded-xl border p-5" style={{ borderColor: "oklch(1 0 0 / 8%)", background: "oklch(0.14 0.008 60)" }}>
+              <div className="rounded-xl border p-5" style={{ borderColor: "var(--ow-border)", background: "var(--ow-bg-raised)" }}>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>Volume in Cellar</span>
+                    <span className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-text-lo)" }}>Volume in Cellar</span>
                     <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.65 0.15 160)" }}>
                       {totalActiveFermentLitres.toLocaleString()} L
                     </span>
-                    <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>active ferment only</span>
+                    <span className="text-xs" style={{ color: "var(--ow-text-lo)" }}>active ferment only</span>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>Est. Bottles (750mL)</span>
-                    <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.92 0.018 75)" }}>
+                    <span className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-text-lo)" }}>Est. Bottles (750mL)</span>
+                    <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "var(--ow-text-hi)" }}>
                       {Math.round(totalActiveFermentLitres / 0.75 * 0.85).toLocaleString()}
                     </span>
-                    <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>at 85% fill efficiency</span>
+                    <span className="text-xs" style={{ color: "var(--ow-text-lo)" }}>at 85% fill efficiency</span>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs uppercase tracking-widest" style={{ color: "oklch(0.45 0.010 75)" }}>Tied Capital</span>
+                    <span className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-text-lo)" }}>Tied Capital</span>
                     {preciseTiedCapital !== null ? (
                       <>
-                        <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.72 0.12 75)" }}>
+                        <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "var(--ow-amber)" }}>
                           ${preciseTiedCapital.toLocaleString()}
                         </span>
-                        <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>
+                        <span className="text-xs" style={{ color: "var(--ow-text-lo)" }}>
                           at ${avgCostPerLitre!.toFixed(0)}/L (your cost)
                           {tanksWithoutCost.length > 0 && ` · ${tanksWithoutCost.length} tank${tanksWithoutCost.length > 1 ? 's' : ''} using estimate`}
                         </span>
                       </>
                     ) : (
                       <>
-                        <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "oklch(0.72 0.12 75)" }}>
+                        <span className="text-2xl font-bold" style={{ fontFamily: "'Fraunces',serif", color: "var(--ow-amber)" }}>
                           ${Math.round(totalActiveFermentLitres * 8).toLocaleString()}–${Math.round(totalActiveFermentLitres * 25).toLocaleString()}
                         </span>
-                        <span className="text-xs" style={{ color: "oklch(0.45 0.010 75)" }}>est. at $8–$25/L · set cost in Batch Book</span>
+                        <span className="text-xs" style={{ color: "var(--ow-text-lo)" }}>est. at $8–$25/L · set cost in Batch Book</span>
                       </>
                     )}
                   </div>
                 </div>
-                <p className="text-xs mt-4 pt-4" style={{ color: "oklch(0.38 0.008 75)", borderTop: "1px solid oklch(1 0 0 / 6%)" }}>
+                <p className="text-xs mt-4 pt-4" style={{ color: "oklch(0.38 0.008 75)", borderTop: "1px solid var(--ow-border)" }}>
                   {hasUserCost
                     ? `Tied capital calculated from your cost-per-litre entries in the Batch Book. ${tanksWithoutCost.length > 0 ? `${tanksWithoutCost.length} tank${tanksWithoutCost.length > 1 ? 's' : ''} without a cost entry use the $8–$25/L industry range.` : 'All active tanks have cost-per-litre set.'}`
                     : 'Indicative estimate based on industry bulk wine price ranges. Set a cost-per-litre in the Batch Book for precise figures.'}

@@ -113,7 +113,7 @@ export default function HomeWinemakerGlossary() {
           position: "sticky",
           top: 0,
           zIndex: 40,
-          background: "oklch(0.11 0.008 60 / 95%)",
+          background: "var(--ow-nav-bg)",
           backdropFilter: "blur(8px)",
           borderBottom: "1px solid var(--ow-border)",
           padding: "0.75rem 1.25rem",
@@ -143,7 +143,7 @@ export default function HomeWinemakerGlossary() {
               fontSize: "0.65rem",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
-              color: "oklch(0.72 0.12 75)",
+              color: "var(--ow-amber)",
               marginBottom: "0.5rem",
             }}
           >
@@ -184,7 +184,7 @@ export default function HomeWinemakerGlossary() {
               fontSize: "1rem",
               outline: "none",
             }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "var(--ow-amber)")}
             onBlur={(e) => (e.currentTarget.style.borderColor = "var(--ow-border-md)")}
           />
         </div>
@@ -200,9 +200,9 @@ export default function HomeWinemakerGlossary() {
                 fontSize: "0.7rem",
                 padding: "0.25rem 0.6rem",
                 borderRadius: "3px",
-                background: !activeLetter ? "oklch(0.72 0.12 75)" : "var(--ow-bg-inset)",
-                border: `1px solid ${!activeLetter ? "oklch(0.72 0.12 75)" : "var(--ow-border)"}`,
-                color: !activeLetter ? "oklch(0.11 0.008 60)" : "var(--ow-text-lo)",
+                background: !activeLetter ? "var(--ow-amber)" : "var(--ow-bg-inset)",
+                border: `1px solid ${!activeLetter ? "var(--ow-amber)" : "var(--ow-border)"}`,
+                color: !activeLetter ? "var(--ow-bg-base)" : "var(--ow-text-lo)",
                 cursor: "pointer",
               }}
             >
@@ -218,9 +218,9 @@ export default function HomeWinemakerGlossary() {
                   fontSize: "0.7rem",
                   padding: "0.25rem 0.6rem",
                   borderRadius: "3px",
-                  background: activeLetter === letter ? "oklch(0.72 0.12 75)" : "var(--ow-bg-inset)",
-                  border: `1px solid ${activeLetter === letter ? "oklch(0.72 0.12 75)" : "var(--ow-border)"}`,
-                  color: activeLetter === letter ? "oklch(0.11 0.008 60)" : "var(--ow-text-lo)",
+                  background: activeLetter === letter ? "var(--ow-amber)" : "var(--ow-bg-inset)",
+                  border: `1px solid ${activeLetter === letter ? "var(--ow-amber)" : "var(--ow-border)"}`,
+                  color: activeLetter === letter ? "var(--ow-bg-base)" : "var(--ow-text-lo)",
                   cursor: "pointer",
                 }}
               >
@@ -260,7 +260,7 @@ export default function HomeWinemakerGlossary() {
                     fontFamily: MONO,
                     fontWeight: 700,
                     fontSize: "0.875rem",
-                    color: "oklch(0.72 0.12 75)",
+                    color: "var(--ow-amber)",
                     lineHeight: 1.3,
                   }}
                 >
@@ -292,7 +292,7 @@ export default function HomeWinemakerGlossary() {
             marginTop: "3rem",
             padding: "1.25rem",
             background: "var(--ow-bg-raised)",
-            border: "1px solid oklch(0.72 0.12 75 / 20%)",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
             borderRadius: "4px",
             textAlign: "center",
           }}
@@ -308,8 +308,8 @@ export default function HomeWinemakerGlossary() {
             style={{
               display: "inline-block",
               padding: "0.6rem 1.5rem",
-              background: "oklch(0.72 0.12 75)",
-              color: "oklch(0.11 0.008 60)",
+              background: "var(--ow-amber)",
+              color: "var(--ow-bg-base)",
               fontFamily: SANS,
               fontWeight: 700,
               fontSize: "0.875rem",

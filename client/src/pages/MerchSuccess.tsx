@@ -9,7 +9,7 @@ export default function MerchSuccess() {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4"
-      style={{ background: "oklch(0.11 0.008 60)", color: "oklch(0.90 0.015 75)" }}
+      style={{ background: "var(--ow-bg-base)", color: "var(--ow-text-hi)" }}
     >
       {/* Logo */}
       <div className="mb-8">
@@ -20,14 +20,14 @@ export default function MerchSuccess() {
       <div
         className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
         style={{
-          background: "oklch(0.72 0.12 75 / 12%)",
-          border: "2px solid oklch(0.72 0.12 75 / 40%)",
+          background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
+          border: "2px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)",
         }}
       >
         <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
           <path
             d="M8 18l7 7L28 11"
-            stroke="oklch(0.72 0.12 75)"
+            stroke="var(--ow-amber)"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -41,7 +41,7 @@ export default function MerchSuccess() {
           fontFamily: "'Fraunces', serif",
           fontWeight: 700,
           fontSize: "clamp(1.8rem, 4vw, 2.5rem)",
-          color: "oklch(0.95 0.018 75)",
+          color: "var(--ow-text-hi)",
           letterSpacing: "-0.02em",
         }}
       >
@@ -54,7 +54,7 @@ export default function MerchSuccess() {
           fontFamily: "'Lato', sans-serif",
           fontWeight: 300,
           fontSize: "1rem",
-          color: "oklch(0.65 0.012 75)",
+          color: "var(--ow-text-lo)",
           lineHeight: 1.7,
         }}
       >
@@ -68,7 +68,7 @@ export default function MerchSuccess() {
           fontFamily: "'Lato', sans-serif",
           fontWeight: 300,
           fontSize: "0.875rem",
-          color: "oklch(0.50 0.010 75)",
+          color: "var(--ow-text-lo)",
           lineHeight: 1.7,
         }}
       >
@@ -84,12 +84,12 @@ export default function MerchSuccess() {
             fontFamily: "'Lato', sans-serif",
             fontWeight: 600,
             letterSpacing: "0.12em",
-            background: "oklch(0.72 0.12 75)",
+            background: "var(--ow-amber)",
             color: "oklch(0.10 0.008 60)",
             textDecoration: "none",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = "oklch(0.78 0.14 75)")}
-          onMouseLeave={(e) => (e.currentTarget.style.background = "oklch(0.72 0.12 75)")}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "var(--ow-amber)")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "var(--ow-amber)")}
         >
           Shop More
         </a>
@@ -101,12 +101,12 @@ export default function MerchSuccess() {
             fontWeight: 400,
             letterSpacing: "0.12em",
             background: "transparent",
-            border: "1px solid oklch(0.72 0.12 75 / 30%)",
-            color: "oklch(0.72 0.12 75)",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+            color: "var(--ow-amber)",
             textDecoration: "none",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75 / 60%)")}
-          onMouseLeave={(e) => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75 / 30%)")}
+          onMouseEnter={(e) => (e.currentTarget.style.borderColor = "color-mix(in oklch, var(--ow-amber) 60%, transparent)")}
+          onMouseLeave={(e) => (e.currentTarget.style.borderColor = "color-mix(in oklch, var(--ow-amber) 30%, transparent)")}
         >
           Back to Ownology
         </a>

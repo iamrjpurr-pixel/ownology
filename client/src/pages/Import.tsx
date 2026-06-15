@@ -133,10 +133,10 @@ function PreviewTable({
   return (
     <div className="mt-6 rounded-lg overflow-hidden border border-white/10">
       <div className="bg-white/5 px-4 py-2.5 flex items-center justify-between">
-        <span className="text-sm font-medium" style={{ color: "oklch(0.72 0.12 75)" }}>
+        <span className="text-sm font-medium" style={{ color: "var(--ow-amber)" }}>
           {entries.length} {entries.length === 1 ? "entry" : "entries"} ready to import
         </span>
-        <span className="text-xs" style={{ color: "oklch(0.55 0.012 75)" }}>
+        <span className="text-xs" style={{ color: "var(--ow-text-lo)" }}>
           Review and remove any incorrect rows before saving
         </span>
       </div>
@@ -148,7 +148,7 @@ function PreviewTable({
                 <th
                   key={h}
                   className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider"
-                  style={{ color: "oklch(0.55 0.012 75)" }}
+                  style={{ color: "var(--ow-text-lo)" }}
                 >
                   {h}
                 </th>
@@ -158,10 +158,10 @@ function PreviewTable({
           <tbody>
             {entries.map((e) => (
               <tr key={e.id} className="border-b border-white/5 hover:bg-white/3 transition-colors">
-                <td className="px-3 py-2.5 font-medium" style={{ color: "oklch(0.88 0.015 75)" }}>
+                <td className="px-3 py-2.5 font-medium" style={{ color: "var(--ow-text-hi)" }}>
                   {e.tankName}
                 </td>
-                <td className="px-3 py-2.5" style={{ color: "oklch(0.75 0.015 75)" }}>
+                <td className="px-3 py-2.5" style={{ color: "var(--ow-text-mid)" }}>
                   {e.variety}
                 </td>
                 <td className="px-3 py-2.5">
@@ -169,10 +169,10 @@ function PreviewTable({
                     {eventLabel(e.eventType)}
                   </span>
                 </td>
-                <td className="px-3 py-2.5 max-w-[200px] truncate" style={{ color: "oklch(0.70 0.015 75)" }}>
+                <td className="px-3 py-2.5 max-w-[200px] truncate" style={{ color: "var(--ow-text-mid)" }}>
                   {detailSummary(e)}
                 </td>
-                <td className="px-3 py-2.5 text-xs" style={{ color: "oklch(0.55 0.012 75)" }}>
+                <td className="px-3 py-2.5 text-xs" style={{ color: "var(--ow-text-lo)" }}>
                   {e.entryDate ?? "—"}
                 </td>
                 <td className="px-3 py-2.5">
@@ -252,8 +252,8 @@ function CameraTab({
       <div
         className="relative rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-colors"
         style={{
-          borderColor: capturedImage ? "oklch(0.72 0.12 75 / 60%)" : "oklch(0.35 0.010 60)",
-          background: capturedImage ? "oklch(0.14 0.008 60)" : "oklch(0.12 0.008 60)",
+          borderColor: capturedImage ? "color-mix(in oklch, var(--ow-amber) 60%, transparent)" : "oklch(0.35 0.010 60)",
+          background: capturedImage ? "var(--ow-bg-raised)" : "var(--ow-bg-base)",
           minHeight: "220px",
         }}
         onClick={() => fileInputRef.current?.click()}
@@ -268,12 +268,12 @@ function CameraTab({
           <div className="flex flex-col items-center gap-4 py-10 px-6 text-center">
             <div
               className="w-20 h-20 rounded-2xl flex items-center justify-center"
-              style={{ background: "oklch(0.72 0.12 75 / 15%)", border: "1px solid oklch(0.72 0.12 75 / 30%)" }}
+              style={{ background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}
             >
-              <Camera size={40} style={{ color: "oklch(0.72 0.12 75)" }} />
+              <Camera size={40} style={{ color: "var(--ow-amber)" }} />
             </div>
             <div>
-              <p className="text-lg font-semibold" style={{ color: "oklch(0.88 0.015 75)" }}>
+              <p className="text-lg font-semibold" style={{ color: "var(--ow-text-hi)" }}>
                 Take a Photo or Scan
               </p>
               <p className="text-sm mt-1" style={{ color: "oklch(0.60 0.012 75)" }}>
@@ -281,8 +281,8 @@ function CameraTab({
               </p>
             </div>
             <div className="flex items-center gap-2 mt-2">
-              <ScanLine size={16} style={{ color: "oklch(0.55 0.012 75)" }} />
-              <span className="text-xs" style={{ color: "oklch(0.55 0.012 75)" }}>
+              <ScanLine size={16} style={{ color: "var(--ow-text-lo)" }} />
+              <span className="text-xs" style={{ color: "var(--ow-text-lo)" }}>
                 Tap to open camera or choose a file
               </span>
             </div>
@@ -304,7 +304,7 @@ function CameraTab({
             variant="outline"
             className="flex-1"
             onClick={() => { setCapturedImage(null); setError(null); }}
-            style={{ borderColor: "oklch(0.30 0.010 60)", color: "oklch(0.65 0.015 75)" }}
+            style={{ borderColor: "oklch(0.30 0.010 60)", color: "var(--ow-text-mid)" }}
           >
             Retake
           </Button>
@@ -312,7 +312,7 @@ function CameraTab({
             className="flex-1 font-semibold"
             onClick={handleParse}
             disabled={parsing}
-            style={{ background: "oklch(0.72 0.12 75)", color: "oklch(0.10 0.008 60)" }}
+            style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}
           >
             {parsing ? (
               <><Loader2 size={16} className="mr-2 animate-spin" /> Analysing…</>
@@ -366,7 +366,7 @@ function PasteTab({
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-sm mb-3" style={{ color: "oklch(0.65 0.015 75)" }}>
+        <p className="text-sm mb-3" style={{ color: "var(--ow-text-mid)" }}>
           Paste anything — copied Excel cells, typed notes, emails, or lab results. The AI will extract structured entries.
         </p>
         <Textarea
@@ -376,9 +376,9 @@ function PasteTab({
           rows={10}
           className="font-mono text-sm resize-y"
           style={{
-            background: "oklch(0.12 0.008 60)",
+            background: "var(--ow-bg-base)",
             borderColor: "oklch(0.25 0.010 60)",
-            color: "oklch(0.85 0.015 75)",
+            color: "var(--ow-text-hi)",
           }}
         />
         <p className="text-xs mt-1.5" style={{ color: "oklch(0.45 0.010 60)" }}>
@@ -390,7 +390,7 @@ function PasteTab({
         className="w-full font-semibold h-12"
         onClick={handleParse}
         disabled={parsing || !text.trim()}
-        style={{ background: "oklch(0.72 0.12 75)", color: "oklch(0.10 0.008 60)" }}
+        style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}
       >
         {parsing ? (
           <><Loader2 size={16} className="mr-2 animate-spin" /> Extracting entries…</>
@@ -528,22 +528,22 @@ function CSVTab({
   if (headers.length === 0) {
     return (
       <div className="space-y-4">
-        <p className="text-sm" style={{ color: "oklch(0.65 0.015 75)" }}>
+        <p className="text-sm" style={{ color: "var(--ow-text-mid)" }}>
           Upload a CSV file. For Excel (.xlsx) files, save as CSV first or use the Paste tab.
         </p>
         <div
           className="rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer py-12 px-6 text-center transition-colors"
-          style={{ borderColor: "oklch(0.30 0.010 60)", background: "oklch(0.12 0.008 60)" }}
+          style={{ borderColor: "oklch(0.30 0.010 60)", background: "var(--ow-bg-base)" }}
           onClick={() => fileInputRef.current?.click()}
         >
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-            style={{ background: "oklch(0.72 0.12 75 / 15%)", border: "1px solid oklch(0.72 0.12 75 / 30%)" }}
+            style={{ background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}
           >
-            <FileSpreadsheet size={32} style={{ color: "oklch(0.72 0.12 75)" }} />
+            <FileSpreadsheet size={32} style={{ color: "var(--ow-amber)" }} />
           </div>
-          <p className="font-semibold" style={{ color: "oklch(0.88 0.015 75)" }}>Upload CSV File</p>
-          <p className="text-sm mt-1" style={{ color: "oklch(0.55 0.012 75)" }}>Tap to browse or drag and drop</p>
+          <p className="font-semibold" style={{ color: "var(--ow-text-hi)" }}>Upload CSV File</p>
+          <p className="text-sm mt-1" style={{ color: "var(--ow-text-lo)" }}>Tap to browse or drag and drop</p>
           <input ref={fileInputRef} type="file" accept=".csv,.txt" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
         </div>
         {error && (
@@ -559,12 +559,12 @@ function CSVTab({
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium" style={{ color: "oklch(0.72 0.12 75)" }}>
+        <p className="text-sm font-medium" style={{ color: "var(--ow-amber)" }}>
           {rows.length} data rows · {headers.length} columns
         </p>
         <button
           className="text-xs underline"
-          style={{ color: "oklch(0.55 0.012 75)" }}
+          style={{ color: "var(--ow-text-lo)" }}
           onClick={() => { setHeaders([]); setRows([]); setMapping({}); setError(null); }}
         >
           Upload different file
@@ -572,13 +572,13 @@ function CSVTab({
       </div>
 
       <div className="space-y-2">
-        <p className="text-sm font-medium" style={{ color: "oklch(0.80 0.015 75)" }}>Map columns to fields</p>
+        <p className="text-sm font-medium" style={{ color: "var(--ow-text-mid)" }}>Map columns to fields</p>
         <div className="grid gap-2">
           {headers.map((h, i) => (
             <div key={i} className="flex items-center gap-3">
               <span
                 className="text-sm flex-1 truncate"
-                style={{ color: "oklch(0.70 0.015 75)", minWidth: 0 }}
+                style={{ color: "var(--ow-text-mid)", minWidth: 0 }}
                 title={h}
               >
                 {h || `Column ${i + 1}`}
@@ -588,9 +588,9 @@ function CSVTab({
                 onChange={(e) => setMapping((m) => ({ ...m, [String(i)]: e.target.value }))}
                 className="text-sm rounded px-2 py-1.5 border"
                 style={{
-                  background: "oklch(0.14 0.008 60)",
+                  background: "var(--ow-bg-raised)",
                   borderColor: "oklch(0.25 0.010 60)",
-                  color: "oklch(0.82 0.015 75)",
+                  color: "var(--ow-text-hi)",
                   minWidth: "160px",
                 }}
               >
@@ -613,7 +613,7 @@ function CSVTab({
       <Button
         className="w-full font-semibold h-12"
         onClick={handleImport}
-        style={{ background: "oklch(0.72 0.12 75)", color: "oklch(0.10 0.008 60)" }}
+        style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}
       >
         <Upload size={16} className="mr-2" /> Preview Import
       </Button>
@@ -671,27 +671,27 @@ export default function Import() {
   return (
     <div
       className="min-h-screen"
-      style={{ background: "oklch(0.11 0.008 60)", color: "oklch(0.88 0.015 75)" }}
+      style={{ background: "var(--ow-bg-base)", color: "var(--ow-text-hi)" }}
     >
       {/* Header */}
       <div
         className="sticky top-0 z-10 border-b"
-        style={{ background: "oklch(0.11 0.008 60 / 95%)", borderColor: "oklch(0.20 0.008 60)" }}
+        style={{ background: "var(--ow-nav-bg)", borderColor: "var(--ow-bg-inset)" }}
       >
         <div className="container max-w-2xl flex items-center gap-4 py-4">
           <Link href="/the-press">
             <button
               className="p-2 rounded-lg transition-colors"
-              style={{ color: "oklch(0.65 0.015 75)" }}
+              style={{ color: "var(--ow-text-mid)" }}
             >
               <ArrowLeft size={20} />
             </button>
           </Link>
           <div>
-            <h1 className="text-lg font-bold" style={{ fontFamily: "'Fraunces', serif", color: "oklch(0.72 0.12 75)" }}>
+            <h1 className="text-lg font-bold" style={{ fontFamily: "'Fraunces', serif", color: "var(--ow-amber)" }}>
               Import Vintage Data
             </h1>
-            <p className="text-xs" style={{ color: "oklch(0.55 0.012 75)" }}>
+            <p className="text-xs" style={{ color: "var(--ow-text-lo)" }}>
               Bring in historical records from any source
             </p>
           </div>
@@ -723,7 +723,7 @@ export default function Import() {
         {/* Tab selector */}
         <div
           className="grid grid-cols-3 rounded-xl p-1 gap-1"
-          style={{ background: "oklch(0.15 0.008 60)" }}
+          style={{ background: "var(--ow-bg-raised)" }}
         >
           {TABS.map((tab) => (
             <button
@@ -731,8 +731,8 @@ export default function Import() {
               onClick={() => { setActiveTab(tab.id); setEntries([]); setSaved(false); }}
               className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-lg transition-all"
               style={{
-                background: activeTab === tab.id ? "oklch(0.72 0.12 75)" : "transparent",
-                color: activeTab === tab.id ? "oklch(0.10 0.008 60)" : "oklch(0.60 0.015 75)",
+                background: activeTab === tab.id ? "var(--ow-amber)" : "transparent",
+                color: activeTab === tab.id ? "oklch(0.10 0.008 60)" : "var(--ow-text-lo)",
               }}
             >
               {tab.icon}
@@ -745,7 +745,7 @@ export default function Import() {
         {/* Tab content */}
         <div
           className="rounded-xl p-5"
-          style={{ background: "oklch(0.14 0.008 60)", border: "1px solid oklch(0.20 0.008 60)" }}
+          style={{ background: "var(--ow-bg-raised)", border: "1px solid var(--ow-bg-inset)" }}
         >
           {activeTab === "camera" && <CameraTab onEntries={handleEntries} />}
           {activeTab === "paste" && <PasteTab onEntries={handleEntries} />}
@@ -760,7 +760,7 @@ export default function Import() {
               className="w-full h-14 text-base font-bold"
               onClick={handleSave}
               disabled={saving || entries.length === 0}
-              style={{ background: "oklch(0.72 0.12 75)", color: "oklch(0.10 0.008 60)" }}
+              style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}
             >
               {saving ? (
                 <><Loader2 size={18} className="mr-2 animate-spin" /> Saving…</>
@@ -774,13 +774,13 @@ export default function Import() {
         {/* Help text */}
         <div
           className="rounded-lg p-4 text-sm space-y-2"
-          style={{ background: "oklch(0.13 0.008 60)", border: "1px solid oklch(0.18 0.008 60)" }}
+          style={{ background: "var(--ow-bg-base)", border: "1px solid var(--ow-bg-inset)" }}
         >
-          <p className="font-medium" style={{ color: "oklch(0.72 0.12 75)" }}>Tips for best results</p>
+          <p className="font-medium" style={{ color: "var(--ow-amber)" }}>Tips for best results</p>
           <ul className="space-y-1" style={{ color: "oklch(0.60 0.012 75)" }}>
-            <li>• <strong style={{ color: "oklch(0.75 0.015 75)" }}>Camera:</strong> Hold steady, ensure good lighting, include tank names and dates in frame</li>
-            <li>• <strong style={{ color: "oklch(0.75 0.015 75)" }}>Paste:</strong> Include tank name, variety, and date on each line for best extraction</li>
-            <li>• <strong style={{ color: "oklch(0.75 0.015 75)" }}>CSV:</strong> One row per event, with columns for tank, variety, event type, and details</li>
+            <li>• <strong style={{ color: "var(--ow-text-mid)" }}>Camera:</strong> Hold steady, ensure good lighting, include tank names and dates in frame</li>
+            <li>• <strong style={{ color: "var(--ow-text-mid)" }}>Paste:</strong> Include tank name, variety, and date on each line for best extraction</li>
+            <li>• <strong style={{ color: "var(--ow-text-mid)" }}>CSV:</strong> One row per event, with columns for tank, variety, event type, and details</li>
           </ul>
         </div>
       </div>

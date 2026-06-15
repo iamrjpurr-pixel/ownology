@@ -30,7 +30,7 @@ interface Lead {
 // ─── Source badge colours ─────────────────────────────────────────────────────
 
 const SOURCE_COLOURS: Record<string, string> = {
-  preview: "oklch(0.72 0.12 75 / 20%)",
+  preview: "color-mix(in oklch, var(--ow-amber) 20%, transparent)",
   pricing: "oklch(0.55 0.18 250 / 20%)",
   event: "oklch(0.55 0.18 150 / 20%)",
   blog: "oklch(0.55 0.18 320 / 20%)",
@@ -39,7 +39,7 @@ const SOURCE_COLOURS: Record<string, string> = {
 };
 
 const SOURCE_TEXT: Record<string, string> = {
-  preview: "oklch(0.72 0.12 75)",
+  preview: "var(--ow-amber)",
   pricing: "oklch(0.65 0.18 250)",
   event: "oklch(0.65 0.18 150)",
   blog: "oklch(0.65 0.18 320)",
@@ -465,8 +465,8 @@ export default function AdminLeads() {
               onClick={() => setShowAddModal(true)}
               className="flex items-center gap-1.5 px-4 py-2 rounded-sm text-sm"
               style={{
-                background: "oklch(0.72 0.12 75 / 12%)",
-                border: "1px solid oklch(0.72 0.12 75 / 30%)",
+                background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
+                border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
                 color: "var(--ow-amber)",
                 fontFamily: "'Lato',sans-serif",
                 fontSize: "0.8rem",

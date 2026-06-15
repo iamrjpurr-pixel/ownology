@@ -9,13 +9,13 @@ import OwnologyLogo from "@/components/OwnologyLogo";
 
 const SERIF = "'Fraunces', serif";
 const SANS = "'Lato', sans-serif";
-const AMBER = "oklch(0.72 0.12 75)";
-const BG = "oklch(0.11 0.008 60)";
-const CARD_BG = "oklch(0.14 0.008 60)";
-const BORDER = "oklch(0.72 0.12 75 / 15%)";
-const TEXT_HI = "oklch(0.95 0.018 75)";
-const TEXT_MID = "oklch(0.70 0.015 75)";
-const TEXT_LO = "oklch(0.50 0.012 75)";
+const AMBER = "var(--ow-amber)";
+const BG = "var(--ow-bg-base)";
+const CARD_BG = "var(--ow-bg-raised)";
+const BORDER = "color-mix(in oklch, var(--ow-amber) 15%, transparent)";
+const TEXT_HI = "var(--ow-text-hi)";
+const TEXT_MID = "var(--ow-text-mid)";
+const TEXT_LO = "var(--ow-text-lo)";
 
 interface RegLink {
   label: string;
@@ -210,7 +210,7 @@ export default function RegulatoryLinks() {
                     textDecoration: "none",
                     transition: "border-color 0.15s",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75 / 40%)")}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "color-mix(in oklch, var(--ow-amber) 40%, transparent)")}
                   onMouseLeave={(e) => (e.currentTarget.style.borderColor = BORDER)}
                 >
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem", marginBottom: "0.375rem" }}>
@@ -245,7 +245,7 @@ export default function RegulatoryLinks() {
         </div>
 
         {/* Compliance AI CTA */}
-        <div style={{ padding: "1.5rem", background: "oklch(0.72 0.12 75 / 8%)", border: `1px solid ${BORDER}`, borderRadius: 2 }}>
+        <div style={{ padding: "1.5rem", background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)", border: `1px solid ${BORDER}`, borderRadius: 2 }}>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9375rem", color: TEXT_MID, lineHeight: 1.6, margin: "0 0 1rem 0" }}>
             Have a specific compliance question — labelling, additives, licensing, WET? The Compliance AI answers from the primary legislation and cites the exact standard and section.
           </p>

@@ -120,8 +120,8 @@ export default function HomeWineryKit() {
       id="home-winery-kit-root"
       style={{
         minHeight: "100vh",
-        background: "oklch(0.11 0.008 60)",
-        color: "oklch(0.90 0.015 75)",
+        background: "var(--ow-bg-base)",
+        color: "var(--ow-text-hi)",
         fontFamily: "'Lato', sans-serif",
         paddingBottom: "4rem",
       }}
@@ -137,11 +137,11 @@ export default function HomeWineryKit() {
       </div>
 
       {/* ── Screen nav ── */}
-      <div className="no-print" style={{ borderBottom: "1px solid oklch(1 0 0 / 8%)", padding: "1rem 0" }}>
+      <div className="no-print" style={{ borderBottom: "1px solid var(--ow-border)", padding: "1rem 0" }}>
         <div className="container" style={{ maxWidth: "760px", margin: "0 auto", padding: "0 1.25rem" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem" }}>
             <Link href="/">
-              <a style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", color: "oklch(0.65 0.015 75)", fontSize: "0.875rem", textDecoration: "none" }}>
+              <a style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", color: "var(--ow-text-lo)", fontSize: "0.875rem", textDecoration: "none" }}>
                 <ArrowLeft size={15} />
                 Back to Ownology
               </a>
@@ -154,9 +154,9 @@ export default function HomeWineryKit() {
                 gap: "0.4rem",
                 padding: "0.5rem 1rem",
                 borderRadius: "6px",
-                border: "1px solid oklch(0.72 0.12 75 / 40%)",
-                background: "oklch(0.72 0.12 75 / 15%)",
-                color: "oklch(0.72 0.12 75)",
+                border: "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)",
+                background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)",
+                color: "var(--ow-amber)",
                 fontWeight: 700,
                 fontSize: "0.875rem",
                 cursor: "pointer",
@@ -171,7 +171,7 @@ export default function HomeWineryKit() {
 
       {/* ── Header ── */}
       <div style={{ maxWidth: "760px", margin: "0 auto", padding: "2.5rem 1.25rem 1.5rem" }}>
-        <p style={{ fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "oklch(0.72 0.12 75)", marginBottom: "0.5rem" }}>
+        <p style={{ fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ow-amber)", marginBottom: "0.5rem" }}>
           Resources · Home Winemaking
         </p>
         <h1
@@ -180,28 +180,28 @@ export default function HomeWineryKit() {
             fontWeight: 700,
             fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
             lineHeight: 1.1,
-            color: "oklch(0.95 0.018 75)",
+            color: "var(--ow-text-hi)",
             marginBottom: "0.75rem",
           }}
         >
           Home Winery Kit
         </h1>
-        <p style={{ fontSize: "1rem", lineHeight: 1.7, color: "oklch(0.68 0.015 75)", maxWidth: "560px", marginBottom: "1.25rem" }}>
+        <p style={{ fontSize: "1rem", lineHeight: 1.7, color: "var(--ow-text-mid)", maxWidth: "560px", marginBottom: "1.25rem" }}>
           Everything you need to make your first 6-gallon (approximately 30 bottles) batch of wine at home — from fermentation to bottling. Tick items off as you gather them.
         </p>
 
         {/* Progress bar */}
         <div className="no-print" style={{ marginBottom: "0.5rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", color: "oklch(0.60 0.015 75)", marginBottom: "0.35rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", color: "var(--ow-text-lo)", marginBottom: "0.35rem" }}>
             <span>{checkedCount} of {totalItems} items gathered</span>
             <span>{Math.round((checkedCount / totalItems) * 100)}%</span>
           </div>
-          <div style={{ height: "4px", background: "oklch(1 0 0 / 8%)", borderRadius: "2px", overflow: "hidden" }}>
+          <div style={{ height: "4px", background: "var(--ow-border)", borderRadius: "2px", overflow: "hidden" }}>
             <div
               style={{
                 height: "100%",
                 width: `${(checkedCount / totalItems) * 100}%`,
-                background: "oklch(0.72 0.12 75)",
+                background: "var(--ow-amber)",
                 borderRadius: "2px",
                 transition: "width 0.3s ease",
               }}
@@ -222,7 +222,7 @@ export default function HomeWineryKit() {
                 gap: "0.5rem",
                 marginBottom: "0.75rem",
                 paddingBottom: "0.5rem",
-                borderBottom: "1px solid oklch(0.72 0.12 75 / 20%)",
+                borderBottom: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
               }}
             >
               <span style={{ fontSize: "1.1rem" }}>{cat.emoji}</span>
@@ -231,7 +231,7 @@ export default function HomeWineryKit() {
                   fontFamily: "'Fraunces', serif",
                   fontWeight: 600,
                   fontSize: "1.1rem",
-                  color: "oklch(0.88 0.018 75)",
+                  color: "var(--ow-text-hi)",
                   margin: 0,
                 }}
               >
@@ -242,7 +242,7 @@ export default function HomeWineryKit() {
                 style={{
                   marginLeft: "auto",
                   fontSize: "0.75rem",
-                  color: "oklch(0.55 0.015 75)",
+                  color: "var(--ow-text-lo)",
                 }}
               >
                 {cat.items.filter(i => checked.has(i.id)).length}/{cat.items.length}
@@ -264,8 +264,8 @@ export default function HomeWineryKit() {
                       gap: "0.75rem",
                       padding: "0.75rem 1rem",
                       borderRadius: "8px",
-                      background: isChecked ? "oklch(0.72 0.12 75 / 8%)" : "oklch(1 0 0 / 3%)",
-                      border: `1px solid ${isChecked ? "oklch(0.72 0.12 75 / 25%)" : "oklch(1 0 0 / 6%)"}`,
+                      background: isChecked ? "color-mix(in oklch, var(--ow-amber) 8%, transparent)" : "var(--ow-bg-raised)",
+                      border: `1px solid ${isChecked ? "color-mix(in oklch, var(--ow-amber) 25%, transparent)" : "var(--ow-border)"}`,
                       cursor: "pointer",
                       transition: "background 0.15s, border-color 0.15s",
                       minHeight: "44px",
@@ -273,8 +273,8 @@ export default function HomeWineryKit() {
                   >
                     <div style={{ flexShrink: 0, paddingTop: "1px" }}>
                       {isChecked
-                        ? <CheckSquare size={18} color="oklch(0.72 0.12 75)" />
-                        : <Square size={18} color="oklch(0.45 0.012 75)" />
+                        ? <CheckSquare size={18} color="var(--ow-amber)" />
+                        : <Square size={18} color="var(--ow-text-lo)" />
                       }
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -283,7 +283,7 @@ export default function HomeWineryKit() {
                           margin: 0,
                           fontSize: "0.9rem",
                           fontWeight: 600,
-                          color: isChecked ? "oklch(0.72 0.12 75)" : "oklch(0.88 0.015 75)",
+                          color: isChecked ? "var(--ow-amber)" : "var(--ow-text-hi)",
                           textDecoration: isChecked ? "line-through" : "none",
                           lineHeight: 1.4,
                         }}
@@ -295,7 +295,7 @@ export default function HomeWineryKit() {
                           style={{
                             margin: "0.2rem 0 0",
                             fontSize: "0.8rem",
-                            color: "oklch(0.55 0.012 75)",
+                            color: "var(--ow-text-lo)",
                             lineHeight: 1.4,
                           }}
                         >
@@ -331,21 +331,21 @@ export default function HomeWineryKit() {
             marginTop: "2rem",
             padding: "1.25rem",
             borderRadius: "10px",
-            background: "oklch(0.72 0.12 75 / 6%)",
-            border: "1px solid oklch(0.72 0.12 75 / 20%)",
+            background: "color-mix(in oklch, var(--ow-amber) 6%, transparent)",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
           }}
         >
-          <p style={{ margin: 0, fontSize: "0.875rem", lineHeight: 1.6, color: "oklch(0.65 0.015 75)" }}>
-            <strong style={{ color: "oklch(0.72 0.12 75)" }}>Tip:</strong> Most homebrew supply shops sell starter kits that bundle the fermenter, carboy, airlock, siphon, tubing, hydrometer, and a wine kit together at a discount. The wine kit itself (juice concentrate, yeast, fining agents) is the most important purchase — choose a quality kit from a reputable supplier for the best results.
+          <p style={{ margin: 0, fontSize: "0.875rem", lineHeight: 1.6, color: "var(--ow-text-lo)" }}>
+            <strong style={{ color: "var(--ow-amber)" }}>Tip:</strong> Most homebrew supply shops sell starter kits that bundle the fermenter, carboy, airlock, siphon, tubing, hydrometer, and a wine kit together at a discount. The wine kit itself (juice concentrate, yeast, fining agents) is the most important purchase — choose a quality kit from a reputable supplier for the best results.
           </p>
         </div>
 
         {/* ── CTA ── */}
-        <div className="no-print" style={{ marginTop: "2.5rem", padding: "1.75rem", background: "oklch(0.15 0.010 60)", borderRadius: "8px", border: "1px solid oklch(0.72 0.12 75 / 20%)" }}>
-          <p style={{ fontSize: "0.9rem", fontWeight: 700, color: "oklch(0.92 0.018 75)", marginBottom: "0.4rem" }}>
+        <div className="no-print" style={{ marginTop: "2.5rem", padding: "1.75rem", background: "var(--ow-bg-raised)", borderRadius: "8px", border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}>
+          <p style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--ow-text-hi)", marginBottom: "0.4rem" }}>
             Have a question about your kit?
           </p>
-          <p style={{ fontSize: "0.8125rem", color: "oklch(0.55 0.015 75)", marginBottom: "1.25rem", lineHeight: 1.6 }}>
+          <p style={{ fontSize: "0.8125rem", color: "var(--ow-text-lo)", marginBottom: "1.25rem", lineHeight: 1.6 }}>
             Ask Ownology's Home Winemaker AI — it knows your equipment, your kit schedule, and common faults.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
@@ -364,16 +364,16 @@ export default function HomeWineryKit() {
                     alignItems: "center",
                     justifyContent: "space-between",
                     padding: "0.6rem 1rem",
-                    background: "oklch(0.18 0.010 60)",
-                    border: "1px solid oklch(0.72 0.12 75 / 15%)",
+                    background: "var(--ow-bg-inset)",
+                    border: "1px solid color-mix(in oklch, var(--ow-amber) 15%, transparent)",
                     borderRadius: "6px",
                     textDecoration: "none",
                     gap: "0.75rem",
                   }}
                 >
-                  <span style={{ fontSize: "0.8125rem", color: "oklch(0.72 0.12 75)", fontWeight: 600 }}>{label}</span>
-                  <span style={{ fontSize: "0.75rem", color: "oklch(0.50 0.012 75)", flex: 1, textAlign: "left" }}>{q}</span>
-                  <ExternalLink size={12} color="oklch(0.72 0.12 75)" style={{ flexShrink: 0 }} />
+                  <span style={{ fontSize: "0.8125rem", color: "var(--ow-amber)", fontWeight: 600 }}>{label}</span>
+                  <span style={{ fontSize: "0.75rem", color: "var(--ow-text-lo)", flex: 1, textAlign: "left" }}>{q}</span>
+                  <ExternalLink size={12} color="var(--ow-amber)" style={{ flexShrink: 0 }} />
                 </a>
               </Link>
             ))}

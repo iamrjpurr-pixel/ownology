@@ -133,7 +133,7 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
         fontSize: "0.75rem",
         letterSpacing: "0.08em",
         textTransform: "uppercase",
-        color: "oklch(0.55 0.015 75)",
+        color: "var(--ow-text-lo)",
         display: "block",
         marginBottom: "0.4rem",
       }}
@@ -158,10 +158,10 @@ function SelectInput({
       onChange={(e) => onChange(e.target.value)}
       style={{
         width: "100%",
-        background: "oklch(0.18 0.010 60)",
-        border: "1px solid oklch(1 0 0 / 12%)",
+        background: "var(--ow-bg-inset)",
+        border: "1px solid var(--ow-border)",
         borderRadius: "6px",
-        color: "oklch(0.88 0.015 75)",
+        color: "var(--ow-text-hi)",
         fontSize: "1rem",
         padding: "0.75rem 1rem",
         fontFamily: "'Lato', sans-serif",
@@ -197,17 +197,17 @@ function TextInput({
       placeholder={placeholder}
       style={{
         width: "100%",
-        background: "oklch(0.18 0.010 60)",
-        border: "1px solid oklch(1 0 0 / 12%)",
+        background: "var(--ow-bg-inset)",
+        border: "1px solid var(--ow-border)",
         borderRadius: "6px",
-        color: "oklch(0.88 0.015 75)",
+        color: "var(--ow-text-hi)",
         fontSize: "1rem",
         padding: "0.75rem 1rem",
         fontFamily: "'Lato', sans-serif",
         outline: "none",
       }}
-      onFocus={(e) => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75 / 60%)")}
-      onBlur={(e) => (e.currentTarget.style.borderColor = "oklch(1 0 0 / 12%)")}
+      onFocus={(e) => (e.currentTarget.style.borderColor = "color-mix(in oklch, var(--ow-amber) 60%, transparent)")}
+      onBlur={(e) => (e.currentTarget.style.borderColor = "var(--ow-border)")}
     />
   );
 }
@@ -320,8 +320,8 @@ function EquipmentSheet({ open, onClose, editItem }: EquipmentSheetProps) {
 
   const panelStyle: React.CSSProperties = isDesktop
     ? {
-        background: "oklch(0.14 0.008 60)",
-        border: "1px solid oklch(1 0 0 / 10%)",
+        background: "var(--ow-bg-raised)",
+        border: "1px solid var(--ow-border)",
         borderRadius: "12px",
         width: "100%",
         maxWidth: "480px",
@@ -330,8 +330,8 @@ function EquipmentSheet({ open, onClose, editItem }: EquipmentSheetProps) {
         overflowY: "auto",
       }
     : {
-        background: "oklch(0.14 0.008 60)",
-        borderTop: "1px solid oklch(1 0 0 / 10%)",
+        background: "var(--ow-bg-raised)",
+        borderTop: "1px solid var(--ow-border)",
         borderRadius: "16px 16px 0 0",
         width: "100%",
         padding: "1.5rem 1.5rem 2.5rem",
@@ -346,7 +346,7 @@ function EquipmentSheet({ open, onClose, editItem }: EquipmentSheetProps) {
         style={{
           position: "fixed",
           inset: 0,
-          background: "oklch(0 0 0 / 60%)",
+          background: "var(--ow-bg-overlay)",
           zIndex: -1,
         }}
         onClick={onClose}
@@ -371,7 +371,7 @@ function EquipmentSheet({ open, onClose, editItem }: EquipmentSheetProps) {
             style={{
               fontFamily: "'Fraunces', serif",
               fontSize: "1.25rem",
-              color: "oklch(0.92 0.018 75)",
+              color: "var(--ow-text-hi)",
               margin: 0,
             }}
           >
@@ -379,7 +379,7 @@ function EquipmentSheet({ open, onClose, editItem }: EquipmentSheetProps) {
           </h2>
           <button
             onClick={onClose}
-            style={{ background: "none", border: "none", cursor: "pointer", color: "oklch(0.55 0.015 75)", padding: "4px" }}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--ow-text-lo)", padding: "4px" }}
           >
             <X size={20} />
           </button>
@@ -430,10 +430,10 @@ function EquipmentSheet({ open, onClose, editItem }: EquipmentSheetProps) {
               rows={2}
               style={{
                 width: "100%",
-                background: "oklch(0.18 0.010 60)",
-                border: "1px solid oklch(1 0 0 / 12%)",
+                background: "var(--ow-bg-inset)",
+                border: "1px solid var(--ow-border)",
                 borderRadius: "6px",
-                color: "oklch(0.88 0.015 75)",
+                color: "var(--ow-text-hi)",
                 fontSize: "1rem",
                 padding: "0.75rem 1rem",
                 fontFamily: "'Lato', sans-serif",
@@ -452,7 +452,7 @@ function EquipmentSheet({ open, onClose, editItem }: EquipmentSheetProps) {
               padding: "0.875rem",
               borderRadius: "8px",
               border: "none",
-              background: isLoading ? "oklch(0.55 0.08 75)" : "oklch(0.72 0.12 75)",
+              background: isLoading ? "color-mix(in oklch, var(--ow-amber) 70%, var(--ow-bg-base))" : "var(--ow-amber)",
               color: "oklch(0.10 0.008 60)",
               fontFamily: "'Lato', sans-serif",
               fontWeight: 700,
@@ -584,13 +584,13 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
       ? "oklch(0.45 0.010 60)"
       : pendingTasks.length === 0
       ? "oklch(0.60 0.14 145)"
-      : "oklch(0.72 0.12 75)";
+      : "var(--ow-amber)";
 
   return (
     <div
       style={{
-        background: "oklch(0.14 0.008 60)",
-        border: `1px solid oklch(1 0 0 / 8%)`,
+        background: "var(--ow-bg-raised)",
+        border: `1px solid var(--ow-border)`,
         borderLeft: `3px solid ${statusColour}`,
         borderRadius: "10px",
         overflow: "hidden",
@@ -608,7 +608,7 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                 style={{
                   fontFamily: "'Fraunces', serif",
                   fontSize: "1rem",
-                  color: "oklch(0.92 0.018 75)",
+                  color: "var(--ow-text-hi)",
                   fontWeight: 600,
                 }}
               >
@@ -618,7 +618,7 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                 <span
                   style={{
                     fontSize: "0.7rem",
-                    color: "oklch(0.55 0.015 75)",
+                    color: "var(--ow-text-lo)",
                     fontFamily: "'Lato', sans-serif",
                   }}
                 >
@@ -630,7 +630,7 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
               style={{
                 fontFamily: "'Lato', sans-serif",
                 fontSize: "0.8rem",
-                color: "oklch(0.55 0.015 75)",
+                color: "var(--ow-text-lo)",
                 marginTop: "0.2rem",
               }}
             >
@@ -646,16 +646,16 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                 style={{
                   fontFamily: "'Fira Code', monospace",
                   fontSize: "0.75rem",
-                  color: pendingTasks.length === 0 ? "oklch(0.60 0.14 145)" : "oklch(0.72 0.12 75)",
+                  color: pendingTasks.length === 0 ? "oklch(0.60 0.14 145)" : "var(--ow-amber)",
                 }}
               >
                 {completedTasks.length}/{tasks.length}
               </span>
             )}
             {expanded ? (
-              <ChevronUp size={16} style={{ color: "oklch(0.55 0.015 75)" }} />
+              <ChevronUp size={16} style={{ color: "var(--ow-text-lo)" }} />
             ) : (
-              <ChevronDown size={16} style={{ color: "oklch(0.55 0.015 75)" }} />
+              <ChevronDown size={16} style={{ color: "var(--ow-text-lo)" }} />
             )}
           </div>
         </div>
@@ -663,7 +663,7 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
 
       {/* Expanded content */}
       {expanded && (
-        <div style={{ borderTop: "1px solid oklch(1 0 0 / 6%)", padding: "0.875rem 1rem 1rem" }}>
+        <div style={{ borderTop: "1px solid var(--ow-border)", padding: "0.875rem 1rem 1rem" }}>
           {/* Action row */}
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.875rem", flexWrap: "wrap" }}>
             <button
@@ -675,9 +675,9 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                 gap: "0.375rem",
                 padding: "0.5rem 0.875rem",
                 borderRadius: "6px",
-                border: "1px solid oklch(0.72 0.12 75 / 30%)",
-                background: "oklch(0.72 0.12 75 / 10%)",
-                color: "oklch(0.72 0.12 75)",
+                border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+                background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+                color: "var(--ow-amber)",
                 fontFamily: "'Lato', sans-serif",
                 fontSize: "0.8rem",
                 cursor: generating ? "not-allowed" : "pointer",
@@ -717,9 +717,9 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                 gap: "0.375rem",
                 padding: "0.5rem 0.875rem",
                 borderRadius: "6px",
-                border: "1px solid oklch(1 0 0 / 10%)",
+                border: "1px solid var(--ow-border)",
                 background: "transparent",
-                color: "oklch(0.65 0.015 75)",
+                color: "var(--ow-text-mid)",
                 fontFamily: "'Lato', sans-serif",
                 fontSize: "0.8rem",
                 cursor: "pointer",
@@ -759,7 +759,7 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
           {faultFormOpen && (
             <div
               style={{
-                background: "oklch(0.14 0.008 60)",
+                background: "var(--ow-bg-raised)",
                 border: "1px solid oklch(0.55 0.18 25 / 25%)",
                 borderRadius: "8px",
                 padding: "1rem",
@@ -775,7 +775,7 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                     value={faultTitle}
                     onChange={e => setFaultTitle(e.target.value)}
                     placeholder="e.g. Pump seal leaking, temperature probe fault"
-                    style={{ width: "100%", background: "oklch(0.11 0.006 60)", border: "1px solid oklch(0.22 0.010 60)", borderRadius: "6px", padding: "0.5rem 0.75rem", color: "oklch(0.88 0.015 75)", fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box" }}
+                    style={{ width: "100%", background: "oklch(0.11 0.006 60)", border: "1px solid var(--ow-bg-inset)", borderRadius: "6px", padding: "0.5rem 0.75rem", color: "var(--ow-text-hi)", fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box" }}
                   />
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.625rem" }}>
@@ -788,7 +788,7 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                       placeholder="0"
                       min="0"
                       step="0.5"
-                      style={{ width: "100%", background: "oklch(0.11 0.006 60)", border: "1px solid oklch(0.22 0.010 60)", borderRadius: "6px", padding: "0.5rem 0.75rem", color: "oklch(0.88 0.015 75)", fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box" }}
+                      style={{ width: "100%", background: "oklch(0.11 0.006 60)", border: "1px solid var(--ow-bg-inset)", borderRadius: "6px", padding: "0.5rem 0.75rem", color: "var(--ow-text-hi)", fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box" }}
                     />
                   </div>
                   <div>
@@ -798,7 +798,7 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                       value={faultResolution}
                       onChange={e => setFaultResolution(e.target.value)}
                       placeholder="e.g. Replaced seal, called technician"
-                      style={{ width: "100%", background: "oklch(0.11 0.006 60)", border: "1px solid oklch(0.22 0.010 60)", borderRadius: "6px", padding: "0.5rem 0.75rem", color: "oklch(0.88 0.015 75)", fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box" }}
+                      style={{ width: "100%", background: "oklch(0.11 0.006 60)", border: "1px solid var(--ow-bg-inset)", borderRadius: "6px", padding: "0.5rem 0.75rem", color: "var(--ow-text-hi)", fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", outline: "none", boxSizing: "border-box" }}
                     />
                   </div>
                 </div>
@@ -809,14 +809,14 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                     onChange={e => setFaultNotes(e.target.value)}
                     placeholder="Any additional context, parts ordered, follow-up required..."
                     rows={2}
-                    style={{ width: "100%", background: "oklch(0.11 0.006 60)", border: "1px solid oklch(0.22 0.010 60)", borderRadius: "6px", padding: "0.5rem 0.75rem", color: "oklch(0.88 0.015 75)", fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", outline: "none", resize: "vertical", boxSizing: "border-box" }}
+                    style={{ width: "100%", background: "oklch(0.11 0.006 60)", border: "1px solid var(--ow-bg-inset)", borderRadius: "6px", padding: "0.5rem 0.75rem", color: "var(--ow-text-hi)", fontFamily: "'Lato',sans-serif", fontSize: "0.875rem", outline: "none", resize: "vertical", boxSizing: "border-box" }}
                   />
                 </div>
                 <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
                   <button
                     type="button"
                     onClick={() => setFaultFormOpen(false)}
-                    style={{ padding: "0.5rem 1rem", borderRadius: "6px", border: "1px solid oklch(1 0 0 / 10%)", background: "transparent", color: "oklch(0.55 0.015 75)", fontFamily: "'Lato',sans-serif", fontSize: "0.8rem", cursor: "pointer" }}
+                    style={{ padding: "0.5rem 1rem", borderRadius: "6px", border: "1px solid var(--ow-border)", background: "transparent", color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", fontSize: "0.8rem", cursor: "pointer" }}
                   >
                     Cancel
                   </button>
@@ -874,7 +874,7 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                     borderRadius: "8px",
                     background: task.completedAt
                       ? "oklch(0.12 0.006 60)"
-                      : "oklch(0.17 0.010 60)",
+                      : "var(--ow-bg-inset)",
                     opacity: task.completedAt ? 0.6 : 1,
                   }}
                 >
@@ -907,7 +907,7 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                         style={{
                           fontFamily: "'Lato', sans-serif",
                           fontSize: "0.9rem",
-                          color: task.completedAt ? "oklch(0.50 0.010 60)" : "oklch(0.85 0.015 75)",
+                          color: task.completedAt ? "oklch(0.50 0.010 60)" : "var(--ow-text-hi)",
                           textDecoration: task.completedAt ? "line-through" : "none",
                           fontWeight: 500,
                         }}
@@ -925,7 +925,7 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                         <span
                           style={{
                             fontSize: "0.65rem",
-                            color: "oklch(0.55 0.015 75)",
+                            color: "var(--ow-text-lo)",
                             fontFamily: "'Lato', sans-serif",
                           }}
                         >
@@ -938,7 +938,7 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                       style={{
                         fontFamily: "'Lato', sans-serif",
                         fontSize: "0.75rem",
-                        color: "oklch(0.50 0.012 75)",
+                        color: "var(--ow-text-lo)",
                         marginTop: "0.15rem",
                       }}
                     >
@@ -993,7 +993,7 @@ function EquipmentCard({ item, tasks, userName, onEdit, onDelete }: EquipmentCar
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      color: "oklch(0.40 0.010 60)",
+                      color: "var(--ow-text-lo)",
                       padding: "2px",
                       flexShrink: 0,
                     }}
@@ -1057,10 +1057,10 @@ export default function CellarTasks() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "oklch(0.11 0.008 60)",
+          background: "var(--ow-bg-base)",
         }}
       >
-        <Loader2 size={32} className="animate-spin" style={{ color: "oklch(0.72 0.12 75)" }} />
+        <Loader2 size={32} className="animate-spin" style={{ color: "var(--ow-amber)" }} />
       </div>
     );
   }
@@ -1074,11 +1074,11 @@ export default function CellarTasks() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "oklch(0.11 0.008 60)",
+          background: "var(--ow-bg-base)",
           gap: "1rem",
         }}
       >
-        <p style={{ fontFamily: "'Lato', sans-serif", color: "oklch(0.65 0.015 75)" }}>
+        <p style={{ fontFamily: "'Lato', sans-serif", color: "var(--ow-text-mid)" }}>
           Sign in to access Cellar Tasks
         </p>
         <Button onClick={() => (window.location.href = getLoginUrl())}>Sign In</Button>
@@ -1117,15 +1117,15 @@ export default function CellarTasks() {
     <div
       style={{
         minHeight: "100vh",
-        background: "oklch(0.11 0.008 60)",
+        background: "var(--ow-bg-base)",
         paddingBottom: "6rem",
       }}
     >
       {/* Header */}
       <div
         style={{
-          background: "oklch(0.13 0.008 60)",
-          borderBottom: "1px solid oklch(1 0 0 / 6%)",
+          background: "var(--ow-bg-base)",
+          borderBottom: "1px solid var(--ow-border)",
           padding: "1.25rem 1rem 1rem",
           position: "sticky",
           top: 0,
@@ -1139,7 +1139,7 @@ export default function CellarTasks() {
                 style={{
                   fontFamily: "'Fraunces', serif",
                   fontSize: "1.4rem",
-                  color: "oklch(0.92 0.018 75)",
+                  color: "var(--ow-text-hi)",
                   margin: 0,
                   fontWeight: 700,
                 }}
@@ -1151,7 +1151,7 @@ export default function CellarTasks() {
                   style={{
                     fontFamily: "'Fira Code', monospace",
                     fontSize: "0.75rem",
-                    color: pendingCount === 0 ? "oklch(0.60 0.14 145)" : "oklch(0.72 0.12 75)",
+                    color: pendingCount === 0 ? "oklch(0.60 0.14 145)" : "var(--ow-amber)",
                     margin: "0.2rem 0 0",
                   }}
                 >
@@ -1169,7 +1169,7 @@ export default function CellarTasks() {
                 padding: "0.625rem 1rem",
                 borderRadius: "8px",
                 border: "none",
-                background: "oklch(0.72 0.12 75)",
+                background: "var(--ow-amber)",
                 color: "oklch(0.10 0.008 60)",
                 fontFamily: "'Lato', sans-serif",
                 fontWeight: 700,
@@ -1192,9 +1192,9 @@ export default function CellarTasks() {
                   style={{
                     padding: "0.375rem 0.875rem",
                     borderRadius: "20px",
-                    border: `1px solid ${filter === f ? "oklch(0.72 0.12 75 / 50%)" : "oklch(1 0 0 / 10%)"}`,
-                    background: filter === f ? "oklch(0.72 0.12 75 / 15%)" : "transparent",
-                    color: filter === f ? "oklch(0.72 0.12 75)" : "oklch(0.55 0.015 75)",
+                    border: `1px solid ${filter === f ? "color-mix(in oklch, var(--ow-amber) 50%, transparent)" : "var(--ow-border)"}`,
+                    background: filter === f ? "color-mix(in oklch, var(--ow-amber) 15%, transparent)" : "transparent",
+                    color: filter === f ? "var(--ow-amber)" : "var(--ow-text-lo)",
                     fontFamily: "'Lato', sans-serif",
                     fontSize: "0.8rem",
                     cursor: "pointer",
@@ -1213,7 +1213,7 @@ export default function CellarTasks() {
       <div style={{ maxWidth: "640px", margin: "0 auto", padding: "1rem 1rem 0" }}>
         {isLoading ? (
           <div style={{ display: "flex", justifyContent: "center", paddingTop: "3rem" }}>
-            <Loader2 size={28} className="animate-spin" style={{ color: "oklch(0.72 0.12 75)" }} />
+            <Loader2 size={28} className="animate-spin" style={{ color: "var(--ow-amber)" }} />
           </div>
         ) : equipment.length === 0 ? (
           <div
@@ -1231,7 +1231,7 @@ export default function CellarTasks() {
               style={{
                 fontFamily: "'Fraunces', serif",
                 fontSize: "1.25rem",
-                color: "oklch(0.65 0.015 75)",
+                color: "var(--ow-text-mid)",
                 marginBottom: "0.5rem",
               }}
             >
@@ -1252,8 +1252,8 @@ export default function CellarTasks() {
             {/* Home Winery Kit preset loader */}
             <div
               style={{
-                background: "oklch(0.72 0.12 75 / 8%)",
-                border: "1px solid oklch(0.72 0.12 75 / 25%)",
+                background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)",
+                border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
                 borderRadius: "10px",
                 padding: "1rem 1.25rem",
                 maxWidth: "340px",
@@ -1267,7 +1267,7 @@ export default function CellarTasks() {
                   fontSize: "0.8rem",
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
-                  color: "oklch(0.72 0.12 75)",
+                  color: "var(--ow-amber)",
                   margin: "0 0 0.4rem",
                 }}
               >
@@ -1277,7 +1277,7 @@ export default function CellarTasks() {
                 style={{
                   fontFamily: "'Lato', sans-serif",
                   fontSize: "0.85rem",
-                  color: "oklch(0.65 0.015 75)",
+                  color: "var(--ow-text-mid)",
                   margin: "0 0 0.875rem",
                   lineHeight: 1.5,
                 }}
@@ -1293,9 +1293,9 @@ export default function CellarTasks() {
                   gap: "0.4rem",
                   padding: "0.5rem 1rem",
                   borderRadius: "6px",
-                  border: "1px solid oklch(0.72 0.12 75 / 40%)",
-                  background: "oklch(0.72 0.12 75 / 15%)",
-                  color: "oklch(0.72 0.12 75)",
+                  border: "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)",
+                  background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)",
+                  color: "var(--ow-amber)",
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 700,
                   fontSize: "0.85rem",
@@ -1317,7 +1317,7 @@ export default function CellarTasks() {
                 padding: "0.75rem 1.5rem",
                 borderRadius: "8px",
                 border: "none",
-                background: "oklch(0.72 0.12 75)",
+                background: "var(--ow-amber)",
                 color: "oklch(0.10 0.008 60)",
                 fontFamily: "'Lato', sans-serif",
                 fontWeight: 700,

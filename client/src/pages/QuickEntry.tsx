@@ -19,16 +19,16 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
-const AMBER       = "oklch(0.72 0.12 75)";
-const AMBER_DIM   = "oklch(0.72 0.12 75 / 18%)";
-const AMBER_BDR   = "oklch(0.72 0.12 75 / 35%)";
+const AMBER       = "var(--ow-amber)";
+const AMBER_DIM   = "color-mix(in oklch, var(--ow-amber) 18%, transparent)";
+const AMBER_BDR   = "color-mix(in oklch, var(--ow-amber) 35%, transparent)";
 const BG          = "oklch(0.10 0.008 60)";
-const CARD        = "oklch(0.14 0.008 60)";
-const CARD_ACT    = "oklch(0.18 0.010 60)";
+const CARD        = "var(--ow-bg-raised)";
+const CARD_ACT    = "var(--ow-bg-inset)";
 const BDR         = "oklch(1 0 0 / 0.09)";
-const TEXT_HI     = "oklch(0.93 0.015 75)";
-const TEXT_MID    = "oklch(0.72 0.015 75)";
-const TEXT_LO     = "oklch(0.50 0.012 75)";
+const TEXT_HI     = "var(--ow-text-hi)";
+const TEXT_MID    = "var(--ow-text-mid)";
+const TEXT_LO     = "var(--ow-text-lo)";
 const GREEN       = "oklch(0.65 0.15 145)";
 const GREEN_DIM   = "oklch(0.65 0.15 145 / 15%)";
 
@@ -89,9 +89,9 @@ function NumberPad({ value, onChange, label, unit }: { value: string; onChange: 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, width: "100%", maxWidth: 320 }}>
         {keys.map((k) => (
           <button key={k} onClick={() => k === "⌫" ? bsp() : append(k)}
-            style={{ height: 72, borderRadius: 10, background: k === "⌫" ? "oklch(0.20 0.010 60)" : CARD, border: `1px solid ${BDR}`, color: k === "⌫" ? AMBER : TEXT_HI, fontFamily: k === "⌫" ? "system-ui" : "'Fira Code',monospace", fontSize: k === "⌫" ? "1.4rem" : "1.5rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", WebkitTapHighlightColor: "transparent" }}
+            style={{ height: 72, borderRadius: 10, background: k === "⌫" ? "var(--ow-bg-inset)" : CARD, border: `1px solid ${BDR}`, color: k === "⌫" ? AMBER : TEXT_HI, fontFamily: k === "⌫" ? "system-ui" : "'Fira Code',monospace", fontSize: k === "⌫" ? "1.4rem" : "1.5rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", WebkitTapHighlightColor: "transparent" }}
             onPointerDown={e => (e.currentTarget as HTMLButtonElement).style.background = k === "⌫" ? "oklch(0.25 0.012 60)" : CARD_ACT}
-            onPointerUp={e => (e.currentTarget as HTMLButtonElement).style.background = k === "⌫" ? "oklch(0.20 0.010 60)" : CARD}
+            onPointerUp={e => (e.currentTarget as HTMLButtonElement).style.background = k === "⌫" ? "var(--ow-bg-inset)" : CARD}
           >{k}</button>
         ))}
       </div>

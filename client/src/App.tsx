@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import ThemeToggle from "@/components/ThemeToggle";
 import Home from "./pages/Home";
 import WhyOwnology from "./pages/WhyOwnology";
 import ForInnoVintUsers from "./pages/ForInnoVintUsers";
@@ -107,6 +108,23 @@ function Router() {
 //   to keep consistent foreground/background color across components
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
+/** GlobalThemeToggle — fixed bottom-right button visible on every page */
+function GlobalThemeToggle() {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        bottom: "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
+        right: "1.25rem",
+        zIndex: 9999,
+        // Avoid overlapping the PWA install banner or mobile bottom tab bar
+      }}
+    >
+      <ThemeToggle compact={false} />
+    </div>
+  );
+}
+
 function App() {
   return (
     <ErrorBoundary>
@@ -118,6 +136,7 @@ function App() {
           <Toaster />
           <Router />
           <PwaInstallBanner />
+          <GlobalThemeToggle />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

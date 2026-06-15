@@ -145,8 +145,8 @@ function Stars({ rating, interactive = false, onRate }: { rating: number; intera
             width="14"
             height="14"
             viewBox="0 0 14 14"
-            fill={filled ? "oklch(0.72 0.12 75)" : "none"}
-            stroke="oklch(0.72 0.12 75)"
+            fill={filled ? "var(--ow-amber)" : "none"}
+            stroke="var(--ow-amber)"
             strokeWidth="1.2"
             style={{ cursor: interactive ? "pointer" : "default", flexShrink: 0 }}
             onMouseEnter={() => interactive && setHoverRating(s)}
@@ -201,20 +201,20 @@ function ReviewSection({ productId }: { productId: string }) {
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
-    background: "oklch(0.11 0.008 60)",
-    border: "1px solid oklch(0.72 0.12 75 / 20%)",
+    background: "var(--ow-bg-base)",
+    border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
     borderRadius: "2px",
     padding: "8px 12px",
     fontFamily: "'Lato', sans-serif",
     fontSize: "0.85rem",
-    color: "oklch(0.88 0.015 75)",
+    color: "var(--ow-text-hi)",
     outline: "none",
   };
 
   return (
     <div
       className="mt-4 pt-4"
-      style={{ borderTop: "1px solid oklch(0.72 0.12 75 / 10%)" }}
+      style={{ borderTop: "1px solid color-mix(in oklch, var(--ow-amber) 10%, transparent)" }}
     >
       {/* Summary row */}
       <div className="flex items-center justify-between mb-3">
@@ -224,7 +224,7 @@ function ReviewSection({ productId }: { productId: string }) {
             style={{
               fontFamily: "'Fira Code', monospace",
               fontSize: "0.72rem",
-              color: "oklch(0.55 0.010 75)",
+              color: "var(--ow-text-lo)",
               letterSpacing: "0.04em",
             }}
           >
@@ -238,7 +238,7 @@ function ReviewSection({ productId }: { productId: string }) {
             fontSize: "0.72rem",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
-            color: "oklch(0.72 0.12 75)",
+            color: "var(--ow-amber)",
             background: "none",
             border: "none",
             cursor: "pointer",
@@ -254,7 +254,7 @@ function ReviewSection({ productId }: { productId: string }) {
         <form onSubmit={handleSubmit} className="mb-4 flex flex-col gap-3">
           <div className="flex items-center gap-3">
             <Stars rating={formRating} interactive onRate={setFormRating} />
-            <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.55 0.010 75)" }}>
+            <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
               {formRating ? `${formRating} star${formRating !== 1 ? "s" : ""}` : "Select rating"}
             </span>
           </div>
@@ -280,7 +280,7 @@ function ReviewSection({ productId }: { productId: string }) {
             style={{
               alignSelf: "flex-start",
               padding: "7px 18px",
-              background: submitting ? "oklch(0.55 0.08 75)" : "oklch(0.72 0.12 75)",
+              background: submitting ? "color-mix(in oklch, var(--ow-amber) 70%, var(--ow-bg-base))" : "var(--ow-amber)",
               color: "oklch(0.10 0.008 60)",
               border: "none",
               borderRadius: "2px",
@@ -304,7 +304,7 @@ function ReviewSection({ productId }: { productId: string }) {
             <div
               key={r.id}
               className="p-3 rounded-sm"
-              style={{ background: "oklch(0.11 0.008 60)", border: "1px solid oklch(0.72 0.12 75 / 8%)" }}
+              style={{ background: "var(--ow-bg-base)", border: "1px solid color-mix(in oklch, var(--ow-amber) 8%, transparent)" }}
             >
               <div className="flex items-center justify-between mb-1">
                 <Stars rating={r.rating} />
@@ -334,7 +334,7 @@ function ReviewSection({ productId }: { productId: string }) {
                 style={{
                   fontFamily: "'Lato', sans-serif",
                   fontSize: "0.72rem",
-                  color: "oklch(0.50 0.010 75)",
+                  color: "var(--ow-text-lo)",
                   fontStyle: "italic",
                 }}
               >
@@ -399,9 +399,9 @@ function ZoomModal({ imageUrl, alt, onClose }: { imageUrl: string; alt: string; 
           position: "absolute",
           top: "16px",
           right: "20px",
-          background: "oklch(0.14 0.008 60)",
-          border: "1px solid oklch(0.72 0.12 75 / 30%)",
-          color: "oklch(0.72 0.12 75)",
+          background: "var(--ow-bg-raised)",
+          border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+          color: "var(--ow-amber)",
           borderRadius: "2px",
           padding: "6px 14px",
           fontFamily: "'Lato', sans-serif",
@@ -426,7 +426,7 @@ function ZoomModal({ imageUrl, alt, onClose }: { imageUrl: string; alt: string; 
           fontSize: "0.7rem",
           letterSpacing: "0.10em",
           textTransform: "uppercase",
-          color: "oklch(0.55 0.010 75)",
+          color: "var(--ow-text-lo)",
           whiteSpace: "nowrap",
           pointerEvents: "none",
         }}
@@ -441,7 +441,7 @@ function ZoomModal({ imageUrl, alt, onClose }: { imageUrl: string; alt: string; 
           maxHeight: "80vh",
           overflow: "hidden",
           borderRadius: "4px",
-          border: "1px solid oklch(0.72 0.12 75 / 20%)",
+          border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
           cursor: scale === 1 ? "zoom-in" : "zoom-out",
         }}
       >
@@ -514,7 +514,7 @@ function CartDrawer({
       {/* Backdrop */}
       <div
         className="fixed inset-0 z-[100]"
-        style={{ background: "oklch(0 0 0 / 60%)", backdropFilter: "blur(2px)" }}
+        style={{ background: "var(--ow-bg-overlay)", backdropFilter: "blur(2px)" }}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -524,9 +524,9 @@ function CartDrawer({
         className="fixed top-0 right-0 h-full z-[101] flex flex-col"
         style={{
           width: "min(420px, 100vw)",
-          background: "oklch(0.13 0.008 60)",
-          borderLeft: "1px solid oklch(0.72 0.12 75 / 15%)",
-          boxShadow: "-8px 0 40px oklch(0 0 0 / 50%)",
+          background: "var(--ow-bg-base)",
+          borderLeft: "1px solid color-mix(in oklch, var(--ow-amber) 15%, transparent)",
+          boxShadow: "-8px 0 40px var(--ow-bg-overlay)",
         }}
         role="dialog"
         aria-label="Shopping cart"
@@ -534,7 +534,7 @@ function CartDrawer({
         {/* Header */}
         <div
           className="flex items-center justify-between px-6 py-4"
-          style={{ borderBottom: "1px solid oklch(0.72 0.12 75 / 12%)" }}
+          style={{ borderBottom: "1px solid color-mix(in oklch, var(--ow-amber) 12%, transparent)" }}
         >
           <div>
             <h2
@@ -542,7 +542,7 @@ function CartDrawer({
                 fontFamily: "'Fraunces', serif",
                 fontWeight: 600,
                 fontSize: "1.1rem",
-                color: "oklch(0.92 0.018 75)",
+                color: "var(--ow-text-hi)",
               }}
             >
               Your Cart
@@ -551,7 +551,7 @@ function CartDrawer({
               style={{
                 fontFamily: "'Fira Code', monospace",
                 fontSize: "0.68rem",
-                color: "oklch(0.50 0.010 75)",
+                color: "var(--ow-text-lo)",
                 letterSpacing: "0.04em",
                 marginTop: "2px",
               }}
@@ -564,8 +564,8 @@ function CartDrawer({
             aria-label="Close cart"
             style={{
               background: "none",
-              border: "1px solid oklch(0.72 0.12 75 / 20%)",
-              color: "oklch(0.65 0.012 75)",
+              border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
+              color: "var(--ow-text-lo)",
               borderRadius: "2px",
               padding: "4px 10px",
               fontFamily: "'Lato', sans-serif",
@@ -582,7 +582,7 @@ function CartDrawer({
           {items.length === 0 ? (
             <div
               className="flex flex-col items-center justify-center h-full gap-3"
-              style={{ color: "oklch(0.50 0.010 75)", fontFamily: "'Lato', sans-serif", fontSize: "0.9rem" }}
+              style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato', sans-serif", fontSize: "0.9rem" }}
             >
               <span style={{ fontSize: "2rem" }}>🛒</span>
               <p>Your cart is empty.</p>
@@ -594,7 +594,7 @@ function CartDrawer({
                 className="flex gap-4 items-start"
                 style={{
                   paddingBottom: "16px",
-                  borderBottom: "1px solid oklch(0.72 0.12 75 / 8%)",
+                  borderBottom: "1px solid color-mix(in oklch, var(--ow-amber) 8%, transparent)",
                 }}
               >
                 {/* Thumbnail */}
@@ -606,7 +606,7 @@ function CartDrawer({
                     height: "64px",
                     objectFit: "cover",
                     borderRadius: "2px",
-                    border: "1px solid oklch(0.72 0.12 75 / 15%)",
+                    border: "1px solid color-mix(in oklch, var(--ow-amber) 15%, transparent)",
                     flexShrink: 0,
                   }}
                 />
@@ -617,7 +617,7 @@ function CartDrawer({
                       fontFamily: "'Fraunces', serif",
                       fontWeight: 600,
                       fontSize: "0.9rem",
-                      color: "oklch(0.90 0.018 75)",
+                      color: "var(--ow-text-hi)",
                       lineHeight: 1.3,
                     }}
                   >
@@ -627,7 +627,7 @@ function CartDrawer({
                     style={{
                       fontFamily: "'Fira Code', monospace",
                       fontSize: "0.68rem",
-                      color: "oklch(0.50 0.010 75)",
+                      color: "var(--ow-text-lo)",
                       letterSpacing: "0.04em",
                       marginTop: "2px",
                     }}
@@ -639,26 +639,26 @@ function CartDrawer({
                   <div className="flex items-center gap-3 mt-2">
                     <div
                       className="flex items-center gap-1 rounded-sm"
-                      style={{ border: "1px solid oklch(0.72 0.12 75 / 20%)" }}
+                      style={{ border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
                     >
                       <button
                         onClick={() => onUpdateQty(item.product.id, Math.max(1, item.qty - 1))}
                         className="w-6 h-6 flex items-center justify-center"
-                        style={{ color: "oklch(0.65 0.012 75)", cursor: "pointer", background: "none", border: "none" }}
+                        style={{ color: "var(--ow-text-lo)", cursor: "pointer", background: "none", border: "none" }}
                         aria-label="Decrease quantity"
                       >
                         −
                       </button>
                       <span
                         className="w-5 text-center text-sm"
-                        style={{ color: "oklch(0.85 0.015 75)", fontFamily: "'Lato', sans-serif" }}
+                        style={{ color: "var(--ow-text-hi)", fontFamily: "'Lato', sans-serif" }}
                       >
                         {item.qty}
                       </span>
                       <button
                         onClick={() => onUpdateQty(item.product.id, Math.min(10, item.qty + 1))}
                         className="w-6 h-6 flex items-center justify-center"
-                        style={{ color: "oklch(0.65 0.012 75)", cursor: "pointer", background: "none", border: "none" }}
+                        style={{ color: "var(--ow-text-lo)", cursor: "pointer", background: "none", border: "none" }}
                         aria-label="Increase quantity"
                       >
                         +
@@ -671,7 +671,7 @@ function CartDrawer({
                         border: "none",
                         fontFamily: "'Lato', sans-serif",
                         fontSize: "0.72rem",
-                        color: "oklch(0.50 0.010 75)",
+                        color: "var(--ow-text-lo)",
                         cursor: "pointer",
                         textDecoration: "underline",
                         padding: 0,
@@ -688,7 +688,7 @@ function CartDrawer({
                     fontFamily: "'Fraunces', serif",
                     fontWeight: 700,
                     fontSize: "1rem",
-                    color: "oklch(0.72 0.12 75)",
+                    color: "var(--ow-amber)",
                     flexShrink: 0,
                   }}
                 >
@@ -703,7 +703,7 @@ function CartDrawer({
         {items.length > 0 && (
           <div
             className="px-6 py-5 flex flex-col gap-3"
-            style={{ borderTop: "1px solid oklch(0.72 0.12 75 / 12%)" }}
+            style={{ borderTop: "1px solid color-mix(in oklch, var(--ow-amber) 12%, transparent)" }}
           >
             <div className="flex items-center justify-between">
               <span
@@ -711,7 +711,7 @@ function CartDrawer({
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 300,
                   fontSize: "0.875rem",
-                  color: "oklch(0.65 0.012 75)",
+                  color: "var(--ow-text-lo)",
                 }}
               >
                 Subtotal (excl. shipping)
@@ -721,7 +721,7 @@ function CartDrawer({
                   fontFamily: "'Fraunces', serif",
                   fontWeight: 700,
                   fontSize: "1.3rem",
-                  color: "oklch(0.72 0.12 75)",
+                  color: "var(--ow-amber)",
                 }}
               >
                 ${(total / 100).toFixed(2)} AUD
@@ -733,7 +733,7 @@ function CartDrawer({
               style={{
                 width: "100%",
                 padding: "14px",
-                background: checkingOut ? "oklch(0.55 0.08 75)" : "oklch(0.72 0.12 75)",
+                background: checkingOut ? "color-mix(in oklch, var(--ow-amber) 70%, var(--ow-bg-base))" : "var(--ow-amber)",
                 color: "oklch(0.10 0.008 60)",
                 border: "none",
                 borderRadius: "2px",
@@ -745,8 +745,8 @@ function CartDrawer({
                 cursor: checkingOut ? "not-allowed" : "pointer",
                 transition: "background 0.2s",
               }}
-              onMouseEnter={(e) => { if (!checkingOut) e.currentTarget.style.background = "oklch(0.78 0.14 75)"; }}
-              onMouseLeave={(e) => { if (!checkingOut) e.currentTarget.style.background = "oklch(0.72 0.12 75)"; }}
+              onMouseEnter={(e) => { if (!checkingOut) e.currentTarget.style.background = "var(--ow-amber)"; }}
+              onMouseLeave={(e) => { if (!checkingOut) e.currentTarget.style.background = "var(--ow-amber)"; }}
             >
               {checkingOut ? "Opening checkout…" : "Proceed to Checkout →"}
             </button>
@@ -817,10 +817,10 @@ function ProductCard({
       <div
         className="flex flex-col rounded-sm overflow-hidden"
         style={{
-          background: "oklch(0.14 0.008 60)",
-          border: "1px solid oklch(0.72 0.12 75 / 15%)",
+          background: "var(--ow-bg-raised)",
+          border: "1px solid color-mix(in oklch, var(--ow-amber) 15%, transparent)",
           transition: "border-color 0.25s",
-          ...(hovered ? { borderColor: "oklch(0.72 0.12 75 / 45%)" } : {}),
+          ...(hovered ? { borderColor: "color-mix(in oklch, var(--ow-amber) 45%, transparent)" } : {}),
         }}
       >
         {/* Image area — desktop: magnifier lens; mobile: tap to open zoom modal */}
@@ -855,8 +855,8 @@ function ProductCard({
                 width: `${LENS}px`,
                 height: `${LENS}px`,
                 borderRadius: "50%",
-                border: "2px solid oklch(0.72 0.12 75 / 70%)",
-                boxShadow: "0 0 0 1px oklch(0 0 0 / 40%), 0 4px 20px oklch(0 0 0 / 60%)",
+                border: "2px solid color-mix(in oklch, var(--ow-amber) 70%, transparent)",
+                boxShadow: "0 0 0 1px var(--ow-bg-overlay), 0 4px 20px var(--ow-bg-overlay)",
                 pointerEvents: "none",
                 left: `calc(${lensPos.x}% - ${LENS / 2}px)`,
                 top: `calc(${lensPos.y}% - ${LENS / 2}px)`,
@@ -876,16 +876,16 @@ function ProductCard({
               bottom: "10px",
               left: "50%",
               transform: "translateX(-50%)",
-              background: "oklch(0 0 0 / 55%)",
+              background: "var(--ow-bg-overlay)",
               backdropFilter: "blur(6px)",
-              border: "1px solid oklch(0.72 0.12 75 / 30%)",
+              border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
               borderRadius: "2px",
               padding: "3px 10px",
               fontFamily: "'Lato', sans-serif",
               fontSize: "0.65rem",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
-              color: "oklch(0.72 0.12 75)",
+              color: "var(--ow-amber)",
               pointerEvents: "none",
               opacity: hovered ? 0 : 1,
               transition: "opacity 0.3s",
@@ -899,9 +899,9 @@ function ProductCard({
           <div
             className="absolute top-3 left-3 px-2 py-0.5 text-xs tracking-widest uppercase"
             style={{
-              background: "oklch(0.72 0.12 75 / 15%)",
-              border: "1px solid oklch(0.72 0.12 75 / 40%)",
-              color: "oklch(0.72 0.12 75)",
+              background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)",
+              border: "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)",
+              color: "var(--ow-amber)",
               fontFamily: "'Lato', sans-serif",
               fontWeight: 400,
               pointerEvents: "none",
@@ -918,7 +918,7 @@ function ProductCard({
               fontFamily: "'Fraunces', serif",
               fontWeight: 600,
               fontSize: "1.1rem",
-              color: "oklch(0.92 0.018 75)",
+              color: "var(--ow-text-hi)",
               lineHeight: 1.3,
             }}
           >
@@ -930,7 +930,7 @@ function ProductCard({
               fontFamily: "'Lato', sans-serif",
               fontWeight: 300,
               fontSize: "0.875rem",
-              color: "oklch(0.65 0.012 75)",
+              color: "var(--ow-text-lo)",
               lineHeight: 1.6,
               flexGrow: 1,
             }}
@@ -942,7 +942,7 @@ function ProductCard({
             style={{
               fontFamily: "'Fira Code', monospace",
               fontSize: "0.72rem",
-              color: "oklch(0.50 0.010 75)",
+              color: "var(--ow-text-lo)",
               letterSpacing: "0.04em",
             }}
           >
@@ -956,7 +956,7 @@ function ProductCard({
                 fontFamily: "'Fraunces', serif",
                 fontWeight: 700,
                 fontSize: "1.4rem",
-                color: "oklch(0.72 0.12 75)",
+                color: "var(--ow-amber)",
               }}
             >
               ${price}
@@ -965,7 +965,7 @@ function ProductCard({
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 300,
                   fontSize: "0.75rem",
-                  color: "oklch(0.55 0.010 75)",
+                  color: "var(--ow-text-lo)",
                   marginLeft: "4px",
                 }}
               >
@@ -975,26 +975,26 @@ function ProductCard({
 
             <div
               className="flex items-center gap-1 rounded-sm"
-              style={{ border: "1px solid oklch(0.72 0.12 75 / 20%)" }}
+              style={{ border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
             >
               <button
                 onClick={() => setQty((q) => Math.max(1, q - 1))}
                 className="w-7 h-7 flex items-center justify-center"
-                style={{ color: "oklch(0.65 0.012 75)", background: "none", border: "none", cursor: "pointer" }}
+                style={{ color: "var(--ow-text-lo)", background: "none", border: "none", cursor: "pointer" }}
                 aria-label="Decrease quantity"
               >
                 −
               </button>
               <span
                 className="w-6 text-center text-sm"
-                style={{ color: "oklch(0.85 0.015 75)", fontFamily: "'Lato', sans-serif" }}
+                style={{ color: "var(--ow-text-hi)", fontFamily: "'Lato', sans-serif" }}
               >
                 {qty}
               </span>
               <button
                 onClick={() => setQty((q) => Math.min(10, q + 1))}
                 className="w-7 h-7 flex items-center justify-center"
-                style={{ color: "oklch(0.65 0.012 75)", background: "none", border: "none", cursor: "pointer" }}
+                style={{ color: "var(--ow-text-lo)", background: "none", border: "none", cursor: "pointer" }}
                 aria-label="Increase quantity"
               >
                 +
@@ -1015,17 +1015,17 @@ function ProductCard({
               fontWeight: 600,
               letterSpacing: "0.12em",
               background: "transparent",
-              color: "oklch(0.72 0.12 75)",
-              border: "1px solid oklch(0.72 0.12 75 / 50%)",
+              color: "var(--ow-amber)",
+              border: "1px solid color-mix(in oklch, var(--ow-amber) 50%, transparent)",
               cursor: "pointer",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "oklch(0.72 0.12 75 / 10%)";
-              e.currentTarget.style.borderColor = "oklch(0.72 0.12 75 / 80%)";
+              e.currentTarget.style.background = "color-mix(in oklch, var(--ow-amber) 10%, transparent)";
+              e.currentTarget.style.borderColor = "color-mix(in oklch, var(--ow-amber) 80%, transparent)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = "transparent";
-              e.currentTarget.style.borderColor = "oklch(0.72 0.12 75 / 50%)";
+              e.currentTarget.style.borderColor = "color-mix(in oklch, var(--ow-amber) 50%, transparent)";
             }}
           >
             Add to Cart
@@ -1072,7 +1072,7 @@ export default function Merch() {
   return (
     <div
       className="min-h-screen"
-      style={{ background: "oklch(0.11 0.008 60)", color: "oklch(0.90 0.015 75)" }}
+      style={{ background: "var(--ow-bg-base)", color: "var(--ow-text-hi)" }}
     >
       {/* Cart drawer */}
       {cartOpen && (
@@ -1088,9 +1088,9 @@ export default function Merch() {
       <nav
         className="sticky top-0 z-50"
         style={{
-          background: "oklch(0.11 0.008 60 / 92%)",
+          background: "var(--ow-nav-bg)",
           backdropFilter: "blur(12px)",
-          borderBottom: "1px solid oklch(1 0 0 / 6%)",
+          borderBottom: "1px solid var(--ow-border)",
         }}
       >
         <div className="container flex items-center justify-between py-4">
@@ -1104,12 +1104,12 @@ export default function Merch() {
                 fontFamily: "'Lato', sans-serif",
                 fontWeight: 300,
                 fontSize: "0.875rem",
-                color: "oklch(0.65 0.015 75)",
+                color: "var(--ow-text-mid)",
                 textDecoration: "none",
                 letterSpacing: "0.04em",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "oklch(0.72 0.12 75)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "oklch(0.65 0.015 75)")}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ow-amber)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ow-text-mid)")}
             >
               ← Back to Ownology
             </a>
@@ -1120,9 +1120,9 @@ export default function Merch() {
               aria-label={`Open cart — ${cartCount} item${cartCount !== 1 ? "s" : ""}`}
               style={{
                 position: "relative",
-                background: cartCount > 0 ? "oklch(0.72 0.12 75 / 12%)" : "none",
-                border: `1px solid ${cartCount > 0 ? "oklch(0.72 0.12 75 / 40%)" : "oklch(0.72 0.12 75 / 20%)"}`,
-                color: "oklch(0.72 0.12 75)",
+                background: cartCount > 0 ? "color-mix(in oklch, var(--ow-amber) 12%, transparent)" : "none",
+                border: `1px solid ${cartCount > 0 ? "color-mix(in oklch, var(--ow-amber) 40%, transparent)" : "color-mix(in oklch, var(--ow-amber) 20%, transparent)"}`,
+                color: "var(--ow-amber)",
                 borderRadius: "2px",
                 padding: "6px 14px",
                 fontFamily: "'Lato', sans-serif",
@@ -1146,7 +1146,7 @@ export default function Merch() {
               {cartCount > 0 && (
                 <span
                   style={{
-                    background: "oklch(0.72 0.12 75)",
+                    background: "var(--ow-amber)",
                     color: "oklch(0.10 0.008 60)",
                     borderRadius: "50%",
                     width: "18px",
@@ -1177,7 +1177,7 @@ export default function Merch() {
             fontSize: "0.7rem",
             letterSpacing: "0.18em",
             textTransform: "uppercase",
-            color: "oklch(0.72 0.12 75)",
+            color: "var(--ow-amber)",
           }}
         >
           Cellar Door · Merch
@@ -1187,7 +1187,7 @@ export default function Merch() {
             fontFamily: "'Fraunces', serif",
             fontWeight: 700,
             fontSize: "clamp(2rem, 4vw, 3rem)",
-            color: "oklch(0.95 0.018 75)",
+            color: "var(--ow-text-hi)",
             lineHeight: 1.1,
             letterSpacing: "-0.02em",
           }}
@@ -1200,7 +1200,7 @@ export default function Merch() {
             fontFamily: "'Lato', sans-serif",
             fontWeight: 300,
             fontSize: "1rem",
-            color: "oklch(0.65 0.012 75)",
+            color: "var(--ow-text-lo)",
             lineHeight: 1.7,
           }}
         >
@@ -1210,7 +1210,7 @@ export default function Merch() {
         </p>
         <div
           className="mt-8"
-          style={{ height: "1px", background: "oklch(0.72 0.12 75 / 20%)" }}
+          style={{ height: "1px", background: "color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
         />
       </header>
 
@@ -1226,8 +1226,8 @@ export default function Merch() {
         <div
           className="mt-16 p-6 rounded-sm"
           style={{
-            background: "oklch(0.14 0.008 60)",
-            border: "1px solid oklch(0.72 0.12 75 / 10%)",
+            background: "var(--ow-bg-raised)",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 10%, transparent)",
           }}
         >
           <h2
@@ -1236,7 +1236,7 @@ export default function Merch() {
               fontFamily: "'Fraunces', serif",
               fontWeight: 600,
               fontSize: "1.1rem",
-              color: "oklch(0.90 0.018 75)",
+              color: "var(--ow-text-hi)",
             }}
           >
             Shipping & Fulfilment
@@ -1251,15 +1251,15 @@ export default function Merch() {
             }}
           >
             <div>
-              <p style={{ color: "oklch(0.72 0.12 75)", fontWeight: 600, marginBottom: "4px" }}>Australia</p>
+              <p style={{ color: "var(--ow-amber)", fontWeight: 600, marginBottom: "4px" }}>Australia</p>
               <p>Standard shipping 5–8 business days. Express available at checkout. All orders fulfilled via Vistaprint AU.</p>
             </div>
             <div>
-              <p style={{ color: "oklch(0.72 0.12 75)", fontWeight: 600, marginBottom: "4px" }}>New Zealand & International</p>
+              <p style={{ color: "var(--ow-amber)", fontWeight: 600, marginBottom: "4px" }}>New Zealand & International</p>
               <p>International shipping available. Rates calculated at checkout based on destination and weight.</p>
             </div>
             <div>
-              <p style={{ color: "oklch(0.72 0.12 75)", fontWeight: 600, marginBottom: "4px" }}>Founding Member Packs</p>
+              <p style={{ color: "var(--ow-amber)", fontWeight: 600, marginBottom: "4px" }}>Founding Member Packs</p>
               <p>Founding member subscribers receive a complimentary notebook and bottle label sticker with their welcome pack.</p>
             </div>
           </div>

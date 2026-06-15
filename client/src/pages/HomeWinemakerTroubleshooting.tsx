@@ -193,7 +193,7 @@ export default function HomeWinemakerTroubleshooting() {
           position: "sticky",
           top: 0,
           zIndex: 40,
-          background: "oklch(0.11 0.008 60 / 95%)",
+          background: "var(--ow-nav-bg)",
           backdropFilter: "blur(8px)",
           borderBottom: "1px solid var(--ow-border)",
           padding: "0.75rem 1.25rem",
@@ -223,7 +223,7 @@ export default function HomeWinemakerTroubleshooting() {
               fontSize: "0.65rem",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
-              color: "oklch(0.72 0.12 75)",
+              color: "var(--ow-amber)",
               marginBottom: "0.5rem",
             }}
           >
@@ -264,7 +264,7 @@ export default function HomeWinemakerTroubleshooting() {
               fontSize: "1rem",
               outline: "none",
             }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "var(--ow-amber)")}
             onBlur={(e) => (e.currentTarget.style.borderColor = "var(--ow-border-md)")}
           />
         </div>
@@ -283,7 +283,7 @@ export default function HomeWinemakerTroubleshooting() {
                 key={issue.id}
                 style={{
                   background: "var(--ow-bg-raised)",
-                  border: `1px solid ${isOpen ? "oklch(0.72 0.12 75 / 40%)" : "var(--ow-border)"}`,
+                  border: `1px solid ${isOpen ? "color-mix(in oklch, var(--ow-amber) 40%, transparent)" : "var(--ow-border)"}`,
                   borderRadius: "4px",
                   overflow: "hidden",
                 }}
@@ -336,7 +336,7 @@ export default function HomeWinemakerTroubleshooting() {
                             fontSize: "0.65rem",
                             letterSpacing: "0.1em",
                             textTransform: "uppercase",
-                            color: "oklch(0.72 0.12 75)",
+                            color: "var(--ow-amber)",
                             marginBottom: "0.5rem",
                           }}
                         >
@@ -345,7 +345,7 @@ export default function HomeWinemakerTroubleshooting() {
                         <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                           {issue.causes.map((c, i) => (
                             <li key={i} className="flex items-start gap-2">
-                              <span style={{ color: "oklch(0.72 0.12 75)", flexShrink: 0, marginTop: "0.1rem" }}>·</span>
+                              <span style={{ color: "var(--ow-amber)", flexShrink: 0, marginTop: "0.1rem" }}>·</span>
                               <span style={{ fontFamily: SANS, fontSize: "0.8125rem", color: "var(--ow-text-mid)", lineHeight: 1.5 }}>{c}</span>
                             </li>
                           ))}
@@ -393,8 +393,8 @@ export default function HomeWinemakerTroubleshooting() {
                       style={{
                         marginTop: "1rem",
                         padding: "0.75rem",
-                        background: "oklch(0.72 0.12 75 / 6%)",
-                        border: "1px solid oklch(0.72 0.12 75 / 18%)",
+                        background: "color-mix(in oklch, var(--ow-amber) 6%, transparent)",
+                        border: "1px solid color-mix(in oklch, var(--ow-amber) 18%, transparent)",
                         borderRadius: "3px",
                       }}
                     >
@@ -404,7 +404,7 @@ export default function HomeWinemakerTroubleshooting() {
                           fontSize: "0.6rem",
                           letterSpacing: "0.1em",
                           textTransform: "uppercase",
-                          color: "oklch(0.72 0.12 75)",
+                          color: "var(--ow-amber)",
                           marginBottom: "0.3rem",
                         }}
                       >
@@ -427,7 +427,7 @@ export default function HomeWinemakerTroubleshooting() {
             marginTop: "3rem",
             padding: "1.25rem",
             background: "var(--ow-bg-raised)",
-            border: "1px solid oklch(0.72 0.12 75 / 20%)",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
             borderRadius: "4px",
             textAlign: "center",
           }}
@@ -443,8 +443,8 @@ export default function HomeWinemakerTroubleshooting() {
             style={{
               display: "inline-block",
               padding: "0.6rem 1.5rem",
-              background: "oklch(0.72 0.12 75)",
-              color: "oklch(0.11 0.008 60)",
+              background: "var(--ow-amber)",
+              color: "var(--ow-bg-base)",
               fontFamily: SANS,
               fontWeight: 700,
               fontSize: "0.875rem",

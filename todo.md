@@ -420,5 +420,15 @@
 - [x] Ingest morew_white_outline (7 sections, all published)
 - [x] Extend colloquial map with white wine terms (cold settling, reductive, sur-lie, bâtonnage, cold stabilisation, tartrate crystals, protein haze, press juice, free-run juice, etc.)
 - [x] Update starter questions to cover both red and white wine
-- [ ] Review and refine starter questions now that white wine knowledge is live — NEXT SESSION
+- [x] Review and refine starter questions now that white wine knowledge is live
 - [ ] Publish remaining red wine bible domains via WBS admin panel (D3 Harvest, D5 Post-Ferment, D6 Stabilisation, D7 Packaging) — NEXT SESSION
+
+## Theme + Knowledge Hub UX Sprint (Jun 2026)
+- [x] Global floating ThemeToggle added to App.tsx (fixed bottom-right, all pages)
+- [x] ForHomeWinemakers: migrate all hardcoded dark oklch values to CSS variables
+- [x] ForHomeWinemakers: remove question chips from chat widget (too busy, let AI surface questions naturally)
+- [x] ForHomeWinemakers: restore equipment list card in features grid
+- [x] ForHomeWinemakers: reorder features as sequential journey (costs → equipment → sanitation → fermentation → bottling)
+- [x] DIYKnowledge hub: reorder guides as sequential beginner workflow (costs → equipment → sanitation → fermentation → bottling)
+- [x] Fix theme CSS variables on all hardcoded-dark pages: DIYKnowledge, HomeWineryKit, HomeWinemakerGlossary, HomeWinemakerTroubleshooting, Pricing, ThePress, RegulatoryLinks, Blog, Regulations
+- [x] Mark starter questions as removed from ForHomeWinemakers widget

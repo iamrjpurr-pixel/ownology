@@ -75,6 +75,7 @@
   --ow-border-md: oklch(1 0 0 / 0.14);   /* medium dividers */
   --ow-shadow:    oklch(0 0 0 / 0.40);    /* card shadows */
   --ow-nav-bg:    oklch(0.11 0.008 60 / 97%); /* scrolled nav */
+  --ow-bg-overlay: oklch(0 0 0 / 0.60);       /* modal/drawer backdrop */
   --ow-blue:      oklch(0.65 0.10 230);       /* blue for ERP/system labels */
   --ow-logo-wordmark: oklch(0.92 0.018 75);  /* logo wordmark — cream in dark mode */
 }
@@ -104,6 +105,7 @@ html.light-mode {
   --ow-border-md: oklch(0 0 0 / 0.18);
   --ow-shadow:    oklch(0 0 0 / 0.12);
   --ow-nav-bg:    oklch(0.97 0.010 75 / 97%);
+  --ow-bg-overlay: oklch(0 0 0 / 0.30);       /* modal/drawer backdrop — lighter in light mode */
   --ow-blue:      oklch(0.50 0.12 230);       /* slightly deeper blue for light mode */
   --ow-logo-wordmark: oklch(0.28 0.012 60);  /* logo wordmark — warm dark grey in light mode */
 }
@@ -200,8 +202,8 @@ html.light-mode {
 
   /* Amber glow button */
   .btn-amber {
-    background: oklch(0.72 0.12 75);
-    color: oklch(0.11 0.008 60);
+    background: var(--ow-amber);
+    color: oklch(0.10 0.008 60);
     font-family: 'Lato', sans-serif;
     font-weight: 700;
     letter-spacing: 0.04em;
@@ -216,14 +218,15 @@ html.light-mode {
     touch-action: manipulation;
   }
   .btn-amber:hover {
-    background: oklch(0.78 0.13 75);
-    box-shadow: 0 0 24px oklch(0.72 0.12 75 / 40%);
+    background: var(--ow-amber);
+    filter: brightness(1.1);
+    box-shadow: 0 0 24px color-mix(in oklch, var(--ow-amber) 40%, transparent);
   }
 
   /* Ghost button */
   .btn-ghost {
     background: transparent;
-    color: oklch(0.72 0.12 75);
+    color: var(--ow-amber);
     font-family: 'Lato', sans-serif;
     font-weight: 700;
     letter-spacing: 0.04em;
@@ -231,15 +234,15 @@ html.light-mode {
     font-size: 0.75rem;
     padding: 0.75rem 2rem;
     border-radius: 2px;
-    border: 1px solid oklch(0.72 0.12 75 / 50%);
+    border: 1px solid color-mix(in oklch, var(--ow-amber) 50%, transparent);
     transition: all 0.2s ease;
     cursor: pointer;
     min-height: 44px;
     touch-action: manipulation;
   }
   .btn-ghost:hover {
-    border-color: oklch(0.72 0.12 75);
-    background: oklch(0.72 0.12 75 / 8%);
+    border-color: var(--ow-amber);
+    background: color-mix(in oklch, var(--ow-amber) 8%, transparent);
   }
 
   /* Cellar card */
@@ -257,13 +260,13 @@ html.light-mode {
   /* Amber rule divider */
   .amber-rule {
     height: 1px;
-    background: linear-gradient(90deg, transparent, oklch(0.72 0.12 75 / 40%), transparent);
+    background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--ow-amber) 40%, transparent), transparent);
   }
 
   /* Data readout — monospaced amber */
   .data-readout {
     font-family: 'Fira Code', monospace;
-    color: oklch(0.72 0.12 75);
+    color: var(--ow-amber);
     font-size: 0.8125rem;
   }
 
@@ -274,7 +277,7 @@ html.light-mode {
     font-size: 0.6875rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: oklch(0.72 0.12 75);
+    color: var(--ow-amber);
   }
 
   /* Grain overlay */

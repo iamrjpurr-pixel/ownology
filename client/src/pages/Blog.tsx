@@ -309,7 +309,7 @@ export default function Blog() {
                         letterSpacing: "0.14em",
                         textTransform: "uppercase",
                         color: "var(--ow-amber)",
-                        background: "oklch(0.72 0.12 75 / 0.1)",
+                        background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
                         padding: "0.2rem 0.6rem",
                         borderRadius: "2px",
                       }}

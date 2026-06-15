@@ -183,7 +183,7 @@ function ToolCard({ tool }: { tool: AdminTool }) {
           <div
             className="flex items-center justify-center w-12 h-12 rounded-sm"
             style={{
-              background: "oklch(0.72 0.12 75 / 12%)",
+              background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
               color: "var(--ow-amber)",
             }}
           >
@@ -193,7 +193,7 @@ function ToolCard({ tool }: { tool: AdminTool }) {
             <span
               className="text-xs px-2 py-0.5 rounded-full"
               style={{
-                background: "oklch(0.72 0.12 75 / 15%)",
+                background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)",
                 color: "var(--ow-amber)",
                 fontFamily: "'Lato',sans-serif",
                 fontSize: "0.65rem",
@@ -269,7 +269,7 @@ function AccessDenied({ isForbidden }: { isForbidden: boolean }) {
     >
       <div
         className="w-14 h-14 rounded-full flex items-center justify-center"
-        style={{ background: "oklch(0.72 0.12 75 / 12%)", color: "var(--ow-amber)" }}
+        style={{ background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", color: "var(--ow-amber)" }}
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />

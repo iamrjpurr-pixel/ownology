@@ -7,13 +7,13 @@ import { Link } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
 
 // ─── Colour tokens (matches Ownology dark theme) ──────────────────────────────
-const BG       = "oklch(0.11 0.008 60)";
-const BG_CARD  = "oklch(0.14 0.008 60)";
-const BORDER   = "oklch(1 0 0 / 8%)";
-const AMBER    = "oklch(0.72 0.12 75)";
-const TEXT_HI  = "oklch(0.92 0.018 75)";
-const TEXT_MID = "oklch(0.65 0.015 75)";
-const TEXT_LO  = "oklch(0.45 0.012 75)";
+const BG       = "var(--ow-bg-base)";
+const BG_CARD  = "var(--ow-bg-raised)";
+const BORDER   = "var(--ow-border)";
+const AMBER    = "var(--ow-amber)";
+const TEXT_HI  = "var(--ow-text-hi)";
+const TEXT_MID = "var(--ow-text-mid)";
+const TEXT_LO  = "var(--ow-text-lo)";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type FeatureItem = {
@@ -205,7 +205,7 @@ function FeatureRow({ item }: { item: FeatureItem }) {
         cursor: item.href ? "pointer" : "default",
         transition: "border-color 0.15s",
       }}
-      onMouseEnter={e => { if (item.href) (e.currentTarget as HTMLDivElement).style.borderColor = "oklch(0.72 0.12 75 / 40%)"; }}
+      onMouseEnter={e => { if (item.href) (e.currentTarget as HTMLDivElement).style.borderColor = "color-mix(in oklch, var(--ow-amber) 40%, transparent)"; }}
       onMouseLeave={e => { if (item.href) (e.currentTarget as HTMLDivElement).style.borderColor = BORDER; }}
     >
       <div className="flex-1 min-w-0">
@@ -219,7 +219,7 @@ function FeatureRow({ item }: { item: FeatureItem }) {
             </span>
           )}
           {item.dr && (
-            <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.6rem", color: "oklch(0.55 0.08 75)", letterSpacing: "0.08em" }}>
+            <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.6rem", color: "color-mix(in oklch, var(--ow-amber) 70%, var(--ow-bg-base))", letterSpacing: "0.08em" }}>
               {item.dr}
             </span>
           )}
@@ -256,7 +256,7 @@ export default function BuildIndex() {
       {/* Header */}
       <div
         className="sticky top-0 z-40 px-6 py-3 flex items-center justify-between"
-        style={{ background: "oklch(0.11 0.008 60 / 95%)", backdropFilter: "blur(8px)", borderBottom: `1px solid ${BORDER}` }}
+        style={{ background: "var(--ow-nav-bg)", backdropFilter: "blur(8px)", borderBottom: `1px solid ${BORDER}` }}
       >
         <div className="flex items-center gap-3">
           <OwnologyLogo size={28} />

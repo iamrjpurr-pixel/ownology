@@ -201,7 +201,7 @@ export default function BlogWeightOfHarvest() {
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 color: AMBER,
-                background: "oklch(0.72 0.12 75 / 0.1)",
+                background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
                 padding: "0.2rem 0.6rem",
                 borderRadius: "2px",
               }}
@@ -232,11 +232,11 @@ export default function BlogWeightOfHarvest() {
           <div className="flex items-center gap-3">
             <div
               className="w-8 h-8 rounded-sm flex items-center justify-center flex-shrink-0"
-              style={{ background: "oklch(0.72 0.12 75 / 0.15)", border: "1px solid oklch(0.72 0.12 75 / 0.3)" }}
+              style={{ background: "color-mix(in oklch, var(--ow-amber) 150%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}
             >
               <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <circle cx="10" cy="10" r="8" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" fill="none" />
-                <path d="M10 6v4l3 2" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" />
+                <circle cx="10" cy="10" r="8" stroke="var(--ow-amber)" strokeWidth="1.5" fill="none" />
+                <path d="M10 6v4l3 2" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
             </div>
             <div>

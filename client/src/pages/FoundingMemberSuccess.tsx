@@ -10,7 +10,7 @@ export default function FoundingMemberSuccess() {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4"
-      style={{ background: "oklch(0.11 0.008 60)", color: "oklch(0.90 0.018 75)" }}
+      style={{ background: "var(--ow-bg-base)", color: "var(--ow-text-hi)" }}
     >
       {/* Logo */}
       <div className="mb-8">
@@ -21,8 +21,8 @@ export default function FoundingMemberSuccess() {
       <div
         className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
         style={{
-          background: "oklch(0.72 0.12 75 / 15%)",
-          border: "2px solid oklch(0.72 0.12 75 / 40%)",
+          background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)",
+          border: "2px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)",
         }}
       >
         <svg
@@ -30,7 +30,7 @@ export default function FoundingMemberSuccess() {
           height="36"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="oklch(0.72 0.12 75)"
+          stroke="var(--ow-amber)"
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -47,11 +47,11 @@ export default function FoundingMemberSuccess() {
           fontWeight: 700,
           fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
           lineHeight: 1.1,
-          color: "oklch(0.95 0.018 75)",
+          color: "var(--ow-text-hi)",
         }}
       >
         Welcome to the{" "}
-        <em style={{ color: "oklch(0.72 0.12 75)", fontStyle: "italic" }}>cellar.</em>
+        <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>cellar.</em>
       </h1>
 
       {/* Subheading */}
@@ -62,7 +62,7 @@ export default function FoundingMemberSuccess() {
           fontWeight: 300,
           fontSize: "1.05rem",
           lineHeight: 1.6,
-          color: "oklch(0.65 0.015 75)",
+          color: "var(--ow-text-mid)",
           maxWidth: "480px",
         }}
       >
@@ -73,15 +73,15 @@ export default function FoundingMemberSuccess() {
       {/* Divider */}
       <div
         className="my-8 w-full max-w-xs h-px"
-        style={{ background: "oklch(1 0 0 / 8%)" }}
+        style={{ background: "var(--ow-border)" }}
       />
 
       {/* What's next */}
       <div
         className="rounded-sm p-6 mb-8 w-full max-w-sm"
         style={{
-          background: "oklch(0.14 0.009 60)",
-          border: "1px solid oklch(1 0 0 / 10%)",
+          background: "var(--ow-bg-raised)",
+          border: "1px solid var(--ow-border)",
         }}
       >
         <p
@@ -91,7 +91,7 @@ export default function FoundingMemberSuccess() {
             fontSize: "0.65rem",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
-            color: "oklch(0.72 0.12 75)",
+            color: "var(--ow-amber)",
           }}
         >
           What happens next
@@ -107,8 +107,8 @@ export default function FoundingMemberSuccess() {
               <span
                 className="flex-shrink-0 w-5 h-5 rounded-sm flex items-center justify-center text-xs mt-0.5"
                 style={{
-                  background: "oklch(0.72 0.12 75 / 15%)",
-                  color: "oklch(0.72 0.12 75)",
+                  background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)",
+                  color: "var(--ow-amber)",
                   fontFamily: "'Fira Code', monospace",
                   fontSize: "0.6rem",
                 }}
@@ -121,7 +121,7 @@ export default function FoundingMemberSuccess() {
                   fontWeight: 300,
                   fontSize: "0.875rem",
                   lineHeight: 1.55,
-                  color: "oklch(0.65 0.015 75)",
+                  color: "var(--ow-text-mid)",
                 }}
               >
                 {item}
@@ -137,8 +137,8 @@ export default function FoundingMemberSuccess() {
           <a
             className="px-6 py-3 rounded-sm text-sm font-medium text-center"
             style={{
-              background: "oklch(0.72 0.12 75)",
-              color: "oklch(0.11 0.008 60)",
+              background: "var(--ow-amber)",
+              color: "var(--ow-bg-base)",
               fontFamily: "'Lato', sans-serif",
               fontWeight: 600,
               letterSpacing: "0.06em",
@@ -154,12 +154,12 @@ export default function FoundingMemberSuccess() {
             className="px-6 py-3 rounded-sm text-sm text-center"
             style={{
               background: "transparent",
-              color: "oklch(0.65 0.015 75)",
+              color: "var(--ow-text-mid)",
               fontFamily: "'Lato', sans-serif",
               fontWeight: 400,
               letterSpacing: "0.06em",
               textTransform: "uppercase",
-              border: "1px solid oklch(1 0 0 / 15%)",
+              border: "1px solid var(--ow-border)",
               textDecoration: "none",
             }}
           >
@@ -174,7 +174,7 @@ export default function FoundingMemberSuccess() {
         style={{
           fontFamily: "'Lato', sans-serif",
           fontSize: "0.75rem",
-          color: "oklch(0.40 0.010 60)",
+          color: "var(--ow-text-lo)",
           maxWidth: "400px",
           lineHeight: 1.6,
         }}
@@ -182,7 +182,7 @@ export default function FoundingMemberSuccess() {
         Questions? Email{" "}
         <a
           href="mailto:support@ownology.ai"
-          style={{ color: "oklch(0.55 0.012 75)", textDecoration: "none" }}
+          style={{ color: "var(--ow-text-lo)", textDecoration: "none" }}
         >
           support@ownology.ai
         </a>

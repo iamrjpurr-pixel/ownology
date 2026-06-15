@@ -134,7 +134,7 @@ const CSU_SUBJECTS: CsuSubject[] = [
 ];
 
 const CSU_LEVEL_COLORS: Record<"Foundation" | "Intermediate" | "Advanced", string> = {
-  Foundation: "oklch(0.72 0.12 75)",
+  Foundation: "var(--ow-amber)",
   Intermediate: "oklch(0.65 0.10 230)",
   Advanced: "oklch(0.62 0.10 45)",
 };
@@ -718,7 +718,7 @@ export default function FreeRun() {
                 fontWeight: 700,
                 fontSize: "0.8125rem",
                 background: question.trim() && !isAsking ? "var(--ow-amber)" : "var(--ow-bg-inset)",
-                color: question.trim() && !isAsking ? "oklch(0.11 0.008 60)" : "var(--ow-text-lo)",
+                color: question.trim() && !isAsking ? "var(--ow-bg-base)" : "var(--ow-text-lo)",
                 border: "none",
                 cursor: question.trim() && !isAsking ? "pointer" : "not-allowed",
                 letterSpacing: "0.04em",

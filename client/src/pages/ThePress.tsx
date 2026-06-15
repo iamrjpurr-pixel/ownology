@@ -104,7 +104,7 @@ const CELLAR_SCENARIOS = [
 
 const URGENCY_COLORS: Record<string, string> = {
   high: "oklch(0.62 0.10 45)",   // terracotta
-  medium: "oklch(0.72 0.12 75)", // amber
+  medium: "var(--ow-amber)", // amber
   low: "oklch(0.65 0.10 230)",   // blue
 };
 
@@ -549,7 +549,7 @@ export default function ThePress() {
                       className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 rounded-sm text-sm transition-all"
                       style={{
                         background: "var(--ow-bg-card)",
-                        color: "oklch(0.72 0.12 75)",
+                        color: "var(--ow-amber)",
                         border: "1px solid var(--ow-border-md)",
                         fontFamily: "'Lato',sans-serif",
                         textDecoration: "none",
@@ -597,7 +597,7 @@ export default function ThePress() {
                       className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-sm text-sm font-semibold transition-all"
                       style={{
                         background: "var(--ow-amber)",
-                        color: "oklch(0.11 0.008 60)",
+                        color: "var(--ow-bg-base)",
                         border: "none",
                         fontFamily: "'Lato',sans-serif",
                         cursor: "pointer",
@@ -654,7 +654,7 @@ export default function ThePress() {
                       type="button"
                       onClick={() => { setQuickEntryTank(undefined); setEntrySheetOpen(true); }}
                       className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm text-sm font-semibold"
-                      style={{ background: "var(--ow-amber)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato',sans-serif", cursor: "pointer", border: "none" }}
+                      style={{ background: "var(--ow-amber)", color: "var(--ow-bg-base)", fontFamily: "'Lato',sans-serif", cursor: "pointer", border: "none" }}
                     >
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                         <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -1287,13 +1287,13 @@ export default function ThePress() {
                   className="sticky-bottom-safe fixed bottom-6 right-5 z-30 flex items-center gap-2 px-5 py-3.5 rounded-full shadow-lg touch-target"
                   style={{
                     background: "var(--ow-amber)",
-                    color: "oklch(0.11 0.008 60)",
+                    color: "var(--ow-bg-base)",
                     fontFamily: "'Lato',sans-serif",
                     fontWeight: 700,
                     fontSize: "0.875rem",
                     border: "none",
                     cursor: "pointer",
-                    boxShadow: "0 4px 20px oklch(0.72 0.12 75 / 40%)",
+                    boxShadow: "0 4px 20px color-mix(in oklch, var(--ow-amber) 40%, transparent)",
                   }}
                 >
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -1603,7 +1603,7 @@ export default function ThePress() {
                     type="button"
                     onClick={() => setBatchSheetOpen(true)}
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm text-sm font-medium"
-                    style={{ background: "var(--ow-amber)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato',sans-serif", cursor: "pointer", border: "none" }}
+                    style={{ background: "var(--ow-amber)", color: "var(--ow-bg-base)", fontFamily: "'Lato',sans-serif", cursor: "pointer", border: "none" }}
                   >
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                       <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -1705,14 +1705,14 @@ export default function ThePress() {
                           {batch.costPerLitre != null && (
                             <div>
                               <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", marginBottom: "0.2rem" }}>COST/L</p>
-                              <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.875rem", color: "oklch(0.72 0.12 75)" }}>${batch.costPerLitre}/L</p>
+                              <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.875rem", color: "var(--ow-amber)" }}>${batch.costPerLitre}/L</p>
                             </div>
                           )}
                           {/* DR-04: Live current volume — shown when set, with indicator if it differs from starting volume */}
                           {(batch.currentVolumeLitres != null || batch.volumeLitres != null) && (
                             <div>
                               <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", marginBottom: "0.2rem" }}>LIVE VOL</p>
-                              <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.875rem", color: batch.currentVolumeLitres != null && batch.volumeLitres != null && batch.currentVolumeLitres !== batch.volumeLitres ? "oklch(0.72 0.12 75)" : "var(--ow-text-hi)" }}>
+                              <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 600, fontSize: "0.875rem", color: batch.currentVolumeLitres != null && batch.volumeLitres != null && batch.currentVolumeLitres !== batch.volumeLitres ? "var(--ow-amber)" : "var(--ow-text-hi)" }}>
                                 {(batch.currentVolumeLitres ?? batch.volumeLitres)} L
                                 {batch.currentVolumeLitres != null && batch.volumeLitres != null && batch.currentVolumeLitres !== batch.volumeLitres && (
                                   <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.6rem", color: "var(--ow-text-lo)", marginLeft: "0.35rem" }}>({batch.currentVolumeLitres < batch.volumeLitres ? "-" : "+"}{Math.abs(batch.currentVolumeLitres - batch.volumeLitres)}L)</span>
@@ -1866,7 +1866,7 @@ export default function ThePress() {
             style={{
               fontFamily: "'Lato', sans-serif",
               fontSize: "0.75rem",
-              color: "oklch(0.50 0.012 75)",
+              color: "var(--ow-text-lo)",
               letterSpacing: "0.08em",
               textTransform: "uppercase",
               marginBottom: "1rem",
@@ -1878,8 +1878,8 @@ export default function ThePress() {
         </div>
 
         {/* Vintage Card PDF */}
-        <div className="mt-10 p-6 rounded-lg" style={{ background: "oklch(0.12 0.008 60)", border: "1px solid oklch(0.72 0.12 75 / 15%)" }}>
-          <div className="mb-1" style={{ fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "oklch(0.50 0.012 75)" }}>
+        <div className="mt-10 p-6 rounded-lg" style={{ background: "var(--ow-bg-base)", border: "1px solid color-mix(in oklch, var(--ow-amber) 15%, transparent)" }}>
+          <div className="mb-1" style={{ fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ow-text-lo)" }}>
             DR-16 · Vintage Card
           </div>
           <VintageCardPDF />

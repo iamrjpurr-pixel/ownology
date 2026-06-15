@@ -2,6 +2,7 @@
  * ForHomeWinemakers — /for-home-winemakers
  * Dedicated landing page for the home DIY winemaker audience.
  * Inline AI chat widget replaces static Q&A list.
+ * Uses CSS variables throughout so it responds to light/dark theme toggle.
  */
 import { useState, useRef } from "react";
 import { Link } from "wouter";
@@ -13,28 +14,34 @@ const SANS = "'Lato', sans-serif";
 
 const FEATURES: { icon: string; title: string; desc: string; href: string }[] = [
   {
+    icon: "💰",
+    title: "Start here: costs & equipment",
+    desc: "What does it cost to make wine at home? A complete checklist of every piece of equipment for a 23-litre batch — Big Mouth Bubbler, hydrometer, siphon, corker — with approximate prices.",
+    href: "/resources/home-winery-kit",
+  },
+  {
+    icon: "🧼",
+    title: "Cleaning & sanitation",
+    desc: "The most important step in winemaking. How to clean and sanitise every piece of equipment before and after use — and why it matters more than anything else.",
+    href: "/for-home-winemakers/knowledge/category/Tank%20Cleaning%20%26%20Sanitation",
+  },
+  {
     icon: "🍇",
+    title: "Fermentation guides",
+    desc: "Red wine fermentation, yeast rehydration, punch-downs, MLF, and pressing — step-by-step guides from crush to dry, written for home winemakers.",
+    href: "/for-home-winemakers/knowledge/category/Fermentation%20Management",
+  },
+  {
+    icon: "🍾",
+    title: "Bottling",
+    desc: "When to bottle, how to prepare your bottles, filling, corking, and labelling your finished home wine — done cleanly and safely.",
+    href: "/for-home-winemakers/knowledge/category/Bottling%20Procedures",
+  },
+  {
+    icon: "🤖",
     title: "AI that speaks home winemaker",
     desc: "Ask questions in plain language — 'my fermentation stopped at 1.020, what do I do?' — and get answers grounded in real home winemaking practice, not commercial winery regulations.",
     href: "/free-run",
-  },
-  {
-    icon: "📚",
-    title: "DIY Knowledge Hub",
-    desc: "Step-by-step guides for home winemakers. Fermentation, bottling, cleaning, MLF — written in plain English with no commercial jargon.",
-    href: "/for-home-winemakers/knowledge",
-  },
-  {
-    icon: "📋",
-    title: "Cellar task tracker",
-    desc: "Log your cleaning and sanitising tasks per piece of equipment. Ownology generates the right protocol for each item — Big Mouth Bubbler, carboy, auto siphon, corker.",
-    href: "/press",
-  },
-  {
-    icon: "📅",
-    title: "Vintage milestone calendar",
-    desc: "Log your inoculation date and Ownology projects your first racking, second racking, and bottling windows — adjusted for kit wine timelines.",
-    href: "/press",
   },
   {
     icon: "🔧",
@@ -42,31 +49,9 @@ const FEATURES: { icon: string; title: string; desc: string; href: string }[] = 
     desc: "7 common home winemaking faults with causes and fixes: stuck ferment, volatile acidity, cloudiness, re-fermentation in the bottle, cork taint, and more.",
     href: "/for-home-winemakers/knowledge/category/Fermentation%20Management",
   },
-  {
-    icon: "📖",
-    title: "Step-by-step guides",
-    desc: "Brix, SG, MLF, K-meta, bentonite, racking, lees, fining — every process explained in plain English with no winery jargon.",
-    href: "/for-home-winemakers/knowledge",
-  },
 ];
 
-const STARTER_QUESTIONS = [
-  // Red wine questions
-  "My Shiraz cap is getting thick — how often should I punch it down?",
-  "My bubbles stopped — is fermentation done or is it stuck?",
-  "My red wine smells like eggs — what do I do?",
-  "When do I rack my red wine off the gross lees?",
-  // White wine questions
-  "How long should I cold settle my Chardonnay juice before adding yeast?",
-  "My Sauvignon Blanc tastes flat and flabby — how do I fix the acidity?",
-  "Do I need to do MLF on my white wine?",
-  "How do I protect my white wine from oxidation during racking?",
-  // Shared questions
-  "How many campden tablets do I add to a 23 litre batch?",
-  "What is MLF and do I need it?",
-  "My wine has gone cloudy after racking — is that normal?",
-  "How do I know when my wine is ready to bottle?",
-];
+// Starter question chips removed — AI surfaces relevant questions naturally through conversation
 
 function InlineAskWidget() {
   const [question, setQuestion] = useState("");
@@ -115,8 +100,8 @@ function InlineAskWidget() {
           display: "flex",
           gap: "0.75rem",
           alignItems: "flex-end",
-          background: "oklch(0.14 0.009 60)",
-          border: `1px solid ${answer || isAsking ? "oklch(0.72 0.12 75 / 40%)" : "oklch(0.72 0.12 75 / 25%)"}`,
+          background: "var(--ow-bg-raised)",
+          border: `1px solid ${answer || isAsking ? "var(--ow-amber)" : "var(--ow-border-md)"}`,
           borderRadius: "4px",
           padding: "0.75rem 1rem",
         }}
@@ -142,7 +127,7 @@ function InlineAskWidget() {
             fontFamily: SANS,
             fontWeight: 300,
             fontSize: "0.95rem",
-            color: "oklch(0.88 0.015 75)",
+            color: "var(--ow-text-hi)",
             lineHeight: 1.6,
           }}
         />
@@ -154,8 +139,8 @@ function InlineAskWidget() {
             padding: "0.5rem 1.25rem",
             background:
               question.trim() && !isAsking
-                ? "oklch(0.72 0.12 75)"
-                : "oklch(0.72 0.12 75 / 25%)",
+                ? "var(--ow-amber)"
+                : "oklch(from var(--ow-amber) l c h / 0.25)",
             border: "none",
             borderRadius: "2px",
             cursor: question.trim() && !isAsking ? "pointer" : "not-allowed",
@@ -163,7 +148,7 @@ function InlineAskWidget() {
             fontWeight: 700,
             fontSize: "0.8rem",
             letterSpacing: "0.06em",
-            color: "oklch(0.11 0.008 60)",
+            color: "var(--ow-bg-base)",
             transition: "background 0.15s ease",
           }}
         >
@@ -171,51 +156,7 @@ function InlineAskWidget() {
         </button>
       </div>
 
-      {/* Starter question chips */}
-      {!asked && (
-        <div
-          style={{
-            marginTop: "0.875rem",
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "0.5rem",
-          }}
-        >
-          {STARTER_QUESTIONS.map((q) => (
-            <button
-              key={q}
-              onClick={() => handleAsk(q)}
-              style={{
-                background: "oklch(0.15 0.009 60)",
-                border: "1px solid oklch(1 0 0 / 0.10)",
-                borderRadius: "20px",
-                padding: "0.4rem 0.9rem",
-                fontFamily: SANS,
-                fontWeight: 300,
-                fontSize: "0.8rem",
-                color: "oklch(0.62 0.012 75)",
-                cursor: "pointer",
-                textAlign: "left",
-                transition: "border-color 0.15s, color 0.15s, background 0.15s",
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLButtonElement;
-                el.style.borderColor = "oklch(0.72 0.12 75 / 50%)";
-                el.style.color = "oklch(0.80 0.015 75)";
-                el.style.background = "oklch(0.17 0.010 60)";
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLButtonElement;
-                el.style.borderColor = "oklch(1 0 0 / 0.10)";
-                el.style.color = "oklch(0.62 0.012 75)";
-                el.style.background = "oklch(0.15 0.009 60)";
-              }}
-            >
-              {q}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Question chips removed — AI surfaces relevant questions naturally through conversation */}
 
       {/* Thinking indicator */}
       {isAsking && (
@@ -223,8 +164,8 @@ function InlineAskWidget() {
           style={{
             marginTop: "1.25rem",
             padding: "1.25rem 1.5rem",
-            background: "oklch(0.14 0.009 60)",
-            border: "1px solid oklch(0.72 0.12 75 / 15%)",
+            background: "var(--ow-bg-raised)",
+            border: "1px solid var(--ow-border-md)",
             borderRadius: "4px",
           }}
         >
@@ -233,7 +174,7 @@ function InlineAskWidget() {
               fontFamily: SANS,
               fontWeight: 600,
               fontSize: "0.8rem",
-              color: "oklch(0.72 0.12 75)",
+              color: "var(--ow-amber)",
               marginBottom: "0.875rem",
             }}
           >
@@ -253,7 +194,7 @@ function InlineAskWidget() {
                     width: "5px",
                     height: "5px",
                     borderRadius: "50%",
-                    background: "oklch(0.72 0.12 75)",
+                    background: "var(--ow-amber)",
                     opacity: 0.4 + i * 0.2,
                   }}
                 />
@@ -263,7 +204,7 @@ function InlineAskWidget() {
               style={{
                 fontFamily: SANS,
                 fontSize: "0.85rem",
-                color: "oklch(0.50 0.010 75)",
+                color: "var(--ow-text-lo)",
                 fontStyle: "italic",
               }}
             >
@@ -279,8 +220,8 @@ function InlineAskWidget() {
           style={{
             marginTop: "1.25rem",
             padding: "1.5rem",
-            background: "oklch(0.14 0.009 60)",
-            border: "1px solid oklch(0.72 0.12 75 / 20%)",
+            background: "var(--ow-bg-raised)",
+            border: "1px solid var(--ow-border-md)",
             borderRadius: "4px",
           }}
         >
@@ -290,7 +231,7 @@ function InlineAskWidget() {
               fontFamily: SANS,
               fontWeight: 600,
               fontSize: "0.8rem",
-              color: "oklch(0.72 0.12 75)",
+              color: "var(--ow-amber)",
               marginBottom: "0.875rem",
               letterSpacing: "0.02em",
             }}
@@ -301,7 +242,7 @@ function InlineAskWidget() {
           <div
             style={{
               height: "1px",
-              background: "oklch(0.72 0.12 75 / 12%)",
+              background: "var(--ow-border)",
               marginBottom: "1rem",
             }}
           />
@@ -311,7 +252,7 @@ function InlineAskWidget() {
               fontFamily: SANS,
               fontWeight: 300,
               fontSize: "0.925rem",
-              color: "oklch(0.78 0.013 75)",
+              color: "var(--ow-text-mid)",
               lineHeight: 1.8,
               whiteSpace: "pre-wrap",
             }}
@@ -327,8 +268,8 @@ function InlineAskWidget() {
               style={{
                 marginTop: "0.875rem",
                 padding: "0.625rem 0.875rem",
-                background: riskLevel === "high" ? "oklch(0.55 0.12 30 / 12%)" : "oklch(0.14 0.009 60)",
-                border: `1px solid ${riskLevel === "high" ? "oklch(0.55 0.12 30 / 35%)" : "oklch(1 0 0 / 0.08)"}`,
+                background: riskLevel === "high" ? "oklch(0.55 0.12 30 / 12%)" : "var(--ow-bg-card)",
+                border: `1px solid ${riskLevel === "high" ? "oklch(0.55 0.12 30 / 35%)" : "var(--ow-border)"}`,
                 borderRadius: "3px",
                 display: "flex",
                 gap: "0.5rem",
@@ -343,7 +284,7 @@ function InlineAskWidget() {
                   fontFamily: SANS,
                   fontWeight: 300,
                   fontSize: "0.78rem",
-                  color: riskLevel === "high" ? "oklch(0.75 0.08 30)" : "oklch(0.50 0.010 75)",
+                  color: riskLevel === "high" ? "oklch(0.75 0.08 30)" : "var(--ow-text-lo)",
                   lineHeight: 1.5,
                   margin: 0,
                 }}
@@ -380,7 +321,7 @@ function InlineAskWidget() {
                 fontFamily: SANS,
                 fontWeight: 400,
                 fontSize: "0.8rem",
-                color: "oklch(0.72 0.12 75)",
+                color: "var(--ow-amber)",
                 padding: 0,
                 letterSpacing: "0.04em",
               }}
@@ -392,7 +333,7 @@ function InlineAskWidget() {
                 fontFamily: SANS,
                 fontWeight: 300,
                 fontSize: "0.72rem",
-                color: "oklch(0.38 0.008 75)",
+                color: "var(--ow-text-lo)",
                 letterSpacing: "0.02em",
               }}
             >
@@ -407,11 +348,11 @@ function InlineAskWidget() {
 
 export default function ForHomeWinemakers() {
   return (
-    <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh" }}>
+    <div style={{ background: "var(--ow-bg-base)", minHeight: "100vh" }}>
       {/* Nav */}
       <nav
         className="sticky top-0 z-50 border-b"
-        style={{ background: "oklch(0.11 0.008 60)", borderColor: "oklch(1 0 0 / 0.08)" }}
+        style={{ background: "var(--ow-nav-bg)", borderColor: "var(--ow-border)" }}
       >
         <div className="container flex items-center justify-between py-5">
           <Link href="/">
@@ -424,7 +365,7 @@ export default function ForHomeWinemakers() {
                 fontFamily: SANS,
                 fontWeight: 300,
                 fontSize: "0.875rem",
-                color: "oklch(0.72 0.12 75)",
+                color: "var(--ow-amber)",
                 letterSpacing: "0.02em",
               }}
             >
@@ -436,7 +377,7 @@ export default function ForHomeWinemakers() {
                 fontFamily: SANS,
                 fontWeight: 300,
                 fontSize: "0.875rem",
-                color: "oklch(0.50 0.010 75)",
+                color: "var(--ow-text-lo)",
                 letterSpacing: "0.02em",
               }}
             >
@@ -447,7 +388,7 @@ export default function ForHomeWinemakers() {
       </nav>
 
       {/* Hero */}
-      <section className="pt-20 pb-16 border-b" style={{ borderColor: "oklch(1 0 0 / 0.08)" }}>
+      <section className="pt-20 pb-16 border-b" style={{ borderColor: "var(--ow-border)" }}>
         <div className="container max-w-4xl">
           <p
             style={{
@@ -456,7 +397,7 @@ export default function ForHomeWinemakers() {
               fontSize: "0.7rem",
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              color: "oklch(0.72 0.12 75)",
+              color: "var(--ow-amber)",
               marginBottom: "1.25rem",
             }}
           >
@@ -468,13 +409,13 @@ export default function ForHomeWinemakers() {
               fontWeight: 700,
               fontSize: "clamp(2rem, 4.5vw, 3rem)",
               lineHeight: 1.1,
-              color: "oklch(0.92 0.018 75)",
+              color: "var(--ow-text-hi)",
               letterSpacing: "-0.02em",
               marginBottom: "1.25rem",
             }}
           >
             Your garage cellar's<br />
-            <em style={{ color: "oklch(0.72 0.12 75)", fontStyle: "italic" }}>most knowledgeable friend.</em>
+            <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>most knowledgeable friend.</em>
           </h1>
           <p
             style={{
@@ -482,7 +423,7 @@ export default function ForHomeWinemakers() {
               fontWeight: 300,
               fontSize: "1.0625rem",
               lineHeight: 1.75,
-              color: "oklch(0.68 0.013 75)",
+              color: "var(--ow-text-mid)",
               maxWidth: "560px",
               marginBottom: "2rem",
             }}
@@ -499,7 +440,7 @@ export default function ForHomeWinemakers() {
                 alignItems: "center",
                 gap: "0.4rem",
                 padding: "0.75rem 1.5rem",
-                background: "oklch(0.72 0.12 75)",
+                background: "var(--ow-amber)",
                 color: "oklch(0.10 0.008 60)",
                 fontFamily: SANS,
                 fontWeight: 700,
@@ -520,12 +461,12 @@ export default function ForHomeWinemakers() {
                 gap: "0.4rem",
                 padding: "0.75rem 1.5rem",
                 background: "transparent",
-                color: "oklch(0.68 0.013 75)",
+                color: "var(--ow-text-mid)",
                 fontFamily: SANS,
                 fontWeight: 300,
                 fontSize: "0.9rem",
                 borderRadius: "2px",
-                border: "1px solid oklch(1 0 0 / 0.08)",
+                border: "1px solid var(--ow-border-md)",
                 textDecoration: "none",
                 letterSpacing: "0.04em",
                 textTransform: "uppercase",
@@ -538,7 +479,7 @@ export default function ForHomeWinemakers() {
       </section>
 
       {/* Inline AI Chat */}
-      <section className="py-16 border-b" style={{ borderColor: "oklch(1 0 0 / 0.08)" }}>
+      <section className="py-16 border-b" style={{ borderColor: "var(--ow-border)" }}>
         <div className="container max-w-4xl">
           <p
             style={{
@@ -547,7 +488,7 @@ export default function ForHomeWinemakers() {
               fontSize: "0.7rem",
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              color: "oklch(0.72 0.12 75)",
+              color: "var(--ow-amber)",
               marginBottom: "0.5rem",
             }}
           >
@@ -558,19 +499,19 @@ export default function ForHomeWinemakers() {
               fontFamily: SANS,
               fontWeight: 300,
               fontSize: "0.875rem",
-              color: "oklch(0.50 0.010 75)",
+              color: "var(--ow-text-lo)",
               marginBottom: "1.5rem",
               lineHeight: 1.6,
             }}
           >
-            Type your question or tap one below — red wine, white wine, or general technique. Answers are grounded in real home winemaking practice.
+            Ask about your red or white wine — Ownology detects the wine type and searches the right knowledge base automatically.
           </p>
           <InlineAskWidget />
         </div>
       </section>
 
       {/* Features grid */}
-      <section className="py-16 border-b" style={{ borderColor: "oklch(1 0 0 / 0.08)" }}>
+      <section className="py-16 border-b" style={{ borderColor: "var(--ow-border)" }}>
         <div className="container max-w-4xl">
           <p
             style={{
@@ -579,7 +520,7 @@ export default function ForHomeWinemakers() {
               fontSize: "0.7rem",
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              color: "oklch(0.72 0.12 75)",
+              color: "var(--ow-amber)",
               marginBottom: "2rem",
             }}
           >
@@ -591,8 +532,8 @@ export default function ForHomeWinemakers() {
                 key={f.title}
                 href={f.href}
                 style={{
-                  background: "oklch(0.14 0.009 60)",
-                  border: "1px solid oklch(1 0 0 / 0.08)",
+                  background: "var(--ow-bg-raised)",
+                  border: "1px solid var(--ow-border)",
                   borderRadius: "2px",
                   padding: "1.5rem",
                   display: "block",
@@ -600,12 +541,10 @@ export default function ForHomeWinemakers() {
                   transition: "border-color 0.15s ease",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor =
-                    "oklch(0.72 0.12 75 / 40%)";
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--ow-amber)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor =
-                    "oklch(1 0 0 / 0.08)";
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--ow-border)";
                 }}
               >
                 <div
@@ -617,14 +556,14 @@ export default function ForHomeWinemakers() {
                   }}
                 >
                   <span style={{ fontSize: "1.75rem" }}>{f.icon}</span>
-                  <span style={{ color: "oklch(0.72 0.12 75)", fontSize: "1rem" }}>→</span>
+                  <span style={{ color: "var(--ow-amber)", fontSize: "1rem" }}>→</span>
                 </div>
                 <p
                   style={{
                     fontFamily: SERIF,
                     fontWeight: 600,
                     fontSize: "1.0625rem",
-                    color: "oklch(0.92 0.018 75)",
+                    color: "var(--ow-text-hi)",
                     marginBottom: "0.5rem",
                   }}
                 >
@@ -635,7 +574,7 @@ export default function ForHomeWinemakers() {
                     fontFamily: SANS,
                     fontWeight: 300,
                     fontSize: "0.875rem",
-                    color: "oklch(0.50 0.010 75)",
+                    color: "var(--ow-text-lo)",
                     lineHeight: 1.7,
                   }}
                 >
@@ -648,7 +587,7 @@ export default function ForHomeWinemakers() {
       </section>
 
       {/* Resources strip */}
-      <section className="py-16 border-b" style={{ borderColor: "oklch(1 0 0 / 0.08)" }}>
+      <section className="py-16 border-b" style={{ borderColor: "var(--ow-border)" }}>
         <div className="container max-w-4xl">
           <p
             style={{
@@ -657,7 +596,7 @@ export default function ForHomeWinemakers() {
               fontSize: "0.7rem",
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              color: "oklch(0.72 0.12 75)",
+              color: "var(--ow-amber)",
               marginBottom: "1.25rem",
             }}
           >
@@ -689,20 +628,18 @@ export default function ForHomeWinemakers() {
                 href={card.href}
                 style={{
                   display: "block",
-                  background: "oklch(0.14 0.009 60)",
-                  border: "1px solid oklch(1 0 0 / 0.08)",
+                  background: "var(--ow-bg-raised)",
+                  border: "1px solid var(--ow-border)",
                   borderRadius: "2px",
                   padding: "1.25rem",
                   textDecoration: "none",
                   transition: "border-color 0.15s ease",
                 }}
                 onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.borderColor =
-                    "oklch(0.72 0.12 75)")
+                  ((e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--ow-amber)")
                 }
                 onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.borderColor =
-                    "oklch(1 0 0 / 0.08)")
+                  ((e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--ow-border)")
                 }
               >
                 <div style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>{card.icon}</div>
@@ -711,7 +648,7 @@ export default function ForHomeWinemakers() {
                     fontFamily: SERIF,
                     fontWeight: 600,
                     fontSize: "1rem",
-                    color: "oklch(0.92 0.018 75)",
+                    color: "var(--ow-text-hi)",
                     marginBottom: "0.4rem",
                   }}
                 >
@@ -722,7 +659,7 @@ export default function ForHomeWinemakers() {
                     fontFamily: SANS,
                     fontWeight: 300,
                     fontSize: "0.8125rem",
-                    color: "oklch(0.50 0.010 75)",
+                    color: "var(--ow-text-lo)",
                     lineHeight: 1.6,
                   }}
                 >
@@ -742,7 +679,7 @@ export default function ForHomeWinemakers() {
               fontFamily: SERIF,
               fontWeight: 700,
               fontSize: "clamp(1.5rem, 3vw, 2rem)",
-              color: "oklch(0.92 0.018 75)",
+              color: "var(--ow-text-hi)",
               marginBottom: "1rem",
             }}
           >
@@ -753,7 +690,7 @@ export default function ForHomeWinemakers() {
               fontFamily: SANS,
               fontWeight: 300,
               fontSize: "1rem",
-              color: "oklch(0.68 0.013 75)",
+              color: "var(--ow-text-mid)",
               marginBottom: "2rem",
               maxWidth: "420px",
               margin: "0 auto 2rem",
@@ -769,7 +706,7 @@ export default function ForHomeWinemakers() {
               alignItems: "center",
               gap: "0.4rem",
               padding: "0.875rem 2rem",
-              background: "oklch(0.72 0.12 75)",
+              background: "var(--ow-amber)",
               color: "oklch(0.10 0.008 60)",
               fontFamily: SANS,
               fontWeight: 700,

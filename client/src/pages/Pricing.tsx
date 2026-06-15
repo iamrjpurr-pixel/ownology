@@ -33,11 +33,11 @@ function WaitlistCapture() {
 
   if (status === "success") {
     return (
-      <div className="py-6 px-8 rounded-sm inline-block" style={{ background: "oklch(0.72 0.12 75 / 10%)", border: "1px solid oklch(0.72 0.12 75 / 30%)" }}>
-        <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, fontSize: "1.125rem", color: "oklch(0.95 0.018 75)" }}>
+      <div className="py-6 px-8 rounded-sm inline-block" style={{ background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}>
+        <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, fontSize: "1.125rem", color: "var(--ow-text-hi)" }}>
           You're on the list. We'll be in touch.
         </p>
-        <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.875rem", color: "oklch(0.60 0.015 75)", marginTop: "0.5rem" }}>
+        <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.875rem", color: "var(--ow-text-lo)", marginTop: "0.5rem" }}>
           Founding member pricing locked for the first 99 subscribers.
         </p>
       </div>
@@ -56,17 +56,17 @@ function WaitlistCapture() {
           disabled={status === "loading"}
           style={{
             flex: 1,
-            background: "oklch(0.16 0.010 60)",
-            border: "1px solid oklch(1 0 0 / 12%)",
+            background: "var(--ow-bg-raised)",
+            border: "1px solid var(--ow-border)",
             borderRadius: "2px",
             padding: "0.75rem 1rem",
             fontFamily: "'Lato', sans-serif",
             fontSize: "0.9375rem",
-            color: "oklch(0.90 0.018 75)",
+            color: "var(--ow-text-hi)",
             outline: "none",
           }}
-          onFocus={e => (e.currentTarget.style.borderColor = "oklch(0.72 0.12 75)")}
-          onBlur={e => (e.currentTarget.style.borderColor = "oklch(1 0 0 / 12%)")}
+          onFocus={e => (e.currentTarget.style.borderColor = "var(--ow-amber)")}
+          onBlur={e => (e.currentTarget.style.borderColor = "var(--ow-border)")}
         />
         <button
           type="submit"
@@ -80,8 +80,8 @@ function WaitlistCapture() {
       {status === "error" && (
         <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: "oklch(0.65 0.15 30)", marginBottom: "0.75rem" }}>{errorMsg}</p>
       )}
-      <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", color: "oklch(0.45 0.010 75)" }}>
-        No credit card required. Or <a href="mailto:support@ownology.ai" style={{ color: "oklch(0.72 0.12 75)" }}>talk to us directly</a>.
+      <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", color: "var(--ow-text-lo)" }}>
+        No credit card required. Or <a href="mailto:support@ownology.ai" style={{ color: "var(--ow-amber)" }}>talk to us directly</a>.
       </p>
     </>
   );
@@ -131,8 +131,8 @@ type PillarTag = { label: string; color: string };
 const PILLAR_TAGS: Record<string, PillarTag[]> = {
   free_run:     [{ label: "GUIDE", color: "oklch(0.65 0.10 160)" }],
   cellar:       [{ label: "LEARN", color: "oklch(0.65 0.10 220)" }, { label: "GUIDE", color: "oklch(0.65 0.10 160)" }],
-  press:        [{ label: "DO", color: "oklch(0.72 0.12 75)" }, { label: "KNOW", color: "oklch(0.62 0.10 45)" }, { label: "GUIDE", color: "oklch(0.65 0.10 160)" }],
-  cellar_master:[{ label: "DO", color: "oklch(0.72 0.12 75)" }, { label: "KNOW", color: "oklch(0.62 0.10 45)" }, { label: "LEARN", color: "oklch(0.65 0.10 220)" }, { label: "GUIDE", color: "oklch(0.65 0.10 160)" }],
+  press:        [{ label: "DO", color: "var(--ow-amber)" }, { label: "KNOW", color: "oklch(0.62 0.10 45)" }, { label: "GUIDE", color: "oklch(0.65 0.10 160)" }],
+  cellar_master:[{ label: "DO", color: "var(--ow-amber)" }, { label: "KNOW", color: "oklch(0.62 0.10 45)" }, { label: "LEARN", color: "oklch(0.65 0.10 220)" }, { label: "GUIDE", color: "oklch(0.65 0.10 160)" }],
 };
 
 const TIERS = [
@@ -145,7 +145,7 @@ const TIERS = [
     annualPrice: 0,
     highlight: false,
     badge: null,
-    color: "oklch(0.55 0.015 75)",
+    color: "var(--ow-text-lo)",
     features: [
       "5 Compliance AI queries per month",
       "3 Free Run lesson previews",
@@ -188,7 +188,7 @@ const TIERS = [
     annualPrice: 490,
     highlight: true,
     badge: "MOST POPULAR",
-    color: "oklch(0.72 0.12 75)",
+    color: "var(--ow-amber)",
     features: [
       "Full cellar operations suite",
       "Knowledge Platform — 31 SOPs, 8 categories",
@@ -297,8 +297,8 @@ function Nav() {
     <nav
       className="fixed top-0 left-0 right-0 z-50 border-b"
       style={{
-        background: "oklch(0.11 0.008 60 / 97%)",
-        borderColor: "oklch(1 0 0 / 6%)",
+        background: "var(--ow-nav-bg)",
+        borderColor: "var(--ow-border)",
         backdropFilter: "blur(12px)",
       }}
     >
@@ -310,7 +310,7 @@ function Nav() {
           <Link
             href="/"
             className="text-sm transition-colors"
-            style={{ color: "oklch(0.60 0.015 75)", fontFamily: "'Lato', sans-serif" }}
+            style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato', sans-serif" }}
           >
             ← Back to Home
           </Link>
@@ -335,7 +335,7 @@ function BillingToggle({
         className="text-sm transition-colors"
         style={{
           fontFamily: "'Lato', sans-serif",
-          color: cycle === "monthly" ? "oklch(0.72 0.12 75)" : "oklch(0.55 0.015 75)",
+          color: cycle === "monthly" ? "var(--ow-amber)" : "var(--ow-text-lo)",
           fontWeight: cycle === "monthly" ? 600 : 300,
         }}
       >
@@ -344,13 +344,13 @@ function BillingToggle({
       <button
         onClick={() => onChange(cycle === "monthly" ? "annual" : "monthly")}
         className="relative w-12 h-6 rounded-full transition-colors flex-shrink-0"
-        style={{ background: cycle === "annual" ? "oklch(0.72 0.12 75)" : "oklch(0.22 0.010 60)" }}
+        style={{ background: cycle === "annual" ? "var(--ow-amber)" : "var(--ow-bg-inset)" }}
         aria-label="Toggle billing cycle"
       >
         <span
           className="absolute top-1 w-4 h-4 rounded-full transition-transform"
           style={{
-            background: "oklch(0.95 0.018 75)",
+            background: "var(--ow-text-hi)",
             transform: cycle === "annual" ? "translateX(26px)" : "translateX(4px)",
           }}
         />
@@ -360,7 +360,7 @@ function BillingToggle({
         className="text-sm transition-colors flex items-center gap-2"
         style={{
           fontFamily: "'Lato', sans-serif",
-          color: cycle === "annual" ? "oklch(0.72 0.12 75)" : "oklch(0.55 0.015 75)",
+          color: cycle === "annual" ? "var(--ow-amber)" : "var(--ow-text-lo)",
           fontWeight: cycle === "annual" ? 600 : 300,
         }}
       >
@@ -368,8 +368,8 @@ function BillingToggle({
         <span
           className="text-xs px-2 py-0.5 rounded"
           style={{
-            background: "oklch(0.72 0.12 75 / 15%)",
-            color: "oklch(0.72 0.12 75)",
+            background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)",
+            color: "var(--ow-amber)",
             fontFamily: "'Fira Code', monospace",
           }}
         >
@@ -392,7 +392,7 @@ function MiniCycleToggle({
   return (
     <div
       className="flex items-center rounded-sm overflow-hidden self-start"
-      style={{ border: "1px solid oklch(1 0 0 / 12%)", background: "oklch(0.15 0.008 60)" }}
+      style={{ border: "1px solid var(--ow-border)", background: "var(--ow-bg-raised)" }}
       role="group"
       aria-label="Billing cycle"
     >
@@ -404,8 +404,8 @@ function MiniCycleToggle({
           style={{
             fontFamily: "'Lato', sans-serif",
             fontWeight: cycle === c ? 600 : 300,
-            background: cycle === c ? "oklch(0.72 0.12 75)" : "transparent",
-            color: cycle === c ? "oklch(0.11 0.008 60)" : "oklch(0.55 0.012 75)",
+            background: cycle === c ? "var(--ow-amber)" : "transparent",
+            color: cycle === c ? "var(--ow-bg-base)" : "var(--ow-text-lo)",
             letterSpacing: "0.04em",
           }}
         >
@@ -424,25 +424,25 @@ function FeatureInfoIcon({ explanation }: { explanation: string }) {
         <button
           className="inline-flex items-center justify-center flex-shrink-0 w-4 h-4 rounded-full ml-1 align-middle"
           style={{
-            background: "oklch(0.22 0.010 60)",
-            border: "1px solid oklch(1 0 0 / 15%)",
+            background: "var(--ow-bg-inset)",
+            border: "1px solid var(--ow-border)",
             verticalAlign: "middle",
           }}
           aria-label="More information"
           onClick={e => e.stopPropagation()}
         >
           <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-            <circle cx="4" cy="2.5" r="0.7" fill="oklch(0.72 0.12 75)" />
-            <path d="M4 4v2.5" stroke="oklch(0.72 0.12 75)" strokeWidth="1.1" strokeLinecap="round" />
+            <circle cx="4" cy="2.5" r="0.7" fill="var(--ow-amber)" />
+            <path d="M4 4v2.5" stroke="var(--ow-amber)" strokeWidth="1.1" strokeLinecap="round" />
           </svg>
         </button>
       </PopoverTrigger>
       <PopoverContent
         className="max-w-[240px] text-xs p-3"
         style={{
-          background: "oklch(0.17 0.010 60)",
-          border: "1px solid oklch(0.72 0.12 75 / 25%)",
-          color: "oklch(0.72 0.015 75)",
+          background: "var(--ow-bg-raised)",
+          border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
+          color: "var(--ow-text-mid)",
           fontFamily: "'Lato', sans-serif",
           fontWeight: 300,
           lineHeight: 1.6,
@@ -526,16 +526,16 @@ function TierCard({
       id={`tier-${tier.id}`}
       className="relative flex flex-col rounded-sm transition-all duration-300"
       style={{
-        background: tier.highlight ? "oklch(0.16 0.012 60)" : "oklch(0.13 0.008 60)",
+        background: tier.highlight ? "oklch(0.16 0.012 60)" : "var(--ow-bg-base)",
         border: pulsing
-          ? "1px solid oklch(0.72 0.12 75 / 90%)"
+          ? "1px solid color-mix(in oklch, var(--ow-amber) 90%, transparent)"
           : tier.highlight
-            ? "1px solid oklch(0.72 0.12 75 / 40%)"
-            : "1px solid oklch(1 0 0 / 8%)",
+            ? "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)"
+            : "1px solid var(--ow-border)",
         boxShadow: pulsing
-          ? "0 0 0 3px oklch(0.72 0.12 75 / 25%), 0 0 40px oklch(0.72 0.12 75 / 20%)"
+          ? "0 0 0 3px color-mix(in oklch, var(--ow-amber) 25%, transparent), 0 0 40px color-mix(in oklch, var(--ow-amber) 20%, transparent)"
           : tier.highlight
-            ? "0 0 40px oklch(0.72 0.12 75 / 8%)"
+            ? "0 0 40px color-mix(in oklch, var(--ow-amber) 8%, transparent)"
             : "none",
       }}
     >
@@ -544,11 +544,11 @@ function TierCard({
         <div
           className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs rounded-sm whitespace-nowrap"
           style={{
-            background: tier.highlight ? "oklch(0.72 0.12 75)" : "oklch(0.22 0.010 60)",
-            color: tier.highlight ? "oklch(0.11 0.008 60)" : "oklch(0.72 0.12 75)",
+            background: tier.highlight ? "var(--ow-amber)" : "var(--ow-bg-inset)",
+            color: tier.highlight ? "var(--ow-bg-base)" : "var(--ow-amber)",
             fontFamily: "'Fira Code', monospace",
             letterSpacing: "0.08em",
-            border: tier.highlight ? "none" : "1px solid oklch(0.72 0.12 75 / 30%)",
+            border: tier.highlight ? "none" : "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
           }}
         >
           {tier.badge}
@@ -565,15 +565,15 @@ function TierCard({
           <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
             {/* Price display */}
             {tier.monthlyPrice === 0 ? (
-              <span style={{ fontFamily: "'Fraunces', serif", fontSize: "1.5rem", fontWeight: 700, color: "oklch(0.85 0.018 75)", lineHeight: 1 }}>
+              <span style={{ fontFamily: "'Fraunces', serif", fontSize: "1.5rem", fontWeight: 700, color: "var(--ow-text-hi)", lineHeight: 1 }}>
                 Free
               </span>
             ) : (
               <div className="flex items-end gap-0.5">
-                <span style={{ fontFamily: "'Fraunces', serif", fontSize: "1.5rem", fontWeight: 700, color: "oklch(0.85 0.018 75)", lineHeight: 1 }}>
+                <span style={{ fontFamily: "'Fraunces', serif", fontSize: "1.5rem", fontWeight: 700, color: "var(--ow-text-hi)", lineHeight: 1 }}>
                   ${displayPrice}
                 </span>
-                <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.50 0.012 75)", marginBottom: "2px" }}>
+                <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)", marginBottom: "2px" }}>
                   /mo
                 </span>
               </div>
@@ -587,20 +587,20 @@ function TierCard({
 
         {/* Annual savings callout */}
         {tier.monthlyPrice > 0 && cycle === "annual" && (
-          <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", color: "oklch(0.72 0.12 75)", marginBottom: "0.375rem", letterSpacing: "0.04em" }}>
+          <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", color: "var(--ow-amber)", marginBottom: "0.375rem", letterSpacing: "0.04em" }}>
             ${tier.annualPrice}/yr · save ${(tier.monthlyPrice * 12) - tier.annualPrice}
           </p>
         )}
 
         {/* Tagline */}
-        <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8125rem", color: "oklch(0.55 0.012 75)", fontStyle: "italic", marginBottom: "0.875rem" }}>
+        <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8125rem", color: "var(--ow-text-lo)", fontStyle: "italic", marginBottom: "0.875rem" }}>
           {tier.tagline}
         </p>
 
         {/* Feature toggle */}
         <button
           className="w-full flex items-center justify-between py-2 text-left"
-          style={{ borderTop: "1px solid oklch(1 0 0 / 8%)", borderBottom: featuresOpen ? "none" : "1px solid oklch(1 0 0 / 8%)" }}
+          style={{ borderTop: "1px solid var(--ow-border)", borderBottom: featuresOpen ? "none" : "1px solid var(--ow-border)" }}
           onClick={() => setFeaturesOpen(o => !o)}
           aria-expanded={featuresOpen}
         >
@@ -611,7 +611,7 @@ function TierCard({
             width="14" height="14" viewBox="0 0 14 14" fill="none"
             style={{ transition: "transform 0.2s", transform: featuresOpen ? "rotate(180deg)" : "rotate(0deg)", flexShrink: 0 }}
           >
-            <path d="M3 5l4 4 4-4" stroke="oklch(0.72 0.12 75)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M3 5l4 4 4-4" stroke="var(--ow-amber)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
 
@@ -624,7 +624,7 @@ function TierCard({
                   <circle cx="7" cy="7" r="6" stroke={tier.color} strokeWidth="1.2" />
                   <path d="M4.5 7l2 2 3-3" stroke={tier.color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <span style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8125rem", color: "oklch(0.70 0.015 75)", lineHeight: 1.5 }}>
+                <span style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8125rem", color: "var(--ow-text-mid)", lineHeight: 1.5 }}>
                   {f}
                   {FEATURE_EXPLANATIONS[f] && (
                     <FeatureInfoIcon explanation={FEATURE_EXPLANATIONS[f]} />
@@ -637,7 +637,7 @@ function TierCard({
 
         {/* Note */}
         {tier.note && (
-          <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", fontStyle: "italic", color: "oklch(0.50 0.012 75)", marginTop: "0.5rem", marginBottom: "0.75rem" }}>
+          <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", fontStyle: "italic", color: "var(--ow-text-lo)", marginTop: "0.5rem", marginBottom: "0.75rem" }}>
             {tier.note}
           </p>
         )}
@@ -650,8 +650,8 @@ function TierCard({
           style={
             tier.highlight
               ? {
-                  background: checkoutLoading ? "oklch(0.60 0.10 75)" : "oklch(0.72 0.12 75)",
-                  color: "oklch(0.11 0.008 60)",
+                  background: checkoutLoading ? "oklch(0.60 0.10 75)" : "var(--ow-amber)",
+                  color: "var(--ow-bg-base)",
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 600,
                   letterSpacing: "0.06em",
@@ -661,12 +661,12 @@ function TierCard({
                 }
               : {
                   background: "transparent",
-                  color: "oklch(0.72 0.12 75)",
+                  color: "var(--ow-amber)",
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 400,
                   letterSpacing: "0.06em",
                   textTransform: "uppercase",
-                  border: "1px solid oklch(0.72 0.12 75 / 35%)",
+                  border: "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)",
                   opacity: checkoutLoading ? 0.7 : 1,
                 }
           }
@@ -689,7 +689,7 @@ function TierCard({
               </span>
             ))}
           </div>
-          <p className="text-sm" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "oklch(0.55 0.012 75)", fontStyle: "italic" }}>
+          <p className="text-sm" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)", fontStyle: "italic" }}>
             {tier.tagline}
           </p>
           {(tier as typeof TIERS[0] & { audience?: string }).audience && (
@@ -700,21 +700,21 @@ function TierCard({
         </div>
         <div className="mb-6">
           {tier.monthlyPrice === 0 ? (
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: "2.5rem", fontWeight: 700, color: "oklch(0.85 0.018 75)", lineHeight: 1 }}>
+            <div style={{ fontFamily: "'Fraunces', serif", fontSize: "2.5rem", fontWeight: 700, color: "var(--ow-text-hi)", lineHeight: 1 }}>
               Free
             </div>
           ) : (
             <div className="flex items-end gap-1">
-              <span style={{ fontFamily: "'Fraunces', serif", fontSize: "2.5rem", fontWeight: 700, color: "oklch(0.85 0.018 75)", lineHeight: 1 }}>
+              <span style={{ fontFamily: "'Fraunces', serif", fontSize: "2.5rem", fontWeight: 700, color: "var(--ow-text-hi)", lineHeight: 1 }}>
                 ${displayPrice}
               </span>
-              <span className="mb-1.5" style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: "oklch(0.50 0.012 75)" }}>
+              <span className="mb-1.5" style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: "var(--ow-text-lo)" }}>
                 /mo{cycle === "annual" ? " · billed annually" : ""}
               </span>
             </div>
           )}
           {tier.note && (
-            <p className="mt-2 text-xs" style={{ fontFamily: "'Lato', sans-serif", fontStyle: "italic", color: "oklch(0.50 0.012 75)" }}>
+            <p className="mt-2 text-xs" style={{ fontFamily: "'Lato', sans-serif", fontStyle: "italic", color: "var(--ow-text-lo)" }}>
               {tier.note}
             </p>
           )}
@@ -726,7 +726,7 @@ function TierCard({
                 <circle cx="7" cy="7" r="6" stroke={tier.color} strokeWidth="1.2" />
                 <path d="M4.5 7l2 2 3-3" stroke={tier.color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <span className="text-sm" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "oklch(0.70 0.015 75)", lineHeight: 1.5 }}>
+              <span className="text-sm" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-mid)", lineHeight: 1.5 }}>
                 {f}
               </span>
             </li>
@@ -739,8 +739,8 @@ function TierCard({
           style={
             tier.highlight
               ? {
-                  background: checkoutLoading ? "oklch(0.60 0.10 75)" : "oklch(0.72 0.12 75)",
-                  color: "oklch(0.11 0.008 60)",
+                  background: checkoutLoading ? "oklch(0.60 0.10 75)" : "var(--ow-amber)",
+                  color: "var(--ow-bg-base)",
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 600,
                   letterSpacing: "0.06em",
@@ -750,16 +750,16 @@ function TierCard({
                 }
               : {
                   background: "transparent",
-                  color: "oklch(0.72 0.12 75)",
+                  color: "var(--ow-amber)",
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 400,
                   letterSpacing: "0.06em",
                   textTransform: "uppercase",
-                  border: "1px solid oklch(0.72 0.12 75 / 35%)",
+                  border: "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)",
                   opacity: checkoutLoading ? 0.7 : 1,
                 }
           }
-          onMouseEnter={e => { if (!tier.highlight) (e.currentTarget as HTMLButtonElement).style.background = "oklch(0.72 0.12 75 / 10%)"; }}
+          onMouseEnter={e => { if (!tier.highlight) (e.currentTarget as HTMLButtonElement).style.background = "color-mix(in oklch, var(--ow-amber) 10%, transparent)"; }}
           onMouseLeave={e => { if (!tier.highlight) (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
         >
           {checkoutLoading ? "Opening checkout…" : tier.cta}
@@ -775,21 +775,21 @@ function CreditPackCard({ pack }: { pack: (typeof CREDIT_PACKS)[0] }) {
     <div
       className="relative rounded-sm p-5"
       style={{
-        background: "oklch(0.13 0.008 60)",
+        background: "var(--ow-bg-base)",
         border: pack.badge === "BEST VALUE"
-          ? "1px solid oklch(0.72 0.12 75 / 35%)"
-          : "1px solid oklch(1 0 0 / 8%)",
+          ? "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)"
+          : "1px solid var(--ow-border)",
       }}
     >
       {pack.badge && (
         <div
           className="absolute -top-3 left-4 px-2 py-0.5 text-xs rounded-sm"
           style={{
-            background: pack.badge === "BEST VALUE" ? "oklch(0.72 0.12 75)" : "oklch(0.22 0.010 60)",
-            color: pack.badge === "BEST VALUE" ? "oklch(0.11 0.008 60)" : "oklch(0.72 0.12 75)",
+            background: pack.badge === "BEST VALUE" ? "var(--ow-amber)" : "var(--ow-bg-inset)",
+            color: pack.badge === "BEST VALUE" ? "var(--ow-bg-base)" : "var(--ow-amber)",
             fontFamily: "'Fira Code', monospace",
             letterSpacing: "0.08em",
-            border: pack.badge === "BEST VALUE" ? "none" : "1px solid oklch(0.72 0.12 75 / 30%)",
+            border: pack.badge === "BEST VALUE" ? "none" : "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
           }}
         >
           {pack.badge}
@@ -797,27 +797,27 @@ function CreditPackCard({ pack }: { pack: (typeof CREDIT_PACKS)[0] }) {
       )}
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h4 style={{ fontFamily: "'Fraunces', serif", fontSize: "1.125rem", fontWeight: 600, color: "oklch(0.85 0.018 75)" }}>
+          <h4 style={{ fontFamily: "'Fraunces', serif", fontSize: "1.125rem", fontWeight: 600, color: "var(--ow-text-hi)" }}>
             {pack.name}
           </h4>
-          <p className="text-xs mt-0.5" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "oklch(0.50 0.012 75)", fontStyle: "italic" }}>
+          <p className="text-xs mt-0.5" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)", fontStyle: "italic" }}>
             {pack.tagline}
           </p>
         </div>
         <div className="text-right">
-          <div style={{ fontFamily: "'Fraunces', serif", fontSize: "1.75rem", fontWeight: 700, color: "oklch(0.72 0.12 75)", lineHeight: 1 }}>
+          <div style={{ fontFamily: "'Fraunces', serif", fontSize: "1.75rem", fontWeight: 700, color: "var(--ow-amber)", lineHeight: 1 }}>
             ${pack.price}
           </div>
-          <div className="text-xs mt-0.5" style={{ fontFamily: "'Fira Code', monospace", color: "oklch(0.50 0.012 75)" }}>
+          <div className="text-xs mt-0.5" style={{ fontFamily: "'Fira Code', monospace", color: "var(--ow-text-lo)" }}>
             {pack.perCredit}/credit
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between py-2.5 px-3 rounded-sm" style={{ background: "oklch(0.17 0.010 60)" }}>
-        <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.875rem", color: "oklch(0.72 0.12 75)" }}>
+      <div className="flex items-center justify-between py-2.5 px-3 rounded-sm" style={{ background: "var(--ow-bg-raised)" }}>
+        <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.875rem", color: "var(--ow-amber)" }}>
           {pack.credits.toLocaleString()} credits
         </span>
-        <span className="text-xs" style={{ fontFamily: "'Lato', sans-serif", color: "oklch(0.50 0.012 75)" }}>
+        <span className="text-xs" style={{ fontFamily: "'Lato', sans-serif", color: "var(--ow-text-lo)" }}>
           Never expire
         </span>
       </div>
@@ -826,15 +826,15 @@ function CreditPackCard({ pack }: { pack: (typeof CREDIT_PACKS)[0] }) {
         className="block text-center mt-4 py-2.5 rounded-sm text-sm transition-colors"
         style={{
           background: "transparent",
-          color: "oklch(0.72 0.12 75)",
+          color: "var(--ow-amber)",
           fontFamily: "'Lato', sans-serif",
           fontWeight: 400,
           letterSpacing: "0.06em",
           textTransform: "uppercase",
-          border: "1px solid oklch(0.72 0.12 75 / 30%)",
+          border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
           fontSize: "0.75rem",
         }}
-        onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = "oklch(0.72 0.12 75 / 10%)"; }}
+        onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = "color-mix(in oklch, var(--ow-amber) 10%, transparent)"; }}
         onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}
       >
         Purchase Pack
@@ -847,12 +847,12 @@ function CreditPackCard({ pack }: { pack: (typeof CREDIT_PACKS)[0] }) {
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b" style={{ borderColor: "oklch(1 0 0 / 6%)" }}>
+    <div className="border-b" style={{ borderColor: "var(--ow-border)" }}>
       <button
         className="w-full flex items-start justify-between py-4 text-left gap-4"
         onClick={() => setOpen(o => !o)}
       >
-        <span style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400, fontSize: "0.9375rem", color: "oklch(0.80 0.015 75)" }}>
+        <span style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400, fontSize: "0.9375rem", color: "var(--ow-text-mid)" }}>
           {q}
         </span>
         <svg
@@ -860,7 +860,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
           className="flex-shrink-0 mt-0.5 transition-transform"
           style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}
         >
-          <path d="M8 3v10M3 8h10" stroke="oklch(0.72 0.12 75)" strokeWidth="1.4" strokeLinecap="round" />
+          <path d="M8 3v10M3 8h10" stroke="var(--ow-amber)" strokeWidth="1.4" strokeLinecap="round" />
         </svg>
       </button>
       {open && (
@@ -903,8 +903,8 @@ function ScrollToTopButton({ hasStickyBar }: { hasStickyBar: boolean }) {
         bottom: hasStickyBar
           ? "calc(64px + env(safe-area-inset-bottom, 0px) + 0.75rem)"
           : "calc(env(safe-area-inset-bottom, 0px) + 1rem)",
-        background: "oklch(0.18 0.010 60)",
-        border: "1px solid oklch(0.72 0.12 75 / 35%)",
+        background: "var(--ow-bg-inset)",
+        border: "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)",
         boxShadow: "0 4px 16px oklch(0 0 0 / 0.5)",
         opacity: visible ? 1 : 0,
         pointerEvents: visible ? "auto" : "none",
@@ -913,7 +913,7 @@ function ScrollToTopButton({ hasStickyBar }: { hasStickyBar: boolean }) {
       aria-label="Scroll to top"
     >
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M4 10l4-4 4 4" stroke="oklch(0.72 0.12 75)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M4 10l4-4 4 4" stroke="var(--ow-amber)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </button>
   );
@@ -970,8 +970,8 @@ function StickyMobileCTA({
       style={{
         bottom: 0,
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
-        background: "oklch(0.11 0.008 60 / 97%)",
-        borderTop: "1px solid oklch(0.72 0.12 75 / 30%)",
+        background: "var(--ow-nav-bg)",
+        borderTop: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
         backdropFilter: "blur(12px)",
         boxShadow: "0 -8px 32px oklch(0 0 0 / 0.5)",
       }}
@@ -981,14 +981,14 @@ function StickyMobileCTA({
       <div className="flex items-center gap-3 px-4 py-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-1.5">
-            <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "1rem", color: "oklch(0.72 0.12 75)" }}>
+            <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "1rem", color: "var(--ow-amber)" }}>
               {highlightedTier.name}
             </span>
-            <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.75rem", color: "oklch(0.55 0.012 75)" }}>
+            <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
               · ${price}/mo
             </span>
           </div>
-          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.7rem", color: "oklch(0.50 0.012 75)", lineHeight: 1.3, marginTop: "1px" }}>
+          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.7rem", color: "var(--ow-text-lo)", lineHeight: 1.3, marginTop: "1px" }}>
             {cycle === "annual" ? "Billed annually · " : ""}Most popular tier
           </p>
         </div>
@@ -996,8 +996,8 @@ function StickyMobileCTA({
           onClick={scrollToTier}
           className="flex-shrink-0 px-4 py-2.5 rounded-sm text-sm font-semibold transition-opacity"
           style={{
-            background: "oklch(0.72 0.12 75)",
-            color: "oklch(0.11 0.008 60)",
+            background: "var(--ow-amber)",
+            color: "var(--ow-bg-base)",
             fontFamily: "'Lato', sans-serif",
             letterSpacing: "0.05em",
             textTransform: "uppercase",
@@ -1009,11 +1009,11 @@ function StickyMobileCTA({
         <button
           onClick={() => setDismissed(true)}
           className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full"
-          style={{ background: "oklch(0.20 0.008 60)", border: "1px solid oklch(1 0 0 / 10%)" }}
+          style={{ background: "var(--ow-bg-inset)", border: "1px solid var(--ow-border)" }}
           aria-label="Dismiss pricing bar"
         >
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-            <path d="M2 2l6 6M8 2l-6 6" stroke="oklch(0.55 0.012 75)" strokeWidth="1.4" strokeLinecap="round" />
+            <path d="M2 2l6 6M8 2l-6 6" stroke="var(--ow-text-lo)" strokeWidth="1.4" strokeLinecap="round" />
           </svg>
         </button>
       </div>
@@ -1049,7 +1049,7 @@ export default function Pricing() {
     <div
       className="min-h-screen"
       style={{
-        background: "oklch(0.11 0.008 60)",
+        background: "var(--ow-bg-base)",
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >
@@ -1061,8 +1061,8 @@ export default function Pricing() {
           role="status"
           aria-live="polite"
           style={{
-            background: "oklch(0.15 0.010 60)",
-            borderBottom: "1px solid oklch(0.72 0.12 75 / 20%)",
+            background: "var(--ow-bg-raised)",
+            borderBottom: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
           }}
         >
           <div
@@ -1077,16 +1077,16 @@ export default function Pricing() {
           >
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
-                <circle cx="8" cy="8" r="7" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" />
-                <path d="M8 5v3.5" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" />
-                <circle cx="8" cy="11" r="0.75" fill="oklch(0.72 0.12 75)" />
+                <circle cx="8" cy="8" r="7" stroke="var(--ow-amber)" strokeWidth="1.5" />
+                <path d="M8 5v3.5" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" />
+                <circle cx="8" cy="11" r="0.75" fill="var(--ow-amber)" />
               </svg>
               <p
                 style={{
                   fontFamily: "'Lato', sans-serif",
                   fontWeight: 300,
                   fontSize: "0.875rem",
-                  color: "oklch(0.75 0.015 75)",
+                  color: "var(--ow-text-mid)",
                   lineHeight: 1.5,
                 }}
               >
@@ -1101,7 +1101,7 @@ export default function Pricing() {
                 border: "none",
                 cursor: "pointer",
                 padding: "0.25rem",
-                color: "oklch(0.50 0.012 75)",
+                color: "var(--ow-text-lo)",
                 flexShrink: 0,
                 lineHeight: 0,
               }}
@@ -1125,13 +1125,13 @@ export default function Pricing() {
               fontFamily: "'Fraunces', serif",
               fontWeight: 700,
               fontSize: "clamp(2rem, 4vw, 3rem)",
-              color: "oklch(0.95 0.018 75)",
+              color: "var(--ow-text-hi)",
               lineHeight: 1.1,
               letterSpacing: "-0.02em",
             }}
           >
             From Free Run to{" "}
-            <em style={{ color: "oklch(0.72 0.12 75)", fontStyle: "italic" }}>
+            <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>
               Cellar Master.
             </em>
           </h1>
@@ -1141,7 +1141,7 @@ export default function Pricing() {
               fontFamily: "'Lato', sans-serif",
               fontWeight: 300,
               fontSize: "1.0625rem",
-              color: "oklch(0.60 0.015 75)",
+              color: "var(--ow-text-lo)",
               lineHeight: 1.7,
             }}
           >
@@ -1155,47 +1155,47 @@ export default function Pricing() {
       <div className="container max-w-5xl mx-auto mb-8">
         <div
           className="rounded-sm px-6 py-5"
-          style={{ background: "oklch(0.72 0.12 75 / 8%)", border: "1px solid oklch(0.72 0.12 75 / 25%)" }}
+          style={{ background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)" }}
         >
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
-            <div className="w-8 h-8 rounded-sm flex items-center justify-center flex-shrink-0" style={{ background: "oklch(0.72 0.12 75 / 15%)" }}>
+            <div className="w-8 h-8 rounded-sm flex items-center justify-center flex-shrink-0" style={{ background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)" }}>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M8 2l1.5 3.5L13 6l-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-.5L8 2z" stroke="oklch(0.72 0.12 75)" strokeWidth="1.2" strokeLinejoin="round" />
+                <path d="M8 2l1.5 3.5L13 6l-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-.5L8 2z" stroke="var(--ow-amber)" strokeWidth="1.2" strokeLinejoin="round" />
               </svg>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium" style={{ fontFamily: "'Lato', sans-serif", color: "oklch(0.80 0.015 75)" }}>
+              <p className="text-sm font-medium" style={{ fontFamily: "'Lato', sans-serif", color: "var(--ow-text-mid)" }}>
                 Founding Member Offer — First 99 paid subscribers
               </p>
-              <p className="text-xs mt-0.5" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "oklch(0.55 0.012 75)" }}>
+              <p className="text-xs mt-0.5" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)" }}>
                 Pricing locked for life · Permanent founding badge · Direct product input · Name in Our Story (optional).
                 Numbers 1–9 reserved; public subscriptions begin at #11.
               </p>
             </div>
-            <div className="flex-shrink-0 text-center px-5 py-3 rounded-sm" style={{ background: "oklch(0.72 0.12 75 / 12%)", border: "1px solid oklch(0.72 0.12 75 / 20%)" }}>
-              <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "2rem", fontWeight: 700, color: "oklch(0.72 0.12 75)", lineHeight: 1 }}>
+            <div className="flex-shrink-0 text-center px-5 py-3 rounded-sm" style={{ background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}>
+              <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "2rem", fontWeight: 700, color: "var(--ow-amber)", lineHeight: 1 }}>
                 {FOUNDING_SPOTS_REMAINING}
               </p>
-              <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.65rem", color: "oklch(0.55 0.012 75)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: "0.25rem" }}>
+              <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.65rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: "0.25rem" }}>
                 spots remaining
               </p>
             </div>
           </div>
           <div>
             <div className="flex justify-between mb-1.5">
-              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "oklch(0.55 0.012 75)" }}>
+              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "var(--ow-text-lo)" }}>
                 {99 - FOUNDING_SPOTS_REMAINING} of 99 founding spots claimed
               </span>
-              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "oklch(0.72 0.12 75)" }}>
+              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "var(--ow-amber)" }}>
                 {Math.round(((99 - FOUNDING_SPOTS_REMAINING) / 99) * 100)}% claimed
               </span>
             </div>
-            <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: "oklch(0.22 0.010 60)" }}>
+            <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: "var(--ow-bg-inset)" }}>
               <div
                 className="h-full rounded-full transition-all duration-1000"
                 style={{
                   width: `${Math.max(2, ((99 - FOUNDING_SPOTS_REMAINING) / 99) * 100)}%`,
-                  background: "linear-gradient(90deg, oklch(0.65 0.10 75), oklch(0.72 0.12 75))",
+                  background: "linear-gradient(90deg, oklch(0.65 0.10 75), var(--ow-amber))",
                 }}
               />
             </div>
@@ -1221,15 +1221,15 @@ export default function Pricing() {
 
       {/* Credit packs */}
       <div className="container max-w-5xl mx-auto mb-16">
-        <div className="flex items-center gap-4" style={{ borderTop: "1px solid oklch(1 0 0 / 6%)" }}>
+        <div className="flex items-center gap-4" style={{ borderTop: "1px solid var(--ow-border)" }}>
           <div className="pt-8 flex-1">
             <p className="section-label mb-2" style={{ fontFamily: "'Lato', sans-serif" }}>
               Credit Packs
             </p>
-            <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "1.75rem", color: "oklch(0.90 0.018 75)" }}>
+            <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "1.75rem", color: "var(--ow-text-hi)" }}>
               Top up when you need it.
             </h2>
-            <p className="mt-2 max-w-xl" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9375rem", color: "oklch(0.55 0.012 75)", lineHeight: 1.7 }}>
+            <p className="mt-2 max-w-xl" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9375rem", color: "var(--ow-text-lo)", lineHeight: 1.7 }}>
               Credits power the AI tutor — every lesson question, quiz, and "explain it differently" request. The Compliance Agent is unlimited on all paid tiers and never consumes credits. Packs never expire; your knowledge investment has no use-by date.
             </p>
           </div>
@@ -1242,9 +1242,9 @@ export default function Pricing() {
       </div>
 
       {/* What is a credit */}
-      <section className="py-16" style={{ background: "oklch(0.13 0.008 60)" }}>
+      <section className="py-16" style={{ background: "var(--ow-bg-base)" }}>
         <div className="container max-w-4xl mx-auto">
-          <h2 className="mb-8 text-center" style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "1.5rem", color: "oklch(0.90 0.018 75)" }}>
+          <h2 className="mb-8 text-center" style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "1.5rem", color: "var(--ow-text-hi)" }}>
             What does one credit get you?
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1256,22 +1256,22 @@ export default function Pricing() {
               { action: "Custom document question", credits: 2, example: "Ask questions from your uploaded SOPs" },
               { action: "Emergency harvest answer", credits: 3, example: "Flagged urgent — priority processing" },
             ].map(item => (
-              <div key={item.action} className="rounded-sm p-4" style={{ background: "oklch(0.11 0.008 60)", border: "1px solid oklch(1 0 0 / 8%)" }}>
+              <div key={item.action} className="rounded-sm p-4" style={{ background: "var(--ow-bg-base)", border: "1px solid var(--ow-border)" }}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium" style={{ fontFamily: "'Lato', sans-serif", color: "oklch(0.80 0.015 75)" }}>
+                  <span className="text-sm font-medium" style={{ fontFamily: "'Lato', sans-serif", color: "var(--ow-text-mid)" }}>
                     {item.action}
                   </span>
-                  <span className="text-xs px-2 py-0.5 rounded-sm" style={{ fontFamily: "'Fira Code', monospace", background: "oklch(0.72 0.12 75 / 12%)", color: "oklch(0.72 0.12 75)" }}>
+                  <span className="text-xs px-2 py-0.5 rounded-sm" style={{ fontFamily: "'Fira Code', monospace", background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", color: "var(--ow-amber)" }}>
                     {item.credits} credit{item.credits > 1 ? "s" : ""}
                   </span>
                 </div>
-                <p className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontStyle: "italic", color: "oklch(0.50 0.012 75)", lineHeight: 1.5 }}>
+                <p className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontStyle: "italic", color: "var(--ow-text-lo)", lineHeight: 1.5 }}>
                   {item.example}
                 </p>
               </div>
             ))}
           </div>
-          <p className="text-center mt-6 text-sm" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "oklch(0.45 0.010 75)", fontStyle: "italic" }}>
+          <p className="text-center mt-6 text-sm" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)", fontStyle: "italic" }}>
             The Compliance Agent is unlimited on all paid tiers — no credits consumed.
           </p>
         </div>
@@ -1280,7 +1280,7 @@ export default function Pricing() {
       {/* FAQ */}
       <section className="py-20">
         <div className="container max-w-2xl mx-auto">
-          <h2 className="mb-8 text-center" style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "1.75rem", color: "oklch(0.90 0.018 75)" }}>
+          <h2 className="mb-8 text-center" style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "1.75rem", color: "var(--ow-text-hi)" }}>
             Common questions
           </h2>
           <div>
@@ -1295,7 +1295,7 @@ export default function Pricing() {
       <section
         id="waitlist"
         className="py-20 text-center"
-        style={{ background: "oklch(0.13 0.008 60)" }}
+        style={{ background: "var(--ow-bg-base)" }}
       >
         <div className="container max-w-2xl mx-auto">
           <p className="section-label mb-4" style={{ fontFamily: "'Lato', sans-serif" }}>
@@ -1306,19 +1306,19 @@ export default function Pricing() {
               fontFamily: "'Fraunces', serif",
               fontWeight: 700,
               fontSize: "clamp(1.75rem, 3vw, 2.5rem)",
-              color: "oklch(0.95 0.018 75)",
+              color: "var(--ow-text-hi)",
               lineHeight: 1.1,
             }}
           >
             You are the must.
             <br />
-            <em style={{ color: "oklch(0.72 0.12 75)", fontStyle: "italic" }}>
+            <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>
               Ownology is the ferment.
             </em>
           </h2>
           <p
             className="mt-4 mb-8"
-            style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "oklch(0.60 0.015 75)", lineHeight: 1.7 }}
+            style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)", lineHeight: 1.7 }}
           >
             Join the waitlist for early access and founding member pricing. First 99 paid subscribers receive lifetime locked rates and a permanent founding badge.
           </p>
@@ -1327,7 +1327,7 @@ export default function Pricing() {
       </section>
 
       {/* Footer note */}
-      <div className="py-6 text-center" style={{ borderTop: "1px solid oklch(1 0 0 / 6%)" }}>
+      <div className="py-6 text-center" style={{ borderTop: "1px solid var(--ow-border)" }}>
         <p className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "oklch(0.40 0.010 75)" }}>
           All prices in AUD. USD pricing available for international customers. Founding member pricing locked for life. No credit card required for Free Run.
         </p>

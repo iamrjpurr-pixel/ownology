@@ -74,7 +74,7 @@ function ArticleEmailCapture() {
         style={{
           flex: 1,
           padding: "0.75rem 1rem",
-          background: "oklch(0.16 0.010 60)",
+          background: "var(--ow-bg-raised)",
           border: "1px solid var(--ow-border-md)",
           borderRadius: "2px",
           color: TEXT_HI,
@@ -143,7 +143,7 @@ export default function BlogTwoPhilosophies() {
           left: 0,
           right: 0,
           zIndex: 50,
-          background: "oklch(0.11 0.008 60 / 97%)",
+          background: "var(--ow-nav-bg)",
           backdropFilter: "blur(12px)",
           borderBottom: `1px solid ${BORDER}`,
         }}
@@ -225,7 +225,7 @@ export default function BlogTwoPhilosophies() {
                 width: "40px",
                 height: "40px",
                 borderRadius: "50%",
-                background: "color-mix(in oklch, var(--ow-amber) 15%, oklch(0.18 0.010 60))",
+                background: "color-mix(in oklch, var(--ow-amber) 15%, var(--ow-bg-inset))",
                 border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
                 display: "flex",
                 alignItems: "center",
@@ -296,7 +296,7 @@ export default function BlogTwoPhilosophies() {
             >
               <table style={{ width: "100%", borderCollapse: "collapse" as const, fontFamily: SANS, fontSize: "0.85rem" }}>
                 <thead>
-                  <tr style={{ background: "oklch(0.16 0.010 60)" }}>
+                  <tr style={{ background: "var(--ow-bg-raised)" }}>
                     <th style={{ padding: "0.75rem 1rem", textAlign: "left" as const, color: TEXT_LO, fontWeight: 400, letterSpacing: "0.06em", fontSize: "0.75rem", textTransform: "uppercase" as const, borderBottom: `1px solid ${BORDER}` }}>Dimension</th>
                     <th style={{ padding: "0.75rem 1rem", textAlign: "left" as const, color: AMBER, fontWeight: 600, borderBottom: `1px solid ${BORDER}` }}>Boutique (&lt; 5,000 cases)</th>
                     <th style={{ padding: "0.75rem 1rem", textAlign: "left" as const, color: TEXT_MID, fontWeight: 600, borderBottom: `1px solid ${BORDER}` }}>Commercial (&gt; 100,000 cases)</th>
@@ -315,7 +315,7 @@ export default function BlogTwoPhilosophies() {
                     ["Winemaking team", "1–3 people (often owner-winemaker)", "5–50 people across winemaking, QA, lab, logistics"],
                     ["Capital investment", "$95,000–$370,000 (equipment)", "$5M–$50M+"],
                   ].map(([dim, boutique, commercial], i) => (
-                    <tr key={i} style={{ background: i % 2 === 0 ? "transparent" : "oklch(0.13 0.008 60 / 50%)" }}>
+                    <tr key={i} style={{ background: i % 2 === 0 ? "transparent" : "var(--ow-nav-bg)" }}>
                       <td style={{ padding: "0.65rem 1rem", color: TEXT_LO, fontWeight: 400, borderBottom: `1px solid ${BORDER}` }}>{dim}</td>
                       <td style={{ padding: "0.65rem 1rem", color: TEXT_HI, borderBottom: `1px solid ${BORDER}` }}>{boutique}</td>
                       <td style={{ padding: "0.65rem 1rem", color: TEXT_MID, borderBottom: `1px solid ${BORDER}` }}>{commercial}</td>
@@ -531,7 +531,7 @@ export default function BlogTwoPhilosophies() {
                     fontSize: "0.7rem",
                     letterSpacing: "0.06em",
                     color: TEXT_LO,
-                    background: "oklch(0.16 0.010 60)",
+                    background: "var(--ow-bg-raised)",
                     border: `1px solid ${BORDER}`,
                     padding: "0.25rem 0.6rem",
                     borderRadius: "2px",

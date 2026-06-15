@@ -83,7 +83,7 @@ function WhatsNewRibbon() {
           fontFamily: "'Fira Code',monospace",
           fontSize: "0.6rem",
           letterSpacing: "0.12em",
-          color: "oklch(0.11 0.008 60)",
+          color: "var(--ow-bg-base)",
           background: "var(--ow-amber)",
           fontWeight: 700,
           whiteSpace: "nowrap",
@@ -293,7 +293,7 @@ function Nav() {
         style={{
           background: scrolled || menuOpen
             ? "var(--ow-nav-bg)"
-            : "oklch(0.11 0.008 60 / 55%)",
+            : "var(--ow-nav-bg)",
         }}
       >
         <div className="container flex items-center justify-between py-5">
@@ -343,11 +343,11 @@ function Nav() {
               <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
                 {menuOpen ? (
                   <>
-                    <path d="M5 5l12 12M17 5L5 17" stroke="oklch(0.72 0.12 75)" strokeWidth="1.8" strokeLinecap="round"/>
+                    <path d="M5 5l12 12M17 5L5 17" stroke="var(--ow-amber)" strokeWidth="1.8" strokeLinecap="round"/>
                   </>
                 ) : (
                   <>
-                    <path d="M3 6h16M3 11h16M3 16h16" stroke="oklch(0.72 0.12 75)" strokeWidth="1.8" strokeLinecap="round"/>
+                    <path d="M3 6h16M3 11h16M3 16h16" stroke="var(--ow-amber)" strokeWidth="1.8" strokeLinecap="round"/>
                   </>
                 )}
               </svg>
@@ -390,7 +390,7 @@ function Nav() {
             aria-label="Close menu"
           >
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-              <path d="M5 5l12 12M17 5L5 17" stroke="oklch(0.72 0.12 75)" strokeWidth="1.8" strokeLinecap="round"/>
+              <path d="M5 5l12 12M17 5L5 17" stroke="var(--ow-amber)" strokeWidth="1.8" strokeLinecap="round"/>
             </svg>
           </button>
         </div>
@@ -568,10 +568,10 @@ function Hero() {
             <div className="cellar-card p-5 max-w-md ml-auto" style={{border:"1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)"}}>
               {/* Header */}
               <div className="flex items-center gap-3 mb-4 pb-4" style={{borderBottom:"1px solid var(--ow-border)"}}>
-                <div className="w-2 h-2 rounded-full" style={{background:"oklch(0.72 0.12 75)"}} />
+                <div className="w-2 h-2 rounded-full" style={{background:"var(--ow-amber)"}} />
                 <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.75rem", color:"var(--ow-text-lo)", letterSpacing:"0.1em", textTransform:"uppercase"}}>Ownology Assistant</span>
                 <div className="ml-auto flex gap-1.5">
-                  {["oklch(0.72 0.12 75 / 30%)","oklch(0.72 0.12 75 / 50%)","oklch(0.72 0.12 75)"].map((c,i)=>(
+                  {["color-mix(in oklch, var(--ow-amber) 30%, transparent)","color-mix(in oklch, var(--ow-amber) 50%, transparent)","var(--ow-amber)"].map((c,i)=>(
                     <div key={i} className="w-1.5 h-1.5 rounded-full" style={{background:c}} />
                   ))}
                 </div>
@@ -584,15 +584,15 @@ function Hero() {
               </div>
               {/* AI response */}
               <div className="flex gap-3">
-                <div className="w-6 h-6 rounded-sm flex-shrink-0 flex items-center justify-center mt-0.5" style={{background:"oklch(0.72 0.12 75 / 15%)", border:"1px solid oklch(0.72 0.12 75 / 30%)"}}>
+                <div className="w-6 h-6 rounded-sm flex-shrink-0 flex items-center justify-center mt-0.5" style={{background:"color-mix(in oklch, var(--ow-amber) 15%, transparent)", border:"1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)"}}>
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                    <circle cx="5" cy="5" r="3.5" stroke="oklch(0.72 0.12 75)" strokeWidth="1.2"/>
-                    <path d="M5 3v2l1.5 1" stroke="oklch(0.72 0.12 75)" strokeWidth="1.2" strokeLinecap="round"/>
+                    <circle cx="5" cy="5" r="3.5" stroke="var(--ow-amber)" strokeWidth="1.2"/>
+                    <path d="M5 3v2l1.5 1" stroke="var(--ow-amber)" strokeWidth="1.2" strokeLinecap="round"/>
                   </svg>
                 </div>
                 <div className="text-sm leading-relaxed" style={{color:"var(--ow-text-mid)", fontFamily:"'Lato',sans-serif", lineHeight:1.65}}>
                   {displayed}
-                  {!done && <span className="cursor-blink" style={{color:"oklch(0.72 0.12 75)"}}>|</span>}
+                  {!done && <span className="cursor-blink" style={{color:"var(--ow-amber)"}}>|</span>}
                 </div>
               </div>
               {/* Data chips */}
@@ -640,7 +640,7 @@ function PainPoints() {
           {points.map((p, i) => (
             <div key={p.num} className={`p-8 ${inView ? `fade-up fade-up-delay-${i+1}` : "opacity-0"}`}
               style={{background:"var(--ow-bg-raised)"}}>
-              <span className="data-readout text-xs mb-4 block" style={{color:"oklch(0.72 0.12 75 / 60%)"}}>{p.num}</span>
+              <span className="data-readout text-xs mb-4 block" style={{color:"color-mix(in oklch, var(--ow-amber) 60%, transparent)"}}>{p.num}</span>
               <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.25rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>{p.title}</h3>
               <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7}}>{p.body}</p>
             </div>
@@ -670,16 +670,16 @@ function Features() {
           {/* Feature 1 — large */}
           <div className={`md:col-span-2 cellar-card overflow-hidden ${inView ? "fade-up" : "opacity-0"}`}>
             <div className="p-8">
-              <div className="w-10 h-10 rounded-sm flex items-center justify-center mb-5" style={{background:"oklch(0.72 0.12 75 / 12%)", border:"1px solid oklch(0.72 0.12 75 / 25%)"}}>
+              <div className="w-10 h-10 rounded-sm flex items-center justify-center mb-5" style={{background:"color-mix(in oklch, var(--ow-amber) 12%, transparent)", border:"1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)"}}>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                  <path d="M3 9h12M9 3l6 6-6 6" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M3 9h12M9 3l6 6-6 6" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
               <EditableText contentKey="home.features.ask.title" defaultValue="AI Knowledge Assistant" as="h3" style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.375rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}} contentMap={contentMap} />
               <EditableText contentKey="home.features.ask.body" defaultValue="Ask anything — from complex SO2 calculations to your own harvest protocols. The assistant searches your uploaded documents and world-class wine science literature, then delivers a precise, cited answer in seconds." as="p" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7, maxWidth:"420px"}} multiline contentMap={contentMap} />
               <div className="mt-6 p-4 rounded-sm" style={{background:"var(--ow-bg-base)", border:"1px solid var(--ow-border)"}}>
-                <p className="data-readout text-xs mb-2" style={{color:"oklch(0.72 0.12 75 / 60%)"}}>EXAMPLE QUERY</p>
-                <p style={{fontFamily:"'Fira Code',monospace", fontSize:"0.8125rem", color:"oklch(0.72 0.12 75)", lineHeight:1.6}}>
+                <p className="data-readout text-xs mb-2" style={{color:"color-mix(in oklch, var(--ow-amber) 60%, transparent)"}}>EXAMPLE QUERY</p>
+                <p style={{fontFamily:"'Fira Code',monospace", fontSize:"0.8125rem", color:"var(--ow-amber)", lineHeight:1.6}}>
                   "What is the target Free SO2 for our barrel-aged Chardonnay before bottling, and how much KMS for a 60-gallon barrel at 15ppm?"
                 </p>
               </div>
@@ -709,10 +709,10 @@ function Features() {
 
           {/* Feature 3 */}
           <div className={`cellar-card p-8 ${inView ? "fade-up fade-up-delay-2" : "opacity-0"}`}>
-            <div className="w-10 h-10 rounded-sm flex items-center justify-center mb-5" style={{background:"oklch(0.72 0.12 75 / 12%)", border:"1px solid oklch(0.72 0.12 75 / 25%)"}}>
+            <div className="w-10 h-10 rounded-sm flex items-center justify-center mb-5" style={{background:"color-mix(in oklch, var(--ow-amber) 12%, transparent)", border:"1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)"}}>
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M3 14 L6 8 L9 11 L12 5 L15 9" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="15" cy="9" r="1.5" fill="oklch(0.72 0.12 75)"/>
+                <path d="M3 14 L6 8 L9 11 L12 5 L15 9" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="15" cy="9" r="1.5" fill="var(--ow-amber)"/>
               </svg>
             </div>
               <EditableText contentKey="home.features.comply.title" defaultValue="Fermentation Dashboard" as="h3" style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.25rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}} contentMap={contentMap} />
@@ -720,17 +720,17 @@ function Features() {
             {/* Mini chart */}
             <div className="mt-6 p-3 rounded-sm" style={{background:"var(--ow-bg-base)"}}>
               <div className="flex justify-between mb-2">
-                <span className="data-readout text-xs" style={{color:"oklch(0.72 0.12 75 / 60%)"}}>TANK 7 · SHIRAZ</span>
-                <span className="data-readout text-xs" style={{color:"oklch(0.72 0.12 75)"}}>DAY 8</span>
+                <span className="data-readout text-xs" style={{color:"color-mix(in oklch, var(--ow-amber) 60%, transparent)"}}>TANK 7 · SHIRAZ</span>
+                <span className="data-readout text-xs" style={{color:"var(--ow-amber)"}}>DAY 8</span>
               </div>
               <svg viewBox="0 0 200 60" className="w-full" style={{height:"48px"}}>
-                <path d="M0 8 C20 8, 40 14, 60 22 C80 30, 100 38, 120 44 C140 50, 160 54, 200 56" stroke="oklch(0.72 0.12 75 / 30%)" strokeWidth="1" fill="none" strokeDasharray="4 3"/>
-                <path d="M0 8 C20 8, 40 15, 60 24 C80 33, 100 42, 130 50" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" fill="none"/>
-                <circle cx="130" cy="50" r="3" fill="oklch(0.72 0.12 75)"/>
+                <path d="M0 8 C20 8, 40 14, 60 22 C80 30, 100 38, 120 44 C140 50, 160 54, 200 56" stroke="color-mix(in oklch, var(--ow-amber) 30%, transparent)" strokeWidth="1" fill="none" strokeDasharray="4 3"/>
+                <path d="M0 8 C20 8, 40 15, 60 24 C80 33, 100 42, 130 50" stroke="var(--ow-amber)" strokeWidth="1.5" fill="none"/>
+                <circle cx="130" cy="50" r="3" fill="var(--ow-amber)"/>
               </svg>
               <div className="flex justify-between mt-1">
-                <span className="data-readout text-xs" style={{color:"oklch(0.50 0.010 75)"}}>24.3 Brix</span>
-                <span className="data-readout text-xs" style={{color:"oklch(0.72 0.12 75)"}}>8.4 Brix</span>
+                <span className="data-readout text-xs" style={{color:"var(--ow-text-lo)"}}>24.3 Brix</span>
+                <span className="data-readout text-xs" style={{color:"var(--ow-amber)"}}>8.4 Brix</span>
               </div>
             </div>
           </div>
@@ -757,7 +757,7 @@ function Features() {
                         <path d="M3 2h5l2 2v6a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="oklch(0.62 0.10 45)" strokeWidth="1"/>
                       </svg>
                       <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-mid)"}}>{f}</span>
-                      <div className="ml-auto w-1.5 h-1.5 rounded-full" style={{background:"oklch(0.72 0.12 75)"}} />
+                      <div className="ml-auto w-1.5 h-1.5 rounded-full" style={{background:"var(--ow-amber)"}} />
                     </div>
                   ))}
                 </div>
@@ -800,9 +800,9 @@ function HowItWorks() {
           {steps.map((s, i) => (
             <div key={s.n} className={`relative ${inView ? `fade-up fade-up-delay-${i+1}` : "opacity-0"}`}>
               <div className="flex items-start gap-4 mb-4">
-                <span style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"2.5rem", color:"oklch(0.72 0.12 75 / 20%)", lineHeight:1, minWidth:"2.5rem"}}>{s.n}</span>
+                <span style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"2.5rem", color:"color-mix(in oklch, var(--ow-amber) 20%, transparent)", lineHeight:1, minWidth:"2.5rem"}}>{s.n}</span>
                 {i < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-5 left-full w-full h-px" style={{background:"linear-gradient(to right, oklch(0.72 0.12 75 / 20%), transparent)", transform:"translateX(-50%)"}} />
+                  <div className="hidden lg:block absolute top-5 left-full w-full h-px" style={{background:"linear-gradient(to right, color-mix(in oklch, var(--ow-amber) 20%, transparent), transparent)", transform:"translateX(-50%)"}} />
                 )}
               </div>
               <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.125rem", color:"var(--ow-text-hi)", marginBottom:"0.625rem"}}>{s.title}</h3>
@@ -817,7 +817,7 @@ function HowItWorks() {
             <div className="rounded-2xl overflow-hidden shadow-2xl" style={{border:"1px solid color-mix(in oklch, var(--ow-amber) 15%, transparent)"}}>
               <img src={PHONE_IMG} alt="Ownology on mobile" className="w-full" />
             </div>
-            <div className="absolute -bottom-4 -right-4 px-4 py-2 rounded-sm" style={{background:"oklch(0.72 0.12 75)", fontFamily:"'Lato',sans-serif", fontWeight:700, fontSize:"0.75rem", color:"oklch(0.11 0.008 60)", letterSpacing:"0.04em", textTransform:"uppercase"}}>
+            <div className="absolute -bottom-4 -right-4 px-4 py-2 rounded-sm" style={{background:"var(--ow-amber)", fontFamily:"'Lato',sans-serif", fontWeight:700, fontSize:"0.75rem", color:"var(--ow-bg-base)", letterSpacing:"0.04em", textTransform:"uppercase"}}>
               Mobile First
             </div>
           </div>
@@ -907,7 +907,7 @@ function Testimonials() {
         <div className="grid md:grid-cols-3 gap-6">
           {quotes.map((t, i) => (
             <div key={i} className={`cellar-card p-8 flex flex-col ${inView ? `fade-up fade-up-delay-${i+1}` : "opacity-0"}`}>
-              <div className="mb-5" style={{color:"oklch(0.72 0.12 75)", fontSize:"2rem", lineHeight:1, fontFamily:"'Fraunces',serif"}}>"</div>
+              <div className="mb-5" style={{color:"var(--ow-amber)", fontSize:"2rem", lineHeight:1, fontFamily:"'Fraunces',serif"}}>"</div>
               <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.75, flex:1, fontStyle:"italic"}}>
                 {t.q}
               </p>
@@ -966,7 +966,7 @@ function Pricing() {
               }}>
               {t.highlight && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-sm text-xs font-bold tracking-widest uppercase"
-                  style={{background:"oklch(0.72 0.12 75)", color:"oklch(0.11 0.008 60)", fontFamily:"'Lato',sans-serif"}}>
+                  style={{background:"var(--ow-amber)", color:"var(--ow-bg-base)", fontFamily:"'Lato',sans-serif"}}>
                   Most Popular
                 </div>
               )}
@@ -975,13 +975,13 @@ function Pricing() {
                 <span style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"2.75rem", color:"var(--ow-text-hi)", lineHeight:1}}>{t.price}</span>
                 <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.875rem", color:"var(--ow-text-lo)", paddingBottom:"0.35rem"}}>{t.period}</span>
               </div>
-              <p className="data-readout text-xs mb-6" style={{color:"oklch(0.55 0.012 75)"}}>{t.cases}</p>
+              <p className="data-readout text-xs mb-6" style={{color:"var(--ow-text-lo)"}}>{t.cases}</p>
               <div className="amber-rule mb-6" />
               <ul className="flex flex-col gap-3 flex-1 mb-8">
                 {t.features.map(f => (
                   <li key={f} className="flex items-start gap-3">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="mt-0.5 flex-shrink-0">
-                      <path d="M2.5 7l3 3 6-6" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M2.5 7l3 3 6-6" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                     <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.9rem", color:"var(--ow-text-mid)", fontWeight:300}}>{f}</span>
                   </li>

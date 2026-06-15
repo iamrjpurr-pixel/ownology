@@ -177,7 +177,7 @@ interface WorkflowStage {
 }
 
 const PILLAR_COLORS: Record<string, string> = {
-  do:    "oklch(0.72 0.12 75)",    // amber — operational
+  do:    "var(--ow-amber)",    // amber — operational
   know:  "oklch(0.62 0.10 45)",    // warm brown — knowledge
   learn: "oklch(0.65 0.10 220)",   // blue — learning
 };
@@ -400,8 +400,8 @@ function RoleCard({ path }: { path: RolePath }) {
       <div className="flex items-start gap-3">
         <div style={{
           width: "2.25rem", height: "2.25rem", borderRadius: "4px", flexShrink: 0,
-          background: "oklch(0.72 0.12 75 / 12%)",
-          border: "1px solid oklch(0.72 0.12 75 / 25%)",
+          background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
+          border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
           display: "flex", alignItems: "center", justifyContent: "center",
           color: AMBER,
         }}>
@@ -533,7 +533,7 @@ export default function Guide() {
               description="Log fermentation events, track tanks and barrels, manage vineyard blocks, assign cellar tasks, and generate export documentation."
               href="/the-press"
               icon={<ClipboardList className="w-5 h-5" />}
-              color="oklch(0.72 0.12 75)"
+              color="var(--ow-amber)"
             />
             <PillarCard
               pillar="Know"
@@ -600,8 +600,8 @@ export default function Guide() {
                   <div className="flex items-center gap-3 py-3">
                     <div style={{
                       width: "1.75rem", height: "1.75rem", borderRadius: "50%", flexShrink: 0,
-                      background: "oklch(0.72 0.12 75 / 12%)",
-                      border: "1px solid oklch(0.72 0.12 75 / 30%)",
+                      background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
+                      border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       color: AMBER,
                     }}>
@@ -622,7 +622,7 @@ export default function Guide() {
                   {stageIdx < WORKFLOW_STAGES.length - 1 && (
                     <div className="flex justify-center py-1 pl-9">
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M8 2v10M4 8l4 4 4-4" stroke="oklch(0.72 0.12 75 / 40%)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M8 2v10M4 8l4 4 4-4" stroke="color-mix(in oklch, var(--ow-amber) 40%, transparent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                   )}
@@ -766,7 +766,7 @@ export default function Guide() {
                 audience: "Boutique winery teams",
                 highlight: true,
                 pillars: [
-                  { label: "DO",    color: "oklch(0.72 0.12 75)",  desc: "Full cellar operations suite" },
+                  { label: "DO",    color: "var(--ow-amber)",  desc: "Full cellar operations suite" },
                   { label: "KNOW",  color: "oklch(0.62 0.10 45)",  desc: "31 SOPs, Decision Logic, Tribal Knowledge" },
                   { label: "GUIDE", color: "oklch(0.65 0.10 160)", desc: "Priority Compliance AI" },
                 ],
@@ -779,7 +779,7 @@ export default function Guide() {
                 audience: "Multi-person winery teams",
                 highlight: false,
                 pillars: [
-                  { label: "DO",    color: "oklch(0.72 0.12 75)",  desc: "Full cellar operations + 3 team seats" },
+                  { label: "DO",    color: "var(--ow-amber)",  desc: "Full cellar operations + 3 team seats" },
                   { label: "KNOW",  color: "oklch(0.62 0.10 45)",  desc: "Knowledge Platform + team editing" },
                   { label: "LEARN", color: "oklch(0.65 0.10 220)", desc: "Unlimited AI tutor credits" },
                   { label: "GUIDE", color: "oklch(0.65 0.10 160)", desc: "Onboarding call + annual review" },
@@ -790,7 +790,7 @@ export default function Guide() {
             ] as Array<{ tier: string; price: string; audience: string; highlight: boolean; pillars: Array<{ label: string; color: string; desc: string }>; href: string; cta: string }>).map(t => (
               <div key={t.tier} style={{
                 background: t.highlight ? "oklch(0.16 0.012 60)" : BG_CARD,
-                border: t.highlight ? "1px solid oklch(0.72 0.12 75 / 40%)" : `1px solid ${BORDER}`,
+                border: t.highlight ? "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)" : `1px solid ${BORDER}`,
                 borderRadius: "4px",
                 padding: "1.25rem",
                 display: "flex",
@@ -827,8 +827,8 @@ export default function Guide() {
                   textDecoration: "none",
                   marginTop: "auto",
                   background: t.highlight ? AMBER : "transparent",
-                  color: t.highlight ? "oklch(0.11 0.008 60)" : AMBER,
-                  border: t.highlight ? "none" : "1px solid oklch(0.72 0.12 75 / 35%)",
+                  color: t.highlight ? "var(--ow-bg-base)" : AMBER,
+                  border: t.highlight ? "none" : "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)",
                 }}>
                   {t.cta}
                 </Link>
@@ -853,7 +853,7 @@ export default function Guide() {
             {([
               { step: 1, title: "Clean Your Tank", pillarLabel: "DO", pillarColor: "oklch(0.65 0.10 220)", tool: "Cellar Tasks", toolHref: "/cellar-tasks", sopTitle: "Tank Cleaning & Sanitisation", sopHref: "/knowledge/category/Tank%20Cleaning%20%26%20Sanitation", desc: "Verify cleaning record, inspect valves and seals, confirm tank ID." },
               { step: 2, title: "Receive Your Grapes", pillarLabel: "DO", pillarColor: "oklch(0.65 0.10 220)", tool: "The Press", toolHref: "/the-press", sopTitle: "Red Wine Fermentation", sopHref: "/knowledge/category/Fermentation%20Management", desc: "Record vineyard block, variety, date, Brix, pH, and TA at intake." },
-              { step: 3, title: "Add Your Yeast", pillarLabel: "KNOW", pillarColor: "oklch(0.72 0.12 75)", tool: "Knowledge Platform", toolHref: "/knowledge", sopTitle: "Yeast Rehydration & Inoculation", sopHref: "/knowledge/category/Fermentation%20Management", desc: "Rehydrate yeast correctly. Record batch number and inoculation time." },
+              { step: 3, title: "Add Your Yeast", pillarLabel: "KNOW", pillarColor: "var(--ow-amber)", tool: "Knowledge Platform", toolHref: "/knowledge", sopTitle: "Yeast Rehydration & Inoculation", sopHref: "/knowledge/category/Fermentation%20Management", desc: "Rehydrate yeast correctly. Record batch number and inoculation time." },
               { step: 4, title: "Monitor Daily", pillarLabel: "DO", pillarColor: "oklch(0.65 0.10 220)", tool: "Quick Entry", toolHref: "/quick-entry", sopTitle: "Pump-Over Protocol", sopHref: "/knowledge/category/Fermentation%20Management", desc: "Measure temperature, Brix, and sensory observations every day." },
               { step: 5, title: "Manage the Cap", pillarLabel: "DO", pillarColor: "oklch(0.65 0.10 220)", tool: "The Press", toolHref: "/the-press", sopTitle: "Pump-Over Protocol", sopHref: "/knowledge/category/Fermentation%20Management", desc: "Conduct pump-overs per your fermentation schedule. Record duration." },
               { step: 6, title: "Press the Wine", pillarLabel: "DO", pillarColor: "oklch(0.65 0.10 220)", tool: "The Press", toolHref: "/the-press", sopTitle: "Wine Press Operation & Pressing", sopHref: "/knowledge/category/Fermentation%20Management", desc: "Confirm residual sugar target. Separate free-run from press fractions." },
@@ -866,7 +866,7 @@ export default function Guide() {
               }}>
                 <div style={{
                   width: "2.25rem", height: "2.25rem", borderRadius: "50%",
-                  background: "oklch(0.72 0.12 75 / 10%)", border: "1px solid oklch(0.72 0.12 75 / 25%)",
+                  background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontFamily: SERIF, fontWeight: 700, fontSize: "0.875rem", color: AMBER, flexShrink: 0,
                 }}>

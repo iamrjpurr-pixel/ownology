@@ -69,7 +69,7 @@ function AccessDenied({ isForbidden }: { isForbidden: boolean }) {
     >
       <div
         className="w-14 h-14 rounded-full flex items-center justify-center"
-        style={{ background: "oklch(0.72 0.12 75 / 12%)", color: "var(--ow-amber)" }}
+        style={{ background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", color: "var(--ow-amber)" }}
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -151,7 +151,7 @@ function EntryCard({ entry, index }: { entry: DoctrineEntry; index: number }) {
         <span
           className="flex-shrink-0 w-7 h-7 rounded-sm flex items-center justify-center text-xs font-mono mt-0.5"
           style={{
-            background: "oklch(0.72 0.12 75 / 10%)",
+            background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
             color: "var(--ow-amber)",
             fontFamily: "'Fira Code',monospace",
             fontSize: "0.65rem",
@@ -276,7 +276,7 @@ function EntryCard({ entry, index }: { entry: DoctrineEntry; index: number }) {
                     <span
                       className="flex-shrink-0 w-5 h-5 rounded-sm flex items-center justify-center text-xs"
                       style={{
-                        background: "oklch(0.72 0.12 75 / 12%)",
+                        background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
                         color: "var(--ow-amber)",
                         fontFamily: "'Fira Code',monospace",
                         fontSize: "0.6rem",
@@ -613,7 +613,7 @@ export default function AdminComplianceDoctrine() {
                   <span
                     className="px-2 py-0.5 rounded-full text-xs"
                     style={{
-                      background: "oklch(0.72 0.12 75 / 12%)",
+                      background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
                       color: "var(--ow-amber)",
                       fontFamily: "'Fira Code',monospace",
                       fontSize: "0.65rem",

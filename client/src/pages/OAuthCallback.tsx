@@ -51,7 +51,7 @@ export default function OAuthCallback() {
     <div
       style={{
         minHeight: "100vh",
-        background: "oklch(0.11 0.008 60)",
+        background: "var(--ow-bg-base)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -68,8 +68,8 @@ export default function OAuthCallback() {
           width: "36px",
           height: "36px",
           borderRadius: "50%",
-          border: "3px solid oklch(0.72 0.12 75 / 20%)",
-          borderTopColor: "oklch(0.72 0.12 75)",
+          border: "3px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
+          borderTopColor: "var(--ow-amber)",
           animation: "ow-spin 0.75s linear infinite",
         }}
       />
@@ -81,7 +81,7 @@ export default function OAuthCallback() {
           fontWeight: 300,
           fontSize: "0.875rem",
           letterSpacing: "0.08em",
-          color: "oklch(0.55 0.015 75)",
+          color: "var(--ow-text-lo)",
           textTransform: "uppercase",
         }}
       >

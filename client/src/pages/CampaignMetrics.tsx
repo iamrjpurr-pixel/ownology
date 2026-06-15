@@ -38,7 +38,7 @@ import { Loader2, TrendingUp, Users, ShoppingBag, Search, Mail, Zap, RefreshCw, 
 import { toast } from "sonner";
 
 // ─── Colour tokens ────────────────────────────────────────────────────────────
-const AMBER = "oklch(0.72 0.12 75)";
+const AMBER = "var(--ow-amber)";
 const AMBER_DIM = "oklch(0.55 0.09 75)";
 const WARM_WHITE = "oklch(0.92 0.010 75)";
 
@@ -59,14 +59,14 @@ function KpiCard({
   return (
     <Card
       style={{
-        background: "oklch(0.13 0.008 60)",
-        border: "1px solid oklch(0.22 0.010 60)",
+        background: "var(--ow-bg-base)",
+        border: "1px solid var(--ow-bg-inset)",
       }}
     >
       <CardContent className="pt-5 pb-4">
         <div className="flex items-start justify-between">
           <div>
-            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", color: "oklch(0.55 0.015 75)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
               {title}
             </p>
             <p
@@ -76,14 +76,14 @@ function KpiCard({
               {value}
             </p>
             {sub && (
-              <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", color: "oklch(0.50 0.012 75)", marginTop: "0.25rem" }}>
+              <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)", marginTop: "0.25rem" }}>
                 {sub}
               </p>
             )}
           </div>
           <div
             className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ background: "oklch(0.72 0.12 75 / 12%)", border: "1px solid oklch(0.72 0.12 75 / 25%)" }}
+            style={{ background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)" }}
           >
             <Icon size={18} style={{ color: AMBER }} />
           </div>
@@ -113,15 +113,15 @@ function ChartTooltip({ active, payload, label }: any) {
   return (
     <div
       style={{
-        background: "oklch(0.13 0.008 60)",
-        border: "1px solid oklch(0.22 0.010 60)",
+        background: "var(--ow-bg-base)",
+        border: "1px solid var(--ow-bg-inset)",
         borderRadius: "6px",
         padding: "10px 14px",
         fontFamily: "'Lato',sans-serif",
         fontSize: "0.8rem",
       }}
     >
-      <p style={{ color: "oklch(0.55 0.015 75)", marginBottom: "6px" }}>{label}</p>
+      <p style={{ color: "var(--ow-text-lo)", marginBottom: "6px" }}>{label}</p>
       {payload.map((p: any) => (
         <p key={p.dataKey} style={{ color: p.color, margin: "2px 0" }}>
           {p.name}: <strong>{p.value}</strong>
@@ -186,7 +186,7 @@ function SnapshotForm({ onSuccess }: { onSuccess: () => void }) {
         onClick={() => setOpen(true)}
         variant="outline"
         size="sm"
-        style={{ borderColor: "oklch(0.72 0.12 75 / 40%)", color: AMBER }}
+        style={{ borderColor: "color-mix(in oklch, var(--ow-amber) 40%, transparent)", color: AMBER }}
       >
         <PlusCircle size={14} className="mr-1.5" /> Add / Update Snapshot
       </Button>
@@ -194,7 +194,7 @@ function SnapshotForm({ onSuccess }: { onSuccess: () => void }) {
   }
 
   return (
-    <Card style={{ background: "oklch(0.13 0.008 60)", border: "1px solid oklch(0.72 0.12 75 / 30%)" }}>
+    <Card style={{ background: "var(--ow-bg-base)", border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}>
       <CardHeader>
         <CardTitle style={{ fontFamily: "'Fraunces',serif", color: WARM_WHITE, fontSize: "1rem" }}>
           Add or Update Weekly Snapshot
@@ -203,12 +203,12 @@ function SnapshotForm({ onSuccess }: { onSuccess: () => void }) {
       <CardContent>
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <Label style={{ color: "oklch(0.65 0.015 75)" }}>Week Label (YYYY-Wnn) *</Label>
+            <Label style={{ color: "var(--ow-text-mid)" }}>Week Label (YYYY-Wnn) *</Label>
             <Input
               placeholder="e.g. 2026-W20"
               value={form.weekLabel}
               onChange={(e) => setForm((f) => ({ ...f, weekLabel: e.target.value }))}
-              style={{ background: "oklch(0.16 0.008 60)", borderColor: "oklch(0.25 0.010 60)", color: WARM_WHITE }}
+              style={{ background: "var(--ow-bg-inset)", borderColor: "oklch(0.25 0.010 60)", color: WARM_WHITE }}
               required
             />
           </div>
@@ -225,34 +225,34 @@ function SnapshotForm({ onSuccess }: { onSuccess: () => void }) {
             { key: "complianceQueries", label: "Compliance Queries", placeholder: "e.g. 87" },
           ].map(({ key, label, placeholder }) => (
             <div key={key}>
-              <Label style={{ color: "oklch(0.65 0.015 75)" }}>{label}</Label>
+              <Label style={{ color: "var(--ow-text-mid)" }}>{label}</Label>
               <Input
                 placeholder={placeholder}
                 value={(form as any)[key]}
                 onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                style={{ background: "oklch(0.16 0.008 60)", borderColor: "oklch(0.25 0.010 60)", color: WARM_WHITE }}
+                style={{ background: "var(--ow-bg-inset)", borderColor: "oklch(0.25 0.010 60)", color: WARM_WHITE }}
               />
             </div>
           ))}
           <div className="col-span-2">
-            <Label style={{ color: "oklch(0.65 0.015 75)" }}>Notes</Label>
+            <Label style={{ color: "var(--ow-text-mid)" }}>Notes</Label>
             <Textarea
               placeholder="Optional notes for this week..."
               value={form.notes}
               onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-              style={{ background: "oklch(0.16 0.008 60)", borderColor: "oklch(0.25 0.010 60)", color: WARM_WHITE }}
+              style={{ background: "var(--ow-bg-inset)", borderColor: "oklch(0.25 0.010 60)", color: WARM_WHITE }}
             />
           </div>
           <div className="col-span-2 flex gap-3">
             <Button
               type="submit"
               disabled={upsert.isPending}
-              style={{ background: AMBER, color: "oklch(0.11 0.008 60)", fontWeight: 600 }}
+              style={{ background: AMBER, color: "var(--ow-bg-base)", fontWeight: 600 }}
             >
               {upsert.isPending ? <Loader2 size={14} className="mr-1.5 animate-spin" /> : null}
               Save Snapshot
             </Button>
-            <Button type="button" variant="ghost" onClick={() => setOpen(false)} style={{ color: "oklch(0.55 0.015 75)" }}>
+            <Button type="button" variant="ghost" onClick={() => setOpen(false)} style={{ color: "var(--ow-text-lo)" }}>
               Cancel
             </Button>
           </div>
@@ -296,14 +296,14 @@ export default function CampaignMetrics() {
   return (
     <div
       className="min-h-screen"
-      style={{ background: "oklch(0.11 0.008 60)", fontFamily: "'Lato',sans-serif" }}
+      style={{ background: "var(--ow-bg-base)", fontFamily: "'Lato',sans-serif" }}
     >
       {/* Header */}
-      <div style={{ borderBottom: "1px solid oklch(0.18 0.008 60)" }}>
+      <div style={{ borderBottom: "1px solid var(--ow-bg-inset)" }}>
         <div className="container py-8">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <p style={{ fontSize: "0.7rem", color: "oklch(0.55 0.015 75)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              <p style={{ fontSize: "0.7rem", color: "var(--ow-text-lo)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Post-Vintage Campaign
               </p>
               <h1
@@ -311,13 +311,13 @@ export default function CampaignMetrics() {
               >
                 Campaign Metrics
               </h1>
-              <p style={{ color: "oklch(0.55 0.015 75)", fontSize: "0.85rem", marginTop: "0.4rem" }}>
+              <p style={{ color: "var(--ow-text-lo)", fontSize: "0.85rem", marginTop: "0.4rem" }}>
                 Weekly snapshots — May to October 2026
               </p>
             </div>
             <div className="flex items-center gap-3">
               <Badge
-                style={{ background: "oklch(0.72 0.12 75 / 15%)", color: AMBER, border: "1px solid oklch(0.72 0.12 75 / 30%)", fontSize: "0.7rem" }}
+                style={{ background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)", color: AMBER, border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)", fontSize: "0.7rem" }}
               >
                 {rows.length} weeks tracked
               </Badge>
@@ -325,7 +325,7 @@ export default function CampaignMetrics() {
                 variant="ghost"
                 size="sm"
                 onClick={() => refetch()}
-                style={{ color: "oklch(0.55 0.015 75)" }}
+                style={{ color: "var(--ow-text-lo)" }}
               >
                 <RefreshCw size={14} className="mr-1.5" /> Refresh
               </Button>
@@ -373,7 +373,7 @@ export default function CampaignMetrics() {
             </div>
 
             {/* Founding members + MRR chart */}
-            <Card style={{ background: "oklch(0.13 0.008 60)", border: "1px solid oklch(0.22 0.010 60)" }}>
+            <Card style={{ background: "var(--ow-bg-base)", border: "1px solid var(--ow-bg-inset)" }}>
               <CardHeader>
                 <CardTitle style={{ fontFamily: "'Fraunces',serif", color: WARM_WHITE, fontSize: "1rem" }}>
                   Founding Members &amp; MRR
@@ -383,8 +383,8 @@ export default function CampaignMetrics() {
                 {chartData.length === 0 ? (
                   <div className="flex items-center justify-center py-16 text-center">
                     <div>
-                      <p style={{ color: "oklch(0.55 0.015 75)", fontSize: "0.9rem" }}>No data yet.</p>
-                      <p style={{ color: "oklch(0.40 0.010 60)", fontSize: "0.8rem", marginTop: "0.5rem" }}>
+                      <p style={{ color: "var(--ow-text-lo)", fontSize: "0.9rem" }}>No data yet.</p>
+                      <p style={{ color: "var(--ow-text-lo)", fontSize: "0.8rem", marginTop: "0.5rem" }}>
                         The weekly Heartbeat will auto-insert a snapshot every Monday.<br />
                         You can also add a snapshot manually below.
                       </p>
@@ -393,12 +393,12 @@ export default function CampaignMetrics() {
                 ) : (
                   <ResponsiveContainer width="100%" height={260}>
                     <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.20 0.008 60)" />
-                      <XAxis dataKey="week" tick={{ fill: "oklch(0.50 0.012 75)", fontSize: 11 }} />
-                      <YAxis yAxisId="left" tick={{ fill: "oklch(0.50 0.012 75)", fontSize: 11 }} />
-                      <YAxis yAxisId="right" orientation="right" tick={{ fill: "oklch(0.50 0.012 75)", fontSize: 11 }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--ow-bg-inset)" />
+                      <XAxis dataKey="week" tick={{ fill: "var(--ow-text-lo)", fontSize: 11 }} />
+                      <YAxis yAxisId="left" tick={{ fill: "var(--ow-text-lo)", fontSize: 11 }} />
+                      <YAxis yAxisId="right" orientation="right" tick={{ fill: "var(--ow-text-lo)", fontSize: 11 }} />
                       <Tooltip content={<ChartTooltip />} />
-                      <Legend wrapperStyle={{ fontSize: "0.75rem", color: "oklch(0.60 0.015 75)" }} />
+                      <Legend wrapperStyle={{ fontSize: "0.75rem", color: "var(--ow-text-lo)" }} />
                       <Line
                         yAxisId="left"
                         type="monotone"
@@ -424,7 +424,7 @@ export default function CampaignMetrics() {
 
             {/* Waitlist + email chart */}
             <div className="grid md:grid-cols-2 gap-6">
-              <Card style={{ background: "oklch(0.13 0.008 60)", border: "1px solid oklch(0.22 0.010 60)" }}>
+              <Card style={{ background: "var(--ow-bg-base)", border: "1px solid var(--ow-bg-inset)" }}>
                 <CardHeader>
                   <CardTitle style={{ fontFamily: "'Fraunces',serif", color: WARM_WHITE, fontSize: "1rem" }}>
                     Waitlist Growth
@@ -433,9 +433,9 @@ export default function CampaignMetrics() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={200}>
                     <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.20 0.008 60)" />
-                      <XAxis dataKey="week" tick={{ fill: "oklch(0.50 0.012 75)", fontSize: 10 }} />
-                      <YAxis tick={{ fill: "oklch(0.50 0.012 75)", fontSize: 10 }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--ow-bg-inset)" />
+                      <XAxis dataKey="week" tick={{ fill: "var(--ow-text-lo)", fontSize: 10 }} />
+                      <YAxis tick={{ fill: "var(--ow-text-lo)", fontSize: 10 }} />
                       <Tooltip content={<ChartTooltip />} />
                       <Bar dataKey="Waitlist" fill={AMBER} radius={[3, 3, 0, 0]} />
                     </BarChart>
@@ -443,7 +443,7 @@ export default function CampaignMetrics() {
                 </CardContent>
               </Card>
 
-              <Card style={{ background: "oklch(0.13 0.008 60)", border: "1px solid oklch(0.22 0.010 60)" }}>
+              <Card style={{ background: "var(--ow-bg-base)", border: "1px solid var(--ow-bg-inset)" }}>
                 <CardHeader>
                   <CardTitle style={{ fontFamily: "'Fraunces',serif", color: WARM_WHITE, fontSize: "1rem" }}>
                     Email Engagement
@@ -452,11 +452,11 @@ export default function CampaignMetrics() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={200}>
                     <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.20 0.008 60)" />
-                      <XAxis dataKey="week" tick={{ fill: "oklch(0.50 0.012 75)", fontSize: 10 }} />
-                      <YAxis tick={{ fill: "oklch(0.50 0.012 75)", fontSize: 10 }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--ow-bg-inset)" />
+                      <XAxis dataKey="week" tick={{ fill: "var(--ow-text-lo)", fontSize: 10 }} />
+                      <YAxis tick={{ fill: "var(--ow-text-lo)", fontSize: 10 }} />
                       <Tooltip content={<ChartTooltip />} />
-                      <Legend wrapperStyle={{ fontSize: "0.7rem", color: "oklch(0.60 0.015 75)" }} />
+                      <Legend wrapperStyle={{ fontSize: "0.7rem", color: "var(--ow-text-lo)" }} />
                       <Line type="monotone" dataKey="Open Rate (%)" stroke={AMBER} strokeWidth={2} dot={{ r: 2 }} />
                       <Line type="monotone" dataKey="Click Rate (%)" stroke={AMBER_DIM} strokeWidth={2} strokeDasharray="4 2" dot={{ r: 2 }} />
                     </LineChart>
@@ -467,7 +467,7 @@ export default function CampaignMetrics() {
 
             {/* Compliance + merch chart */}
             <div className="grid md:grid-cols-2 gap-6">
-              <Card style={{ background: "oklch(0.13 0.008 60)", border: "1px solid oklch(0.22 0.010 60)" }}>
+              <Card style={{ background: "var(--ow-bg-base)", border: "1px solid var(--ow-bg-inset)" }}>
                 <CardHeader>
                   <CardTitle style={{ fontFamily: "'Fraunces',serif", color: WARM_WHITE, fontSize: "1rem" }}>
                     Compliance Agent Queries
@@ -476,9 +476,9 @@ export default function CampaignMetrics() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={200}>
                     <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.20 0.008 60)" />
-                      <XAxis dataKey="week" tick={{ fill: "oklch(0.50 0.012 75)", fontSize: 10 }} />
-                      <YAxis tick={{ fill: "oklch(0.50 0.012 75)", fontSize: 10 }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--ow-bg-inset)" />
+                      <XAxis dataKey="week" tick={{ fill: "var(--ow-text-lo)", fontSize: 10 }} />
+                      <YAxis tick={{ fill: "var(--ow-text-lo)", fontSize: 10 }} />
                       <Tooltip content={<ChartTooltip />} />
                       <Bar dataKey="Compliance Queries" fill="oklch(0.55 0.09 75)" radius={[3, 3, 0, 0]} />
                     </BarChart>
@@ -486,7 +486,7 @@ export default function CampaignMetrics() {
                 </CardContent>
               </Card>
 
-              <Card style={{ background: "oklch(0.13 0.008 60)", border: "1px solid oklch(0.22 0.010 60)" }}>
+              <Card style={{ background: "var(--ow-bg-base)", border: "1px solid var(--ow-bg-inset)" }}>
                 <CardHeader>
                   <CardTitle style={{ fontFamily: "'Fraunces',serif", color: WARM_WHITE, fontSize: "1rem" }}>
                     Merch Orders
@@ -495,9 +495,9 @@ export default function CampaignMetrics() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={200}>
                     <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.20 0.008 60)" />
-                      <XAxis dataKey="week" tick={{ fill: "oklch(0.50 0.012 75)", fontSize: 10 }} />
-                      <YAxis tick={{ fill: "oklch(0.50 0.012 75)", fontSize: 10 }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--ow-bg-inset)" />
+                      <XAxis dataKey="week" tick={{ fill: "var(--ow-text-lo)", fontSize: 10 }} />
+                      <YAxis tick={{ fill: "var(--ow-text-lo)", fontSize: 10 }} />
                       <Tooltip content={<ChartTooltip />} />
                       <Bar dataKey="Merch Orders" fill="oklch(0.65 0.10 75)" radius={[3, 3, 0, 0]} />
                     </BarChart>
@@ -507,7 +507,7 @@ export default function CampaignMetrics() {
             </div>
 
             {/* Organic sessions chart */}
-            <Card style={{ background: "oklch(0.13 0.008 60)", border: "1px solid oklch(0.22 0.010 60)" }}>
+            <Card style={{ background: "var(--ow-bg-base)", border: "1px solid var(--ow-bg-inset)" }}>
               <CardHeader>
                 <CardTitle style={{ fontFamily: "'Fraunces',serif", color: WARM_WHITE, fontSize: "1rem" }}>
                   <Search size={14} className="inline mr-2" style={{ color: AMBER }} />
@@ -517,9 +517,9 @@ export default function CampaignMetrics() {
               <CardContent>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.20 0.008 60)" />
-                    <XAxis dataKey="week" tick={{ fill: "oklch(0.50 0.012 75)", fontSize: 10 }} />
-                    <YAxis tick={{ fill: "oklch(0.50 0.012 75)", fontSize: 10 }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--ow-bg-inset)" />
+                    <XAxis dataKey="week" tick={{ fill: "var(--ow-text-lo)", fontSize: 10 }} />
+                    <YAxis tick={{ fill: "var(--ow-text-lo)", fontSize: 10 }} />
                     <Tooltip content={<ChartTooltip />} />
                     <Bar dataKey="Organic Sessions" fill={AMBER} radius={[3, 3, 0, 0]} />
                   </BarChart>
@@ -532,7 +532,7 @@ export default function CampaignMetrics() {
 
             {/* Snapshot history table */}
             {rows.length > 0 && (
-              <Card style={{ background: "oklch(0.13 0.008 60)", border: "1px solid oklch(0.22 0.010 60)" }}>
+              <Card style={{ background: "var(--ow-bg-base)", border: "1px solid var(--ow-bg-inset)" }}>
                 <CardHeader>
                   <CardTitle style={{ fontFamily: "'Fraunces',serif", color: WARM_WHITE, fontSize: "1rem" }}>
                     Snapshot History
@@ -542,11 +542,11 @@ export default function CampaignMetrics() {
                   <div className="overflow-x-auto">
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem", fontFamily: "'Lato',sans-serif" }}>
                       <thead>
-                        <tr style={{ borderBottom: "1px solid oklch(0.22 0.010 60)" }}>
+                        <tr style={{ borderBottom: "1px solid var(--ow-bg-inset)" }}>
                           {["Week", "FM", "MRR", "Waitlist", "Open%", "Click%", "Sessions", "Queries", "Merch"].map((h) => (
                             <th
                               key={h}
-                              style={{ padding: "8px 10px", textAlign: "right", color: "oklch(0.50 0.012 75)", fontWeight: 400, letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.68rem" }}
+                              style={{ padding: "8px 10px", textAlign: "right", color: "var(--ow-text-lo)", fontWeight: 400, letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.68rem" }}
                             >
                               {h}
                             </th>
@@ -557,7 +557,7 @@ export default function CampaignMetrics() {
                         {[...rows].reverse().map((r) => (
                           <tr
                             key={r.id}
-                            style={{ borderBottom: "1px solid oklch(0.17 0.008 60)" }}
+                            style={{ borderBottom: "1px solid var(--ow-bg-inset)" }}
                           >
                             <td style={{ padding: "7px 10px", color: AMBER, fontWeight: 600 }}>{r.weekLabel}</td>
                             <td style={{ padding: "7px 10px", textAlign: "right", color: WARM_WHITE }}>{r.foundingMemberCount}</td>

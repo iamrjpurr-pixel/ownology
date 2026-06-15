@@ -98,7 +98,7 @@ function Hero() {
         </p>
         <div className="flex flex-wrap gap-4 items-center">
           {["7 products researched", "0 direct competitors found", "1 market to watch"].map(label => (
-            <div key={label} className="px-4 py-2 rounded-full text-sm font-medium" style={{ background: "oklch(0.72 0.12 75 / 12%)", border: "1px solid oklch(0.72 0.12 75 / 30%)", color: AMBER, fontFamily: SANS }}>
+            <div key={label} className="px-4 py-2 rounded-full text-sm font-medium" style={{ background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)", color: AMBER, fontFamily: SANS }}>
               {label}
             </div>
           ))}
@@ -133,9 +133,9 @@ function TheGap() {
           <div className="grid sm:grid-cols-2 gap-4">
             {capabilities.map((c, i) => (
               <div key={i} className="flex gap-4 p-5 rounded-lg" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-0.5" style={{ background: "oklch(0.72 0.12 75 / 15%)", border: "1px solid oklch(0.72 0.12 75 / 35%)" }}>
+                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-0.5" style={{ background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)" }}>
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M2.5 7.5l3 3 6-6" stroke="oklch(0.72 0.12 75)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2.5 7.5l3 3 6-6" stroke="var(--ow-amber)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
                 <div>
@@ -240,14 +240,14 @@ const COMPETITORS: Competitor[] = [
 ];
 
 const THREAT_STYLES: Record<ThreatLevel, { bg: string; text: string; label: string }> = {
-  None:     { bg: "oklch(0.20 0.010 60)", text: "oklch(0.55 0.010 75)", label: "No Threat" },
+  None:     { bg: "var(--ow-bg-inset)", text: "var(--ow-text-lo)", label: "No Threat" },
   Low:      { bg: "oklch(0.22 0.04 145 / 40%)", text: "oklch(0.68 0.10 145)", label: "Low" },
-  Moderate: { bg: "oklch(0.22 0.08 75 / 40%)", text: "oklch(0.72 0.12 75)", label: "Monitor" },
+  Moderate: { bg: "oklch(0.22 0.08 75 / 40%)", text: "var(--ow-amber)", label: "Monitor" },
 };
 
 const STATUS_STYLES: Record<StatusType, { color: string }> = {
   Active:    { color: "oklch(0.68 0.10 145)" },
-  Abandoned: { color: "oklch(0.55 0.010 75)" },
+  Abandoned: { color: "var(--ow-text-lo)" },
   Uncertain: { color: "oklch(0.65 0.08 55)" },
 };
 
@@ -272,7 +272,7 @@ function CompetitorGrid() {
   };
 
   const activePill = (active: boolean): React.CSSProperties => active
-    ? { ...pillBase, background: "oklch(0.72 0.12 75 / 18%)", borderColor: "oklch(0.72 0.12 75 / 50%)", color: AMBER, fontWeight: 600 }
+    ? { ...pillBase, background: "color-mix(in oklch, var(--ow-amber) 18%, transparent)", borderColor: "color-mix(in oklch, var(--ow-amber) 50%, transparent)", color: AMBER, fontWeight: 600 }
     : { ...pillBase, background: BG_CARD, color: TEXT_LO };
 
   return (
@@ -405,8 +405,8 @@ function FeatureMatrix() {
     if (v === true) return (
       <span className="flex items-center justify-center">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="7" fill="oklch(0.72 0.12 75 / 20%)" stroke="oklch(0.72 0.12 75 / 50%)"/>
-          <path d="M4.5 8.5l2.5 2.5 4.5-5" stroke="oklch(0.72 0.12 75)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <circle cx="8" cy="8" r="7" fill="color-mix(in oklch, var(--ow-amber) 20%, transparent)" stroke="color-mix(in oklch, var(--ow-amber) 50%, transparent)"/>
+          <path d="M4.5 8.5l2.5 2.5 4.5-5" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </span>
     );
@@ -488,7 +488,7 @@ function FeatureMatrix() {
                       <tr
                         key={i}
                         style={{
-                          background: isOwnology ? "oklch(0.72 0.12 75 / 8%)" : i % 2 === 0 ? BG_CARD : BG_BASE,
+                          background: isOwnology ? "color-mix(in oklch, var(--ow-amber) 8%, transparent)" : i % 2 === 0 ? BG_CARD : BG_BASE,
                           borderBottom: `1px solid ${BORDER}`,
                         }}
                       >
@@ -498,7 +498,7 @@ function FeatureMatrix() {
                               {p.name}
                             </span>
                             {p.note && (
-                              <span className="px-2 py-0.5 rounded-full text-xs" style={{ background: "oklch(0.72 0.12 75 / 15%)", color: AMBER, fontFamily: SANS, whiteSpace: "nowrap" }}>
+                              <span className="px-2 py-0.5 rounded-full text-xs" style={{ background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)", color: AMBER, fontFamily: SANS, whiteSpace: "nowrap" }}>
                                 {p.note}
                               </span>
                             )}
@@ -567,8 +567,8 @@ function IntelligenceLayer() {
               },
             ].map((col, i) => (
               <div key={i} className="p-5 rounded-xl" style={{
-                background: col.ownology ? "oklch(0.72 0.12 75 / 10%)" : BG_CARD,
-                border: col.ownology ? "1px solid oklch(0.72 0.12 75 / 35%)" : `1px solid ${BORDER}`,
+                background: col.ownology ? "color-mix(in oklch, var(--ow-amber) 10%, transparent)" : BG_CARD,
+                border: col.ownology ? "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)" : `1px solid ${BORDER}`,
               }}>
                 <div className="text-2xl mb-3">{col.icon}</div>
                 <p style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1rem", color: col.ownology ? AMBER : TEXT_HI, marginBottom: "0.375rem" }}>{col.title}</p>
@@ -730,14 +730,14 @@ function AustralianMoat() {
                           d={state.path}
                           style={{
                             fill: isActive && isCovered
-                              ? "oklch(0.72 0.12 75 / 35%)"
+                              ? "color-mix(in oklch, var(--ow-amber) 35%, transparent)"
                               : isCovered
-                              ? "oklch(0.72 0.12 75 / 15%)"
+                              ? "color-mix(in oklch, var(--ow-amber) 15%, transparent)"
                               : "oklch(0.20 0.005 60)",
                             stroke: isActive && isCovered
-                              ? "oklch(0.72 0.12 75)"
+                              ? "var(--ow-amber)"
                               : isCovered
-                              ? "oklch(0.72 0.12 75 / 40%)"
+                              ? "color-mix(in oklch, var(--ow-amber) 40%, transparent)"
                               : "oklch(0.30 0.005 60)",
                             strokeWidth: isActive ? 2 : 1,
                             transition: "fill 0.2s, stroke 0.2s",
@@ -766,7 +766,7 @@ function AustralianMoat() {
                 {/* Legend */}
                 <div className="flex items-center gap-5 mt-3 px-1">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-sm" style={{ background: "oklch(0.72 0.12 75 / 15%)", border: "1px solid oklch(0.72 0.12 75 / 40%)" }} />
+                    <div className="w-3 h-3 rounded-sm" style={{ background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)" }} />
                     <span style={{ fontFamily: SANS, fontSize: "0.75rem", color: TEXT_LO }}>Covered by Ownology</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -782,7 +782,7 @@ function AustralianMoat() {
               {activeState && COVERED.has(activeState.code) ? (
                 <div className="p-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: "oklch(0.72 0.12 75 / 15%)", border: "1px solid oklch(0.72 0.12 75 / 30%)" }}>
+                    <div className="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}>
                       <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: "0.8rem", color: AMBER }}>{activeState.code}</span>
                     </div>
                     <div>
@@ -793,9 +793,9 @@ function AustralianMoat() {
                   <div className="space-y-3">
                     {activeState.items.map((item, j) => (
                       <div key={j} className="flex items-start gap-3 p-3 rounded-lg" style={{ background: BG_INSET, border: `1px solid ${BORDER}` }}>
-                        <div className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5" style={{ background: "oklch(0.72 0.12 75 / 15%)", border: "1px solid oklch(0.72 0.12 75 / 30%)" }}>
+                        <div className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5" style={{ background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}>
                           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                            <path d="M2 5.5l2 2 4-4" stroke="oklch(0.72 0.12 75)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M2 5.5l2 2 4-4" stroke="var(--ow-amber)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         </div>
                         <span style={{ fontFamily: SANS, fontWeight: 400, fontSize: "0.875rem", color: TEXT_MID, lineHeight: 1.5 }}>{item}</span>
@@ -810,9 +810,9 @@ function AustralianMoat() {
                 </div>
               ) : (
                 <div className="p-6 flex flex-col items-center justify-center h-full text-center" style={{ minHeight: "280px" }}>
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ background: "oklch(0.72 0.12 75 / 10%)", border: "1px solid oklch(0.72 0.12 75 / 25%)" }}>
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)" }}>
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <path d="M10 4v8M10 14v2" stroke="oklch(0.72 0.12 75)" strokeWidth="1.8" strokeLinecap="round"/>
+                      <path d="M10 4v8M10 14v2" stroke="var(--ow-amber)" strokeWidth="1.8" strokeLinecap="round"/>
                     </svg>
                   </div>
                   <p style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "1rem", color: TEXT_HI, marginBottom: "0.5rem" }}>Select a state</p>
@@ -902,7 +902,7 @@ function CTA() {
             Join the founding member waitlist and get early access before the intelligence layer becomes table stakes for every boutique winery in Australia.
           </p>
           {status === "success" ? (
-            <div className="py-6 px-8 rounded-sm inline-block" style={{ background: "oklch(0.72 0.12 75 / 10%)", border: "1px solid oklch(0.72 0.12 75 / 30%)" }}>
+            <div className="py-6 px-8 rounded-sm inline-block" style={{ background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}>
               <p style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "1.125rem", color: TEXT_HI }}>You're on the list. We'll be in touch.</p>
               <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: TEXT_MID, marginTop: "0.5rem" }}>In the meantime, explore the full site at <a href="/" style={{ color: AMBER }}>ownology.ai</a></p>
             </div>

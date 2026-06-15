@@ -34,7 +34,7 @@ const QUALITY_LABELS: Record<number, { label: string; color: string }> = {
   2: { label: "Below Avg", color: "oklch(0.65 0.12 60)" },
   3: { label: "Average", color: "oklch(0.65 0.12 200)" },
   4: { label: "Excellent", color: "oklch(0.65 0.18 150)" },
-  5: { label: "Exceptional", color: "oklch(0.72 0.12 75)" },
+  5: { label: "Exceptional", color: "var(--ow-amber)" },
 };
 
 const AU_STATES = ["National", "SA", "WA", "VIC", "NSW", "QLD", "TAS"];
@@ -281,7 +281,7 @@ function UpsertModal({
               type="submit"
               disabled={upsert.isPending}
               className="px-5 py-2 rounded-sm text-sm font-medium"
-              style={{ background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)" }}
+              style={{ background: "var(--ow-amber)", color: "var(--ow-bg-base)" }}
             >
               {upsert.isPending ? "Saving…" : isEdit ? "Save Changes" : "Add Entry"}
             </button>
@@ -325,7 +325,7 @@ export default function AdminVintageIntelligence() {
           <p className="text-lg mb-4" style={{ fontFamily: "'Fraunces', serif", color: "var(--ow-text-primary)" }}>
             Owner access required
           </p>
-          <a href={getLoginUrl()} className="text-sm underline" style={{ color: "oklch(0.72 0.12 75)" }}>
+          <a href={getLoginUrl()} className="text-sm underline" style={{ color: "var(--ow-amber)" }}>
             Sign in
           </a>
         </div>
@@ -340,7 +340,7 @@ export default function AdminVintageIntelligence() {
       {/* Nav */}
       <nav
         className="sticky top-0 z-40"
-        style={{ background: "oklch(0.11 0.008 60 / 97%)", borderBottom: "1px solid oklch(1 0 0 / 0.06)" }}
+        style={{ background: "var(--ow-nav-bg)", borderBottom: "1px solid oklch(1 0 0 / 0.06)" }}
       >
         <div className="container flex items-center justify-between py-4">
           <div className="flex items-center gap-6">
@@ -377,7 +377,7 @@ export default function AdminVintageIntelligence() {
           <button
             onClick={() => setModalEntry({})}
             className="px-4 py-2 rounded-sm text-sm font-medium"
-            style={{ background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)" }}
+            style={{ background: "var(--ow-amber)", color: "var(--ow-bg-base)" }}
           >
             + Add Entry
           </button>
@@ -447,7 +447,7 @@ export default function AdminVintageIntelligence() {
                       <td className="px-4 py-3 font-medium" style={{ color: "var(--ow-text-primary)" }}>
                         {entry.region}
                       </td>
-                      <td className="px-4 py-3" style={{ color: "oklch(0.72 0.12 75)", fontFamily: "'Fira Code', monospace", fontWeight: 600 }}>
+                      <td className="px-4 py-3" style={{ color: "var(--ow-amber)", fontFamily: "'Fira Code', monospace", fontWeight: 600 }}>
                         {entry.year}
                       </td>
                       <td className="px-4 py-3" style={{ color: "var(--ow-text-muted)" }}>
@@ -476,7 +476,7 @@ export default function AdminVintageIntelligence() {
                           <button
                             onClick={() => setModalEntry(entry)}
                             className="px-3 py-1 rounded-sm text-xs"
-                            style={{ background: "oklch(0.72 0.12 75 / 15%)", color: "oklch(0.72 0.12 75)", border: "1px solid oklch(0.72 0.12 75 / 30%)" }}
+                            style={{ background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)", color: "var(--ow-amber)", border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}
                           >
                             Edit
                           </button>
@@ -520,9 +520,9 @@ export default function AdminVintageIntelligence() {
         {/* Info callout */}
         <div
           className="mt-8 p-4 rounded-md text-sm"
-          style={{ background: "oklch(0.72 0.12 75 / 8%)", border: "1px solid oklch(0.72 0.12 75 / 20%)", color: "var(--ow-text-muted)" }}
+          style={{ background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)", color: "var(--ow-text-muted)" }}
         >
-          <strong style={{ color: "oklch(0.72 0.12 75)" }}>How it works:</strong>{" "}
+          <strong style={{ color: "var(--ow-amber)" }}>How it works:</strong>{" "}
           When a user asks the Free Run AI Tutor a question that mentions a known Australian wine region (e.g. "Barossa Valley",
           "McLaren Vale") or a vintage year (e.g. "2024"), the system automatically fetches the matching entry from this table
           and appends it to the AI's context window. This gives the tutor real, sourced vintage intelligence without the user
