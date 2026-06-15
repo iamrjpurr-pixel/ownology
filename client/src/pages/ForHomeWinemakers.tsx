@@ -52,17 +52,17 @@ const FEATURES: { icon: string; title: string; desc: string; href: string }[] = 
 
 const STARTER_QUESTIONS = [
   // Red wine questions
+  "My Shiraz cap is getting thick — how often should I punch it down?",
   "My bubbles stopped — is fermentation done or is it stuck?",
-  "My wine smells like eggs — what do I do?",
-  "How many campden tablets do I add to a 23 litre batch?",
-  "When do I rack off the gross lees?",
+  "My red wine smells like eggs — what do I do?",
+  "When do I rack my red wine off the gross lees?",
   // White wine questions
-  "How long should I cold settle my white wine juice before adding yeast?",
-  "My white wine tastes flat and flabby — how do I fix the acidity?",
-  "Do I need to do MLF on my Chardonnay?",
+  "How long should I cold settle my Chardonnay juice before adding yeast?",
+  "My Sauvignon Blanc tastes flat and flabby — how do I fix the acidity?",
+  "Do I need to do MLF on my white wine?",
   "How do I protect my white wine from oxidation during racking?",
   // Shared questions
-  "My wine tastes sharp — how do I fix the acidity?",
+  "How many campden tablets do I add to a 23 litre batch?",
   "What is MLF and do I need it?",
   "My wine has gone cloudy after racking — is that normal?",
   "How do I know when my wine is ready to bottle?",
@@ -131,7 +131,7 @@ function InlineAskWidget() {
               handleAsk();
             }
           }}
-          placeholder="Ask anything about your home winemaking…"
+          placeholder="Ask about your red or white wine… e.g. 'my Shiraz cap is thick' or 'how long to cold settle Chardonnay'"
           rows={2}
           style={{
             flex: 1,
@@ -563,7 +563,7 @@ export default function ForHomeWinemakers() {
               lineHeight: 1.6,
             }}
           >
-            Type your question or tap one below — answers are grounded in real home winemaking practice.
+            Type your question or tap one below — red wine, white wine, or general technique. Answers are grounded in real home winemaking practice.
           </p>
           <InlineAskWidget />
         </div>

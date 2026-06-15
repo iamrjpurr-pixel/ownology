@@ -2294,7 +2294,31 @@ const tutorRouter = router({
         }
         const questionWords = Array.from(expandedTerms).filter(w => w.length > 2).slice(0, 20);
 
-        // Step 1: Retrieve published chunks from ALL sources (bible + outline)
+        // ── Wine type auto-detection ──────────────────────────────────────────
+        // Detect red or white wine from question keywords. Defaults to 'both' if ambiguous.
+        const RED_VARIETY_SIGNALS = [
+          "shiraz", "cabernet", "merlot", "pinot noir", "grenache", "malbec", "tempranillo",
+          "sangiovese", "zinfandel", "mourvedre", "nebbiolo", "barbera", "dolcetto",
+          "red wine", "red grape", "red kit", "cap management", "punch down", "pump over",
+          "pomace", "skin contact red", "maceration", "anthocyanin",
+        ];
+        const WHITE_VARIETY_SIGNALS = [
+          "chardonnay", "sauvignon blanc", "riesling", "pinot gris", "pinot grigio",
+          "gewurztraminer", "viognier", "semillon", "muscat", "verdejo", "albarino",
+          "white wine", "white grape", "white kit", "cold settling", "cold soak",
+          "sur lie", "sur-lie", "cold stable", "cold stab", "tartrate", "protein haze",
+          "free-run", "press juice", "reductive", "inert gas", "argon", "nitrogen flush",
+        ];
+        const isRedSignal = RED_VARIETY_SIGNALS.some(s => questionLower.includes(s));
+        const isWhiteSignal = WHITE_VARIETY_SIGNALS.some(s => questionLower.includes(s));
+        // Determine detected wine type
+        let detectedWineType: "red" | "white" | "both" = "both";
+        if (isRedSignal && !isWhiteSignal) detectedWineType = "red";
+        else if (isWhiteSignal && !isRedSignal) detectedWineType = "white";
+        // else both (ambiguous — search all sources)
+        console.log(`[DIYTutor] Detected wine type: ${detectedWineType} | red signal: ${isRedSignal} | white signal: ${isWhiteSignal}`);
+
+        // Step 1: Retrieve published chunks — scoped to detected wine type
         const allPublishedChunks = await db
           .select({
             id: schema.diyKnowledgeChunks.id,
@@ -2304,21 +2328,31 @@ const tutorRouter = router({
             wbsCode: schema.diyKnowledgeChunks.wbsCode,
             content: schema.diyKnowledgeChunks.content,
             sourceDoc: schema.diyKnowledgeChunks.sourceDoc,
+            wineType: schema.diyKnowledgeChunks.wineType,
           })
           .from(schema.diyKnowledgeChunks)
           .where(eq(schema.diyKnowledgeChunks.published, true))
           .limit(300);
 
+        // Filter by detected wine type — if 'both', include all
+        const scopedChunks = detectedWineType === "both"
+          ? allPublishedChunks
+          : allPublishedChunks.filter(c =>
+              c.wineType === detectedWineType ||
+              c.sourceDoc === "morew_red_outline" && detectedWineType === "red" ||
+              c.sourceDoc === "morew_white_outline" && detectedWineType === "white"
+            );
+
         // Score each chunk by expanded keyword overlap
-        const scored = allPublishedChunks.map((chunk) => {
+        const scored = scopedChunks.map((chunk) => {
           const haystack = [
             (chunk.topicTags ?? "").toLowerCase(),
             (chunk.chapterTitle ?? "").toLowerCase(),
             chunk.content.toLowerCase().slice(0, 800),
           ].join(" ");
           const score = questionWords.reduce((acc, word) => acc + (haystack.includes(word) ? 1 : 0), 0);
-          // Boost morew_red_outline chunks slightly — they are home-scale by design
-          const sourceBoost = chunk.sourceDoc === "morew_red_outline" ? 0.5 : 0;
+          // Boost outline chunks — they are home-scale by design
+          const sourceBoost = (chunk.sourceDoc === "morew_red_outline" || chunk.sourceDoc === "morew_white_outline") ? 0.5 : 0;
           return { ...chunk, score: score + sourceBoost };
         });
 
@@ -2383,6 +2417,8 @@ SCALE TRANSLATION RULES:
 - Always state the assumed or stated batch size in your answer
 
 BATCH SIZE: ${batchSizeContext}
+
+WINE TYPE CONTEXT: The user appears to be asking about ${detectedWineType === 'both' ? 'general winemaking (could be red or white)' : detectedWineType + ' wine'}. Tailor your answer to ${detectedWineType === 'both' ? 'the applicable wine type, or both if relevant' : detectedWineType + ' wine specifically'}.
 
 DOCUMENT-GROUNDED RULES:
 1. Answer from the reference documents provided. If the exact answer is not there, reason from the principles in the documents and say so.
