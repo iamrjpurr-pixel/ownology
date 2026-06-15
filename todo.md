@@ -413,3 +413,12 @@
 
 ### White Wine Bible
 - [ ] Ingest White Wine Bible when uploaded (pipeline ready: node scripts/ingest-diy-bible.mjs --doc white_wine_bible) — AWAITING UPLOAD
+
+## White Wine Knowledge Sprint (Jun 2026)
+- [x] Ingest White Wine Bible (Guide to White Wine Making — MoreFlavor!, 127 chunks, all published)
+- [x] Write Ownology White Wine Home Winemaker Outline (7 sections, home scale, reductive handling thread, Ownology's own synthesis)
+- [x] Ingest morew_white_outline (7 sections, all published)
+- [x] Extend colloquial map with white wine terms (cold settling, reductive, sur-lie, bâtonnage, cold stabilisation, tartrate crystals, protein haze, press juice, free-run juice, etc.)
+- [x] Update starter questions to cover both red and white wine
+- [ ] Review and refine starter questions now that white wine knowledge is live — NEXT SESSION
+- [ ] Publish remaining red wine bible domains via WBS admin panel (D3 Harvest, D5 Post-Ferment, D6 Stabilisation, D7 Packaging) — NEXT SESSION
