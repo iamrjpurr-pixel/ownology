@@ -529,8 +529,8 @@ export default function Guide() {
           <div className="grid sm:grid-cols-2 gap-4">
             <PillarCard
               pillar="Do"
-              label="Cellar Operations"
-              description="Log fermentation events, track tanks and barrels, manage vineyard blocks, assign cellar tasks, and generate export documentation."
+              label="Cellar Operations — The Press"
+              description="The Press is your harvest floor command centre. Log fermentation events, track tanks and barrels, manage vineyard blocks, assign cellar tasks, and generate export documentation."
               href="/the-press"
               icon={<ClipboardList className="w-5 h-5" />}
               color="var(--ow-amber)"

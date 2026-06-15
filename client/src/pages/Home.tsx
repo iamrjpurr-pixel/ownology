@@ -670,6 +670,7 @@ function Features() {
           {/* Feature 1 — large */}
           <div className={`md:col-span-2 cellar-card overflow-hidden ${inView ? "fade-up" : "opacity-0"}`}>
             <div className="p-8">
+              <p style={{fontFamily:"'Lato',sans-serif", fontWeight:700, fontSize:"0.6rem", letterSpacing:"0.14em", textTransform:"uppercase", color:"var(--ow-amber)", marginBottom:"1rem"}}>LEARN — Free Run</p>
               <div className="w-10 h-10 rounded-sm flex items-center justify-center mb-5" style={{background:"color-mix(in oklch, var(--ow-amber) 12%, transparent)", border:"1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)"}}>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                   <path d="M3 9h12M9 3l6 6-6 6" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -689,6 +690,7 @@ function Features() {
 
           {/* Feature 2 */}
           <div className={`cellar-card p-8 ${inView ? "fade-up fade-up-delay-1" : "opacity-0"}`}>
+            <p style={{fontFamily:"'Lato',sans-serif", fontWeight:700, fontSize:"0.6rem", letterSpacing:"0.14em", textTransform:"uppercase", color:"var(--ow-amber)", marginBottom:"1rem"}}>DO — The Press</p>
             <div className="w-10 h-10 rounded-sm flex items-center justify-center mb-5" style={{background:"oklch(0.62 0.10 45 / 12%)", border:"1px solid oklch(0.62 0.10 45 / 25%)"}}>
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <rect x="3" y="3" width="12" height="12" rx="1" stroke="oklch(0.62 0.10 45)" strokeWidth="1.5"/>
@@ -709,6 +711,7 @@ function Features() {
 
           {/* Feature 3 */}
           <div className={`cellar-card p-8 ${inView ? "fade-up fade-up-delay-2" : "opacity-0"}`}>
+            <p style={{fontFamily:"'Lato',sans-serif", fontWeight:700, fontSize:"0.6rem", letterSpacing:"0.14em", textTransform:"uppercase", color:"var(--ow-amber)", marginBottom:"1rem"}}>DO — The Press</p>
             <div className="w-10 h-10 rounded-sm flex items-center justify-center mb-5" style={{background:"color-mix(in oklch, var(--ow-amber) 12%, transparent)", border:"1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)"}}>
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <path d="M3 14 L6 8 L9 11 L12 5 L15 9" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -739,6 +742,7 @@ function Features() {
           <div className={`md:col-span-2 cellar-card overflow-hidden ${inView ? "fade-up fade-up-delay-3" : "opacity-0"}`}>
             <div className="grid md:grid-cols-2 gap-0 h-full">
               <div className="p-8">
+                <p style={{fontFamily:"'Lato',sans-serif", fontWeight:700, fontSize:"0.6rem", letterSpacing:"0.14em", textTransform:"uppercase", color:"var(--ow-amber)", marginBottom:"1rem"}}>KNOW — Knowledge Platform</p>
                 <div className="w-10 h-10 rounded-sm flex items-center justify-center mb-5" style={{background:"oklch(0.62 0.10 45 / 12%)", border:"1px solid oklch(0.62 0.10 45 / 25%)"}}>
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                     <path d="M3 4h12v10H3z" stroke="oklch(0.62 0.10 45)" strokeWidth="1.5" strokeLinejoin="round"/>

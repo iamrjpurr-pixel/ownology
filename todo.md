@@ -432,3 +432,12 @@
 - [x] DIYKnowledge hub: reorder guides as sequential beginner workflow (costs → equipment → sanitation → fermentation → bottling)
 - [x] Fix theme CSS variables on all hardcoded-dark pages: DIYKnowledge, HomeWineryKit, HomeWinemakerGlossary, HomeWinemakerTroubleshooting, Pricing, ThePress, RegulatoryLinks, Blog, Regulations
 - [x] Mark starter questions as removed from ForHomeWinemakers widget
+
+## Red Wine Bible Expansion + Ghost Questions Sprint (Jun 2026)
+- [ ] Publish Red Wine Bible domains D3 Harvest, D5 Post-Ferment, D6 Stabilisation, D7 Packaging via SQL
+- [ ] Verify published chunk counts per domain after publish
+- [ ] Add optional batch size input field to ForHomeWinemakers chat widget (pre-fills scale context)
+- [ ] Wire batch size into tutor.ask system prompt context
+- [ ] Generate 1000 ghost questions mapped to WBS nodes (LLM batch generation)
+- [ ] Store ghost questions in database (ghost_questions table)
+- [ ] Build ghost questions admin view in AdminWbs page
