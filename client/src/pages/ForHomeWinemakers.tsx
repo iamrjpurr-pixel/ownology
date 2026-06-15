@@ -51,12 +51,19 @@ const FEATURES: { icon: string; title: string; desc: string; href: string }[] = 
 ];
 
 const STARTER_QUESTIONS = [
+  // Red wine questions
   "My bubbles stopped — is fermentation done or is it stuck?",
   "My wine smells like eggs — what do I do?",
   "How many campden tablets do I add to a 23 litre batch?",
   "When do I rack off the gross lees?",
+  // White wine questions
+  "How long should I cold settle my white wine juice before adding yeast?",
+  "My white wine tastes flat and flabby — how do I fix the acidity?",
+  "Do I need to do MLF on my Chardonnay?",
+  "How do I protect my white wine from oxidation during racking?",
+  // Shared questions
   "My wine tastes sharp — how do I fix the acidity?",
-  "What is MLF and do I need it for a kit red wine?",
+  "What is MLF and do I need it?",
   "My wine has gone cloudy after racking — is that normal?",
   "How do I know when my wine is ready to bottle?",
 ];
