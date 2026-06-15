@@ -335,3 +335,12 @@
 
 ## SOP Database Seeding (Jun 2026)
 - [x] Seed sop_library table with 7 core DIY winemaker SOPs from references/diy-sops-content.md (Tank Cleaning, Red Wine Fermentation, Yeast Rehydration, Pump-Over, MLF Management, Pressing, Bottling)
+
+## Site Cleanup — Connectivity Audit (Jun 2026)
+
+- [ ] Remove fake SEED_REVIEWS from Merch.tsx (ACL legal risk)
+- [ ] Replace Regulations.tsx with curated links page (~80 lines, direct to primary sources)
+- [ ] Delete Resources.tsx (duplicate of Regulations, 1 inbound link)
+- [ ] Fix App.tsx: /resources route should redirect to /regulations
+- [ ] Add Knowledge Platform to primary nav (currently buried in More dropdown)
+- [ ] Remove CompetitiveAdvantage from footer (merge key content into WhyOwnology)

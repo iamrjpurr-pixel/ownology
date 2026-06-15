@@ -90,60 +90,8 @@ const PRODUCTS: Product[] = [
   },
 ];
 
-// ─── Seed reviews ─────────────────────────────────────────────────────────────
-
-const SEED_REVIEWS: Record<string, Review[]> = {
-  "coaster-dark": [
-    {
-      id: "r1",
-      author: "James R., Barossa Valley",
-      rating: 5,
-      body: "These sit on every tasting table at our cellar door. Guests always ask about them — great conversation starter and the print quality is exceptional.",
-      date: "2026-04-12",
-    },
-    {
-      id: "r2",
-      author: "Sophie M., McLaren Vale",
-      rating: 5,
-      body: "The amber gold on black is exactly the right weight. Not flashy — just quietly confident. Exactly what we needed.",
-      date: "2026-04-28",
-    },
-  ],
-  "coaster-light": [
-    {
-      id: "r3",
-      author: "Tom W., Yarra Valley",
-      rating: 4,
-      body: "Love the cream/parchment look. Pairs beautifully with our tasting room aesthetic. Would love a slightly larger size option.",
-      date: "2026-05-02",
-    },
-  ],
-  "bar-towel": [
-    {
-      id: "r4",
-      author: "Claire D., Margaret River",
-      rating: 5,
-      body: "The linen quality is superb. Sits flat on the bar, the print hasn't faded after two weeks of daily use. Worth every cent.",
-      date: "2026-05-05",
-    },
-    {
-      id: "r5",
-      author: "Ben K., Hunter Valley",
-      rating: 5,
-      body: "Ordered two. One for the cellar door bar, one for the barrel hall bench. The Founding Member seal detail is crisp at this scale.",
-      date: "2026-05-08",
-    },
-  ],
-  notebook: [
-    {
-      id: "r6",
-      author: "Anna L., Clare Valley",
-      rating: 5,
-      body: "This is the notebook I've been waiting for. Lay-flat binding is essential during ferment when your hands are full. The foil stamp is a beautiful touch.",
-      date: "2026-05-01",
-    },
-  ],
-};
+// No seed reviews — only real customer reviews are shown.
+const SEED_REVIEWS: Record<string, Review[]> = {};
 
 // ─── Checkout helpers ─────────────────────────────────────────────────────────
 

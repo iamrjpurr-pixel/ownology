@@ -11,6 +11,7 @@ import ForVintraceUsers from "./pages/ForVintraceUsers";
 import Blog from "./pages/Blog";
 import BlogArticle from "./pages/BlogArticle";
 import Regulations from "./pages/Regulations";
+import RegulatoryLinks from "./pages/RegulatoryLinks";
 import Compliance from "./pages/Compliance";
 import FreeRun from "./pages/FreeRun";
 import ThePress from "./pages/ThePress";
@@ -57,8 +58,9 @@ function Router() {
       <Route path={"/for-home-winemakers/glossary"} component={HomeWinemakerGlossary} />
       <Route path={"/blog"} component={Blog} />
       <Route path={"/blog/:slug"} component={BlogArticle} />
-      <Route path={"/regulations"} component={Regulations} />
-      <Route path={"/resources"} component={Regulations} />
+      <Route path={"/regulations"} component={RegulatoryLinks} />
+      <Route path={"/regulations/detail"} component={Regulations} />
+      <Route path={"/resources"} component={RegulatoryLinks} />
       <Route path={"/resources/home-winery-kit"} component={HomeWineryKit} />
       <Route path={"/compliance"} component={Compliance} />
       <Route path={"/free-run"} component={FreeRun} />
