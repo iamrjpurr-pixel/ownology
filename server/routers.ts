@@ -2147,6 +2147,152 @@ const tutorRouter = router({
       const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
       if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
 
+      const isHomeWinemaker = input.mode === "home_winemaker";
+
+      // ═══════════════════════════════════════════════════════════════════════
+      // DIY HOME WINEMAKER PATH — Document-grounded bible chunk retrieval
+      // Only uses published chunks from diy_knowledge_chunks.
+      // Applies reasoning layer + risk assessment. Cites chapter in answer.
+      // ═══════════════════════════════════════════════════════════════════════
+      if (isHomeWinemaker) {
+        // Step 1: Retrieve published bible chunks relevant to the question
+        // Use keyword matching on topic_tags + chapter_title + content
+        const questionWords = input.question
+          .toLowerCase()
+          .split(/\s+/)
+          .filter((w) => w.length > 3)
+          .slice(0, 8);
+
+        // Build a relevance-scored set of chunks from published content
+        // Fetch all published chunks (max 200) then score by keyword overlap
+        const allPublishedChunks = await db
+          .select({
+            id: schema.diyKnowledgeChunks.id,
+            chapterRef: schema.diyKnowledgeChunks.chapterRef,
+            chapterTitle: schema.diyKnowledgeChunks.chapterTitle,
+            topicTags: schema.diyKnowledgeChunks.topicTags,
+            wbsCode: schema.diyKnowledgeChunks.wbsCode,
+            content: schema.diyKnowledgeChunks.content,
+            sourceDoc: schema.diyKnowledgeChunks.sourceDoc,
+          })
+          .from(schema.diyKnowledgeChunks)
+          .where(eq(schema.diyKnowledgeChunks.published, true))
+          .limit(200);
+
+        // Score each chunk by keyword overlap
+        const scored = allPublishedChunks.map((chunk) => {
+          const haystack = [
+            (chunk.topicTags ?? "").toLowerCase(),
+            (chunk.chapterTitle ?? "").toLowerCase(),
+            chunk.content.toLowerCase().slice(0, 600),
+          ].join(" ");
+          const score = questionWords.reduce((acc, word) => acc + (haystack.includes(word) ? 1 : 0), 0);
+          return { ...chunk, score };
+        });
+
+        // Take top 5 most relevant chunks
+        const topChunks = scored
+          .filter((c) => c.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 5);
+
+        // If no keyword match, take the first 3 published chunks (fermentation intro)
+        const relevantChunks = topChunks.length > 0 ? topChunks : allPublishedChunks.slice(0, 3);
+
+        console.log(`[DIYTutor] Retrieved ${relevantChunks.length} published chunks (top score: ${topChunks[0]?.score ?? 0})`);
+
+        // Step 2: Build document context
+        const docContext = relevantChunks
+          .map((chunk) => {
+            const docLabel = chunk.sourceDoc === "red_wine_bible" ? "Red Wine Bible" : "White Wine Bible";
+            return `## ${docLabel} — ${chunk.chapterTitle ?? `Chapter ${chunk.chapterRef}`} (WBS ${chunk.wbsCode ?? "—"})\n${chunk.content.slice(0, 1800)}`;
+          })
+          .join("\n\n---\n\n");
+
+        const sourceRefs = Array.from(new Set(relevantChunks.map((c) => c.chapterTitle ?? `Chapter ${c.chapterRef}`))).slice(0, 3);
+
+        // Step 3: Risk classification — detect high-risk topics
+        // High-risk: chemical additions, dosage, food safety, sulphites, acid additions
+        const highRiskKeywords = ["so2", "sulfite", "sulphite", "metabisulphite", "metabisulfite",
+          "potassium", "sorbate", "bentonite", "tartaric", "citric", "acid addition",
+          "dap", "yan", "nutrient", "dosage", "ppm", "grams per", "g/l", "mg/l",
+          "fining", "isinglass", "gelatin", "casein", "food safe"];
+        const questionLowerDIY = input.question.toLowerCase();
+        const isHighRisk = highRiskKeywords.some((kw) => questionLowerDIY.includes(kw));
+
+        // Step 4: Build DIY system prompt with reasoning layer
+        const diySystemPrompt = `You are a knowledgeable home winemaking assistant. You ONLY answer from the reference documents provided below — you do not use general internet knowledge.
+
+DOCUMENT-GROUNDED RULES:
+1. Answer ONLY from the document passages provided. If the exact answer is not in the documents, reason from the principles stated in the documents (e.g. if a document explains acid resistance matters for equipment, apply that principle to the user's specific equipment question).
+2. When reasoning beyond explicit document text, say "Based on the principles in [chapter name]..." to distinguish document facts from applied reasoning.
+3. Cite the chapter or section your answer comes from (e.g. "According to Chapter 3 — Primary Fermentation...").
+4. If the question is completely outside the scope of the provided documents, say: "This topic isn't covered in the current reference documents. I can answer questions about fermentation, yeast management, MLF, and cap management from the Red Wine Bible."
+
+RISK ASSESSMENT:
+${isHighRisk ? '- This question involves chemical additions, dosages, or food safety. Provide the document guidance AND add a clear caveat: "Verify quantities and products with your homebrew supplier before use."' : '- This is a low-risk process or equipment question. Answer confidently from the documents.'}
+
+RESPONSE FORMAT — respond with a JSON object only, no markdown fences:
+{
+  "answer": "<your full answer citing chapters>",
+  "sourceChapters": ["<chapter title 1>", "<chapter title 2>"],
+  "riskLevel": "${isHighRisk ? 'high' : 'low'}",
+  "disclaimer": "${isHighRisk ? 'Verify chemical quantities and products with your homebrew supplier before use.' : 'Home winemaking practices vary — always taste and judge your wine yourself.'}"
+}
+
+REFERENCE DOCUMENTS:
+${docContext}`;
+
+        const diyMessages = [
+          { role: "system" as const, content: diySystemPrompt },
+          ...(input.history ?? []).map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+          { role: "user" as const, content: input.question },
+        ];
+
+        const diyResponse = await fetch(`${forgeUrl}/v1/chat/completions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
+          body: JSON.stringify({ messages: diyMessages, stream: false, response_format: { type: "json_object" } }),
+        });
+
+        if (!diyResponse.ok) {
+          const errText = await diyResponse.text();
+          console.error("[DIYTutor] LLM error:", diyResponse.status, errText);
+          throw new Error(`LLM error: ${diyResponse.status}`);
+        }
+
+        const diyData = await diyResponse.json();
+        const diyRawContent = diyData.choices?.[0]?.message?.content || "{}";
+
+        let diyAnswer = "No response received.";
+        let diySourceChapters: string[] = sourceRefs;
+        let diyDisclaimer = isHighRisk
+          ? "Verify chemical quantities and products with your homebrew supplier before use."
+          : "Home winemaking practices vary — always taste and judge your wine yourself.";
+        let diyRiskLevel = isHighRisk ? "high" : "low";
+
+        try {
+          const parsed = JSON.parse(diyRawContent);
+          if (parsed.answer) diyAnswer = parsed.answer;
+          if (Array.isArray(parsed.sourceChapters)) diySourceChapters = parsed.sourceChapters;
+          if (parsed.disclaimer) diyDisclaimer = parsed.disclaimer;
+          if (parsed.riskLevel) diyRiskLevel = parsed.riskLevel;
+        } catch {
+          diyAnswer = diyRawContent;
+        }
+
+        return {
+          answer: diyAnswer,
+          sopTitles: diySourceChapters,
+          disclaimer: diyDisclaimer,
+          riskLevel: diyRiskLevel,
+        };
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════
+      // COMMERCIAL WINEMAKER PATH — SOP-based retrieval (unchanged)
+      // ═══════════════════════════════════════════════════════════════════════
+
       // ── Step 1: Query Router — classify intent and determine retrieval strategy ────
       const routerDecision = await routeQuery(input.question, forgeUrl, forgeKey);
       console.log(`[QueryRouter] intents=${routerDecision.intents.join(",")} categories=${routerDecision.sopCategories.join(",")} confidence=${routerDecision.confidence} | ${routerDecision.reasoning}`);
@@ -2155,23 +2301,9 @@ const tutorRouter = router({
       const isComplianceRedirect = routerDecision.isCompliance;
 
       // ── Step 2: SOP Retriever ─────────────────────────────────────────────────
-      // DIY mode: try semantic vector search first (Sprint 4)
-      // Commercial mode: use Query Router category-based retrieval
       let sops: Array<{ title: string; category: string; procedureText: string | null; decisionLogic: string | null; tribalKnowledge: string | null }> = [];
-      const isHomeWinemaker = input.mode === "home_winemaker";
 
-      if (isHomeWinemaker) {
-        // Sprint 4: LLM-based semantic SOP ranking for DIY mode
-        try {
-          const semanticResults = await semanticSopSearch(input.question, "diy", 3, forgeUrl, forgeKey);
-          if (semanticResults.length > 0) {
-            sops = semanticResults;
-            console.log(`[SemanticSearch] Found ${semanticResults.length} DIY SOPs, top similarity: ${semanticResults[0].similarity.toFixed(3)}`);
-          }
-        } catch (semanticErr) {
-          console.warn("[SemanticSearch] LLM ranking failed, falling back to keyword search:", semanticErr);
-        }
-      } else if (routerDecision.sopCategories.length > 0) {
+      if (routerDecision.sopCategories.length > 0) {
         // Commercial: Router-guided category retrieval
         const categoryConditions = routerDecision.sopCategories.map((cat) =>
           like(schema.sopLibrary.category, `%${cat}%`)
@@ -2194,9 +2326,6 @@ const tutorRouter = router({
         const words = input.question.toLowerCase().split(/\s+/).filter((w) => w.length > 4).slice(0, 3);
         if (words.length > 0) {
           const titleConditions = words.map((w) => like(schema.sopLibrary.title, `%${w}%`));
-          const audienceFilter = isHomeWinemaker
-            ? eq(schema.sopLibrary.audience, "diy")
-            : eq(schema.sopLibrary.audience, "commercial");
           sops = await db
             .select({
               title: schema.sopLibrary.title,
@@ -2206,7 +2335,7 @@ const tutorRouter = router({
               tribalKnowledge: schema.sopLibrary.tribalKnowledge,
             })
             .from(schema.sopLibrary)
-            .where(and(audienceFilter, or(...titleConditions)))
+            .where(and(eq(schema.sopLibrary.audience, "commercial"), or(...titleConditions)))
             .limit(3);
         }
       }
@@ -2482,6 +2611,134 @@ const vintageIntelligenceRouter = router({
     }),
 });
 
+// ─── WBS Admin Router ───────────────────────────────────────────────────────
+// Owner-only: manage published status of bible knowledge chunks by WBS domain.
+
+const wbsAdminRouter = router({
+  // List all unique WBS domains with chunk counts and published status
+  listDomains: ownerProcedure.query(async () => {
+    // Get summary by wbs_domain: total chunks, published chunks, chapter titles
+    const rows = await db
+      .select({
+        wbsDomain: schema.diyKnowledgeChunks.wbsDomain,
+        wbsCode: schema.diyKnowledgeChunks.wbsCode,
+        chapterTitle: schema.diyKnowledgeChunks.chapterTitle,
+        sourceDoc: schema.diyKnowledgeChunks.sourceDoc,
+        published: schema.diyKnowledgeChunks.published,
+        id: schema.diyKnowledgeChunks.id,
+      })
+      .from(schema.diyKnowledgeChunks)
+      .orderBy(schema.diyKnowledgeChunks.wbsDomain, schema.diyKnowledgeChunks.chapterRef);
+
+    // Group by wbsDomain + chapterTitle
+    const groups: Record<string, {
+      wbsDomain: string | null;
+      wbsCode: string | null;
+      chapterTitle: string | null;
+      sourceDoc: string | null;
+      totalChunks: number;
+      publishedChunks: number;
+      chunkIds: number[];
+    }> = {};
+
+    for (const row of rows) {
+      const key = `${row.wbsDomain ?? "none"}::${row.chapterTitle ?? "unknown"}::${row.sourceDoc ?? ""}`;
+      if (!groups[key]) {
+        groups[key] = {
+          wbsDomain: row.wbsDomain,
+          wbsCode: row.wbsCode,
+          chapterTitle: row.chapterTitle,
+          sourceDoc: row.sourceDoc,
+          totalChunks: 0,
+          publishedChunks: 0,
+          chunkIds: [],
+        };
+      }
+      groups[key].totalChunks++;
+      if (row.published) groups[key].publishedChunks++;
+      groups[key].chunkIds.push(row.id);
+    }
+
+    return Object.values(groups).sort((a, b) => {
+      const da = parseFloat(a.wbsDomain ?? "99");
+      const db_ = parseFloat(b.wbsDomain ?? "99");
+      return da - db_;
+    });
+  }),
+
+  // Toggle published status for all chunks in a chapter (by chapterTitle + sourceDoc)
+  setChapterPublished: ownerProcedure
+    .input(
+      z.object({
+        chapterTitle: z.string(),
+        sourceDoc: z.string(),
+        published: z.boolean(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const now = Date.now();
+      await db
+        .update(schema.diyKnowledgeChunks)
+        .set({
+          published: input.published,
+          publishedAt: input.published ? now : null,
+        })
+        .where(
+          and(
+            eq(schema.diyKnowledgeChunks.chapterTitle, input.chapterTitle),
+            eq(schema.diyKnowledgeChunks.sourceDoc, input.sourceDoc)
+          )
+        );
+      return { success: true, published: input.published, updatedAt: now };
+    }),
+
+  // Bulk publish/unpublish all chunks in a WBS domain
+  setDomainPublished: ownerProcedure
+    .input(
+      z.object({
+        wbsDomain: z.string(),
+        sourceDoc: z.string().optional(),
+        published: z.boolean(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const now = Date.now();
+      const conditions = [eq(schema.diyKnowledgeChunks.wbsDomain, input.wbsDomain)];
+      if (input.sourceDoc) conditions.push(eq(schema.diyKnowledgeChunks.sourceDoc, input.sourceDoc));
+      await db
+        .update(schema.diyKnowledgeChunks)
+        .set({
+          published: input.published,
+          publishedAt: input.published ? now : null,
+        })
+        .where(and(...conditions));
+      return { success: true, published: input.published, updatedAt: now };
+    }),
+
+  // Get chunk count summary (for dashboard)
+  summary: ownerProcedure.query(async () => {
+    const all = await db
+      .select({
+        published: schema.diyKnowledgeChunks.published,
+        sourceDoc: schema.diyKnowledgeChunks.sourceDoc,
+        id: schema.diyKnowledgeChunks.id,
+      })
+      .from(schema.diyKnowledgeChunks);
+
+    const total = all.length;
+    const published = all.filter((r) => r.published).length;
+    const byDoc = all.reduce((acc, r) => {
+      const doc = r.sourceDoc ?? "unknown";
+      if (!acc[doc]) acc[doc] = { total: 0, published: 0 };
+      acc[doc].total++;
+      if (r.published) acc[doc].published++;
+      return acc;
+    }, {} as Record<string, { total: number; published: number }>);
+
+    return { total, published, unpublished: total - published, byDoc };
+  }),
+});
+
 // ─── App Router (re-export with knowledge) ───────────────────────────────────
 export const appRouter = router({
   campaignMetrics: campaignMetricsRouter,
@@ -2504,5 +2761,6 @@ export const appRouter = router({
   knowledge: knowledgeRouter,
   tutor: tutorRouter,
   vintageIntelligence: vintageIntelligenceRouter,
+  wbsAdmin: wbsAdminRouter,
 });
 export type AppRouter = typeof appRouter;

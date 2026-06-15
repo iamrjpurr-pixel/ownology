@@ -364,3 +364,28 @@
 - [x] Sprint 4: Audience filter fixed (diy not home_winemaker)
 - [x] Sprint 4: embedding_vector column added to sop_library (for future vector DB migration)
 - [x] Sprint 4: Forge API embeddings endpoint not available — LLM ranking used as equivalent
+
+## DIY Bible Ingestion & Q&A Redesign (Sprint 5)
+- [ ] Create diy_knowledge_chunks table in schema.ts and run db:push
+- [ ] Write ingestion script to chunk red wine bible PDF into 500-word passages with chapter/section tags
+- [ ] Store chunks in diy_knowledge_chunks table with wine_type, topic_tags, source_doc
+- [ ] Update queryRouter.ts to search diy_knowledge_chunks for DIY audience questions
+- [ ] Replace static Q&A list on /for-home-winemakers with inline streaming chat widget
+- [ ] Add "People also ask" follow-up questions below chat answer
+- [ ] Upload white wine bible PDF and ingest when provided
+- [ ] Fix /for-home-winemakers/troubleshooting 404 (redirect to DIY Knowledge Hub)
+- [ ] Fix /resources/home-winery-kit 404 (Equipment Checklist button in hero)
+
+## WBS Knowledge Architecture (Sprint 6 — Jun 2026)
+- [ ] Schema: add wbs_domain, wbs_process_family, wbs_code, published, published_at to sop_library
+- [ ] Schema: add wbs_domain, wbs_process_family, wbs_code, published, published_at to diy_knowledge_chunks
+- [ ] Backfill existing 38 commercial SOPs with WBS codes (Domains 2–8, 10)
+- [ ] Ingest Red Wine Bible with WBS mapping — all chunks unpublished initially
+- [ ] Publish Domain 4 (Fermentation) chunks for DIY launch
+- [ ] Build document-grounded DIY tutor — WBS routing, published-only retrieval, reasoning + risk assessment layer
+- [ ] Update DIY Knowledge Hub to show only published chunks/SOPs
+- [ ] Build WBS admin panel — content tree with publish toggles (owner only)
+- [ ] Wire ForHomeWinemakers inline chat to new DIY tutor procedure
+- [ ] Ghost questions: generate 1000 likely home winemaker questions mapped to WBS nodes (UI layer only)
+- [ ] White Wine Bible: ingest when uploaded, same WBS structure
+- [ ] Domain 1 (Vineyard) and Domain 9 (Maintenance) — parked, schema ready

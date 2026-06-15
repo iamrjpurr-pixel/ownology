@@ -593,12 +593,24 @@ export const sopLibrary = mysqlTable(
     // Vector embedding for semantic search (JSON array of 1536 floats, text-embedding-3-small)
     // Null until backfill script runs. Used for DIY semantic SOP retrieval.
     embeddingVector: text("embedding_vector"),
+    // WBS domain code (e.g. "4" = Fermentation & Winemaking)
+    wbsDomain: varchar("wbs_domain", { length: 10 }),
+    // WBS process family code (e.g. "4.1" = Alcoholic Fermentation SOP)
+    wbsProcessFamily: varchar("wbs_process_family", { length: 10 }),
+    // Full WBS code (e.g. "4.1", "5.3") — canonical reference
+    wbsCode: varchar("wbs_code", { length: 10 }),
+    // Whether this SOP is published/visible in the DIY tutor context
+    published: boolean("published").notNull().default(false),
+    // UTC ms timestamp when published (null if not yet published)
+    publishedAt: bigint("published_at", { mode: "number" }),
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
     updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
   },
   (t) => [
     index("sop_category_idx").on(t.category),
     index("sop_sort_idx").on(t.category, t.sortOrder),
+    index("sop_wbs_code_idx").on(t.wbsCode),
+    index("sop_published_idx").on(t.published),
   ]
 );
 
@@ -689,5 +701,50 @@ export const vintageIntelligence = mysqlTable(
     index("vi_region_year_idx").on(t.region, t.year),
     index("vi_state_idx").on(t.state),
     index("vi_year_idx").on(t.year),
+  ]
+);
+
+// ─── DIY Knowledge Chunks (Home Winemaker Bible Documents) ──────────────────
+// Stores chunked passages from home winemaking reference documents (e.g. the
+// Red Wine Bible, White Wine Bible). Each chunk is a ~400-word passage with
+// chapter/section metadata for context injection into the DIY AI tutor.
+export const diyKnowledgeChunks = mysqlTable(
+  "diy_knowledge_chunks",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // Source document identifier (e.g. "red_wine_bible", "white_wine_bible")
+    sourceDoc: varchar("source_doc", { length: 64 }).notNull(),
+    // Wine type: "red", "white", "general"
+    wineType: varchar("wine_type", { length: 16 }).notNull().default("general"),
+    // Chapter number or section identifier (e.g. "3", "10.4")
+    chapterRef: varchar("chapter_ref", { length: 32 }),
+    // Chapter/section title (e.g. "The Fermentation", "Yeast Nutrition")
+    chapterTitle: varchar("chapter_title", { length: 256 }),
+    // Comma-separated topic tags for keyword routing (e.g. "fermentation,yeast,nutrition")
+    topicTags: varchar("topic_tags", { length: 512 }),
+    // WBS domain code (e.g. "4" = Fermentation & Winemaking)
+    wbsDomain: varchar("wbs_domain", { length: 10 }),
+    // WBS process family code (e.g. "4.1" = Alcoholic Fermentation SOP)
+    wbsProcessFamily: varchar("wbs_process_family", { length: 10 }),
+    // Full WBS code (e.g. "4.1", "5.3") — canonical reference
+    wbsCode: varchar("wbs_code", { length: 10 }),
+    // Whether this chunk is published/visible in the DIY tutor
+    // Controlled release: Domain 4 published at launch, others unpublished
+    published: boolean("published").notNull().default(false),
+    // UTC ms timestamp when published (null if not yet published)
+    publishedAt: bigint("published_at", { mode: "number" }),
+    // The actual text passage (~400 words)
+    content: text("content").notNull(),
+    // Chunk sequence number within the source doc (for ordering)
+    chunkIndex: int("chunk_index").notNull().default(0),
+    // UTC ms timestamp
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("dkc_source_doc_idx").on(t.sourceDoc),
+    index("dkc_wine_type_idx").on(t.wineType),
+    index("dkc_chapter_idx").on(t.chapterRef),
+    index("dkc_wbs_code_idx").on(t.wbsCode),
+    index("dkc_published_idx").on(t.published),
   ]
 );
