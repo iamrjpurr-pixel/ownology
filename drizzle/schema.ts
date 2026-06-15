@@ -599,6 +599,9 @@ export const sopLibrary = mysqlTable(
     wbsProcessFamily: varchar("wbs_process_family", { length: 10 }),
     // Full WBS code (e.g. "4.1", "5.3") — canonical reference
     wbsCode: varchar("wbs_code", { length: 10 }),
+    // Bible chapter cross-references — comma-separated chapter refs from diy_knowledge_chunks
+    // e.g. "3,4,6" means this SOP is grounded in Red Wine Bible chapters 3, 4, and 6
+    bibleChapters: varchar("bible_chapters", { length: 255 }),
     // Whether this SOP is published/visible in the DIY tutor context
     published: boolean("published").notNull().default(false),
     // UTC ms timestamp when published (null if not yet published)

@@ -51,12 +51,14 @@ const FEATURES: { icon: string; title: string; desc: string; href: string }[] = 
 ];
 
 const STARTER_QUESTIONS = [
-  "My fermentation has stalled at 1.020 SG — what should I do?",
-  "My wine smells like vinegar — is it ruined?",
+  "My bubbles stopped — is fermentation done or is it stuck?",
+  "My wine smells like eggs — what do I do?",
+  "How many campden tablets do I add to a 23 litre batch?",
+  "When do I rack off the gross lees?",
+  "My wine tastes sharp — how do I fix the acidity?",
   "What is MLF and do I need it for a kit red wine?",
-  "How do I know when my wine is ready to rack?",
-  "What does Brix actually mean?",
-  "When should I add the fining agent from my kit?",
+  "My wine has gone cloudy after racking — is that normal?",
+  "How do I know when my wine is ready to bottle?",
 ];
 
 function InlineAskWidget() {
@@ -428,7 +430,7 @@ function InlineAskWidget() {
                 letterSpacing: "0.02em",
               }}
             >
-              Answers grounded in the Red Wine Bible
+              Answers grounded in the Red Wine Bible & MoreWine! Outline
             </span>
           </div>
         </div>

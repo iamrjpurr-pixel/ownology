@@ -2155,16 +2155,108 @@ const tutorRouter = router({
       // Applies reasoning layer + risk assessment. Cites chapter in answer.
       // ═══════════════════════════════════════════════════════════════════════
       if (isHomeWinemaker) {
-        // Step 1: Retrieve published bible chunks relevant to the question
-        // Use keyword matching on topic_tags + chapter_title + content
-        const questionWords = input.question
-          .toLowerCase()
-          .split(/\s+/)
-          .filter((w) => w.length > 3)
-          .slice(0, 8);
+        // ── Colloquial normalisation map ──────────────────────────────────────
+        // Maps home winemaker slang to technical winemaking concepts.
+        // Used to expand keyword search — NOT shown to the user.
+        const COLLOQUIAL_MAP: Record<string, string[]> = {
+          "bubbles stopped": ["stuck fermentation", "fermentation stalled", "activity"],
+          "bubbles": ["fermentation", "CO2", "activity", "yeast"],
+          "stopped bubbling": ["stuck fermentation", "fermentation complete", "activity"],
+          "not bubbling": ["fermentation", "MLF", "activity", "stuck"],
+          "smells like eggs": ["hydrogen sulphide", "H2S", "reductive", "sulphur"],
+          "egg smell": ["hydrogen sulphide", "H2S", "reductive"],
+          "smells like nail polish": ["ethyl acetate", "volatile acidity", "VA"],
+          "nail polish remover": ["ethyl acetate", "volatile acidity", "VA"],
+          "smells off": ["fault", "volatile acidity", "H2S", "oxidation"],
+          "tastes sharp": ["acidity", "TA", "pH", "tartaric"],
+          "too acidic": ["TA", "pH", "acid adjustment", "calcium carbonate"],
+          "too sweet": ["residual sugar", "Brix", "stuck fermentation", "dry"],
+          "not dry": ["residual sugar", "stuck fermentation", "Brix"],
+          "campden tablets": ["potassium metabisulphite", "SO2", "sulphite"],
+          "campden": ["potassium metabisulphite", "SO2", "sulphite"],
+          "marbles trick": ["headspace", "oxidation", "top-up"],
+          "cap": ["pomace cap", "punch down", "cap management"],
+          "punch down": ["cap management", "punch down", "extraction"],
+          "pump over": ["cap management", "extraction", "oxygen"],
+          "rack": ["racking", "siphon", "lees", "sediment"],
+          "racking": ["racking", "lees", "siphon", "sediment"],
+          "sediment": ["lees", "gross lees", "fine lees", "racking"],
+          "cloudy": ["haze", "clarity", "fining", "protein", "bentonite"],
+          "gone cloudy": ["haze", "clarity", "fining", "protein"],
+          "white powder": ["film yeast", "oxidation", "Kahm yeast"],
+          "film on surface": ["film yeast", "oxidation", "Kahm yeast"],
+          "how many campden": ["SO2", "sulphite", "potassium metabisulphite", "ppm"],
+          "how much sulphite": ["SO2", "sulphite", "ppm", "free SO2"],
+          "when do i rack": ["racking timing", "lees", "gross lees", "sediment"],
+          "when to rack": ["racking timing", "lees", "gross lees"],
+          "how long do i leave it": ["fermentation duration", "aging", "maturation"],
+          "can i drink it": ["maturation", "readiness", "aging", "bottle"],
+          "is it ready": ["maturation", "readiness", "aging"],
+          "hydrometer": ["Brix", "specific gravity", "sugar", "fermentation"],
+          "refractometer": ["Brix", "sugar", "alcohol correction"],
+          "carboy": ["fermenter", "vessel", "storage", "headspace"],
+          "demijohn": ["fermenter", "vessel", "storage", "headspace"],
+          "bucket": ["fermenter", "vessel", "primary fermentation"],
+          "airlock": ["CO2", "oxygen", "fermentation", "headspace"],
+          "stuck": ["stuck fermentation", "stalled", "YAN", "nutrient"],
+          "mlf": ["malolactic fermentation", "lactic acid", "malic acid", "bacteria"],
+          "malo": ["malolactic fermentation", "lactic acid", "malic acid"],
+          "lees": ["gross lees", "fine lees", "sediment", "racking"],
+          "gross lees": ["gross lees", "racking", "sediment", "pressing"],
+          "press": ["pressing", "extraction", "skins", "juice"],
+          "pressing": ["pressing", "extraction", "bladder press"],
+          "dap": ["DAP", "diammonium phosphate", "YAN", "nutrient"],
+          "fermaid": ["Fermaid-O", "Fermaid-K", "nutrient", "YAN"],
+          "goferm": ["GoFerm", "yeast rehydration", "yeast hydration"],
+          "oak chips": ["oak", "aging", "tannin", "flavor"],
+          "oak cubes": ["oak", "aging", "tannin", "flavor"],
+          "bottle shock": ["bottle shock", "sulfite", "bottling"],
+          "corking": ["cork", "bottling", "sealing"],
+          "fining": ["fining", "clarity", "bentonite", "gelatin"],
+          "bentonite": ["fining", "protein", "clarity", "bentonite"],
+          "isinglass": ["fining", "clarity", "isinglass"],
+          "ph": ["pH", "acidity", "tartaric", "calcium carbonate"],
+          "ta": ["TA", "total acidity", "tartaric", "acid"],
+          "brix": ["Brix", "sugar", "refractometer", "hydrometer"],
+          "specific gravity": ["Brix", "sugar", "hydrometer", "fermentation"],
+          "sg": ["specific gravity", "Brix", "hydrometer"],
+          "temperature": ["fermentation temperature", "temperature control", "cooling"],
+          "too hot": ["fermentation temperature", "temperature", "cooling"],
+          "too cold": ["fermentation temperature", "temperature", "yeast"],
+          "yeast": ["yeast", "inoculation", "fermentation", "Saccharomyces"],
+          "inoculate": ["inoculation", "yeast", "pitch"],
+          "pitch": ["inoculation", "yeast", "pitch rate"],
+          "sulphur": ["sulphur", "SO2", "H2S", "sulphite"],
+          "sulfur": ["sulphur", "SO2", "H2S", "sulphite"],
+          "oxidation": ["oxidation", "oxygen", "browning", "SO2"],
+          "browning": ["oxidation", "browning", "SO2", "colour"],
+          "color": ["colour", "extraction", "anthocyanins", "tannin"],
+          "colour": ["colour", "extraction", "anthocyanins", "tannin"],
+          "tannin": ["tannin", "structure", "mouthfeel", "extraction"],
+          "mouthfeel": ["mouthfeel", "tannin", "body", "texture"],
+          "flat": ["mouthfeel", "acidity", "CO2", "body"],
+          "thin": ["body", "mouthfeel", "tannin", "extract"],
+          "headspace": ["headspace", "oxygen", "top-up", "oxidation"],
+          "top up": ["headspace", "top-up", "oxidation", "oxygen"],
+          "top-up": ["headspace", "top-up", "oxidation"],
+          "siphon": ["racking", "siphon", "transfer", "lees"],
+          "transfer": ["racking", "transfer", "lees", "vessel"],
+        };
 
-        // Build a relevance-scored set of chunks from published content
-        // Fetch all published chunks (max 200) then score by keyword overlap
+        // Expand the question with colloquial synonyms for better keyword matching
+        const questionLower = input.question.toLowerCase();
+        const expandedTerms = new Set<string>();
+        // Add original question words
+        questionLower.split(/\s+/).filter(w => w.length > 2).forEach(w => expandedTerms.add(w));
+        // Add colloquial expansions
+        for (const [phrase, synonyms] of Object.entries(COLLOQUIAL_MAP)) {
+          if (questionLower.includes(phrase)) {
+            synonyms.forEach(s => s.toLowerCase().split(/\s+/).forEach(w => expandedTerms.add(w)));
+          }
+        }
+        const questionWords = Array.from(expandedTerms).filter(w => w.length > 2).slice(0, 20);
+
+        // Step 1: Retrieve published chunks from ALL sources (bible + outline)
         const allPublishedChunks = await db
           .select({
             id: schema.diyKnowledgeChunks.id,
@@ -2177,67 +2269,97 @@ const tutorRouter = router({
           })
           .from(schema.diyKnowledgeChunks)
           .where(eq(schema.diyKnowledgeChunks.published, true))
-          .limit(200);
+          .limit(300);
 
-        // Score each chunk by keyword overlap
+        // Score each chunk by expanded keyword overlap
         const scored = allPublishedChunks.map((chunk) => {
           const haystack = [
             (chunk.topicTags ?? "").toLowerCase(),
             (chunk.chapterTitle ?? "").toLowerCase(),
-            chunk.content.toLowerCase().slice(0, 600),
+            chunk.content.toLowerCase().slice(0, 800),
           ].join(" ");
           const score = questionWords.reduce((acc, word) => acc + (haystack.includes(word) ? 1 : 0), 0);
-          return { ...chunk, score };
+          // Boost morew_red_outline chunks slightly — they are home-scale by design
+          const sourceBoost = chunk.sourceDoc === "morew_red_outline" ? 0.5 : 0;
+          return { ...chunk, score: score + sourceBoost };
         });
 
-        // Take top 5 most relevant chunks
+        // Take top 6 most relevant chunks (mix of sources)
         const topChunks = scored
           .filter((c) => c.score > 0)
           .sort((a, b) => b.score - a.score)
-          .slice(0, 5);
+          .slice(0, 6);
 
-        // If no keyword match, take the first 3 published chunks (fermentation intro)
-        const relevantChunks = topChunks.length > 0 ? topChunks : allPublishedChunks.slice(0, 3);
+        // If no keyword match, take fermentation intro chunks from both sources
+        const relevantChunks = topChunks.length > 0 ? topChunks : allPublishedChunks.slice(0, 4);
 
-        console.log(`[DIYTutor] Retrieved ${relevantChunks.length} published chunks (top score: ${topChunks[0]?.score ?? 0})`);
+        console.log(`[DIYTutor] Retrieved ${relevantChunks.length} published chunks (top score: ${topChunks[0]?.score ?? 0}) | sources: ${Array.from(new Set<string>(relevantChunks.map(c => c.sourceDoc ?? ''))).join(', ')}`);
 
-        // Step 2: Build document context
+        // Step 2: Build document context with source labels
         const docContext = relevantChunks
           .map((chunk) => {
-            const docLabel = chunk.sourceDoc === "red_wine_bible" ? "Red Wine Bible" : "White Wine Bible";
-            return `## ${docLabel} — ${chunk.chapterTitle ?? `Chapter ${chunk.chapterRef}`} (WBS ${chunk.wbsCode ?? "—"})\n${chunk.content.slice(0, 1800)}`;
+            let docLabel: string;
+            if (chunk.sourceDoc === "red_wine_bible") docLabel = "Red Wine Bible";
+            else if (chunk.sourceDoc === "morew_red_outline") docLabel = "MoreWine! Red Winemaking Outline (home scale)";
+            else if (chunk.sourceDoc === "white_wine_bible") docLabel = "White Wine Bible";
+            else docLabel = chunk.sourceDoc ?? "Reference Document";
+            return `## ${docLabel} — ${chunk.chapterTitle ?? `Chapter ${chunk.chapterRef}`}\n${chunk.content.slice(0, 2000)}`;
           })
           .join("\n\n---\n\n");
 
-        const sourceRefs = Array.from(new Set(relevantChunks.map((c) => c.chapterTitle ?? `Chapter ${c.chapterRef}`))).slice(0, 3);
+        const sourceRefs = Array.from(new Set<string>(relevantChunks.map((c) => c.chapterTitle ?? `Chapter ${c.chapterRef}`))).slice(0, 4);
 
-        // Step 3: Risk classification — detect high-risk topics
-        // High-risk: chemical additions, dosage, food safety, sulphites, acid additions
+        // Step 3: Batch size extraction — parse stated volume from question
+        const batchSizeMatch = questionLower.match(/(\d+(?:\.\d+)?)\s*(litre|liter|l\b|gallon|gal|L)/);
+        const batchSize = batchSizeMatch ? `${batchSizeMatch[1]} ${batchSizeMatch[2]}` : null;
+        const batchSizeContext = batchSize
+          ? `The user has stated their batch size is ${batchSize}. Scale all quantities and dosages to this volume.`
+          : `The user has not stated their batch size. Assume a standard home winemaker batch of 23 litres (5 gallons) and state this assumption in your answer.`;
+
+        // Step 4: Risk classification — detect high-risk topics
         const highRiskKeywords = ["so2", "sulfite", "sulphite", "metabisulphite", "metabisulfite",
-          "potassium", "sorbate", "bentonite", "tartaric", "citric", "acid addition",
+          "campden", "potassium", "sorbate", "bentonite", "tartaric", "citric", "acid addition",
           "dap", "yan", "nutrient", "dosage", "ppm", "grams per", "g/l", "mg/l",
-          "fining", "isinglass", "gelatin", "casein", "food safe"];
-        const questionLowerDIY = input.question.toLowerCase();
-        const isHighRisk = highRiskKeywords.some((kw) => questionLowerDIY.includes(kw));
+          "fining", "isinglass", "gelatin", "casein", "food safe", "how much", "how many"];
+        const isHighRisk = highRiskKeywords.some((kw) => questionLower.includes(kw));
 
-        // Step 4: Build DIY system prompt with reasoning layer
-        const diySystemPrompt = `You are a knowledgeable home winemaking assistant. You ONLY answer from the reference documents provided below — you do not use general internet knowledge.
+        // Step 5: Build DIY system prompt — colloquial, scale-aware, document-grounded
+        const diySystemPrompt = `You are a friendly, knowledgeable home winemaking assistant. You help home winemakers at garage scale (typically 10–100 litres). You speak in plain, everyday English — not textbook language.
+
+COLLOQUIAL LANGUAGE RULES:
+- If the user says "bubbles stopped" they mean stuck or completed fermentation
+- If they say "smells like eggs" they mean hydrogen sulphide (H2S)
+- If they say "nail polish remover" they mean ethyl acetate or volatile acidity
+- If they say "campden tablets" they mean potassium metabisulphite (SO2 source)
+- If they say "cap" they mean the pomace cap that forms during red wine fermentation
+- If they say "rack" or "racking" they mean siphoning wine off the sediment
+- If they say "marbles trick" they mean filling headspace to prevent oxidation
+- Translate any commercial-scale language in the documents to home-scale equivalents
+
+SCALE TRANSLATION RULES:
+- Convert all quantities from per hectolitre (hL) to per litre, then scale to the user's batch
+- "Pump-over" → "punch-down or gentle stir with a spoon"
+- "Laboratory analysis" → "hydrometer or refractometer reading"
+- "Tank" → "carboy, bucket, or demijohn"
+- "Inoculation rate in g/hL" → convert to grams for the user's batch size
+- Always state the assumed or stated batch size in your answer
+
+BATCH SIZE: ${batchSizeContext}
 
 DOCUMENT-GROUNDED RULES:
-1. Answer ONLY from the document passages provided. If the exact answer is not in the documents, reason from the principles stated in the documents (e.g. if a document explains acid resistance matters for equipment, apply that principle to the user's specific equipment question).
-2. When reasoning beyond explicit document text, say "Based on the principles in [chapter name]..." to distinguish document facts from applied reasoning.
-3. Cite the chapter or section your answer comes from (e.g. "According to Chapter 3 — Primary Fermentation...").
-4. If the question is completely outside the scope of the provided documents, say: "This topic isn't covered in the current reference documents. I can answer questions about fermentation, yeast management, MLF, and cap management from the Red Wine Bible."
+1. Answer from the reference documents provided. If the exact answer is not there, reason from the principles in the documents and say so.
+2. Cite the source document and section (e.g. "According to the MoreWine! Outline, Section C...").
+3. If the question is outside the scope of all provided documents, say so honestly and suggest what topics are covered.
 
-RISK ASSESSMENT:
-${isHighRisk ? '- This question involves chemical additions, dosages, or food safety. Provide the document guidance AND add a clear caveat: "Verify quantities and products with your homebrew supplier before use."' : '- This is a low-risk process or equipment question. Answer confidently from the documents.'}
+RISK GUIDANCE:
+${isHighRisk ? '- This question involves chemical additions or dosages. Provide the document guidance, scale the quantities to the user\'s batch size, and add: "Always do a bench trial on a small sample before treating the whole batch. Verify products with your homebrew supplier."' : '- This is a process or technique question. Answer confidently and practically.'}
 
 RESPONSE FORMAT — respond with a JSON object only, no markdown fences:
 {
-  "answer": "<your full answer citing chapters>",
-  "sourceChapters": ["<chapter title 1>", "<chapter title 2>"],
+  "answer": "<plain English answer, scaled to batch size, citing source>",
+  "sourceChapters": ["<source and section 1>", "<source and section 2>"],
   "riskLevel": "${isHighRisk ? 'high' : 'low'}",
-  "disclaimer": "${isHighRisk ? 'Verify chemical quantities and products with your homebrew supplier before use.' : 'Home winemaking practices vary — always taste and judge your wine yourself.'}"
+  "disclaimer": "${isHighRisk ? 'Scale quantities to your batch size. Do a bench trial before treating the whole batch. Verify products with your homebrew supplier.' : 'Home winemaking varies — always taste and trust your senses.'}"
 }
 
 REFERENCE DOCUMENTS:
