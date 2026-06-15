@@ -373,8 +373,8 @@
 - [x] Replace static Q&A list on /for-home-winemakers with inline streaming chat widget
 - [ ] Add "People also ask" follow-up questions below chat answer
 - [ ] Upload white wine bible PDF and ingest when provided
-- [ ] Fix /for-home-winemakers/troubleshooting 404 (redirect to DIY Knowledge Hub)
-- [ ] Fix /resources/home-winery-kit 404 (Equipment Checklist button in hero)
+- [x] Fix /for-home-winemakers/troubleshooting 404 — page exists and loads correctly
+- [x] Fix /resources/home-winery-kit 404 — page exists and loads correctly
 
 ## WBS Knowledge Architecture (Sprint 6 — Jun 2026)
 - [x] Schema: add wbs_domain, wbs_process_family, wbs_code, published, published_at to sop_library
@@ -405,11 +405,11 @@
 - [x] Replace current InlineAskWidget starter questions with colloquial real-world questions (not textbook language)
 - [x] Add "Powered by the Red Wine Bible & MoreWine! Outline" attribution line to the chat widget
 - [ ] Add batch size input field to chat widget (optional, pre-fills scale context)
-- [ ] Ensure /for-home-winemakers is linked from homepage nav and footer as a primary destination
+- [x] Ensure /for-home-winemakers is linked from homepage nav (More dropdown) and footer
 
 ### Fixes
-- [ ] Fix /for-home-winemakers/troubleshooting 404
-- [ ] Fix /resources/home-winery-kit 404
+- [x] Fix /for-home-winemakers/troubleshooting 404 — verified working
+- [x] Fix /resources/home-winery-kit 404 — verified working
 
 ### White Wine Bible
 - [ ] Ingest White Wine Bible when uploaded (pipeline ready: node scripts/ingest-diy-bible.mjs --doc white_wine_bible)
