@@ -524,6 +524,30 @@ export default function FreeRun() {
                       {pair.disclaimer}
                     </p>
                   )}
+                  {/* Learn→Do bridge: Try it in The Press */}
+                  <div className="mt-4 pt-3 flex items-center gap-3" style={{ borderTop: "1px solid var(--ow-border)" }}>
+                    <Link
+                      href="/the-press"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm"
+                      style={{
+                        background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+                        border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+                        color: "var(--ow-amber)",
+                        fontFamily: "'Lato', sans-serif",
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        textDecoration: "none",
+                      }}
+                    >
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path d="M1 5h8M5 1l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      Log it in The Press
+                    </Link>
+                    <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.7rem", color: "var(--ow-text-lo)" }}>
+                      Ready to record this in your vintage log?
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}

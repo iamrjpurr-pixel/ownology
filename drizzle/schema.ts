@@ -579,6 +579,8 @@ export const sopLibrary = mysqlTable(
     tribalKnowledge: text("tribal_knowledge"),
     // CSU subject reference code(s) e.g. "WSC202, WSC318"
     csuSubjectRef: varchar("csu_subject_ref", { length: 100 }),
+    // Cellar-ready quick steps: 3–5 action-verb bullet points (Markdown list)
+    quickSteps: text("quick_steps"),
     // Whether this SOP was platform-authored (true) or fully custom (false)
     isTemplate: boolean("is_template").notNull().default(true),
     createdAt: bigint("created_at", { mode: "number" }).notNull(),

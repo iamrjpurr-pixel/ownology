@@ -1,6 +1,6 @@
 # Ownology — Document Tree & Workflow Architecture
 
-*Generated: June 2026. Reflects current codebase, knowledge base, and reference library.*
+*Updated: June 2026. Reflects current codebase, knowledge base, and reference library after Sprint 8.*
 
 ---
 
@@ -22,18 +22,25 @@ OWNOLOGY
 │
 ├── KNOWLEDGE SURFACE (reference & compliance)
 │   ├── Regulations          ← "the what" — static reference library
-│   └── Compliance           ← "the how" — AI compliance chat
+│   ├── Compliance           ← "the how" — AI compliance chat
+│   └── Knowledge Platform   ← SOP library (38 SOPs, 10 categories) + AI Tutor
+│       ├── /knowledge                — SOP library browse & search
+│       ├── /knowledge/category/:cat  — filtered by category
+│       ├── /knowledge/sop/:id        — SOP detail (procedure, quick steps, notes, training)
+│       └── /free-run                 — AI winemaking tutor (scoped RAG)
 │
 ├── OPERATIONAL SURFACE (cellar tools) — BRAND ID
 │   ├── The Press            ← vintage log, batch tracking, calculations
-│   └── The Free Run         ← unfiltered content / early access stream
+│   │   ├── VintageEntrySheet — 5-step guided entry (with SOP bridge chips)
+│   │   └── QuickEntry        — rapid single-field entry
+│   └── Guide                ← new-user onboarding guide (/guide)
 │
 └── ADMIN SURFACE (owner-only)
     ├── Admin (dashboard)
     ├── Admin Leads
     ├── Admin Compliance Doctrine
+    ├── Build Index           ← owner-only (not in public nav)
     ├── Campaign Metrics
-    ├── Quick Entry
     └── Orders
 ```
 
@@ -134,34 +141,75 @@ Q&A DOCTRINE (54 entries)
 
 ---
 
-## 4. SOP Reference Library
+## 4. SOP Knowledge Platform (LIVE — Sprint 8)
 
-Stored in `references/sop-starting-points.md`. This is the **foundational source material** for future SOP creation — not yet built into the product.
+The SOP library is stored in the `sop_library` database table and served via the `/knowledge` routes.
 
 ```
-SOP REFERENCE LIBRARY (references/)
+SOP KNOWLEDGE PLATFORM
 │
-├── Source 1: Fhyzics SOP Manual for Wineries
-│   └── 50 SOP titles across 5 pillars:
-│       ├── Viticulture (harvest, pruning, pest, irrigation, soil)
-│       ├── Cellar Operations (fermentation, pressing, MLF, blending, barrel)
-│       ├── Packaging & QC (bottling, labelling, sensory, QC testing)
-│       ├── Compliance & Safety (recordkeeping, export, waste, WHS, emergency)
-│       └── Commercial (tasting room, wine club, events, distribution)
+├── sop_library table (38 SOPs across 10 categories)
+│   ├── Fields: id, title, category, purpose, scope, procedure (JSON steps),
+│   │           materials, safetyNotes, references, csuSubjectRef, isTemplate,
+│   │           quickSteps (NEW — Sprint 8: cellar-ready bullet checklist)
+│   │
+│   ├── Categories (10):
+│   │   ├── Barrel Management (5 SOPs)
+│   │   ├── Bottling Procedures (4 SOPs)
+│   │   ├── Crushing & Fermentation (4 SOPs)
+│   │   ├── Fermentation Management (6 SOPs)
+│   │   ├── Laboratory Testing (5 SOPs)
+│   │   ├── Pre-Harvest (3 SOPs)
+│   │   ├── Tank Cleaning & Sanitation (4 SOPs)
+│   │   ├── Traceability (3 SOPs)
+│   │   ├── Vineyard Operations (2 SOPs)
+│   │   └── Winery Safety (2 SOPs)
+│   │
+│   └── SOP Detail Tabs:
+│       ├── Procedure — step-by-step with QUICK STEPS panel (Sprint 8)
+│       ├── Notes     — winemaker vintage notes (linked to vintage_log_entries)
+│       └── Training  — training record log
 │
-└── Source 2: Winemaker Magazine — Garagiste 2023 (Jenne Baldwin-Eaton)
-    └── 6-stage winemaking SOP framework:
-        ├── Stage 1: Harvest (picking params, method, transport, vessel, fruit condition)
-        ├── Stage 2: Pre-fermentation (enzyme/tannin, cold soak, carbonic mac, SO₂)
-        ├── Stage 3: Fermentation (yeast strategy, rehydration, temp, nitrogen, MLF, oak)
-        ├── Stage 4: Post-fermentation / aging (maceration, sur lie, oak, oxidation, microbial)
-        ├── Stage 5: Bottling prep (blending → fining → stabilities → filtering → bottle)
-        └── Philosophy: SOPs are living roadmaps, not perfection checklists
+├── sop_vintage_notes table — winemaker notes per SOP
+├── sop_training_records table — training completions per SOP
+│
+└── AI Tutor (Free Run) — scoped RAG over sop_library
+    ├── Retrieves top-5 relevant SOPs by keyword match
+    ├── Returns JSON: { answer, sopTitles[], disclaimer }
+    └── Supports conversation history (multi-turn)
 ```
 
 ---
 
-## 5. User Workflow — Compliance Journey
+## 5. Cross-Pillar Bridges (Sprint 8)
+
+The three pillars — **Do** (The Press), **Know** (Knowledge Platform), **Learn** (Free Run) — are now interconnected.
+
+```
+CROSS-PILLAR BRIDGES
+│
+├── Do → Know  (VintageEntrySheet → Knowledge Platform)
+│   ├── Location: Step 4 (note step) of VintageEntrySheet
+│   ├── Trigger: When event type is addition / measurement / racking /
+│   │            inoculation / sanitation / bottling_run / observation
+│   ├── Display: Amber "Related SOPs" chips above the note textarea
+│   └── Action: Opens SOP detail page in new tab (/knowledge/sop/:id)
+│
+├── Know → Learn  (SOP detail → Free Run)
+│   ├── Location: SOP detail page header (next to Print SOP button)
+│   ├── Display: Amber "Ask AI Tutor" button
+│   └── Action: Opens /free-run?q=Tell+me+more+about:+{sop.title}
+│               (auto-submits the question via ?q= param)
+│
+└── Learn → Do  (Free Run → The Press)
+    ├── Location: Bottom of each answer card in Free Run
+    ├── Display: Amber "Log it in The Press" chip + helper text
+    └── Action: Links to /the-press (user opens VintageEntrySheet)
+```
+
+---
+
+## 6. User Workflow — Compliance Journey
 
 ```
 USER ARRIVES AT OWNOLOGY
@@ -186,18 +234,26 @@ USER ARRIVES AT OWNOLOGY
 │       ├── AI answer with section-level citations
 │       └── PDF export of conversation
 │
+├── Knowledge path (wants to learn or look up a procedure)
+│   └── Nav → Knowledge
+│       ├── Browse by category (10 categories, 38 SOPs)
+│       ├── Search by keyword
+│       ├── SOP detail: procedure + quick steps + notes + training
+│       ├── Ask AI Tutor → Free Run (pre-filled question)
+│       └── Print SOP
+│
 └── Operational path (in the cellar, doing the work)
     └── Nav → The Press
         ├── Wine batch selection / creation
         ├── Vintage log entry (addition / measurement / racking / inoculation / observation)
+        │   └── Step 4 (note step): Related SOP chips → Knowledge Platform
         ├── Tank reminders
-        ├── Quick entry mode
-        └── [Future] SOP guidance at each stage
+        └── Quick entry mode
 ```
 
 ---
 
-## 6. Data Flow — Compliance Chat
+## 7. Data Flow — Compliance Chat
 
 ```
 USER QUESTION
@@ -231,7 +287,37 @@ USER RECEIVES ANSWER
 
 ---
 
-## 7. Database Tables
+## 8. Data Flow — AI Tutor (Free Run)
+
+```
+USER QUESTION
+     │
+     ▼
+[Stage 1] SOP Retrieval (keyword match)
+     │    → Queries sop_library for top-5 relevant SOPs
+     │    → Matches on title + category + procedure text
+     │
+     ▼
+[Stage 2] Context Assembly
+     │    → Builds sopContext string from retrieved SOPs
+     │    → Includes: title, category, purpose, procedure steps
+     │
+     ▼
+[Stage 3] LLM Answer Generation
+     │    → System prompt: expert winemaking assistant (professional or home)
+     │    → Context: sopContext + conversation history
+     │    → Output: JSON { answer, sopTitles[], disclaimer }
+     │
+     ▼
+USER RECEIVES ANSWER
+     │    → Displayed with SOP source badges
+     │    → "Log it in The Press" CTA → The Press
+     └──→ Conversation history maintained for multi-turn
+```
+
+---
+
+## 9. Database Tables
 
 ```
 DATABASE (MySQL / TiDB)
@@ -245,45 +331,15 @@ DATABASE (MySQL / TiDB)
 ├── campaign_metrics_snapshots — marketing analytics
 ├── site_content              — CMS-style editable content blocks
 ├── doctrine_verified         — admin-verified Q&A doctrine entries
-└── regulation_monitor_seen   — tracks which regulation updates user has seen
+├── regulation_monitor_seen   — tracks which regulation updates user has seen
+├── sop_library               — 38 SOPs (title, category, procedure, quickSteps, ...)
+├── sop_vintage_notes         — winemaker notes per SOP (linked to user + sop_id)
+└── sop_training_records      — training completions per SOP (linked to user + sop_id)
 ```
 
 ---
 
-## 8. Future SOP Feature — Planned Architecture
-
-*Not yet built. Starting points stored in `references/sop-starting-points.md`.*
-
-```
-SOP FEATURE (planned)
-│
-├── SOP Template Library
-│   ├── Tier 1: General winery (all styles)
-│   ├── Tier 2: Style family (red / white / sparkling / fortified / orange)
-│   └── Tier 3: Individual wine (winery-specific customisation)
-│
-├── SOP Stages (from Garagiste 2023 framework)
-│   ├── Harvest
-│   ├── Pre-fermentation
-│   ├── Fermentation
-│   ├── Post-fermentation / aging
-│   ├── Bottling prep
-│   └── [Compliance checkpoints at each stage — linked to KB]
-│
-├── SOP Versioning
-│   ├── Review date tracking
-│   ├── Revision history
-│   └── Incident / exception notes
-│
-└── Integration points
-    ├── The Press → log entries can reference SOP step
-    ├── Compliance → SOP steps can link to relevant KB section
-    └── Regulations → SOP compliance checkpoints cite regulation source
-```
-
----
-
-## 9. Gap Analysis — What Is Missing
+## 10. Gap Analysis — What Is Missing
 
 | Area | Current state | Priority |
 |---|---|---|
@@ -292,9 +348,10 @@ SOP FEATURE (planned)
 | FSANZ Standard 1.2.7 (nutrition) | Not in KB | Low |
 | Organic certification (ACO / NASAA) | Not in KB | Medium |
 | NZ GI / Geographical Indications | Partial in KB | Medium |
-| SOP feature | Reference material only — not built | Future |
+| SOP bridge: event log → SOP chips | Live (Sprint 8) — static mapping, not dynamic | Future: dynamic by addition.what |
 | Crosslink: Regulations → Compliance | No CTA linking the two pages | Low |
 | NT compliance map | Map shows NT as black / uncovered | Medium |
+| SOP quick_steps | Live (Sprint 8) — 38 SOPs seeded | Ongoing: refine per winemaker feedback |
 
 ---
 

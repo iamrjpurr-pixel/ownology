@@ -167,7 +167,6 @@ const GUIDE_NAV: NavItem[] = [
   { label: "Guide — Getting Started", href: "/guide" },
   { label: "Compliance AI",           href: "/compliance" },
   { label: "Regulations Library",     href: "/regulations" },
-  { label: "⚙ Build Index",           href: "/build-index" },
 ];
 const MORE_NAV: NavItem[] = [
   { label: "Our Story",    href: "#our-story" },

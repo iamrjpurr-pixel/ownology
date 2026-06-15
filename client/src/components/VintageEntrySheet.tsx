@@ -87,6 +87,40 @@ const MEASUREMENT_UNIT_MAP: Record<string, string> = {
 const RACKING_LEES = ["Gross lees", "Fine lees", "Clean (no lees)"];
 const INOCULATION_WHAT = ["Yeast", "MLF bacteria", "Other"];
 
+// ─── SOP bridge: map event types to related SOP IDs in the Knowledge Platform ─
+// IDs correspond to sop_library rows. Multiple IDs = multiple chips.
+const EVENT_SOP_MAP: Partial<Record<string, { id: number; title: string; category: string }[]>> = {
+  addition: [
+    { id: 30, title: "Nutrient Management (YAN)", category: "Fermentation Management" },
+    { id: 11, title: "SO₂ Management", category: "Tank Cleaning & Sanitation" },
+  ],
+  measurement: [
+    { id: 21, title: "Brix & SG Measurement", category: "Laboratory Testing" },
+    { id: 22, title: "pH & TA Measurement", category: "Laboratory Testing" },
+    { id: 23, title: "Free SO₂ Analysis", category: "Laboratory Testing" },
+  ],
+  racking: [
+    { id: 2, title: "Barrel-to-Barrel Transfer", category: "Barrel Management" },
+    { id: 13, title: "Transfer & Racking Records", category: "Traceability" },
+  ],
+  inoculation: [
+    { id: 26, title: "Yeast Inoculation", category: "Fermentation Management" },
+    { id: 31, title: "MLF Inoculation & Monitoring", category: "Fermentation Management" },
+  ],
+  sanitation: [
+    { id: 8, title: "Tank Cleaning & CIP", category: "Tank Cleaning & Sanitation" },
+    { id: 9, title: "Barrel Sanitation", category: "Barrel Management" },
+  ],
+  bottling_run: [
+    { id: 15, title: "Pre-Bottling Checklist", category: "Bottling Procedures" },
+    { id: 16, title: "Bottling Line Operation", category: "Bottling Procedures" },
+  ],
+  observation: [
+    { id: 3, title: "Barrel Inspection", category: "Barrel Management" },
+    { id: 27, title: "Fermentation Monitoring", category: "Fermentation Management" },
+  ],
+};
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function StepIndicator({ step, total }: { step: number; total: number }) {
@@ -1026,6 +1060,49 @@ export default function VintageEntrySheet({ open, onClose, onSaved, prefillTank 
                   </p>
                 )}
               </div>
+
+              {/* SOP Bridge chips — Do→Know: link to related SOPs in Knowledge Platform */}
+              {eventType && EVENT_SOP_MAP[eventType] && EVENT_SOP_MAP[eventType]!.length > 0 && (
+                <div className="mb-3">
+                  <p
+                    className="text-xs mb-2"
+                    style={{
+                      fontFamily: "'Lato', sans-serif",
+                      color: "var(--ow-text-lo)",
+                      letterSpacing: "0.06em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Related SOPs
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {EVENT_SOP_MAP[eventType]!.map((sop) => (
+                      <a
+                        key={sop.id}
+                        href={`/knowledge/sop/${sop.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm"
+                        style={{
+                          background: "color-mix(in oklch, var(--ow-amber) 8%, var(--ow-bg-inset))",
+                          border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+                          color: "var(--ow-amber)",
+                          fontFamily: "'Lato', sans-serif",
+                          fontSize: "0.75rem",
+                          fontWeight: 500,
+                          textDecoration: "none",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ flexShrink: 0 }}>
+                          <path d="M1 5h8M5 1l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        {sop.title}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Repeat last entry chip */}
               {lastEntry && !showRepeatChip && (

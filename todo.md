@@ -338,9 +338,9 @@
 
 ## Site Cleanup — Connectivity Audit (Jun 2026)
 
-- [ ] Remove fake SEED_REVIEWS from Merch.tsx (ACL legal risk)
-- [ ] Replace Regulations.tsx with curated links page (~80 lines, direct to primary sources)
-- [ ] Delete Resources.tsx (duplicate of Regulations, 1 inbound link)
-- [ ] Fix App.tsx: /resources route should redirect to /regulations
-- [ ] Add Knowledge Platform to primary nav (currently buried in More dropdown)
-- [ ] Remove CompetitiveAdvantage from footer (merge key content into WhyOwnology)
+- [x] Remove fake SEED_REVIEWS from Merch.tsx (ACL legal risk)
+- [x] Replace Regulations.tsx with curated links page (~80 lines, direct to primary sources)
+- [x] Delete Resources.tsx (duplicate of Regulations, 1 inbound link) — /resources now routes to RegulatoryLinks
+- [x] Fix App.tsx: /resources route now renders RegulatoryLinks
+- [x] Add Knowledge Platform to primary nav (currently buried in More dropdown)
+- [x] Remove CompetitiveAdvantage from footer — replaced with Knowledge link

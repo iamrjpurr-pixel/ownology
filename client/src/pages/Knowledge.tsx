@@ -482,16 +482,29 @@ function SopDetail({ id }: { id: number }) {
                 {sop.isTemplate && <Badge variant="outline" className="text-xs" style={{ borderColor: "oklch(0.72 0.12 75 / 30%)", color: "oklch(0.72 0.12 75)" }}>Platform Template</Badge>}
               </div>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2 print:hidden"
-              onClick={() => window.print()}
-              style={{ borderColor: "oklch(1 0 0 / 15%)", color: "oklch(0.75 0.015 75)" }}
-            >
-              <Printer className="w-4 h-4" />
-              Print SOP
-            </Button>
+            <div className="flex gap-2 flex-wrap print:hidden">
+              <Link href={`/free-run?q=${encodeURIComponent(`Tell me more about: ${sop.title}`)}`}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  style={{ borderColor: "oklch(0.72 0.12 75 / 30%)", color: "oklch(0.72 0.12 75)" }}
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Ask AI Tutor
+                </Button>
+              </Link>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => window.print()}
+                style={{ borderColor: "oklch(1 0 0 / 15%)", color: "oklch(0.75 0.015 75)" }}
+              >
+                <Printer className="w-4 h-4" />
+                Print SOP
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -518,6 +531,49 @@ function SopDetail({ id }: { id: number }) {
 
       {/* Tab content */}
       <div className="container py-8 max-w-4xl">
+
+        {/* ── Quick Steps panel — shown at top of Procedure tab when available ── */}
+        {activeTab === "procedure" && sop.quickSteps && (
+          <div
+            className="mb-8 p-5 rounded-sm"
+            style={{
+              background: "oklch(0.15 0.010 75 / 60%)",
+              border: "1px solid oklch(0.72 0.12 75 / 25%)",
+            }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <span
+                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm"
+                style={{
+                  fontFamily: "'Fira Code', monospace",
+                  fontSize: "0.6rem",
+                  letterSpacing: "0.12em",
+                  color: "oklch(0.11 0.008 60)",
+                  background: "oklch(0.72 0.12 75)",
+                  fontWeight: 700,
+                }}
+              >
+                QUICK STEPS
+              </span>
+              <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.55 0.015 75)" }}>
+                Cellar-ready checklist
+              </span>
+            </div>
+            <ul className="space-y-2">
+              {sop.quickSteps.split("\n").filter((l: string) => l.trim().startsWith("-")).map((line: string, i: number) => (
+                <li key={i} className="flex items-start gap-2.5">
+                  <span
+                    className="mt-1.5 flex-shrink-0"
+                    style={{ width: "6px", height: "6px", borderRadius: "50%", background: "oklch(0.72 0.12 75)", display: "inline-block", marginTop: "8px" }}
+                  />
+                  <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: "oklch(0.82 0.015 75)", lineHeight: 1.6 }}>
+                    {line.replace(/^-\s*/, "")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* ── Procedure ── */}
         {activeTab === "procedure" && (
