@@ -751,3 +751,37 @@ export const diyKnowledgeChunks = mysqlTable(
     index("dkc_published_idx").on(t.published),
   ]
 );
+
+// ─── Ghost Questions ───────────────────────────────────────────────────────────
+// AI-generated questions mapped to WBS nodes for the home winemaker knowledge hub.
+// These "ghost questions" surface naturally through the AI journey rather than
+// being shown as static chips. They are used for:
+//   1. SEO — question-answer pairs for search indexing
+//   2. AI context — pre-seeded Q&A pairs to improve retrieval quality
+//   3. Future "suggested questions" feature — surfaced contextually after answers
+export const ghostQuestions = mysqlTable(
+  "ghost_questions",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    // WBS node this question maps to (e.g. "D4.2", "5.1")
+    wbsCode: varchar("wbs_code", { length: 10 }).notNull(),
+    // Wine type: "red", "white", or "general"
+    wineType: varchar("wine_type", { length: 10 }).notNull().default("general"),
+    // The question text (plain language, home winemaker voice)
+    question: text("question").notNull(),
+    // Difficulty level: "beginner", "intermediate", "advanced"
+    difficulty: varchar("difficulty", { length: 20 }).notNull().default("beginner"),
+    // Category tag for grouping (e.g. "fermentation", "sanitation", "bottling")
+    category: varchar("category", { length: 50 }),
+    // Whether this question is active/visible
+    active: boolean("active").notNull().default(true),
+    // UTC ms timestamp
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("gq_wbs_code_idx").on(t.wbsCode),
+    index("gq_wine_type_idx").on(t.wineType),
+    index("gq_difficulty_idx").on(t.difficulty),
+    index("gq_active_idx").on(t.active),
+  ]
+);

@@ -53,8 +53,17 @@ const FEATURES: { icon: string; title: string; desc: string; href: string }[] = 
 
 // Starter question chips removed — AI surfaces relevant questions naturally through conversation
 
+const BATCH_SIZES = [
+  { label: "6 L", value: "6" },
+  { label: "23 L", value: "23" },
+  { label: "60 L", value: "60" },
+  { label: "Other", value: "other" },
+];
+
 function InlineAskWidget() {
   const [question, setQuestion] = useState("");
+  const [batchSize, setBatchSize] = useState<string>("23"); // default 23L
+  const [customBatch, setCustomBatch] = useState("");
   const [answer, setAnswer] = useState("");
   const [sourceChapters, setSourceChapters] = useState<string[]>([]);
   const [riskLevel, setRiskLevel] = useState<string>("low");
@@ -68,6 +77,10 @@ function InlineAskWidget() {
     const finalQ = (q ?? question).trim();
     if (!finalQ || isAsking) return;
     setIsAsking(true);
+    // Prepend batch size context to the question
+    const batchLitres = batchSize === "other" ? (customBatch.trim() || "unknown") : batchSize;
+    const batchContext = `[Batch size: ${batchLitres} litres] `;
+    const questionWithContext = batchContext + finalQ;
     setAsked(finalQ);
     setAnswer("");
     setSourceChapters([]);
@@ -76,7 +89,7 @@ function InlineAskWidget() {
     setQuestion("");
     try {
       const result = await askMutation.mutateAsync({
-        question: finalQ,
+        question: questionWithContext,
         mode: "home_winemaker",
         history: [],
       });
@@ -156,7 +169,70 @@ function InlineAskWidget() {
         </button>
       </div>
 
-      {/* Question chips removed — AI surfaces relevant questions naturally through conversation */}
+      {/* Batch size selector */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          marginTop: "0.6rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: SANS,
+            fontSize: "0.72rem",
+            color: "var(--ow-text-lo)",
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Batch size:
+        </span>
+        {BATCH_SIZES.map((s) => (
+          <button
+            key={s.value}
+            onClick={() => setBatchSize(s.value)}
+            style={{
+              padding: "0.2rem 0.65rem",
+              border: `1px solid ${batchSize === s.value ? "var(--ow-amber)" : "var(--ow-border-md)"}`,
+              borderRadius: "2px",
+              background: batchSize === s.value ? "color-mix(in oklch, var(--ow-amber) 12%, transparent)" : "transparent",
+              color: batchSize === s.value ? "var(--ow-amber)" : "var(--ow-text-lo)",
+              fontFamily: SANS,
+              fontSize: "0.75rem",
+              fontWeight: batchSize === s.value ? 700 : 400,
+              cursor: "pointer",
+              transition: "all 0.12s ease",
+            }}
+          >
+            {s.label}
+          </button>
+        ))}
+        {batchSize === "other" && (
+          <input
+            type="number"
+            min={1}
+            max={9999}
+            placeholder="litres"
+            value={customBatch}
+            onChange={(e) => setCustomBatch(e.target.value)}
+            style={{
+              width: "70px",
+              padding: "0.2rem 0.5rem",
+              border: "1px solid var(--ow-amber)",
+              borderRadius: "2px",
+              background: "var(--ow-bg-raised)",
+              color: "var(--ow-text-hi)",
+              fontFamily: SANS,
+              fontSize: "0.8rem",
+              outline: "none",
+            }}
+          />
+        )}
+      </div>
 
       {/* Thinking indicator */}
       {isAsking && (
