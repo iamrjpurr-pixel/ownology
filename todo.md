@@ -372,23 +372,23 @@
 - [x] Update queryRouter.ts to search diy_knowledge_chunks for DIY audience questions
 - [x] Replace static Q&A list on /for-home-winemakers with inline streaming chat widget
 - [ ] Add "People also ask" follow-up questions below chat answer
-- [ ] Upload white wine bible PDF and ingest when provided
+- [ ] Upload white wine bible PDF and ingest when provided — AWAITING UPLOAD
 - [x] Fix /for-home-winemakers/troubleshooting 404 — page exists and loads correctly
 - [x] Fix /resources/home-winery-kit 404 — page exists and loads correctly
 
 ## WBS Knowledge Architecture (Sprint 6 — Jun 2026)
 - [x] Schema: add wbs_domain, wbs_process_family, wbs_code, published, published_at to sop_library
 - [x] Schema: add wbs_domain, wbs_process_family, wbs_code, published, published_at to diy_knowledge_chunks
-- [ ] Backfill existing 38 commercial SOPs with WBS codes (Domains 2–8, 10)
+- [ ] Backfill existing 38 commercial SOPs with WBS codes (Domains 2–8, 10) — PARKED (not blocking DIY launch)
 - [x] Ingest Red Wine Bible with WBS mapping — all chunks unpublished initially
 - [x] Publish Domain 4 (Fermentation) chunks for DIY launch
 - [x] Build document-grounded DIY tutor — WBS routing, published-only retrieval, reasoning + risk assessment layer
-- [ ] Update DIY Knowledge Hub to show only published chunks/SOPs
+- [ ] Update DIY Knowledge Hub to show only published chunks/SOPs — NEXT SPRINT
 - [x] Build WBS admin panel — content tree with publish toggles (owner only)
 - [x] Wire ForHomeWinemakers inline chat to new DIY tutor procedure
-- [ ] Ghost questions: generate 1000 likely home winemaker questions mapped to WBS nodes (UI layer only)
+- [ ] Ghost questions: generate 1000 likely home winemaker questions mapped to WBS nodes (UI layer only) — NEXT SPRINT
 - [x] White Wine Bible: ingestion pipeline ready (ingest when uploaded, same WBS structure)
-- [ ] Domain 1 (Vineyard) and Domain 9 (Maintenance) — parked, schema ready
+- [ ] Domain 1 (Vineyard) and Domain 9 (Maintenance) — PARKED, schema ready
 
 ## Home Winemaker MVP — Ship It (Jun 2026)
 
@@ -404,7 +404,7 @@
 ### Entry point: /for-home-winemakers polish
 - [x] Replace current InlineAskWidget starter questions with colloquial real-world questions (not textbook language)
 - [x] Add "Powered by the Red Wine Bible & MoreWine! Outline" attribution line to the chat widget
-- [ ] Add batch size input field to chat widget (optional, pre-fills scale context)
+- [ ] Add batch size input field to chat widget (optional, pre-fills scale context) — NEXT SPRINT
 - [x] Ensure /for-home-winemakers is linked from homepage nav (More dropdown) and footer
 
 ### Fixes
@@ -412,4 +412,4 @@
 - [x] Fix /resources/home-winery-kit 404 — verified working
 
 ### White Wine Bible
-- [ ] Ingest White Wine Bible when uploaded (pipeline ready: node scripts/ingest-diy-bible.mjs --doc white_wine_bible)
+- [ ] Ingest White Wine Bible when uploaded (pipeline ready: node scripts/ingest-diy-bible.mjs --doc white_wine_bible) — AWAITING UPLOAD

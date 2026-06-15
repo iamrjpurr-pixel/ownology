@@ -312,48 +312,7 @@ function InlineAskWidget() {
             {answer}
           </div>
 
-          {/* Source chapters */}
-          {sourceChapters.length > 0 && (
-            <div
-              style={{
-                marginTop: "1rem",
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "0.4rem",
-                alignItems: "center",
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: SANS,
-                  fontSize: "0.72rem",
-                  color: "oklch(0.48 0.010 75)",
-                  letterSpacing: "0.06em",
-                  textTransform: "uppercase",
-                  marginRight: "0.25rem",
-                }}
-              >
-                Source
-              </span>
-              {sourceChapters.map((ch) => (
-                <span
-                  key={ch}
-                  style={{
-                    background: "oklch(0.72 0.12 75 / 10%)",
-                    border: "1px solid oklch(0.72 0.12 75 / 25%)",
-                    borderRadius: "2px",
-                    padding: "0.2rem 0.55rem",
-                    fontFamily: SANS,
-                    fontSize: "0.72rem",
-                    color: "oklch(0.72 0.12 75)",
-                    letterSpacing: "0.02em",
-                  }}
-                >
-                  {ch}
-                </span>
-              ))}
-            </div>
-          )}
+          {/* Source chapters intentionally not shown to user — internal knowledge source only */}
 
           {/* Risk badge + disclaimer */}
           {(riskLevel === "high" || disclaimer) && (
@@ -430,7 +389,7 @@ function InlineAskWidget() {
                 letterSpacing: "0.02em",
               }}
             >
-              Answers grounded in the Red Wine Bible & MoreWine! Outline
+              Powered by Ownology
             </span>
           </div>
         </div>
