@@ -4,7 +4,7 @@
  * Replaces the placeholder lesson-card shell with a live question→answer interface.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useSearch } from "wouter";
 import { Send, BookOpen, ExternalLink, GraduationCap } from "lucide-react";
 import { trpc } from "@/lib/trpc";
@@ -248,6 +248,30 @@ export default function FreeRun() {
   const csuRef = useInView(0.05);
 
   const askMutation = trpc.tutor.ask.useMutation();
+
+  // Voice input
+  const [listening, setListening] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const srRef = useRef<any>(null);
+  const startVoice = useCallback(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    const SR = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+    if (!SR) { alert("Voice input is not supported in this browser. Try Chrome on Android or desktop."); return; }
+    if (listening) { srRef.current?.stop(); setListening(false); return; }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rec = new SR() as any;
+    rec.lang = "en-AU"; rec.interimResults = false; rec.maxAlternatives = 1;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rec.onresult = (e: any) => {
+      const transcript = e.results[0][0].transcript as string;
+      setQuestion(prev => prev ? `${prev} ${transcript}` : transcript);
+      setListening(false);
+    };
+    rec.onerror = () => setListening(false);
+    rec.onend = () => setListening(false);
+    srRef.current = rec; rec.start(); setListening(true);
+  }, [listening]);
 
   // Load thread from localStorage
   useEffect(() => {
@@ -667,6 +691,24 @@ export default function FreeRun() {
             <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "var(--ow-text-lo)" }}>
               Enter to send · Shift+Enter for new line
             </p>
+            <div className="flex items-center gap-2">
+            {/* Microphone button */}
+            <button
+              onClick={startVoice}
+              disabled={isAsking}
+              title={listening ? "Stop listening" : "Ask by voice"}
+              className="flex items-center justify-center rounded-sm transition-all"
+              style={{
+                width: 34, height: 34,
+                background: listening ? "color-mix(in oklch, var(--ow-amber) 18%, transparent)" : "var(--ow-bg-inset)",
+                border: `1px solid ${listening ? "var(--ow-amber)" : "var(--ow-border)"}`,
+                color: listening ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                cursor: isAsking ? "not-allowed" : "pointer",
+                fontSize: "1rem",
+              }}
+            >
+              {listening ? "🎙" : "🎤"}
+            </button>
             <button
               onClick={() => handleAsk()}
               disabled={!question.trim() || isAsking}
@@ -685,6 +727,7 @@ export default function FreeRun() {
               <Send size={13} />
               Ask
             </button>
+            </div>
           </div>
         </div>
 

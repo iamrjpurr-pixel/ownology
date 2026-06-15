@@ -1,620 +1,505 @@
 /**
- * QUICK ENTRY — Rapid Cellar Logging
+ * QUICK ENTRY — Harvest Floor Logging (S9-A)
  *
- * Designed for harvest: log multiple tanks in rapid succession without
- * navigating away. Each entry fires immediately, the sheet resets to the
- * next tank, and a running session log shows what's been recorded.
+ * Blind-calculator model: large-target tap-only interface for cellar-floor use.
+ * No keyboard appears except on Observation/Other note fields.
+ * Designed for: gloved hands, bright sunlight, 30-second logging windows.
  *
- * Mobile-first — 44px touch targets, bottom-sheet entry form, safe-area insets.
+ * Four screens:
+ *   1. Event Type  — 6 full-height tiles
+ *   2. Tank        — large tiles from wine batches + log history
+ *   3. Detail      — context-specific: number pad, addition tiles, or text
+ *   4. Confirm     — summary card + single LOG IT button
+ *
+ * Auth: handled server-side via protectedProcedure (dev bypass in trpc.ts).
  */
-
-import { useState, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
-import { getLoginUrl } from "@/const";
 import { toast } from "sonner";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
-const AMBER = "oklch(0.72 0.12 75)";
-const BG = "oklch(0.11 0.008 60)";
-const CARD_BG = "oklch(0.15 0.008 60)";
-const BORDER = "oklch(1 0 0 / 0.08)";
-const BORDER_MD = "oklch(1 0 0 / 0.14)";
-const TEXT_HI = "oklch(0.92 0.015 75)";
-const TEXT_MID = "oklch(0.72 0.015 75)";
-const TEXT_LO = "oklch(0.52 0.012 75)";
+const AMBER       = "oklch(0.72 0.12 75)";
+const AMBER_DIM   = "oklch(0.72 0.12 75 / 18%)";
+const AMBER_BDR   = "oklch(0.72 0.12 75 / 35%)";
+const BG          = "oklch(0.10 0.008 60)";
+const CARD        = "oklch(0.14 0.008 60)";
+const CARD_ACT    = "oklch(0.18 0.010 60)";
+const BDR         = "oklch(1 0 0 / 0.09)";
+const TEXT_HI     = "oklch(0.93 0.015 75)";
+const TEXT_MID    = "oklch(0.72 0.015 75)";
+const TEXT_LO     = "oklch(0.50 0.012 75)";
+const GREEN       = "oklch(0.65 0.15 145)";
+const GREEN_DIM   = "oklch(0.65 0.15 145 / 15%)";
 
-// ─── Event type config ────────────────────────────────────────────────────────
-const EVENT_TYPES = [
-  { id: "measurement", label: "Measurement", icon: "📊", color: "oklch(0.60 0.12 200)" },
-  { id: "addition", label: "Addition", icon: "⚗", color: "oklch(0.60 0.12 150)" },
-  { id: "racking", label: "Racking", icon: "🔄", color: "oklch(0.60 0.12 280)" },
-  { id: "inoculation", label: "Inoculation", icon: "🧫", color: "oklch(0.60 0.12 320)" },
-  { id: "observation", label: "Observation", icon: "👁", color: AMBER },
-  { id: "other", label: "Other", icon: "📝", color: TEXT_LO },
-] as const;
+// ─── Types ────────────────────────────────────────────────────────────────────
+type EventTypeId = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "other";
+type Screen = "event" | "tank" | "detail" | "confirm" | "success";
+type AddStep = "type" | "qty" | "timing";
+type InoStep = "type" | "rate";
 
-type EventTypeId = typeof EVENT_TYPES[number]["id"];
-
-// ─── Measurement options ──────────────────────────────────────────────────────
-const MEASUREMENTS: { label: string; unit: string }[] = [
-  { label: "Brix", unit: "°Bx" },
-  { label: "YAN", unit: "ppm" },
-  { label: "Free SO₂", unit: "ppm" },
-  { label: "Total SO₂", unit: "ppm" },
-  { label: "TA", unit: "g/L" },
-  { label: "pH", unit: "" },
-  { label: "VA", unit: "g/L" },
-  { label: "Temperature", unit: "°C" },
-  { label: "Alcohol", unit: "%" },
-  { label: "Other", unit: "" },
+// ─── Constants ────────────────────────────────────────────────────────────────
+const EVENT_TILES: { id: EventTypeId; label: string; icon: string; color: string }[] = [
+  { id: "addition",    label: "Addition",    icon: "＋", color: "oklch(0.62 0.14 150)" },
+  { id: "measurement", label: "Measurement", icon: "◉",  color: "oklch(0.62 0.14 200)" },
+  { id: "racking",     label: "Racking",     icon: "⇄",  color: "oklch(0.62 0.14 280)" },
+  { id: "inoculation", label: "Inoculation", icon: "⬡",  color: "oklch(0.62 0.14 320)" },
+  { id: "observation", label: "Observation", icon: "◎",  color: AMBER },
+  { id: "other",       label: "Other",       icon: "…",   color: TEXT_LO },
 ];
 
-const ADDITIONS = ["DAP", "SO₂ (potassium metabisulphite)", "Tartaric acid", "Bentonite", "Oak chips", "Yeast nutrients", "Enzyme", "Fining agent", "Other"];
-const ADDITION_UNITS = ["g", "kg", "mL", "L", "g/hL"];
-const ADDITION_TIMINGS = ["At inoculation", "⅓ sugar depletion", "½ sugar depletion", "Post-ferment", "Pre-bottling", "Other"];
-const LEES_OPTIONS = ["Gross lees", "Fine lees", "Clean"];
+const MEASURES = [
+  { label: "Brix",        unit: "°Bx" },
+  { label: "SG",          unit: "" },
+  { label: "pH",          unit: "" },
+  { label: "TA",          unit: "g/L" },
+  { label: "Free SO₂",    unit: "ppm" },
+  { label: "Total SO₂",   unit: "ppm" },
+  { label: "Temperature", unit: "°C" },
+  { label: "VA",          unit: "g/L" },
+  { label: "YAN",         unit: "ppm" },
+  { label: "Alcohol",     unit: "%" },
+];
 
-// ─── Session log entry type ───────────────────────────────────────────────────
-interface SessionEntry {
-  id: string;
-  tank: string;
-  variety: string;
-  eventType: EventTypeId;
-  summary: string;
-  timestamp: Date;
+const ADD_TYPES    = ["DAP", "SO₂ (KMBS)", "Tartaric acid", "Bentonite", "Oak chips", "Yeast nutrients", "Enzyme", "Fining agent", "Other"];
+const ADD_UNITS    = ["g", "kg", "mL", "L", "g/hL"];
+const ADD_TIMINGS  = ["At inoculation", "⅓ sugar depletion", "½ sugar depletion", "Post-ferment", "Pre-bottling", "Other"];
+const LEES_OPTS    = ["Gross lees", "Fine lees", "Clean"];
+const INO_TYPES    = ["Yeast", "MLF Bacteria", "Other"];
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+/** Large-target number pad with display */
+function NumberPad({ value, onChange, label, unit }: { value: string; onChange: (v: string) => void; label: string; unit: string }) {
+  const append = (ch: string) => {
+    if (ch === "." && value.includes(".")) return;
+    if (value === "0" && ch !== ".") { onChange(ch); return; }
+    onChange((value + ch).slice(0, 8));
+  };
+  const bsp = () => onChange(value.length > 1 ? value.slice(0, -1) : "0");
+  const keys = ["7","8","9","4","5","6","1","2","3",".","0","⌫"];
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
+      <div style={{ width: "100%", maxWidth: 320, background: CARD, border: `1px solid ${BDR}`, borderRadius: 12, padding: "16px 20px", display: "flex", alignItems: "baseline", justifyContent: "flex-end", gap: 8 }}>
+        <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "2.4rem", color: TEXT_HI, letterSpacing: "-0.02em" }}>{value || "0"}</span>
+        {unit && <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "1rem", color: AMBER }}>{unit}</span>}
+      </div>
+      <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>{label}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, width: "100%", maxWidth: 320 }}>
+        {keys.map((k) => (
+          <button key={k} onClick={() => k === "⌫" ? bsp() : append(k)}
+            style={{ height: 72, borderRadius: 10, background: k === "⌫" ? "oklch(0.20 0.010 60)" : CARD, border: `1px solid ${BDR}`, color: k === "⌫" ? AMBER : TEXT_HI, fontFamily: k === "⌫" ? "system-ui" : "'Fira Code',monospace", fontSize: k === "⌫" ? "1.4rem" : "1.5rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", WebkitTapHighlightColor: "transparent" }}
+            onPointerDown={e => (e.currentTarget as HTMLButtonElement).style.background = k === "⌫" ? "oklch(0.25 0.012 60)" : CARD_ACT}
+            onPointerUp={e => (e.currentTarget as HTMLButtonElement).style.background = k === "⌫" ? "oklch(0.20 0.010 60)" : CARD}
+          >{k}</button>
+        ))}
+      </div>
+    </div>
+  );
 }
 
-// ─── Shared input style ───────────────────────────────────────────────────────
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  background: "oklch(0.18 0.008 60)",
-  border: `1px solid ${BORDER_MD}`,
-  borderRadius: 6,
-  padding: "10px 12px",
-  color: TEXT_HI,
-  fontFamily: "'Lato', sans-serif",
-  fontSize: "1rem",
-  outline: "none",
-  boxSizing: "border-box",
-};
-
-const labelStyle: React.CSSProperties = {
-  display: "block",
-  fontSize: "0.78rem",
-  color: TEXT_LO,
-  marginBottom: 4,
-  fontFamily: "'Lato', sans-serif",
-  textTransform: "uppercase",
-  letterSpacing: "0.06em",
-};
-
-// ─── Detail fields per event type ────────────────────────────────────────────
-function MeasurementFields({
-  details, setDetails,
-}: { details: Record<string, string>; setDetails: (d: Record<string, string>) => void }) {
-  const selectedMeasure = details.measureType ?? "Brix";
-  const unit = MEASUREMENTS.find((m) => m.label === selectedMeasure)?.unit ?? "";
-
+/** Generic tile grid for option selection */
+function Tiles<T extends string>({ options, selected, onSelect, getLabel, getColor, cols = 2 }: { options: T[]; selected: T | null; onSelect: (v: T) => void; getLabel?: (v: T) => string; getColor?: (v: T) => string; cols?: number }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <div>
-        <label style={labelStyle}>What was measured?</label>
-        <select
-          value={selectedMeasure}
-          onChange={(e) => setDetails({ ...details, measureType: e.target.value, unit: MEASUREMENTS.find((m) => m.label === e.target.value)?.unit ?? "" })}
-          style={inputStyle}
-        >
-          {MEASUREMENTS.map((m) => <option key={m.label} value={m.label}>{m.label}</option>)}
-        </select>
+    <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols},1fr)`, gap: 10 }}>
+      {options.map((opt) => {
+        const active = opt === selected;
+        const color = getColor ? getColor(opt) : AMBER;
+        return (
+          <button key={opt} onClick={() => onSelect(opt)}
+            style={{ minHeight: 64, padding: "14px 12px", borderRadius: 10, background: active ? `${color.replace(")", " / 20%)")}` : CARD, border: `1.5px solid ${active ? color : BDR}`, color: active ? color : TEXT_MID, fontFamily: "'Lato',sans-serif", fontSize: "0.95rem", fontWeight: active ? 600 : 400, cursor: "pointer", textAlign: "center", lineHeight: 1.3, WebkitTapHighlightColor: "transparent" }}
+          >{getLabel ? getLabel(opt) : opt}</button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Progress bar + back button header */
+function Header({ step, total, title, sub, onBack }: { step: number; total: number; title: string; sub?: string; onBack?: () => void }) {
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
+        {Array.from({ length: total }).map((_, i) => (
+          <div key={i} style={{ height: 3, flex: 1, borderRadius: 2, background: i < step ? AMBER : BDR, transition: "background 0.2s" }} />
+        ))}
       </div>
-      <div style={{ display: "flex", gap: 8 }}>
-        <div style={{ flex: 1 }}>
-          <label style={labelStyle}>Value</label>
-          <input
-            type="number"
-            inputMode="decimal"
-            placeholder="0.0"
-            value={details.value ?? ""}
-            onChange={(e) => setDetails({ ...details, value: e.target.value })}
-            style={inputStyle}
-          />
-        </div>
-        <div style={{ width: 80 }}>
-          <label style={labelStyle}>Unit</label>
-          <input
-            type="text"
-            value={unit || details.unit || ""}
-            onChange={(e) => setDetails({ ...details, unit: e.target.value })}
-            placeholder="unit"
-            style={inputStyle}
-          />
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {onBack && (
+          <button onClick={onBack} style={{ width: 40, height: 40, borderRadius: 8, background: CARD, border: `1px solid ${BDR}`, color: TEXT_MID, fontSize: "1.2rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>←</button>
+        )}
+        <div>
+          <h2 style={{ fontFamily: "'Fraunces',serif", fontSize: "1.4rem", fontWeight: 700, color: TEXT_HI, margin: 0, lineHeight: 1.2 }}>{title}</h2>
+          {sub && <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.82rem", color: TEXT_LO, margin: "4px 0 0" }}>{sub}</p>}
         </div>
       </div>
     </div>
   );
 }
 
-function AdditionFields({
-  details, setDetails,
-}: { details: Record<string, string>; setDetails: (d: Record<string, string>) => void }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <div>
-        <label style={labelStyle}>What was added?</label>
-        <select value={details.additionType ?? "DAP"} onChange={(e) => setDetails({ ...details, additionType: e.target.value })} style={inputStyle}>
-          {ADDITIONS.map((a) => <option key={a} value={a}>{a}</option>)}
-        </select>
-      </div>
-      <div style={{ display: "flex", gap: 8 }}>
-        <div style={{ flex: 1 }}>
-          <label style={labelStyle}>Quantity</label>
-          <input type="number" inputMode="decimal" placeholder="0.0" value={details.quantity ?? ""} onChange={(e) => setDetails({ ...details, quantity: e.target.value })} style={inputStyle} />
-        </div>
-        <div style={{ width: 80 }}>
-          <label style={labelStyle}>Unit</label>
-          <select value={details.unit ?? "kg"} onChange={(e) => setDetails({ ...details, unit: e.target.value })} style={inputStyle}>
-            {ADDITION_UNITS.map((u) => <option key={u} value={u}>{u}</option>)}
-          </select>
-        </div>
-      </div>
-      <div>
-        <label style={labelStyle}>Timing</label>
-        <select value={details.timing ?? "At inoculation"} onChange={(e) => setDetails({ ...details, timing: e.target.value })} style={inputStyle}>
-          {ADDITION_TIMINGS.map((t) => <option key={t} value={t}>{t}</option>)}
-        </select>
-      </div>
-    </div>
-  );
-}
-
-function RackingFields({
-  details, setDetails,
-}: { details: Record<string, string>; setDetails: (d: Record<string, string>) => void }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <div style={{ display: "flex", gap: 8 }}>
-        <div style={{ flex: 1 }}>
-          <label style={labelStyle}>From</label>
-          <input type="text" placeholder="Tank 7" value={details.from ?? ""} onChange={(e) => setDetails({ ...details, from: e.target.value })} style={inputStyle} />
-        </div>
-        <div style={{ flex: 1 }}>
-          <label style={labelStyle}>To</label>
-          <input type="text" placeholder="Tank 12" value={details.to ?? ""} onChange={(e) => setDetails({ ...details, to: e.target.value })} style={inputStyle} />
-        </div>
-      </div>
-      <div style={{ display: "flex", gap: 8 }}>
-        <div style={{ flex: 1 }}>
-          <label style={labelStyle}>Volume (L)</label>
-          <input type="number" inputMode="decimal" placeholder="0" value={details.volume ?? ""} onChange={(e) => setDetails({ ...details, volume: e.target.value })} style={inputStyle} />
-        </div>
-        <div style={{ flex: 1 }}>
-          <label style={labelStyle}>Lees status</label>
-          <select value={details.leesStatus ?? "Gross lees"} onChange={(e) => setDetails({ ...details, leesStatus: e.target.value })} style={inputStyle}>
-            {LEES_OPTIONS.map((l) => <option key={l} value={l}>{l}</option>)}
-          </select>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function InoculationFields({
-  details, setDetails,
-}: { details: Record<string, string>; setDetails: (d: Record<string, string>) => void }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <div>
-        <label style={labelStyle}>What was inoculated?</label>
-        <select value={details.inoculationType ?? "Yeast"} onChange={(e) => setDetails({ ...details, inoculationType: e.target.value })} style={inputStyle}>
-          {["Yeast", "MLF bacteria", "Other"].map((o) => <option key={o} value={o}>{o}</option>)}
-        </select>
-      </div>
-      <div>
-        <label style={labelStyle}>Product name</label>
-        <input type="text" placeholder="e.g. EC-1118, VP41" value={details.productName ?? ""} onChange={(e) => setDetails({ ...details, productName: e.target.value })} style={inputStyle} />
-      </div>
-      <div>
-        <label style={labelStyle}>Rate (g/hL)</label>
-        <input type="number" inputMode="decimal" placeholder="20" value={details.rate ?? ""} onChange={(e) => setDetails({ ...details, rate: e.target.value })} style={inputStyle} />
-      </div>
-    </div>
-  );
-}
-
-function ObservationFields({
-  details, setDetails,
-}: { details: Record<string, string>; setDetails: (d: Record<string, string>) => void }) {
-  return (
-    <div>
-      <label style={labelStyle}>Sensory note</label>
-      <textarea
-        rows={4}
-        placeholder="Colour, aroma, visual observation…"
-        value={details.observation ?? ""}
-        onChange={(e) => setDetails({ ...details, observation: e.target.value })}
-        style={{ ...inputStyle, resize: "vertical", minHeight: 96 }}
-      />
-    </div>
-  );
-}
-
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function QuickEntry() {
-  // Auth check via vintage log query (build phase: treat auth errors as open access)
-  const { data: logEntries, isLoading: authLoading } = trpc.vintageLog.list.useQuery(
-    { limit: 1 },
-    { retry: false }
-  );
-  // Build phase: always treat as logged in so the form is accessible without sign-in
-  const isLoggedIn = true;
-  void logEntries; // suppress unused warning
+  // Data
+  const { data: batches = [] } = trpc.wineBatch.list.useQuery();
+  const { data: usedTanks = [] } = trpc.vintageLog.getUsedTanks.useQuery();
+  const utils = trpc.useUtils();
 
-  // Known tank names for autocomplete
-  const { data: tankNamesData } = trpc.vintageLog.getUsedTanks.useQuery(undefined, {
-    enabled: isLoggedIn,
-  });
-  const tankNames = tankNamesData ?? [];
+  // Build tank list: batches with tankName first, then log-only tanks
+  const batchTanks = batches.filter(b => b.tankName).map(b => ({ name: b.tankName!, variety: b.variety }));
+  const batchNames = new Set(batchTanks.map(t => t.name));
+  const logOnly = usedTanks.filter(t => !batchNames.has(t)).map(t => ({ name: t, variety: "" }));
+  const allTanks = [...batchTanks, ...logOnly];
 
-  // Form state
-  const [tank, setTank] = useState("");
-  const [variety, setVariety] = useState("Shiraz");
-  const [eventType, setEventType] = useState<EventTypeId>("measurement");
-  const [details, setDetails] = useState<Record<string, string>>({});
-  const [note, setNote] = useState("");
-  const [tankSuggestions, setTankSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  // Screen
+  const [screen, setScreen] = useState<Screen>("event");
+
+  // Entry state
+  const [eventType, setEventType] = useState<EventTypeId | null>(null);
+  const [tankName, setTankName]   = useState<string | null>(null);
+  const [variety, setVariety]     = useState("");
+
+  // Measurement
+  const [mType,  setMType]  = useState("Brix");
+  const [mValue, setMValue] = useState("0");
+
+  // Addition
+  const [aType,    setAType]    = useState("DAP");
+  const [aQty,     setAQty]     = useState("0");
+  const [aUnit,    setAUnit]    = useState("kg");
+  const [aTiming,  setATiming]  = useState("At inoculation");
+  const [aStep,    setAStep]    = useState<AddStep>("type");
+
+  // Racking
+  const [rackTo,   setRackTo]   = useState<string | null>(null);
+  const [lees,     setLees]     = useState("Fine lees");
+
+  // Inoculation
+  const [iType,    setIType]    = useState("Yeast");
+  const [iProd,    setIProd]    = useState("");
+  const [iRate,    setIRate]    = useState("0");
+  const [iStep,    setIStep]    = useState<InoStep>("type");
+
+  // Observation / Other
+  const [noteText, setNoteText] = useState("");
+  const [listening, setListening] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recRef = useRef<any>(null);
 
   // Session log
-  const [sessionLog, setSessionLog] = useState<SessionEntry[]>([]);
-  const [sessionCount, setSessionCount] = useState(0);
-  const tankInputRef = useRef<HTMLInputElement>(null);
+  const [sessionLog, setSessionLog] = useState<{ tank: string; summary: string; ts: Date }[]>([]);
 
-  const utils = trpc.useUtils();
+  // Mutation
   const addMutation = trpc.vintageLog.add.useMutation({
     onSuccess: () => {
-      // Build summary string
-      let summary = "";
-      if (eventType === "measurement") summary = `${details.measureType ?? "Measurement"}: ${details.value ?? "—"} ${details.unit ?? ""}`.trim();
-      else if (eventType === "addition") summary = `${details.additionType ?? "Addition"} ${details.quantity ?? ""} ${details.unit ?? ""}`.trim();
-      else if (eventType === "racking") summary = `Racked → ${details.to ?? "?"}`;
-      else if (eventType === "inoculation") summary = `${details.inoculationType ?? "Inoculation"} — ${details.productName ?? ""}`.trim();
-      else if (eventType === "observation") summary = (details.observation ?? "").slice(0, 60);
-      else summary = note.slice(0, 60) || "Entry logged";
-
-      const newEntry: SessionEntry = {
-        id: Date.now().toString(),
-        tank,
-        variety,
-        eventType,
-        summary,
-        timestamp: new Date(),
-      };
-      setSessionLog((prev) => [newEntry, ...prev]);
-      setSessionCount((c) => c + 1);
       utils.vintageLog.list.invalidate();
-      toast.success(`Logged: ${tank}`);
-
-      // Reset for next entry — keep tank and variety for rapid repeat logging
-      setDetails({});
-      setNote("");
-      // Focus tank input for next entry
-      setTimeout(() => tankInputRef.current?.focus(), 100);
+      const summary = buildSummary();
+      setSessionLog(prev => [{ tank: tankName!, summary, ts: new Date() }, ...prev]);
+      setScreen("success");
+      setTimeout(() => {
+        setScreen("event");
+        setEventType(null); setTankName(null); setVariety("");
+        setMValue("0"); setAQty("0"); setAStep("type");
+        setIRate("0"); setIStep("type"); setNoteText(""); setRackTo(null);
+      }, 1800);
     },
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
-  function handleTankInput(val: string) {
-    setTank(val);
-    if (val.length >= 1) {
-      const matches = tankNames.filter((t) => t.toLowerCase().includes(val.toLowerCase()));
-      setTankSuggestions(matches);
-      setShowSuggestions(matches.length > 0);
-    } else {
-      setShowSuggestions(false);
-    }
+  // Helpers
+  function buildSummary(): string {
+    if (!eventType) return "";
+    if (eventType === "measurement") { const u = MEASURES.find(m => m.label === mType)?.unit ?? ""; return `${mType}: ${mValue} ${u}`.trim(); }
+    if (eventType === "addition")    return `${aType} ${aQty} ${aUnit} — ${aTiming}`;
+    if (eventType === "racking")     return `Racked → ${rackTo ?? "?"} (${lees})`;
+    if (eventType === "inoculation") return `${iType}${iProd ? ` (${iProd})` : ""} @ ${iRate} g/hL`;
+    if (eventType === "observation") return noteText.slice(0, 80) || "Observation";
+    return noteText.slice(0, 80) || "Other entry";
   }
 
-  // Reset details when event type changes
-  useEffect(() => { setDetails({}); }, [eventType]);
+  function buildDetails(): Record<string, string> {
+    if (eventType === "measurement") { const u = MEASURES.find(m => m.label === mType)?.unit ?? ""; return { what: mType, value: mValue, unit: u }; }
+    if (eventType === "addition")    return { what: aType, quantity: aQty, unit: aUnit, timing: aTiming };
+    if (eventType === "racking")     return { to: rackTo ?? "", leesStatus: lees };
+    if (eventType === "inoculation") return { inoculationType: iType, productName: iProd, rate: iRate, unit: "g/hL" };
+    if (eventType === "observation") return { observation: noteText };
+    return { note: noteText };
+  }
 
   function handleSubmit() {
-    if (!tank.trim()) { toast.error("Enter a tank name"); return; }
-    addMutation.mutate({
-      tankName: tank.trim(),
-      variety,
-      eventType,
-      details,
-      noteText: note || undefined,
-    });
+    if (!tankName || !eventType) return;
+    addMutation.mutate({ tankName, variety: variety || "Unknown", eventType, details: buildDetails(), noteText: (eventType === "observation" || eventType === "other") ? noteText : undefined });
   }
 
-  const VARIETIES = ["Shiraz", "Cabernet Sauvignon", "Merlot", "Pinot Noir", "Grenache", "Tempranillo", "Chardonnay", "Sauvignon Blanc", "Riesling", "Pinot Gris", "Viognier", "Semillon", "Blend", "Other"];
-
-  if (authLoading) {
-    return (
-      <div style={{ background: BG, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: 32, height: 32, borderRadius: "50%", border: `2px solid ${BORDER_MD}`, borderTopColor: AMBER, animation: "spin 0.8s linear infinite" }} />
-      </div>
-    );
+  function canProceed(): boolean {
+    if (eventType === "measurement") return parseFloat(mValue) > 0;
+    if (eventType === "addition") { if (aStep === "qty") return parseFloat(aQty) > 0; return true; }
+    if (eventType === "racking") return !!rackTo;
+    if (eventType === "inoculation") { if (iStep === "rate") return parseFloat(iRate) > 0; return true; }
+    return true;
   }
 
+  function detailNext() {
+    if (eventType === "addition") { if (aStep === "type") { setAStep("qty"); return; } if (aStep === "qty") { setAStep("timing"); return; } }
+    if (eventType === "inoculation" && iStep === "type") { setIStep("rate"); return; }
+    setScreen("confirm");
+  }
+
+  function detailBack() {
+    if (eventType === "addition" && aStep !== "type") { setAStep(aStep === "timing" ? "qty" : "type"); return; }
+    if (eventType === "inoculation" && iStep !== "type") { setIStep("type"); return; }
+    setScreen("tank");
+  }
+
+  function detailNextLabel(): string {
+    if (eventType === "addition") { if (aStep === "type") return "Set quantity →"; if (aStep === "qty") return "Set timing →"; return "Review →"; }
+    if (eventType === "inoculation" && iStep === "type") return "Set rate →";
+    return "Review →";
+  }
+
+  const startDictation = useCallback(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    const SR = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+    if (!SR) { toast.error("Voice not supported in this browser"); return; }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rec = new SR() as any;
+    rec.lang = "en-AU"; rec.interimResults = false; rec.maxAlternatives = 1;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rec.onresult = (e: any) => { setNoteText(prev => prev ? `${prev} ${e.results[0][0].transcript}` : e.results[0][0].transcript); setListening(false); };
+    rec.onerror = () => { setListening(false); toast.error("Couldn't hear that — try typing"); };
+    rec.onend = () => setListening(false);
+    recRef.current = rec; rec.start(); setListening(true);
+  }, []);
+
+  // Shared button styles
+  const primaryBtn: React.CSSProperties = { width: "100%", height: 72, background: AMBER, color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 12, fontFamily: "'Fraunces',serif", fontSize: "1.3rem", fontWeight: 700, letterSpacing: "0.04em", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", WebkitTapHighlightColor: "transparent" };
+  const secondaryBtn: React.CSSProperties = { width: "100%", height: 56, background: "transparent", color: TEXT_MID, border: `1px solid ${BDR}`, borderRadius: 10, fontFamily: "'Lato',sans-serif", fontSize: "0.9rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", WebkitTapHighlightColor: "transparent" };
+
+  // ── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div style={{ background: BG, minHeight: "100vh", paddingBottom: "env(safe-area-inset-bottom, 24px)" }}>
-      {/* Header */}
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-          background: "oklch(0.11 0.008 60 / 95%)",
-          backdropFilter: "blur(8px)",
-          borderBottom: `1px solid ${BORDER}`,
-          paddingTop: "env(safe-area-inset-top, 0px)",
-        }}
-      >
-        <div style={{ maxWidth: 640, margin: "0 auto", padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
-          <Link href="/the-press" style={{ color: TEXT_LO, textDecoration: "none", display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </Link>
-          <div style={{ flex: 1 }}>
-            <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "1.1rem", color: TEXT_HI, margin: 0, lineHeight: 1.2 }}>
-              Quick Entry
-            </h1>
-            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: TEXT_LO, margin: 0 }}>
-              Rapid cellar logging
-            </p>
-          </div>
-          {sessionCount > 0 && (
-            <div
-              style={{
-                background: "oklch(0.72 0.12 75 / 15%)",
-                border: `1px solid oklch(0.72 0.12 75 / 30%)`,
-                borderRadius: 20,
-                padding: "3px 10px",
-                fontFamily: "'Fira Code', monospace",
-                fontSize: "0.75rem",
-                color: AMBER,
-                flexShrink: 0,
-              }}
-            >
-              {sessionCount} logged
-            </div>
+    <div style={{ background: BG, minHeight: "100dvh", fontFamily: "'Lato',sans-serif", paddingBottom: "env(safe-area-inset-bottom,24px)" }}>
+
+      {/* Top bar */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px 0", paddingTop: "max(16px,env(safe-area-inset-top,16px))" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: AMBER }} />
+          <span style={{ fontFamily: "'Fraunces',serif", fontSize: "1rem", color: TEXT_HI, fontWeight: 600 }}>Quick Entry</span>
+        </div>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          {sessionLog.length > 0 && (
+            <span style={{ background: AMBER_DIM, color: AMBER, border: `1px solid ${AMBER_BDR}`, borderRadius: 20, padding: "3px 10px", fontSize: "0.75rem", fontWeight: 600 }}>
+              {sessionLog.length} logged
+            </span>
           )}
+          <Link href="/the-press" style={{ color: TEXT_LO, fontSize: "0.8rem", textDecoration: "none" }}>Full Entry</Link>
         </div>
       </div>
 
-      <div style={{ maxWidth: 640, margin: "0 auto", padding: "16px" }}>
+      {/* Screen content */}
+      <div style={{ padding: "20px 20px 0", maxWidth: 480, margin: "0 auto" }}>
 
-        {/* ── Entry form card ─────────────────────────────────────────────── */}
-        <div
-          style={{
-            background: CARD_BG,
-            border: `1px solid ${BORDER_MD}`,
-            borderRadius: 12,
-            padding: "20px",
-            marginBottom: 20,
-          }}
-        >
-          {/* Tank + Variety row */}
-          <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-            {/* Tank */}
-            <div style={{ flex: 1, position: "relative" }}>
-              <label style={labelStyle}>Tank</label>
-              <input
-                ref={tankInputRef}
-                type="text"
-                placeholder="Tank 7"
-                value={tank}
-                onChange={(e) => handleTankInput(e.target.value)}
-                onFocus={() => tank.length >= 1 && setShowSuggestions(true)}
-                onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                autoFocus
-                style={inputStyle}
-              />
-              {showSuggestions && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "100%",
-                    left: 0,
-                    right: 0,
-                    background: "oklch(0.18 0.008 60)",
-                    border: `1px solid ${BORDER_MD}`,
-                    borderRadius: 6,
-                    zIndex: 20,
-                    maxHeight: 160,
-                    overflowY: "auto",
-                  }}
+        {/* ── SCREEN 1: Event type ── */}
+        {screen === "event" && (
+          <div>
+            <Header step={1} total={4} title="What happened?" sub="Tap the event type" />
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {EVENT_TILES.map(tile => (
+                <button key={tile.id} onClick={() => { setEventType(tile.id); setScreen("tank"); }}
+                  style={{ height: 80, borderRadius: 12, background: CARD, border: `1.5px solid ${BDR}`, display: "flex", alignItems: "center", gap: 20, padding: "0 24px", cursor: "pointer", WebkitTapHighlightColor: "transparent" }}
+                  onPointerDown={e => (e.currentTarget as HTMLButtonElement).style.background = CARD_ACT}
+                  onPointerUp={e => (e.currentTarget as HTMLButtonElement).style.background = CARD}
                 >
-                  {tankSuggestions.map((t: string) => (
-                    <button
-                      key={t}
-                      onMouseDown={() => { setTank(t); setShowSuggestions(false); }}
-                      style={{
-                        display: "block",
-                        width: "100%",
-                        textAlign: "left",
-                        padding: "10px 12px",
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        color: TEXT_HI,
-                        fontFamily: "'Lato', sans-serif",
-                        fontSize: "0.9rem",
-                      }}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Variety */}
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Variety</label>
-              <select value={variety} onChange={(e) => setVariety(e.target.value)} style={inputStyle}>
-                {VARIETIES.map((v) => <option key={v} value={v}>{v}</option>)}
-              </select>
-            </div>
-          </div>
-
-          {/* Event type pills */}
-          <div style={{ marginBottom: 14 }}>
-            <label style={labelStyle}>Event type</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {EVENT_TYPES.map((et) => (
-                <button
-                  key={et.id}
-                  onClick={() => setEventType(et.id)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 5,
-                    padding: "7px 12px",
-                    borderRadius: 20,
-                    border: `1px solid ${eventType === et.id ? et.color : BORDER}`,
-                    background: eventType === et.id ? `${et.color}20` : "transparent",
-                    color: eventType === et.id ? et.color : TEXT_MID,
-                    fontFamily: "'Lato', sans-serif",
-                    fontSize: "0.8rem",
-                    cursor: "pointer",
-                    transition: "all 0.15s",
-                    minHeight: 36,
-                  }}
-                >
-                  <span>{et.icon}</span>
-                  <span>{et.label}</span>
+                  <span style={{ fontSize: "1.8rem", color: tile.color, width: 36, textAlign: "center" }}>{tile.icon}</span>
+                  <span style={{ fontFamily: "'Fraunces',serif", fontSize: "1.2rem", fontWeight: 600, color: TEXT_HI }}>{tile.label}</span>
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Contextual detail fields */}
-          <div style={{ marginBottom: 14 }}>
-            {eventType === "measurement" && <MeasurementFields details={details} setDetails={setDetails} />}
-            {eventType === "addition" && <AdditionFields details={details} setDetails={setDetails} />}
-            {eventType === "racking" && <RackingFields details={details} setDetails={setDetails} />}
-            {eventType === "inoculation" && <InoculationFields details={details} setDetails={setDetails} />}
-            {eventType === "observation" && <ObservationFields details={details} setDetails={setDetails} />}
-          </div>
-
-          {/* Optional note */}
-          {eventType !== "observation" && (
-            <div style={{ marginBottom: 16 }}>
-              <label style={labelStyle}>Note (optional)</label>
-              <textarea
-                rows={2}
-                placeholder="Any additional context…"
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                style={{ ...inputStyle, resize: "vertical", minHeight: 60 }}
-              />
-            </div>
-          )}
-
-          {/* Log button */}
-          <button
-            onClick={handleSubmit}
-            disabled={addMutation.isPending || !tank.trim()}
-            style={{
-              width: "100%",
-              padding: "14px",
-              background: tank.trim() ? AMBER : "oklch(0.25 0.008 60)",
-              border: "none",
-              borderRadius: 8,
-              color: tank.trim() ? "oklch(0.11 0.008 60)" : TEXT_LO,
-              fontFamily: "'Lato', sans-serif",
-              fontWeight: 700,
-              fontSize: "1rem",
-              cursor: tank.trim() && !addMutation.isPending ? "pointer" : "not-allowed",
-              transition: "all 0.15s",
-              minHeight: 48,
-            }}
-          >
-            {addMutation.isPending ? "Logging…" : "⚡ Log Entry"}
-          </button>
-        </div>
-
-        {/* ── Session log ─────────────────────────────────────────────────── */}
-        {sessionLog.length > 0 && (
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-              <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                This session
-              </span>
-              <div style={{ flex: 1, height: 1, background: BORDER }} />
-              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: AMBER }}>
-                {sessionCount} {sessionCount === 1 ? "entry" : "entries"}
-              </span>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {sessionLog.map((entry) => {
-                const et = EVENT_TYPES.find((e) => e.id === entry.eventType);
-                return (
-                  <div
-                    key={entry.id}
-                    style={{
-                      background: CARD_BG,
-                      border: `1px solid ${BORDER}`,
-                      borderRadius: 8,
-                      padding: "10px 14px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                    }}
-                  >
-                    <span style={{ fontSize: "1rem", flexShrink: 0 }}>{et?.icon ?? "📝"}</span>
+            {sessionLog.length > 0 && (
+              <div style={{ marginTop: 28 }}>
+                <p style={{ fontSize: "0.72rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>This session</p>
+                {sessionLog.slice(0, 5).map((e, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: i < Math.min(sessionLog.length, 5) - 1 ? `1px solid ${BDR}` : "none" }}>
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: GREEN, flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                        <span style={{ fontFamily: "'Lato', sans-serif", fontWeight: 600, fontSize: "0.875rem", color: TEXT_HI }}>
-                          {entry.tank}
-                        </span>
-                        <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: TEXT_LO }}>
-                          {entry.variety}
-                        </span>
-                      </div>
-                      <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8rem", color: TEXT_MID, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {entry.summary}
-                      </p>
+                      <span style={{ fontSize: "0.88rem", color: TEXT_HI, fontWeight: 500 }}>{e.tank}</span>
+                      <span style={{ fontSize: "0.82rem", color: TEXT_LO, marginLeft: 8 }}>{e.summary}</span>
                     </div>
-                    <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", color: TEXT_LO, flexShrink: 0 }}>
-                      {entry.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </span>
+                    <span style={{ fontSize: "0.72rem", color: TEXT_LO, flexShrink: 0 }}>{e.ts.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
-            <div style={{ marginTop: 16, textAlign: "center" }}>
-              <Link
-                href="/the-press"
-                style={{
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.85rem",
-                  color: AMBER,
-                  textDecoration: "none",
-                }}
-              >
-                View full Vintage Log →
-              </Link>
+        {/* ── SCREEN 2: Tank selector ── */}
+        {screen === "tank" && (
+          <div>
+            <Header step={2} total={4} title="Which tank?" sub={eventType ? EVENT_TILES.find(t => t.id === eventType)?.label : undefined} onBack={() => setScreen("event")} />
+            {allTanks.length === 0 ? (
+              <div style={{ background: CARD, border: `1px solid ${BDR}`, borderRadius: 12, padding: 24, textAlign: "center" }}>
+                <p style={{ color: TEXT_MID, fontSize: "0.95rem", marginBottom: 12 }}>No tanks registered yet.</p>
+                <Link href="/the-press" style={{ color: AMBER, fontSize: "0.9rem" }}>Add a batch in The Press →</Link>
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                {allTanks.map(t => (
+                  <button key={t.name} onClick={() => { setTankName(t.name); setVariety(t.variety || ""); setAStep("type"); setIStep("type"); setScreen("detail"); }}
+                    style={{ minHeight: 80, borderRadius: 12, background: CARD, border: `1.5px solid ${BDR}`, display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "center", padding: "14px 16px", cursor: "pointer", WebkitTapHighlightColor: "transparent", textAlign: "left" }}
+                    onPointerDown={e => { (e.currentTarget as HTMLButtonElement).style.background = CARD_ACT; (e.currentTarget as HTMLButtonElement).style.borderColor = AMBER_BDR; }}
+                    onPointerUp={e => { (e.currentTarget as HTMLButtonElement).style.background = CARD; (e.currentTarget as HTMLButtonElement).style.borderColor = BDR; }}
+                  >
+                    <span style={{ fontFamily: "'Fraunces',serif", fontSize: "1.05rem", fontWeight: 700, color: TEXT_HI, lineHeight: 1.2 }}>{t.name}</span>
+                    {t.variety && <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: AMBER, marginTop: 4 }}>{t.variety}</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── SCREEN 3: Detail ── */}
+        {screen === "detail" && eventType && (
+          <div>
+            <Header step={3} total={4}
+              title={
+                eventType === "measurement" ? "What was measured?" :
+                eventType === "addition" ? (aStep === "type" ? "What was added?" : aStep === "qty" ? "How much?" : "When?") :
+                eventType === "racking" ? "Racking details" :
+                eventType === "inoculation" ? (iStep === "type" ? "What was inoculated?" : "At what rate?") :
+                "Add a note"
+              }
+              sub={`${tankName}${variety ? ` · ${variety}` : ""}`}
+              onBack={detailBack}
+            />
+
+            {/* Measurement */}
+            {eventType === "measurement" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 8 }}>
+                  {MEASURES.map(m => (
+                    <button key={m.label} onClick={() => setMType(m.label)}
+                      style={{ height: 52, borderRadius: 8, background: mType === m.label ? AMBER_DIM : CARD, border: `1.5px solid ${mType === m.label ? AMBER : BDR}`, color: mType === m.label ? AMBER : TEXT_MID, fontFamily: "'Lato',sans-serif", fontSize: "0.88rem", fontWeight: mType === m.label ? 600 : 400, cursor: "pointer", WebkitTapHighlightColor: "transparent" }}
+                    >{m.label}</button>
+                  ))}
+                </div>
+                <NumberPad value={mValue} onChange={setMValue} label={mType} unit={MEASURES.find(m => m.label === mType)?.unit ?? ""} />
+              </div>
+            )}
+
+            {/* Addition — type */}
+            {eventType === "addition" && aStep === "type" && <Tiles options={ADD_TYPES} selected={aType} onSelect={setAType} cols={2} />}
+
+            {/* Addition — quantity */}
+            {eventType === "addition" && aStep === "qty" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8 }}>
+                  {ADD_UNITS.map(u => (
+                    <button key={u} onClick={() => setAUnit(u)}
+                      style={{ height: 48, borderRadius: 8, background: aUnit === u ? AMBER_DIM : CARD, border: `1.5px solid ${aUnit === u ? AMBER : BDR}`, color: aUnit === u ? AMBER : TEXT_MID, fontFamily: "'Fira Code',monospace", fontSize: "0.85rem", fontWeight: aUnit === u ? 600 : 400, cursor: "pointer", WebkitTapHighlightColor: "transparent" }}
+                    >{u}</button>
+                  ))}
+                </div>
+                <NumberPad value={aQty} onChange={setAQty} label={aType} unit={aUnit} />
+              </div>
+            )}
+
+            {/* Addition — timing */}
+            {eventType === "addition" && aStep === "timing" && <Tiles options={ADD_TIMINGS} selected={aTiming} onSelect={setATiming} cols={1} />}
+
+            {/* Racking */}
+            {eventType === "racking" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                <div>
+                  <p style={{ fontSize: "0.78rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Racking to</p>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                    {allTanks.filter(t => t.name !== tankName).map(t => (
+                      <button key={t.name} onClick={() => setRackTo(t.name)}
+                        style={{ minHeight: 64, borderRadius: 10, background: rackTo === t.name ? AMBER_DIM : CARD, border: `1.5px solid ${rackTo === t.name ? AMBER : BDR}`, color: rackTo === t.name ? AMBER : TEXT_MID, fontFamily: "'Fraunces',serif", fontSize: "1rem", fontWeight: 600, cursor: "pointer", WebkitTapHighlightColor: "transparent" }}
+                      >{t.name}</button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p style={{ fontSize: "0.78rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Lees status</p>
+                  <Tiles options={LEES_OPTS} selected={lees} onSelect={setLees} cols={3} />
+                </div>
+              </div>
+            )}
+
+            {/* Inoculation — type */}
+            {eventType === "inoculation" && iStep === "type" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <Tiles options={INO_TYPES} selected={iType} onSelect={setIType} cols={3} />
+                <div>
+                  <p style={{ fontSize: "0.78rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Product name (optional)</p>
+                  <input type="text" placeholder="e.g. EC1118, Lalvin 71B" value={iProd} onChange={e => setIProd(e.target.value)}
+                    style={{ width: "100%", background: CARD, border: `1px solid ${BDR}`, borderRadius: 8, padding: "12px 14px", color: TEXT_HI, fontFamily: "'Lato',sans-serif", fontSize: "1rem", outline: "none", boxSizing: "border-box" }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Inoculation — rate */}
+            {eventType === "inoculation" && iStep === "rate" && (
+              <NumberPad value={iRate} onChange={setIRate} label={`${iType} rate`} unit="g/hL" />
+            )}
+
+            {/* Observation / Other */}
+            {(eventType === "observation" || eventType === "other") && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <textarea placeholder={eventType === "observation" ? "Describe what you observed — colour, aroma, clarity…" : "Add a note…"} value={noteText} onChange={e => setNoteText(e.target.value)} rows={5}
+                  style={{ width: "100%", background: CARD, border: `1px solid ${BDR}`, borderRadius: 10, padding: "14px 16px", color: TEXT_HI, fontFamily: "'Lato',sans-serif", fontSize: "1rem", lineHeight: 1.6, resize: "vertical", outline: "none", boxSizing: "border-box" }}
+                />
+                <button onClick={startDictation} disabled={listening}
+                  style={{ height: 52, borderRadius: 10, background: listening ? AMBER_DIM : CARD, border: `1.5px solid ${listening ? AMBER : BDR}`, color: listening ? AMBER : TEXT_MID, fontFamily: "'Lato',sans-serif", fontSize: "0.9rem", cursor: listening ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, WebkitTapHighlightColor: "transparent" }}
+                >
+                  <span style={{ fontSize: "1.1rem" }}>{listening ? "🎙" : "🎤"}</span>
+                  {listening ? "Listening…" : "Dictate note"}
+                </button>
+              </div>
+            )}
+
+            <div style={{ marginTop: 24 }}>
+              <button onClick={detailNext} disabled={!canProceed()}
+                style={{ ...primaryBtn, opacity: canProceed() ? 1 : 0.4, cursor: canProceed() ? "pointer" : "default" }}
+              >{detailNextLabel()}</button>
             </div>
           </div>
         )}
 
-        {/* Empty state hint */}
-        {sessionLog.length === 0 && (
-          <div style={{ textAlign: "center", padding: "24px 0", color: TEXT_LO }}>
-            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.85rem", lineHeight: 1.6 }}>
-              Fill in the form above and tap <strong style={{ color: AMBER }}>Log Entry</strong> to start your session.
-              <br />Each entry saves instantly — keep going without navigating away.
-            </p>
+        {/* ── SCREEN 4: Confirm ── */}
+        {screen === "confirm" && eventType && (
+          <div>
+            <Header step={4} total={4} title="Confirm entry" onBack={() => setScreen("detail")} />
+            <div style={{ background: CARD, border: `1.5px solid ${AMBER_BDR}`, borderRadius: 16, padding: 24, marginBottom: 24 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                <span style={{ fontSize: "1.6rem", color: EVENT_TILES.find(t => t.id === eventType)?.color ?? AMBER }}>{EVENT_TILES.find(t => t.id === eventType)?.icon}</span>
+                <div>
+                  <p style={{ fontFamily: "'Fraunces',serif", fontSize: "1.1rem", fontWeight: 700, color: TEXT_HI, margin: 0 }}>{EVENT_TILES.find(t => t.id === eventType)?.label}</p>
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.82rem", color: AMBER, margin: "2px 0 0" }}>{tankName}{variety ? ` · ${variety}` : ""}</p>
+                </div>
+              </div>
+              <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "1rem", color: TEXT_HI, background: "oklch(0.10 0.008 60)", border: `1px solid ${BDR}`, borderRadius: 8, padding: "12px 14px", margin: 0, lineHeight: 1.5 }}>
+                {buildSummary()}
+              </p>
+            </div>
+            <button onClick={handleSubmit} disabled={addMutation.isPending} style={{ ...primaryBtn, opacity: addMutation.isPending ? 0.7 : 1 }}>
+              {addMutation.isPending ? "Logging…" : "LOG IT"}
+            </button>
+            <button onClick={() => setScreen("event")} style={{ ...secondaryBtn, marginTop: 10 }}>Cancel</button>
           </div>
         )}
+
+        {/* ── SCREEN 5: Success ── */}
+        {screen === "success" && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60dvh", gap: 16, textAlign: "center" }}>
+            <div style={{ width: 80, height: 80, borderRadius: "50%", background: GREEN_DIM, border: `2px solid ${GREEN}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2.2rem" }}>✓</div>
+            <p style={{ fontFamily: "'Fraunces',serif", fontSize: "1.4rem", fontWeight: 700, color: TEXT_HI, margin: 0 }}>Logged</p>
+            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.9rem", color: TEXT_LO, margin: 0 }}>{tankName}</p>
+          </div>
+        )}
+
       </div>
     </div>
   );

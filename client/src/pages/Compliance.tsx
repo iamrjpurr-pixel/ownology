@@ -226,6 +226,29 @@ export default function Compliance() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const autoSubmittedRef = useRef(false);
+  // Voice input
+  const [listening, setListening] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const srRef = useRef<any>(null);
+  const startVoice = useCallback(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    const SR = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+    if (!SR) { alert("Voice input is not supported in this browser. Try Chrome on Android or desktop."); return; }
+    if (listening) { srRef.current?.stop(); setListening(false); return; }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rec = new SR() as any;
+    rec.lang = "en-AU"; rec.interimResults = false; rec.maxAlternatives = 1;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rec.onresult = (e: any) => {
+      const transcript = e.results[0][0].transcript as string;
+      setInput(prev => prev ? `${prev} ${transcript}` : transcript);
+      setListening(false);
+    };
+    rec.onerror = () => setListening(false);
+    rec.onend = () => setListening(false);
+    srRef.current = rec; rec.start(); setListening(true);
+  }, [listening]);
 
   const filteredQuestions = stateFilter === "All"
     ? SAMPLE_QUESTIONS
@@ -833,6 +856,25 @@ export default function Compliance() {
               }}
               disabled={loading}
             />
+            {/* Microphone button */}
+            <button
+              type="button"
+              onClick={startVoice}
+              disabled={loading}
+              title={listening ? "Stop listening" : "Ask by voice"}
+              className="touch-target flex-shrink-0 rounded-sm transition-all flex items-center justify-center"
+              style={{
+                width: 40, height: 40,
+                background: listening ? "color-mix(in oklch, var(--ow-amber) 18%, transparent)" : "var(--ow-bg-inset)",
+                border: `1px solid ${listening ? "var(--ow-amber)" : "var(--ow-border)"}`,
+                color: listening ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                cursor: loading ? "not-allowed" : "pointer",
+                fontSize: "1.1rem",
+                touchAction: "manipulation",
+              }}
+            >
+              {listening ? "🎙" : "🎤"}
+            </button>
             <button
               type="submit"
               disabled={loading || !input.trim()}
