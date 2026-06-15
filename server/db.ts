@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import * as schema from "../drizzle/schema.js";
-import { desc, eq, and, gte } from "drizzle-orm";
+import { desc, eq, and, gte, or, like } from "drizzle-orm";
 
 // ─── Connection pool ──────────────────────────────────────────────────────────
 
@@ -968,4 +968,91 @@ export async function deleteVineyardObservation(id: number, userId: number) {
   await db
     .delete(schema.vineyardObservations)
     .where(and(eq(schema.vineyardObservations.id, id), eq(schema.vineyardObservations.userId, userId)));
+}
+
+// ─── Vintage Intelligence ─────────────────────────────────────────────────────
+
+export async function listVintageIntelligence(filters?: { year?: number; state?: string }) {
+  const rows = await db.query.vintageIntelligence.findMany({
+    orderBy: [desc(schema.vintageIntelligence.year), desc(schema.vintageIntelligence.region)],
+  });
+  if (!filters) return rows;
+  return rows.filter((r) => {
+    if (filters.year && r.year !== filters.year) return false;
+    if (filters.state && r.state !== filters.state) return false;
+    return true;
+  });
+}
+
+export async function getVintageIntelligenceByRegionYear(region: string, year: number) {
+  return db.query.vintageIntelligence.findFirst({
+    where: and(
+      eq(schema.vintageIntelligence.region, region),
+      eq(schema.vintageIntelligence.year, year)
+    ),
+  });
+}
+
+export async function upsertVintageIntelligence(data: {
+  region: string;
+  year: number;
+  state: string;
+  country?: string;
+  conditions: string;
+  standoutVarieties?: string | null;
+  qualityRating?: number;
+  yieldAssessment?: string | null;
+  winemakingNotes?: string | null;
+  source?: string | null;
+}) {
+  const now = Date.now();
+  const existing = await db.query.vintageIntelligence.findFirst({
+    where: and(
+      eq(schema.vintageIntelligence.region, data.region),
+      eq(schema.vintageIntelligence.year, data.year)
+    ),
+  });
+  if (existing) {
+    await db
+      .update(schema.vintageIntelligence)
+      .set({
+        state: data.state,
+        country: data.country ?? "Australia",
+        conditions: data.conditions,
+        standoutVarieties: data.standoutVarieties ?? null,
+        qualityRating: data.qualityRating ?? 3,
+        yieldAssessment: data.yieldAssessment ?? null,
+        winemakingNotes: data.winemakingNotes ?? null,
+        source: data.source ?? null,
+        updatedAt: now,
+      })
+      .where(eq(schema.vintageIntelligence.id, existing.id));
+    return { id: existing.id, created: false };
+  } else {
+    await db.insert(schema.vintageIntelligence).values({
+      region: data.region,
+      year: data.year,
+      state: data.state,
+      country: data.country ?? "Australia",
+      conditions: data.conditions,
+      standoutVarieties: data.standoutVarieties ?? null,
+      qualityRating: data.qualityRating ?? 3,
+      yieldAssessment: data.yieldAssessment ?? null,
+      winemakingNotes: data.winemakingNotes ?? null,
+      source: data.source ?? null,
+      createdAt: now,
+      updatedAt: now,
+    });
+    const inserted = await db.query.vintageIntelligence.findFirst({
+      where: and(
+        eq(schema.vintageIntelligence.region, data.region),
+        eq(schema.vintageIntelligence.year, data.year)
+      ),
+    });
+    return { id: inserted!.id, created: true };
+  }
+}
+
+export async function deleteVintageIntelligence(id: number) {
+  await db.delete(schema.vintageIntelligence).where(eq(schema.vintageIntelligence.id, id));
 }

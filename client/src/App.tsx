@@ -32,6 +32,7 @@ import CompetitiveAdvantage from "./pages/CompetitiveAdvantage";
 import Preview from "./pages/Preview";
 import AdminLeads from "./pages/AdminLeads";
 import AdminComplianceDoctrine from "./pages/AdminComplianceDoctrine";
+import AdminVintageIntelligence from "./pages/AdminVintageIntelligence";
 import FoundingMemberSuccess from "./pages/FoundingMemberSuccess";
 import OAuthCallback from "./pages/OAuthCallback";
 import ProductionDashboard from "./pages/ProductionDashboard";
@@ -79,6 +80,7 @@ function Router() {
       <Route path={"/preview"} component={Preview} />
       <Route path={"/admin/leads"} component={AdminLeads} />
       <Route path={"/admin/compliance-doctrine"} component={AdminComplianceDoctrine} />
+      <Route path={"/admin/vintage-intelligence"} component={AdminVintageIntelligence} />
       <Route path={"/founding-member/success"} component={FoundingMemberSuccess} />
       <Route path={"/dashboard"} component={ProductionDashboard} />
       <Route path={"/vineyard"} component={Vineyard} />

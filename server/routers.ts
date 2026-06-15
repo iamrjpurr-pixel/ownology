@@ -1,6 +1,6 @@
 import { z } from "zod";
 import Stripe from "stripe";
-import { eq, or, like } from "drizzle-orm";
+import { eq, or, like, and } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
 import { buildScopedKnowledgeBase, buildSourceDoctrineSummary } from "./complianceKnowledgeBase.js";
 import { buildQADoctrineSummary, QA_DOCTRINE, getTopics } from "./complianceQADoctrine.js";
@@ -61,6 +61,10 @@ import {
   listVineyardObservations,
   createVineyardObservation,
   deleteVineyardObservation,
+  listVintageIntelligence,
+  getVintageIntelligenceByRegionYear,
+  upsertVintageIntelligence,
+  deleteVintageIntelligence,
 } from "./db.js";
 import * as schema from "../drizzle/schema.js";
 
@@ -2198,6 +2202,123 @@ const tutorRouter = router({
         sopContext = "No specific SOP found for this topic. Answer from general oenological knowledge.";
       }
 
+      // ── Step 3b: Detect vintage year and region mentions; inject vintage context ─
+      // Known Australian wine regions for detection
+      const KNOWN_REGIONS = [
+        "Barossa Valley", "Barossa",
+        "Eden Valley",
+        "McLaren Vale",
+        "Margaret River",
+        "Hunter Valley", "Hunter",
+        "Yarra Valley", "Yarra",
+        "Mudgee",
+        "Orange",
+        "Canberra District", "Canberra",
+        "Clare Valley", "Clare",
+        "Coonawarra",
+        "Mornington Peninsula", "Mornington",
+        "Heathcote",
+        "Grampians",
+        "Rutherglen",
+        "Langhorne Creek",
+        "Padthaway",
+        "Wrattonbully",
+        "Adelaide Hills",
+        "Riverland",
+        "Riverina",
+        "King Valley",
+      ];
+
+      // Detect year mentions (e.g. "2024", "2023 vintage", "'24")
+      const yearMatches = input.question.match(/\b(20[0-9]{2})\b/);
+      const mentionedYear = yearMatches ? parseInt(yearMatches[1]) : null;
+
+      // Detect region mentions
+      const questionLower = input.question.toLowerCase();
+      const mentionedRegion = KNOWN_REGIONS.find((r) => questionLower.includes(r.toLowerCase()));
+
+      let vintageContext = "";
+      if (mentionedRegion || mentionedYear) {
+        // Try to find a matching vintage intelligence entry
+        const targetYear = mentionedYear ?? new Date().getFullYear();
+        let vintageRows: Array<{
+          region: string;
+          year: number;
+          state: string;
+          conditions: string;
+          standoutVarieties: string | null;
+          qualityRating: number;
+          yieldAssessment: string | null;
+          winemakingNotes: string | null;
+          source: string | null;
+        }> = [];
+
+        if (mentionedRegion) {
+          // Try exact region match first
+          const exactRow = await db
+            .select({
+              region: schema.vintageIntelligence.region,
+              year: schema.vintageIntelligence.year,
+              state: schema.vintageIntelligence.state,
+              conditions: schema.vintageIntelligence.conditions,
+              standoutVarieties: schema.vintageIntelligence.standoutVarieties,
+              qualityRating: schema.vintageIntelligence.qualityRating,
+              yieldAssessment: schema.vintageIntelligence.yieldAssessment,
+              winemakingNotes: schema.vintageIntelligence.winemakingNotes,
+              source: schema.vintageIntelligence.source,
+            })
+            .from(schema.vintageIntelligence)
+            .where(
+              and(
+                like(schema.vintageIntelligence.region, `%${mentionedRegion}%`),
+                eq(schema.vintageIntelligence.year, targetYear)
+              )
+            )
+            .limit(1);
+          if (exactRow.length > 0) vintageRows = exactRow;
+        }
+
+        // If no region match but year mentioned, get national overview
+        if (vintageRows.length === 0 && mentionedYear) {
+          const nationalRow = await db
+            .select({
+              region: schema.vintageIntelligence.region,
+              year: schema.vintageIntelligence.year,
+              state: schema.vintageIntelligence.state,
+              conditions: schema.vintageIntelligence.conditions,
+              standoutVarieties: schema.vintageIntelligence.standoutVarieties,
+              qualityRating: schema.vintageIntelligence.qualityRating,
+              yieldAssessment: schema.vintageIntelligence.yieldAssessment,
+              winemakingNotes: schema.vintageIntelligence.winemakingNotes,
+              source: schema.vintageIntelligence.source,
+            })
+            .from(schema.vintageIntelligence)
+            .where(
+              and(
+                eq(schema.vintageIntelligence.year, mentionedYear),
+                like(schema.vintageIntelligence.region, "%National%")
+              )
+            )
+            .limit(1);
+          if (nationalRow.length > 0) vintageRows = nationalRow;
+        }
+
+        if (vintageRows.length > 0) {
+          const vi = vintageRows[0];
+          const ratingLabels: Record<number, string> = { 1: "Poor", 2: "Below Average", 3: "Average", 4: "Excellent", 5: "Exceptional" };
+          const parts = [
+            `## ${vi.region} ${vi.year} Vintage Intelligence`,
+            `**Quality Rating:** ${vi.qualityRating}/5 — ${ratingLabels[vi.qualityRating] ?? "Unknown"}`,
+          ];
+          if (vi.yieldAssessment) parts.push(`**Yield:** ${vi.yieldAssessment}`);
+          if (vi.standoutVarieties) parts.push(`**Standout Varieties:** ${vi.standoutVarieties}`);
+          parts.push(`\n### Growing Season Conditions\n${vi.conditions.slice(0, 1200)}`);
+          if (vi.winemakingNotes) parts.push(`\n### Winemaking Implications\n${vi.winemakingNotes.slice(0, 800)}`);
+          if (vi.source) parts.push(`\n*Source: ${vi.source}*`);
+          vintageContext = parts.join("\n");
+        }
+      }
+
       const personaLine = isHomeWinemaker
         ? "You are a friendly, practical home winemaking assistant helping a home winemaker in their garage or cellar."
         : "You are an expert winemaking assistant helping a professional winemaker or cellar hand.";
@@ -2218,7 +2339,7 @@ Rules:
 }
 
 SOPs:
-${sopContext}`;
+${sopContext}${vintageContext ? `\n\n---\n\n## Regional Vintage Context\n${vintageContext}` : ""}`;
 
       const messages = [
         { role: "system" as const, content: systemPrompt },
@@ -2260,6 +2381,62 @@ ${sopContext}`;
     }),
 });
 
+// ─── Vintage Intelligence Router ────────────────────────────────────────────
+
+const vintageIntelligenceRouter = router({
+  // Public: list all entries (optionally filtered by year/state)
+  list: publicProcedure
+    .input(
+      z.object({
+        year: z.number().optional(),
+        state: z.string().optional(),
+      }).optional()
+    )
+    .query(async ({ input }) => {
+      return listVintageIntelligence(input ?? {});
+    }),
+
+  // Public: get a single entry by region + year (used for AI context injection)
+  getByRegionYear: publicProcedure
+    .input(
+      z.object({
+        region: z.string(),
+        year: z.number(),
+      })
+    )
+    .query(async ({ input }) => {
+      return getVintageIntelligenceByRegionYear(input.region, input.year);
+    }),
+
+  // Owner-only: create or update a vintage intelligence entry
+  upsert: ownerProcedure
+    .input(
+      z.object({
+        region: z.string().min(1).max(128),
+        year: z.number().int().min(2000).max(2100),
+        state: z.string().min(1).max(10),
+        country: z.string().optional().default("Australia"),
+        conditions: z.string().min(1),
+        standoutVarieties: z.string().optional(),
+        qualityRating: z.number().int().min(1).max(5).optional().default(3),
+        yieldAssessment: z.string().optional(),
+        winemakingNotes: z.string().optional(),
+        source: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return upsertVintageIntelligence(input);
+    }),
+
+  // Owner-only: delete a vintage intelligence entry
+  delete: ownerProcedure
+    .input(z.object({ id: z.number().int() }))
+    .mutation(async ({ input }) => {
+      await deleteVintageIntelligence(input.id);
+      return { success: true };
+    }),
+});
+
 // ─── App Router (re-export with knowledge) ───────────────────────────────────
 export const appRouter = router({
   campaignMetrics: campaignMetricsRouter,
@@ -2281,5 +2458,6 @@ export const appRouter = router({
   vineyard: vineyardRouter,
   knowledge: knowledgeRouter,
   tutor: tutorRouter,
+  vintageIntelligence: vintageIntelligenceRouter,
 });
 export type AppRouter = typeof appRouter;

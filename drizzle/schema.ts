@@ -647,3 +647,42 @@ export const sopTrainingRecords = mysqlTable(
     index("str_trained_at_idx").on(t.trainedAt),
   ]
 );
+
+// ─── Vintage Intelligence (Regional Vintage Context) ────────────────────────
+// One row per (region, year). Stores regional vintage conditions, quality
+// assessment, and standout varieties. Used to inject context into the Free Run
+// AI Tutor system prompt when a user asks about a specific region or vintage.
+export const vintageIntelligence = mysqlTable(
+  "vintage_intelligence",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // Region name (e.g. "Barossa Valley", "Margaret River")
+    region: varchar("region", { length: 128 }).notNull(),
+    // Vintage year (e.g. 2024)
+    year: int("year").notNull(),
+    // Australian state abbreviation (e.g. "SA", "WA", "VIC", "NSW")
+    state: varchar("state", { length: 10 }).notNull(),
+    // Country (default "Australia")
+    country: varchar("country", { length: 64 }).notNull().default("Australia"),
+    // Full narrative of growing season conditions (Markdown)
+    conditions: text("conditions").notNull(),
+    // Comma-separated list of standout varieties (e.g. "Grenache, Shiraz, Riesling")
+    standoutVarieties: varchar("standout_varieties", { length: 512 }),
+    // Overall quality rating 1–5 (1=Poor, 2=Below Average, 3=Average, 4=Excellent, 5=Exceptional)
+    qualityRating: int("quality_rating").notNull().default(3),
+    // Yield assessment relative to average (e.g. "Below average — 50–90% of normal")
+    yieldAssessment: varchar("yield_assessment", { length: 256 }),
+    // Key winemaking implications for this vintage
+    winemakingNotes: text("winemaking_notes"),
+    // Data source attribution (e.g. "Barossa Australia Vintage Report 2024")
+    source: varchar("source", { length: 512 }),
+    // UTC ms timestamp
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("vi_region_year_idx").on(t.region, t.year),
+    index("vi_state_idx").on(t.state),
+    index("vi_year_idx").on(t.year),
+  ]
+);
