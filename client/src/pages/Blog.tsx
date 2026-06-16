@@ -26,7 +26,7 @@ const ARTICLES = [
       "Boutique and commercial wine production are not different philosophies applied to the same process. They are fundamentally different processes that happen to share a raw material. Understanding the distinction matters for anyone building tools that serve the wine industry.",
     date: "May 2026",
     readTime: "8 min read",
-    category: "Winemaking Science",
+    category: "The Craft",
     tags: ["boutique winemaking", "commercial winemaking", "winery equipment", "AI in winemaking"],
   },
   {
@@ -36,7 +36,7 @@ const ARTICLES = [
       "There is a moment that every winemaker knows. It arrives somewhere around the third week of vintage — usually at 2am, usually in the middle of a stuck fermentation. This is not a technical problem. It is a cognitive one.",
     date: "May 2026",
     readTime: "7 min read",
-    category: "Winemaker Psychology",
+    category: "The Science",
     tags: ["cognitive load", "harvest", "AI in winemaking", "institutional knowledge"],
   },
 ];
@@ -135,7 +135,7 @@ function BlogEmailCapture() {
   );
 }
 
-const ALL_CATEGORIES = ["All", ...Array.from(new Set(ARTICLES.map((a) => a.category)))];
+const ALL_CATEGORIES = ["All", "The Science", "The Vineyard", "The Craft"];
 
 export default function Blog() {
   const [activeCategory, setActiveCategory] = useState<string>("All");
@@ -228,8 +228,7 @@ export default function Blog() {
               maxWidth: "560px",
             }}
           >
-            Thought leadership for boutique winemakers — on AI, cognitive load, harvest pressure,
-            and the future of cellar intelligence.
+            Thought leadership for boutique winemakers — through the three lenses of the Divine Trinity: The Science, The Vineyard, and The Craft.
           </p>
         </div>
       </section>

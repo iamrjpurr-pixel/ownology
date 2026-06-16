@@ -502,3 +502,36 @@
 - [x] QuickEntry.tsx: BDR border token → var(--ow-border-md) (theme-aware), code preview boxes → var(--ow-bg-inset)
 - [x] FounderStory.tsx: added "Advanced Certificate of Viticulture and Winemaking — Oenology" credential block with graduation cap icon
 - [x] Knowledge Layers tooltip: hover tooltip on stats bar explains all 5 layers (Procedure, Decision Logic, Tribal Knowledge, Vintage Notes, Training)
+
+## Blog — Design Scope & Trinity Content Pipeline (planned)
+
+### Blog restructure (immediate)
+- [ ] Blog.tsx: replace "Winemaking Science" + "Winemaker Psychology" filter tabs with The Science / The Vineyard / The Craft (Divine Trinity headings)
+- [ ] Blog.tsx: re-tag existing articles to correct Trinity category (Two Philosophies → The Craft, Weight of Harvest → The Science)
+- [ ] Blog.tsx: update header tagline to reference the Divine Trinity framing
+
+### Trinity content pipeline — design decisions captured
+- Blog content is sourced from real Free Run user questions + Divine Trinity responses
+- Questions are clustered by embedding similarity — duplicate/near-identical questions are grouped, not published separately
+- The highest-rated Trinity response from each cluster becomes the canonical candidate
+- An AI editorial pass runs automatically: polishes the three panels for standalone readability, rewrites the question into its clearest canonical form, generates a one-sentence excerpt
+- The bibles (Red Wine Bible, White Wine Bible) are used as a private quality/accuracy layer — verify claims, enrich depth — but are NEVER cited or exposed to users; authority comes from Ownology, not named documents
+- Unsupported or contradicted claims are flagged for owner review rather than auto-publishing
+- Pieces auto-publish to "pending/community draft" state (visible to members, not featured)
+- Owner receives weekly digest notification: "N new pieces ready — M strong candidates for featuring"
+- Owner promotes best pieces to "featured" (appears at top of Trinity tab, amber badge)
+- Newsletter draws from featured pieces monthly (one per Trinity act = 3 articles per send)
+- Newsletter preview sent to owner 24h before send with approve/delay option
+
+### Trinity content pipeline — build items
+- [ ] Store question embeddings on each Free Run ask (for clustering)
+- [ ] Nightly Heartbeat job: cluster questions by embedding similarity (threshold 0.85), identify clusters with 3+ responses, select highest-rated Trinity response as canonical candidate
+- [ ] Editorial LLM pass: polish panels, canonicalise question, generate excerpt, cross-reference bibles for accuracy (private), flag unsupported claims
+- [ ] Auto-publish to "pending" state; flag accuracy issues for owner review
+- [ ] DB table: published_trinity_responses (question_canonical, panel_type, content_science, content_vineyard, content_craft, excerpt, status: pending/featured/suppressed, cluster_size, published_at)
+- [ ] Admin view: cluster review, promote to featured, suppress duplicates
+- [ ] Blog renders published Trinity responses under correct Trinity tab alongside manual articles
+- [ ] Duplicate suppression: skip clusters within 0.9 similarity of already-published piece
+- [ ] FreeRun: "This answer was shared with the community" badge on published Trinity panels (anonymised)
+- [ ] Monthly newsletter: Buttondown integration, auto-compose from top 3 featured pieces (one per Trinity act), 24h preview with owner approve/delay
+- [ ] Most-asked question clusters → auto-generate FAQ entries (top 10 clusters by volume)
