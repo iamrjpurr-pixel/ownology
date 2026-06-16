@@ -63,7 +63,7 @@ export default function FounderStory() {
           Our Story
         </p>
 
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
           {/* Left — founder portrait (3 cols) */}
           <div
@@ -175,9 +175,9 @@ export default function FounderStory() {
             </div>
           </div>
 
-          {/* Centre-left — Rich portrait (3 cols) */}
+          {/* Centre-left — Rich portrait (2 cols) */}
           <div
-            className={`lg:col-span-3 ${inView ? "fade-up fade-up-delay-1" : "opacity-0"}`}
+            className={`lg:col-span-2 ${inView ? "fade-up fade-up-delay-1" : "opacity-0"}`}
             style={{ transitionDelay: "80ms" }}
           >
             <div
@@ -228,9 +228,9 @@ export default function FounderStory() {
             </div>
           </div>
 
-          {/* Centre-right — Geraldine portrait (3 cols) */}
+          {/* Centre-right — Geraldine portrait (2 cols) */}
           <div
-            className={`lg:col-span-3 ${inView ? "fade-up fade-up-delay-2" : "opacity-0"}`}
+            className={`lg:col-span-2 ${inView ? "fade-up fade-up-delay-2" : "opacity-0"}`}
             style={{ transitionDelay: "160ms" }}
           >
             <div
@@ -281,9 +281,9 @@ export default function FounderStory() {
             </div>
           </div>
 
-          {/* Right — quote + body copy (3 cols) */}
+          {/* Right — quote + body copy (5 cols) */}
           <div
-            className={`lg:col-span-3 flex flex-col gap-7 ${inView ? "fade-up fade-up-delay-3" : "opacity-0"}`}
+            className={`lg:col-span-5 flex flex-col gap-7 ${inView ? "fade-up fade-up-delay-3" : "opacity-0"}`}
           >
             {/* Cellar key decorative mark */}
             <svg width="24" height="52" viewBox="0 0 20 44" fill="none" aria-hidden="true">
