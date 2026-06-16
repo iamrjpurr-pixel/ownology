@@ -254,23 +254,49 @@ function KnowledgeHome() {
       <div className="container py-10">
         {/* Stats row */}
         <div className="flex gap-8 mb-8 flex-wrap">
-          {[
-            { label: "Categories", value: baseCategories.length.toString() },
-            { label: "SOPs", value: allSops.length.toString() },
-            { label: "Knowledge Layers", value: "5" },
-          ].map((s) => (
-            <div key={s.label}>
-              <p
-                className="text-2xl font-bold"
-                style={{ fontFamily: "'Fraunces', serif", color: "var(--ow-amber)" }}
-              >
-                {s.value}
-              </p>
-              <p className="text-xs" style={{ color: "var(--ow-text-lo)" }}>
-                {s.label}
-              </p>
+          <div>
+            <p className="text-2xl font-bold" style={{ fontFamily: "'Fraunces', serif", color: "var(--ow-amber)" }}>
+              {baseCategories.length}
+            </p>
+            <p className="text-xs" style={{ color: "var(--ow-text-lo)" }}>Categories</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold" style={{ fontFamily: "'Fraunces', serif", color: "var(--ow-amber)" }}>
+              {allSops.length}
+            </p>
+            <p className="text-xs" style={{ color: "var(--ow-text-lo)" }}>SOPs</p>
+          </div>
+          <div className="relative group">
+            <p className="text-2xl font-bold" style={{ fontFamily: "'Fraunces', serif", color: "var(--ow-amber)" }}>5</p>
+            <p className="text-xs flex items-center gap-1 cursor-default" style={{ color: "var(--ow-text-lo)" }}>
+              Knowledge Layers
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style={{ opacity: 0.5, flexShrink: 0 }}>
+                <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.1"/>
+                <path d="M6 5.5v3" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+                <circle cx="6" cy="3.75" r="0.6" fill="currentColor"/>
+              </svg>
+            </p>
+            {/* Tooltip */}
+            <div
+              className="absolute bottom-full left-0 mb-2 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+              style={{ width: "220px" }}
+            >
+              <div style={{
+                background: "var(--ow-bg-inset)",
+                border: "1px solid var(--ow-border)",
+                borderRadius: "4px",
+                padding: "0.625rem 0.75rem",
+                boxShadow: "0 4px 16px oklch(0 0 0 / 0.15)",
+              }}>
+                <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.7rem", fontWeight: 600, color: "var(--ow-amber)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "0.375rem" }}>Per SOP</p>
+                {["Procedure", "Decision Logic", "Tribal Knowledge", "Vintage Notes", "Training"].map((layer, i) => (
+                  <p key={layer} style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "var(--ow-text-mid)", lineHeight: 1.6 }}>
+                    <span style={{ color: "var(--ow-amber)", marginRight: "0.375rem" }}>{i + 1}.</span>{layer}
+                  </p>
+                ))}
+              </div>
             </div>
-          ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

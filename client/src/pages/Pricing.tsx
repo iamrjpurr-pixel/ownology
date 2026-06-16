@@ -184,8 +184,8 @@ const TIERS = [
     name: "The Press",
     tagline: "Full cellar operations + institutional knowledge.",
     audience: "Boutique winery teams who need operations and protocol management.",
-    monthlyPrice: 49,
-    annualPrice: 490,
+    monthlyPrice: 41,
+    annualPrice: 410,
     highlight: true,
     badge: "MOST POPULAR",
     color: "var(--ow-amber)",
@@ -206,8 +206,8 @@ const TIERS = [
     name: "Cellar Master",
     tagline: "All four pillars. Multi-person winery teams.",
     audience: "Winery teams with cellar hands, assistant winemakers, or vineyard staff.",
-    monthlyPrice: 99,
-    annualPrice: 990,
+    monthlyPrice: 83,
+    annualPrice: 830,
     highlight: false,
     badge: "TEAM",
     color: "oklch(0.80 0.14 75)",
@@ -615,7 +615,7 @@ function TierCard({
                   <circle cx="7" cy="7" r="6" stroke={tier.color} strokeWidth="1.2" />
                   <path d="M4.5 7l2 2 3-3" stroke={tier.color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <span style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8125rem", color: "var(--ow-text-mid)", lineHeight: 1.5 }}>
+                <span style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8125rem", color: tier.highlight ? "oklch(0.82 0.015 75)" : "var(--ow-text-mid)", lineHeight: 1.5 }}>
                   {f}
                   {FEATURE_EXPLANATIONS[f] && (
                     <FeatureInfoIcon explanation={FEATURE_EXPLANATIONS[f]} />
@@ -718,7 +718,7 @@ function TierCard({
                 <circle cx="7" cy="7" r="6" stroke={tier.color} strokeWidth="1.2" />
                 <path d="M4.5 7l2 2 3-3" stroke={tier.color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <span className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-mid)", lineHeight: 1.5 }}>
+              <span className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: tier.highlight ? "oklch(0.82 0.015 75)" : "var(--ow-text-mid)", lineHeight: 1.5 }}>
                 {f}
               </span>
             </li>
