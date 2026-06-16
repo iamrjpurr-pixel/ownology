@@ -108,6 +108,11 @@ const FOUNDING_SPOTS_REMAINING = 99;
 // Feature explanations for info icon popovers — keyed by exact feature string
 const FEATURE_EXPLANATIONS: Record<string, string> = {
   // Free Run
+  "3 curiosity questions / day": "Ask Ownology three wine questions every day — the counter resets at midnight. No credit card, no commitment.",
+  "Flavour science, varietals & regions": "Explore why Shiraz tastes different from Pinot Noir, how tannins work, what makes a wine 'mineral', and how climate shapes flavour. Wine knowledge for curious drinkers, not just winemakers.",
+  "Deep Dive triangle — Science, Vineyard, Craft": "Every answer has a hidden depth layer. Tap Deep Dive to unlock three panels: the Science behind it, the Vineyard story, and the Craft decision. Each panel costs one credit.",
+  "First Deep Dive reveal free": "Your first Deep Dive panel is on us — no credits needed. Try it on any answer to see how much deeper the rabbit hole goes.",
+  "Free account — no card needed": "Sign up with your email and start immediately. No trial period, no credit card, no catch.",
   "5 Compliance AI queries per month": "Ask up to 5 regulatory questions per month across LIP, FSANZ, and state liquor licensing — no credit card required.",
   "Vintage log (5 entries per month)": "Log up to 5 cellar events per month — enough to follow a single fermentation from inoculation to press.",
   // The Cellar
@@ -148,10 +153,10 @@ const TIERS = [
     color: "var(--ow-text-lo)",
     features: [
       "3 curiosity questions / day",
-      "Flavour science & varietals",
-      "Deep Dive triangle",
+      "Flavour science, varietals & regions",
+      "Deep Dive triangle — Science, Vineyard, Craft",
       "First Deep Dive reveal free",
-      "Free account \u2014 no card needed",
+      "Free account — no card needed",
     ],
     cta: "Start Exploring",
     ctaHref: "/free-run",
