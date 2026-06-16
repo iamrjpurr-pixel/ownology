@@ -444,9 +444,9 @@
 
 ## Upsell & Reference Features (Jun 2026)
 - [ ] Free Run: add locked premium feature cards section with hover tooltips explaining the upsell (The Press tier features, glimpse mechanic)
-- [ ] Build /waitlist page: professional tier waitlist signup with tier selector (Cellar Hand, Winemaker, Head Winemaker), lead capture using useEmailSubscribe hook
-- [ ] Build /reference/vine page: searchable Vine et al. index component querying vine-et-al-index.json (search by chapter, section, page, topic)
-- [ ] Wire /waitlist and /reference/vine routes in App.tsx
+- [x] Build /waitlist page: professional tier waitlist signup with tier selector (Cellar Hand, Winemaker, Head Winemaker), lead capture using useEmailSubscribe hook
+- [x] Build /reference/vine page: searchable Vine et al. index component querying vine-et-al-index.json (search by chapter, section, page, topic)
+- [x] Wire /waitlist and /reference/vine routes in App.tsx
 
 ## Free Run Redesign — Wine Virgin Strategy (Jun 2026)
 - [ ] Redesign Free Run page: excitement-first for wine virgins (people who love wine and want to understand it, even if they never make it)
@@ -477,5 +477,5 @@
 - [x] Rewrite FreeRun.tsx as wine curiosity experience (3 questions/day, Go Deeper triangle, thumbs feedback)
 - [x] Update Pricing page: Free Run features, credit pack names/pricing, Go Deeper triangle grid
 - [x] Update Pricing FAQs to reflect new credit model
-- [ ] Wire Stripe checkout for credit pack purchases on Free Run page
+- [x] Wire Stripe checkout for credit pack purchases on Free Run page
 - [ ] Add analytics event tracking (panel expansion, thumbs, credit purchase, Press CTA click)

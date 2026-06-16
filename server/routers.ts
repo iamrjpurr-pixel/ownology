@@ -970,11 +970,35 @@ const leadsRouter = router({
         name: input.name,
         wineryName: input.wineryName,
       });
-      if (input.notes) await updateLeadNotes(id, input.notes);
+            if (input.notes) await updateLeadNotes(id, input.notes);
+      return { ok: true, id };
+    }),
+  // Public: join the professional tier waitlist
+  join: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        name: z.string().max(256).optional(),
+        wineryName: z.string().max(256).optional(),
+        annualProduction: z.string().max(64).optional(),
+        tier: z.enum(["cellar_master", "press", "cellar"]).default("cellar_master"),
+        message: z.string().max(1000).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const tags = ["waitlist", `tier:${input.tier}`];
+      if (input.annualProduction) tags.push(`production:${input.annualProduction}`);
+      const id = await addLead({
+        email: input.email,
+        source: "waitlist",
+        name: input.name,
+        wineryName: input.wineryName,
+        tags,
+      });
+      if (input.message) await updateLeadNotes(id, input.message);
       return { ok: true, id };
     }),
 });
-
 // ─── Site Content Router (Owner Inline Editing) ─────────────────────────────
 
 const siteContentRouter = router({

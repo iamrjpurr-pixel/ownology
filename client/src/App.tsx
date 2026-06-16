@@ -45,6 +45,8 @@ import PwaInstallBanner from "./components/PwaInstallBanner";
 import Knowledge from "./pages/Knowledge";
 import Guide from "./pages/Guide";
 import Import from "./pages/Import";
+import Waitlist from "./pages/Waitlist";
+import VineReference from "./pages/VineReference";
 
 
 function Router() {
@@ -95,6 +97,8 @@ function Router() {
       <Route path={"/knowledge/*"} component={Knowledge} />
       <Route path={"/guide"} component={Guide} />
       <Route path={"/import"} component={Import} />
+      <Route path={"/waitlist"} component={Waitlist} />
+      <Route path={"/reference/vine"} component={VineReference} />
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
