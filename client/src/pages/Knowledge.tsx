@@ -282,17 +282,27 @@ function KnowledgeHome() {
               style={{ width: "220px" }}
             >
               <div style={{
-                background: "var(--ow-bg-inset)",
-                border: "1px solid var(--ow-border)",
+                background: "oklch(0.14 0.008 60)",
+                border: "1px solid oklch(0.72 0.12 75 / 30%)",
                 borderRadius: "4px",
                 padding: "0.625rem 0.75rem",
-                boxShadow: "0 4px 16px oklch(0 0 0 / 0.15)",
+                boxShadow: "0 4px 20px oklch(0 0 0 / 0.35)",
               }}>
-                <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.7rem", fontWeight: 600, color: "var(--ow-amber)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "0.375rem" }}>Per SOP</p>
-                {["Procedure", "Decision Logic", "Tribal Knowledge", "Vintage Notes", "Training"].map((layer, i) => (
-                  <p key={layer} style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "var(--ow-text-mid)", lineHeight: 1.6 }}>
-                    <span style={{ color: "var(--ow-amber)", marginRight: "0.375rem" }}>{i + 1}.</span>{layer}
-                  </p>
+                <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", fontWeight: 600, color: "var(--ow-amber)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.5rem" }}>5 Layers per SOP</p>
+                {[
+                  ["Procedure", "Step-by-step method"],
+                  ["Decision Logic", "When and why to deviate"],
+                  ["Tribal Knowledge", "What the textbooks don't say"],
+                  ["Vintage Notes", "What actually happened"],
+                  ["Training", "How to teach it"],
+                ].map(([layer, desc], i) => (
+                  <div key={layer} style={{ marginBottom: i < 4 ? "0.375rem" : 0 }}>
+                    <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.88 0.015 75)", lineHeight: 1.4 }}>
+                      <span style={{ color: "var(--ow-amber)", marginRight: "0.375rem", fontFamily: "'Fira Code', monospace", fontSize: "0.65rem" }}>{i + 1}.</span>
+                      <strong style={{ fontWeight: 500 }}>{layer}</strong>
+                    </p>
+                    <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.7rem", color: "oklch(0.60 0.012 75)", lineHeight: 1.4, paddingLeft: "1rem" }}>{desc}</p>
+                  </div>
                 ))}
               </div>
             </div>
