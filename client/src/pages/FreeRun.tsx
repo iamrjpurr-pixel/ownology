@@ -16,6 +16,118 @@ import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
 import { ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Beaker, Sprout, Wine, Sparkles, ArrowRight } from "lucide-react";
 
+// ─── Divine Trinity Popover ───────────────────────────────────────────────────
+
+const TRINITY_ACTS = [
+  {
+    icon: <Beaker size={15} />,
+    color: "oklch(0.60 0.18 220)",
+    label: "The Science",
+    desc: "The chemistry, biology, and physics behind this — what's actually happening at a molecular level.",
+  },
+  {
+    icon: <Sprout size={15} />,
+    color: "oklch(0.65 0.18 145)",
+    label: "The Vineyard",
+    desc: "Where this characteristic begins — in the soil, the variety, the climate, and the vine.",
+  },
+  {
+    icon: <Wine size={15} />,
+    color: "oklch(0.72 0.12 75)",
+    label: "The Craft",
+    desc: "How the winemaker shaped it — the decisions that brought it from vine to glass.",
+  },
+];
+
+function DivineTriniityPopover({ creditBalance }: { creditBalance: number }) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        bottom: "calc(100% + 10px)",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "300px",
+        background: "oklch(0.16 0.010 60)",
+        border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 30%, transparent)",
+        borderRadius: "6px",
+        padding: "16px",
+        boxShadow: "0 16px 48px oklch(0 0 0 / 0.6), 0 0 0 1px oklch(0.72 0.12 75 / 0.08)",
+        zIndex: 50,
+        pointerEvents: "none",
+      }}
+    >
+      {/* Arrow */}
+      <div style={{
+        position: "absolute",
+        bottom: "-6px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "10px",
+        height: "10px",
+        background: "oklch(0.16 0.010 60)",
+        border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 30%, transparent)",
+        borderTop: "none",
+        borderLeft: "none",
+        rotate: "45deg",
+      }} />
+
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-3" style={{ borderBottom: "1px solid oklch(1 0 0 / 0.07)", paddingBottom: "10px" }}>
+        <Sparkles size={12} style={{ color: "oklch(0.72 0.12 75)" }} />
+        <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", letterSpacing: "0.1em", color: "oklch(0.72 0.12 75)", textTransform: "uppercase" }}>
+          The Divine Trinity
+        </span>
+        <span style={{ marginLeft: "auto", fontFamily: "'Lato', sans-serif", fontSize: "0.65rem", color: creditBalance > 0 ? "oklch(0.65 0.18 145)" : "oklch(0.72 0.12 75)", fontWeight: 600 }}>
+          {creditBalance > 0 ? `${creditBalance} credit${creditBalance !== 1 ? "s" : ""} remaining` : "First reveal free"}
+        </span>
+      </div>
+
+      {/* Tagline */}
+      <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.78rem", lineHeight: 1.6, color: "oklch(0.65 0.015 75)", marginBottom: "12px", fontStyle: "italic" }}>
+        Three acts on the same question — anchored, focused, and impossible to drift.
+      </p>
+
+      {/* Three acts */}
+      <div className="flex flex-col gap-2.5">
+        {TRINITY_ACTS.map((act) => (
+          <div key={act.label} className="flex items-start gap-3">
+            <div style={{
+              width: "28px",
+              height: "28px",
+              borderRadius: "4px",
+              background: `color-mix(in oklch, ${act.color} 12%, transparent)`,
+              border: `1px solid color-mix(in oklch, ${act.color} 25%, transparent)`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              color: act.color,
+            }}>
+              {act.icon}
+            </div>
+            <div>
+              <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: "0.75rem", color: "oklch(0.88 0.015 75)", marginBottom: "2px", letterSpacing: "0.02em" }}>
+                {act.label}
+              </p>
+              <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.72rem", lineHeight: 1.55, color: "oklch(0.58 0.012 75)" }}>
+                {act.desc}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-3 pt-3" style={{ borderTop: "1px solid oklch(1 0 0 / 0.07)" }}>
+        <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.65rem", color: "oklch(0.40 0.010 75)", textAlign: "center" }}>
+          One credit · All three panels · Credits never expire
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface TriangleReveal {
@@ -62,6 +174,13 @@ function trackEvent(name: string, props?: Record<string, string | number | boole
 
 // ─── Deep Dive Triangle Panel ─────────────────────────────────────────────────
 
+// Panel tooltip descriptions
+const PANEL_TOOLTIPS: Record<"science" | "vineyard" | "craft", string> = {
+  science: "The chemistry, biology, and physics behind this — what's actually happening at a molecular level.",
+  vineyard: "Where this characteristic begins — in the soil, the variety, the climate, and the vine.",
+  craft: "How the winemaker shaped it — the decisions that brought it from vine to glass.",
+};
+
 interface PanelProps {
   icon: React.ReactNode;
   label: string;
@@ -74,7 +193,8 @@ interface PanelProps {
   onFeedback: (thumbsUp: boolean) => void;
 }
 
-function TrianglePanel({ icon, label, color, content, isOpen, onToggle, feedback, onFeedback }: PanelProps) {
+function TrianglePanel({ icon, label, color, content, panelKey, isOpen, onToggle, feedback, onFeedback }: PanelProps) {
+  const [hovered, setHovered] = useState(false);
   return (
     <div
       className="rounded-sm overflow-hidden"
@@ -82,11 +202,14 @@ function TrianglePanel({ icon, label, color, content, isOpen, onToggle, feedback
     >
       <button
         onClick={onToggle}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
         className="w-full flex items-center justify-between px-4 py-3 text-left transition-all"
         style={{
           background: isOpen
             ? `color-mix(in oklch, ${color} 12%, transparent)`
             : `color-mix(in oklch, ${color} 6%, transparent)`,
+          position: "relative",
         }}
       >
         <div className="flex items-center gap-2.5">
@@ -103,6 +226,35 @@ function TrianglePanel({ icon, label, color, content, isOpen, onToggle, feedback
           >
             {label}
           </span>
+          {/* Panel tooltip — shown when collapsed and hovered */}
+          {!isOpen && hovered && (
+            <span
+              style={{
+                position: "absolute",
+                left: "44px",
+                top: "calc(100% + 6px)",
+                background: "oklch(0.14 0.008 60)",
+                border: `1px solid color-mix(in oklch, ${color} 25%, transparent)`,
+                borderRadius: "4px",
+                padding: "6px 10px",
+                fontFamily: "'Lato', sans-serif",
+                fontWeight: 300,
+                fontSize: "0.72rem",
+                lineHeight: 1.55,
+                color: "oklch(0.65 0.015 75)",
+                maxWidth: "220px",
+                zIndex: 40,
+                pointerEvents: "none",
+                boxShadow: "0 8px 24px oklch(0 0 0 / 0.4)",
+                whiteSpace: "normal",
+                textTransform: "none",
+                letterSpacing: "normal",
+                fontStyle: "italic",
+              }}
+            >
+              {PANEL_TOOLTIPS[panelKey]}
+            </span>
+          )}
         </div>
         <span style={{ color: "oklch(0.55 0.015 75)" }}>
           {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -179,6 +331,7 @@ export default function FreeRun() {
   const [pairs, setPairs] = useState<QAPair[]>([]);
   const [isAsking, setIsAsking] = useState(false);
   const [isRevealing, setIsRevealing] = useState<string | null>(null);
+  const [deepDiveHover, setDeepDiveHover] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -515,36 +668,47 @@ export default function FreeRun() {
 
                   {!pair.reveal && !pair.answer.includes("daily curiosity allowance") && (
                     <div className="mt-4 pt-3" style={{ borderTop: "1px solid oklch(1 0 0 / 0.06)" }}>
-                      <button
-                        onClick={() => handleGoDeeper(pair.id)}
-                        disabled={isRevealing === pair.id}
-                        className="flex items-center gap-2 px-4 py-2 rounded-sm text-sm transition-all"
-                        style={{
-                          background: "color-mix(in oklch, oklch(0.72 0.12 75) 12%, transparent)",
-                          border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 35%, transparent)",
-                          color: "oklch(0.72 0.12 75)",
-                          fontFamily: "'Lato', sans-serif",
-                          fontWeight: 600,
-                          letterSpacing: "0.03em",
-                          cursor: isRevealing === pair.id ? "wait" : "pointer",
-                          opacity: isRevealing === pair.id ? 0.6 : 1,
-                        }}
-                      >
-                        {isRevealing === pair.id ? (
-                          <>
-                            <div style={{ width: "12px", height: "12px", border: "1.5px solid oklch(0.72 0.12 75)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                            Revealing the triangle…
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles size={13} />
-                            Deep Dive
-                            {creditBalance === 0 && (
-                              <span style={{ fontSize: "0.7rem", opacity: 0.7, marginLeft: "2px" }}>(first one free)</span>
-                            )}
-                          </>
+                      <div style={{ position: "relative", display: "inline-block" }}>
+                        <button
+                          onClick={() => handleGoDeeper(pair.id)}
+                          onMouseEnter={() => !isRevealing && setDeepDiveHover(pair.id)}
+                          onMouseLeave={() => setDeepDiveHover(null)}
+                          disabled={isRevealing === pair.id}
+                          className="flex items-center gap-2 px-4 py-2 rounded-sm text-sm transition-all"
+                          style={{
+                            background: deepDiveHover === pair.id
+                              ? "color-mix(in oklch, oklch(0.72 0.12 75) 20%, transparent)"
+                              : "color-mix(in oklch, oklch(0.72 0.12 75) 12%, transparent)",
+                            border: `1px solid color-mix(in oklch, oklch(0.72 0.12 75) ${deepDiveHover === pair.id ? "55%" : "35%"}, transparent)`,
+                            color: "oklch(0.72 0.12 75)",
+                            fontFamily: "'Lato', sans-serif",
+                            fontWeight: 600,
+                            letterSpacing: "0.03em",
+                            cursor: isRevealing === pair.id ? "wait" : "pointer",
+                            opacity: isRevealing === pair.id ? 0.6 : 1,
+                            transition: "all 0.15s ease",
+                          }}
+                        >
+                          {isRevealing === pair.id ? (
+                            <>
+                              <div style={{ width: "12px", height: "12px", border: "1.5px solid oklch(0.72 0.12 75)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                              Revealing the Trinity…
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles size={13} />
+                              Deep Dive
+                              {creditBalance === 0 && (
+                                <span style={{ fontSize: "0.7rem", opacity: 0.7, marginLeft: "2px" }}>(first one free)</span>
+                              )}
+                            </>
+                          )}
+                        </button>
+                        {/* Divine Trinity popover */}
+                        {deepDiveHover === pair.id && !isRevealing && (
+                          <DivineTriniityPopover creditBalance={creditBalance} />
                         )}
-                      </button>
+                      </div>
                     </div>
                   )}
 
@@ -586,7 +750,7 @@ export default function FreeRun() {
                         style={{ background: "color-mix(in oklch, oklch(0.65 0.18 145) 8%, transparent)", border: "1px solid color-mix(in oklch, oklch(0.65 0.18 145) 20%, transparent)", fontFamily: "'Lato', sans-serif", color: "oklch(0.65 0.18 145)" }}
                       >
                         <Sparkles size={11} />
-                        Your first Deep Dive is free — welcome to the rabbit hole.
+                        Your first Divine Trinity is free — welcome to the rabbit hole.
                       </div>
                     )}
 

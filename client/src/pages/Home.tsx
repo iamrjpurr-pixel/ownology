@@ -945,12 +945,12 @@ function Pricing() {
   const tiers = [
     {
       name:"Free Run", price:"Free", period:"", sub:"No credit card needed",
-      features:["3 curiosity questions / day","Flavour science & varietals","Deep Dive triangle (first reveal free)","Free account — no card needed"],
+      features:["3 curiosity questions / day","Flavour science & varietals","Divine Trinity — first reveal free","Free account — no card needed"],
       cta:"Start Exploring", href:"/free-run", highlight:false,
     },
     {
       name:"The Cellar", price:"$16", period:"/mo", sub:"$190/yr · save $38",
-      features:["Full curiosity AI — 40+ subjects","30 Deep Dive credits per month","Unlimited Compliance AI","Vintage log (unlimited entries)","Email support","Founding member badge (first 99)"],
+      features:["Full curiosity AI — 40+ subjects","30 Divine Trinity reveals per month","Unlimited Compliance AI","Vintage log (unlimited entries)","Email support","Founding member badge (first 99)"],
       cta:"Join The Cellar", href:"/pricing", highlight:false,
     },
     {

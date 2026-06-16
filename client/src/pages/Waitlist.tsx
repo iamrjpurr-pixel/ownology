@@ -310,7 +310,7 @@ export default function Waitlist() {
                 className="text-sm leading-relaxed"
                 style={{ color: "oklch(0.65 0.015 75)" }}
               >
-                Free Run is available now — unlimited wine curiosity questions, the Deep Dive triangle, and 3 questions per day at no cost.
+                Free Run is available now — unlimited wine curiosity questions, the Divine Trinity, and 3 questions per day at no cost.
               </p>
               <Link href="/free-run">
                 <button

@@ -110,14 +110,14 @@ const FEATURE_EXPLANATIONS: Record<string, string> = {
   // Free Run
   "3 curiosity questions / day": "Ask Ownology three wine questions every day — the counter resets at midnight. No credit card, no commitment.",
   "Flavour science, varietals & regions": "Explore why Shiraz tastes different from Pinot Noir, how tannins work, what makes a wine 'mineral', and how climate shapes flavour. Wine knowledge for curious drinkers, not just winemakers.",
-  "Deep Dive triangle — Science, Vineyard, Craft": "Every answer has a hidden depth layer. Tap Deep Dive to unlock three panels: the Science behind it, the Vineyard story, and the Craft decision. Each panel costs one credit.",
-  "First Deep Dive reveal free": "Your first Deep Dive panel is on us — no credits needed. Try it on any answer to see how much deeper the rabbit hole goes.",
+  "Divine Trinity — Science, Vineyard, Craft": "Every answer has a hidden depth layer. Tap Deep Dive to unlock the Divine Trinity: three acts on the same question — The Science (the chemistry behind it), The Vineyard (where it begins in the ground), and The Craft (how the winemaker shaped it). One credit unlocks all three.",
+  "First Divine Trinity reveal free": "Your first Divine Trinity is on us — no credits needed. Try it on any answer to see how much deeper the rabbit hole goes.",
   "Free account — no card needed": "Sign up with your email and start immediately. No trial period, no credit card, no catch.",
   "5 Compliance AI queries per month": "Ask up to 5 regulatory questions per month across LIP, FSANZ, and state liquor licensing — no credit card required.",
   "Vintage log (5 entries per month)": "Log up to 5 cellar events per month — enough to follow a single fermentation from inoculation to press.",
   // The Cellar
   "Full Free Run AI tutor — 40+ subjects": "Unlimited access to the full lesson library covering fermentation chemistry, microbiology, sensory science, viticulture, and regulatory compliance.",
-  "30 AI tutor credits per month": "Credits power AI tutor interactions — questions, quizzes, and 'explain it differently' requests. 30 credits ≈ 30 lesson conversations per month.",
+  "30 Divine Trinity reveals per month": "Each credit unlocks the full Divine Trinity for one question — The Science, The Vineyard, and The Craft. One credit = three panels of depth. 30 credits = 30 questions taken all the way to the bottom. Credits reset monthly.",
   "Unlimited Compliance AI queries": "No monthly cap on regulatory questions. Ask anything across LIP, FSANZ, state licensing, and export requirements.",
   // The Press
   "Full cellar operations suite": "The complete Do pillar: The Press (Vintage Log, Batch Book, Barrels, Packaging, Calculations, Export Docs), Cellar Tasks, Vineyard, Quick Entry, and Dashboard.",
@@ -128,7 +128,7 @@ const FEATURE_EXPLANATIONS: Record<string, string> = {
   "3 team seats (winemaker + 2 staff)": "One Cellar Master account covers you plus two additional team members — cellar hands, assistant winemakers, or vineyard staff.",
   "Annual knowledge base review alert": "Each year, Ownology flags any regulatory changes in your state jurisdictions so your compliance knowledge stays current without manual checking.",
   "Dedicated onboarding call (30 min)": "A 30-minute video call with the Ownology team to configure your Knowledge Platform, set up team seats, and walk through the platform for your specific winery.",
-  "Unlimited AI tutor credits": "No monthly cap. Ask as many questions, run as many quizzes, and request as many explanations as your team needs.",
+  "Unlimited Divine Trinity reveals": "No monthly cap on Deep Dive credits. Every question you ask can be taken all the way to the Divine Trinity — The Science, The Vineyard, and The Craft — without counting the cost.",
 };
 
 // Pillar tags shown on each tier card
@@ -154,8 +154,8 @@ const TIERS = [
     features: [
       "3 curiosity questions / day",
       "Flavour science, varietals & regions",
-      "Deep Dive triangle — Science, Vineyard, Craft",
-      "First Deep Dive reveal free",
+      "Divine Trinity — Science, Vineyard, Craft",
+      "First Divine Trinity reveal free",
       "Free account — no card needed",
     ],
     cta: "Start Exploring",
@@ -174,7 +174,7 @@ const TIERS = [
     color: "oklch(0.65 0.08 75)",
     features: [
       "Full curiosity AI \u2014 40+ subjects",
-      "30 Deep Dive credits per month",
+      "30 Divine Trinity reveals per month",
       "Unlimited Compliance AI",
       "Vintage log (unlimited entries)",
       "Email support",
@@ -218,7 +218,7 @@ const TIERS = [
     color: "oklch(0.80 0.14 75)",
     features: [
       "Everything in The Press",
-      "Unlimited Deep Dive credits",
+      "Unlimited Divine Trinity reveals",
       "3 team seats (winemaker + 2 staff)",
       "Dedicated onboarding call (30 min)",
       "Annual knowledge base review",
@@ -237,7 +237,7 @@ const CREDIT_PACKS = [
     credits: 5,
     price: 4,
     perCredit: "$0.80",
-    tagline: "Five Deep Dive reveals. Packs never expire.",
+    tagline: "Five Divine Trinity reveals. Packs never expire.",
     badge: null,
   },
   {
@@ -263,7 +263,7 @@ const CREDIT_PACKS = [
 const FAQS = [
   {
     q: "What is a credit?",
-    a: "One credit unlocks the Deep Dive triangle for one question \u2014 three panels (Science, Vineyard, Craft) that take your curiosity one level deeper. Credits never expire; your knowledge investment has no use-by date.",
+    a: "One credit unlocks the Divine Trinity for one question \u2014 three acts (The Science, The Vineyard, The Craft) that take your curiosity one level deeper. Credits never expire; your knowledge investment has no use-by date.",
   },
   {
     q: "Do credits expire?",
@@ -1227,7 +1227,7 @@ export default function Pricing() {
               Top up when you need it.
             </h2>
             <p className="mt-2 max-w-xl" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9375rem", color: "var(--ow-text-lo)", lineHeight: 1.7 }}>
-              One credit unlocks the Deep Dive triangle for one question — Science, Vineyard, and Craft panels that take your curiosity one level deeper. Packs never expire. Your knowledge investment has no use-by date.
+              One credit unlocks the Divine Trinity for one question — The Science, The Vineyard, and The Craft — three acts that take your curiosity one level deeper. Packs never expire. Your knowledge investment has no use-by date.
             </p>
           </div>
         </div>
@@ -1245,7 +1245,7 @@ export default function Pricing() {
             What does one credit get you?
           </h2>
           <p className="text-center mb-8" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9375rem", color: "var(--ow-text-lo)" }}>
-            One credit unlocks the full Deep Dive triangle for one question.
+              One credit unlocks the full Divine Trinity for one question.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
