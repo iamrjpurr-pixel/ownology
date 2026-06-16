@@ -49,7 +49,9 @@ const SECTIONS: Section[] = [
       { label: "Resources",               href: "/resources",          desc: "Resource hub — links to Home Winemaker kit, compliance guides.", status: "live" },
       { label: "Why Ownology",            href: "/why-ownology",       desc: "Value proposition and competitive positioning page.", status: "live" },
       { label: "Pricing",                 href: "/pricing",            desc: "Founding member pricing tiers and Stripe checkout.", status: "live" },
-      { label: "Blog",                    href: "/blog",               desc: "Editorial blog — two articles live.", status: "live" },
+      { label: "Blog",                    href: "/blog",               desc: "Editorial blog — Trinity filter tabs (The Science / The Vineyard / The Craft).", status: "live" },
+      { label: "Blog Article — Weight of Harvest", href: "/blog/weight-of-harvest", desc: "Full article: The Weight of Harvest — cognitive load relief framing.", status: "live" },
+      { label: "Blog Article — Two Philosophies",  href: "/blog/two-philosophies",  desc: "Full article: Two Philosophies, One Grape — boutique vs commercial winemaking.", status: "live" },
       { label: "Merch",                   href: "/merch",              desc: "Branded merchandise store with Stripe checkout.", status: "live" },
       { label: "Preview (customer)",      href: "/preview",            desc: "Email-gated customer brochure — do not edit.", status: "live" },
     ],
@@ -98,10 +100,11 @@ const SECTIONS: Section[] = [
     title: "Home Winemaker Section",
     icon: "🏠",
     items: [
-      { label: "For Home Winemakers",      href: "/for-home-winemakers", desc: "Landing page: feature grid, sample questions, resource strip.", status: "live" },
-      { label: "Home Winery Kit",          href: "/resources/home-winery-kit", desc: "Kit checklist, AI CTA pre-filled with HomeWinemaker filter.", status: "live" },
+      { label: "For Home Winemakers",      href: "/for-home-winemakers",              desc: "Landing page: feature grid, sample questions, resource strip.", status: "live" },
+      { label: "DIY Knowledge Hub",        href: "/for-home-winemakers/knowledge",     desc: "Home winemaker knowledge library — guides, tips, recipes.", status: "live" },
+      { label: "Home Winery Kit",          href: "/resources/home-winery-kit",        desc: "Kit checklist, AI CTA pre-filled with HomeWinemaker filter.", status: "live" },
       { label: "Troubleshooting Guide",    href: "/for-home-winemakers/troubleshooting", desc: "8-fault searchable accordion: stuck ferment, H₂S, VA, Brett, oxidation, etc.", status: "live" },
-      { label: "Glossary",                 href: "/for-home-winemakers/glossary", desc: "50+ terms, A-Z filter, live search.", status: "live" },
+      { label: "Glossary",                 href: "/for-home-winemakers/glossary",      desc: "50+ terms, A-Z filter, live search.", status: "live" },
       { label: "Vessel type on log entry", href: "/the-press",         anchor: "New Log Entry → Step 1 → Vessel Type selector", desc: "Tank / Carboy / Barrel / Demijohn toggle saved in entry details.", status: "live" },
       { label: "Kit Wine variety",         href: "/the-press",         anchor: "New Log Entry → Variety → Kit Wine option", desc: "Kit Wine in COMMON_VARIETIES with amber badge in Milestones calendar.", status: "live" },
     ],
@@ -110,11 +113,16 @@ const SECTIONS: Section[] = [
     title: "Commercial & Admin",
     icon: "💼",
     items: [
-      { label: "Admin Panel",              href: "/admin",              desc: "Owner-only: compliance doctrine editor, lead management.", status: "live" },
-      { label: "Campaign Metrics",         href: "/admin/campaigns",    desc: "Email campaign analytics dashboard.", status: "live" },
-      { label: "Orders / Payments",        href: "/orders",             desc: "Stripe payment history for logged-in user.", status: "live" },
-      { label: "For Vintrace Users",       href: "/for-vintrace-users", desc: "Migration landing page targeting Vintrace users.", status: "live" },
-      { label: "For InnoVint Users",       href: "/for-innovint-users", desc: "Migration landing page targeting InnoVint users.", status: "live" },
+      { label: "Admin Panel",                     href: "/admin",                          desc: "Owner-only hub: links to all admin sub-pages.", status: "live" },
+      { label: "Admin — Leads",                    href: "/admin/leads",                    desc: "Waitlist lead management — view, export, manage signups.", status: "live" },
+      { label: "Admin — Compliance Doctrine",      href: "/admin/compliance-doctrine",      desc: "Owner editor for the compliance AI knowledge base.", status: "live" },
+      { label: "Admin — Vintage Intelligence",     href: "/admin/vintage-intelligence",     desc: "Owner view of vintage log intelligence and analytics.", status: "live" },
+      { label: "Admin — WBS",                      href: "/admin/wbs",                      desc: "Work breakdown structure / project tracking view.", status: "live" },
+      { label: "Campaign Metrics",                 href: "/campaign-metrics",               desc: "Email campaign analytics dashboard with trend charts and KPI cards.", status: "live" },
+      { label: "Orders / Payments",                href: "/orders",                         desc: "Stripe payment history — last 50 sessions with line items.", status: "live" },
+      { label: "Competitive Advantage",            href: "/competitive-advantage",          desc: "7-competitor grid, feature matrix, Australian compliance moat, investment thesis.", status: "live" },
+      { label: "For Vintrace Users",               href: "/for-vintrace-users",             desc: "Migration landing page targeting Vintrace users.", status: "live" },
+      { label: "For InnoVint Users",               href: "/for-innovint-users",             desc: "Migration landing page targeting InnoVint users.", status: "live" },
     ],
   },
   {
@@ -160,6 +168,11 @@ const SECTIONS: Section[] = [
     icon: "📚",
     items: [
       { label: "Knowledge Platform home",        href: "/knowledge",      sprint: "S7", desc: "8-category SOP library grid with search, category filter, and quick-access cards. Seeded with 31 pre-written SOPs across Fermentation, Sanitation, Barrels, Bottling, Lab, Onboarding, Food Safety, and Traceability.", status: "live" },
+      { label: "Guide — Getting Started",          href: "/guide",          sprint: "S7", desc: "Onboarding guide: step-by-step walkthrough of Ownology features for new users.", status: "live" },
+      { label: "Import",                           href: "/import",         sprint: "S7", desc: "Data import tool — bulk import vintage log entries or batch records.", status: "live" },
+      { label: "Vine Reference",                   href: "/reference/vine", sprint: "S7", desc: "Vine variety reference library — variety cards with characteristics and notes.", status: "live" },
+      { label: "Waitlist page",                    href: "/waitlist",                     desc: "Standalone waitlist signup page.", status: "live" },
+      { label: "Founding Member Success",          href: "/founding-member/success",      desc: "Post-checkout founding member confirmation page.", status: "live" },
       { label: "SOP detail view",                href: "/knowledge",      anchor: "Knowledge → any category → click any SOP card", sprint: "S7", desc: "Full SOP procedure text, Decision Logic notes (winemaker reasoning), Tribal Knowledge field (equipment quirks, supplier preferences), and Vintage Notes history.", status: "live" },
       { label: "Vintage Lessons Log",            href: "/knowledge",      anchor: "Knowledge → any SOP → Vintage Notes tab → Add Note", sprint: "S7", desc: "Per-SOP vintage notes with What Worked, What Failed, Seasonal Observations, and Winemaker Notes fields. Grouped by vintage year.", status: "live" },
       { label: "Training Records module",        href: "/knowledge",      anchor: "Knowledge → Training Records tab → New Session", sprint: "S7", desc: "Create training sessions with title, date, trainer, trainees, and topics covered. Downloadable sign-off record. Full session history.", status: "live" },
@@ -264,7 +277,7 @@ export default function BuildIndex() {
             BUILD INDEX
           </span>
           <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", color: TEXT_LO, letterSpacing: "0.08em" }}>
-            v4 · 7 sprints · 27/27 DRs met · 31 SOPs seeded — remove before launch
+            v5 · 7 sprints · 27/27 DRs met · 31 SOPs seeded — remove before launch
           </span>
         </div>
         <Link href="/" style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8125rem", fontWeight: 300, color: TEXT_LO, textDecoration: "none" }}>
@@ -279,7 +292,7 @@ export default function BuildIndex() {
           style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
         >
           {[
-            { label: "Pages & Features", value: "62" },
+            { label: "Pages & Features", value: "84" },
             { label: "Sprints completed", value: "7" },
             { label: "DRs fully met", value: "27 / 27" },
             { label: "SOPs seeded", value: "31" },

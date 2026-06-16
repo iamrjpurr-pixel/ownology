@@ -506,9 +506,9 @@
 ## Blog — Design Scope & Trinity Content Pipeline (planned)
 
 ### Blog restructure (immediate)
-- [ ] Blog.tsx: replace "Winemaking Science" + "Winemaker Psychology" filter tabs with The Science / The Vineyard / The Craft (Divine Trinity headings)
-- [ ] Blog.tsx: re-tag existing articles to correct Trinity category (Two Philosophies → The Craft, Weight of Harvest → The Science)
-- [ ] Blog.tsx: update header tagline to reference the Divine Trinity framing
+- [x] Blog.tsx: replace "Winemaking Science" + "Winemaker Psychology" filter tabs with The Science / The Vineyard / The Craft (Divine Trinity headings)
+- [x] Blog.tsx: re-tag existing articles to correct Trinity category (Two Philosophies → The Craft, Weight of Harvest → The Science)
+- [x] Blog.tsx: update header tagline to reference the Divine Trinity framing
 
 ### Trinity content pipeline — design decisions captured
 - Blog content is sourced from real Free Run user questions + Divine Trinity responses
