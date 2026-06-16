@@ -7,8 +7,8 @@
  *
  * Mechanics:
  *   - 3 curiosity questions per day (midnight UTC reset)
- *   - Every answer has a "Go Deeper" button (1 credit, first one free)
- *   - Go Deeper unlocks the Triangle: Science / Vineyard / Craft
+ *   - Every answer has a "Deep Dive" button (1 credit, first one free)
+ *   - Deep Dive unlocks the Triangle: Science / Vineyard / Craft
  *   - Thumbs up/down per panel for quality analytics
  *   - Panel expansion + thumbs + credit purchase tracked as analytics events
  */
@@ -22,9 +22,9 @@ import Stripe from "stripe";
 
 // ─── Credit Pack Definitions ─────────────────────────────────────────────────
 export const CREDIT_PACKS = [
-  { id: "bottle",   name: "A Bottle of Curiosity",  credits: 5,  priceAud: 400,  description: "5 Go Deeper reveals" },
-  { id: "case",     name: "A Case of Questions",    credits: 15, priceAud: 900,  description: "15 Go Deeper reveals" },
-  { id: "obsessed", name: "The Obsessive",           credits: 40, priceAud: 1900, description: "40 Go Deeper reveals" },
+  { id: "bottle",   name: "A Bottle of Curiosity",  credits: 5,  priceAud: 400,  description: "5 Deep Dive reveals" },
+  { id: "case",     name: "A Case of Questions",    credits: 15, priceAud: 900,  description: "15 Deep Dive reveals" },
+  { id: "obsessed", name: "The Obsessive",           credits: 40, priceAud: 1900, description: "40 Deep Dive reveals" },
 ] as const;
 
 function getStripe(): Stripe {
@@ -180,7 +180,7 @@ If the question is about making wine commercially or winemaking technique, respo
     }),
 
   /**
-   * Unlock the Go Deeper triangle for a question.
+   * Unlock the Deep Dive triangle for a question.
    * Costs 1 credit (first reveal ever is free).
    * Returns Science, Vineyard, and Craft panels.
    */
@@ -297,7 +297,7 @@ Write "The Craft" panel — explain how a winemaker shapes, controls, or exploit
     }),
 
   /**
-   * Submit thumbs up/down feedback for a Go Deeper panel.
+   * Submit thumbs up/down feedback for a Deep Dive panel.
    */
   submitFeedback: protectedProcedure
     .input(

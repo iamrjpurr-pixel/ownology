@@ -16,8 +16,8 @@ const TIERS = [
   {
     id: "press" as const,
     name: "The Press",
-    price: "$49/mo",
-    annual: "$490/yr",
+    price: "$41/mo",
+    annual: "$410/yr",
     description: "Full winemaking AI — SOPs, technique, vintage log, cellar tracking.",
     forWho: "Home winemakers and serious hobbyists",
     badge: null,
@@ -25,8 +25,8 @@ const TIERS = [
   {
     id: "cellar_master" as const,
     name: "Cellar Master",
-    price: "$99/mo",
-    annual: "$990/yr",
+    price: "$83/mo",
+    annual: "$830/yr",
     description: "Everything in The Press + 3 team seats, dedicated onboarding, annual knowledge review.",
     forWho: "Boutique winery teams",
     badge: "Most popular",
@@ -310,7 +310,7 @@ export default function Waitlist() {
                 className="text-sm leading-relaxed"
                 style={{ color: "oklch(0.65 0.015 75)" }}
               >
-                Free Run is available now — unlimited wine curiosity questions, the Go Deeper triangle, and 3 questions per day at no cost.
+                Free Run is available now — unlimited wine curiosity questions, the Deep Dive triangle, and 3 questions per day at no cost.
               </p>
               <Link href="/free-run">
                 <button

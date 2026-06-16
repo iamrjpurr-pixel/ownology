@@ -479,3 +479,19 @@
 - [x] Update Pricing FAQs to reflect new credit model
 - [x] Wire Stripe checkout for credit pack purchases on Free Run page
 - [ ] Add analytics event tracking (panel expansion, thumbs, credit purchase, Press CTA click)
+
+## Site-Wide Cleanup — Stale Content Audit (Jun 2026)
+- [x] Pricing toggle knob alignment fix (left-0 + translateX values corrected)
+- [x] The Press price visibility fix in light mode (forced light text on dark highlighted card)
+- [x] Knowledge page: add 4 missing categories (Crushing & Fermentation, Cleaning & Sanitation, Pressing & Juice Handling, Bottling & Packaging) — now shows all 12 categories
+- [x] Knowledge stats bar: now shows accurate 38 SOPs across 12 categories (was hardcoded 38 but only 8 categories shown)
+- [x] Home page: fix stale "45 industry SOPs" → 38 SOPs across 12 categories in all sections
+- [x] Home page: fix stale annual pricing sub-labels ($490/yr → $410/yr for The Press; $990/yr → $830/yr for Cellar Master)
+- [x] Home page: replace stale Harvest/Cellar/Estate pricing section with current Free Run/The Cellar/The Press/Cellar Master tiers
+- [x] FAQ.tsx: fix stale 45 SOP references and old tier names/prices
+- [x] Guide.tsx: fix stale 45 SOP references and old prices ($49/mo → $41/mo, $99/mo → $83/mo)
+- [x] Pricing.tsx: fix stale 45 SOP references in tier features and FAQ
+- [x] Waitlist.tsx: fix stale prices ($49/mo → $41/mo, $99/mo → $83/mo, annual totals corrected)
+- [x] FreeRun.tsx: fix stale $9/month upsell copy → $41/month
+- [x] Global rename: "Go Deeper" → "Deep Dive" across all UI-facing text (7 files updated)
+- [x] FreeRun.tsx: add press-cta-click analytics tracking to all 3 Press CTA links (header, answer-card, daily-limit locations)

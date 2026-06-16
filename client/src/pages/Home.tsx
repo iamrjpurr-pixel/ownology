@@ -101,7 +101,7 @@ function WhatsNewRibbon() {
           margin: 0,
         }}
       >
-        <strong style={{ fontWeight: 600, color: "var(--ow-text-hi)" }}>Knowledge Platform</strong> is live — 45 industry SOPs, Decision Logic &amp; Tribal Knowledge capture.
+        <strong style={{ fontWeight: 600, color: "var(--ow-text-hi)" }}>Knowledge Platform</strong> is live — 38 industry SOPs across 12 categories, Decision Logic &amp; Tribal Knowledge capture.
         {" "}
         <Link
           href="/knowledge"
@@ -542,7 +542,7 @@ function Hero() {
               style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,4rem)", lineHeight:1.1, color:"var(--ow-text-hi)", letterSpacing:"-0.02em"}}>
               <EditableText contentKey="home.hero.headline" defaultValue="Your cellar's most knowledgeable apprentice." contentMap={contentMap} />
             </h1>
-            <EditableText contentKey="home.hero.subheading" defaultValue="Log cellar readings. Access 45 industry SOPs. Ask the AI anything. Stay compliant. Ownology is the complete intelligence platform for boutique winery teams — on a mobile phone, during harvest." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
+            <EditableText contentKey="home.hero.subheading" defaultValue="Log cellar readings. Access 38 industry SOPs across 12 categories. Ask the AI anything. Stay compliant. Ownology is the complete intelligence platform for boutique winery teams — on a mobile phone, during harvest." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-10 fade-up fade-up-delay-3">
               <a href="/pricing" className="btn-amber text-center">Start 14-Day Free Trial</a>
               <a href="#how-it-works" className="btn-ghost text-center">See How It Works</a>
@@ -752,10 +752,10 @@ function Features() {
                 </div>
                 <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.375rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>Knowledge Platform</h3>
                 <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7}}>
-                  45 industry-standard SOPs across 12 categories — from fermentation management to bottling. Capture the reasoning behind every decision in Decision Logic. Preserve your team's accumulated experience in Tribal Knowledge. Your winery's institutional memory, searchable and permanent.
+                  38 industry-standard SOPs across 12 categories — from fermentation management to bottling. Capture the reasoning behind every decision in Decision Logic. Preserve your team's accumulated experience in Tribal Knowledge. Your winery's institutional memory, searchable and permanent.
                 </p>
                 <div className="mt-6 flex flex-col gap-2">
-                  {["Fermentation Management · 11 SOPs","Laboratory Testing · 5 SOPs","Tank Cleaning & Sanitation · 5 SOPs","Bottling Procedures · 4 SOPs"].map(f=>(
+                  {["Fermentation Management · 6 SOPs","Laboratory Testing · 5 SOPs","Tank Cleaning & Sanitation · 4 SOPs","Bottling Procedures · 3 SOPs"].map(f=>(
                     <div key={f} className="flex items-center gap-3 px-3 py-2 rounded-sm" style={{background:"var(--ow-bg-base)"}}>
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                         <path d="M3 2h5l2 2v6a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="oklch(0.62 0.10 45)" strokeWidth="1"/>
@@ -784,7 +784,7 @@ function HowItWorks() {
   const { ref, inView } = useInView();
   const steps = [
     { n:"01", title:"Do — Log and Track", body:"Record cellar readings by voice or photo in The Press. The Fermentation Dashboard tracks all active tanks. Vineyard and Cellar Tasks keep your team aligned in real time." },
-    { n:"02", title:"Know — Access Your SOPs", body:"45 industry-standard SOPs across 12 categories, ready to use on day one. Add your own Decision Logic and Tribal Knowledge. Every protocol is searchable, every decision is documented." },
+    { n:"02", title:"Know — Access Your SOPs", body:"38 industry-standard SOPs across 12 categories, ready to use on day one. Add your own Decision Logic and Tribal Knowledge. Every protocol is searchable, every decision is documented." },
     { n:"03", title:"Learn — Ask the AI", body:"Open Free Run and ask anything — from SO₂ calculations to stuck fermentation triage. The AI draws on your winery's own SOPs and world-class wine science, then delivers a precise, cited answer." },
     { n:"04", title:"Guide — Stay Compliant", body:"The Compliance AI answers regulatory questions across LIP, FSANZ, and state licensing. Every answer is grounded in current legislation — not generic internet content." },
   ];
@@ -944,19 +944,24 @@ function Pricing() {
   const { ref, inView } = useInView();
   const tiers = [
     {
-      name:"Harvest", price:"$99", period:"/month", cases:"Up to 5,000 cases",
-      features:["The Press — cellar logbook & fermentation tracking","Knowledge Platform — 45 industry SOPs","Free Run — AI assistant","Compliance AI — regulatory Q&A","2 user seats","14-day free trial"],
-      cta:"Start Free Trial", highlight:false,
+      name:"Free Run", price:"Free", period:"", sub:"No credit card needed",
+      features:["3 curiosity questions / day","Flavour science & varietals","Deep Dive triangle (first reveal free)","Free account — no card needed"],
+      cta:"Start Exploring", href:"/free-run", highlight:false,
     },
     {
-      name:"Cellar", price:"$249", period:"/month", cases:"5,001–20,000 cases",
-      features:["Everything in Harvest","Vineyard & Cellar Tasks modules","Fermentation anomaly alerts","Decision Logic & Tribal Knowledge capture","5 user seats","Priority support"],
-      cta:"Start Free Trial", highlight:true,
+      name:"The Cellar", price:"$16", period:"/mo", sub:"$190/yr · save $38",
+      features:["Full curiosity AI — 40+ subjects","30 Deep Dive credits per month","Unlimited Compliance AI","Vintage log (unlimited entries)","Email support","Founding member badge (first 99)"],
+      cta:"Join The Cellar", href:"/pricing", highlight:false,
     },
     {
-      name:"Estate", price:"$499", period:"/month", cases:"20,001+ cases",
-      features:["Everything in Cellar","Unlimited user seats","Custom SOP library","Dedicated onboarding","API access","SLA guarantee"],
-      cta:"Contact Us", highlight:false,
+      name:"The Press", price:"$41", period:"/mo", sub:"$410/yr · save $82",
+      features:["Full cellar operations suite","38 SOPs across 12 categories","Decision Logic + Tribal Knowledge","Priority Compliance AI","Vintage log PDF export","Phone & chat support"],
+      cta:"Enter The Press", href:"/pricing", highlight:true,
+    },
+    {
+      name:"Cellar Master", price:"$83", period:"/mo", sub:"$830/yr · save $166",
+      features:["Everything in The Press","Unlimited Deep Dive credits","3 team seats (winemaker + 2 staff)","Dedicated onboarding call (30 min)","Annual knowledge base review","Cellar Master badge + number"],
+      cta:"Claim Cellar Master", href:"/pricing", highlight:false,
     },
   ];
   return (
@@ -964,62 +969,57 @@ function Pricing() {
       <div className="container" ref={ref}>
         <p className="section-label mb-4">Pricing</p>
         <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
-          Priced by production scale. No surprises.
+          From Free Run to Cellar Master.
         </h2>
         <p className="mt-4" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, color:"var(--ow-text-mid)", fontSize:"1rem"}}>
-          All plans include a 14-day free trial. No credit card required.
+          Start free. No credit card required. Founding member pricing locked for life for the first 99 subscribers.
         </p>
         <div className="amber-rule mt-8 mb-12" />
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {tiers.map((t, i) => (
             <div key={t.name} className={`relative flex flex-col ${inView ? `fade-up fade-up-delay-${i+1}` : "opacity-0"}`}
               style={{
-                background: t.highlight ? "var(--ow-bg-card)" : "var(--ow-bg-raised)",
+                background: t.highlight ? "oklch(0.16 0.012 60)" : "var(--ow-bg-card)",
                 border: t.highlight ? "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)" : "1px solid var(--ow-border)",
                 borderRadius:"4px",
-                padding:"2rem",
+                padding:"1.75rem",
               }}>
               {t.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-sm text-xs font-bold tracking-widest uppercase"
-                  style={{background:"var(--ow-amber)", color:"var(--ow-bg-base)", fontFamily:"'Lato',sans-serif"}}>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-sm text-xs font-bold tracking-widest uppercase"
+                  style={{background:"var(--ow-amber)", color:"oklch(0.16 0.012 60)", fontFamily:"'Lato',sans-serif"}}>
                   Most Popular
                 </div>
               )}
-              <p className="section-label mb-2">{t.name}</p>
+              <p className="section-label mb-2" style={{color: t.highlight ? "oklch(0.72 0.12 75)" : undefined}}>{t.name}</p>
               <div className="flex items-end gap-1 mb-1">
-                <span style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"2.75rem", color:"var(--ow-text-hi)", lineHeight:1}}>{t.price}</span>
-                <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.875rem", color:"var(--ow-text-lo)", paddingBottom:"0.35rem"}}>{t.period}</span>
+                <span style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"2.25rem", color: t.highlight ? "oklch(0.92 0.018 75)" : "var(--ow-text-hi)", lineHeight:1}}>{t.price}</span>
+                {t.period && <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.875rem", color: t.highlight ? "oklch(0.70 0.015 75)" : "var(--ow-text-lo)", paddingBottom:"0.35rem"}}>{t.period}</span>}
               </div>
-              <p className="data-readout text-xs mb-6" style={{color:"var(--ow-text-lo)"}}>{t.cases}</p>
-              <div className="amber-rule mb-6" />
-              <ul className="flex flex-col gap-3 flex-1 mb-8">
+              <p className="data-readout text-xs mb-5" style={{color: t.highlight ? "oklch(0.60 0.015 75)" : "var(--ow-text-lo)"}}>{t.sub}</p>
+              <div className="amber-rule mb-5" />
+              <ul className="flex flex-col gap-2.5 flex-1 mb-7">
                 {t.features.map(f => (
-                  <li key={f} className="flex items-start gap-3">
+                  <li key={f} className="flex items-start gap-2.5">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="mt-0.5 flex-shrink-0">
                       <path d="M2.5 7l3 3 6-6" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.9rem", color:"var(--ow-text-mid)", fontWeight:300}}>{f}</span>
+                    <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.875rem", color: t.highlight ? "oklch(0.78 0.015 75)" : "var(--ow-text-mid)", fontWeight:300}}>{f}</span>
                   </li>
                 ))}
               </ul>
-              <button className={t.highlight ? "btn-amber w-full" : "btn-ghost w-full"}>
+              <a href={t.href} className={t.highlight ? "btn-amber w-full text-center" : "btn-ghost w-full text-center"}>
                 {t.cta}
-              </button>
+              </a>
             </div>
           ))}
         </div>
 
-        {/* Consultant tier note */}
-        <div className="mt-8 p-6 rounded-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
-          style={{background:"var(--ow-bg-card)", border:"1px solid var(--ow-border)"}}>
-          <div>
-            <p style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.125rem", color:"var(--ow-text-hi)"}}>Consulting Winemaker?</p>
-            <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9rem", color:"var(--ow-text-mid)", marginTop:"0.25rem"}}>
-              Manage multiple winery clients from a single account. $149/month per client with full Cellar features.
-            </p>
-          </div>
-          <button className="btn-ghost flex-shrink-0">Learn More</button>
+        {/* Full pricing details link */}
+        <div className="mt-8 text-center">
+          <a href="/pricing" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.9rem", color:"var(--ow-amber)", textDecoration:"underline", textUnderlineOffset:"3px"}}>
+            View full pricing details, credit packs, and founding member offer →
+          </a>
         </div>
       </div>
     </section>

@@ -6,8 +6,8 @@
  *
  * Mechanics:
  *  - 3 curiosity questions/day (midnight UTC reset)
- *  - Every answer has a "Go Deeper" button (1 credit, first one free)
- *  - Go Deeper unlocks the Triangle: Science / Vineyard / Craft
+ *  - Every answer has a "Deep Dive" button (1 credit, first one free)
+ *  - Deep Dive unlocks the Triangle: Science / Vineyard / Craft
  *  - Thumbs up/down per panel for quality analytics
  */
 import { useEffect, useRef, useState } from "react";
@@ -60,7 +60,7 @@ function trackEvent(name: string, props?: Record<string, string | number | boole
   }
 }
 
-// ─── Go Deeper Triangle Panel ─────────────────────────────────────────────────
+// ─── Deep Dive Triangle Panel ─────────────────────────────────────────────────
 
 interface PanelProps {
   icon: React.ReactNode;
@@ -228,7 +228,7 @@ export default function FreeRun() {
           {
             id,
             question: text,
-            answer: `You've used your 3 questions for today — your daily curiosity allowance resets at midnight.\n\nMeanwhile, if you're ready to go deeper into the craft of winemaking, The Press is waiting.`,
+            answer: `You've used your 3 questions for today — your daily curiosity allowance resets at midnight.\n\nMeanwhile, if you're ready to deep dive into the craft of winemaking, The Press is waiting.`,
             topicTag: null,
             reveal: null,
             openPanels: new Set(),
@@ -467,6 +467,7 @@ export default function FreeRun() {
               )}
               <Link
                 href="/pricing"
+                onClick={() => trackEvent('press-cta-click', { location: 'header' })}
                 style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "6px 12px", background: "oklch(0.16 0.010 60)", border: "1px solid oklch(1 0 0 / 0.10)", color: "oklch(0.60 0.015 75)", fontFamily: "'Lato',sans-serif", textDecoration: "none", letterSpacing: "0.04em", fontSize: "0.75rem", borderRadius: "2px" }}
               >
                 The Press →
@@ -537,7 +538,7 @@ export default function FreeRun() {
                         ) : (
                           <>
                             <Sparkles size={13} />
-                            Go Deeper
+                            Deep Dive
                             {creditBalance === 0 && (
                               <span style={{ fontSize: "0.7rem", opacity: 0.7, marginLeft: "2px" }}>(first one free)</span>
                             )}
@@ -550,7 +551,7 @@ export default function FreeRun() {
                   {pair.reveal?.revealId === -1 && (
                     <div className="mt-4 pt-3" style={{ borderTop: "1px solid oklch(1 0 0 / 0.06)" }}>
                       <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.85rem", color: "oklch(0.60 0.015 75)", marginBottom: "12px" }}>
-                        You've used your free reveal. Top up to go deeper.
+                        You've used your free reveal. Top up to deep dive.
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {(["bottle", "case", "obsessed"] as const).map((packId) => {
@@ -570,7 +571,7 @@ export default function FreeRun() {
                         })}
                       </div>
                       <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.40 0.010 75)", marginTop: "8px" }}>
-                        Or get unlimited with <Link href="/pricing" style={{ color: "oklch(0.72 0.12 75)", textDecoration: "none" }}>The Press — $9/month</Link>
+                        Or get unlimited with <Link href="/pricing" style={{ color: "oklch(0.72 0.12 75)", textDecoration: "none" }}>The Press — $41/month</Link>
                       </p>
                     </div>
                   )}
@@ -585,7 +586,7 @@ export default function FreeRun() {
                         style={{ background: "color-mix(in oklch, oklch(0.65 0.18 145) 8%, transparent)", border: "1px solid color-mix(in oklch, oklch(0.65 0.18 145) 20%, transparent)", fontFamily: "'Lato', sans-serif", color: "oklch(0.65 0.18 145)" }}
                       >
                         <Sparkles size={11} />
-                        Your first Go Deeper is free — welcome to the rabbit hole.
+                        Your first Deep Dive is free — welcome to the rabbit hole.
                       </div>
                     )}
 
@@ -632,6 +633,7 @@ export default function FreeRun() {
                       </p>
                       <Link
                         href="/pricing"
+                        onClick={() => trackEvent('press-cta-click', { location: 'answer-card' })}
                         style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "6px 14px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, textDecoration: "none", letterSpacing: "0.03em", fontSize: "0.75rem", borderRadius: "2px", whiteSpace: "nowrap" }}
                       >
                         The Press <ArrowRight size={11} />
@@ -680,6 +682,7 @@ export default function FreeRun() {
               </p>
               <Link
                 href="/pricing"
+                onClick={() => trackEvent('press-cta-click', { location: 'daily-limit' })}
                 style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 16px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, textDecoration: "none", fontSize: "0.8rem", borderRadius: "2px" }}
               >
                 Upgrade to The Press for unlimited <ArrowRight size={12} />
@@ -721,7 +724,7 @@ export default function FreeRun() {
             style={{ background: "oklch(0.14 0.008 60)", border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 20%, transparent)" }}
           >
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 600, fontSize: "0.85rem", color: "oklch(0.85 0.015 75)", marginBottom: "4px" }}>
-              Want to go deeper on your next question?
+              Want to deep dive on your next question?
             </p>
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8rem", color: "oklch(0.55 0.015 75)", marginBottom: "12px" }}>
               Pick a pack — credits never expire.
@@ -746,7 +749,7 @@ export default function FreeRun() {
               })}
             </div>
             <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.40 0.010 75)", marginTop: "10px" }}>
-              Or get unlimited with <Link href="/pricing" style={{ color: "oklch(0.72 0.12 75)", textDecoration: "none" }}>The Press — $9/month</Link>
+              Or get unlimited with <Link href="/pricing" style={{ color: "oklch(0.72 0.12 75)", textDecoration: "none" }}>The Press — $41/month</Link>
             </p>
           </div>
         )}

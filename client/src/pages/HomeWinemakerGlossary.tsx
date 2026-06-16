@@ -298,7 +298,7 @@ export default function HomeWinemakerGlossary() {
           }}
         >
           <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "1.1rem", color: "var(--ow-text-hi)", marginBottom: "0.5rem" }}>
-            Want to go deeper?
+            Want to deep dive?
           </p>
           <p style={{ fontFamily: SANS, fontSize: "0.875rem", color: "var(--ow-text-mid)", marginBottom: "1rem", lineHeight: 1.6 }}>
             Ask Ownology any winemaking question — from nutrient calculations to troubleshooting off-flavours.

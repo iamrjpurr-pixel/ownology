@@ -116,7 +116,7 @@ const FEATURE_EXPLANATIONS: Record<string, string> = {
   "Unlimited Compliance AI queries": "No monthly cap on regulatory questions. Ask anything across LIP, FSANZ, state licensing, and export requirements.",
   // The Press
   "Full cellar operations suite": "The complete Do pillar: The Press (Vintage Log, Batch Book, Barrels, Packaging, Calculations, Export Docs), Cellar Tasks, Vineyard, Quick Entry, and Dashboard.",
-  "Knowledge Platform — 45 SOPs, 12 categories": "The full Know pillar: 45 industry-standard SOPs across Fermentation, Sanitation, Barrels, Bottling, Lab, Onboarding, Food Safety, and Traceability. Add Decision Logic, Tribal Knowledge, and Vintage Notes to each SOP.",
+  "Knowledge Platform — 38 SOPs, 12 categories": "The full Know pillar: 38 industry-standard SOPs across 12 categories including Fermentation, Sanitation, Barrels, Bottling, Lab, Onboarding, Food Safety, and Traceability. Add Decision Logic, Tribal Knowledge, and Vintage Notes to each SOP.",
   "Priority Compliance AI responses": "Your compliance queries jump the queue — faster response times during busy harvest periods when you need answers in seconds, not minutes.",
   "Vintage log PDF export": "Export your full vintage log as a formatted PDF — useful for audits, cellar notes, and end-of-vintage records.",
   // Cellar Master
@@ -149,8 +149,8 @@ const TIERS = [
     features: [
       "3 curiosity questions / day",
       "Flavour science & varietals",
-      "Go Deeper triangle",
-      "First Go Deeper reveal free",
+      "Deep Dive triangle",
+      "First Deep Dive reveal free",
       "Free account \u2014 no card needed",
     ],
     cta: "Start Exploring",
@@ -169,7 +169,7 @@ const TIERS = [
     color: "oklch(0.65 0.08 75)",
     features: [
       "Full curiosity AI \u2014 40+ subjects",
-      "30 Go Deeper credits per month",
+      "30 Deep Dive credits per month",
       "Unlimited Compliance AI",
       "Vintage log (unlimited entries)",
       "Email support",
@@ -191,7 +191,7 @@ const TIERS = [
     color: "var(--ow-amber)",
     features: [
       "Full cellar operations suite",
-      "45 SOPs across 12 categories",
+      "38 SOPs across 12 categories",
       "Decision Logic + Tribal Knowledge",
       "Priority Compliance AI",
       "Vintage log PDF export",
@@ -213,7 +213,7 @@ const TIERS = [
     color: "oklch(0.80 0.14 75)",
     features: [
       "Everything in The Press",
-      "Unlimited Go Deeper credits",
+      "Unlimited Deep Dive credits",
       "3 team seats (winemaker + 2 staff)",
       "Dedicated onboarding call (30 min)",
       "Annual knowledge base review",
@@ -232,7 +232,7 @@ const CREDIT_PACKS = [
     credits: 5,
     price: 4,
     perCredit: "$0.80",
-    tagline: "Five Go Deeper reveals. Packs never expire.",
+    tagline: "Five Deep Dive reveals. Packs never expire.",
     badge: null,
   },
   {
@@ -258,7 +258,7 @@ const CREDIT_PACKS = [
 const FAQS = [
   {
     q: "What is a credit?",
-    a: "One credit unlocks the Go Deeper triangle for one question \u2014 three panels (Science, Vineyard, Craft) that take your curiosity one level deeper. Credits never expire; your knowledge investment has no use-by date.",
+    a: "One credit unlocks the Deep Dive triangle for one question \u2014 three panels (Science, Vineyard, Craft) that take your curiosity one level deeper. Credits never expire; your knowledge investment has no use-by date.",
   },
   {
     q: "Do credits expire?",
@@ -339,10 +339,10 @@ function BillingToggle({
         aria-label="Toggle billing cycle"
       >
         <span
-          className="absolute top-1 w-4 h-4 rounded-full transition-transform"
+          className="absolute top-1 left-1 w-4 h-4 rounded-full transition-transform"
           style={{
-            background: "var(--ow-text-hi)",
-            transform: cycle === "annual" ? "translateX(26px)" : "translateX(4px)",
+            background: "oklch(0.96 0.010 75)",
+            transform: cycle === "annual" ? "translateX(20px)" : "translateX(0px)",
           }}
         />
       </button>
@@ -561,10 +561,10 @@ function TierCard({
               </span>
             ) : (
               <div className="flex items-end gap-0.5">
-                <span style={{ fontFamily: "'Fraunces', serif", fontSize: "1.5rem", fontWeight: 700, color: "var(--ow-text-hi)", lineHeight: 1 }}>
+                <span style={{ fontFamily: "'Fraunces', serif", fontSize: "1.5rem", fontWeight: 700, color: tier.highlight ? "oklch(0.96 0.010 75)" : "var(--ow-text-hi)", lineHeight: 1 }}>
                   ${displayPrice}
                 </span>
-                <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)", marginBottom: "2px" }}>
+                <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: tier.highlight ? "oklch(0.70 0.015 75)" : "var(--ow-text-lo)", marginBottom: "2px" }}>
                   /mo
                 </span>
               </div>
@@ -692,10 +692,10 @@ function TierCard({
             </div>
           ) : (
             <div className="flex items-end gap-1">
-              <span style={{ fontFamily: "'Fraunces', serif", fontSize: "2.5rem", fontWeight: 700, color: "var(--ow-text-hi)", lineHeight: 1 }}>
+              <span style={{ fontFamily: "'Fraunces', serif", fontSize: "2.5rem", fontWeight: 700, color: tier.highlight ? "oklch(0.96 0.010 75)" : "var(--ow-text-hi)", lineHeight: 1 }}>
                 ${displayPrice}
               </span>
-              <span className="mb-1.5" style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: "var(--ow-text-lo)" }}>
+              <span className="mb-1.5" style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: tier.highlight ? "oklch(0.70 0.015 75)" : "var(--ow-text-lo)" }}>
                 /mo
               </span>
             </div>
@@ -1137,7 +1137,7 @@ export default function Pricing() {
               lineHeight: 1.7,
             }}
           >
-            Start with free run juice — unforced, natural, no commitment. When you are ready to go deeper, step into The Press. Every tier is designed around the winemaker's working rhythm, not a generic SaaS model.
+            Start with free run juice — unforced, natural, no commitment. When you are ready to deep dive, step into The Press. Every tier is designed around the winemaker's working rhythm, not a generic SaaS model.
           </p>
           <BillingToggle cycle={cycle} onChange={setCycle} />
         </div>
@@ -1222,7 +1222,7 @@ export default function Pricing() {
               Top up when you need it.
             </h2>
             <p className="mt-2 max-w-xl" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9375rem", color: "var(--ow-text-lo)", lineHeight: 1.7 }}>
-              One credit unlocks the Go Deeper triangle for one question — Science, Vineyard, and Craft panels that take your curiosity one level deeper. Packs never expire. Your knowledge investment has no use-by date.
+              One credit unlocks the Deep Dive triangle for one question — Science, Vineyard, and Craft panels that take your curiosity one level deeper. Packs never expire. Your knowledge investment has no use-by date.
             </p>
           </div>
         </div>
@@ -1240,7 +1240,7 @@ export default function Pricing() {
             What does one credit get you?
           </h2>
           <p className="text-center mb-8" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9375rem", color: "var(--ow-text-lo)" }}>
-            One credit unlocks the full Go Deeper triangle for one question.
+            One credit unlocks the full Deep Dive triangle for one question.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[

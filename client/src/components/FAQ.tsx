@@ -52,7 +52,7 @@ const FAQS = [
   },
   {
     q: "How long does setup take? We are flat out during vintage.",
-    a: "Most wineries are up and running in under two hours. Ownology ships with 45 industry-standard SOPs already loaded — so the Knowledge Platform is useful from the moment you log in, before you've added a single document of your own. Add your own protocols and vintage records at any pace. There is no lengthy onboarding, no IT project, and no hardware to install.",
+    a: "Most wineries are up and running in under two hours. Ownology ships with 38 industry-standard SOPs across 12 categories already loaded — so the Knowledge Platform is useful from the moment you log in, before you've added a single document of your own. Add your own protocols and vintage records at any pace. There is no lengthy onboarding, no IT project, and no hardware to install.",
   },
   {
     q: "Do I need to be tech-savvy to use this?",
@@ -72,7 +72,7 @@ const FAQS = [
   },
   {
     q: "What does it cost, and is there a free trial?",
-    a: "Ownology starts at $99/month for the Harvest tier — full access to The Press, the Knowledge Platform (45 SOPs), Free Run AI assistant, and Compliance AI, for up to 2 users. The Cellar tier ($249/month) adds Vineyard, Cellar Tasks, and Decision Logic capture for up to 5 users. All plans include a 14-day free trial — no credit card required. Consulting winemakers managing multiple clients should contact us about the Consultant tier.",
+    a: "Ownology starts with Free Run — a free account with no credit card required. Paid plans begin at $16/month (The Cellar) for full curiosity AI, Compliance AI, and 30 Deep Dive credits per month. The Press ($41/month) adds the full cellar operations suite — 38 SOPs across 12 categories, Decision Logic, Tribal Knowledge, and priority support. Cellar Master ($83/month) covers multi-person winery teams with 3 seats and dedicated onboarding. Founding member pricing is locked for life for the first 99 subscribers.",
   },
 ];
 

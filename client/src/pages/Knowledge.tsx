@@ -102,6 +102,34 @@ const CATEGORY_META: Record<string, {
     industryRef: "Oenology 4 · Oenology 8",
     description: "Grape receival records, addition records, blending records, packaging records, and export movement advice.",
   },
+  "Crushing & Fermentation": {
+    label: "Crushing & Fermentation",
+    icon: <FlaskConical className="w-6 h-6" />,
+    color: "oklch(0.62 0.10 55)",
+    industryRef: "Oenology 2 · Oenology 5",
+    description: "Grape receival, crusher-destemmer setup, press operation, juice settling, and inoculation protocols.",
+  },
+  "Cleaning & Sanitation": {
+    label: "Cleaning & Sanitation",
+    icon: <Droplets className="w-6 h-6" />,
+    color: "oklch(0.62 0.10 195)",
+    industryRef: "Oenology 2 · Oenology 3",
+    description: "General winery cleaning schedules, chemical handling, CIP procedures, and hygiene verification.",
+  },
+  "Pressing & Juice Handling": {
+    label: "Pressing & Juice Handling",
+    icon: <Wine className="w-6 h-6" />,
+    color: "oklch(0.62 0.10 15)",
+    industryRef: "Oenology 2 · Oenology 5",
+    description: "Press cycle selection, free-run and pressings separation, juice clarification, and SO₂ additions at crush.",
+  },
+  "Bottling & Packaging": {
+    label: "Bottling & Packaging",
+    icon: <Package className="w-6 h-6" />,
+    color: "oklch(0.62 0.10 145)",
+    industryRef: "Oenology 8",
+    description: "Line preparation, fill height and headspace, closure application, label compliance, and finished goods dispatch.",
+  },
 };
 
 const ALL_CATEGORIES = Object.keys(CATEGORY_META);
