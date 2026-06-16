@@ -252,6 +252,14 @@ function MoreDropdown({ extraItems }: { extraItems?: NavItem[] }) {
               <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Guide</p>
               {GUIDE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
               {extraItems?.map(item => <NavLink key={item.label} item={item} close={close} />)}
+              <button
+                onClick={() => { localStorage.clear(); sessionStorage.clear(); document.cookie.split(";").forEach(c => { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); }); close(); window.location.reload(); }}
+                className="block w-full text-left px-4 py-1.5 text-sm transition-colors"
+                style={{color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", fontWeight: 300, background: "none", border: "none", cursor: "pointer"}}
+                onMouseEnter={e => (e.currentTarget.style.color = "var(--ow-amber)")}
+                onMouseLeave={e => (e.currentTarget.style.color = "var(--ow-text-lo)")}>
+                ⟳ Clear Cache
+              </button>
             </div>
           </div>
         </div>
@@ -493,6 +501,18 @@ function Nav() {
             </Link>
           </div>
 
+          {/* Cache clear button */}
+          <div className="pt-2 pb-2">
+            <button
+              onClick={() => { localStorage.clear(); sessionStorage.clear(); document.cookie.split(";").forEach(c => { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); }); setMenuOpen(false); window.location.reload(); }}
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.875rem", color: "var(--ow-text-lo)", background: "none", border: "none", cursor: "pointer", borderBottom: "1px solid var(--ow-border)", minHeight: "44px", padding: 0 }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2a5 5 0 1 0 4.33 2.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><path d="M11 2v2.5H8.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              Clear Cache &amp; Reload
+            </button>
+          </div>
+
           {/* Spacer */}
           <div className="flex-1" />
 
@@ -658,7 +678,7 @@ function Features() {
     <section id="features" className="py-28">
       <div className="container" ref={ref}>
         <p className="section-label mb-4">Features</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em", textWrap: 'balance' as 'balance'}}>
           Everything your team needs. Nothing they don't.
         </h2>
         <div className="amber-rule mt-8 mb-12" />
@@ -794,7 +814,7 @@ function HowItWorks() {
       </div>
       <div className="container relative z-10" ref={ref}>
         <p className="section-label mb-4">How It Works</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em", textWrap: 'balance' as 'balance'}}>
           Do. Know. Learn. Guide.
         </h2>
         <div className="amber-rule mt-8 mb-16" />
@@ -848,7 +868,7 @@ function DemoVideo() {
     <section id="demo" className="py-28" style={{background:"var(--ow-bg-raised)"}}>
       <div className="container" ref={ref}>
         <p className="section-label mb-4">See It In Action</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"560px", lineHeight:1.2, letterSpacing:"-0.01em", textWrap: 'balance' as 'balance'}}>
           60 seconds. A real cellar question. A real answer.
         </h2>
         <div className="amber-rule mt-8 mb-12" />
@@ -915,7 +935,7 @@ function Testimonials() {
     <section className="py-28">
       <div className="container" ref={ref}>
         <p className="section-label mb-4">Why Ownology</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"480px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"480px", lineHeight:1.2, letterSpacing:"-0.01em", textWrap: 'balance' as 'balance'}}>
           Built by winemakers, for winemakers.
         </h2>
         <div className="amber-rule mt-8 mb-12" />
@@ -967,7 +987,7 @@ function Pricing() {
     <section id="pricing" className="py-28" style={{background:"var(--ow-bg-raised)"}}>
       <div className="container" ref={ref}>
         <p className="section-label mb-4">Pricing</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em", textWrap: 'balance' as 'balance'}}>
           From Free Run to The Vigneron.
         </h2>
         <p className="mt-4" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, color:"var(--ow-text-mid)", fontSize:"1rem"}}>
@@ -1096,6 +1116,7 @@ function WeightOfHarvest() {
               lineHeight: 1.1,
               letterSpacing: "-0.02em",
               color: "var(--ow-text-hi)",
+              textWrap: 'balance' as 'balance',
             }}
           >
             The Weight of Harvest
@@ -1167,8 +1188,8 @@ function WeightOfHarvest() {
 
         {/* Pull quote */}
         <div
-          className={`border-l-2 pl-6 max-w-2xl mx-auto text-center ${inView ? "fade-up fade-up-delay-4" : "opacity-0"}`}
-          style={{ borderColor: "var(--ow-amber)" }}
+          className={`max-w-2xl mx-auto text-center ${inView ? "fade-up fade-up-delay-4" : "opacity-0"}`}
+          style={{ borderTop: "1px solid var(--ow-amber)", paddingTop: "1.5rem" }}
         >
           <blockquote
             style={{
@@ -1262,6 +1283,7 @@ function WhatOwnologyKnows() {
               lineHeight: 1.1,
               letterSpacing: "-0.02em",
               color: "var(--ow-text-hi)",
+              textWrap: 'balance' as 'balance',
             }}
           >
             What Ownology Knows
@@ -1396,7 +1418,7 @@ function CTA() {
       </div>
       <div className="container relative z-10 text-center">
         <p className="section-label mb-6">Get Started</p>
-        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,4.5vw,3.5rem)", color:"var(--ow-text-hi)", lineHeight:1.1, letterSpacing:"-0.02em", maxWidth:"640px", margin:"0 auto"}}>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,4.5vw,3.5rem)", color:"var(--ow-text-hi)", lineHeight:1.1, letterSpacing:"-0.02em", maxWidth:"640px", margin:"0 auto", textWrap: 'balance' as 'balance'}}>
           Your winery's most knowledgeable apprentice is ready.
         </h2>
         <p className="mt-6 mx-auto" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", color:"var(--ow-text-mid)", maxWidth:"480px", lineHeight:1.7}}>

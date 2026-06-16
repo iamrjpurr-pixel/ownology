@@ -919,6 +919,63 @@ export default function FreeRun() {
         )}
       </div>
 
+        {/* Locked premium feature cards — upsell glimpse */}
+        <div className="mt-16 mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div style={{ flex: 1, height: "1px", background: "oklch(1 0 0 / 0.06)" }} />
+            <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", color: "oklch(0.40 0.010 75)", letterSpacing: "0.12em", textTransform: "uppercase", whiteSpace: "nowrap" }}>The Press — for winemakers</p>
+            <div style={{ flex: 1, height: "1px", background: "oklch(1 0 0 / 0.06)" }} />
+          </div>
+          <div className="grid grid-cols-1 gap-3" style={{ opacity: 0.55 }}>
+            {[
+              { icon: "🧪", title: "Vintage Log", desc: "Track every tank, batch, and decision from crush to bottle.", tag: "The Press" },
+              { icon: "📋", title: "38 Cellar SOPs", desc: "Industry-standard procedures for fermentation, sanitation, barrels, and bottling.", tag: "The Press" },
+              { icon: "⚖️", title: "Compliance AI", desc: "Australian winemaking regulations, labelling rules, and export requirements.", tag: "The Cellar Hand" },
+              { icon: "🛢️", title: "Barrel & Tank Register", desc: "Full vessel tracking with status, fill history, and maintenance logs.", tag: "The Press" },
+            ].map((card) => (
+              <div
+                key={card.title}
+                className="flex items-start gap-4 px-5 py-4 rounded-sm"
+                style={{ background: "oklch(0.13 0.008 60)", border: "1px solid oklch(1 0 0 / 0.06)", position: "relative", overflow: "hidden" }}
+              >
+                <div style={{ fontSize: "1.25rem", flexShrink: 0, marginTop: "1px", filter: "grayscale(0.4)" }}>{card.icon}</div>
+                <div style={{ flex: 1 }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "0.9rem", color: "oklch(0.70 0.015 75)" }}>{card.title}</span>
+                    <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.6rem", color: "oklch(0.55 0.08 75)", letterSpacing: "0.08em", background: "oklch(0.18 0.010 60)", padding: "1px 6px", borderRadius: "2px" }}>{card.tag}</span>
+                  </div>
+                  <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8rem", color: "oklch(0.45 0.012 75)", lineHeight: 1.5 }}>{card.desc}</p>
+                </div>
+                <div style={{ position: "absolute", top: "10px", right: "12px" }}>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="3" y="5" width="6" height="6" rx="1" stroke="oklch(0.40 0.010 75)" strokeWidth="1.2"/><path d="M4 5V3.5a2 2 0 0 1 4 0V5" stroke="oklch(0.40 0.010 75)" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Ready to make it? CTA */}
+        <div
+          className="mt-6 mb-16 px-6 py-8 rounded-sm text-center"
+          style={{ background: "color-mix(in oklch, oklch(0.72 0.12 75) 6%, oklch(0.11 0.008 60))", border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 18%, transparent)" }}
+        >
+          <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", color: "oklch(0.55 0.08 75)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "12px" }}>From curiosity to craft</p>
+          <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "clamp(1.4rem, 2.8vw, 1.9rem)", color: "oklch(0.95 0.018 75)", lineHeight: 1.15, letterSpacing: "-0.01em", marginBottom: "12px", textWrap: 'balance' as 'balance' }}>
+            Ready to make it?
+          </h2>
+          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9rem", color: "oklch(0.62 0.015 75)", lineHeight: 1.65, maxWidth: "420px", margin: "0 auto 24px" }}>
+            The Press gives you the full winemaking suite — vintage log, cellar SOPs, AI assistant, and barrel tracking. If you've spent $1,000 on equipment, it pays for itself in the first harvest.
+          </p>
+          <Link
+            href="/pricing"
+            onClick={() => trackEvent('press-cta-click', { location: 'bottom-cta' })}
+            style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "11px 26px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: "0.875rem", letterSpacing: "0.04em", textDecoration: "none", borderRadius: "2px" }}
+          >
+            Explore The Press <ArrowRight size={14} />
+          </Link>
+          <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.7rem", color: "oklch(0.38 0.010 75)", marginTop: "10px" }}>From $41/month · Cancel anytime</p>
+        </div>
+
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );

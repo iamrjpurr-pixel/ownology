@@ -129,7 +129,7 @@ function TwoSystems() {
           </div>
         </div>
 
-        <div className={`mt-10 max-w-5xl mx-auto p-6 rounded-sm text-center ${inView ? "fade-up fade-up-delay-2" : "opacity-0"}`}
+        <div className={`mt-10 max-w-3xl mx-auto p-6 rounded-sm text-center ${inView ? "fade-up fade-up-delay-2" : "opacity-0"}`}
           style={{ background: "color-mix(in oklch, var(--ow-amber) 5%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 15%, transparent)" }}>
           <p style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "1.125rem", color: TEXT_HI, lineHeight: 1.6 }}>
             InnoVint tells you <em style={{ color: AMBER }}>what happened</em>. Ownology tells you <em style={{ color: AMBER }}>what to do about it</em>. Most Ownology customers use both.
