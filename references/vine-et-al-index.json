@@ -1,0 +1,478 @@
+{
+  "title": "Winemaking: From Grape Growing to Marketplace",
+  "authors": ["Richard P. Vine", "Ellen M. Harkness", "Theresa Browning", "Cheri Wagner"],
+  "series": "The Chapman & Hall Enology Library",
+  "publisher": "Chapman & Hall",
+  "total_pages": 427,
+  "role_in_ownology": "Side 3 of the Bible Triangle — the scientific and industry-standard reference anchor. Used by the AI to ground answers in peer-reviewed, published winemaking science.",
+  "chapters": [
+    {
+      "number": 0,
+      "title": "Front Matter",
+      "sections": [
+        { "title": "Preface", "page": "xi" },
+        { "title": "Acknowledgments", "page": "xiii" },
+        { "title": "Introduction", "page": "xv" }
+      ]
+    },
+    {
+      "number": 1,
+      "title": "History of Wine in America",
+      "page_start": 1,
+      "sections": [
+        { "title": "Eastern America", "page": 2 },
+        { "title": "Western America", "page": 9 },
+        { "title": "National Prohibition", "page": 14 },
+        { "title": "American Wine in the 20th Century", "page": 17 },
+        { "title": "The American Wine Booms", "page": 20 }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Viticulture (Grape Growing)",
+      "page_start": 24,
+      "sections": [
+        { "title": "Site Selection", "page": 26, "subsections": ["Climate", "Soils", "The Vine"] },
+        {
+          "title": "Cultivar Selection",
+          "page": 30,
+          "subsections": [
+            "Vitis vinifera — Major White Varieties (p.32), Major Red Varieties (p.34)",
+            "Vitis labrusca — Major White (p.38), Major Red (p.38)",
+            "Vitis riparia (p.39), Vitis aestivalis (p.40), Vitis rupestris (p.40)",
+            "Vitis berlandieri (p.41), Vitis rotundifolia (p.41)",
+            "Hybrids and Grafting (p.41)",
+            "French-American Hybrids (p.42) — Major Hybrid White (p.43), Major Hybrid Red (p.44)"
+          ]
+        },
+        {
+          "title": "Vineyard Establishment",
+          "page": 44,
+          "subsections": [
+            "Cost and Value (p.47)",
+            "Start-Up: Labor Costs, Equipment Costs, Variable Costs, Fixed Costs (p.47)",
+            "Budget (p.48)",
+            "Site Preparation (p.58)",
+            "Vineyard Layout (p.58)",
+            "Planting (p.59)",
+            "Vine Training (p.60)",
+            "Trellising (p.60) — Training Systems (p.60), Machine Harvesting (p.61)",
+            "Weed Control (p.63)",
+            "Herbicide Injury (p.64)"
+          ]
+        },
+        {
+          "title": "Vineyard Management",
+          "page": 64,
+          "subsections": [
+            "Pruning (p.64)",
+            "Pest Control (p.65) — Diseases (p.65), Insects (p.70)"
+          ]
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Wine Microbiology",
+      "page_start": 73,
+      "sections": [
+        { "title": "Yeasts", "page": 73 },
+        { "title": "Bacteria", "page": 80 },
+        { "title": "Molds", "page": 83 },
+        {
+          "title": "The Microbiological Workplace",
+          "page": 83,
+          "subsections": ["Equipment (p.85)", "Factors Affecting Microbial Growth (p.87)", "Commercial Starter Cultures (p.87)"]
+        },
+        {
+          "title": "Microbial Spoilage in Juice and Must",
+          "page": 88,
+          "subsections": [
+            "Microbial Spoilage of Juice Concentrates (p.89)",
+            "Microbial Spoilage of Bulk Wine — Detection (p.90), Control (p.90)",
+            "Microbial Spoilage of Bottled Wine — Detection (p.90), Control (p.90)"
+          ]
+        },
+        {
+          "title": "Wine Preservation",
+          "page": 88,
+          "subsections": ["Sterile Filtration (p.88)", "Pasteurization (p.89)", "Chemical Agents (p.89)"]
+        },
+        {
+          "title": "Winery Sanitation",
+          "page": 93,
+          "subsections": ["Sulfite and Citric Acid Sanitizing (p.94)"]
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Enology (Winemaking)",
+      "page_start": 95,
+      "sections": [
+        { "title": "Grape and Wine Components", "page": 96 },
+        { "title": "Pectic Enzymes", "page": 96 },
+        { "title": "Sugars and Sweetness", "page": 98 },
+        { "title": "Late-Harvest Grapes", "page": 99 },
+        { "title": "Acids, Acidity, and pH", "page": 101 },
+        { "title": "Oxygen and Oxidation", "page": 102 },
+        { "title": "Sulfur Dioxide", "page": 103 },
+        { "title": "Phenols, Phenolics, and Polyphenols", "page": 105, "subsections": ["Color (p.106)"] },
+        { "title": "Nitrogenous Compounds — Proteins", "page": 107 },
+        { "title": "Malolactic Fermentation", "page": 108 },
+        { "title": "Grape Flavors", "page": 108 },
+        {
+          "title": "Wine Blending",
+          "page": 111,
+          "subsections": [
+            "Blend Expression Rationale (p.111)",
+            "Key ATF Blending Regulations (p.112)",
+            "Key ATF Blending Regulations for Labeling (p.115)",
+            "Meritage Blending (p.117)",
+            "Proprietary Blending (p.118)",
+            "Blending Cost Rationale (p.119)"
+          ]
+        },
+        { "title": "Fining", "page": 119 },
+        { "title": "Detartration", "page": 119 },
+        {
+          "title": "Barrel Aging",
+          "page": 120,
+          "subsections": [
+            "Cost Implications (p.121)",
+            "American Oak Versus French Oak (p.126)",
+            "Conditioning (p.126)",
+            "New Barrels (p.128)",
+            "Maintenance of Empty Barrels — Short Term (p.129)",
+            "Maintenance of Empty Barrels — Long Term (p.129)",
+            "Soda Ash Treatment (p.129)",
+            "Chlorine Treatment (p.130)",
+            "Citric Acid Treatment (p.130)"
+          ]
+        },
+        {
+          "title": "Filtration",
+          "page": 131,
+          "subsections": ["Microfiltration and Ultrafiltration (p.133)", "Unfiltered Wines (p.133)"]
+        },
+        {
+          "title": "Packaging",
+          "page": 134,
+          "subsections": [
+            "Bottles (p.134)",
+            "Closures (p.135)",
+            "Capsules (p.136)",
+            "Label Rationale (p.137)",
+            "Label Shapes (p.138)",
+            "Label Colors (p.138)",
+            "Label Humor (p.139)",
+            "Label Experiments (p.139)",
+            "Key ATF Labeling Regulations (p.140)",
+            "Winemaking Perils and Pitfalls (p.145)"
+          ]
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Wine Classification",
+      "page_start": 148,
+      "sections": [
+        { "title": "Table Wines", "page": 148 },
+        { "title": "Sparkling Wines", "page": 150 },
+        { "title": "Dessert Wines", "page": 151 },
+        { "title": "Aperitif Wines", "page": 152 },
+        { "title": "Pop Wines", "page": 152 }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "Winery Design",
+      "page_start": 153,
+      "sections": [
+        { "title": "Management", "page": 154 },
+        { "title": "Feasibility and Finance", "page": 157 },
+        { "title": "Insurance", "page": 159 },
+        { "title": "Location", "page": 160 },
+        { "title": "Scale and Size", "page": 162 },
+        { "title": "Design Motif", "page": 163 },
+        {
+          "title": "Case Studies",
+          "page": 163,
+          "subsections": ["Remodeled Small Barn (p.163)", "Simplistic Custom Design (p.165)"]
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "Requirements, Restrictions, and Regulations",
+      "page_start": 169,
+      "sections": [
+        { "title": "Application for Basic Permit", "page": 170 },
+        { "title": "Application to Establish and Operate Wine Premises", "page": 170 },
+        { "title": "Bonds", "page": 171 },
+        { "title": "Environmental Impact", "page": 172 },
+        { "title": "Personnel Questionnaire", "page": 172 },
+        { "title": "Signature Authority", "page": 173 },
+        { "title": "Label Approvals", "page": 173 },
+        { "title": "Formula Wines", "page": 173 },
+        { "title": "State ABC Regulations", "page": 174 }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "Getting Started",
+      "page_start": 176,
+      "sections": [
+        { "title": "Record Keeping", "page": 176 },
+        { "title": "Sanitation", "page": 178 },
+        { "title": "Quality Assurance", "page": 183 },
+        {
+          "title": "Analytical Instrumentation",
+          "page": 184,
+          "subsections": [
+            "pH Meter (p.184)",
+            "Brix and Balling (p.185)",
+            "Residual Sugar (p.186)",
+            "Total Acidity (p.186)",
+            "Volatile Acidity (p.187)",
+            "Sulfur Dioxide (p.187)"
+          ]
+        },
+        { "title": "Sensory Evaluation", "page": 187 },
+        { "title": "Laboratory Refrigerator", "page": 188 },
+        {
+          "title": "Winery Equipment",
+          "page": 188,
+          "subsections": [
+            "Scales (p.188)",
+            "Crusher-Destemmer-Must Pump (p.189)",
+            "Press (p.190)",
+            "Pumps (p.192)",
+            "Hose (p.192)",
+            "Tanks, Barrels, and Other Bulk Wine Vessels (p.194)",
+            "Key ATF Tank Regulations (p.195)",
+            "Fermentation Locks (p.196)",
+            "Refrigeration (p.197)",
+            "Filters (p.198)",
+            "Fillers (p.200)",
+            "Corkers (p.201)",
+            "Labelers (p.201)"
+          ]
+        },
+        {
+          "title": "Materials",
+          "page": 202,
+          "subsections": [
+            "Potassium Meta-bisulfite (p.203)",
+            "Pectic Enzymes (p.204)",
+            "Yeast (p.204)",
+            "Fining Agents (p.204)",
+            "Ascorbic Acid (p.205)",
+            "Citric Acid (p.205)",
+            "Sorbic Acid (p.206)",
+            "Bottles (p.206)",
+            "Corks (p.208)",
+            "Capsules (p.209)",
+            "Labels (p.209)",
+            "Cases (p.210)"
+          ]
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "White Table Wines",
+      "page_start": 211,
+      "sections": [
+        { "title": "Grape Varieties", "page": 211 },
+        { "title": "Increasing White Wine Fruit Flavor Intensity", "page": 212 },
+        { "title": "Harvesting", "page": 214 },
+        { "title": "Crushing-Destemming", "page": 214 },
+        { "title": "Pressing", "page": 215 },
+        { "title": "Brix (Sugar) Adjustments", "page": 215 },
+        { "title": "Acid Additions", "page": 219 },
+        { "title": "Yeast Inoculation", "page": 219 },
+        { "title": "Fermentation", "page": 220 },
+        { "title": "Stuck Fermentation", "page": 220 },
+        { "title": "First Racking", "page": 221 },
+        { "title": "Second Racking", "page": 222 },
+        { "title": "Blending", "page": 222 },
+        { "title": "Fining and Stabilization", "page": 223 },
+        { "title": "Aging", "page": 228 },
+        { "title": "Balancing and Preservation", "page": 228 },
+        { "title": "Filtration", "page": 229 },
+        { "title": "Bottling", "page": 231 },
+        { "title": "Packaging", "page": 231 },
+        { "title": "Records", "page": 235 }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "Red Table Wines",
+      "page_start": 236,
+      "sections": [
+        { "title": "Grape Varieties", "page": 236 },
+        { "title": "Increasing Red Wine Fruit Flavor Intensity", "page": 237 },
+        { "title": "Harvesting", "page": 238 },
+        { "title": "Crushing-Destemming", "page": 238 },
+        { "title": "Brix (Sugar) Adjustments", "page": 238 },
+        { "title": "Acid Additions", "page": 240 },
+        { "title": "Yeast Inoculation", "page": 240 },
+        { "title": "Fermentation", "page": 240 },
+        { "title": "Pressing", "page": 244 },
+        { "title": "Maceration", "page": 244 },
+        { "title": "Free-Run and Press Wine", "page": 245 },
+        { "title": "Racking", "page": 245 },
+        { "title": "Blending", "page": 246 },
+        { "title": "Malolactic Fermentation", "page": 247 },
+        { "title": "Fining and Stabilization", "page": 247 },
+        { "title": "Barrel Aging", "page": 248 },
+        { "title": "Balancing and Preservation", "page": 249 },
+        { "title": "Filtration", "page": 249 },
+        { "title": "Bottling and Corking", "page": 249 },
+        { "title": "Bottle Aging", "page": 250 },
+        { "title": "Packaging", "page": 252 },
+        { "title": "Records", "page": 254 }
+      ]
+    },
+    {
+      "number": 11,
+      "title": "Blush Table Wines",
+      "page_start": 255,
+      "sections": [
+        { "title": "Grape Varieties", "page": 255 },
+        { "title": "Crushing-Destemming, Sugar and Acidity Adjustments, and Yeast Inoculation", "page": 256 },
+        { "title": "Pressing and Fermentation", "page": 257 },
+        { "title": "Rackings", "page": 258 },
+        { "title": "Blending", "page": 258 },
+        { "title": "Clarification and Stabilization", "page": 259 },
+        { "title": "Aging, Balancing, and Preservation", "page": 259 },
+        { "title": "Filtration", "page": 259 },
+        { "title": "Bottling, Corking, and Recording", "page": 260 }
+      ]
+    },
+    {
+      "number": 12,
+      "title": "Fruit and Berry Wines",
+      "page_start": 261,
+      "sections": [
+        { "title": "Apple Wine", "page": 262 },
+        { "title": "Bramble Berry Wine", "page": 263 },
+        { "title": "Blueberry Wine", "page": 264 },
+        { "title": "Cherry Wine", "page": 265 },
+        { "title": "Peach Wine", "page": 266 },
+        { "title": "Strawberry Wine", "page": 267 },
+        { "title": "Dried Fruit Wines", "page": 268 },
+        { "title": "Mead", "page": 269 }
+      ]
+    },
+    {
+      "number": 13,
+      "title": "Marketing",
+      "page_start": 270,
+      "sections": [
+        { "title": "Rationale", "page": 270 },
+        { "title": "Marketing Plan", "page": 271 },
+        { "title": "Marketing Budget", "page": 273 },
+        {
+          "title": "Public Relations",
+          "page": 273,
+          "subsections": [
+            "Tourism (p.274)", "Traveler Motivation (p.274)", "Winery Video (p.275)",
+            "Motorcoach and Group Tours (p.275)", "Wine Trails (p.276)", "Networking (p.277)",
+            "Education (p.277)"
+          ]
+        },
+        {
+          "title": "Media Relations",
+          "page": 278,
+          "subsections": [
+            "Journalism Basics (p.278)", "News Releases (p.279)", "Television (p.280)",
+            "Media Formats — Timing and Deadlines (p.280)", "Interviews (p.281)",
+            "Interviewing Techniques (p.282)", "Visuals (p.282)", "Media Kits (p.283)",
+            "Special Events (p.284)", "Newsletters (p.288)"
+          ]
+        },
+        {
+          "title": "Advertising",
+          "page": 289,
+          "subsections": [
+            "Brochures (p.290)", "Direct Mail (p.291)", "Database Marketing (p.292)",
+            "Billboards (p.292)", "Internet (p.293)", "Word of Mouth (p.294)"
+          ]
+        },
+        { "title": "Sales Promotion", "page": 294 },
+        {
+          "title": "Sales",
+          "page": 295,
+          "subsections": [
+            "Sales Personnel (p.295)", "Niche Sales (p.296)",
+            "Winery Tour, Tasting Room, and Retail Shop (p.296)",
+            "Customer Service (p.298)", "Gift Shop (p.298)",
+            "Sales to the Wholesale Channel (p.300)",
+            "Sales to the Retail Channel (p.301)",
+            "Sales to Consumers (p.301)"
+          ]
+        },
+        {
+          "title": "Market Feedback",
+          "page": 302,
+          "subsections": ["Retailing (p.302)", "Keeping in Touch (p.303)", "Testimonials (p.303)", "Referrals (p.304)"]
+        }
+      ]
+    }
+  ],
+  "appendices": [
+    {
+      "id": "A",
+      "title": "Sources",
+      "page_start": 305,
+      "sections": [
+        "Microbiology Laboratory Material and Equipment (p.305)",
+        "New Equipment (p.305)", "New Tankage (p.306)", "Used Equipment and Tankage (p.306)",
+        "Grapes, Must, and Juice (p.306)",
+        "Laboratory Ware and Computer Software (p.307)",
+        "Materials (p.307)", "Periodicals (p.307)"
+      ]
+    },
+    {
+      "id": "B",
+      "title": "Analytical Procedures",
+      "page_start": 309,
+      "sections": [
+        "Microscopy (p.309)", "Gram Stain Procedure (p.312)",
+        "Malolactic Fermentation Determination by Paper Chromatography (p.314)",
+        "Bottle Sterility (p.315)", "Winery Sanitation Swab Test (p.317)",
+        "pH Meter (p.319)", "Brix by Hydrometer (p.320)", "Brix by Refractometer (p.321)",
+        "Alcohol by Ebulliometer (p.336)", "Extract by Nomograph (p.338)",
+        "Total Acidity (p.338)", "Volatile Acidity by Cash Still (p.342)",
+        "Free Sulfur Dioxide (p.344)", "Total Sulfur Dioxide (p.347)",
+        "Sensory Evaluation (p.348) — Visual Mode (p.350), Olfactory Mode (p.353), Gustatory Mode (p.356), Overall Impression (p.361), Cardinal Scales (p.361)"
+      ]
+    },
+    {
+      "id": "C",
+      "title": "Charts and Tables",
+      "page_start": 362
+    },
+    {
+      "id": "D",
+      "title": "Glossary",
+      "page_start": 414
+    }
+  ],
+  "bibliography_page": 425,
+  "index_page": 427,
+  "aoc_module_mapping": {
+    "Oenology 1 — Scope and Nature of Oenology": ["Ch.4 Enology (Winemaking)", "Ch.5 Wine Classification"],
+    "Oenology 2 — Fermentation Science": ["Ch.3 Wine Microbiology", "Ch.4 Enology — Sugars, Acids, MLF"],
+    "Oenology 3 — The Winemaking Process": ["Ch.9 White Table Wines", "Ch.10 Red Table Wines", "Ch.11 Blush Table Wines"],
+    "Oenology 4 — Factors Affecting Grape Characteristics": ["Ch.2 Viticulture", "Ch.4 Grape and Wine Components"],
+    "Oenology 5 — Wine Classification": ["Ch.5 Wine Classification"],
+    "Oenology 6 — Sensory Science and Evaluation": ["Ch.8 Getting Started — Sensory Evaluation", "Appendix B — Sensory Evaluation"],
+    "Oenology 7 — White Wine and Sparkling Production": ["Ch.9 White Table Wines", "Ch.5 Sparkling Wines"],
+    "Oenology 8 — Red Wine and Rosé Production": ["Ch.10 Red Table Wines", "Ch.11 Blush Table Wines"],
+    "Oenology 9 — Production of Spirits": ["Ch.12 Fruit and Berry Wines", "Ch.4 Enology — Wine Blending"]
+  }
+}
