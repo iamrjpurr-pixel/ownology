@@ -22,10 +22,10 @@ import { toast } from "sonner";
 const AMBER       = "var(--ow-amber)";
 const AMBER_DIM   = "color-mix(in oklch, var(--ow-amber) 18%, transparent)";
 const AMBER_BDR   = "color-mix(in oklch, var(--ow-amber) 35%, transparent)";
-const BG          = "oklch(0.10 0.008 60)";
+const BG          = "var(--ow-bg-base)";
 const CARD        = "var(--ow-bg-raised)";
 const CARD_ACT    = "var(--ow-bg-inset)";
-const BDR         = "oklch(1 0 0 / 0.09)";
+const BDR         = "var(--ow-border-md)";
 const TEXT_HI     = "var(--ow-text-hi)";
 const TEXT_MID    = "var(--ow-text-mid)";
 const TEXT_LO     = "var(--ow-text-lo)";
@@ -483,7 +483,7 @@ export default function QuickEntry() {
                   <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.82rem", color: AMBER, margin: "2px 0 0" }}>{traineeName}</p>
                 </div>
               </div>
-              <div style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.9rem", color: TEXT_HI, background: "oklch(0.10 0.008 60)", border: `1px solid ${BDR}`, borderRadius: 8, padding: "12px 14px", lineHeight: 1.6 }}>
+              <div style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.9rem", color: TEXT_HI, background: "var(--ow-bg-inset)", border: `1px solid ${BDR}`, borderRadius: 8, padding: "12px 14px", lineHeight: 1.6 }}>
                 <div><span style={{ color: TEXT_LO }}>SOP: </span>{trainingSopTitle}</div>
                 {trainerName && <div style={{ marginTop: 4 }}><span style={{ color: TEXT_LO }}>Trainer: </span>{trainerName}</div>}
                 {trainingNotes && <div style={{ marginTop: 4 }}><span style={{ color: TEXT_LO }}>Notes: </span>{trainingNotes.slice(0, 80)}{trainingNotes.length > 80 ? "…" : ""}</div>}
@@ -644,7 +644,7 @@ export default function QuickEntry() {
                   <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.82rem", color: AMBER, margin: "2px 0 0" }}>{tankName}{variety ? ` · ${variety}` : ""}</p>
                 </div>
               </div>
-              <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "1rem", color: TEXT_HI, background: "oklch(0.10 0.008 60)", border: `1px solid ${BDR}`, borderRadius: 8, padding: "12px 14px", margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "1rem", color: TEXT_HI, background: "var(--ow-bg-inset)", border: `1px solid ${BDR}`, borderRadius: 8, padding: "12px 14px", margin: 0, lineHeight: 1.5 }}>
                 {buildSummary()}
               </p>
             </div>

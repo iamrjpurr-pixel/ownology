@@ -377,6 +377,33 @@ export default function FounderStory() {
             <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.8, color: "var(--ow-text-mid)" }}>
               There is one more thread to this story. My co-founder Geraldine brings a deep passion for chemistry and science — and somewhere along the way, we began sharing a quiet dream: what would it look like to bring science, agriculture, systems thinking, and wine together in a single platform? As Chemistry & Science Lead, Geraldine ensures that every answer Ownology gives is grounded in real winemaking science, not just pattern-matching. Ownology is, in part, an answer to that shared question. A project built on curiosity, shaped by two people who refused to stop asking why.
             </p>
+
+            {/* Education credential */}
+            <div
+              className="flex items-start gap-4 p-5"
+              style={{
+                background: "var(--ow-bg-raised)",
+                borderRadius: "2px",
+                border: "1px solid var(--ow-border-md)",
+              }}
+            >
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ flexShrink: 0, marginTop: "2px" }}>
+                <path d="M12 3L2 8l10 5 10-5-10-5z" stroke="var(--ow-amber)" strokeWidth="1.4" strokeLinejoin="round" />
+                <path d="M2 8v6" stroke="var(--ow-amber)" strokeWidth="1.4" strokeLinecap="round" />
+                <path d="M6 10.5v4.5a6 6 0 0012 0v-4.5" stroke="var(--ow-amber)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <div>
+                <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ow-amber)", marginBottom: "0.3rem" }}>
+                  Formal Education
+                </p>
+                <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 400, fontSize: "1rem", lineHeight: 1.5, color: "var(--ow-text-hi)", margin: 0 }}>
+                  Advanced Certificate of Viticulture and Winemaking — Oenology
+                </p>
+                <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8125rem", color: "var(--ow-text-lo)", marginTop: "0.25rem" }}>
+                  The knowledge behind Ownology is not borrowed — it is earned.
+                </p>
+              </div>
+            </div>
           </div>
 
         </div>

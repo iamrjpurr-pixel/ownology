@@ -495,3 +495,10 @@
 - [x] FreeRun.tsx: fix stale $9/month upsell copy → $41/month
 - [x] Global rename: "Go Deeper" → "Deep Dive" across all UI-facing text (7 files updated)
 - [x] FreeRun.tsx: add press-cta-click analytics tracking to all 3 Press CTA links (header, answer-card, daily-limit locations)
+
+## Site-Wide Cleanup — Round 2 (Jun 2026)
+- [x] The Press card: feature list text forced to white (oklch 0.82) on dark highlighted card — both mobile and desktop
+- [x] Annual pricing sub-labels: formula now dynamic and correct ($410/yr save $82, $830/yr save $166)
+- [x] QuickEntry.tsx: BDR border token → var(--ow-border-md) (theme-aware), code preview boxes → var(--ow-bg-inset)
+- [x] FounderStory.tsx: added "Advanced Certificate of Viticulture and Winemaking — Oenology" credential block with graduation cap icon
+- [x] Knowledge Layers tooltip: hover tooltip on stats bar explains all 5 layers (Procedure, Decision Logic, Tribal Knowledge, Vintage Notes, Training)
