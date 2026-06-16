@@ -1,380 +1,252 @@
 /**
- * FREE RUN — AI Winemaking Tutor
- * Scoped RAG: retrieves relevant SOPs from the knowledge base and answers from them.
- * Replaces the placeholder lesson-card shell with a live question→answer interface.
+ * FREE RUN — Wine Curiosity Experience
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Audience: wine lovers, curious drinkers, food & wine enthusiasts.
+ * NOT for winemakers — no SOPs, no production guides.
+ *
+ * Mechanics:
+ *  - 3 curiosity questions/day (midnight UTC reset)
+ *  - Every answer has a "Go Deeper" button (1 credit, first one free)
+ *  - Go Deeper unlocks the Triangle: Science / Vineyard / Craft
+ *  - Thumbs up/down per panel for quality analytics
  */
-
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useSearch } from "wouter";
-import { Send, BookOpen, ExternalLink, GraduationCap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { getLoginUrl } from "@/const";
+import { ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Beaker, Sprout, Wine, Sparkles, ArrowRight } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+
+interface TriangleReveal {
+  revealId: number;
+  sciencePanel: string;
+  vineyardPanel: string;
+  craftPanel: string;
+  wasFreeHook: boolean;
+}
+
 interface QAPair {
+  id: string;
   question: string;
   answer: string;
-  sopTitles: string[];
-  disclaimer: string;
+  topicTag: string | null;
+  reveal: TriangleReveal | null;
+  openPanels: Set<"science" | "vineyard" | "craft">;
+  feedback: Map<"science" | "vineyard" | "craft", boolean>;
 }
 
-// ─── Example prompt chips ─────────────────────────────────────────────────────
-const EXAMPLE_PROMPTS = [
-  { label: "Stuck ferment", q: "My fermentation has stalled at 1.020 SG — what should I do?" },
-  { label: "YAN addition", q: "My Shiraz is at 24.3 Brix and YAN is 120ppm. What DAP addition do I need?" },
-  { label: "SO₂ management", q: "How do I calculate my free SO₂ addition after racking?" },
-  { label: "MLF timing", q: "When should I inoculate for malolactic fermentation?" },
-  { label: "Racking decision", q: "How do I know when my wine is ready to rack for the first time?" },
-  { label: "Fining agents", q: "What fining agents should I use to improve clarity in my white wine?" },
+// ─── Curiosity prompt chips ───────────────────────────────────────────────────
+
+const CURIOSITY_PROMPTS = [
+  { label: "Buttery Chardonnay", q: "Why does some Chardonnay taste buttery?" },
+  { label: "Tannins", q: "What are tannins and why do they make my mouth dry?" },
+  { label: "Natural wine", q: "What actually makes a wine 'natural'?" },
+  { label: "Terroir", q: "What does terroir actually mean — is it real?" },
+  { label: "Pinot Noir", q: "Why is Pinot Noir so hard to grow and make?" },
+  { label: "Orange wine", q: "What is orange wine and why is it orange?" },
+  { label: "Biodynamic", q: "What is biodynamic wine and does it taste different?" },
+  { label: "Vintage variation", q: "Why does the same wine taste different every year?" },
 ];
 
-// ─── Industry Curriculum Backbone (AOC Advanced Certificate of Viticulture, Winemaking & Oenology) ─
-interface AocModule {
-  unit: string;
-  name: string;
-  phase: "Foundation" | "Process" | "Advanced";
-  keyTopics: string[];
-  ownologyLink: string;
-  ownologyLabel: string;
+// ─── Analytics helper ─────────────────────────────────────────────────────────
+
+function trackEvent(name: string, props?: Record<string, string | number | boolean>) {
+  try {
+    // @ts-expect-error umami is injected globally
+    window.umami?.track(name, props);
+  } catch {
+    // analytics not available
+  }
 }
 
-const AOC_MODULES: AocModule[] = [
-  {
-    unit: "Oenology 1",
-    name: "Scope and Nature of Oenology",
-    phase: "Foundation",
-    keyTopics: [
-      "Introduction to global wine production",
-      "Global wine consumption patterns",
-      "What is involved in winemaking",
-      "Wine making terminology",
-      "Testing, tasting and monitoring",
-      "Alcohol and health considerations",
-    ],
-    ownologyLink: "/knowledge",
-    ownologyLabel: "Knowledge Platform →",
-  },
-  {
-    unit: "Oenology 2",
-    name: "Fermentation Science",
-    phase: "Foundation",
-    keyTopics: [
-      "Fermentation fundamentals and carbohydrate metabolism",
-      "Microbiology: yeasts, bacteria, and spoilage organisms",
-      "Enzyme activity and quality control",
-      "Malolactic fermentation (MLF)",
-      "Secondary fermentation management",
-    ],
-    ownologyLink: "/knowledge/category/Crushing%20%26%20Fermentation",
-    ownologyLabel: "Fermentation SOPs →",
-  },
-  {
-    unit: "Oenology 3",
-    name: "The Winemaking Process",
-    phase: "Process",
-    keyTopics: [
-      "Outline of the winemaking process end-to-end",
-      "Clarification and stabilisation techniques",
-      "Preservation: SO₂ management and additions",
-      "Methods to determine sugar and sulphur dioxide levels",
-    ],
-    ownologyLink: "/knowledge/category/Tank%20Cleaning%20%26%20Sanitation",
-    ownologyLabel: "Cellar Operations SOPs →",
-  },
-  {
-    unit: "Oenology 4",
-    name: "Factors Affecting Grape Characteristics",
-    phase: "Process",
-    keyTopics: [
-      "Fruit characteristics affecting wine style",
-      "Fermentation preparation and additions",
-      "Effects of yeasts in winemaking",
-      "Managing yeasts: nutrition, temperature, YAN",
-      "Alcohol content, chemical and microbial stability",
-      "Inoculum of yeast: timing and selection",
-    ],
-    ownologyLink: "/knowledge/category/Crushing%20%26%20Fermentation",
-    ownologyLabel: "Fermentation SOPs →",
-  },
-  {
-    unit: "Oenology 5",
-    name: "Wine Classification",
-    phase: "Foundation",
-    keyTopics: [
-      "Types of wines and production methods",
-      "Selecting wine grapes by variety and region",
-      "Varietal characteristics and style outcomes",
-    ],
-    ownologyLink: "/knowledge",
-    ownologyLabel: "Knowledge Platform →",
-  },
-  {
-    unit: "Oenology 6",
-    name: "Sensory Science and Evaluation",
-    phase: "Advanced",
-    keyTopics: [
-      "Wine sensory science fundamentals",
-      "Determining consumer preference",
-      "Types of senses and sensory thresholds",
-      "Wine evaluation methodology",
-      "Wine and food interaction principles",
-    ],
-    ownologyLink: "/knowledge/category/Laboratory%20Testing",
-    ownologyLabel: "Lab & QC SOPs →",
-  },
-  {
-    unit: "Oenology 7",
-    name: "White Wine and Sparkling Production",
-    phase: "Process",
-    keyTopics: [
-      "Harvesting grapes for white wine",
-      "Crushing and must management",
-      "Managing the must: cold settling, juice clarification",
-      "Sparkling wines: Méthode Champenoise, tank method",
-      "The Champenois method in detail",
-    ],
-    ownologyLink: "/knowledge/category/Crushing%20%26%20Fermentation",
-    ownologyLabel: "Fermentation SOPs →",
-  },
-  {
-    unit: "Oenology 8",
-    name: "Red Wine and Rosé Production",
-    phase: "Process",
-    keyTopics: [
-      "Harvesting and crushing for reds",
-      "Fermentation on skins: cap management, extraction",
-      "Extracting colour: pumpovers, plunging, délestage",
-      "Thermovinification for colour extraction",
-      "Getting a wood flavour: barrel selection and use",
-    ],
-    ownologyLink: "/knowledge/category/Crushing%20%26%20Fermentation",
-    ownologyLabel: "Fermentation SOPs →",
-  },
-  {
-    unit: "Oenology 9",
-    name: "Production of Spirits",
-    phase: "Advanced",
-    keyTopics: [
-      "Distillation principles and methods",
-      "Fortified wine production: Port, Muscat, Sherry styles",
-      "Spirit quality and maturation",
-    ],
-    ownologyLink: "/knowledge",
-    ownologyLabel: "Knowledge Platform →",
-  },
-];
+// ─── Go Deeper Triangle Panel ─────────────────────────────────────────────────
 
-const AOC_PHASE_COLORS: Record<"Foundation" | "Process" | "Advanced", string> = {
-  Foundation: "var(--ow-amber)",
-  Process: "oklch(0.65 0.10 230)",
-  Advanced: "oklch(0.62 0.10 45)",
-};
-
-// ─── Intersection observer hook ───────────────────────────────────────────────
-function useInView(threshold = 0.12) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setInView(true); obs.disconnect(); }
-    }, { threshold });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [threshold]);
-  return { ref, inView };
+interface PanelProps {
+  icon: React.ReactNode;
+  label: string;
+  color: string;
+  content: string;
+  panelKey: "science" | "vineyard" | "craft";
+  isOpen: boolean;
+  onToggle: () => void;
+  feedback: boolean | undefined;
+  onFeedback: (thumbsUp: boolean) => void;
 }
 
-// ─── CSU Subject Card ─────────────────────────────────────────────────────────
-function AocModuleCard({ module: mod }: { module: AocModule }) {
-  const phaseColor = AOC_PHASE_COLORS[mod.phase];
-  const [expanded, setExpanded] = useState(false);
+function TrianglePanel({ icon, label, color, content, isOpen, onToggle, feedback, onFeedback }: PanelProps) {
   return (
-    <div className="cellar-card p-5 flex flex-col gap-3" style={{ border: "1px solid var(--ow-border)" }}>
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.7rem", color: "var(--ow-amber)", letterSpacing: "0.08em" }}>
-              {mod.unit}
-            </span>
-            <span
-              className="text-xs px-2 py-0.5 rounded-sm"
-              style={{
-                fontFamily: "'Fira Code',monospace",
-                fontSize: "0.65rem",
-                color: phaseColor,
-                background: `color-mix(in oklch, ${phaseColor} 12%, transparent)`,
-                border: `1px solid color-mix(in oklch, ${phaseColor} 25%, transparent)`,
-              }}
-            >
-              {mod.phase}
-            </span>
-          </div>
-          <h3 style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "1rem", lineHeight: 1.25, color: "var(--ow-text-hi)" }}>
-            {mod.name}
-          </h3>
-        </div>
-        <div
-          className="flex-shrink-0 w-8 h-8 rounded-sm flex items-center justify-center"
-          style={{ background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
-        >
-          <GraduationCap size={14} style={{ color: "var(--ow-amber)" }} />
-        </div>
-      </div>
-
+    <div
+      className="rounded-sm overflow-hidden"
+      style={{ border: `1px solid color-mix(in oklch, ${color} 25%, transparent)` }}
+    >
       <button
-        onClick={() => setExpanded(e => !e)}
-        className="flex items-center gap-2 text-xs transition-colors"
-        style={{ fontFamily: "'Lato',sans-serif", color: expanded ? "var(--ow-amber)" : "var(--ow-text-lo)", background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left" }}
+        onClick={onToggle}
+        className="w-full flex items-center justify-between px-4 py-3 text-left transition-all"
+        style={{
+          background: isOpen
+            ? `color-mix(in oklch, ${color} 12%, transparent)`
+            : `color-mix(in oklch, ${color} 6%, transparent)`,
+        }}
       >
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
-          <path d="M3 2l4 3-4 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        {expanded ? "Hide topics" : "Show key topics"}
+        <div className="flex items-center gap-2.5">
+          <span style={{ color }}>{icon}</span>
+          <span
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.8rem",
+              fontWeight: 600,
+              color: "oklch(0.82 0.015 75)",
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+            }}
+          >
+            {label}
+          </span>
+        </div>
+        <span style={{ color: "oklch(0.55 0.015 75)" }}>
+          {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        </span>
       </button>
 
-      {expanded && (
-        <ul className="flex flex-col gap-1.5 pl-3" style={{ borderLeft: "2px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)" }}>
-          {mod.keyTopics.map((t: string) => (
-            <li key={t} style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.8rem", color: "var(--ow-text-mid)", lineHeight: 1.5 }}>
-              {t}
-            </li>
-          ))}
-        </ul>
-      )}
+      {isOpen && (
+        <div className="px-4 pt-3 pb-4">
+          <p
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontWeight: 300,
+              fontSize: "0.9rem",
+              lineHeight: 1.75,
+              color: "oklch(0.75 0.015 75)",
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {content}
+          </p>
 
-      <div className="flex items-center gap-3 mt-auto pt-3" style={{ borderTop: "1px solid var(--ow-border)" }}>
-        <Link
-          href={mod.ownologyLink}
-          className="text-xs"
-          style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-amber)", textDecoration: "none" }}
-        >
-          {mod.ownologyLabel}
-        </Link>
-        <a
-          href="https://australianonlinecourses.com.au/courses/advanced-certificate-of-viticulture-winemaking-oenology/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="ml-auto flex items-center gap-1 text-xs"
-          style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "var(--ow-text-lo)", textDecoration: "none", letterSpacing: "0.05em" }}
-        >
-          AOC Course <ExternalLink size={10} />
-        </a>
-      </div>
+          <div className="flex items-center gap-3 mt-4 pt-3" style={{ borderTop: "1px solid oklch(1 0 0 / 0.06)" }}>
+            <span
+              style={{
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.7rem",
+                color: "oklch(0.45 0.012 75)",
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+              }}
+            >
+              Useful?
+            </span>
+            <button
+              onClick={() => onFeedback(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm transition-all text-xs"
+              style={{
+                background: feedback === true ? "color-mix(in oklch, oklch(0.65 0.18 145) 20%, transparent)" : "transparent",
+                border: `1px solid ${feedback === true ? "oklch(0.65 0.18 145)" : "oklch(1 0 0 / 0.12)"}`,
+                color: feedback === true ? "oklch(0.65 0.18 145)" : "oklch(0.50 0.012 75)",
+                fontFamily: "'Lato', sans-serif",
+                cursor: "pointer",
+              }}
+            >
+              <ThumbsUp size={11} />&nbsp;Yes
+            </button>
+            <button
+              onClick={() => onFeedback(false)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm transition-all text-xs"
+              style={{
+                background: feedback === false ? "color-mix(in oklch, oklch(0.55 0.18 25) 20%, transparent)" : "transparent",
+                border: `1px solid ${feedback === false ? "oklch(0.55 0.18 25)" : "oklch(1 0 0 / 0.12)"}`,
+                color: feedback === false ? "oklch(0.55 0.18 25)" : "oklch(0.50 0.012 75)",
+                fontFamily: "'Lato', sans-serif",
+                cursor: "pointer",
+              }}
+            >
+              <ThumbsDown size={11} />&nbsp;Not really
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
+
 export default function FreeRun() {
-  const search = useSearch();
+  const authCheckQuery = trpc.freeRun.authCheck.useQuery(undefined, { retry: false });
+  const isAuthenticated = authCheckQuery.data?.isAuthenticated ?? false;
+  const authLoading = authCheckQuery.isLoading;
   const [question, setQuestion] = useState("");
-  const [history, setHistory] = useState<QAPair[]>([]);
+  const [pairs, setPairs] = useState<QAPair[]>([]);
   const [isAsking, setIsAsking] = useState(false);
-  const autoSubmittedRef = useRef(false);
+  const [isRevealing, setIsRevealing] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const headerRef = useInView(0.1);
-  const csuRef = useInView(0.05);
+  const statusQuery = trpc.freeRun.status.useQuery(undefined, { enabled: isAuthenticated });
+  const askMutation = trpc.freeRun.curiosityAsk.useMutation();
+  const goDeeperMutation = trpc.freeRun.goDeeper.useMutation();
+  const feedbackMutation = trpc.freeRun.submitFeedback.useMutation();
 
-  const askMutation = trpc.tutor.ask.useMutation();
+  const status = statusQuery.data;
 
-  // Voice input
-  const [listening, setListening] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const srRef = useRef<any>(null);
-  const startVoice = useCallback(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const w = window as any;
-    const SR = w.SpeechRecognition ?? w.webkitSpeechRecognition;
-    if (!SR) { alert("Voice input is not supported in this browser. Try Chrome on Android or desktop."); return; }
-    if (listening) { srRef.current?.stop(); setListening(false); return; }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rec = new SR() as any;
-    rec.lang = "en-AU"; rec.interimResults = false; rec.maxAlternatives = 1;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    rec.onresult = (e: any) => {
-      const transcript = e.results[0][0].transcript as string;
-      setQuestion(prev => prev ? `${prev} ${transcript}` : transcript);
-      setListening(false);
-    };
-    rec.onerror = () => setListening(false);
-    rec.onend = () => setListening(false);
-    srRef.current = rec; rec.start(); setListening(true);
-  }, [listening]);
-
-  // Load thread from localStorage
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("ow_tutor_thread");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) setHistory(parsed);
-      }
-    } catch { /* ignore */ }
-  }, []);
-
-  // Persist thread to localStorage
-  useEffect(() => {
-    if (history.length > 0) {
-      localStorage.setItem("ow_tutor_thread", JSON.stringify(history.slice(-5)));
+    if (pairs.length > 0) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [history]);
+  }, [pairs.length]);
 
-  // Handle ?q= param — pre-fill and auto-submit once
-  useEffect(() => {
-    const params = new URLSearchParams(search);
-    const q = params.get("q");
-    if (q && !autoSubmittedRef.current) {
-      autoSubmittedRef.current = true;
-      setQuestion(q);
-      // Auto-submit after a short delay to let state settle
-      setTimeout(() => {
-        handleAsk(q);
-      }, 300);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
-
-  // Scroll to bottom after new answer
-  useEffect(() => {
-    if (history.length > 0) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-    }
-  }, [history]);
-
-  async function handleAsk(overrideQ?: string) {
-    const q = (overrideQ ?? question).trim();
-    if (!q || isAsking) return;
-    setIsAsking(true);
+  async function handleAsk(q?: string) {
+    const text = (q ?? question).trim();
+    if (!text || isAsking) return;
     setQuestion("");
+    setIsAsking(true);
+    trackEvent("freerun-question", { topic: text.slice(0, 50) });
+
     try {
-      const result = await askMutation.mutateAsync({
-        question: q,
-        mode: "winemaking",
-        history: history.slice(-4).map((h) => [
-          { role: "user" as const, content: h.question },
-          { role: "assistant" as const, content: h.answer },
-        ]).flat(),
-      });
-      setHistory((prev) => [
+      const result = await askMutation.mutateAsync({ question: text });
+      const id = crypto.randomUUID();
+
+      if (result.limitReached) {
+        setPairs((prev) => [
+          ...prev,
+          {
+            id,
+            question: text,
+            answer: `You've used your 3 questions for today — your daily curiosity allowance resets at midnight.\n\nMeanwhile, if you're ready to go deeper into the craft of winemaking, The Press is waiting.`,
+            topicTag: null,
+            reveal: null,
+            openPanels: new Set(),
+            feedback: new Map(),
+          },
+        ]);
+        return;
+      }
+
+      setPairs((prev) => [
         ...prev,
         {
-          question: q,
-          answer: result.answer,
-          sopTitles: result.sopTitles,
-          disclaimer: result.disclaimer,
+          id,
+          question: text,
+          answer: result.answer ?? "",
+          topicTag: result.topicTag ?? null,
+          reveal: null,
+          openPanels: new Set(),
+          feedback: new Map(),
         },
       ]);
-    } catch (err) {
-      setHistory((prev) => [
+      statusQuery.refetch();
+    } catch {
+      const id = crypto.randomUUID();
+      setPairs((prev) => [
         ...prev,
         {
-          question: q,
-          answer: "Something went wrong. Please try again.",
-          sopTitles: [],
-          disclaimer: "",
+          id,
+          question: text,
+          answer: "Something went wrong — please try again.",
+          topicTag: null,
+          reveal: null,
+          openPanels: new Set(),
+          feedback: new Map(),
         },
       ]);
     } finally {
@@ -382,435 +254,461 @@ export default function FreeRun() {
     }
   }
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleAsk();
+  async function handleGoDeeper(pairId: string) {
+    const pair = pairs.find((p) => p.id === pairId);
+    if (!pair || pair.reveal || isRevealing) return;
+    setIsRevealing(pairId);
+    trackEvent("freerun-go-deeper-click", { topic: pair.topicTag ?? "unknown" });
+
+    try {
+      const result = await goDeeperMutation.mutateAsync({
+        question: pair.question,
+        surfaceAnswer: pair.answer,
+        topicTag: pair.topicTag ?? undefined,
+      });
+
+      if (result.insufficientCredits) {
+        setPairs((prev) =>
+          prev.map((p) =>
+            p.id === pairId
+              ? { ...p, reveal: { revealId: -1, sciencePanel: "", vineyardPanel: "", craftPanel: "", wasFreeHook: false } }
+              : p
+          )
+        );
+        return;
+      }
+
+      if (result.success && result.sciencePanel) {
+        setPairs((prev) =>
+          prev.map((p) =>
+            p.id === pairId
+              ? {
+                  ...p,
+                  reveal: {
+                    revealId: result.revealId ?? 0,
+                    sciencePanel: result.sciencePanel!,
+                    vineyardPanel: result.vineyardPanel!,
+                    craftPanel: result.craftPanel!,
+                    wasFreeHook: result.wasFreeHook ?? false,
+                  },
+                }
+              : p
+          )
+        );
+        trackEvent("freerun-go-deeper-unlocked", { topic: pair.topicTag ?? "unknown", wasFreeHook: result.wasFreeHook ?? false });
+        statusQuery.refetch();
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setIsRevealing(null);
     }
   }
 
-  function clearThread() {
-    setHistory([]);
-    localStorage.removeItem("ow_tutor_thread");
+  function togglePanel(pairId: string, panel: "science" | "vineyard" | "craft") {
+    setPairs((prev) =>
+      prev.map((p) => {
+        if (p.id !== pairId) return p;
+        const next = new Set(p.openPanels);
+        if (next.has(panel)) {
+          next.delete(panel);
+        } else {
+          next.add(panel);
+          trackEvent("freerun-panel-open", { panel, topic: p.topicTag ?? "unknown" });
+        }
+        return { ...p, openPanels: next };
+      })
+    );
   }
 
+  function handleFeedback(pairId: string, panel: "science" | "vineyard" | "craft", thumbsUp: boolean) {
+    const pair = pairs.find((p) => p.id === pairId);
+    if (!pair?.reveal || pair.reveal.revealId <= 0) return;
+    feedbackMutation.mutate({ revealId: pair.reveal.revealId, panel, thumbsUp });
+    trackEvent("freerun-panel-feedback", { panel, thumbsUp, topic: pair.topicTag ?? "unknown" });
+    setPairs((prev) =>
+      prev.map((p) => {
+        if (p.id !== pairId) return p;
+        const next = new Map(p.feedback);
+        next.set(panel, thumbsUp);
+        return { ...p, feedback: next };
+      })
+    );
+  }
+
+  // ── Login gate ─────────────────────────────────────────────────────────────
+  if (authLoading) {
+    return (
+      <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: "24px", height: "24px", border: "2px solid oklch(0.72 0.12 75)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh" }}>
+        <div className="container pt-6" style={{ maxWidth: "760px", margin: "0 auto" }}>
+          <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "0.75rem", color: "oklch(0.50 0.012 75)", textDecoration: "none", fontFamily: "'Lato',sans-serif" }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            Back to Ownology
+          </Link>
+        </div>
+        <div className="container" style={{ maxWidth: "760px", margin: "0 auto", paddingTop: "80px", paddingBottom: "80px", textAlign: "center" }}>
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm mb-8"
+            style={{
+              background: "color-mix(in oklch, oklch(0.72 0.12 75) 10%, transparent)",
+              border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 30%, transparent)",
+              fontFamily: "'Fira Code',monospace",
+              fontSize: "0.7rem",
+              color: "oklch(0.72 0.12 75)",
+              letterSpacing: "0.06em",
+            }}
+          >
+            <span>◈</span>&nbsp;FREE RUN
+          </div>
+
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1.1, color: "oklch(0.95 0.018 75)", letterSpacing: "-0.02em", marginBottom: "20px" }}>
+            Understand wine<br />
+            <em style={{ color: "oklch(0.72 0.12 75)", fontStyle: "italic" }}>from the inside out.</em>
+          </h1>
+
+          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.05rem", lineHeight: 1.75, color: "oklch(0.65 0.015 75)", maxWidth: "480px", margin: "0 auto 40px" }}>
+            Ask anything about wine — the flavours, the science, the stories behind the glass. Real oenology, not dumbed down.
+          </p>
+
+          <div className="flex flex-col items-center gap-4">
+            <a
+              href={getLoginUrl("/free-run")}
+              style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "12px 28px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: "0.9rem", letterSpacing: "0.04em", textDecoration: "none", borderRadius: "2px" }}
+            >
+              Sign in to start exploring <ArrowRight size={15} />
+            </a>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.45 0.012 75)" }}>
+              Free account · 3 questions per day · No card required
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-2 mt-12">
+            {CURIOSITY_PROMPTS.slice(0, 6).map((p) => (
+              <div key={p.label} className="px-3 py-1.5 rounded-sm text-xs" style={{ background: "oklch(0.16 0.010 60)", border: "1px solid oklch(1 0 0 / 0.08)", color: "oklch(0.60 0.015 75)", fontFamily: "'Lato', sans-serif" }}>
+                {p.label}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Authenticated view ─────────────────────────────────────────────────────
+  const questionsRemaining = status?.questionsRemaining ?? 3;
+  const questionsUsed = status?.questionsUsedToday ?? 0;
+  const creditBalance = status?.creditBalance ?? 0;
+  const hasQuestionsLeft = questionsRemaining > 0;
+
   return (
-    <div style={{ background: "var(--ow-bg-base)", minHeight: "100vh" }}>
-      {/* Back nav */}
-      <div className="container pt-6 pb-0" style={{ maxWidth: "900px", margin: "0 auto" }}>
-        <Link href="/" className="inline-flex items-center gap-2 text-xs" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", textDecoration: "none" }}>
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+    <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh" }}>
+      <div className="container pt-6 pb-0" style={{ maxWidth: "760px", margin: "0 auto" }}>
+        <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "0.75rem", color: "oklch(0.50 0.012 75)", textDecoration: "none", fontFamily: "'Lato',sans-serif" }}>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
           Back to Ownology
         </Link>
       </div>
 
-      <div className="container pt-10 pb-24" style={{ maxWidth: "900px", margin: "0 auto" }}>
-
-        {/* ── Header ── */}
-        <div ref={headerRef.ref} className={`mb-10 ${headerRef.inView ? "fade-up" : "opacity-0"}`}>
-          <div className="flex items-center gap-3 mb-6">
-            <div
-              className="px-3 py-1.5 rounded-sm text-xs flex items-center gap-2"
-              style={{
-                background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
-                border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
-                fontFamily: "'Fira Code',monospace",
-                color: "var(--ow-amber)",
-                letterSpacing: "0.06em",
-              }}
-            >
-              <span style={{ fontSize: "0.8rem" }}>◈</span>
-              FREE RUN
+      <div className="container pt-8 pb-24" style={{ maxWidth: "760px", margin: "0 auto" }}>
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div
+                className="px-3 py-1.5 rounded-sm text-xs flex items-center gap-2"
+                style={{ background: "color-mix(in oklch, oklch(0.72 0.12 75) 10%, transparent)", border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 30%, transparent)", fontFamily: "'Fira Code',monospace", color: "oklch(0.72 0.12 75)", letterSpacing: "0.06em" }}
+              >
+                <span style={{ fontSize: "0.8rem" }}>◈</span> FREE RUN
+              </div>
+              <div className="flex items-center gap-1.5">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="w-2 h-2 rounded-full" style={{ background: i < questionsUsed ? "oklch(0.72 0.12 75)" : "oklch(1 0 0 / 0.12)" }} />
+                ))}
+                <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "oklch(0.45 0.012 75)", marginLeft: "4px" }}>
+                  {questionsRemaining} left today
+                </span>
+              </div>
             </div>
-            <div className="h-px flex-1" style={{ background: "linear-gradient(to right, color-mix(in oklch, var(--ow-amber) 20%, transparent), transparent)" }} />
-            <Link
-              href="/the-press"
-              className="px-3 py-1.5 rounded-sm text-xs flex items-center gap-2 transition-all"
-              style={{
-                background: "var(--ow-bg-card)",
-                border: "1px solid var(--ow-border)",
-                fontFamily: "'Fira Code',monospace",
-                color: "var(--ow-text-lo)",
-                letterSpacing: "0.06em",
-                textDecoration: "none",
-              }}
-            >
-              <span style={{ fontSize: "0.8rem" }}>⊞</span>
-              THE PRESS →
-            </Link>
+
+            <div className="flex items-center gap-3">
+              {creditBalance > 0 && (
+                <div
+                  className="px-2.5 py-1 rounded-sm text-xs flex items-center gap-1.5"
+                  style={{ background: "color-mix(in oklch, oklch(0.65 0.18 145) 10%, transparent)", border: "1px solid color-mix(in oklch, oklch(0.65 0.18 145) 25%, transparent)", fontFamily: "'Fira Code',monospace", color: "oklch(0.65 0.18 145)", letterSpacing: "0.04em" }}
+                >
+                  <Sparkles size={10} />
+                  {creditBalance} credit{creditBalance !== 1 ? "s" : ""}
+                </div>
+              )}
+              <Link
+                href="/pricing"
+                style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "6px 12px", background: "oklch(0.16 0.010 60)", border: "1px solid oklch(1 0 0 / 0.10)", color: "oklch(0.60 0.015 75)", fontFamily: "'Lato',sans-serif", textDecoration: "none", letterSpacing: "0.04em", fontSize: "0.75rem", borderRadius: "2px" }}
+              >
+                The Press →
+              </Link>
+            </div>
           </div>
 
-          <p className="section-label mb-4" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", letterSpacing: "0.12em" }}>
-            AI Winemaking Tutor
-          </p>
-          <h1
-            style={{
-              fontFamily: "'Fraunces',serif",
-              fontWeight: 700,
-              fontSize: "clamp(2rem,4.5vw,3.25rem)",
-              lineHeight: 1.08,
-              letterSpacing: "-0.02em",
-              color: "var(--ow-text-hi)",
-            }}
-          >
-            Free <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>Run</em>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "clamp(1.8rem, 3.5vw, 2.5rem)", lineHeight: 1.1, color: "oklch(0.95 0.018 75)", letterSpacing: "-0.02em", marginBottom: "12px" }}>
+            What do you want to understand about wine?
           </h1>
-          <p
-            className="mt-4"
-            style={{
-              fontFamily: "'Lato',sans-serif",
-              fontWeight: 300,
-              fontSize: "1.0625rem",
-              lineHeight: 1.75,
-              color: "var(--ow-text-mid)",
-              maxWidth: "560px",
-            }}
-          >
-            Ask any winemaking question. Answers are drawn directly from Ownology's SOP knowledge base — the same library your cellar team uses.
+          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.95rem", color: "oklch(0.60 0.015 75)", lineHeight: 1.6 }}>
+            Ask anything — flavours, aromas, regions, science, stories. Grounded in real oenology.
           </p>
         </div>
 
-        {/* ── Example prompt chips ── */}
-        {history.length === 0 && !isAsking && (
-          <div className="mb-8">
-            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.75rem" }}>
-              Try asking
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {EXAMPLE_PROMPTS.map(({ label, q }) => (
-                <button
-                  key={label}
-                  onClick={() => { setQuestion(q); inputRef.current?.focus(); }}
-                  className="px-3 py-1.5 rounded-sm text-xs transition-all"
-                  style={{
-                    fontFamily: "'Lato',sans-serif",
-                    color: "var(--ow-amber)",
-                    background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)",
-                    border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
-                    cursor: "pointer",
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ── Conversation thread ── */}
-        {history.length > 0 && (
-          <div className="mb-8 flex flex-col gap-6">
-            {history.map((pair, i) => (
-              <div key={i} className="flex flex-col gap-3">
-                {/* Question bubble */}
-                <div className="flex justify-end">
+        {/* Conversation */}
+        {pairs.length > 0 && (
+          <div className="mb-8 flex flex-col gap-8">
+            {pairs.map((pair) => (
+              <div key={pair.id}>
+                {/* Question */}
+                <div className="flex justify-end mb-4">
                   <div
                     className="px-4 py-3 rounded-sm max-w-lg"
-                    style={{
-                      background: "var(--ow-bg-inset)",
-                      border: "1px solid var(--ow-border)",
-                      fontFamily: "'Lato',sans-serif",
-                      fontWeight: 300,
-                      fontSize: "0.9rem",
-                      color: "var(--ow-text-hi)",
-                      lineHeight: 1.6,
-                    }}
+                    style={{ background: "oklch(0.18 0.010 60)", border: "1px solid oklch(1 0 0 / 0.08)", fontFamily: "'Lato', sans-serif", fontSize: "0.9rem", color: "oklch(0.85 0.015 75)", lineHeight: 1.6 }}
                   >
                     {pair.question}
                   </div>
                 </div>
 
                 {/* Answer */}
-                <div
-                  className="cellar-card p-5"
-                  style={{ border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
-                >
-                  {/* SOP source badges */}
-                  {pair.sopTitles.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {pair.sopTitles.map((t) => (
-                        <span
-                          key={t}
-                          className="px-2 py-0.5 rounded-sm text-xs flex items-center gap-1"
-                          style={{
-                            fontFamily: "'Fira Code',monospace",
-                            fontSize: "0.65rem",
-                            color: "var(--ow-amber)",
-                            background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
-                            border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
-                          }}
-                        >
-                          <BookOpen size={9} />
-                          {t}
-                        </span>
-                      ))}
+                <div className="px-5 py-4 rounded-sm mb-4" style={{ background: "oklch(0.14 0.008 60)", border: "1px solid oklch(1 0 0 / 0.06)" }}>
+                  {pair.topicTag && (
+                    <div
+                      className="inline-block px-2 py-0.5 rounded-sm text-xs mb-3"
+                      style={{ background: "color-mix(in oklch, oklch(0.72 0.12 75) 10%, transparent)", border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 20%, transparent)", fontFamily: "'Fira Code',monospace", color: "oklch(0.65 0.10 75)", letterSpacing: "0.05em", fontSize: "0.65rem" }}
+                    >
+                      {pair.topicTag}
                     </div>
                   )}
 
-                  {/* Answer text */}
-                  <div
-                    style={{
-                      fontFamily: "'Lato',sans-serif",
-                      fontWeight: 300,
-                      fontSize: "0.9375rem",
-                      color: "var(--ow-text-hi)",
-                      lineHeight: 1.75,
-                      whiteSpace: "pre-wrap",
-                    }}
-                  >
+                  <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9rem", lineHeight: 1.8, color: "oklch(0.75 0.015 75)", whiteSpace: "pre-wrap" }}>
                     {pair.answer}
-                  </div>
+                  </p>
 
-                  {/* Disclaimer */}
-                  {pair.disclaimer && (
-                    <p
-                      className="mt-4 pt-3"
-                      style={{
-                        fontFamily: "'Lato',sans-serif",
-                        fontWeight: 300,
-                        fontSize: "0.75rem",
-                        color: "var(--ow-text-lo)",
-                        fontStyle: "italic",
-                        borderTop: "1px solid var(--ow-border)",
-                      }}
-                    >
-                      {pair.disclaimer}
-                    </p>
-                  )}
-                  {/* Learn→Do bridge: Try it in The Press */}
-                  <div className="mt-4 pt-3 flex items-center gap-3" style={{ borderTop: "1px solid var(--ow-border)" }}>
-                    <Link
-                      href="/the-press"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm"
-                      style={{
-                        background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
-                        border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
-                        color: "var(--ow-amber)",
-                        fontFamily: "'Lato', sans-serif",
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        textDecoration: "none",
-                      }}
-                    >
-                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                        <path d="M1 5h8M5 1l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                      Log it in The Press
-                    </Link>
-                    <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.7rem", color: "var(--ow-text-lo)" }}>
-                      Ready to record this in your vintage log?
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {/* Loading state */}
-            {isAsking && (
-              <div className="flex justify-start">
-                <div
-                  className="cellar-card px-5 py-4 flex items-center gap-3"
-                  style={{ border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
-                >
-                  <div className="flex gap-1">
-                    {[0, 1, 2].map((i) => (
-                      <div
-                        key={i}
-                        className="w-1.5 h-1.5 rounded-full"
+                  {!pair.reveal && !pair.answer.includes("daily curiosity allowance") && (
+                    <div className="mt-4 pt-3" style={{ borderTop: "1px solid oklch(1 0 0 / 0.06)" }}>
+                      <button
+                        onClick={() => handleGoDeeper(pair.id)}
+                        disabled={isRevealing === pair.id}
+                        className="flex items-center gap-2 px-4 py-2 rounded-sm text-sm transition-all"
                         style={{
-                          background: "var(--ow-amber)",
-                          animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
+                          background: "color-mix(in oklch, oklch(0.72 0.12 75) 12%, transparent)",
+                          border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 35%, transparent)",
+                          color: "oklch(0.72 0.12 75)",
+                          fontFamily: "'Lato', sans-serif",
+                          fontWeight: 600,
+                          letterSpacing: "0.03em",
+                          cursor: isRevealing === pair.id ? "wait" : "pointer",
+                          opacity: isRevealing === pair.id ? 0.6 : 1,
                         }}
-                      />
-                    ))}
-                  </div>
-                  <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8rem", color: "var(--ow-text-lo)" }}>
-                    Searching SOPs…
-                  </span>
+                      >
+                        {isRevealing === pair.id ? (
+                          <>
+                            <div style={{ width: "12px", height: "12px", border: "1.5px solid oklch(0.72 0.12 75)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                            Revealing the triangle…
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles size={13} />
+                            Go Deeper
+                            {creditBalance === 0 && (
+                              <span style={{ fontSize: "0.7rem", opacity: 0.7, marginLeft: "2px" }}>(first one free)</span>
+                            )}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+
+                  {pair.reveal?.revealId === -1 && (
+                    <div className="mt-4 pt-3" style={{ borderTop: "1px solid oklch(1 0 0 / 0.06)" }}>
+                      <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.85rem", color: "oklch(0.60 0.015 75)", marginBottom: "12px" }}>
+                        You've used your free reveal. Top up to go deeper.
+                      </p>
+                      <Link
+                        href="/pricing"
+                        style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 16px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, textDecoration: "none", letterSpacing: "0.03em", fontSize: "0.85rem", borderRadius: "2px" }}
+                      >
+                        Get credits <ArrowRight size={13} />
+                      </Link>
+                    </div>
+                  )}
                 </div>
+
+                {/* Triangle reveal */}
+                {pair.reveal && pair.reveal.revealId !== -1 && (
+                  <div className="flex flex-col gap-2 mb-4">
+                    {pair.reveal.wasFreeHook && (
+                      <div
+                        className="px-3 py-2 rounded-sm text-xs mb-1 flex items-center gap-2"
+                        style={{ background: "color-mix(in oklch, oklch(0.65 0.18 145) 8%, transparent)", border: "1px solid color-mix(in oklch, oklch(0.65 0.18 145) 20%, transparent)", fontFamily: "'Lato', sans-serif", color: "oklch(0.65 0.18 145)" }}
+                      >
+                        <Sparkles size={11} />
+                        Your first Go Deeper is free — welcome to the rabbit hole.
+                      </div>
+                    )}
+
+                    <TrianglePanel
+                      icon={<Beaker size={14} />}
+                      label="The Science"
+                      color="oklch(0.60 0.18 220)"
+                      content={pair.reveal.sciencePanel}
+                      panelKey="science"
+                      isOpen={pair.openPanels.has("science")}
+                      onToggle={() => togglePanel(pair.id, "science")}
+                      feedback={pair.feedback.get("science")}
+                      onFeedback={(v) => handleFeedback(pair.id, "science", v)}
+                    />
+                    <TrianglePanel
+                      icon={<Sprout size={14} />}
+                      label="The Vineyard"
+                      color="oklch(0.65 0.18 145)"
+                      content={pair.reveal.vineyardPanel}
+                      panelKey="vineyard"
+                      isOpen={pair.openPanels.has("vineyard")}
+                      onToggle={() => togglePanel(pair.id, "vineyard")}
+                      feedback={pair.feedback.get("vineyard")}
+                      onFeedback={(v) => handleFeedback(pair.id, "vineyard", v)}
+                    />
+                    <TrianglePanel
+                      icon={<Wine size={14} />}
+                      label="The Craft"
+                      color="oklch(0.72 0.12 75)"
+                      content={pair.reveal.craftPanel}
+                      panelKey="craft"
+                      isOpen={pair.openPanels.has("craft")}
+                      onToggle={() => togglePanel(pair.id, "craft")}
+                      feedback={pair.feedback.get("craft")}
+                      onFeedback={(v) => handleFeedback(pair.id, "craft", v)}
+                    />
+
+                    <div
+                      className="mt-2 px-4 py-3 rounded-sm flex items-center justify-between"
+                      style={{ background: "oklch(0.14 0.008 60)", border: "1px solid oklch(1 0 0 / 0.06)" }}
+                    >
+                      <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8rem", color: "oklch(0.55 0.015 75)", fontStyle: "italic" }}>
+                        Ready to make it, not just drink it?
+                      </p>
+                      <Link
+                        href="/pricing"
+                        style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "6px 14px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, textDecoration: "none", letterSpacing: "0.03em", fontSize: "0.75rem", borderRadius: "2px", whiteSpace: "nowrap" }}
+                      >
+                        The Press <ArrowRight size={11} />
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-
-            <div ref={bottomRef} />
-
-            {/* Thread controls */}
-            <div className="flex items-center justify-between pt-2">
-              <button
-                onClick={clearThread}
-                className="text-xs"
-                style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-text-lo)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
-              >
-                Clear conversation
-              </button>
-              <div className="flex flex-wrap gap-2">
-                {EXAMPLE_PROMPTS.slice(0, 3).map(({ label, q }) => (
-                  <button
-                    key={label}
-                    onClick={() => { setQuestion(q); inputRef.current?.focus(); }}
-                    className="px-2.5 py-1 rounded-sm text-xs"
-                    style={{
-                      fontFamily: "'Lato',sans-serif",
-                      color: "var(--ow-text-lo)",
-                      background: "var(--ow-bg-inset)",
-                      border: "1px solid var(--ow-border)",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Loading state when no history yet */}
-        {isAsking && history.length === 0 && (
-          <div className="mb-8 flex justify-start">
-            <div
-              className="cellar-card px-5 py-4 flex items-center gap-3"
-              style={{ border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}
-            >
-              <div className="flex gap-1">
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{
-                      background: "var(--ow-amber)",
-                      animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
-                    }}
-                  />
-                ))}
-              </div>
-              <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8rem", color: "var(--ow-text-lo)" }}>
-                Searching SOPs…
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* ── Input box ── */}
-        <div
-          className="cellar-card p-4"
-          style={{ border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}
-        >
-          <textarea
-            ref={inputRef}
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask a winemaking question — stuck ferment, YAN addition, SO₂ management, MLF timing…"
-            rows={3}
-            disabled={isAsking}
-            style={{
-              width: "100%",
-              background: "transparent",
-              border: "none",
-              outline: "none",
-              resize: "none",
-              fontFamily: "'Lato',sans-serif",
-              fontWeight: 300,
-              fontSize: "0.9375rem",
-              color: "var(--ow-text-hi)",
-              lineHeight: 1.6,
-            }}
-          />
-          <div className="flex items-center justify-between pt-3" style={{ borderTop: "1px solid var(--ow-border)" }}>
-            <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "var(--ow-text-lo)" }}>
-              Enter to send · Shift+Enter for new line
-            </p>
-            <div className="flex items-center gap-2">
-            {/* Microphone button */}
-            <button
-              onClick={startVoice}
-              disabled={isAsking}
-              title={listening ? "Stop listening" : "Ask by voice"}
-              className="flex items-center justify-center rounded-sm transition-all"
-              style={{
-                width: 34, height: 34,
-                background: listening ? "color-mix(in oklch, var(--ow-amber) 18%, transparent)" : "var(--ow-bg-inset)",
-                border: `1px solid ${listening ? "var(--ow-amber)" : "var(--ow-border)"}`,
-                color: listening ? "var(--ow-amber)" : "var(--ow-text-lo)",
-                cursor: isAsking ? "not-allowed" : "pointer",
-                fontSize: "1rem",
-              }}
-            >
-              {listening ? "🎙" : "🎤"}
-            </button>
-            <button
-              onClick={() => handleAsk()}
-              disabled={!question.trim() || isAsking}
-              className="flex items-center gap-2 px-4 py-2 rounded-sm text-sm transition-all"
-              style={{
-                fontFamily: "'Lato',sans-serif",
-                fontWeight: 700,
-                fontSize: "0.8125rem",
-                background: question.trim() && !isAsking ? "var(--ow-amber)" : "var(--ow-bg-inset)",
-                color: question.trim() && !isAsking ? "var(--ow-bg-base)" : "var(--ow-text-lo)",
-                border: "none",
-                cursor: question.trim() && !isAsking ? "pointer" : "not-allowed",
-                letterSpacing: "0.04em",
-              }}
-            >
-              <Send size={13} />
-              Ask
-            </button>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Compliance redirect notice ── */}
-        <div
-          className="mt-4 px-4 py-3 rounded-sm flex items-start gap-3"
-          style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="mt-0.5 flex-shrink-0">
-            <circle cx="7" cy="7" r="6" stroke="var(--ow-text-lo)" strokeWidth="1.2" />
-            <path d="M7 5v4M7 10.5v.5" stroke="var(--ow-text-lo)" strokeWidth="1.2" strokeLinecap="round" />
-          </svg>
-          <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.8rem", color: "var(--ow-text-lo)", lineHeight: 1.6 }}>
-            Free Run answers winemaking questions from the SOP knowledge base.{" "}
-            For <strong style={{ color: "var(--ow-text-mid)" }}>regulatory and compliance questions</strong>{" "}
-            (licensing, FSANZ, WET, EPA obligations),{" "}
-            <Link href="/compliance" style={{ color: "var(--ow-amber)", textDecoration: "none" }}>
-              use the Compliance AI →
-            </Link>
-          </p>
-        </div>
-
-        {/* ── Industry Curriculum ── */}
-        <div ref={csuRef.ref} className={`mt-16 ${csuRef.inView ? "fade-up" : "opacity-0"}`}>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="h-px flex-1" style={{ background: "var(--ow-border)" }} />
-            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-              Further Study — Industry Curriculum
-            </p>
-            <div className="h-px flex-1" style={{ background: "var(--ow-border)" }} />
-          </div>
-          <p
-            className="mb-6"
-            style={{
-              fontFamily: "'Lato',sans-serif",
-              fontWeight: 300,
-              fontSize: "0.875rem",
-              color: "var(--ow-text-lo)",
-              lineHeight: 1.7,
-              maxWidth: "560px",
-            }}
-          >
-            Free Run's AI is grounded in the Ownology Winemaking Bibles — original authored content aligned with industry-standard references including “Winemaking: From Grape Growing to Marketplace” (Vine, Harkness, Browning & Wagner, Chapman & Hall Enology Library). The modules below are drawn from the Australian Online Courses Advanced Certificate of Viticulture, Winemaking & Oenology — a practical, vocational-level curriculum for winemakers at every stage.
-          </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {AOC_MODULES.map((mod) => (
-              <AocModuleCard key={mod.unit} module={mod} />
             ))}
+            <div ref={bottomRef} />
           </div>
+        )}
+
+        {/* Empty state prompts */}
+        {pairs.length === 0 && (
+          <div className="mb-8">
+            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.45 0.012 75)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "12px" }}>
+              Try asking…
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {CURIOSITY_PROMPTS.map((p) => (
+                <button
+                  key={p.label}
+                  onClick={() => handleAsk(p.q)}
+                  className="px-3 py-2 rounded-sm text-xs transition-all"
+                  style={{ background: "oklch(0.15 0.008 60)", border: "1px solid oklch(1 0 0 / 0.08)", color: "oklch(0.65 0.015 75)", fontFamily: "'Lato', sans-serif", cursor: "pointer" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = "color-mix(in oklch, oklch(0.72 0.12 75) 40%, transparent)"; e.currentTarget.style.color = "oklch(0.72 0.12 75)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = "oklch(1 0 0 / 0.08)"; e.currentTarget.style.color = "oklch(0.65 0.015 75)"; }}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Input */}
+        <div
+          className="sticky bottom-6"
+          style={{ background: "oklch(0.13 0.008 60)", border: "1px solid oklch(1 0 0 / 0.10)", borderRadius: "4px", padding: "12px" }}
+        >
+          {!hasQuestionsLeft ? (
+            <div className="text-center py-2">
+              <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.85rem", color: "oklch(0.55 0.015 75)", marginBottom: "8px" }}>
+                You've used your 3 questions for today. Come back tomorrow.
+              </p>
+              <Link
+                href="/pricing"
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 16px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, textDecoration: "none", fontSize: "0.8rem", borderRadius: "2px" }}
+              >
+                Upgrade to The Press for unlimited <ArrowRight size={12} />
+              </Link>
+            </div>
+          ) : (
+            <div className="flex gap-3 items-end">
+              <textarea
+                ref={inputRef}
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleAsk(); } }}
+                placeholder="Ask anything about wine…"
+                rows={2}
+                disabled={isAsking}
+                style={{ flex: 1, background: "transparent", border: "none", outline: "none", resize: "none", fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9rem", color: "oklch(0.85 0.015 75)", lineHeight: 1.6, padding: "4px 0" }}
+              />
+              <button
+                onClick={() => handleAsk()}
+                disabled={!question.trim() || isAsking}
+                style={{ width: "36px", height: "36px", background: question.trim() && !isAsking ? "oklch(0.72 0.12 75)" : "oklch(0.20 0.010 60)", border: "none", borderRadius: "2px", cursor: question.trim() && !isAsking ? "pointer" : "not-allowed", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
+              >
+                {isAsking ? (
+                  <div style={{ width: "14px", height: "14px", border: "1.5px solid oklch(0.72 0.12 75)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                ) : (
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M2 12L12 7 2 2v3.5l7 1.5-7 1.5V12z" fill={question.trim() ? "oklch(0.11 0.008 60)" : "oklch(0.45 0.012 75)"} />
+                  </svg>
+                )}
+              </button>
+            </div>
+          )}
         </div>
 
+        {/* Credit upsell nudge */}
+        {creditBalance === 0 && pairs.some((p) => p.reveal && p.reveal.revealId !== -1) && (
+          <div
+            className="mt-6 px-5 py-4 rounded-sm flex items-center justify-between gap-4"
+            style={{ background: "oklch(0.14 0.008 60)", border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 20%, transparent)" }}
+          >
+            <div>
+              <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 600, fontSize: "0.85rem", color: "oklch(0.85 0.015 75)", marginBottom: "4px" }}>
+                Want to go deeper on your next question?
+              </p>
+              <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8rem", color: "oklch(0.55 0.015 75)" }}>
+                5 credits for $4 — or get unlimited with The Press for $9/month.
+              </p>
+            </div>
+            <Link
+              href="/pricing"
+              style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "8px 16px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, textDecoration: "none", letterSpacing: "0.03em", fontSize: "0.8rem", borderRadius: "2px", whiteSpace: "nowrap" }}
+            >
+              Get credits <ArrowRight size={12} />
+            </Link>
+          </div>
+        )}
       </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

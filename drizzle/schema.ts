@@ -11,6 +11,89 @@ export const users = mysqlTable("users", {
   createdAt: bigint("created_at", { mode: "number" }).notNull(),
 });
 
+// ─── Free Run Credits ────────────────────────────────────────────────────────
+// Tracks purchased credit balance per user. Credits never expire.
+export const freeRunCredits = mysqlTable("free_run_credits", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  // Current credit balance
+  balance: int("balance").notNull().default(0),
+  // Total credits ever purchased (for analytics)
+  totalPurchased: int("total_purchased").notNull().default(0),
+  // Total credits ever consumed
+  totalConsumed: int("total_consumed").notNull().default(0),
+  updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  createdAt: bigint("created_at", { mode: "number" }).notNull(),
+});
+
+// ─── Free Run Daily Usage ─────────────────────────────────────────────────────
+// Tracks daily question count per user. Resets at midnight UTC.
+export const freeRunDailyUsage = mysqlTable(
+  "free_run_daily_usage",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull(),
+    // Date string YYYY-MM-DD UTC
+    dateKey: varchar("date_key", { length: 10 }).notNull(),
+    // Number of curiosity questions asked today
+    questionCount: int("question_count").notNull().default(0),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [index("fru_user_date_idx").on(t.userId, t.dateKey)]
+);
+
+// ─── Go Deeper Reveals ────────────────────────────────────────────────────────
+// Tracks each Go Deeper unlock (1 credit per question). Stores the triangle
+// content for all three panels so they can be retrieved without re-calling LLM.
+export const goDeeperReveals = mysqlTable(
+  "go_deeper_reveals",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull(),
+    // The original curiosity question
+    question: text("question").notNull(),
+    // Detected topic tag (e.g. "MLF", "Tannins", "Chardonnay") for analytics
+    topicTag: varchar("topic_tag", { length: 100 }),
+    // The surface answer (free tier)
+    surfaceAnswer: text("surface_answer").notNull(),
+    // Triangle panels — generated when credit is consumed
+    sciencePanel: text("science_panel"),
+    vineyardPanel: text("vineyard_panel"),
+    craftPanel: text("craft_panel"),
+    // Whether this was the user's first free reveal (hook)
+    wasFreeHook: boolean("was_free_hook").notNull().default(false),
+    // Credits consumed (0 for free hook, 1 for paid)
+    creditsConsumed: int("credits_consumed").notNull().default(1),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("gdr_user_idx").on(t.userId),
+    index("gdr_topic_idx").on(t.topicTag),
+  ]
+);
+
+// ─── Go Deeper Panel Feedback ─────────────────────────────────────────────────
+// Thumbs up/down per panel per reveal. Powers quality analytics and viticulture
+// demand signal.
+export const goDeeperFeedback = mysqlTable(
+  "go_deeper_feedback",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull(),
+    revealId: int("reveal_id").notNull(),
+    // Which panel: "science" | "vineyard" | "craft"
+    panel: mysqlEnum("panel", ["science", "vineyard", "craft"]).notNull(),
+    // true = thumbs up, false = thumbs down
+    thumbsUp: boolean("thumbs_up").notNull(),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("gdf_reveal_idx").on(t.revealId),
+    index("gdf_panel_idx").on(t.panel),
+    index("gdf_user_idx").on(t.userId),
+  ]
+);
+
 // ─── Campaign Metrics Snapshots ───────────────────────────────────────────────
 // One row per weekly snapshot. All counts are cumulative totals at snapshot time.
 // The weekly Heartbeat cron inserts a new row every Monday 09:00 AEST (23:00 UTC Sun).

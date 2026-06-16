@@ -441,3 +441,41 @@
 - [x] Generate 1000 ghost questions mapped to WBS nodes (LLM batch generation — 930 questions across 31 WBS nodes)
 - [x] Store ghost questions in database (ghost_questions table)
 - [x] Build ghost questions admin view in AdminWbs page
+
+## Upsell & Reference Features (Jun 2026)
+- [ ] Free Run: add locked premium feature cards section with hover tooltips explaining the upsell (The Press tier features, glimpse mechanic)
+- [ ] Build /waitlist page: professional tier waitlist signup with tier selector (Cellar Hand, Winemaker, Head Winemaker), lead capture using useEmailSubscribe hook
+- [ ] Build /reference/vine page: searchable Vine et al. index component querying vine-et-al-index.json (search by chapter, section, page, topic)
+- [ ] Wire /waitlist and /reference/vine routes in App.tsx
+
+## Free Run Redesign — Wine Virgin Strategy (Jun 2026)
+- [ ] Redesign Free Run page: excitement-first for wine virgins (people who love wine and want to understand it, even if they never make it)
+- [ ] Replace "AI Winemaking Tutor" label with curiosity-first messaging
+- [ ] Replace compliance redirect notice with a curiosity hook about the science of wine
+- [ ] Redesign example prompt chips: wine appreciation + curiosity questions, not just production questions
+- [ ] Add "wine curiosity" fascination cards section (The Science of Fermentation, Why Tannins Matter, The Vintage Effect, etc.)
+- [ ] Remove or reposition the AOC curriculum section — it's for winemakers, not wine virgins
+- [ ] Revisit pricing page: Free Run CTA for wine lovers vs winemakers
+
+## Free Run & Pricing Redesign — Confirmed Model (Jun 2026)
+- [ ] Redesign Free Run page: wine curiosity experience for wine virgins (not winemakers), account required, 3 questions/day with midnight reset, "Go Deeper" button on every answer (1 credit, first free)
+- [ ] Remove all winemaking SOP framing from Free Run — no production guides, no harvest language
+- [ ] Replace example prompts with wine appreciation questions (flavour science, varietals, regions, food pairing)
+- [ ] Add curiosity-first header: "Understand wine from the inside out"
+- [ ] Remove compliance redirect notice from Free Run
+- [ ] Remove AOC curriculum section from Free Run (internal only)
+- [ ] Add "Ready to make it, not just drink it?" CTA to The Press at bottom of Free Run
+- [ ] Update Pricing page: fix Free Run feature list (3 questions/day, curiosity AI, account required, no SOPs)
+- [ ] Replace "What does one credit get you?" lesson/quiz grid with Go Deeper credit model
+- [ ] Update credit pack names: 5 credits $4 "A bottle of curiosity", 15 credits $9 "A case of questions"
+- [ ] Remove "Compliance Agent is unlimited on all paid tiers" from credit pack description
+- [ ] Update GTM Bible reference file with confirmed Free Run / credit model
+
+## Free Run Redesign — Wine Curiosity Experience
+- [x] Add freeRunCredits, freeRunDailyUsage, goDeeperReveals, goDeeperFeedback tables to schema
+- [x] Create freeRunRouter with curiosityAsk, goDeeper, submitFeedback, authCheck, status procedures
+- [x] Rewrite FreeRun.tsx as wine curiosity experience (3 questions/day, Go Deeper triangle, thumbs feedback)
+- [x] Update Pricing page: Free Run features, credit pack names/pricing, Go Deeper triangle grid
+- [x] Update Pricing FAQs to reflect new credit model
+- [ ] Wire Stripe checkout for credit pack purchases on Free Run page
+- [ ] Add analytics event tracking (panel expansion, thumbs, credit purchase, Press CTA click)

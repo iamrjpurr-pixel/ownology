@@ -1,5 +1,6 @@
 import { z } from "zod";
 import Stripe from "stripe";
+import { freeRunRouter } from "./freeRunRouter.js";
 import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
 import { routeQuery, buildLiveCellarContext } from "./queryRouter.js";
@@ -3022,5 +3023,6 @@ export const appRouter = router({
   tutor: tutorRouter,
   vintageIntelligence: vintageIntelligenceRouter,
   wbsAdmin: wbsAdminRouter,
+  freeRun: freeRunRouter,
 });
 export type AppRouter = typeof appRouter;

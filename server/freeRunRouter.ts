@@ -1,0 +1,344 @@
+/**
+ * Free Run Router
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Powers the wine curiosity experience for wine virgins.
+ * Audience: wine lovers, curious drinkers — NOT winemakers.
+ * No winemaking SOPs, no production guides.
+ *
+ * Mechanics:
+ *   - 3 curiosity questions per day (midnight UTC reset)
+ *   - Every answer has a "Go Deeper" button (1 credit, first one free)
+ *   - Go Deeper unlocks the Triangle: Science / Vineyard / Craft
+ *   - Thumbs up/down per panel for quality analytics
+ *   - Panel expansion + thumbs + credit purchase tracked as analytics events
+ */
+
+import { z } from "zod";
+import { eq, and } from "drizzle-orm";
+import { router, protectedProcedure, publicProcedure } from "./trpc.js";
+import * as schema from "../drizzle/schema.js";
+import { db, getUserByOpenId } from "./db.js";
+
+const DAILY_FREE_QUESTIONS = 3;
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function todayUTC(): string {
+  return new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+}
+
+async function callLLM(messages: { role: "system" | "user" | "assistant"; content: string }[]) {
+  const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+  const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+  if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+  const resp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
+    body: JSON.stringify({ messages, stream: false }),
+  });
+  if (!resp.ok) throw new Error(`LLM error: ${resp.status}`);
+  const data = await resp.json();
+  return (data.choices?.[0]?.message?.content ?? "") as string;
+}
+
+async function callLLMJson(messages: { role: "system" | "user" | "assistant"; content: string }[]) {
+  const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+  const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+  if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+  const resp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
+    body: JSON.stringify({ messages, stream: false, response_format: { type: "json_object" } }),
+  });
+  if (!resp.ok) throw new Error(`LLM error: ${resp.status}`);
+  const data = await resp.json();
+  return (data.choices?.[0]?.message?.content ?? "{}") as string;
+}
+
+// ─── Router ──────────────────────────────────────────────────────────────────
+
+export const freeRunRouter = router({
+  /** Public: check if the current request is authenticated */
+  authCheck: publicProcedure.query(async ({ ctx }) => {
+    return { isAuthenticated: !!ctx.user };
+  }),
+
+  /**
+   * Ask a wine curiosity question.
+   * Returns a surface-level answer grounded in real oenology.
+   * Enforces 3 questions/day limit.
+   */
+  curiosityAsk: protectedProcedure
+    .input(
+      z.object({
+        question: z.string().min(1).max(500),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const userId = dbUser.id;
+      const dateKey = todayUTC();
+
+      // ── Check daily limit ────────────────────────────────────────────────
+      const [usage] = await db
+        .select()
+        .from(schema.freeRunDailyUsage)
+        .where(
+          and(
+            eq(schema.freeRunDailyUsage.userId, userId),
+            eq(schema.freeRunDailyUsage.dateKey, dateKey)
+          )
+        )
+        .limit(1);
+
+      const currentCount = usage?.questionCount ?? 0;
+      if (currentCount >= DAILY_FREE_QUESTIONS) {
+        return {
+          answer: null,
+          limitReached: true,
+          questionsUsed: currentCount,
+          questionsTotal: DAILY_FREE_QUESTIONS,
+        };
+      }
+
+      // ── Generate surface answer ──────────────────────────────────────────
+      const systemPrompt = `You are Ownology's wine curiosity guide — a knowledgeable, enthusiastic companion for people who love wine and want to understand it more deeply.
+
+Your audience: wine lovers, curious drinkers, food & wine enthusiasts. They are NOT winemakers. They want to understand wine — its flavours, aromas, science, and origins — not how to produce it commercially.
+
+Answer style:
+- Warm, intelligent, and genuinely curious — like a sommelier friend at dinner
+- Grounded in real oenology and wine science — never dumbed down, never condescending
+- 2–4 paragraphs maximum — leave them wanting more
+- End with a single sentence that hints at a deeper layer (science, vineyard, or craft) to create curiosity
+- Do NOT mention winemaking production, SOPs, commercial processes, or compliance
+- Do NOT answer questions about how to make wine commercially — redirect warmly to the curiosity angle
+
+If the question is about making wine commercially or winemaking technique, respond:
+"That's a winemaking question — it lives in The Press, our tool for winemakers. Here in Free Run, we explore the science and soul of wine. Let me answer the curiosity behind your question instead: [then answer the wine science angle]"`;
+
+      const answer = await callLLM([
+        { role: "system", content: systemPrompt },
+        { role: "user", content: input.question },
+      ]);
+
+      // ── Detect topic tag ─────────────────────────────────────────────────
+      let topicTag: string | null = null;
+      try {
+        const tagJson = await callLLMJson([
+          {
+            role: "system",
+            content:
+              'Extract a single short topic tag (max 3 words) from this wine question. Return JSON: {"tag": "..."}. Examples: "MLF", "Tannins", "Chardonnay", "Terroir", "Fermentation", "Food Pairing", "Pinot Noir".',
+          },
+          { role: "user", content: input.question },
+        ]);
+        const parsed = JSON.parse(tagJson);
+        if (parsed.tag) topicTag = String(parsed.tag).slice(0, 100);
+      } catch {
+        // tag is optional
+      }
+
+      // ── Update daily usage ───────────────────────────────────────────────
+      const now = Date.now();
+      if (usage) {
+        await db
+          .update(schema.freeRunDailyUsage)
+          .set({ questionCount: currentCount + 1, updatedAt: now })
+          .where(eq(schema.freeRunDailyUsage.id, usage.id));
+      } else {
+        await db.insert(schema.freeRunDailyUsage).values({
+          userId,
+          dateKey,
+          questionCount: 1,
+          updatedAt: now,
+        });
+      }
+
+      return {
+        answer,
+        topicTag,
+        limitReached: false,
+        questionsUsed: currentCount + 1,
+        questionsTotal: DAILY_FREE_QUESTIONS,
+      };
+    }),
+
+  /**
+   * Unlock the Go Deeper triangle for a question.
+   * Costs 1 credit (first reveal ever is free).
+   * Returns Science, Vineyard, and Craft panels.
+   */
+  goDeeper: protectedProcedure
+    .input(
+      z.object({
+        question: z.string().min(1).max(500),
+        surfaceAnswer: z.string().min(1).max(5000),
+        topicTag: z.string().max(100).optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const userId = dbUser.id;
+      const now = Date.now();
+
+      // ── Check if this is the user's first ever reveal (free hook) ────────
+      const [existingReveal] = await db
+        .select({ id: schema.goDeeperReveals.id })
+        .from(schema.goDeeperReveals)
+        .where(eq(schema.goDeeperReveals.userId, userId))
+        .limit(1);
+
+      const isFirstEver = !existingReveal;
+
+      // ── Check credit balance if not free ────────────────────────────────
+      if (!isFirstEver) {
+        const [credits] = await db
+          .select()
+          .from(schema.freeRunCredits)
+          .where(eq(schema.freeRunCredits.userId, userId))
+          .limit(1);
+
+        const balance = credits?.balance ?? 0;
+        if (balance < 1) {
+          return {
+            success: false,
+            insufficientCredits: true,
+            balance,
+            sciencePanel: null,
+            vineyardPanel: null,
+            craftPanel: null,
+            revealId: null,
+          };
+        }
+
+        // Deduct 1 credit
+        if (credits) {
+          await db
+            .update(schema.freeRunCredits)
+            .set({
+              balance: balance - 1,
+              totalConsumed: (credits.totalConsumed ?? 0) + 1,
+              updatedAt: now,
+            })
+            .where(eq(schema.freeRunCredits.id, credits.id));
+        }
+      }
+
+      // ── Generate the three triangle panels in parallel ───────────────────
+      const baseContext = `Original question: "${input.question}"\n\nSurface answer already given: "${input.surfaceAnswer}"\n\nTopic: ${input.topicTag ?? "wine"}`;
+
+      const sciencePrompt = `You are a wine science expert writing for curious wine lovers (not winemakers).
+
+${baseContext}
+
+Write "The Science" panel — go one level deeper into the chemistry, biology, or physics behind this topic. Stay strictly on this topic. Do not introduce new subjects. 2–3 paragraphs. Use accessible but precise scientific language. Make it fascinating.`;
+
+      const vineyardPrompt = `You are a viticulture expert writing for curious wine lovers (not winemakers).
+
+${baseContext}
+
+Write "The Vineyard" panel — explain how this characteristic originates in the vineyard: the grape variety, soil, climate, canopy management, or geography. Stay strictly on this topic. Do not introduce new subjects. 2–3 paragraphs. Make the connection between vineyard and glass vivid and tangible.`;
+
+      const craftPrompt = `You are a winemaking expert writing for curious wine lovers who want to understand the craft (not commercial winemakers).
+
+${baseContext}
+
+Write "The Craft" panel — explain how a winemaker shapes, controls, or exploits this characteristic during winemaking. Stay strictly on this topic. Do not introduce new subjects. 2–3 paragraphs. Make the winemaker's decisions feel like artistry, not industrial process.`;
+
+      const [sciencePanel, vineyardPanel, craftPanel] = await Promise.all([
+        callLLM([{ role: "user", content: sciencePrompt }]),
+        callLLM([{ role: "user", content: vineyardPrompt }]),
+        callLLM([{ role: "user", content: craftPrompt }]),
+      ]);
+
+      // ── Store the reveal ─────────────────────────────────────────────────
+      const [inserted] = await db.insert(schema.goDeeperReveals).values({
+        userId,
+        question: input.question,
+        topicTag: input.topicTag ?? null,
+        surfaceAnswer: input.surfaceAnswer,
+        sciencePanel,
+        vineyardPanel,
+        craftPanel,
+        wasFreeHook: isFirstEver,
+        creditsConsumed: isFirstEver ? 0 : 1,
+        createdAt: now,
+      });
+
+      const revealId = (inserted as unknown as { insertId: number }).insertId;
+
+      return {
+        success: true,
+        insufficientCredits: false,
+        balance: null,
+        sciencePanel,
+        vineyardPanel,
+        craftPanel,
+        revealId,
+        wasFreeHook: isFirstEver,
+      };
+    }),
+
+  /**
+   * Submit thumbs up/down feedback for a Go Deeper panel.
+   */
+  submitFeedback: protectedProcedure
+    .input(
+      z.object({
+        revealId: z.number().int().positive(),
+        panel: z.enum(["science", "vineyard", "craft"]),
+        thumbsUp: z.boolean(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await db.insert(schema.goDeeperFeedback).values({
+        userId: dbUser.id,
+        revealId: input.revealId,
+        panel: input.panel,
+        thumbsUp: input.thumbsUp,
+        createdAt: Date.now(),
+      });
+      return { success: true };
+    }),
+
+  /**
+   * Get the user's current credit balance and daily usage.
+   */
+  status: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return { creditBalance: 0, totalPurchased: 0, questionsUsedToday: 0, questionsTotal: DAILY_FREE_QUESTIONS, questionsRemaining: DAILY_FREE_QUESTIONS };
+    const userId = dbUser.id;
+    const dateKey = todayUTC();
+
+    const [[credits], [usage]] = await Promise.all([
+      db
+        .select()
+        .from(schema.freeRunCredits)
+        .where(eq(schema.freeRunCredits.userId, userId))
+        .limit(1),
+      db
+        .select()
+        .from(schema.freeRunDailyUsage)
+        .where(
+          and(
+            eq(schema.freeRunDailyUsage.userId, userId),
+            eq(schema.freeRunDailyUsage.dateKey, dateKey)
+          )
+        )
+        .limit(1),
+    ]);
+
+    return {
+      creditBalance: credits?.balance ?? 0,
+      totalPurchased: credits?.totalPurchased ?? 0,
+      questionsUsedToday: usage?.questionCount ?? 0,
+      questionsTotal: DAILY_FREE_QUESTIONS,
+      questionsRemaining: Math.max(0, DAILY_FREE_QUESTIONS - (usage?.questionCount ?? 0)),
+    };
+  }),
+});

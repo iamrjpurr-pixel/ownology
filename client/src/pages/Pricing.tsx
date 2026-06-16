@@ -139,22 +139,22 @@ const TIERS = [
   {
     id: "free_run",
     name: "Free Run",
-    tagline: "Orientation & compliance basics. No card required.",
-    audience: "Curious about winemaking or exploring Ownology.",
+    tagline: "Understand wine from the inside out. No card required.",
+    audience: "Wine lovers, curious drinkers, food & wine enthusiasts.",
     monthlyPrice: 0,
     annualPrice: 0,
     highlight: false,
     badge: null,
     color: "var(--ow-text-lo)",
     features: [
-      "5 Compliance AI queries per month",
-      "3 Free Run lesson previews",
-      "Vintage log (5 entries per month)",
-      "Getting Started Guide",
-      "Full public Resources library",
+      "3 wine curiosity questions per day",
+      "Flavour science, varietals, regions, food pairing",
+      "Go Deeper triangle: Science \u00b7 Vineyard \u00b7 Craft",
+      "First Go Deeper reveal free",
+      "Account required \u2014 no card needed",
     ],
-    cta: "Start Free",
-    ctaHref: "#waitlist",
+    cta: "Start Exploring",
+    ctaHref: "/free-run",
     note: null,
   },
   {
@@ -227,51 +227,42 @@ const TIERS = [
 
 const CREDIT_PACKS = [
   {
-    id: "measure",
-    name: "The Measure",
-    credits: 50,
+    id: "starter",
+    name: "A Bottle of Curiosity",
+    credits: 5,
+    price: 4,
+    perCredit: "$0.80",
+    tagline: "Five Go Deeper reveals. Packs never expire.",
+    badge: null,
+  },
+  {
+    id: "curious",
+    name: "A Case of Questions",
+    credits: 15,
     price: 9,
-    perCredit: "$0.18",
-    tagline: "For casual learners and one-off questions.",
-    badge: null,
+    perCredit: "$0.60",
+    tagline: "Same price as The Press \u2014 or go unlimited.",
+    badge: "MOST POPULAR",
   },
   {
-    id: "vintage",
-    name: "The Vintage",
-    credits: 200,
-    price: 29,
-    perCredit: "$0.145",
-    tagline: "For seasonal workers and active learners.",
-    badge: "HARVEST READY",
-  },
-  {
-    id: "reserve",
-    name: "The Reserve",
-    credits: 600,
-    price: 69,
-    perCredit: "$0.115",
-    tagline: "For serious students and small teams.",
+    id: "obsessed",
+    name: "The Obsessive",
+    credits: 40,
+    price: 19,
+    perCredit: "$0.48",
+    tagline: "For the genuinely wine-obsessed.",
     badge: "BEST VALUE",
-  },
-  {
-    id: "magnum",
-    name: "The Magnum",
-    credits: 1500,
-    price: 149,
-    perCredit: "$0.099",
-    tagline: "For Cellar Master overflow and team use.",
-    badge: null,
   },
 ];
 
 const FAQS = [
   {
     q: "What is a credit?",
-    a: "One credit = one AI tutor interaction — asking a question about a lesson, requesting a different explanation, or taking a quiz. The Compliance Agent is unlimited on all paid tiers and does not consume credits.",
+    a: "One credit unlocks the Go Deeper triangle for one question \u2014 three panels (Science, Vineyard, Craft) that take your curiosity one level deeper. Credits never expire; your knowledge investment has no use-by date.",
   },
   {
     q: "Do credits expire?",
-    a: "No. Credits purchased via credit packs never expire. Monthly subscription credits reset each billing cycle, but pack credits roll over indefinitely. We designed it this way deliberately — your knowledge investment should not have a use-by date.",
+    a: "No. Credit pack credits never expire. We designed it this way deliberately \u2014 curiosity doesn't have a use-by date.",
   },
   {
     q: "What is the Founding Member offer?",
@@ -282,8 +273,8 @@ const FAQS = [
     a: "Yes. You can upgrade or downgrade at any time. Upgrades take effect immediately; downgrades take effect at the next billing cycle. Founding member pricing is locked regardless of tier changes.",
   },
   {
-    q: "What is the difference between Free Run and The Cellar?",
-    a: "Free Run gives you a taste — 5 compliance queries and 3 lesson previews per month, no credit card required. The Cellar unlocks the full lesson library, unlimited compliance queries, and 30 AI tutor credits per month. It is the first step from learning about Ownology to learning with it.",
+    q: "What is the difference between Free Run and The Press?",
+    a: "Free Run is for wine lovers who want to understand wine \u2014 its flavours, science, and origins. It's curiosity-led, free, and requires an account. The Press is for people who make or want to make wine \u2014 full winemaking AI, SOPs, vintage log, and cellar operations. If you've spent $1,000 on equipment, The Press pays for itself in the first harvest.",
   },
   {
     q: "Is there a team plan?",
@@ -1230,49 +1221,60 @@ export default function Pricing() {
               Top up when you need it.
             </h2>
             <p className="mt-2 max-w-xl" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9375rem", color: "var(--ow-text-lo)", lineHeight: 1.7 }}>
-              Credits power the AI tutor — every lesson question, quiz, and "explain it differently" request. The Compliance Agent is unlimited on all paid tiers and never consumes credits. Packs never expire; your knowledge investment has no use-by date.
+              One credit unlocks the Go Deeper triangle for one question — Science, Vineyard, and Craft panels that take your curiosity one level deeper. Packs never expire. Your knowledge investment has no use-by date.
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
           {CREDIT_PACKS.map(pack => (
             <CreditPackCard key={pack.id} pack={pack} />
           ))}
         </div>
       </div>
 
-      {/* What is a credit */}
+      {/* What does one credit get you */}
       <section className="py-16" style={{ background: "var(--ow-bg-base)" }}>
         <div className="container max-w-4xl mx-auto">
-          <h2 className="mb-8 text-center" style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "1.5rem", color: "var(--ow-text-hi)" }}>
+          <h2 className="mb-2 text-center" style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "1.5rem", color: "var(--ow-text-hi)" }}>
             What does one credit get you?
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <p className="text-center mb-8" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9375rem", color: "var(--ow-text-lo)" }}>
+            One credit unlocks the full Go Deeper triangle for one question.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
-              { action: "Ask about a lesson", credits: 1, example: '"What does YAN actually mean for my Shiraz?"' },
-              { action: "Explain it differently", credits: 1, example: '"Can you explain MLF without the chemistry?"' },
-              { action: "Quiz me on this topic", credits: 1, example: "3–5 adaptive questions on your chosen subject" },
-              { action: "Check my understanding", credits: 2, example: "You explain it back; AI scores and fills the gaps" },
-              { action: "Custom document question", credits: 2, example: "Ask questions from your uploaded SOPs" },
-              { action: "Emergency harvest answer", credits: 3, example: "Flagged urgent — priority processing" },
+              {
+                icon: "🔬",
+                panel: "The Science",
+                desc: "The chemistry, biology, and physics behind what you taste. Why diacetyl makes Chardonnay buttery. What tannins actually are at a molecular level.",
+                example: '"Why does this wine taste like this?" — answered at the cellular level.',
+              },
+              {
+                icon: "🌿",
+                panel: "The Vineyard",
+                desc: "How it starts in the fruit. Soil, climate, variety, canopy — the invisible forces that shape every glass before the winemaker touches it.",
+                example: '"Where does this flavour come from?" — traced back to the vine.',
+              },
+              {
+                icon: "🍷",
+                panel: "The Craft",
+                desc: "How the winemaker shapes, controls, or exploits this characteristic. The decisions that turn grapes into the wine in your glass.",
+                example: '"How do winemakers make this happen?" — the artistry explained.',
+              },
             ].map(item => (
-              <div key={item.action} className="rounded-sm p-4" style={{ background: "var(--ow-bg-base)", border: "1px solid var(--ow-border)" }}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium" style={{ fontFamily: "'Lato', sans-serif", color: "var(--ow-text-mid)" }}>
-                    {item.action}
-                  </span>
-                  <span className="text-xs px-2 py-0.5 rounded-sm" style={{ fontFamily: "'Fira Code', monospace", background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", color: "var(--ow-amber)" }}>
-                    {item.credits} credit{item.credits > 1 ? "s" : ""}
-                  </span>
+              <div key={item.panel} className="p-5" style={{ background: "var(--ow-bg-raised)", border: "1px solid var(--ow-border)", borderRadius: "2px" }}>
+                <div className="flex items-center gap-3 mb-3">
+                  <span style={{ fontSize: "1.5rem" }}>{item.icon}</span>
+                  <span className="font-medium" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.0625rem", color: "var(--ow-text-hi)" }}>{item.panel}</span>
+                  <span className="ml-auto text-xs px-2 py-0.5 rounded-sm" style={{ fontFamily: "'Fira Code', monospace", background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", color: "var(--ow-amber)" }}>1 credit</span>
                 </div>
-                <p className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontStyle: "italic", color: "var(--ow-text-lo)", lineHeight: 1.5 }}>
-                  {item.example}
-                </p>
+                <p className="text-sm mb-3" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-mid)", lineHeight: 1.6 }}>{item.desc}</p>
+                <p className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontStyle: "italic", color: "var(--ow-text-lo)", lineHeight: 1.5 }}>{item.example}</p>
               </div>
             ))}
           </div>
           <p className="text-center mt-6 text-sm" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)", fontStyle: "italic" }}>
-            The Compliance Agent is unlimited on all paid tiers — no credits consumed.
+            All three panels unlock for one credit. First reveal ever is always free.
           </p>
         </div>
       </section>
