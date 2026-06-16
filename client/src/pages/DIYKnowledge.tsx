@@ -144,16 +144,65 @@ function DIYKnowledgeHome() {
       <section className="py-6 border-b" style={{ borderColor: "var(--ow-border)" }}>
         <div className="container max-w-3xl">
           <div className="flex items-center gap-8">
-            {[
-              { label: "Guides", value: isLoading ? "…" : String(allSops.length) },
-              { label: "Journey steps", value: "5" },
-              { label: "Audience", value: "Home winemakers" },
-            ].map((s) => (
-              <div key={s.label}>
-                <p style={{ fontFamily: MONO, fontSize: "1.25rem", fontWeight: 700, color: "var(--ow-amber)", margin: 0 }}>{s.value}</p>
-                <p style={{ fontFamily: SANS, fontSize: "0.75rem", color: "var(--ow-text-lo)", margin: "2px 0 0", letterSpacing: "0.06em", textTransform: "uppercase" }}>{s.label}</p>
+
+            {/* Guides — with tooltip */}
+            <div className="relative group cursor-default">
+              <p style={{ fontFamily: MONO, fontSize: "1.25rem", fontWeight: 700, color: "var(--ow-amber)", margin: 0 }}>{isLoading ? "…" : String(allSops.length)}</p>
+              <p className="flex items-center gap-1" style={{ fontFamily: SANS, fontSize: "0.75rem", color: "var(--ow-text-lo)", margin: "2px 0 0", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                Guides
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style={{ opacity: 0.45, flexShrink: 0 }}>
+                  <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.1"/>
+                  <path d="M6 5.5v3" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+                  <circle cx="6" cy="3.75" r="0.6" fill="currentColor"/>
+                </svg>
+              </p>
+              <div className="absolute bottom-full left-0 mb-2 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150" style={{ width: "230px" }}>
+                <div style={{ background: "oklch(0.14 0.008 60)", border: "1px solid oklch(0.72 0.12 75 / 30%)", borderRadius: "4px", padding: "0.625rem 0.75rem", boxShadow: "0 4px 20px oklch(0 0 0 / 0.35)" }}>
+                  <p style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 600, color: "var(--ow-amber)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.375rem" }}>What are guides?</p>
+                  <p style={{ fontFamily: SANS, fontSize: "0.75rem", color: "oklch(0.82 0.015 75)", lineHeight: 1.55, margin: 0 }}>Each guide is a step-by-step SOP (Standard Operating Procedure) drawn from the Red Wine Bible and MoreWine! Outline — written for home scale, not commercial production.</p>
+                </div>
               </div>
-            ))}
+            </div>
+
+            {/* Journey Steps — with tooltip */}
+            <div className="relative group cursor-default">
+              <p style={{ fontFamily: MONO, fontSize: "1.25rem", fontWeight: 700, color: "var(--ow-amber)", margin: 0 }}>5</p>
+              <p className="flex items-center gap-1" style={{ fontFamily: SANS, fontSize: "0.75rem", color: "var(--ow-text-lo)", margin: "2px 0 0", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                Journey Steps
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style={{ opacity: 0.45, flexShrink: 0 }}>
+                  <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.1"/>
+                  <path d="M6 5.5v3" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+                  <circle cx="6" cy="3.75" r="0.6" fill="currentColor"/>
+                </svg>
+              </p>
+              <div className="absolute bottom-full left-0 mb-2 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150" style={{ width: "240px" }}>
+                <div style={{ background: "oklch(0.14 0.008 60)", border: "1px solid oklch(0.72 0.12 75 / 30%)", borderRadius: "4px", padding: "0.625rem 0.75rem", boxShadow: "0 4px 20px oklch(0 0 0 / 0.35)" }}>
+                  <p style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 600, color: "var(--ow-amber)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.5rem" }}>The 5-step journey</p>
+                  {[
+                    ["1", "Costs & Planning", "What it costs before you start"],
+                    ["2", "Equipment", "Everything you need for a 23L batch"],
+                    ["3", "Cleaning & Sanitation", "The most important step"],
+                    ["4", "Fermentation", "Crush to dry — the core of it"],
+                    ["5", "Bottling", "Filling, corking, labelling"],
+                  ].map(([num, title, desc]) => (
+                    <div key={num} style={{ marginBottom: num !== "5" ? "0.35rem" : 0 }}>
+                      <p style={{ fontFamily: SANS, fontSize: "0.75rem", color: "oklch(0.88 0.015 75)", lineHeight: 1.35, margin: 0 }}>
+                        <span style={{ fontFamily: MONO, fontSize: "0.65rem", color: "var(--ow-amber)", marginRight: "0.35rem" }}>{num}.</span>
+                        <strong style={{ fontWeight: 500 }}>{title}</strong>
+                      </p>
+                      <p style={{ fontFamily: SANS, fontSize: "0.7rem", color: "oklch(0.58 0.012 75)", lineHeight: 1.35, margin: 0, paddingLeft: "1rem" }}>{desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Audience — plain */}
+            <div>
+              <p style={{ fontFamily: MONO, fontSize: "1.25rem", fontWeight: 700, color: "var(--ow-amber)", margin: 0 }}>Home winemakers</p>
+              <p style={{ fontFamily: SANS, fontSize: "0.75rem", color: "var(--ow-text-lo)", margin: "2px 0 0", letterSpacing: "0.06em", textTransform: "uppercase" }}>Audience</p>
+            </div>
+
           </div>
         </div>
       </section>
