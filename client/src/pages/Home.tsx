@@ -101,7 +101,7 @@ function WhatsNewRibbon() {
           margin: 0,
         }}
       >
-        <strong style={{ fontWeight: 600, color: "var(--ow-text-hi)" }}>Knowledge Platform</strong> is live — 31 industry SOPs, Decision Logic &amp; Tribal Knowledge capture.
+        <strong style={{ fontWeight: 600, color: "var(--ow-text-hi)" }}>Knowledge Platform</strong> is live — 45 industry SOPs, Decision Logic &amp; Tribal Knowledge capture.
         {" "}
         <Link
           href="/knowledge"
@@ -542,7 +542,7 @@ function Hero() {
               style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,4rem)", lineHeight:1.1, color:"var(--ow-text-hi)", letterSpacing:"-0.02em"}}>
               <EditableText contentKey="home.hero.headline" defaultValue="Your cellar's most knowledgeable apprentice." contentMap={contentMap} />
             </h1>
-            <EditableText contentKey="home.hero.subheading" defaultValue="Log cellar readings. Access 31 industry SOPs. Ask the AI anything. Stay compliant. Ownology is the complete intelligence platform for boutique winery teams — on a mobile phone, during harvest." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
+            <EditableText contentKey="home.hero.subheading" defaultValue="Log cellar readings. Access 45 industry SOPs. Ask the AI anything. Stay compliant. Ownology is the complete intelligence platform for boutique winery teams — on a mobile phone, during harvest." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-10 fade-up fade-up-delay-3">
               <a href="/pricing" className="btn-amber text-center">Start 14-Day Free Trial</a>
               <a href="#how-it-works" className="btn-ghost text-center">See How It Works</a>
@@ -557,7 +557,7 @@ function Hero() {
             <div className="mt-12 flex items-center gap-4 fade-up fade-up-delay-4">
               <div className="amber-rule flex-1 hidden sm:block" />
               <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.7rem", color:"var(--ow-text-lo)", letterSpacing:"0.06em", textAlign:"center"}}>
-                TRUSTED BY BOUTIQUE WINERIES ACROSS AU · NZ · US
+                BUILT FOR BOUTIQUE WINERIES ACROSS AU · NZ · US
               </p>
               <div className="amber-rule flex-1 hidden sm:block" />
             </div>
@@ -752,10 +752,10 @@ function Features() {
                 </div>
                 <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.375rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>Knowledge Platform</h3>
                 <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7}}>
-                  31 industry-standard SOPs across 8 categories — from fermentation management to bottling. Capture the reasoning behind every decision in Decision Logic. Preserve your team's accumulated experience in Tribal Knowledge. Your winery's institutional memory, searchable and permanent.
+                  45 industry-standard SOPs across 12 categories — from fermentation management to bottling. Capture the reasoning behind every decision in Decision Logic. Preserve your team's accumulated experience in Tribal Knowledge. Your winery's institutional memory, searchable and permanent.
                 </p>
                 <div className="mt-6 flex flex-col gap-2">
-                  {["Fermentation Management · 6 SOPs","Additions & Nutrients · 5 SOPs","Cleaning & Sanitation · 4 SOPs","Packaging & Bottling · 4 SOPs"].map(f=>(
+                  {["Fermentation Management · 11 SOPs","Laboratory Testing · 5 SOPs","Tank Cleaning & Sanitation · 5 SOPs","Bottling Procedures · 4 SOPs"].map(f=>(
                     <div key={f} className="flex items-center gap-3 px-3 py-2 rounded-sm" style={{background:"var(--ow-bg-base)"}}>
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                         <path d="M3 2h5l2 2v6a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="oklch(0.62 0.10 45)" strokeWidth="1"/>
@@ -784,7 +784,7 @@ function HowItWorks() {
   const { ref, inView } = useInView();
   const steps = [
     { n:"01", title:"Do — Log and Track", body:"Record cellar readings by voice or photo in The Press. The Fermentation Dashboard tracks all active tanks. Vineyard and Cellar Tasks keep your team aligned in real time." },
-    { n:"02", title:"Know — Access Your SOPs", body:"31 industry-standard SOPs across 8 categories, ready to use on day one. Add your own Decision Logic and Tribal Knowledge. Every protocol is searchable, every decision is documented." },
+    { n:"02", title:"Know — Access Your SOPs", body:"45 industry-standard SOPs across 12 categories, ready to use on day one. Add your own Decision Logic and Tribal Knowledge. Every protocol is searchable, every decision is documented." },
     { n:"03", title:"Learn — Ask the AI", body:"Open Free Run and ask anything — from SO₂ calculations to stuck fermentation triage. The AI draws on your winery's own SOPs and world-class wine science, then delivers a precise, cited answer." },
     { n:"04", title:"Guide — Stay Compliant", body:"The Compliance AI answers regulatory questions across LIP, FSANZ, and state licensing. Every answer is grounded in current legislation — not generic internet content." },
   ];
@@ -895,33 +895,45 @@ function DemoVideo() {
 // ─── Testimonials ─────────────────────────────────────────────────────────────
 function Testimonials() {
   const { ref, inView } = useInView();
-  const quotes = [
-    { q:"I make wine, I don't do data entry. By the time I update the spreadsheet on Friday, I've already forgotten what I observed on Tuesday. Ownology changed that completely.", name:"Owner-Winemaker", region:"Marlborough, NZ", cases:"6,200 cases" },
-    { q:"During harvest I get asked the same questions every single day. Ownology answers them for me. I can finally focus on the wine.", name:"Head Winemaker", region:"Sonoma, CA", cases:"18,000 cases" },
-    { q:"I work across eight clients. If I had something that could hold my protocols and answer questions on my behalf, I could take on two more clients. This is that thing.", name:"Consulting Winemaker", region:"Yarra Valley, VIC", cases:"8 clients" },
+  const cards = [
+    {
+      icon: "🍷",
+      title: "The problem we're solving",
+      body: "Boutique winery teams lose institutional knowledge every vintage. SOPs live in binders. Decisions aren't documented. New staff ask the same questions every harvest. Ownology fixes that.",
+    },
+    {
+      icon: "📱",
+      title: "Built for mobile, during harvest",
+      body: "Designed to be used one-handed, in a cold cellar, with wet gloves. Every answer is grounded in your own documents — not generic internet content.",
+    },
+    {
+      icon: "🔒",
+      title: "Your data stays yours",
+      body: "Your SOPs, vintage records, and tribal knowledge are never used to train AI models. They stay in your account, searchable only by your team.",
+    },
   ];
   return (
     <section className="py-28">
       <div className="container" ref={ref}>
-        <p className="section-label mb-4">From the Cellar</p>
+        <p className="section-label mb-4">Why Ownology</p>
         <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"480px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
-          What winemakers are saying.
+          Built by winemakers, for winemakers.
         </h2>
         <div className="amber-rule mt-8 mb-12" />
         <div className="grid md:grid-cols-3 gap-6">
-          {quotes.map((t, i) => (
+          {cards.map((c, i) => (
             <div key={i} className={`cellar-card p-8 flex flex-col ${inView ? `fade-up fade-up-delay-${i+1}` : "opacity-0"}`}>
-              <div className="mb-5" style={{color:"var(--ow-amber)", fontSize:"2rem", lineHeight:1, fontFamily:"'Fraunces',serif"}}>"</div>
-              <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.75, flex:1, fontStyle:"italic"}}>
-                {t.q}
+              <div className="mb-4 text-3xl">{c.icon}</div>
+              <p style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}}>{c.title}</p>
+              <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.75, flex:1}}>
+                {c.body}
               </p>
-              <div className="mt-6 pt-5" style={{borderTop:"1px solid var(--ow-border)"}}>
-                <p style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"0.9375rem", color:"var(--ow-text-hi)"}}>{t.name}</p>
-                <p className="data-readout text-xs mt-1" style={{color:"var(--ow-text-lo)"}}>{t.region} · {t.cases}</p>
-              </div>
             </div>
           ))}
         </div>
+        <p className="text-center mt-10" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.875rem", color:"var(--ow-text-lo)", fontStyle:"italic"}}>
+          Founding member access open now — be among the first wineries to use Ownology in the 2025–26 vintage.
+        </p>
       </div>
     </section>
   );
@@ -933,7 +945,7 @@ function Pricing() {
   const tiers = [
     {
       name:"Harvest", price:"$99", period:"/month", cases:"Up to 5,000 cases",
-      features:["The Press — cellar logbook & fermentation tracking","Knowledge Platform — 31 industry SOPs","Free Run — AI assistant","Compliance AI — regulatory Q&A","2 user seats","14-day free trial"],
+      features:["The Press — cellar logbook & fermentation tracking","Knowledge Platform — 45 industry SOPs","Free Run — AI assistant","Compliance AI — regulatory Q&A","2 user seats","14-day free trial"],
       cta:"Start Free Trial", highlight:false,
     },
     {

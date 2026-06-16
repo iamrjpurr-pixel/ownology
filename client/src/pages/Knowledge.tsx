@@ -43,63 +43,63 @@ const CATEGORY_META: Record<string, {
   label: string;
   icon: React.ReactNode;
   color: string;
-  csuRef: string;
+  industryRef: string;
   description: string;
 }> = {
   "Fermentation Management": {
     label: "Fermentation Management",
     icon: <FlaskConical className="w-6 h-6" />,
     color: "var(--ow-amber)",
-    csuRef: "WSC202, WSC318",
+    industryRef: "Oenology 2 · Oenology 4",
     description: "Yeast selection, YAN management, temperature control, cap management, and stuck ferment response.",
   },
   "Tank Cleaning & Sanitation": {
     label: "Tank Cleaning & Sanitation",
     icon: <Droplets className="w-6 h-6" />,
     color: "oklch(0.65 0.10 220)",
-    csuRef: "WSC318, WSC202",
+    industryRef: "Oenology 2 · Oenology 3",
     description: "Pre-vintage CIP, post-ferment tank clean, barrel sanitation, hose and pump sanitation.",
   },
   "Barrel Management": {
     label: "Barrel Management",
     icon: <Wine className="w-6 h-6" />,
     color: "oklch(0.60 0.10 30)",
-    csuRef: "WSC303, WSC317",
+    industryRef: "Oenology 8 · Oenology 7",
     description: "Topping schedules, barrel inspection, cooper selection criteria, and barrel retirement.",
   },
   "Bottling Procedures": {
     label: "Bottling Procedures",
     icon: <Package className="w-6 h-6" />,
     color: "oklch(0.65 0.10 160)",
-    csuRef: "WSC303",
+    industryRef: "Oenology 8",
     description: "Bottling line setup, fill level and headspace, closure selection, label verification, finished goods release.",
   },
   "Laboratory Testing": {
     label: "Laboratory Testing",
     icon: <TestTube className="w-6 h-6" />,
     color: "oklch(0.65 0.10 280)",
-    csuRef: "WSC319, WSC318",
+    industryRef: "Oenology 3 · Oenology 6",
     description: "Sampling procedures, pH and TA measurement, Brix/SG, free SO₂, YAN, and VA analysis.",
   },
   "Vintage Worker Onboarding": {
     label: "Vintage Worker Onboarding",
     icon: <Users className="w-6 h-6" />,
     color: "oklch(0.65 0.10 340)",
-    csuRef: "AHT274, WSC202",
+    industryRef: "Oenology 1 · Oenology 4",
     description: "Site induction, safety induction, role-specific training, and end-of-vintage debrief.",
   },
   "Food Safety & Compliance": {
     label: "Food Safety & Compliance",
     icon: <ShieldCheck className="w-6 h-6" />,
     color: "oklch(0.65 0.10 120)",
-    csuRef: "AGR202, WSC319",
+    industryRef: "Oenology 3 · Oenology 6",
     description: "HACCP critical control points, allergen management, traceability, corrective actions, and document control.",
   },
   "Traceability": {
     label: "Traceability",
     icon: <Barcode className="w-6 h-6" />,
     color: "oklch(0.65 0.10 200)",
-    csuRef: "WSC202, WSC303",
+    industryRef: "Oenology 4 · Oenology 8",
     description: "Grape receival records, addition records, blending records, packaging records, and export movement advice.",
   },
 };
@@ -294,9 +294,9 @@ function KnowledgeHome() {
                     </Badge>
                     <ChevronRight className="w-4 h-4" style={{ color: "var(--ow-text-lo)" }} />
                   </div>
-                  {meta?.csuRef && (
+                  {meta?.industryRef && (
                     <p className="text-xs mt-2" style={{ color: "var(--ow-text-lo)" }}>
-                      CSU: {meta.csuRef}
+                      Further Study: {meta.industryRef}
                     </p>
                   )}
                 </div>
@@ -342,9 +342,9 @@ function KnowledgeCategory({ category }: { category: string }) {
             </h1>
           </div>
           <p className="text-sm" style={{ color: "var(--ow-text-lo)" }}>{meta?.description}</p>
-          {meta?.csuRef && (
+          {meta?.industryRef && (
             <p className="text-xs mt-1" style={{ color: "var(--ow-text-lo)" }}>
-              CSU Reference: {meta.csuRef}
+              Industry Curriculum: {meta.industryRef}
             </p>
           )}
         </div>
@@ -368,7 +368,7 @@ function KnowledgeCategory({ category }: { category: string }) {
                     <div className="flex gap-2 flex-wrap">
                       {sop.decisionLogic && <Badge variant="outline" className="text-xs gap-1" style={{ borderColor: "color-mix(in oklch, var(--ow-amber) 30%, transparent)", color: "var(--ow-amber)" }}><Brain className="w-3 h-3" />Decision Logic</Badge>}
                       {sop.tribalKnowledge && <Badge variant="outline" className="text-xs gap-1" style={{ borderColor: "oklch(0.65 0.10 220 / 30%)", color: "oklch(0.65 0.10 220)" }}><Lightbulb className="w-3 h-3" />Tribal Knowledge</Badge>}
-                      {sop.csuSubjectRef && <Badge variant="outline" className="text-xs" style={{ borderColor: "var(--ow-border)", color: "var(--ow-text-lo)" }}>CSU: {sop.csuSubjectRef}</Badge>}
+                      {sop.csuSubjectRef && <Badge variant="outline" className="text-xs" style={{ borderColor: "var(--ow-border)", color: "var(--ow-text-lo)" }}>Further Study: {sop.csuSubjectRef}</Badge>}
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: "var(--ow-text-lo)" }} />
@@ -461,7 +461,7 @@ function SopDetail({ id }: { id: number }) {
               <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: "'Fraunces', serif", color: "var(--ow-text-hi)" }}>{sop.title}</h1>
               <div className="flex gap-2 flex-wrap">
                 <Badge variant="outline" className="text-xs" style={{ borderColor: "var(--ow-border)", color: "var(--ow-text-lo)" }}>{sop.category}</Badge>
-                {sop.csuSubjectRef && <Badge variant="outline" className="text-xs" style={{ borderColor: "oklch(0.65 0.10 280 / 30%)", color: "oklch(0.65 0.10 280)" }}>CSU: {sop.csuSubjectRef}</Badge>}
+                {sop.csuSubjectRef && <Badge variant="outline" className="text-xs" style={{ borderColor: "oklch(0.65 0.10 280 / 30%)", color: "oklch(0.65 0.10 280)" }}>Further Study: {sop.csuSubjectRef}</Badge>}
                 {sop.isTemplate && <Badge variant="outline" className="text-xs" style={{ borderColor: "color-mix(in oklch, var(--ow-amber) 30%, transparent)", color: "var(--ow-amber)" }}>Platform Template</Badge>}
               </div>
             </div>

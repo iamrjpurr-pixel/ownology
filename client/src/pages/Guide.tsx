@@ -83,7 +83,7 @@ const CHECKLIST: ChecklistItem[] = [
   {
     id: "browse-sops",
     label: "Browse the SOP library",
-    description: "31 industry-standard SOPs across 8 categories are ready to use from day one.",
+    description: "45 industry-standard SOPs across 12 categories are ready to use from day one.",
     href: "/knowledge",
     linkLabel: "Open Knowledge Platform",
   },
@@ -538,7 +538,7 @@ export default function Guide() {
             <PillarCard
               pillar="Know"
               label="Knowledge Platform"
-              description="31 industry-standard SOPs across 8 categories. Capture Decision Logic, Tribal Knowledge, and Vintage Notes. Your winery's institutional memory, permanent and searchable."
+              description="45 industry-standard SOPs across 12 categories. Capture Decision Logic, Tribal Knowledge, and Vintage Notes. Your winery's institutional memory, permanent and searchable."
               href="/knowledge"
               icon={<BookOpen className="w-5 h-5" />}
               color="oklch(0.62 0.10 45)"
@@ -767,7 +767,7 @@ export default function Guide() {
                 highlight: true,
                 pillars: [
                   { label: "DO",    color: "var(--ow-amber)",  desc: "Full cellar operations suite" },
-                  { label: "KNOW",  color: "oklch(0.62 0.10 45)",  desc: "31 SOPs, Decision Logic, Tribal Knowledge" },
+                  { label: "KNOW",  color: "oklch(0.62 0.10 45)",  desc: "45 SOPs, Decision Logic, Tribal Knowledge" },
                   { label: "GUIDE", color: "oklch(0.65 0.10 160)", desc: "Priority Compliance AI" },
                 ],
                 href: "/pricing",

@@ -116,7 +116,7 @@ const FEATURE_EXPLANATIONS: Record<string, string> = {
   "Unlimited Compliance AI queries": "No monthly cap on regulatory questions. Ask anything across LIP, FSANZ, state licensing, and export requirements.",
   // The Press
   "Full cellar operations suite": "The complete Do pillar: The Press (Vintage Log, Batch Book, Barrels, Packaging, Calculations, Export Docs), Cellar Tasks, Vineyard, Quick Entry, and Dashboard.",
-  "Knowledge Platform — 31 SOPs, 8 categories": "The full Know pillar: 31 industry-standard SOPs across Fermentation, Sanitation, Barrels, Bottling, Lab, Onboarding, Food Safety, and Traceability. Add Decision Logic, Tribal Knowledge, and Vintage Notes to each SOP.",
+  "Knowledge Platform — 45 SOPs, 12 categories": "The full Know pillar: 45 industry-standard SOPs across Fermentation, Sanitation, Barrels, Bottling, Lab, Onboarding, Food Safety, and Traceability. Add Decision Logic, Tribal Knowledge, and Vintage Notes to each SOP.",
   "Priority Compliance AI responses": "Your compliance queries jump the queue — faster response times during busy harvest periods when you need answers in seconds, not minutes.",
   "Vintage log PDF export": "Export your full vintage log as a formatted PDF — useful for audits, cellar notes, and end-of-vintage records.",
   // Cellar Master
@@ -191,7 +191,7 @@ const TIERS = [
     color: "var(--ow-amber)",
     features: [
       "Full cellar operations suite",
-      "Knowledge Platform — 31 SOPs, 8 categories",
+      "Knowledge Platform — 45 SOPs, 12 categories",
       "Decision Logic + Tribal Knowledge capture",
       "Priority Compliance AI responses",
       "Vintage log PDF export",

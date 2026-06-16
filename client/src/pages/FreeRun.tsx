@@ -27,115 +27,145 @@ const EXAMPLE_PROMPTS = [
   { label: "Fining agents", q: "What fining agents should I use to improve clarity in my white wine?" },
 ];
 
-// ─── CSU Academic Backbone (sourced from CSU Bachelor of Wine Science handbook) ─
-interface CsuSubject {
-  code: string;
+// ─── Industry Curriculum Backbone (AOC Advanced Certificate of Viticulture, Winemaking & Oenology) ─
+interface AocModule {
+  unit: string;
   name: string;
-  level: "Foundation" | "Intermediate" | "Advanced";
+  phase: "Foundation" | "Process" | "Advanced";
   keyTopics: string[];
   ownologyLink: string;
   ownologyLabel: string;
-  handbookUrl: string;
 }
 
-const CSU_SUBJECTS: CsuSubject[] = [
+const AOC_MODULES: AocModule[] = [
   {
-    code: "WSC202",
-    name: "Wine Production 1",
-    level: "Intermediate",
+    unit: "Oenology 1",
+    name: "Scope and Nature of Oenology",
+    phase: "Foundation",
     keyTopics: [
-      "Fruit quality, maturity patterns, picking criteria",
-      "Grape processing: crushing, pressing, juice clarification",
-      "White wine fermentation control",
-      "Red wine: skin fermentation, colour and flavour extraction",
-      "Post-fermentation: fining, MLF, stabilisation, blending",
-      "Bottling: filtration, wine protection",
+      "Introduction to global wine production",
+      "Global wine consumption patterns",
+      "What is involved in winemaking",
+      "Wine making terminology",
+      "Testing, tasting and monitoring",
+      "Alcohol and health considerations",
+    ],
+    ownologyLink: "/knowledge",
+    ownologyLabel: "Knowledge Platform →",
+  },
+  {
+    unit: "Oenology 2",
+    name: "Fermentation Science",
+    phase: "Foundation",
+    keyTopics: [
+      "Fermentation fundamentals and carbohydrate metabolism",
+      "Microbiology: yeasts, bacteria, and spoilage organisms",
+      "Enzyme activity and quality control",
+      "Malolactic fermentation (MLF)",
+      "Secondary fermentation management",
     ],
     ownologyLink: "/knowledge/category/Crushing%20%26%20Fermentation",
     ownologyLabel: "Fermentation SOPs →",
-    handbookUrl: "https://handbook.csu.edu.au/subject/2024/wsc202",
   },
   {
-    code: "WSC318",
-    name: "Wine Microbiology",
-    level: "Advanced",
+    unit: "Oenology 3",
+    name: "The Winemaking Process",
+    phase: "Process",
     keyTopics: [
-      "Yeast ecology during alcoholic fermentation",
-      "MLF organisms, conditions, and wine quality impact",
-      "Spoilage organisms: Brett, acetic acid bacteria, Pediococcus",
-      "SO₂ as microbial control: molecular SO₂ calculation",
-      "YAN and yeast nutrition — stuck ferment causes",
-      "Microbiological analysis techniques",
-    ],
-    ownologyLink: "/knowledge/category/Laboratory%20Testing",
-    ownologyLabel: "Lab Testing SOPs →",
-    handbookUrl: "https://handbook.csu.edu.au/subject/2026/wsc318",
-  },
-  {
-    code: "WSC319",
-    name: "Wine Chemistry",
-    level: "Advanced",
-    keyTopics: [
-      "Protein stability, acidification, bitartrate stability",
-      "Fining agents: bentonite, egg white, PVPP, copper sulphate",
-      "Bitartrate stabilisation: cold stab, KHT seeding",
-      "Wine oxidation chemistry and SO₂ as antioxidant",
-      "Enzyme treatments: pectolytic, glucanase, glycosidase",
+      "Outline of the winemaking process end-to-end",
+      "Clarification and stabilisation techniques",
+      "Preservation: SO₂ management and additions",
+      "Methods to determine sugar and sulphur dioxide levels",
     ],
     ownologyLink: "/knowledge/category/Tank%20Cleaning%20%26%20Sanitation",
     ownologyLabel: "Cellar Operations SOPs →",
-    handbookUrl: "https://handbook.csu.edu.au/subject/2026/wsc319",
   },
   {
-    code: "WSC303",
-    name: "Wine Production 2",
-    level: "Advanced",
+    unit: "Oenology 4",
+    name: "Factors Affecting Grape Characteristics",
+    phase: "Process",
     keyTopics: [
-      "Sparkling wine: Méthode Champenoise, tank fermentation",
-      "Fortified wine: Port, Muscat, Tokay, Sherry styles",
-      "NOLO (no/low alcohol) wine production",
-      "Blending, fining, and ageing for style development",
-      "Distillation methods and fortifying spirit quality",
+      "Fruit characteristics affecting wine style",
+      "Fermentation preparation and additions",
+      "Effects of yeasts in winemaking",
+      "Managing yeasts: nutrition, temperature, YAN",
+      "Alcohol content, chemical and microbial stability",
+      "Inoculum of yeast: timing and selection",
     ],
-    ownologyLink: "/knowledge/category/Bottling%20Procedures",
-    ownologyLabel: "Bottling SOPs →",
-    handbookUrl: "https://handbook.csu.edu.au/subject/2026/wsc303",
+    ownologyLink: "/knowledge/category/Crushing%20%26%20Fermentation",
+    ownologyLabel: "Fermentation SOPs →",
   },
   {
-    code: "WSC321",
-    name: "Winery Engineering",
-    level: "Advanced",
+    unit: "Oenology 5",
+    name: "Wine Classification",
+    phase: "Foundation",
     keyTopics: [
-      "Pump types, selection, and maintenance",
-      "Heat exchangers and temperature control systems",
-      "CIP (Clean-In-Place) system design and operation",
-      "Press types: pneumatic, membrane, basket",
-      "Tank design, materials, and cleaning protocols",
+      "Types of wines and production methods",
+      "Selecting wine grapes by variety and region",
+      "Varietal characteristics and style outcomes",
     ],
-    ownologyLink: "/knowledge/category/Equipment%20Maintenance",
-    ownologyLabel: "Equipment SOPs →",
-    handbookUrl: "https://handbook.csu.edu.au/subject/2026/wsc321",
+    ownologyLink: "/knowledge",
+    ownologyLabel: "Knowledge Platform →",
   },
   {
-    code: "MCR101",
-    name: "Introduction to Microbiology",
-    level: "Foundation",
+    unit: "Oenology 6",
+    name: "Sensory Science and Evaluation",
+    phase: "Advanced",
     keyTopics: [
-      "Microbial cell structure and function",
-      "Bacterial and yeast growth kinetics",
-      "Fermentation pathways: glycolysis, ethanol production",
-      "Microbial control methods: heat, chemicals, pH",
-      "Food safety microbiology fundamentals",
+      "Wine sensory science fundamentals",
+      "Determining consumer preference",
+      "Types of senses and sensory thresholds",
+      "Wine evaluation methodology",
+      "Wine and food interaction principles",
     ],
-    ownologyLink: "/knowledge/category/Food%20Safety%20%26%20Compliance",
-    ownologyLabel: "Food Safety SOPs →",
-    handbookUrl: "https://handbook.csu.edu.au/subject/2026/mcr101",
+    ownologyLink: "/knowledge/category/Laboratory%20Testing",
+    ownologyLabel: "Lab & QC SOPs →",
+  },
+  {
+    unit: "Oenology 7",
+    name: "White Wine and Sparkling Production",
+    phase: "Process",
+    keyTopics: [
+      "Harvesting grapes for white wine",
+      "Crushing and must management",
+      "Managing the must: cold settling, juice clarification",
+      "Sparkling wines: Méthode Champenoise, tank method",
+      "The Champenois method in detail",
+    ],
+    ownologyLink: "/knowledge/category/Crushing%20%26%20Fermentation",
+    ownologyLabel: "Fermentation SOPs →",
+  },
+  {
+    unit: "Oenology 8",
+    name: "Red Wine and Rosé Production",
+    phase: "Process",
+    keyTopics: [
+      "Harvesting and crushing for reds",
+      "Fermentation on skins: cap management, extraction",
+      "Extracting colour: pumpovers, plunging, délestage",
+      "Thermovinification for colour extraction",
+      "Getting a wood flavour: barrel selection and use",
+    ],
+    ownologyLink: "/knowledge/category/Crushing%20%26%20Fermentation",
+    ownologyLabel: "Fermentation SOPs →",
+  },
+  {
+    unit: "Oenology 9",
+    name: "Production of Spirits",
+    phase: "Advanced",
+    keyTopics: [
+      "Distillation principles and methods",
+      "Fortified wine production: Port, Muscat, Sherry styles",
+      "Spirit quality and maturation",
+    ],
+    ownologyLink: "/knowledge",
+    ownologyLabel: "Knowledge Platform →",
   },
 ];
 
-const CSU_LEVEL_COLORS: Record<"Foundation" | "Intermediate" | "Advanced", string> = {
+const AOC_PHASE_COLORS: Record<"Foundation" | "Process" | "Advanced", string> = {
   Foundation: "var(--ow-amber)",
-  Intermediate: "oklch(0.65 0.10 230)",
+  Process: "oklch(0.65 0.10 230)",
   Advanced: "oklch(0.62 0.10 45)",
 };
 
@@ -156,7 +186,8 @@ function useInView(threshold = 0.12) {
 }
 
 // ─── CSU Subject Card ─────────────────────────────────────────────────────────
-function CsuSubjectCard({ subject }: { subject: CsuSubject }) {
+function AocModuleCard({ module: mod }: { module: AocModule }) {
+  const phaseColor = AOC_PHASE_COLORS[mod.phase];
   const [expanded, setExpanded] = useState(false);
   return (
     <div className="cellar-card p-5 flex flex-col gap-3" style={{ border: "1px solid var(--ow-border)" }}>
@@ -164,23 +195,23 @@ function CsuSubjectCard({ subject }: { subject: CsuSubject }) {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.7rem", color: "var(--ow-amber)", letterSpacing: "0.08em" }}>
-              {subject.code}
+              {mod.unit}
             </span>
             <span
               className="text-xs px-2 py-0.5 rounded-sm"
               style={{
                 fontFamily: "'Fira Code',monospace",
                 fontSize: "0.65rem",
-                color: CSU_LEVEL_COLORS[subject.level],
-                background: `color-mix(in oklch, ${CSU_LEVEL_COLORS[subject.level]} 12%, transparent)`,
-                border: `1px solid color-mix(in oklch, ${CSU_LEVEL_COLORS[subject.level]} 25%, transparent)`,
+                color: phaseColor,
+                background: `color-mix(in oklch, ${phaseColor} 12%, transparent)`,
+                border: `1px solid color-mix(in oklch, ${phaseColor} 25%, transparent)`,
               }}
             >
-              {subject.level}
+              {mod.phase}
             </span>
           </div>
           <h3 style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "1rem", lineHeight: 1.25, color: "var(--ow-text-hi)" }}>
-            {subject.name}
+            {mod.name}
           </h3>
         </div>
         <div
@@ -204,7 +235,7 @@ function CsuSubjectCard({ subject }: { subject: CsuSubject }) {
 
       {expanded && (
         <ul className="flex flex-col gap-1.5 pl-3" style={{ borderLeft: "2px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)" }}>
-          {subject.keyTopics.map((t) => (
+          {mod.keyTopics.map((t: string) => (
             <li key={t} style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.8rem", color: "var(--ow-text-mid)", lineHeight: 1.5 }}>
               {t}
             </li>
@@ -214,20 +245,20 @@ function CsuSubjectCard({ subject }: { subject: CsuSubject }) {
 
       <div className="flex items-center gap-3 mt-auto pt-3" style={{ borderTop: "1px solid var(--ow-border)" }}>
         <Link
-          href={subject.ownologyLink}
+          href={mod.ownologyLink}
           className="text-xs"
           style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-amber)", textDecoration: "none" }}
         >
-          {subject.ownologyLabel}
+          {mod.ownologyLabel}
         </Link>
         <a
-          href={subject.handbookUrl}
+          href="https://australianonlinecourses.com.au/courses/advanced-certificate-of-viticulture-winemaking-oenology/"
           target="_blank"
           rel="noopener noreferrer"
           className="ml-auto flex items-center gap-1 text-xs"
           style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "var(--ow-text-lo)", textDecoration: "none", letterSpacing: "0.05em" }}
         >
-          CSU Handbook <ExternalLink size={10} />
+          AOC Course <ExternalLink size={10} />
         </a>
       </div>
     </div>
@@ -750,12 +781,12 @@ export default function FreeRun() {
           </p>
         </div>
 
-        {/* ── CSU Academic Backbone ── */}
+        {/* ── Industry Curriculum ── */}
         <div ref={csuRef.ref} className={`mt-16 ${csuRef.inView ? "fade-up" : "opacity-0"}`}>
           <div className="flex items-center gap-3 mb-6">
             <div className="h-px flex-1" style={{ background: "var(--ow-border)" }} />
             <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-              CSU Academic Backbone
+              Further Study — Industry Curriculum
             </p>
             <div className="h-px flex-1" style={{ background: "var(--ow-border)" }} />
           </div>
@@ -770,12 +801,11 @@ export default function FreeRun() {
               maxWidth: "560px",
             }}
           >
-            Ownology's knowledge base is structured around the Charles Sturt University Bachelor of Wine Science curriculum.
-            These subjects define the academic framework behind the SOPs Free Run draws from.
+            Free Run's AI is grounded in the Ownology Winemaking Bibles — original authored content aligned with industry-standard references including “Winemaking: From Grape Growing to Marketplace” (Vine, Harkness, Browning & Wagner, Chapman & Hall Enology Library). The modules below are drawn from the Australian Online Courses Advanced Certificate of Viticulture, Winemaking & Oenology — a practical, vocational-level curriculum for winemakers at every stage.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {CSU_SUBJECTS.map((s) => (
-              <CsuSubjectCard key={s.code} subject={s} />
+            {AOC_MODULES.map((mod) => (
+              <AocModuleCard key={mod.unit} module={mod} />
             ))}
           </div>
         </div>
