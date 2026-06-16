@@ -89,7 +89,7 @@ function WaitlistCapture() {
 
 /**
  * Ownology Pricing Page
- * Tiers: Free Run / The Cellar / The Press / Cellar Master
+ * Tiers: Free Run / The Cellar Hand / The Press / The Vigneron
  * Credit Packs: The Measure / The Vintage / The Reserve / The Magnum
  * Founding member strategy: first 99 paid subscribers, locked pricing
  *
@@ -115,7 +115,7 @@ const FEATURE_EXPLANATIONS: Record<string, string> = {
   "Free account — no card needed": "Sign up with your email and start immediately. No trial period, no credit card, no catch.",
   "5 Compliance AI queries per month": "Ask up to 5 regulatory questions per month across LIP, FSANZ, and state liquor licensing — no credit card required.",
   "Vintage log (5 entries per month)": "Log up to 5 cellar events per month — enough to follow a single fermentation from inoculation to press.",
-  // The Cellar
+  // The Cellar Hand
   "Full Free Run AI tutor — 40+ subjects": "Unlimited access to the full lesson library covering fermentation chemistry, microbiology, sensory science, viticulture, and regulatory compliance.",
   "30 Divine Trinity reveals / mo": "Each credit unlocks the full Divine Trinity for one question — The Science, The Vineyard, and The Craft. One credit = three panels of depth. 30 credits = 30 questions taken all the way to the bottom. Credits reset monthly.",
   "Unlimited Compliance AI queries": "No monthly cap on regulatory questions. Ask anything across LIP, FSANZ, state licensing, and export requirements.",
@@ -124,8 +124,8 @@ const FEATURE_EXPLANATIONS: Record<string, string> = {
   "Knowledge Platform — 38 SOPs, 12 categories": "The full Know pillar: 38 industry-standard SOPs across 12 categories including Fermentation, Sanitation, Barrels, Bottling, Lab, Onboarding, Food Safety, and Traceability. Add Decision Logic, Tribal Knowledge, and Vintage Notes to each SOP.",
   "Priority Compliance AI responses": "Your compliance queries jump the queue — faster response times during busy harvest periods when you need answers in seconds, not minutes.",
   "Vintage log PDF export": "Export your full vintage log as a formatted PDF — useful for audits, cellar notes, and end-of-vintage records.",
-  // Cellar Master
-  "3 team seats included": "One Cellar Master account covers you plus two additional team members — cellar hands, assistant winemakers, or vineyard staff.",
+  // The Vigneron
+  "3 team seats included": "One Vigneron account covers you plus two additional team members — cellar hands, assistant winemakers, or vineyard staff.",
   "Annual knowledge base review alert": "Each year, Ownology flags any regulatory changes in your state jurisdictions so your compliance knowledge stays current without manual checking.",
   "Onboarding call \u2014 30 min": "A 30-minute video call with the Ownology team to configure your Knowledge Platform, set up team seats, and walk through the platform for your specific winery.",
   "Unlimited Divine Trinity reveals": "No monthly cap on Deep Dive credits. Every question you ask can be taken all the way to the Divine Trinity — The Science, The Vineyard, and The Craft — without counting the cost.",
@@ -164,7 +164,7 @@ const TIERS = [
   },
   {
     id: "cellar",
-    name: "The Cellar",
+    name: "The Cellar Hand",
     tagline: "Learn the science. Stay compliant.",
     audience: "Home winemakers and wine students who want to learn.",
     monthlyPrice: 19,
@@ -180,7 +180,7 @@ const TIERS = [
       "Email support",
       "Founding member badge",
     ],
-    cta: "Join The Cellar",
+    cta: "Join The Cellar Hand",
     ctaHref: "#waitlist",
     note: "Less than a bottle of decent Shiraz per month.",
   },
@@ -208,9 +208,9 @@ const TIERS = [
   },
   {
     id: "cellar_master",
-    name: "Cellar Master",
-    tagline: "All four pillars. Multi-person winery teams.",
-    audience: "Winery teams with cellar hands, assistant winemakers, or vineyard staff.",
+    name: "The Vigneron",
+    tagline: "Your whole operation. Your whole team. Your institutional knowledge.",
+    audience: "Owner-operator boutique vignerons — you grow the grapes and make the wine.",
     monthlyPrice: 83,
     annualPrice: 830,
     highlight: false,
@@ -222,9 +222,9 @@ const TIERS = [
       "3 team seats included",
       "Onboarding call \u2014 30 min",
       "Annual knowledge base review",
-      "Cellar Master badge + number",
+      "Vigneron badge + number",
     ],
-    cta: "Claim Cellar Master",
+    cta: "Claim The Vigneron",
     ctaHref: "#waitlist",
     note: null,
   },
@@ -283,7 +283,7 @@ const FAQS = [
   },
   {
     q: "Is there a team plan?",
-    a: "Yes — Cellar Master includes 3 team seats. For larger teams (4+ users), contact us for an enterprise quote.",
+    a: "Yes — The Vigneron includes 3 team seats. For larger teams (4+ users), contact us for an enterprise quote.",
   },
 ];
 
@@ -681,9 +681,9 @@ function TierCard({
       </div>
 
       {/* ── Desktop layout ── */}
-      <div className="hidden sm:flex flex-col flex-1 p-6">
-        <div className="mb-5">
-          <h3 className="mb-1" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.375rem", fontWeight: 600, color: tier.color }}>
+      <div className="hidden sm:flex flex-col flex-1 p-7">
+        <div className="mb-6">
+          <h3 className="mb-1" style={{ fontFamily: "'Fraunces', serif", fontSize: "1.5rem", fontWeight: 600, color: tier.color }}>
             {tier.name}
           </h3>
           {/* Pillar tags */}
@@ -694,22 +694,22 @@ function TierCard({
               </span>
             ))}
           </div>
-          <p className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)", fontStyle: "italic", lineHeight: 1.4 }}>
+          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.875rem", color: "var(--ow-text-lo)", fontStyle: "italic", lineHeight: 1.5 }}>
             {tier.tagline}
           </p>
 
         </div>
-        <div className="mb-6">
+        <div className="mb-7">
           {tier.monthlyPrice === 0 ? (
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: "3rem", fontWeight: 700, color: "var(--ow-text-hi)", lineHeight: 1 }}>
+            <div style={{ fontFamily: "'Fraunces', serif", fontSize: "3.25rem", fontWeight: 700, color: "var(--ow-text-hi)", lineHeight: 1 }}>
               Free
             </div>
           ) : (
             <div className="flex items-end gap-1">
-              <span style={{ fontFamily: "'Fraunces', serif", fontSize: "3rem", fontWeight: 700, color: tier.highlight ? "oklch(0.96 0.010 75)" : "var(--ow-text-hi)", lineHeight: 1 }}>
+              <span style={{ fontFamily: "'Fraunces', serif", fontSize: "3.25rem", fontWeight: 700, color: tier.highlight ? "oklch(0.96 0.010 75)" : "var(--ow-text-hi)", lineHeight: 1 }}>
                 ${displayPrice}
               </span>
-              <span className="mb-2" style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: tier.highlight ? "oklch(0.70 0.015 75)" : "var(--ow-text-lo)" }}>
+              <span className="mb-2" style={{ fontFamily: "'Lato', sans-serif", fontSize: "1rem", color: tier.highlight ? "oklch(0.70 0.015 75)" : "var(--ow-text-lo)" }}>
                 /mo
               </span>
             </div>
@@ -725,11 +725,11 @@ function TierCard({
             </p>
           )}
         </div>
-        <ul className="flex-1 mb-6" style={{ borderTop: "1px solid var(--ow-border)", paddingTop: "1rem" }}>
+        <ul className="flex-1 mb-7" style={{ borderTop: "1px solid var(--ow-border)", paddingTop: "1.25rem" }}>
           {tier.features.map((f, i) => (
             <li
               key={f}
-              className="flex items-center gap-2.5 py-2"
+              className="flex items-center gap-3 py-2.5"
               style={{
                 borderBottom: i < tier.features.length - 1 ? "1px solid color-mix(in oklch, var(--ow-border) 60%, transparent)" : "none",
               }}
@@ -737,7 +737,7 @@ function TierCard({
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="flex-shrink-0">
                 <path d="M2.5 6l2.5 2.5 4.5-5" stroke={tier.color} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <span className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: tier.highlight ? "oklch(0.85 0.015 75)" : "var(--ow-text-mid)", lineHeight: 1.4, whiteSpace: "nowrap" }}>
+              <span style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.875rem", color: tier.highlight ? "oklch(0.85 0.015 75)" : "var(--ow-text-mid)", lineHeight: 1.5 }}>
                 {f}
                 {FEATURE_EXPLANATIONS[f] && (
                   <FeatureInfoIcon explanation={FEATURE_EXPLANATIONS[f]} />
@@ -1129,8 +1129,8 @@ export default function Pricing() {
       )}
 
       {/* Hero */}
-      <section className="pt-32 pb-16 text-center">
-        <div className="container max-w-3xl mx-auto">
+      <section className="pt-32 pb-20 text-center">
+        <div className="container max-w-3xl mx-auto px-4">
           <p className="section-label mb-4" style={{ fontFamily: "'Lato', sans-serif" }}>
             Pricing
           </p>
@@ -1138,7 +1138,7 @@ export default function Pricing() {
             style={{
               fontFamily: "'Fraunces', serif",
               fontWeight: 700,
-              fontSize: "clamp(2rem, 4vw, 3rem)",
+              fontSize: "clamp(2.25rem, 4.5vw, 3.5rem)",
               color: "var(--ow-text-hi)",
               lineHeight: 1.1,
               letterSpacing: "-0.02em",
@@ -1146,7 +1146,7 @@ export default function Pricing() {
           >
             From Free Run to{" "}
             <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>
-              Cellar Master.
+              The Vigneron.
             </em>
           </h1>
           <p
@@ -1154,9 +1154,9 @@ export default function Pricing() {
             style={{
               fontFamily: "'Lato', sans-serif",
               fontWeight: 300,
-              fontSize: "1.0625rem",
+              fontSize: "1.125rem",
               color: "var(--ow-text-lo)",
-              lineHeight: 1.7,
+              lineHeight: 1.75,
             }}
           >
             Start with free run juice — unforced, natural, no commitment. When you are ready to deep dive, step into The Press. Every tier is designed around the winemaker's working rhythm, not a generic SaaS model.
@@ -1166,7 +1166,7 @@ export default function Pricing() {
       </section>
 
       {/* Founding member banner */}
-      <div className="container max-w-5xl mx-auto mb-8">
+      <div className="container max-w-7xl mx-auto mb-8 px-4 sm:px-6">
         <div
           className="rounded-sm px-6 py-5"
           style={{ background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)" }}
@@ -1218,8 +1218,8 @@ export default function Pricing() {
       </div>
 
       {/* Tier cards */}
-      <section className="container max-w-5xl mx-auto mb-16 sm:mb-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 pb-24 sm:pb-0">
+      <section className="container max-w-7xl mx-auto mb-16 sm:mb-20 px-4 sm:px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 pb-24 sm:pb-0">
           {TIERS.map(tier => (
             <TierCard
               key={tier.id}
@@ -1234,7 +1234,7 @@ export default function Pricing() {
       </section>
 
       {/* Credit packs */}
-      <div className="container max-w-5xl mx-auto mb-16">
+      <div className="container max-w-7xl mx-auto mb-16 px-4 sm:px-6">
         <div className="flex items-center gap-4" style={{ borderTop: "1px solid var(--ow-border)" }}>
           <div className="pt-8 flex-1">
             <p className="section-label mb-2" style={{ fontFamily: "'Lato', sans-serif" }}>

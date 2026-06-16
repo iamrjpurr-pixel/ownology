@@ -72,7 +72,7 @@ const FAQS = [
   },
   {
     q: "What does it cost, and is there a free trial?",
-    a: "Ownology starts with Free Run — a free account with no credit card required. Paid plans begin at $16/month (The Cellar) for full curiosity AI, Compliance AI, and 30 Deep Dive credits per month. The Press ($41/month) adds the full cellar operations suite — 38 SOPs across 12 categories, Decision Logic, Tribal Knowledge, and priority support. Cellar Master ($83/month) covers multi-person winery teams with 3 seats and dedicated onboarding. Founding member pricing is locked for life for the first 99 subscribers.",
+    a: "Ownology starts with Free Run — a free account with no credit card required. The Cellar Hand ($16/month) is for DIY home winemakers who want to understand every step of what they're making — full curiosity AI, 30 Divine Trinity reveals per month, and unlimited Compliance AI. The Press ($41/month) is for professional boutique winemakers — full cellar operations suite, 38 SOPs across 12 categories, Decision Logic, Tribal Knowledge, and priority support. The Vigneron ($83/month) is for owner-operator vignerons running a team — 3 seats, dedicated onboarding, and everything in The Press. Founding member pricing is locked for life for the first 99 subscribers.",
   },
 ];
 

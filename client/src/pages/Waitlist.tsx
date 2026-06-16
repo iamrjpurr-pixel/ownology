@@ -24,11 +24,11 @@ const TIERS = [
   },
   {
     id: "cellar_master" as const,
-    name: "Cellar Master",
+    name: "The Vigneron",
     price: "$83/mo",
     annual: "$830/yr",
     description: "Everything in The Press + 3 team seats, dedicated onboarding, annual knowledge review.",
-    forWho: "Boutique winery teams",
+    forWho: "Owner-operator boutique vignerons",
     badge: "Most popular",
   },
 ];
@@ -132,7 +132,7 @@ export default function Waitlist() {
             >
               We'll be in touch before the{" "}
               <em style={{ color: "oklch(0.72 0.12 75)", fontStyle: "italic" }}>
-                {selectedTier === "cellar_master" ? "Cellar Master" : "The Press"}
+                {selectedTier === "cellar_master" ? "The Vigneron" : "The Press"}
               </em>{" "}
               tier opens. Expect a personal email — not a mass blast.
             </p>

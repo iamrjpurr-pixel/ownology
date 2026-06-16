@@ -774,9 +774,9 @@ export default function Guide() {
                 cta: "Enter The Press",
               },
               {
-                tier: "Cellar Master",
+                tier: "The Vigneron",
                 price: "$83/mo",
-                audience: "Multi-person winery teams",
+                audience: "Owner-operator boutique vignerons",
                 highlight: false,
                 pillars: [
                   { label: "DO",    color: "var(--ow-amber)",  desc: "Full cellar operations + 3 team seats" },
@@ -785,7 +785,7 @@ export default function Guide() {
                   { label: "GUIDE", color: "oklch(0.65 0.10 160)", desc: "Onboarding call + annual review" },
                 ],
                 href: "/pricing",
-                cta: "Claim Cellar Master",
+                cta: "Claim The Vigneron",
               },
             ] as Array<{ tier: string; price: string; audience: string; highlight: boolean; pillars: Array<{ label: string; color: string; desc: string }>; href: string; cta: string }>).map(t => (
               <div key={t.tier} style={{

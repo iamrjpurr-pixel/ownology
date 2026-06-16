@@ -959,9 +959,9 @@ function Pricing() {
       cta:"Enter The Press", href:"/pricing", highlight:true,
     },
     {
-      name:"Cellar Master", price:"$83", period:"/mo", sub:"$830/yr · save $166",
-      features:["Everything in The Press","Unlimited Deep Dive credits","3 team seats (winemaker + 2 staff)","Dedicated onboarding call (30 min)","Annual knowledge base review","Cellar Master badge + number"],
-      cta:"Claim Cellar Master", href:"/pricing", highlight:false,
+      name:"The Vigneron", price:"$83", period:"/mo", sub:"$830/yr · save $166",
+      features:["Everything in The Press","Unlimited Divine Trinity reveals","3 team seats included","Onboarding call — 30 min","Annual knowledge base review","Vigneron badge + number"],
+      cta:"Claim The Vigneron", href:"/pricing", highlight:false,
     },
   ];
   return (
@@ -969,7 +969,7 @@ function Pricing() {
       <div className="container" ref={ref}>
         <p className="section-label mb-4">Pricing</p>
         <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"520px", lineHeight:1.2, letterSpacing:"-0.01em"}}>
-          From Free Run to Cellar Master.
+          From Free Run to The Vigneron.
         </h2>
         <p className="mt-4" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, color:"var(--ow-text-mid)", fontSize:"1rem"}}>
           Start free. No credit card required. Founding member pricing locked for life for the first 99 subscribers.

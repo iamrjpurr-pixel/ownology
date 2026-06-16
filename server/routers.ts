@@ -170,13 +170,13 @@ const foundingMembersRouter = router({
       const TIER_PRICES: Record<string, { monthly: number; annual: number; name: string }> = {
         cellar: { monthly: 1900, annual: 19000, name: "Ownology — The Cellar" },
         press: { monthly: 4900, annual: 49000, name: "Ownology — The Press" },
-        cellar_master: { monthly: 9900, annual: 99000, name: "Ownology — Cellar Master" },
+        cellar_master: { monthly: 9900, annual: 99000, name: "Ownology — The Vigneron" },
       };
 
       const tierInfo = TIER_PRICES[input.tier];
       const unitAmount = input.cycle === "annual" ? tierInfo.annual : tierInfo.monthly;
       const interval = input.cycle === "annual" ? "year" : "month";
-      const tierLabel = input.tier === "cellar" ? "The Cellar" : input.tier === "press" ? "The Press" : "Cellar Master";
+      const tierLabel = input.tier === "cellar" ? "The Cellar Hand" : input.tier === "press" ? "The Press" : "The Vigneron";
       const cycleLabel = input.cycle === "annual" ? "Annual" : "Monthly";
 
       const session = await stripe.checkout.sessions.create({
