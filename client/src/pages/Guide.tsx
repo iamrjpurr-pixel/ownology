@@ -749,8 +749,8 @@ export default function Guide() {
                 cta: "Start free",
               },
               {
-                tier: "The Cellar",
-                price: "$19/mo",
+                tier: "The Cellar Hand",
+                price: "$16/mo",
                 audience: "Home winemakers & wine students",
                 highlight: false,
                 pillars: [
@@ -758,7 +758,7 @@ export default function Guide() {
                   { label: "GUIDE", color: "oklch(0.65 0.10 160)", desc: "Unlimited Compliance AI queries" },
                 ],
                 href: "/pricing",
-                cta: "Join The Cellar",
+                cta: "Join The Cellar Hand",
               },
               {
                 tier: "The Press",

@@ -144,28 +144,26 @@ const PRIMARY_NAV: NavItem[] = [
 // Secondary links — grouped by four product pillars
 // DO pillar: operational cellar tools
 const VINTAGE_NAV: NavItem[] = [
-  { label: "Dashboard",    href: "/dashboard" },
   { label: "The Press",    href: "/the-press" },
+  { label: "Dashboard",    href: "/dashboard" },
   { label: "Cellar Tasks", href: "/cellar-tasks" },
   { label: "Vineyard",     href: "/vineyard" },
-  { label: "Quick Entry",  href: "/quick-entry" },
 ];
 // KNOW pillar: knowledge platform + compliance
 const KNOWLEDGE_NAV: NavItem[] = [
+  { label: "Free Run",           href: "/free-run" },
   { label: "Knowledge Platform", href: "/knowledge" },
   { label: "Compliance AI",      href: "/compliance" },
 ];
 // LEARN pillar + business
 const BUSINESS_NAV: NavItem[] = [
-  { label: "Free Run",            href: "/free-run" },
+  { label: "Blog",                href: "/blog" },
   { label: "Why Ownology",        href: "/why-ownology" },
   { label: "For Home Winemakers", href: "/for-home-winemakers" },
-  { label: "Blog",                href: "/blog" },
 ];
 // GUIDE pillar
 const GUIDE_NAV: NavItem[] = [
   { label: "Guide — Getting Started", href: "/guide" },
-  { label: "Compliance AI",           href: "/compliance" },
   { label: "Regulations Library",     href: "/regulations" },
 ];
 const MORE_NAV: NavItem[] = [
@@ -238,7 +236,8 @@ function MoreDropdown({ extraItems }: { extraItems?: NavItem[] }) {
           {/* Four-column pillar section */}
           <div className="grid grid-cols-4" style={{borderTop: "1px solid var(--ow-border)", minWidth: "420px"}}>
             <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Do</p>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.25rem"}}>In the Cellar</p>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.55rem", letterSpacing:"0.06em", color:"var(--ow-text-lo)", padding:"0 0.75rem 0.5rem", fontStyle:"italic"}}>The Press plan</p>
               {VINTAGE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
             </div>
             <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
@@ -949,9 +948,9 @@ function Pricing() {
       cta:"Start Exploring", href:"/free-run", highlight:false,
     },
     {
-      name:"The Cellar", price:"$16", period:"/mo", sub:"$190/yr · save $38",
+      name:"The Cellar Hand", price:"$16", period:"/mo", sub:"$190/yr · save $38",
       features:["Full curiosity AI — 40+ subjects","30 Divine Trinity reveals per month","Unlimited Compliance AI","Vintage log (unlimited entries)","Email support","Founding member badge (first 99)"],
-      cta:"Join The Cellar", href:"/pricing", highlight:false,
+      cta:"Join The Cellar Hand", href:"/pricing", highlight:false,
     },
     {
       name:"The Press", price:"$41", period:"/mo", sub:"$410/yr · save $82",
