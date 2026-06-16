@@ -117,7 +117,7 @@ const FEATURE_EXPLANATIONS: Record<string, string> = {
   "Vintage log (5 entries per month)": "Log up to 5 cellar events per month — enough to follow a single fermentation from inoculation to press.",
   // The Cellar
   "Full Free Run AI tutor — 40+ subjects": "Unlimited access to the full lesson library covering fermentation chemistry, microbiology, sensory science, viticulture, and regulatory compliance.",
-  "30 Divine Trinity reveals per month": "Each credit unlocks the full Divine Trinity for one question — The Science, The Vineyard, and The Craft. One credit = three panels of depth. 30 credits = 30 questions taken all the way to the bottom. Credits reset monthly.",
+  "30 Divine Trinity reveals / mo": "Each credit unlocks the full Divine Trinity for one question — The Science, The Vineyard, and The Craft. One credit = three panels of depth. 30 credits = 30 questions taken all the way to the bottom. Credits reset monthly.",
   "Unlimited Compliance AI queries": "No monthly cap on regulatory questions. Ask anything across LIP, FSANZ, state licensing, and export requirements.",
   // The Press
   "Full cellar operations suite": "The complete Do pillar: The Press (Vintage Log, Batch Book, Barrels, Packaging, Calculations, Export Docs), Cellar Tasks, Vineyard, Quick Entry, and Dashboard.",
@@ -125,9 +125,9 @@ const FEATURE_EXPLANATIONS: Record<string, string> = {
   "Priority Compliance AI responses": "Your compliance queries jump the queue — faster response times during busy harvest periods when you need answers in seconds, not minutes.",
   "Vintage log PDF export": "Export your full vintage log as a formatted PDF — useful for audits, cellar notes, and end-of-vintage records.",
   // Cellar Master
-  "3 team seats (winemaker + 2 staff)": "One Cellar Master account covers you plus two additional team members — cellar hands, assistant winemakers, or vineyard staff.",
+  "3 team seats included": "One Cellar Master account covers you plus two additional team members — cellar hands, assistant winemakers, or vineyard staff.",
   "Annual knowledge base review alert": "Each year, Ownology flags any regulatory changes in your state jurisdictions so your compliance knowledge stays current without manual checking.",
-  "Dedicated onboarding call (30 min)": "A 30-minute video call with the Ownology team to configure your Knowledge Platform, set up team seats, and walk through the platform for your specific winery.",
+  "Onboarding call \u2014 30 min": "A 30-minute video call with the Ownology team to configure your Knowledge Platform, set up team seats, and walk through the platform for your specific winery.",
   "Unlimited Divine Trinity reveals": "No monthly cap on Deep Dive credits. Every question you ask can be taken all the way to the Divine Trinity — The Science, The Vineyard, and The Craft — without counting the cost.",
 };
 
@@ -174,11 +174,11 @@ const TIERS = [
     color: "oklch(0.65 0.08 75)",
     features: [
       "Full curiosity AI \u2014 40+ subjects",
-      "30 Divine Trinity reveals per month",
+      "30 Divine Trinity reveals / mo",
       "Unlimited Compliance AI",
-      "Vintage log (unlimited entries)",
+      "Vintage log \u2014 unlimited entries",
       "Email support",
-      "Founding member badge (first 99)",
+      "Founding member badge",
     ],
     cta: "Join The Cellar",
     ctaHref: "#waitlist",
@@ -219,8 +219,8 @@ const TIERS = [
     features: [
       "Everything in The Press",
       "Unlimited Divine Trinity reveals",
-      "3 team seats (winemaker + 2 staff)",
-      "Dedicated onboarding call (30 min)",
+      "3 team seats included",
+      "Onboarding call \u2014 30 min",
       "Annual knowledge base review",
       "Cellar Master badge + number",
     ],
@@ -531,10 +531,19 @@ function TierCard({
         boxShadow: pulsing
           ? "0 0 0 3px color-mix(in oklch, var(--ow-amber) 25%, transparent), 0 0 40px color-mix(in oklch, var(--ow-amber) 20%, transparent)"
           : tier.highlight
-            ? "0 0 40px color-mix(in oklch, var(--ow-amber) 8%, transparent)"
+            ? "0 4px 32px color-mix(in oklch, var(--ow-amber) 12%, transparent), 0 0 0 1px color-mix(in oklch, var(--ow-amber) 40%, transparent)"
             : "none",
+        borderLeft: tier.highlight
+          ? "3px solid var(--ow-amber)"
+          : pulsing
+            ? "3px solid color-mix(in oklch, var(--ow-amber) 90%, transparent)"
+            : "1px solid var(--ow-border)",
       }}
     >
+      {/* Amber top accent bar for highlighted card */}
+      {tier.highlight && (
+        <div style={{ height: "3px", background: "var(--ow-amber)", borderRadius: "2px 2px 0 0", marginLeft: "-1px", marginRight: "-1px", marginTop: "-1px" }} />
+      )}
       {/* Badge */}
       {tier.badge && (
         <div
@@ -692,15 +701,15 @@ function TierCard({
         </div>
         <div className="mb-6">
           {tier.monthlyPrice === 0 ? (
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: "2.5rem", fontWeight: 700, color: "var(--ow-text-hi)", lineHeight: 1 }}>
+            <div style={{ fontFamily: "'Fraunces', serif", fontSize: "3rem", fontWeight: 700, color: "var(--ow-text-hi)", lineHeight: 1 }}>
               Free
             </div>
           ) : (
             <div className="flex items-end gap-1">
-              <span style={{ fontFamily: "'Fraunces', serif", fontSize: "2.5rem", fontWeight: 700, color: tier.highlight ? "oklch(0.96 0.010 75)" : "var(--ow-text-hi)", lineHeight: 1 }}>
+              <span style={{ fontFamily: "'Fraunces', serif", fontSize: "3rem", fontWeight: 700, color: tier.highlight ? "oklch(0.96 0.010 75)" : "var(--ow-text-hi)", lineHeight: 1 }}>
                 ${displayPrice}
               </span>
-              <span className="mb-1.5" style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: tier.highlight ? "oklch(0.70 0.015 75)" : "var(--ow-text-lo)" }}>
+              <span className="mb-2" style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: tier.highlight ? "oklch(0.70 0.015 75)" : "var(--ow-text-lo)" }}>
                 /mo
               </span>
             </div>
@@ -716,15 +725,23 @@ function TierCard({
             </p>
           )}
         </div>
-        <ul className="flex-1 space-y-2.5 mb-6">
-          {tier.features.map(f => (
-            <li key={f} className="flex items-start gap-2.5">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="mt-0.5 flex-shrink-0">
-                <circle cx="7" cy="7" r="6" stroke={tier.color} strokeWidth="1.2" />
-                <path d="M4.5 7l2 2 3-3" stroke={tier.color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+        <ul className="flex-1 mb-6" style={{ borderTop: "1px solid var(--ow-border)", paddingTop: "1rem" }}>
+          {tier.features.map((f, i) => (
+            <li
+              key={f}
+              className="flex items-center gap-2.5 py-2"
+              style={{
+                borderBottom: i < tier.features.length - 1 ? "1px solid color-mix(in oklch, var(--ow-border) 60%, transparent)" : "none",
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="flex-shrink-0">
+                <path d="M2.5 6l2.5 2.5 4.5-5" stroke={tier.color} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <span className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: tier.highlight ? "oklch(0.82 0.015 75)" : "var(--ow-text-mid)", lineHeight: 1.5 }}>
+              <span className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: tier.highlight ? "oklch(0.85 0.015 75)" : "var(--ow-text-mid)", lineHeight: 1.4, whiteSpace: "nowrap" }}>
                 {f}
+                {FEATURE_EXPLANATIONS[f] && (
+                  <FeatureInfoIcon explanation={FEATURE_EXPLANATIONS[f]} />
+                )}
               </span>
             </li>
           ))}
