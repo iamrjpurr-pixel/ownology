@@ -18,6 +18,20 @@ import { eq, and } from "drizzle-orm";
 import { router, protectedProcedure, publicProcedure } from "./trpc.js";
 import * as schema from "../drizzle/schema.js";
 import { db, getUserByOpenId } from "./db.js";
+import Stripe from "stripe";
+
+// ─── Credit Pack Definitions ─────────────────────────────────────────────────
+export const CREDIT_PACKS = [
+  { id: "bottle",   name: "A Bottle of Curiosity",  credits: 5,  priceAud: 400,  description: "5 Go Deeper reveals" },
+  { id: "case",     name: "A Case of Questions",    credits: 15, priceAud: 900,  description: "15 Go Deeper reveals" },
+  { id: "obsessed", name: "The Obsessive",           credits: 40, priceAud: 1900, description: "40 Go Deeper reveals" },
+] as const;
+
+function getStripe(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("STRIPE_SECRET_KEY is not configured");
+  return new Stripe(key, { apiVersion: "2026-04-22.dahlia" });
+}
 
 const DAILY_FREE_QUESTIONS = 3;
 
@@ -304,6 +318,53 @@ Write "The Craft" panel — explain how a winemaker shapes, controls, or exploit
         createdAt: Date.now(),
       });
       return { success: true };
+    }),
+
+  /**
+   * Create a Stripe Checkout session for a credit pack purchase.
+   */
+  createCreditPackCheckout: protectedProcedure
+    .input(
+      z.object({
+        packId: z.enum(["bottle", "case", "obsessed"]),
+        origin: z.string().url(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const pack = CREDIT_PACKS.find((p) => p.id === input.packId);
+      if (!pack) throw new Error("Invalid pack");
+
+      const stripe = getStripe();
+      const session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        payment_method_types: ["card"],
+        allow_promotion_codes: true,
+        customer_email: ctx.user.email ?? undefined,
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: "aud",
+              unit_amount: pack.priceAud,
+              product_data: {
+                name: `Ownology Credits — ${pack.name}`,
+                description: pack.description,
+              },
+            },
+          },
+        ],
+        metadata: {
+          credit_pack: "true",
+          pack_id: pack.id,
+          credits: String(pack.credits),
+          user_open_id: ctx.user.openId,
+          customer_email: ctx.user.email ?? "",
+        },
+        success_url: `${input.origin}/free-run?credits_purchased=1`,
+        cancel_url: `${input.origin}/free-run?credits_cancelled=1`,
+      });
+
+      return { url: session.url };
     }),
 
   /**

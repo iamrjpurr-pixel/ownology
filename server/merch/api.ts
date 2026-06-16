@@ -186,6 +186,76 @@ router.post(
         } catch (notifyErr) {
           console.error("[Webhook] Owner notification failed:", notifyErr);
         }
+      } else if (meta.credit_pack === "true") {
+        // ── Free Run credit pack purchase ─────────────────────────────────────
+        const credits = parseInt(meta.credits ?? "0", 10);
+        const userOpenId = meta.user_open_id ?? "";
+        const email = meta.customer_email || session.customer_email || "";
+        console.log(`[Webhook] Credit pack purchase — pack: ${meta.pack_id}, credits: ${credits}, user: ${userOpenId}`);
+
+        if (userOpenId && credits > 0) {
+          try {
+            const { db } = await import("../db.js");
+            const { freeRunCredits } = await import("../../drizzle/schema.js");
+            const { eq } = await import("drizzle-orm");
+            const { getUserByOpenId } = await import("../db.js");
+
+            const dbUser = await getUserByOpenId(userOpenId);
+            if (dbUser) {
+              const now = Date.now();
+              const [existing] = await db
+                .select()
+                .from(freeRunCredits)
+                .where(eq(freeRunCredits.userId, dbUser.id))
+                .limit(1);
+
+              if (existing) {
+                await db
+                  .update(freeRunCredits)
+                  .set({
+                    balance: existing.balance + credits,
+                    totalPurchased: (existing.totalPurchased ?? 0) + credits,
+                    updatedAt: now,
+                  })
+                  .where(eq(freeRunCredits.id, existing.id));
+              } else {
+                await db.insert(freeRunCredits).values({
+                  userId: dbUser.id,
+                  balance: credits,
+                  totalPurchased: credits,
+                  totalConsumed: 0,
+                  updatedAt: now,
+                  createdAt: now,
+                });
+              }
+              console.log(`[Webhook] Topped up ${credits} credits for user ${dbUser.id}`);
+            }
+          } catch (dbErr) {
+            console.error("[Webhook] Credit top-up failed:", dbErr);
+          }
+        }
+
+        // Notify owner
+        try {
+          const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+          const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+          const appId = process.env.VITE_APP_ID;
+          const ownerOpenId = process.env.OWNER_OPEN_ID;
+          if (forgeUrl && forgeKey && appId && ownerOpenId) {
+            await fetch(`${forgeUrl}/v1/notification/send`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
+              body: JSON.stringify({
+                app_id: appId,
+                open_id: ownerOpenId,
+                title: `🍷 Credit Pack Purchased — ${meta.pack_id}`,
+                content: `${email || "guest"} bought ${credits} credits (${meta.pack_id}). Session: ${session.id}`,
+              }),
+            });
+          }
+        } catch (notifyErr) {
+          console.error("[Webhook] Owner notification failed:", notifyErr);
+        }
       } else {
         // ── Merch order ──────────────────────────────────────────────────────
         console.log(

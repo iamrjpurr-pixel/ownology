@@ -186,6 +186,22 @@ export default function FreeRun() {
   const askMutation = trpc.freeRun.curiosityAsk.useMutation();
   const goDeeperMutation = trpc.freeRun.goDeeper.useMutation();
   const feedbackMutation = trpc.freeRun.submitFeedback.useMutation();
+  const [pendingPackId, setPendingPackId] = useState<string | null>(null);
+  const checkoutMutation = trpc.freeRun.createCreditPackCheckout.useMutation({
+    onSuccess: (data) => {
+      if (data.url) {
+        trackEvent('credit-pack-checkout-start', { pack: pendingPackId ?? 'unknown' });
+        window.open(data.url, '_blank');
+      }
+      setPendingPackId(null);
+    },
+    onError: () => setPendingPackId(null),
+  });
+
+  function handleBuyCredits(packId: 'bottle' | 'case' | 'obsessed') {
+    setPendingPackId(packId);
+    checkoutMutation.mutate({ packId, origin: window.location.origin });
+  }
 
   const status = statusQuery.data;
 
@@ -536,12 +552,26 @@ export default function FreeRun() {
                       <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.85rem", color: "oklch(0.60 0.015 75)", marginBottom: "12px" }}>
                         You've used your free reveal. Top up to go deeper.
                       </p>
-                      <Link
-                        href="/pricing"
-                        style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 16px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, textDecoration: "none", letterSpacing: "0.03em", fontSize: "0.85rem", borderRadius: "2px" }}
-                      >
-                        Get credits <ArrowRight size={13} />
-                      </Link>
+                      <div className="flex flex-wrap gap-2">
+                        {(["bottle", "case", "obsessed"] as const).map((packId) => {
+                          const labels = { bottle: "5 credits — $4", case: "15 credits — $9", obsessed: "40 credits — $19" };
+                          const isLoading = pendingPackId === packId && checkoutMutation.isPending;
+                          return (
+                            <button
+                              key={packId}
+                              onClick={() => handleBuyCredits(packId)}
+                              disabled={checkoutMutation.isPending}
+                              style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 14px", background: packId === 'bottle' ? "oklch(0.72 0.12 75)" : "oklch(0.18 0.010 60)", border: `1px solid ${packId === 'bottle' ? 'oklch(0.72 0.12 75)' : 'oklch(1 0 0 / 0.12)'}`, color: packId === 'bottle' ? "oklch(0.11 0.008 60)" : "oklch(0.72 0.015 75)", fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: "0.8rem", borderRadius: "2px", cursor: checkoutMutation.isPending ? "wait" : "pointer", opacity: checkoutMutation.isPending && !isLoading ? 0.5 : 1 }}
+                            >
+                              {isLoading ? <div style={{ width: "11px", height: "11px", border: "1.5px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> : null}
+                              {labels[packId]}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.40 0.010 75)", marginTop: "8px" }}>
+                        Or get unlimited with <Link href="/pricing" style={{ color: "oklch(0.72 0.12 75)", textDecoration: "none" }}>The Press — $9/month</Link>
+                      </p>
                     </div>
                   )}
                 </div>
@@ -687,23 +717,37 @@ export default function FreeRun() {
         {/* Credit upsell nudge */}
         {creditBalance === 0 && pairs.some((p) => p.reveal && p.reveal.revealId !== -1) && (
           <div
-            className="mt-6 px-5 py-4 rounded-sm flex items-center justify-between gap-4"
+            className="mt-6 px-5 py-4 rounded-sm"
             style={{ background: "oklch(0.14 0.008 60)", border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 20%, transparent)" }}
           >
-            <div>
-              <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 600, fontSize: "0.85rem", color: "oklch(0.85 0.015 75)", marginBottom: "4px" }}>
-                Want to go deeper on your next question?
-              </p>
-              <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8rem", color: "oklch(0.55 0.015 75)" }}>
-                5 credits for $4 — or get unlimited with The Press for $9/month.
-              </p>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 600, fontSize: "0.85rem", color: "oklch(0.85 0.015 75)", marginBottom: "4px" }}>
+              Want to go deeper on your next question?
+            </p>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8rem", color: "oklch(0.55 0.015 75)", marginBottom: "12px" }}>
+              Pick a pack — credits never expire.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {(["bottle", "case", "obsessed"] as const).map((packId) => {
+                const labels = { bottle: "5 credits — $4", case: "15 credits — $9", obsessed: "40 credits — $19" };
+                const names = { bottle: "A Bottle of Curiosity", case: "A Case of Questions", obsessed: "The Obsessive" };
+                const isLoading = pendingPackId === packId && checkoutMutation.isPending;
+                return (
+                  <button
+                    key={packId}
+                    onClick={() => handleBuyCredits(packId)}
+                    disabled={checkoutMutation.isPending}
+                    title={names[packId]}
+                    style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 14px", background: packId === 'bottle' ? "oklch(0.72 0.12 75)" : "oklch(0.18 0.010 60)", border: `1px solid ${packId === 'bottle' ? 'oklch(0.72 0.12 75)' : 'oklch(1 0 0 / 0.12)'}`, color: packId === 'bottle' ? "oklch(0.11 0.008 60)" : "oklch(0.72 0.015 75)", fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: "0.8rem", borderRadius: "2px", cursor: checkoutMutation.isPending ? "wait" : "pointer", opacity: checkoutMutation.isPending && !isLoading ? 0.5 : 1 }}
+                  >
+                    {isLoading ? <div style={{ width: "11px", height: "11px", border: "1.5px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> : null}
+                    {labels[packId]}
+                  </button>
+                );
+              })}
             </div>
-            <Link
-              href="/pricing"
-              style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "8px 16px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, textDecoration: "none", letterSpacing: "0.03em", fontSize: "0.8rem", borderRadius: "2px", whiteSpace: "nowrap" }}
-            >
-              Get credits <ArrowRight size={12} />
-            </Link>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.40 0.010 75)", marginTop: "10px" }}>
+              Or get unlimited with <Link href="/pricing" style={{ color: "oklch(0.72 0.12 75)", textDecoration: "none" }}>The Press — $9/month</Link>
+            </p>
           </div>
         )}
       </div>
