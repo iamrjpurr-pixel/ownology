@@ -24,7 +24,7 @@ import Stripe from "stripe";
 export const CREDIT_PACKS = [
   { id: "bottle",   name: "A Bottle of Curiosity",  credits: 5,  priceAud: 400,  description: "5 Deep Dive reveals" },
   { id: "case",     name: "A Case of Questions",    credits: 15, priceAud: 900,  description: "15 Deep Dive reveals" },
-  { id: "obsessed", name: "The Obsessive",           credits: 40, priceAud: 1900, description: "40 Deep Dive reveals" },
+  { id: "obsessed", name: "The Obsessive",           credits: 40, priceAud: 1600, description: "40 Divine Trinity reveals" },
 ] as const;
 
 function getStripe(): Stripe {

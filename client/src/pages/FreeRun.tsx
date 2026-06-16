@@ -719,7 +719,7 @@ export default function FreeRun() {
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {(["bottle", "case", "obsessed"] as const).map((packId) => {
-                          const labels = { bottle: "5 credits — $4", case: "15 credits — $9", obsessed: "40 credits — $19" };
+                          const labels = { bottle: "5 credits — $4", case: "15 credits — $9", obsessed: "40 credits — $16" };
                           const isLoading = pendingPackId === packId && checkoutMutation.isPending;
                           return (
                             <button
@@ -895,7 +895,7 @@ export default function FreeRun() {
             </p>
             <div className="flex flex-wrap gap-2">
               {(["bottle", "case", "obsessed"] as const).map((packId) => {
-                const labels = { bottle: "5 credits — $4", case: "15 credits — $9", obsessed: "40 credits — $19" };
+                const labels = { bottle: "5 credits — $4", case: "15 credits — $9", obsessed: "40 credits — $16" };
                 const names = { bottle: "A Bottle of Curiosity", case: "A Case of Questions", obsessed: "The Obsessive" };
                 const isLoading = pendingPackId === packId && checkoutMutation.isPending;
                 return (
