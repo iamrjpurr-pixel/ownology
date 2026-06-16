@@ -179,7 +179,7 @@ export default function FreeRun() {
   const [pairs, setPairs] = useState<QAPair[]>([]);
   const [isAsking, setIsAsking] = useState(false);
   const [isRevealing, setIsRevealing] = useState<string | null>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const statusQuery = trpc.freeRun.status.useQuery(undefined, { enabled: isAuthenticated });
@@ -656,16 +656,16 @@ export default function FreeRun() {
               </Link>
             </div>
           ) : (
-            <div className="flex gap-3 items-end">
-              <textarea
+            <div className="flex gap-3 items-center">
+              <input
                 ref={inputRef}
+                type="text"
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleAsk(); } }}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAsk(); } }}
                 placeholder="Ask anything about wine…"
-                rows={2}
                 disabled={isAsking}
-                style={{ flex: 1, background: "transparent", border: "none", outline: "none", resize: "none", fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9rem", color: "oklch(0.85 0.015 75)", lineHeight: 1.6, padding: "4px 0" }}
+                style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.95rem", color: "oklch(0.85 0.015 75)", lineHeight: 1.6, padding: "4px 0", caretColor: "oklch(0.72 0.12 75)" }}
               />
               <button
                 onClick={() => handleAsk()}

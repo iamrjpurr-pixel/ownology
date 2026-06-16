@@ -139,7 +139,7 @@ const TIERS = [
   {
     id: "free_run",
     name: "Free Run",
-    tagline: "Understand wine from the inside out. No card required.",
+    tagline: "Understand wine from the inside out.",
     audience: "Wine lovers, curious drinkers, food & wine enthusiasts.",
     monthlyPrice: 0,
     annualPrice: 0,
@@ -147,11 +147,11 @@ const TIERS = [
     badge: null,
     color: "var(--ow-text-lo)",
     features: [
-      "3 wine curiosity questions per day",
-      "Flavour science, varietals, regions, food pairing",
-      "Go Deeper triangle: Science \u00b7 Vineyard \u00b7 Craft",
+      "3 curiosity questions / day",
+      "Flavour science & varietals",
+      "Go Deeper triangle",
       "First Go Deeper reveal free",
-      "Account required \u2014 no card needed",
+      "Free account \u2014 no card needed",
     ],
     cta: "Start Exploring",
     ctaHref: "/free-run",
@@ -160,7 +160,7 @@ const TIERS = [
   {
     id: "cellar",
     name: "The Cellar",
-    tagline: "Learn the science. Stay compliant. For home winemakers.",
+    tagline: "Learn the science. Stay compliant.",
     audience: "Home winemakers and wine students who want to learn.",
     monthlyPrice: 19,
     annualPrice: 190,
@@ -168,9 +168,9 @@ const TIERS = [
     badge: "FOUNDING MEMBER",
     color: "oklch(0.65 0.08 75)",
     features: [
-      "Full Free Run AI tutor — 40+ subjects",
-      "30 AI tutor credits per month",
-      "Unlimited Compliance AI queries",
+      "Full curiosity AI \u2014 40+ subjects",
+      "30 Go Deeper credits per month",
+      "Unlimited Compliance AI",
       "Vintage log (unlimited entries)",
       "Email support",
       "Founding member badge (first 99)",
@@ -182,7 +182,7 @@ const TIERS = [
   {
     id: "press",
     name: "The Press",
-    tagline: "Full cellar operations + institutional knowledge. For boutique wineries.",
+    tagline: "Full cellar operations + institutional knowledge.",
     audience: "Boutique winery teams who need operations and protocol management.",
     monthlyPrice: 49,
     annualPrice: 490,
@@ -191,11 +191,11 @@ const TIERS = [
     color: "var(--ow-amber)",
     features: [
       "Full cellar operations suite",
-      "Knowledge Platform — 45 SOPs, 12 categories",
-      "Decision Logic + Tribal Knowledge capture",
-      "Priority Compliance AI responses",
+      "45 SOPs across 12 categories",
+      "Decision Logic + Tribal Knowledge",
+      "Priority Compliance AI",
       "Vintage log PDF export",
-      "Phone & chat support (business hours)",
+      "Phone & chat support",
     ],
     cta: "Enter The Press",
     ctaHref: "#waitlist",
@@ -204,7 +204,7 @@ const TIERS = [
   {
     id: "cellar_master",
     name: "Cellar Master",
-    tagline: "All four pillars. For multi-person winery teams.",
+    tagline: "All four pillars. Multi-person winery teams.",
     audience: "Winery teams with cellar hands, assistant winemakers, or vineyard staff.",
     monthlyPrice: 99,
     annualPrice: 990,
@@ -213,11 +213,11 @@ const TIERS = [
     color: "oklch(0.80 0.14 75)",
     features: [
       "Everything in The Press",
-      "Full Free Run AI tutor — unlimited credits",
+      "Unlimited Go Deeper credits",
       "3 team seats (winemaker + 2 staff)",
       "Dedicated onboarding call (30 min)",
-      "Annual knowledge base review alert",
-      "Cellar Master badge + member number",
+      "Annual knowledge base review",
+      "Cellar Master badge + number",
     ],
     cta: "Claim Cellar Master",
     ctaHref: "#waitlist",
@@ -680,14 +680,10 @@ function TierCard({
               </span>
             ))}
           </div>
-          <p className="text-sm" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)", fontStyle: "italic" }}>
+          <p className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)", fontStyle: "italic", lineHeight: 1.4 }}>
             {tier.tagline}
           </p>
-          {(tier as typeof TIERS[0] & { audience?: string }).audience && (
-            <p className="text-xs mt-1" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400, color: "oklch(0.48 0.010 75)" }}>
-              {(tier as typeof TIERS[0] & { audience?: string }).audience}
-            </p>
-          )}
+
         </div>
         <div className="mb-6">
           {tier.monthlyPrice === 0 ? (
@@ -700,9 +696,14 @@ function TierCard({
                 ${displayPrice}
               </span>
               <span className="mb-1.5" style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: "var(--ow-text-lo)" }}>
-                /mo{cycle === "annual" ? " · billed annually" : ""}
+                /mo
               </span>
             </div>
+          )}
+          {tier.monthlyPrice > 0 && cycle === "annual" && (
+            <p className="mt-1" style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", color: "var(--ow-amber)", letterSpacing: "0.03em", whiteSpace: "nowrap" }}>
+              ${tier.annualPrice}/yr · save ${(tier.monthlyPrice * 12) - tier.annualPrice}
+            </p>
           )}
           {tier.note && (
             <p className="mt-2 text-xs" style={{ fontFamily: "'Lato', sans-serif", fontStyle: "italic", color: "var(--ow-text-lo)" }}>
@@ -717,7 +718,7 @@ function TierCard({
                 <circle cx="7" cy="7" r="6" stroke={tier.color} strokeWidth="1.2" />
                 <path d="M4.5 7l2 2 3-3" stroke={tier.color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <span className="text-sm" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-mid)", lineHeight: 1.5 }}>
+              <span className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-mid)", lineHeight: 1.5 }}>
                 {f}
               </span>
             </li>
@@ -1196,7 +1197,7 @@ export default function Pricing() {
 
       {/* Tier cards */}
       <section className="container max-w-5xl mx-auto mb-16 sm:mb-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 pb-20 sm:pb-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 pb-24 sm:pb-0">
           {TIERS.map(tier => (
             <TierCard
               key={tier.id}
