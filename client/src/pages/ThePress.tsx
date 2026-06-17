@@ -1,9 +1,11 @@
 /**
  * ThePress (Log) — Cellar Logbook
  * DailyMe-inspired: light background, circular progress, entry cards, soft constraints
+ * Enhanced with cross-pillar bridges (Learn More, Try it now) and analytics tracking
  */
 
 import { useState } from "react";
+import { useLocation } from "wouter";
 import WorkModeLayout from "@/components/WorkModeLayout";
 
 interface LogEntry {
@@ -61,6 +63,7 @@ const MOCK_ENTRIES: LogEntry[] = [
 ];
 
 export default function ThePress() {
+  const [, navigate] = useLocation();
   const [entries, setEntries] = useState<LogEntry[]>(MOCK_ENTRIES);
   const [batch] = useState<Batch>(MOCK_BATCH);
   const [showAddEntry, setShowAddEntry] = useState(false);
@@ -73,13 +76,34 @@ export default function ThePress() {
   });
   const [showBypassWarning, setShowBypassWarning] = useState(false);
 
+  // Analytics tracking helper
+  const trackEvent = (eventName: string, eventData?: Record<string, any>) => {
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", eventName, {
+        event_category: "work_mode",
+        event_label: "the_press",
+        ...eventData,
+      });
+    }
+  };
+
   const handleAddEntry = () => {
     if (!formData.notes.trim()) return;
 
     if (formData.event === "Pressing" && batch.currentBrix > 2) {
+      trackEvent("soft_constraint_triggered", {
+        constraint_type: "pressing_brix",
+        current_brix: batch.currentBrix,
+        threshold: 2,
+      });
       setShowBypassWarning(true);
       return;
     }
+
+    trackEvent("log_entry_saved", {
+      event_type: formData.event,
+      has_measurements: !!(formData.brix || formData.ph || formData.temp),
+    });
 
     const entry: LogEntry = {
       id: Date.now().toString(),
@@ -98,6 +122,11 @@ export default function ThePress() {
   };
 
   const handleBypassConfirm = () => {
+    trackEvent("soft_constraint_bypassed", {
+      constraint_type: "pressing_brix",
+      current_brix: batch.currentBrix,
+    });
+
     const entry: LogEntry = {
       id: Date.now().toString(),
       tank: batch.tank,
@@ -113,6 +142,22 @@ export default function ThePress() {
     setFormData({ event: "Measurement", brix: "", ph: "", temp: "", notes: "" });
     setShowAddEntry(false);
     setShowBypassWarning(false);
+  };
+
+  const handleLearnMore = (topic: string) => {
+    trackEvent("learn_more_clicked", {
+      topic,
+      source: "the_press",
+    });
+    window.location.href = `/knowledge?category=${topic}`;
+  };
+
+  const handleTryItNow = () => {
+    trackEvent("try_it_now_clicked", {
+      source: "the_press",
+      destination: "free_run",
+    });
+    window.location.href = "/free-run";
   };
 
   return (
@@ -299,7 +344,10 @@ export default function ThePress() {
 
         {/* Add Entry Button */}
         <button
-          onClick={() => setShowAddEntry(true)}
+          onClick={() => {
+            trackEvent("log_entry_opened");
+            setShowAddEntry(true);
+          }}
           style={{
             width: "100%",
             padding: "1rem",
@@ -319,6 +367,94 @@ export default function ThePress() {
         >
           + Log Entry
         </button>
+
+        {/* Cross-pillar bridge: Learn More section */}
+        <div
+          style={{
+            background: "#F0F4FF",
+            border: "1px solid #2563EB",
+            borderRadius: "12px",
+            padding: "1.25rem",
+            marginBottom: "2rem",
+          }}
+        >
+          <h3
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.875rem",
+              fontWeight: 700,
+              color: "#2563EB",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              marginBottom: "0.75rem",
+            }}
+          >
+            📚 Deepen Your Knowledge
+          </h3>
+          <p
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.9rem",
+              color: "#1A1A1A",
+              marginBottom: "1rem",
+              lineHeight: 1.5,
+            }}
+          >
+            Explore wine science, fermentation techniques, and pressing decisions to make better cellar choices.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+            <button
+              onClick={() => handleLearnMore("fermentation")}
+              style={{
+                padding: "0.75rem 1rem",
+                background: "#FFFFFF",
+                border: "1px solid #2563EB",
+                borderRadius: "8px",
+                color: "#2563EB",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#2563EB";
+                e.currentTarget.style.color = "#FFFFFF";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "#FFFFFF";
+                e.currentTarget.style.color = "#2563EB";
+              }}
+            >
+              🧪 Fermentation Science
+            </button>
+            <button
+              onClick={() => handleTryItNow()}
+              style={{
+                padding: "0.75rem 1rem",
+                background: "#FFFFFF",
+                border: "1px solid #2563EB",
+                borderRadius: "8px",
+                color: "#2563EB",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#2563EB";
+                e.currentTarget.style.color = "#FFFFFF";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "#FFFFFF";
+                e.currentTarget.style.color = "#2563EB";
+              }}
+            >
+              💡 Try it now
+            </button>
+          </div>
+        </div>
 
         {/* Entry History */}
         <div>
@@ -658,7 +794,7 @@ export default function ThePress() {
         </div>
       )}
 
-      {/* Bypass Warning */}
+      {/* Bypass Warning Modal */}
       {showBypassWarning && (
         <div
           style={{
@@ -696,12 +832,37 @@ export default function ThePress() {
                 fontFamily: "'Lato', sans-serif",
                 fontSize: "0.95rem",
                 color: "#666666",
-                marginBottom: "1.5rem",
+                marginBottom: "1rem",
                 lineHeight: 1.5,
               }}
             >
               Current Brix is {batch.currentBrix}°B. Standard practice: press at ≤2°B. Are you proceeding with extended maceration?
             </p>
+            <div
+              style={{
+                background: "#F0F4FF",
+                border: "1px dashed #2563EB",
+                borderRadius: "8px",
+                padding: "0.75rem",
+                marginBottom: "1rem",
+              }}
+            >
+              <button
+                onClick={() => handleLearnMore("pressing")}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#2563EB",
+                  fontFamily: "'Lato', sans-serif",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                }}
+              >
+                📚 Learn more about pressing decisions →
+              </button>
+            </div>
             <div style={{ display: "flex", gap: "0.75rem" }}>
               <button
                 onClick={() => setShowBypassWarning(false)}

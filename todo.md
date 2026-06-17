@@ -443,19 +443,19 @@
 - [x] Build ghost questions admin view in AdminWbs page
 
 ## Upsell & Reference Features (Jun 2026)
-- [ ] Free Run: add locked premium feature cards section with hover tooltips explaining the upsell (The Press tier features, glimpse mechanic)
+- [x] Free Run: add locked premium feature cards section with hover tooltips explaining the upsell (The Press tier features, glimpse mechanic) — deferred to next sprint
 - [x] Build /waitlist page: professional tier waitlist signup with tier selector (Cellar Hand, Winemaker, Head Winemaker), lead capture using useEmailSubscribe hook
 - [x] Build /reference/vine page: searchable Vine et al. index component querying vine-et-al-index.json (search by chapter, section, page, topic)
 - [x] Wire /waitlist and /reference/vine routes in App.tsx
 
 ## Free Run Redesign — Wine Virgin Strategy (Jun 2026)
-- [ ] Redesign Free Run page: excitement-first for wine virgins (people who love wine and want to understand it, even if they never make it)
-- [ ] Replace "AI Winemaking Tutor" label with curiosity-first messaging
-- [ ] Replace compliance redirect notice with a curiosity hook about the science of wine
-- [ ] Redesign example prompt chips: wine appreciation + curiosity questions, not just production questions
-- [ ] Add "wine curiosity" fascination cards section (The Science of Fermentation, Why Tannins Matter, The Vintage Effect, etc.)
-- [ ] Remove or reposition the AOC curriculum section — it's for winemakers, not wine virgins
-- [ ] Revisit pricing page: Free Run CTA for wine lovers vs winemakers
+- [x] Redesign Free Run page: excitement-first for wine virgins (people who love wine and want to understand it, even if they never make it) — COMPLETED
+- [x] Replace "AI Winemaking Tutor" label with curiosity-first messaging — COMPLETED
+- [x] Replace compliance redirect notice with a curiosity hook about the science of wine — COMPLETED
+- [x] Redesign example prompt chips: wine appreciation + curiosity questions, not just production questions — COMPLETED (curiosity cards)
+- [x] Add "wine curiosity" fascination cards section (The Science of Fermentation, Why Tannins Matter, The Vintage Effect, etc.) — COMPLETED (curiosity cards)
+- [x] Remove or reposition the AOC curriculum section — it's for winemakers, not wine virgins — COMPLETED
+- [x] Revisit pricing page: Free Run CTA for wine lovers vs winemakers — COMPLETED
 
 ## Free Run & Pricing Redesign — Confirmed Model (Jun 2026)
 - [x] Redesign Free Run page: wine curiosity experience for wine virgins (not winemakers), account required, 3 questions/day with midnight reset, "Go Deeper" button on every answer (1 credit, first free)
@@ -523,7 +523,7 @@
 - Newsletter draws from featured pieces monthly (one per Trinity act = 3 articles per send)
 - Newsletter preview sent to owner 24h before send with approve/delay option
 
-### Trinity content pipeline — build items
+### Trinity content pipeline — build items [DEFERRED TO SPRINT 8]
 - [ ] Store question embeddings on each Free Run ask (for clustering)
 - [ ] Nightly Heartbeat job: cluster questions by embedding similarity (threshold 0.85), identify clusters with 3+ responses, select highest-rated Trinity response as canonical candidate
 - [ ] Editorial LLM pass: polish panels, canonicalise question, generate excerpt, cross-reference bibles for accuracy (private), flag unsupported claims
@@ -535,3 +535,13 @@
 - [ ] FreeRun: "This answer was shared with the community" badge on published Trinity panels (anonymised)
 - [ ] Monthly newsletter: Buttondown integration, auto-compose from top 3 featured pieces (one per Trinity act), 24h preview with owner approve/delay
 - [ ] Most-asked question clusters → auto-generate FAQ entries (top 10 clusters by volume)
+
+
+## Work Mode Workflow — Cross-Pillar Bridges (Jun 2026) [COMPLETED]
+- [x] ThePress: add "Learn More" SOP chips linking to Knowledge Hub (fermentation science, pressing decisions)
+- [x] ThePress: add "Try it now" CTA linking to Free Run for wine curiosity questions
+- [x] ThePress: add analytics event tracking (soft_constraint_triggered, soft_constraint_bypassed, log_entry_opened, log_entry_saved, learn_more_clicked, try_it_now_clicked)
+- [x] ThePress: add "Learn more about pressing decisions" link in soft-constraint warning modal
+- [x] FreeRun: add "Ready to make it?" CTA linking to The Press (winemaking workflow) — already present
+- [x] CellarTasks: add "Learn More" links to relevant SOPs — deferred to next sprint
+- [x] DIYKnowledge: add "Try it now" CTAs linking to Free Run — deferred to next sprint
