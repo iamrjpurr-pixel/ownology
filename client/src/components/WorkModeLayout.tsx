@@ -140,7 +140,7 @@ export default function WorkModeLayout({
             background: "var(--ow-bg-card)",
             position: "sticky",
             top: 0,
-            zIndex: 40,
+            zIndex: 50,
           }}
         >
           <OwnologyLogo size={28} showWordmark={false} showIABadge={false} showTheoryCard={false} />
@@ -206,7 +206,7 @@ export default function WorkModeLayout({
               background: "var(--ow-bg-card)",
               borderTop: "1px solid var(--ow-border)",
               paddingBottom: "env(safe-area-inset-bottom, 0px)",
-              zIndex: 50,
+              zIndex: 40,
               display: "flex",
             }}
           >

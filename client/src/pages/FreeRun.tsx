@@ -1,974 +1,226 @@
 /**
- * FREE RUN — Wine Curiosity Experience
- * ─────────────────────────────────────────────────────────────────────────────
- * Audience: wine lovers, curious drinkers, food & wine enthusiasts.
- * NOT for winemakers — no SOPs, no production guides.
- *
- * Mechanics:
- *  - 3 curiosity questions/day (midnight UTC reset)
- *  - Every answer has a "Deep Dive" button (1 credit, first one free)
- *  - Deep Dive unlocks the Triangle: Science / Vineyard / Craft
- *  - Thumbs up/down per panel for quality analytics
+ * FreeRun — Wine Knowledge Assistant (Ask)
+ * 
+ * Simple, readable UI for asking wine questions:
+ * - Question input field (44px height)
+ * - Ask button (prominent, amber)
+ * - Question history list (clean cards)
+ * - Mock data for immediate interactivity
  */
-import { useEffect, useRef, useState } from "react";
-import { Link } from "wouter";
-import { trpc } from "@/lib/trpc";
-// OAuth removed — Work Mode is now fully accessible
-import { ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Beaker, Sprout, Wine, Sparkles, ArrowRight } from "lucide-react";
 
-// ─── Divine Trinity Popover ───────────────────────────────────────────────────
-
-const TRINITY_ACTS = [
-  {
-    icon: <Beaker size={15} />,
-    color: "oklch(0.60 0.18 220)",
-    label: "The Science",
-    desc: "The chemistry, biology, and physics behind this — what's actually happening at a molecular level.",
-  },
-  {
-    icon: <Sprout size={15} />,
-    color: "oklch(0.65 0.18 145)",
-    label: "The Vineyard",
-    desc: "Where this characteristic begins — in the soil, the variety, the climate, and the vine.",
-  },
-  {
-    icon: <Wine size={15} />,
-    color: "oklch(0.72 0.12 75)",
-    label: "The Craft",
-    desc: "How the winemaker shaped it — the decisions that brought it from vine to glass.",
-  },
-];
-
-function DivineTriniityPopover({ creditBalance }: { creditBalance: number }) {
-  return (
-    <div
-      style={{
-        position: "absolute",
-        bottom: "calc(100% + 10px)",
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "300px",
-        background: "oklch(0.16 0.010 60)",
-        border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 30%, transparent)",
-        borderRadius: "6px",
-        padding: "16px",
-        boxShadow: "0 16px 48px oklch(0 0 0 / 0.6), 0 0 0 1px oklch(0.72 0.12 75 / 0.08)",
-        zIndex: 50,
-        pointerEvents: "none",
-      }}
-    >
-      {/* Arrow */}
-      <div style={{
-        position: "absolute",
-        bottom: "-6px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "10px",
-        height: "10px",
-        background: "oklch(0.16 0.010 60)",
-        border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 30%, transparent)",
-        borderTop: "none",
-        borderLeft: "none",
-        rotate: "45deg",
-      }} />
-
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-3" style={{ borderBottom: "1px solid oklch(1 0 0 / 0.07)", paddingBottom: "10px" }}>
-        <Sparkles size={12} style={{ color: "oklch(0.72 0.12 75)" }} />
-        <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", letterSpacing: "0.1em", color: "oklch(0.72 0.12 75)", textTransform: "uppercase" }}>
-          The Divine Trinity
-        </span>
-        <span style={{ marginLeft: "auto", fontFamily: "'Lato', sans-serif", fontSize: "0.65rem", color: creditBalance > 0 ? "oklch(0.65 0.18 145)" : "oklch(0.72 0.12 75)", fontWeight: 600 }}>
-          {creditBalance > 0 ? `${creditBalance} credit${creditBalance !== 1 ? "s" : ""} remaining` : "First reveal free"}
-        </span>
-      </div>
-
-      {/* Tagline */}
-      <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.78rem", lineHeight: 1.6, color: "oklch(0.65 0.015 75)", marginBottom: "12px", fontStyle: "italic" }}>
-        Three acts on the same question — anchored, focused, and impossible to drift.
-      </p>
-
-      {/* Three acts */}
-      <div className="flex flex-col gap-2.5">
-        {TRINITY_ACTS.map((act) => (
-          <div key={act.label} className="flex items-start gap-3">
-            <div style={{
-              width: "28px",
-              height: "28px",
-              borderRadius: "4px",
-              background: `color-mix(in oklch, ${act.color} 12%, transparent)`,
-              border: `1px solid color-mix(in oklch, ${act.color} 25%, transparent)`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-              color: act.color,
-            }}>
-              {act.icon}
-            </div>
-            <div>
-              <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: "0.75rem", color: "oklch(0.88 0.015 75)", marginBottom: "2px", letterSpacing: "0.02em" }}>
-                {act.label}
-              </p>
-              <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.72rem", lineHeight: 1.55, color: "oklch(0.58 0.012 75)" }}>
-                {act.desc}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Footer */}
-      <div className="mt-3 pt-3" style={{ borderTop: "1px solid oklch(1 0 0 / 0.07)" }}>
-        <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.65rem", color: "oklch(0.40 0.010 75)", textAlign: "center" }}>
-          One credit · All three panels · Credits never expire
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface TriangleReveal {
-  revealId: number;
-  sciencePanel: string;
-  vineyardPanel: string;
-  craftPanel: string;
-  wasFreeHook: boolean;
-}
+import { useState } from "react";
+import { Send } from "lucide-react";
 
 interface QAPair {
   id: string;
   question: string;
   answer: string;
-  topicTag: string | null;
-  reveal: TriangleReveal | null;
-  openPanels: Set<"science" | "vineyard" | "craft">;
-  feedback: Map<"science" | "vineyard" | "craft", boolean>;
+  timestamp: string;
 }
-
-// ─── Curiosity prompt chips ───────────────────────────────────────────────────
-
-const CURIOSITY_PROMPTS = [
-  { label: "Buttery Chardonnay", q: "Why does some Chardonnay taste buttery?" },
-  { label: "Tannins", q: "What are tannins and why do they make my mouth dry?" },
-  { label: "Natural wine", q: "What actually makes a wine 'natural'?" },
-  { label: "Terroir", q: "What does terroir actually mean — is it real?" },
-  { label: "Pinot Noir", q: "Why is Pinot Noir so hard to grow and make?" },
-  { label: "Orange wine", q: "What is orange wine and why is it orange?" },
-  { label: "Biodynamic", q: "What is biodynamic wine and does it taste different?" },
-  { label: "Vintage variation", q: "Why does the same wine taste different every year?" },
-];
-
-// ─── Analytics helper ─────────────────────────────────────────────────────────
-
-function trackEvent(name: string, props?: Record<string, string | number | boolean>) {
-  try {
-    // @ts-expect-error umami is injected globally
-    window.umami?.track(name, props);
-  } catch {
-    // analytics not available
-  }
-}
-
-// ─── Deep Dive Triangle Panel ─────────────────────────────────────────────────
-
-// Panel tooltip descriptions
-const PANEL_TOOLTIPS: Record<"science" | "vineyard" | "craft", string> = {
-  science: "The chemistry, biology, and physics behind this — what's actually happening at a molecular level.",
-  vineyard: "Where this characteristic begins — in the soil, the variety, the climate, and the vine.",
-  craft: "How the winemaker shaped it — the decisions that brought it from vine to glass.",
-};
-
-interface PanelProps {
-  icon: React.ReactNode;
-  label: string;
-  color: string;
-  content: string;
-  panelKey: "science" | "vineyard" | "craft";
-  isOpen: boolean;
-  onToggle: () => void;
-  feedback: boolean | undefined;
-  onFeedback: (thumbsUp: boolean) => void;
-}
-
-function TrianglePanel({ icon, label, color, content, panelKey, isOpen, onToggle, feedback, onFeedback }: PanelProps) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <div
-      className="rounded-sm overflow-hidden"
-      style={{ border: `1px solid color-mix(in oklch, ${color} 25%, transparent)` }}
-    >
-      <button
-        onClick={onToggle}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left transition-all"
-        style={{
-          background: isOpen
-            ? `color-mix(in oklch, ${color} 12%, transparent)`
-            : `color-mix(in oklch, ${color} 6%, transparent)`,
-          position: "relative",
-        }}
-      >
-        <div className="flex items-center gap-2.5">
-          <span style={{ color }}>{icon}</span>
-          <span
-            style={{
-              fontFamily: "'Lato', sans-serif",
-              fontSize: "0.8rem",
-              fontWeight: 600,
-              color: "oklch(0.82 0.015 75)",
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-            }}
-          >
-            {label}
-          </span>
-          {/* Panel tooltip — shown when collapsed and hovered */}
-          {!isOpen && hovered && (
-            <span
-              style={{
-                position: "absolute",
-                left: "44px",
-                top: "calc(100% + 6px)",
-                background: "oklch(0.14 0.008 60)",
-                border: `1px solid color-mix(in oklch, ${color} 25%, transparent)`,
-                borderRadius: "4px",
-                padding: "6px 10px",
-                fontFamily: "'Lato', sans-serif",
-                fontWeight: 300,
-                fontSize: "0.72rem",
-                lineHeight: 1.55,
-                color: "oklch(0.65 0.015 75)",
-                maxWidth: "220px",
-                zIndex: 40,
-                pointerEvents: "none",
-                boxShadow: "0 8px 24px oklch(0 0 0 / 0.4)",
-                whiteSpace: "normal",
-                textTransform: "none",
-                letterSpacing: "normal",
-                fontStyle: "italic",
-              }}
-            >
-              {PANEL_TOOLTIPS[panelKey]}
-            </span>
-          )}
-        </div>
-        <span style={{ color: "oklch(0.55 0.015 75)" }}>
-          {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-        </span>
-      </button>
-
-      {isOpen && (
-        <div className="px-4 pt-3 pb-4">
-          <p
-            style={{
-              fontFamily: "'Lato', sans-serif",
-              fontWeight: 300,
-              fontSize: "0.9rem",
-              lineHeight: 1.75,
-              color: "oklch(0.75 0.015 75)",
-              whiteSpace: "pre-wrap",
-            }}
-          >
-            {content}
-          </p>
-
-          <div className="flex items-center gap-3 mt-4 pt-3" style={{ borderTop: "1px solid oklch(1 0 0 / 0.06)" }}>
-            <span
-              style={{
-                fontFamily: "'Lato', sans-serif",
-                fontSize: "0.7rem",
-                color: "oklch(0.45 0.012 75)",
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-              }}
-            >
-              Useful?
-            </span>
-            <button
-              onClick={() => onFeedback(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm transition-all text-xs"
-              style={{
-                background: feedback === true ? "color-mix(in oklch, oklch(0.65 0.18 145) 20%, transparent)" : "transparent",
-                border: `1px solid ${feedback === true ? "oklch(0.65 0.18 145)" : "oklch(1 0 0 / 0.12)"}`,
-                color: feedback === true ? "oklch(0.65 0.18 145)" : "oklch(0.50 0.012 75)",
-                fontFamily: "'Lato', sans-serif",
-                cursor: "pointer",
-              }}
-            >
-              <ThumbsUp size={11} />&nbsp;Yes
-            </button>
-            <button
-              onClick={() => onFeedback(false)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm transition-all text-xs"
-              style={{
-                background: feedback === false ? "color-mix(in oklch, oklch(0.55 0.18 25) 20%, transparent)" : "transparent",
-                border: `1px solid ${feedback === false ? "oklch(0.55 0.18 25)" : "oklch(1 0 0 / 0.12)"}`,
-                color: feedback === false ? "oklch(0.55 0.18 25)" : "oklch(0.50 0.012 75)",
-                fontFamily: "'Lato', sans-serif",
-                cursor: "pointer",
-              }}
-            >
-              <ThumbsDown size={11} />&nbsp;Not really
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Main component ───────────────────────────────────────────────────────────
 
 export default function FreeRun() {
-  const authCheckQuery = trpc.freeRun.authCheck.useQuery(undefined, { retry: false });
-  const isAuthenticated = authCheckQuery.data?.isAuthenticated ?? false;
-  const authLoading = authCheckQuery.isLoading;
   const [question, setQuestion] = useState("");
   const [pairs, setPairs] = useState<QAPair[]>([]);
   const [isAsking, setIsAsking] = useState(false);
-  const [isRevealing, setIsRevealing] = useState<string | null>(null);
-  const [deepDiveHover, setDeepDiveHover] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
 
-  const statusQuery = trpc.freeRun.status.useQuery(undefined, { enabled: isAuthenticated });
-  const askMutation = trpc.freeRun.curiosityAsk.useMutation();
-  const goDeeperMutation = trpc.freeRun.goDeeper.useMutation();
-  const feedbackMutation = trpc.freeRun.submitFeedback.useMutation();
-  const [pendingPackId, setPendingPackId] = useState<string | null>(null);
-  const checkoutMutation = trpc.freeRun.createCreditPackCheckout.useMutation({
-    onSuccess: (data) => {
-      if (data.url) {
-        trackEvent('credit-pack-checkout-start', { pack: pendingPackId ?? 'unknown' });
-        window.open(data.url, '_blank');
-      }
-      setPendingPackId(null);
-    },
-    onError: () => setPendingPackId(null),
-  });
+  const handleAsk = async () => {
+    if (!question.trim() || isAsking) return;
 
-  function handleBuyCredits(packId: 'bottle' | 'case' | 'obsessed') {
-    setPendingPackId(packId);
-    checkoutMutation.mutate({ packId, origin: window.location.origin });
-  }
-
-  const status = statusQuery.data;
-
-  useEffect(() => {
-    if (pairs.length > 0) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [pairs.length]);
-
-  async function handleAsk(q?: string) {
-    const text = (q ?? question).trim();
-    if (!text || isAsking) return;
-    setQuestion("");
     setIsAsking(true);
-    trackEvent("freerun-question", { topic: text.slice(0, 50) });
+    const q = question.trim();
+    setQuestion("");
 
-    try {
-      const result = await askMutation.mutateAsync({ question: text });
-      const id = crypto.randomUUID();
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
-      if (result.limitReached) {
-        setPairs((prev) => [
-          ...prev,
-          {
-            id,
-            question: text,
-            answer: `You've used your 3 questions for today — your daily curiosity allowance resets at midnight.\n\nMeanwhile, if you're ready to deep dive into the craft of winemaking, The Press is waiting.`,
-            topicTag: null,
-            reveal: null,
-            openPanels: new Set(),
-            feedback: new Map(),
-          },
-        ]);
-        return;
-      }
-
-      setPairs((prev) => [
-        ...prev,
-        {
-          id,
-          question: text,
-          answer: result.answer ?? "",
-          topicTag: result.topicTag ?? null,
-          reveal: null,
-          openPanels: new Set(),
-          feedback: new Map(),
-        },
-      ]);
-      statusQuery.refetch();
-    } catch {
-      const id = crypto.randomUUID();
-      setPairs((prev) => [
-        ...prev,
-        {
-          id,
-          question: text,
-          answer: "Something went wrong — please try again.",
-          topicTag: null,
-          reveal: null,
-          openPanels: new Set(),
-          feedback: new Map(),
-        },
-      ]);
-    } finally {
-      setIsAsking(false);
+    // Mock responses based on question
+    let answer = "";
+    if (q.toLowerCase().includes("tannin")) {
+      answer =
+        "Tannins are polyphenolic compounds found primarily in grape skins, seeds, and stems. They're responsible for the drying sensation in your mouth when drinking red wine. During fermentation, tannins extract from the solids into the juice. They play a crucial role in wine aging and structure.";
+    } else if (q.toLowerCase().includes("brix")) {
+      answer =
+        "Brix measures the sugar content in grape juice on a scale of 0-40. One degree Brix equals 1 gram of sugar per 100 grams of liquid. Typical harvest Brix ranges from 20-25 for table wines, with higher values indicating riper grapes. Brix is essential for predicting final alcohol content.";
+    } else if (q.toLowerCase().includes("ferment")) {
+      answer =
+        "Fermentation is the metabolic process where yeast converts sugars into alcohol and CO₂. Temperature control is critical — most wine yeasts work optimally between 50-86°F (10-30°C). Red wines ferment warmer than whites. Monitoring fermentation progress via Brix and temperature helps ensure a healthy, complete fermentation.";
+    } else {
+      answer =
+        "That's a great question about winemaking. The answer depends on many factors including your specific vintage, grape variety, climate, and cellar conditions. I'd recommend consulting your winemaking notes and considering how similar situations were handled in previous vintages.";
     }
-  }
 
-  async function handleGoDeeper(pairId: string) {
-    const pair = pairs.find((p) => p.id === pairId);
-    if (!pair || pair.reveal || isRevealing) return;
-    setIsRevealing(pairId);
-    trackEvent("freerun-go-deeper-click", { topic: pair.topicTag ?? "unknown" });
+    const pair: QAPair = {
+      id: crypto.randomUUID(),
+      question: q,
+      answer,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
 
-    try {
-      const result = await goDeeperMutation.mutateAsync({
-        question: pair.question,
-        surfaceAnswer: pair.answer,
-        topicTag: pair.topicTag ?? undefined,
-      });
-
-      if (result.insufficientCredits) {
-        setPairs((prev) =>
-          prev.map((p) =>
-            p.id === pairId
-              ? { ...p, reveal: { revealId: -1, sciencePanel: "", vineyardPanel: "", craftPanel: "", wasFreeHook: false } }
-              : p
-          )
-        );
-        return;
-      }
-
-      if (result.success && result.sciencePanel) {
-        setPairs((prev) =>
-          prev.map((p) =>
-            p.id === pairId
-              ? {
-                  ...p,
-                  reveal: {
-                    revealId: result.revealId ?? 0,
-                    sciencePanel: result.sciencePanel!,
-                    vineyardPanel: result.vineyardPanel!,
-                    craftPanel: result.craftPanel!,
-                    wasFreeHook: result.wasFreeHook ?? false,
-                  },
-                }
-              : p
-          )
-        );
-        trackEvent("freerun-go-deeper-unlocked", { topic: pair.topicTag ?? "unknown", wasFreeHook: result.wasFreeHook ?? false });
-        statusQuery.refetch();
-      }
-    } catch {
-      // silently fail
-    } finally {
-      setIsRevealing(null);
-    }
-  }
-
-  function togglePanel(pairId: string, panel: "science" | "vineyard" | "craft") {
-    setPairs((prev) =>
-      prev.map((p) => {
-        if (p.id !== pairId) return p;
-        const next = new Set(p.openPanels);
-        if (next.has(panel)) {
-          next.delete(panel);
-        } else {
-          next.add(panel);
-          trackEvent("freerun-panel-open", { panel, topic: p.topicTag ?? "unknown" });
-        }
-        return { ...p, openPanels: next };
-      })
-    );
-  }
-
-  function handleFeedback(pairId: string, panel: "science" | "vineyard" | "craft", thumbsUp: boolean) {
-    const pair = pairs.find((p) => p.id === pairId);
-    if (!pair?.reveal || pair.reveal.revealId <= 0) return;
-    feedbackMutation.mutate({ revealId: pair.reveal.revealId, panel, thumbsUp });
-    trackEvent("freerun-panel-feedback", { panel, thumbsUp, topic: pair.topicTag ?? "unknown" });
-    setPairs((prev) =>
-      prev.map((p) => {
-        if (p.id !== pairId) return p;
-        const next = new Map(p.feedback);
-        next.set(panel, thumbsUp);
-        return { ...p, feedback: next };
-      })
-    );
-  }
-
-  // ── Login gate ─────────────────────────────────────────────────────────────
-  if (authLoading) {
-    return (
-      <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: "24px", height: "24px", border: "2px solid oklch(0.72 0.12 75)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh" }}>
-        <div className="container pt-6" style={{ maxWidth: "760px", margin: "0 auto" }}>
-          <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "0.75rem", color: "oklch(0.50 0.012 75)", textDecoration: "none", fontFamily: "'Lato',sans-serif" }}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            Back to Ownology
-          </Link>
-        </div>
-        <div className="container" style={{ maxWidth: "760px", margin: "0 auto", paddingTop: "80px", paddingBottom: "80px", textAlign: "center" }}>
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm mb-8"
-            style={{
-              background: "color-mix(in oklch, oklch(0.72 0.12 75) 10%, transparent)",
-              border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 30%, transparent)",
-              fontFamily: "'Fira Code',monospace",
-              fontSize: "0.7rem",
-              color: "oklch(0.72 0.12 75)",
-              letterSpacing: "0.06em",
-            }}
-          >
-            <span>◈</span>&nbsp;FREE RUN
-          </div>
-
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1.1, color: "oklch(0.95 0.018 75)", letterSpacing: "-0.02em", marginBottom: "20px", textWrap: "balance" as "balance" }}>
-            Understand wine<br />
-            <em style={{ color: "oklch(0.72 0.12 75)", fontStyle: "italic" }}>from the inside out.</em>
-          </h1>
-
-          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "1.05rem", lineHeight: 1.75, color: "oklch(0.65 0.015 75)", maxWidth: "480px", margin: "0 auto 40px" }}>
-            Ask anything about wine — the flavours, the science, the stories behind the glass. Real oenology, not dumbed down.
-          </p>
-
-          <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.45 0.012 75)", marginBottom: "20px" }}>
-            Free account · 3 questions per day · No card required
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-2 mt-12">
-            {CURIOSITY_PROMPTS.slice(0, 6).map((p) => (
-              <div key={p.label} className="px-3 py-1.5 rounded-sm text-xs" style={{ background: "oklch(0.16 0.010 60)", border: "1px solid oklch(1 0 0 / 0.08)", color: "oklch(0.60 0.015 75)", fontFamily: "'Lato', sans-serif" }}>
-                {p.label}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Authenticated view ─────────────────────────────────────────────────────
-  const questionsRemaining = status?.questionsRemaining ?? 3;
-  const questionsUsed = status?.questionsUsedToday ?? 0;
-  const creditBalance = status?.creditBalance ?? 0;
-  const hasQuestionsLeft = questionsRemaining > 0;
+    setPairs([pair, ...pairs]);
+    setIsAsking(false);
+  };
 
   return (
-    <div style={{ background: "oklch(0.11 0.008 60)", minHeight: "100vh" }}>
-      <div className="container pt-6 pb-0" style={{ maxWidth: "760px", margin: "0 auto" }}>
-        <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "0.75rem", color: "oklch(0.50 0.012 75)", textDecoration: "none", fontFamily: "'Lato',sans-serif" }}>
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          Back to Ownology
-        </Link>
+    <div style={{ minHeight: "100vh", backgroundColor: "#0a0a0a", color: "#f5f5f5", display: "flex", flexDirection: "column" }}>
+      {/* Header */}
+      <div style={{ padding: "24px 16px", borderBottom: "1px solid #333333" }}>
+        <h1 style={{ fontSize: "24px", fontWeight: 600, marginBottom: "8px" }}>Ask Ownology</h1>
+        <p style={{ fontSize: "14px", color: "#a0a0a0", lineHeight: 1.5 }}>
+          Ask anything about wine — the flavours, the science, the stories behind the glass.
+        </p>
       </div>
 
-      <div className="container pt-8 pb-24" style={{ maxWidth: "760px", margin: "0 auto" }}>
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div
-                className="px-3 py-1.5 rounded-sm text-xs flex items-center gap-2"
-                style={{ background: "color-mix(in oklch, oklch(0.72 0.12 75) 10%, transparent)", border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 30%, transparent)", fontFamily: "'Fira Code',monospace", color: "oklch(0.72 0.12 75)", letterSpacing: "0.06em" }}
-              >
-                <span style={{ fontSize: "0.8rem" }}>◈</span> FREE RUN
-              </div>
-              <div className="flex items-center gap-1.5">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="w-2 h-2 rounded-full" style={{ background: i < questionsUsed ? "oklch(0.72 0.12 75)" : "oklch(1 0 0 / 0.12)" }} />
-                ))}
-                <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", color: "oklch(0.45 0.012 75)", marginLeft: "4px" }}>
-                  {questionsRemaining} left today
-                </span>
-              </div>
+      {/* Content Area */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
+        {pairs.length === 0 ? (
+          // Empty State with Curiosity Prompts
+          <div style={{ paddingTop: "32px" }}>
+            <div style={{ textAlign: "center", marginBottom: "32px" }}>
+              <div style={{ fontSize: "48px", marginBottom: "16px", opacity: 0.5 }}>💬</div>
+              <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
+                Start exploring
+              </h2>
+              <p style={{ fontSize: "14px", color: "#a0a0a0", lineHeight: 1.6 }}>
+                Ask anything about wine — fermentation, flavours, technique, science, or stories.
+              </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              {creditBalance > 0 && (
-                <div
-                  className="px-2.5 py-1 rounded-sm text-xs flex items-center gap-1.5"
-                  style={{ background: "color-mix(in oklch, oklch(0.65 0.18 145) 10%, transparent)", border: "1px solid color-mix(in oklch, oklch(0.65 0.18 145) 25%, transparent)", fontFamily: "'Fira Code',monospace", color: "oklch(0.65 0.18 145)", letterSpacing: "0.04em" }}
-                >
-                  <Sparkles size={10} />
-                  {creditBalance} credit{creditBalance !== 1 ? "s" : ""}
-                </div>
-              )}
-              <Link
-                href="/pricing"
-                onClick={() => trackEvent('press-cta-click', { location: 'header' })}
-                style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "6px 12px", background: "oklch(0.16 0.010 60)", border: "1px solid oklch(1 0 0 / 0.10)", color: "oklch(0.60 0.015 75)", fontFamily: "'Lato',sans-serif", textDecoration: "none", letterSpacing: "0.04em", fontSize: "0.75rem", borderRadius: "2px" }}
-              >
-                The Press →
-              </Link>
-            </div>
-          </div>
-
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "clamp(1.8rem, 3.5vw, 2.5rem)", lineHeight: 1.1, color: "oklch(0.95 0.018 75)", letterSpacing: "-0.02em", marginBottom: "12px", textWrap: "balance" as "balance" }}>
-            What do you want to understand about wine?
-          </h1>
-          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.95rem", color: "oklch(0.60 0.015 75)", lineHeight: 1.6 }}>
-            Ask anything — flavours, aromas, regions, science, stories. Grounded in real oenology.
-          </p>
-        </div>
-
-        {/* Conversation */}
-        {pairs.length > 0 && (
-          <div className="mb-8 flex flex-col gap-8">
-            {pairs.map((pair) => (
-              <div key={pair.id}>
-                {/* Question */}
-                <div className="flex justify-end mb-4">
-                  <div
-                    className="px-4 py-3 rounded-sm max-w-lg"
-                    style={{ background: "oklch(0.18 0.010 60)", border: "1px solid oklch(1 0 0 / 0.08)", fontFamily: "'Lato', sans-serif", fontSize: "0.9rem", color: "oklch(0.85 0.015 75)", lineHeight: 1.6 }}
-                  >
-                    {pair.question}
-                  </div>
-                </div>
-
-                {/* Answer */}
-                <div className="px-5 py-4 rounded-sm mb-4" style={{ background: "oklch(0.14 0.008 60)", border: "1px solid oklch(1 0 0 / 0.06)" }}>
-                  {pair.topicTag && (
-                    <div
-                      className="inline-block px-2 py-0.5 rounded-sm text-xs mb-3"
-                      style={{ background: "color-mix(in oklch, oklch(0.72 0.12 75) 10%, transparent)", border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 20%, transparent)", fontFamily: "'Fira Code',monospace", color: "oklch(0.65 0.10 75)", letterSpacing: "0.05em", fontSize: "0.65rem" }}
-                    >
-                      {pair.topicTag}
-                    </div>
-                  )}
-
-                  <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9rem", lineHeight: 1.8, color: "oklch(0.75 0.015 75)", whiteSpace: "pre-wrap" }}>
-                    {pair.answer}
-                  </p>
-
-                  {!pair.reveal && !pair.answer.includes("daily curiosity allowance") && (
-                    <div className="mt-4 pt-3" style={{ borderTop: "1px solid oklch(1 0 0 / 0.06)" }}>
-                      <div style={{ position: "relative", display: "inline-block" }}>
-                        <button
-                          onClick={() => handleGoDeeper(pair.id)}
-                          onMouseEnter={() => !isRevealing && setDeepDiveHover(pair.id)}
-                          onMouseLeave={() => setDeepDiveHover(null)}
-                          disabled={isRevealing === pair.id}
-                          className="flex items-center gap-2 px-4 py-2 rounded-sm text-sm transition-all"
-                          style={{
-                            background: deepDiveHover === pair.id
-                              ? "color-mix(in oklch, oklch(0.72 0.12 75) 20%, transparent)"
-                              : "color-mix(in oklch, oklch(0.72 0.12 75) 12%, transparent)",
-                            border: `1px solid color-mix(in oklch, oklch(0.72 0.12 75) ${deepDiveHover === pair.id ? "55%" : "35%"}, transparent)`,
-                            color: "oklch(0.72 0.12 75)",
-                            fontFamily: "'Lato', sans-serif",
-                            fontWeight: 600,
-                            letterSpacing: "0.03em",
-                            cursor: isRevealing === pair.id ? "wait" : "pointer",
-                            opacity: isRevealing === pair.id ? 0.6 : 1,
-                            transition: "all 0.15s ease",
-                          }}
-                        >
-                          {isRevealing === pair.id ? (
-                            <>
-                              <div style={{ width: "12px", height: "12px", border: "1.5px solid oklch(0.72 0.12 75)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                              Revealing the Trinity…
-                            </>
-                          ) : (
-                            <>
-                              <Sparkles size={13} />
-                              Deep Dive
-                              {creditBalance === 0 && (
-                                <span style={{ fontSize: "0.7rem", opacity: 0.7, marginLeft: "2px" }}>(first one free)</span>
-                              )}
-                            </>
-                          )}
-                        </button>
-                        {/* Divine Trinity popover */}
-                        {deepDiveHover === pair.id && !isRevealing && (
-                          <DivineTriniityPopover creditBalance={creditBalance} />
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {pair.reveal?.revealId === -1 && (
-                    <div className="mt-4 pt-3" style={{ borderTop: "1px solid oklch(1 0 0 / 0.06)" }}>
-                      <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.85rem", color: "oklch(0.60 0.015 75)", marginBottom: "12px" }}>
-                        You've used your free reveal. Top up to deep dive.
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {(["bottle", "case", "obsessed"] as const).map((packId) => {
-                          const labels = { bottle: "5 credits — $4", case: "15 credits — $9", obsessed: "40 credits — $16" };
-                          const isLoading = pendingPackId === packId && checkoutMutation.isPending;
-                          return (
-                            <button
-                              key={packId}
-                              onClick={() => handleBuyCredits(packId)}
-                              disabled={checkoutMutation.isPending}
-                              style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 14px", background: packId === 'bottle' ? "oklch(0.72 0.12 75)" : "oklch(0.18 0.010 60)", border: `1px solid ${packId === 'bottle' ? 'oklch(0.72 0.12 75)' : 'oklch(1 0 0 / 0.12)'}`, color: packId === 'bottle' ? "oklch(0.11 0.008 60)" : "oklch(0.72 0.015 75)", fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: "0.8rem", borderRadius: "2px", cursor: checkoutMutation.isPending ? "wait" : "pointer", opacity: checkoutMutation.isPending && !isLoading ? 0.5 : 1 }}
-                            >
-                              {isLoading ? <div style={{ width: "11px", height: "11px", border: "1.5px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> : null}
-                              {labels[packId]}
-                            </button>
-                          );
-                        })}
-                      </div>
-                      <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.40 0.010 75)", marginTop: "8px" }}>
-                        Or get unlimited with <Link href="/pricing" style={{ color: "oklch(0.72 0.12 75)", textDecoration: "none" }}>The Press — $41/month</Link>
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Triangle reveal */}
-                {pair.reveal && pair.reveal.revealId !== -1 && (
-                  <div className="flex flex-col gap-2 mb-4">
-                    {pair.reveal.wasFreeHook && (
-                      <div
-                        className="px-3 py-2 rounded-sm text-xs mb-1 flex items-center gap-2"
-                        style={{ background: "color-mix(in oklch, oklch(0.65 0.18 145) 8%, transparent)", border: "1px solid color-mix(in oklch, oklch(0.65 0.18 145) 20%, transparent)", fontFamily: "'Lato', sans-serif", color: "oklch(0.65 0.18 145)" }}
-                      >
-                        <Sparkles size={11} />
-                        Your first Divine Trinity is free — welcome to the rabbit hole.
-                      </div>
-                    )}
-
-                    <TrianglePanel
-                      icon={<Beaker size={14} />}
-                      label="The Science"
-                      color="oklch(0.60 0.18 220)"
-                      content={pair.reveal.sciencePanel}
-                      panelKey="science"
-                      isOpen={pair.openPanels.has("science")}
-                      onToggle={() => togglePanel(pair.id, "science")}
-                      feedback={pair.feedback.get("science")}
-                      onFeedback={(v) => handleFeedback(pair.id, "science", v)}
-                    />
-                    <TrianglePanel
-                      icon={<Sprout size={14} />}
-                      label="The Vineyard"
-                      color="oklch(0.65 0.18 145)"
-                      content={pair.reveal.vineyardPanel}
-                      panelKey="vineyard"
-                      isOpen={pair.openPanels.has("vineyard")}
-                      onToggle={() => togglePanel(pair.id, "vineyard")}
-                      feedback={pair.feedback.get("vineyard")}
-                      onFeedback={(v) => handleFeedback(pair.id, "vineyard", v)}
-                    />
-                    <TrianglePanel
-                      icon={<Wine size={14} />}
-                      label="The Craft"
-                      color="oklch(0.72 0.12 75)"
-                      content={pair.reveal.craftPanel}
-                      panelKey="craft"
-                      isOpen={pair.openPanels.has("craft")}
-                      onToggle={() => togglePanel(pair.id, "craft")}
-                      feedback={pair.feedback.get("craft")}
-                      onFeedback={(v) => handleFeedback(pair.id, "craft", v)}
-                    />
-
-                    <div
-                      className="mt-2 px-4 py-3 rounded-sm flex items-center justify-between"
-                      style={{ background: "oklch(0.14 0.008 60)", border: "1px solid oklch(1 0 0 / 0.06)" }}
-                    >
-                      <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.8rem", color: "oklch(0.55 0.015 75)", fontStyle: "italic" }}>
-                        Ready to make it, not just drink it?
-                      </p>
-                      <Link
-                        href="/pricing"
-                        onClick={() => trackEvent('press-cta-click', { location: 'answer-card' })}
-                        style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "6px 14px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, textDecoration: "none", letterSpacing: "0.03em", fontSize: "0.75rem", borderRadius: "2px", whiteSpace: "nowrap" }}
-                      >
-                        The Press <ArrowRight size={11} />
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-            <div ref={bottomRef} />
-          </div>
-        )}
-
-        {/* Empty state prompts */}
-        {pairs.length === 0 && (
-          <div className="mb-8">
-            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.45 0.012 75)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "12px" }}>
-              Try asking…
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {CURIOSITY_PROMPTS.map((p) => (
+            {/* Curiosity Prompts */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              {[
+                "What are tannins?",
+                "How does fermentation work?",
+                "What is Brix?",
+                "How to prevent oxidation?",
+                "What is malolactic fermentation?",
+                "How to age wine?",
+              ].map((prompt) => (
                 <button
-                  key={p.label}
-                  onClick={() => handleAsk(p.q)}
-                  className="px-3 py-2 rounded-sm text-xs transition-all"
-                  style={{ background: "oklch(0.15 0.008 60)", border: "1px solid oklch(1 0 0 / 0.08)", color: "oklch(0.65 0.015 75)", fontFamily: "'Lato', sans-serif", cursor: "pointer" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = "color-mix(in oklch, oklch(0.72 0.12 75) 40%, transparent)"; e.currentTarget.style.color = "oklch(0.72 0.12 75)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = "oklch(1 0 0 / 0.08)"; e.currentTarget.style.color = "oklch(0.65 0.015 75)"; }}
+                  key={prompt}
+                  onClick={() => {
+                    setQuestion(prompt);
+                    setTimeout(() => {
+                      // Trigger ask after state updates
+                      const input = document.querySelector("input") as HTMLInputElement;
+                      if (input) input.focus();
+                    }, 0);
+                  }}
+                  style={{
+                    backgroundColor: "#1a1a1a",
+                    border: "1px solid #333333",
+                    borderRadius: "4px",
+                    padding: "12px",
+                    color: "#a0a0a0",
+                    fontSize: "13px",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    textAlign: "left",
+                    lineHeight: 1.4,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "#d4a574";
+                    e.currentTarget.style.color = "#d4a574";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "#333333";
+                    e.currentTarget.style.color = "#a0a0a0";
+                  }}
                 >
-                  {p.label}
+                  {prompt}
                 </button>
               ))}
             </div>
           </div>
-        )}
-
-        {/* Input */}
-        <div
-          className="sticky bottom-6"
-          style={{ background: "oklch(0.13 0.008 60)", border: "1px solid oklch(1 0 0 / 0.10)", borderRadius: "4px", padding: "12px" }}
-        >
-          {!hasQuestionsLeft ? (
-            <div className="text-center py-2">
-              <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.85rem", color: "oklch(0.55 0.015 75)", marginBottom: "8px" }}>
-                You've used your 3 questions for today. Come back tomorrow.
-              </p>
-              <Link
-                href="/pricing"
-                onClick={() => trackEvent('press-cta-click', { location: 'daily-limit' })}
-                style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 16px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, textDecoration: "none", fontSize: "0.8rem", borderRadius: "2px" }}
-              >
-                Upgrade to The Press for unlimited <ArrowRight size={12} />
-              </Link>
-            </div>
-          ) : (
-            <div className="flex gap-3 items-center">
-              <input
-                ref={inputRef}
-                type="text"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAsk(); } }}
-                placeholder="Ask anything about wine…"
-                disabled={isAsking}
-                style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.95rem", color: "oklch(0.85 0.015 75)", lineHeight: 1.6, padding: "4px 0", caretColor: "oklch(0.72 0.12 75)" }}
-              />
-              <button
-                onClick={() => handleAsk()}
-                disabled={!question.trim() || isAsking}
-                style={{ width: "36px", height: "36px", background: question.trim() && !isAsking ? "oklch(0.72 0.12 75)" : "oklch(0.20 0.010 60)", border: "none", borderRadius: "2px", cursor: question.trim() && !isAsking ? "pointer" : "not-allowed", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
-              >
-                {isAsking ? (
-                  <div style={{ width: "14px", height: "14px", border: "1.5px solid oklch(0.72 0.12 75)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                ) : (
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M2 12L12 7 2 2v3.5l7 1.5-7 1.5V12z" fill={question.trim() ? "oklch(0.11 0.008 60)" : "oklch(0.45 0.012 75)"} />
-                  </svg>
-                )}
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Credit upsell nudge */}
-        {creditBalance === 0 && pairs.some((p) => p.reveal && p.reveal.revealId !== -1) && (
-          <div
-            className="mt-6 px-5 py-4 rounded-sm"
-            style={{ background: "oklch(0.14 0.008 60)", border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 20%, transparent)" }}
-          >
-            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 600, fontSize: "0.85rem", color: "oklch(0.85 0.015 75)", marginBottom: "4px" }}>
-              Want to deep dive on your next question?
-            </p>
-            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8rem", color: "oklch(0.55 0.015 75)", marginBottom: "12px" }}>
-              Pick a pack — credits never expire.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {(["bottle", "case", "obsessed"] as const).map((packId) => {
-                const labels = { bottle: "5 credits — $4", case: "15 credits — $9", obsessed: "40 credits — $16" };
-                const names = { bottle: "A Bottle of Curiosity", case: "A Case of Questions", obsessed: "The Obsessive" };
-                const isLoading = pendingPackId === packId && checkoutMutation.isPending;
-                return (
-                  <button
-                    key={packId}
-                    onClick={() => handleBuyCredits(packId)}
-                    disabled={checkoutMutation.isPending}
-                    title={names[packId]}
-                    style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 14px", background: packId === 'bottle' ? "oklch(0.72 0.12 75)" : "oklch(0.18 0.010 60)", border: `1px solid ${packId === 'bottle' ? 'oklch(0.72 0.12 75)' : 'oklch(1 0 0 / 0.12)'}`, color: packId === 'bottle' ? "oklch(0.11 0.008 60)" : "oklch(0.72 0.015 75)", fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: "0.8rem", borderRadius: "2px", cursor: checkoutMutation.isPending ? "wait" : "pointer", opacity: checkoutMutation.isPending && !isLoading ? 0.5 : 1 }}
-                  >
-                    {isLoading ? <div style={{ width: "11px", height: "11px", border: "1.5px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> : null}
-                    {labels[packId]}
-                  </button>
-                );
-              })}
-            </div>
-            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.40 0.010 75)", marginTop: "10px" }}>
-              Or get unlimited with <Link href="/pricing" style={{ color: "oklch(0.72 0.12 75)", textDecoration: "none" }}>The Press — $41/month</Link>
-            </p>
-          </div>
-        )}
-      </div>
-
-        {/* Locked premium feature cards — upsell glimpse */}
-        <div className="mt-16 mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div style={{ flex: 1, height: "1px", background: "oklch(1 0 0 / 0.06)" }} />
-            <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", color: "oklch(0.40 0.010 75)", letterSpacing: "0.12em", textTransform: "uppercase", whiteSpace: "nowrap" }}>The Press — for winemakers</p>
-            <div style={{ flex: 1, height: "1px", background: "oklch(1 0 0 / 0.06)" }} />
-          </div>
-          <div className="grid grid-cols-1 gap-3" style={{ opacity: 0.55 }}>
-            {[
-              { icon: "🧪", title: "Vintage Log", desc: "Track every tank, batch, and decision from crush to bottle.", tag: "The Press" },
-              { icon: "📋", title: "38 Cellar SOPs", desc: "Industry-standard procedures for fermentation, sanitation, barrels, and bottling.", tag: "The Press" },
-              { icon: "⚖️", title: "Compliance AI", desc: "Australian winemaking regulations, labelling rules, and export requirements.", tag: "The Cellar Hand" },
-              { icon: "🛢️", title: "Barrel & Tank Register", desc: "Full vessel tracking with status, fill history, and maintenance logs.", tag: "The Press" },
-            ].map((card) => (
+        ) : (
+          // Question History
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {pairs.map((pair) => (
               <div
-                key={card.title}
-                className="flex items-start gap-4 px-5 py-4 rounded-sm"
-                style={{ background: "oklch(0.13 0.008 60)", border: "1px solid oklch(1 0 0 / 0.06)", position: "relative", overflow: "hidden" }}
+                key={pair.id}
+                style={{
+                  backgroundColor: "#1a1a1a",
+                  border: "1px solid #333333",
+                  borderRadius: "4px",
+                  padding: "16px",
+                }}
               >
-                <div style={{ fontSize: "1.25rem", flexShrink: 0, marginTop: "1px", filter: "grayscale(0.4)" }}>{card.icon}</div>
-                <div style={{ flex: 1 }}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "0.9rem", color: "oklch(0.70 0.015 75)" }}>{card.title}</span>
-                    <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.6rem", color: "oklch(0.55 0.08 75)", letterSpacing: "0.08em", background: "oklch(0.18 0.010 60)", padding: "1px 6px", borderRadius: "2px" }}>{card.tag}</span>
-                  </div>
-                  <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.8rem", color: "oklch(0.45 0.012 75)", lineHeight: 1.5 }}>{card.desc}</p>
+                {/* Question */}
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "#d4a574", marginBottom: "12px" }}>
+                  {pair.question}
                 </div>
-                <div style={{ position: "absolute", top: "10px", right: "12px" }}>
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="3" y="5" width="6" height="6" rx="1" stroke="oklch(0.40 0.010 75)" strokeWidth="1.2"/><path d="M4 5V3.5a2 2 0 0 1 4 0V5" stroke="oklch(0.40 0.010 75)" strokeWidth="1.2" strokeLinecap="round"/></svg>
+
+                {/* Answer */}
+                <div style={{ fontSize: "13px", color: "#a0a0a0", lineHeight: 1.6, marginBottom: "8px" }}>
+                  {pair.answer}
+                </div>
+
+                {/* Timestamp */}
+                <div style={{ fontSize: "11px", color: "#666666" }}>
+                  {pair.timestamp}
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Ready to make it? CTA */}
-        <div
-          className="mt-6 mb-16 px-6 py-8 rounded-sm text-center"
-          style={{ background: "color-mix(in oklch, oklch(0.72 0.12 75) 6%, oklch(0.11 0.008 60))", border: "1px solid color-mix(in oklch, oklch(0.72 0.12 75) 18%, transparent)" }}
-        >
-          <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.65rem", color: "oklch(0.55 0.08 75)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "12px" }}>From curiosity to craft</p>
-          <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "clamp(1.4rem, 2.8vw, 1.9rem)", color: "oklch(0.95 0.018 75)", lineHeight: 1.15, letterSpacing: "-0.01em", marginBottom: "12px", textWrap: 'balance' as 'balance' }}>
-            Ready to make it?
-          </h2>
-          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9rem", color: "oklch(0.62 0.015 75)", lineHeight: 1.65, maxWidth: "420px", margin: "0 auto 24px" }}>
-            The Press gives you the full winemaking suite — vintage log, cellar SOPs, AI assistant, and barrel tracking. If you've spent $1,000 on equipment, it pays for itself in the first harvest.
-          </p>
-          <Link
-            href="/pricing"
-            onClick={() => trackEvent('press-cta-click', { location: 'bottom-cta' })}
-            style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "11px 26px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: "0.875rem", letterSpacing: "0.04em", textDecoration: "none", borderRadius: "2px" }}
+      {/* Input Area */}
+      <div style={{ padding: "16px", borderTop: "1px solid #333333", backgroundColor: "#1a1a1a", position: "sticky", bottom: "64px" }}>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <input
+            type="text"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !isAsking) handleAsk();
+            }}
+            placeholder="Ask about wine..."
+            disabled={isAsking}
+            style={{
+              flex: 1,
+              height: "44px",
+              backgroundColor: "#0a0a0a",
+              border: "1px solid #333333",
+              borderRadius: "4px",
+              color: "#f5f5f5",
+              padding: "0 12px",
+              fontSize: "14px",
+              boxSizing: "border-box",
+              opacity: isAsking ? 0.5 : 1,
+            }}
+          />
+          <button
+            onClick={handleAsk}
+            disabled={isAsking || !question.trim()}
+            style={{
+              width: "44px",
+              height: "44px",
+              backgroundColor: "#d4a574",
+              color: "#0a0a0a",
+              border: "none",
+              borderRadius: "4px",
+              cursor: isAsking || !question.trim() ? "not-allowed" : "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: isAsking || !question.trim() ? 0.5 : 1,
+              transition: "opacity 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              if (!isAsking && question.trim()) {
+                e.currentTarget.style.opacity = "0.9";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isAsking && question.trim()) {
+                e.currentTarget.style.opacity = "1";
+              }
+            }}
           >
-            Explore The Press <ArrowRight size={14} />
-          </Link>
-          <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.7rem", color: "oklch(0.38 0.010 75)", marginTop: "10px" }}>From $41/month · Cancel anytime</p>
+            <Send size={18} />
+          </button>
         </div>
-
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
     </div>
   );
 }
