@@ -412,7 +412,7 @@
 - [x] Fix /resources/home-winery-kit 404 — verified working
 
 ### White Wine Bible
-- [ ] Ingest White Wine Bible when uploaded (pipeline ready: node scripts/ingest-diy-bible.mjs --doc white_wine_bible) — AWAITING UPLOAD
+- [x] Ingest White Wine Bible (Guide_to_White_Wine_Making.pdf, 92pp) — ran scripts/ingest-white-wine-bible.mjs: 119 chunks (18 published in WBS Domain 4 Fermentation: Ch3/Ch4/Ch9.8, 101 unpublished); removed 17 TOC-stub chunks; verified DIY tutor retrieves white-wine content via wine_type='white' + published filter
 
 ## White Wine Knowledge Sprint (Jun 2026)
 - [x] Ingest White Wine Bible (Guide to White Wine Making — MoreFlavor!, 127 chunks, all published)
