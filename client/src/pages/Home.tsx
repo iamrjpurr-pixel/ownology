@@ -304,7 +304,7 @@ function Nav() {
         }}
       >
         <div className="container flex items-center justify-between py-5">
-          <OwnologyLogo size={36} />
+          <OwnologyLogo size={36} showIABadge showTheoryCard />
 
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-6">
@@ -390,7 +390,7 @@ function Nav() {
             borderBottom: "1px solid var(--ow-border)",
           }}
         >
-          <OwnologyLogo size={32} />
+          <OwnologyLogo size={32} showIABadge showTheoryCard />
           <button
             className="touch-target rounded-sm"
             onClick={() => setMenuOpen(false)}

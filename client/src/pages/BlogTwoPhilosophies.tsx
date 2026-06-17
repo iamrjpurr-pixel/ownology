@@ -150,7 +150,7 @@ export default function BlogTwoPhilosophies() {
       >
         <div className="container flex items-center justify-between py-4">
           <Link href="/">
-            <OwnologyLogo size={32} />
+            <OwnologyLogo size={32} showIABadge showTheoryCard />
           </Link>
           <Link
             href="/blog"

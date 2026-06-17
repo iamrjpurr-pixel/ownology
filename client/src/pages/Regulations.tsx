@@ -1279,7 +1279,7 @@ export default function Resources() {
       >
         <div className="container flex items-center justify-between py-5">
           <Link href="/">
-            <OwnologyLogo size={32} />
+            <OwnologyLogo size={32} showIABadge showTheoryCard />
           </Link>
           <div className="flex items-center gap-4">
             <button

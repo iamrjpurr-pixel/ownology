@@ -51,7 +51,7 @@ function Nav() {
       style={scrolled ? { background: "var(--ow-nav-bg)" } : {}}
     >
       <div className="container flex items-center justify-between py-5">
-        <Link href="/"><OwnologyLogo size={32} /></Link>
+        <Link href="/"><OwnologyLogo size={32} showIABadge showTheoryCard /></Link>
         <div className="flex items-center gap-6">
           <Link href="/" style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: TEXT_LO }}>
             Back to Home

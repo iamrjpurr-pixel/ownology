@@ -1095,7 +1095,7 @@ export default function Merch() {
       >
         <div className="container flex items-center justify-between py-4">
           <a href="/" aria-label="Ownology home">
-            <OwnologyLogo size={32} />
+            <OwnologyLogo size={32} showIABadge showTheoryCard />
           </a>
           <div className="flex items-center gap-4">
             <a

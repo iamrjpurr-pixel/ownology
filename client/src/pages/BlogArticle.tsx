@@ -31,7 +31,7 @@ export default function BlogArticle() {
           padding: "2rem",
         }}
       >
-        <OwnologyLogo size={36} />
+        <OwnologyLogo size={32} showIABadge showTheoryCard />
         <p
           style={{
             fontFamily: "'Fraunces', serif",
