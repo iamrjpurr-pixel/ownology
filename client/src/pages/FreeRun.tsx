@@ -1,226 +1,276 @@
 /**
- * FreeRun — Wine Knowledge Assistant (Ask)
- * 
- * Simple, readable UI for asking wine questions:
- * - Question input field (44px height)
- * - Ask button (prominent, amber)
- * - Question history list (clean cards)
- * - Mock data for immediate interactivity
+ * FreeRun (Ask) — Wine Knowledge Assistant
+ * DailyMe-inspired: light background, goal cards, input field, AI responses
  */
 
 import { useState } from "react";
-import { Send } from "lucide-react";
+import WorkModeLayout from "@/components/WorkModeLayout";
 
-interface QAPair {
+interface Message {
   id: string;
-  question: string;
-  answer: string;
-  timestamp: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
 }
 
+const GOAL_CARDS = [
+  { id: 1, label: "Fermentation Science", emoji: "🧪" },
+  { id: 2, label: "Tasting & Flavours", emoji: "👅" },
+  { id: 3, label: "Vineyard & Harvest", emoji: "🍇" },
+  { id: 4, label: "Cellar Techniques", emoji: "🍷" },
+  { id: 5, label: "Equipment & Tools", emoji: "🔧" },
+  { id: 6, label: "Winemaking History", emoji: "📚" },
+];
+
 export default function FreeRun() {
-  const [question, setQuestion] = useState("");
-  const [pairs, setPairs] = useState<QAPair[]>([]);
-  const [isAsking, setIsAsking] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAsk = async () => {
-    if (!question.trim() || isAsking) return;
+  const handleGoalClick = (label: string) => {
+    setInput(label);
+  };
 
-    setIsAsking(true);
-    const q = question.trim();
-    setQuestion("");
+  const handleSend = async () => {
+    if (!input.trim()) return;
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    // Mock responses based on question
-    let answer = "";
-    if (q.toLowerCase().includes("tannin")) {
-      answer =
-        "Tannins are polyphenolic compounds found primarily in grape skins, seeds, and stems. They're responsible for the drying sensation in your mouth when drinking red wine. During fermentation, tannins extract from the solids into the juice. They play a crucial role in wine aging and structure.";
-    } else if (q.toLowerCase().includes("brix")) {
-      answer =
-        "Brix measures the sugar content in grape juice on a scale of 0-40. One degree Brix equals 1 gram of sugar per 100 grams of liquid. Typical harvest Brix ranges from 20-25 for table wines, with higher values indicating riper grapes. Brix is essential for predicting final alcohol content.";
-    } else if (q.toLowerCase().includes("ferment")) {
-      answer =
-        "Fermentation is the metabolic process where yeast converts sugars into alcohol and CO₂. Temperature control is critical — most wine yeasts work optimally between 50-86°F (10-30°C). Red wines ferment warmer than whites. Monitoring fermentation progress via Brix and temperature helps ensure a healthy, complete fermentation.";
-    } else {
-      answer =
-        "That's a great question about winemaking. The answer depends on many factors including your specific vintage, grape variety, climate, and cellar conditions. I'd recommend consulting your winemaking notes and considering how similar situations were handled in previous vintages.";
-    }
-
-    const pair: QAPair = {
-      id: crypto.randomUUID(),
-      question: q,
-      answer,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    // Add user message
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: input,
+      timestamp: new Date(),
     };
 
-    setPairs([pair, ...pairs]);
-    setIsAsking(false);
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
+
+    // Simulate AI response
+    setTimeout(() => {
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: `Great question about "${input}"! This is a placeholder response. In the full implementation, this would be powered by the Ownology AI tutor with access to the SOP library and CSU Academic Backbone.`,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, aiMessage]);
+      setIsLoading(false);
+    }, 1000);
   };
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#0a0a0a", color: "#f5f5f5", display: "flex", flexDirection: "column" }}>
-      {/* Header */}
-      <div style={{ padding: "24px 16px", borderBottom: "1px solid #333333" }}>
-        <h1 style={{ fontSize: "24px", fontWeight: 600, marginBottom: "8px" }}>Ask Ownology</h1>
-        <p style={{ fontSize: "14px", color: "#a0a0a0", lineHeight: 1.5 }}>
-          Ask anything about wine — the flavours, the science, the stories behind the glass.
-        </p>
-      </div>
+    <WorkModeLayout title="Ask Ownology" activeTab="ask">
+      <div style={{ padding: "1.5rem 1rem" }}>
+        {/* If no messages, show goal cards */}
+        {messages.length === 0 ? (
+          <div>
+            <h2
+              style={{
+                fontFamily: "'Fraunces', serif",
+                fontSize: "1.75rem",
+                fontWeight: 700,
+                color: "#1A1A1A",
+                marginBottom: "0.5rem",
+                lineHeight: 1.2,
+              }}
+            >
+              What would you like to know?
+            </h2>
+            <p
+              style={{
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.95rem",
+                color: "#666666",
+                marginBottom: "2rem",
+                lineHeight: 1.5,
+              }}
+            >
+              Ask anything about wine, fermentation, vineyard management, or cellar techniques.
+            </p>
 
-      {/* Content Area */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
-        {pairs.length === 0 ? (
-          // Empty State with Curiosity Prompts
-          <div style={{ paddingTop: "32px" }}>
-            <div style={{ textAlign: "center", marginBottom: "32px" }}>
-              <div style={{ fontSize: "48px", marginBottom: "16px", opacity: 0.5 }}>💬</div>
-              <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
-                Start exploring
-              </h2>
-              <p style={{ fontSize: "14px", color: "#a0a0a0", lineHeight: 1.6 }}>
-                Ask anything about wine — fermentation, flavours, technique, science, or stories.
-              </p>
-            </div>
-
-            {/* Curiosity Prompts */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-              {[
-                "What are tannins?",
-                "How does fermentation work?",
-                "What is Brix?",
-                "How to prevent oxidation?",
-                "What is malolactic fermentation?",
-                "How to age wine?",
-              ].map((prompt) => (
+            {/* Goal cards grid */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "1rem",
+                marginBottom: "2rem",
+              }}
+            >
+              {GOAL_CARDS.map((card) => (
                 <button
-                  key={prompt}
-                  onClick={() => {
-                    setQuestion(prompt);
-                    setTimeout(() => {
-                      // Trigger ask after state updates
-                      const input = document.querySelector("input") as HTMLInputElement;
-                      if (input) input.focus();
-                    }, 0);
-                  }}
+                  key={card.id}
+                  onClick={() => handleGoalClick(card.label)}
                   style={{
-                    backgroundColor: "#1a1a1a",
-                    border: "1px solid #333333",
-                    borderRadius: "4px",
-                    padding: "12px",
-                    color: "#a0a0a0",
-                    fontSize: "13px",
+                    padding: "1.25rem 1rem",
+                    background: "#FFFFFF",
+                    border: "1px solid #E8EAED",
+                    borderRadius: "12px",
                     cursor: "pointer",
                     transition: "all 0.2s",
-                    textAlign: "left",
-                    lineHeight: 1.4,
+                    textAlign: "center",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "#d4a574";
-                    e.currentTarget.style.color = "#d4a574";
+                    e.currentTarget.style.background = "#F0F4FF";
+                    e.currentTarget.style.borderColor = "#2563EB";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "#333333";
-                    e.currentTarget.style.color = "#a0a0a0";
+                    e.currentTarget.style.background = "#FFFFFF";
+                    e.currentTarget.style.borderColor = "#E8EAED";
                   }}
                 >
-                  {prompt}
+                  <div style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>{card.emoji}</div>
+                  <div
+                    style={{
+                      fontFamily: "'Lato', sans-serif",
+                      fontSize: "0.875rem",
+                      fontWeight: 600,
+                      color: "#1A1A1A",
+                    }}
+                  >
+                    {card.label}
+                  </div>
                 </button>
               ))}
             </div>
           </div>
         ) : (
-          // Question History
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            {pairs.map((pair) => (
+          /* Messages view */
+          <div style={{ marginBottom: "1rem" }}>
+            {messages.map((msg) => (
               <div
-                key={pair.id}
+                key={msg.id}
                 style={{
-                  backgroundColor: "#1a1a1a",
-                  border: "1px solid #333333",
-                  borderRadius: "4px",
-                  padding: "16px",
+                  marginBottom: "1.25rem",
+                  display: "flex",
+                  justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
                 }}
               >
-                {/* Question */}
-                <div style={{ fontSize: "14px", fontWeight: 600, color: "#d4a574", marginBottom: "12px" }}>
-                  {pair.question}
-                </div>
-
-                {/* Answer */}
-                <div style={{ fontSize: "13px", color: "#a0a0a0", lineHeight: 1.6, marginBottom: "8px" }}>
-                  {pair.answer}
-                </div>
-
-                {/* Timestamp */}
-                <div style={{ fontSize: "11px", color: "#666666" }}>
-                  {pair.timestamp}
+                <div
+                  style={{
+                    maxWidth: "85%",
+                    padding: "0.875rem 1rem",
+                    borderRadius: "12px",
+                    background: msg.role === "user" ? "#2563EB" : "#FFFFFF",
+                    color: msg.role === "user" ? "#FFFFFF" : "#1A1A1A",
+                    border: msg.role === "assistant" ? "1px solid #E8EAED" : "none",
+                    fontFamily: "'Lato', sans-serif",
+                    fontSize: "0.95rem",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {msg.content}
                 </div>
               </div>
             ))}
+            {isLoading && (
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  padding: "1rem",
+                  background: "#FFFFFF",
+                  borderRadius: "12px",
+                  border: "1px solid #E8EAED",
+                }}
+              >
+                <div
+                  style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    background: "#2563EB",
+                    animation: "pulse 1.5s ease-in-out infinite",
+                  }}
+                />
+                <div
+                  style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    background: "#2563EB",
+                    animation: "pulse 1.5s ease-in-out infinite 0.2s",
+                  }}
+                />
+                <div
+                  style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    background: "#2563EB",
+                    animation: "pulse 1.5s ease-in-out infinite 0.4s",
+                  }}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      {/* Input Area */}
-      <div style={{ padding: "16px", borderTop: "1px solid #333333", backgroundColor: "#1a1a1a", position: "sticky", bottom: "64px" }}>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <input
-            type="text"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !isAsking) handleAsk();
-            }}
-            placeholder="Ask about wine..."
-            disabled={isAsking}
-            style={{
-              flex: 1,
-              height: "44px",
-              backgroundColor: "#0a0a0a",
-              border: "1px solid #333333",
-              borderRadius: "4px",
-              color: "#f5f5f5",
-              padding: "0 12px",
-              fontSize: "14px",
-              boxSizing: "border-box",
-              opacity: isAsking ? 0.5 : 1,
-            }}
-          />
-          <button
-            onClick={handleAsk}
-            disabled={isAsking || !question.trim()}
-            style={{
-              width: "44px",
-              height: "44px",
-              backgroundColor: "#d4a574",
-              color: "#0a0a0a",
-              border: "none",
-              borderRadius: "4px",
-              cursor: isAsking || !question.trim() ? "not-allowed" : "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              opacity: isAsking || !question.trim() ? 0.5 : 1,
-              transition: "opacity 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              if (!isAsking && question.trim()) {
-                e.currentTarget.style.opacity = "0.9";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isAsking && question.trim()) {
-                e.currentTarget.style.opacity = "1";
-              }
-            }}
-          >
-            <Send size={18} />
-          </button>
-        </div>
+      {/* Input field (always visible) */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: "5rem",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "100%",
+          maxWidth: "430px",
+          padding: "1rem",
+          background: "linear-gradient(to top, #F8F9FA, transparent)",
+          display: "flex",
+          gap: "0.75rem",
+          zIndex: 30,
+        }}
+      >
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyPress={(e) => e.key === "Enter" && handleSend()}
+          placeholder="Ask a question..."
+          style={{
+            flex: 1,
+            padding: "0.875rem 1rem",
+            borderRadius: "24px",
+            border: "1px solid #E8EAED",
+            background: "#FFFFFF",
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.95rem",
+            color: "#1A1A1A",
+            outline: "none",
+            transition: "border-color 0.2s",
+          }}
+          onFocus={(e) => (e.currentTarget.style.borderColor = "#2563EB")}
+          onBlur={(e) => (e.currentTarget.style.borderColor = "#E8EAED")}
+        />
+        <button
+          onClick={handleSend}
+          disabled={!input.trim() || isLoading}
+          style={{
+            padding: "0.875rem 1.5rem",
+            borderRadius: "24px",
+            border: "none",
+            background: input.trim() && !isLoading ? "#2563EB" : "#E8EAED",
+            color: input.trim() && !isLoading ? "#FFFFFF" : "#999999",
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.9rem",
+            fontWeight: 600,
+            cursor: input.trim() && !isLoading ? "pointer" : "not-allowed",
+            transition: "background 0.2s",
+          }}
+        >
+          Send
+        </button>
       </div>
-    </div>
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 1; }
+        }
+      `}</style>
+    </WorkModeLayout>
   );
 }

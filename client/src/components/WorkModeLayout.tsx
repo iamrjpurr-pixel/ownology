@@ -1,12 +1,13 @@
 /**
- * WorkModeLayout — Ownology Work Mode Shell
+ * WorkModeLayout — Ownology Work Mode Shell (DailyMe-Inspired)
  *
- * A mobile-first app shell that wraps all working pages (Free Run, The Press,
- * Quick Entry, Cellar Tasks, Dashboard). Provides:
- *   - Minimal top bar: Trinity logo + page title only, no marketing nav
- *   - Cross-app bottom navigation: Ask · Press · Log · Tasks · More
- *   - Safe-area padding for notched phones
- *   - On desktop: centred at 430px max-width with dark surround (phone-on-desk feel)
+ * Light, minimal design with:
+ *   - Light gray background (#F8F9FA)
+ *   - White cards and surfaces
+ *   - Pill-shaped buttons (24px border radius)
+ *   - Circular progress indicators
+ *   - Clean typography
+ *   - Lots of white space
  *
  * Usage:
  *   <WorkModeLayout title="The Press" activeTab="press">
@@ -20,9 +21,7 @@ import OwnologyLogo from "@/components/OwnologyLogo";
 interface WorkModeLayoutProps {
   children: React.ReactNode;
   title?: string;
-  /** Which bottom nav tab is active */
   activeTab?: "ask" | "press" | "log" | "tasks" | "more";
-  /** Hide the bottom nav (e.g. when a sheet/modal is open) */
   hideBottomNav?: boolean;
 }
 
@@ -32,10 +31,10 @@ const NAV_ITEMS = [
     label: "Ask",
     href: "/free-run",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-        <circle cx="11" cy="11" r="8.5" stroke="currentColor" strokeWidth="1.4" />
-        <path d="M8.5 9C8.5 7.619 9.619 6.5 11 6.5s2.5 1.119 2.5 2.5c0 1.5-1.5 2-1.5 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-        <circle cx="11" cy="15.5" r="0.9" fill="currentColor" />
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M9 10C9 8.343 10.343 7 12 7s3 1.343 3 3c0 1.5-1.5 2-1.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="12" cy="17" r="1" fill="currentColor" />
       </svg>
     ),
   },
@@ -44,9 +43,9 @@ const NAV_ITEMS = [
     label: "Press",
     href: "/the-press",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-        <rect x="3.5" y="2.5" width="15" height="17" rx="2" stroke="currentColor" strokeWidth="1.4" />
-        <path d="M7 8h8M7 11h8M7 14h5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M8 9h8M8 12h8M8 15h5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -55,10 +54,9 @@ const NAV_ITEMS = [
     label: "Log",
     href: "/quick-entry",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-        <circle cx="11" cy="11" r="8.5" stroke="currentColor" strokeWidth="1.4" />
-        <path d="M11 7v4l2.5 2.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M7.5 3.5L5 1M14.5 3.5L17 1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M12 8v4l2.5 2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
@@ -67,9 +65,9 @@ const NAV_ITEMS = [
     label: "Tasks",
     href: "/cellar-tasks",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-        <rect x="3.5" y="3.5" width="15" height="15" rx="2" stroke="currentColor" strokeWidth="1.4" />
-        <path d="M7.5 11l2.5 2.5 5-5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M8 12l2.5 2.5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
@@ -78,10 +76,10 @@ const NAV_ITEMS = [
     label: "More",
     href: "/dashboard",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-        <circle cx="6" cy="11" r="1.4" fill="currentColor" />
-        <circle cx="11" cy="11" r="1.4" fill="currentColor" />
-        <circle cx="16" cy="11" r="1.4" fill="currentColor" />
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="6" cy="12" r="1.5" fill="currentColor" />
+        <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+        <circle cx="18" cy="12" r="1.5" fill="currentColor" />
       </svg>
     ),
   },
@@ -99,18 +97,18 @@ export default function WorkModeLayout({
     <div
       style={{
         minHeight: "100dvh",
-        background: "var(--ow-bg)",
+        background: "#F8F9FA",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
       }}
     >
-      {/* Desktop surround — dark bleed on sides when viewport > 430px */}
+      {/* Desktop surround — light gray on sides */}
       <div
         style={{
           position: "fixed",
           inset: 0,
-          background: "oklch(0.08 0.005 60)",
+          background: "#E8EAED",
           zIndex: -1,
         }}
         className="hidden md:block"
@@ -124,7 +122,7 @@ export default function WorkModeLayout({
           minHeight: "100dvh",
           display: "flex",
           flexDirection: "column",
-          background: "var(--ow-bg)",
+          background: "#F8F9FA",
           position: "relative",
         }}
       >
@@ -134,10 +132,10 @@ export default function WorkModeLayout({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0.75rem 1rem",
-            paddingTop: "calc(0.75rem + env(safe-area-inset-top, 0px))",
-            borderBottom: "1px solid var(--ow-border)",
-            background: "var(--ow-bg-card)",
+            padding: "1rem",
+            paddingTop: "calc(1rem + env(safe-area-inset-top, 0px))",
+            borderBottom: "1px solid #E8EAED",
+            background: "#FFFFFF",
             position: "sticky",
             top: 0,
             zIndex: 50,
@@ -148,9 +146,9 @@ export default function WorkModeLayout({
             <span
               style={{
                 fontFamily: "'Fraunces', serif",
-                fontSize: "1rem",
+                fontSize: "1.125rem",
                 fontWeight: 600,
-                color: "var(--ow-text-hi)",
+                color: "#1A1A1A",
                 letterSpacing: "-0.01em",
               }}
             >
@@ -164,18 +162,21 @@ export default function WorkModeLayout({
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "var(--ow-text-lo)",
-              padding: "0.25rem",
+              color: "#666666",
+              padding: "0.5rem",
               borderRadius: "50%",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              transition: "color 0.2s",
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#1A1A1A")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#666666")}
             aria-label="Profile and settings"
           >
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <circle cx="11" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.4" />
-              <path d="M4 19c0-3.866 3.134-7 7-7h0c3.866 0 7 3.134 7 7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="9" r="4" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M4 20c0-4.418 3.582-8 8-8h0c4.418 0 8 3.582 8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </button>
         </header>
@@ -187,7 +188,7 @@ export default function WorkModeLayout({
             overflowY: "auto",
             paddingBottom: hideBottomNav
               ? "env(safe-area-inset-bottom, 0px)"
-              : "calc(4.5rem + env(safe-area-inset-bottom, 0px))",
+              : "calc(5rem + env(safe-area-inset-bottom, 0px))",
           }}
         >
           {children}
@@ -203,8 +204,8 @@ export default function WorkModeLayout({
               transform: "translateX(-50%)",
               width: "100%",
               maxWidth: "430px",
-              background: "var(--ow-bg-card)",
-              borderTop: "1px solid var(--ow-border)",
+              background: "#FFFFFF",
+              borderTop: "1px solid #E8EAED",
               paddingBottom: "env(safe-area-inset-bottom, 0px)",
               zIndex: 40,
               display: "flex",
@@ -222,14 +223,14 @@ export default function WorkModeLayout({
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: "0.2rem",
-                    padding: "0.6rem 0.25rem",
+                    gap: "0.25rem",
+                    padding: "0.75rem 0.5rem",
                     background: "none",
                     border: "none",
                     cursor: "pointer",
-                    color: isActive ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                    color: isActive ? "#2563EB" : "#999999",
                     transition: "color 0.15s",
-                    minHeight: "56px",
+                    minHeight: "60px",
                   }}
                   aria-label={item.label}
                   aria-current={isActive ? "page" : undefined}
@@ -239,9 +240,10 @@ export default function WorkModeLayout({
                     style={{
                       fontFamily: "'Lato', sans-serif",
                       fontSize: "0.625rem",
-                      fontWeight: isActive ? 700 : 400,
-                      letterSpacing: "0.06em",
+                      fontWeight: isActive ? 600 : 400,
+                      letterSpacing: "0.05em",
                       textTransform: "uppercase",
+                      color: isActive ? "#2563EB" : "#999999",
                     }}
                   >
                     {item.label}
