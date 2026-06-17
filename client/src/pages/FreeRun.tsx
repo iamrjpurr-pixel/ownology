@@ -13,7 +13,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
-import { getLoginUrl } from "@/const";
+// OAuth removed — Work Mode is now fully accessible
 import { ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Beaker, Sprout, Wine, Sparkles, ArrowRight } from "lucide-react";
 
 // ─── Divine Trinity Popover ───────────────────────────────────────────────────
@@ -548,17 +548,9 @@ export default function FreeRun() {
             Ask anything about wine — the flavours, the science, the stories behind the glass. Real oenology, not dumbed down.
           </p>
 
-          <div className="flex flex-col items-center gap-4">
-            <a
-              href={getLoginUrl("/free-run")}
-              style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "12px 28px", background: "oklch(0.72 0.12 75)", color: "oklch(0.11 0.008 60)", fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: "0.9rem", letterSpacing: "0.04em", textDecoration: "none", borderRadius: "2px" }}
-            >
-              Sign in to start exploring <ArrowRight size={15} />
-            </a>
-            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.45 0.012 75)" }}>
-              Free account · 3 questions per day · No card required
-            </p>
-          </div>
+          <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.45 0.012 75)", marginBottom: "20px" }}>
+            Free account · 3 questions per day · No card required
+          </p>
 
           <div className="flex flex-wrap justify-center gap-2 mt-12">
             {CURIOSITY_PROMPTS.slice(0, 6).map((p) => (

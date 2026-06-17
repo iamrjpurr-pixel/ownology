@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
-import { getLoginUrl } from "@/const";
+// OAuth removed — Work Mode is now fully accessible
 import VintageEntrySheet from "@/components/VintageEntrySheet";
 import MilestoneCalendar from "@/components/MilestoneCalendar";
 import TankReminderSheet from "@/components/TankReminderSheet";

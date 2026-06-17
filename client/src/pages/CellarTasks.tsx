@@ -4,7 +4,7 @@
  */
 import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
-import { getLoginUrl } from "@/const";
+// OAuth removed — Work Mode is now fully accessible
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -1065,26 +1065,7 @@ export default function CellarTasks() {
     );
   }
 
-  if (!isAuthenticated) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "var(--ow-bg-base)",
-          gap: "1rem",
-        }}
-      >
-        <p style={{ fontFamily: "'Lato', sans-serif", color: "var(--ow-text-mid)" }}>
-          Sign in to access Cellar Tasks
-        </p>
-        <Button onClick={() => (window.location.href = getLoginUrl())}>Sign In</Button>
-      </div>
-    );
-  }
+  // OAuth removed — Work Mode is now fully accessible
 
   const isLoading = equipLoading || tasksLoading;
   const userName = user?.name ?? "Me";
