@@ -146,6 +146,7 @@ function SectionHeader({ label, title, subtitle }: { label: string; title: strin
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function ThePress() {
   const [activeTab, setActiveTab] = useState<"log" | "calcs" | "scenarios" | "notes" | "calendar" | "barrels" | "packaging" | "exports">("log");
+  const [moreSheetOpen, setMoreSheetOpen] = useState(false);
   // Batch Book state
   const [batchSheetOpen, setBatchSheetOpen] = useState(false);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
@@ -302,15 +303,6 @@ export default function ThePress() {
 
   return (
     <div style={{ background: "var(--ow-bg-base)", minHeight: "100vh" }}>
-      {/* Back nav */}
-      <div className="container pt-6 pb-0" style={{ maxWidth: "960px", margin: "0 auto" }}>
-        <Link href="/" className="inline-flex items-center gap-2 text-xs" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", textDecoration: "none" }}>
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          Back to Ownology
-        </Link>
-      </div>
 
       <div className="container pt-10 pb-24 md:pb-24" style={{ maxWidth: "960px", margin: "0 auto", paddingBottom: "calc(6rem + env(safe-area-inset-bottom, 0px))" }}>
 
@@ -489,9 +481,9 @@ export default function ThePress() {
           </div>
         </div>
 
-        {/* ── Tab navigation ── */}
+        {/* ── Tab navigation — desktop only (mobile uses bottom nav) ── */}
         <div
-          className="flex gap-1 mb-8 p-1 rounded-sm overflow-x-auto"
+          className="hidden md:flex gap-1 mb-8 p-1 rounded-sm overflow-x-auto"
           style={{
             background: "var(--ow-bg-card)",
             border: "1px solid var(--ow-border)",
@@ -1953,9 +1945,9 @@ export default function ThePress() {
       />
 
       {/* ── Mobile bottom tab bar (hidden when any sheet is open) ── */}
-      {!entrySheetOpen && !reminderSheetOpen && !batchSheetOpen && (
+      {!entrySheetOpen && !reminderSheetOpen && !batchSheetOpen && !moreSheetOpen && (
         <nav
-          className="md:hidden fixed bottom-0 left-0 right-0 z-20"
+          className="md:hidden fixed bottom-0 left-0 right-0 z-30"
           style={{
             background: "var(--ow-bg-card)",
             borderTop: "1px solid var(--ow-border)",
@@ -1992,41 +1984,115 @@ export default function ThePress() {
                   <circle cx="12" cy="12" r="1" fill="currentColor" />
                 </svg>
               )},
-              { id: "scenarios" as const, label: "More", icon: (
+              { id: "more-sheet" as const, label: "More", icon: (
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                   <circle cx="5" cy="9" r="1.2" fill="currentColor" />
                   <circle cx="9" cy="9" r="1.2" fill="currentColor" />
                   <circle cx="13" cy="9" r="1.2" fill="currentColor" />
                 </svg>
               )},
-            ].map((tab) => (
+            ].map((tab) => {
+              const isActive = tab.id === "more-sheet"
+                ? ["scenarios", "barrels", "packaging", "exports"].includes(activeTab)
+                : activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => {
+                    if (tab.id === "more-sheet") {
+                      setMoreSheetOpen(true);
+                    } else {
+                      setActiveTab(tab.id);
+                    }
+                  }}
+                  className="flex-1 flex flex-col items-center justify-center gap-1 py-2.5 touch-target"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: isActive ? "var(--ow-amber)" : "var(--ow-text-lo)",
+                    transition: "color 0.15s",
+                  }}
+                >
+                  {tab.icon}
+                  <span style={{
+                    fontFamily: "'Lato',sans-serif",
+                    fontSize: "0.6rem",
+                    letterSpacing: "0.06em",
+                    fontWeight: isActive ? 700 : 400,
+                    textTransform: "uppercase",
+                  }}>
+                    {tab.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+      )}
+
+      {/* ── More bottom sheet ── */}
+      {moreSheetOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="md:hidden fixed inset-0 z-40"
+            style={{ background: "oklch(0 0 0 / 0.6)" }}
+            onClick={() => setMoreSheetOpen(false)}
+          />
+          {/* Sheet */}
+          <div
+            className="md:hidden fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl"
+            style={{
+              background: "var(--ow-bg-card)",
+              borderTop: "1px solid var(--ow-border)",
+              paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))",
+            }}
+          >
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-4">
+              <div style={{ width: "2.5rem", height: "4px", borderRadius: "2px", background: "var(--ow-border)" }} />
+            </div>
+            <div style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.65rem", letterSpacing: "0.1em", color: "var(--ow-text-lo)", textTransform: "uppercase", padding: "0 1.25rem 0.75rem" }}>
+              More in The Press
+            </div>
+            {[
+              { id: "barrels" as const, label: "Barrels", icon: "🪵", desc: "Barrel register & fill tracking" },
+              { id: "packaging" as const, label: "Packaging", icon: "📦", desc: "Inventory & bottling records" },
+              { id: "scenarios" as const, label: "Cellar Scenarios", icon: "🔬", desc: "What-if blending & additions" },
+              { id: "exports" as const, label: "Export Docs", icon: "📄", desc: "LIP, compliance & export docs" },
+            ].map((item) => (
               <button
-                key={tab.id}
+                key={item.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className="flex-1 flex flex-col items-center justify-center gap-1 py-2.5 touch-target"
+                onClick={() => { setActiveTab(item.id); setMoreSheetOpen(false); }}
                 style={{
-                  background: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "1rem",
+                  width: "100%",
+                  padding: "0.875rem 1.25rem",
+                  background: activeTab === item.id ? "color-mix(in oklch, var(--ow-amber) 8%, transparent)" : "none",
                   border: "none",
+                  borderBottom: "1px solid var(--ow-border)",
                   cursor: "pointer",
-                  color: activeTab === tab.id ? "var(--ow-amber)" : "var(--ow-text-lo)",
-                  transition: "color 0.15s",
+                  textAlign: "left",
                 }}
               >
-                {tab.icon}
-                <span style={{
-                  fontFamily: "'Lato',sans-serif",
-                  fontSize: "0.6rem",
-                  letterSpacing: "0.06em",
-                  fontWeight: activeTab === tab.id ? 700 : 400,
-                  textTransform: "uppercase",
-                }}>
-                  {tab.label}
+                <span style={{ fontSize: "1.25rem" }}>{item.icon}</span>
+                <span>
+                  <span style={{ display: "block", fontFamily: "'Lato',sans-serif", fontSize: "0.9rem", fontWeight: 600, color: activeTab === item.id ? "var(--ow-amber)" : "var(--ow-text-hi)" }}>
+                    {item.label}
+                  </span>
+                  <span style={{ display: "block", fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)", marginTop: "0.1rem" }}>
+                    {item.desc}
+                  </span>
                 </span>
               </button>
             ))}
           </div>
-        </nav>
+        </>
       )}
     </div>
   );

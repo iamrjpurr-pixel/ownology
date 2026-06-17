@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch, Redirect } from "wouter";
+import { Route, Switch, Redirect, useLocation } from "wouter";
+import { useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -47,7 +48,77 @@ import Guide from "./pages/Guide";
 import Import from "./pages/Import";
 import Waitlist from "./pages/Waitlist";
 import VineReference from "./pages/VineReference";
+import WorkModeLayout from "@/components/WorkModeLayout";
 
+
+// ── Work Mode wrapper components ──────────────────────────────────────────
+function FreeRunPage() {
+  return (
+    <WorkModeLayout title="Ask Ownology" activeTab="ask">
+      <FreeRun />
+    </WorkModeLayout>
+  );
+}
+function ThePressPage() {
+  return (
+    <WorkModeLayout title="The Press" activeTab="press">
+      <ThePress />
+    </WorkModeLayout>
+  );
+}
+function QuickEntryPage() {
+  return (
+    <WorkModeLayout title="Quick Entry" activeTab="log">
+      <QuickEntry />
+    </WorkModeLayout>
+  );
+}
+function CellarTasksPage() {
+  return (
+    <WorkModeLayout title="Cellar Tasks" activeTab="tasks">
+      <CellarTasks />
+    </WorkModeLayout>
+  );
+}
+function DashboardPage() {
+  return (
+    <WorkModeLayout title="Dashboard" activeTab="more">
+      <ProductionDashboard />
+    </WorkModeLayout>
+  );
+}
+function ImportPage() {
+  return (
+    <WorkModeLayout title="Import">
+      <Import />
+    </WorkModeLayout>
+  );
+}
+function KnowledgePage() {
+  return (
+    <WorkModeLayout title="Knowledge">
+      <Knowledge />
+    </WorkModeLayout>
+  );
+}
+
+/**
+ * MobileRedirect — auto-routes mobile users to Work Mode on first visit to /
+ * Desktop users see the marketing homepage as normal.
+ * A sessionStorage flag prevents re-redirecting during the same session.
+ */
+function MobileHomeRoute() {
+  const [, navigate] = useLocation();
+  useEffect(() => {
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const alreadyRedirected = sessionStorage.getItem("ow_mobile_redirected");
+    if (isMobile && !alreadyRedirected) {
+      sessionStorage.setItem("ow_mobile_redirected", "1");
+      navigate("/free-run", { replace: true });
+    }
+  }, [navigate]);
+  return <Home />;
+}
 
 function Router() {
   // S8-I: Post-login redirect to /guide for new users
@@ -55,7 +126,7 @@ function Router() {
   // We only redirect on the root path so deep-links are not interrupted.
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={MobileHomeRoute} />
       <Route path={"/home"} component={Home} />
       <Route path={"/why-ownology"} component={WhyOwnology} />
       <Route path={"/for-innovint-users"} component={ForInnoVintUsers} />
@@ -72,8 +143,8 @@ function Router() {
       <Route path={"/resources"} component={RegulatoryLinks} />
       <Route path={"/resources/home-winery-kit"} component={HomeWineryKit} />
       <Route path={"/compliance"} component={Compliance} />
-      <Route path={"/free-run"} component={FreeRun} />
-      <Route path={"/the-press"} component={ThePress} />
+      <Route path={"/free-run"} component={FreeRunPage} />
+      <Route path={"/the-press"} component={ThePressPage} />
       <Route path={"/pricing"} component={Pricing} />
       <Route path={"/merch/success"} component={MerchSuccess} />
       <Route path={"/merch/cancel"} component={MerchCancel} />
@@ -81,8 +152,8 @@ function Router() {
       <Route path={"/campaign-metrics"} component={CampaignMetrics} />
       <Route path={"/orders"} component={Orders} />
       <Route path={"/admin"} component={Admin} />
-      <Route path={"/quick-entry"} component={QuickEntry} />
-      <Route path={"/cellar-tasks"} component={CellarTasks} />
+      <Route path={"/quick-entry"} component={QuickEntryPage} />
+      <Route path={"/cellar-tasks"} component={CellarTasksPage} />
       <Route path={"/competitive-advantage"} component={CompetitiveAdvantage} />
       <Route path={"/preview"} component={Preview} />
       <Route path={"/admin/leads"} component={AdminLeads} />
@@ -90,15 +161,16 @@ function Router() {
       <Route path={"/admin/vintage-intelligence"} component={AdminVintageIntelligence} />
       <Route path={"/admin/wbs"} component={AdminWbs} />
       <Route path={"/founding-member/success"} component={FoundingMemberSuccess} />
-      <Route path={"/dashboard"} component={ProductionDashboard} />
+      <Route path={"/dashboard"} component={DashboardPage} />
       <Route path={"/vineyard"} component={Vineyard} />
       <Route path={"/build-index"} component={BuildIndex} />
-      <Route path={"/knowledge"} component={Knowledge} />
-      <Route path={"/knowledge/*"} component={Knowledge} />
+      <Route path={"/knowledge"} component={KnowledgePage} />
+      <Route path={"/knowledge/*"} component={KnowledgePage} />
       <Route path={"/guide"} component={Guide} />
-      <Route path={"/import"} component={Import} />
+      <Route path={"/import"} component={ImportPage} />
       <Route path={"/waitlist"} component={Waitlist} />
       <Route path={"/reference/vine"} component={VineReference} />
+      <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

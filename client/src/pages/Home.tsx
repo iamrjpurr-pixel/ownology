@@ -331,6 +331,25 @@ function Nav() {
 
           <div className="hidden md:flex items-center gap-3">
             <ThemeToggle compact />
+            <Link
+              href="/free-run"
+              className="text-xs inline-flex items-center gap-1.5 px-3 py-2 rounded-sm transition-all"
+              style={{
+                fontFamily: "'Lato',sans-serif",
+                letterSpacing: "0.06em",
+                fontWeight: 600,
+                background: "var(--ow-bg-card)",
+                border: "1px solid var(--ow-border)",
+                color: "var(--ow-text-lo)",
+                textDecoration: "none",
+              }}
+            >
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                <rect x="1" y="1" width="11" height="11" rx="2.5" stroke="currentColor" strokeWidth="1.2"/>
+                <path d="M4 6.5h5M6.5 4v5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+              </svg>
+              Work Mode
+            </Link>
             <a href="/pricing" className="btn-amber text-xs inline-flex items-center">
               Start Free Trial
             </a>
