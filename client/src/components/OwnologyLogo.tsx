@@ -93,6 +93,7 @@ export default function OwnologyLogo({
   const wrapRef   = useRef<HTMLDivElement>(null);
   const badgeRef  = useRef<HTMLSpanElement>(null);
   const abortRef  = useRef<AbortController | null>(null);
+  const rafRef    = useRef<number | null>(null);
 
   // I.A. badge animation
   useEffect(() => {
@@ -103,20 +104,27 @@ export default function OwnologyLogo({
     return () => ac.abort();
   }, [showIABadge]);
 
-  // Calculate fixed card position below the logo
-  const handleMouseEnter = useCallback(() => {
-    if (!showTheoryCard || !wrapRef.current) return;
+  // Track logo position continuously while hovered using rAF
+  const trackPosition = useCallback(() => {
+    if (!wrapRef.current) return;
     const rect = wrapRef.current.getBoundingClientRect();
-    setCardPos({
-      top: rect.bottom + 10,
-      left: rect.left,
-    });
+    setCardPos({ top: rect.bottom + 10, left: rect.left });
+    rafRef.current = requestAnimationFrame(trackPosition);
+  }, []);
+
+  const handleMouseEnter = useCallback(() => {
+    if (!showTheoryCard) return;
+    trackPosition();
     setHovered(true);
-  }, [showTheoryCard]);
+  }, [showTheoryCard, trackPosition]);
 
   const handleMouseLeave = useCallback(() => {
+    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
     setHovered(false);
   }, []);
+
+  // Cleanup rAF on unmount
+  useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
 
   // Scale tiers
   const showVine    = size >= 28;
