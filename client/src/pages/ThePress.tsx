@@ -308,8 +308,8 @@ export default function ThePress() {
 
         {/* ── Header ── */}
         <div ref={headerRef.ref} className={`mb-10 ${headerRef.inView ? "fade-up" : "opacity-0"}`}>
-          {/* Board identity */}
-          <div className="flex items-center gap-3 mb-6">
+          {/* Board identity — desktop only; mobile uses WorkModeLayout bottom nav */}
+          <div className="hidden md:flex items-center gap-3 mb-6">
             <Link
               href="/free-run"
               className="px-3 py-1.5 rounded-sm text-xs flex items-center gap-2 transition-all"
