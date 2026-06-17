@@ -110,6 +110,19 @@ function KnowledgePage() {
 function MobileHomeRoute() {
   const [, navigate] = useLocation();
   useEffect(() => {
+    // S8-I: First-visit orientation redirect.
+    // New users (no ownology_guide_seen flag) are sent to /guide once.
+    // The Guide page sets ownology_guide_seen on mount, so this fires only once.
+    const guideSeen = (() => {
+      try { return localStorage.getItem("ownology_guide_seen") === "1"; }
+      catch { return true; /* if storage unavailable, never force-redirect */ }
+    })();
+    if (!guideSeen) {
+      navigate("/guide", { replace: true });
+      return;
+    }
+
+    // Returning mobile users are routed straight to Work Mode (Free Run) once per session.
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
     const alreadyRedirected = sessionStorage.getItem("ow_mobile_redirected");
     if (isMobile && !alreadyRedirected) {

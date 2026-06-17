@@ -7,7 +7,15 @@
 import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import WorkModeLayout from "@/components/WorkModeLayout";
+import ThePressCtaCard from "@/components/ThePressCtaCard";
 import { Loader2, ChevronDown, ThumbsUp, ThumbsDown } from "lucide-react";
+
+// Lightweight analytics helper (mirrors ThePress.trackEvent)
+function trackFreeRunEvent(eventName: string, eventData?: Record<string, unknown>) {
+  if (typeof window !== "undefined" && (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag) {
+    (window as unknown as { gtag: (...a: unknown[]) => void }).gtag("event", eventName, eventData ?? {});
+  }
+}
 
 interface Message {
   id: string;
@@ -63,6 +71,20 @@ export default function FreeRun() {
   useEffect(() => {
     localStorage.setItem("ow_free_run_messages", JSON.stringify(messages));
   }, [messages]);
+
+  // S8-D: prefill the input from a ?q= deep link (e.g. from a Knowledge SOP "Learn more" link).
+  // We prefill but do NOT auto-send, so the user keeps control of their daily question budget.
+  useEffect(() => {
+    try {
+      const q = new URLSearchParams(window.location.search).get("q");
+      if (q) {
+        setInput(q);
+        trackFreeRunEvent("free_run_seeded_from_sop", { q });
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const handleCuriosityCardClick = (label: string) => {
     setInput(`Tell me about ${label.toLowerCase()}`);
@@ -595,6 +617,11 @@ export default function FreeRun() {
                 )}
               </div>
             ))}
+
+            {/* S8-E: Learn→Do bridge — contextual Press CTA after at least one answer */}
+            {messages.length > 0 && !isLoading && (
+              <ThePressCtaCard onClick={() => trackFreeRunEvent("press_cta_clicked")} />
+            )}
 
             {isLoading && (
               <div

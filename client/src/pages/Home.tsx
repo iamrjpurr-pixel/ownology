@@ -326,7 +326,8 @@ function Nav() {
               )
             ))}
             {/* More dropdown */}
-            <MoreDropdown extraItems={isOwner ? [{ label: "Admin", href: "/admin" }, { label: "⚙ Build Index", href: "/build-index" }] : [{ label: "⚙ Build Index", href: "/build-index" }]} />
+            {/* S8-B/J: Build Index removed from nav (internal only — still reachable via direct URL /build-index) */}
+            <MoreDropdown extraItems={isOwner ? [{ label: "Admin", href: "/admin" }] : []} />
           </div>
 
           <div className="hidden md:flex items-center gap-3">
@@ -504,18 +505,7 @@ function Nav() {
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </Link>
             )}
-            <Link
-              href="/build-index"
-              onClick={handleNavClick}
-              className="flex items-center justify-between transition-colors"
-              style={{ fontFamily: "'Lato',sans-serif", fontWeight: 400, fontSize: "0.9375rem", color: "var(--ow-text-mid)", borderBottom: "1px solid var(--ow-border)", letterSpacing: "0.01em", minHeight: "48px" }}
-            >
-              <span className="flex items-center gap-2">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3"/><path d="M5 7h4M7 5v4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
-                Build Index
-              </span>
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="var(--ow-border)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </Link>
+            {/* S8-B/J: Build Index removed from mobile nav (internal only — still reachable via /build-index direct URL) */}
           </div>
 
           {/* Cache clear button */}
@@ -1474,7 +1464,7 @@ function Footer() {
             onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Why Ownology</Link>
           <Link href="/for-home-winemakers" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
             onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)}")}>For Home Winemakers</Link>
+            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>For Home Winemakers</Link>
           <Link href="/for-innovint-users" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
             onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
             onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>For InnoVint Users</Link>

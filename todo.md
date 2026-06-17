@@ -545,3 +545,19 @@
 - [x] FreeRun: add "Ready to make it?" CTA linking to The Press (winemaking workflow) — already present
 - [x] CellarTasks: add "Learn More" links to relevant SOPs — deferred to next sprint
 - [x] DIYKnowledge: add "Try it now" CTAs linking to Free Run — deferred to next sprint
+
+
+## Sprint 8 — Triangulation Sprint (Proper Scope, Jun 2026)
+- [x] S8-A: Add /knowledge to main nav (already in PRIMARY_NAV + KNOWLEDGE_NAV)
+- [x] S8-B/J: Remove Build Index link from desktop MoreDropdown, mobile Internal group, and footer (kept /build-index route for direct URL); also fixed pre-existing footer color typo
+- [x] S8-I: Implement first-visit redirect to /guide for new users (localStorage ownology_guide_seen, fires once, deep-links unaffected)
+- [x] S8-H: quick_steps column exists in sop_library schema, pushed to DB, all 45 SOPs seeded (missing=0 filled=45)
+- [x] S8-C: Do→Know bridge — SopBridgeChip + SopSidePanel below Event Type selector in The Press; opens slide-in SOP (quick steps + procedure), form state preserved, mapped to real DB categories, analytics on open
+- [x] S8-D: Know→Learn bridge — FreeRunBridgeLink at bottom of SOP Procedure tab; deep-links to /free-run?q=... which prefills (not auto-sends) the curiosity input
+- [x] S8-E: Learn→Do bridge — ThePressCtaCard after Free Run answer thread ("Ready to make it, not just drink it?") reconciled with the curiosity-first redesign; analytics on click
+- [x] S8-F: Verified /guide page has all four sections (pillars overview, workflow map, checklist, role paths) and sets ownology_guide_seen on mount
+- [x] S8-G: Update ownology-document-tree.md to four-pillar architecture (done in prior session)
+- [x] Verify all Sprint 8 acceptance criteria + checkpoint "Sprint 8 complete: Triangulation Sprint" (tsc clean, bridges wired, nav/hygiene done)
+
+## Known Pre-existing Issues (NOT Sprint 8 scope)
+- [ ] Compliance.qld.test.ts + Compliance.tas.test.ts: 16 failing tests — Compliance.tsx is missing the detailed QLD & TAS knowledge-base content (OLGR/ERA22/WorkSafe QLD; Small Producer's Permit/EMPCA/TPS/WorkSafe TAS) the tests assert. Belongs to a Compliance content sprint, not Triangulation.

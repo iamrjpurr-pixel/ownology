@@ -7,6 +7,17 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import WorkModeLayout from "@/components/WorkModeLayout";
+import { SopBridgeChip } from "@/components/SopSidePanel";
+
+// S8-C: Map The Press event types to real sop_library categories (commercial audience).
+// Event types with no relevant SOP (e.g. Pump-Over) are intentionally omitted.
+const EVENT_SOP_CATEGORY: Record<string, string> = {
+  "Racking": "Pressing & Juice Handling",
+  "Pressing": "Pressing & Juice Handling",
+  "MLF Inoculation": "Fermentation Management",
+  "Measurement": "Laboratory Testing",
+  "Bottling": "Bottling Procedures",
+};
 
 interface LogEntry {
   id: string;
@@ -625,6 +636,15 @@ export default function ThePress() {
                 <option>MLF Inoculation</option>
                 <option>Bottling</option>
               </select>
+              {EVENT_SOP_CATEGORY[formData.event] && (
+                <div style={{ marginTop: "0.65rem" }}>
+                  <SopBridgeChip
+                    category={EVENT_SOP_CATEGORY[formData.event]}
+                    eventLabel={formData.event}
+                    onOpen={() => trackEvent("sop_chip_opened", { event: formData.event })}
+                  />
+                </div>
+              )}
             </div>
 
             <div>

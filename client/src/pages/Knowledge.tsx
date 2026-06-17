@@ -10,11 +10,26 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
+import FreeRunBridgeLink from "@/components/FreeRunBridgeLink";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+
+// S8-D: Map real SOP categories to Free Run curiosity topics.
+// Categories with no clear curiosity counterpart are omitted (no link shown).
+const CATEGORY_FREE_RUN_TOPIC: Record<string, string> = {
+  "Fermentation Management": "Fermentation Chemistry",
+  "Crushing & Fermentation": "Fermentation Chemistry",
+  "Laboratory Testing": "Wine Analysis",
+  "Cleaning & Sanitation": "Microbiology & Sanitation",
+  "Tank Cleaning & Sanitation": "Microbiology & Sanitation",
+  "Pressing & Juice Handling": "How Wine Is Made",
+  "Bottling Procedures": "Packaging & Ageing",
+  "Bottling & Packaging": "Packaging & Ageing",
+  "Barrel Management": "Oak & Ageing",
+};
 import {
   BookOpen,
   FlaskConical,
@@ -635,6 +650,15 @@ function SopDetail({ id }: { id: number }) {
                 </div>
               )}
             </div>
+            {/* S8-D: Know→Learn bridge — link to the related Free Run curiosity topic */}
+            {CATEGORY_FREE_RUN_TOPIC[sop.category] && (
+              <div className="mt-6 pt-4" style={{ borderTop: "1px solid var(--ow-border)" }}>
+                <FreeRunBridgeLink
+                  topic={CATEGORY_FREE_RUN_TOPIC[sop.category]}
+                  seedQuestion={`Tell me about ${CATEGORY_FREE_RUN_TOPIC[sop.category].toLowerCase()}`}
+                />
+              </div>
+            )}
           </div>
         )}
 
