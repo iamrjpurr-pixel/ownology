@@ -11,9 +11,16 @@
  *   3. Detail      — context-specific: number pad, addition tiles, or text
  *   4. Confirm     — summary card + single LOG IT button
  *
- * Auth: handled server-side via protectedProcedure (dev bypass in trpc.ts).
+ * Auth: enforced server-side. vintageLog.add / getUsedTanks are protectedProcedure,
+ *   so in production (NODE_ENV=production) an unauthenticated request returns
+ *   UNAUTHORIZED and the global tRPC error handler redirects to login. The
+ *   non-production DEV_BYPASS_USER in trpc.ts is disabled in production.
+ *
+ * Draft save: the in-progress entry is persisted to localStorage and restored
+ *   for up to 30 minutes (see DRAFT_KEY / DRAFT_TTL_MS), so an interruption on
+ *   the cellar floor never loses a partial log.
  */
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -67,6 +74,48 @@ const ADD_UNITS    = ["g", "kg", "mL", "L", "g/hL"];
 const ADD_TIMINGS  = ["At inoculation", "⅓ sugar depletion", "½ sugar depletion", "Post-ferment", "Pre-bottling", "Other"];
 const LEES_OPTS    = ["Gross lees", "Fine lees", "Clean"];
 const INO_TYPES    = ["Yeast", "MLF Bacteria", "Other"];
+
+// ─── localStorage draft save (30-min TTL) ──────────────────────────────────────
+// HF: if a winemaker is interrupted mid-entry on the cellar floor, the partial
+// entry is preserved for 30 minutes so they can resume where they left off
+// instead of starting over. After 30 minutes the draft is considered stale and
+// silently discarded (a measurement taken 30+ min ago is no longer "now").
+const DRAFT_KEY = "ownology_quick_entry_draft";
+const DRAFT_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+type DraftPayload = {
+  ts: number; // epoch ms when last saved
+  screen: Screen;
+  eventType: EventTypeId | null;
+  tankName: string | null;
+  variety: string;
+  mType: string; mValue: string;
+  aType: string; aQty: string; aUnit: string; aTiming: string; aStep: AddStep;
+  rackTo: string | null; lees: string;
+  iType: string; iProd: string; iRate: string; iStep: InoStep;
+  noteText: string;
+};
+
+function loadDraft(): DraftPayload | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const draft = JSON.parse(raw) as DraftPayload;
+    if (typeof draft?.ts !== "number") return null;
+    // Expire drafts older than the 30-minute TTL.
+    if (Date.now() - draft.ts > DRAFT_TTL_MS) {
+      localStorage.removeItem(DRAFT_KEY);
+      return null;
+    }
+    return draft;
+  } catch {
+    return null;
+  }
+}
+
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch { /* storage unavailable */ }
+}
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -249,6 +298,45 @@ export default function QuickEntry() {
   // Session log
   const [sessionLog, setSessionLog] = useState<{ tank: string; summary: string; ts: Date }[]>([]);
 
+  // ── Draft restore (on mount) ────────────────────────────────────────────────
+  // Restore an in-progress entry if one was saved within the last 30 minutes.
+  // We deliberately do NOT restore the Training sub-flow (free-text people
+  // names) — the draft model targets the tap-only event entry path.
+  const draftRestored = useRef(false);
+  useEffect(() => {
+    if (draftRestored.current) return;
+    draftRestored.current = true;
+    const d = loadDraft();
+    if (!d || !d.eventType || d.eventType === "training") return;
+    setEventType(d.eventType);
+    setTankName(d.tankName);
+    setVariety(d.variety);
+    setMType(d.mType); setMValue(d.mValue);
+    setAType(d.aType); setAQty(d.aQty); setAUnit(d.aUnit); setATiming(d.aTiming); setAStep(d.aStep);
+    setRackTo(d.rackTo); setLees(d.lees);
+    setIType(d.iType); setIProd(d.iProd); setIRate(d.iRate); setIStep(d.iStep);
+    setNoteText(d.noteText);
+    // Never resume on the success screen; clamp to a real entry screen.
+    setScreen(d.screen === "success" || d.screen === "event" ? "tank" : d.screen);
+    toast("Resumed your unfinished entry", { duration: 2500 });
+  }, []);
+
+  // ── Draft save (on change) ──────────────────────────────────────────────────
+  // Persist the partial entry whenever the user is mid-flow (past Screen 1 and
+  // not on a terminal screen). Screen 1 with no selection means "nothing to
+  // save"; success means "already logged, clear it".
+  useEffect(() => {
+    if (!eventType || eventType === "training" || screen === "event" || screen === "success" || screen.startsWith("training")) {
+      return;
+    }
+    const payload: DraftPayload = {
+      ts: Date.now(), screen, eventType, tankName, variety,
+      mType, mValue, aType, aQty, aUnit, aTiming, aStep,
+      rackTo, lees, iType, iProd, iRate, iStep, noteText,
+    };
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(payload)); } catch { /* storage unavailable */ }
+  }, [screen, eventType, tankName, variety, mType, mValue, aType, aQty, aUnit, aTiming, aStep, rackTo, lees, iType, iProd, iRate, iStep, noteText]);
+
   // Training mutation
   const addTrainingMutation = trpc.knowledge.addTrainingRecord.useMutation({
     onSuccess: () => {
@@ -270,6 +358,7 @@ export default function QuickEntry() {
       utils.vintageLog.list.invalidate();
       const summary = buildSummary();
       setSessionLog(prev => [{ tank: tankName!, summary, ts: new Date() }, ...prev]);
+      clearDraft(); // entry logged — drop the saved draft so it can't be re-restored
       setScreen("success");
       setTimeout(() => {
         setScreen("event");
@@ -651,7 +740,7 @@ export default function QuickEntry() {
             <button onClick={handleSubmit} disabled={addMutation.isPending} style={{ ...primaryBtn, opacity: addMutation.isPending ? 0.7 : 1 }}>
               {addMutation.isPending ? "Logging…" : "LOG IT"}
             </button>
-            <button onClick={() => setScreen("event")} style={{ ...secondaryBtn, marginTop: 10 }}>Cancel</button>
+            <button onClick={() => { clearDraft(); setScreen("event"); }} style={{ ...secondaryBtn, marginTop: 10 }}>Cancel</button>
           </div>
         )}
 

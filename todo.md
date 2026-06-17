@@ -565,3 +565,19 @@
 - [x] Added Jurisdiction reference panel rendering KB_SECTIONS + KEY CONTACTS (constants used, not dead code) + 2 missing TAS sample questions
 - [x] TAS tab + TAS_SECTIONS cards already existed in Resources.tsx; removed my duplicate TAS_SECTIONS block (kept richer pre-existing one)
 - [x] Full vitest suite green: 201/201 passing (37 QLD/TAS tests pass), tsc clean
+
+
+## Sprint 9 — Cellar Floor Readiness (Jun 2026)
+### S9-A: Quick Entry — Harvest Floor Redesign (Blind Calculator model)
+- [x] S9-A: Auth bypass — verified no client isLoggedIn bypass; trpc.ts DEV_BYPASS_USER gated to non-production; vintageLog procedures protected
+- [x] S9-A: Screen 1 — Event Type: 6 full tiles (80px) amber-on-dark + de-emphasised "Full Entry" escape link
+- [x] S9-A: Screen 2 — Tank Selector tiles (name + variety) from batches + log history, scrollable
+- [x] S9-A: Screen 3 — context-dependent What/Value: custom number pad / addition tiles+pad / From-To racking / inoculation tiles+pad / textarea+dictate
+- [x] S9-A: Screen 4 — Confirm summary card + large "LOG IT" button, success flash then reset to Screen 1
+- [x] S9-A: localStorage 30-min draft save (restore on mount, save on change, clear on log/cancel, TTL expiry)
+- [x] S9-A: write vitest for the redesigned Quick Entry (19 tests passing)
+### S9-B: Voice Input — Free Run + Compliance AI (Web Speech API)
+- [ ] S9-B: Build reusable useSpeechRecognition hook (Web Speech API, 2s silence auto-stop, graceful unsupported fallback)
+- [ ] S9-B: Free Run mic button (idle/listening/processing states, auto-submit on silence, tooltip)
+- [ ] S9-B: Compliance AI mic button (identical behaviour)
+- [ ] S9-B: write vitest for voice components (render, fallback hide on unsupported)
