@@ -4,10 +4,11 @@
  * Deep Dive triangle: Science / Vineyard / Craft panels with credit system
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import WorkModeLayout from "@/components/WorkModeLayout";
 import ThePressCtaCard from "@/components/ThePressCtaCard";
+import VoiceMicButton from "@/components/VoiceMicButton";
 import { Loader2, ChevronDown, ThumbsUp, ThumbsDown } from "lucide-react";
 
 // Lightweight analytics helper (mirrors ThePress.trackEvent)
@@ -90,18 +91,25 @@ export default function FreeRun() {
     setInput(`Tell me about ${label.toLowerCase()}`);
   };
 
-  const handleSend = async () => {
-    if (!input.trim() || !isAuthenticated) return;
+  // Guards against an in-flight request so a voice transcript can't double-send.
+  const sendingRef = useRef(false);
+
+  // Core send: takes an explicit question string so voice input can submit
+  // its transcript directly without waiting for the input state to flush.
+  const submitQuestion = async (question: string) => {
+    const q = question.trim();
+    if (!q || !isAuthenticated || sendingRef.current) return;
+    sendingRef.current = true;
 
     setIsLoading(true);
     try {
-      const result = await curiosityAskMutation.mutateAsync({ question: input });
+      const result = await curiosityAskMutation.mutateAsync({ question: q });
 
       if (result.limitReached) {
         // Show daily limit reached message
         const limitMessage: Message = {
           id: Date.now().toString(),
-          question: input,
+          question: q,
           surfaceAnswer: `You've reached your daily limit of ${result.questionsTotal} questions. Come back tomorrow to explore more!`,
           timestamp: new Date(),
         };
@@ -110,7 +118,7 @@ export default function FreeRun() {
         // Add new message with surface answer
         const newMessage: Message = {
           id: Date.now().toString(),
-          question: input,
+          question: q,
           surfaceAnswer: result.answer || "",
           topicTag: result.topicTag ?? undefined,
           timestamp: new Date(),
@@ -125,7 +133,18 @@ export default function FreeRun() {
       console.error("Error sending question:", error);
     } finally {
       setIsLoading(false);
+      sendingRef.current = false;
     }
+  };
+
+  // Manual send from the text input / Enter key.
+  const handleSend = () => submitQuestion(input);
+
+  // Voice: prefill the input for visibility, then auto-submit the transcript.
+  const handleVoiceTranscript = (text: string) => {
+    setInput(text);
+    trackFreeRunEvent("free_run_voice_input", { length: text.length });
+    submitQuestion(text);
   };
 
   const handleDeepDive = async (messageId: string) => {
@@ -704,6 +723,14 @@ export default function FreeRun() {
             }}
             onFocus={(e) => (e.currentTarget.style.borderColor = "#2563EB")}
             onBlur={(e) => (e.currentTarget.style.borderColor = "#E8EAED")}
+          />
+          <VoiceMicButton
+            onTranscript={handleVoiceTranscript}
+            disabled={isLoading}
+            accent="#2563EB"
+            idleBg="#FFFFFF"
+            idleBorder="#E8EAED"
+            idleColor="#666666"
           />
           <button
             onClick={handleSend}

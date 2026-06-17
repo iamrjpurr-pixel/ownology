@@ -577,7 +577,8 @@
 - [x] S9-A: localStorage 30-min draft save (restore on mount, save on change, clear on log/cancel, TTL expiry)
 - [x] S9-A: write vitest for the redesigned Quick Entry (19 tests passing)
 ### S9-B: Voice Input — Free Run + Compliance AI (Web Speech API)
-- [ ] S9-B: Build reusable useSpeechRecognition hook (Web Speech API, 2s silence auto-stop, graceful unsupported fallback)
-- [ ] S9-B: Free Run mic button (idle/listening/processing states, auto-submit on silence, tooltip)
-- [ ] S9-B: Compliance AI mic button (identical behaviour)
-- [ ] S9-B: write vitest for voice components (render, fallback hide on unsupported)
+- [x] S9-B: Build reusable useSpeechRecognition hook (Web Speech API, en-AU, 2s silence auto-stop, idle/listening/processing tri-state, graceful silent unsupported fallback)
+- [x] S9-B: Shared VoiceMicButton component (hides on unsupported, tooltip, pulsing listening ring, theme-agnostic accent)
+- [x] S9-B: Free Run mic button — wired with submitQuestion(text) core, auto-submit on silence, double-send guard
+- [x] S9-B: Compliance AI mic button — replaced bespoke startVoice/alert; auto-submit via ask(transcript) (identical behaviour)
+- [x] S9-B: write vitest for voice (hook + button + both integrations) — 15 tests passing (full suite 235 green)
