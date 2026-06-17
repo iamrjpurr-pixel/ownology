@@ -100,6 +100,7 @@ function EmailGate({ onUnlock }: { onUnlock: () => void }) {
           lineHeight: 1.08,
           color: C.text,
           letterSpacing: "-0.02em",
+          textWrap: "balance" as "balance",
         }}>
           You are the must.<br />
           <em style={{ color: C.amberBright, fontStyle: "italic" }}>
@@ -288,6 +289,7 @@ function PreviewContent() {
           lineHeight: 1.1,
           color: C.text,
           letterSpacing: "-0.02em",
+          textWrap: "balance" as "balance",
         }}>
           The cellar intelligence platform<br />
           <em style={{ color: C.amberBright, fontStyle: "italic" }}>built for winemakers.</em>

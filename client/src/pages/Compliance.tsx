@@ -448,6 +448,7 @@ export default function Compliance() {
               fontSize: "clamp(1.75rem,4vw,2.75rem)",
               lineHeight: 1.1,
               color: "var(--ow-text-hi)",
+              textWrap: "balance" as "balance",
             }}
           >
             Compliance <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>Assistant</em>

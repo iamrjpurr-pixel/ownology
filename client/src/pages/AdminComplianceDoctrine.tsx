@@ -493,6 +493,7 @@ export default function AdminComplianceDoctrine() {
                     fontSize: "clamp(1.2rem,2.5vw,1.6rem)",
                     color: "var(--ow-text-hi)",
                     lineHeight: 1.1,
+                    textWrap: "balance" as "balance",
                   }}
                 >
                   Q&A <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>Doctrine Map</em>

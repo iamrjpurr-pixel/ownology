@@ -213,6 +213,7 @@ export default function Blog() {
               color: "var(--ow-text-hi)",
               letterSpacing: "-0.02em",
               marginBottom: "1.25rem",
+              textWrap: "balance" as "balance",
             }}
           >
             Thinking about wine,<br />
@@ -337,6 +338,7 @@ export default function Blog() {
                       letterSpacing: "-0.01em",
                       marginBottom: "0.875rem",
                       transition: "color 0.15s",
+                      textWrap: "balance" as "balance",
                     }}
                   >
                     {article.title}
@@ -410,6 +412,7 @@ export default function Blog() {
               lineHeight: 1.4,
               color: "var(--ow-text-hi)",
               marginBottom: "2rem",
+              textWrap: "balance" as "balance",
             }}
           >
             "The knowledge is there. The bandwidth is not."

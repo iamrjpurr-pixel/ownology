@@ -208,6 +208,7 @@ export default function Waitlist() {
               color: "oklch(0.92 0.018 75)",
               letterSpacing: "-0.02em",
               lineHeight: 1.1,
+              textWrap: "balance" as "balance",
             }}
           >
             Join the waitlist.

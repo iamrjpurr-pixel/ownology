@@ -90,7 +90,7 @@ function Hero() {
         <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1.25rem" }}>
           Competitive Landscape · May 2026
         </p>
-        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(2.25rem, 5vw, 3.75rem)", lineHeight: 1.08, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.5rem" }}>
+        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(2.25rem, 5vw, 3.75rem)", lineHeight: 1.08, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.5rem" , textWrap: "balance" as "balance" }}>
           The intelligence layer that nobody else is building.
         </h1>
         <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.125rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "640px", marginBottom: "2rem" }}>
@@ -124,7 +124,7 @@ function TheGap() {
           <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>
             The Unoccupied Market
           </p>
-          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.25rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.25rem" , textWrap: "balance" as "balance" }}>
             No product in this landscape does any of this.
           </h2>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "600px", marginBottom: "3rem" }}>
@@ -282,7 +282,7 @@ function CompetitorGrid() {
           <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>
             Product-by-Product Analysis
           </p>
-          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1rem" , textWrap: "balance" as "balance" }}>
             Seven products. Zero direct competitors.
           </h2>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "600px", marginBottom: "2rem" }}>
@@ -429,7 +429,7 @@ function FeatureMatrix() {
             <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>
               Feature Matrix
             </p>
-            <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "0.75rem" }}>
+            <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "0.75rem" , textWrap: "balance" as "balance" }}>
               Side by side, the picture is clear.
             </h2>
             <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: TEXT_LO, marginBottom: "2rem" }}>
@@ -535,7 +535,7 @@ function IntelligenceLayer() {
           <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>
             Ownology's Position
           </p>
-          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.5rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.5rem" , textWrap: "balance" as "balance" }}>
             The difference between a library and a librarian.
           </h2>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "640px", marginBottom: "3rem" }}>
@@ -692,7 +692,7 @@ function AustralianMoat() {
           <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>
             The Australian Compliance Moat
           </p>
-          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.25rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.25rem" , textWrap: "balance" as "balance" }}>
             No competitor has this. Not one.
           </h2>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "600px", marginBottom: "3rem" }}>
@@ -839,7 +839,7 @@ function InvestmentThesis() {
           <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>
             The Investment Thesis
           </p>
-          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.5rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.5rem" , textWrap: "balance" as "balance" }}>
             The risk is not competition. The risk is speed.
           </h2>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "640px", marginBottom: "2.5rem" }}>
@@ -895,7 +895,7 @@ function CTA() {
     <section style={{ background: BG_RAISED, borderTop: `1px solid ${BORDER}` }} className="py-20">
       <div className="container max-w-2xl text-center">
         <div ref={ref} className={`transition-all duration-700 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
-          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.25rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.12, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.25rem" , textWrap: "balance" as "balance" }}>
             Be first in an unoccupied market.
           </h2>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", lineHeight: 1.75, color: TEXT_MID, marginBottom: "2.5rem" }}>

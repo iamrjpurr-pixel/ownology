@@ -448,6 +448,7 @@ export default function Admin() {
                     fontSize: "clamp(1.2rem,2.5vw,1.6rem)",
                     color: "var(--ow-text-hi)",
                     lineHeight: 1.1,
+                    textWrap: "balance" as "balance",
                   }}
                 >
                   Admin <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>Hub</em>

@@ -131,7 +131,7 @@ function SectionHeader({ label, title, subtitle }: { label: string; title: strin
       <p className="section-label mb-2" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.65rem", letterSpacing: "0.14em" }}>
         {label}
       </p>
-      <h2 style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "clamp(1.25rem,2.5vw,1.75rem)", lineHeight: 1.15, color: "var(--ow-text-hi)" }}>
+      <h2 style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "clamp(1.25rem,2.5vw,1.75rem)", lineHeight: 1.15, color: "var(--ow-text-hi)" , textWrap: "balance" as "balance" }}>
         {title}
       </h2>
       {subtitle && (
@@ -378,6 +378,7 @@ export default function ThePress() {
               lineHeight: 1.08,
               letterSpacing: "-0.02em",
               color: "var(--ow-text-hi)",
+              textWrap: "balance" as "balance",
             }}
           >
             The <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>Press</em>
@@ -650,17 +651,27 @@ export default function ThePress() {
                     <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.875rem", lineHeight: 1.7, color: "var(--ow-text-lo)", maxWidth: "520px", marginBottom: "1.25rem" }}>
                       Log every cellar event — additions, measurements, rackings, inoculations — and Ownology builds a permanent, searchable record of your vintage. Start with your first tank below.
                     </p>
-                    <button
-                      type="button"
-                      onClick={() => { setQuickEntryTank(undefined); setEntrySheetOpen(true); }}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm text-sm font-semibold"
-                      style={{ background: "var(--ow-amber)", color: "var(--ow-bg-base)", fontFamily: "'Lato',sans-serif", cursor: "pointer", border: "none" }}
-                    >
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                        <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                      Log First Entry
-                    </button>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => { setQuickEntryTank(undefined); setEntrySheetOpen(true); }}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm text-sm font-semibold"
+                        style={{ background: "var(--ow-amber)", color: "var(--ow-bg-base)", fontFamily: "'Lato',sans-serif", cursor: "pointer", border: "none" }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                          <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        </svg>
+                        Log First Entry
+                      </button>
+                      <Link
+                        href="/import"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-sm text-sm"
+                        style={{ background: "transparent", color: "var(--ow-text-mid)", border: "1px solid var(--ow-border-md)", fontFamily: "'Lato',sans-serif", textDecoration: "none" }}
+                      >
+                        <span style={{ fontSize: "0.85rem" }}>📥</span>
+                        Import existing records
+                      </Link>
+                    </div>
                   </div>
 
                   {/* Quick-start guide */}

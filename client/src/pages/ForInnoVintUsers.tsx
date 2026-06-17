@@ -72,7 +72,7 @@ function Hero() {
         <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1.25rem" }}>
           For InnoVint Users
         </p>
-        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(2.25rem, 5vw, 3.75rem)", color: TEXT_HI, letterSpacing: "-0.02em", lineHeight: 1.08, marginBottom: "1.5rem" }}>
+        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(2.25rem, 5vw, 3.75rem)", color: TEXT_HI, letterSpacing: "-0.02em", lineHeight: 1.08, marginBottom: "1.5rem" , textWrap: "balance" as "balance" }}>
           InnoVint tracks your cellar.<br />
           <em style={{ color: AMBER, fontStyle: "italic" }}>Ownology answers your questions.</em>
         </h1>
@@ -118,7 +118,7 @@ function GapSection() {
         <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>
           The Gap InnoVint Leaves Open
         </p>
-        <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)", color: TEXT_HI, lineHeight: 1.2, letterSpacing: "-0.01em", marginBottom: "1rem", maxWidth: "560px" }}>
+        <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)", color: TEXT_HI, lineHeight: 1.2, letterSpacing: "-0.01em", marginBottom: "1rem", maxWidth: "560px", textWrap: "balance" as "balance" }}>
           InnoVint tells you what happened. Ownology tells you what to do about it.
         </h2>
         <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1rem", color: TEXT_MID, lineHeight: 1.75, maxWidth: "540px", marginBottom: "3rem" }}>
@@ -153,7 +153,7 @@ function HowItFits() {
         <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>
           How They Work Together
         </p>
-        <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)", color: TEXT_HI, lineHeight: 1.2, letterSpacing: "-0.01em", marginBottom: "3rem", maxWidth: "560px" }}>
+        <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)", color: TEXT_HI, lineHeight: 1.2, letterSpacing: "-0.01em", marginBottom: "3rem", maxWidth: "560px", textWrap: "balance" as "balance" }}>
           Two tools. One complete cellar intelligence stack.
         </h2>
 
@@ -249,7 +249,7 @@ function Workflow() {
         <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>
           The Combined Workflow
         </p>
-        <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)", color: TEXT_HI, lineHeight: 1.2, letterSpacing: "-0.01em", marginBottom: "3rem", maxWidth: "520px" }}>
+        <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)", color: TEXT_HI, lineHeight: 1.2, letterSpacing: "-0.01em", marginBottom: "3rem", maxWidth: "520px", textWrap: "balance" as "balance" }}>
           How InnoVint and Ownology work together in practice.
         </h2>
         <div className="grid md:grid-cols-2 gap-8">
@@ -320,7 +320,7 @@ function CTA() {
           <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1.25rem" }}>
             Add the Knowledge Layer to Your InnoVint Setup
           </p>
-          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(2rem, 4vw, 3rem)", color: TEXT_HI, letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: "1.25rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(2rem, 4vw, 3rem)", color: TEXT_HI, letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: "1.25rem" , textWrap: "balance" as "balance" }}>
             14-day free trial. No credit card.
           </h2>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", color: TEXT_MID, lineHeight: 1.75, marginBottom: "2.5rem" }}>

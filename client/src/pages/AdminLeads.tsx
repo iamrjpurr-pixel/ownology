@@ -373,7 +373,7 @@ export default function AdminLeads() {
                 <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ow-amber)" }}>
                   Owner Panel
                 </p>
-                <h1 style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "clamp(1.1rem,2.5vw,1.4rem)", color: "var(--ow-text-hi)", lineHeight: 1.1 }}>
+                <h1 style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "clamp(1.1rem,2.5vw,1.4rem)", color: "var(--ow-text-hi)", lineHeight: 1.1 , textWrap: "balance" as "balance" }}>
                   Lead <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>CRM</em>
                 </h1>
               </div>

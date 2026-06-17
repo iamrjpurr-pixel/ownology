@@ -1142,6 +1142,7 @@ export default function Pricing() {
               color: "var(--ow-text-hi)",
               lineHeight: 1.1,
               letterSpacing: "-0.02em",
+              textWrap: "balance" as "balance",
             }}
           >
             From Free Run to{" "}
@@ -1333,6 +1334,7 @@ export default function Pricing() {
               fontSize: "clamp(1.75rem, 3vw, 2.5rem)",
               color: "var(--ow-text-hi)",
               lineHeight: 1.1,
+              textWrap: "balance" as "balance",
             }}
           >
             You are the must.

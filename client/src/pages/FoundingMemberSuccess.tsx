@@ -48,6 +48,7 @@ export default function FoundingMemberSuccess() {
           fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
           lineHeight: 1.1,
           color: "var(--ow-text-hi)",
+          textWrap: "balance" as "balance",
         }}
       >
         Welcome to the{" "}

@@ -307,7 +307,7 @@ export default function CampaignMetrics() {
                 Post-Vintage Campaign
               </p>
               <h1
-                style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "clamp(1.6rem,3vw,2.2rem)", color: WARM_WHITE, marginTop: "0.25rem" }}
+                style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "clamp(1.6rem,3vw,2.2rem)", color: WARM_WHITE, marginTop: "0.25rem", textWrap: "balance" as "balance" }}
               >
                 Campaign Metrics
               </h1>

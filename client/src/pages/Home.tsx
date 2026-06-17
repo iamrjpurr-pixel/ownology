@@ -558,7 +558,7 @@ function Hero() {
           <div>
             <EditableText contentKey="home.hero.label" defaultValue="Cellar Intelligence Platform for Winemakers" as="p" className="section-label mb-6 fade-up" contentMap={contentMap} />
             <h1 className="fade-up fade-up-delay-1"
-              style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,4rem)", lineHeight:1.1, color:"var(--ow-text-hi)", letterSpacing:"-0.02em"}}>
+              style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,4rem)", lineHeight:1.1, color:"var(--ow-text-hi)", letterSpacing:"-0.02em", textWrap: "balance" as "balance" }}>
               <EditableText contentKey="home.hero.headline" defaultValue="Your cellar's most knowledgeable apprentice." contentMap={contentMap} />
             </h1>
             <EditableText contentKey="home.hero.subheading" defaultValue="Log cellar readings. Access 38 industry SOPs across 12 categories. Ask the AI anything. Stay compliant. Ownology is the complete intelligence platform for boutique winery teams — on a mobile phone, during harvest." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
@@ -802,10 +802,10 @@ function Features() {
 function HowItWorks() {
   const { ref, inView } = useInView();
   const steps = [
-    { n:"01", title:"Do — Log and Track", body:"Record cellar readings by voice or photo in The Press. The Fermentation Dashboard tracks all active tanks. Vineyard and Cellar Tasks keep your team aligned in real time." },
-    { n:"02", title:"Know — Access Your SOPs", body:"38 industry-standard SOPs across 12 categories, ready to use on day one. Add your own Decision Logic and Tribal Knowledge. Every protocol is searchable, every decision is documented." },
-    { n:"03", title:"Learn — Ask the AI", body:"Open Free Run and ask anything — from SO₂ calculations to stuck fermentation triage. The AI draws on your winery's own SOPs and world-class wine science, then delivers a precise, cited answer." },
-    { n:"04", title:"Guide — Stay Compliant", body:"The Compliance AI answers regulatory questions across LIP, FSANZ, and state licensing. Every answer is grounded in current legislation — not generic internet content." },
+    { n:"01", title:"Do — Run Your Cellar", body:"Voice logs, tank readings, barrel tracking, task lists. Everything your team needs to stay aligned from crush to cork — in the pocket, in the cellar, in real time." },
+    { n:"02", title:"Know — Your Intelligence Layer", body:"38 industry-standard SOPs, your own Decision Logic, your Tribal Knowledge — all searchable, all cited. When the answer matters, Ownology draws from your protocols first." },
+    { n:"03", title:"Learn — Ask Anything About Wine", body:"From SO₂ calculations to stuck fermentation triage to understanding what terroir actually means. Free Run is open to everyone — winemakers, wine lovers, and the genuinely curious." },
+    { n:"04", title:"Guide — Find Your Footing", body:"New to Ownology? Start here. The Getting Started guide walks you through every feature at your own pace. Compliance answers are here too — grounded in current legislation, not generic internet content." },
   ];
   return (
     <section id="how-it-works" className="py-28 relative overflow-hidden" style={{background:"var(--ow-bg-raised)"}}>
@@ -1198,6 +1198,7 @@ function WeightOfHarvest() {
               fontSize: "clamp(1.1rem, 2vw, 1.375rem)",
               lineHeight: 1.5,
               color: "var(--ow-text-hi)",
+              textWrap: "balance" as "balance",
             }}
           >
             "Ownology does not replace that person. It makes sure their knowledge is never the single point of failure."

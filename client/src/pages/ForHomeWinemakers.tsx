@@ -487,6 +487,7 @@ export default function ForHomeWinemakers() {
               lineHeight: 1.1,
               color: "var(--ow-text-hi)",
               letterSpacing: "-0.02em",
+              textWrap: "balance" as "balance",
               marginBottom: "1.25rem",
             }}
           >
@@ -757,6 +758,7 @@ export default function ForHomeWinemakers() {
               fontSize: "clamp(1.5rem, 3vw, 2rem)",
               color: "var(--ow-text-hi)",
               marginBottom: "1rem",
+              textWrap: "balance" as "balance",
             }}
           >
             Ready to make better wine?

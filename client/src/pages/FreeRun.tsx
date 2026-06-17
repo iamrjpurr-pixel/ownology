@@ -539,7 +539,7 @@ export default function FreeRun() {
             <span>◈</span>&nbsp;FREE RUN
           </div>
 
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1.1, color: "oklch(0.95 0.018 75)", letterSpacing: "-0.02em", marginBottom: "20px" }}>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1.1, color: "oklch(0.95 0.018 75)", letterSpacing: "-0.02em", marginBottom: "20px", textWrap: "balance" as "balance" }}>
             Understand wine<br />
             <em style={{ color: "oklch(0.72 0.12 75)", fontStyle: "italic" }}>from the inside out.</em>
           </h1>
@@ -628,7 +628,7 @@ export default function FreeRun() {
             </div>
           </div>
 
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "clamp(1.8rem, 3.5vw, 2.5rem)", lineHeight: 1.1, color: "oklch(0.95 0.018 75)", letterSpacing: "-0.02em", marginBottom: "12px" }}>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "clamp(1.8rem, 3.5vw, 2.5rem)", lineHeight: 1.1, color: "oklch(0.95 0.018 75)", letterSpacing: "-0.02em", marginBottom: "12px", textWrap: "balance" as "balance" }}>
             What do you want to understand about wine?
           </h1>
           <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.95rem", color: "oklch(0.60 0.015 75)", lineHeight: 1.6 }}>

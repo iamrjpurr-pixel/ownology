@@ -233,6 +233,7 @@ export default function Orders() {
                 fontSize: "clamp(1.75rem,4vw,2.5rem)",
                 lineHeight: 1.1,
                 color: "var(--ow-text-hi)",
+                textWrap: "balance" as "balance",
               }}
             >
               Merch <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>Orders</em>

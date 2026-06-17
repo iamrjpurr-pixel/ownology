@@ -502,7 +502,7 @@ export default function Guide() {
               Guide
             </p>
           </div>
-          <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 4vw, 2.75rem)", color: TEXT_HI, lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: "0.75rem" }}>
+          <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 4vw, 2.75rem)", color: TEXT_HI, lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: "0.75rem", textWrap: "balance" as "balance" }}>
             Welcome to Ownology.
           </h1>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", color: TEXT_MID, lineHeight: 1.7, maxWidth: "560px" }}>

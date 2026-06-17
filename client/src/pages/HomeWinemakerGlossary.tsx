@@ -157,6 +157,7 @@ export default function HomeWinemakerGlossary() {
               lineHeight: 1.1,
               color: "var(--ow-text-hi)",
               marginBottom: "0.75rem",
+              textWrap: "balance" as "balance",
             }}
           >
             Winemaking Glossary

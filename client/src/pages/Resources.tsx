@@ -1185,6 +1185,7 @@ export default function Resources() {
               lineHeight: 1.1,
               color: "var(--ow-text-hi)",
               letterSpacing: "-0.02em",
+              textWrap: "balance" as "balance",
               marginBottom: "1.25rem",
             }}
           >

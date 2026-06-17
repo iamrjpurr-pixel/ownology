@@ -43,6 +43,7 @@ export default function MerchSuccess() {
           fontSize: "clamp(1.8rem, 4vw, 2.5rem)",
           color: "var(--ow-text-hi)",
           letterSpacing: "-0.02em",
+          textWrap: "balance" as "balance",
         }}
       >
         Order confirmed.

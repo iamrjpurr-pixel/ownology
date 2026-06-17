@@ -69,11 +69,11 @@ function Hero() {
         <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1.25rem" }}>
           Why Ownology
         </p>
-        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(2.25rem, 5vw, 3.75rem)", lineHeight: 1.08, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.5rem" }}>
+        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(2rem, 4vw, 3.25rem)", lineHeight: 1.1, color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "1.5rem", textWrap: "balance" as "balance", maxWidth: "820px" }}>
           The AI knowledge layer your production software was never designed to be.
         </h1>
-        <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.125rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "640px" }}>
-          Ownology does not replace InnoVint, Vintrace, or WineDirect. It sits on top of them — answering the questions your production system records but cannot answer, grounded in your own documents, accessible from your phone in the cellar.
+        <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.125rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "580px" }}>
+          Your production system records what happened. Ownology tells you what to do about it — drawing on your own SOPs, vintage notes, and the institutional knowledge that lives in your team’s heads. And for everything that was never in any system at all? Photograph it. Paste it. We’ll read it.
         </p>
       </div>
     </section>
@@ -174,7 +174,7 @@ function ComparisonTable() {
       <div className="container" ref={ref}>
         <div className={`max-w-5xl mx-auto ${inView ? "fade-up" : "opacity-0"}`}>
           <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>How It Compares</p>
-          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)", color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "2.5rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)", color: TEXT_HI, letterSpacing: "-0.02em", marginBottom: "2.5rem", textWrap: "balance" as "balance" }}>
             Different tools. Different jobs.
           </h2>
           <div className="overflow-x-auto">
@@ -222,7 +222,7 @@ function NotAReplacement() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className={inView ? "fade-up" : "opacity-0"}>
             <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>Complementary, Not Competitive</p>
-            <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)", color: TEXT_HI, letterSpacing: "-0.02em", lineHeight: 1.15, marginBottom: "1.25rem" }}>
+            <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)", color: TEXT_HI, letterSpacing: "-0.02em", lineHeight: 1.15, marginBottom: "1.25rem" , textWrap: "balance" as "balance" }}>
               Already using InnoVint? Good — Ownology makes it more useful.
             </h2>
             <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1rem", color: TEXT_MID, lineHeight: 1.8, marginBottom: "1rem" }}>
@@ -262,7 +262,7 @@ function VsMarketing() {
       <div className="container max-w-5xl" ref={ref}>
         <div className={`mb-12 ${inView ? "fade-up" : "opacity-0"}`}>
           <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>Not a Marketing Tool</p>
-          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)", color: TEXT_HI, letterSpacing: "-0.02em", lineHeight: 1.15 }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)", color: TEXT_HI, letterSpacing: "-0.02em", lineHeight: 1.15, textWrap: "balance" as "balance" }}>
             WineryCopilot writes your Instagram captions.<br />
             <em style={{ color: AMBER }}>Ownology answers your cellar questions.</em>
           </h2>
@@ -334,7 +334,7 @@ function CTA() {
       <div className="container max-w-3xl text-center" ref={ref}>
         <div className={inView ? "fade-up" : "opacity-0"}>
           <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1.25rem" }}>Ready to Add the Knowledge Layer?</p>
-          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(2rem, 4vw, 3rem)", color: TEXT_HI, letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: "1.25rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(2rem, 4vw, 3rem)", color: TEXT_HI, letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: "1.25rem" , textWrap: "balance" as "balance" }}>
             Start your 14-day free trial.
           </h2>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", color: TEXT_MID, lineHeight: 1.75, marginBottom: "2.5rem" }}>

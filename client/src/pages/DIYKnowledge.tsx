@@ -130,7 +130,7 @@ function DIYKnowledgeHome() {
           <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--ow-amber)", marginBottom: "1rem" }}>
             DIY Knowledge Hub
           </p>
-          <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 4vw, 2.75rem)", lineHeight: 1.1, color: "var(--ow-text-hi)", letterSpacing: "-0.02em", marginBottom: "1rem" }}>
+          <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 4vw, 2.75rem)", lineHeight: 1.1, color: "var(--ow-text-hi)", letterSpacing: "-0.02em", marginBottom: "1rem", textWrap: "balance" as "balance" }}>
             Your step-by-step guide to<br />
             <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>making wine at home.</em>
           </h1>
@@ -325,7 +325,7 @@ function DIYKnowledgeCategory({ category }: { category: string }) {
           </Link>
           <div className="flex items-center gap-4" style={{ marginBottom: "0.75rem" }}>
             <span style={{ fontSize: "2rem" }}>{meta.icon}</span>
-            <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", lineHeight: 1.1, color: "var(--ow-text-hi)", letterSpacing: "-0.02em", margin: 0 }}>{decodedCat}</h1>
+            <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", lineHeight: 1.1, color: "var(--ow-text-hi)", letterSpacing: "-0.02em", margin: 0 , textWrap: "balance" as "balance" }}>{decodedCat}</h1>
           </div>
           {meta.description && (
             <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.95rem", lineHeight: 1.7, color: "var(--ow-text-mid)", maxWidth: "520px", margin: 0 }}>{meta.description}</p>
@@ -449,7 +449,7 @@ function DIYSopDetail({ id }: { id: number }) {
               DIY Guide
             </span>
           </div>
-          <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", lineHeight: 1.1, color: "var(--ow-text-hi)", letterSpacing: "-0.02em", marginBottom: "0.75rem" }}>
+          <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", lineHeight: 1.1, color: "var(--ow-text-hi)", letterSpacing: "-0.02em", marginBottom: "0.75rem" , textWrap: "balance" as "balance" }}>
             {displayTitle}
           </h1>
           {sop.procedureText && (

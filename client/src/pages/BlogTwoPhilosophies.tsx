@@ -204,6 +204,7 @@ export default function BlogTwoPhilosophies() {
               color: TEXT_HI,
               letterSpacing: "-0.02em",
               marginBottom: "1.5rem",
+              textWrap: "balance" as "balance",
             }}
           >
             Two Philosophies, One Grape: What Boutique and Commercial Winemaking Actually Have in Common — and Where They Diverge

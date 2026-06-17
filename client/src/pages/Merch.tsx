@@ -1190,6 +1190,7 @@ export default function Merch() {
             color: "var(--ow-text-hi)",
             lineHeight: 1.1,
             letterSpacing: "-0.02em",
+            textWrap: "balance" as "balance",
           }}
         >
           Wear the knowledge.

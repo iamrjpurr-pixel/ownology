@@ -223,6 +223,7 @@ export default function BlogWeightOfHarvest() {
               color: TEXT_HI,
               letterSpacing: "-0.02em",
               marginBottom: "1.5rem",
+              textWrap: "balance" as "balance",
             }}
           >
             The Weight of Harvest: Why the Winemaker's Greatest Risk Is Not the Weather
@@ -263,7 +264,7 @@ export default function BlogWeightOfHarvest() {
           </p>
 
           {/* Section 1 */}
-          <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.4rem, 2.5vw, 1.875rem)", color: TEXT_HI, letterSpacing: "-0.01em", lineHeight: 1.2, marginBottom: "1.25rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.4rem, 2.5vw, 1.875rem)", color: TEXT_HI, letterSpacing: "-0.01em", lineHeight: 1.2, marginBottom: "1.25rem" , textWrap: "balance" as "balance" }}>
             The Harvest Sprint and the Limits of Human Memory
           </h2>
           <div style={{ width: "2.5rem", height: "1px", background: AMBER, marginBottom: "1.5rem" }} />
@@ -286,13 +287,13 @@ export default function BlogWeightOfHarvest() {
               borderRadius: "0 2px 2px 0",
             }}
           >
-            <p style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 300, fontSize: "clamp(1.2rem, 2.2vw, 1.5rem)", lineHeight: 1.45, color: TEXT_HI }}>
+            <p style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 300, fontSize: "clamp(1.2rem, 2.2vw, 1.5rem)", lineHeight: 1.45, color: TEXT_HI, textWrap: "balance" as "balance" }}>
               "The knowledge is there. The bandwidth is not."
             </p>
           </blockquote>
 
           {/* Section 2 */}
-          <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.4rem, 2.5vw, 1.875rem)", color: TEXT_HI, letterSpacing: "-0.01em", lineHeight: 1.2, marginBottom: "1.25rem", marginTop: "3rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.4rem, 2.5vw, 1.875rem)", color: TEXT_HI, letterSpacing: "-0.01em", lineHeight: 1.2, marginBottom: "1.25rem", marginTop: "3rem" , textWrap: "balance" as "balance" }}>
             The Single Point of Failure Problem
           </h2>
           <div style={{ width: "2.5rem", height: "1px", background: AMBER, marginBottom: "1.5rem" }} />
@@ -310,7 +311,7 @@ export default function BlogWeightOfHarvest() {
           </p>
 
           {/* Section 3 */}
-          <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.4rem, 2.5vw, 1.875rem)", color: TEXT_HI, letterSpacing: "-0.01em", lineHeight: 1.2, marginBottom: "1.25rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.4rem, 2.5vw, 1.875rem)", color: TEXT_HI, letterSpacing: "-0.01em", lineHeight: 1.2, marginBottom: "1.25rem" , textWrap: "balance" as "balance" }}>
             AI as Cognitive Relief, Not Cognitive Replacement
           </h2>
           <div style={{ width: "2.5rem", height: "1px", background: AMBER, marginBottom: "1.5rem" }} />
@@ -352,7 +353,7 @@ export default function BlogWeightOfHarvest() {
           </div>
 
           {/* Section 4 */}
-          <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.4rem, 2.5vw, 1.875rem)", color: TEXT_HI, letterSpacing: "-0.01em", lineHeight: 1.2, marginBottom: "1.25rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.4rem, 2.5vw, 1.875rem)", color: TEXT_HI, letterSpacing: "-0.01em", lineHeight: 1.2, marginBottom: "1.25rem" , textWrap: "balance" as "balance" }}>
             The Terroir Objection
           </h2>
           <div style={{ width: "2.5rem", height: "1px", background: AMBER, marginBottom: "1.5rem" }} />
@@ -367,7 +368,7 @@ export default function BlogWeightOfHarvest() {
           </p>
 
           {/* Section 5 */}
-          <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.4rem, 2.5vw, 1.875rem)", color: TEXT_HI, letterSpacing: "-0.01em", lineHeight: 1.2, marginBottom: "1.25rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.4rem, 2.5vw, 1.875rem)", color: TEXT_HI, letterSpacing: "-0.01em", lineHeight: 1.2, marginBottom: "1.25rem" , textWrap: "balance" as "balance" }}>
             What This Means for the Winemaker
           </h2>
           <div style={{ width: "2.5rem", height: "1px", background: AMBER, marginBottom: "1.5rem" }} />
@@ -385,7 +386,7 @@ export default function BlogWeightOfHarvest() {
           </p>
 
           {/* Section 6 */}
-          <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.4rem, 2.5vw, 1.875rem)", color: TEXT_HI, letterSpacing: "-0.01em", lineHeight: 1.2, marginBottom: "1.25rem" }}>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.4rem, 2.5vw, 1.875rem)", color: TEXT_HI, letterSpacing: "-0.01em", lineHeight: 1.2, marginBottom: "1.25rem" , textWrap: "balance" as "balance" }}>
             A Note on the Broader Landscape
           </h2>
           <div style={{ width: "2.5rem", height: "1px", background: AMBER, marginBottom: "1.5rem" }} />

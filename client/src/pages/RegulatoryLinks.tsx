@@ -171,7 +171,7 @@ export default function RegulatoryLinks() {
         <p style={{ fontFamily: SANS, fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", color: TEXT_LO, marginBottom: "0.75rem" }}>
           Regulatory Reference
         </p>
-        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 4vw, 2.5rem)", lineHeight: 1.1, color: TEXT_HI, marginBottom: "1rem" }}>
+        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 4vw, 2.5rem)", lineHeight: 1.1, color: TEXT_HI, marginBottom: "1rem", textWrap: "balance" as "balance" }}>
           Australian Winery<br />
           <em style={{ color: AMBER, fontStyle: "italic" }}>Regulatory Library</em>
         </h1>
