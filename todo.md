@@ -559,5 +559,9 @@
 - [x] S8-G: Update ownology-document-tree.md to four-pillar architecture (done in prior session)
 - [x] Verify all Sprint 8 acceptance criteria + checkpoint "Sprint 8 complete: Triangulation Sprint" (tsc clean, bridges wired, nav/hygiene done)
 
-## Known Pre-existing Issues (NOT Sprint 8 scope)
-- [ ] Compliance.qld.test.ts + Compliance.tas.test.ts: 16 failing tests — Compliance.tsx is missing the detailed QLD & TAS knowledge-base content (OLGR/ERA22/WorkSafe QLD; Small Producer's Permit/EMPCA/TPS/WorkSafe TAS) the tests assert. Belongs to a Compliance content sprint, not Triangulation.
+## Compliance QLD & TAS Knowledge Base (clear pre-existing failing tests) — DONE
+- [x] Add QLD knowledge base to Compliance.tsx (KNOWLEDGE_BASE / KB_SECTIONS / CONTACTS with ## QUEENSLAND (QLD) REGULATIONS, OLGR/Wine Industry Act 1994, ERA 22(2)/1 megalitre, WorkSafe QLD/WHS Act 2011, sample questions, badge text, classifier jurisdictions, KEY CONTACTS)
+- [x] Add TAS knowledge base to Compliance.tsx (## TASMANIA (TAS) REGULATIONS, Liquor Licensing Act 1990/Commissioner for Licensing, Small Producer's Permit/28,500 litres, EMPCA/EPA Tasmania, WorkSafe Tasmania/WHS Act 2012, Tasmanian Planning Scheme/Resource Processing, sample questions, badge text, classifier jurisdictions, KEY CONTACTS)
+- [x] Added Jurisdiction reference panel rendering KB_SECTIONS + KEY CONTACTS (constants used, not dead code) + 2 missing TAS sample questions
+- [x] TAS tab + TAS_SECTIONS cards already existed in Resources.tsx; removed my duplicate TAS_SECTIONS block (kept richer pre-existing one)
+- [x] Full vitest suite green: 201/201 passing (37 QLD/TAS tests pass), tsc clean

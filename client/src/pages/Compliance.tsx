@@ -110,10 +110,65 @@ const SAMPLE_QUESTIONS: { q: string; state: StateFilter }[] = [
   { q: "What is a WA Producer's Licence and what trading hours apply?", state: "WA" },
   { q: "What wine producer licence do I need to operate a winery in Queensland?", state: "QLD" },
   { q: "What liquor licence do I need to operate a cellar door in Tasmania?", state: "TAS" },
+  { q: "Does my Tasmanian winery need an environmental licence under EMPCA?", state: "TAS" },
+  { q: "What is the Small Producer's Permit and who qualifies in Tasmania?", state: "TAS" },
+  { q: "Does my Granite Belt winery need an Environmental Authority under ERA 22?", state: "QLD" },
+  { q: "What are the WorkSafe Queensland obligations for confined spaces in a winery?", state: "QLD" },
   { q: "What liquor producer authority do I need to sell wine in the Northern Territory?", state: "NT" },
   { q: "What is a Wine Standards Management Plan (WSMP) and is it mandatory in NZ?", state: "NZ" },
   { q: "What licences do I need to sell wine from a cellar door in New Zealand?", state: "NZ" },
   { q: "What are the NZ wine labelling requirements for export to Australia?", state: "NZ" },
+];
+
+// ─── Client-side jurisdiction reference (QLD & TAS) ───────────────────────────
+// Canonical reference text rendered in the "Jurisdiction reference" panel.
+// Facts mirror the server knowledge base (server/complianceKnowledgeBase.ts).
+// Classifier jurisdictions kept in sync so the UI labels match the AI router.
+const CLASSIFIER_JURISDICTIONS = ["Federal", "SA", "VIC", "NSW", "WA", "QLD", "TAS", "NT", "NZ"] as const;
+
+const KNOWLEDGE_BASE = `
+## QUEENSLAND (QLD) REGULATIONS
+
+### Wine Producer Licence — Wine Industry Act 1994 (Qld) & Liquor Act 1992 (Qld)
+Wine producers in Queensland operate under the Wine Industry Act 1994 (Qld), with liquor sales authorised through the Office of Liquor and Gaming Regulation (OLGR). A Producer/Wholesaler Licence allows production, wholesale, cellar door sales and tastings; on-premises consumption requires an additional authority. Applications are lodged online via the OLGR portal with a floor plan, proof of premises, local government approval and RSA-trained staff.
+
+### Environmental Authority — ERA 22 (Environmental Protection Regulation 2019, Qld)
+Wineries are classed as Environmentally Relevant Activity 22 ("Winery operations"). ERA 22(2) is triggered where the winery processes grapes producing more than 1 megalitre of winery wastewater per year (or otherwise meets the regulated threshold), requiring an Environmental Authority from the Department of Environment, Tourism, Science and Innovation (DETSI). Smaller operations below the ERA 22 threshold are not required to hold an Environmental Authority but must still prevent unlawful environmental harm. Granite Belt and Scenic Rim wineries should confirm thresholds before vintage.
+
+### Work Health & Safety — WHS Act 2011 (Qld)
+Administered by WorkSafe Queensland (Workplace Health and Safety Queensland). As a PCBU you must eliminate or minimise risks so far as reasonably practicable. Winery-specific duties include confined space management for fermentation tanks, CO2 monitoring during ferment, safe manual handling of barrels and cases, chemical handling (SO2, cleaning agents) and working at heights. Serious incidents must be reported to WorkSafe Queensland immediately.
+
+---
+
+## TASMANIA (TAS) REGULATIONS
+
+### Liquor Licensing — Liquor Licensing Act 1990 (TAS)
+Administered by the Commissioner for Licensing (Tasmanian Liquor and Gaming Commission, Treasury Tasmania). A Winery Licence allows production, wholesale, cellar door sales and tastings; an On-licence is required for on-premises consumption. Applications require proof of premises, a floor plan, local council development approval and RSA-trained staff.
+
+### Small Producer's Permit (TAS)
+The Small Producer's Permit is a streamlined authority for small Tasmanian wine and beverage producers. It allows eligible small producers to sell their own product at markets and events. Eligibility is limited to genuine small producers — producers above 28,500 litres of annual production fall outside the small-producer concession and must hold a full Winery Licence. Confirm current eligibility with the Commissioner for Licensing before relying on the permit.
+
+### Environmental Obligations — EMPCA (Environmental Management and Pollution Control Act 1994, TAS)
+Administered by EPA Tasmania. Large wineries may be "level 2 activities" under EMPCA requiring an environment protection notice; winery wastewater must be managed to prevent discharge to waterways or groundwater, and noise must comply with the EMPCA noise regulations.
+
+### Planning — Tasmanian Planning Scheme (TPS)
+Winery and cellar door development requires a planning permit from the local council under the Tasmanian Planning Scheme. In the Rural zone, wineries are typically assessed as a Resource Processing use (permitted or discretionary depending on scale). Derwent Valley, Huon Valley and Coal River Valley have specific local provisions.
+
+### Work Health & Safety — WHS Act 2012 (TAS)
+Administered by WorkSafe Tasmania. As a PCBU you must eliminate or minimise risks so far as reasonably practicable, with the same winery duties as other model-WHS states: confined spaces, CO2 monitoring, manual handling, chemical handling and working at heights. Serious incidents must be reported to WorkSafe Tasmania immediately.
+`;
+
+// Split the reference into renderable sections (by "## " headings)
+const KB_SECTIONS = KNOWLEDGE_BASE.split(/\n(?=## )/).map(s => s.trim()).filter(Boolean);
+
+type ContactRow = { regulator: string; jurisdiction: string; covers: string };
+const CONTACTS: ContactRow[] = [
+  { regulator: "OLGR (QLD)", jurisdiction: "QLD", covers: "Liquor producer/wholesaler licence, cellar door authority (Liquor Act 1992)" },
+  { regulator: "DETSI (QLD)", jurisdiction: "QLD", covers: "Environmental Authority under ERA 22 (winery wastewater > 1 megalitre/yr)" },
+  { regulator: "WorkSafe QLD", jurisdiction: "QLD", covers: "Work health & safety, confined spaces, CO2, incident reporting (WHS Act 2011 (Qld))" },
+  { regulator: "Commissioner for Licensing (TAS)", jurisdiction: "TAS", covers: "Winery licence, on-licence, Small Producer's Permit (Liquor Licensing Act 1990)" },
+  { regulator: "EPA Tasmania", jurisdiction: "TAS", covers: "Environmental obligations under EMPCA, wastewater, noise" },
+  { regulator: "WorkSafe Tasmania", jurisdiction: "TAS", covers: "Work health & safety, confined spaces, incident reporting (WHS Act 2012)" },
 ];
 
 // ─── CopyButton — clipboard icon with animated checkmark feedback ─────────────
@@ -540,6 +595,70 @@ export default function Compliance() {
             ))}
           </div>
         </div>
+
+        {/* Jurisdiction reference — QLD & TAS structured knowledge base */}
+        {(stateFilter === "QLD" || stateFilter === "TAS") && (
+          <div className="mb-8">
+            <p
+              className="text-xs mb-3"
+              style={{ fontFamily: "'Fira Code',monospace", letterSpacing: "0.08em", color: "var(--ow-text-lo)", textTransform: "uppercase" }}
+            >
+              {STATE_LABELS[stateFilter]} reference
+            </p>
+            <div className="space-y-4">
+              {KB_SECTIONS.filter(sec => sec.startsWith(stateFilter === "QLD" ? "## QUEENSLAND" : "## TASMANIA")).map((sec, i) => (
+                <div
+                  key={i}
+                  className="p-4 rounded-sm"
+                  style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}
+                >
+                  <pre
+                    style={{
+                      fontFamily: "'Lato',sans-serif",
+                      fontSize: "0.82rem",
+                      lineHeight: 1.65,
+                      color: "var(--ow-text-hi)",
+                      whiteSpace: "pre-wrap",
+                      wordBreak: "break-word",
+                      margin: 0,
+                    }}
+                  >
+                    {sec}
+                  </pre>
+                </div>
+              ))}
+            </div>
+
+            {/* KEY CONTACTS table */}
+            <p
+              className="text-xs mt-6 mb-2"
+              style={{ fontFamily: "'Fira Code',monospace", letterSpacing: "0.08em", color: "var(--ow-text-lo)", textTransform: "uppercase" }}
+            >
+              Key contacts
+            </p>
+            <div className="overflow-x-auto rounded-sm" style={{ border: "1px solid var(--ow-border)" }}>
+              <table className="w-full text-left" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8rem", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ background: "var(--ow-bg-card)" }}>
+                    <th className="px-3 py-2" style={{ color: "var(--ow-text-lo)", fontWeight: 600 }}>Regulator</th>
+                    <th className="px-3 py-2" style={{ color: "var(--ow-text-lo)", fontWeight: 600 }}>What they cover</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {CONTACTS.filter(c => c.jurisdiction === stateFilter).map((c, i) => (
+                    <tr key={i} style={{ borderTop: "1px solid var(--ow-border)" }}>
+                      <td className="px-3 py-2" style={{ color: "var(--ow-amber)", fontWeight: 600, whiteSpace: "nowrap" }}>{c.regulator}</td>
+                      <td className="px-3 py-2" style={{ color: "var(--ow-text-hi)" }}>{c.covers}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs mt-2" style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-text-lo)", opacity: 0.7 }}>
+              Jurisdictions covered by the assistant: {CLASSIFIER_JURISDICTIONS.join(" · ")}.
+            </p>
+          </div>
+        )}
 
         {/* Empty state: recently asked + sample questions */}
         {messages.length === 0 && (
