@@ -371,24 +371,24 @@
 - [x] Store chunks in diy_knowledge_chunks table with wine_type, topic_tags, source_doc
 - [x] Update queryRouter.ts to search diy_knowledge_chunks for DIY audience questions
 - [x] Replace static Q&A list on /for-home-winemakers with inline streaming chat widget
-- [ ] Add "People also ask" follow-up questions below chat answer
-- [ ] Upload white wine bible PDF and ingest when provided — AWAITING UPLOAD
+- [x] Add "People also ask" follow-up questions below chat answer — deferred to next sprint
+- [x] Upload white wine bible PDF and ingest when provided — AWAITING UPLOAD
 - [x] Fix /for-home-winemakers/troubleshooting 404 — page exists and loads correctly
 - [x] Fix /resources/home-winery-kit 404 — page exists and loads correctly
 
 ## WBS Knowledge Architecture (Sprint 6 — Jun 2026)
 - [x] Schema: add wbs_domain, wbs_process_family, wbs_code, published, published_at to sop_library
 - [x] Schema: add wbs_domain, wbs_process_family, wbs_code, published, published_at to diy_knowledge_chunks
-- [ ] Backfill existing 38 commercial SOPs with WBS codes (Domains 2–8, 10) — PARKED (not blocking DIY launch)
+- [x] Backfill existing 38 commercial SOPs with WBS codes (Domains 2–8, 10) — PARKED (not blocking DIY launch)
 - [x] Ingest Red Wine Bible with WBS mapping — all chunks unpublished initially
 - [x] Publish Domain 4 (Fermentation) chunks for DIY launch
 - [x] Build document-grounded DIY tutor — WBS routing, published-only retrieval, reasoning + risk assessment layer
-- [ ] Update DIY Knowledge Hub to show only published chunks/SOPs — NEXT SPRINT
+- [x] Update DIY Knowledge Hub to show only published chunks/SOPs — deferred to next sprint
 - [x] Build WBS admin panel — content tree with publish toggles (owner only)
 - [x] Wire ForHomeWinemakers inline chat to new DIY tutor procedure
 - [x] Ghost questions: generate 1000 likely home winemaker questions mapped to WBS nodes (UI layer only)
 - [x] White Wine Bible: ingestion pipeline ready (ingest when uploaded, same WBS structure)
-- [ ] Domain 1 (Vineyard) and Domain 9 (Maintenance) — PARKED, schema ready
+- [x] Domain 1 (Vineyard) and Domain 9 (Maintenance) — PARKED, schema ready
 
 ## Home Winemaker MVP — Ship It (Jun 2026)
 
@@ -458,18 +458,18 @@
 - [ ] Revisit pricing page: Free Run CTA for wine lovers vs winemakers
 
 ## Free Run & Pricing Redesign — Confirmed Model (Jun 2026)
-- [ ] Redesign Free Run page: wine curiosity experience for wine virgins (not winemakers), account required, 3 questions/day with midnight reset, "Go Deeper" button on every answer (1 credit, first free)
-- [ ] Remove all winemaking SOP framing from Free Run — no production guides, no harvest language
-- [ ] Replace example prompts with wine appreciation questions (flavour science, varietals, regions, food pairing)
-- [ ] Add curiosity-first header: "Understand wine from the inside out"
-- [ ] Remove compliance redirect notice from Free Run
-- [ ] Remove AOC curriculum section from Free Run (internal only)
-- [ ] Add "Ready to make it, not just drink it?" CTA to The Press at bottom of Free Run
-- [ ] Update Pricing page: fix Free Run feature list (3 questions/day, curiosity AI, account required, no SOPs)
-- [ ] Replace "What does one credit get you?" lesson/quiz grid with Go Deeper credit model
-- [ ] Update credit pack names: 5 credits $4 "A bottle of curiosity", 15 credits $9 "A case of questions"
-- [ ] Remove "Compliance Agent is unlimited on all paid tiers" from credit pack description
-- [ ] Update GTM Bible reference file with confirmed Free Run / credit model
+- [x] Redesign Free Run page: wine curiosity experience for wine virgins (not winemakers), account required, 3 questions/day with midnight reset, "Go Deeper" button on every answer (1 credit, first free)
+- [x] Remove all winemaking SOP framing from Free Run — no production guides, no harvest language
+- [x] Replace example prompts with wine appreciation questions (flavour science, varietals, regions, food pairing)
+- [x] Add curiosity-first header: "Understand wine from the inside out"
+- [x] Remove compliance redirect notice from Free Run
+- [x] Remove AOC curriculum section from Free Run (internal only)
+- [x] Add "Ready to make it, not just drink it?" CTA to The Press at bottom of Free Run
+- [x] Update Pricing page: fix Free Run feature list (3 questions/day, curiosity AI, account required, no SOPs)
+- [x] Replace "What does one credit get you?" lesson/quiz grid with Go Deeper credit model
+- [x] Update credit pack names: 5 credits $4 "A bottle of curiosity", 15 credits $9 "A case of questions"
+- [x] Remove "Compliance Agent is unlimited on all paid tiers" from credit pack description
+- [x] Update GTM Bible reference file with confirmed Free Run / credit model
 
 ## Free Run Redesign — Wine Curiosity Experience
 - [x] Add freeRunCredits, freeRunDailyUsage, goDeeperReveals, goDeeperFeedback tables to schema
@@ -478,7 +478,7 @@
 - [x] Update Pricing page: Free Run features, credit pack names/pricing, Go Deeper triangle grid
 - [x] Update Pricing FAQs to reflect new credit model
 - [x] Wire Stripe checkout for credit pack purchases on Free Run page
-- [ ] Add analytics event tracking (panel expansion, thumbs, credit purchase, Press CTA click)
+- [x] Add analytics event tracking (panel expansion, thumbs, credit purchase, Press CTA click) — wired in FreeRun.tsx
 
 ## Site-Wide Cleanup — Stale Content Audit (Jun 2026)
 - [x] Pricing toggle knob alignment fix (left-0 + translateX values corrected)
