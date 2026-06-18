@@ -334,15 +334,8 @@ function Nav() {
             <ThemeToggle compact />
             <Link
               href="/free-run"
-              className="text-xs inline-flex items-center gap-1.5 px-4 py-2 rounded-full transition-all font-medium"
-              style={{
-                fontFamily: "'Lato',sans-serif",
-                letterSpacing: "0.02em",
-                background: "linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)",
-                color: "#FFFFFF",
-                textDecoration: "none",
-                boxShadow: "0 2px 8px rgba(59, 130, 246, 0.3)",
-              }}
+              className="btn-ghost text-xs inline-flex items-center gap-1.5 rounded-full"
+              style={{ textDecoration: "none" }}
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
