@@ -541,7 +541,11 @@ NOTE on embeddings: Forge API exposes only /v1/chat/completions (no /v1/embeddin
 - [x] Auto-FAQ: most-asked clusters → generate FAQ entries (top 10 by volume) surfaced in FAQ.tsx "Most-asked by the community" subsection
 - [x] vitest coverage for trinity pipeline (25 tests: clustering/editorial/accuracy/dedupe/newsletter pure logic + router/handler/schema contracts) — full suite 260 green, tsc clean
 - [x] Production build validated: pnpm build OK, prod server serves SPA at / (200) + /api on single $PORT — confirms publish path works (dev preview "Cannot GET /" is a dev-port artifact only)
-- [ ] Register Heartbeat crons via manus-heartbeat CLI AFTER deploy (site must be deployed first — dev sandboxes are unreachable to the scheduler)
+- [x] Register Heartbeat crons via manus-heartbeat CLI (registered after deploy 2026-06-18; all enabled). Production https://ownology.ai/ serves SPA 200; /api/scheduled/* correctly 403 to external POST (gateway cron-only).
+      Persisted task_uids (for future update/delete via `manus-heartbeat update/delete --task-uid`):
+        - trinity-cluster-nightly        cron "0 0 16 * * *" (02:00 AEST)        task_uid cB6d9iNFZtxoLZmCR6rNwV
+        - trinity-newsletter-finalize-daily cron "0 30 23 * * *" (09:30 AEST) payload {"mode":"finalize"} task_uid Zjxd6iRxLQNiyVYSaLetBN
+        - trinity-newsletter-monthly     cron "0 0 23 1 * *" (1st 09:00 AEST) payload {"mode":"monthly"}  task_uid 8wRCjTnjRUnXtxHPLWgCCp
 
 
 ## Work Mode Workflow — Cross-Pillar Bridges (Jun 2026) [COMPLETED]
