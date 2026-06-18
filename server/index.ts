@@ -11,6 +11,8 @@ import { campaignMetricsHandler } from "./scheduled/campaignMetrics.js";
 import { vintageRemindersHandler } from "./scheduled/vintageReminders.js";
 import { regulationMonitorHandler } from "./scheduled/regulationMonitor.js";
 import { fermentationWatchHandler } from "./scheduled/fermentationWatch.js";
+import { trinityClusterHandler } from "./scheduled/trinityCluster.js";
+import { trinityNewsletterHandler } from "./scheduled/trinityNewsletter.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +32,8 @@ async function startServer() {
   app.post("/api/scheduled/vintage-reminders", express.json(), vintageRemindersHandler);
   app.post("/api/scheduled/regulation-monitor", express.json(), regulationMonitorHandler);
   app.post("/api/scheduled/fermentation-watch", express.json(), fermentationWatchHandler);
+  app.post("/api/scheduled/trinity-cluster", express.json(), trinityClusterHandler);
+  app.post("/api/scheduled/trinity-newsletter", express.json(), trinityNewsletterHandler);
 
   // ── JSON body parser ─────────────────────────────────────────────────────────
   app.use(express.json());

@@ -137,8 +137,37 @@ function BlogEmailCapture() {
 
 const ALL_CATEGORIES = ["All", "The Science", "The Vineyard", "The Craft"];
 
+const ACT_TO_CATEGORY: Record<string, string> = {
+  science: "The Science",
+  vineyard: "The Vineyard",
+  craft: "The Craft",
+};
+
+interface CommunityPiece {
+  id: number;
+  questionCanonical: string;
+  excerpt: string | null;
+  contentScience: string | null;
+  contentVineyard: string | null;
+  contentCraft: string | null;
+  primaryAct: string;
+  topicTag: string | null;
+  status: string;
+  clusterSize: number;
+  publishedAt: number | null;
+}
+
 export default function Blog() {
   const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [expandedCommunity, setExpandedCommunity] = useState<number | null>(null);
+
+  // Published community pieces from the Trinity content pipeline.
+  const { data: communityRaw } = trpc.trinity.listPublished.useQuery();
+  const community: CommunityPiece[] = (communityRaw ?? []) as CommunityPiece[];
+  const filteredCommunity =
+    activeCategory === "All"
+      ? community
+      : community.filter((p) => ACT_TO_CATEGORY[p.primaryAct] === activeCategory);
 
   const filteredArticles = activeCategory === "All"
     ? ARTICLES
@@ -394,6 +423,159 @@ export default function Blog() {
               </Link>
             ))}
           </div>
+
+          {/* Community pieces — auto-curated from real Free Run questions */}
+          {filteredCommunity.length > 0 && (
+            <div className="mt-12">
+              <div className="flex items-center gap-3 mb-6">
+                <span
+                  style={{
+                    fontFamily: "'Lato', sans-serif",
+                    fontWeight: 700,
+                    fontSize: "0.7rem",
+                    letterSpacing: "0.16em",
+                    textTransform: "uppercase",
+                    color: "var(--ow-text-lo)",
+                  }}
+                >
+                  From the community
+                </span>
+                <div style={{ flex: 1, height: "1px", background: "var(--ow-border)" }} />
+              </div>
+              <div className="flex flex-col gap-8">
+                {filteredCommunity.map((piece) => {
+                  const isOpen = expandedCommunity === piece.id;
+                  return (
+                    <article
+                      key={`community-${piece.id}`}
+                      className="block p-8"
+                      style={{
+                        background: "var(--ow-bg-card)",
+                        border: "1px solid var(--ow-border)",
+                        borderRadius: "2px",
+                      }}
+                    >
+                      <div className="flex items-center gap-4 mb-4 flex-wrap">
+                        <span
+                          style={{
+                            fontFamily: "'Lato', sans-serif",
+                            fontWeight: 700,
+                            fontSize: "0.65rem",
+                            letterSpacing: "0.14em",
+                            textTransform: "uppercase",
+                            color: "var(--ow-amber)",
+                            background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+                            padding: "0.2rem 0.6rem",
+                            borderRadius: "2px",
+                          }}
+                        >
+                          {ACT_TO_CATEGORY[piece.primaryAct] ?? "The Craft"}
+                        </span>
+                        <span
+                          style={{
+                            fontFamily: "'Fira Code', monospace",
+                            fontSize: "0.65rem",
+                            color: "var(--ow-text-lo)",
+                            border: "1px solid var(--ow-border)",
+                            padding: "0.15rem 0.5rem",
+                            borderRadius: "2px",
+                          }}
+                        >
+                          Community · asked by {piece.clusterSize} winemakers
+                        </span>
+                      </div>
+                      <h2
+                        style={{
+                          fontFamily: "'Fraunces', serif",
+                          fontWeight: 600,
+                          fontSize: "clamp(1.25rem, 2.5vw, 1.625rem)",
+                          lineHeight: 1.25,
+                          color: "var(--ow-text-hi)",
+                          letterSpacing: "-0.01em",
+                          marginBottom: "0.875rem",
+                          textWrap: "balance" as "balance",
+                        }}
+                      >
+                        {piece.questionCanonical}
+                      </h2>
+                      {piece.excerpt && (
+                        <p
+                          style={{
+                            fontFamily: "'Lato', sans-serif",
+                            fontWeight: 300,
+                            fontSize: "1rem",
+                            lineHeight: 1.75,
+                            color: "var(--ow-text-mid)",
+                            marginBottom: "1.25rem",
+                          }}
+                        >
+                          {piece.excerpt}
+                        </p>
+                      )}
+
+                      {isOpen && (
+                        <div className="grid md:grid-cols-3 gap-4 mb-5">
+                          {([["The Science", piece.contentScience], ["The Vineyard", piece.contentVineyard], ["The Craft", piece.contentCraft]] as const).map(
+                            ([label, body]) =>
+                              body ? (
+                                <div
+                                  key={label}
+                                  className="p-4"
+                                  style={{ background: "var(--ow-bg-raised)", border: "1px solid var(--ow-border)", borderRadius: "2px" }}
+                                >
+                                  <p
+                                    style={{
+                                      fontFamily: "'Lato', sans-serif",
+                                      fontSize: "0.62rem",
+                                      letterSpacing: "0.12em",
+                                      textTransform: "uppercase",
+                                      color: "var(--ow-amber)",
+                                      marginBottom: "0.5rem",
+                                    }}
+                                  >
+                                    {label}
+                                  </p>
+                                  <p
+                                    style={{
+                                      fontFamily: "'Lato', sans-serif",
+                                      fontWeight: 300,
+                                      fontSize: "0.85rem",
+                                      lineHeight: 1.65,
+                                      color: "var(--ow-text-mid)",
+                                      whiteSpace: "pre-wrap",
+                                    }}
+                                  >
+                                    {body}
+                                  </p>
+                                </div>
+                              ) : null
+                          )}
+                        </div>
+                      )}
+
+                      <button
+                        onClick={() => setExpandedCommunity(isOpen ? null : piece.id)}
+                        style={{
+                          fontFamily: "'Lato', sans-serif",
+                          fontWeight: 600,
+                          fontSize: "0.8rem",
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                          color: "var(--ow-amber)",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          padding: 0,
+                        }}
+                      >
+                        {isOpen ? "Hide the three lenses ▲" : "Read through the three lenses ▼"}
+                      </button>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

@@ -386,6 +386,13 @@ const TOOLS: AdminTool[] = [
     icon: <IconKnowledge />,
     badge: "DIY Tutor",
   },
+  {
+    label: "Trinity Review",
+    description: "Review community blog pieces auto-drafted nightly from clusters of real Free Run questions. Promote the best to Featured, suppress duplicates, and action accuracy flags.",
+    href: "/admin/trinity",
+    icon: <IconKnowledge />,
+    badge: "Pipeline",
+  },
 ];
 
 export default function Admin() {

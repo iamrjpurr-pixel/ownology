@@ -64,11 +64,19 @@ export const goDeeperReveals = mysqlTable(
     wasFreeHook: boolean("was_free_hook").notNull().default(false),
     // Credits consumed (0 for free hook, 1 for paid)
     creditsConsumed: int("credits_consumed").notNull().default(1),
+    // ── Trinity content pipeline candidacy ──────────────────────────────────
+    // UTC ms timestamp when the nightly clustering job processed this reveal.
+    // Null = not yet clustered (eligible for the next clustering run).
+    clusteredAt: bigint("clustered_at", { mode: "number" }),
+    // If this reveal was folded into a published Trinity piece, the id of that
+    // published_trinity_responses row. Null otherwise.
+    publishedTrinityId: int("published_trinity_id"),
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
   },
   (t) => [
     index("gdr_user_idx").on(t.userId),
     index("gdr_topic_idx").on(t.topicTag),
+    index("gdr_clustered_idx").on(t.clusteredAt),
   ]
 );
 
@@ -866,5 +874,146 @@ export const ghostQuestions = mysqlTable(
     index("gq_wine_type_idx").on(t.wineType),
     index("gq_difficulty_idx").on(t.difficulty),
     index("gq_active_idx").on(t.active),
+  ]
+);
+
+// ─── Published Trinity Responses (Trinity Content Pipeline) ──────────────────
+// One row per community Trinity piece produced by the nightly clustering +
+// editorial job. Each piece is a canonicalised Free Run question with three
+// polished panels (Science / Vineyard / Craft) sourced from the highest-rated
+// reveal in a cluster of 3+ similar questions.
+//
+// status lifecycle:
+//   pending    → auto-published community draft (visible to members, not featured)
+//   featured   → owner-promoted (top of Trinity tab, amber badge)
+//   suppressed → hidden (duplicate of an existing piece or owner-rejected)
+//
+// The bibles (diy_knowledge_chunks) are used privately for the accuracy pass.
+// accuracyFlag/accuracyNote capture any unsupported or contradicted claims for
+// owner review. Bible names are NEVER exposed to end users.
+export const publishedTrinityResponses = mysqlTable(
+  "published_trinity_responses",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // Canonicalised, editorially-polished question (the piece title)
+    questionCanonical: text("question_canonical").notNull(),
+    // One-sentence excerpt for cards / list views
+    excerpt: text("excerpt"),
+    // The three polished Trinity panels (Markdown)
+    contentScience: text("content_science"),
+    contentVineyard: text("content_vineyard"),
+    contentCraft: text("content_craft"),
+    // Which Trinity act this piece leads with for tab placement:
+    // "science" | "vineyard" | "craft" — drives Blog tab grouping
+    primaryAct: mysqlEnum("primary_act", ["science", "vineyard", "craft"])
+      .notNull()
+      .default("science"),
+    // Topic tag carried over from the source reveal (for grouping / FAQ)
+    topicTag: varchar("topic_tag", { length: 100 }),
+    // Workflow status
+    status: mysqlEnum("status", ["pending", "featured", "suppressed"])
+      .notNull()
+      .default("pending"),
+    // How many reveals were clustered into this piece (>=3 to publish)
+    clusterSize: int("cluster_size").notNull().default(1),
+    // JSON array of goDeeperReveals.id that formed this cluster
+    memberRevealIdsJson: text("member_reveal_ids_json").notNull().default("[]"),
+    // The reveal whose panels were selected as the canonical source
+    sourceRevealId: int("source_reveal_id"),
+    // Private accuracy review (bible cross-reference). true = a claim was
+    // flagged as unsupported/contradicted and needs owner review.
+    accuracyFlag: boolean("accuracy_flag").notNull().default(false),
+    // Human-readable note describing the flagged claim(s) (owner-only)
+    accuracyNote: text("accuracy_note"),
+    // UTC ms timestamps
+    publishedAt: bigint("published_at", { mode: "number" }),
+    featuredAt: bigint("featured_at", { mode: "number" }),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("ptr_status_idx").on(t.status),
+    index("ptr_primary_act_idx").on(t.primaryAct),
+    index("ptr_published_at_idx").on(t.publishedAt),
+    index("ptr_accuracy_idx").on(t.accuracyFlag),
+  ]
+);
+
+// ─── Trinity FAQ Clusters (Auto-generated FAQ) ───────────────────────────────
+// One row per high-volume question cluster. Populated by the nightly job (top
+// clusters by member count). Surfaced as auto-FAQ entries in FAQ.tsx. Kept
+// separate from publishedTrinityResponses because FAQ entries are short Q&A
+// pairs, not full Trinity pieces, and ranking is by raw question volume.
+export const trinityFaqClusters = mysqlTable(
+  "trinity_faq_clusters",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // Canonicalised question (the FAQ question)
+    canonicalQuestion: text("canonical_question").notNull(),
+    // Concise FAQ answer (editorially generated, 1–2 short paragraphs)
+    answer: text("answer").notNull(),
+    // Number of similar questions in this cluster (drives ranking)
+    clusterSize: int("cluster_size").notNull().default(1),
+    // 1-based rank among published FAQ clusters (lower = higher volume)
+    rank: int("rank").notNull().default(0),
+    // Whether this FAQ entry is currently shown
+    active: boolean("active").notNull().default(true),
+    // UTC ms timestamp when the cluster was generated
+    generatedAt: bigint("generated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("tfc_rank_idx").on(t.rank),
+    index("tfc_active_idx").on(t.active),
+  ]
+);
+
+// ─── Trinity Newsletter Drafts (Monthly newsletter, 24h owner preview) ───────
+// One row per monthly newsletter run. The monthly Heartbeat composes a draft
+// from the top featured Trinity pieces (one per act), creates it in Buttondown
+// as a draft, and notifies the owner. The draft sits in "preview" for a 24h
+// window; the owner can approve (send immediately) or skip. A daily pass
+// auto-sends a still-"preview" draft once previewUntil has passed and it was
+// not skipped. Buttondown stores the actual email; we keep only draft metadata.
+export const trinityNewsletterDrafts = mysqlTable(
+  "trinity_newsletter_drafts",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // Period label this newsletter covers, e.g. "2026-06" (one per month)
+    periodLabel: varchar("period_label", { length: 20 }).notNull(),
+    // Composed email subject + Markdown body (kept for owner preview + audit)
+    subject: text("subject").notNull(),
+    body: text("body").notNull(),
+    // JSON array of publishedTrinityResponses.id featured in this issue.
+    // No DB DEFAULT (TiDB rejects DEFAULT on TEXT); the app layer always
+    // supplies a valid JSON string.
+    featuredIdsJson: text("featured_ids_json").notNull(),
+    // Buttondown email id once the draft is created upstream (nullable)
+    buttondownEmailId: varchar("buttondown_email_id", { length: 128 }),
+    // Workflow status:
+    //  preview  → in the 24h owner-preview window
+    //  approved → owner approved; send in progress / done
+    //  sent     → published to Buttondown
+    //  skipped  → owner chose not to send this issue
+    //  failed   → send attempt failed (see error log)
+    status: mysqlEnum("status", [
+      "preview",
+      "approved",
+      "sent",
+      "skipped",
+      "failed",
+    ])
+      .notNull()
+      .default("preview"),
+    // UTC ms: end of the 24h owner-preview window (auto-send after this)
+    previewUntil: bigint("preview_until", { mode: "number" }).notNull(),
+    // UTC ms: when the issue was actually sent
+    sentAt: bigint("sent_at", { mode: "number" }),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("tnd_status_idx").on(t.status),
+    index("tnd_period_idx").on(t.periodLabel),
+    index("tnd_preview_until_idx").on(t.previewUntil),
   ]
 );

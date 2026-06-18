@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import * as schema from "../drizzle/schema.js";
-import { desc, eq, and, gte, or, like } from "drizzle-orm";
+import { desc, eq, and, gte, lt, or, like, inArray, isNull, sql } from "drizzle-orm";
 
 // ─── Connection pool ──────────────────────────────────────────────────────────
 
@@ -1055,4 +1055,332 @@ export async function upsertVintageIntelligence(data: {
 
 export async function deleteVintageIntelligence(id: number) {
   await db.delete(schema.vintageIntelligence).where(eq(schema.vintageIntelligence.id, id));
+}
+
+// ─── Trinity Content Pipeline ───────────────────────────────────────────────
+// Helpers backing the nightly clustering/editorial Heartbeat job, the admin
+// review surfaces, and the public Blog/FreeRun rendering.
+
+export type TrinityReveal = typeof schema.goDeeperReveals.$inferSelect;
+export type PublishedTrinity = typeof schema.publishedTrinityResponses.$inferSelect;
+export type TrinityFaqCluster = typeof schema.trinityFaqClusters.$inferSelect;
+
+/**
+ * Reveals eligible for clustering: have all three panels and have not yet been
+ * processed by the nightly job (clusteredAt IS NULL). Returns oldest-first so a
+ * capped batch deterministically drains the backlog.
+ */
+export async function getUnclusteredReveals(limit = 200): Promise<TrinityReveal[]> {
+  return db.query.goDeeperReveals.findMany({
+    where: isNull(schema.goDeeperReveals.clusteredAt),
+    orderBy: [schema.goDeeperReveals.createdAt],
+    limit,
+  });
+}
+
+/**
+ * Net feedback score (thumbs up minus thumbs down across all panels) for a set
+ * of reveal ids. Returns a Map keyed by revealId. Used to pick the
+ * highest-rated reveal in a cluster as the canonical source.
+ */
+export async function getRevealFeedbackScores(
+  revealIds: number[]
+): Promise<Map<number, number>> {
+  const scores = new Map<number, number>();
+  if (revealIds.length === 0) return scores;
+  const rows = await db
+    .select({
+      revealId: schema.goDeeperFeedback.revealId,
+      thumbsUp: schema.goDeeperFeedback.thumbsUp,
+    })
+    .from(schema.goDeeperFeedback)
+    .where(inArray(schema.goDeeperFeedback.revealId, revealIds));
+  for (const id of revealIds) scores.set(id, 0);
+  for (const r of rows) {
+    scores.set(r.revealId, (scores.get(r.revealId) ?? 0) + (r.thumbsUp ? 1 : -1));
+  }
+  return scores;
+}
+
+/** Mark a set of reveals as processed by the clustering job. */
+export async function markRevealsClustered(
+  revealIds: number[],
+  publishedTrinityId: number | null,
+  clusteredAt: number
+) {
+  if (revealIds.length === 0) return;
+  await db
+    .update(schema.goDeeperReveals)
+    .set({ clusteredAt, publishedTrinityId: publishedTrinityId ?? null })
+    .where(inArray(schema.goDeeperReveals.id, revealIds));
+}
+
+/** Insert a new published Trinity piece (defaults to pending). Returns insertId. */
+export async function insertPublishedTrinity(data: {
+  questionCanonical: string;
+  excerpt?: string | null;
+  contentScience?: string | null;
+  contentVineyard?: string | null;
+  contentCraft?: string | null;
+  primaryAct: "science" | "vineyard" | "craft";
+  topicTag?: string | null;
+  clusterSize: number;
+  memberRevealIds: number[];
+  sourceRevealId?: number | null;
+  accuracyFlag?: boolean;
+  accuracyNote?: string | null;
+}): Promise<number> {
+  const now = Date.now();
+  const result = await db.insert(schema.publishedTrinityResponses).values({
+    questionCanonical: data.questionCanonical,
+    excerpt: data.excerpt ?? null,
+    contentScience: data.contentScience ?? null,
+    contentVineyard: data.contentVineyard ?? null,
+    contentCraft: data.contentCraft ?? null,
+    primaryAct: data.primaryAct,
+    topicTag: data.topicTag ?? null,
+    status: "pending",
+    clusterSize: data.clusterSize,
+    memberRevealIdsJson: JSON.stringify(data.memberRevealIds ?? []),
+    sourceRevealId: data.sourceRevealId ?? null,
+    accuracyFlag: data.accuracyFlag ?? false,
+    accuracyNote: data.accuracyNote ?? null,
+    publishedAt: now,
+    featuredAt: null,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return (result as unknown as { insertId: number }).insertId;
+}
+
+/** All already-published canonical questions (for the dedupe prompt context). */
+export async function getPublishedCanonicalQuestions(): Promise<
+  { id: number; questionCanonical: string }[]
+> {
+  return db
+    .select({
+      id: schema.publishedTrinityResponses.id,
+      questionCanonical: schema.publishedTrinityResponses.questionCanonical,
+    })
+    .from(schema.publishedTrinityResponses);
+}
+
+/**
+ * Public: published pieces (pending or featured, never suppressed) optionally
+ * filtered by primary Trinity act. Featured first, then most recent.
+ */
+export async function listPublishedTrinity(
+  primaryAct?: "science" | "vineyard" | "craft"
+): Promise<PublishedTrinity[]> {
+  const notSuppressed = inArray(schema.publishedTrinityResponses.status, [
+    "pending",
+    "featured",
+  ]);
+  const where = primaryAct
+    ? and(notSuppressed, eq(schema.publishedTrinityResponses.primaryAct, primaryAct))
+    : notSuppressed;
+  return db.query.publishedTrinityResponses.findMany({
+    where,
+    orderBy: [
+      desc(schema.publishedTrinityResponses.status), // 'pending' < 'featured' alpha; see sort note
+      desc(schema.publishedTrinityResponses.publishedAt),
+    ],
+  });
+}
+
+/** Admin: list pieces by status (default pending) for the review queue. */
+export async function listTrinityByStatus(
+  status: "pending" | "featured" | "suppressed",
+  limit = 200
+): Promise<PublishedTrinity[]> {
+  return db.query.publishedTrinityResponses.findMany({
+    where: eq(schema.publishedTrinityResponses.status, status),
+    orderBy: [desc(schema.publishedTrinityResponses.createdAt)],
+    limit,
+  });
+}
+
+/** Admin: counts per status + accuracy-flag count for the digest/dashboard. */
+export async function getTrinityStatusCounts(): Promise<{
+  pending: number;
+  featured: number;
+  suppressed: number;
+  flagged: number;
+}> {
+  const rows = await db
+    .select({
+      status: schema.publishedTrinityResponses.status,
+      n: sql<number>`count(*)`,
+    })
+    .from(schema.publishedTrinityResponses)
+    .groupBy(schema.publishedTrinityResponses.status);
+  const flaggedRows = await db
+    .select({ n: sql<number>`count(*)` })
+    .from(schema.publishedTrinityResponses)
+    .where(eq(schema.publishedTrinityResponses.accuracyFlag, true));
+  const counts = { pending: 0, featured: 0, suppressed: 0, flagged: 0 };
+  for (const r of rows) {
+    if (r.status === "pending") counts.pending = Number(r.n);
+    if (r.status === "featured") counts.featured = Number(r.n);
+    if (r.status === "suppressed") counts.suppressed = Number(r.n);
+  }
+  counts.flagged = Number(flaggedRows[0]?.n ?? 0);
+  return counts;
+}
+
+/** Admin: change a piece's status (promote to featured / suppress / restore). */
+export async function setTrinityStatus(
+  id: number,
+  status: "pending" | "featured" | "suppressed"
+) {
+  const now = Date.now();
+  await db
+    .update(schema.publishedTrinityResponses)
+    .set({
+      status,
+      featuredAt: status === "featured" ? now : null,
+      updatedAt: now,
+    })
+    .where(eq(schema.publishedTrinityResponses.id, id));
+}
+
+/** Public: the published piece that contains a given reveal id, if any. */
+export async function getPublishedTrinityByReveal(
+  revealId: number
+): Promise<PublishedTrinity | undefined> {
+  // Fast path: the source reveal directly references the piece via FK column.
+  const reveal = await db.query.goDeeperReveals.findFirst({
+    where: eq(schema.goDeeperReveals.id, revealId),
+    columns: { publishedTrinityId: true },
+  });
+  if (!reveal?.publishedTrinityId) return undefined;
+  const piece = await db.query.publishedTrinityResponses.findFirst({
+    where: eq(schema.publishedTrinityResponses.id, reveal.publishedTrinityId),
+  });
+  // Only surface non-suppressed pieces to the community badge.
+  if (!piece || piece.status === "suppressed") return undefined;
+  return piece;
+}
+
+/** Top featured pieces for the monthly newsletter (one per act handled by caller). */
+export async function listFeaturedTrinity(): Promise<PublishedTrinity[]> {
+  return db.query.publishedTrinityResponses.findMany({
+    where: eq(schema.publishedTrinityResponses.status, "featured"),
+    orderBy: [desc(schema.publishedTrinityResponses.featuredAt)],
+  });
+}
+
+// ── Trinity FAQ clusters ──────────────────────────────────────────────────
+
+/** Replace the auto-FAQ cluster set atomically (delete-all then insert). */
+export async function replaceTrinityFaqClusters(
+  clusters: { canonicalQuestion: string; answer: string; clusterSize: number; rank: number }[]
+) {
+  const now = Date.now();
+  await db.delete(schema.trinityFaqClusters);
+  if (clusters.length === 0) return;
+  await db.insert(schema.trinityFaqClusters).values(
+    clusters.map((c) => ({
+      canonicalQuestion: c.canonicalQuestion,
+      answer: c.answer,
+      clusterSize: c.clusterSize,
+      rank: c.rank,
+      active: true,
+      generatedAt: now,
+    }))
+  );
+}
+
+/** Public: active auto-FAQ clusters in rank order for FAQ.tsx. */
+export async function listTrinityFaqClusters(limit = 10): Promise<TrinityFaqCluster[]> {
+  return db.query.trinityFaqClusters.findMany({
+    where: eq(schema.trinityFaqClusters.active, true),
+    orderBy: [schema.trinityFaqClusters.rank],
+    limit,
+  });
+}
+
+// ── Trinity Newsletter Drafts ─────────────────────────────────────────────
+export type TrinityNewsletterDraft =
+  typeof schema.trinityNewsletterDrafts.$inferSelect;
+
+/** Insert a newly composed newsletter draft (status defaults to "preview"). */
+export async function insertNewsletterDraft(data: {
+  periodLabel: string;
+  subject: string;
+  body: string;
+  featuredIds: number[];
+  buttondownEmailId?: string | null;
+  previewUntil: number;
+}): Promise<number> {
+  const now = Date.now();
+  const [res] = await db.insert(schema.trinityNewsletterDrafts).values({
+    periodLabel: data.periodLabel,
+    subject: data.subject,
+    body: data.body,
+    featuredIdsJson: JSON.stringify(data.featuredIds ?? []),
+    buttondownEmailId: data.buttondownEmailId ?? null,
+    status: "preview",
+    previewUntil: data.previewUntil,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return (res as { insertId: number }).insertId;
+}
+
+/** Has a newsletter for this period already been created? (idempotency). */
+export async function getNewsletterDraftByPeriod(
+  periodLabel: string
+): Promise<TrinityNewsletterDraft | undefined> {
+  return db.query.trinityNewsletterDrafts.findFirst({
+    where: eq(schema.trinityNewsletterDrafts.periodLabel, periodLabel),
+    orderBy: [desc(schema.trinityNewsletterDrafts.createdAt)],
+  });
+}
+
+/** The most recent draft still in the owner-preview window. */
+export async function getLatestNewsletterDraft(): Promise<
+  TrinityNewsletterDraft | undefined
+> {
+  return db.query.trinityNewsletterDrafts.findFirst({
+    orderBy: [desc(schema.trinityNewsletterDrafts.createdAt)],
+  });
+}
+
+export async function getNewsletterDraftById(
+  id: number
+): Promise<TrinityNewsletterDraft | undefined> {
+  return db.query.trinityNewsletterDrafts.findFirst({
+    where: eq(schema.trinityNewsletterDrafts.id, id),
+  });
+}
+
+/** Drafts whose 24h preview window has elapsed and are still in "preview". */
+export async function getExpiredPreviewDrafts(
+  now = Date.now()
+): Promise<TrinityNewsletterDraft[]> {
+  return db.query.trinityNewsletterDrafts.findMany({
+    where: and(
+      eq(schema.trinityNewsletterDrafts.status, "preview"),
+      lt(schema.trinityNewsletterDrafts.previewUntil, now)
+    ),
+  });
+}
+
+export async function setNewsletterStatus(
+  id: number,
+  status: "preview" | "approved" | "sent" | "skipped" | "failed",
+  opts?: { sentAt?: number; buttondownEmailId?: string | null }
+) {
+  const patch: Record<string, unknown> = {
+    status,
+    updatedAt: Date.now(),
+  };
+  if (opts?.sentAt !== undefined) patch.sentAt = opts.sentAt;
+  if (opts?.buttondownEmailId !== undefined)
+    patch.buttondownEmailId = opts.buttondownEmailId;
+  await db
+    .update(schema.trinityNewsletterDrafts)
+    .set(patch)
+    .where(eq(schema.trinityNewsletterDrafts.id, id));
 }

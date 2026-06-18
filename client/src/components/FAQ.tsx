@@ -12,6 +12,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useEffect, useRef, useState } from "react";
+import { trpc } from "@/lib/trpc";
 
 function useInView(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
@@ -78,6 +79,10 @@ const FAQS = [
 
 export default function FAQ() {
   const { ref, inView } = useInView(0.1);
+  // Auto-FAQ generated from the most-asked Free Run community questions.
+  // Renders only once the Trinity pipeline has produced clusters.
+  const { data: communityFaq } = trpc.trinity.listFaq.useQuery({ limit: 6 });
+  const communityEntries = communityFaq ?? [];
 
   return (
     <section
@@ -184,6 +189,62 @@ export default function FAQ() {
                 </AccordionItem>
               ))}
             </Accordion>
+
+            {communityEntries.length > 0 && (
+              <div className="mt-12">
+                <p
+                  style={{
+                    fontFamily: "'Lato', sans-serif",
+                    fontWeight: 700,
+                    fontSize: "0.7rem",
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                    color: "var(--ow-amber)",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  Most-asked by the community
+                </p>
+                <Accordion type="single" collapsible className="w-full">
+                  {communityEntries.map((faq, i) => (
+                    <AccordionItem
+                      key={`community-${faq.id}`}
+                      value={`community-faq-${i}`}
+                      style={{ borderBottom: "1px solid var(--ow-border)" }}
+                    >
+                      <AccordionTrigger
+                        style={{
+                          fontFamily: "'Fraunces', serif",
+                          fontWeight: 500,
+                          fontSize: "1.0625rem",
+                          lineHeight: 1.4,
+                          color: "var(--ow-text-hi)",
+                          textAlign: "left",
+                          paddingTop: "1.5rem",
+                          paddingBottom: "1.5rem",
+                          textDecoration: "none",
+                        }}
+                        className="hover:no-underline [&[data-state=open]]:text-amber-400 transition-colors duration-200"
+                      >
+                        {faq.canonicalQuestion}
+                      </AccordionTrigger>
+                      <AccordionContent
+                        style={{
+                          fontFamily: "'Lato', sans-serif",
+                          fontWeight: 300,
+                          fontSize: "1rem",
+                          lineHeight: 1.8,
+                          color: "var(--ow-text-mid)",
+                          paddingBottom: "1.5rem",
+                        }}
+                      >
+                        {faq.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+            )}
           </div>
 
         </div>

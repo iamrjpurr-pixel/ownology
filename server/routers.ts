@@ -1,6 +1,7 @@
 import { z } from "zod";
 import Stripe from "stripe";
 import { freeRunRouter } from "./freeRunRouter.js";
+import { trinityRouter } from "./trinityRouter.js";
 import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
 import { routeQuery, buildLiveCellarContext } from "./queryRouter.js";
@@ -3048,5 +3049,6 @@ export const appRouter = router({
   vintageIntelligence: vintageIntelligenceRouter,
   wbsAdmin: wbsAdminRouter,
   freeRun: freeRunRouter,
+  trinity: trinityRouter,
 });
 export type AppRouter = typeof appRouter;

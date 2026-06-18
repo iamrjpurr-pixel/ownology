@@ -523,18 +523,25 @@
 - Newsletter draws from featured pieces monthly (one per Trinity act = 3 articles per send)
 - Newsletter preview sent to owner 24h before send with approve/delay option
 
-### Trinity content pipeline — build items [DEFERRED TO SPRINT 8]
-- [ ] Store question embeddings on each Free Run ask (for clustering)
-- [ ] Nightly Heartbeat job: cluster questions by embedding similarity (threshold 0.85), identify clusters with 3+ responses, select highest-rated Trinity response as canonical candidate
-- [ ] Editorial LLM pass: polish panels, canonicalise question, generate excerpt, cross-reference bibles for accuracy (private), flag unsupported claims
-- [ ] Auto-publish to "pending" state; flag accuracy issues for owner review
-- [ ] DB table: published_trinity_responses (question_canonical, panel_type, content_science, content_vineyard, content_craft, excerpt, status: pending/featured/suppressed, cluster_size, published_at)
-- [ ] Admin view: cluster review, promote to featured, suppress duplicates
-- [ ] Blog renders published Trinity responses under correct Trinity tab alongside manual articles
-- [ ] Duplicate suppression: skip clusters within 0.9 similarity of already-published piece
-- [ ] FreeRun: "This answer was shared with the community" badge on published Trinity panels (anonymised)
-- [ ] Monthly newsletter: Buttondown integration, auto-compose from top 3 featured pieces (one per Trinity act), 24h preview with owner approve/delay
-- [ ] Most-asked question clusters → auto-generate FAQ entries (top 10 clusters by volume)
+### Trinity content pipeline — build items [IN PROGRESS — Sprint 8 build]
+NOTE on embeddings: Forge API exposes only /v1/chat/completions (no /v1/embeddings — confirmed in server/sopEmbeddings.ts). Vector-cosine clustering is therefore not available. SUBSTITUTION: the nightly job clusters recent Free Run questions via an LLM semantic-grouping pass (group near-duplicates, emit a canonical question + member reveal IDs per cluster). Same product outcome (group 3+ similar Qs, canonicalise, suppress dupes) within platform capability. Similarity "thresholds" become LLM grouping judgement; dedupe checks canonical question against already-published pieces in the same grouping prompt.
+
+- [x] Data layer scoped: Trinity corpus = goDeeperReveals (question + 3 panels + topicTag); ratings = goDeeperFeedback; private accuracy layer = diyKnowledgeChunks
+- [x] Mark goDeeperReveals candidacy: added clustered_at / published_trinity_id columns so processed reveals aren't re-clustered
+- [x] DB table: published_trinity_responses (all spec columns) — migration 0018 applied to DB
+- [x] DB table: trinity_faq_clusters — migration 0018 applied to DB
+- [x] DB helpers in server/db.ts for the above (raw rows)
+- [x] trinityRouter.ts: owner procedures (listPending/Featured/Suppressed, statusCounts, promote, suppress, unsuppress, runNow) + public (listPublished by act, getByReveal badge, listFaq)
+- [x] Nightly Heartbeat handler /api/scheduled/trinity-cluster: pull unclustered reveals, LLM semantic-grouping → clusters of 3+, pick highest-rated reveal as canonical, editorial LLM pass, private bible accuracy cross-ref (never cited), flag unsupported claims, dedupe vs published, insert pending, mark reveals clustered (server/trinityPipeline.ts + server/scheduled/trinityCluster.ts)
+- [x] Owner digest notification via Forge notification API: "N new pieces ready — M strong candidates"
+- [x] Admin view (Trinity Review at /admin/trinity + hub tile): cluster review list, promote, suppress, restore, accuracy-flag surfacing, Run-now
+- [x] Blog renders published Trinity responses under correct Trinity tab alongside manual articles (community section, expandable 3-panel, anonymised attribution)
+- [x] FreeRun: "This answer was shared with the community" badge on published Trinity panels (anonymised)
+- [x] Monthly newsletter Heartbeat /api/scheduled/trinity-newsletter (mode=monthly compose + mode=finalize auto-send): Buttondown draft integration, auto-compose top featured (one per Trinity act), 24h owner preview with approve/skip + owner notification; Admin Newsletter panel
+- [x] Auto-FAQ: most-asked clusters → generate FAQ entries (top 10 by volume) surfaced in FAQ.tsx "Most-asked by the community" subsection
+- [x] vitest coverage for trinity pipeline (25 tests: clustering/editorial/accuracy/dedupe/newsletter pure logic + router/handler/schema contracts) — full suite 260 green, tsc clean
+- [x] Production build validated: pnpm build OK, prod server serves SPA at / (200) + /api on single $PORT — confirms publish path works (dev preview "Cannot GET /" is a dev-port artifact only)
+- [ ] Register Heartbeat crons via manus-heartbeat CLI AFTER deploy (site must be deployed first — dev sandboxes are unreachable to the scheduler)
 
 
 ## Work Mode Workflow — Cross-Pillar Bridges (Jun 2026) [COMPLETED]

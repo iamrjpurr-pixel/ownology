@@ -30,6 +30,40 @@ interface Message {
   craftPanel?: string;
 }
 
+/**
+ * CommunityBadge — anonymised "shared with the community" pill shown on a Go Deeper
+ * reveal when the Trinity pipeline has published that reveal as a community blog piece.
+ */
+function CommunityBadge({ messageId }: { messageId: string }) {
+  const revealId = parseInt(messageId, 10);
+  const { data } = trpc.trinity.getByReveal.useQuery(
+    { revealId },
+    { enabled: !isNaN(revealId) && revealId > 0 }
+  );
+  if (!data?.shared) return null;
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "0.5rem",
+        padding: "0.5rem 0.85rem",
+        borderRadius: "999px",
+        background: "color-mix(in oklch, var(--ow-amber, #C99A4B) 12%, transparent)",
+        border: "1px solid color-mix(in oklch, var(--ow-amber, #C99A4B) 35%, transparent)",
+        fontFamily: "'Lato', sans-serif",
+        fontSize: "0.78rem",
+        color: "var(--ow-amber, #9A6B2F)",
+        width: "fit-content",
+      }}
+      title="An anonymised version of this answer was published to the community blog"
+    >
+      <span aria-hidden>✦</span>
+      <span>This answer was shared with the community</span>
+    </div>
+  );
+}
+
 const CURIOSITY_CARDS = [
   { id: 1, label: "Wine Science", emoji: "🧪", desc: "Fermentation, tannins, acidity" },
   { id: 2, label: "Flavour & Aroma", emoji: "👃", desc: "Tasting notes and sensory science" },
@@ -417,6 +451,7 @@ export default function FreeRun() {
                 {/* Deep Dive triangle panels */}
                 {msg.deepDiveExpanded && (
                   <div style={{ marginTop: "1rem", display: "grid", gridTemplateColumns: "1fr", gap: "1rem" }}>
+                    <CommunityBadge messageId={msg.id} />
                     {/* Science panel */}
                     <div
                       style={{
