@@ -33,7 +33,7 @@ export default function FreeRunBridgeLink({
         display: "inline-flex",
         alignItems: "center",
         gap: "0.45rem",
-        color: "#2563EB",
+        color: "#B0741A",
         fontFamily: "'Lato', sans-serif",
         fontSize: "0.9rem",
         fontWeight: 600,

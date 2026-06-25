@@ -1,13 +1,24 @@
 /**
  * ThePress (Log) — Cellar Logbook
- * DailyMe-inspired: light background, circular progress, entry cards, soft constraints
- * Enhanced with cross-pillar bridges (Learn More, Try it now) and analytics tracking
+ * Light surface, amber Ownology brand accent, circular progress, entry cards, soft constraints.
+ * Enhanced with cross-pillar bridges (Learn More, Try it now) and analytics tracking.
+ *
+ * NOTE: This component renders ONLY its own content. The WorkModeLayout shell
+ * (top bar + bottom nav) is provided once by the route wrapper in App.tsx.
+ * Do NOT wrap this component in WorkModeLayout here — doing so duplicates the header.
  */
 
 import { useState } from "react";
-import { useLocation } from "wouter";
-import WorkModeLayout from "@/components/WorkModeLayout";
 import { SopBridgeChip } from "@/components/SopSidePanel";
+
+// ── Work Mode brand accent (amber) ───────────────────────────────────────────
+// The Work Mode app is a light surface; we use a deep amber for text/strokes so
+// it stays legible, with near-black text on solid amber fills.
+const ACCENT = "#B0741A"; // deep amber — text, strokes, active accents
+const ACCENT_HOVER = "#9A6315"; // darker amber for hover on solids
+const ACCENT_INK = "#2A1E0A"; // near-black warm ink for text on amber fills
+const ACCENT_SOFT = "#FBF3E4"; // amber-tinted surface (cards / callouts)
+const ACCENT_BORDER = "#E8D3A8"; // soft amber border
 
 // S8-C: Map The Press event types to real sop_library categories (commercial audience).
 // Event types with no relevant SOP (e.g. Pump-Over) are intentionally omitted.
@@ -74,7 +85,6 @@ const MOCK_ENTRIES: LogEntry[] = [
 ];
 
 export default function ThePress() {
-  const [, navigate] = useLocation();
   const [entries, setEntries] = useState<LogEntry[]>(MOCK_ENTRIES);
   const [batch] = useState<Batch>(MOCK_BATCH);
   const [showAddEntry, setShowAddEntry] = useState(false);
@@ -171,18 +181,61 @@ export default function ThePress() {
     window.location.href = "/free-run";
   };
 
+  const fieldStyle: React.CSSProperties = {
+    width: "100%",
+    padding: "0.875rem",
+    borderRadius: "10px",
+    border: "1px solid #E2E4E8",
+    fontFamily: "'Lato', sans-serif",
+    fontSize: "0.95rem",
+    color: "#1A1A1A",
+    boxSizing: "border-box",
+    background: "#FFFFFF",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontFamily: "'Lato', sans-serif",
+    fontSize: "0.9rem",
+    fontWeight: 600,
+    color: "#1A1A1A",
+    display: "block",
+    marginBottom: "0.5rem",
+  };
+
   return (
-    <WorkModeLayout title="The Press" activeTab="press">
-      <div style={{ padding: "1.5rem 1rem" }}>
-        {/* Batch Header */}
-        <div style={{ marginBottom: "2rem" }}>
+    <div style={{ padding: "1.5rem 1.25rem", maxWidth: "640px", margin: "0 auto", width: "100%" }}>
+      {/* Batch Header */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          gap: "1rem",
+          marginBottom: "1.75rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <span
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.72rem",
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: ACCENT,
+            }}
+          >
+            Active Batch
+          </span>
           <h2
             style={{
               fontFamily: "'Fraunces', serif",
-              fontSize: "1.5rem",
+              fontSize: "1.75rem",
               fontWeight: 700,
               color: "#1A1A1A",
-              marginBottom: "0.5rem",
+              margin: "0.35rem 0 0.4rem",
+              lineHeight: 1.1,
             }}
           >
             {batch.variety}
@@ -192,6 +245,7 @@ export default function ThePress() {
               fontFamily: "'Lato', sans-serif",
               fontSize: "0.9rem",
               color: "#666666",
+              margin: 0,
             }}
           >
             {batch.tank} • Started {batch.startDate}
@@ -201,352 +255,334 @@ export default function ThePress() {
         {/* Circular Progress Indicator */}
         <div
           style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "2rem",
+            position: "relative",
+            width: "104px",
+            height: "104px",
+            flexShrink: 0,
           }}
         >
+          <svg width="104" height="104" style={{ transform: "rotate(-90deg)" }}>
+            <circle cx="52" cy="52" r="44" fill="none" stroke="#EDEFF2" strokeWidth="8" />
+            <circle
+              cx="52"
+              cy="52"
+              r="44"
+              fill="none"
+              stroke={ACCENT}
+              strokeWidth="8"
+              strokeDasharray={`${(batch.fermentationProgress / 100) * 276.5} 276.5`}
+              strokeLinecap="round"
+              style={{ transition: "stroke-dasharray 0.3s" }}
+            />
+          </svg>
           <div
             style={{
-              position: "relative",
-              width: "120px",
-              height: "120px",
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <svg
-              width="120"
-              height="120"
-              style={{
-                transform: "rotate(-90deg)",
-              }}
-            >
-              <circle
-                cx="60"
-                cy="60"
-                r="50"
-                fill="none"
-                stroke="#E8EAED"
-                strokeWidth="8"
-              />
-              <circle
-                cx="60"
-                cy="60"
-                r="50"
-                fill="none"
-                stroke="#2563EB"
-                strokeWidth="8"
-                strokeDasharray={`${(batch.fermentationProgress / 100) * 314} 314`}
-                strokeLinecap="round"
-                style={{
-                  transition: "stroke-dasharray 0.3s",
-                }}
-              />
-            </svg>
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: "'Fraunces', serif",
-                  fontSize: "1.75rem",
-                  fontWeight: 700,
-                  color: "#2563EB",
-                }}
-              >
-                {batch.fermentationProgress}%
-              </div>
-              <div
-                style={{
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.75rem",
-                  color: "#999999",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                Fermenting
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Metrics */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "1rem",
-            marginBottom: "2rem",
-          }}
-        >
-          <div
-            style={{
-              background: "#FFFFFF",
-              border: "1px solid #E8EAED",
-              borderRadius: "12px",
-              padding: "1rem",
-              textAlign: "center",
-            }}
-          >
-            <div
-              style={{
-                fontFamily: "'Lato', sans-serif",
-                fontSize: "0.8rem",
-                color: "#999999",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Current Brix
-            </div>
             <div
               style={{
                 fontFamily: "'Fraunces', serif",
-                fontSize: "1.5rem",
+                fontSize: "1.45rem",
                 fontWeight: 700,
-                color: "#1A1A1A",
+                color: ACCENT,
+                lineHeight: 1,
               }}
             >
-              {batch.currentBrix}°
+              {batch.fermentationProgress}%
             </div>
-          </div>
-          <div
-            style={{
-              background: "#FFFFFF",
-              border: "1px solid #E8EAED",
-              borderRadius: "12px",
-              padding: "1rem",
-              textAlign: "center",
-            }}
-          >
             <div
               style={{
                 fontFamily: "'Lato', sans-serif",
-                fontSize: "0.8rem",
+                fontSize: "0.6rem",
                 color: "#999999",
                 textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                marginBottom: "0.5rem",
+                letterSpacing: "0.08em",
+                marginTop: "0.15rem",
               }}
             >
-              Status
-            </div>
-            <div
-              style={{
-                fontFamily: "'Fraunces', serif",
-                fontSize: "1rem",
-                fontWeight: 700,
-                color: "#2563EB",
-                textTransform: "capitalize",
-              }}
-            >
-              {batch.status}
+              Fermenting
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Add Entry Button */}
-        <button
-          onClick={() => {
-            trackEvent("log_entry_opened");
-            setShowAddEntry(true);
-          }}
-          style={{
-            width: "100%",
-            padding: "1rem",
-            borderRadius: "24px",
-            border: "none",
-            background: "#2563EB",
-            color: "#FFFFFF",
-            fontFamily: "'Lato', sans-serif",
-            fontSize: "0.95rem",
-            fontWeight: 600,
-            cursor: "pointer",
-            marginBottom: "2rem",
-            transition: "opacity 0.2s",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-        >
-          + Log Entry
-        </button>
-
-        {/* Cross-pillar bridge: Learn More section */}
+      {/* Metrics */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "1rem",
+          marginBottom: "1.5rem",
+        }}
+      >
         <div
           style={{
-            background: "#F0F4FF",
-            border: "1px solid #2563EB",
-            borderRadius: "12px",
-            padding: "1.25rem",
-            marginBottom: "2rem",
+            background: "#FFFFFF",
+            border: "1px solid #EDEFF2",
+            borderRadius: "14px",
+            padding: "1.1rem",
+            textAlign: "center",
           }}
         >
-          <h3
+          <div
             style={{
               fontFamily: "'Lato', sans-serif",
-              fontSize: "0.875rem",
-              fontWeight: 700,
-              color: "#2563EB",
+              fontSize: "0.72rem",
+              color: "#999999",
               textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              marginBottom: "0.75rem",
+              letterSpacing: "0.06em",
+              marginBottom: "0.5rem",
             }}
           >
-            📚 Deepen Your Knowledge
-          </h3>
-          <p
-            style={{
-              fontFamily: "'Lato', sans-serif",
-              fontSize: "0.9rem",
-              color: "#1A1A1A",
-              marginBottom: "1rem",
-              lineHeight: 1.5,
-            }}
-          >
-            Explore wine science, fermentation techniques, and pressing decisions to make better cellar choices.
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
-            <button
-              onClick={() => handleLearnMore("fermentation")}
-              style={{
-                padding: "0.75rem 1rem",
-                background: "#FFFFFF",
-                border: "1px solid #2563EB",
-                borderRadius: "8px",
-                color: "#2563EB",
-                fontFamily: "'Lato', sans-serif",
-                fontSize: "0.85rem",
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#2563EB";
-                e.currentTarget.style.color = "#FFFFFF";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "#FFFFFF";
-                e.currentTarget.style.color = "#2563EB";
-              }}
-            >
-              🧪 Fermentation Science
-            </button>
-            <button
-              onClick={() => handleTryItNow()}
-              style={{
-                padding: "0.75rem 1rem",
-                background: "#FFFFFF",
-                border: "1px solid #2563EB",
-                borderRadius: "8px",
-                color: "#2563EB",
-                fontFamily: "'Lato', sans-serif",
-                fontSize: "0.85rem",
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#2563EB";
-                e.currentTarget.style.color = "#FFFFFF";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "#FFFFFF";
-                e.currentTarget.style.color = "#2563EB";
-              }}
-            >
-              💡 Try it now
-            </button>
+            Current Brix
           </div>
-        </div>
-
-        {/* Entry History */}
-        <div>
-          <h3
+          <div
             style={{
               fontFamily: "'Fraunces', serif",
-              fontSize: "1.125rem",
+              fontSize: "1.6rem",
               fontWeight: 700,
               color: "#1A1A1A",
-              marginBottom: "1rem",
             }}
           >
-            Recent Entries
-          </h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            {entries.map((entry) => (
+            {batch.currentBrix}°
+          </div>
+        </div>
+        <div
+          style={{
+            background: "#FFFFFF",
+            border: "1px solid #EDEFF2",
+            borderRadius: "14px",
+            padding: "1.1rem",
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.72rem",
+              color: "#999999",
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+              marginBottom: "0.5rem",
+            }}
+          >
+            Status
+          </div>
+          <div
+            style={{
+              fontFamily: "'Fraunces', serif",
+              fontSize: "1.1rem",
+              fontWeight: 700,
+              color: ACCENT,
+              textTransform: "capitalize",
+            }}
+          >
+            {batch.status}
+          </div>
+        </div>
+      </div>
+
+      {/* Add Entry Button */}
+      <button
+        onClick={() => {
+          trackEvent("log_entry_opened");
+          setShowAddEntry(true);
+        }}
+        style={{
+          width: "100%",
+          padding: "1rem",
+          borderRadius: "24px",
+          border: "none",
+          background: ACCENT,
+          color: ACCENT_INK,
+          fontFamily: "'Lato', sans-serif",
+          fontSize: "0.95rem",
+          fontWeight: 700,
+          cursor: "pointer",
+          marginBottom: "1.75rem",
+          transition: "background 0.2s",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = ACCENT_HOVER)}
+        onMouseLeave={(e) => (e.currentTarget.style.background = ACCENT)}
+      >
+        + Log Entry
+      </button>
+
+      {/* Cross-pillar bridge: Learn More section */}
+      <div
+        style={{
+          background: ACCENT_SOFT,
+          border: `1px solid ${ACCENT_BORDER}`,
+          borderRadius: "14px",
+          padding: "1.35rem",
+          marginBottom: "1.75rem",
+        }}
+      >
+        <h3
+          style={{
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.78rem",
+            fontWeight: 700,
+            color: ACCENT,
+            textTransform: "uppercase",
+            letterSpacing: "0.06em",
+            marginBottom: "0.6rem",
+          }}
+        >
+          Deepen Your Knowledge
+        </h3>
+        <p
+          style={{
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.9rem",
+            color: "#5A4B33",
+            marginBottom: "1.1rem",
+            lineHeight: 1.55,
+          }}
+        >
+          Explore wine science, fermentation techniques, and pressing decisions to make better cellar choices.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+          <button
+            onClick={() => handleLearnMore("fermentation")}
+            style={{
+              padding: "0.8rem 1rem",
+              background: "#FFFFFF",
+              border: `1px solid ${ACCENT}`,
+              borderRadius: "10px",
+              color: ACCENT,
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = ACCENT;
+              e.currentTarget.style.color = ACCENT_INK;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#FFFFFF";
+              e.currentTarget.style.color = ACCENT;
+            }}
+          >
+            Fermentation Science
+          </button>
+          <button
+            onClick={() => handleTryItNow()}
+            style={{
+              padding: "0.8rem 1rem",
+              background: "#FFFFFF",
+              border: `1px solid ${ACCENT}`,
+              borderRadius: "10px",
+              color: ACCENT,
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = ACCENT;
+              e.currentTarget.style.color = ACCENT_INK;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#FFFFFF";
+              e.currentTarget.style.color = ACCENT;
+            }}
+          >
+            Try it now
+          </button>
+        </div>
+      </div>
+
+      {/* Entry History */}
+      <div>
+        <h3
+          style={{
+            fontFamily: "'Fraunces', serif",
+            fontSize: "1.2rem",
+            fontWeight: 700,
+            color: "#1A1A1A",
+            marginBottom: "1rem",
+          }}
+        >
+          Recent Entries
+        </h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
+          {entries.map((entry) => (
+            <div
+              key={entry.id}
+              style={{
+                background: "#FFFFFF",
+                border: "1px solid #EDEFF2",
+                borderLeft: `3px solid ${ACCENT}`,
+                borderRadius: "12px",
+                padding: "1.05rem 1.1rem",
+              }}
+            >
               <div
-                key={entry.id}
                 style={{
-                  background: "#FFFFFF",
-                  border: "1px solid #E8EAED",
-                  borderRadius: "12px",
-                  padding: "1rem",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "0.6rem",
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "0.75rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontFamily: "'Lato', sans-serif",
-                      fontSize: "0.9rem",
-                      fontWeight: 600,
-                      color: "#2563EB",
-                    }}
-                  >
-                    {entry.event}
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: "'Lato', sans-serif",
-                      fontSize: "0.8rem",
-                      color: "#999999",
-                    }}
-                  >
-                    {entry.date}
-                  </div>
-                </div>
-                {(entry.brix || entry.ph || entry.temp) && (
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "1rem",
-                      marginBottom: "0.75rem",
-                      fontSize: "0.85rem",
-                      color: "#666666",
-                    }}
-                  >
-                    {entry.brix && <span>Brix: {entry.brix}°</span>}
-                    {entry.ph && <span>pH: {entry.ph}</span>}
-                    {entry.temp && <span>Temp: {entry.temp}°F</span>}
-                  </div>
-                )}
                 <div
                   style={{
                     fontFamily: "'Lato', sans-serif",
-                    fontSize: "0.9rem",
-                    color: "#1A1A1A",
-                    lineHeight: 1.5,
+                    fontSize: "0.92rem",
+                    fontWeight: 700,
+                    color: ACCENT,
                   }}
                 >
-                  {entry.notes}
+                  {entry.event}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "'Lato', sans-serif",
+                    fontSize: "0.8rem",
+                    color: "#999999",
+                  }}
+                >
+                  {entry.date}
                 </div>
               </div>
-            ))}
-          </div>
+              {(entry.brix || entry.ph || entry.temp) && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "1rem",
+                    marginBottom: "0.6rem",
+                    fontSize: "0.85rem",
+                    color: "#666666",
+                  }}
+                >
+                  {entry.brix && <span>Brix: {entry.brix}°</span>}
+                  {entry.ph && <span>pH: {entry.ph}</span>}
+                  {entry.temp && <span>Temp: {entry.temp}°F</span>}
+                </div>
+              )}
+              <div
+                style={{
+                  fontFamily: "'Lato', sans-serif",
+                  fontSize: "0.9rem",
+                  color: "#1A1A1A",
+                  lineHeight: 1.5,
+                }}
+              >
+                {entry.notes}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -559,15 +595,16 @@ export default function ThePress() {
             left: "50%",
             transform: "translateX(-50%)",
             width: "100%",
-            maxWidth: "430px",
+            maxWidth: "460px",
             background: "#FFFFFF",
-            borderTop: "1px solid #E8EAED",
+            borderTop: "1px solid #EDEFF2",
             borderRadius: "20px 20px 0 0",
-            padding: "1.5rem 1rem",
+            padding: "1.5rem 1.25rem",
             paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))",
             zIndex: 50,
             maxHeight: "80vh",
             overflowY: "auto",
+            boxShadow: "0 -8px 40px rgba(0,0,0,0.12)",
           }}
         >
           <div
@@ -597,6 +634,7 @@ export default function ThePress() {
                 cursor: "pointer",
                 color: "#999999",
               }}
+              aria-label="Close"
             >
               ×
             </button>
@@ -604,30 +642,11 @@ export default function ThePress() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <div>
-              <label
-                style={{
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  color: "#1A1A1A",
-                  display: "block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                Event Type
-              </label>
+              <label style={labelStyle}>Event Type</label>
               <select
                 value={formData.event}
                 onChange={(e) => setFormData({ ...formData, event: e.target.value })}
-                style={{
-                  width: "100%",
-                  padding: "0.875rem",
-                  borderRadius: "8px",
-                  border: "1px solid #E8EAED",
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.95rem",
-                  color: "#1A1A1A",
-                }}
+                style={fieldStyle}
               >
                 <option>Measurement</option>
                 <option>Pump-Over</option>
@@ -648,129 +667,47 @@ export default function ThePress() {
             </div>
 
             <div>
-              <label
-                style={{
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  color: "#1A1A1A",
-                  display: "block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                Brix (optional)
-              </label>
+              <label style={labelStyle}>Brix (optional)</label>
               <input
                 type="number"
                 step="0.1"
                 value={formData.brix}
                 onChange={(e) => setFormData({ ...formData, brix: e.target.value })}
                 placeholder="e.g., 8.4"
-                style={{
-                  width: "100%",
-                  padding: "0.875rem",
-                  borderRadius: "8px",
-                  border: "1px solid #E8EAED",
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.95rem",
-                  color: "#1A1A1A",
-                  boxSizing: "border-box",
-                }}
+                style={fieldStyle}
               />
             </div>
 
             <div>
-              <label
-                style={{
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  color: "#1A1A1A",
-                  display: "block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                pH (optional)
-              </label>
+              <label style={labelStyle}>pH (optional)</label>
               <input
                 type="number"
                 step="0.1"
                 value={formData.ph}
                 onChange={(e) => setFormData({ ...formData, ph: e.target.value })}
                 placeholder="e.g., 3.2"
-                style={{
-                  width: "100%",
-                  padding: "0.875rem",
-                  borderRadius: "8px",
-                  border: "1px solid #E8EAED",
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.95rem",
-                  color: "#1A1A1A",
-                  boxSizing: "border-box",
-                }}
+                style={fieldStyle}
               />
             </div>
 
             <div>
-              <label
-                style={{
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  color: "#1A1A1A",
-                  display: "block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                Temperature °F (optional)
-              </label>
+              <label style={labelStyle}>Temperature °F (optional)</label>
               <input
                 type="number"
                 value={formData.temp}
                 onChange={(e) => setFormData({ ...formData, temp: e.target.value })}
                 placeholder="e.g., 68"
-                style={{
-                  width: "100%",
-                  padding: "0.875rem",
-                  borderRadius: "8px",
-                  border: "1px solid #E8EAED",
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.95rem",
-                  color: "#1A1A1A",
-                  boxSizing: "border-box",
-                }}
+                style={fieldStyle}
               />
             </div>
 
             <div>
-              <label
-                style={{
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  color: "#1A1A1A",
-                  display: "block",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                Notes
-              </label>
+              <label style={labelStyle}>Notes</label>
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Observations, actions taken..."
-                style={{
-                  width: "100%",
-                  padding: "0.875rem",
-                  borderRadius: "8px",
-                  border: "1px solid #E8EAED",
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.95rem",
-                  color: "#1A1A1A",
-                  boxSizing: "border-box",
-                  minHeight: "80px",
-                  resize: "vertical",
-                }}
+                style={{ ...fieldStyle, minHeight: "80px", resize: "vertical" }}
               />
             </div>
 
@@ -781,7 +718,7 @@ export default function ThePress() {
                   flex: 1,
                   padding: "0.875rem",
                   borderRadius: "24px",
-                  border: "1px solid #E8EAED",
+                  border: "1px solid #E2E4E8",
                   background: "#FFFFFF",
                   color: "#1A1A1A",
                   fontFamily: "'Lato', sans-serif",
@@ -799,11 +736,11 @@ export default function ThePress() {
                   padding: "0.875rem",
                   borderRadius: "24px",
                   border: "none",
-                  background: "#2563EB",
-                  color: "#FFFFFF",
+                  background: ACCENT,
+                  color: ACCENT_INK,
                   fontFamily: "'Lato', sans-serif",
                   fontSize: "0.9rem",
-                  fontWeight: 600,
+                  fontWeight: 700,
                   cursor: "pointer",
                 }}
               >
@@ -825,6 +762,7 @@ export default function ThePress() {
             alignItems: "center",
             justifyContent: "center",
             zIndex: 60,
+            padding: "1rem",
           }}
         >
           <div
@@ -832,7 +770,7 @@ export default function ThePress() {
               background: "#FFFFFF",
               borderRadius: "16px",
               padding: "1.5rem",
-              maxWidth: "320px",
+              maxWidth: "340px",
               textAlign: "center",
             }}
           >
@@ -860,9 +798,9 @@ export default function ThePress() {
             </p>
             <div
               style={{
-                background: "#F0F4FF",
-                border: "1px dashed #2563EB",
-                borderRadius: "8px",
+                background: ACCENT_SOFT,
+                border: `1px dashed ${ACCENT}`,
+                borderRadius: "10px",
                 padding: "0.75rem",
                 marginBottom: "1rem",
               }}
@@ -872,15 +810,15 @@ export default function ThePress() {
                 style={{
                   background: "none",
                   border: "none",
-                  color: "#2563EB",
+                  color: ACCENT,
                   fontFamily: "'Lato', sans-serif",
                   fontSize: "0.85rem",
-                  fontWeight: 600,
+                  fontWeight: 700,
                   cursor: "pointer",
                   textDecoration: "underline",
                 }}
               >
-                📚 Learn more about pressing decisions →
+                Learn more about pressing decisions →
               </button>
             </div>
             <div style={{ display: "flex", gap: "0.75rem" }}>
@@ -889,8 +827,8 @@ export default function ThePress() {
                 style={{
                   flex: 1,
                   padding: "0.75rem",
-                  borderRadius: "8px",
-                  border: "1px solid #E8EAED",
+                  borderRadius: "10px",
+                  border: "1px solid #E2E4E8",
                   background: "#FFFFFF",
                   color: "#1A1A1A",
                   fontFamily: "'Lato', sans-serif",
@@ -906,13 +844,13 @@ export default function ThePress() {
                 style={{
                   flex: 1,
                   padding: "0.75rem",
-                  borderRadius: "8px",
+                  borderRadius: "10px",
                   border: "none",
-                  background: "#2563EB",
-                  color: "#FFFFFF",
+                  background: ACCENT,
+                  color: ACCENT_INK,
                   fontFamily: "'Lato', sans-serif",
                   fontSize: "0.9rem",
-                  fontWeight: 600,
+                  fontWeight: 700,
                   cursor: "pointer",
                 }}
               >
@@ -922,6 +860,6 @@ export default function ThePress() {
           </div>
         </div>
       )}
-    </WorkModeLayout>
+    </div>
   );
 }

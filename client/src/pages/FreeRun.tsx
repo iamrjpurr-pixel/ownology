@@ -6,10 +6,16 @@
 
 import { useState, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
-import WorkModeLayout from "@/components/WorkModeLayout";
 import ThePressCtaCard from "@/components/ThePressCtaCard";
 import VoiceMicButton from "@/components/VoiceMicButton";
+import { getLoginUrl } from "@/const";
 import { Loader2, ChevronDown, ThumbsUp, ThumbsDown } from "lucide-react";
+
+// ── Work Mode brand accent (amber) ───────────────────────────────────────────
+const ACCENT = "#B0741A"; // deep amber — text, strokes, active accents
+const ACCENT_INK = "#2A1E0A"; // near-black warm ink for text on amber fills
+const ACCENT_SOFT = "#FBF3E4"; // amber-tinted surface
+const ACCENT_BORDER = "#E8D3A8"; // soft amber border
 
 // Lightweight analytics helper (mirrors ThePress.trackEvent)
 function trackFreeRunEvent(eventName: string, eventData?: Record<string, unknown>) {
@@ -80,6 +86,7 @@ export default function FreeRun() {
   const [expandedMessageId, setExpandedMessageId] = useState<string | null>(null);
   const [userCredits, setUserCredits] = useState<number | null>(null);
   const [questionsUsed, setQuestionsUsed] = useState<number>(0);
+  const [showSignInNudge, setShowSignInNudge] = useState(false);
 
   // tRPC queries/mutations
   const authCheckQuery = trpc.freeRun.authCheck.useQuery();
@@ -132,7 +139,13 @@ export default function FreeRun() {
   // its transcript directly without waiting for the input state to flush.
   const submitQuestion = async (question: string) => {
     const q = question.trim();
-    if (!q || !isAuthenticated || sendingRef.current) return;
+    if (!q || sendingRef.current) return;
+    // Work Mode is open: anyone can browse. Asking a question requires an account
+    // (daily limit + credits are tracked server-side), so nudge — don't hard-gate.
+    if (!isAuthenticated) {
+      setShowSignInNudge(true);
+      return;
+    }
     sendingRef.current = true;
 
     setIsLoading(true);
@@ -236,45 +249,15 @@ export default function FreeRun() {
     }
   };
 
-  if (!isAuthenticated) {
-    return (
-      <WorkModeLayout title="Ask Ownology" activeTab="ask">
-        <div style={{ padding: "2rem 1rem", textAlign: "center" }}>
-          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: "1.5rem", marginBottom: "1rem", color: "#1A1A1A" }}>
-            Sign in to explore wine
-          </h2>
-          <p style={{ color: "#666", marginBottom: "2rem" }}>
-            Create an account to unlock 3 free curiosity questions per day.
-          </p>
-          <button
-            style={{
-              padding: "0.875rem 1.5rem",
-              background: "#2563EB",
-              color: "#FFFFFF",
-              border: "none",
-              borderRadius: "24px",
-              fontFamily: "'Lato', sans-serif",
-              fontSize: "0.95rem",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            Sign In
-          </button>
-        </div>
-      </WorkModeLayout>
-    );
-  }
-
   return (
-    <WorkModeLayout title="Ask Ownology" activeTab="ask">
-      <div style={{ padding: "1.5rem 1rem" }}>
+    <>
+      <div style={{ padding: "1.5rem 1rem", maxWidth: "640px", margin: "0 auto", width: "100%" }}>
         {/* Daily limit indicator */}
         <div
           style={{
             marginBottom: "1.5rem",
             padding: "0.75rem 1rem",
-            background: "#F0F4FF",
+            background: ACCENT_SOFT,
             borderRadius: "8px",
             display: "flex",
             justifyContent: "space-between",
@@ -284,7 +267,7 @@ export default function FreeRun() {
           <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: "#1A1A1A", fontWeight: 600 }}>
             Today's Questions
           </span>
-          <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: "#2563EB", fontWeight: 700 }}>
+          <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: ACCENT, fontWeight: 700 }}>
             {questionsUsed} / 3
           </span>
         </div>
@@ -339,8 +322,8 @@ export default function FreeRun() {
                     textAlign: "center",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#F0F4FF";
-                    e.currentTarget.style.borderColor = "#2563EB";
+                    e.currentTarget.style.background = ACCENT_SOFT;
+                    e.currentTarget.style.borderColor = ACCENT;
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = "#FFFFFF";
@@ -391,8 +374,8 @@ export default function FreeRun() {
                       maxWidth: "85%",
                       padding: "0.875rem 1rem",
                       borderRadius: "12px",
-                      background: "#2563EB",
-                      color: "#FFFFFF",
+                      background: ACCENT,
+                      color: ACCENT_INK,
                       fontFamily: "'Lato', sans-serif",
                       fontSize: "0.95rem",
                       lineHeight: 1.5,
@@ -428,10 +411,10 @@ export default function FreeRun() {
                         alignItems: "center",
                         gap: "0.5rem",
                         padding: "0.5rem 1rem",
-                        background: "#F0F4FF",
-                        border: "1px solid #2563EB",
+                        background: ACCENT_SOFT,
+                        border: `1px solid ${ACCENT}`,
                         borderRadius: "20px",
-                        color: "#2563EB",
+                        color: ACCENT,
                         fontFamily: "'Lato', sans-serif",
                         fontSize: "0.85rem",
                         fontWeight: 600,
@@ -693,7 +676,7 @@ export default function FreeRun() {
                     width: "8px",
                     height: "8px",
                     borderRadius: "50%",
-                    background: "#2563EB",
+                    background: ACCENT,
                     animation: "pulse 1.5s ease-in-out infinite",
                   }}
                 />
@@ -702,7 +685,7 @@ export default function FreeRun() {
                     width: "8px",
                     height: "8px",
                     borderRadius: "50%",
-                    background: "#2563EB",
+                    background: ACCENT,
                     animation: "pulse 1.5s ease-in-out infinite 0.2s",
                   }}
                 />
@@ -711,7 +694,7 @@ export default function FreeRun() {
                     width: "8px",
                     height: "8px",
                     borderRadius: "50%",
-                    background: "#2563EB",
+                    background: ACCENT,
                     animation: "pulse 1.5s ease-in-out infinite 0.4s",
                   }}
                 />
@@ -756,13 +739,13 @@ export default function FreeRun() {
               outline: "none",
               transition: "border-color 0.2s",
             }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = "#2563EB")}
+            onFocus={(e) => (e.currentTarget.style.borderColor = ACCENT)}
             onBlur={(e) => (e.currentTarget.style.borderColor = "#E8EAED")}
           />
           <VoiceMicButton
             onTranscript={handleVoiceTranscript}
             disabled={isLoading}
-            accent="#2563EB"
+            accent={ACCENT}
             idleBg="#FFFFFF"
             idleBorder="#E8EAED"
             idleColor="#666666"
@@ -774,8 +757,8 @@ export default function FreeRun() {
               padding: "0.875rem 1.5rem",
               borderRadius: "24px",
               border: "none",
-              background: input.trim() && !isLoading ? "#2563EB" : "#E8EAED",
-              color: input.trim() && !isLoading ? "#FFFFFF" : "#999999",
+              background: input.trim() && !isLoading ? ACCENT : "#E8EAED",
+              color: input.trim() && !isLoading ? ACCENT_INK : "#999999",
               fontFamily: "'Lato', sans-serif",
               fontSize: "0.9rem",
               fontWeight: 600,
@@ -798,6 +781,77 @@ export default function FreeRun() {
           to { transform: rotate(360deg); }
         }
       `}</style>
-    </WorkModeLayout>
+
+      {/* Inline sign-in nudge (Work Mode is open; asking needs an account) */}
+      {showSignInNudge && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 60,
+            padding: "1rem",
+          }}
+          onClick={() => setShowSignInNudge(false)}
+        >
+          <div
+            style={{
+              background: "#FFFFFF",
+              borderRadius: "16px",
+              padding: "1.75rem 1.5rem",
+              maxWidth: "340px",
+              textAlign: "center",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: "1.25rem", fontWeight: 700, color: "#1A1A1A", marginBottom: "0.6rem" }}>
+              Create a free account
+            </h3>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.92rem", color: "#666", marginBottom: "1.25rem", lineHeight: 1.5 }}>
+              Browsing is open. To ask Ownology, sign in for 3 free curiosity questions a day.
+            </p>
+            <div style={{ display: "flex", gap: "0.75rem" }}>
+              <button
+                onClick={() => setShowSignInNudge(false)}
+                style={{
+                  flex: 1,
+                  padding: "0.8rem",
+                  borderRadius: "24px",
+                  border: "1px solid #E2E4E8",
+                  background: "#FFFFFF",
+                  color: "#1A1A1A",
+                  fontFamily: "'Lato', sans-serif",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Not now
+              </button>
+              <button
+                onClick={() => { window.location.href = getLoginUrl("/free-run"); }}
+                style={{
+                  flex: 1,
+                  padding: "0.8rem",
+                  borderRadius: "24px",
+                  border: "none",
+                  background: ACCENT,
+                  color: ACCENT_INK,
+                  fontFamily: "'Lato', sans-serif",
+                  fontSize: "0.9rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                Sign In
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

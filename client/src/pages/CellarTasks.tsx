@@ -4,7 +4,10 @@
  */
 
 import { useState } from "react";
-import WorkModeLayout from "@/components/WorkModeLayout";
+
+// ── Work Mode brand accent (amber) ───────────────────────────────────────────
+const ACCENT = "#B0741A"; // deep amber
+const ACCENT_INK = "#2A1E0A"; // near-black warm ink for text on amber fills
 
 interface Equipment {
   id: string;
@@ -77,8 +80,8 @@ export default function CellarTasks() {
   }).length;
 
   return (
-    <WorkModeLayout title="Cellar Tasks" activeTab="tasks">
-      <div style={{ padding: "1.5rem 1rem", background: "#F8F9FA", minHeight: "100vh" }}>
+    <>
+      <div style={{ padding: "1.5rem 1.25rem", maxWidth: "640px", margin: "0 auto", width: "100%" }}>
         {/* Dashboard Header */}
         <div style={{ marginBottom: "2rem" }}>
           <h2
@@ -138,7 +141,7 @@ export default function CellarTasks() {
                 fontFamily: "'Fraunces', serif",
                 fontSize: "1.75rem",
                 fontWeight: 700,
-                color: "#2563EB",
+                color: ACCENT,
               }}
             >
               {totalEquipment}
@@ -186,11 +189,11 @@ export default function CellarTasks() {
             padding: "1rem",
             borderRadius: "24px",
             border: "none",
-            background: "#2563EB",
-            color: "#FFFFFF",
+            background: ACCENT,
+            color: ACCENT_INK,
             fontFamily: "'Lato', sans-serif",
             fontSize: "0.95rem",
-            fontWeight: 600,
+            fontWeight: 700,
             cursor: "pointer",
             marginBottom: "2rem",
             transition: "opacity 0.2s",
@@ -244,7 +247,7 @@ export default function CellarTasks() {
                           fontFamily: "'Lato', sans-serif",
                           fontSize: "0.9rem",
                           fontWeight: 600,
-                          color: "#2563EB",
+                          color: ACCENT,
                           marginBottom: "0.25rem",
                         }}
                       >
@@ -536,11 +539,11 @@ export default function CellarTasks() {
                   padding: "0.875rem",
                   borderRadius: "24px",
                   border: "none",
-                  background: "#2563EB",
-                  color: "#FFFFFF",
+                  background: ACCENT,
+                  color: ACCENT_INK,
                   fontFamily: "'Lato', sans-serif",
                   fontSize: "0.9rem",
-                  fontWeight: 600,
+                  fontWeight: 700,
                   cursor: "pointer",
                 }}
               >
@@ -550,6 +553,6 @@ export default function CellarTasks() {
           </div>
         </div>
       )}
-    </WorkModeLayout>
+    </>
   );
 }

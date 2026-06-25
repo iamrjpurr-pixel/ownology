@@ -34,7 +34,7 @@ interface VoiceMicButtonProps {
 export default function VoiceMicButton({
   onTranscript,
   disabled = false,
-  accent = "#2563EB",
+  accent = "#B0741A",
   idleBg = "#FFFFFF",
   idleBorder = "#E8EAED",
   idleColor = "#666666",

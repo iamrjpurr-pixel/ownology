@@ -228,7 +228,7 @@ export default function WorkModeLayout({
                     background: "none",
                     border: "none",
                     cursor: "pointer",
-                    color: isActive ? "#2563EB" : "#999999",
+                    color: isActive ? "#B0741A" : "#999999",
                     transition: "color 0.15s",
                     minHeight: "60px",
                   }}
@@ -243,7 +243,7 @@ export default function WorkModeLayout({
                       fontWeight: isActive ? 600 : 400,
                       letterSpacing: "0.05em",
                       textTransform: "uppercase",
-                      color: isActive ? "#2563EB" : "#999999",
+                      color: isActive ? "#B0741A" : "#999999",
                     }}
                   >
                     {item.label}
