@@ -49,6 +49,7 @@ import Guide from "./pages/Guide";
 import Import from "./pages/Import";
 import Waitlist from "./pages/Waitlist";
 import VineReference from "./pages/VineReference";
+import Resume from "./pages/Resume";
 import WorkModeLayout from "@/components/WorkModeLayout";
 
 
@@ -185,6 +186,7 @@ function Router() {
       <Route path={"/import"} component={ImportPage} />
       <Route path={"/waitlist"} component={Waitlist} />
       <Route path={"/reference/vine"} component={VineReference} />
+      <Route path={"/resume"} component={Resume} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />

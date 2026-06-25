@@ -593,3 +593,8 @@ NOTE on embeddings: Forge API exposes only /v1/chat/completions (no /v1/embeddin
 - [x] S9-B: Free Run mic button — wired with submitQuestion(text) core, auto-submit on silence, double-send guard
 - [x] S9-B: Compliance AI mic button — replaced bespoke startVoice/alert; auto-submit via ask(transcript) (identical behaviour)
 - [x] S9-B: write vitest for voice (hook + button + both integrations) — 15 tests passing (full suite 235 green)
+
+## Resume Webpage
+
+- [x] Create web version of Richard Purr resume at /resume (brand-styled, responsive, print/PDF friendly)
+- [x] Register /resume route in App.tsx
