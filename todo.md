@@ -600,3 +600,6 @@ NOTE on embeddings: Forge API exposes only /v1/chat/completions (no /v1/embeddin
 - [x] Register /resume route in App.tsx
 
 - [x] Fix Knowledge Layers tooltip (make 5 layers clickable to filter categories by layer)
+- [x] Fix Knowledge page info button (hover → click-to-toggle on mobile)
+- [x] Improve Knowledge page mobile layout (responsive grid, spacing, button labels)
+- [x] Add home link to Ownology logo in WorkModeLayout (The Press, Free Run, Cellar Tasks)

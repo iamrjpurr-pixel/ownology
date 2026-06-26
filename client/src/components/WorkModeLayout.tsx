@@ -17,6 +17,7 @@
 
 import { useLocation } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
+import { Link } from "wouter";
 
 interface WorkModeLayoutProps {
   children: React.ReactNode;
@@ -141,7 +142,11 @@ export default function WorkModeLayout({
             zIndex: 50,
           }}
         >
-          <OwnologyLogo size={28} showWordmark={false} showIABadge={false} showTheoryCard={false} />
+          <Link href="/">
+            <button style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", alignItems: "center" }} aria-label="Back to home">
+              <OwnologyLogo size={28} showWordmark={false} showIABadge={false} showTheoryCard={false} />
+            </button>
+          </Link>
           {title && (
             <span
               style={{

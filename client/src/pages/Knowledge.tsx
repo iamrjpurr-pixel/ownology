@@ -161,6 +161,7 @@ const DIY_CATEGORIES = new Set([
 function KnowledgeHome() {
   const [search, setSearch] = useState("");
   const [layerFilter, setLayerFilter] = useState<string | null>(null);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
   const { data: allSops = [] } = trpc.knowledge.listSops.useQuery({ audience: "commercial" });
 
   const baseCategories = ALL_CATEGORIES;
@@ -205,17 +206,17 @@ function KnowledgeHome() {
         className="border-b"
         style={{ borderColor: "var(--ow-border)", background: "var(--ow-bg-base)" }}
       >
-        <div className="container py-8">
+        <div className="container py-8 px-4 md:px-6">
           <Link href="/">
             <button
-              className="flex items-center gap-2 text-sm mb-6 transition-colors"
+              className="flex items-center gap-2 text-sm mb-6 transition-colors hover:opacity-80"
               style={{ color: "var(--ow-text-lo)" }}
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Ownology
             </button>
           </Link>
-          <div className="flex items-start justify-between gap-6 flex-wrap">
+          <div className="flex items-start justify-between gap-4 md:gap-6 flex-wrap">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <BookOpen className="w-7 h-7" style={{ color: "var(--ow-amber)" }} />
@@ -230,27 +231,29 @@ function KnowledgeHome() {
                 SOPs, decision logic, vintage lessons, and training records — all in one place.
               </p>
             </div>
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-2 md:gap-3 flex-wrap">
               <Link href="/knowledge/training">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-2"
+                  className="gap-2 text-xs md:text-sm"
                   style={{ borderColor: "var(--ow-border)", color: "var(--ow-text-mid)" }}
                 >
-                  <GraduationCap className="w-4 h-4" />
-                  Training Records
+                  <GraduationCap className="w-4 h-4 flex-shrink-0" />
+                  <span className="hidden sm:inline">Training Records</span>
+                  <span className="sm:hidden">Training</span>
                 </Button>
               </Link>
               <Link href="/knowledge/vintage-debrief">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-2"
+                  className="gap-2 text-xs md:text-sm"
                   style={{ borderColor: "var(--ow-border)", color: "var(--ow-text-mid)" }}
                 >
-                  <BookMarked className="w-4 h-4" />
-                  Vintage Debrief
+                  <BookMarked className="w-4 h-4 flex-shrink-0" />
+                  <span className="hidden sm:inline">Vintage Debrief</span>
+                  <span className="sm:hidden">Debrief</span>
                 </Button>
               </Link>
             </div>
@@ -262,7 +265,7 @@ function KnowledgeHome() {
               placeholder="Search SOPs, categories, or topics…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-transparent border-white/10 text-sm max-w-sm"
+              className="bg-transparent border-white/10 text-sm flex-1 min-w-[200px] max-w-sm"
               style={{ color: "var(--ow-text-hi)" }}
             />
             <Link href="/for-home-winemakers">
@@ -284,9 +287,9 @@ function KnowledgeHome() {
       </div>
 
       {/* Category grid */}
-      <div className="container py-10">
+        <div className="container py-8 md:py-10 px-4 md:px-6">
         {/* Stats row */}
-        <div className="flex gap-8 mb-8 flex-wrap">
+          <div className="flex gap-6 md:gap-8 mb-8 flex-wrap">
           <div>
             <p className="text-2xl font-bold" style={{ fontFamily: "'Fraunces', serif", color: "var(--ow-amber)" }}>
               {baseCategories.length}
@@ -299,20 +302,25 @@ function KnowledgeHome() {
             </p>
             <p className="text-xs" style={{ color: "var(--ow-text-lo)" }}>SOPs</p>
           </div>
-          <div className="relative group">
+          <div className="relative">
             <p className="text-2xl font-bold" style={{ fontFamily: "'Fraunces', serif", color: "var(--ow-amber)" }}>5</p>
-            <p className="text-xs flex items-center gap-1 cursor-default" style={{ color: "var(--ow-text-lo)" }}>
+            <button
+              onClick={() => setTooltipOpen(!tooltipOpen)}
+              className="text-xs flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
+              style={{ color: "var(--ow-text-lo)" }}
+              aria-label="Toggle Knowledge Layers info"
+            >
               Knowledge Layers
               <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style={{ opacity: 0.5, flexShrink: 0 }}>
                 <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.1"/>
                 <path d="M6 5.5v3" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
                 <circle cx="6" cy="3.75" r="0.6" fill="currentColor"/>
               </svg>
-            </p>
+            </button>
             {/* Tooltip */}
             <div
-              className="absolute bottom-full left-0 mb-2 z-20 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-              style={{ width: "220px" }}
+              className="absolute bottom-full left-0 mb-2 z-20 pointer-events-auto transition-opacity duration-150"
+              style={{ width: "220px", opacity: tooltipOpen ? 1 : 0, pointerEvents: tooltipOpen ? "auto" : "none" }}
             >
               <div style={{
                 background: "oklch(0.14 0.008 60)",
@@ -353,14 +361,14 @@ function KnowledgeHome() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
           {filteredCategories.map((cat) => {
             const meta = CATEGORY_META[cat];
             const sopCount = allSops.filter((s) => s.category === cat).length;
             return (
               <Link key={cat} href={`/knowledge/category/${encodeURIComponent(cat)}`}>
                 <div
-                  className="rounded-lg p-5 cursor-pointer transition-all"
+                  className="rounded-lg p-5 cursor-pointer transition-all active:scale-95"
                   style={{
                     background: "var(--ow-bg-raised)",
                     border: "1px solid var(--ow-border)",
@@ -375,35 +383,35 @@ function KnowledgeHome() {
                   }}
                 >
                   <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
+                    className="w-10 h-10 rounded-lg flex items-center justify-center mb-3 flex-shrink-0"
                     style={{ background: `${meta?.color ?? "var(--ow-amber)"} / 15%`, color: meta?.color ?? "var(--ow-amber)" }}
                   >
                     {meta?.icon}
                   </div>
                   <h3
-                    className="font-semibold text-sm mb-1"
+                    className="font-semibold text-sm mb-2 line-clamp-2"
                     style={{ color: "var(--ow-text-hi)" }}
                   >
                     {cat}
                   </h3>
                   <p
-                    className="text-xs mb-3 leading-relaxed"
+                    className="text-xs mb-3 leading-relaxed line-clamp-3"
                     style={{ color: "var(--ow-text-lo)" }}
                   >
                     {meta?.description}
                   </p>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <Badge
                       variant="outline"
-                      className="text-xs"
+                      className="text-xs flex-shrink-0"
                       style={{ borderColor: "var(--ow-border)", color: "var(--ow-text-lo)" }}
                     >
                       {sopCount} SOP{sopCount !== 1 ? "s" : ""}
                     </Badge>
-                    <ChevronRight className="w-4 h-4" style={{ color: "var(--ow-text-lo)" }} />
+                    <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: "var(--ow-text-lo)" }} />
                   </div>
                   {meta?.industryRef && (
-                    <p className="text-xs mt-2" style={{ color: "var(--ow-text-lo)" }}>
+                    <p className="text-xs mt-2 line-clamp-1" style={{ color: "var(--ow-text-lo)" }}>
                       Further Study: {meta.industryRef}
                     </p>
                   )}
