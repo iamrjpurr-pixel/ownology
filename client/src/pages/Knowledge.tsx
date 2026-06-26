@@ -160,22 +160,40 @@ const DIY_CATEGORIES = new Set([
 
 function KnowledgeHome() {
   const [search, setSearch] = useState("");
+  const [layerFilter, setLayerFilter] = useState<string | null>(null);
   const { data: allSops = [] } = trpc.knowledge.listSops.useQuery({ audience: "commercial" });
 
   const baseCategories = ALL_CATEGORIES;
 
-  const filteredCategories = search.trim()
-    ? baseCategories.filter((cat) => {
-        const meta = CATEGORY_META[cat];
-        const matchCat = cat.toLowerCase().includes(search.toLowerCase());
-        const matchSop = allSops.some(
-          (s) =>
-            s.category === cat &&
-            s.title.toLowerCase().includes(search.toLowerCase())
-        );
-        return matchCat || matchSop || meta?.description.toLowerCase().includes(search.toLowerCase());
-      })
-    : baseCategories;
+  const filteredCategories = baseCategories.filter((cat) => {
+    const meta = CATEGORY_META[cat];
+    const catsOps = allSops.filter((s) => s.category === cat);
+    
+    // If layerFilter is set, only show categories with SOPs that have that layer populated
+    if (layerFilter) {
+      const hasLayer = catsOps.some((s) => {
+        if (layerFilter === "Procedure") return s.procedureText?.trim();
+        if (layerFilter === "Decision Logic") return s.decisionLogic?.trim();
+        if (layerFilter === "Tribal Knowledge") return s.tribalKnowledge?.trim();
+        if (layerFilter === "Vintage Notes") return (s as any).vintageNotes?.trim();
+        if (layerFilter === "Training") return (s as any).training?.trim();
+        return false;
+      });
+      if (!hasLayer) return false;
+    }
+    
+    // Apply search filter
+    if (search.trim()) {
+      const matchCat = cat.toLowerCase().includes(search.toLowerCase());
+      const matchSop = catsOps.some(
+        (s) => s.title.toLowerCase().includes(search.toLowerCase())
+      );
+      const matchDesc = meta?.description.toLowerCase().includes(search.toLowerCase());
+      return matchCat || matchSop || matchDesc;
+    }
+    
+    return true;
+  });
 
   return (
     <div
@@ -293,7 +311,7 @@ function KnowledgeHome() {
             </p>
             {/* Tooltip */}
             <div
-              className="absolute bottom-full left-0 mb-2 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+              className="absolute bottom-full left-0 mb-2 z-20 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity duration-150"
               style={{ width: "220px" }}
             >
               <div style={{
@@ -311,7 +329,18 @@ function KnowledgeHome() {
                   ["Vintage Notes", "What actually happened"],
                   ["Training", "How to teach it"],
                 ].map(([layer, desc], i) => (
-                  <div key={layer} style={{ marginBottom: i < 4 ? "0.375rem" : 0 }}>
+                  <div
+                    key={layer}
+                    onClick={() => setLayerFilter(layerFilter === layer ? null : layer)}
+                    style={{
+                      marginBottom: i < 4 ? "0.375rem" : 0,
+                      cursor: "pointer",
+                      padding: "0.375rem",
+                      borderRadius: "3px",
+                      background: layerFilter === layer ? "oklch(0.72 0.12 75 / 20%)" : "transparent",
+                      transition: "background 150ms",
+                    }}
+                  >
                     <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "oklch(0.88 0.015 75)", lineHeight: 1.4 }}>
                       <span style={{ color: "var(--ow-amber)", marginRight: "0.375rem", fontFamily: "'Fira Code', monospace", fontSize: "0.65rem" }}>{i + 1}.</span>
                       <strong style={{ fontWeight: 500 }}>{layer}</strong>

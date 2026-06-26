@@ -598,3 +598,5 @@ NOTE on embeddings: Forge API exposes only /v1/chat/completions (no /v1/embeddin
 
 - [x] Create web version of Richard Purr resume at /resume (brand-styled, responsive, print/PDF friendly)
 - [x] Register /resume route in App.tsx
+
+- [x] Fix Knowledge Layers tooltip (make 5 layers clickable to filter categories by layer)
