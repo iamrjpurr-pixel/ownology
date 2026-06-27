@@ -30,6 +30,17 @@
 - Embeddings endpoint: `https://integrations.emergentagent.com/llm/openai/v1/embeddings` with `text-embedding-3-small`. Exposed via `embed()` in the adapter.
 - Smoke-tested end-to-end: `freeRun.curiosityAsk` returns real, oenology-grounded answers + auto-extracted topic tags.
 
+**Cellar Journal — SEO/CTA growth engine (27 Jan 2026)**
+- New `cellar_journal` table — slug, question, full_answer, teaser_answer (~40% cutoff at paragraph boundary), diagnosis, topicTag, citations (JSON), wineType, viewCount, askedCount, featured, published.
+- Auto-persists on every `tutor.ask` and `freeRun.curiosityAsk` (fire-and-forget). Dedupe by slug → bumps askedCount instead of duplicating.
+- Topic inference via curated regex catalogue (`server/cellarJournalRouter.ts → TOPIC_KEYWORDS`) — 17 canonical topics (Stuck Fermentation, MLF, SO₂ & Sulphites, Racking & Lees, …). Rejects LLM-hallucinated chapter labels.
+- Public pages:
+  - `/cellar-journal` — editorial index, topic chip filter (with counts), live search, entry cards with diagnosis teaser.
+  - `/cellar-journal/:slug` — single entry: question headline, diagnosis pull-quote, teaser content, **wax-sealed CTA wall** (amber lock seal, "FREE 5/mo" + "$16/mo Unlock"), citations, 3 related entries from same topic.
+- SEO: per-entry JSON-LD `Article` schema with `isAccessibleForFree: false` + `hasPart` (Google flexible-sampling spec — no cloaking penalty). Full answer also rendered in off-screen `.cj-paid-content` div for crawlers. Helmet sets `<title>`, meta description, and canonical URL.
+- `cellarJournal.list` / `cellarJournal.topics` / `cellarJournal.getBySlug` tRPC procedures.
+- View counter auto-increments per pageload (fire-and-forget).
+
 **Knowledge corpus (27 Jan 2026)**
 - **38 SOPs** in `sop_library` across the canonical 12 categories (all published, all AI-authored via `gpt-5.4-mini` grounded in bible chunks, with full procedure_text + decision_logic + tribal_knowledge + quick_steps + WBS codes):
   - Harvest & Receival (3), Fermentation Management (4), Yeast & Fermentation (3),

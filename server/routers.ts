@@ -1,6 +1,7 @@
 import { z } from "zod";
 import Stripe from "stripe";
 import { freeRunRouter } from "./freeRunRouter.js";
+import { cellarJournalRouter, persistJournalEntry } from "./cellarJournalRouter.js";
 import { trinityRouter } from "./trinityRouter.js";
 import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
@@ -2509,6 +2510,20 @@ ${docContext}`;
           diyAnswer = diyRawContent;
         }
 
+        // ── Persist to Cellar Journal (fire-and-forget) ──
+        persistJournalEntry({
+          question: input.question,
+          topicTag:
+            Array.isArray(diySourceChapters) && diySourceChapters.length > 0
+              ? diySourceChapters[0]
+              : "Home Winemaking",
+          fullAnswer: diyAnswer,
+          source: "tutor.ask",
+          audience: "home_winemaker",
+          wineType: detectedWineType ?? "unknown",
+          citations: (diySourceChapters || []).map((c) => ({ label: c })),
+        }).catch((e) => console.warn("[CellarJournal] persist failed:", e?.message));
+
         return {
           answer: diyAnswer,
           sopTitles: diySourceChapters,
@@ -3049,6 +3064,7 @@ export const appRouter = router({
   vintageIntelligence: vintageIntelligenceRouter,
   wbsAdmin: wbsAdminRouter,
   freeRun: freeRunRouter,
+  cellarJournal: cellarJournalRouter,
   trinity: trinityRouter,
 });
 export type AppRouter = typeof appRouter;

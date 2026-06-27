@@ -1011,3 +1011,60 @@ export const trinityNewsletterDrafts = mysqlTable(
     index("tnd_preview_until_idx").on(t.previewUntil),
   ]
 );
+
+
+/**
+ * Cellar Journal — public, SEO-indexable Q&A entries.
+ *
+ * Every time the AI tutor or Free Run answers a question, we persist a
+ * canonicalised version here. The public site renders a teaser (~40% of the
+ * answer) with a wax-sealed wall and CTA to upgrade. Googlebot is given the
+ * full answer marked with `isAccessibleForFree: false` + `hasPart` (per
+ * Google's flexible sampling spec) so we avoid cloaking while still gating
+ * the body for human visitors.
+ */
+export const cellarJournal = mysqlTable(
+  "cellar_journal",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    // URL slug — derived from question + topicTag, unique
+    slug: varchar("slug", { length: 200 }).notNull().unique(),
+    // The question as displayed (cleaned, sentence-cased)
+    question: varchar("question", { length: 500 }).notNull(),
+    // Topic tag from Free Run / tutor (e.g. "Stuck Fermentation", "MLF")
+    topicTag: varchar("topic_tag", { length: 100 }).notNull(),
+    // Full markdown answer (what Google sees)
+    fullAnswer: text("full_answer").notNull(),
+    // Teaser — first ~40% of the answer (what humans see before the wall)
+    teaserAnswer: text("teaser_answer").notNull(),
+    // Diagnosis sentence — the "first finding" before the procedural part
+    diagnosis: varchar("diagnosis", { length: 600 }),
+    // Source — which procedure generated this ('tutor.ask', 'freeRun.curiosityAsk')
+    source: varchar("source", { length: 50 }).notNull(),
+    // Audience this Q targeted ('home_winemaker', 'commercial', 'curious')
+    audience: varchar("audience", { length: 30 }),
+    // Citations — JSON array of {label, source_doc, chapter} pulled from chunks
+    citations: text("citations"), // JSON string
+    // Wine type if detected
+    wineType: mysqlEnum("wine_type", ["red", "white", "both", "unknown"])
+      .notNull()
+      .default("unknown"),
+    // Engagement metrics
+    viewCount: int("view_count").notNull().default(0),
+    askedCount: int("asked_count").notNull().default(1),
+    // Curation
+    featured: boolean("featured").notNull().default(false),
+    published: boolean("published").notNull().default(true),
+    // Timestamps (epoch ms)
+    firstAskedAt: bigint("first_asked_at", { mode: "number" }).notNull(),
+    lastAskedAt: bigint("last_asked_at", { mode: "number" }).notNull(),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("cj_topic_idx").on(t.topicTag),
+    index("cj_published_idx").on(t.published, t.lastAskedAt),
+    index("cj_featured_idx").on(t.featured, t.lastAskedAt),
+    index("cj_views_idx").on(t.viewCount),
+  ]
+);

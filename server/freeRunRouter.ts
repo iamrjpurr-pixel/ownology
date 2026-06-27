@@ -42,6 +42,7 @@ function todayUTC(): string {
 }
 
 import { chatCompletion, MODELS } from "./_core/llm.js";
+import { persistJournalEntry } from "./cellarJournalRouter.js";
 
 async function callLLM(messages: { role: "system" | "user" | "assistant"; content: string }[]) {
   return chatCompletion(messages, { model: MODELS.PREMIUM, maxTokens: 1500 });
@@ -152,6 +153,15 @@ If the question is about making wine commercially or winemaking technique, respo
           updatedAt: now,
         });
       }
+
+      // ── Persist to Cellar Journal (fire-and-forget) ──
+      persistJournalEntry({
+        question: input.question,
+        topicTag: topicTag || "Wine Curiosity",
+        fullAnswer: answer,
+        source: "freeRun.curiosityAsk",
+        audience: "curious",
+      }).catch((e) => console.warn("[CellarJournal] persist failed:", e?.message));
 
       return {
         answer,

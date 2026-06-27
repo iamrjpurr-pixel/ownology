@@ -45,6 +45,7 @@ import BuildIndex from "./pages/BuildIndex";
 import Vineyard from "./pages/Vineyard";
 import PwaInstallBanner from "./components/PwaInstallBanner";
 import Knowledge from "./pages/Knowledge";
+import { CellarJournalIndex, CellarJournalEntry } from "./pages/CellarJournal";
 import Guide from "./pages/Guide";
 import Import from "./pages/Import";
 import Waitlist from "./pages/Waitlist";
@@ -153,6 +154,10 @@ function Router() {
       <Route path={"/for-home-winemakers/knowledge/*"} component={DIYKnowledge} />
       <Route path={"/blog"} component={Blog} />
       <Route path={"/blog/:slug"} component={BlogArticle} />
+      <Route path={"/cellar-journal"} component={CellarJournalIndex} />
+      <Route path={"/cellar-journal/:slug"}>
+        {(params) => <CellarJournalEntry slug={params.slug} />}
+      </Route>
       <Route path={"/regulations"} component={RegulatoryLinks} />
       <Route path={"/regulations/detail"} component={Regulations} />
       <Route path={"/resources"} component={RegulatoryLinks} />
