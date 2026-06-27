@@ -14,7 +14,7 @@ import { regulationMonitorHandler } from "./scheduled/regulationMonitor.js";
 import { fermentationWatchHandler } from "./scheduled/fermentationWatch.js";
 import { trinityClusterHandler } from "./scheduled/trinityCluster.js";
 import { trinityNewsletterHandler } from "./scheduled/trinityNewsletter.js";
-import { cellarJournalSitemapHandler, robotsTxtHandler } from "./sitemap.js";
+import { cellarJournalSitemapHandler, robotsTxtHandler, cellarJournalRssHandler } from "./sitemap.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,9 +37,10 @@ async function startServer() {
   app.post("/api/scheduled/trinity-cluster", express.json(), trinityClusterHandler);
   app.post("/api/scheduled/trinity-newsletter", express.json(), trinityNewsletterHandler);
 
-  // ── SEO: sitemap + robots ────────────────────────────────────────────────────
+  // ── SEO: sitemap + robots + RSS ──────────────────────────────────────────────
   app.get("/api/cellar-journal/sitemap.xml", cellarJournalSitemapHandler);
   app.get("/api/sitemap.xml", cellarJournalSitemapHandler);
+  app.get("/api/cellar-journal/rss.xml", cellarJournalRssHandler);
   app.get("/api/robots.txt", robotsTxtHandler);
 
   // ── JSON body parser ─────────────────────────────────────────────────────────

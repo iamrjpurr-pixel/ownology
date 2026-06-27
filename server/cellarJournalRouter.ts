@@ -241,8 +241,67 @@ export async function persistJournalEntry(opts: {
     createdAt: now,
     updatedAt: now,
   });
+  const id = Number(result[0].insertId);
 
-  return { id: Number(result[0].insertId), slug, isNew: true };
+  // 4) Fire outbound webhook for NEW canonical entries (zapier/n8n/make/discord/slack)
+  fireSocialWebhook({
+    event: "new_entry",
+    slug,
+    url: `${process.env.PUBLIC_SITE_URL ?? "https://ownology.ai"}/cellar-journal/${slug}`,
+    question: cleanQ,
+    topic,
+    diagnosis,
+    teaser: teaser.slice(0, 280),
+    fullLength: opts.fullAnswer.length,
+    askedCount: 1,
+    socialDraft: composeSocialDraft(cleanQ, diagnosis, topic, slug),
+  }).catch(() => {});
+
+  return { id, slug, isNew: true };
+}
+
+/* -- outbound social webhook + draft composer ----------------------------- */
+
+/** Compose a short social-ready paragraph + link for the entry. */
+export function composeSocialDraft(
+  question: string,
+  diagnosis: string | undefined,
+  topic: string,
+  slug: string
+): { twitter: string; linkedin: string; markdown: string } {
+  const origin = process.env.PUBLIC_SITE_URL ?? "https://ownology.ai";
+  const url = `${origin}/cellar-journal/${slug}`;
+  const lead = diagnosis ?? `A question every winemaker faces — answered.`;
+
+  // Twitter/X — under 280 chars including URL (URL counts as 23)
+  const tHook = `🍷 New in the Cellar Journal: "${question}"`;
+  const tBody = lead.slice(0, 280 - tHook.length - 25 - 8);
+  const twitter = `${tHook}\n\n${tBody}\n\n→ ${url}`.slice(0, 280);
+
+  // LinkedIn — longer form, 1-2 paragraphs, conversational
+  const linkedin = `Cellar floor question of the week:\n\n"${question}"\n\n${lead}\n\nFull answer (cited from the Red & White Wine Bibles): ${url}\n\n#winemaking #${topic.replace(/[^a-z0-9]/gi, "")} #ownology #cellarjournal`;
+
+  // Markdown for newsletters / Discord / Slack / Reddit
+  const markdown = `**${question}**\n\n${lead}\n\n[Read the full answer →](${url})`;
+
+  return { twitter, linkedin, markdown };
+}
+
+/** Fire an outbound JSON payload to a configured webhook (Zapier/Make/n8n/Discord/Slack).
+ *  The user wires the social posting on their side — we just emit clean events. */
+async function fireSocialWebhook(payload: Record<string, unknown>): Promise<void> {
+  const url = process.env.CELLAR_JOURNAL_WEBHOOK_URL;
+  if (!url) return; // no webhook configured → silent no-op
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    console.log(`[CellarJournal] webhook fired: ${payload.event} ${payload.slug}`);
+  } catch (e) {
+    console.warn("[CellarJournal] webhook failed:", (e as Error).message);
+  }
 }
 
 /* -- public router ------------------------------------------------------- */
