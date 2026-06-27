@@ -21,14 +21,17 @@ import { toast } from "sonner";
 // Categories with no clear curiosity counterpart are omitted (no link shown).
 const CATEGORY_FREE_RUN_TOPIC: Record<string, string> = {
   "Fermentation Management": "Fermentation Chemistry",
-  "Crushing & Fermentation": "Fermentation Chemistry",
-  "Laboratory Testing": "Wine Analysis",
-  "Cleaning & Sanitation": "Microbiology & Sanitation",
-  "Tank Cleaning & Sanitation": "Microbiology & Sanitation",
-  "Pressing & Juice Handling": "How Wine Is Made",
-  "Bottling Procedures": "Packaging & Ageing",
+  "Yeast & Fermentation": "Fermentation Chemistry",
+  "SO₂ Management": "Wine Analysis",
+  "Malolactic Fermentation": "Fermentation Chemistry",
+  "Racking & Clarification": "How Wine Is Made",
+  "Additions & Chemistry": "Wine Analysis",
+  "Harvest & Receival": "How Wine Is Made",
+  "Pressing & Free-Run": "How Wine Is Made",
   "Bottling & Packaging": "Packaging & Ageing",
-  "Barrel Management": "Oak & Ageing",
+  "Sanitation & Equipment": "Microbiology & Sanitation",
+  "Fault Diagnosis": "Wine Analysis",
+  "Laboratory Testing": "Wine Analysis",
 };
 import {
   BookOpen,
@@ -61,89 +64,89 @@ const CATEGORY_META: Record<string, {
   industryRef: string;
   description: string;
 }> = {
+  "Harvest & Receival": {
+    label: "Harvest & Receival",
+    icon: <Wine className="w-6 h-6" />,
+    color: "oklch(0.62 0.12 30)",
+    industryRef: "Oenology 1 · Oenology 2",
+    description: "Harvest decision, sampling, fruit reception, sorting, and pre-fermentation handling.",
+  },
   "Fermentation Management": {
     label: "Fermentation Management",
     icon: <FlaskConical className="w-6 h-6" />,
     color: "var(--ow-amber)",
     industryRef: "Oenology 2 · Oenology 4",
-    description: "Yeast selection, YAN management, temperature control, cap management, and stuck ferment response.",
+    description: "Red and white ferment management, temperature, cap management, and extraction strategy.",
   },
-  "Tank Cleaning & Sanitation": {
-    label: "Tank Cleaning & Sanitation",
-    icon: <Droplets className="w-6 h-6" />,
-    color: "oklch(0.65 0.10 220)",
-    industryRef: "Oenology 2 · Oenology 3",
-    description: "Pre-vintage CIP, post-ferment tank clean, barrel sanitation, hose and pump sanitation.",
-  },
-  "Barrel Management": {
-    label: "Barrel Management",
-    icon: <Wine className="w-6 h-6" />,
-    color: "oklch(0.60 0.10 30)",
-    industryRef: "Oenology 8 · Oenology 7",
-    description: "Topping schedules, barrel inspection, cooper selection criteria, and barrel retirement.",
-  },
-  "Bottling Procedures": {
-    label: "Bottling Procedures",
-    icon: <Package className="w-6 h-6" />,
-    color: "oklch(0.65 0.10 160)",
-    industryRef: "Oenology 8",
-    description: "Bottling line setup, fill level and headspace, closure selection, label verification, finished goods release.",
-  },
-  "Laboratory Testing": {
-    label: "Laboratory Testing",
-    icon: <TestTube className="w-6 h-6" />,
-    color: "oklch(0.65 0.10 280)",
-    industryRef: "Oenology 3 · Oenology 6",
-    description: "Sampling procedures, pH and TA measurement, Brix/SG, free SO₂, YAN, and VA analysis.",
-  },
-  "Vintage Worker Onboarding": {
-    label: "Vintage Worker Onboarding",
-    icon: <Users className="w-6 h-6" />,
-    color: "oklch(0.65 0.10 340)",
-    industryRef: "Oenology 1 · Oenology 4",
-    description: "Site induction, safety induction, role-specific training, and end-of-vintage debrief.",
-  },
-  "Food Safety & Compliance": {
-    label: "Food Safety & Compliance",
-    icon: <ShieldCheck className="w-6 h-6" />,
-    color: "oklch(0.65 0.10 120)",
-    industryRef: "Oenology 3 · Oenology 6",
-    description: "HACCP critical control points, allergen management, traceability, corrective actions, and document control.",
-  },
-  "Traceability": {
-    label: "Traceability",
-    icon: <Barcode className="w-6 h-6" />,
-    color: "oklch(0.65 0.10 200)",
-    industryRef: "Oenology 4 · Oenology 8",
-    description: "Grape receival records, addition records, blending records, packaging records, and export movement advice.",
-  },
-  "Crushing & Fermentation": {
-    label: "Crushing & Fermentation",
+  "Yeast & Fermentation": {
+    label: "Yeast & Fermentation",
     icon: <FlaskConical className="w-6 h-6" />,
-    color: "oklch(0.62 0.10 55)",
-    industryRef: "Oenology 2 · Oenology 5",
-    description: "Grape receival, crusher-destemmer setup, press operation, juice settling, and inoculation protocols.",
+    color: "oklch(0.65 0.12 80)",
+    industryRef: "Oenology 4",
+    description: "Strain selection, rehydration and inoculation, YAN management and DAP additions.",
   },
-  "Cleaning & Sanitation": {
-    label: "Cleaning & Sanitation",
+  "SO₂ Management": {
+    label: "SO₂ Management",
     icon: <Droplets className="w-6 h-6" />,
-    color: "oklch(0.62 0.10 195)",
-    industryRef: "Oenology 2 · Oenology 3",
-    description: "General winery cleaning schedules, chemical handling, CIP procedures, and hygiene verification.",
+    color: "oklch(0.65 0.12 220)",
+    industryRef: "Oenology 3 · Oenology 6",
+    description: "SO₂ at the crush, post-MLF adjustment, and free vs molecular SO₂ calculation.",
   },
-  "Pressing & Juice Handling": {
-    label: "Pressing & Juice Handling",
+  "Malolactic Fermentation": {
+    label: "Malolactic Fermentation",
+    icon: <FlaskConical className="w-6 h-6" />,
+    color: "oklch(0.62 0.12 120)",
+    industryRef: "Oenology 4 · Oenology 5",
+    description: "MLF management, inoculation strategy, and co-inoculation with primary yeast.",
+  },
+  "Pressing & Free-Run": {
+    label: "Pressing & Free-Run",
     icon: <Wine className="w-6 h-6" />,
     color: "oklch(0.62 0.10 15)",
     industryRef: "Oenology 2 · Oenology 5",
-    description: "Press cycle selection, free-run and pressings separation, juice clarification, and SO₂ additions at crush.",
+    description: "Press cycle selection, free-run vs press-run separation, and whole-bunch pressing.",
+  },
+  "Racking & Clarification": {
+    label: "Racking & Clarification",
+    icon: <Droplets className="w-6 h-6" />,
+    color: "oklch(0.65 0.10 200)",
+    industryRef: "Oenology 5 · Oenology 6",
+    description: "Racking off gross lees, bâtonnage, cold stabilisation, and protein fining.",
+  },
+  "Additions & Chemistry": {
+    label: "Additions & Chemistry",
+    icon: <TestTube className="w-6 h-6" />,
+    color: "oklch(0.65 0.10 280)",
+    industryRef: "Oenology 3 · Oenology 6",
+    description: "Acid and sugar adjustment, tannin and oak programme decisions.",
   },
   "Bottling & Packaging": {
     label: "Bottling & Packaging",
     icon: <Package className="w-6 h-6" />,
     color: "oklch(0.62 0.10 145)",
     industryRef: "Oenology 8",
-    description: "Line preparation, fill height and headspace, closure application, label compliance, and finished goods dispatch.",
+    description: "Pre-bottling filtration, line setup, closure selection, and finished goods release.",
+  },
+  "Sanitation & Equipment": {
+    label: "Sanitation & Equipment",
+    icon: <ShieldCheck className="w-6 h-6" />,
+    color: "oklch(0.65 0.10 160)",
+    industryRef: "Oenology 2 · Oenology 3",
+    description: "Tank cleaning, barrel topping, hose/pump hygiene and CIP best practice.",
+  },
+  "Fault Diagnosis": {
+    label: "Fault Diagnosis",
+    icon: <Brain className="w-6 h-6" />,
+    color: "oklch(0.60 0.14 30)",
+    industryRef: "Oenology 5 · Oenology 6",
+    description: "Stuck ferments, Brettanomyces, volatile acidity, and reductive fault response.",
+  },
+  "Laboratory Testing": {
+    label: "Laboratory Testing",
+    icon: <TestTube className="w-6 h-6" />,
+    color: "oklch(0.65 0.10 280)",
+    industryRef: "Oenology 3 · Oenology 6",
+    description: "Brix/SG monitoring, pH and TA, bench trials for fining and acid adjustment.",
   },
 };
 
@@ -152,8 +155,10 @@ const ALL_CATEGORIES = Object.keys(CATEGORY_META);
 // Categories that contain DIY home winemaker SOPs
 const DIY_CATEGORIES = new Set([
   "Fermentation Management",
-  "Tank Cleaning & Sanitation",
-  "Bottling Procedures",
+  "Yeast & Fermentation",
+  "Malolactic Fermentation",
+  "Sanitation & Equipment",
+  "Bottling & Packaging",
 ]);
 
 // ─── Knowledge Home ───────────────────────────────────────────────────────────

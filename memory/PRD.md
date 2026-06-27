@@ -31,12 +31,17 @@
 - Smoke-tested end-to-end: `freeRun.curiosityAsk` returns real, oenology-grounded answers + auto-extracted topic tags.
 
 **Knowledge corpus (27 Jan 2026)**
-- 7 SOPs in `sop_library` (`seed-sops.mjs`)
-- 213 bible chunks in `diy_knowledge_chunks`:
+- **38 SOPs** in `sop_library` across the canonical 12 categories (all published, all AI-authored via `gpt-5.4-mini` grounded in bible chunks, with full procedure_text + decision_logic + tribal_knowledge + quick_steps + WBS codes):
+  - Harvest & Receival (3), Fermentation Management (4), Yeast & Fermentation (3),
+    SO₂ Management (3), Malolactic Fermentation (2), Pressing & Free-Run (3),
+    Racking & Clarification (4), Additions & Chemistry (4), Bottling & Packaging (3),
+    Sanitation & Equipment (3), Fault Diagnosis (3), Laboratory Testing (3).
+  - Seed script: `scripts/seed-38-sops.mjs` (idempotent — re-runs UPDATE, doesn't dup).
+- **213 bible chunks** in `diy_knowledge_chunks`:
   - Red Wine Bible (MoreWine! / Shea AJ Comfort, 74p) — 102 chunks, 25 published (Domain-4 fermentation)
   - White Wine Bible (MoreWine! 2009 edition, 92p) — 104 chunks, 17 published
   - MoreWine Red Outline (3p quick-ref) — 7 chunks, all published
-- Used by the **DIY home-winemaker tutor** (`tutor.ask` mode=`home_winemaker`) via keyword + colloquial routing → top chunks injected into prompt. Verified end-to-end: a "stuck at 1.020" question returns a 23L-batch-scaled answer that quotes the bibles directly.
+- Frontend `Knowledge.tsx` `CATEGORY_META` + `CATEGORY_FREE_RUN_TOPIC` + `DIY_CATEGORIES` updated to the canonical 12 (was showing 12 stale hardcoded categories that didn't match DB).
 
 **Stubbed / disabled (awaiting user decision)**
 - Stripe — env contains `sk_test_stub` / `whsec_stub`. Merch checkout won't process real payments.
