@@ -20,7 +20,15 @@
 - Schema fixes: `barrels.format` enum → varchar(64) (drizzle-kit enum-with-paren bug); `regulation_monitor_seen.publication_url` varchar(1024) → varchar(512) (utf8mb4 key-length limit)
 
 **Auth (current)**
-- Manus OAuth removed. `protectedProcedure` falls back to a seed admin user (`DEV_BYPASS_USER` — id `seed-owner-001`) when `NODE_ENV !== "production"`. Per-user decisions deferred.
+- Manus OAuth removed. `protectedProcedure` falls back to a seed admin user (`DEV_BYPASS_USER` — id `seed-owner-001`) when `NODE_ENV !== "production"`. The user has been INSERTed into `users` table (id=1). Note: the `freeRun.authCheck` public procedure still reports `isAuthenticated: false` for unauthenticated browser sessions, so the UI shows a "Create account" modal. Backend API works without auth via curl/server-side.
+
+**LLM (wired 27 Jan 2026 — hybrid)**
+- All traffic routes through Emergent Universal LLM Key proxy at `https://integrations.emergentagent.com/llm/`.
+- **Premium tier** (`claude-sonnet-4-6`) — explicit calls from `server/_core/llm.ts` adapter. Used by `freeRunRouter.ts` user-facing answers (`callLLM`, `callLLMJson`).
+- **Cheap tier** (`gpt-5.4-mini`) — default for every other call site. Wired transparently via a `fetch` shim in `server/_core/forgeShim.ts` that intercepts POSTs to `…/chat/completions`, injects a `model` field if missing, and rewrites `max_tokens` → `max_completion_tokens` for GPT-5 family.
+- Existing `BUILT_IN_FORGE_API_URL` / `BUILT_IN_FORGE_API_KEY` env vars now point at the Emergent proxy — zero changes needed to the ~30 call sites in `routers.ts`, `queryRouter.ts`, `sopEmbeddings.ts`, `trinityPipeline.ts`, `complianceKnowledgeBase.ts`, and scheduled jobs.
+- Embeddings endpoint: `https://integrations.emergentagent.com/llm/openai/v1/embeddings` with `text-embedding-3-small`. Exposed via `embed()` in the adapter.
+- Smoke-tested end-to-end: `freeRun.curiosityAsk` returns real, oenology-grounded answers + auto-extracted topic tags.
 
 **Stubbed / disabled (awaiting user decision)**
 - Stripe — env contains `sk_test_stub` / `whsec_stub`. Merch checkout won't process real payments.
@@ -39,8 +47,10 @@
 
 ## Backlog / Next actions
 **P0 — finish the import**
-- [ ] Pick **LLM model** (Claude Sonnet 4.6 / GPT‑5.2 / Gemini 3 Pro) and wire via Emergent Universal LLM key → unlocks Free Run, Compliance, Trinity pipelines.
-- [ ] Pick **auth direction** (Emergent Google login / JWT email-password / keep dev bypass) and replace stubbed OAuth.
+- [x] ~~Pick LLM model and wire~~ → DONE (claude-sonnet-4-6 + gpt-5.4-mini hybrid).
+- [ ] Decide if the "Create account" modal blocking Free Run/Press in the browser should be auto-bypassed in dev (quick fix: make `authCheck` return `isAuthenticated: true` when bypass is active).
+- [ ] Drop the **Guide to Red Winemaking** + **White Wine Bible** PDFs into `/app/references/` so I can chunk + embed them into `diy_knowledge_chunks`.
+- [ ] Pick **real auth direction** (Emergent Google login / JWT email-password / keep dev bypass).
 - [ ] Pick **storage** (Cloudinary or skip) — only needed if file uploads matter near-term.
 - [ ] Pick **Stripe** (Emergent test key vs own keys) — only needed for merch / pricing flows.
 - [ ] Seed the remaining 31 SOPs to reach the 38 advertised (current scripts only ship 7).

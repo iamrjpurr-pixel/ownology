@@ -41,32 +41,15 @@ function todayUTC(): string {
   return new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
 }
 
+import { chatCompletion, MODELS } from "./_core/llm.js";
+
 async function callLLM(messages: { role: "system" | "user" | "assistant"; content: string }[]) {
-  const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
-  const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
-  if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
-  const resp = await fetch(`${forgeUrl}/v1/chat/completions`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
-    body: JSON.stringify({ messages, stream: false }),
-  });
-  if (!resp.ok) throw new Error(`LLM error: ${resp.status}`);
-  const data = await resp.json();
-  return (data.choices?.[0]?.message?.content ?? "") as string;
+  return chatCompletion(messages, { model: MODELS.PREMIUM, maxTokens: 1500 });
 }
 
 async function callLLMJson(messages: { role: "system" | "user" | "assistant"; content: string }[]) {
-  const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
-  const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
-  if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
-  const resp = await fetch(`${forgeUrl}/v1/chat/completions`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
-    body: JSON.stringify({ messages, stream: false, response_format: { type: "json_object" } }),
-  });
-  if (!resp.ok) throw new Error(`LLM error: ${resp.status}`);
-  const data = await resp.json();
-  return (data.choices?.[0]?.message?.content ?? "{}") as string;
+  const out = await chatCompletion(messages, { model: MODELS.PREMIUM, json: true, maxTokens: 1500 });
+  return out || "{}";
 }
 
 // ─── Router ──────────────────────────────────────────────────────────────────

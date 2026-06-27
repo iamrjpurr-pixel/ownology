@@ -1,4 +1,5 @@
 import "dotenv/config";
+import "./_core/forgeShim.js";
 import express from "express";
 import { createServer } from "http";
 import path from "path";
