@@ -63,9 +63,9 @@ async function startServer() {
     res.sendFile(path.join(staticPath, "index.html"));
   });
 
-  const port = process.env.PORT || 3000;
-  server.listen(port, () => {
-    console.log(`[server] Running on http://localhost:${port}/`);
+  const port = Number(process.env.PORT) || 8001;
+  server.listen(port, "0.0.0.0", () => {
+    console.log(`[server] Running on http://0.0.0.0:${port}/`);
   });
 }
 

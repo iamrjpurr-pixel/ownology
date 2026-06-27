@@ -469,7 +469,7 @@ export const regulationMonitorSeen = mysqlTable(
   {
     id: int("id").autoincrement().primaryKey(),
     // Unique identifier for the publication — typically the URL or a stable ID
-    publicationUrl: varchar("publication_url", { length: 1024 }).notNull().unique(),
+    publicationUrl: varchar("publication_url", { length: 512 }).notNull().unique(),
     // Human-readable title of the publication
     title: varchar("title", { length: 512 }).notNull(),
     // Source feed (e.g. "FSANZ", "WineAustralia", "legislation.gov.au")
@@ -507,13 +507,7 @@ export const barrels = mysqlTable(
       .notNull()
       .default("French"),
     // Barrel format
-    format: mysqlEnum("format", [
-      "Barrique (225L)",
-      "Hogshead (300L)",
-      "Puncheon (500L)",
-      "Foudre (>500L)",
-      "Other",
-    ])
+    format: varchar("format", { length: 64 })
       .notNull()
       .default("Barrique (225L)"),
     // Age in years at time of first fill (0 = new oak)
