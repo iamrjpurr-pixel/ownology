@@ -30,6 +30,14 @@
 - Embeddings endpoint: `https://integrations.emergentagent.com/llm/openai/v1/embeddings` with `text-embedding-3-small`. Exposed via `embed()` in the adapter.
 - Smoke-tested end-to-end: `freeRun.curiosityAsk` returns real, oenology-grounded answers + auto-extracted topic tags.
 
+**Knowledge corpus (27 Jan 2026)**
+- 7 SOPs in `sop_library` (`seed-sops.mjs`)
+- 213 bible chunks in `diy_knowledge_chunks`:
+  - Red Wine Bible (MoreWine! / Shea AJ Comfort, 74p) — 102 chunks, 25 published (Domain-4 fermentation)
+  - White Wine Bible (MoreWine! 2009 edition, 92p) — 104 chunks, 17 published
+  - MoreWine Red Outline (3p quick-ref) — 7 chunks, all published
+- Used by the **DIY home-winemaker tutor** (`tutor.ask` mode=`home_winemaker`) via keyword + colloquial routing → top chunks injected into prompt. Verified end-to-end: a "stuck at 1.020" question returns a 23L-batch-scaled answer that quotes the bibles directly.
+
 **Stubbed / disabled (awaiting user decision)**
 - Stripe — env contains `sk_test_stub` / `whsec_stub`. Merch checkout won't process real payments.
 - Forge storage — Manus' proprietary blob store stubbed; any file-upload feature will fail.
