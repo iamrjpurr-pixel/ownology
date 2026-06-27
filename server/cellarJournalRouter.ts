@@ -428,4 +428,83 @@ export const cellarJournalRouter = router({
 
       return { entry: { ...row, citations, variants }, related };
     }),
+
+  /** Trending — top-asked entries from the last N days. Used for "Trending"
+   *  rail on the index, and as the source for the weekly social digest. */
+  trending: publicProcedure
+    .input(
+      z
+        .object({
+          windowDays: z.number().min(1).max(90).default(7),
+          limit: z.number().min(1).max(20).default(5),
+        })
+        .default({})
+    )
+    .query(async ({ input }) => {
+      const cj = schema.cellarJournal;
+      const since = Date.now() - input.windowDays * 86400_000;
+      const rows = await db
+        .select({
+          slug: cj.slug,
+          question: cj.question,
+          topicTag: cj.topicTag,
+          diagnosis: cj.diagnosis,
+          askedCount: cj.askedCount,
+          viewCount: cj.viewCount,
+          lastAskedAt: cj.lastAskedAt,
+        })
+        .from(cj)
+        .where(and(eq(cj.published, true), sql`${cj.lastAskedAt} >= ${since}`))
+        .orderBy(desc(cj.askedCount), desc(cj.viewCount), desc(cj.lastAskedAt))
+        .limit(input.limit);
+      return rows;
+    }),
+
+  /** Weekly digest — pre-composed social-ready text for the top entries.
+   *  Paste straight into LinkedIn, X, Reddit, Mastodon, Bluesky, or feed
+   *  into Zapier/n8n via the outbound webhook. */
+  weeklyDigest: publicProcedure
+    .input(
+      z.object({ windowDays: z.number().min(1).max(90).default(7) }).default({})
+    )
+    .query(async ({ input }) => {
+      const cj = schema.cellarJournal;
+      const since = Date.now() - input.windowDays * 86400_000;
+      const rows = await db
+        .select({
+          slug: cj.slug,
+          question: cj.question,
+          topicTag: cj.topicTag,
+          diagnosis: cj.diagnosis,
+          askedCount: cj.askedCount,
+        })
+        .from(cj)
+        .where(and(eq(cj.published, true), sql`${cj.lastAskedAt} >= ${since}`))
+        .orderBy(desc(cj.askedCount), desc(cj.viewCount))
+        .limit(5);
+
+      const drafts = rows.map((r) => ({
+        ...r,
+        social: composeSocialDraft(r.question, r.diagnosis ?? undefined, r.topicTag, r.slug),
+      }));
+
+      const origin = process.env.PUBLIC_SITE_URL ?? "https://ownology.ai";
+      const rollup =
+        rows.length === 0
+          ? null
+          : {
+              twitter: `🍷 This week in the Cellar Journal — ${rows.length} new questions answered.\n\nThe most-asked: "${rows[0].question}"\n\n→ ${origin}/cellar-journal`,
+              linkedin: `${rows.length} new questions answered in the Cellar Journal this week:\n\n${rows
+                .map((r, i) => `${i + 1}. "${r.question}"`)
+                .join("\n")}\n\nThe most-asked was "${rows[0].question}" — bible-cited answer here: ${origin}/cellar-journal/${rows[0].slug}\n\n#winemaking #cellarjournal #ownology`,
+              markdown: `## Cellar Journal — top questions this week\n\n${rows
+                .map(
+                  (r, i) =>
+                    `${i + 1}. **[${r.question}](${origin}/cellar-journal/${r.slug})** · ${r.topicTag} · asked ${r.askedCount}×`
+                )
+                .join("\n")}`,
+            };
+
+      return { drafts, rollup, totalEntries: rows.length, windowDays: input.windowDays };
+    }),
 });

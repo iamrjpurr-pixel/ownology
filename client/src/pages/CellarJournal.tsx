@@ -14,7 +14,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { trpc } from "@/lib/trpc";
 import { Helmet } from "react-helmet";
-import { ChevronRight, BookOpen, Wine, Search, Sparkles, ArrowRight, Lock } from "lucide-react";
+import { ChevronRight, BookOpen, Wine, Search, Sparkles, ArrowRight, Lock, TrendingUp, Share2, Copy, Check } from "lucide-react";
 
 /* ─────────────── INDEX ─────────────── */
 
@@ -110,6 +110,8 @@ export function CellarJournalIndex() {
 
       {/* ── Entry grid ── */}
       <section className="px-6 md:px-12 pb-20 max-w-6xl mx-auto">
+        <TrendingRail />
+
         {listQ.isLoading ? (
           <p className="opacity-60 font-mono text-sm">Loading the cellar…</p>
         ) : rows.length === 0 ? (
@@ -181,7 +183,84 @@ export function CellarJournalIndex() {
   );
 }
 
+/* ─────────────── Trending rail ─────────────── */
+
+function TrendingRail() {
+  const trendingQ = trpc.cellarJournal.trending.useQuery({ windowDays: 7, limit: 5 });
+  const rows = trendingQ.data ?? [];
+  if (rows.length === 0) return null;
+
+  return (
+    <div className="mb-12 -mx-2" data-testid="cj-trending-rail">
+      <div className="flex items-center gap-3 px-2 mb-4">
+        <TrendingUp className="w-4 h-4" style={{ color: "var(--ow-amber)" }} />
+        <p className="eyebrow font-mono text-[11px] uppercase tracking-[0.22em]" style={{ color: "var(--ow-amber)" }}>
+          Trending this week · {rows.length} entr{rows.length === 1 ? "y" : "ies"}
+        </p>
+      </div>
+      <div className="flex gap-3 overflow-x-auto pb-3 px-2 snap-x">
+        {rows.map((r, i) => (
+          <Link
+            key={r.slug}
+            href={`/cellar-journal/${r.slug}`}
+            data-testid={`cj-trending-${r.slug}`}
+            className="group flex-none w-72 snap-start p-4 border rounded-lg transition hover:translate-y-[-2px]"
+            style={{ borderColor: "var(--ow-border, rgba(255,255,255,0.15))", background: "rgba(184,146,74,0.03)" }}
+          >
+            <div className="flex items-baseline justify-between text-[10px] font-mono uppercase tracking-[0.18em]">
+              <span style={{ color: "var(--ow-amber)" }}>#{i + 1} · {r.topicTag}</span>
+              <span className="opacity-50">{r.askedCount}× asked</span>
+            </div>
+            <p className="font-serif italic text-base mt-2 leading-snug">{r.question}</p>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ─────────────── ENTRY (single page) ─────────────── */
+
+function ShareRow({ entry }: { entry: { slug: string; question: string; topicTag: string } }) {
+  const [copied, setCopied] = React.useState(false);
+  const url = `https://ownology.ai/cellar-journal/${entry.slug}`;
+  const text = `🍷 "${entry.question}" — answered in the Cellar Journal`;
+  const links = {
+    twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+    reddit: `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(entry.question)}`,
+  };
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // no-op
+    }
+  };
+  return (
+    <div className="mt-10 flex flex-wrap items-center gap-3" data-testid="cj-share-row">
+      <span className="font-mono text-[10px] uppercase tracking-[0.22em] opacity-70 inline-flex items-center gap-2">
+        <Share2 className="w-3 h-3" /> Share this answer
+      </span>
+      <a href={links.twitter} target="_blank" rel="noopener noreferrer" data-testid="cj-share-twitter"
+         className="px-3 py-1.5 rounded-full text-[11px] font-mono uppercase tracking-[0.18em] border opacity-80 hover:opacity-100 transition"
+         style={{ borderColor: "var(--ow-border, rgba(255,255,255,0.2))" }}>X / Twitter</a>
+      <a href={links.linkedin} target="_blank" rel="noopener noreferrer" data-testid="cj-share-linkedin"
+         className="px-3 py-1.5 rounded-full text-[11px] font-mono uppercase tracking-[0.18em] border opacity-80 hover:opacity-100 transition"
+         style={{ borderColor: "var(--ow-border, rgba(255,255,255,0.2))" }}>LinkedIn</a>
+      <a href={links.reddit} target="_blank" rel="noopener noreferrer" data-testid="cj-share-reddit"
+         className="px-3 py-1.5 rounded-full text-[11px] font-mono uppercase tracking-[0.18em] border opacity-80 hover:opacity-100 transition"
+         style={{ borderColor: "var(--ow-border, rgba(255,255,255,0.2))" }}>Reddit</a>
+      <button onClick={copy} data-testid="cj-share-copy"
+              className="px-3 py-1.5 rounded-full text-[11px] font-mono uppercase tracking-[0.18em] border opacity-80 hover:opacity-100 transition inline-flex items-center gap-1.5"
+              style={{ borderColor: "var(--ow-border, rgba(255,255,255,0.2))" }}>
+        {copied ? <><Check className="w-3 h-3" /> Copied</> : <><Copy className="w-3 h-3" /> Copy link</>}
+      </button>
+    </div>
+  );
+}
 
 export function CellarJournalEntry({ slug }: { slug: string }) {
   const [, setLoc] = useLocation();
@@ -249,6 +328,17 @@ export function CellarJournalEntry({ slug }: { slug: string }) {
         <title>{entry.question} · Cellar Journal · Ownology</title>
         <meta name="description" content={entry.diagnosis || teaser.slice(0, 180)} />
         <link rel="canonical" href={`https://ownology.ai/cellar-journal/${entry.slug}`} />
+        {/* Open Graph */}
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={entry.question} />
+        <meta property="og:description" content={entry.diagnosis || teaser.slice(0, 180)} />
+        <meta property="og:url" content={`https://ownology.ai/cellar-journal/${entry.slug}`} />
+        <meta property="og:site_name" content="Ownology — Cellar Journal" />
+        <meta property="article:section" content={entry.topicTag} />
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={entry.question} />
+        <meta name="twitter:description" content={entry.diagnosis || teaser.slice(0, 180)} />
         <script type="application/ld+json">{JSON.stringify(ldJson)}</script>
       </Helmet>
 
@@ -344,6 +434,9 @@ export function CellarJournalEntry({ slug }: { slug: string }) {
             </p>
           </div>
         </div>
+
+        {/* Share buttons */}
+        <ShareRow entry={entry} />
 
         {/* Citations */}
         {entry.citations && entry.citations.length > 0 && (

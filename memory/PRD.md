@@ -30,6 +30,15 @@
 - Embeddings endpoint: `https://integrations.emergentagent.com/llm/openai/v1/embeddings` with `text-embedding-3-small`. Exposed via `embed()` in the adapter.
 - Smoke-tested end-to-end: `freeRun.curiosityAsk` returns real, oenology-grounded answers + auto-extracted topic tags.
 
+**Social flywheel (27 Jan 2026)**
+- **RSS feed** at `/api/cellar-journal/rss.xml` — RSS 2.0, last 50 entries with categories/GUIDs/pubDates. Ingested out-of-the-box by Zapier, IFTTT, Buffer, Mastodon bots, Bluesky bridges, Feedly, NetNewsWire.
+- **`trending`** tRPC procedure — top-asked entries in last N days (default 7), ordered by askedCount → viewCount → recency. Drives the "Trending this week" rail on the index.
+- **`weeklyDigest`** tRPC — returns per-entry social drafts (Twitter ≤280, LinkedIn long-form, Markdown for newsletters) AND a rolled-up "best of the week" post for all three platforms. Zero composition needed — paste straight into any channel.
+- **`composeSocialDraft()`** helper produces three platform-specific drafts from a single (question, diagnosis, topic, slug).
+- **Outbound webhook** — when a NEW canonical journal entry is created, fire-and-forget POST to `CELLAR_JOURNAL_WEBHOOK_URL` (configurable in `.env`). Payload includes `event`, `slug`, `url`, `question`, `topic`, `diagnosis`, `teaser`, `askedCount`, and pre-composed `socialDraft` (twitter/linkedin/markdown). Webhook is OPTIONAL — silent no-op if not configured. Pairs perfectly with Zapier/Make/n8n/Discord/Slack — those handle all the per-platform auth, we just emit clean events.
+- **Share row** on every entry page: X/Twitter, LinkedIn, Reddit, Copy Link buttons. Standard share-intent URLs, no API needed.
+- **Open Graph + Twitter Card** meta tags on entry pages (`og:title`, `og:description`, `og:url`, `og:type=article`, `twitter:card=summary_large_image`, etc.) so links unfurl as rich cards on every social platform.
+
 **Cellar Journal — SEO/CTA growth engine (27 Jan 2026, updated)**
 - New `cellar_journal` table — slug, question, full_answer, teaser_answer (~40% cutoff at paragraph boundary), diagnosis, topicTag, citations (JSON), wineType, viewCount, askedCount, featured, published, **embedding** (1536-dim JSON from `text-embedding-3-small`), **variants** (JSON array of paraphrase questions that mapped to this canonical entry).
 - Auto-persists on every `tutor.ask` and `freeRun.curiosityAsk` (fire-and-forget). Dedupe pipeline:
