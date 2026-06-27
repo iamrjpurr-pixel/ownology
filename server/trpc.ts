@@ -52,6 +52,16 @@ async function getUserFromCookie(req: Request): Promise<User | null> {
   }
 }
 
+// DEV BYPASS: When not in production, if no authenticated user is present,
+// inject the seed owner account so all features are testable without login.
+// This bypass is DISABLED in production (NODE_ENV=production).
+const DEV_BYPASS_USER: User = {
+  openId: "seed-owner-001",
+  name: "Redstone Ridge Wines",
+  email: "cellar@redstoneridge.com.au",
+  role: "admin",
+};
+
 export async function createContext({
   req,
   res,
@@ -59,7 +69,13 @@ export async function createContext({
   req: Request;
   res: Response;
 }): Promise<Context> {
-  const user = await getUserFromCookie(req);
+  const cookieUser = await getUserFromCookie(req);
+  // DEV BYPASS: in non-production, if no real session cookie was presented,
+  // inject the seed owner so `ctx.user` is populated on EVERY procedure
+  // (including public ones like `freeRun.authCheck`). This makes the browser
+  // UI behave as if logged in, with zero auth wiring needed during dev.
+  const isProduction = process.env.NODE_ENV === "production";
+  const user = cookieUser ?? (isProduction ? null : DEV_BYPASS_USER);
   return { req, res, user };
 }
 
@@ -71,23 +87,11 @@ const t = initTRPC.context<Context>().create({
 export const router = t.router;
 export const publicProcedure = t.procedure;
 
-// DEV BYPASS: When not in production, if no authenticated user is present,
-// inject the seed owner account so all features are testable without login.
-// This bypass is DISABLED in production (NODE_ENV=production).
-const DEV_BYPASS_USER: User = {
-  openId: "seed-owner-001",
-  name: "Redstone Ridge Wines",
-  email: "cellar@redstoneridge.com.au",
-  role: "admin",
-};
-
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
-  const isProduction = process.env.NODE_ENV === "production";
-  const user = ctx.user ?? (isProduction ? null : DEV_BYPASS_USER);
-  if (!user) {
+  if (!ctx.user) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: "Please login (10001)" });
   }
-  return next({ ctx: { ...ctx, user } });
+  return next({ ctx: { ...ctx, user: ctx.user } });
 });
 
 export const ownerProcedure = t.procedure.use(({ ctx, next }) => {
