@@ -1052,6 +1052,13 @@ export const cellarJournal = mysqlTable(
     // Engagement metrics
     viewCount: int("view_count").notNull().default(0),
     askedCount: int("asked_count").notNull().default(1),
+    /* Trinity-style clustering: 1536-dim embedding (text-embedding-3-small)
+     * stored as JSON array. Used for cosine-similarity dedup so variants of
+     * the same question funnel into ONE canonical entry. */
+    embedding: text("embedding"),
+    /* Variant questions that mapped to this canonical entry — JSON array of
+     * { q: string, askedAt: number }. */
+    variants: text("variants"),
     // Curation
     featured: boolean("featured").notNull().default(false),
     published: boolean("published").notNull().default(true),

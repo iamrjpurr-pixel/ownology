@@ -1,0 +1,9 @@
+# Ownology — robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Sitemaps
+Sitemap: https://ownology.ai/api/sitemap.xml
+Sitemap: https://ownology.ai/api/cellar-journal/sitemap.xml

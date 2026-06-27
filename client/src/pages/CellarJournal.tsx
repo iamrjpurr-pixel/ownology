@@ -361,6 +361,22 @@ export function CellarJournalEntry({ slug }: { slug: string }) {
           </div>
         )}
 
+        {/* Variants — other phrasings of the same question */}
+        {entry.variants && entry.variants.length > 0 && (
+          <div className="mt-10" data-testid="cj-variants">
+            <p className="font-mono text-[10px] uppercase tracking-[0.24em] opacity-70">
+              ↳ Also asked as
+            </p>
+            <ul className="mt-3 space-y-2 text-sm">
+              {entry.variants.map((v, i) => (
+                <li key={i} className="font-serif italic opacity-80">
+                  "{v.q}"
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* Related */}
         {related.length > 0 && (
           <div className="mt-14">

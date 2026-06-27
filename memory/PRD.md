@@ -30,16 +30,25 @@
 - Embeddings endpoint: `https://integrations.emergentagent.com/llm/openai/v1/embeddings` with `text-embedding-3-small`. Exposed via `embed()` in the adapter.
 - Smoke-tested end-to-end: `freeRun.curiosityAsk` returns real, oenology-grounded answers + auto-extracted topic tags.
 
-**Cellar Journal — SEO/CTA growth engine (27 Jan 2026)**
-- New `cellar_journal` table — slug, question, full_answer, teaser_answer (~40% cutoff at paragraph boundary), diagnosis, topicTag, citations (JSON), wineType, viewCount, askedCount, featured, published.
-- Auto-persists on every `tutor.ask` and `freeRun.curiosityAsk` (fire-and-forget). Dedupe by slug → bumps askedCount instead of duplicating.
+**Cellar Journal — SEO/CTA growth engine (27 Jan 2026, updated)**
+- New `cellar_journal` table — slug, question, full_answer, teaser_answer (~40% cutoff at paragraph boundary), diagnosis, topicTag, citations (JSON), wineType, viewCount, askedCount, featured, published, **embedding** (1536-dim JSON from `text-embedding-3-small`), **variants** (JSON array of paraphrase questions that mapped to this canonical entry).
+- Auto-persists on every `tutor.ask` and `freeRun.curiosityAsk` (fire-and-forget). Dedupe pipeline:
+  1. Exact-slug match → bump askedCount + update lastAskedAt.
+  2. **Trinity semantic clustering** — embed the new Q, cosine-sim ≥ 0.80 against all entries in the same topic → fold as variant of canonical entry. Threshold empirically tuned for `text-embedding-3-small` (paraphrases score 0.82-0.94; truly different Qs stay below 0.70).
+  3. No match → create new canonical entry.
+- Verified end-to-end: 3 paraphrases of "stuck at SG 1.020" funnel into ONE canonical journal page with `askedCount=3`. The two paraphrase variants render as "↳ ALSO ASKED AS" beneath the wax-sealed wall — SEO gold (multiple keyword variants pointing at one indexable URL).
 - Topic inference via curated regex catalogue (`server/cellarJournalRouter.ts → TOPIC_KEYWORDS`) — 17 canonical topics (Stuck Fermentation, MLF, SO₂ & Sulphites, Racking & Lees, …). Rejects LLM-hallucinated chapter labels.
 - Public pages:
   - `/cellar-journal` — editorial index, topic chip filter (with counts), live search, entry cards with diagnosis teaser.
-  - `/cellar-journal/:slug` — single entry: question headline, diagnosis pull-quote, teaser content, **wax-sealed CTA wall** (amber lock seal, "FREE 5/mo" + "$16/mo Unlock"), citations, 3 related entries from same topic.
-- SEO: per-entry JSON-LD `Article` schema with `isAccessibleForFree: false` + `hasPart` (Google flexible-sampling spec — no cloaking penalty). Full answer also rendered in off-screen `.cj-paid-content` div for crawlers. Helmet sets `<title>`, meta description, and canonical URL.
-- `cellarJournal.list` / `cellarJournal.topics` / `cellarJournal.getBySlug` tRPC procedures.
-- View counter auto-increments per pageload (fire-and-forget).
+  - `/cellar-journal/:slug` — single entry: question headline, diagnosis pull-quote, teaser content, **wax-sealed CTA wall**, citations, **"Also asked as" variants block**, 3 related entries from same topic.
+- SEO infrastructure:
+  - Per-entry JSON-LD `Article` schema with `isAccessibleForFree: false` + `hasPart` (Google flexible-sampling spec — no cloaking penalty).
+  - Off-screen `.cj-paid-content` div with full answer for crawlers.
+  - **`/robots.txt`** (static at `/app/client/public/`) declaring two sitemap URLs.
+  - **`/sitemap.xml`** (static sitemap index) at root → points to dynamic sitemap.
+  - **`/api/cellar-journal/sitemap.xml`** dynamic XML — auto-generated from DB, priority weighted by featured/askedCount, lastmod from lastAskedAt. 10-min cache header.
+  - **`/api/robots.txt`** also served from Express (belt-and-suspenders).
+- Backfill script: `scripts/backfill-cj-embeddings.mjs` — idempotent.
 
 **Knowledge corpus (27 Jan 2026)**
 - **38 SOPs** in `sop_library` across the canonical 12 categories (all published, all AI-authored via `gpt-5.4-mini` grounded in bible chunks, with full procedure_text + decision_logic + tribal_knowledge + quick_steps + WBS codes):

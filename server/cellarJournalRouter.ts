@@ -7,9 +7,10 @@
  * indexed without cloaking.
  */
 import { z } from "zod";
-import { and, desc, eq, sql, like, or } from "drizzle-orm";
+import { and, desc, eq, sql, like, or, isNotNull } from "drizzle-orm";
 import { router, publicProcedure } from "./trpc.js";
 import { db } from "./db.js";
+import { embed } from "./_core/llm.js";
 import * as schema from "../drizzle/schema.js";
 
 /* -- topic inference (keyword-based; cheap, deterministic) ---------------- */
@@ -92,6 +93,26 @@ export function buildTeaser(full: string): { teaser: string; diagnosis: string }
 
 /* -- core persist function (called from tutor.ask / freeRun) ------------- */
 
+/** Cosine similarity between two equal-length vectors. */
+function cosine(a: number[], b: number[]): number {
+  let dot = 0,
+    na = 0,
+    nb = 0;
+  const len = Math.min(a.length, b.length);
+  for (let i = 0; i < len; i++) {
+    dot += a[i] * b[i];
+    na += a[i] * a[i];
+    nb += b[i] * b[i];
+  }
+  if (!na || !nb) return 0;
+  return dot / (Math.sqrt(na) * Math.sqrt(nb));
+}
+
+/** Trinity-style dedup threshold. ≥0.80 = "same question, different phrasing"
+ *  for text-embedding-3-small. Empirically tuned: typical paraphrases score
+ *  0.82-0.85, while semantically-different Qs in the same topic stay below 0.70. */
+const SIMILARITY_THRESHOLD = 0.80;
+
 export async function persistJournalEntry(opts: {
   question: string;
   topicTag: string;
@@ -100,32 +121,104 @@ export async function persistJournalEntry(opts: {
   audience?: string;
   wineType?: "red" | "white" | "both" | "unknown";
   citations?: Array<{ label: string; source_doc?: string; chapter?: string }>;
-}): Promise<{ id: number; slug: string; isNew: boolean }> {
+}): Promise<{ id: number; slug: string; isNew: boolean; clusterMatch?: number }> {
   const now = Date.now();
   const cleanQ = opts.question.trim().replace(/\s+/g, " ").slice(0, 480);
   const topic = inferTopic(cleanQ, opts.topicTag);
   const slug = slugifyQuestion(cleanQ, topic);
   const { teaser, diagnosis } = buildTeaser(opts.fullAnswer);
 
-  // Try insert; if slug exists, bump askedCount + update lastAskedAt
-  const [existing] = await db
-    .select({ id: schema.cellarJournal.id, askedCount: schema.cellarJournal.askedCount })
+  // 1) Fast exact-slug dedup (paraphrase-identical Q)
+  const [exactMatch] = await db
+    .select({ id: schema.cellarJournal.id, askedCount: schema.cellarJournal.askedCount, variants: schema.cellarJournal.variants })
     .from(schema.cellarJournal)
     .where(eq(schema.cellarJournal.slug, slug))
     .limit(1);
 
-  if (existing) {
+  if (exactMatch) {
     await db
       .update(schema.cellarJournal)
       .set({
-        askedCount: existing.askedCount + 1,
+        askedCount: exactMatch.askedCount + 1,
         lastAskedAt: now,
         updatedAt: now,
       })
-      .where(eq(schema.cellarJournal.id, existing.id));
-    return { id: existing.id, slug, isNew: false };
+      .where(eq(schema.cellarJournal.id, exactMatch.id));
+    return { id: exactMatch.id, slug, isNew: false };
   }
 
+  // 2) Trinity semantic dedup — embed the new question, compare cosine sim
+  //    against all entries in the same topic. If best match ≥ threshold,
+  //    fold this question in as a variant of the canonical entry.
+  let newEmbedding: number[] | null = null;
+  try {
+    const [vec] = await embed(cleanQ);
+    if (Array.isArray(vec)) newEmbedding = vec;
+  } catch (e) {
+    console.warn("[CellarJournal] embed failed (continuing without dedup):", (e as Error).message);
+  }
+
+  if (newEmbedding) {
+    const candidates = await db
+      .select({
+        id: schema.cellarJournal.id,
+        slug: schema.cellarJournal.slug,
+        askedCount: schema.cellarJournal.askedCount,
+        variants: schema.cellarJournal.variants,
+        embedding: schema.cellarJournal.embedding,
+      })
+      .from(schema.cellarJournal)
+      .where(
+        and(
+          eq(schema.cellarJournal.topicTag, topic),
+          isNotNull(schema.cellarJournal.embedding)
+        )
+      )
+      .limit(200);
+
+    let best: { id: number; slug: string; askedCount: number; variants: string | null; score: number } | null = null;
+    for (const c of candidates) {
+      if (!c.embedding) continue;
+      try {
+        const vec = JSON.parse(c.embedding) as number[];
+        const score = cosine(newEmbedding, vec);
+        if (!best || score > best.score) {
+          best = { id: c.id, slug: c.slug, askedCount: c.askedCount, variants: c.variants, score };
+        }
+      } catch {
+        // ignore corrupt embedding rows
+      }
+    }
+
+    if (best && best.score >= SIMILARITY_THRESHOLD) {
+      // Fold this variant into the canonical entry
+      let variants: Array<{ q: string; askedAt: number }> = [];
+      try {
+        variants = best.variants ? JSON.parse(best.variants) : [];
+      } catch {
+        variants = [];
+      }
+      // Avoid storing the same variant string twice
+      if (!variants.find((v) => v.q === cleanQ)) {
+        variants.push({ q: cleanQ, askedAt: now });
+      }
+      await db
+        .update(schema.cellarJournal)
+        .set({
+          askedCount: best.askedCount + 1,
+          lastAskedAt: now,
+          updatedAt: now,
+          variants: JSON.stringify(variants),
+        })
+        .where(eq(schema.cellarJournal.id, best.id));
+      console.log(`[CellarJournal] Trinity-clustered "${cleanQ.slice(0, 50)}…" → ${best.slug} (score=${best.score.toFixed(3)})`);
+      return { id: best.id, slug: best.slug, isNew: false, clusterMatch: best.score };
+    } else if (best) {
+      console.log(`[CellarJournal] No cluster match (best=${best.score.toFixed(3)} < ${SIMILARITY_THRESHOLD}) → creating new entry for "${cleanQ.slice(0, 60)}…"`);
+    }
+  }
+
+  // 3) No match — insert as a new canonical entry
   const result = await db.insert(schema.cellarJournal).values({
     slug,
     question: cleanQ,
@@ -141,6 +234,8 @@ export async function persistJournalEntry(opts: {
     askedCount: 1,
     featured: false,
     published: true,
+    embedding: newEmbedding ? JSON.stringify(newEmbedding) : null,
+    variants: null,
     firstAskedAt: now,
     lastAskedAt: now,
     createdAt: now,
@@ -246,6 +341,12 @@ export const cellarJournalRouter = router({
       } catch {
         citations = [];
       }
+      let variants: Array<{ q: string; askedAt: number }> = [];
+      try {
+        variants = row.variants ? JSON.parse(row.variants) : [];
+      } catch {
+        variants = [];
+      }
 
       // Related: 3 most-asked entries with same topic (excluding self)
       const related = await db
@@ -266,6 +367,6 @@ export const cellarJournalRouter = router({
         .orderBy(desc(cj.askedCount))
         .limit(3);
 
-      return { entry: { ...row, citations }, related };
+      return { entry: { ...row, citations, variants }, related };
     }),
 });
