@@ -1,0 +1,36 @@
+{
+  "summary": "Tiered LLM Budget Guard (free/premium/system) fully verified end-to-end against live preview. Backend pytest: 27/27 PASS — 11 NEW tier tests in /app/backend/tests/test_tiered_budget.py + 8 daily-budget regression + 8 LLM-meter regression. Frontend Playwright: /stats renders all 3 tier rows (stats-daily-tier-{free|premium|system}); under .env defaults shows 'Free tier $0.000000 / $3.00', 'Premium $X / $8.00', 'System (uncapped) $Y / unlimited' (no progress bar for system, matches spec). Tier-pause styling verified by mocking admin.llmStats to force free.exceeded=true → label becomes 'Free tier · PAUSED' rendered in rgb(185,28,28) = #b91c1c with red progress bar; Premium + System remain in default styling (only free pauses). Key product-value assertion VERIFIED in test_free_pause_does_not_block_premium: with DAILY_FREE_BUDGET_USD=0.0005, freeRun.curiosityAsk #1 returned a real LLM answer + armed guard, #2 returned the tier-paused synthetic ('AI free-tier service temporarily paused — … Premium members are still served'), and tutor.ask IMMEDIATELY AFTER returned a real LLM answer (premium $8 + overall $10 caps untouched). Overall-cap regression VERIFIED in test_overall_cap_pauses_everything: with DAILY_LLM_BUDGET_USD=0.0003, after one tutor.ask burns the cap, the next tutor.ask returns the 'overall' synthetic — even system-bound queryRouter would be paused. resetDailyBudget + resetLlmStats both zero all 3 tier buckets AND overall spend. Env fully restored at end of run: DAILY_LLM_BUDGET_USD=10, DAILY_FREE_BUDGET_USD=3, DAILY_PREMIUM_BUDGET_USD=8 (verified via curl /api/trpc/admin.llmStats). The 'shim source-classification bug fix' (sourceForGuard derived BEFORE pause check) is implicitly verified: tutor.ask direct-fetch calls correctly classify as 'premium' tier (bySource shows 'direct:tutor.ts:725') instead of being misclassified as 'free' — proven by tutor.ask NOT being paused when only free budget is exhausted.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_tiered_budget.py",
+    "/app/test_reports/pytest/iteration_9_tiered_budget.xml",
+    "/app/test_reports/pytest/iteration_9_regression.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "llmMeter.ts classifySource() defaults UNKNOWN sources to 'free' (line 88). Safe cost-wise (front-loads pauses) but means a typo'd source tag silently lands in free bucket and could accelerate a free-tier pause. Consider logging a one-time WARN for sources that match no prefix.",
+    "forgeShim.ts buildBudgetExceededResponse() embeds the literal tier label 'free-tier' / 'premium' / 'system' in the user-facing message. If marketing renames 'Free tier' → 'Curious tier' the synthetic message must be updated in two places (Stats.tsx + forgeShim.ts). Consider centralising tier labels.",
+    "deriveSourceFromStack() falls back to 'direct:unknown' (line 98) which classifySource then routes to 'free'. So any direct-fetch caller in a file the regex can't parse will silently consume free budget. Low risk today (all direct callers match the regex) but worth a sentinel test.",
+    "Stats.tsx tier progress bar uses Math.min(100, (spend/budget)*100) for width — correct, but when exceeded the bar is fully red regardless of overflow amount. Consider showing the overflow % in the description sub-text for transparency (e.g. '+$0.50 over budget').",
+    "TIERS array is declared as const tuple ['free','premium','system'] but iteration order in getLlmStats() builds the object literal with the same keys — fine today; just note that if a 4th tier is added (e.g. 'enterprise'), Stats.tsx hard-codes the 3-tier loop and would miss it.",
+    "Per-tier WARN log in recordLlmCall() fires once per threshold-crossing (tierSpendBefore<tierBudget && tierSpendAfter>=tierBudget). Good, but if process restarts mid-day the warn fires again on the next crossing — non-issue but worth noting for SRE."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_tiered_budget.py",
+    "/app/test_reports/iteration_9.json",
+    "/app/test_reports/pytest/iteration_9_tiered_budget.xml",
+    "/app/test_reports/pytest/iteration_9_regression.xml"
+  ],
+  "success_rate": {"backend": "100% (27/27: 11 new tiered-budget + 8 daily-budget regression + 8 llm-meter regression)", "frontend": "100% (all 3 tier rows + paused-state red styling + uncapped-system no-progress-bar verified)"},
+  "test_credentials": "None — dev-bypass injects seed-owner-001 as admin.",
+  "seed_data_creation": "None. Tests use existing tutor.ask + freeRun.curiosityAsk; total spend < $0.01 across full suite.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Tiered budget test file: /app/backend/tests/test_tiered_budget.py (11 tests, ~40s). It mutates /app/.env DAILY_FREE_BUDGET_USD (between 0.0005 and 3) and DAILY_LLM_BUDGET_USD (between 0.0003 and 10) via supervisorctl restart backend, restoring at teardown_class. Single tutor.ask burns ~$0.0004 total split as ~$0.00029 premium (direct:tutor.ts:725) + ~$0.00012 system (direct:queryRouter.ts:89) — so budget=0.0003 reliably arms the overall guard after exactly one tutor.ask. Single freeRun.curiosityAsk burns ~$0.0007+ on the free tier, so budget=0.0005 arms after exactly one call. Tier names in synthetic messages: 'free-tier' (free) / 'premium' (premium) / 'system' (system). Detection substring: 'temporarily paused' (case-insensitive). resetFreeRunQuota body MUST be {} not null — empty input object. /stats card data-testid='stats-daily-tier-{free|premium|system}'. PAUSED-state red color = rgb(185,28,28). System tier has budgetUsd=null AND no progress bar (intentional). KPI labels are RENDERED UPPERCASE ('TOTAL LLM CALLS' not 'Total LLM calls') via CSS text-transform — match case-insensitively or use uppercase strings in assertions. Pre-existing 400 console errors on /stats from iteration 7-8 are still present (global query, unrelated).",
+  "rca of the issue": "N/A — no bugs found. Initial test calibration adjustments: (1) freeRun.curiosityAsk takes {question: string} not {topic: string} — fixed in helper. (2) Overall-cap test budget=0.0005 was insufficient (1 tutor.ask burns $0.00041); lowered to 0.0003 so single call arms guard reliably. The 'shim source-classification bug fix' described in the review (sourceForGuard derived BEFORE pause check) is correctly implemented at forgeShim.ts:157 — confirmed by reading source AND by tier-pause semantics test where tutor.ask correctly continues to work when free tier is paused (proving direct-fetch tutor calls classify as 'premium' not 'free')."
+}

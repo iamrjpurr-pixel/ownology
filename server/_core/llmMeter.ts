@@ -44,6 +44,50 @@ let startedAt = Date.now();
 let dailySpendUsd = 0;
 let dailyDateKey = ""; // YYYY-MM-DD UTC
 
+// Per-tier spend buckets (free/premium/system) — for tiered budget enforcement.
+const TIERS = ["free", "premium", "system"] as const;
+export type Tier = (typeof TIERS)[number];
+const dailySpendByTier: Record<Tier, number> = { free: 0, premium: 0, system: 0 };
+
+/**
+ * Classify an x-ow-source tag into a budget tier.
+ *
+ *   system   = Internal pipelines that must never be paused — alert
+ *              classifiers, embeddings, tag/topic classifiers. Subject only
+ *              to the overall DAILY_LLM_BUDGET_USD safety cap.
+ *   premium  = Paying-tier features: full tutor, premium Curiosity (Claude),
+ *              vintage compare, decision-grounded answers. Pauses when
+ *              DAILY_PREMIUM_BUDGET_USD reached.
+ *   free     = Free-tier and anonymous calls (freeRun.curiosityAsk on
+ *              non-premium accounts, demo flows). Pauses first.
+ *
+ * Mapping is intentionally readable — extend it by appending rules below.
+ * Unknown sources default to "free" (safest cost-wise).
+ */
+export function classifySource(source: string | null | undefined): Tier {
+  const s = (source ?? "").toLowerCase();
+  // System: internal classifiers, embeddings, scheduled pipelines.
+  if (
+    s.startsWith("freerun.tag") ||
+    s.startsWith("direct:queryrouter") ||
+    s.startsWith("direct:vintagelog") ||
+    s.startsWith("direct:trinitypipeline") ||
+    s.startsWith("direct:sopembeddings") ||
+    s.startsWith("scheduled.")
+  ) return "system";
+  // Premium: tutor (paying-tier intent) and premium curiosity adapter.
+  if (
+    s === "tutor.ask" ||
+    s.startsWith("tutor.") ||
+    s.startsWith("direct:tutor") ||
+    s.startsWith("direct:routers.ts") ||
+    s.startsWith("freerun.curiosityask.premium") ||
+    s.startsWith("merch.")
+  ) return "premium";
+  // Default = free (covers freeRun.curiosityAsk, demo flows, unknown).
+  return "free";
+}
+
 function todayKey(): string {
   return new Date().toISOString().slice(0, 10);
 }
@@ -52,14 +96,19 @@ function rollDailyIfNeeded(): void {
   const k = todayKey();
   if (k !== dailyDateKey) {
     if (dailyDateKey !== "") {
-      console.log(`[llm-meter] daily spend rolled over: ${dailyDateKey} → ${k} (yesterday: $${dailySpendUsd.toFixed(4)})`);
+      console.log(
+        `[llm-meter] daily spend rolled over: ${dailyDateKey} → ${k} (yesterday: $${dailySpendUsd.toFixed(4)}, free $${dailySpendByTier.free.toFixed(4)}, premium $${dailySpendByTier.premium.toFixed(4)}, system $${dailySpendByTier.system.toFixed(4)})`
+      );
     }
     dailyDateKey = k;
     dailySpendUsd = 0;
+    dailySpendByTier.free = 0;
+    dailySpendByTier.premium = 0;
+    dailySpendByTier.system = 0;
   }
 }
 
-/** Returns the daily budget in USD from env, or null when unconfigured. */
+/** Returns the OVERALL daily budget in USD from env, or null when unconfigured. */
 export function getDailyBudgetUsd(): number | null {
   const raw = process.env.DAILY_LLM_BUDGET_USD;
   if (!raw) return null;
@@ -68,7 +117,44 @@ export function getDailyBudgetUsd(): number | null {
   return n;
 }
 
-/** Returns true when today's spend has reached/exceeded the configured budget. */
+/** Returns the per-tier daily budget in USD from env, or null when unconfigured. */
+export function getTierBudgetUsd(tier: Tier): number | null {
+  // System tier is intentionally uncapped at the tier level — it's only
+  // subject to the overall DAILY_LLM_BUDGET_USD safety cap.
+  if (tier === "system") return null;
+  const envKey = tier === "free" ? "DAILY_FREE_BUDGET_USD" : "DAILY_PREMIUM_BUDGET_USD";
+  const raw = process.env[envKey];
+  if (!raw) return null;
+  const n = parseFloat(raw);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return n;
+}
+
+/**
+ * Pause decision for a single call. Pauses only if:
+ *   - The tier's per-tier budget is configured AND reached, OR
+ *   - The overall DAILY_LLM_BUDGET_USD is configured AND reached.
+ * System-tier calls only obey the overall cap.
+ */
+export function isCallPaused(source: string | null | undefined): {
+  paused: boolean;
+  tier: Tier;
+  reason: "tier" | "overall" | null;
+} {
+  rollDailyIfNeeded();
+  const tier = classifySource(source);
+  const tierBudget = getTierBudgetUsd(tier);
+  if (tierBudget !== null && dailySpendByTier[tier] >= tierBudget) {
+    return { paused: true, tier, reason: "tier" };
+  }
+  const overallBudget = getDailyBudgetUsd();
+  if (overallBudget !== null && dailySpendUsd >= overallBudget) {
+    return { paused: true, tier, reason: "overall" };
+  }
+  return { paused: false, tier, reason: null };
+}
+
+/** Returns true when today's overall spend has reached/exceeded the configured budget. */
 export function isDailyBudgetExceeded(): boolean {
   rollDailyIfNeeded();
   const budget = getDailyBudgetUsd();
@@ -80,6 +166,9 @@ export function isDailyBudgetExceeded(): boolean {
 export function resetDailyBudget(): void {
   rollDailyIfNeeded();
   dailySpendUsd = 0;
+  dailySpendByTier.free = 0;
+  dailySpendByTier.premium = 0;
+  dailySpendByTier.system = 0;
   dailyDateKey = todayKey();
 }
 
@@ -125,19 +214,31 @@ export function recordLlmCall(
   // Daily budget tracking — roll the day if needed, then accumulate.
   rollDailyIfNeeded();
   dailySpendUsd += cost;
+
+  // Tiered accumulation (free | premium | system).
+  const tier = classifySource(source);
+  const tierSpendBefore = dailySpendByTier[tier];
+  dailySpendByTier[tier] = tierSpendBefore + cost;
+  const tierBudget = getTierBudgetUsd(tier);
+  if (tierBudget !== null && dailySpendByTier[tier] >= tierBudget && tierSpendBefore < tierBudget) {
+    console.warn(
+      `[llm-meter] ⚠ TIER BUDGET REACHED — tier=${tier} spend=$${dailySpendByTier[tier].toFixed(4)} >= $${tierBudget.toFixed(2)}. Further ${tier}-tier calls pause until UTC midnight or admin.resetDailyBudget.`
+    );
+  }
+
   const budget = getDailyBudgetUsd();
   if (budget !== null && dailySpendUsd >= budget) {
     // Loud warning once per day-roll when threshold is crossed.
     if (dailySpendUsd - cost < budget) {
       console.warn(
-        `[llm-meter] ⚠ DAILY BUDGET REACHED — todaySpend=$${dailySpendUsd.toFixed(4)} >= budget=$${budget.toFixed(2)}. Further chat-completion calls will receive a synthetic "AI paused" response until UTC midnight or admin.resetDailyBudget.`
+        `[llm-meter] ⚠ OVERALL DAILY BUDGET REACHED — todaySpend=$${dailySpendUsd.toFixed(4)} >= budget=$${budget.toFixed(2)}. ALL further chat-completion calls (including system tier) receive synthetic "AI paused" response until UTC midnight or admin.resetDailyBudget.`
       );
     }
   }
 
   // Single-line structured log so Railway logs can be greped/aggregated.
   console.log(
-    `[llm-meter] model=${model} source=${source} in=${tokensIn} out=${tokensOut} cost=$${cost.toFixed(6)}`
+    `[llm-meter] model=${model} source=${source} tier=${tier} in=${tokensIn} out=${tokensOut} cost=$${cost.toFixed(6)}`
   );
 }
 
@@ -147,6 +248,13 @@ export type LlmStatsRow = {
   tokensIn: number;
   tokensOut: number;
   costUsd: number;
+};
+
+export type TierState = {
+  spendUsd: number;
+  budgetUsd: number | null;
+  exceeded: boolean;
+  remainingUsd: number | null;
 };
 
 export type LlmStats = {
@@ -161,8 +269,20 @@ export type LlmStats = {
     budgetUsd: number | null;
     exceeded: boolean;
     remainingUsd: number | null;
+    tiers: Record<Tier, TierState>;
   };
 };
+
+function buildTierState(tier: Tier): TierState {
+  const budgetUsd = getTierBudgetUsd(tier);
+  const spendUsd = dailySpendByTier[tier];
+  return {
+    spendUsd,
+    budgetUsd,
+    exceeded: budgetUsd !== null && spendUsd >= budgetUsd,
+    remainingUsd: budgetUsd !== null ? Math.max(0, budgetUsd - spendUsd) : null,
+  };
+}
 
 export function getLlmStats(): LlmStats {
   const toRows = (m: Map<string, Bucket>): LlmStatsRow[] =>
@@ -183,6 +303,11 @@ export function getLlmStats(): LlmStats {
       budgetUsd,
       exceeded: budgetUsd !== null && dailySpendUsd >= budgetUsd,
       remainingUsd: budgetUsd !== null ? Math.max(0, budgetUsd - dailySpendUsd) : null,
+      tiers: {
+        free: buildTierState("free"),
+        premium: buildTierState("premium"),
+        system: buildTierState("system"),
+      },
     },
   };
 }
@@ -197,5 +322,8 @@ export function resetLlmStats(): void {
   bySource.clear();
   startedAt = Date.now();
   dailySpendUsd = 0;
+  dailySpendByTier.free = 0;
+  dailySpendByTier.premium = 0;
+  dailySpendByTier.system = 0;
   dailyDateKey = todayKey();
 }

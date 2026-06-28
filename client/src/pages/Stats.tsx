@@ -62,7 +62,7 @@ export default function Stats() {
             >
               <div className="flex items-baseline justify-between mb-2">
                 <p className="text-xs uppercase tracking-widest" style={{ color: stats.daily.exceeded ? "#b91c1c" : "var(--ow-amber)" }}>
-                  Today&apos;s budget · {stats.daily.dateKey}{stats.daily.exceeded ? " · PAUSED" : ""}
+                  Today&apos;s budget · {stats.daily.dateKey}{stats.daily.exceeded ? " · OVERALL PAUSED" : ""}
                 </p>
                 <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.85rem", color: "var(--ow-text-mid)" }}>
                   {fmtUsd(stats.daily.spendUsd)}{" "}
@@ -81,13 +81,63 @@ export default function Stats() {
                   />
                 </div>
               )}
-              <p className="mt-2" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)" }}>
+              <p className="mt-2 mb-3" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)" }}>
                 {stats.daily.budgetUsd === null
-                  ? "No daily budget configured — set DAILY_LLM_BUDGET_USD to enable the guard."
+                  ? "No overall budget configured — set DAILY_LLM_BUDGET_USD to enable the safety cap."
                   : stats.daily.exceeded
-                    ? "Budget reached — chat completions return a graceful \"paused\" response until UTC midnight or admin reset."
-                    : `${fmtUsd(stats.daily.remainingUsd ?? 0)} remaining today. Guard auto-engages at the cap; resets at UTC midnight.`}
+                    ? "Overall cap hit — ALL chat completions (including system) return a graceful \"paused\" response until UTC midnight or admin reset."
+                    : `${fmtUsd(stats.daily.remainingUsd ?? 0)} remaining today across all tiers. Resets at UTC midnight.`}
               </p>
+
+              {/* Per-tier rows */}
+              {stats.daily.tiers && (
+                <div className="mt-3 pt-3" style={{ borderTop: "1px dashed var(--ow-border)" }}>
+                  <p className="text-xs uppercase tracking-widest mb-2" style={{ color: "var(--ow-text-lo)" }}>
+                    Per-tier guard
+                  </p>
+                  {(["free", "premium", "system"] as const).map((tier) => {
+                    const t = stats.daily.tiers[tier];
+                    const label = tier === "free" ? "Free tier" : tier === "premium" ? "Premium" : "System (uncapped)";
+                    const desc =
+                      tier === "free"
+                        ? "Anonymous & free-quota Curiosity questions. Pauses first."
+                        : tier === "premium"
+                          ? "Tutor + paying-tier features."
+                          : "Internal classifiers, embeddings, scheduled jobs. Never paused at the tier level.";
+                    return (
+                      <div
+                        key={tier}
+                        data-testid={`stats-daily-tier-${tier}`}
+                        className="mb-2"
+                      >
+                        <div className="flex items-baseline justify-between">
+                          <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8rem", color: t.exceeded ? "#b91c1c" : "var(--ow-text-mid)", fontWeight: 600 }}>
+                            {label}{t.exceeded ? " · PAUSED" : ""}
+                          </span>
+                          <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.78rem", color: "var(--ow-text-lo)" }}>
+                            {fmtUsd(t.spendUsd)} {t.budgetUsd !== null ? `/ ${fmtUsd(t.budgetUsd)}` : "/ unlimited"}
+                          </span>
+                        </div>
+                        {t.budgetUsd !== null && (
+                          <div style={{ height: 4, background: "var(--ow-border)", borderRadius: 2, overflow: "hidden", marginTop: 2 }}>
+                            <div
+                              style={{
+                                width: `${Math.min(100, (t.spendUsd / t.budgetUsd) * 100)}%`,
+                                height: "100%",
+                                background: t.exceeded ? "#b91c1c" : tier === "free" ? "#6b7280" : tier === "premium" ? "var(--ow-amber)" : "#10b981",
+                                transition: "width 0.4s",
+                              }}
+                            />
+                          </div>
+                        )}
+                        <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", color: "var(--ow-text-lo)", marginTop: 2, lineHeight: 1.4 }}>
+                          {desc}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 

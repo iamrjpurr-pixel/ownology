@@ -23,7 +23,7 @@
  * model-injection branch by passing an explicit model.
  */
 
-import { recordLlmCall, isDailyBudgetExceeded, getDailyBudgetUsd } from "./llmMeter.js";
+import { recordLlmCall, isCallPaused, getDailyBudgetUsd, getTierBudgetUsd, type Tier } from "./llmMeter.js";
 
 const DEFAULT_MODEL = "gpt-5.4-mini";
 const PROXY_HOST = "integrations.emergentagent.com";
@@ -33,12 +33,21 @@ const isOpenAiNewFamily = (model: string) => /^(gpt-5|o[134])/i.test(model);
 /** Synthetic response returned when the daily LLM budget is exhausted. Shaped
  *  like an OpenAI chat-completion success so every existing caller's
  *  `data.choices[0].message.content` access works unchanged. */
-function buildBudgetExceededResponse(model: string): Response {
-  const budget = getDailyBudgetUsd();
+function buildBudgetExceededResponse(
+  model: string,
+  tier: Tier,
+  reason: "tier" | "overall"
+): Response {
+  const overall = getDailyBudgetUsd();
+  const tierBudget = getTierBudgetUsd(tier);
+  const tierLabel = tier === "free" ? "free-tier" : tier === "premium" ? "premium" : "system";
   const message =
-    "AI service temporarily paused — Ownology has reached today's AI budget. " +
-    "Please try again after UTC midnight, or contact your administrator. " +
-    "(This protects us from a runaway loop or traffic spike eating the monthly bill.)";
+    reason === "tier"
+      ? `AI ${tierLabel} service temporarily paused — Ownology has reached today's ${tierLabel} AI budget. ` +
+        "Premium members are still served; please try again after UTC midnight or contact your administrator."
+      : "AI service temporarily paused — Ownology has reached today's overall AI budget. " +
+        "Please try again after UTC midnight, or contact your administrator. " +
+        "(This protects us from a runaway loop or traffic spike eating the monthly bill.)";
   const body = {
     id: "chatcmpl-budget-paused",
     object: "chat.completion",
@@ -53,11 +62,19 @@ function buildBudgetExceededResponse(model: string): Response {
     ],
     usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
     _ownology_budget_paused: true,
-    _ownology_budget_usd: budget,
+    _ownology_budget_reason: reason,
+    _ownology_budget_tier: tier,
+    _ownology_budget_overall_usd: overall,
+    _ownology_budget_tier_usd: tierBudget,
   };
   return new Response(JSON.stringify(body), {
     status: 200,
-    headers: { "content-type": "application/json", "x-ow-budget-paused": "1" },
+    headers: {
+      "content-type": "application/json",
+      "x-ow-budget-paused": "1",
+      "x-ow-budget-reason": reason,
+      "x-ow-budget-tier": tier,
+    },
   });
 }
 
@@ -132,16 +149,19 @@ globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
 
       init = { ...init, body: JSON.stringify(body) };
 
-      // ── Daily budget guard ──────────────────────────────────────────────
-      // Short-circuit BEFORE hitting the LLM proxy. Returns a synthetic
-      // success response so callers keep working — just with a "paused"
-      // message instead of a real answer.
-      if (isDailyBudgetExceeded()) {
+      // ── Tiered daily budget guard ───────────────────────────────────────
+      // Short-circuit BEFORE hitting the LLM proxy. Pauses free tier first,
+      // premium second; system tier only pauses if the overall cap is hit.
+      // Derive source NOW (not after the fetch) so direct call sites get the
+      // right tier classification — header → stack-trace → "direct:unknown".
+      const sourceForGuard = sourceFromHeader ?? deriveSourceFromStack();
+      const verdict = isCallPaused(sourceForGuard);
+      if (verdict.paused && verdict.reason) {
         const model = String(body.model);
         console.warn(
-          `[forge-shim] budget exceeded — returning synthetic paused response (source=${sourceFromHeader ?? "unknown"})`
+          `[forge-shim] budget paused — tier=${verdict.tier} reason=${verdict.reason} source=${sourceForGuard}`
         );
-        return buildBudgetExceededResponse(model);
+        return buildBudgetExceededResponse(model, verdict.tier, verdict.reason);
       }
     }
   } catch {
