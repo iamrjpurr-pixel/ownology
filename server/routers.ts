@@ -29,6 +29,7 @@ import {
   getUsedTankNames,
   deleteVintageLogEntry,
   getUserByOpenId,
+  getUserCellarContext,
   type EventType,
   upsertTankReminder,
   listTankReminders,
@@ -2170,7 +2171,7 @@ const tutorRouter = router({
           .optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
       const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
       if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
@@ -2583,9 +2584,20 @@ ${docContext}`;
         }
       }
 
-      // ── Step 2b: Live Cellar Retriever — placeholder for authenticated tutor ─
-      const liveCellarContext = "";
-      void liveCellarContext;
+      // ── Step 2b: Live Cellar Retriever — inject this winemaker's own history ─
+      // Pulls last ~120 vintage_log entries + tank/variety inventory + event mix
+      // so the AI grounds advice in THEIR cellar, not just generic SOPs.
+      let liveCellarContext = "";
+      if (ctx.user) {
+        try {
+          const dbUser = await getUserByOpenId(ctx.user.openId);
+          if (dbUser) {
+            liveCellarContext = await getUserCellarContext(dbUser.id);
+          }
+        } catch (e) {
+          console.warn("[Tutor] cellar context fetch failed:", (e as Error)?.message);
+        }
+      }
 
       // ── Step 3: Build scoped context from retrieved SOPs ────────────────────
 
@@ -2738,6 +2750,7 @@ Rules:
 - Answer from the SOPs provided. If the SOPs don't cover the question, use sound oenological knowledge and say so.
 - Be specific and actionable. Give numbers, ranges, and decision criteria where relevant.
 - ${isHomeWinemaker ? "Keep language accessible — avoid jargon where possible, or explain it briefly." : "Use professional winemaking terminology."}${complianceNote}
+- ${liveCellarContext ? "PERSONAL HISTORY PRIORITY: A 'THIS WINEMAKER'S CELLAR HISTORY' block is provided below with this winemaker's own logged entries. When the question relates to a tank/variety/event in their history, CITE specific past entries by date + tank — e.g. 'Looking at your 18 Mar entry on Tank 7 (Shiraz), you measured…'. Ground your numbers in their actual data when possible. Never expose source labels (no 'CELLAR HISTORY says…'); speak naturally as their assistant." : ""}
 - Respond with a JSON object only, no markdown fences:
 {
   "answer": "<your full answer, may include newlines>",
@@ -2746,7 +2759,7 @@ Rules:
 }
 
 SOPs:
-${sopContext}${vintageContext ? `\n\n---\n\n## Regional Vintage Context\n${vintageContext}` : ""}`;
+${sopContext}${vintageContext ? `\n\n---\n\n## Regional Vintage Context\n${vintageContext}` : ""}${liveCellarContext ? `\n\n---\n\n${liveCellarContext}` : ""}`;
 
       const messages = [
         { role: "system" as const, content: systemPrompt },

@@ -185,6 +185,84 @@ export async function deleteVintageLogEntry(id: number, userId: number) {
     );
 }
 
+/**
+ * Build a compact "personal cellar history" summary for the AI tutor.
+ *
+ * This is THE learning-loop primitive: the user's own vintage log gets
+ * distilled into a prompt block so the AI grounds its advice in their
+ * actual tanks, varieties, and recent decisions — not just generic bibles.
+ *
+ * Returns an empty string when the user has no logged history (safe to inject).
+ */
+export async function getUserCellarContext(userId: number): Promise<string> {
+  const entries = await db.query.vintageLogEntries.findMany({
+    where: eq(schema.vintageLogEntries.userId, userId),
+    orderBy: [desc(schema.vintageLogEntries.entryAt)],
+    limit: 120,
+  });
+
+  if (entries.length === 0) return "";
+
+  // Tank + variety inventory
+  const tanks = new Map<string, Set<string>>(); // tankName -> set of varieties
+  const varieties = new Set<string>();
+  for (const e of entries) {
+    if (!tanks.has(e.tankName)) tanks.set(e.tankName, new Set());
+    tanks.get(e.tankName)!.add(e.variety);
+    varieties.add(e.variety);
+  }
+
+  const tankSummary = Array.from(tanks.entries())
+    .slice(0, 30)
+    .map(([t, vs]) => `${t} (${Array.from(vs).join(", ")})`)
+    .join(" · ");
+
+  // Event-type frequency
+  const eventCounts = new Map<string, number>();
+  for (const e of entries) {
+    eventCounts.set(e.eventType, (eventCounts.get(e.eventType) ?? 0) + 1);
+  }
+  const eventBreakdown = Array.from(eventCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([t, n]) => `${t}×${n}`)
+    .join(", ");
+
+  // Most recent 25 events as compact log lines
+  const recentLines = entries.slice(0, 25).map((e) => {
+    const d = new Date(e.entryAt).toLocaleDateString("en-AU", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+    let details = "";
+    try {
+      const obj = JSON.parse(e.detailsJson) as Record<string, unknown>;
+      const pairs = Object.entries(obj)
+        .filter(([, v]) => v !== null && v !== undefined && v !== "")
+        .slice(0, 4)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join(", ");
+      details = pairs;
+    } catch {
+      /* details may not be JSON */
+    }
+    const note = e.noteText ? ` — ${e.noteText.slice(0, 80)}` : "";
+    return `  • ${d} · ${e.tankName} (${e.variety}) · ${e.eventType}${details ? ` · ${details}` : ""}${note}`;
+  });
+
+  return `# THIS WINEMAKER'S CELLAR HISTORY (private — never expose source labels to the user)
+
+You have access to ${entries.length} logged events from this winemaker's own cellar.
+Tanks in use (${tanks.size}): ${tankSummary}
+Varieties worked (${varieties.size}): ${Array.from(varieties).slice(0, 20).join(", ")}
+Event mix: ${eventBreakdown}
+
+## Recent activity (${recentLines.length} most recent entries):
+${recentLines.join("\n")}
+
+When relevant, ground your answer in THESE specific past entries. Cite them naturally — e.g. "Looking at your 18 Mar entry on Tank 7 (Shiraz), you measured Brix 24.3 and YAN 120 — the same call applies now." Do NOT invent entries that aren't in this list.`;
+}
+
 // ─── Tank Reminders ──────────────────────────────────────────────────────
 
 export type ReminderEventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "any";

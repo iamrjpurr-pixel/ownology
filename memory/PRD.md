@@ -22,6 +22,17 @@
 **Auth (current — bypassed 28 Jun 2026)**
 - Manus OAuth removed. As of 28 Jun 2026 auth is **fully bypassed in production AND dev**: `createContext` in `server/trpc.ts` always injects `DEV_BYPASS_USER` (openId `seed-owner-001`, role `admin`) when no real session cookie is present. The bypass user is auto-upserted into the `users` table on every request (idempotent). `ownerProcedure` accepts any `role === "admin"` user, so the bypass user has owner privileges too. To re-enable real auth later, restore the `NODE_ENV` check in `createContext` and remove the auto-upsert.
 
+**Learning Loop (CORE USP — wired 28 Jun 2026)**
+- The single most important feature: AI advice grounded in the winemaker's OWN cellar history, not just generic bibles.
+- `server/db.ts → getUserCellarContext(userId)` distils the last 120 `vintage_log_entries` into a compact prompt block:
+  - Tank inventory + variety crossing
+  - Event-type frequency mix (additions, measurements, racking, inoculation, observation, etc.)
+  - Top 25 most-recent events as compact `date · tank · variety · type · details · note` lines
+- Injected into `tutor.ask` commercial path (after SOPs + Regional Vintage Context). Empty-string safe — new users with zero history get standard SOP-grounded answers; personalisation grows as they upload more.
+- System prompt rule: *"PERSONAL HISTORY PRIORITY: When the question relates to a tank/variety/event in their history, CITE specific past entries by date + tank. Speak naturally — never expose source labels."*
+- Smoke-tested 28 Jun 2026 (local prod): asking *"What did I do last vintage on Tank 7 with the Shiraz?"* returns a chronological recap of the user's actual logged events (24.3°Bx at crush → YAN 120ppm → split DAP → EC1118 → press at 2.0°Bx → MLF) and grounds the new advice in those past decisions. ✅
+- Seed script: `scripts/seed-test-cellar-history.mjs` populates 16 sample entries across 3 tanks (Shiraz, Chardonnay, Pinot Noir) so you can demo the personalisation without uploading real data.
+
 **RAG Knowledge Base (re-ingested 28 Jun 2026 — Railway prod MySQL)**
 - `diy_knowledge_chunks`: **348 total / 184 published** (was empty before re-ingestion)
   - `red_wine_bible`: 102 (25 published) — `Guide_to_Red_Winemaking.pdf`
