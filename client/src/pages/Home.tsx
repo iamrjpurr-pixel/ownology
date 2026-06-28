@@ -342,7 +342,7 @@ function Nav() {
               </svg>
               Work Mode
             </Link>
-            <a href="/pricing" className="btn-amber text-xs inline-flex items-center">
+            <a href="/pricing?from=homepage-nav" className="btn-amber text-xs inline-flex items-center">
               Start Free Trial
             </a>
           </div>
@@ -524,7 +524,7 @@ function Nav() {
             }}
           >
             <a
-              href="/pricing"
+              href="/pricing?from=homepage-mobile"
               onClick={handleNavClick}
               className="btn-amber w-full text-center block"
             >
@@ -563,7 +563,7 @@ function Hero() {
             </h1>
             <EditableText contentKey="home.hero.subheading" defaultValue="Log cellar readings. Access 38 industry SOPs across 12 categories. Ask the AI anything. Stay compliant. Ownology is the complete intelligence platform for boutique winery teams — on a mobile phone, during harvest." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-10 fade-up fade-up-delay-3">
-              <a href="/pricing" className="btn-amber text-center">Start 14-Day Free Trial</a>
+              <a href="/pricing?from=homepage-hero" className="btn-amber text-center">Start 14-Day Free Trial</a>
               <a href="#how-it-works" className="btn-ghost text-center">See How It Works</a>
               <Link href="/compliance" className="btn-ghost flex items-center justify-center gap-2" style={{borderColor:"color-mix(in oklch, var(--ow-amber) 30%, transparent)", color:"var(--ow-text-mid)"}}>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">

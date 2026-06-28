@@ -393,6 +393,13 @@ const TOOLS: AdminTool[] = [
     icon: <IconKnowledge />,
     badge: "Pipeline",
   },
+  {
+    label: "Conversion Funnel",
+    description: "Where do paid signups actually come from? Every /pricing visit is tagged by source (free-paused, homepage, press CTA, cellar-journal…) so you can tune budgets and CTAs against real conversion data.",
+    href: "/admin/funnel",
+    icon: <IconLeads />,
+    badge: "Attribution",
+  },
 ];
 
 export default function Admin() {

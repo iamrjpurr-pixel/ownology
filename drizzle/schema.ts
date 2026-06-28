@@ -1098,3 +1098,27 @@ export const aiAnswerFeedback = mysqlTable(
   ]
 );
 
+/**
+ * Pricing-page visit log — powers the /admin/funnel conversion-attribution
+ * dashboard. Every visit to /pricing is logged with the originating source
+ * (`?from=<source>`) so we can measure which acquisition channel converts.
+ *
+ * Sources currently tagged: free-paused, free-quota, homepage, press,
+ * cellar-journal, competitive-advantage, preview, stats, direct (untagged).
+ */
+export const pricingViews = mysqlTable(
+  "pricing_views",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    source: varchar("source", { length: 32 }).notNull(), // e.g. "free-paused"
+    userId: int("user_id"), // null = anonymous visitor
+    referer: varchar("referer", { length: 500 }),
+    userAgent: varchar("user_agent", { length: 500 }),
+    viewedAt: bigint("viewed_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("pv_source_idx").on(t.source, t.viewedAt),
+    index("pv_viewed_idx").on(t.viewedAt),
+  ]
+);
+

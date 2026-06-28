@@ -71,7 +71,7 @@ function Nav() {
           <Link href="/" style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.875rem", color: TEXT_LO }}>
             ← Back to Home
           </Link>
-          <Link href="/pricing">
+          <Link href="/pricing?from=competitive-advantage">
             <span className="btn-amber" style={{ fontSize: "0.8125rem", padding: "0.5rem 1.25rem" }}>
               Start Free Trial
             </span>

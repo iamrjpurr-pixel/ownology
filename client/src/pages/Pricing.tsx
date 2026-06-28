@@ -1052,6 +1052,23 @@ export default function Pricing() {
   const wasCancelled = new URLSearchParams(search).get("cancelled") === "1";
   const [showCancelledBanner, setShowCancelledBanner] = useState(wasCancelled);
 
+  // ── Conversion-attribution: log this /pricing visit once per mount ─────
+  // Source comes from `?from=<src>` query param; defaults to "direct" when
+  // a visitor lands without a tagged CTA. Powers /admin/funnel.
+  const logViewMutation = trpc.pricing.logView.useMutation();
+  const loggedRef = useRef(false);
+  useEffect(() => {
+    if (loggedRef.current) return;
+    loggedRef.current = true;
+    const params = new URLSearchParams(search);
+    const fromRaw = params.get("from")?.trim() || "direct";
+    logViewMutation.mutate({
+      source: fromRaw,
+      referer: typeof document !== "undefined" ? document.referrer.slice(0, 500) : undefined,
+      userAgent: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 500) : undefined,
+    });
+  }, []);
+
   const handleFlashPress = () => {
     // Small delay to let scroll animation finish before flashing
     setTimeout(() => {

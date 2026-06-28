@@ -441,7 +441,7 @@ export default function FreeRun() {
                   {/* Paused → Upgrade CTA */}
                   {msg.isPaused && (
                     <Link
-                      href="/pricing"
+                      href="/pricing?from=free-paused"
                       data-testid={`freerun-paused-upgrade-${msg.id}`}
                       style={{
                         display: "inline-flex",

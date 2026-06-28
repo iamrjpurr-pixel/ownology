@@ -141,6 +141,13 @@
       "when": 1781741149990,
       "tag": "0019_damp_bishop",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1782637853475,
+      "tag": "0020_clumsy_black_bird",
+      "breakpoints": true
     }
   ]
 }

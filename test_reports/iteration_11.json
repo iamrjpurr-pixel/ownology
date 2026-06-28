@@ -1,0 +1,38 @@
+{
+  "summary": "Tested Ownology conversion-attribution funnel (pricing.logView + pricing.funnelStats + /admin/funnel UI + tagged CTAs). 21/21 pytest backend tests pass. All Playwright frontend checks pass (admin-funnel-page renders, headline/sparkline/table/window-selector all work, /admin hub shows Conversion Funnel link, /pricing?from=X auto-logs exactly once via useRef gate, /pricing without ?from defaults to 'direct', regression pages /stats /tank-qr /the-press/compare /compliance /admin all return 200, admin.llmStats still works). Source normalisation, Zod validation (empty + >32 chars + days>365), DESC ordering, sharePct sum=100, daily zero-fill (7/30/90/365) all verified. Tagged CTAs in FreeRun/Home/CompetitiveAdvantage/CellarJournal all carry the correct ?from= query param.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/admin (Admin hub)", "issues": ["Pre-existing React hydration warning: nested <a> inside <a> in the header back-link area (not introduced by funnel work). Visible in console: 'In HTML, <a> cannot be a descendant of <a>'. Not blocking, but should be cleaned up."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_conversion_funnel.py",
+    "/app/test_reports/pytest/pytest_conversion_funnel.xml"
+  ],
+  "action_items": [
+    "(Optional, pre-existing) Fix nested <a> tag in /admin header back-link to silence React hydration warning.",
+    "(Tech-debt acknowledged in playbook) drizzle-kit migrate did not record pricing_views in __drizzle_migrations; consider re-baselining or switching to `drizzle-kit push` for future schema changes."
+  ],
+  "critical_code_review_comments": [
+    "/app/server/routers/pricing.ts:47 — `const source = (KNOWN_SOURCES as readonly string[]).includes(raw) ? raw : raw || 'direct';` collapses to `raw || 'direct'` and the KNOWN_SOURCES check has no behavioural effect. The current behaviour (store raw lowercased; fall back to 'direct' only when raw is empty after normalisation) is what the spec asks for, but the ternary is dead code — simplify to `const source = raw || 'direct';`.",
+    "/app/server/routers/pricing.ts:48 — `const userId = ctx.user?.openId ? null : null;` is always null. Comment says 'user wiring deferred', so this is intentional, but explicit `const userId: number | null = null;` would be clearer.",
+    "/app/server/routers/pricing.ts:100-104 — `Date.now()` is sampled inside the loop instead of once before; minor (no correctness impact at <1s loops) but worth pulling out for clarity.",
+    "Daily bucketing uses UTC `DATE(FROM_UNIXTIME(...))` server-side but the zero-fill loop uses the JS `Date` UTC slice — these align, but if the MySQL server timezone is not UTC the join could misalign. Consider `SET time_zone='+00:00'` on the connection or convert at the app layer."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_conversion_funnel.py (new)"
+  ],
+  "success_rate": {"backend": "100% (21/21)", "frontend": "100% (all critical flows)"},
+  "test_credentials": "Auth bypassed in dev (seed-owner-001 / cellar@redstoneridge.com.au, role=admin) per /app/memory/test_credentials.md.",
+  "seed_data_creation": "Backend tests created several rows in pricing_views: 'my-experiment-<ts>', 'test-agent-<ts>' (×3 in round-trip test), various normalisation rows ('free-paused', 'free-paused--'), and the Playwright run added 'pw-test-<ts>', 'pw-verify-2', plus 2 'direct' rows. All non-destructive; counts only.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "pytest file /app/backend/tests/test_conversion_funnel.py covers logView + funnelStats end-to-end and is safe to re-run. Hits the live preview URL. No fixtures required — auth is bypassed. The TestRoundTrip test depends on Railway MySQL latency (1.5s sleep after writes); if flakey, bump the sleep. Funnel UI uses data-testid: admin-funnel-page, admin-funnel-headline, admin-funnel-table, admin-funnel-row-<source>, admin-funnel-window-{7,30,90}.",
+  "rca of the issue": "N/A — all features working as spec'd. Manual e2e claim from main agent confirmed by automated tests."
+}

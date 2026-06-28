@@ -416,7 +416,7 @@ export function CellarJournalEntry({ slug }: { slug: string }) {
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setLoc("/pricing")}
+                onClick={() => setLoc("/pricing?from=cellar-journal")}
                 data-testid="cj-cta-paid"
                 className="px-5 py-3 rounded-full font-mono text-[11px] uppercase tracking-[0.22em] text-left flex items-center justify-between"
                 style={{ background: "var(--ow-amber)", color: "#1a1410" }}

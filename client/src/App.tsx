@@ -38,6 +38,7 @@ import AdminComplianceDoctrine from "./pages/AdminComplianceDoctrine";
 import AdminVintageIntelligence from "./pages/AdminVintageIntelligence";
 import AdminWbs from "./pages/AdminWbs";
 import AdminTrinity from "./pages/AdminTrinity";
+import AdminFunnel from "./pages/AdminFunnel";
 import FoundingMemberSuccess from "./pages/FoundingMemberSuccess";
 import OAuthCallback from "./pages/OAuthCallback";
 import ProductionDashboard from "./pages/ProductionDashboard";
@@ -193,6 +194,7 @@ function Router() {
       <Route path={"/admin/vintage-intelligence"} component={AdminVintageIntelligence} />
       <Route path={"/admin/wbs"} component={AdminWbs} />
       <Route path={"/admin/trinity"} component={AdminTrinity} />
+      <Route path={"/admin/funnel"} component={AdminFunnel} />
       <Route path={"/founding-member/success"} component={FoundingMemberSuccess} />
       <Route path={"/dashboard"} component={DashboardPage} />
       <Route path={"/vineyard"} component={Vineyard} />
