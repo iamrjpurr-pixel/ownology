@@ -62,7 +62,7 @@ export default function Stats() {
             >
               <div className="flex items-baseline justify-between mb-2">
                 <p className="text-xs uppercase tracking-widest" style={{ color: stats.daily.exceeded ? "#b91c1c" : "var(--ow-amber)" }}>
-                  Today&apos;s budget · {stats.daily.dateKey} {stats.daily.exceeded ? "· PAUSED" : ""}
+                  Today&apos;s budget · {stats.daily.dateKey}{stats.daily.exceeded ? " · PAUSED" : ""}
                 </p>
                 <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.85rem", color: "var(--ow-text-mid)" }}>
                   {fmtUsd(stats.daily.spendUsd)}{" "}

@@ -78,6 +78,7 @@ export function isDailyBudgetExceeded(): boolean {
 
 /** Manual override — used by admin.resetDailyBudget. */
 export function resetDailyBudget(): void {
+  rollDailyIfNeeded();
   dailySpendUsd = 0;
   dailyDateKey = todayKey();
 }

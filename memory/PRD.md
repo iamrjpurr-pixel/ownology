@@ -150,6 +150,19 @@
 - OAuth portal — replaced with placeholder; the `OAuthCallback.tsx` page can be revisited when real auth is chosen.
 - Buttondown newsletter — `BUTTONDOWN_API_KEY` empty; newsletter scheduled job will no-op.
 
+**Daily LLM Budget Guard-Rail (28 Jun 2026, this session)**
+- New env var `DAILY_LLM_BUDGET_USD` (default $10). When today's accumulated spend reaches the budget, `server/_core/forgeShim.ts` returns a synthetic OpenAI-shaped success response with content `"AI service temporarily paused — Ownology has reached today's AI budget…"` for every chat-completion request. Every existing caller's `data.choices[0].message.content` access works unchanged — they just receive the graceful message instead of a real answer.
+- Counter auto-resets at UTC midnight via `rollDailyIfNeeded()`. Manual override: new `admin.resetDailyBudget` owner mutation.
+- Surfaced on `/stats`: new "Today's Budget" card with progress bar, remaining-$ message, red border + PAUSED label when exceeded.
+- `admin.llmStats` now includes `daily: { dateKey, spendUsd, budgetUsd, exceeded, remainingUsd }`.
+- Verified live (iter 8, 16/16 backend + all 3 frontend states pass): with a $0.0003 test budget, call 1 spent $0.00043 (under budget → real answer), call 2 hit the guard and returned synthetic "paused" response. `admin.resetDailyBudget` cleared spend; subsequent calls succeeded again.
+- Synthetic responses do NOT increment the meter (usage:0/0/0) — so /stats KPIs remain accurate.
+
+**Three P1 Items Shipped (28 Jun 2026, this session)**
+- **Daily Cellar Brief email** — `GET/POST /api/scheduled/daily-alert-email` Express route. Uses Resend SDK. Loops over users, computes alerts via `computeAlertsForUser()` (extracted from the tRPC alerts proc into a reusable export), renders HTML+text email with severity-coded alert blocks, sends via Resend. Env knobs: `RESEND_API_KEY` (set), `ALERT_FROM_EMAIL` (`onboarding@resend.dev` for sandbox), `ALERT_FROM_NAME`, `ALERT_TEST_TO` (Resend sandbox only delivers to the verified account email — set to `iamrjpurr@gmail.com`), `CRON_SECRET` (optional guard for live sends; dry-runs always open). Live send verified — Resend message ID `a206cc1b-15e7-4850-8d30-a757187c922d`. Cron schedule for prod: Railway cron → `7 0 * * *` UTC ≈ Sydney 10am AEST (adjust for daylight). Dry-run via `?dryRun=1`.
+- **Vintage Comparison view** (`/the-press/compare`) — pure data composition over `vintage_log_entries`. Pick 2-6 tanks; each card shows variety, yeast strain, ferment duration (inoc→dry), start/final Brix, YAN range, peak temp, avg pH, DAP/SO₂ addition counts, last 5 decisions ("Why?" reasoning). New tRPC proc `vintageLog.compareTanks(tankNames[])`. Discoverability link added at top of `/the-press`. Standalone full-width page (bypasses WorkModeLayout's 430px mobile cap).
+- **`admin.resetFreeRunQuota`** owner mutation — optional `userId` (omit → clears today's quota for all users). Closes the CI friction point the testing agent flagged.
+
 **LLM Cost Meter — Universal coverage (28 Jun 2026, this session)**
 - Closed the coverage gap flagged earlier. Previously only `freeRunRouter` calls (via `chatCompletion`) were metered; ~15 direct `fetch()` LLM call sites in `routers/tutor.ts`, `routers/vintageLog.ts`, `merch/api.ts`, `queryRouter.ts`, `trinityPipeline.ts`, `routers.ts`, `sopEmbeddings.ts` were invisible.
 - **Architecture change**: `server/_core/forgeShim.ts` is now the SINGLE SOURCE OF TRUTH for metering. The shim already wraps `globalThis.fetch` to inject default model + rewrite `max_tokens`. It now ALSO clones every successful chat/completion response, parses `usage.prompt_tokens` + `usage.completion_tokens`, and calls `recordLlmCall(model, in, out, source)`.
