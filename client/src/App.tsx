@@ -253,6 +253,8 @@ function Router() {
       <Route path={"/stats"} component={Stats} />
       <Route path={"/tank-qr"} component={TankQr} />
       <Route path={"/the-press/compare"} component={VintageCompare} />
+      <Route path={"/hi/:slug"} component={HiContact} />
+      <Route path={"/admin/contacts"} component={AdminContacts} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />

@@ -400,6 +400,13 @@ const TOOLS: AdminTool[] = [
     icon: <IconLeads />,
     badge: "Attribution",
   },
+  {
+    label: "Personal SMS Contacts",
+    description: "Outreach pipeline for warm leads met at wine events. Add a winemaker → get a personalised /hi/<slug> landing page + ready-to-send SMS draft. Tracks who opened the link and who booked a demo.",
+    href: "/admin/contacts",
+    icon: <IconLeads />,
+    badge: "Outreach",
+  },
 ];
 
 export default function Admin() {
