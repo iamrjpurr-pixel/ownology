@@ -150,6 +150,13 @@
 - OAuth portal — replaced with placeholder; the `OAuthCallback.tsx` page can be revisited when real auth is chosen.
 - Buttondown newsletter — `BUTTONDOWN_API_KEY` empty; newsletter scheduled job will no-op.
 
+**Batch 2 — Value Engineered feature upgrades (28 Jun 2026)**
+- **Tank QR codes** (`/tank-qr`) — printable QR code per unique tank in cellar history (`client/src/pages/TankQr.tsx`, 90 LOC). Each QR encodes `/quick-entry?tank=<TankName>&variety=<Variety>` so cellar staff scan with phone → land on pre-filled QuickEntry. Bridges physical → digital. QuickEntry already supports the URL params (line 263-269). Verified live: 10 QR cards render (Tank 1/12/2/3/4/5/7/8/9/Test 1).
+- **Compliance Audit Trail PDF** (`GET /api/compliance/audit-trail.pdf?days=N`) — Express endpoint using `pdfkit`. Filters `vintage_log_entries` to compliance-relevant events (event type: addition/racking/inoculation/measurement OR keyword match: so2/yan/dap/ph/ta/abv/brix/mlf etc) and produces a regulator-ready chronological export with timestamps, tank, variety, details, notes, and operator reasoning. CTA button placed on `/compliance` page (`compliance-audit-trail-download`). Verified live: returns 5256-byte valid PDF starting with `%PDF-1.3`.
+- **Public Stats transparency page** (`/stats`) — pulls from `admin.llmStats` and surfaces total LLM spend, by-model breakdown, by-source breakdown, and a "$99/mo covers ~X AI calls" explainer. Refetches every 60s. Unique trust signal — no SaaS does this. **Caveat**: currently behind `ownerProcedure` but works in dev because auth-bypass user is admin. Convert `llmStats` to `publicProcedure` when real auth lands, or `/stats` will 401 publicly.
+- All three verified end-to-end in `/app/test_reports/iteration_5.json` (15/15 backend + 8/8 frontend).
+- Regression file: `/app/backend/tests/test_batch2_features.py`.
+
 ## What's been implemented (27 Jan 2026)
 - Mockup page in Emergent's default React stack ("Cellar Journal" aesthetic) — used as design exploration before the lift-and-shift.
 - Full lift-and-shift import of the Manus codebase into `/app`.

@@ -38,8 +38,12 @@ export default function TankQr() {
       for (const item of items) {
         const variety = item.varieties[0] ?? "";
         const url = `${origin}/quick-entry?tank=${encodeURIComponent(item.tank)}${variety ? `&variety=${encodeURIComponent(variety)}` : ""}`;
-        const dataUrl = await QRCode.toDataURL(url, { width: 256, margin: 1, color: { dark: "#000", light: "#FFF" } });
-        next.push({ tank: item.tank, varieties: item.varieties, dataUrl });
+        try {
+          const dataUrl = await QRCode.toDataURL(url, { width: 256, margin: 1, color: { dark: "#000", light: "#FFF" } });
+          next.push({ tank: item.tank, varieties: item.varieties, dataUrl });
+        } catch (err) {
+          console.error(`[tank-qr] Failed to encode QR for "${item.tank}":`, err);
+        }
       }
       if (!cancelled) setRows(next);
     })();
