@@ -1,14 +1,12 @@
 # Nixpacks build configuration for Railway
-# Tells Railway how to build and start Ownology.
-# Install pnpm globally to /usr/local so it's on PATH across all build phases.
+# Chain everything in single commands so PATH from npm install -g persists.
 
 [phases.setup]
 nixPkgs = ["nodejs_20"]
 
 [phases.install]
 cmds = [
-  "npm install -g --prefix /usr/local pnpm@10.4.1",
-  "pnpm install --no-frozen-lockfile"
+  "npm install -g pnpm@10.4.1 && PNPM_BIN=$(npm root -g)/pnpm/bin/pnpm.cjs && ln -sf $PNPM_BIN /usr/bin/pnpm && pnpm install --no-frozen-lockfile"
 ]
 
 [phases.build]
