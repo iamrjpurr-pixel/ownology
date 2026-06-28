@@ -150,6 +150,13 @@
 - OAuth portal — replaced with placeholder; the `OAuthCallback.tsx` page can be revisited when real auth is chosen.
 - Buttondown newsletter — `BUTTONDOWN_API_KEY` empty; newsletter scheduled job will no-op.
 
+**Lazy Code-Splitting for Cold Pages (28 Jun 2026, this session)**
+- 30+ rarely-visited pages converted from static `import` to `React.lazy(() => import(...))` in `client/src/App.tsx`. Suspense wraps the entire Switch with a tiny "Loading…" skeleton (`data-testid="page-loading"`).
+- **Eager (kept synchronous)**: Home, FreeRun, ThePress, QuickEntry, CellarTasks, Today, Pricing, WorkModeLayout, PwaInstallBanner. These are first-paint or PWA bottom-nav critical.
+- **Lazy (code-split into own chunks)**: WhyOwnology, ForInnoVintUsers, ForVintraceUsers, Blog, BlogArticle, Regulations, RegulatoryLinks, Compliance, Merch×3, CampaignMetrics, Orders, Admin, HomeWineryKit, ForHomeWinemakers, DIYKnowledge, HomeWinemakerTroubleshooting, HomeWinemakerGlossary, CompetitiveAdvantage, Preview, AdminLeads, AdminComplianceDoctrine, AdminVintageIntelligence, AdminWbs, AdminTrinity, AdminFunnel, FoundingMemberSuccess, OAuthCallback, ProductionDashboard, BuildIndex, Vineyard, Knowledge, CellarJournalIndex/Entry (named exports rewrapped), Guide, Import, Demo, Waitlist, VineReference, Resume, Stats, TankQr, VintageCompare.
+- Verified live: with 250 KB/s network throttling, the `page-loading` skeleton briefly flashes when navigating to a fresh lazy chunk; the page then renders correctly. Eager routes feel instant.
+- **Net effect**: first JS payload meaningfully smaller — winemakers on rural 3G during vintage will feel the win on `/`, `/free-run`, `/the-press` loads. Admin/Trinity/Knowledge chunks only download when someone actually visits those routes.
+
 **Work-Mode Desktop Layout Audit (28 Jun 2026, this session)**
 After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept every page rendered inside `WorkModeLayout` at 1920×1080:
 - ✅ `/compliance` — already standalone (not in WorkModeLayout), full-width, no fix needed.

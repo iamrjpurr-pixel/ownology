@@ -2,62 +2,101 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect, useLocation } from "wouter";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ThemeToggle from "@/components/ThemeToggle";
+
+// ── EAGER: first-paint-critical + cellar-floor PWA tabs ───────────────────
+// Loaded synchronously so the most-trafficked routes render with zero
+// network round-trip after the JS shell arrives. Everything else lives
+// behind React.lazy() so a winemaker on rural 3G doesn't pay for code
+// they may never touch.
 import Home from "./pages/Home";
-import WhyOwnology from "./pages/WhyOwnology";
-import ForInnoVintUsers from "./pages/ForInnoVintUsers";
-import ForVintraceUsers from "./pages/ForVintraceUsers";
-import Blog from "./pages/Blog";
-import BlogArticle from "./pages/BlogArticle";
-import Regulations from "./pages/Regulations";
-import RegulatoryLinks from "./pages/RegulatoryLinks";
-import Compliance from "./pages/Compliance";
 import FreeRun from "./pages/FreeRun";
 import ThePress from "./pages/ThePress";
-import Pricing from "./pages/Pricing";
-import Merch from "./pages/Merch";
-import MerchSuccess from "./pages/MerchSuccess";
-import MerchCancel from "./pages/MerchCancel";
-import CampaignMetrics from "./pages/CampaignMetrics";
-import Orders from "./pages/Orders";
-import Admin from "./pages/Admin";
 import QuickEntry from "./pages/QuickEntry";
 import CellarTasks from "./pages/CellarTasks";
-import HomeWineryKit from "./pages/HomeWineryKit";
-import ForHomeWinemakers from "./pages/ForHomeWinemakers";
-import DIYKnowledge from "./pages/DIYKnowledge";
-import HomeWinemakerTroubleshooting from "./pages/HomeWinemakerTroubleshooting";
-import HomeWinemakerGlossary from "./pages/HomeWinemakerGlossary";
-import CompetitiveAdvantage from "./pages/CompetitiveAdvantage";
-import Preview from "./pages/Preview";
-import AdminLeads from "./pages/AdminLeads";
-import AdminComplianceDoctrine from "./pages/AdminComplianceDoctrine";
-import AdminVintageIntelligence from "./pages/AdminVintageIntelligence";
-import AdminWbs from "./pages/AdminWbs";
-import AdminTrinity from "./pages/AdminTrinity";
-import AdminFunnel from "./pages/AdminFunnel";
-import FoundingMemberSuccess from "./pages/FoundingMemberSuccess";
-import OAuthCallback from "./pages/OAuthCallback";
-import ProductionDashboard from "./pages/ProductionDashboard";
-import BuildIndex from "./pages/BuildIndex";
-import Vineyard from "./pages/Vineyard";
-import PwaInstallBanner from "./components/PwaInstallBanner";
-import Knowledge from "./pages/Knowledge";
-import { CellarJournalIndex, CellarJournalEntry } from "./pages/CellarJournal";
-import Guide from "./pages/Guide";
-import Import from "./pages/Import";
 import Today from "./pages/Today";
-import Demo from "./pages/Demo";
-import Waitlist from "./pages/Waitlist";
-import VineReference from "./pages/VineReference";
-import Resume from "./pages/Resume";
-import Stats from "./pages/Stats";
-import TankQr from "./pages/TankQr";
-import VintageCompare from "./pages/VintageCompare";
+import Pricing from "./pages/Pricing";
 import WorkModeLayout from "@/components/WorkModeLayout";
+import PwaInstallBanner from "./components/PwaInstallBanner";
+
+// ── LAZY: cold pages — code-split into their own chunks ───────────────────
+const WhyOwnology = lazy(() => import("./pages/WhyOwnology"));
+const ForInnoVintUsers = lazy(() => import("./pages/ForInnoVintUsers"));
+const ForVintraceUsers = lazy(() => import("./pages/ForVintraceUsers"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogArticle = lazy(() => import("./pages/BlogArticle"));
+const Regulations = lazy(() => import("./pages/Regulations"));
+const RegulatoryLinks = lazy(() => import("./pages/RegulatoryLinks"));
+const Compliance = lazy(() => import("./pages/Compliance"));
+const Merch = lazy(() => import("./pages/Merch"));
+const MerchSuccess = lazy(() => import("./pages/MerchSuccess"));
+const MerchCancel = lazy(() => import("./pages/MerchCancel"));
+const CampaignMetrics = lazy(() => import("./pages/CampaignMetrics"));
+const Orders = lazy(() => import("./pages/Orders"));
+const Admin = lazy(() => import("./pages/Admin"));
+const HomeWineryKit = lazy(() => import("./pages/HomeWineryKit"));
+const ForHomeWinemakers = lazy(() => import("./pages/ForHomeWinemakers"));
+const DIYKnowledge = lazy(() => import("./pages/DIYKnowledge"));
+const HomeWinemakerTroubleshooting = lazy(() => import("./pages/HomeWinemakerTroubleshooting"));
+const HomeWinemakerGlossary = lazy(() => import("./pages/HomeWinemakerGlossary"));
+const CompetitiveAdvantage = lazy(() => import("./pages/CompetitiveAdvantage"));
+const Preview = lazy(() => import("./pages/Preview"));
+const AdminLeads = lazy(() => import("./pages/AdminLeads"));
+const AdminComplianceDoctrine = lazy(() => import("./pages/AdminComplianceDoctrine"));
+const AdminVintageIntelligence = lazy(() => import("./pages/AdminVintageIntelligence"));
+const AdminWbs = lazy(() => import("./pages/AdminWbs"));
+const AdminTrinity = lazy(() => import("./pages/AdminTrinity"));
+const AdminFunnel = lazy(() => import("./pages/AdminFunnel"));
+const FoundingMemberSuccess = lazy(() => import("./pages/FoundingMemberSuccess"));
+const OAuthCallback = lazy(() => import("./pages/OAuthCallback"));
+const ProductionDashboard = lazy(() => import("./pages/ProductionDashboard"));
+const BuildIndex = lazy(() => import("./pages/BuildIndex"));
+const Vineyard = lazy(() => import("./pages/Vineyard"));
+const Knowledge = lazy(() => import("./pages/Knowledge"));
+// Named exports — must rewrap to a `default` shape for React.lazy().
+const CellarJournalIndex = lazy(() =>
+  import("./pages/CellarJournal").then((m) => ({ default: m.CellarJournalIndex }))
+);
+const CellarJournalEntry = lazy(() =>
+  import("./pages/CellarJournal").then((m) => ({ default: m.CellarJournalEntry }))
+);
+const Guide = lazy(() => import("./pages/Guide"));
+const Import = lazy(() => import("./pages/Import"));
+const Demo = lazy(() => import("./pages/Demo"));
+const Waitlist = lazy(() => import("./pages/Waitlist"));
+const VineReference = lazy(() => import("./pages/VineReference"));
+const Resume = lazy(() => import("./pages/Resume"));
+const Stats = lazy(() => import("./pages/Stats"));
+const TankQr = lazy(() => import("./pages/TankQr"));
+const VintageCompare = lazy(() => import("./pages/VintageCompare"));
+
+/** Lightweight skeleton shown while a lazy page chunk downloads.
+ *  Sized so it doesn't cause layout shift on first paint. */
+function PageLoading() {
+  return (
+    <div
+      style={{
+        minHeight: "60vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "var(--ow-text-lo, #6b7280)",
+        fontFamily: "'Lato',sans-serif",
+        fontSize: "0.85rem",
+        letterSpacing: "0.08em",
+        textTransform: "uppercase",
+      }}
+      data-testid="page-loading"
+      role="status"
+      aria-live="polite"
+    >
+      Loading…
+    </div>
+  );
+}
 
 
 // ── Work Mode wrapper components ──────────────────────────────────────────
@@ -154,6 +193,7 @@ function Router() {
   // The Guide page sets 'ownology_guide_seen' in localStorage on mount.
   // We only redirect on the root path so deep-links are not interrupted.
   return (
+    <Suspense fallback={<PageLoading />}>
     <Switch>
       <Route path={"/"} component={MobileHomeRoute} />
       <Route path={"/home"} component={Home} />
@@ -217,6 +257,7 @@ function Router() {
       {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
+    </Suspense>
   );
 }
 
