@@ -78,12 +78,12 @@ export default function HiContact() {
 
         {contact.event && (
           <p style={{ fontFamily: "'Fraunces',serif", fontSize: "1.25rem", color: "#374151", marginTop: "0.6rem", marginBottom: 0, fontStyle: "italic" }}>
-            Great chatting at <strong style={{ color: "#b45309", fontStyle: "normal" }}>{contact.event}</strong>
-            {contact.winery ? <> — and bringing <strong style={{ color: "#b45309", fontStyle: "normal" }}>{contact.winery}</strong> into the chat.</> : "."}
+            We crossed paths at <strong style={{ color: "#b45309", fontStyle: "normal" }}>{contact.event}</strong>
+            {contact.winery ? <> — sending this your way for <strong style={{ color: "#b45309", fontStyle: "normal" }}>{contact.winery}</strong>.</> : "."}
           </p>
         )}
 
-        {/* Pain hook */}
+        {/* Pain hook (only if explicitly captured) */}
         {contact.painPoint && (
           <div
             data-testid="hi-pain"
@@ -99,8 +99,24 @@ export default function HiContact() {
               color: "#1f2937",
             }}
           >
-            You mentioned <em>{contact.painPoint}</em>. That&apos;s exactly the kind of question Ownology is built to answer — grounded in your actual vintage logs, not a guess from a forum.
+            Thought this might be relevant: <em>{contact.painPoint}</em>. Ownology is built to answer that kind of question grounded in your actual vintage logs, not a guess from a forum.
           </div>
+        )}
+
+        {/* Honest framing for cold/brief contacts */}
+        {!contact.painPoint && (
+          <p
+            data-testid="hi-intro"
+            style={{
+              marginTop: "1.5rem",
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.95rem",
+              lineHeight: 1.6,
+              color: "#374151",
+            }}
+          >
+            We didn&apos;t get long to chat — I&apos;ve since shipped something I reckon could save you real time in the cellar. 90-second look below; no signup needed.
+          </p>
         )}
 
         {/* Value bullets */}

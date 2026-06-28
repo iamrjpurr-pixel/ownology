@@ -22,11 +22,29 @@ function fmtAgo(ms: number | null | undefined): string {
 
 function smsDraft(c: { firstName: string; winery?: string | null; event?: string | null; painPoint?: string | null; slug: string }): string {
   const where = c.event ? `at ${c.event}` : "the other day";
-  const pain = c.painPoint ? `about ${c.painPoint}` : "about your cellar setup";
-  const wineryBit = c.winery ? ` (${c.winery})` : "";
   const url = `${PREVIEW_BASE}/hi/${c.slug}`;
-  return `G'day ${c.firstName} — great chatting ${where}${wineryBit} ${pain}. I built a cellar AI that grounds advice in your own vintage logs. 90 sec look: ${url} — Jamie`;
+  if (c.painPoint) {
+    const wineryBit = c.winery ? ` (${c.winery})` : "";
+    return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. You mentioned ${c.painPoint}; I've since built a cellar AI that answers exactly that, grounded in your own vintage logs. 90 sec look: ${url} — Jamie`;
+  }
+  // Honest cold-contact version — no faux familiarity
+  const wineryBit = c.winery ? `, sending this to ${c.winery} too` : "";
+  return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. I've since built a cellar AI grounded in your own vintage logs — figured you might find it useful. 90 sec look: ${url} — Jamie`;
 }
+
+type ContactStatus = "warm" | "lukewarm" | "cold" | "sales" | "skip";
+
+const STATUS_OPTIONS: { value: ContactStatus; label: string; color: string }[] = [
+  { value: "warm",     label: "Warm",     color: "#16a34a" },
+  { value: "lukewarm", label: "Lukewarm", color: "#ca8a04" },
+  { value: "cold",     label: "Cold",     color: "#6b7280" },
+  { value: "sales",    label: "Sales/Vendor", color: "#7c3aed" },
+  { value: "skip",     label: "Skip",     color: "#9ca3af" },
+];
+
+const STATUS_META: Record<ContactStatus, { label: string; color: string }> = Object.fromEntries(
+  STATUS_OPTIONS.map((o) => [o.value, { label: o.label, color: o.color }])
+) as Record<ContactStatus, { label: string; color: string }>;
 
 export default function AdminContacts() {
   const utils = trpc.useUtils();
@@ -34,6 +52,7 @@ export default function AdminContacts() {
   const createMutation = trpc.outreach.create.useMutation();
   const markSmsSentMutation = trpc.outreach.markSmsSent.useMutation();
   const markBookedMutation = trpc.outreach.markBooked.useMutation();
+  const setStatusMutation = trpc.outreach.setStatus.useMutation();
   const removeMutation = trpc.outreach.remove.useMutation();
 
   const [form, setForm] = useState({
@@ -48,15 +67,32 @@ export default function AdminContacts() {
   });
   const [err, setErr] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<Record<string, "url" | "sms" | null>>({});
+  const [statusFilter, setStatusFilter] = useState<ContactStatus | "all">("all");
 
-  const contacts = useMemo(() => data?.contacts ?? [], [data]);
+  const allContacts = useMemo(() => data?.contacts ?? [], [data]);
+  const contacts = useMemo(() => {
+    if (statusFilter === "all") return allContacts;
+    return allContacts.filter((c) => (c.status ?? "cold") === statusFilter);
+  }, [allContacts, statusFilter]);
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<ContactStatus, number> = { warm: 0, lukewarm: 0, cold: 0, sales: 0, skip: 0 };
+    for (const c of allContacts) {
+      const s = (c.status ?? "cold") as ContactStatus;
+      if (counts[s] !== undefined) counts[s]++;
+    }
+    return counts;
+  }, [allContacts]);
+
   const stats = useMemo(() => {
-    const total = contacts.length;
-    const sent = contacts.filter((c) => c.smsSentAt).length;
-    const opened = contacts.filter((c) => (c.viewCount ?? 0) > 0).length;
-    const booked = contacts.filter((c) => c.demoBookedAt).length;
+    // KPIs are computed over the FULL list (not the filtered view) so the
+    // headline numbers stay stable as the operator clicks filter chips.
+    const total = allContacts.length;
+    const sent = allContacts.filter((c) => c.smsSentAt).length;
+    const opened = allContacts.filter((c) => (c.viewCount ?? 0) > 0).length;
+    const booked = allContacts.filter((c) => c.demoBookedAt).length;
     return { total, sent, opened, booked };
-  }, [contacts]);
+  }, [allContacts]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -109,6 +145,27 @@ export default function AdminContacts() {
         <Kpi label="Demo booked" value={stats.booked} testid="contacts-kpi-booked" />
       </div>
 
+      {/* Triage filter chips */}
+      <div className="flex flex-wrap gap-2 mb-6" data-testid="status-filter-bar">
+        <FilterChip
+          label={`All (${allContacts.length})`}
+          active={statusFilter === "all"}
+          color="#b45309"
+          onClick={() => setStatusFilter("all")}
+          testid="filter-all"
+        />
+        {STATUS_OPTIONS.map((s) => (
+          <FilterChip
+            key={s.value}
+            label={`${s.label} (${statusCounts[s.value]})`}
+            active={statusFilter === s.value}
+            color={s.color}
+            onClick={() => setStatusFilter(s.value)}
+            testid={`filter-${s.value}`}
+          />
+        ))}
+      </div>
+
       {/* Add form */}
       <form onSubmit={handleCreate} className="mb-8 rounded p-5" style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}>
         <p className="text-xs uppercase tracking-widest mb-3" style={{ color: "var(--ow-amber)" }}>Add contact</p>
@@ -157,12 +214,19 @@ export default function AdminContacts() {
           const url = `${PREVIEW_BASE}/hi/${c.slug}`;
           const sms = smsDraft({ firstName: c.firstName, winery: c.winery, event: c.event, painPoint: c.painPoint, slug: c.slug });
           const copied = copyState[c.slug];
+          const status = ((c.status ?? "cold") as ContactStatus);
+          const meta = STATUS_META[status] ?? STATUS_META.cold;
+          const isSilent = status === "sales" || status === "skip";
           return (
             <div
               key={c.slug}
               data-testid={`contact-row-${c.slug}`}
               className="rounded p-4"
-              style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}
+              style={{
+                background: "var(--ow-bg-card)",
+                border: "1px solid var(--ow-border)",
+                opacity: isSilent ? 0.55 : 1,
+              }}
             >
               <div className="flex items-baseline justify-between flex-wrap gap-2 mb-2">
                 <div>
@@ -173,81 +237,117 @@ export default function AdminContacts() {
                     {c.winery ?? "—"} · {c.event ?? "—"} · {c.mobileAu ?? "no mobile"}
                   </p>
                 </div>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+                  <Pill color={meta.color}>{meta.label}</Pill>
+                  <select
+                    data-testid={`status-select-${c.slug}`}
+                    value={status}
+                    onChange={(e) =>
+                      setStatusMutation.mutate(
+                        { slug: c.slug, status: e.target.value as ContactStatus },
+                        { onSuccess: () => utils.outreach.list.invalidate() }
+                      )
+                    }
+                    style={{
+                      padding: "4px 8px",
+                      borderRadius: 4,
+                      border: "1px solid var(--ow-border)",
+                      background: "var(--ow-bg-card)",
+                      color: "var(--ow-text-mid)",
+                      fontFamily: "'Lato',sans-serif",
+                      fontSize: "0.72rem",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {STATUS_OPTIONS.map((s) => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
                   {c.smsSentAt && <Pill color="#6b7280">SMS sent {fmtAgo(c.smsSentAt)}</Pill>}
                   {(c.viewCount ?? 0) > 0 && <Pill color="#b45309">{c.viewCount} view{c.viewCount === 1 ? "" : "s"}</Pill>}
                   {c.demoBookedAt && <Pill color="#10b981">Booked {fmtAgo(c.demoBookedAt)}</Pill>}
                 </div>
               </div>
               {c.painPoint && <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.85rem", color: "var(--ow-text-mid)", fontStyle: "italic", marginBottom: 8 }}>“{c.painPoint}”</p>}
-              <div className="flex flex-wrap gap-2 mt-2">
-                <button
-                  data-testid={`copy-url-${c.slug}`}
-                  onClick={() => copy(c.slug, "url", url)}
-                  style={btn}
+              {isSilent ? (
+                <p
+                  data-testid={`silent-note-${c.slug}`}
+                  style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)", fontStyle: "italic", marginTop: 8 }}
                 >
-                  {copied === "url" ? "✓ URL copied" : `Copy link`}
-                </button>
-                <button
-                  data-testid={`copy-sms-${c.slug}`}
-                  onClick={() => copy(c.slug, "sms", sms)}
-                  style={{ ...btn, background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", fontWeight: 700 }}
-                >
-                  {copied === "sms" ? "✓ SMS copied" : "Copy SMS draft"}
-                </button>
-                <a href={url} target="_blank" rel="noopener noreferrer" style={{ ...btn, textDecoration: "none" }}>
-                  Preview /hi/{c.slug}
-                </a>
-                {!c.smsSentAt && (
+                  {status === "sales" ? "Sales/vendor — SMS draft hidden so you don't accidentally pitch a rep." : "Marked skip — kept for reference only."}
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2 mt-2">
                   <button
-                    data-testid={`mark-sent-${c.slug}`}
-                    onClick={() => markSmsSentMutation.mutate({ slug: c.slug }, { onSuccess: () => utils.outreach.list.invalidate() })}
+                    data-testid={`copy-url-${c.slug}`}
+                    onClick={() => copy(c.slug, "url", url)}
                     style={btn}
                   >
-                    Mark SMS sent
+                    {copied === "url" ? "✓ URL copied" : `Copy link`}
                   </button>
-                )}
-                {!c.demoBookedAt && (
                   <button
-                    data-testid={`mark-booked-${c.slug}`}
-                    onClick={() => markBookedMutation.mutate({ slug: c.slug }, { onSuccess: () => utils.outreach.list.invalidate() })}
-                    style={btn}
+                    data-testid={`copy-sms-${c.slug}`}
+                    onClick={() => copy(c.slug, "sms", sms)}
+                    style={{ ...btn, background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", fontWeight: 700 }}
                   >
-                    Mark booked
+                    {copied === "sms" ? "✓ SMS copied" : "Copy SMS draft"}
                   </button>
-                )}
-                <button
-                  data-testid={`remove-${c.slug}`}
-                  onClick={() => {
-                    if (confirm(`Delete ${c.firstName}?`)) {
-                      removeMutation.mutate({ slug: c.slug }, { onSuccess: () => utils.outreach.list.invalidate() });
-                    }
-                  }}
-                  style={{ ...btn, color: "#b91c1c" }}
-                >
-                  Delete
-                </button>
-              </div>
-              <details style={{ marginTop: 10 }}>
-                <summary style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)", cursor: "pointer" }}>
-                  Show SMS draft preview
-                </summary>
-                <pre
-                  style={{
-                    marginTop: 8,
-                    padding: 10,
-                    background: "color-mix(in oklch, var(--ow-amber) 4%, transparent)",
-                    border: "1px solid var(--ow-border)",
-                    borderRadius: 4,
-                    fontFamily: "'Fira Code',monospace",
-                    fontSize: "0.78rem",
-                    color: "var(--ow-text-hi)",
-                    whiteSpace: "pre-wrap",
-                  }}
-                >
-                  {sms}
-                </pre>
-              </details>
+                  <a href={url} target="_blank" rel="noopener noreferrer" style={{ ...btn, textDecoration: "none" }}>
+                    Preview /hi/{c.slug}
+                  </a>
+                  {!c.smsSentAt && (
+                    <button
+                      data-testid={`mark-sent-${c.slug}`}
+                      onClick={() => markSmsSentMutation.mutate({ slug: c.slug }, { onSuccess: () => utils.outreach.list.invalidate() })}
+                      style={btn}
+                    >
+                      Mark SMS sent
+                    </button>
+                  )}
+                  {!c.demoBookedAt && (
+                    <button
+                      data-testid={`mark-booked-${c.slug}`}
+                      onClick={() => markBookedMutation.mutate({ slug: c.slug }, { onSuccess: () => utils.outreach.list.invalidate() })}
+                      style={btn}
+                    >
+                      Mark booked
+                    </button>
+                  )}
+                  <button
+                    data-testid={`remove-${c.slug}`}
+                    onClick={() => {
+                      if (confirm(`Delete ${c.firstName}?`)) {
+                        removeMutation.mutate({ slug: c.slug }, { onSuccess: () => utils.outreach.list.invalidate() });
+                      }
+                    }}
+                    style={{ ...btn, color: "#b91c1c" }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+              {!isSilent && (
+                <details style={{ marginTop: 10 }}>
+                  <summary style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)", cursor: "pointer" }}>
+                    Show SMS draft preview
+                  </summary>
+                  <pre
+                    style={{
+                      marginTop: 8,
+                      padding: 10,
+                      background: "color-mix(in oklch, var(--ow-amber) 4%, transparent)",
+                      border: "1px solid var(--ow-border)",
+                      borderRadius: 4,
+                      fontFamily: "'Fira Code',monospace",
+                      fontSize: "0.78rem",
+                      color: "var(--ow-text-hi)",
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {sms}
+                  </pre>
+                </details>
+              )}
             </div>
           );
         })}
@@ -286,6 +386,43 @@ function Field({ label, value, onChange, testid, placeholder }: { label: string;
         }}
       />
     </label>
+  );
+}
+
+function FilterChip({
+  label,
+  active,
+  color,
+  onClick,
+  testid,
+}: {
+  label: string;
+  active: boolean;
+  color: string;
+  onClick: () => void;
+  testid: string;
+}) {
+  return (
+    <button
+      type="button"
+      data-testid={testid}
+      onClick={onClick}
+      style={{
+        padding: "6px 12px",
+        borderRadius: 16,
+        border: `1px solid ${active ? color : "var(--ow-border)"}`,
+        background: active ? color : "transparent",
+        color: active ? "white" : "var(--ow-text-mid)",
+        fontFamily: "'Lato',sans-serif",
+        fontSize: "0.78rem",
+        fontWeight: active ? 700 : 500,
+        letterSpacing: "0.02em",
+        cursor: "pointer",
+        transition: "all 120ms ease",
+      }}
+    >
+      {label}
+    </button>
   );
 }
 

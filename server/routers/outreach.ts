@@ -88,6 +88,7 @@ export const outreachRouter = router({
         calendlyOverride: z.string().max(300).optional(),
         notes: z.string().max(500).optional(),
         slug: z.string().max(80).optional(),
+        status: z.enum(["warm", "lukewarm", "cold", "sales", "skip"]).optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -104,6 +105,7 @@ export const outreachRouter = router({
           painPoint: input.painPoint?.trim() || null,
           calendlyOverride: input.calendlyOverride?.trim() || null,
           notes: input.notes?.trim() || null,
+          status: input.status ?? "cold",
           viewCount: 0,
           createdAt: Date.now(),
         });
@@ -115,6 +117,22 @@ export const outreachRouter = router({
         throw err;
       }
       return { ok: true, slug };
+    }),
+
+  /** OWNER — update triage status (warm/lukewarm/cold/sales/skip). */
+  setStatus: ownerProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+        status: z.enum(["warm", "lukewarm", "cold", "sales", "skip"]),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await db
+        .update(schema.outreachContacts)
+        .set({ status: input.status })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true };
     }),
 
   /** OWNER — record SMS sent (operator marks it after they hit send). */

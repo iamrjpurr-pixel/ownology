@@ -1144,11 +1144,15 @@ export const outreachContacts = mysqlTable(
     viewCount: int("view_count").notNull().default(0),
     demoBookedAt: bigint("demo_booked_at", { mode: "number" }),
     notes: varchar("notes", { length: 500 }),
+    // Triage state — warm = had a real conversation, lukewarm = brief positive,
+    // cold = just collected card, sales = vendor/rep not a winemaker, skip = ignore
+    status: varchar("status", { length: 16 }).notNull().default("cold"),
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
   },
   (t) => [
     index("oc_slug_idx").on(t.slug),
     index("oc_event_idx").on(t.event),
+    index("oc_status_idx").on(t.status),
   ]
 );
 
