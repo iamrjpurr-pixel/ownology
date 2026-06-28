@@ -150,6 +150,18 @@
 - OAuth portal — replaced with placeholder; the `OAuthCallback.tsx` page can be revisited when real auth is chosen.
 - Buttondown newsletter — `BUTTONDOWN_API_KEY` empty; newsletter scheduled job will no-op.
 
+**Tiered LLM Budget Guard (28 Jun 2026, this session)**
+- Three tiers with independent budgets:
+  - **free** (`DAILY_FREE_BUDGET_USD`, default $3) — anonymous & free-quota Curiosity calls. Pauses first.
+  - **premium** (`DAILY_PREMIUM_BUDGET_USD`, default $8) — tutor, paying-tier features. Pauses second.
+  - **system** (intentionally uncapped) — internal classifiers, embeddings, scheduled jobs. Only subject to the overall `DAILY_LLM_BUDGET_USD` ($10) safety cap.
+- **Classifier** in `llmMeter.classifySource(source)`: maps `x-ow-source` header (or stack-trace-derived `direct:<file>:<line>` tag) to a tier via prefix matching. Unknown sources default to `free` AND emit a one-time WARN so silent mis-attribution is impossible.
+- **Enforcement** in `forgeShim.isCallPaused(source)`: tier budget checked first, overall cap second. Synthetic OpenAI-shaped response returned with tier-specific copy: "AI free-tier service temporarily paused — Premium members are still served" vs "AI service temporarily paused — overall budget hit".
+- **Critical bug fixed during impl**: shim was checking pause status BEFORE deriving the stack-trace source, so ALL direct-fetch sites (tutor, vintageLog, queryRouter, …) were misclassified as `free` tier. Fix: `sourceForGuard = sourceFromHeader ?? deriveSourceFromStack()` computed BEFORE the pause check.
+- **Visibility**: `/stats` page now shows a "Per-tier guard" section with 3 rows. Each row has its own progress bar, colour (grey / amber / green), and "PAUSED" red label when exceeded. System row shows "uncapped" instead of a bar.
+- **Verified live** (iter 9, 27/27 backend + frontend pass): with free=$0.0005, freeRun.curiosityAsk #2 paused while tutor.ask immediately returned a real Riesling answer — exactly the "paying members never starved by a free spike" guarantee. Overall-cap regression with budget=$0.0003: even system-bound queryRouter paused when overall hit.
+- Synthetic responses carry headers `x-ow-budget-paused: 1`, `x-ow-budget-reason: tier|overall`, `x-ow-budget-tier: free|premium|system` for downstream log filtering.
+
 **Daily LLM Budget Guard-Rail (28 Jun 2026, this session)**
 - New env var `DAILY_LLM_BUDGET_USD` (default $10). When today's accumulated spend reaches the budget, `server/_core/forgeShim.ts` returns a synthetic OpenAI-shaped success response with content `"AI service temporarily paused — Ownology has reached today's AI budget…"` for every chat-completion request. Every existing caller's `data.choices[0].message.content` access works unchanged — they just receive the graceful message instead of a real answer.
 - Counter auto-resets at UTC midnight via `rollDailyIfNeeded()`. Manual override: new `admin.resetDailyBudget` owner mutation.

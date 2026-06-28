@@ -36,6 +36,7 @@ const totals: Bucket = { calls: 0, tokensIn: 0, tokensOut: 0, costUsd: 0 };
 const byModel = new Map<string, Bucket>();
 const bySource = new Map<string, Bucket>();
 const warnedUnknownModels = new Set<string>();
+const warnedUnknownSources = new Set<string>();
 let startedAt = Date.now();
 
 // ─── Daily Budget Guard ─────────────────────────────────────────────────────
@@ -85,6 +86,21 @@ export function classifySource(source: string | null | undefined): Tier {
     s.startsWith("merch.")
   ) return "premium";
   // Default = free (covers freeRun.curiosityAsk, demo flows, unknown).
+  // Warn ONCE per unrecognised source so a typo doesn't silently drain the
+  // free budget — keeps the classifier honest as we add new call sites.
+  if (
+    s &&
+    s !== "unknown" &&
+    !s.startsWith("freerun.curiosityask") &&
+    !s.startsWith("freerun.curiosity") &&
+    !s.startsWith("demo.") &&
+    !warnedUnknownSources.has(s)
+  ) {
+    warnedUnknownSources.add(s);
+    console.warn(
+      `[llm-meter] unknown source "${source}" — defaulting to "free" tier. Add a rule in classifySource() if this should be system/premium.`
+    );
+  }
   return "free";
 }
 
