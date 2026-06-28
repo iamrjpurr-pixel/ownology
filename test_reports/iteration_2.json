@@ -1,0 +1,42 @@
+{
+  "summary": "Iteration 2 verification of the 3 new features on live Railway (https://ownology-production.up.railway.app): (1) vintageLog.alerts engine, (2) 'Why?' reasoning round-trip + AI surfacing, (3) discoverability of Import in the Dashboard alerts banner. ALL 8 backend tests passed (1 skipped — optional cleanup) and the frontend dashboard banner renders all 5 alert chips with correct high→medium→low ordering. Tutor surfaced the seeded reasoning text 'diurnal swing' verbatim in its answer, proving getUserCellarContext is wired through to the AI prompt. Non-regression of the Tank 7 Shiraz learning loop and home_winemaker isolation also re-verified.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/trpc/vintageLog.add", "issue": "Response payload is {success:true} — does NOT include the new entry's id. The review request explicitly says 'returns an id'. Workaround: clients can re-query vintageLog.list and match on noteText/entryAt, but returning the new id (and ideally the full row) would make the client UX simpler and the delete-cleanup flow reliable."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "ProductionDashboard at desktop widths (>=1024px)", "issues": ["Content column is constrained to ~mobile width (~380px) inside WorkModeLayout — alert chips and tank table render in a narrow column on a 1920px viewport with large empty side margins. Not a blocker, but desktop real estate is under-utilised for a 'harvest-floor' overview."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_alerts_reasoning.py",
+    "/app/backend/tests/test_learning_loop.py",
+    "/app/test_reports/pytest/iteration_2_results.xml"
+  ],
+  "action_items": [
+    "(Optional) Have vintageLog.add return the new entry's id (or the full inserted row) instead of just {success:true} so the client can chain delete/edit/optimistic-update without a re-list round-trip.",
+    "(Optional polish) Widen the ProductionDashboard layout on desktop so the alerts banner + tank status table use available horizontal space."
+  ],
+  "critical_code_review_comments": [
+    "vintageLog.alerts engine produces all 5 documented kinds (dap_due, high_temp, stuck_ferment, ready_to_rack, tank_quiet) and is correctly sorted by severity (high→medium→low). Confirmed on live: 2 HIGH (Tank 8 stuck, Tank 9 DAP), 2 MEDIUM (Tank 5 high temp, Tank 2 ready to rack), 1 LOW (Tank 4 quiet).",
+    "Reasoning round-trip works end-to-end: written via vintageLog.add → persisted in detailsJson → extracted by getUserCellarContext → surfaced by tutor.ask. Tutor verbatim quoted the seeded note 'Cool morning measurement to track diurnal swing' back to the user, validating the 'why' learning-loop enhancement.",
+    "Non-regression confirmed: Tank 7 Shiraz history is still cited by tutor.ask (winemaking mode), and home_winemaker mode still does NOT leak any commercial tank references.",
+    "data-testid coverage is excellent on the dashboard: dashboard-alerts-banner, alert-{kind}-{tank-slug}, dashboard-import-link all present and selector-stable.",
+    "Minor API-shape inconsistency: vintageLog.add returns {success:true} only — consider returning {id, ...row} for richer client UX (see backend_issues.minor)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_alerts_reasoning.py (new — 9 pytest cases covering all 8 review items)"
+  ],
+  "success_rate": {"backend": "100% (8/8 passed, 1 cleanup skipped due to missing id in add response)", "frontend": "100% (banner, alert chips, import link all render correctly)"},
+  "test_credentials": "Auth bypass — all requests auto-authenticate as seed-owner-001 (admin). No credentials needed (per /app/memory/test_credentials.md).",
+  "seed_data_creation": "Test #3 and Test #4 seeded one Tank Test 1 entry each with reasoning='Cool morning measurement to track diurnal swing'. Test #3's entry was cleaned up via vintageLog.delete; Test #4's was attempted but cleanup skipped because vintageLog.add doesn't return the id. There may be 1 residual 'Tank Test 1 / Test Variety' entry with noteText='smoke test reasoning surfacing' in the prod DB — benign.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Run: `pytest /app/backend/tests/test_alerts_reasoning.py -v -s --tb=short` against live Railway. LLM endpoints (tutor.ask) take 5-15s, so keep timeout >=120s. The alerts seed data is persisted in prod MySQL — no setup needed. If vintageLog.add starts returning ids, re-enable the strict id assertion in TestReasoningRoundTrip. Frontend dashboard mounts at /dashboard (see /app/client/src/App.tsx line 185).",
+  "rca of the issue": "No bugs to fix. The only minor deviation from the spec is vintageLog.add returning {success:true} instead of {id, ...}. Root cause is in server/routers.ts vintageLog.add handler — it likely does `await db.insert(...)` then returns a literal success object rather than returning the inserted row (or the inserted id from MySQL's insertId / RETURNING clause)."
+}
