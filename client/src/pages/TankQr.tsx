@@ -15,7 +15,7 @@ import { trpc } from "../lib/trpc";
 type TankQrRow = { tank: string; varieties: string[]; dataUrl: string };
 
 export default function TankQr() {
-  const { data: entries } = trpc.vintageLog.list.useQuery(undefined, { retry: false });
+  const { data: entries } = trpc.vintageLog.list.useQuery({ limit: 200 }, { retry: false });
   const [rows, setRows] = useState<TankQrRow[]>([]);
 
   // Build a unique tank+variety list (skipping duplicates)

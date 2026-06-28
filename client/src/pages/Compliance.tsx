@@ -546,6 +546,37 @@ export default function Compliance() {
             </svg>
             Knowledge base: Federal · SA · VIC · NSW · WA · QLD · TAS · NT · NZ — last updated June 2026
           </div>
+          {/* Audit trail PDF download — regulator-ready compliance export */}
+          <div className="mt-4">
+            <a
+              href="/api/compliance/audit-trail.pdf?days=365"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="compliance-audit-trail-download"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.6rem 1rem",
+                background: "var(--ow-amber)",
+                color: "oklch(0.10 0.008 60)",
+                fontFamily: "'Lato',sans-serif",
+                fontWeight: 600,
+                fontSize: "0.85rem",
+                borderRadius: "4px",
+                textDecoration: "none",
+                letterSpacing: "0.02em",
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M7 1v8m0 0L4 6m3 3 3-3M2 12h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Download audit trail PDF (last 365 days)
+            </a>
+            <p className="mt-2" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
+              Regulator-ready chronological export of all SO₂, YAN, additions, racking & measurement entries with operator reasoning.
+            </p>
+          </div>
         </div>
 
         {/* State selector — sticky below nav */}

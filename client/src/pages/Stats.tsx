@@ -82,9 +82,9 @@ export default function Stats() {
           <div className="rounded p-4" style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}>
             <p className="text-sm font-semibold mb-2" style={{ color: "var(--ow-text-hi)" }}>What this means for Premium ($99/mo)</p>
             <p className="text-sm" style={{ color: "var(--ow-text-mid)" }}>
-              At today's per-call rate, your $99/mo Premium subscription covers approximately{" "}
+              At today&apos;s per-call rate, your $99/mo Premium subscription covers approximately{" "}
               <strong style={{ color: "var(--ow-amber)" }}>{costPerCall > 0 ? Math.floor(99 / costPerCall).toLocaleString() : "—"}</strong>{" "}
-              AI calls before we lose money. We won't hide the maths from you.
+              AI calls before we lose money. We won&apos;t hide the maths from you.
             </p>
           </div>
 
