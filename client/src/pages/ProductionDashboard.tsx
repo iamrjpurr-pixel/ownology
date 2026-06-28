@@ -126,6 +126,11 @@ export default function ProductionDashboard() {
     refetchInterval: 60_000, // refresh every minute
     retry: false,
   });
+  const { data: alertsData } = trpc.vintageLog.alerts.useQuery(undefined, {
+    refetchInterval: 60_000,
+    retry: false,
+  });
+  const alerts = alertsData?.alerts ?? [];
 
   // Build phase: show loading spinner while fetching, empty state if no data (no login wall)
   if (isLoading) {
@@ -203,6 +208,76 @@ export default function ProductionDashboard() {
       </div>
 
       <div className="container py-8 flex flex-col gap-8">
+
+        {/* ── Alerts Banner (real-time harvest alerts) ── */}
+        {alerts.length > 0 && (
+          <div data-testid="dashboard-alerts-banner" className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4" style={{ color: "oklch(0.70 0.18 30)" }} />
+                <h2 className="text-sm tracking-widest uppercase" style={{ color: "var(--ow-text-lo)" }}>
+                  Cellar Alerts · {alerts.length}
+                </h2>
+              </div>
+              <Link href="/import" data-testid="dashboard-import-link" className="text-xs px-3 py-1.5 rounded" style={{ color: "var(--ow-amber)", border: "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)", background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)" }}>
+                ↥ Import past vintages
+              </Link>
+            </div>
+            <div className="grid gap-2">
+              {alerts.map((a, i) => {
+                const sevColor =
+                  a.severity === "high"
+                    ? "oklch(0.65 0.18 25)"
+                    : a.severity === "medium"
+                    ? "oklch(0.70 0.15 70)"
+                    : "oklch(0.68 0.08 240)";
+                const bg = `color-mix(in oklch, ${sevColor} 12%, transparent)`;
+                const bdr = `color-mix(in oklch, ${sevColor} 40%, transparent)`;
+                return (
+                  <div
+                    key={i}
+                    data-testid={`alert-${a.kind}-${a.tankName.replace(/\s+/g, "-").toLowerCase()}`}
+                    className="flex items-start gap-3 rounded p-3"
+                    style={{ background: bg, border: `1px solid ${bdr}` }}
+                  >
+                    <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: sevColor }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm" style={{ color: "var(--ow-text-hi)" }}>
+                        {a.title}{" "}
+                        <span className="font-normal text-xs" style={{ color: "var(--ow-text-lo)" }}>
+                          · {a.variety}
+                        </span>
+                      </p>
+                      <p className="text-xs mt-0.5" style={{ color: "var(--ow-text-mid)" }}>
+                        {a.detail}
+                      </p>
+                      <p className="text-xs mt-1" style={{ color: sevColor, fontWeight: 600 }}>
+                        → {a.action}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Empty-state Import nudge when no alerts AND no tanks logged */}
+        {alerts.length === 0 && totalTanks === 0 && (
+          <div data-testid="dashboard-import-empty" className="rounded p-5 flex items-start justify-between gap-4" style={{ background: "var(--ow-bg-raised)", border: "1px solid var(--ow-border)" }}>
+            <div>
+              <p className="font-semibold" style={{ color: "var(--ow-text-hi)", fontFamily: "'Fraunces',serif" }}>
+                Bring your cellar into the system
+              </p>
+              <p className="text-sm mt-1" style={{ color: "var(--ow-text-mid)" }}>
+                Upload past vintage logs — the AI tutor will then ground its advice in your actual tanks, varieties, and decisions.
+              </p>
+            </div>
+            <Link href="/import" data-testid="dashboard-import-cta" className="text-sm whitespace-nowrap px-4 py-2 rounded font-semibold" style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}>
+              ↥ Import past vintages
+            </Link>
+          </div>
+        )}
 
         {/* ── KPI Grid ── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

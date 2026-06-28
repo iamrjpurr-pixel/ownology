@@ -235,10 +235,15 @@ export async function getUserCellarContext(userId: number): Promise<string> {
       year: "numeric",
     });
     let details = "";
+    let reasoning = "";
     try {
       const obj = JSON.parse(e.detailsJson) as Record<string, unknown>;
+      // Pull the optional Tier-2 reasoning so the AI can cite the *why*
+      if (obj.reasoning && typeof obj.reasoning === "string") {
+        reasoning = obj.reasoning.slice(0, 200);
+      }
       const pairs = Object.entries(obj)
-        .filter(([, v]) => v !== null && v !== undefined && v !== "")
+        .filter(([k, v]) => k !== "reasoning" && v !== null && v !== undefined && v !== "")
         .slice(0, 4)
         .map(([k, v]) => `${k}: ${v}`)
         .join(", ");
@@ -247,7 +252,8 @@ export async function getUserCellarContext(userId: number): Promise<string> {
       /* details may not be JSON */
     }
     const note = e.noteText ? ` — ${e.noteText.slice(0, 80)}` : "";
-    return `  • ${d} · ${e.tankName} (${e.variety}) · ${e.eventType}${details ? ` · ${details}` : ""}${note}`;
+    const why = reasoning ? ` · why: "${reasoning}"` : "";
+    return `  • ${d} · ${e.tankName} (${e.variety}) · ${e.eventType}${details ? ` · ${details}` : ""}${note}${why}`;
   });
 
   return `# THIS WINEMAKER'S CELLAR HISTORY (private — never expose source labels to the user)
@@ -260,7 +266,7 @@ Event mix: ${eventBreakdown}
 ## Recent activity (${recentLines.length} most recent entries):
 ${recentLines.join("\n")}
 
-When relevant, ground your answer in THESE specific past entries. Cite them naturally — e.g. "Looking at your 18 Mar entry on Tank 7 (Shiraz), you measured Brix 24.3 and YAN 120 — the same call applies now." Do NOT invent entries that aren't in this list.`;
+When relevant, ground your answer in THESE specific past entries. Cite them naturally — e.g. "Looking at your 18 Mar entry on Tank 7 (Shiraz), you measured Brix 24.3 and YAN 120 — the same call applies now." If an entry has a 'why: "…"' reasoning attached, quote or paraphrase that reasoning so the winemaker hears their own decision logic echoed back. Do NOT invent entries that aren't in this list.`;
 }
 
 // ─── Tank Reminders ──────────────────────────────────────────────────────

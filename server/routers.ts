@@ -457,6 +457,162 @@ const vintageLogRouter = router({
     return getUsedTankNames(dbUser.id);
   }),
 
+  /**
+   * Real-time alerts engine. Scans the user's recent vintage_log_entries and
+   * emits actionable alerts for the cellar floor: DAP due, high temp, stuck
+   * ferment, ready-to-rack, tank-gone-quiet. Returns up to 6 alerts ordered
+   * by severity.
+   */
+  alerts: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return { alerts: [] };
+
+    const rows = await listVintageLogEntries(dbUser.id, 400);
+    if (rows.length === 0) return { alerts: [] };
+
+    // Group events by tank, keeping most-recent first (rows already DESC by entryAt)
+    const byTank = new Map<string, typeof rows>();
+    for (const r of rows) {
+      if (!byTank.has(r.tankName)) byTank.set(r.tankName, []);
+      byTank.get(r.tankName)!.push(r);
+    }
+
+    const now = Date.now();
+    const day = 86400 * 1000;
+    type Alert = {
+      kind: "dap_due" | "high_temp" | "stuck_ferment" | "ready_to_rack" | "tank_quiet";
+      severity: "high" | "medium" | "low";
+      tankName: string;
+      variety: string;
+      title: string;
+      detail: string;
+      action: string;
+    };
+    const alerts: Alert[] = [];
+
+    function parseDetails(detailsJson: string): Record<string, unknown> {
+      try { return JSON.parse(detailsJson) as Record<string, unknown>; } catch { return {}; }
+    }
+
+    for (const [tankName, events] of byTank.entries()) {
+      const variety = events[0]?.variety ?? "—";
+      const newest = events[0];
+      const daysSinceNewest = (now - newest.entryAt) / day;
+
+      // Skip tanks where the last event was >120 days ago — that vintage is over
+      if (daysSinceNewest > 120) continue;
+
+      // Helpers — find specific events
+      const inoculation = events.find((e) => e.eventType === "inoculation");
+      const lastRacking = events.find((e) => e.eventType === "racking");
+      const measurements = events
+        .filter((e) => e.eventType === "measurement")
+        .map((e) => ({ at: e.entryAt, d: parseDetails(e.detailsJson) }));
+      const additions = events
+        .filter((e) => e.eventType === "addition")
+        .map((e) => ({ at: e.entryAt, d: parseDetails(e.detailsJson) }));
+
+      // ── Rule 1: DAP due (YAN low, no DAP added since) ──
+      const lastYan = measurements.find((m) => String(m.d.what ?? "").toLowerCase() === "yan");
+      if (lastYan) {
+        const yanValue = parseFloat(String(lastYan.d.value ?? "")) || 0;
+        const dapSinceYan = additions.find(
+          (a) => String(a.d.what ?? "").toLowerCase().includes("dap") && a.at >= lastYan.at
+        );
+        if (yanValue > 0 && yanValue < 200 && !dapSinceYan) {
+          alerts.push({
+            kind: "dap_due",
+            severity: yanValue < 150 ? "high" : "medium",
+            tankName,
+            variety,
+            title: `${tankName}: DAP due`,
+            detail: `YAN at ${yanValue} ppm (below 200 ppm target). No DAP added since measurement.`,
+            action: "Add DAP — split addition recommended.",
+          });
+        }
+      }
+
+      // ── Rule 2: High fermentation temperature ──
+      const lastTemp = measurements.find((m) => {
+        const w = String(m.d.what ?? "").toLowerCase();
+        return w === "temperature" || w === "temp";
+      });
+      if (lastTemp) {
+        const temp = parseFloat(String(lastTemp.d.value ?? "")) || 0;
+        const ageHrs = (now - lastTemp.at) / (3600 * 1000);
+        if (temp > 22 && ageHrs < 24) {
+          alerts.push({
+            kind: "high_temp",
+            severity: temp > 26 ? "high" : "medium",
+            tankName,
+            variety,
+            title: `${tankName}: High temp (${temp}°C)`,
+            detail: `Last reading ${Math.round(ageHrs)}h ago — above 22°C threshold.`,
+            action: "Cool ferment — risk of stuck ferment / volatile loss.",
+          });
+        }
+      }
+
+      // ── Rule 3: Stuck ferment (Brix not moving) ──
+      const brixSeries = measurements
+        .filter((m) => String(m.d.what ?? "").toLowerCase() === "brix")
+        .slice(0, 4); // most recent 4 brix
+      if (brixSeries.length >= 2 && inoculation) {
+        const latest = parseFloat(String(brixSeries[0].d.value ?? "")) || 0;
+        const oldest = parseFloat(String(brixSeries[brixSeries.length - 1].d.value ?? "")) || 0;
+        const spanDays = (brixSeries[0].at - brixSeries[brixSeries.length - 1].at) / day;
+        const delta = oldest - latest;
+        if (latest > 4 && spanDays >= 2 && delta < 1) {
+          alerts.push({
+            kind: "stuck_ferment",
+            severity: "high",
+            tankName,
+            variety,
+            title: `${tankName}: Possible stuck ferment`,
+            detail: `Brix moved only ${delta.toFixed(1)}° in ${spanDays.toFixed(1)} days (currently ${latest}°Bx).`,
+            action: "Check temp, YAN, and yeast viability. Consider restart protocol.",
+          });
+        }
+      }
+
+      // ── Rule 4: Ready to rack (Brix at dry, no recent racking) ──
+      const lastBrix = brixSeries[0];
+      if (lastBrix && inoculation) {
+        const brix = parseFloat(String(lastBrix.d.value ?? "")) || 0;
+        const rackingSinceDry = lastRacking && lastBrix.at < lastRacking.entryAt;
+        const ageHrs = (now - lastBrix.at) / (3600 * 1000);
+        if (brix <= 2 && brix >= -2 && !rackingSinceDry && ageHrs < 96) {
+          alerts.push({
+            kind: "ready_to_rack",
+            severity: "medium",
+            tankName,
+            variety,
+            title: `${tankName}: Ready to rack`,
+            detail: `Brix at ${brix}°Bx (dry). No racking recorded since.`,
+            action: "Plan racking off gross lees.",
+          });
+        }
+      }
+
+      // ── Rule 5: Tank gone quiet during active vintage ──
+      if (inoculation && daysSinceNewest > 5 && daysSinceNewest < 14) {
+        alerts.push({
+          kind: "tank_quiet",
+          severity: "low",
+          tankName,
+          variety,
+          title: `${tankName}: No recent activity`,
+          detail: `Last log entry ${Math.round(daysSinceNewest)} days ago. Active vintage tank.`,
+          action: "Walk the cellar — check on this tank.",
+        });
+      }
+    }
+
+    const order = { high: 0, medium: 1, low: 2 };
+    alerts.sort((a, b) => order[a.severity] - order[b.severity]);
+    return { alerts: alerts.slice(0, 6) };
+  }),
+
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {

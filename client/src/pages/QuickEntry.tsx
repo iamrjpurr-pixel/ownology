@@ -284,6 +284,8 @@ export default function QuickEntry() {
 
   // Observation / Other
   const [noteText, setNoteText] = useState("");
+  // Optional "Why?" — Tier 2 decision-logic capture (asked on confirm screen)
+  const [reasoning, setReasoning] = useState("");
   const [listening, setListening] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recRef = useRef<any>(null);
@@ -364,7 +366,7 @@ export default function QuickEntry() {
         setScreen("event");
         setEventType(null); setTankName(null); setVariety("");
         setMValue("0"); setAQty("0"); setAStep("type");
-        setIRate("0"); setIStep("type"); setNoteText(""); setRackTo(null);
+        setIRate("0"); setIStep("type"); setNoteText(""); setRackTo(null); setReasoning("");
       }, 1800);
     },
     onError: err => toast.error(err.message),
@@ -382,12 +384,18 @@ export default function QuickEntry() {
   }
 
   function buildDetails(): Record<string, string> {
-    if (eventType === "measurement") { const u = MEASURES.find(m => m.label === mType)?.unit ?? ""; return { what: mType, value: mValue, unit: u }; }
-    if (eventType === "addition")    return { what: aType, quantity: aQty, unit: aUnit, timing: aTiming };
-    if (eventType === "racking")     return { to: rackTo ?? "", leesStatus: lees };
-    if (eventType === "inoculation") return { inoculationType: iType, productName: iProd, rate: iRate, unit: "g/hL" };
-    if (eventType === "observation") return { observation: noteText };
-    return { note: noteText };
+    const base: Record<string, string> = (() => {
+      if (eventType === "measurement") { const u = MEASURES.find(m => m.label === mType)?.unit ?? ""; return { what: mType, value: mValue, unit: u }; }
+      if (eventType === "addition")    return { what: aType, quantity: aQty, unit: aUnit, timing: aTiming };
+      if (eventType === "racking")     return { to: rackTo ?? "", leesStatus: lees };
+      if (eventType === "inoculation") return { inoculationType: iType, productName: iProd, rate: iRate, unit: "g/hL" };
+      if (eventType === "observation") return { observation: noteText };
+      return { note: noteText };
+    })();
+    // Tier 2: decision-logic capture. Stored in details JSON so the AI tutor
+    // surfaces it via getUserCellarContext when grounding future answers.
+    if (reasoning.trim()) base.reasoning = reasoning.trim().slice(0, 240);
+    return base;
   }
 
   function handleSubmitTraining() {
@@ -467,6 +475,7 @@ export default function QuickEntry() {
               {sessionLog.length} logged
             </span>
           )}
+          <Link href="/import" data-testid="quick-entry-import-link" style={{ color: AMBER, fontSize: "0.8rem", textDecoration: "none", fontWeight: 600, border: `1px solid ${AMBER_BDR}`, borderRadius: 14, padding: "3px 10px", background: AMBER_DIM }}>↥ Import</Link>
           <Link href="/the-press" style={{ color: TEXT_LO, fontSize: "0.8rem", textDecoration: "none" }}>Full Entry</Link>
         </div>
       </div>
@@ -725,7 +734,7 @@ export default function QuickEntry() {
         {screen === "confirm" && eventType && (
           <div>
             <Header step={4} total={4} title="Confirm entry" onBack={() => setScreen("detail")} />
-            <div style={{ background: CARD, border: `1.5px solid ${AMBER_BDR}`, borderRadius: 16, padding: 24, marginBottom: 24 }}>
+            <div style={{ background: CARD, border: `1.5px solid ${AMBER_BDR}`, borderRadius: 16, padding: 24, marginBottom: 16 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
                 <span style={{ fontSize: "1.6rem", color: EVENT_TILES.find(t => t.id === eventType)?.color ?? AMBER }}>{EVENT_TILES.find(t => t.id === eventType)?.icon}</span>
                 <div>
@@ -737,10 +746,43 @@ export default function QuickEntry() {
                 {buildSummary()}
               </p>
             </div>
-            <button onClick={handleSubmit} disabled={addMutation.isPending} style={{ ...primaryBtn, opacity: addMutation.isPending ? 0.7 : 1 }}>
+
+            {/* Tier 2 — decision-logic capture (optional, but THE moat).
+                The AI tutor surfaces this reasoning in future answers via
+                getUserCellarContext, so the system learns the *why*, not just
+                the *what*. Skippable on the cellar floor. */}
+            <div data-testid="quick-entry-reasoning-section" style={{ marginBottom: 24 }}>
+              <label style={{ display: "block", fontSize: "0.72rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+                Why? <span style={{ textTransform: "none", letterSpacing: 0, color: TEXT_LO, fontWeight: 400 }}>(optional · captures your decision logic)</span>
+              </label>
+              <textarea
+                data-testid="quick-entry-reasoning-input"
+                value={reasoning}
+                onChange={(e) => setReasoning(e.target.value.slice(0, 240))}
+                placeholder="e.g. YAN below 200 ppm target — split addition to avoid stuck ferment"
+                rows={2}
+                style={{
+                  width: "100%",
+                  background: CARD,
+                  border: `1.5px solid ${BDR}`,
+                  borderRadius: 10,
+                  padding: "10px 12px",
+                  fontFamily: "'Lato',sans-serif",
+                  fontSize: "0.92rem",
+                  color: TEXT_HI,
+                  resize: "vertical",
+                  outline: "none",
+                }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = AMBER_BDR)}
+                onBlur={(e) => (e.currentTarget.style.borderColor = BDR)}
+              />
+              <p style={{ fontSize: "0.7rem", color: TEXT_LO, margin: "6px 0 0", textAlign: "right" }}>{reasoning.length}/240</p>
+            </div>
+
+            <button data-testid="quick-entry-log-button" onClick={handleSubmit} disabled={addMutation.isPending} style={{ ...primaryBtn, opacity: addMutation.isPending ? 0.7 : 1 }}>
               {addMutation.isPending ? "Logging…" : "LOG IT"}
             </button>
-            <button onClick={() => { clearDraft(); setScreen("event"); }} style={{ ...secondaryBtn, marginTop: 10 }}>Cancel</button>
+            <button onClick={() => { clearDraft(); setReasoning(""); setScreen("event"); }} style={{ ...secondaryBtn, marginTop: 10 }}>Cancel</button>
           </div>
         )}
 
