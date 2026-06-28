@@ -15,6 +15,7 @@ import { fermentationWatchHandler } from "./scheduled/fermentationWatch.js";
 import { trinityClusterHandler } from "./scheduled/trinityCluster.js";
 import { trinityNewsletterHandler } from "./scheduled/trinityNewsletter.js";
 import { cellarJournalSitemapHandler, robotsTxtHandler, cellarJournalRssHandler } from "./sitemap.js";
+import { generateAuditTrailPdf } from "./auditTrailPdf.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,6 +43,9 @@ async function startServer() {
   app.get("/api/sitemap.xml", cellarJournalSitemapHandler);
   app.get("/api/cellar-journal/rss.xml", cellarJournalRssHandler);
   app.get("/api/robots.txt", robotsTxtHandler);
+
+  // ── Compliance audit trail PDF (regulator-ready export) ─────────────────────
+  app.get("/api/compliance/audit-trail.pdf", generateAuditTrailPdf);
 
   // ── JSON body parser ─────────────────────────────────────────────────────────
   app.use(express.json());

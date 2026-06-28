@@ -258,8 +258,15 @@ export default function QuickEntry() {
 
   // Entry state
   const [eventType, setEventType] = useState<EventTypeId | null>(null);
-  const [tankName, setTankName]   = useState<string | null>(null);
-  const [variety, setVariety]     = useState("");
+  // Tank/variety defaults — pre-fill from URL params (used by tank QR codes).
+  // ?tank=Tank+7&variety=Shiraz → scanned QR opens with these pre-filled.
+  const initialFromUrl = (() => {
+    if (typeof window === "undefined") return { tank: null as string | null, variety: "" };
+    const p = new URLSearchParams(window.location.search);
+    return { tank: p.get("tank"), variety: p.get("variety") ?? "" };
+  })();
+  const [tankName, setTankName]   = useState<string | null>(initialFromUrl.tank);
+  const [variety, setVariety]     = useState(initialFromUrl.variety);
 
   // Measurement
   const [mType,  setMType]  = useState("Brix");
