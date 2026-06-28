@@ -70,7 +70,10 @@ function adminGate(req: express.Request, res: express.Response, next: express.Ne
   const isAdminPage = p === "/admin" || p.startsWith("/admin/");
   const isAdminApi =
     p.startsWith("/api/trpc/admin.") || p.startsWith("/api/trpc/pricing.funnelStats");
-  if (isAdminPage || isAdminApi) {
+  // /api/exports/* serves proprietary IP (e.g. the SOP library export) —
+  // gate it the same as admin pages so only the owner can grab it.
+  const isExport = p.startsWith("/api/exports/");
+  if (isAdminPage || isAdminApi || isExport) {
     return adminBasicAuth(req, res, next);
   }
   next();
@@ -112,6 +115,20 @@ async function startServer() {
 
   // ── Compliance audit trail PDF (regulator-ready export) ─────────────────────
   app.get("/api/compliance/audit-trail.pdf", generateAuditTrailPdf);
+
+  // ── SOP Library export (Markdown + PDF) — owner-only ────────────────────────
+  // Run `node scripts/export-sops.mjs` to regenerate. These endpoints serve
+  // the most recent generated copy. Behind adminGate so only you can grab it.
+  app.get("/api/exports/sops.md", (_req, res) => {
+    res.sendFile(path.resolve(__dirname, "..", "exports", `sops-library-${new Date().toISOString().slice(0, 10)}.md`), (err) => {
+      if (err) res.status(404).send("Run `node scripts/export-sops.mjs` first.");
+    });
+  });
+  app.get("/api/exports/sops.pdf", (_req, res) => {
+    res.sendFile(path.resolve(__dirname, "..", "exports", `sops-library-${new Date().toISOString().slice(0, 10)}.pdf`), (err) => {
+      if (err) res.status(404).send("Run `node scripts/export-sops.mjs` first.");
+    });
+  });
 
   // ── JSON body parser ─────────────────────────────────────────────────────────
   app.use(express.json());
