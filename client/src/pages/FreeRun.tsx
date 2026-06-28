@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useRef } from "react";
+import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import ThePressCtaCard from "@/components/ThePressCtaCard";
 import VoiceMicButton from "@/components/VoiceMicButton";
@@ -439,7 +440,7 @@ export default function FreeRun() {
 
                   {/* Paused → Upgrade CTA */}
                   {msg.isPaused && (
-                    <a
+                    <Link
                       href="/pricing"
                       data-testid={`freerun-paused-upgrade-${msg.id}`}
                       style={{
@@ -457,7 +458,7 @@ export default function FreeRun() {
                       }}
                     >
                       Upgrade to Premium →
-                    </a>
+                    </Link>
                   )}
 
                   {/* Deep Dive button — hidden when paused */}

@@ -150,6 +150,17 @@
 - OAuth portal — replaced with placeholder; the `OAuthCallback.tsx` page can be revisited when real auth is chosen.
 - Buttondown newsletter — `BUTTONDOWN_API_KEY` empty; newsletter scheduled job will no-op.
 
+**Friendly Free-Tier Paused UX → Sales Funnel (28 Jun 2026, this session)**
+- When free-tier LLM budget is exhausted, `freeRun.curiosityAsk` now:
+  1. **Doesn't charge a question** against the user's daily 3/3 quota (free user not punished for an outage)
+  2. **Doesn't persist the synthetic message** to the Cellar Journal
+  3. **Returns a structured payload** `{ paused: true, pausedTier, pausedMessage, retryAt, questionsUsed, questionsTotal }` so the UI can render the right state
+- Detection: substring match on the canonical synthetic phrase "temporarily paused" (case-insensitive) — robust to em-dash / en-dash / hyphen copy-edits in the underlying shim message.
+- Tier-aware copy: `free` tier gets "Premium members keep going — upgrade for unlimited"; `overall` tier gets the neutral "we'll be back at UTC midnight" message.
+- `/free-run` UI: amber-tinted card (#FEF3C7) with "✦ DAILY AI BUDGET REACHED" badge and a bright "Upgrade to Premium →" CTA pointing at `/pricing`. Deep Dive button suppressed on paused cards. Uses wouter `<Link>` for SPA navigation (no full-page reload).
+- Verified live (iter 10, 5/5 backend + 5/5 frontend pass, 0 issues): paused calls leave `questionsUsed=1` unchanged across 3 consecutive paused requests; `cellarJournal.list` row count identical before/after paused interactions; restored budget produces real answers again.
+- **Direct conversion driver** — the guard-rail is no longer just a defensive cap; it's a sales funnel that surfaces Premium upsell at the exact moment of unmet demand.
+
 **Tiered LLM Budget Guard (28 Jun 2026, this session)**
 - Three tiers with independent budgets:
   - **free** (`DAILY_FREE_BUDGET_USD`, default $3) — anonymous & free-quota Curiosity calls. Pauses first.

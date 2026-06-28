@@ -131,7 +131,14 @@ If the question is about making wine commercially or winemaking technique, respo
       //   2. DON'T persist the paused message into the Cellar Journal
       //   3. Return a structured `paused: true` payload so the UI can render
       //      a polite upgrade CTA instead of the synthetic text.
-      const isPaused = /temporarily paused — Ownology has reached today/i.test(answer);
+      // Detection: match the most stable substring of the canonical message
+      // built in server/_core/forgeShim.ts::buildBudgetExceededResponse().
+      // Using "temporarily paused" (case-insensitive) so a future em-dash
+      // / en-dash / hyphen copy-edit doesn't silently break this branch.
+      const isPaused = /temporarily paused/i.test(answer);
+      // Free-tier message contains "free-tier" verbatim; overall-cap message
+      // does NOT. Verified against forgeShim.ts message templates.
+      const pausedTier: "free" | "overall" = /free-tier/i.test(answer) ? "free" : "overall";
       if (isPaused) {
         // Compute next UTC midnight ISO string for the retry hint.
         const next = new Date();
@@ -142,9 +149,11 @@ If the question is about making wine commercially or winemaking technique, respo
           topicTag: null,
           limitReached: false,
           paused: true,
-          pausedTier: /free-tier/i.test(answer) ? ("free" as const) : ("overall" as const),
+          pausedTier,
           pausedMessage:
-            "We've reached today's free-tier AI budget. Premium members keep going — upgrade for unlimited curiosity, or try again at UTC midnight.",
+            pausedTier === "free"
+              ? "We've reached today's free-tier AI budget. Premium members keep going — upgrade for unlimited curiosity, or try again at UTC midnight."
+              : "Our AI service is temporarily paused while we reset the daily safety cap. Everything will be back online at UTC midnight.",
           retryAt: retryAtIso,
           questionsUsed: currentCount,
           questionsTotal: DAILY_FREE_QUESTIONS,
