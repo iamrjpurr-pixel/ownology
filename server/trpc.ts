@@ -4,6 +4,7 @@ import type { Request, Response } from "express";
 import { jwtVerify } from "jose";
 import { parse as parseCookies } from "cookie";
 import { COOKIE_NAME } from "../shared/const.js";
+import { upsertUser } from "./db.js";
 
 // --- Context ------------------------------------------------------------------
 export type User = {
@@ -52,9 +53,9 @@ async function getUserFromCookie(req: Request): Promise<User | null> {
   }
 }
 
-// DEV BYPASS: When not in production, if no authenticated user is present,
-// inject the seed owner account so all features are testable without login.
-// This bypass is DISABLED in production (NODE_ENV=production).
+// AUTH BYPASS: Auth is currently disabled site-wide. Every request is treated
+// as the seed owner account so all features work without login.
+// To re-enable real auth, restore the NODE_ENV check below.
 const DEV_BYPASS_USER: User = {
   openId: "seed-owner-001",
   name: "Redstone Ridge Wines",
@@ -70,12 +71,14 @@ export async function createContext({
   res: Response;
 }): Promise<Context> {
   const cookieUser = await getUserFromCookie(req);
-  // DEV BYPASS: in non-production, if no real session cookie was presented,
-  // inject the seed owner so `ctx.user` is populated on EVERY procedure
-  // (including public ones like `freeRun.authCheck`). This makes the browser
-  // UI behave as if logged in, with zero auth wiring needed during dev.
-  const isProduction = process.env.NODE_ENV === "production";
-  const user = cookieUser ?? (isProduction ? null : DEV_BYPASS_USER);
+  // AUTH BYPASS: always inject the seed owner if no real session cookie present.
+  // This makes the entire app accessible without login (production + dev).
+  const user = cookieUser ?? DEV_BYPASS_USER;
+  // Ensure the bypass user exists in the DB so protected routes (which call
+  // getUserByOpenId) don't fail. Best-effort; ignore errors.
+  if (user === DEV_BYPASS_USER) {
+    upsertUser(user.openId, user.name, user.email).catch(() => {});
+  }
   return { req, res, user };
 }
 
@@ -95,14 +98,15 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
 });
 
 export const ownerProcedure = t.procedure.use(({ ctx, next }) => {
-  const ownerOpenId = process.env.OWNER_OPEN_ID;
-  if (!ownerOpenId) {
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "OWNER_OPEN_ID not configured",
-    });
+  // AUTH BYPASS: allow any admin-role user (the bypass user has role: "admin"),
+  // or fall back to the OWNER_OPEN_ID env check for real cookie-authenticated users.
+  if (!ctx.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "Please login (10001)" });
   }
-  if (!ctx.user || ctx.user.openId !== ownerOpenId) {
+  const ownerOpenId = process.env.OWNER_OPEN_ID;
+  const isOwnerByEnv = ownerOpenId && ctx.user.openId === ownerOpenId;
+  const isOwnerByRole = ctx.user.role === "admin";
+  if (!isOwnerByEnv && !isOwnerByRole) {
     throw new TRPCError({ code: "FORBIDDEN", message: "Owner access required" });
   }
   return next({ ctx: { ...ctx, user: ctx.user } });

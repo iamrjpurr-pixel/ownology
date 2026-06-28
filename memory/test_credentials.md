@@ -1,9 +1,10 @@
 # Test credentials — Ownology
 
-Authentication is currently in **dev bypass mode** (no real login required).
+Authentication is **fully bypassed** (both production and dev — updated 28 Jun 2026).
 
-When `NODE_ENV != "production"`, every protected tRPC procedure auto-injects
-this seed admin user (see `server/trpc.ts → DEV_BYPASS_USER`):
+Every request without a real session cookie is auto-authenticated as the
+seed admin user (see `server/trpc.ts → DEV_BYPASS_USER`). The user is
+auto-upserted into the `users` table on each request:
 
 | Field   | Value                                  |
 |---------|----------------------------------------|

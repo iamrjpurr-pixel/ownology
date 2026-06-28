@@ -19,8 +19,8 @@
 - `vite.config.ts` rewritten; `server/index.ts` listens on PORT env (8001)
 - Schema fixes: `barrels.format` enum → varchar(64) (drizzle-kit enum-with-paren bug); `regulation_monitor_seen.publication_url` varchar(1024) → varchar(512) (utf8mb4 key-length limit)
 
-**Auth (current)**
-- Manus OAuth removed. `protectedProcedure` falls back to a seed admin user (`DEV_BYPASS_USER` — id `seed-owner-001`) when `NODE_ENV !== "production"`. The user has been INSERTed into `users` table (id=1). Note: the `freeRun.authCheck` public procedure still reports `isAuthenticated: false` for unauthenticated browser sessions, so the UI shows a "Create account" modal. Backend API works without auth via curl/server-side.
+**Auth (current — bypassed 28 Jun 2026)**
+- Manus OAuth removed. As of 28 Jun 2026 auth is **fully bypassed in production AND dev**: `createContext` in `server/trpc.ts` always injects `DEV_BYPASS_USER` (openId `seed-owner-001`, role `admin`) when no real session cookie is present. The bypass user is auto-upserted into the `users` table on every request (idempotent). `ownerProcedure` accepts any `role === "admin"` user, so the bypass user has owner privileges too. To re-enable real auth later, restore the `NODE_ENV` check in `createContext` and remove the auto-upsert.
 
 **LLM (wired 27 Jan 2026 — hybrid)**
 - All traffic routes through Emergent Universal LLM Key proxy at `https://integrations.emergentagent.com/llm/`.
