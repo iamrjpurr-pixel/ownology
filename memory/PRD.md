@@ -56,6 +56,15 @@
 - All 4 extracted routers verified live: alerts engine returns 5 alerts, knowledge returns 38 SOPs, wbsAdmin returns 83 domains, tutor still cites Tank 7 Shiraz history correctly.
 - Refactor playbook for next pass (when splitting the remaining 20 sub-routers): always grep the moved router for ALL `from "../db.js"` and `from "./trpc.js"` symbol references BEFORE deleting from routers.ts, and audit which symbols are STILL needed by the remaining routers in routers.ts (the `dashboard.getStats` regression was caused by skipping this audit step).
 
+**Value Engineering Operationalized (28 Jun 2026)**
+- New file `/app/memory/VALUE-ENGINEERING.md` — codifies the cost-control doctrine. Includes 5-question filter, cost-saving levers per resource (LLM/polling/code volume/storage/testing), retroactive audit of all ROADMAP items with score 1–5/5, standing rules for agent (e.g. never default to gpt-5.4, no polling <60s, extend before build).
+- Two pure-win edits applied:
+  1. `server/freeRunRouter.ts → callLLMJson` model switched from `MODELS.PREMIUM` (Claude Sonnet) to `MODELS.CHEAP` (gpt-5.4-mini). Tag classification is 3-word categorisation — zero quality loss, ~20× cheaper.
+  2. `client/src/pages/ProductionDashboard.tsx` polling interval `60_000 → 300_000` + `refetchOnWindowFocus: true` for both `dashboard.getStats` and `vintageLog.alerts`. ~80% DB IOPS reduction.
+- LLM cost meter shipped: new `server/_core/llmMeter.ts` (in-memory aggregator, ~120 LOC), instrumented in `_core/llm.ts → chatCompletion` so every `freeRunRouter` LLM call is tracked. Source-tagged: `freeRun.curiosityAsk`, `freeRun.tag`, `freeRun.goDeeper.{science,vineyard,craft}`. Exposed via 2 ownerProcedures in `routers.ts`: `admin.llmStats` (read) and `admin.resetLlmStats` (mutation).
+- Coverage gap (documented, intentional v1): direct `fetch()` LLM call sites in `routers/tutor.ts`, `routers/vintageLog.ts`, `merch/api.ts`, `trinityPipeline.ts`, `queryRouter.ts` are NOT yet metered. Those use the CHEAP model by default so cost-per-call is small. Extend coverage when a measured reason appears.
+- Verified live: cheap tag classification costs $0.000021 vs premium curiosity answer $0.005778 — **0.4% of premium cost**, matching the 95% saving projection.
+
 **Auth (current — bypassed 28 Jun 2026)**
 - Manus OAuth removed. As of 28 Jun 2026 auth is **fully bypassed in production AND dev**: `createContext` in `server/trpc.ts` always injects `DEV_BYPASS_USER` (openId `seed-owner-001`, role `admin`) when no real session cookie is present. The bypass user is auto-upserted into the `users` table on every request (idempotent). `ownerProcedure` accepts any `role === "admin"` user, so the bypass user has owner privileges too. To re-enable real auth later, restore the `NODE_ENV` check in `createContext` and remove the auto-upsert.
 
