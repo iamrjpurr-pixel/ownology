@@ -50,6 +50,47 @@ export default function Stats() {
             <Kpi label="Calls / hour" value={callsPerHour.toFixed(1)} data-testid="stats-calls-per-hour" />
           </div>
 
+          {/* Daily budget guard */}
+          {stats.daily && (
+            <div
+              data-testid="stats-daily-budget"
+              className="rounded p-4"
+              style={{
+                background: "var(--ow-bg-card)",
+                border: `1px solid ${stats.daily.exceeded ? "#b91c1c" : "var(--ow-border)"}`,
+              }}
+            >
+              <div className="flex items-baseline justify-between mb-2">
+                <p className="text-xs uppercase tracking-widest" style={{ color: stats.daily.exceeded ? "#b91c1c" : "var(--ow-amber)" }}>
+                  Today&apos;s budget · {stats.daily.dateKey} {stats.daily.exceeded ? "· PAUSED" : ""}
+                </p>
+                <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.85rem", color: "var(--ow-text-mid)" }}>
+                  {fmtUsd(stats.daily.spendUsd)}{" "}
+                  {stats.daily.budgetUsd !== null ? `/ ${fmtUsd(stats.daily.budgetUsd)}` : "/ unlimited"}
+                </p>
+              </div>
+              {stats.daily.budgetUsd !== null && (
+                <div style={{ height: 8, background: "var(--ow-border)", borderRadius: 4, overflow: "hidden" }}>
+                  <div
+                    style={{
+                      width: `${Math.min(100, (stats.daily.spendUsd / stats.daily.budgetUsd) * 100)}%`,
+                      height: "100%",
+                      background: stats.daily.exceeded ? "#b91c1c" : "var(--ow-amber)",
+                      transition: "width 0.4s",
+                    }}
+                  />
+                </div>
+              )}
+              <p className="mt-2" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)" }}>
+                {stats.daily.budgetUsd === null
+                  ? "No daily budget configured — set DAILY_LLM_BUDGET_USD to enable the guard."
+                  : stats.daily.exceeded
+                    ? "Budget reached — chat completions return a graceful \"paused\" response until UTC midnight or admin reset."
+                    : `${fmtUsd(stats.daily.remainingUsd ?? 0)} remaining today. Guard auto-engages at the cap; resets at UTC midnight.`}
+              </p>
+            </div>
+          )}
+
           {/* By Model */}
           <Section title="By Model">
             <Table

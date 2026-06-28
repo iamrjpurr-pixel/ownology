@@ -23,12 +23,43 @@
  * model-injection branch by passing an explicit model.
  */
 
-import { recordLlmCall } from "./llmMeter.js";
+import { recordLlmCall, isDailyBudgetExceeded, getDailyBudgetUsd } from "./llmMeter.js";
 
 const DEFAULT_MODEL = "gpt-5.4-mini";
 const PROXY_HOST = "integrations.emergentagent.com";
 
 const isOpenAiNewFamily = (model: string) => /^(gpt-5|o[134])/i.test(model);
+
+/** Synthetic response returned when the daily LLM budget is exhausted. Shaped
+ *  like an OpenAI chat-completion success so every existing caller's
+ *  `data.choices[0].message.content` access works unchanged. */
+function buildBudgetExceededResponse(model: string): Response {
+  const budget = getDailyBudgetUsd();
+  const message =
+    "AI service temporarily paused — Ownology has reached today's AI budget. " +
+    "Please try again after UTC midnight, or contact your administrator. " +
+    "(This protects us from a runaway loop or traffic spike eating the monthly bill.)";
+  const body = {
+    id: "chatcmpl-budget-paused",
+    object: "chat.completion",
+    created: Math.floor(Date.now() / 1000),
+    model,
+    choices: [
+      {
+        index: 0,
+        finish_reason: "stop",
+        message: { role: "assistant", content: message },
+      },
+    ],
+    usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+    _ownology_budget_paused: true,
+    _ownology_budget_usd: budget,
+  };
+  return new Response(JSON.stringify(body), {
+    status: 200,
+    headers: { "content-type": "application/json", "x-ow-budget-paused": "1" },
+  });
+}
 
 /** Walk the current stack to find the first frame inside /server/ that
  *  isn't the shim itself or the centralised llm adapter. Returns a tag like
@@ -100,6 +131,18 @@ globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
       }
 
       init = { ...init, body: JSON.stringify(body) };
+
+      // ── Daily budget guard ──────────────────────────────────────────────
+      // Short-circuit BEFORE hitting the LLM proxy. Returns a synthetic
+      // success response so callers keep working — just with a "paused"
+      // message instead of a real answer.
+      if (isDailyBudgetExceeded()) {
+        const model = String(body.model);
+        console.warn(
+          `[forge-shim] budget exceeded — returning synthetic paused response (source=${sourceFromHeader ?? "unknown"})`
+        );
+        return buildBudgetExceededResponse(model);
+      }
     }
   } catch {
     // best-effort — fall through to original fetch on any parse error

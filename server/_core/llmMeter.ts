@@ -38,6 +38,50 @@ const bySource = new Map<string, Bucket>();
 const warnedUnknownModels = new Set<string>();
 let startedAt = Date.now();
 
+// ─── Daily Budget Guard ─────────────────────────────────────────────────────
+// Tracks today's spend separately so we can compare against DAILY_LLM_BUDGET_USD.
+// Resets automatically at UTC midnight.
+let dailySpendUsd = 0;
+let dailyDateKey = ""; // YYYY-MM-DD UTC
+
+function todayKey(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function rollDailyIfNeeded(): void {
+  const k = todayKey();
+  if (k !== dailyDateKey) {
+    if (dailyDateKey !== "") {
+      console.log(`[llm-meter] daily spend rolled over: ${dailyDateKey} → ${k} (yesterday: $${dailySpendUsd.toFixed(4)})`);
+    }
+    dailyDateKey = k;
+    dailySpendUsd = 0;
+  }
+}
+
+/** Returns the daily budget in USD from env, or null when unconfigured. */
+export function getDailyBudgetUsd(): number | null {
+  const raw = process.env.DAILY_LLM_BUDGET_USD;
+  if (!raw) return null;
+  const n = parseFloat(raw);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return n;
+}
+
+/** Returns true when today's spend has reached/exceeded the configured budget. */
+export function isDailyBudgetExceeded(): boolean {
+  rollDailyIfNeeded();
+  const budget = getDailyBudgetUsd();
+  if (budget === null) return false;
+  return dailySpendUsd >= budget;
+}
+
+/** Manual override — used by admin.resetDailyBudget. */
+export function resetDailyBudget(): void {
+  dailySpendUsd = 0;
+  dailyDateKey = todayKey();
+}
+
 function bump(b: Bucket, tokensIn: number, tokensOut: number, cost: number) {
   b.calls += 1;
   b.tokensIn += tokensIn;
@@ -77,6 +121,19 @@ export function recordLlmCall(
   if (!bySource.has(source)) bySource.set(source, emptyBucket());
   bump(bySource.get(source)!, tokensIn, tokensOut, cost);
 
+  // Daily budget tracking — roll the day if needed, then accumulate.
+  rollDailyIfNeeded();
+  dailySpendUsd += cost;
+  const budget = getDailyBudgetUsd();
+  if (budget !== null && dailySpendUsd >= budget) {
+    // Loud warning once per day-roll when threshold is crossed.
+    if (dailySpendUsd - cost < budget) {
+      console.warn(
+        `[llm-meter] ⚠ DAILY BUDGET REACHED — todaySpend=$${dailySpendUsd.toFixed(4)} >= budget=$${budget.toFixed(2)}. Further chat-completion calls will receive a synthetic "AI paused" response until UTC midnight or admin.resetDailyBudget.`
+      );
+    }
+  }
+
   // Single-line structured log so Railway logs can be greped/aggregated.
   console.log(
     `[llm-meter] model=${model} source=${source} in=${tokensIn} out=${tokensOut} cost=$${cost.toFixed(6)}`
@@ -97,6 +154,13 @@ export type LlmStats = {
   totals: Bucket;
   byModel: LlmStatsRow[];
   bySource: LlmStatsRow[];
+  daily: {
+    dateKey: string;
+    spendUsd: number;
+    budgetUsd: number | null;
+    exceeded: boolean;
+    remainingUsd: number | null;
+  };
 };
 
 export function getLlmStats(): LlmStats {
@@ -104,12 +168,21 @@ export function getLlmStats(): LlmStats {
     Array.from(m.entries())
       .map(([key, b]) => ({ key, ...b }))
       .sort((a, b) => b.costUsd - a.costUsd);
+  rollDailyIfNeeded();
+  const budgetUsd = getDailyBudgetUsd();
   return {
     startedAt,
     uptimeSec: Math.round((Date.now() - startedAt) / 1000),
     totals: { ...totals },
     byModel: toRows(byModel),
     bySource: toRows(bySource),
+    daily: {
+      dateKey: dailyDateKey || todayKey(),
+      spendUsd: dailySpendUsd,
+      budgetUsd,
+      exceeded: budgetUsd !== null && dailySpendUsd >= budgetUsd,
+      remainingUsd: budgetUsd !== null ? Math.max(0, budgetUsd - dailySpendUsd) : null,
+    },
   };
 }
 
@@ -122,4 +195,6 @@ export function resetLlmStats(): void {
   byModel.clear();
   bySource.clear();
   startedAt = Date.now();
+  dailySpendUsd = 0;
+  dailyDateKey = todayKey();
 }

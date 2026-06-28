@@ -9,7 +9,7 @@ import { tutorRouter } from "./routers/tutor.js";
 import { wbsAdminRouter } from "./routers/wbsAdmin.js";
 import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
-import { getLlmStats, resetLlmStats } from "./_core/llmMeter.js";
+import { getLlmStats, resetLlmStats, resetDailyBudget } from "./_core/llmMeter.js";
 import { buildScopedKnowledgeBase, buildSourceDoctrineSummary } from "./complianceKnowledgeBase.js";
 import { buildQADoctrineSummary, QA_DOCTRINE, getTopics } from "./complianceQADoctrine.js";
 import {
@@ -372,6 +372,16 @@ const adminRouter = router({
   resetLlmStats: ownerProcedure.mutation(async () => {
     resetLlmStats();
     return { ok: true };
+  }),
+
+  /**
+   * Manual override — clears today's spend counter back to $0 so the budget
+   * guard re-arms immediately (e.g. after raising DAILY_LLM_BUDGET_USD or
+   * after investigating a runaway-call incident).
+   */
+  resetDailyBudget: ownerProcedure.mutation(async () => {
+    resetDailyBudget();
+    return { ok: true, dateKey: new Date().toISOString().slice(0, 10) };
   }),
 
   /**

@@ -18,6 +18,9 @@
  *   ALERT_TEST_TO      — optional override. If set, ALL emails go to this
  *                        address (useful while Resend is in sandbox mode, which
  *                        only delivers to your account email).
+ *   CRON_SECRET        — optional. If set, live sends require either header
+ *                        `x-cron-secret: <value>` or `?cronSecret=<value>`.
+ *                        Dry-runs stay open. Strongly recommended in prod.
  *
  * Value-engineering check: 4/5 — reuses computeAlertsForUser(), no new LLM,
  * no DB writes (we don't persist the email; Resend dashboard has the history).
@@ -102,7 +105,7 @@ function renderHtml(userName: string, alerts: Alert[]): string {
     <tr><td align="center">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:6px;overflow:hidden;border:1px solid #e5e7eb;">
         <tr><td style="padding:24px 24px 0;">
-          <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:2px;color:#b45309;text-transform:uppercase;font-weight:700;margin-bottom:8px;">Cellar Brief · ${new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long" })}</div>
+          <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:2px;color:#b45309;text-transform:uppercase;font-weight:700;margin-bottom:8px;">Cellar Brief · ${new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", timeZone: "Australia/Sydney" })}</div>
           <h1 style="font-family:Georgia,serif;font-size:28px;color:#111827;margin:0 0 6px;line-height:1.2;">Good morning, ${escapeHtml(userName)}.</h1>
           <p style="font-family:Arial,sans-serif;font-size:14px;color:#6b7280;margin:0 0 20px;">Here's what needs your attention in the cellar today — ${alerts.length} alert${alerts.length === 1 ? "" : "s"}.</p>
         </td></tr>
@@ -132,7 +135,22 @@ export async function dailyAlertEmailHandler(req: Request, res: Response): Promi
   const fromEmail = process.env.ALERT_FROM_EMAIL ?? "onboarding@resend.dev";
   const fromName = process.env.ALERT_FROM_NAME ?? "Ownology Cellar Brief";
   const testTo = process.env.ALERT_TEST_TO?.trim() || null;
-  const dryRun = req.query.dryRun === "1" || !apiKey;
+  const cronSecret = process.env.CRON_SECRET?.trim() || null;
+  const providedSecret = (req.headers["x-cron-secret"] as string | undefined)?.trim()
+    ?? (req.query.cronSecret as string | undefined)?.trim()
+    ?? null;
+
+  // Live sends require either no CRON_SECRET configured (dev convenience) or
+  // a matching header/query. Dry-runs stay open so the cellar team can poll
+  // safely without burning Resend quota.
+  const dryRunRequested = req.query.dryRun === "1" || !apiKey;
+  const secretRequired = cronSecret !== null;
+  const secretOk = !secretRequired || providedSecret === cronSecret;
+  const dryRun = dryRunRequested || !secretOk;
+
+  if (!secretOk && !dryRunRequested) {
+    console.warn("[daily-alert-email] CRON_SECRET mismatch — downgrading to dry-run.");
+  }
 
   const resend = apiKey ? new Resend(apiKey) : null;
   const results: EmailResult[] = [];

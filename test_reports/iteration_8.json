@@ -1,0 +1,34 @@
+{
+  "summary": "Daily LLM Budget Guard feature is fully verified end-to-end against the live preview. Backend pytest: 8/8 PASS (new test_daily_budget.py) + 8/8 PASS (existing test_llm_cost_meter.py regression). Frontend Playwright: /stats card data-testid='stats-daily-budget' renders all three states correctly — (a) normal: '$0.001536 / $10.00' with '$10.00 remaining today', amber heading, default border; (b) PAUSED: heading reads 'TODAY'S BUDGET · 2026-06-28 · PAUSED', card border = rgb(185,28,28) (#b91c1c) ✓, progress bar fully red, paused copy present; (c) disabled (budget<=0): card shows '$X / unlimited' and 'No daily budget configured — set DAILY_LLM_BUDGET_USD to enable the guard.' Budget enforcement confirmed: with budget=$0.0003, call 1 spent ~$0.00043 and returned a real LLM answer; call 2 returned the synthetic 'AI service temporarily paused — Ownology has reached today's AI budget…' message verbatim. totals.calls was UNCHANGED by the synthetic response (usage=0/0/0). admin.resetDailyBudget returned {ok:true, dateKey:'2026-06-28'} and unpaused subsequent calls. admin.resetLlmStats also zeroes daily.spendUsd. KPIs + By Model + By Source tables on /stats still render (regression intact). .env restored to DAILY_LLM_BUDGET_USD=10 at end of run.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_daily_budget.py",
+    "/app/test_reports/pytest/iteration_8_daily_budget.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "buildBudgetExceededResponse() returns a Response without Content-Length header — most HTTP clients handle this fine via chunked-or-eof, but if any caller upstream wraps fetch with a strict reader it could trip. Low priority; the global undici fetch in Node 20+ handles it cleanly.",
+    "rollDailyIfNeeded() is called inside recordLlmCall(), getLlmStats(), and isDailyBudgetExceeded() — but NOT inside resetDailyBudget(). Net effect is identical because resetDailyBudget assigns dailyDateKey = todayKey() directly, but adding the call would make the function order-independent (defensive). Minor.",
+    "getDailyBudgetUsd() reads process.env on every call. Cheap but means an in-process env mutation (rare) takes immediate effect. Behaviour is correct; just noting it differs from a snapshot-at-boot pattern in case future tests rely on stability.",
+    "The synthetic response body includes _ownology_budget_paused:true and _ownology_budget_usd:<number>. These leak through to clients that JSON.stringify the chat.completion response — fine for tutor.ask (server strips to .answer) but if any other call path forwards the raw upstream JSON to the client (e.g. raw proxy endpoint), it would leak these debug fields. Recommend grepping for 'data.choices[0]' to confirm no raw-pass-through callers exist.",
+    "Test ergonomics: dailySpendUsd is float-accumulated; over a long day with many calls it could exhibit drift (cents-level). Currently irrelevant at $10 budget but worth a comment.",
+    "Stats.tsx: heading template literal uses ` · PAUSED` with a leading space inside the conditional — that produces a double-space when not exceeded ('Today's budget · 2026-06-28 '). Trivial; CSS likely collapses it but worth cleaning."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_daily_budget.py",
+    "/app/test_reports/iteration_8.json",
+    "/app/test_reports/pytest/iteration_8_daily_budget.xml"
+  ],
+  "success_rate": {"backend": "100% (16/16: 8 new daily-budget + 8 existing llm-meter regression)", "frontend": "100% (all 3 states of stats-daily-budget card verified visually)"},
+  "test_credentials": "None — dev-bypass injects seed-owner-001 as admin.",
+  "seed_data_creation": "None. Tests use existing tutor.ask flow which consumes ~$0.0004 per call against gpt-5.4-mini via the Emergent LLM proxy. Total spend across full suite was <$0.01.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Daily Budget Guard test file: /app/backend/tests/test_daily_budget.py (8 tests, ~27s). It mutates /app/.env DAILY_LLM_BUDGET_USD between $0.0003 (to arm the guard) and $10 (restore), via sudo supervisorctl restart backend in setup_class/teardown_class. Single tutor.ask costs ~$0.00043 on gpt-5.4-mini so budget=$0.0003 arms guard exactly after one call. The synthetic 'paused' response uses message text starting with 'AI service temporarily paused —' — case-insensitive substring 'temporarily paused' is a stable detector. resetDailyBudget mutation: POST /api/trpc/admin.resetDailyBudget body {\"json\":null} → {ok:true,dateKey:'YYYY-MM-DD'}. /stats card has data-testid='stats-daily-budget'; PAUSED border color is rgb(185,28,28). Pre-existing 400 console errors visible on / and /stats (carried over from iteration 7 — global query, not caused by this batch). Env restored to DAILY_LLM_BUDGET_USD=10 at end of testing — verified with curl /api/trpc/admin.llmStats showing budgetUsd:10, spendUsd:0.",
+  "rca of the issue": "N/A — no bugs found. Initial test failure (budget=0.0005 → spend=0.000403 < threshold) was a test calibration issue, not a product bug. Adjusted to budget=0.0003 so one ~$0.0004 tutor.ask reliably arms the guard."
+}
