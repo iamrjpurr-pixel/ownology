@@ -112,7 +112,7 @@ export default function AdminFunnel() {
             style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}
             data-testid="admin-funnel-headline"
           >
-            <div className="flex items-baseline justify-between mb-3">
+            <div className="flex items-baseline justify-between mb-3 flex-wrap gap-4">
               <div>
                 <p className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-text-lo)" }}>
                   Total /pricing visits · last {data.windowDays} days
@@ -122,6 +122,20 @@ export default function AdminFunnel() {
                 </p>
                 <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)" }}>
                   across {data.totals.sources} source{data.totals.sources === 1 ? "" : "s"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-text-lo)" }}>
+                  Conversions
+                </p>
+                <p
+                  data-testid="admin-funnel-total-conversions"
+                  style={{ fontFamily: "'Fraunces',serif", fontSize: "2.25rem", fontWeight: 700, color: "var(--ow-amber)", margin: 0 }}
+                >
+                  {(data.totals.conversions ?? 0).toLocaleString()}
+                </p>
+                <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)" }}>
+                  {data.totals.conversionPct ?? 0}% overall
                 </p>
               </div>
               <Sparkline values={dailyCounts} />
@@ -138,6 +152,8 @@ export default function AdminFunnel() {
                 <tr style={{ background: "color-mix(in oklch, var(--ow-amber) 6%, transparent)", borderBottom: "1px solid var(--ow-border)" }}>
                   <th style={th}>Source</th>
                   <th style={{ ...th, textAlign: "right" }}>Visits</th>
+                  <th style={{ ...th, textAlign: "right" }}>Converted</th>
+                  <th style={{ ...th, textAlign: "right" }}>Conv %</th>
                   <th style={{ ...th, textAlign: "right" }}>Share</th>
                   <th style={{ ...th, textAlign: "right" }}>Last visit</th>
                 </tr>
@@ -145,43 +161,59 @@ export default function AdminFunnel() {
               <tbody>
                 {data.bySource.length === 0 && (
                   <tr>
-                    <td colSpan={4} style={{ padding: "2rem", textAlign: "center", color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", fontSize: "0.85rem" }}>
+                    <td colSpan={6} style={{ padding: "2rem", textAlign: "center", color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", fontSize: "0.85rem" }}>
                       No /pricing visits in this window yet. Once visitors land on /pricing tagged with <code>?from=&lt;source&gt;</code>, rows will appear here.
                     </td>
                   </tr>
                 )}
-                {data.bySource.map((row) => (
-                  <tr
-                    key={row.source}
-                    data-testid={`admin-funnel-row-${row.source}`}
-                    style={{ borderBottom: "1px solid var(--ow-border)" }}
-                  >
-                    <td style={td}>
-                      <div style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.85rem", color: "var(--ow-text-hi)", fontWeight: 600 }}>
-                        {labelFor(row.source)}
-                      </div>
-                      <div style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.7rem", color: "var(--ow-text-lo)" }}>
-                        {row.source}
-                      </div>
-                    </td>
-                    <td style={{ ...td, textAlign: "right", fontFamily: "'Fira Code',monospace", color: "var(--ow-text-hi)" }}>
-                      {row.count.toLocaleString()}
-                    </td>
-                    <td style={{ ...td, textAlign: "right", fontFamily: "'Fira Code',monospace", color: "var(--ow-text-mid)" }}>
-                      {row.sharePct}%
-                    </td>
-                    <td style={{ ...td, textAlign: "right", fontFamily: "'Fira Code',monospace", fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
-                      {fmtAgo(row.lastAt)}
-                    </td>
-                  </tr>
-                ))}
+                {data.bySource.map((row) => {
+                  const conv = (row as { conversions?: number }).conversions ?? 0;
+                  const convPct = (row as { conversionPct?: number }).conversionPct ?? 0;
+                  const winning = conv > 0 && convPct >= 5;
+                  return (
+                    <tr
+                      key={row.source}
+                      data-testid={`admin-funnel-row-${row.source}`}
+                      style={{ borderBottom: "1px solid var(--ow-border)" }}
+                    >
+                      <td style={td}>
+                        <div style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.85rem", color: "var(--ow-text-hi)", fontWeight: 600 }}>
+                          {labelFor(row.source)}
+                        </div>
+                        <div style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.7rem", color: "var(--ow-text-lo)" }}>
+                          {row.source}
+                        </div>
+                      </td>
+                      <td style={{ ...td, textAlign: "right", fontFamily: "'Fira Code',monospace", color: "var(--ow-text-hi)" }}>
+                        {row.count.toLocaleString()}
+                      </td>
+                      <td
+                        data-testid={`admin-funnel-conv-${row.source}`}
+                        style={{ ...td, textAlign: "right", fontFamily: "'Fira Code',monospace", color: conv > 0 ? "var(--ow-amber)" : "var(--ow-text-lo)", fontWeight: conv > 0 ? 700 : 400 }}
+                      >
+                        {conv.toLocaleString()}
+                      </td>
+                      <td
+                        style={{ ...td, textAlign: "right", fontFamily: "'Fira Code',monospace", color: winning ? "#10b981" : "var(--ow-text-mid)", fontWeight: winning ? 700 : 400 }}
+                      >
+                        {convPct}%
+                      </td>
+                      <td style={{ ...td, textAlign: "right", fontFamily: "'Fira Code',monospace", color: "var(--ow-text-mid)" }}>
+                        {row.sharePct}%
+                      </td>
+                      <td style={{ ...td, textAlign: "right", fontFamily: "'Fira Code',monospace", fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
+                        {fmtAgo(row.lastAt)}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
 
           <p className="mt-4" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
-            Tip: when the budget guard pauses free-tier AI, visitors are sent to <code>/pricing?from=free-paused</code>.
-            If that row converts well, consider lowering <code>DAILY_FREE_BUDGET_USD</code> to surface the prompt sooner.
+            Tip: <code>free-paused</code> and any source with <strong>Conv %</strong> ≥5% (highlighted green) is your strongest channel —
+            invest more in that CTA. Sources with high <strong>Visits</strong> but 0% conversion are leaking traffic; rework the pricing copy or the upstream promise.
           </p>
         </>
       )}

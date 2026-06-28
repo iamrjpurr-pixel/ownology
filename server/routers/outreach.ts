@@ -31,7 +31,10 @@ function normaliseMobile(raw: string | undefined | null): string | null {
 }
 
 export const outreachRouter = router({
-  /** PUBLIC — fetch a single contact by slug for the /hi/:slug page. */
+  /** PUBLIC — fetch a single contact by slug for the /hi/:slug page.
+   *  Resolves the Calendly URL on the server: per-contact override wins,
+   *  else falls back to CALENDLY_DEFAULT_URL env. Frontend just renders
+   *  whatever `calendlyUrl` is returned (null = no booking CTA). */
   bySlug: publicProcedure
     .input(z.object({ slug: z.string().min(1).max(80) }))
     .query(async ({ input }) => {
@@ -47,7 +50,11 @@ export const outreachRouter = router({
         .from(schema.outreachContacts)
         .where(eq(schema.outreachContacts.slug, input.slug))
         .limit(1);
-      return rows[0] ?? null;
+      const row = rows[0];
+      if (!row) return null;
+      const defaultCalendly = process.env.CALENDLY_DEFAULT_URL?.trim() || null;
+      const calendlyUrl = row.calendlyOverride?.trim() || defaultCalendly || null;
+      return { ...row, calendlyUrl };
     }),
 
   /** PUBLIC — mark a slug as viewed (called once on landing-page mount). */

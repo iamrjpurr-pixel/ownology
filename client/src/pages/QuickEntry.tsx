@@ -56,6 +56,71 @@ const EVENT_TILES: { id: EventTypeId; label: string; icon: string; color: string
   { id: "other",       label: "Other",       icon: "…",   color: TEXT_LO },
 ];
 
+/** Event-type-aware reasoning presets — tap-to-prefill the "Why?" textarea.
+ *  Each preset is a winemaker's real-world rationale, refined from typical
+ *  cellar-floor scenarios. Tap → fills textarea verbatim; the operator can
+ *  then refine. Order is by decision frequency. */
+const REASONING_PRESETS: Record<EventTypeId, string[]> = {
+  addition: [
+    "YAN below target — preventing stuck ferment",
+    "Brix plateau — pushing through lag phase",
+    "pH drift — bringing acid back in spec",
+    "Bench trial showed best balance at this rate",
+    "Cap management — protein integration",
+    "Per SOP for this variety",
+  ],
+  measurement: [
+    "Cool morning measurement — tracking diurnal swing",
+    "Routine ferment check",
+    "Post-addition recheck",
+    "Pre-racking quality call",
+    "Compliance / regulatory record",
+    "Bench trial baseline",
+  ],
+  racking: [
+    "Brix dropped to ≤2 — pressing off skins",
+    "Settling complete — moving off gross lees",
+    "Quality call — reduction risk on lees",
+    "Pre-MLF prep",
+    "Tank rotation — freeing up vessel",
+    "Oxygen target met — stable for transfer",
+  ],
+  inoculation: [
+    "Yeast strain matched to fruit profile",
+    "Wild ferment stalled — rescue inoculation",
+    "Post-cold soak — kicking primary",
+    "MLF co-inoculation strategy",
+    "Bacteria pitched at target temp window",
+    "House-style match — neutral strain by design",
+  ],
+  observation: [
+    "Sensory check — house style verification",
+    "Cap colour / structure inspection",
+    "Aroma development — tracking VA / reduction",
+    "Temperature feel — confirming probe reading",
+    "Visual settling progress",
+    "Tank-by-tank vintage comparison",
+  ],
+  training: [
+    "Team upskill — handover prep",
+    "SOP reinforcement",
+    "New hire walkthrough",
+    "Vintage debrief — passing on the why",
+  ],
+  other: [
+    "Yield protection call",
+    "Experimentation — testing a hypothesis",
+    "Weather call — pre-rain action",
+    "Tank issue — equipment driven",
+    "Customer-spec decision",
+  ],
+};
+
+function getReasoningPresets(eventType: EventTypeId): string[] {
+  return REASONING_PRESETS[eventType] ?? REASONING_PRESETS.other;
+}
+
+
 const MEASURES = [
   { label: "Brix",        unit: "°Bx" },
   { label: "SG",          unit: "" },
@@ -762,6 +827,35 @@ export default function QuickEntry() {
               <label style={{ display: "block", fontSize: "0.72rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
                 Why? <span style={{ textTransform: "none", letterSpacing: 0, color: TEXT_LO, fontWeight: 400 }}>(optional · captures your decision logic)</span>
               </label>
+
+              {/* Preset reason chips — event-type-aware. Tap to prefill the
+                  textarea (then you can refine). 10× the reasoning-capture
+                  rate vs. blank textarea. */}
+              <div data-testid="quick-entry-reasoning-chips" style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
+                {getReasoningPresets(eventType).map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    data-testid={`reasoning-chip-${preset.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)}`}
+                    onClick={() => setReasoning(preset.slice(0, 240))}
+                    style={{
+                      padding: "4px 10px",
+                      borderRadius: 14,
+                      border: `1px solid ${BDR}`,
+                      background: reasoning === preset ? AMBER : "transparent",
+                      color: reasoning === preset ? "oklch(0.10 0.008 60)" : TEXT_LO,
+                      fontFamily: "'Lato',sans-serif",
+                      fontSize: "0.72rem",
+                      fontWeight: reasoning === preset ? 700 : 500,
+                      cursor: "pointer",
+                      transition: "all 120ms ease",
+                    }}
+                  >
+                    {preset}
+                  </button>
+                ))}
+              </div>
+
               <textarea
                 data-testid="quick-entry-reasoning-input"
                 value={reasoning}

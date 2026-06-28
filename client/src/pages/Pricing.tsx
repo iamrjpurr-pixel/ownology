@@ -1067,6 +1067,12 @@ export default function Pricing() {
       referer: typeof document !== "undefined" ? document.referrer.slice(0, 500) : undefined,
       userAgent: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 500) : undefined,
     });
+    // Stash for the conversion link — success pages read this within 24h.
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.setItem("ow_pricing_source", JSON.stringify({ source: fromRaw, at: Date.now() }));
+      } catch { /* private mode or quota — non-fatal */ }
+    }
   }, []);
 
   const handleFlashPress = () => {

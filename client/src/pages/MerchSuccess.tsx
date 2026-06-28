@@ -4,8 +4,10 @@
  */
 
 import OwnologyLogo from "@/components/OwnologyLogo";
+import { useConversionAttribution } from "@/hooks/useConversionAttribution";
 
 export default function MerchSuccess() {
+  useConversionAttribution();
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4"

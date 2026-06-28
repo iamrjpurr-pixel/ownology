@@ -61,6 +61,31 @@ export const pricingRouter = router({
       return { ok: true, source };
     }),
 
+  /** Log a conversion (signup / paid). Called by /merch/success,
+   *  /founding-member/success, or any Stripe webhook handler. Stores a
+   *  second row with source = `<orig>:converted` — keeps the existing
+   *  pricing_views schema, lets funnelStats split views vs conversions
+   *  by suffix. */
+  logConversion: publicProcedure
+    .input(
+      z.object({
+        source: z.string().min(1).max(32),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const raw = input.source.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0, 32);
+      const baseSource = raw || "direct";
+      // Cap suffixed source at the 32-char column limit
+      const source = `${baseSource}:converted`.slice(0, 32);
+      const userId: number | null = null;
+      await db.insert(schema.pricingViews).values({
+        source,
+        userId,
+        viewedAt: Date.now(),
+      });
+      return { ok: true, source };
+    }),
+
   /**
    * Aggregated funnel stats for the /admin/funnel dashboard.
    * Returns:
@@ -109,17 +134,56 @@ export const pricingRouter = router({
       }
 
       const totalViews = bySource.reduce((s, r) => s + Number(r.count), 0);
+
+      // Split views vs conversions by `:converted` suffix. Both share the
+      // same canonical source (e.g. "free-paused" + "free-paused:converted").
+      const viewsByCanonical = new Map<string, number>();
+      const convByCanonical = new Map<string, number>();
+      const firstByCanonical = new Map<string, number>();
+      const lastByCanonical = new Map<string, number>();
+      for (const r of bySource) {
+        const isConv = r.source.endsWith(":converted");
+        const canonical = isConv ? r.source.slice(0, -":converted".length) : r.source;
+        const count = Number(r.count);
+        if (isConv) {
+          convByCanonical.set(canonical, (convByCanonical.get(canonical) ?? 0) + count);
+        } else {
+          viewsByCanonical.set(canonical, (viewsByCanonical.get(canonical) ?? 0) + count);
+        }
+        const f = Number(r.firstAt), l = Number(r.lastAt);
+        const prevF = firstByCanonical.get(canonical);
+        if (prevF == null || f < prevF) firstByCanonical.set(canonical, f);
+        const prevL = lastByCanonical.get(canonical);
+        if (prevL == null || l > prevL) lastByCanonical.set(canonical, l);
+      }
+      const canonicalSources = Array.from(new Set([...viewsByCanonical.keys(), ...convByCanonical.keys()]));
+      const merged = canonicalSources
+        .map((source) => {
+          const views = viewsByCanonical.get(source) ?? 0;
+          const conversions = convByCanonical.get(source) ?? 0;
+          return {
+            source,
+            count: views,
+            conversions,
+            conversionPct: views > 0 ? Number(((conversions / views) * 100).toFixed(1)) : 0,
+            firstAt: firstByCanonical.get(source) ?? 0,
+            lastAt: lastByCanonical.get(source) ?? 0,
+            sharePct: totalViews > 0 ? Number(((views / totalViews) * 100).toFixed(1)) : 0,
+          };
+        })
+        .sort((a, b) => b.count - a.count);
+
+      const totalConversions = Array.from(convByCanonical.values()).reduce((s, n) => s + n, 0);
       return {
         windowDays: days,
         sinceIso: new Date(sinceMs).toISOString(),
-        totals: { views: totalViews, sources: bySource.length },
-        bySource: bySource.map((r) => ({
-          source: r.source,
-          count: Number(r.count),
-          firstAt: Number(r.firstAt),
-          lastAt: Number(r.lastAt),
-          sharePct: totalViews > 0 ? Number(((Number(r.count) / totalViews) * 100).toFixed(1)) : 0,
-        })),
+        totals: {
+          views: totalViews,
+          conversions: totalConversions,
+          conversionPct: totalViews > 0 ? Number(((totalConversions / totalViews) * 100).toFixed(1)) : 0,
+          sources: merged.length,
+        },
+        bySource: merged,
         daily,
       };
     }),

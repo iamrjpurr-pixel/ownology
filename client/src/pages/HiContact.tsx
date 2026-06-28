@@ -54,7 +54,7 @@ export default function HiContact() {
     );
   }
 
-  const calendlyUrl = contact.calendlyOverride || ""; // empty falls back to /free-run secondary
+  const calendlyUrl = contact.calendlyUrl || ""; // server resolves override → CALENDLY_DEFAULT_URL → null
   const tryNowHref = `/free-run?from=sms-${encodeURIComponent(contact.slug)}`;
 
   return (
