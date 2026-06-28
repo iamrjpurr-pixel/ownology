@@ -35,6 +35,7 @@ type Bucket = {
 const totals: Bucket = { calls: 0, tokensIn: 0, tokensOut: 0, costUsd: 0 };
 const byModel = new Map<string, Bucket>();
 const bySource = new Map<string, Bucket>();
+const warnedUnknownModels = new Set<string>();
 let startedAt = Date.now();
 
 function bump(b: Bucket, tokensIn: number, tokensOut: number, cost: number) {
@@ -60,6 +61,12 @@ export function recordLlmCall(
   source = "unknown"
 ): void {
   const price = PRICING[model] ?? PRICING.default;
+  if (!PRICING[model] && !warnedUnknownModels.has(model)) {
+    warnedUnknownModels.add(model);
+    console.warn(
+      `[llm-meter] unknown model "${model}" — using default pricing (in $${PRICING.default.input}/M, out $${PRICING.default.output}/M). Add to PRICING in llmMeter.ts for accurate cost.`
+    );
+  }
   const cost = (tokensIn * price.input + tokensOut * price.output) / 1_000_000;
 
   bump(totals, tokensIn, tokensOut, cost);

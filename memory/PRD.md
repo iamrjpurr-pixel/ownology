@@ -150,6 +150,18 @@
 - OAuth portal — replaced with placeholder; the `OAuthCallback.tsx` page can be revisited when real auth is chosen.
 - Buttondown newsletter — `BUTTONDOWN_API_KEY` empty; newsletter scheduled job will no-op.
 
+**LLM Cost Meter — Universal coverage (28 Jun 2026, this session)**
+- Closed the coverage gap flagged earlier. Previously only `freeRunRouter` calls (via `chatCompletion`) were metered; ~15 direct `fetch()` LLM call sites in `routers/tutor.ts`, `routers/vintageLog.ts`, `merch/api.ts`, `queryRouter.ts`, `trinityPipeline.ts`, `routers.ts`, `sopEmbeddings.ts` were invisible.
+- **Architecture change**: `server/_core/forgeShim.ts` is now the SINGLE SOURCE OF TRUTH for metering. The shim already wraps `globalThis.fetch` to inject default model + rewrite `max_tokens`. It now ALSO clones every successful chat/completion response, parses `usage.prompt_tokens` + `usage.completion_tokens`, and calls `recordLlmCall(model, in, out, source)`.
+- **Source tagging** (priority):
+  1. Explicit `x-ow-source` request header (set by `chatCompletion()` in `_core/llm.ts` from `opts.source`). Produces clean tags like `freeRun.curiosityAsk`, `tutor.ask`.
+  2. Stack-trace walk in `deriveSourceFromStack()` — finds first frame inside `/server/`, returns `direct:<basename>.ts:<line>` (e.g. `direct:tutor.ts:725`). Auto-captures every untagged direct fetch site for free.
+  3. Fallback: `direct:unknown`.
+- `chatCompletion()` no longer calls `recordLlmCall` itself (would double-count). It just injects the `x-ow-source` header.
+- Unknown-model warning: `recordLlmCall` now logs `console.warn` the first time a model is seen without a PRICING entry, so silent miscosts can't accumulate when a new model is introduced.
+- Verified live (iter 6, 8/8 backend pass): freeRun.curiosityAsk + tutor.ask + 3 parallel tutor.ask all metered correctly. `/stats` now displays 4 source rows including `direct:tutor.ts:725` + `direct:queryRouter.ts:89` that were previously invisible.
+- Caveat for production: stack-trace tagging requires source maps / unminified server — works in `tsx` dev mode and Railway nixpacks (no bundler). If a future build step minifies the server, source tags will collapse to `direct:bundle.js:<line>` and lose attribution — at which point the path forward is to add explicit `x-ow-source` headers to each direct fetch call site.
+
 **Batch 2 — Value Engineered feature upgrades (28 Jun 2026)**
 - **Tank QR codes** (`/tank-qr`) — printable QR code per unique tank in cellar history (`client/src/pages/TankQr.tsx`, 90 LOC). Each QR encodes `/quick-entry?tank=<TankName>&variety=<Variety>` so cellar staff scan with phone → land on pre-filled QuickEntry. Bridges physical → digital. QuickEntry already supports the URL params (line 263-269). Verified live: 10 QR cards render (Tank 1/12/2/3/4/5/7/8/9/Test 1).
 - **Compliance Audit Trail PDF** (`GET /api/compliance/audit-trail.pdf?days=N`) — Express endpoint using `pdfkit`. Filters `vintage_log_entries` to compliance-relevant events (event type: addition/racking/inoculation/measurement OR keyword match: so2/yan/dap/ph/ta/abv/brix/mlf etc) and produces a regulator-ready chronological export with timestamps, tank, variety, details, notes, and operator reasoning. CTA button placed on `/compliance` page (`compliance-audit-trail-download`). Verified live: returns 5256-byte valid PDF starting with `%PDF-1.3`.
