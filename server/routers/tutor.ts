@@ -765,6 +765,39 @@ ${sopContext}${vintageContext ? `\n\n---\n\n## Regional Vintage Context\n${vinta
       const result = await backfillSopEmbeddings(forgeUrl, forgeKey, input?.audience);
       return result;
     }),
+
+  /**
+   * Capture thumbs-up / thumbs-down feedback on an AI answer.
+   * Used to identify weak prompts/RAG gaps over time. Public — any user can rate.
+   * Stored in ai_answer_feedback (schema.aiAnswerFeedback).
+   */
+  rateAnswer: publicProcedure
+    .input(
+      z.object({
+        procName: z.string().min(1).max(64),
+        question: z.string().min(1).max(2000),
+        answerHash: z.string().min(1).max(32),
+        score: z.union([z.literal(1), z.literal(-1)]),
+        note: z.string().max(500).optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      let userId: number | null = null;
+      if (ctx.user) {
+        const u = await getUserByOpenId(ctx.user.openId);
+        if (u) userId = u.id;
+      }
+      await db.insert(schema.aiAnswerFeedback).values({
+        userId,
+        procName: input.procName,
+        question: input.question.slice(0, 2000),
+        answerHash: input.answerHash,
+        score: input.score,
+        note: input.note ?? null,
+        createdAt: Date.now(),
+      });
+      return { ok: true };
+    }),
 });
 
 export { tutorRouter };

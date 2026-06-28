@@ -48,6 +48,8 @@ import Knowledge from "./pages/Knowledge";
 import { CellarJournalIndex, CellarJournalEntry } from "./pages/CellarJournal";
 import Guide from "./pages/Guide";
 import Import from "./pages/Import";
+import Today from "./pages/Today";
+import Demo from "./pages/Demo";
 import Waitlist from "./pages/Waitlist";
 import VineReference from "./pages/VineReference";
 import Resume from "./pages/Resume";
@@ -94,6 +96,13 @@ function ImportPage() {
   return (
     <WorkModeLayout title="Import">
       <Import />
+    </WorkModeLayout>
+  );
+}
+function TodayPage() {
+  return (
+    <WorkModeLayout title="Today" activeTab="more">
+      <Today />
     </WorkModeLayout>
   );
 }
@@ -189,6 +198,8 @@ function Router() {
       <Route path={"/knowledge/*"} component={KnowledgePage} />
       <Route path={"/guide"} component={Guide} />
       <Route path={"/import"} component={ImportPage} />
+      <Route path={"/today"} component={TodayPage} />
+      <Route path={"/demo"} component={Demo} />
       <Route path={"/waitlist"} component={Waitlist} />
       <Route path={"/reference/vine"} component={VineReference} />
       <Route path={"/resume"} component={Resume} />

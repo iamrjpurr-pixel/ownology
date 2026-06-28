@@ -373,6 +373,19 @@ const adminRouter = router({
     resetLlmStats();
     return { ok: true };
   }),
+
+  /**
+   * AI answer feedback list (admin view) — shows recent thumbs-down feedback
+   * so prompts/RAG gaps can be hunted. Limit 50 most recent.
+   */
+  aiFeedback: ownerProcedure.query(async () => {
+    const rows = await db
+      .select()
+      .from(schema.aiAnswerFeedback)
+      .orderBy(desc(schema.aiAnswerFeedback.createdAt))
+      .limit(50);
+    return rows;
+  }),
 });
 
 

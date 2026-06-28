@@ -1075,3 +1075,26 @@ export const cellarJournal = mysqlTable(
     index("cj_views_idx").on(t.viewCount),
   ]
 );
+
+/**
+ * AI answer feedback — thumbs up/down captured under tutor.ask + freeRun answers.
+ * Used to identify weak prompts/RAG gaps over time. The data moat.
+ */
+export const aiAnswerFeedback = mysqlTable(
+  "ai_answer_feedback",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    userId: int("user_id"),
+    procName: varchar("proc_name", { length: 64 }).notNull(), // e.g. "tutor.ask", "freeRun.curiosityAsk"
+    question: text("question").notNull(),
+    answerHash: varchar("answer_hash", { length: 32 }).notNull(),
+    score: int("score").notNull(), // 1 = thumbs up, -1 = thumbs down
+    note: varchar("note", { length: 500 }),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("aaf_proc_idx").on(t.procName, t.createdAt),
+    index("aaf_score_idx").on(t.score),
+  ]
+);
+

@@ -7,6 +7,7 @@
 import { useState, useRef } from "react";
 import { Link } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { trpc } from "@/lib/trpc";
 
 const SERIF = "'Fraunces', serif";
@@ -336,7 +337,32 @@ function InlineAskWidget() {
             {answer}
           </div>
 
-          {/* Source chapters intentionally not shown to user — internal knowledge source only */}
+          {/* Bible-grounded citation footer. We never expose specific bible/chapter
+              names (bible privacy doctrine) — but we DO show the count to build
+              trust + signal the answer is grounded, not hallucinated. */}
+          {sourceChapters.length > 0 && (
+            <div
+              data-testid="tutor-answer-citations"
+              style={{
+                marginTop: "0.875rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                fontFamily: SANS,
+                fontSize: "0.72rem",
+                color: "var(--ow-text-lo)",
+                letterSpacing: "0.02em",
+              }}
+            >
+              <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "var(--ow-amber)" }} />
+              <span>
+                Grounded in <strong style={{ color: "var(--ow-text-mid)" }}>{sourceChapters.length}</strong> home winemaking reference{sourceChapters.length === 1 ? "" : "s"}
+              </span>
+            </div>
+          )}
+
+          {/* Feedback widget — captures thumbs-up/down to identify weak prompts */}
+          <FeedbackWidget question={asked} answer={answer} procName="tutor.ask" />
 
           {/* Risk badge + disclaimer */}
           {(riskLevel === "high" || disclaimer) && (
