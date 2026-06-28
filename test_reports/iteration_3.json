@@ -1,0 +1,52 @@
+{
+  "summary": "Iteration 3 — PURE REFACTOR regression verification on live Railway (https://ownology-production.up.railway.app). Goal was zero regressions after splitting server/routers.ts (3239 LOC) into 4 sub-routers (tutor.ts, vintageLog.ts, knowledge.ts, wbsAdmin.ts). Wrote /app/backend/tests/test_refactor_regression.py covering: (a) all 4 extracted routers, (b) 7 non-extracted routers, (c) appRouter composition for 18 named sub-routers, (d) full learning-loop prompt path on the new tutor.ts, (e) cellar-journal SEO Express endpoints. Result: 31/32 PASS. ONE CONFIRMED REGRESSION introduced by the refactor: `dashboard.getStats` returns HTTP 500 with `listVintageLogEntries is not defined`. The dashboard router (still in routers.ts) calls a helper that was implicitly defined in the old monolithic routers.ts but is no longer in scope after the vintageLog extraction. All extracted routers (tutor.ask, vintageLog.alerts, knowledge.listSops, wbsAdmin.listDomains) work correctly. Learning loop (Tank 7 Shiraz AND Tank 9 Shiraz) verified end-to-end through the new tutor.ts file with the AI surfacing seeded measurements (24.3, 18.5, EC1118, etc.). Alerts engine returns all 5 alerts with correct severity ordering. SEO XML endpoints (sitemap.xml, rss.xml) both serve valid XML.",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "GET /api/trpc/dashboard.getStats",
+        "issue": "HTTP 500 — `listVintageLogEntries is not defined`. CONFIRMED REGRESSION introduced by this refactor. The dashboard.getStats handler (still living in routers.ts after the split) references a helper named `listVintageLogEntries` which appears to have been moved into server/routers/vintageLog.ts during the extraction and is no longer importable / in-scope in routers.ts. Reproducible 100% of the time via `curl https://ownology-production.up.railway.app/api/trpc/dashboard.getStats`. Breaks the entire Production Dashboard (counters, tile metrics) for every user.",
+        "priority": "CRITICAL"
+      }
+    ],
+    "minor": [
+      {
+        "endpoint": "GET /api/trpc/compliance.searchSops",
+        "issue": "Returns 404 NOT_FOUND. Test request listed this as expected to work, but live probing shows the procedure does not exist on the compliance router (the live router exposes `compliance.ask` as a POST instead). Most likely the procedure was already absent before this refactor (review request appears to be speculative about its name) — not flagged CRITICAL because compliance.ask works and the compliance router itself IS mounted. If the procedure was previously present and removed, please confirm and re-add."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_refactor_regression.py",
+    "/app/test_reports/pytest/iteration_3_results.xml"
+  ],
+  "action_items": [
+    "FIX (CRITICAL): In server/routers.ts, restore access to the `listVintageLogEntries` helper used by `dashboard.getStats`. Either (a) re-import it from server/routers/vintageLog.ts (export it from there first), (b) move the helper into a shared module like server/services/vintageLogService.ts and import it in both files, or (c) inline the query in dashboard.getStats. Verify with `curl .../api/trpc/dashboard.getStats` — must return 200 with a JSON stats object.",
+    "CONFIRM (minor): Was `compliance.searchSops` ever a real procedure, or was it speculative in the test request? If it was present pre-refactor, re-add it. If it never existed, update internal docs to point to `compliance.ask` instead."
+  ],
+  "critical_code_review_comments": [
+    "Refactor surface: 4 extracted routers all respond correctly — tutor.ask still grounds answers in user's cellar history (verified Tank 7 with 24.3/18.5/EC1118 citations AND Tank 9 reasoning surfacing), vintageLog.alerts returns 5 alerts with correct severity ordering (Tank 8 stuck HIGH, Tank 9 DAP HIGH, Tank 5 high temp MEDIUM, Tank 2 ready_to_rack MEDIUM, Tank 4 quiet LOW), knowledge.listSops returns >=38 SOPs, wbsAdmin.listDomains returns >=50 domains.",
+    "appRouter composition: 18 named sub-routers verified reachable via concrete probe procedures. All non-extracted sub-routers (foundingMembers, orders, vintageReminder, wineBatch, leads, siteContent, cellarEquipment, cellarTasks, barrel, packaging, vineyard, vintageIntelligence, freeRun, cellarJournal) return 200 with valid data shapes.",
+    "Discovered shape note (NOT a regression): vintageLog.alerts returns `{alerts: [...]}` (object with alerts key) rather than a bare array. Previous iteration_2 tests passed against this same shape — consistent before and after the refactor. Documenting here so future test agents don't trip on it.",
+    "CONFIRMED REGRESSION ROOT CAUSE (dashboard.getStats 500): `listVintageLogEntries is not defined` indicates a JS-level ReferenceError in the dashboard.getStats handler in server/routers.ts. The function was almost certainly declared as a top-level helper in the old monolithic routers.ts and got carried into server/routers/vintageLog.ts during extraction (because all its callers inside vintageLog were moved too), but dashboard.getStats was left behind in routers.ts and lost access to the helper. Fix is a 1-3 line import/export change.",
+    "SEO XML endpoints (Express, not tRPC) — sitemap.xml + rss.xml both 200 with valid XML. Refactor did not break the Express handler registration.",
+    "Learning loop (the most important verification) — VERIFIED. tutor.ask in the new server/routers/tutor.ts file correctly calls getUserCellarContext: live tutor responses to 'What did I do last vintage on Tank 7 with the Shiraz?' include Tank 7, Shiraz, 18.5, EC1118, 0.6 kg DAP citations directly from seeded vintage_log_entries. Zero regression in the AI grounding pipeline."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_refactor_regression.py (new — 32 pytest cases covering all P0/P1 review items)"
+  ],
+  "success_rate": {
+    "backend": "96.9% (31/32 PASS, 1 confirmed regression on dashboard.getStats)",
+    "frontend": "n/a (backend-only testing per review request)"
+  },
+  "test_credentials": "Auth bypass — all requests auto-authenticate as seed-owner-001 (admin). No credentials needed (per /app/memory/test_credentials.md).",
+  "seed_data_creation": "None — this iteration is read-only regression testing; no test data written to prod.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "After the dashboard.getStats fix lands, just re-run `pytest /app/backend/tests/test_refactor_regression.py -v --tb=short` against live. The single failing test (TestNonExtractedRouters::test_dashboard_getStats) should flip to PASS. No setup needed; no env vars; auth bypass is on. Existing tests from prior iterations (/app/backend/tests/test_alerts_reasoning.py, /app/backend/tests/test_learning_loop.py) are still relevant and can be re-run for deep-feature regression coverage if desired.",
+  "rca of the issue": "REGRESSION: dashboard.getStats 500 `listVintageLogEntries is not defined`. REPRODUCTION: `curl https://ownology-production.up.railway.app/api/trpc/dashboard.getStats` reliably returns the 500 INTERNAL_SERVER_ERROR. ROOT CAUSE: When server/routers.ts (3239 LOC) was split into server/routers/{tutor,vintageLog,knowledge,wbsAdmin}.ts, the helper function `listVintageLogEntries` — which previously lived as a top-level function in the monolithic routers.ts and was visible to all router handlers in that file — was moved into server/routers/vintageLog.ts along with its primary callers. However, dashboard.getStats (which stayed in routers.ts because the dashboard router was NOT extracted) still calls `listVintageLogEntries(...)` directly. After the refactor that call resolves to nothing in routers.ts's scope, producing a ReferenceError at request time. MITIGATION: (a) export `listVintageLogEntries` from server/routers/vintageLog.ts and `import { listVintageLogEntries } from './routers/vintageLog'` at the top of server/routers.ts, OR (b) lift the helper into a shared service module like server/services/vintageLogService.ts and import from both files, OR (c) inline the underlying drizzle/SQL query into dashboard.getStats. Option (b) is the cleanest long-term. Verify fix by re-running the single failing test."
+}
