@@ -124,6 +124,33 @@ If the question is about making wine commercially or winemaking technique, respo
         { role: "user", content: input.question },
       ], "freeRun.curiosityAsk");
 
+      // ── Detect synthetic budget-paused response ──────────────────────────
+      // The forge shim returns a graceful "AI service temporarily paused"
+      // message when the daily LLM budget is exhausted. When that happens we:
+      //   1. DON'T charge a free-tier question against the user's daily quota
+      //   2. DON'T persist the paused message into the Cellar Journal
+      //   3. Return a structured `paused: true` payload so the UI can render
+      //      a polite upgrade CTA instead of the synthetic text.
+      const isPaused = /temporarily paused — Ownology has reached today/i.test(answer);
+      if (isPaused) {
+        // Compute next UTC midnight ISO string for the retry hint.
+        const next = new Date();
+        next.setUTCHours(24, 0, 0, 0);
+        const retryAtIso = next.toISOString();
+        return {
+          answer: "",
+          topicTag: null,
+          limitReached: false,
+          paused: true,
+          pausedTier: /free-tier/i.test(answer) ? ("free" as const) : ("overall" as const),
+          pausedMessage:
+            "We've reached today's free-tier AI budget. Premium members keep going — upgrade for unlimited curiosity, or try again at UTC midnight.",
+          retryAt: retryAtIso,
+          questionsUsed: currentCount,
+          questionsTotal: DAILY_FREE_QUESTIONS,
+        };
+      }
+
       // ── Detect topic tag ─────────────────────────────────────────────────
       let topicTag: string | null = null;
       try {
@@ -170,6 +197,7 @@ If the question is about making wine commercially or winemaking technique, respo
         answer,
         topicTag,
         limitReached: false,
+        paused: false as const,
         questionsUsed: currentCount + 1,
         questionsTotal: DAILY_FREE_QUESTIONS,
       };

@@ -34,6 +34,9 @@ interface Message {
   sciencePanel?: string;
   vineyardPanel?: string;
   craftPanel?: string;
+  /** True when this row is the synthetic "AI budget paused" message — UI
+   *  renders an upgrade CTA instead of Deep Dive controls. */
+  isPaused?: boolean;
 }
 
 /**
@@ -152,7 +155,24 @@ export default function FreeRun() {
     try {
       const result = await curiosityAskMutation.mutateAsync({ question: q });
 
-      if (result.limitReached) {
+      if (result.paused) {
+        // Friendly budget-paused state. NOT a quota issue — the AI service
+        // itself is throttled. Surface upgrade CTA + retry-at hint.
+        const retryAt = result.retryAt ? new Date(result.retryAt) : null;
+        const retryStr = retryAt
+          ? retryAt.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", timeZone: "Australia/Sydney" })
+          : "midnight UTC";
+        const pausedMessage: Message = {
+          id: Date.now().toString(),
+          question: q,
+          surfaceAnswer: `${result.pausedMessage ?? "We've reached today's free-tier AI budget."} Try again after ${retryStr} (Sydney) — or upgrade to Premium for unlimited Curiosity questions.`,
+          topicTag: undefined,
+          timestamp: new Date(),
+          deepDiveExpanded: false,
+          isPaused: true,
+        };
+        setMessages((prev) => [...prev, pausedMessage]);
+      } else if (result.limitReached) {
         // Show daily limit reached message
         const limitMessage: Message = {
           id: Date.now().toString(),
@@ -265,7 +285,7 @@ export default function FreeRun() {
           }}
         >
           <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: "#1A1A1A", fontWeight: 600 }}>
-            Today's Questions
+            Today&apos;s Questions
           </span>
           <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: ACCENT, fontWeight: 700 }}>
             {questionsUsed} / 3
@@ -387,22 +407,61 @@ export default function FreeRun() {
 
                 {/* Surface answer */}
                 <div
+                  data-testid={msg.isPaused ? `freerun-paused-card-${msg.id}` : `freerun-answer-card-${msg.id}`}
                   style={{
                     maxWidth: "85%",
                     padding: "1rem",
                     borderRadius: "12px",
-                    background: "#FFFFFF",
-                    border: "1px solid #E8EAED",
+                    background: msg.isPaused ? "#FEF3C7" : "#FFFFFF",
+                    border: msg.isPaused ? `1px solid ${ACCENT}` : "1px solid #E8EAED",
                     fontFamily: "'Lato', sans-serif",
                     fontSize: "0.95rem",
                     lineHeight: 1.6,
                     color: "#1A1A1A",
                   }}
                 >
+                  {msg.isPaused && (
+                    <div
+                      style={{
+                        fontFamily: "'Lato', sans-serif",
+                        fontSize: "0.7rem",
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                        color: ACCENT,
+                        fontWeight: 700,
+                        marginBottom: "0.5rem",
+                      }}
+                    >
+                      ✦ Daily AI budget reached
+                    </div>
+                  )}
                   <p style={{ margin: 0, marginBottom: "0.75rem" }}>{msg.surfaceAnswer}</p>
 
-                  {/* Deep Dive button */}
-                  {!msg.deepDiveExpanded && (
+                  {/* Paused → Upgrade CTA */}
+                  {msg.isPaused && (
+                    <a
+                      href="/pricing"
+                      data-testid={`freerun-paused-upgrade-${msg.id}`}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.4rem",
+                        padding: "0.5rem 1rem",
+                        background: ACCENT,
+                        color: ACCENT_INK,
+                        borderRadius: "20px",
+                        fontFamily: "'Lato', sans-serif",
+                        fontSize: "0.85rem",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                      }}
+                    >
+                      Upgrade to Premium →
+                    </a>
+                  )}
+
+                  {/* Deep Dive button — hidden when paused */}
+                  {!msg.isPaused && !msg.deepDiveExpanded && (
                     <button
                       onClick={() => handleDeepDive(msg.id)}
                       disabled={isLoading}
