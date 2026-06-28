@@ -74,9 +74,11 @@ export const pricingRouter = router({
     )
     .mutation(async ({ input }) => {
       const raw = input.source.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0, 32);
-      const baseSource = raw || "direct";
-      // Cap suffixed source at the 32-char column limit
-      const source = `${baseSource}:converted`.slice(0, 32);
+      const SUFFIX = ":converted";
+      // Reserve room for the suffix so funnelStats' endsWith(":converted")
+      // check is never defeated by truncation on a too-long source.
+      const baseSource = (raw || "direct").slice(0, 32 - SUFFIX.length);
+      const source = `${baseSource}${SUFFIX}`;
       const userId: number | null = null;
       await db.insert(schema.pricingViews).values({
         source,

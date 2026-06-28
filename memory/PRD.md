@@ -176,6 +176,22 @@
 **Lazy Code-Splitting for Cold Pages (28 Jun 2026, this session)**
 - 30+ rarely-visited pages converted from static `import` to `React.lazy(() => import(...))` in `client/src/App.tsx`. Suspense wraps the entire Switch with a tiny "Loading…" skeleton (`data-testid="page-loading"`).
 - **Eager (kept synchronous)**: Home, FreeRun, ThePress, QuickEntry, CellarTasks, Today, Pricing, WorkModeLayout, PwaInstallBanner. These are first-paint or PWA bottom-nav critical.
+
+**Three-feature drop — Sales Validation Polish (28 Jun 2026, this session)**
+
+1. **QuickEntry — Decision-logic "Why?" preset chips.** Event-type-aware preset chips render above the reasoning textarea on the Confirm screen. Tap a chip → prefills the 240-char textarea verbatim (operator can refine). REPLACES previous text on subsequent taps (no append spam). 6 chips for `addition` (YAN, Brix, pH, bench trial, cap mgmt, SOP), 6 for `measurement` (diurnal, routine, post-add, pre-rack, compliance, baseline), 6 for `racking`, `inoculation`, `observation`, 4 for `training`, 5 for `other`. Goal: 10× the reasoning-capture rate vs. blank textarea — feeds the Learning Loop. `getReasoningPresets(eventType)` helper at top of `QuickEntry.tsx`.
+
+2. **Default Calendly URL for `/hi/:slug`.** New env `CALENDLY_DEFAULT_URL=https://calendly.com/ownology`. `outreach.bySlug` now resolves server-side: per-contact `calendlyOverride` wins, else env default, else null. Frontend reads new `contact.calendlyUrl` field. Every personalised SMS landing page now has a working "📅 Book a 20-min demo →" CTA without per-contact setup. `calendlyOverride` still on the payload for backward-compat.
+
+3. **Signup-conversion column on `/admin/funnel`.** Zero-schema-change design via `<source>:converted` suffix idiom.
+   - New `pricing.logConversion({source})` public mutation. Normalises (lowercase, punct→`-`), caps base at 22 chars to preserve the 10-char `:converted` suffix within the 32-char `pricing_views.source` column. Verified that a max-32-char input still ends with `:converted` (edge case from code review).
+   - `pricing.funnelStats` refactored: splits views vs conversions by suffix, merges onto canonical source name, returns `{conversions, conversionPct}` per row and in `totals`.
+   - New `useConversionAttribution` hook (`/app/client/src/hooks/useConversionAttribution.ts`) — drop into any post-payment / success page. Reads `localStorage.ow_pricing_source` (24h freshness window), fires `pricing.logConversion`, clears stash. Ref-gated so StrictMode double-mount is safe.
+   - `Pricing.tsx` stashes `{source, at: Date.now()}` to localStorage on every `/pricing` mount (in parallel with the existing `logView` call).
+   - `MerchSuccess.tsx` + `FoundingMemberSuccess.tsx` call the hook — Stripe-stub-friendly, also future-proof for real Stripe webhooks.
+   - `/admin/funnel` UI: new Conversions KPI block (count + overall %), 6-column table (Source/Visits/**Converted**/**Conv %**/Share/Last visit), amber-bold Converted cell when >0, green Conv % cell when ≥5% so winning channels jump off the page.
+- Verified live (`/app/test_reports/iteration_13.json`, **13/13 backend pytest + 100% frontend, 0 critical, 0 minor**). One latent suffix-truncation bug from the code review was fixed in the same session.
+
 - **Lazy (code-split into own chunks)**: WhyOwnology, ForInnoVintUsers, ForVintraceUsers, Blog, BlogArticle, Regulations, RegulatoryLinks, Compliance, Merch×3, CampaignMetrics, Orders, Admin, HomeWineryKit, ForHomeWinemakers, DIYKnowledge, HomeWinemakerTroubleshooting, HomeWinemakerGlossary, CompetitiveAdvantage, Preview, AdminLeads, AdminComplianceDoctrine, AdminVintageIntelligence, AdminWbs, AdminTrinity, AdminFunnel, FoundingMemberSuccess, OAuthCallback, ProductionDashboard, BuildIndex, Vineyard, Knowledge, CellarJournalIndex/Entry (named exports rewrapped), Guide, Import, Demo, Waitlist, VineReference, Resume, Stats, TankQr, VintageCompare.
 - Verified live: with 250 KB/s network throttling, the `page-loading` skeleton briefly flashes when navigating to a fresh lazy chunk; the page then renders correctly. Eager routes feel instant.
 - **Net effect**: first JS payload meaningfully smaller — winemakers on rural 3G during vintage will feel the win on `/`, `/free-run`, `/the-press` loads. Admin/Trinity/Knowledge chunks only download when someone actually visits those routes.
