@@ -49,7 +49,10 @@ async function callLLM(messages: { role: "system" | "user" | "assistant"; conten
 }
 
 async function callLLMJson(messages: { role: "system" | "user" | "assistant"; content: string }[]) {
-  const out = await chatCompletion(messages, { model: MODELS.PREMIUM, json: true, maxTokens: 1500 });
+  // Value engineering: tag classification is a 3-word categorisation — no quality
+  // benefit from PREMIUM. Use CHEAP gpt-5.4-mini (~20× cheaper). See
+  // /app/memory/VALUE-ENGINEERING.md for the cost-control doctrine.
+  const out = await chatCompletion(messages, { model: MODELS.CHEAP, json: true, maxTokens: 300 });
   return out || "{}";
 }
 

@@ -123,11 +123,16 @@ function StatCard({
 
 export default function ProductionDashboard() {
   const { data: stats, isLoading, error } = trpc.dashboard.getStats.useQuery(undefined, {
-    refetchInterval: 60_000, // refresh every minute
+    // Value engineering: 60s polling × 2 queries × N open dashboards generates
+    // significant DB IOPS for marginal freshness. 5 min + refetchOnFocus covers
+    // the cellar-floor need. See /app/memory/VALUE-ENGINEERING.md.
+    refetchInterval: 300_000,
+    refetchOnWindowFocus: true,
     retry: false,
   });
   const { data: alertsData } = trpc.vintageLog.alerts.useQuery(undefined, {
-    refetchInterval: 60_000,
+    refetchInterval: 300_000,
+    refetchOnWindowFocus: true,
     retry: false,
   });
   const alerts = alertsData?.alerts ?? [];
