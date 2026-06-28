@@ -1,0 +1,33 @@
+{
+  "summary": "Backend-only verification of Ownology learning-loop on live Railway deployment (https://ownology-production.up.railway.app). All 7 pytest cases PASSED, including the P0 core USP. The tutor.ask response for the Tank 7 Shiraz question explicitly cited Tank 7, Shiraz, 30 Mar / 31 Mar / 1 Apr / 3 Apr / 7 Apr / 8 Apr, measurements 24.3 °Bx, 120 ppm YAN, 18.5 °Bx, 2.0 °Bx, 0.6 kg DAP, and products EC1118 / GoFerm / DAP / Fermaid K — proving the personalised cellar context is being injected end-to-end. Home-winemaker, FreeRun.curiosityAsk, vintageLog.list, sitemap.xml, rss.xml, and SO2/NSW regulation RAG were all verified.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_learning_loop.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "P0 learning-loop verified: tutor.ask commercial path correctly injects getUserCellarContext(dbUser.id) — answer references exact dates, measurements, products from vintage_log_entries.",
+    "home_winemaker path correctly bypasses cellar context (no 'Tank 7' leak) and returns the required disclaimer field — clean separation maintained.",
+    "freeRun.curiosityAsk is properly isolated from cellar history (different audience path).",
+    "vintageLog.list is a tRPC query (must use GET ?input=...). POST returns 405 — this is correct tRPC semantics, just a note for next testers.",
+    "Cellar-journal SEO endpoints (sitemap.xml, rss.xml) return well-formed XML — SEO flywheel intact.",
+    "SO2/NSW compliance RAG answers with relevant compliance keywords — 72 regulation chunks appear queryable."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "N/A (skipped per request)"},
+  "test_credentials": "Auth bypass enabled — every request auto-authenticates as seed-owner-001 (admin). No credentials required. See /app/memory/test_credentials.md.",
+  "seed_data_creation": "None — relied on the pre-seeded 16 vintage_log_entries for seed-owner-001 (Tank 7 Shiraz, Tank 12 Shiraz MLF, Tank 3 Chardonnay, Tank 1 Pinot Noir).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 7 backend tests in /app/backend/tests/test_learning_loop.py pass against live Railway URL. To re-run: `pytest /app/backend/tests/test_learning_loop.py -v -s --tb=short`. tRPC queries need GET ?input=urlencode({\"json\":{...}}); tRPC mutations need POST {\"json\":{...}}. LLM endpoints (tutor.ask, curiosityAsk) can take 30-60s — keep timeout >= 120s. Auth bypass is intentional in production.",
+  "rca of the issue": "Not a bug fix — this was verification of a new feature. The learning loop (getUserCellarContext injected into the commercial winemaking prompt path in server/routers.ts ~line 2586) is wired correctly and produces personalised answers grounded in the user's own vintage_log_entries."
+}
