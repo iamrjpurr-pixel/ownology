@@ -26,6 +26,7 @@ import {
   getFoundingMemberCount,
   listFoundingMembers,
   addFoundingMember,
+  listVintageLogEntries,
   getUserByOpenId,
   upsertTankReminder,
   listTankReminders,
