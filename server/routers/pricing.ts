@@ -30,6 +30,9 @@ const KNOWN_SOURCES = [
   "stats",
   "direct",
 ] as const;
+// KNOWN_SOURCES is documentation only — see SOURCE_LABEL in AdminFunnel.tsx
+// for the canonical display-name map.
+void KNOWN_SOURCES;
 
 export const pricingRouter = router({
   /** Log a /pricing page visit. Anonymous-friendly. */
@@ -42,10 +45,12 @@ export const pricingRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // Normalise source: lowercase, trim, fall back to "direct" if unrecognised.
+      // Normalise source: lowercase, trim, fall back to "direct" if empty
+      // after stripping non-[a-z0-9-] chars. Cap at 32 chars to match DB.
       const raw = input.source.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0, 32);
-      const source = (KNOWN_SOURCES as readonly string[]).includes(raw) ? raw : raw || "direct";
-      const userId = ctx.user?.openId ? null : null; // anonymous OK; user wiring deferred until real auth
+      const source = raw || "direct";
+      // user wiring deferred until real auth lands — see /admin auth TODO.
+      const userId: number | null = null;
       await db.insert(schema.pricingViews).values({
         source,
         userId,

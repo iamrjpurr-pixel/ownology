@@ -150,6 +150,23 @@
 - OAuth portal — replaced with placeholder; the `OAuthCallback.tsx` page can be revisited when real auth is chosen.
 - Buttondown newsletter — `BUTTONDOWN_API_KEY` empty; newsletter scheduled job will no-op.
 
+**Conversion-Attribution Funnel (28 Jun 2026, this session)**
+- New table `pricing_views(id, source, userId, referer, userAgent, viewedAt)` + 2 indexes. Created via raw SQL since `drizzle-kit migrate` wasn't recording in `__drizzle_migrations` (pre-existing baseline issue — flagged for future cleanup; consider re-baselining or switching to `drizzle-kit push`).
+- New `pricingRouter` in `/app/server/routers/pricing.ts` (124 LOC):
+  - `pricing.logView({source, referer?, userAgent?})` — public mutation, anonymous-friendly. Normalises source (lowercase, strip non-alphanumeric, cap 32 chars), defaults to `"direct"` when empty.
+  - `pricing.funnelStats({days?})` — owner query. Returns `{windowDays, totals, bySource[], daily[]}` with daily zero-fill so the sparkline never lies.
+- `Pricing.tsx` auto-logs every visit on mount with `?from=<source>` extracted from URL. `useRef` gate ensures EXACTLY one log per mount (no React StrictMode double-fire).
+- **4 highest-value CTAs tagged**:
+  - `FreeRun.tsx` paused upgrade button → `from=free-paused` (the budget-guard funnel — defence-to-conversion lever)
+  - `Home.tsx` 3 CTAs → `from=homepage-hero|homepage-nav|homepage-mobile`
+  - `CompetitiveAdvantage.tsx` → `from=competitive-advantage`
+  - `CellarJournal.tsx` → `from=cellar-journal`
+  - Untagged visits default to `direct`
+- **New `/admin/funnel` page** (`AdminFunnel.tsx`, 200 LOC): inline SVG sparkline (no chart lib), window selector (7/30/90 days), sortable per-source table with friendly display labels, share-of-traffic %, and last-visit-ago. Tip text at the bottom suggests *"if free-paused converts well, consider lowering `DAILY_FREE_BUDGET_USD` to surface the prompt sooner"* — pairs naturally with the tiered budget guard.
+- **Admin hub** (`/admin`) now exposes a "Conversion Funnel" tool card → `/admin/funnel`.
+- Verified live (iter 11, **21/21 backend + 100% frontend pass, 0 critical**): 10 seeded views aggregated correctly (free-paused 30%, homepage-hero 20%, 5 others 10% each); window selector refetches; pricing page auto-logs exactly once; tagged CTAs carry correct `?from=`; regression pages all return 200.
+- **Polish applied**: removed dead-code ternary, made `userId: number | null = null` explicit, kept `KNOWN_SOURCES` as documentation-only.
+
 **Friendly Free-Tier Paused UX → Sales Funnel (28 Jun 2026, this session)**
 - When free-tier LLM budget is exhausted, `freeRun.curiosityAsk` now:
   1. **Doesn't charge a question** against the user's daily 3/3 quota (free user not punished for an outage)
