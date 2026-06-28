@@ -1,29 +1,62 @@
 /**
- * Forge → Emergent LLM proxy shim.
+ * Forge → Emergent LLM proxy shim + universal cost meter.
  *
- * The Ownology codebase (inherited from Manus) calls
- * `${BUILT_IN_FORGE_API_URL}/v1/chat/completions` in ~30 places, relying on
- * Forge to pick a default model (gpt-4o-mini). The Emergent LLM proxy is
- * OpenAI-compatible but REQUIRES an explicit `model` field, and the new GPT-5
- * family uses `max_completion_tokens` instead of `max_tokens`.
+ * The Ownology codebase calls `${BUILT_IN_FORGE_API_URL}/v1/chat/completions`
+ * in ~15 places. The Emergent LLM proxy is OpenAI-compatible but REQUIRES an
+ * explicit `model` field, and the new GPT-5 family uses `max_completion_tokens`
+ * instead of `max_tokens`. Rather than edit every call site, this shim wraps
+ * `globalThis.fetch` once at boot and:
+ *   - injects a default `model` (gpt-5.4-mini) if missing
+ *   - rewrites `max_tokens` → `max_completion_tokens` for GPT-5/o-family
+ *   - meters cost via `recordLlmCall()` on every successful response (28 Jun 2026)
  *
- * Rather than edit every call site, this shim wraps `globalThis.fetch` once at
- * boot. Any POST to `/llm/v1/chat/completions` on the Emergent host gets:
- *   - a default `model` injected if missing (gpt-5.4-mini — cheap & fast)
- *   - `max_tokens` rewritten to `max_completion_tokens` when needed
+ * Source tagging priority:
+ *   1. Explicit `x-ow-source` request header (set by `chatCompletion` adapter)
+ *   2. Stack-trace walk to first frame inside `/server/...` (filename:line)
+ *   3. "unknown"
  *
- * Per-endpoint upgrades (e.g. claude-sonnet-4-6 for Free Run answers) bypass
- * this shim by calling `server/_core/llm.ts` directly with an explicit model.
+ * Streaming responses (`stream: true`) are NOT metered — the proxy doesn't
+ * emit a final usage block on the SSE wire for every provider. Today no
+ * call site uses streaming, so this is theoretical.
+ *
+ * Per-endpoint upgrades (e.g. claude-sonnet-4-6 for Free Run) bypass the
+ * model-injection branch by passing an explicit model.
  */
+
+import { recordLlmCall } from "./llmMeter.js";
 
 const DEFAULT_MODEL = "gpt-5.4-mini";
 const PROXY_HOST = "integrations.emergentagent.com";
 
 const isOpenAiNewFamily = (model: string) => /^(gpt-5|o[134])/i.test(model);
 
+/** Walk the current stack to find the first frame inside /server/ that
+ *  isn't the shim itself or the centralised llm adapter. Returns a tag like
+ *  "tutor.ts:725" so the meter can group spend by call site. */
+function deriveSourceFromStack(): string {
+  const stack = new Error().stack ?? "";
+  const lines = stack.split("\n");
+  for (const line of lines) {
+    // Skip the shim and the llm adapter — we want the actual caller.
+    if (line.includes("/_core/forgeShim.") || line.includes("/_core/llm.")) continue;
+    // Match e.g. "at fn (/app/server/routers/tutor.ts:725:24)"
+    const m = line.match(/\/server\/([^\s)]+?\.[jt]s):(\d+)/);
+    if (m) {
+      // Strip leading directories for compactness: "routers/tutor.ts:725" → "tutor.ts:725"
+      const file = m[1].split("/").pop();
+      return `direct:${file}:${m[2]}`;
+    }
+  }
+  return "direct:unknown";
+}
+
 const originalFetch = globalThis.fetch.bind(globalThis);
 
 globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+  let isChatCompletion = false;
+  let bodyStreaming = false;
+  let sourceFromHeader: string | undefined;
+
   try {
     const url =
       typeof input === "string"
@@ -38,6 +71,7 @@ globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
       url.includes("/chat/completions") &&
       typeof init.body === "string"
     ) {
+      isChatCompletion = true;
       const body = JSON.parse(init.body) as Record<string, unknown>;
 
       if (!body.model) body.model = DEFAULT_MODEL;
@@ -52,15 +86,58 @@ globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
         delete body.max_tokens;
       }
 
+      if (body.stream === true) bodyStreaming = true;
+
+      // Pull source tag from caller-supplied header (set by chatCompletion()).
+      const headers = init.headers as Record<string, string> | undefined;
+      if (headers) {
+        for (const k of Object.keys(headers)) {
+          if (k.toLowerCase() === "x-ow-source") {
+            sourceFromHeader = headers[k];
+            break;
+          }
+        }
+      }
+
       init = { ...init, body: JSON.stringify(body) };
     }
   } catch {
     // best-effort — fall through to original fetch on any parse error
   }
 
-  return originalFetch(input, init);
+  const resp = await originalFetch(input, init);
+
+  // Meter on the way back. Cloning the response is cheap and lets us read the
+  // JSON body without consuming the stream the caller will read.
+  if (isChatCompletion && !bodyStreaming && resp.ok) {
+    const source = sourceFromHeader ?? deriveSourceFromStack();
+    resp
+      .clone()
+      .json()
+      .then((data: unknown) => {
+        try {
+          const obj = data as {
+            model?: string;
+            usage?: { prompt_tokens?: number; completion_tokens?: number };
+          };
+          const tokensIn = obj.usage?.prompt_tokens ?? 0;
+          const tokensOut = obj.usage?.completion_tokens ?? 0;
+          const modelOut = obj.model ?? "unknown";
+          if (tokensIn || tokensOut) {
+            recordLlmCall(modelOut, tokensIn, tokensOut, source);
+          }
+        } catch {
+          /* metering is non-fatal */
+        }
+      })
+      .catch(() => {
+        /* metering is non-fatal */
+      });
+  }
+
+  return resp;
 }) as typeof fetch;
 
 console.log(
-  `[forge-shim] active — default model=${DEFAULT_MODEL}, proxy=${PROXY_HOST}`
+  `[forge-shim] active — default model=${DEFAULT_MODEL}, proxy=${PROXY_HOST}, meter=enabled`
 );

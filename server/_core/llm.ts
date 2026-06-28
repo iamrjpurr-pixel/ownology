@@ -19,8 +19,6 @@ const PROXY_BASE = "https://integrations.emergentagent.com";
 const CHAT_URL = `${PROXY_BASE}/llm/chat/completions`;
 const EMBED_URL = `${PROXY_BASE}/llm/openai/v1/embeddings`;
 
-import { recordLlmCall } from "./llmMeter.js";
-
 export const MODELS = {
   /** Fast & cheap — Trinity clustering, query routing, semantic ranking,
    *  vintage card summaries. ~$0.15 / $0.60 per M tokens. */
@@ -76,6 +74,8 @@ export async function chatCompletion(
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${getKey()}`,
+      // Tag for the universal LLM cost meter (read by server/_core/forgeShim.ts).
+      ...(opts.source ? { "x-ow-source": opts.source } : {}),
     },
     body: JSON.stringify(body),
   });
@@ -86,16 +86,10 @@ export async function chatCompletion(
   }
   const data = (await resp.json()) as {
     choices?: { message?: { content?: string } }[];
-    usage?: { prompt_tokens?: number; completion_tokens?: number };
   };
-  // Cost metering — best-effort; never blocks the response.
-  try {
-    const tokensIn = data.usage?.prompt_tokens ?? 0;
-    const tokensOut = data.usage?.completion_tokens ?? 0;
-    if (tokensIn || tokensOut) {
-      recordLlmCall(model, tokensIn, tokensOut, opts.source ?? "unknown");
-    }
-  } catch { /* metering is non-fatal */ }
+  // Cost metering is now centralised in server/_core/forgeShim.ts — it
+  // intercepts every chat-completion fetch (including this one) and reads
+  // x-ow-source above. No duplicate metering needed here.
   return data.choices?.[0]?.message?.content ?? "";
 }
 
