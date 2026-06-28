@@ -69,7 +69,13 @@ function adminGate(req: express.Request, res: express.Response, next: express.Ne
   const p = req.path;
   const isAdminPage = p === "/admin" || p.startsWith("/admin/");
   const isAdminApi =
-    p.startsWith("/api/trpc/admin.") || p.startsWith("/api/trpc/pricing.funnelStats");
+    p.startsWith("/api/trpc/admin.") ||
+    p.startsWith("/api/trpc/pricing.funnelStats") ||
+    p.startsWith("/api/trpc/outreach.list") ||
+    p.startsWith("/api/trpc/outreach.create") ||
+    p.startsWith("/api/trpc/outreach.markSmsSent") ||
+    p.startsWith("/api/trpc/outreach.markBooked") ||
+    p.startsWith("/api/trpc/outreach.remove");
   // /api/exports/* serves proprietary IP (e.g. the SOP library export) —
   // gate it the same as admin pages so only the owner can grab it.
   const isExport = p.startsWith("/api/exports/");

@@ -72,6 +72,8 @@ const Resume = lazy(() => import("./pages/Resume"));
 const Stats = lazy(() => import("./pages/Stats"));
 const TankQr = lazy(() => import("./pages/TankQr"));
 const VintageCompare = lazy(() => import("./pages/VintageCompare"));
+const HiContact = lazy(() => import("./pages/HiContact"));
+const AdminContacts = lazy(() => import("./pages/AdminContacts"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
  *  Sized so it doesn't cause layout shift on first paint. */

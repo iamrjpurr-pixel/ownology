@@ -1122,3 +1122,33 @@ export const pricingViews = mysqlTable(
   ]
 );
 
+/**
+ * Outreach contacts — winemakers met in person (e.g. wine events). Each
+ * contact gets a personalised landing page at /hi/:slug. The slug + opened/
+ * booked timestamps let us track which warm SMS leads actually engaged.
+ */
+export const outreachContacts = mysqlTable(
+  "outreach_contacts",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    slug: varchar("slug", { length: 80 }).notNull().unique(), // e.g. "sarah-brokenwood"
+    firstName: varchar("first_name", { length: 80 }).notNull(),
+    lastName: varchar("last_name", { length: 80 }),
+    mobileAu: varchar("mobile_au", { length: 20 }), // +61 4XX XXX XXX
+    winery: varchar("winery", { length: 120 }),
+    event: varchar("event", { length: 120 }), // e.g. "McLaren Vale 2025"
+    painPoint: varchar("pain_point", { length: 300 }), // what they complained about
+    calendlyOverride: varchar("calendly_override", { length: 300 }),
+    smsSentAt: bigint("sms_sent_at", { mode: "number" }),
+    firstViewedAt: bigint("first_viewed_at", { mode: "number" }),
+    viewCount: int("view_count").notNull().default(0),
+    demoBookedAt: bigint("demo_booked_at", { mode: "number" }),
+    notes: varchar("notes", { length: 500 }),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("oc_slug_idx").on(t.slug),
+    index("oc_event_idx").on(t.event),
+  ]
+);
+
