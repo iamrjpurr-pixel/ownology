@@ -22,6 +22,20 @@
 **Auth (current — bypassed 28 Jun 2026)**
 - Manus OAuth removed. As of 28 Jun 2026 auth is **fully bypassed in production AND dev**: `createContext` in `server/trpc.ts` always injects `DEV_BYPASS_USER` (openId `seed-owner-001`, role `admin`) when no real session cookie is present. The bypass user is auto-upserted into the `users` table on every request (idempotent). `ownerProcedure` accepts any `role === "admin"` user, so the bypass user has owner privileges too. To re-enable real auth later, restore the `NODE_ENV` check in `createContext` and remove the auto-upsert.
 
+**RAG Knowledge Base (re-ingested 28 Jun 2026 — Railway prod MySQL)**
+- `diy_knowledge_chunks`: **348 total / 184 published** (was empty before re-ingestion)
+  - `red_wine_bible`: 102 (25 published) — `Guide_to_Red_Winemaking.pdf`
+  - `white_wine_bible`: 104 (17 published) — `Guide_to_White_Wine_Making.pdf`
+  - `morew_red_outline`: 7 (all published) — `Red_Wine_Making_Outline.pdf` proceduralised
+  - `morew_white_outline`: 7 (all published) — white wine procedural outline
+  - 🆕 `au_regulations__*`: 72 chunks (all published) — 13 markdown files: federal, NSW/VIC/QLD/SA/WA/TAS/NZ wine regulations, IP/labelling (WIPO), liquor licensing, agritourism
+  - 🆕 `au_equipment__*`: 9 chunks (all published) — boutique winery equipment cost breakdown + minimum tool list (AU suppliers)
+  - 🆕 `oenology_education__*`: 47 chunks (all published) — CSU/Adelaide curricula, Bachelor-level oenology references, microbiology slides (MCR101), Field-to-Glass overview, Two-Philosophies essay, oenology comparison
+- `sop_library`: 38 SOPs (38 published)
+- `cellar_journal`: 11 entries (live, growing as users ask questions)
+- Schema change applied 28 Jun 2026: `diy_knowledge_chunks.wbs_process_family` widened from `varchar(10)` → `varchar(64)`; `wbs_domain` and `wbs_code` widened to `varchar(16)` to fit human-readable names used by the morew ingestion scripts.
+- Generic ingestion helper: `scripts/ingest-knowledge-folder.mjs --folder <dir> --source-prefix <prefix>` — reads markdown from `references/<dir>/`, chunks ~600 words, marks all chunks PUBLISHED, idempotent re-runs (deletes by prefix first).
+
 **LLM (wired 27 Jan 2026 — hybrid)**
 - All traffic routes through Emergent Universal LLM Key proxy at `https://integrations.emergentagent.com/llm/`.
 - **Premium tier** (`claude-sonnet-4-6`) — explicit calls from `server/_core/llm.ts` adapter. Used by `freeRunRouter.ts` user-facing answers (`callLLM`, `callLLMJson`).
