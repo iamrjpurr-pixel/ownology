@@ -107,7 +107,65 @@ First-time setup: name, region, tank count, varieties grown → seeds initial SO
 | File uploads | Disabled |
 | Push notifications | Not wired |
 | SMS alerts (Twilio) | Not wired |
-| Email (Resend) | Not wired |
+| Email (Resend) | ✅ Wired (28 Jun 2026) — live send verified, awaiting Railway cron schedule + domain verification |
+
+---
+
+## 💡 Saved enhancement ideas (28 Jun 2026)
+
+End-of-session ideas that didn't make this sprint. All small, all valuable, listed in build order from highest leverage to lowest. Pick the next one off the top when you're ready.
+
+### 🔴 P0/P1 (high leverage, small lift)
+
+**1. Signup-conversion measurement on `/admin/funnel`** (~30 LOC)
+> Today `/admin/funnel` shows visits-by-source. Add the *conversion column* by hooking the Stripe Checkout success webhook (or the `pricing.createCheckout` success redirect) to log a second row into `pricing_views` with `source = "<original>:converted"`. The funnel page then shows `homepage-hero: 340 visits → 8 converted (2.4%)` vs `free-paused: 87 visits → 12 converted (13.8%)`. Turns the dashboard from "interesting" to "operational" — you'll know exactly which channel to invest in.
+> **Files**: `server/routers.ts` (createCheckout), `server/scheduled/` (Stripe webhook handler), `server/routers/pricing.ts` (extend funnelStats with conversion math), `client/src/pages/AdminFunnel.tsx` (new column).
+
+**2. Decision-logic "Why?" quick-select buttons on QuickEntry** (P1 from finish backlog)
+> Pre-set reasons: BMV detected · Brix plateaued · regulatory cap reached · yield protection · experimentation · house-style match. Tap-to-fill, then user can refine. Captures reasoning at 10× the rate. Powers the Learning Loop's grounding even better.
+> **Files**: `client/src/pages/QuickEntry.tsx` (add chip selector above the reasoning textarea).
+
+**3. Railway cron schedule for `/api/scheduled/daily-alert-email`**
+> Cron line: `0 21 * * *` UTC ≈ 7am Sydney AEDT. Set `CRON_SECRET` env in Railway and pass it via `?cronSecret=` in the cron request URL. Verify a domain in Resend (`ownology.ai`) so `ALERT_FROM_EMAIL=cellar@ownology.ai` and `ALERT_TEST_TO` can be removed.
+> **Files**: Railway dashboard only. Code is already shipped.
+
+### 🟠 P1 (operational + tuning)
+
+**4. Cost guard-rail dashboard alerts** (~20 LOC)
+> When a tier flips to PAUSED, fire a Resend email to the operator ("Free tier paused at 9:14am Sydney — 47 free-tier calls served, $3.00 spent. Consider raising DAILY_FREE_BUDGET_USD?"). Catches budget-tuning issues in real time instead of the operator finding out from user complaints.
+> **Files**: `server/_core/llmMeter.ts` (hook into the existing one-time WARN), new `server/scheduled/budgetAlertEmail.ts`.
+
+**5. Tier classification from `users.plan` column** (P2 from finish backlog)
+> Once real auth lands and we have `users.plan = free|premium|enterprise`, tier classification should read from the *request user* rather than just the source tag. A premium user calling `freeRun.curiosityAsk` should be classified as `premium` tier (not free), so their queries don't pause when free-tier hits its cap.
+> **Files**: `server/_core/llmMeter.ts` (`classifySource` extended to take optional user plan), `server/_core/llm.ts` (chatCompletion injects user plan as new header `x-ow-plan`).
+
+### 🟡 P2 (polish + product surface)
+
+**6. Decision-logic templates expand to Compliance + Free Run**
+> Same "Why?" preset pattern applied to: every time the AI gives a regulatory answer, surface a "Save this decision" button that pre-fills QuickEntry with the AI's recommendation + reasoning. Closes the loop from advice → recorded action.
+
+**7. Voice input on QuickEntry** (P2 from finish backlog)
+> Web Speech API → Whisper fallback. The cellar floor is loud and gloved — typing is the friction. *"Tank 9, racked off gross lees, 15 ppm SO₂ added"* should be a 3-second speak, not a 30-second tap.
+
+**8. Custom domain DNS for `ownology.ai`** (P2)
+> A/AAAA records to Railway's edge. Required before launch.
+
+### 🟢 P3 (long-horizon)
+
+**9. Multi-tenant winery model**
+> Add `winery_id` foreign key across vintage_log_entries, cellar_tasks, etc. Allows one winery to invite multiple operators. Required for the "enterprise" plan tier.
+
+**10. Native iOS/Android apps**
+> Wrap the existing PWA in Capacitor for app-store distribution + push notifications. Lets daily-alert-email become daily push notification (much higher engagement).
+
+**11. File/image upload archive** (Emergent Object Storage)
+> Photos of harvest, lab reports, certificates of analysis, must samples. Vector-RAG over OCR'd content unlocks "ask the AI about this barrel's chromatography from last year".
+
+**12. `/the-press/compare` exportable PDF**
+> The vintage comparison view is the natural moment a winemaker wants to share with their distributor or family business partner. Add an "Export as PDF" button using the same `pdfkit` we shipped for audit-trail.
+
+**13. Re-baseline `__drizzle_migrations`** (tech debt)
+> `drizzle-kit migrate` currently doesn't record applied migrations (0 rows in `__drizzle_migrations`). Future schema changes had to be applied via raw SQL during the funnel work. Either re-baseline by inserting historical migration tags, or switch the workflow to `drizzle-kit push` for live DBs.
 
 ---
 
@@ -115,7 +173,7 @@ First-time setup: name, region, tank count, varieties grown → seeds initial SO
 
 When the agent finishes a feature and writes a "Potential improvement 💡" or "Next Action Items" block:
 1. The block goes into the chat (user sees it once)
-2. **AND** it must be appended/merged here in `/app/memory/ROADMAP.md`
+2. **AND** it must be appended/merged into the "💡 Saved enhancement ideas" section above
 3. Each item: title + priority + 1–2 sentence why + acceptance criteria if obvious
 
 This way new forks pick up the full backlog by reading this file alongside `PRD.md`.

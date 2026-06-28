@@ -150,6 +150,12 @@
 - OAuth portal — replaced with placeholder; the `OAuthCallback.tsx` page can be revisited when real auth is chosen.
 - Buttondown newsletter — `BUTTONDOWN_API_KEY` empty; newsletter scheduled job will no-op.
 
+**Knowledge Page Desktop Layout Fix (28 Jun 2026, this session)**
+- Bug: `/knowledge` was wrapped in `WorkModeLayout` (mobile-first 430px shell) but its inner grid uses `xl:grid-cols-4` — on desktop the page was rendering 4 cards in a ~430px column with text truncated to "Harv…", "Ferme…", "Yeast…".
+- Fix: added a `wide` prop to `WorkModeLayout`. When `wide={true}`, the shell stays 430px on mobile (`< lg`) but expands to **1280px on lg+** via a small media-query injected `<style>` block. Bottom nav stays centered at phone width regardless of shell width (thumb-zone pattern preserved).
+- `/knowledge` opts in via `<WorkModeLayout title="Knowledge" wide>`. Mobile rendering is pixel-identical to before; desktop now shows proper 4-col responsive grid with full text + breathing room.
+- The `wide` prop is reusable for any other content-dense work-mode page (e.g. `/the-press`, `/compliance`, `/dashboard`) that needs more horizontal real-estate on desktop.
+
 **Conversion-Attribution Funnel (28 Jun 2026, this session)**
 - New table `pricing_views(id, source, userId, referer, userAgent, viewedAt)` + 2 indexes. Created via raw SQL since `drizzle-kit migrate` wasn't recording in `__drizzle_migrations` (pre-existing baseline issue — flagged for future cleanup; consider re-baselining or switching to `drizzle-kit push`).
 - New `pricingRouter` in `/app/server/routers/pricing.ts` (124 LOC):

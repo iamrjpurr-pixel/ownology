@@ -24,6 +24,14 @@ interface WorkModeLayoutProps {
   title?: string;
   activeTab?: "ask" | "press" | "log" | "tasks" | "more";
   hideBottomNav?: boolean;
+  /**
+   * Opt-in wider desktop shell. Mobile (< 1024px) still gets the canonical
+   * 430px mobile-first PWA shell. lg+ screens expand to 1280px so dense
+   * content pages like /knowledge can breathe instead of squashing
+   * `xl:grid-cols-4` into ~430px. Bottom nav stays centered + 430px wide
+   * regardless of shell width so it keeps its thumb-zone feel.
+   */
+  wide?: boolean;
 }
 
 const NAV_ITEMS = [
@@ -91,6 +99,7 @@ export default function WorkModeLayout({
   title,
   activeTab,
   hideBottomNav = false,
+  wide = false,
 }: WorkModeLayoutProps) {
   const [, navigate] = useLocation();
 
@@ -115,8 +124,9 @@ export default function WorkModeLayout({
         className="hidden md:block"
       />
 
-      {/* App shell — max 430px, full height */}
+      {/* App shell — 430px on mobile; widens to 1280px on lg+ when wide=true. */}
       <div
+        className={wide ? "ow-work-shell ow-work-shell--wide" : "ow-work-shell"}
         style={{
           width: "100%",
           maxWidth: "430px",
@@ -127,6 +137,14 @@ export default function WorkModeLayout({
           position: "relative",
         }}
       >
+        {/* lg+ override for wide shells — bumps the max-width to 1280px so
+            content-dense pages like /knowledge breathe instead of squashing
+            the responsive grid into a 430px column. */}
+        <style>{`
+          @media (min-width: 1024px) {
+            .ow-work-shell--wide { max-width: 1280px !important; }
+          }
+        `}</style>
         {/* ── Top bar ── */}
         <header
           style={{

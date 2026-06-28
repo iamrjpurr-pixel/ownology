@@ -112,7 +112,7 @@ function TodayPage() {
 }
 function KnowledgePage() {
   return (
-    <WorkModeLayout title="Knowledge">
+    <WorkModeLayout title="Knowledge" wide>
       <Knowledge />
     </WorkModeLayout>
   );
