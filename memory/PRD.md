@@ -19,6 +19,32 @@
 - `vite.config.ts` rewritten; `server/index.ts` listens on PORT env (8001)
 - Schema fixes: `barrels.format` enum → varchar(64) (drizzle-kit enum-with-paren bug); `regulation_monitor_seen.publication_url` varchar(1024) → varchar(512) (utf8mb4 key-length limit)
 
+**Real-time Alerts Engine (wired 28 Jun 2026)**
+- New `vintageLog.alerts` protectedProcedure (`server/routers.ts` ~line 478) scans the user's last 400 `vintage_log_entries` grouped by tank, and emits up to 6 actionable alerts sorted high → medium → low.
+- Five rules:
+  1. **dap_due** (high if YAN<150, else medium) — last YAN reading <200 ppm AND no DAP added since
+  2. **high_temp** (high if temp>26°C, medium if >22°C) — last temp reading within 24h above 22°C
+  3. **stuck_ferment** (always high) — 2+ Brix readings with <1° movement over 2+ days AND post-inoculation AND latest >4°Bx
+  4. **ready_to_rack** (medium) — last Brix ≤2°Bx within 96h AND no racking recorded since AND post-inoculation
+  5. **tank_quiet** (low) — post-inoculation tank with no events in 5-14 days
+- Tanks where the last event was >120 days ago are excluded (past vintage).
+- Dashboard renders `[data-testid=dashboard-alerts-banner]` with severity-color chips and an "↥ Import past vintages" link in the header. Empty state (no alerts AND no tanks) shows a prominent Import CTA card.
+- Seed script `scripts/seed-alert-triggers.mjs` populates Tanks 2/4/5/8/9 with deliberately alert-triggering data so the engine fires 5 alerts immediately.
+
+**Decision-Logic Capture (Tier 2 — wired 28 Jun 2026)**
+- QuickEntry confirm screen now has an optional 240-char "Why?" textarea (`[data-testid=quick-entry-reasoning-input]`).
+- The reasoning is stored in `vintage_log_entries.detailsJson` under the `reasoning` key (no schema change).
+- `getUserCellarContext` extracts the reasoning per entry and appends ` · why: "..."` to the prompt line, so the AI tutor can quote the winemaker's own decision logic back when answering future questions.
+- Verified live (iter 2 test report): tutor verbatim quoted *"Cool morning measurement to track diurnal swing"* back to the user. ✅
+
+**Import Discoverability (wired 28 Jun 2026)**
+- `[data-testid=quick-entry-import-link]` on QuickEntry header.
+- `[data-testid=dashboard-import-link]` in the alerts-banner header.
+- `[data-testid=dashboard-import-cta]` on the empty-state card when user has zero tanks AND zero alerts.
+
+**API polish (28 Jun 2026)**
+- `vintageLog.add` mutation now returns `{success: true, id}` (was just `{success: true}`). `addVintageLogEntry` in `server/db.ts` now returns the new row's `insertId`. Enables client to chain edits/deletes/optimistic updates without a re-list round-trip.
+
 **Auth (current — bypassed 28 Jun 2026)**
 - Manus OAuth removed. As of 28 Jun 2026 auth is **fully bypassed in production AND dev**: `createContext` in `server/trpc.ts` always injects `DEV_BYPASS_USER` (openId `seed-owner-001`, role `admin`) when no real session cookie is present. The bypass user is auto-upserted into the `users` table on every request (idempotent). `ownerProcedure` accepts any `role === "admin"` user, so the bypass user has owner privileges too. To re-enable real auth later, restore the `NODE_ENV` check in `createContext` and remove the auto-upsert.
 

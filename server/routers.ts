@@ -413,7 +413,7 @@ const vintageLogRouter = router({
       const dbUser = await getUserByOpenId(ctx.user.openId);
       if (!dbUser) throw new Error("User not found");
       const tags = generateTags(input.eventType, input.details, input.variety, input.tankName);
-      await addVintageLogEntry({
+      const id = await addVintageLogEntry({
         userId: dbUser.id,
         tankName: input.tankName,
         variety: input.variety,
@@ -435,7 +435,7 @@ const vintageLogRouter = router({
           ).catch(() => { /* non-fatal — volume update is best-effort */ });
         }
       }
-      return { success: true };
+      return { success: true, id };
     }),
 
   list: protectedProcedure

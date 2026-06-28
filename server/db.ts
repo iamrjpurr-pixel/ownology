@@ -154,7 +154,7 @@ export async function addVintageLogEntry(data: {
     importSource: data.importSource ?? null,
     importBatchId: data.importBatchId ?? null,
   });
-  return result;
+  return (result as unknown as { insertId: number }).insertId;
 }
 
 export async function listVintageLogEntries(userId: number, limit = 50) {
