@@ -44,15 +44,15 @@ function todayUTC(): string {
 import { chatCompletion, MODELS } from "./_core/llm.js";
 import { persistJournalEntry } from "./cellarJournalRouter.js";
 
-async function callLLM(messages: { role: "system" | "user" | "assistant"; content: string }[]) {
-  return chatCompletion(messages, { model: MODELS.PREMIUM, maxTokens: 1500 });
+async function callLLM(messages: { role: "system" | "user" | "assistant"; content: string }[], source = "freeRun") {
+  return chatCompletion(messages, { model: MODELS.PREMIUM, maxTokens: 1500, source });
 }
 
-async function callLLMJson(messages: { role: "system" | "user" | "assistant"; content: string }[]) {
+async function callLLMJson(messages: { role: "system" | "user" | "assistant"; content: string }[], source = "freeRun.tag") {
   // Value engineering: tag classification is a 3-word categorisation — no quality
   // benefit from PREMIUM. Use CHEAP gpt-5.4-mini (~20× cheaper). See
   // /app/memory/VALUE-ENGINEERING.md for the cost-control doctrine.
-  const out = await chatCompletion(messages, { model: MODELS.CHEAP, json: true, maxTokens: 300 });
+  const out = await chatCompletion(messages, { model: MODELS.CHEAP, json: true, maxTokens: 300, source });
   return out || "{}";
 }
 
@@ -122,7 +122,7 @@ If the question is about making wine commercially or winemaking technique, respo
       const answer = await callLLM([
         { role: "system", content: systemPrompt },
         { role: "user", content: input.question },
-      ]);
+      ], "freeRun.curiosityAsk");
 
       // ── Detect topic tag ─────────────────────────────────────────────────
       let topicTag: string | null = null;
@@ -134,7 +134,7 @@ If the question is about making wine commercially or winemaking technique, respo
               'Extract a single short topic tag (max 3 words) from this wine question. Return JSON: {"tag": "..."}. Examples: "MLF", "Tannins", "Chardonnay", "Terroir", "Fermentation", "Food Pairing", "Pinot Noir".',
           },
           { role: "user", content: input.question },
-        ]);
+        ], "freeRun.tag");
         const parsed = JSON.parse(tagJson);
         if (parsed.tag) topicTag = String(parsed.tag).slice(0, 100);
       } catch {
@@ -259,9 +259,9 @@ ${baseContext}
 Write "The Craft" panel — explain how a winemaker shapes, controls, or exploits this characteristic during winemaking. Stay strictly on this topic. Do not introduce new subjects. 2–3 paragraphs. Make the winemaker's decisions feel like artistry, not industrial process.`;
 
       const [sciencePanel, vineyardPanel, craftPanel] = await Promise.all([
-        callLLM([{ role: "user", content: sciencePrompt }]),
-        callLLM([{ role: "user", content: vineyardPrompt }]),
-        callLLM([{ role: "user", content: craftPrompt }]),
+        callLLM([{ role: "user", content: sciencePrompt }], "freeRun.goDeeper.science"),
+        callLLM([{ role: "user", content: vineyardPrompt }], "freeRun.goDeeper.vineyard"),
+        callLLM([{ role: "user", content: craftPrompt }], "freeRun.goDeeper.craft"),
       ]);
 
       // ── Store the reveal ─────────────────────────────────────────────────

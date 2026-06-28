@@ -9,6 +9,7 @@ import { tutorRouter } from "./routers/tutor.js";
 import { wbsAdminRouter } from "./routers/wbsAdmin.js";
 import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
+import { getLlmStats, resetLlmStats } from "./_core/llmMeter.js";
 import { buildScopedKnowledgeBase, buildSourceDoctrineSummary } from "./complianceKnowledgeBase.js";
 import { buildQADoctrineSummary, QA_DOCTRINE, getTopics } from "./complianceQADoctrine.js";
 import {
@@ -356,6 +357,21 @@ const adminRouter = router({
       latestWeek: latest?.weekLabel ?? null,
       snapshotAt: latest?.snapshotAt ?? null,
     };
+  }),
+
+  /**
+   * LLM cost meter — in-memory aggregator showing what we've spent on LLM
+   * calls since the last deploy/reset. Granularity: by model, by source.
+   * Zero-cost to operate (no LLM calls, no DB writes).
+   */
+  llmStats: ownerProcedure.query(async () => {
+    return getLlmStats();
+  }),
+
+  /** Reset the LLM cost meter — useful for cost-experiments. */
+  resetLlmStats: ownerProcedure.mutation(async () => {
+    resetLlmStats();
+    return { ok: true };
   }),
 });
 

@@ -19,6 +19,8 @@ const PROXY_BASE = "https://integrations.emergentagent.com";
 const CHAT_URL = `${PROXY_BASE}/llm/chat/completions`;
 const EMBED_URL = `${PROXY_BASE}/llm/openai/v1/embeddings`;
 
+import { recordLlmCall } from "./llmMeter.js";
+
 export const MODELS = {
   /** Fast & cheap — Trinity clustering, query routing, semantic ranking,
    *  vintage card summaries. ~$0.15 / $0.60 per M tokens. */
@@ -38,6 +40,9 @@ export type ChatOpts = {
   json?: boolean;
   maxTokens?: number;
   temperature?: number;
+  /** Caller tag for cost metering — e.g. "freeRun.curiosityAsk", "tutor.ask".
+   *  Falls back to "unknown" if omitted. See server/_core/llmMeter.ts. */
+  source?: string;
 };
 
 function getKey(): string {
@@ -81,7 +86,16 @@ export async function chatCompletion(
   }
   const data = (await resp.json()) as {
     choices?: { message?: { content?: string } }[];
+    usage?: { prompt_tokens?: number; completion_tokens?: number };
   };
+  // Cost metering — best-effort; never blocks the response.
+  try {
+    const tokensIn = data.usage?.prompt_tokens ?? 0;
+    const tokensOut = data.usage?.completion_tokens ?? 0;
+    if (tokensIn || tokensOut) {
+      recordLlmCall(model, tokensIn, tokensOut, opts.source ?? "unknown");
+    }
+  } catch { /* metering is non-fatal */ }
   return data.choices?.[0]?.message?.content ?? "";
 }
 
