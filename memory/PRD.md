@@ -45,6 +45,17 @@
 **API polish (28 Jun 2026)**
 - `vintageLog.add` mutation now returns `{success: true, id}` (was just `{success: true}`). `addVintageLogEntry` in `server/db.ts` now returns the new row's `insertId`. Enables client to chain edits/deletes/optimistic updates without a re-list round-trip.
 
+**Refactor — server/routers.ts split (28 Jun 2026)**
+- `server/routers.ts` went from **3,239 → 1,556 LOC** (−52%). Now a slim composition file importing 4 extracted sub-routers + 20 still-inline sub-routers.
+- New `server/routers/` directory:
+  - `tutor.ts` (770 LOC) — `tutorRouter` + `KEYWORD_CATEGORY_MAP` + `detectSopCategories`. Hosts `tutor.ask` with the learning loop wired via `getUserCellarContext`.
+  - `vintageLog.ts` (533 LOC) — `vintageLogRouter` + `EVENT_TYPES` + `generateTags`. Hosts add/list/delete/bulkSave/parseFromImage/parseFromText/alerts.
+  - `knowledge.ts` (227 LOC) — `knowledgeRouter` (SOP library CRUD + training records).
+  - `wbsAdmin.ts` (194 LOC) — `wbsAdminRouter` (domain publish/unpublish).
+- Regression caught and fixed during iteration: `dashboard.getStats` 500 because `listVintageLogEntries` (in `db.ts`) was accidentally removed from the routers.ts import list. Re-added; 32/32 tests pass on live (test report `/app/test_reports/iteration_4.json`).
+- All 4 extracted routers verified live: alerts engine returns 5 alerts, knowledge returns 38 SOPs, wbsAdmin returns 83 domains, tutor still cites Tank 7 Shiraz history correctly.
+- Refactor playbook for next pass (when splitting the remaining 20 sub-routers): always grep the moved router for ALL `from "../db.js"` and `from "./trpc.js"` symbol references BEFORE deleting from routers.ts, and audit which symbols are STILL needed by the remaining routers in routers.ts (the `dashboard.getStats` regression was caused by skipping this audit step).
+
 **Auth (current — bypassed 28 Jun 2026)**
 - Manus OAuth removed. As of 28 Jun 2026 auth is **fully bypassed in production AND dev**: `createContext` in `server/trpc.ts` always injects `DEV_BYPASS_USER` (openId `seed-owner-001`, role `admin`) when no real session cookie is present. The bypass user is auto-upserted into the `users` table on every request (idempotent). `ownerProcedure` accepts any `role === "admin"` user, so the bypass user has owner privileges too. To re-enable real auth later, restore the `NODE_ENV` check in `createContext` and remove the auto-upsert.
 
