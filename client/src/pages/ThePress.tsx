@@ -204,6 +204,25 @@ export default function ThePress() {
 
   return (
     <div style={{ padding: "1.5rem 1.25rem", maxWidth: "640px", margin: "0 auto", width: "100%" }}>
+      {/* Compare vintages CTA */}
+      <div style={{ marginBottom: "1rem", textAlign: "right" }}>
+        <a
+          href="/the-press/compare"
+          data-testid="the-press-compare-link"
+          style={{
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.8rem",
+            fontWeight: 600,
+            color: ACCENT,
+            textDecoration: "none",
+            borderBottom: `1px solid ${ACCENT}`,
+            paddingBottom: "1px",
+          }}
+        >
+          Compare vintages side-by-side →
+        </a>
+      </div>
+
       {/* Batch Header */}
       <div
         style={{

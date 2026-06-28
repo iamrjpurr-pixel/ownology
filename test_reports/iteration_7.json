@@ -1,0 +1,32 @@
+{
+  "summary": "Batch P1 regression coverage complete. All 3 features verified end-to-end against the live preview (https://ownership-dev.preview.emergentagent.com). Backend pytest 10/10 PASS. Frontend Playwright: /the-press/compare renders with vintage-compare-page testid, 10 tank chips populated, first 2 tanks (Tank 1, Tank 12) auto-selected as cards, clicking 3rd chip (Tank 2) appends a 3rd card live. /the-press shows the new 'Compare vintages side-by-side →' link with data-testid the-press-compare-link, navigates correctly. Resend live send returned a UUID (resendId present, status=sent, recipient=iamrjpurr@gmail.com per ALERT_TEST_TO override). admin.resetFreeRunQuota works in both scopes (all + userId). compareTanks(Tank 7, Tank 9) returns the expected Tank 7 Shiraz fields (yeast=Lalvin EC1118, fermentDays=6, startBrix=24.3, finalBrix=2). vintageLog.alerts still returns 5 alerts after the computeAlertsForUser refactor — behavioural parity confirmed. LLM cost-meter regression: cron invocations did NOT increment admin.llmStats.totals.calls (cron is pure data composition, no LLM).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_p1_features.py",
+    "/app/test_reports/pytest/iteration_7_p1.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "dailyAlertEmail.ts swallows individual user send-errors and aggregates them into results[]; that's correct for cron resilience, but the route returns res.json(summary) with HTTP 200 even when every send failed. Consider returning 207 (multi-status) or 500 when totals.errors > 0 so Railway cron logs surface failures as red instead of green.",
+    "renderHtml() inlines new Date().toLocaleDateString('en-AU', { weekday: 'long', ... }) which runs in the container's TZ (UTC by default in Railway) — at 7am Sydney = 8pm UTC, so 'Friday morning' Sydney could render as 'Thursday'. Pin to Australia/Sydney via {timeZone:'Australia/Sydney'} option in toLocaleDateString.",
+    "Cron route /api/scheduled/daily-alert-email is exposed unauthenticated on a public URL — anyone hitting it triggers a real Resend send (in current single-tenant setup, that's 1 email to iamrjpurr@gmail.com per request, costing $0.0008 against your Resend quota). Recommend adding a CRON_SECRET header check (req.headers['x-cron-secret'] === process.env.CRON_SECRET) before the live send branch. Dry-run can stay open.",
+    "VintageCompare.tsx pre-fill effect `usedTanks && usedTanks.length >= 2 && selected.length === 0` is keyed off selected.length — if a user manually deselects down to 0, the effect refires and re-selects tanks 0,1. Minor UX surprise; consider a `hasInitialised` flag.",
+    "admin.resetFreeRunQuota is correctly owner-only via ownerProcedure but there's no audit log row written — for a destructive admin op (bulk DELETE FROM free_run_daily_usage) consider inserting an entry into an admin_audit table with userId/scope/dateKey for traceability."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_p1_features.py",
+    "/app/test_reports/iteration_7.json",
+    "/app/test_reports/pytest/iteration_7_p1.xml"
+  ],
+  "success_rate": {"backend": "100% (10/10)", "frontend": "100% (all P1 selectors + nav verified)"},
+  "test_credentials": "None — dev-bypass injects seed-owner-001 as admin. Resend sandbox is locked to iamrjpurr@gmail.com via ALERT_TEST_TO.",
+  "seed_data_creation": "None. Live send fired exactly once (per request guidance to avoid Resend rate limits). Test_quota_actually_reset_allows_new_freerun probes curiosityAsk to verify quota state but tolerates non-quota errors.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "P1 batch (daily-alert-email cron + /the-press/compare + admin.resetFreeRunQuota) is regression-covered in /app/backend/tests/test_p1_features.py (10 tests, ~7.5s). Reusable: test_dry_run_returns_alerts is idempotent and safe for CI; test_live_send_returns_resend_id will skip on Resend 429. Frontend testids confirmed working: vintage-compare-page, compare-tank-chip-tank-<N>, compare-card-tank-<N>, compare-grid, the-press-compare-link. Resend sandbox sender is onboarding@resend.dev → iamrjpurr@gmail.com only. Cron is unauthenticated — flagged as a security-hardening item in critical_code_review_comments[2]. Observed during regression: pre-existing 400 console errors on multiple frontend routes (appear on /, /free-run, /dashboard, /tank-qr, /stats, /the-press — same on every page so global query) — NOT introduced by this batch. Also /compliance returned 429 when hit immediately after 5 other routes in a tight loop; navigating individually works fine. The Vite frontend env points API at REACT_APP_BACKEND_URL via the kubernetes ingress; /api/* routes proxy to port 8001."
+}

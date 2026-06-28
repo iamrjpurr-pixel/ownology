@@ -113,152 +113,120 @@ const vintageLogRouter = router({
   alerts: protectedProcedure.query(async ({ ctx }) => {
     const dbUser = await getUserByOpenId(ctx.user.openId);
     if (!dbUser) return { alerts: [] };
-
-    const rows = await listVintageLogEntries(dbUser.id, 400);
-    if (rows.length === 0) return { alerts: [] };
-
-    // Group events by tank, keeping most-recent first (rows already DESC by entryAt)
-    const byTank = new Map<string, typeof rows>();
-    for (const r of rows) {
-      if (!byTank.has(r.tankName)) byTank.set(r.tankName, []);
-      byTank.get(r.tankName)!.push(r);
-    }
-
-    const now = Date.now();
-    const day = 86400 * 1000;
-    type Alert = {
-      kind: "dap_due" | "high_temp" | "stuck_ferment" | "ready_to_rack" | "tank_quiet";
-      severity: "high" | "medium" | "low";
-      tankName: string;
-      variety: string;
-      title: string;
-      detail: string;
-      action: string;
-    };
-    const alerts: Alert[] = [];
-
-    function parseDetails(detailsJson: string): Record<string, unknown> {
-      try { return JSON.parse(detailsJson) as Record<string, unknown>; } catch { return {}; }
-    }
-
-    for (const [tankName, events] of byTank.entries()) {
-      const variety = events[0]?.variety ?? "—";
-      const newest = events[0];
-      const daysSinceNewest = (now - newest.entryAt) / day;
-
-      // Skip tanks where the last event was >120 days ago — that vintage is over
-      if (daysSinceNewest > 120) continue;
-
-      // Helpers — find specific events
-      const inoculation = events.find((e) => e.eventType === "inoculation");
-      const lastRacking = events.find((e) => e.eventType === "racking");
-      const measurements = events
-        .filter((e) => e.eventType === "measurement")
-        .map((e) => ({ at: e.entryAt, d: parseDetails(e.detailsJson) }));
-      const additions = events
-        .filter((e) => e.eventType === "addition")
-        .map((e) => ({ at: e.entryAt, d: parseDetails(e.detailsJson) }));
-
-      // ── Rule 1: DAP due (YAN low, no DAP added since) ──
-      const lastYan = measurements.find((m) => String(m.d.what ?? "").toLowerCase() === "yan");
-      if (lastYan) {
-        const yanValue = parseFloat(String(lastYan.d.value ?? "")) || 0;
-        const dapSinceYan = additions.find(
-          (a) => String(a.d.what ?? "").toLowerCase().includes("dap") && a.at >= lastYan.at
-        );
-        if (yanValue > 0 && yanValue < 200 && !dapSinceYan) {
-          alerts.push({
-            kind: "dap_due",
-            severity: yanValue < 150 ? "high" : "medium",
-            tankName,
-            variety,
-            title: `${tankName}: DAP due`,
-            detail: `YAN at ${yanValue} ppm (below 200 ppm target). No DAP added since measurement.`,
-            action: "Add DAP — split addition recommended.",
-          });
-        }
-      }
-
-      // ── Rule 2: High fermentation temperature ──
-      const lastTemp = measurements.find((m) => {
-        const w = String(m.d.what ?? "").toLowerCase();
-        return w === "temperature" || w === "temp";
-      });
-      if (lastTemp) {
-        const temp = parseFloat(String(lastTemp.d.value ?? "")) || 0;
-        const ageHrs = (now - lastTemp.at) / (3600 * 1000);
-        if (temp > 22 && ageHrs < 24) {
-          alerts.push({
-            kind: "high_temp",
-            severity: temp > 26 ? "high" : "medium",
-            tankName,
-            variety,
-            title: `${tankName}: High temp (${temp}°C)`,
-            detail: `Last reading ${Math.round(ageHrs)}h ago — above 22°C threshold.`,
-            action: "Cool ferment — risk of stuck ferment / volatile loss.",
-          });
-        }
-      }
-
-      // ── Rule 3: Stuck ferment (Brix not moving) ──
-      const brixSeries = measurements
-        .filter((m) => String(m.d.what ?? "").toLowerCase() === "brix")
-        .slice(0, 4); // most recent 4 brix
-      if (brixSeries.length >= 2 && inoculation) {
-        const latest = parseFloat(String(brixSeries[0].d.value ?? "")) || 0;
-        const oldest = parseFloat(String(brixSeries[brixSeries.length - 1].d.value ?? "")) || 0;
-        const spanDays = (brixSeries[0].at - brixSeries[brixSeries.length - 1].at) / day;
-        const delta = oldest - latest;
-        if (latest > 4 && spanDays >= 2 && delta < 1) {
-          alerts.push({
-            kind: "stuck_ferment",
-            severity: "high",
-            tankName,
-            variety,
-            title: `${tankName}: Possible stuck ferment`,
-            detail: `Brix moved only ${delta.toFixed(1)}° in ${spanDays.toFixed(1)} days (currently ${latest}°Bx).`,
-            action: "Check temp, YAN, and yeast viability. Consider restart protocol.",
-          });
-        }
-      }
-
-      // ── Rule 4: Ready to rack (Brix at dry, no recent racking) ──
-      const lastBrix = brixSeries[0];
-      if (lastBrix && inoculation) {
-        const brix = parseFloat(String(lastBrix.d.value ?? "")) || 0;
-        const rackingSinceDry = lastRacking && lastBrix.at < lastRacking.entryAt;
-        const ageHrs = (now - lastBrix.at) / (3600 * 1000);
-        if (brix <= 2 && brix >= -2 && !rackingSinceDry && ageHrs < 96) {
-          alerts.push({
-            kind: "ready_to_rack",
-            severity: "medium",
-            tankName,
-            variety,
-            title: `${tankName}: Ready to rack`,
-            detail: `Brix at ${brix}°Bx (dry). No racking recorded since.`,
-            action: "Plan racking off gross lees.",
-          });
-        }
-      }
-
-      // ── Rule 5: Tank gone quiet during active vintage ──
-      if (inoculation && daysSinceNewest > 5 && daysSinceNewest < 14) {
-        alerts.push({
-          kind: "tank_quiet",
-          severity: "low",
-          tankName,
-          variety,
-          title: `${tankName}: No recent activity`,
-          detail: `Last log entry ${Math.round(daysSinceNewest)} days ago. Active vintage tank.`,
-          action: "Walk the cellar — check on this tank.",
-        });
-      }
-    }
-
-    const order = { high: 0, medium: 1, low: 2 };
-    alerts.sort((a, b) => order[a.severity] - order[b.severity]);
-    return { alerts: alerts.slice(0, 6) };
+    const alerts = await computeAlertsForUser(dbUser.id);
+    return { alerts };
   }),
+
+  /**
+   * Vintage comparison — distil 2+ tanks' full life cycles into side-by-side
+   * stat blocks for a post-vintage debrief.
+   *
+   * Pure data composition over existing vintage_log_entries — zero new LLM
+   * cost, zero schema changes. Powers /the-press/compare.
+   */
+  compareTanks: protectedProcedure
+    .input(z.object({ tankNames: z.array(z.string().min(1)).min(2).max(6) }))
+    .query(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) return { tanks: [] };
+
+      const rows = await listVintageLogEntries(dbUser.id, 800);
+      const parseDetails = (s: string): Record<string, unknown> => {
+        try { return JSON.parse(s) as Record<string, unknown>; } catch { return {}; }
+      };
+
+      const tanks = input.tankNames.map((tankName) => {
+        const events = rows.filter((r) => r.tankName === tankName);
+        if (events.length === 0) {
+          return { tankName, found: false, variety: "—", totalEvents: 0 } as const;
+        }
+
+        const sortedAsc = [...events].sort((a, b) => a.entryAt - b.entryAt);
+        const variety = sortedAsc[0].variety;
+        const firstAt = sortedAsc[0].entryAt;
+        const lastAt = sortedAsc[sortedAsc.length - 1].entryAt;
+
+        // Measurements
+        const measurements = events
+          .filter((e) => e.eventType === "measurement")
+          .map((e) => ({ at: e.entryAt, d: parseDetails(e.detailsJson) }));
+        const brixReadings = measurements
+          .filter((m) => String(m.d.what ?? "").toLowerCase() === "brix")
+          .map((m) => ({ at: m.at, v: parseFloat(String(m.d.value ?? "")) || 0 }))
+          .sort((a, b) => a.at - b.at);
+        const tempReadings = measurements
+          .filter((m) => ["temperature", "temp"].includes(String(m.d.what ?? "").toLowerCase()))
+          .map((m) => parseFloat(String(m.d.value ?? "")) || 0);
+        const yanReadings = measurements
+          .filter((m) => String(m.d.what ?? "").toLowerCase() === "yan")
+          .map((m) => parseFloat(String(m.d.value ?? "")) || 0);
+        const phReadings = measurements
+          .filter((m) => String(m.d.what ?? "").toLowerCase() === "ph")
+          .map((m) => parseFloat(String(m.d.value ?? "")) || 0);
+
+        // Inoculation
+        const inoc = events.find((e) => e.eventType === "inoculation");
+        const inocDetails = inoc ? parseDetails(inoc.detailsJson) : null;
+        const yeastStrain = inocDetails ? String(inocDetails.productName ?? inocDetails.what ?? "—") : "—";
+        const inocAt = inoc?.entryAt ?? null;
+
+        // Ferment duration: inoculation → first brix ≤ 2
+        let fermentDays: number | null = null;
+        if (inocAt) {
+          const dryReading = brixReadings.find((b) => b.at >= inocAt && b.v <= 2);
+          if (dryReading) fermentDays = (dryReading.at - inocAt) / 86400000;
+        }
+
+        // Additions
+        const additions = events
+          .filter((e) => e.eventType === "addition")
+          .map((e) => ({ at: e.entryAt, d: parseDetails(e.detailsJson) }));
+        const dapCount = additions.filter((a) => String(a.d.what ?? "").toLowerCase().includes("dap")).length;
+        const so2Count = additions.filter((a) => {
+          const w = String(a.d.what ?? "").toLowerCase();
+          return w.includes("so2") || w.includes("so₂") || w.includes("sulphite") || w.includes("kms") || w.includes("metabisulfite");
+        }).length;
+
+        // Decision reasoning ("Why?" entries) — last 5 most recent
+        const reasonings: { date: string; eventType: string; reasoning: string }[] = [];
+        for (const e of [...events].sort((a, b) => b.entryAt - a.entryAt)) {
+          const d = parseDetails(e.detailsJson);
+          const r = typeof d.reasoning === "string" ? d.reasoning.trim() : "";
+          if (r) {
+            reasonings.push({
+              date: new Date(e.entryAt).toISOString().slice(0, 10),
+              eventType: e.eventType,
+              reasoning: r,
+            });
+          }
+          if (reasonings.length >= 5) break;
+        }
+
+        return {
+          tankName,
+          found: true,
+          variety,
+          totalEvents: events.length,
+          firstAt,
+          lastAt,
+          inocAt,
+          yeastStrain,
+          fermentDays,
+          finalBrix: brixReadings.length ? brixReadings[brixReadings.length - 1].v : null,
+          startBrix: brixReadings.length ? brixReadings[0].v : null,
+          peakTemp: tempReadings.length ? Math.max(...tempReadings) : null,
+          avgTemp: tempReadings.length ? tempReadings.reduce((a, b) => a + b, 0) / tempReadings.length : null,
+          minYan: yanReadings.length ? Math.min(...yanReadings) : null,
+          maxYan: yanReadings.length ? Math.max(...yanReadings) : null,
+          avgPh: phReadings.length ? phReadings.reduce((a, b) => a + b, 0) / phReadings.length : null,
+          dapAdditions: dapCount,
+          so2Additions: so2Count,
+          reasonings,
+        } as const;
+      });
+
+      return { tanks };
+    }),
 
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
@@ -531,3 +499,145 @@ Return ONLY a valid JSON array. No markdown, no explanation. If you cannot ident
 });
 
 export { vintageLogRouter };
+
+// ─── Shared Alert Computation ────────────────────────────────────────────────
+// Pure function reused by the tRPC alerts query AND the daily-email cron handler.
+
+export type Alert = {
+  kind: "dap_due" | "high_temp" | "stuck_ferment" | "ready_to_rack" | "tank_quiet";
+  severity: "high" | "medium" | "low";
+  tankName: string;
+  variety: string;
+  title: string;
+  detail: string;
+  action: string;
+};
+
+export async function computeAlertsForUser(userId: number): Promise<Alert[]> {
+  const rows = await listVintageLogEntries(userId, 400);
+  if (rows.length === 0) return [];
+
+  const byTank = new Map<string, typeof rows>();
+  for (const r of rows) {
+    if (!byTank.has(r.tankName)) byTank.set(r.tankName, []);
+    byTank.get(r.tankName)!.push(r);
+  }
+
+  const now = Date.now();
+  const day = 86400 * 1000;
+  const alerts: Alert[] = [];
+
+  function parseDetails(detailsJson: string): Record<string, unknown> {
+    try { return JSON.parse(detailsJson) as Record<string, unknown>; } catch { return {}; }
+  }
+
+  for (const [tankName, events] of byTank.entries()) {
+    const variety = events[0]?.variety ?? "—";
+    const newest = events[0];
+    const daysSinceNewest = (now - newest.entryAt) / day;
+    if (daysSinceNewest > 120) continue;
+
+    const inoculation = events.find((e) => e.eventType === "inoculation");
+    const lastRacking = events.find((e) => e.eventType === "racking");
+    const measurements = events
+      .filter((e) => e.eventType === "measurement")
+      .map((e) => ({ at: e.entryAt, d: parseDetails(e.detailsJson) }));
+    const additions = events
+      .filter((e) => e.eventType === "addition")
+      .map((e) => ({ at: e.entryAt, d: parseDetails(e.detailsJson) }));
+
+    // Rule 1: DAP due
+    const lastYan = measurements.find((m) => String(m.d.what ?? "").toLowerCase() === "yan");
+    if (lastYan) {
+      const yanValue = parseFloat(String(lastYan.d.value ?? "")) || 0;
+      const dapSinceYan = additions.find(
+        (a) => String(a.d.what ?? "").toLowerCase().includes("dap") && a.at >= lastYan.at
+      );
+      if (yanValue > 0 && yanValue < 200 && !dapSinceYan) {
+        alerts.push({
+          kind: "dap_due",
+          severity: yanValue < 150 ? "high" : "medium",
+          tankName, variety,
+          title: `${tankName}: DAP due`,
+          detail: `YAN at ${yanValue} ppm (below 200 ppm target). No DAP added since measurement.`,
+          action: "Add DAP — split addition recommended.",
+        });
+      }
+    }
+
+    // Rule 2: High temp
+    const lastTemp = measurements.find((m) => {
+      const w = String(m.d.what ?? "").toLowerCase();
+      return w === "temperature" || w === "temp";
+    });
+    if (lastTemp) {
+      const temp = parseFloat(String(lastTemp.d.value ?? "")) || 0;
+      const ageHrs = (now - lastTemp.at) / (3600 * 1000);
+      if (temp > 22 && ageHrs < 24) {
+        alerts.push({
+          kind: "high_temp",
+          severity: temp > 26 ? "high" : "medium",
+          tankName, variety,
+          title: `${tankName}: High temp (${temp}°C)`,
+          detail: `Last reading ${Math.round(ageHrs)}h ago — above 22°C threshold.`,
+          action: "Cool ferment — risk of stuck ferment / volatile loss.",
+        });
+      }
+    }
+
+    // Rule 3: Stuck ferment
+    const brixSeries = measurements
+      .filter((m) => String(m.d.what ?? "").toLowerCase() === "brix")
+      .slice(0, 4);
+    if (brixSeries.length >= 2 && inoculation) {
+      const latest = parseFloat(String(brixSeries[0].d.value ?? "")) || 0;
+      const oldest = parseFloat(String(brixSeries[brixSeries.length - 1].d.value ?? "")) || 0;
+      const spanDays = (brixSeries[0].at - brixSeries[brixSeries.length - 1].at) / day;
+      const delta = oldest - latest;
+      if (latest > 4 && spanDays >= 2 && delta < 1) {
+        alerts.push({
+          kind: "stuck_ferment",
+          severity: "high",
+          tankName, variety,
+          title: `${tankName}: Possible stuck ferment`,
+          detail: `Brix moved only ${delta.toFixed(1)}° in ${spanDays.toFixed(1)} days (currently ${latest}°Bx).`,
+          action: "Check temp, YAN, and yeast viability. Consider restart protocol.",
+        });
+      }
+    }
+
+    // Rule 4: Ready to rack
+    const lastBrix = brixSeries[0];
+    if (lastBrix && inoculation) {
+      const brix = parseFloat(String(lastBrix.d.value ?? "")) || 0;
+      const rackingSinceDry = lastRacking && lastBrix.at < lastRacking.entryAt;
+      const ageHrs = (now - lastBrix.at) / (3600 * 1000);
+      if (brix <= 2 && brix >= -2 && !rackingSinceDry && ageHrs < 96) {
+        alerts.push({
+          kind: "ready_to_rack",
+          severity: "medium",
+          tankName, variety,
+          title: `${tankName}: Ready to rack`,
+          detail: `Brix at ${brix}°Bx (dry). No racking recorded since.`,
+          action: "Plan racking off gross lees.",
+        });
+      }
+    }
+
+    // Rule 5: Tank gone quiet
+    if (inoculation && daysSinceNewest > 5 && daysSinceNewest < 14) {
+      alerts.push({
+        kind: "tank_quiet",
+        severity: "low",
+        tankName, variety,
+        title: `${tankName}: No recent activity`,
+        detail: `Last log entry ${Math.round(daysSinceNewest)} days ago. Active vintage tank.`,
+        action: "Walk the cellar — check on this tank.",
+      });
+    }
+  }
+
+  const order = { high: 0, medium: 1, low: 2 };
+  alerts.sort((a, b) => order[a.severity] - order[b.severity]);
+  return alerts.slice(0, 6);
+}

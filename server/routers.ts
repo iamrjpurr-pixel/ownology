@@ -375,6 +375,33 @@ const adminRouter = router({
   }),
 
   /**
+   * Reset today's Free Run quota — CI/QA helper so test runs can repeatedly
+   * exercise freeRun.curiosityAsk without hitting the 3/day cap.
+   * Optional `userId`: if omitted, clears ALL users' usage for today.
+   */
+  resetFreeRunQuota: ownerProcedure
+    .input(z.object({ userId: z.number().optional() }).optional())
+    .mutation(async ({ input }) => {
+      const today = new Date().toISOString().slice(0, 10);
+      const userId = input?.userId;
+      if (userId !== undefined) {
+        await db
+          .delete(schema.freeRunDailyUsage)
+          .where(
+            and(
+              eq(schema.freeRunDailyUsage.userId, userId),
+              eq(schema.freeRunDailyUsage.dateKey, today)
+            )
+          );
+        return { ok: true, scope: "user", userId, dateKey: today };
+      }
+      await db
+        .delete(schema.freeRunDailyUsage)
+        .where(eq(schema.freeRunDailyUsage.dateKey, today));
+      return { ok: true, scope: "all", dateKey: today };
+    }),
+
+  /**
    * AI answer feedback list (admin view) — shows recent thumbs-down feedback
    * so prompts/RAG gaps can be hunted. Limit 50 most recent.
    */

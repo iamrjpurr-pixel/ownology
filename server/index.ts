@@ -16,6 +16,7 @@ import { trinityClusterHandler } from "./scheduled/trinityCluster.js";
 import { trinityNewsletterHandler } from "./scheduled/trinityNewsletter.js";
 import { cellarJournalSitemapHandler, robotsTxtHandler, cellarJournalRssHandler } from "./sitemap.js";
 import { generateAuditTrailPdf } from "./auditTrailPdf.js";
+import { dailyAlertEmailHandler } from "./scheduled/dailyAlertEmail.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +38,8 @@ async function startServer() {
   app.post("/api/scheduled/fermentation-watch", express.json(), fermentationWatchHandler);
   app.post("/api/scheduled/trinity-cluster", express.json(), trinityClusterHandler);
   app.post("/api/scheduled/trinity-newsletter", express.json(), trinityNewsletterHandler);
+  app.post("/api/scheduled/daily-alert-email", express.json(), dailyAlertEmailHandler);
+  app.get("/api/scheduled/daily-alert-email", dailyAlertEmailHandler); // GET allowed for manual triggering / dry-run
 
   // ── SEO: sitemap + robots + RSS ──────────────────────────────────────────────
   app.get("/api/cellar-journal/sitemap.xml", cellarJournalSitemapHandler);

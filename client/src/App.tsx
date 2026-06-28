@@ -55,6 +55,7 @@ import VineReference from "./pages/VineReference";
 import Resume from "./pages/Resume";
 import Stats from "./pages/Stats";
 import TankQr from "./pages/TankQr";
+import VintageCompare from "./pages/VintageCompare";
 import WorkModeLayout from "@/components/WorkModeLayout";
 
 
@@ -207,6 +208,7 @@ function Router() {
       <Route path={"/resume"} component={Resume} />
       <Route path={"/stats"} component={Stats} />
       <Route path={"/tank-qr"} component={TankQr} />
+      <Route path={"/the-press/compare"} component={VintageCompare} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />
