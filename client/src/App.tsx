@@ -91,7 +91,7 @@ function CellarTasksPage() {
 }
 function DashboardPage() {
   return (
-    <WorkModeLayout title="Dashboard" activeTab="more">
+    <WorkModeLayout title="Dashboard" activeTab="more" wide>
       <ProductionDashboard />
     </WorkModeLayout>
   );
