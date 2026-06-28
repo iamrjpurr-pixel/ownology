@@ -150,6 +150,13 @@
 - OAuth portal — replaced with placeholder; the `OAuthCallback.tsx` page can be revisited when real auth is chosen.
 - Buttondown newsletter — `BUTTONDOWN_API_KEY` empty; newsletter scheduled job will no-op.
 
+**Admin Basic-Auth Gate — Stopgap Protection (28 Jun 2026, this session)**
+- Added `adminGate` Express middleware in `server/index.ts` that protects `/admin`, `/admin/*` (SPA pages) and `/api/trpc/admin.*` + `/api/trpc/pricing.funnelStats` (admin tRPC routes) behind HTTP Basic Auth.
+- Reads `ADMIN_AUTH_USER` and `ADMIN_AUTH_PASS` from env. **When either is unset → gate disabled** (dev convenience). **When both are set → gate active.**
+- Verified live in dev with creds enabled: unauth API calls return 401 with `WWW-Authenticate: Basic realm="Ownology Admin"`; correct creds return 200; wrong password returns 401; public endpoints unaffected.
+- Note on dev vs prod: the Emergent preview environment routes non-`/api/*` URLs to Vite directly (port 3000), so `/admin` SPA pages aren't gated in dev. In Railway production, Express serves the SPA via `app.get("*")` after `adminGate` runs, so the gate WILL catch `/admin/*` pages too. ✓
+- **This is a stopgap.** Proper auth (Emergent Google login or JWT) is still on the P0 roadmap. The gate buys 2–3 months of safety while you onboard the first 5 paying winemakers.
+
 **Lazy Code-Splitting for Cold Pages (28 Jun 2026, this session)**
 - 30+ rarely-visited pages converted from static `import` to `React.lazy(() => import(...))` in `client/src/App.tsx`. Suspense wraps the entire Switch with a tiny "Loading…" skeleton (`data-testid="page-loading"`).
 - **Eager (kept synchronous)**: Home, FreeRun, ThePress, QuickEntry, CellarTasks, Today, Pricing, WorkModeLayout, PwaInstallBanner. These are first-paint or PWA bottom-nav critical.

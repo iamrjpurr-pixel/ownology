@@ -18,12 +18,75 @@ import { cellarJournalSitemapHandler, robotsTxtHandler, cellarJournalRssHandler 
 import { generateAuditTrailPdf } from "./auditTrailPdf.js";
 import { dailyAlertEmailHandler } from "./scheduled/dailyAlertEmail.js";
 
+/**
+ * HTTP Basic Auth gate for `/admin/*` pages and admin-only tRPC procedures.
+ *
+ * When `ADMIN_AUTH_USER` + `ADMIN_AUTH_PASS` env vars are BOTH set, the gate
+ * is active — any request to an admin URL must include a matching Basic Auth
+ * header. When either env var is missing (dev convenience), the gate is
+ * disabled so curl + Playwright can still hit endpoints freely.
+ *
+ * Two URL classes are gated:
+ *   1. SPA pages — /admin, /admin/* (frontend HTML routes)
+ *   2. tRPC procs — /api/trpc/admin.* and /api/trpc/pricing.funnelStats
+ *      (the backend admin routes — caught at the URL level so a leaked
+ *       deep-link API URL can't be curled blind).
+ *
+ * Browser users see the standard browser auth prompt; curl users get a
+ * 401 with WWW-Authenticate header (`-u user:pass` works).
+ */
+function adminBasicAuth(req: express.Request, res: express.Response, next: express.NextFunction) {
+  const user = process.env.ADMIN_AUTH_USER;
+  const pass = process.env.ADMIN_AUTH_PASS;
+  // Dev convenience: no credentials configured → gate is OFF.
+  if (!user || !pass) return next();
+
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith("Basic ")) {
+    res.setHeader("WWW-Authenticate", 'Basic realm="Ownology Admin"');
+    return res.status(401).send("Authentication required.");
+  }
+  let decoded: string;
+  try {
+    decoded = Buffer.from(auth.slice(6), "base64").toString("utf8");
+  } catch {
+    res.setHeader("WWW-Authenticate", 'Basic realm="Ownology Admin"');
+    return res.status(401).send("Authentication required.");
+  }
+  const idx = decoded.indexOf(":");
+  const reqUser = idx >= 0 ? decoded.slice(0, idx) : "";
+  const reqPass = idx >= 0 ? decoded.slice(idx + 1) : "";
+  if (reqUser !== user || reqPass !== pass) {
+    res.setHeader("WWW-Authenticate", 'Basic realm="Ownology Admin"');
+    return res.status(401).send("Authentication required.");
+  }
+  next();
+}
+
+/** Apply the admin gate selectively based on URL path. Kept as a single
+ *  middleware so the route table stays clean. */
+function adminGate(req: express.Request, res: express.Response, next: express.NextFunction) {
+  const p = req.path;
+  const isAdminPage = p === "/admin" || p.startsWith("/admin/");
+  const isAdminApi =
+    p.startsWith("/api/trpc/admin.") || p.startsWith("/api/trpc/pricing.funnelStats");
+  if (isAdminPage || isAdminApi) {
+    return adminBasicAuth(req, res, next);
+  }
+  next();
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
   const server = createServer(app);
+
+  // ── Admin Basic-Auth gate (first middleware) ─────────────────────────────
+  // Gates /admin/* SPA pages and /api/trpc/admin.* + /api/trpc/pricing.funnelStats
+  // when ADMIN_AUTH_USER + ADMIN_AUTH_PASS are set in env. No-op otherwise.
+  app.use(adminGate);
 
   // ── Stripe webhook MUST come before express.json() ──────────────────────────
   app.use("/api/stripe/webhook", express.raw({ type: "application/json" }), (req, res, next) => {
