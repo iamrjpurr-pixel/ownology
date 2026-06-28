@@ -157,6 +157,22 @@
 - Note on dev vs prod: the Emergent preview environment routes non-`/api/*` URLs to Vite directly (port 3000), so `/admin` SPA pages aren't gated in dev. In Railway production, Express serves the SPA via `app.get("*")` after `adminGate` runs, so the gate WILL catch `/admin/*` pages too. ✓
 - **This is a stopgap.** Proper auth (Emergent Google login or JWT) is still on the P0 roadmap. The gate buys 2–3 months of safety while you onboard the first 5 paying winemakers.
 
+**SMS Outreach / CRM — VIVID Event Lead Triage (28 Jun 2026, this session)**
+- New routes wired in `App.tsx`: `/hi/:slug` (public personalised landing) + `/admin/contacts` (owner CRM). Both were lazy-imported but had no `<Route>` definitions; now fixed.
+- `outreach_contacts` table extended with `status varchar(16) NOT NULL DEFAULT 'cold'` + `oc_status_idx` index. Triage states: `warm | lukewarm | cold | sales | skip`. Migration applied via `scripts/add-outreach-status-column.mjs` (raw SQL).
+- 31 contacts seeded from the **VIVID Event (Cult & Classic) Jun 2026** list via `scripts/seed-vivid-contacts.mjs`. Idempotent. Manly Spirits + Archie Rose pre-flipped to `sales`; James Agnew (Audrey Wilkinson / Pooles Rock) flipped to `warm`.
+- New `outreach.setStatus` ownerProcedure (zod enum, 400 on invalid). `outreach.create` now accepts optional `status`.
+- `/admin/contacts` UI: filter chip bar (`status-filter-bar`) above the form with per-state counts; per-row status dropdown (`status-select-<slug>`); rows for `sales`/`skip` dimmed to 0.55 opacity, silent-mode notice, Copy-SMS / Copy-link / Mark-sent / Mark-booked HIDDEN.
+- **Honest copy refactor** (user feedback: *"didn't really chat much; some are just sales people"*). Removed "Great chatting at…" framing.
+  - `/hi/:slug` greeting: *"We crossed paths at <event> — sending this your way for <winery>."*
+  - No-painPoint intro (operator-supplied): *"We didn't get long to chat — I've since shipped something I reckon could save your wine making heroes real time through the vintage. 90-second look below; no signup needed."*
+  - With-painPoint hook: *"Thought this might be relevant: <pain>. Ownology is built to answer that kind of question grounded in your actual vintage logs."*
+  - SMS draft templates rewritten to match.
+- `HiContact.tsx` `markViewed` gated on `contact?.slug` so unknown slugs don't fire a 400 (test-agent cosmetic flag, now fixed).
+- Admin hub (`/admin`) has a new "Personal SMS Contacts" tool card.
+- Verified live (`/app/test_reports/iteration_12.json`, **11/11 backend + 100% frontend pass, 0 critical, 0 minor**).
+
+
 **Lazy Code-Splitting for Cold Pages (28 Jun 2026, this session)**
 - 30+ rarely-visited pages converted from static `import` to `React.lazy(() => import(...))` in `client/src/App.tsx`. Suspense wraps the entire Switch with a tiny "Loading…" skeleton (`data-testid="page-loading"`).
 - **Eager (kept synchronous)**: Home, FreeRun, ThePress, QuickEntry, CellarTasks, Today, Pricing, WorkModeLayout, PwaInstallBanner. These are first-paint or PWA bottom-nav critical.

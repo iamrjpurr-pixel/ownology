@@ -28,11 +28,13 @@ export default function HiContact() {
   const fired = useRef(false);
 
   useEffect(() => {
-    if (!slug || fired.current) return;
+    // Only log the view if the contact actually exists — avoids dirty 400s
+    // on /hi/<typo> URLs.
+    if (!contact?.slug || fired.current) return;
     fired.current = true;
-    markViewed.mutate({ slug });
+    markViewed.mutate({ slug: contact.slug });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug]);
+  }, [contact?.slug]);
 
   if (isLoading) {
     return (
@@ -115,7 +117,7 @@ export default function HiContact() {
               color: "#374151",
             }}
           >
-            We didn&apos;t get long to chat — I&apos;ve since shipped something I reckon could save you real time in the cellar. 90-second look below; no signup needed.
+            We didn&apos;t get long to chat — I&apos;ve since shipped something I reckon could save your wine making heroes real time through the vintage. 90-second look below; no signup needed.
           </p>
         )}
 
