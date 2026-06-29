@@ -1,7 +1,8 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
+import fs from "node:fs";
 import path from "node:path";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 
 // Ownology — Emergent-compatible Vite config.
 // Manus-specific plugins (jsx-loc, manus-runtime, debug-collector, storage-proxy,
@@ -9,8 +10,40 @@ import { defineConfig } from "vite";
 // the Express backend runs as a separate process on port 8001, and Vite simply
 // proxies all /api/* requests to it during development.
 
+/** Clean URL alias for the sample vintage log static asset.
+ *  /sample-vintage-log → serves client/public/sample-vintage-log.html
+ *  Mirrors the Express route in server/index.ts so the alias works in BOTH
+ *  dev (Vite middleware) and prod (Express). Query params pass through.
+ */
+function sampleVintageLogAlias(): Plugin {
+  return {
+    name: "ownology-sample-vintage-log-alias",
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (!req.url) return next();
+        const [pathOnly] = req.url.split("?");
+        if (pathOnly === "/sample-vintage-log") {
+          const file = path.resolve(import.meta.dirname, "client", "public", "sample-vintage-log.html");
+          fs.readFile(file, (err, data) => {
+            if (err) {
+              res.statusCode = 404;
+              res.end("sample-vintage-log.html not found");
+              return;
+            }
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "text/html; charset=utf-8");
+            res.end(data);
+          });
+          return;
+        }
+        next();
+      });
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), sampleVintageLogAlias()],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),

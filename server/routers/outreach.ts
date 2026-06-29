@@ -103,7 +103,7 @@ export const outreachRouter = router({
       const defaultCalendly = process.env.CALENDLY_DEFAULT_URL?.trim() || null;
       const calendlyUrl = row.calendlyOverride?.trim() || defaultCalendly || null;
       const variant = pickSampleVintageVariant({ winery: row.winery, event: row.event });
-      const sampleVintageLogUrl = `/sample-vintage-log.html?variant=${variant}&from=sms-${encodeURIComponent(row.slug)}`;
+      const sampleVintageLogUrl = `/sample-vintage-log?variant=${variant}&from=sms-${encodeURIComponent(row.slug)}`;
       return { ...row, calendlyUrl, sampleVintageLogUrl, sampleVintageLogVariant: variant };
     }),
 

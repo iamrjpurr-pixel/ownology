@@ -247,6 +247,13 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 - Verified live: Nathan/Jane/Sarah/Ollie all resolve to `hunter`; Sally/Tim/Hamish-Mada/Paul/Jared resolve to `boutique`; Bryan-Ravensworth (Canberra) resolves to `large`. Variant pages render correctly (titles, KPIs, boutique tank-card hiding all confirmed via screenshot).
 
 - ✅ `/today` — single-column alert feed, intentionally narrow.
+
+**Clean URL `/sample-vintage-log` (28 Jun 2026, this session)**
+- Express route in `server/index.ts` serves `client/public/sample-vintage-log.html` at the no-extension path `/sample-vintage-log`. Query params (`?variant=…&from=…`) pass through. Old `.html` URL keeps working — both routes are valid entry points.
+- Matching dev-mode Vite middleware plugin (`sampleVintageLogAlias` in `vite.config.ts`) so the clean URL works locally too (Vite serves the frontend in dev; Express only in prod build).
+- Backend `outreach.bySlug` now hands `/hi/:slug` the clean URL: `sampleVintageLogUrl = "/sample-vintage-log?variant=<v>&from=sms-<slug>"`.
+- Verified in dev: `/sample-vintage-log?variant=hunter` renders Hunter Valley Estate mockup with correct KPIs (8/2/12/1), title, and subtitle.
+
 - 🔴 → ✅ **`/dashboard`** — opted into `wide` (`<WorkModeLayout title="Dashboard" activeTab="more" wide>`). KPI row (`grid-cols-2 md:grid-cols-4`) was being forced into a 430px column → labels wrapped to "Activi Tanks / In Fermen / Approa Bottli". Now renders the proper 4-up grid with full labels + descriptions + Tank Status table's 6 columns at full readability. Mobile pixel-identical to before.
 
 **Knowledge Page Desktop Layout Fix (28 Jun 2026, this session)**

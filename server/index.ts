@@ -136,6 +136,18 @@ async function startServer() {
     });
   });
 
+  // ── Clean URL alias for the sample vintage log demo ─────────────────────────
+  // The static asset lives at /sample-vintage-log.html. This alias serves the
+  // same file at /sample-vintage-log (no extension) for prettier marketing
+  // links. Query params (?variant=hunter|boutique|large&from=sms-<slug>) are
+  // passed through unchanged. The .html URL keeps working — both routes are
+  // valid entry points.
+  app.get("/sample-vintage-log", (_req, res) => {
+    res.sendFile(path.resolve(__dirname, "..", "client", "public", "sample-vintage-log.html"), (err) => {
+      if (err) res.status(404).send("sample-vintage-log.html not found in client/public");
+    });
+  });
+
   // ── JSON body parser ─────────────────────────────────────────────────────────
   app.use(express.json());
 
