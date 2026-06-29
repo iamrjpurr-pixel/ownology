@@ -75,6 +75,7 @@ const VintageCompare = lazy(() => import("./pages/VintageCompare"));
 const HiContact = lazy(() => import("./pages/HiContact"));
 const AdminContacts = lazy(() => import("./pages/AdminContacts"));
 const AdminContactsPipeline = lazy(() => import("./pages/AdminContactsPipeline"));
+const AdminMarketingKit = lazy(() => import("./pages/AdminMarketingKit"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
  *  Sized so it doesn't cause layout shift on first paint. */
@@ -257,6 +258,7 @@ function Router() {
       <Route path={"/hi/:slug"} component={HiContact} />
       <Route path={"/admin/contacts/pipeline"} component={AdminContactsPipeline} />
       <Route path={"/admin/contacts"} component={AdminContacts} />
+      <Route path={"/admin/marketing-kit"} component={AdminMarketingKit} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />

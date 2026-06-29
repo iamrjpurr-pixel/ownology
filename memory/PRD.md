@@ -256,6 +256,18 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 
 - 🔴 → ✅ **`/dashboard`** — opted into `wide` (`<WorkModeLayout title="Dashboard" activeTab="more" wide>`). KPI row (`grid-cols-2 md:grid-cols-4`) was being forced into a 430px column → labels wrapped to "Activi Tanks / In Fermen / Approa Bottli". Now renders the proper 4-up grid with full labels + descriptions + Tank Status table's 6 columns at full readability. Mobile pixel-identical to before.
 
+
+**Marketing Kit reference page (28 Jun 2026, this session)**
+- New page `/app/client/src/pages/AdminMarketingKit.tsx` at `/admin/marketing-kit`. Single bookmarkable URL with one-click copy for every outreach asset.
+- Sections:
+  - **Sample vintage log URLs** (3 variants — Default/Hunter/Boutique) — each has `Open ↗` preview + `Copy` button
+  - **Email signature** — preview-domain version (use today) + ownology.ai version (use post-DNS)
+  - **LinkedIn DM templates** — 3 variants matching the sample-vintage-log variants
+  - **Operational links** — quicklinks to Contacts CRM, Pipeline board, Funnel
+- Origin computed via `window.location.origin` so all URLs reflect the current deployment automatically when DNS is pointed.
+- Admin hub (`/admin`) now has a "Marketing Kit · Assets" card linking here.
+- Verified live: 8 copy rows, Copy → ✓ Copied feedback works.
+
 **Knowledge Page Desktop Layout Fix (28 Jun 2026, this session)**
 - Bug: `/knowledge` was wrapped in `WorkModeLayout` (mobile-first 430px shell) but its inner grid uses `xl:grid-cols-4` — on desktop the page was rendering 4 cards in a ~430px column with text truncated to "Harv…", "Ferme…", "Yeast…".
 - Fix: added a `wide` prop to `WorkModeLayout`. When `wide={true}`, the shell stays 430px on mobile (`< lg`) but expands to **1280px on lg+** via a small media-query injected `<style>` block. Bottom nav stays centered at phone width regardless of shell width (thumb-zone pattern preserved).

@@ -407,6 +407,13 @@ const TOOLS: AdminTool[] = [
     icon: <IconLeads />,
     badge: "Outreach",
   },
+  {
+    label: "Marketing Kit",
+    description: "Every outreach asset in one place — sample-vintage-log variant URLs (Hunter / Boutique / Large), email signature templates, and LinkedIn DM copy. One-click copy for each. Bookmark this.",
+    href: "/admin/marketing-kit",
+    icon: <IconLeads />,
+    badge: "Assets",
+  },
 ];
 
 export default function Admin() {
