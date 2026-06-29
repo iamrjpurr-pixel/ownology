@@ -129,12 +129,34 @@ export default function AdminContacts() {
         <p className="text-xs uppercase tracking-widest mt-3" style={{ color: "var(--ow-amber)" }}>
           Outreach pipeline
         </p>
-        <h1 className="text-3xl font-semibold mt-1" style={{ color: "var(--ow-text-hi)", fontFamily: "'Fraunces',serif" }}>
-          Personal SMS contacts
-        </h1>
-        <p className="mt-2 text-sm" style={{ color: "var(--ow-text-mid)", maxWidth: 720 }}>
-          Add a winemaker from your event notes → get a personalised <code>/hi/&lt;slug&gt;</code> URL + ready-to-send SMS draft. Track who opened the link and who booked a demo.
-        </p>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+          <div>
+            <h1 className="text-3xl font-semibold mt-1" style={{ color: "var(--ow-text-hi)", fontFamily: "'Fraunces',serif" }}>
+              Personal SMS contacts
+            </h1>
+            <p className="mt-2 text-sm" style={{ color: "var(--ow-text-mid)", maxWidth: 720 }}>
+              Add a winemaker from your event notes → get a personalised <code>/hi/&lt;slug&gt;</code> URL + ready-to-send SMS draft. Track who opened the link and who booked a demo.
+            </p>
+          </div>
+          <Link
+            href="/admin/contacts/pipeline"
+            data-testid="link-to-pipeline"
+            style={{
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              padding: "8px 14px",
+              border: "1px solid var(--ow-amber)",
+              borderRadius: 6,
+              color: "var(--ow-amber)",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Pipeline board →
+          </Link>
+        </div>
       </div>
 
       {/* Headline stats */}

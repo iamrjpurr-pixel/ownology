@@ -142,6 +142,76 @@ export const outreachRouter = router({
       return { ok: true };
     }),
 
+  /** OWNER — drag-and-drop pipeline stage transition. Sets the canonical
+   *  timestamps in one atomic write so the derived board view stays
+   *  consistent. Stages:
+   *    - lead     : pre-outreach. Clears smsSentAt/repliedAt/demoBookedAt.
+   *    - sent     : SMS sent, no engagement yet. Sets smsSentAt only.
+   *    - awaiting : SMS sent + prospect viewed but no reply. Same DB state
+   *                 as 'sent' — the board sorts by viewCount > 0.
+   *    - replied  : prospect replied. Sets smsSentAt + repliedAt.
+   *    - booked   : demo booked. Sets smsSentAt + demoBookedAt.
+   *  Idempotent: existing timestamps preserved when possible. */
+  setPipelineStage: ownerProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+        stage: z.enum(["lead", "sent", "awaiting", "replied", "booked"]),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const now = Date.now();
+      const rows = await db
+        .select({
+          smsSentAt: schema.outreachContacts.smsSentAt,
+          repliedAt: schema.outreachContacts.repliedAt,
+          demoBookedAt: schema.outreachContacts.demoBookedAt,
+        })
+        .from(schema.outreachContacts)
+        .where(eq(schema.outreachContacts.slug, input.slug))
+        .limit(1);
+      const existing = rows[0];
+      if (!existing) throw new Error(`Contact ${input.slug} not found`);
+
+      // Compute the new state based on target stage. Preserve prior
+      // timestamps where the stage still implies them.
+      let smsSentAt = existing.smsSentAt ?? null;
+      let repliedAt = existing.repliedAt ?? null;
+      let demoBookedAt = existing.demoBookedAt ?? null;
+
+      switch (input.stage) {
+        case "lead":
+          smsSentAt = null;
+          repliedAt = null;
+          demoBookedAt = null;
+          break;
+        case "sent":
+        case "awaiting":
+          // First time entering this column: stamp smsSentAt. Clear later-
+          // stage timestamps so dragging backward really moves the card.
+          smsSentAt = smsSentAt ?? now;
+          repliedAt = null;
+          demoBookedAt = null;
+          break;
+        case "replied":
+          smsSentAt = smsSentAt ?? now;
+          repliedAt = repliedAt ?? now;
+          demoBookedAt = null;
+          break;
+        case "booked":
+          smsSentAt = smsSentAt ?? now;
+          demoBookedAt = demoBookedAt ?? now;
+          // repliedAt left alone — booking implies they engaged
+          break;
+      }
+
+      await db
+        .update(schema.outreachContacts)
+        .set({ smsSentAt, repliedAt, demoBookedAt })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true, stage: input.stage };
+    }),
+
   /** OWNER — record SMS sent (operator marks it after they hit send). */
   markSmsSent: ownerProcedure
     .input(z.object({ slug: z.string() }))

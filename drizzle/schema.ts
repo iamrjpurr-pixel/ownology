@@ -1143,6 +1143,10 @@ export const outreachContacts = mysqlTable(
     firstViewedAt: bigint("first_viewed_at", { mode: "number" }),
     viewCount: int("view_count").notNull().default(0),
     demoBookedAt: bigint("demo_booked_at", { mode: "number" }),
+    // Reply pipeline timestamp — set when the operator marks the prospect
+    // replied to the SMS but hasn't booked yet. Used by the pipeline-board
+    // view to derive the "Replied" column.
+    repliedAt: bigint("replied_at", { mode: "number" }),
     notes: varchar("notes", { length: 500 }),
     // Triage state — warm = had a real conversation, lukewarm = brief positive,
     // cold = just collected card, sales = vendor/rep not a winemaker, skip = ignore
