@@ -33,7 +33,6 @@ export default function HiContact() {
     if (!contact?.slug || fired.current) return;
     fired.current = true;
     markViewed.mutate({ slug: contact.slug });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contact?.slug]);
 
   if (isLoading) {
@@ -55,7 +54,11 @@ export default function HiContact() {
   }
 
   const calendlyUrl = contact.calendlyUrl || ""; // server resolves override → CALENDLY_DEFAULT_URL → null
-  const tryNowHref = `/free-run?from=sms-${encodeURIComponent(contact.slug)}`;
+  // Cold prospects need a "what would this look like at scale" visual, not the AI
+  // chat or pitch text. The /sample-vintage-log.html static asset is a polished
+  // 128-tank mockup that lets them imagine their own operation in the product.
+  // Tracked param `from=sms-<slug>` flows through to /admin/funnel attribution.
+  const tryNowHref = `/sample-vintage-log.html?from=sms-${encodeURIComponent(contact.slug)}`;
 
   return (
     <div style={wrap} data-testid="hi-page">
@@ -147,23 +150,25 @@ export default function HiContact() {
             📅 {CALENDLY_FALLBACK_LABEL} →
           </a>
         ) : (
-          <Link
+          <a
             href={tryNowHref}
             data-testid="hi-cta-primary"
             style={btnPrimary}
           >
-            👋 See the AI in action →
-          </Link>
+            👋 See a real-time vintage log →
+          </a>
         )}
 
-        {/* Secondary CTA */}
-        <Link
+        {/* Secondary CTA — opens the polished 128-tank sample dashboard so the
+            prospect can visualise their own operation in Ownology. Plain <a>
+            because the target is a static .html outside the React router. */}
+        <a
           href={tryNowHref}
           data-testid="hi-cta-secondary"
           style={btnSecondary}
         >
-          Or try it right now — no signup →
-        </Link>
+          See a sample 2026 vintage log →
+        </a>
 
         {/* Signature */}
         <p style={{ marginTop: "3rem", fontFamily: "'Lato',sans-serif", fontSize: "0.85rem", color: "#6b7280" }}>

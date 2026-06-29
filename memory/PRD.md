@@ -225,6 +225,13 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 - Operator workflow change: phone the prospect first → tweak each SMS to match the call context ("thanks for the chat" vs "tried to ring") → copy + send from real iPhone → mark sent.
 
 - ✅ `/compliance` — already standalone (not in WorkModeLayout), full-width, no fix needed.
+
+**Marketing demo asset for cold prospects (28 Jun 2026, this session)**
+- Saved `ownology-vintage-log-mockup` (Manus-built, 869 lines) to `/app/client/public/sample-vintage-log.html` as a static asset. Polished 128-tank 2026-Harvest dashboard mockup: KPI cards (47 active fermentations, 12 racking, 69 aging, 3 alerts), Tank Status Overview with status-coded cards (T-01..T-88), T-01 Shiraz detail panel (Brix 12.4°, YAN, days fermenting, brix decline rate), event timeline. No JS interactivity required — purely visual proof.
+- `/hi/:slug` secondary CTA rewired: was `/free-run?from=sms-<slug>` → now `/sample-vintage-log.html?from=sms-<slug>`. Cold prospects see a tangible "what could my operation look like here" mockup instead of being dropped into the AI chat. Funnel attribution preserved via `from=sms-<slug>`.
+- Primary CTA fallback (when no Calendly URL) and secondary CTA both updated to the new copy: "See a real-time vintage log →" / "See a sample 2026 vintage log →".
+- `<Link>` → `<a>` swap on both CTAs (target is a static `.html` outside wouter's React router).
+
 - ✅ `/the-press` — narrow batch-focused content, mobile-first design intentional.
 - ✅ `/cellar-tasks` — equipment list, naturally narrow.
 - ✅ `/today` — single-column alert feed, intentionally narrow.

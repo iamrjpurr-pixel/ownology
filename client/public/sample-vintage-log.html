@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ownology — Vintage Log Dashboard | Real-Time Tank Status</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --ow-amber: oklch(0.72 0.12 75);
+      --ow-bg-base: oklch(0.11 0.008 60);
+      --ow-bg-raised: oklch(0.14 0.008 60);
+      --ow-bg-inset: oklch(0.09 0.008 60);
+      --ow-text-hi: oklch(0.95 0.018 75);
+      --ow-text-mid: oklch(0.70 0.015 75);
+      --ow-text-lo: oklch(0.55 0.012 75);
+      --ow-border: oklch(0.20 0.010 60);
+      --status-fermenting: oklch(0.65 0.15 120);
+      --status-racking: oklch(0.72 0.12 75);
+      --status-aging: oklch(0.50 0.10 260);
+      --status-complete: oklch(0.60 0.10 150);
+    }
+
+    body {
+      font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--ow-bg-base);
+      color: var(--ow-text-hi);
+      line-height: 1.6;
+    }
+
+    /* ─── Header ─────────────────────────────────────────────────────────────── */
+    header {
+      background: var(--ow-bg-raised);
+      border-bottom: 1px solid var(--ow-border);
+      padding: 1.5rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .logo {
+      font-family: 'Fraunces', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ow-amber);
+      letter-spacing: -0.02em;
+    }
+
+    .header-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      background: var(--ow-bg-inset);
+      border: 1px solid var(--ow-border);
+      color: var(--ow-text-mid);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: all 150ms;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--ow-amber);
+      color: var(--ow-amber);
+    }
+
+    .filter-btn.active {
+      background: var(--ow-amber);
+      color: var(--ow-bg-base);
+      border-color: var(--ow-amber);
+    }
+
+    .quick-entry-btn {
+      padding: 0.75rem 1.5rem;
+      background: var(--ow-amber);
+      color: var(--ow-bg-base);
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: opacity 150ms;
+    }
+
+    .quick-entry-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* ─── Main Content ────────────────────────────────────────────────────────── */
+    main {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .dashboard-header {
+      margin-bottom: 2rem;
+    }
+
+    .dashboard-title {
+      font-family: 'Fraunces', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--ow-text-hi);
+      letter-spacing: -0.01em;
+    }
+
+    .dashboard-subtitle {
+      color: var(--ow-text-lo);
+      font-size: 0.95rem;
+    }
+
+    /* ─── KPI Cards ──────────────────────────────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--ow-bg-raised);
+      border: 1px solid var(--ow-border);
+      border-radius: 6px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .kpi-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ow-text-lo);
+      font-weight: 600;
+    }
+
+    .kpi-value {
+      font-family: 'Fraunces', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--ow-amber);
+    }
+
+    .kpi-detail {
+      font-size: 0.85rem;
+      color: var(--ow-text-mid);
+    }
+
+    /* ─── Tank Grid ──────────────────────────────────────────────────────────── */
+    .tank-grid-container {
+      background: var(--ow-bg-raised);
+      border: 1px solid var(--ow-border);
+      border-radius: 8px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .tank-grid-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--ow-border);
+    }
+
+    .tank-grid-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--ow-text-hi);
+    }
+
+    .tank-grid-controls {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .search-input {
+      padding: 0.5rem 1rem;
+      background: var(--ow-bg-inset);
+      border: 1px solid var(--ow-border);
+      border-radius: 4px;
+      color: var(--ow-text-hi);
+      font-size: 0.875rem;
+      width: 200px;
+    }
+
+    .search-input::placeholder {
+      color: var(--ow-text-lo);
+    }
+
+    .tank-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+      max-height: 600px;
+      overflow-y: auto;
+      padding-right: 1rem;
+    }
+
+    /* ─── Tank Card ──────────────────────────────────────────────────────────── */
+    .tank-card {
+      background: var(--ow-bg-inset);
+      border: 2px solid var(--ow-border);
+      border-radius: 6px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 200ms;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tank-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--ow-amber);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .tank-card.active {
+      border-color: var(--ow-amber);
+      background: var(--ow-bg-raised);
+      box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.1);
+    }
+
+    .tank-status-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--status-fermenting);
+    }
+
+    .tank-card.racking .tank-status-indicator {
+      background: var(--status-racking);
+    }
+
+    .tank-card.aging .tank-status-indicator {
+      background: var(--status-aging);
+    }
+
+    .tank-card.complete .tank-status-indicator {
+      background: var(--status-complete);
+    }
+
+    .tank-name {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ow-text-hi);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .tank-variety {
+      font-size: 0.75rem;
+      color: var(--ow-text-lo);
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tank-metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      margin-bottom: 0.5rem;
+      padding: 0.25rem 0;
+    }
+
+    .tank-metric-label {
+      color: var(--ow-text-lo);
+    }
+
+    .tank-metric-value {
+      font-family: 'Fira Code', monospace;
+      color: var(--ow-text-mid);
+      font-weight: 600;
+    }
+
+    .tank-status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      background: rgba(184, 134, 11, 0.15);
+      border: 1px solid var(--ow-amber);
+      border-radius: 3px;
+      font-size: 0.65rem;
+      color: var(--ow-amber);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+
+    /* ─── Detail Panel ────────────────────────────────────────────────────────── */
+    .detail-panel {
+      background: var(--ow-bg-raised);
+      border: 1px solid var(--ow-border);
+      border-radius: 8px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--ow-border);
+    }
+
+    .detail-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ow-text-hi);
+    }
+
+    .detail-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.85rem;
+      color: var(--ow-text-lo);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .detail-item-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ow-text-lo);
+      font-weight: 600;
+    }
+
+    .detail-item-value {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--ow-text-hi);
+      font-family: 'Fira Code', monospace;
+    }
+
+    .detail-timeline {
+      background: var(--ow-bg-inset);
+      border-left: 2px solid var(--ow-amber);
+      padding: 1.5rem;
+      border-radius: 4px;
+      margin-top: 1rem;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--ow-border);
+    }
+
+    .timeline-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .timeline-time {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.75rem;
+      color: var(--ow-amber);
+      font-weight: 600;
+      min-width: 70px;
+    }
+
+    .timeline-event {
+      flex: 1;
+    }
+
+    .timeline-event-title {
+      font-weight: 600;
+      color: var(--ow-text-hi);
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .timeline-event-detail {
+      font-size: 0.8rem;
+      color: var(--ow-text-lo);
+    }
+
+    /* ─── Action Buttons ─────────────────────────────────────────────────────── */
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 150ms;
+    }
+
+    .btn-primary {
+      background: var(--ow-amber);
+      color: var(--ow-bg-base);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background: var(--ow-bg-inset);
+      color: var(--ow-text-mid);
+      border: 1px solid var(--ow-border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--ow-amber);
+      color: var(--ow-amber);
+    }
+
+    /* ─── Legend ──────────────────────────────────────────────────────────────── */
+    .legend {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2rem;
+      padding: 1rem;
+      background: var(--ow-bg-inset);
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+
+    /* ─── Responsive ──────────────────────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .tank-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      }
+
+      .detail-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .tank-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .legend {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <div class="logo">◈ Ownology</div>
+      <div class="header-controls">
+        <div class="filter-group">
+          <button class="filter-btn active">All Tanks</button>
+          <button class="filter-btn">Fermenting</button>
+          <button class="filter-btn">Racking</button>
+          <button class="filter-btn">Aging</button>
+        </div>
+        <button class="quick-entry-btn">+ Log Entry</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">Vintage Log — 2026 Harvest</h1>
+      <p class="dashboard-subtitle">Real-time fermentation monitoring across 128 tanks | Last updated 2 minutes ago</p>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">Active Fermentations</div>
+        <div class="kpi-value">47</div>
+        <div class="kpi-detail">Avg Brix: 8.2° | Avg YAN: 185 ppm</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Racking in Progress</div>
+        <div class="kpi-value">12</div>
+        <div class="kpi-detail">Est. completion: 18:30 today</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Aging / Settled</div>
+        <div class="kpi-value">69</div>
+        <div class="kpi-detail">Avg age: 14 days | SO₂ scheduled: 8 tanks</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Alerts & Actions</div>
+        <div class="kpi-value">3</div>
+        <div class="kpi-detail">Tank T-47: DAP due | Tank T-89: Temp high</div>
+      </div>
+    </div>
+
+    <!-- Tank Grid -->
+    <div class="tank-grid-container">
+      <div class="tank-grid-header">
+        <h2 class="tank-grid-title">Tank Status Overview</h2>
+        <div class="tank-grid-controls">
+          <input type="text" class="search-input" placeholder="Search tank name...">
+        </div>
+      </div>
+
+      <div class="tank-grid">
+        <!-- Fermenting Tanks -->
+        <div class="tank-card active">
+          <div class="tank-status-indicator"></div>
+          <div class="tank-name">T-01</div>
+          <div class="tank-variety">Shiraz</div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">Brix</span>
+            <span class="tank-metric-value">12.4°</span>
+          </div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">Temp</span>
+            <span class="tank-metric-value">18.2°C</span>
+          </div>
+          <div class="tank-status-badge">Fermenting</div>
+        </div>
+
+        <div class="tank-card">
+          <div class="tank-status-indicator"></div>
+          <div class="tank-name">T-02</div>
+          <div class="tank-variety">Chardonnay</div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">Brix</span>
+            <span class="tank-metric-value">9.8°</span>
+          </div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">Temp</span>
+            <span class="tank-metric-value">16.5°C</span>
+          </div>
+          <div class="tank-status-badge">Fermenting</div>
+        </div>
+
+        <div class="tank-card">
+          <div class="tank-status-indicator"></div>
+          <div class="tank-name">T-03</div>
+          <div class="tank-variety">Cabernet</div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">Brix</span>
+            <span class="tank-metric-value">14.1°</span>
+          </div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">Temp</span>
+            <span class="tank-metric-value">19.8°C</span>
+          </div>
+          <div class="tank-status-badge">Fermenting</div>
+        </div>
+
+        <!-- Racking Tanks -->
+        <div class="tank-card racking">
+          <div class="tank-status-indicator"></div>
+          <div class="tank-name">T-15</div>
+          <div class="tank-variety">Pinot Noir</div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">Brix</span>
+            <span class="tank-metric-value">0.2°</span>
+          </div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">SO₂</span>
+            <span class="tank-metric-value">45 ppm</span>
+          </div>
+          <div class="tank-status-badge">Racking</div>
+        </div>
+
+        <div class="tank-card racking">
+          <div class="tank-status-indicator"></div>
+          <div class="tank-name">T-18</div>
+          <div class="tank-variety">Shiraz</div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">Brix</span>
+            <span class="tank-metric-value">0.1°</span>
+          </div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">SO₂</span>
+            <span class="tank-metric-value">42 ppm</span>
+          </div>
+          <div class="tank-status-badge">Racking</div>
+        </div>
+
+        <!-- Aging Tanks -->
+        <div class="tank-card aging">
+          <div class="tank-status-indicator"></div>
+          <div class="tank-name">T-45</div>
+          <div class="tank-variety">Cabernet</div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">Age</span>
+            <span class="tank-metric-value">28 days</span>
+          </div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">SO₂</span>
+            <span class="tank-metric-value">50 ppm</span>
+          </div>
+          <div class="tank-status-badge">Aging</div>
+        </div>
+
+        <div class="tank-card aging">
+          <div class="tank-status-indicator"></div>
+          <div class="tank-name">T-52</div>
+          <div class="tank-variety">Chardonnay</div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">Age</span>
+            <span class="tank-metric-value">35 days</span>
+          </div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">SO₂</span>
+            <span class="tank-metric-value">48 ppm</span>
+          </div>
+          <div class="tank-status-badge">Aging</div>
+        </div>
+
+        <div class="tank-card aging">
+          <div class="tank-status-indicator"></div>
+          <div class="tank-name">T-67</div>
+          <div class="tank-variety">Shiraz</div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">Age</span>
+            <span class="tank-metric-value">42 days</span>
+          </div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">SO₂</span>
+            <span class="tank-metric-value">52 ppm</span>
+          </div>
+          <div class="tank-status-badge">Aging</div>
+        </div>
+
+        <div class="tank-card complete">
+          <div class="tank-status-indicator"></div>
+          <div class="tank-name">T-88</div>
+          <div class="tank-variety">Pinot Noir</div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">Age</span>
+            <span class="tank-metric-value">56 days</span>
+          </div>
+          <div class="tank-metric">
+            <span class="tank-metric-label">Status</span>
+            <span class="tank-metric-value">Ready</span>
+          </div>
+          <div class="tank-status-badge">Complete</div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-color" style="background: var(--status-fermenting);"></div>
+          <span>Fermenting</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: var(--status-racking);"></div>
+          <span>Racking</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: var(--status-aging);"></div>
+          <span>Aging</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: var(--status-complete);"></div>
+          <span>Complete</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail Panel (Tank T-01 Selected) -->
+    <div class="detail-panel">
+      <div class="detail-header">
+        <div>
+          <h2 class="detail-title">Tank T-01 — 2026 Shiraz</h2>
+          <div class="detail-meta">
+            <span>Started: June 5, 2026 • 14:30</span>
+            <span>Est. Completion: June 18, 2026</span>
+            <span>Volume: 2,400L</span>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 2rem; font-weight: 700; color: var(--ow-amber); font-family: 'Fraunces', serif;">12.4°</div>
+          <div style="font-size: 0.75rem; color: var(--ow-text-lo); text-transform: uppercase; letter-spacing: 0.1em;">Current Brix</div>
+        </div>
+      </div>
+
+      <!-- Metrics Grid -->
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-item-label">Temperature</div>
+          <div class="detail-item-value">18.2°C</div>
+          <div style="font-size: 0.8rem; color: var(--ow-text-lo);">Target: 18–20°C ✓</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-item-label">YAN (Yeast Assimilable Nitrogen)</div>
+          <div class="detail-item-value">185 ppm</div>
+          <div style="font-size: 0.8rem; color: var(--ow-text-lo);">Target: 200 ppm | Next DAP: +2.1 kg</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-item-label">Days Fermenting</div>
+          <div class="detail-item-value">9</div>
+          <div style="font-size: 0.8rem; color: var(--ow-text-lo);">Est. 5 days remaining</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-item-label">Brix Decline Rate</div>
+          <div class="detail-item-value">0.38°/day</div>
+          <div style="font-size: 0.8rem; color: var(--ow-text-lo);">Healthy fermentation pace</div>
+        </div>
+      </div>
+
+      <!-- Event Timeline -->
+      <div style="margin-top: 2rem;">
+        <h3 style="font-size: 0.9rem; font-weight: 600; color: var(--ow-text-hi); margin-bottom: 1rem;">Fermentation Timeline</h3>
+        <div class="detail-timeline">
+          <div class="timeline-item">
+            <div class="timeline-time">14:30</div>
+            <div class="timeline-event">
+              <div class="timeline-event-title">Inoculation</div>
+              <div class="timeline-event-detail">Yeast: EC1118 | Temp: 16°C | Initial Brix: 24.3°</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">18:45</div>
+            <div class="timeline-event">
+              <div class="timeline-event-title">First Punch Down</div>
+              <div class="timeline-event-detail">Cap breaking, fermentation initiated | Temp: 16.8°C</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">+36h</div>
+            <div class="timeline-event">
+              <div class="timeline-event-title">DAP Addition (Phase 1)</div>
+              <div class="timeline-event-detail">2.1 kg added | YAN boosted to 200 ppm | Temp: 17.5°C</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">+72h</div>
+            <div class="timeline-event">
+              <div class="timeline-event-title">Temperature Adjustment</div>
+              <div class="timeline-event-detail">Increased to 18.5°C to accelerate fermentation | Brix: 18.9°</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">+216h</div>
+            <div class="timeline-event">
+              <div class="timeline-event-title">Current Status</div>
+              <div class="timeline-event-detail">Brix: 12.4° | Temp: 18.2°C | On track for completion June 18</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="btn btn-primary">+ Log Entry for T-01</button>
+        <button class="btn btn-secondary">View Full History</button>
+        <button class="btn btn-secondary">Add Note</button>
+      </div>
+    </div>
+
+    <!-- Feature Highlights -->
+    <div style="background: var(--ow-bg-raised); border: 1px solid var(--ow-border); border-radius: 8px; padding: 2rem; margin-top: 2rem;">
+      <h3 style="font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--ow-text-hi);">Why Winemakers Love Ownology's Vintage Log</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+        <div>
+          <h4 style="color: var(--ow-amber); font-weight: 600; margin-bottom: 0.5rem;">⚡ Quick Entry</h4>
+          <p style="font-size: 0.9rem; color: var(--ow-text-lo); line-height: 1.6;">Log fermentation events in seconds with harvest-floor optimized forms. Voice input available for hands-free logging during peak activity.</p>
+        </div>
+        <div>
+          <h4 style="color: var(--ow-amber); font-weight: 600; margin-bottom: 0.5rem;">📊 Real-Time Dashboard</h4>
+          <p style="font-size: 0.9rem; color: var(--ow-text-lo); line-height: 1.6;">Monitor 120+ tanks at a glance. Color-coded status indicators, KPI cards, and alerts keep you informed without information overload.</p>
+        </div>
+        <div>
+          <h4 style="color: var(--ow-amber); font-weight: 600; margin-bottom: 0.5rem;">🧠 Decision Logic</h4>
+          <p style="font-size: 0.9rem; color: var(--ow-text-lo); line-height: 1.6;">Every log entry captures the 'why' behind decisions. Build a searchable library of fermentation decisions tied to final wine quality.</p>
+        </div>
+        <div>
+          <h4 style="color: var(--ow-amber); font-weight: 600; margin-bottom: 0.5rem;">📋 Compliance Ready</h4>
+          <p style="font-size: 0.9rem; color: var(--ow-text-lo); line-height: 1.6;">Automatic SO₂ tracking, YAN calculations, and temperature logs. Export audit-ready reports for organic/biodynamic certification.</p>
+        </div>
+        <div>
+          <h4 style="color: var(--ow-amber); font-weight: 600; margin-bottom: 0.5rem;">🔄 Vintage Intelligence</h4>
+          <p style="font-size: 0.9rem; color: var(--ow-text-lo); line-height: 1.6;">AI-powered analysis correlates fermentation decisions with final wine quality. Learn what works for your house style year over year.</p>
+        </div>
+        <div>
+          <h4 style="color: var(--ow-amber); font-weight: 600; margin-bottom: 0.5rem;">👥 Team Alignment</h4>
+          <p style="font-size: 0.9rem; color: var(--ow-text-lo); line-height: 1.6;">New cellar staff see the full decision context. Reduce training time and ensure consistent execution of house protocols.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
