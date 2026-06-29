@@ -79,6 +79,35 @@ export function useOwnologyTheme() {
     applyThemeToDom(themeId);
   }, []);
 
+  // Cross-instance sync — there are TWO ThemeToggle instances on /home (desktop
+  // nav + floating bottom-right picker). Without this, switching via one
+  // leaves the other displaying a stale label. The `storage` event fires on
+  // other tabs only — so we ALSO listen for our own custom 'ownology:theme'
+  // event dispatched on every select. Belt-and-braces.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    function syncFromStorage() {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (!stored) return;
+      const mapped = LEGACY_MAP[stored] ?? (stored as ThemeId);
+      if (THEMES.some((t) => t.id === mapped) && mapped !== themeId) {
+        setThemeId(mapped);
+      }
+    }
+    function onStorage(e: StorageEvent) {
+      if (e.key === STORAGE_KEY) syncFromStorage();
+    }
+    function onCustom() {
+      syncFromStorage();
+    }
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("ownology:theme", onCustom as EventListener);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("ownology:theme", onCustom as EventListener);
+    };
+  }, [themeId]);
+
   const select = useCallback((id: ThemeId) => {
     // Telemetry must read localStorage BEFORE we persist the new value so
     // the isFirstPick flag is correctly detected on the very first pick.
@@ -88,6 +117,10 @@ export function useOwnologyTheme() {
       window.dispatchEvent(new CustomEvent("ownology:crush", { detail: { themeId: id } }));
     }
     setThemeId(id);
+    // Notify other in-tab picker instances to sync their displayed label
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("ownology:theme", { detail: { themeId: id } }));
+    }
   }, [telemetry]);
 
   // Legacy shim — many existing callers do `const { isLight } = useOwnologyTheme()`
