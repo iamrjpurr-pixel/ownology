@@ -13,17 +13,19 @@ import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 
 const THEME_LABELS: Record<string, string> = {
-  "soft-cellar": "Soft Cellar",
-  "parchment":   "Parchment",
-  "auto":        "Auto",
-  "cellar":      "Cellar Night",
+  "soft-cellar":   "Soft Cellar",
+  "parchment":     "Parchment",
+  "auto":          "Auto",
+  "cellar":        "Cellar Night",
+  "concrete-tank": "Concrete Tank",
 };
 
 const THEME_COLORS: Record<string, string> = {
-  "soft-cellar": "#b45309",
-  "parchment":   "#ca8a04",
-  "auto":        "#7c3aed",
-  "cellar":      "#6b7280",
+  "soft-cellar":   "#b45309",
+  "parchment":     "#ca8a04",
+  "auto":          "#7c3aed",
+  "cellar":        "#6b7280",
+  "concrete-tank": "#475569",
 };
 
 export default function AdminThemesStats() {

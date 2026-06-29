@@ -147,7 +147,41 @@ html.theme-soft-cellar {
   --ow-logo-wordmark: oklch(0.95 0.018 75);
 }
 
-/* ── Smooth theme-switch transition (~250ms) ─────────────────────────────────
+/* ── NEW "Concrete Tank" theme (harsh sunlight / crush-pad bright) ──────────
+   Genuinely different vibe — cool industrial grey-white, near-black text,
+   brand amber dialled DOWN to accent only. For the operator standing in
+   direct sun on the crush pad. Hits WCAG AAA (>14:1 on body copy). Strips
+   the heritage warmth deliberately so you can read at a glance with the
+   sun behind you.
+   Activated by adding `theme-concrete-tank` to <html>. */
+html.theme-concrete-tank {
+  --background: oklch(0.985 0.003 240);
+  --foreground: oklch(0.10 0.005 240);
+  --card: oklch(0.945 0.004 240);
+  --card-foreground: oklch(0.10 0.005 240);
+  --popover: oklch(0.945 0.004 240);
+  --popover-foreground: oklch(0.10 0.005 240);
+  --muted: oklch(0.92 0.005 240);
+  --muted-foreground: oklch(0.36 0.006 240);
+  --border: oklch(0 0 0 / 0.18);
+  --input: oklch(0 0 0 / 0.12);
+
+  --ow-bg-base:   oklch(0.985 0.003 240); /* near-white, fractionally cool */
+  --ow-bg-raised: oklch(0.965 0.004 240);
+  --ow-bg-card:   oklch(0.945 0.004 240); /* cool grey concrete */
+  --ow-bg-inset:  oklch(0.915 0.005 240);
+  --ow-text-hi:   oklch(0.10 0.005 240);   /* near-black with cool tint */
+  --ow-text-mid:  oklch(0.25 0.005 240);   /* dark grey body — AAA contrast */
+  --ow-text-lo:   oklch(0.45 0.004 240);   /* caption grey */
+  --ow-amber:     oklch(0.58 0.16 65);     /* deeper amber to pop on cool bg */
+  --ow-border:    oklch(0 0 0 / 0.16);
+  --ow-border-md: oklch(0 0 0 / 0.26);
+  --ow-shadow:    oklch(0 0 0 / 0.10);
+  --ow-nav-bg:    oklch(0.985 0.003 240 / 95%);
+  --ow-bg-overlay: oklch(0 0 0 / 0.40);
+  --ow-blue:      oklch(0.48 0.13 235);    /* steel blue accent */
+  --ow-logo-wordmark: oklch(0.18 0.005 240);
+}
    When the operator toggles themes via the nav picker, fade the background,
    foreground, and border colours so the change feels intentional, not jarring.
    Applies to ALL elements — performant because transition-property is scoped

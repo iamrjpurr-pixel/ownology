@@ -13,7 +13,7 @@ import { router, publicProcedure, ownerProcedure } from "../trpc.js";
 import { db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
 
-const KNOWN_THEME_IDS = ["soft-cellar", "parchment", "cellar", "auto"] as const;
+const KNOWN_THEME_IDS = ["soft-cellar", "parchment", "cellar", "auto", "concrete-tank"] as const;
 type KnownThemeId = (typeof KNOWN_THEME_IDS)[number];
 
 export const themesRouter = router({

@@ -9,7 +9,7 @@
  * Admin can enable/disable themes via VITE_ENABLED_THEMES env (comma-list
  * of theme ids). Default: all enabled. Empty/missing env = all enabled.
  */
-export type ThemeId = "soft-cellar" | "parchment" | "cellar" | "auto";
+export type ThemeId = "soft-cellar" | "parchment" | "cellar" | "auto" | "concrete-tank";
 
 export type Theme = {
   id: ThemeId;
@@ -35,6 +35,13 @@ export const THEMES: Theme[] = [
     label: "Parchment",
     description: "Warm cream daylight. Best for harvest pad / lab / outdoors / long-form reading.",
     htmlClass: "theme-parchment light-mode",
+    kind: "light",
+  },
+  {
+    id: "concrete-tank",
+    label: "Concrete Tank",
+    description: "Cool industrial grey-white + max contrast. For working in direct sun on the crush pad.",
+    htmlClass: "theme-concrete-tank light-mode",
     kind: "light",
   },
   {
