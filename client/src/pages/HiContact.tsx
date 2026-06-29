@@ -54,11 +54,14 @@ export default function HiContact() {
   }
 
   const calendlyUrl = contact.calendlyUrl || ""; // server resolves override → CALENDLY_DEFAULT_URL → null
-  // Cold prospects need a "what would this look like at scale" visual, not the AI
-  // chat or pitch text. The /sample-vintage-log.html static asset is a polished
-  // 128-tank mockup that lets them imagine their own operation in the product.
-  // Tracked param `from=sms-<slug>` flows through to /admin/funnel attribution.
-  const tryNowHref = `/sample-vintage-log.html?from=sms-${encodeURIComponent(contact.slug)}`;
+  // Sample-vintage-log URL is resolved server-side based on contact.winery /
+  // event — Hunter Valley prospects get a Hunter-themed view, small/cult
+  // labels get a 12-tank boutique view, everyone else gets the 128-tank
+  // default. Falls back to the static asset if older API responses don't
+  // include the field. Funnel attribution via `from=sms-<slug>` is already
+  // baked into the resolved URL.
+  const tryNowHref = contact.sampleVintageLogUrl
+    ?? `/sample-vintage-log.html?from=sms-${encodeURIComponent(contact.slug)}`;
 
   return (
     <div style={wrap} data-testid="hi-page">

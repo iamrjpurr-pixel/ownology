@@ -234,6 +234,18 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 
 - ✅ `/the-press` — narrow batch-focused content, mobile-first design intentional.
 - ✅ `/cellar-tasks` — equipment list, naturally narrow.
+
+**Region/scale variants for `/sample-vintage-log` (28 Jun 2026, this session)**
+- Single HTML file (`/app/client/public/sample-vintage-log.html`) now supports `?variant=hunter|boutique|large` query param. Inline script + 3 datasets swap title, subtitle, 4 KPI numbers, 4 KPI detail lines, and document.title at load. CSS class `body.vw-boutique` hides 3 tank cards (`data-vw-boutique-hide`) so boutique drops from 9 → 6 cards visible. Falls back to "large" if JS disabled or unknown variant.
+- Three datasets baked in:
+  - **`large`** (default): "Vintage Log — 2026 Harvest" · 128 tanks · 47/12/69/3 KPIs
+  - **`hunter`**: "Hunter Valley Estate — 2026 Vintage" · 24 tanks · Semillon & Shiraz country · 8/2/12/1 KPIs · alert text Hunter-flavoured
+  - **`boutique`**: "Boutique Cellar — 2026 Vintage" · 12 tanks · Family-scale single-vineyard · 4/1/6/0 KPIs · "All clear"
+- Backend `outreach.bySlug` now returns `sampleVintageLogUrl` + `sampleVintageLogVariant`. `pickSampleVintageVariant({winery, event})` heuristic — order: Hunter region (region trumps winery name list) → known multi-region large producer → boutique label list → fallback heuristic (winery name ≤14 chars after stripping "Wines/Estate/Cellars/Vineyards" → boutique) → "large".
+- HUNTER_MARKERS includes all known Hunter Valley contacts from the seeded VIVID list (Brokenwood, Tyrrells, Margan, Mount Pleasant, De Iuliis, Thomas Wines, Audrey Wilkinson, Pooles Rock, M+J Becker, Usher Tinkler, Charteris, Majama + region keywords).
+- HiContact.tsx `tryNowHref` now reads `contact.sampleVintageLogUrl` (server-resolved) and falls back gracefully if older API responses don't include it. `from=sms-<slug>` attribution param baked in by the server.
+- Verified live: Nathan/Jane/Sarah/Ollie all resolve to `hunter`; Sally/Tim/Hamish-Mada/Paul/Jared resolve to `boutique`; Bryan-Ravensworth (Canberra) resolves to `large`. Variant pages render correctly (titles, KPIs, boutique tank-card hiding all confirmed via screenshot).
+
 - ✅ `/today` — single-column alert feed, intentionally narrow.
 - 🔴 → ✅ **`/dashboard`** — opted into `wide` (`<WorkModeLayout title="Dashboard" activeTab="more" wide>`). KPI row (`grid-cols-2 md:grid-cols-4`) was being forced into a 430px column → labels wrapped to "Activi Tanks / In Fermen / Approa Bottli". Now renders the proper 4-up grid with full labels + descriptions + Tank Status table's 6 columns at full readability. Mobile pixel-identical to before.
 

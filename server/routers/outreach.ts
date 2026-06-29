@@ -30,11 +30,59 @@ function normaliseMobile(raw: string | undefined | null): string | null {
   return `+${digits}`;
 }
 
+/** Pick which sample-vintage-log variant best matches the prospect.
+ *  Returns one of: "hunter" | "boutique" | "large" (default fallback). */
+type SampleVintageVariant = "hunter" | "boutique" | "large";
+
+// Hunter Valley markers — region names + specific known Hunter wineries.
+// (Most of these are 30-80 tank operations — the "Hunter Estate" mockup
+// fits them better than the 128-tank "large" view.)
+const HUNTER_MARKERS = [
+  "hunter", "broke", "pokolbin", "lovedale", "rothbury", "cessnock",
+  "brokenwood", "tyrrell", "margan", "mount pleasant", "de iuliis",
+  "thomas wines", "audrey wilkinson", "pooles rock", "m+j becker",
+  "usher tinkler", "charteris", "majama",
+];
+
+// Only TRULY large multi-region producers go here — used to pin them to
+// the 128-tank view regardless of region. Empty for now; most Australian
+// indie + boutique winemakers see boutique or hunter views.
+const LARGE_PRODUCER_MARKERS = [
+  "treasury", "accolade", "pernod", "casella", "yalumba", "de bortoli",
+];
+
+// Explicit indie/cult labels — single-vineyard, side-projects, no scale.
+const BOUTIQUE_NAME_MARKERS = [
+  "ur 1st luv", "château acid", "chateau acid", "pride of lunatics",
+  "hopeless thoughtful", "jilly", "frankly", "sabi wabi", "balmy nights",
+  "tim ward", "toppers mountain", "sassafras",
+];
+
+function pickSampleVintageVariant(input: {
+  winery: string | null;
+  event: string | null;
+}): SampleVintageVariant {
+  const haystack = `${input.winery ?? ""} ${input.event ?? ""}`.toLowerCase();
+  if (!haystack.trim()) return "large";
+  // Order matters: region trumps name (a Hunter producer that happens to
+  // also be in a "large" or "boutique" list still gets Hunter).
+  if (HUNTER_MARKERS.some((m) => haystack.includes(m))) return "hunter";
+  if (LARGE_PRODUCER_MARKERS.some((m) => haystack.includes(m))) return "large";
+  if (BOUTIQUE_NAME_MARKERS.some((m) => haystack.includes(m))) return "boutique";
+  // Fallback heuristic: a short single-name winery (≤ 14 chars after
+  // stripping "Wines/Estate/Cellars/Vineyards") tends to be a small indie
+  // brand. Bigger established names rarely fit that profile.
+  const wineryNorm = (input.winery ?? "").toLowerCase().replace(/\b(wines?|estate|cellars?|vineyards?)\b/g, "").trim();
+  if (wineryNorm.length > 0 && wineryNorm.length <= 14) return "boutique";
+  return "large";
+}
+
 export const outreachRouter = router({
   /** PUBLIC — fetch a single contact by slug for the /hi/:slug page.
-   *  Resolves the Calendly URL on the server: per-contact override wins,
-   *  else falls back to CALENDLY_DEFAULT_URL env. Frontend just renders
-   *  whatever `calendlyUrl` is returned (null = no booking CTA). */
+   *  Resolves on the server:
+   *    - calendlyUrl: per-contact override → CALENDLY_DEFAULT_URL → null
+   *    - sampleVintageLogUrl: variant-tagged URL chosen by event+winery text
+   *      (hunter | boutique | large fallback). Frontend just renders. */
   bySlug: publicProcedure
     .input(z.object({ slug: z.string().min(1).max(80) }))
     .query(async ({ input }) => {
@@ -54,7 +102,9 @@ export const outreachRouter = router({
       if (!row) return null;
       const defaultCalendly = process.env.CALENDLY_DEFAULT_URL?.trim() || null;
       const calendlyUrl = row.calendlyOverride?.trim() || defaultCalendly || null;
-      return { ...row, calendlyUrl };
+      const variant = pickSampleVintageVariant({ winery: row.winery, event: row.event });
+      const sampleVintageLogUrl = `/sample-vintage-log.html?variant=${variant}&from=sms-${encodeURIComponent(row.slug)}`;
+      return { ...row, calendlyUrl, sampleVintageLogUrl, sampleVintageLogVariant: variant };
     }),
 
   /** PUBLIC — mark a slug as viewed (called once on landing-page mount). */

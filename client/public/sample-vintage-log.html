@@ -545,31 +545,31 @@
   <main>
     <!-- Dashboard Header -->
     <div class="dashboard-header">
-      <h1 class="dashboard-title">Vintage Log — 2026 Harvest</h1>
-      <p class="dashboard-subtitle">Real-time fermentation monitoring across 128 tanks | Last updated 2 minutes ago</p>
+      <h1 class="dashboard-title" data-vw="title">Vintage Log — 2026 Harvest</h1>
+      <p class="dashboard-subtitle" data-vw="subtitle">Real-time fermentation monitoring across 128 tanks | Last updated 2 minutes ago</p>
     </div>
 
     <!-- KPI Cards -->
     <div class="kpi-row">
       <div class="kpi-card">
         <div class="kpi-label">Active Fermentations</div>
-        <div class="kpi-value">47</div>
-        <div class="kpi-detail">Avg Brix: 8.2° | Avg YAN: 185 ppm</div>
+        <div class="kpi-value" data-vw="kpi1">47</div>
+        <div class="kpi-detail" data-vw="kpi1d">Avg Brix: 8.2° | Avg YAN: 185 ppm</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Racking in Progress</div>
-        <div class="kpi-value">12</div>
-        <div class="kpi-detail">Est. completion: 18:30 today</div>
+        <div class="kpi-value" data-vw="kpi2">12</div>
+        <div class="kpi-detail" data-vw="kpi2d">Est. completion: 18:30 today</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Aging / Settled</div>
-        <div class="kpi-value">69</div>
-        <div class="kpi-detail">Avg age: 14 days | SO₂ scheduled: 8 tanks</div>
+        <div class="kpi-value" data-vw="kpi3">69</div>
+        <div class="kpi-detail" data-vw="kpi3d">Avg age: 14 days | SO₂ scheduled: 8 tanks</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Alerts & Actions</div>
-        <div class="kpi-value">3</div>
-        <div class="kpi-detail">Tank T-47: DAP due | Tank T-89: Temp high</div>
+        <div class="kpi-value" data-vw="kpi4">3</div>
+        <div class="kpi-detail" data-vw="kpi4d">Tank T-47: DAP due | Tank T-89: Temp high</div>
       </div>
     </div>
 
@@ -676,7 +676,7 @@
           <div class="tank-status-badge">Aging</div>
         </div>
 
-        <div class="tank-card aging">
+        <div class="tank-card aging" data-vw-boutique-hide>
           <div class="tank-status-indicator"></div>
           <div class="tank-name">T-52</div>
           <div class="tank-variety">Chardonnay</div>
@@ -691,7 +691,7 @@
           <div class="tank-status-badge">Aging</div>
         </div>
 
-        <div class="tank-card aging">
+        <div class="tank-card aging" data-vw-boutique-hide>
           <div class="tank-status-indicator"></div>
           <div class="tank-name">T-67</div>
           <div class="tank-variety">Shiraz</div>
@@ -706,7 +706,7 @@
           <div class="tank-status-badge">Aging</div>
         </div>
 
-        <div class="tank-card complete">
+        <div class="tank-card complete" data-vw-boutique-hide>
           <div class="tank-status-indicator"></div>
           <div class="tank-name">T-88</div>
           <div class="tank-variety">Pinot Noir</div>
@@ -865,5 +865,60 @@
       </div>
     </div>
   </main>
+
+  <!-- ─────────────────────────────────────────────────────────────────────
+       Variant swap script.
+       Reads ?variant=hunter|boutique|large from the URL and overrides the
+       static "large" default with region/scale-appropriate copy + KPIs.
+       Falls back to the static markup if JS is disabled or variant unknown,
+       so the page is always presentable.
+       Used by /hi/:slug to render a contextually-matched marketing demo:
+         - Hunter-tagged event/winery → ?variant=hunter (24-tank Hunter Estate)
+         - Single-name/boutique winery → ?variant=boutique (12-tank family scale)
+         - Everyone else              → ?variant=large (128-tank default)
+       ───────────────────────────────────────────────────────────────────── -->
+  <style>
+    body.vw-boutique [data-vw-boutique-hide] { display: none !important; }
+  </style>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var variant = (params.get("variant") || "large").toLowerCase();
+      var DATA = {
+        large: {
+          title: "Vintage Log — 2026 Harvest",
+          subtitle: "Real-time fermentation monitoring across 128 tanks  ·  Last updated 2 minutes ago",
+          kpi1: "47", kpi1d: "Avg Brix: 8.2°  |  Avg YAN: 185 ppm",
+          kpi2: "12", kpi2d: "Est. completion: 18:30 today",
+          kpi3: "69", kpi3d: "Avg age: 14 days  |  SO₂ scheduled: 8 tanks",
+          kpi4: "3",  kpi4d: "Tank T-47: DAP due  |  Tank T-89: Temp high"
+        },
+        hunter: {
+          title: "Hunter Valley Estate — 2026 Vintage",
+          subtitle: "Real-time monitoring across 24 tanks  ·  Semillon & Shiraz country  ·  Last updated 4 minutes ago",
+          kpi1: "8",  kpi1d: "Avg Brix: 9.4°  |  Avg YAN: 195 ppm",
+          kpi2: "2",  kpi2d: "Est. completion: 17:00 today",
+          kpi3: "12", kpi3d: "Avg age: 11 days  |  SO₂ scheduled: 2 tanks",
+          kpi4: "1",  kpi4d: "Tank T-03 (Semillon): verify YAN before dawn"
+        },
+        boutique: {
+          title: "Boutique Cellar — 2026 Vintage",
+          subtitle: "Real-time monitoring across 12 tanks  ·  Family-scale single-vineyard  ·  Last updated just now",
+          kpi1: "4",  kpi1d: "Avg Brix: 7.8°  |  Avg YAN: 175 ppm",
+          kpi2: "1",  kpi2d: "Est. completion: 16:30 today",
+          kpi3: "6",  kpi3d: "Avg age: 12 days  |  SO₂ scheduled: 1 tank",
+          kpi4: "0",  kpi4d: "All clear — nothing flagged today"
+        }
+      };
+      var data = DATA[variant] || DATA.large;
+      document.body.classList.add("vw-" + (DATA[variant] ? variant : "large"));
+      // Also update the document title so browser tab + share previews match
+      if (data.title) document.title = data.title + " · Ownology";
+      Object.keys(data).forEach(function (key) {
+        var el = document.querySelector('[data-vw="' + key + '"]');
+        if (el) el.textContent = data[key];
+      });
+    })();
+  </script>
 </body>
 </html>
