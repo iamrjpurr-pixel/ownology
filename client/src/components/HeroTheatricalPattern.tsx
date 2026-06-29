@@ -2,7 +2,7 @@
  * HeroTheatricalPattern — persistent ambient overlay for marketing heroes.
  *
  * Compounds the wow-factor of the CrushCascade one-shot animation by giving
- * marketing heroes a quiet, always-on "juice trail" pattern: 6 vertical
+ * marketing heroes a quiet, always-on "juice trail" pattern: 7 vertical
  * stripes of translucent amber (or pink/green when a crush theme is active)
  * drift slowly down the hero at different speeds, like fermenting must
  * running down a tank wall. Pure CSS — no JS animation loop, no perf hit.
@@ -16,8 +16,10 @@
  * Respects prefers-reduced-motion (stripes go static at low opacity).
  * Theme-aware: reads `--ow-accent-live` so red-crush → wine-rose stripes,
  * white-crush → grape-green stripes, otherwise → amber.
+ * Blend mode auto-flips between `screen` (dark heroes) and `multiply`
+ * (light heroes like parchment) so the pattern stays visible on both.
  */
-import { useId } from "react";
+import { useEffect, useId, useState } from "react";
 
 interface HeroTheatricalPatternProps {
   /** Higher = more visible. Default 0.18 keeps it ambient. */
@@ -48,6 +50,28 @@ export default function HeroTheatricalPattern({
   const id = useId().replace(/[:]/g, "");
   const keyframe = `htpDrip_${id}`;
 
+  // Auto-flip blend mode: screen looks great over dark heroes (cellar photo),
+  // but disappears on light themes like parchment. Use multiply when the html
+  // element is in a known light theme.
+  const [blendMode, setBlendMode] = useState<"screen" | "multiply">("screen");
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const isLight = () => {
+      const cl = document.documentElement.classList;
+      return (
+        cl.contains("theme-parchment") ||
+        cl.contains("theme-red-crush") ||
+        cl.contains("theme-white-crush") ||
+        cl.contains("light-mode")
+      );
+    };
+    const compute = () => setBlendMode(isLight() ? "multiply" : "screen");
+    compute();
+    const obs = new MutationObserver(compute);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => obs.disconnect();
+  }, []);
+
   return (
     <div
       data-testid="hero-theatrical-pattern"
@@ -58,7 +82,7 @@ export default function HeroTheatricalPattern({
         overflow: "hidden",
         pointerEvents: "none",
         zIndex,
-        mixBlendMode: "screen",
+        mixBlendMode: blendMode,
       }}
     >
       {STRIPES.map((s, i) => (
@@ -92,7 +116,7 @@ export default function HeroTheatricalPattern({
           inset: 0,
           background:
             "radial-gradient(ellipse 60% 50% at 25% 30%, color-mix(in oklch, var(--ow-accent-live, var(--ow-amber)) 12%, transparent) 0%, transparent 70%)",
-          mixBlendMode: "screen",
+          mixBlendMode: blendMode,
         }}
       />
 

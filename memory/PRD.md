@@ -316,19 +316,25 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 - **Polish applied**: removed dead-code ternary, made `userId: number | null = null` explicit, kept `KNOWN_SOURCES` as documentation-only.
 
 **Friendly Free-Tier Paused UX → Sales Funnel (28 Jun 2026, this session)**
+- When free-tier LLM budget is exhausted, `freeRun.curiosityAsk` returns a structured `paused` payload (questions not charged, message not persisted), and `/free-run` renders an amber "Daily AI Budget Reached" card with a Premium upsell CTA. Direct conversion driver — the guard-rail doubles as a sales funnel.
 
-**Red Crush + White Crush themes + theatrical cascade (28 Jun 2026, this session)**
-- Replaced the proposed "Concrete Tank" / "Crush Pad" experiments with TWO genuinely-different harvest-themed light themes:
-  - **🍇 Red Crush** — pure white + near-black + rose-pink `--ow-accent-live` (the pink of Pinot juice on the press)
-  - **🍏 White Crush** — pure white + near-black + apple-green `--ow-accent-live` (the green of Chardonnay fresh off the picker)
-- Both follow Google's outdoor-productivity ergonomics: 19:1 black-on-white contrast, stronger 0.20 borders so edges survive sun-glare, font-weights bumped (h1=800, h2/h3/strong=700) to add the "redundancy beyond colour" Google calls for.
-- Amber retained as brand backbone in both — operators still recognise Ownology. Pink/green are the 5-10% slice for "live/active" things (signals, badges, fresh-event pills). Defined via a new `--ow-accent-live` + `--ow-accent-live-soft` token. Falls back to amber in non-crush themes via `:root` defaults so components are safe.
-- **CrushCascade component** (`/app/client/src/components/CrushCascade.tsx`) — theatrical 1300ms juice-wave animation triggered ONLY when switching INTO `red-crush` or `white-crush`. Deep colour washes down from above with a translucent trailing edge, drains off the bottom. Centred caption fades in with emoji + label + italic story line ("Pink of Pinot juice on the press" / "Apple-green of Chardonnay fresh off the picker"). Pure CSS keyframes, scoped inline. Respects `prefers-reduced-motion`.
-- Mounted globally in `App.tsx` next to `<ThemeOnboarding />`. Triggered via `window.dispatchEvent(new CustomEvent('ownology:crush', {detail:{themeId}}))` from `ThemeToggle.select()` and `ThemeOnboarding.choose()` — only fires for the two crush themes.
-- Updated everywhere: theme registry (`themes.ts`), telemetry zod enum (`server/routers/themes.ts`), admin stats labels/colours (`AdminThemesStats.tsx`).
-- Verified live: both cascades captured mid-flight with juice-wave + caption rendering perfectly. Red Crush in deep wine-rose, White Crush in grape-green.
+**Red Crush + White Crush themes + theatrical cascade (28 Jun 2026)**
+- Two harvest-themed light themes: 🍇 Red Crush (rose-pink `--ow-accent-live`) and 🍏 White Crush (apple-green). 19:1 contrast, stronger borders for sun-glare survival.
+- `CrushCascade` component fires a 1700ms juice-wave animation only when switching INTO red-crush/white-crush. Deep colour washes down with caption ("Pink of Pinot juice on the press" / "Apple-green of Chardonnay fresh off the picker"). Pure CSS, scoped inline. Respects `prefers-reduced-motion`.
 
-- When free-tier LLM budget is exhausted, `freeRun.curiosityAsk` now:
+**Cascade hardening + Theatrical hero pattern (29 Jun 2026, this session)**
+- **Bug fix**: User reported cascade not visible after Git push. Cascade was working in Emergent preview but likely missed on Railway deploy. Three robustness fixes shipped to `/app/client/src/components/CrushCascade.tsx`:
+  1. **MutationObserver fallback** — watches `<html>.classList` for `theme-red-crush`/`theme-white-crush` additions. Fires cascade even if the `ownology:crush` CustomEvent was somehow missed (defensive against build-time tree-shaking, race conditions, or programmatic theme changes that bypass the picker).
+  2. **Page-load suppression** — `initialClasses` Set pre-populated from `localStorage.ownology-theme` at component mount, so the initial `applyThemeToDom` running in a later `useEffect` does NOT false-trigger a cascade when a returning visitor lands with a crush theme already stored.
+  3. **De-dup cooldown** — 400ms cooldown + `lastFiredId` ref prevents event + observer racing into double-fire. Duration bumped 1300→1700ms for better visibility. zIndex 9999→99999 against any overlay collision.
+- **New `<HeroTheatricalPattern />` component** (`/app/client/src/components/HeroTheatricalPattern.tsx`, ~115 LOC) — persistent ambient overlay for marketing heroes. 7 vertical translucent stripes (CSS-only infinite keyframe loop) drift slowly down the hero at different speeds/delays, like fermenting must running down a tank wall. Pure CSS animation — no JS hot path.
+  - **Theme-reactive**: reads `--ow-accent-live` (falls back to `--ow-amber`) so stripes auto-recolour to rose-pink on red-crush, grape-green on white-crush, amber otherwise.
+  - **Blend-mode auto-flip**: MutationObserver detects light vs dark theme on `<html>` and switches `mixBlendMode` between `screen` (dark cellar bg) and `multiply` (parchment cream bg) so the pattern stays visible on both.
+  - **Pointer-events:none + zIndex:1**: never blocks hero CTAs. Content sits above at z-10.
+  - **Reduced-motion safe**: stripes go static at 0.4 opacity when `prefers-reduced-motion: reduce`.
+- **Wired into 3 marketing heroes**: `/home` (Home.tsx Hero), `/why-ownology` (WhyOwnology.tsx Hero), `/competitive-advantage` (CompetitiveAdvantage.tsx Hero).
+- Verified live (iter 15, 16/16 frontend checkpoints, 0 critical): cascade fires via picker + via MutationObserver fallback + does NOT fire on page load with stored crush theme + de-dup works on rapid red→white swap. Pattern renders on all 3 pages, recolours on theme switch, blend mode flips correctly between parchment and dark themes.
+
   1. **Doesn't charge a question** against the user's daily 3/3 quota (free user not punished for an outage)
   2. **Doesn't persist the synthetic message** to the Cellar Journal
   3. **Returns a structured payload** `{ paused: true, pausedTier, pausedMessage, retryAt, questionsUsed, questionsTotal }` so the UI can render the right state
