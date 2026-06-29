@@ -1,0 +1,109 @@
+{
+  "theme_archetype": "Hybrid: Luxury (Dark Theme) + Organic & Earthy (Light Theme)",
+  "colors": {
+    "revised_dark_mode_css_variables": {
+      "--ow-bg-base": "oklch(0.18 0.015 60)",
+      "--ow-bg-raised": "oklch(0.21 0.015 60)",
+      "--ow-bg-card": "oklch(0.24 0.015 60)",
+      "--ow-bg-inset": "oklch(0.28 0.015 60)",
+      "--ow-text-hi": "oklch(0.95 0.018 75)",
+      "--ow-text-mid": "oklch(0.84 0.015 75)",
+      "--ow-text-lo": "oklch(0.70 0.015 75)",
+      "--ow-amber": "oklch(0.72 0.12 75)",
+      "--ow-border": "oklch(0.84 0.015 75 / 0.15)"
+    },
+    "justification": "Lifted the base background from a harsh, polarizing near-black (0.11 lightness) to a softer, warmer deep umber/charcoal (0.18 lightness). Boosted the mid-text from 0.68 to 0.84 lightness. This significantly warms up the dark mode, reduces astigmatism-induced 'haloing', and drastically improves reading comfort without losing the moody cellar aesthetic."
+  },
+  "theatrical_hero_pattern": {
+    "strategy": "Section-by-Section Theme Scoping with a CSS Gradient Bridge",
+    "css_approach": "Do not rewrite the app. Simply wrap your <header> and #hero section in a div/section with a `.dark` (or `[data-theme='dark']`) class to force the dark CSS variables natively. Immediately following the hero, add a transition block: `<div class=\"h-32 w-full bg-gradient-to-b from-[var(--ow-bg-base)] to-[#f6f5f3]\"></div>` (using your exact light base hex equivalent). The remaining page content sits in a container explicitly set to light theme. This relies purely on your existing CSS custom property scoping.",
+    "benefits": "Zero scroll-jacking, no complex JS intersection observers, highly performant, and completely frees users from reading long body copy in dark mode while keeping the 5-second 'brand wow' at the top."
+  },
+  "page_by_page_recommendation": [
+    {
+      "route": "/",
+      "type": "Marketing",
+      "theme": "Hero-Dark-then-Light",
+      "justification": "Sets the 'brand wow' hook immediately, but drops into the warm, readable parchment for the long explanatory copy."
+    },
+    {
+      "route": "/why-ownology",
+      "type": "Marketing",
+      "theme": "Hero-Dark-then-Light",
+      "justification": "Maintains marketing consistency. Dark hero establishes authority; light body ensures comprehension."
+    },
+    {
+      "route": "/pricing",
+      "type": "Marketing",
+      "theme": "Hero-Dark-then-Light",
+      "justification": "Dark hero for the value prop, but the actual pricing cards and feature lists should sit in the light section for absolute clarity and conversion optimization."
+    },
+    {
+      "route": "/founding-member",
+      "type": "Marketing",
+      "theme": "Hero-Dark-then-Light",
+      "justification": "Same pattern. Establishes premium exclusivity up top, readable details below."
+    },
+    {
+      "route": "/cellar-journal/*",
+      "type": "Content",
+      "theme": "Light",
+      "justification": "Long-form reading must prioritize ergonomics. Stick to the light parchment theme entirely. Dark mode long-form creates high cognitive load."
+    },
+    {
+      "route": "/free-run",
+      "type": "AI Chat",
+      "theme": "Light",
+      "justification": "Chat involves intensive reading of paragraph-length AI responses. Default to light for cognitive ease (the user specifically complained about this page)."
+    },
+    {
+      "route": "/admin/*",
+      "type": "Dashboard",
+      "theme": "Revised Dark",
+      "justification": "Data-dense interfaces (pipelines, funnels) benefit from dark mode to reduce eye strain. The new, softer revised dark mode provides the necessary contrast without the polarizing pure-black harshness."
+    },
+    {
+      "route": "/hi/:slug",
+      "type": "SMS Landing",
+      "theme": "Dark",
+      "justification": "Short, highly theatrical, single-screen experience. The user is in and out in 15 seconds. Maximize the 'wow' factor here."
+    },
+    {
+      "route": "/sample-vintage-log",
+      "type": "Sample Dashboard",
+      "theme": "Revised Dark",
+      "justification": "Perfect testbed for the revised dark mode. Data-dense and technical."
+    }
+  ],
+  "industry_standard_references": [
+    {
+      "name": "Apple (iPhone Pro Marketing Pages)",
+      "url": "https://www.apple.com/iphone-15-pro/",
+      "note": "Masters of the 'theatrical dark hero'. The page loads in complete blackness to show off the hardware (the 'wow'), then cross-fades or hard-cuts into white/light gray backgrounds for dense technical spec reading."
+    },
+    {
+      "name": "Stripe (Press/Newsroom)",
+      "url": "https://stripe.com/newsroom",
+      "note": "Uses stark, dramatic dark headers that smoothly transition into highly legible, crisp light-themed article bodies."
+    },
+    {
+      "name": "Linear",
+      "url": "https://linear.app",
+      "note": "The gold standard for a highly readable, non-polarizing dark mode. Their dark mode isn't pure black; it's a soft, elevated dark gray that prevents eye strain—exactly what we are achieving with the revised `--ow-bg-base`."
+    }
+  ],
+  "wine_cellar_heritage_lever": {
+    "texture": "Implement a very subtle SVG noise/grain overlay (opacity: 0.03 to 0.05) exclusively on the dark background surfaces. This breaks the 'digital flatness' and subtly simulates the organic, imperfect texture of aged cork, paper, or a concrete tank.",
+    "typography": "Use the 'Fraunces' serif strictly for H1/H2s, taking advantage of its optical sizing. Use Fraunces italics for specific accents (e.g., italicizing conjunctions like 'and'/'or', or key nouns) to mimic a vintner's handwritten logs.",
+    "brand_amber": "Treat `--ow-amber` as a precious resource. Do not use it for large background blocks. Use it as an accent laser—e.g., a 1px top border on a card, the active state ring of an input, or a single glowing dot indicator. This constraint makes it feel luxurious and 'heritage'."
+  },
+  "accessibility_check": {
+    "text_mid_vs_bg_base": {
+      "background_l": "0.18",
+      "text_l": "0.84",
+      "contrast_status": "Passes WCAG AA (and AAA in most contexts)",
+      "details": "The perceived lightness difference between 18% and 84% provides a contrast ratio well above the 4.5:1 requirement for normal text. It effectively sits around 8.5:1, offering crystal-clear legibility without the 'vibrating' astigmatism effect of pure white on pure black."
+    }
+  },
+  "instructions_to_main_agent": "1. Replace the existing dark-mode variables in `/app/client/src/index.css` with the revised ones provided here. 2. For the marketing pages (`/`, `/pricing`, `/why-ownology`), wrap the hero section in a theme override (e.g., `.dark` class) and the rest of the content in `.light`. 3. Add the CSS gradient transition block between them. 4. Ensure `/free-run` defaults strictly to the light theme."
+}
