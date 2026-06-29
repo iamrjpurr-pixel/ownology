@@ -1148,6 +1148,10 @@ export const outreachContacts = mysqlTable(
     // view to derive the "Replied" column.
     repliedAt: bigint("replied_at", { mode: "number" }),
     notes: varchar("notes", { length: 500 }),
+    // Per-contact SMS draft override. When null, AdminContacts.tsx falls
+    // back to the auto-generated template (smsDraft() helper). Set when
+    // the operator hand-edits the message for a specific person.
+    smsDraftOverride: varchar("sms_draft_override", { length: 500 }),
     // Triage state — warm = had a real conversation, lukewarm = brief positive,
     // cold = just collected card, sales = vendor/rep not a winemaker, skip = ignore
     status: varchar("status", { length: 16 }).notNull().default("cold"),

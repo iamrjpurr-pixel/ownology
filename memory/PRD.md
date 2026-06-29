@@ -211,6 +211,19 @@
 
 **Work-Mode Desktop Layout Audit (28 Jun 2026, this session)**
 After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept every page rendered inside `WorkModeLayout` at 1920×1080:
+
+**Per-contact SMS draft editor (28 Jun 2026, this session)**
+- New `sms_draft_override varchar(500)` column on `outreach_contacts` (raw SQL migration `scripts/add-outreach-sms-override.mjs`).
+- New `outreach.setSmsDraft({slug, draft})` ownerProcedure — accepts null/empty to clear, atomic write.
+- `/admin/contacts` row UI: read-only `<details><pre>` SMS preview replaced with an inline `SmsDraftEditor` component (`AdminContacts.tsx`). Features:
+  - Editable `<textarea>` pre-filled from `smsDraftOverride ?? smsDraft(template)`
+  - Live character count + SMS segment indicator (`147 chars · 1 SMS` / amber border when ≥160 / red badge when >160)
+  - Auto-saves on blur. Visual states: dirty (amber border + "Click outside to save"), saved (green "✓ Saved"), reverted ("↺ Reverted to template")
+  - **CUSTOM** amber badge in the section header when an override is active
+  - "Reset to template" link clears the override; if the textarea exactly matches the auto-generated template it also auto-clears (so future template edits propagate)
+- `Copy SMS draft` button now copies the effective draft (override if set, else template).
+- Operator workflow change: phone the prospect first → tweak each SMS to match the call context ("thanks for the chat" vs "tried to ring") → copy + send from real iPhone → mark sent.
+
 - ✅ `/compliance` — already standalone (not in WorkModeLayout), full-width, no fix needed.
 - ✅ `/the-press` — narrow batch-focused content, mobile-first design intentional.
 - ✅ `/cellar-tasks` — equipment list, naturally narrow.

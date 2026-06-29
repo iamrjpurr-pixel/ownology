@@ -142,6 +142,24 @@ export const outreachRouter = router({
       return { ok: true };
     }),
 
+  /** OWNER — set/clear a per-contact SMS override. Pass null or empty
+   *  string to revert back to the auto-generated template. */
+  setSmsDraft: ownerProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+        draft: z.string().max(500).nullable(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const value = input.draft && input.draft.trim().length > 0 ? input.draft.trim() : null;
+      await db
+        .update(schema.outreachContacts)
+        .set({ smsDraftOverride: value })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true, cleared: value === null };
+    }),
+
   /** OWNER — drag-and-drop pipeline stage transition. Sets the canonical
    *  timestamps in one atomic write so the derived board view stays
    *  consistent. Stages:

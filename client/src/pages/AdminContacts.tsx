@@ -53,6 +53,7 @@ export default function AdminContacts() {
   const markSmsSentMutation = trpc.outreach.markSmsSent.useMutation();
   const markBookedMutation = trpc.outreach.markBooked.useMutation();
   const setStatusMutation = trpc.outreach.setStatus.useMutation();
+  const setSmsDraftMutation = trpc.outreach.setSmsDraft.useMutation();
   const removeMutation = trpc.outreach.remove.useMutation();
 
   const [form, setForm] = useState({
@@ -234,7 +235,8 @@ export default function AdminContacts() {
       <div className="flex flex-col gap-3">
         {contacts.map((c) => {
           const url = `${PREVIEW_BASE}/hi/${c.slug}`;
-          const sms = smsDraft({ firstName: c.firstName, winery: c.winery, event: c.event, painPoint: c.painPoint, slug: c.slug });
+          const templateSms = smsDraft({ firstName: c.firstName, winery: c.winery, event: c.event, painPoint: c.painPoint, slug: c.slug });
+          const effectiveSms = c.smsDraftOverride ?? templateSms;
           const copied = copyState[c.slug];
           const status = ((c.status ?? "cold") as ContactStatus);
           const meta = STATUS_META[status] ?? STATUS_META.cold;
@@ -309,7 +311,7 @@ export default function AdminContacts() {
                   </button>
                   <button
                     data-testid={`copy-sms-${c.slug}`}
-                    onClick={() => copy(c.slug, "sms", sms)}
+                    onClick={() => copy(c.slug, "sms", effectiveSms)}
                     style={{ ...btn, background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", fontWeight: 700 }}
                   >
                     {copied === "sms" ? "✓ SMS copied" : "Copy SMS draft"}
@@ -349,26 +351,17 @@ export default function AdminContacts() {
                 </div>
               )}
               {!isSilent && (
-                <details style={{ marginTop: 10 }}>
-                  <summary style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)", cursor: "pointer" }}>
-                    Show SMS draft preview
-                  </summary>
-                  <pre
-                    style={{
-                      marginTop: 8,
-                      padding: 10,
-                      background: "color-mix(in oklch, var(--ow-amber) 4%, transparent)",
-                      border: "1px solid var(--ow-border)",
-                      borderRadius: 4,
-                      fontFamily: "'Fira Code',monospace",
-                      fontSize: "0.78rem",
-                      color: "var(--ow-text-hi)",
-                      whiteSpace: "pre-wrap",
-                    }}
-                  >
-                    {sms}
-                  </pre>
-                </details>
+                <SmsDraftEditor
+                  slug={c.slug}
+                  templateSms={templateSms}
+                  override={c.smsDraftOverride ?? null}
+                  onSave={(draft) =>
+                    setSmsDraftMutation.mutate(
+                      { slug: c.slug, draft },
+                      { onSuccess: () => utils.outreach.list.invalidate() }
+                    )
+                  }
+                />
               )}
             </div>
           );
@@ -408,6 +401,135 @@ function Field({ label, value, onChange, testid, placeholder }: { label: string;
         }}
       />
     </label>
+  );
+}
+
+function SmsDraftEditor({
+  slug,
+  templateSms,
+  override,
+  onSave,
+}: {
+  slug: string;
+  templateSms: string;
+  override: string | null;
+  onSave: (draft: string | null) => void;
+}) {
+  const [value, setValue] = useState<string>(override ?? templateSms);
+  const [savedHint, setSavedHint] = useState<"saved" | "reset" | null>(null);
+  const isOverride = override !== null && override.length > 0;
+  const dirty = value !== (override ?? templateSms);
+
+  function handleBlur() {
+    if (!dirty) return;
+    const trimmed = value.trim();
+    // Treat "same as template" as a reset (clears override so future
+    // template changes auto-apply to this contact).
+    if (trimmed === templateSms.trim()) {
+      onSave(null);
+      setSavedHint("reset");
+    } else {
+      onSave(trimmed.length > 0 ? trimmed : null);
+      setSavedHint(trimmed.length > 0 ? "saved" : "reset");
+    }
+    setTimeout(() => setSavedHint(null), 2200);
+  }
+
+  function handleReset() {
+    setValue(templateSms);
+    onSave(null);
+    setSavedHint("reset");
+    setTimeout(() => setSavedHint(null), 2200);
+  }
+
+  return (
+    <div data-testid={`sms-editor-${slug}`} style={{ marginTop: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+        <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "var(--ow-text-lo)", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+          SMS Draft
+        </span>
+        {isOverride && (
+          <span
+            data-testid={`sms-editor-badge-${slug}`}
+            style={{
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.65rem",
+              padding: "1px 6px",
+              borderRadius: 8,
+              background: "var(--ow-amber)",
+              color: "oklch(0.10 0.008 60)",
+              fontWeight: 700,
+              letterSpacing: "0.03em",
+              textTransform: "uppercase",
+            }}
+          >
+            Custom
+          </span>
+        )}
+        <span style={{ flexGrow: 1 }} />
+        <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.68rem", color: value.length > 160 ? "#dc2626" : "var(--ow-text-lo)" }}>
+          {value.length} chars · {value.length <= 160 ? "1 SMS" : value.length <= 306 ? "2 SMS" : `${Math.ceil(value.length / 153)} SMS`}
+        </span>
+      </div>
+      <textarea
+        data-testid={`sms-editor-input-${slug}`}
+        value={value}
+        onChange={(e) => setValue(e.target.value.slice(0, 500))}
+        onBlur={handleBlur}
+        rows={4}
+        style={{
+          width: "100%",
+          padding: 10,
+          background: "color-mix(in oklch, var(--ow-amber) 4%, transparent)",
+          border: `1px solid ${dirty ? "var(--ow-amber)" : "var(--ow-border)"}`,
+          borderRadius: 4,
+          fontFamily: "'Fira Code',monospace",
+          fontSize: "0.78rem",
+          color: "var(--ow-text-hi)",
+          lineHeight: 1.5,
+          resize: "vertical",
+          outline: "none",
+          transition: "border-color 120ms ease",
+        }}
+      />
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
+        {isOverride && (
+          <button
+            type="button"
+            data-testid={`sms-editor-reset-${slug}`}
+            onClick={handleReset}
+            style={{
+              background: "transparent",
+              border: "none",
+              padding: 0,
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.72rem",
+              color: "var(--ow-text-lo)",
+              cursor: "pointer",
+              textDecoration: "underline",
+            }}
+          >
+            Reset to template
+          </button>
+        )}
+        <span style={{ flexGrow: 1 }} />
+        {savedHint === "saved" && (
+          <span data-testid={`sms-editor-saved-${slug}`} style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "#10b981" }}>
+            ✓ Saved
+          </span>
+        )}
+        {savedHint === "reset" && (
+          <span data-testid={`sms-editor-reset-confirm-${slug}`} style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "var(--ow-text-lo)" }}>
+            ↺ Reverted to template
+          </span>
+        )}
+        {dirty && !savedHint && (
+          <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "var(--ow-amber)" }}>
+            Click outside to save
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
 
