@@ -408,25 +408,46 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 - 7 core SOPs seeded (`seed-sops.mjs`).
 
 ## Backlog / Next actions
-**P0 — finish the import**
-- [x] ~~Pick LLM model and wire~~ → DONE (claude-sonnet-4-6 + gpt-5.4-mini hybrid).
-- [ ] Decide if the "Create account" modal blocking Free Run/Press in the browser should be auto-bypassed in dev (quick fix: make `authCheck` return `isAuthenticated: true` when bypass is active).
-- [ ] Drop the **Guide to Red Winemaking** + **White Wine Bible** PDFs into `/app/references/` so I can chunk + embed them into `diy_knowledge_chunks`.
-- [ ] Pick **real auth direction** (Emergent Google login / JWT email-password / keep dev bypass).
-- [ ] Pick **storage** (Cloudinary or skip) — only needed if file uploads matter near-term.
-- [ ] Pick **Stripe** (Emergent test key vs own keys) — only needed for merch / pricing flows.
-- [ ] Seed the remaining 31 SOPs to reach the 38 advertised (current scripts only ship 7).
 
-**P1 — known issues**
-- `seed-mock-data.mjs` references `openId` column (schema uses `open_id`) — fails. Script bug, low priority.
-- `seed-quick-steps.mjs` expects SOP ids 60005–60042; only 60001–60007 exist after current seed.
-- Light/dark theme — currently defaults to dark; verify intended.
-- Audit any remaining `import.meta.env.VITE_FRONTEND_FORGE_*` usages on the client.
+(See the consolidated P0–P3 roadmap below — the older 27 Jan 2026 backlog items
+have been folded in or marked complete.)
 
-**P2 — features deferred**
-- Re-evaluate the 60+ pages, prune anything off-roadmap.
-- Wire scheduled jobs (campaign metrics, vintage reminders, regulation monitor, fermentation watch, trinity cluster, trinity newsletter) into a cron runner.
-- PWA install banner + service worker check.
+**P0 — Ship blockers for first paying member**
+- [ ] **Real auth** — replace HTTP Basic Auth gate (Emergent Google Login or JWT).
+- [ ] **Real Stripe wiring** — `sk_test_stub` is the current placeholder; wire Founding Member + merch checkout end-to-end with `sk_test_emergent`.
+- [ ] **Custom domain DNS** — point `ownology.ai` at Railway (or Emergent preview).
+- [ ] **Verify Railway auto-deploy** post Drizzle baseline.
+
+**P1 — High-value compounders**
+- [ ] Trigger cascade from a homepage CTA so cold SMS prospects see the wow moment.
+- [ ] Auto-bypass "Create account" modal in dev (`authCheck` → `isAuthenticated: true` when bypass user active).
+- [ ] Drop Red/White Wine Bible PDFs into `/app/references/` for next ingest pass (USER ACTION required to supply files).
+- [ ] Convert `admin.llmStats` → `publicProcedure` so `/stats` works post-auth.
+
+**P2 — Polish & operational resilience**
+- [ ] Theme × conversion A/B card on `/admin/themes-stats`.
+- [ ] Wire scheduled cron jobs (campaign metrics, vintage reminders, regulation monitor, fermentation watch, trinity cluster, trinity newsletter).
+- [ ] `pnpm db:migrate` prestart hook for Railway auto-migrate.
+- [ ] Prune off-roadmap pages (60+ from Manus import).
+- [ ] PWA install banner + service worker check.
+- [ ] Fix seed scripts: `seed-mock-data.mjs` (uses `openId`, schema is `open_id`), `seed-quick-steps.mjs` (expects SOP ids 60005–60042 that don't exist).
+- [ ] Audit remaining `import.meta.env.VITE_FRONTEND_FORGE_*` usages.
+- [ ] HeroTheatricalPattern `blendMode` prop + StrictMode keyframe hardening (forward-looking from iter_15 review).
+
+**P3 — Future / post-PMF**
+- [ ] Multi-tenant winery data model (`winery_id` FKs throughout).
+- [ ] File/Image uploads via Emergent Object Storage.
+- [ ] Native iOS/Android apps.
+- [ ] Suppress `outreach.markViewed` 400s on non-`/hi` routes (carried from iter_12).
+- [ ] AdminContactsPipeline mobile layout polish (deferred from iter_14).
+
+**Completed (historical — kept for audit trail)**
+- [x] Lift-and-shift Manus codebase into `/app` (27 Jan 2026)
+- [x] LLM model + wiring → claude-sonnet-4-6 + gpt-5.4-mini hybrid (27 Jan 2026)
+- [x] All 38 SOPs seeded across 12 canonical categories (27 Jan 2026, verified 29 Jun 2026: total=38, published=38)
+- [x] Drizzle migration baseline — `__drizzle_migrations` populated with all 22 records (29 Jun 2026)
+- [x] CrushCascade 4-second cinematic redesign + diagnostic page + picker sync fix (29 Jun 2026)
+- [x] HeroTheatricalPattern wired into 3 marketing pages (29 Jun 2026)
 
 ## Test credentials
 - Dev bypass user (auto-injected when NODE_ENV != production):
