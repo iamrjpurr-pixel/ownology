@@ -99,6 +99,16 @@ export default function CrushCascade() {
     //     any path that applies the theme without dispatching the event.
     const html = document.documentElement;
     const initialClasses = new Set(Array.from(html.classList));
+    // Pre-populate with the theme stored in localStorage so the initial
+    // `applyThemeToDom` (which runs in a useEffect AFTER CrushCascade mounts)
+    // doesn't false-trigger the cascade on page load.
+    try {
+      const stored = window.localStorage.getItem("ownology-theme");
+      if (stored === "red-crush") initialClasses.add("theme-red-crush");
+      if (stored === "white-crush") initialClasses.add("theme-white-crush");
+    } catch {
+      // localStorage may be unavailable (privacy mode) — observer-only baseline is fine
+    }
     const observer = new MutationObserver((mutations) => {
       for (const m of mutations) {
         if (m.type !== "attributes" || m.attributeName !== "class") continue;

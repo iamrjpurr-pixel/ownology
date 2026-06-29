@@ -8,6 +8,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import FounderStory from "@/components/FounderStory";
 import FAQ from "@/components/FAQ";
+import HeroTheatricalPattern from "@/components/HeroTheatricalPattern";
 import { Link } from "wouter";
 import ThemeToggle, { useOwnologyTheme } from "@/components/ThemeToggle";
 import { trpc } from "@/lib/trpc";
@@ -551,6 +552,9 @@ function Hero() {
         <div className="absolute inset-0" style={{background:"linear-gradient(135deg, var(--ow-bg-base) 0%, transparent 60%, color-mix(in oklch, var(--ow-bg-base) 60%, transparent) 100%)"}} />
         <div className="absolute inset-0" style={{background:"linear-gradient(to top, var(--ow-bg-base) 0%, transparent 50%)"}} />
       </div>
+
+      {/* Theatrical juice-trail pattern — sits above the bg image, below copy */}
+      <HeroTheatricalPattern />
 
       <div className="container relative z-10 pt-32 pb-24">
         <div className="grid lg:grid-cols-2 gap-16 items-center">

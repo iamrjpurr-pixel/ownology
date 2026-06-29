@@ -5,6 +5,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import OwnologyLogo from "@/components/OwnologyLogo";
+import HeroTheatricalPattern from "@/components/HeroTheatricalPattern";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 
@@ -64,8 +65,9 @@ function Nav() {
 
 function Hero() {
   return (
-    <section className="pt-36 pb-20" style={{ background: BG_BASE }}>
-      <div className="container max-w-4xl">
+    <section className="pt-36 pb-20 relative overflow-hidden" style={{ background: BG_BASE }}>
+      <HeroTheatricalPattern intensity={0.14} />
+      <div className="container max-w-4xl relative" style={{ zIndex: 2 }}>
         <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: AMBER, marginBottom: "1.25rem" }}>
           Why Ownology
         </p>
