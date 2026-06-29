@@ -6,6 +6,7 @@ import { lazy, Suspense, useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ThemeToggle from "@/components/ThemeToggle";
+import ThemeOnboarding from "@/components/ThemeOnboarding";
 
 // ── EAGER: first-paint-critical + cellar-floor PWA tabs ───────────────────
 // Loaded synchronously so the most-trafficked routes render with zero
@@ -197,6 +198,8 @@ function Router() {
   // The Guide page sets 'ownology_guide_seen' in localStorage on mount.
   // We only redirect on the root path so deep-links are not interrupted.
   return (
+    <>
+    <ThemeOnboarding />
     <Suspense fallback={<PageLoading />}>
     <Switch>
       <Route path={"/"} component={MobileHomeRoute} />
@@ -266,6 +269,7 @@ function Router() {
       <Route component={NotFound} />
     </Switch>
     </Suspense>
+    </>
   );
 }
 

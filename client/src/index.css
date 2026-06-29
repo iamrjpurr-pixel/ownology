@@ -81,7 +81,8 @@
 }
 
 /* ── Light "Cellar Daylight" theme ── */
-html.light-mode {
+html.light-mode,
+html.theme-parchment {
   --background: oklch(0.97 0.010 75);
   --foreground: oklch(0.18 0.012 60);
   --card: oklch(0.93 0.012 75);
@@ -108,6 +109,69 @@ html.light-mode {
   --ow-bg-overlay: oklch(0 0 0 / 0.30);       /* modal/drawer backdrop — lighter in light mode */
   --ow-blue:      oklch(0.50 0.12 230);       /* slightly deeper blue for light mode */
   --ow-logo-wordmark: oklch(0.28 0.012 60);  /* logo wordmark — warm dark grey in light mode */
+}
+
+/* ── NEW "Soft Cellar" theme (rebalanced dark) ──────────────────────────────
+   Designed by the design subagent (Feb 2026) to fix the "pure black too harsh"
+   feedback. Base bg lifted 0.11 → 0.18 (warm soft umber), body text boosted
+   0.68 → 0.84 lightness. Hits WCAG AAA (~8.5:1) on body copy. Brand amber
+   unchanged. Preserves the cellar heritage while being long-read friendly.
+   Activated by adding `theme-soft-cellar` to <html>. The existing default
+   "cellar" theme (in :root above) is unchanged. */
+html.theme-soft-cellar {
+  --background: oklch(0.18 0.015 60);
+  --foreground: oklch(0.95 0.018 75);
+  --card: oklch(0.24 0.015 60);
+  --card-foreground: oklch(0.95 0.018 75);
+  --popover: oklch(0.24 0.015 60);
+  --popover-foreground: oklch(0.95 0.018 75);
+  --muted: oklch(0.21 0.015 60);
+  --muted-foreground: oklch(0.70 0.015 75);
+  --border: oklch(0.84 0.015 75 / 0.15);
+  --input: oklch(0.84 0.015 75 / 0.18);
+
+  --ow-bg-base:   oklch(0.18 0.015 60);   /* warm soft umber — not pure black */
+  --ow-bg-raised: oklch(0.21 0.015 60);   /* slightly lifted */
+  --ow-bg-card:   oklch(0.24 0.015 60);   /* card surface */
+  --ow-bg-inset:  oklch(0.28 0.015 60);   /* code blocks, inset areas */
+  --ow-text-hi:   oklch(0.95 0.018 75);   /* headings */
+  --ow-text-mid:  oklch(0.84 0.015 75);   /* body copy — WCAG AA-AAA boosted */
+  --ow-text-lo:   oklch(0.70 0.015 75);   /* captions, labels */
+  --ow-amber:     oklch(0.72 0.12 75);    /* brand amber — unchanged */
+  --ow-border:    oklch(0.84 0.015 75 / 0.15);
+  --ow-border-md: oklch(0.84 0.015 75 / 0.22);
+  --ow-shadow:    oklch(0 0 0 / 0.35);
+  --ow-nav-bg:    oklch(0.18 0.015 60 / 97%);
+  --ow-bg-overlay: oklch(0 0 0 / 0.55);
+  --ow-blue:      oklch(0.65 0.10 230);
+  --ow-logo-wordmark: oklch(0.95 0.018 75);
+}
+
+/* ── Smooth theme-switch transition (~250ms) ─────────────────────────────────
+   When the operator toggles themes via the nav picker, fade the background,
+   foreground, and border colours so the change feels intentional, not jarring.
+   Applies to ALL elements — performant because transition-property is scoped
+   to color properties only (browser composites these on the GPU). Skip if the
+   user has Reduce Motion enabled. */
+@media (prefers-reduced-motion: no-preference) {
+  *, *::before, *::after {
+    transition:
+      background-color 240ms ease,
+      color 240ms ease,
+      border-color 240ms ease,
+      fill 240ms ease,
+      stroke 240ms ease;
+  }
+  /* Don't transition transform/opacity for interactive elements where snappy
+     feel matters (buttons, links). The 240ms color fade still applies. */
+  a, button, [role="button"] {
+    transition:
+      background-color 180ms ease,
+      color 180ms ease,
+      border-color 180ms ease,
+      transform 120ms ease,
+      box-shadow 180ms ease;
+  }
 }
 
 @layer base {

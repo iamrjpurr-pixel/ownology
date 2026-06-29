@@ -270,6 +270,19 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 
 **Knowledge Page Desktop Layout Fix (28 Jun 2026, this session)**
 - Bug: `/knowledge` was wrapped in `WorkModeLayout` (mobile-first 430px shell) but its inner grid uses `xl:grid-cols-4` — on desktop the page was rendering 4 cards in a ~430px column with text truncated to "Harv…", "Ferme…", "Yeast…".
+
+**Multi-theme registry + first-time onboarding (28 Jun 2026, this session)**
+- Per user feedback ("wineries swing between cellar-dark and harvest-pad bright; theme choice is a key interface decision before they start working"), the existing 2-theme toggle was rebuilt as a 4-theme registry with first-time onboarding.
+- New CSS theme **`theme-soft-cellar`** added alongside the existing default dark + `theme-parchment` (existing light, also aliased as `light-mode`). Soft-cellar uses oklch(0.18 0.015 60) base + 0.84 L body text — softer warm umber, ~8.5:1 contrast (WCAG AAA), no astigmatism halo. Brand amber unchanged. Spec from `design_guidelines.json` (design subagent).
+- New file `/app/client/src/lib/themes.ts` — `THEMES` registry with id, label, htmlClass, kind, description. `getEnabledThemes()` filters by `VITE_ENABLED_THEMES` env (comma list of ids). Empty/missing env = all enabled. `applyThemeToDom(id)` strips all known theme classes then applies the target. `resolveAutoTheme()` returns soft-cellar or parchment based on `prefers-color-scheme`.
+- `ThemeToggle.tsx` rebuilt as a registry-driven dropdown picker — single-tap shows all enabled themes with descriptions, ✓ active marker, keyboard accessible (outside-click + Esc to close). `useOwnologyTheme()` hook kept stable (`isLight`, `cycle`, `toggle` shims) so existing pages don't break.
+- Legacy localStorage values auto-mapped: `dark` → `soft-cellar` (returning users get the gentler dark), `light` → `parchment`, `system` → `auto`. Zero migration friction.
+- New component `/app/client/src/components/ThemeOnboarding.tsx` — bottom-anchored "Choose your working light" card shown once for first-time visitors (no `ownology-theme` + no `ownology-theme-onboarded` localStorage keys). 800ms after page paint. Tap any theme → saves + dismisses. Auto-suppressed on `/admin/*`, `/hi/:slug`, `/founding-member/success`, `/merch/success`.
+- New default for new users: **`auto`** — honours OS `prefers-color-scheme` and listens for live changes via MediaQueryList event handler.
+- Smooth 240ms color transitions added globally (`background-color`, `color`, `border-color`, `fill`, `stroke`). Skipped when `prefers-reduced-motion`. Interactive elements (a/button/[role=button]) get a snappier 180ms tier for tactile feedback.
+- Wired into App.tsx as `<ThemeOnboarding />` outside `<Suspense>` so it shows before route lazy-loading completes.
+- Verified live: first-time visitor sees the onboarding card with all 4 enabled themes; returning user with `theme-soft-cellar` sees soft-warm umber page + the picker in nav; clicking picker opens dropdown with all themes + descriptions; OS-level light/dark flip when in `auto` updates the page in real-time.
+
 - Fix: added a `wide` prop to `WorkModeLayout`. When `wide={true}`, the shell stays 430px on mobile (`< lg`) but expands to **1280px on lg+** via a small media-query injected `<style>` block. Bottom nav stays centered at phone width regardless of shell width (thumb-zone pattern preserved).
 - `/knowledge` opts in via `<WorkModeLayout title="Knowledge" wide>`. Mobile rendering is pixel-identical to before; desktop now shows proper 4-col responsive grid with full text + breathing room.
 - The `wide` prop is reusable for any other content-dense work-mode page (e.g. `/the-press`, `/compliance`, `/dashboard`) that needs more horizontal real-estate on desktop.
