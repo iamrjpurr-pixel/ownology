@@ -64,7 +64,13 @@ function fmtAgo(ms: number | null): string {
 
 export default function AdminContactsPipeline() {
   const utils = trpc.useUtils();
-  const { data, isLoading } = trpc.outreach.list.useQuery();
+  const { data, isLoading } = trpc.outreach.list.useQuery(undefined, {
+    // Multi-tab safety — refetch when the operator switches back to this tab,
+    // and every 30s as a backstop so SMS-open events from /hi/:slug also
+    // bubble through.
+    refetchOnWindowFocus: true,
+    refetchInterval: 30_000,
+  });
   const setStage = trpc.outreach.setPipelineStage.useMutation();
 
   const [draggedSlug, setDraggedSlug] = useState<string | null>(null);
@@ -94,15 +100,60 @@ export default function AdminContactsPipeline() {
 
   function handleDrop(targetStage: Stage) {
     if (!draggedSlug) return;
-    const currentStage = deriveStage(
-      ((data?.contacts ?? []) as Contact[]).find((c) => c.slug === draggedSlug)!
-    );
+    const contacts = (data?.contacts ?? []) as Contact[];
+    const dragged = contacts.find((c) => c.slug === draggedSlug);
+    if (!dragged) {
+      setDraggedSlug(null);
+      setHoverStage(null);
+      return;
+    }
+    const currentStage = deriveStage(dragged);
     setDraggedSlug(null);
     setHoverStage(null);
-    if (currentStage === targetStage) return; // no-op
+    if (currentStage === targetStage) return;
+
+    // Optimistic timestamp rewrite — mirrors the server-side switch in
+    // outreach.setPipelineStage so the card moves instantly. Rolled back
+    // onError. setQueryData with the EXACT input shape (undefined).
+    const now = Date.now();
+    const prev = utils.outreach.list.getData();
+    utils.outreach.list.setData(undefined, (cur) => {
+      if (!cur) return cur;
+      return {
+        ...cur,
+        contacts: cur.contacts.map((c) => {
+          if (c.slug !== draggedSlug) return c;
+          // Treat all rows as the same shape regardless of upstream types
+          const u = c as unknown as Contact;
+          let smsSentAt = u.smsSentAt ?? null;
+          let repliedAt = u.repliedAt ?? null;
+          let demoBookedAt = u.demoBookedAt ?? null;
+          switch (targetStage) {
+            case "lead":
+              smsSentAt = null; repliedAt = null; demoBookedAt = null; break;
+            case "sent":
+            case "awaiting":
+              smsSentAt = smsSentAt ?? now; repliedAt = null; demoBookedAt = null; break;
+            case "replied":
+              smsSentAt = smsSentAt ?? now; repliedAt = repliedAt ?? now; demoBookedAt = null; break;
+            case "booked":
+              smsSentAt = smsSentAt ?? now; demoBookedAt = demoBookedAt ?? now; break;
+          }
+          return { ...u, smsSentAt, repliedAt, demoBookedAt } as typeof c;
+        }),
+      };
+    });
+
     setStage.mutate(
       { slug: draggedSlug, stage: targetStage },
-      { onSuccess: () => utils.outreach.list.invalidate() }
+      {
+        onSuccess: () => utils.outreach.list.invalidate(),
+        onError: () => {
+          // Roll back the optimistic update and surface the failure on refetch
+          if (prev) utils.outreach.list.setData(undefined, prev);
+          utils.outreach.list.invalidate();
+        },
+      }
     );
   }
 

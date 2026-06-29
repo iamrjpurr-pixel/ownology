@@ -194,6 +194,19 @@
 
 - **Lazy (code-split into own chunks)**: WhyOwnology, ForInnoVintUsers, ForVintraceUsers, Blog, BlogArticle, Regulations, RegulatoryLinks, Compliance, Merch×3, CampaignMetrics, Orders, Admin, HomeWineryKit, ForHomeWinemakers, DIYKnowledge, HomeWinemakerTroubleshooting, HomeWinemakerGlossary, CompetitiveAdvantage, Preview, AdminLeads, AdminComplianceDoctrine, AdminVintageIntelligence, AdminWbs, AdminTrinity, AdminFunnel, FoundingMemberSuccess, OAuthCallback, ProductionDashboard, BuildIndex, Vineyard, Knowledge, CellarJournalIndex/Entry (named exports rewrapped), Guide, Import, Demo, Waitlist, VineReference, Resume, Stats, TankQr, VintageCompare.
 - Verified live: with 250 KB/s network throttling, the `page-loading` skeleton briefly flashes when navigating to a fresh lazy chunk; the page then renders correctly. Eager routes feel instant.
+
+**Sales Pipeline Board — `/admin/contacts/pipeline` (28 Jun 2026, this session)**
+- New page `/app/client/src/pages/AdminContactsPipeline.tsx` — Trello-style 5-column board (Lead → Sent → Awaiting → Replied → Booked), HTML5 native drag-and-drop (no external lib).
+- Stage **derivation, not storage**: columns are computed from existing timestamps (`smsSentAt`, `viewCount`, `repliedAt`, `demoBookedAt`) so Awaiting → Sent transitions happen automatically as soon as the prospect opens the SMS link. Sales/skip-tagged contacts filtered out entirely.
+- New `outreach.setPipelineStage({slug, stage})` ownerProcedure — atomically rewrites the timestamps so dropping a card on a column persists exactly that derived state. Idempotent: existing timestamps preserved when the stage doesn't require zeroing them.
+- New `replied_at` bigint column on `outreach_contacts` (raw SQL migration via `scripts/add-outreach-replied-column.mjs`). Drizzle schema updated.
+- KPI bar: In pipeline / Awaiting reply / Booked demos / Booking rate % — the booking rate is the north-star metric for sales validation.
+- **Optimistic UI** on drop — applies the same timestamp rewrite client-side via `utils.outreach.list.setData()` so the card moves instantly. Roll-back on error.
+- **Multi-tab safety** — `refetchOnWindowFocus: true` + 30s polling so SMS-open events bubble across tabs without manual refresh.
+- Cross-link `Pipeline board →` added to `/admin/contacts` header.
+- **Updated** `CALENDLY_DEFAULT_URL=https://calendly.com/ownology/new-meeting` (user-supplied specific meeting-type link).
+- Verified live (`/app/test_reports/iteration_14.json`, **11/11 backend pytest + 100% frontend, 0 critical, 0 minor**). All 5 code-review polish notes were forward-looking (UX surprise on `sent` vs `awaiting` drop when viewCount>0, lossy timeline on lead→booked) — the two most user-visible (optimistic update + multi-tab refetch) were fixed in the same session; mobile layout deferred to backlog.
+
 - **Net effect**: first JS payload meaningfully smaller — winemakers on rural 3G during vintage will feel the win on `/`, `/free-run`, `/the-press` loads. Admin/Trinity/Knowledge chunks only download when someone actually visits those routes.
 
 **Work-Mode Desktop Layout Audit (28 Jun 2026, this session)**
