@@ -9,7 +9,7 @@
  * Admin can enable/disable themes via VITE_ENABLED_THEMES env (comma-list
  * of theme ids). Default: all enabled. Empty/missing env = all enabled.
  */
-export type ThemeId = "soft-cellar" | "parchment" | "cellar" | "auto" | "concrete-tank";
+export type ThemeId = "soft-cellar" | "parchment" | "cellar" | "auto" | "red-crush" | "white-crush";
 
 export type Theme = {
   id: ThemeId;
@@ -38,10 +38,17 @@ export const THEMES: Theme[] = [
     kind: "light",
   },
   {
-    id: "concrete-tank",
-    label: "Concrete Tank",
-    description: "Cool industrial grey-white + max contrast. For working in direct sun on the crush pad.",
-    htmlClass: "theme-concrete-tank light-mode",
+    id: "red-crush",
+    label: "Red Crush",
+    description: "🍇 Pure white + rose-pink accent — the colour of Pinot juice on the press. Sun-readable.",
+    htmlClass: "theme-red-crush light-mode",
+    kind: "light",
+  },
+  {
+    id: "white-crush",
+    label: "White Crush",
+    description: "🍏 Pure white + apple-green accent — the colour of Chardonnay fresh off the picker.",
+    htmlClass: "theme-white-crush light-mode",
     kind: "light",
   },
   {

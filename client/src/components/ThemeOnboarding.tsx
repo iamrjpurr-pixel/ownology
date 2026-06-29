@@ -62,6 +62,10 @@ export default function ThemeOnboarding() {
     if (typeof window !== "undefined") {
       window.localStorage.setItem(STORAGE_THEME, id);
       window.localStorage.setItem(STORAGE_DISMISSED, "1");
+      // Theatrical cascade for the two crush themes
+      if (id === "red-crush" || id === "white-crush") {
+        window.dispatchEvent(new CustomEvent("ownology:crush", { detail: { themeId: id } }));
+      }
     }
     applyThemeToDom(id);
     setPicked(id);

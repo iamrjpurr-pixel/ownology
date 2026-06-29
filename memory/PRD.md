@@ -316,6 +316,18 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 - **Polish applied**: removed dead-code ternary, made `userId: number | null = null` explicit, kept `KNOWN_SOURCES` as documentation-only.
 
 **Friendly Free-Tier Paused UX → Sales Funnel (28 Jun 2026, this session)**
+
+**Red Crush + White Crush themes + theatrical cascade (28 Jun 2026, this session)**
+- Replaced the proposed "Concrete Tank" / "Crush Pad" experiments with TWO genuinely-different harvest-themed light themes:
+  - **🍇 Red Crush** — pure white + near-black + rose-pink `--ow-accent-live` (the pink of Pinot juice on the press)
+  - **🍏 White Crush** — pure white + near-black + apple-green `--ow-accent-live` (the green of Chardonnay fresh off the picker)
+- Both follow Google's outdoor-productivity ergonomics: 19:1 black-on-white contrast, stronger 0.20 borders so edges survive sun-glare, font-weights bumped (h1=800, h2/h3/strong=700) to add the "redundancy beyond colour" Google calls for.
+- Amber retained as brand backbone in both — operators still recognise Ownology. Pink/green are the 5-10% slice for "live/active" things (signals, badges, fresh-event pills). Defined via a new `--ow-accent-live` + `--ow-accent-live-soft` token. Falls back to amber in non-crush themes via `:root` defaults so components are safe.
+- **CrushCascade component** (`/app/client/src/components/CrushCascade.tsx`) — theatrical 1300ms juice-wave animation triggered ONLY when switching INTO `red-crush` or `white-crush`. Deep colour washes down from above with a translucent trailing edge, drains off the bottom. Centred caption fades in with emoji + label + italic story line ("Pink of Pinot juice on the press" / "Apple-green of Chardonnay fresh off the picker"). Pure CSS keyframes, scoped inline. Respects `prefers-reduced-motion`.
+- Mounted globally in `App.tsx` next to `<ThemeOnboarding />`. Triggered via `window.dispatchEvent(new CustomEvent('ownology:crush', {detail:{themeId}}))` from `ThemeToggle.select()` and `ThemeOnboarding.choose()` — only fires for the two crush themes.
+- Updated everywhere: theme registry (`themes.ts`), telemetry zod enum (`server/routers/themes.ts`), admin stats labels/colours (`AdminThemesStats.tsx`).
+- Verified live: both cascades captured mid-flight with juice-wave + caption rendering perfectly. Red Crush in deep wine-rose, White Crush in grape-green.
+
 - When free-tier LLM budget is exhausted, `freeRun.curiosityAsk` now:
   1. **Doesn't charge a question** against the user's daily 3/3 quota (free user not punished for an outage)
   2. **Doesn't persist the synthetic message** to the Cellar Journal

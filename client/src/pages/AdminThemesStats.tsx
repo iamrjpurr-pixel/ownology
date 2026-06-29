@@ -17,7 +17,8 @@ const THEME_LABELS: Record<string, string> = {
   "parchment":     "Parchment",
   "auto":          "Auto",
   "cellar":        "Cellar Night",
-  "concrete-tank": "Concrete Tank",
+  "red-crush":     "Red Crush",
+  "white-crush":   "White Crush",
 };
 
 const THEME_COLORS: Record<string, string> = {
@@ -25,7 +26,8 @@ const THEME_COLORS: Record<string, string> = {
   "parchment":     "#ca8a04",
   "auto":          "#7c3aed",
   "cellar":        "#6b7280",
-  "concrete-tank": "#475569",
+  "red-crush":     "#be185d",
+  "white-crush":   "#65a30d",
 };
 
 export default function AdminThemesStats() {

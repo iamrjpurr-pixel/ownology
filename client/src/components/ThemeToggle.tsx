@@ -83,6 +83,10 @@ export function useOwnologyTheme() {
     // Telemetry must read localStorage BEFORE we persist the new value so
     // the isFirstPick flag is correctly detected on the very first pick.
     telemetry.record(id);
+    // Theatrical crush cascade — only fires for the two crush themes.
+    if (typeof window !== "undefined" && (id === "red-crush" || id === "white-crush")) {
+      window.dispatchEvent(new CustomEvent("ownology:crush", { detail: { themeId: id } }));
+    }
     setThemeId(id);
   }, [telemetry]);
 

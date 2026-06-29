@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ThemeToggle from "@/components/ThemeToggle";
 import ThemeOnboarding from "@/components/ThemeOnboarding";
+import CrushCascade from "@/components/CrushCascade";
 
 // ── EAGER: first-paint-critical + cellar-floor PWA tabs ───────────────────
 // Loaded synchronously so the most-trafficked routes render with zero
@@ -201,6 +202,7 @@ function Router() {
   return (
     <>
     <ThemeOnboarding />
+    <CrushCascade />
     <Suspense fallback={<PageLoading />}>
     <Switch>
       <Route path={"/"} component={MobileHomeRoute} />

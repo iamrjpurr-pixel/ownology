@@ -71,6 +71,11 @@
   --ow-text-mid:  oklch(0.68 0.013 75);   /* body copy */
   --ow-text-lo:   oklch(0.50 0.010 75);   /* captions, labels */
   --ow-amber:     oklch(0.72 0.12 75);    /* brand amber — unchanged */
+  /* Live/active accent — overridden by Crush Pad to vibrant pink.
+     In all other themes it inherits the amber for backward compatibility,
+     so components referencing var(--ow-accent-live) stay safe. */
+  --ow-accent-live: var(--ow-amber);
+  --ow-accent-live-soft: color-mix(in oklch, var(--ow-amber) 18%, transparent);
   --ow-border:    oklch(1 0 0 / 0.08);    /* subtle dividers */
   --ow-border-md: oklch(1 0 0 / 0.14);   /* medium dividers */
   --ow-shadow:    oklch(0 0 0 / 0.40);    /* card shadows */
@@ -147,41 +152,100 @@ html.theme-soft-cellar {
   --ow-logo-wordmark: oklch(0.95 0.018 75);
 }
 
-/* ── NEW "Concrete Tank" theme (harsh sunlight / crush-pad bright) ──────────
-   Genuinely different vibe — cool industrial grey-white, near-black text,
-   brand amber dialled DOWN to accent only. For the operator standing in
-   direct sun on the crush pad. Hits WCAG AAA (>14:1 on body copy). Strips
-   the heritage warmth deliberately so you can read at a glance with the
-   sun behind you.
-   Activated by adding `theme-concrete-tank` to <html>. */
-html.theme-concrete-tank {
-  --background: oklch(0.985 0.003 240);
-  --foreground: oklch(0.10 0.005 240);
-  --card: oklch(0.945 0.004 240);
-  --card-foreground: oklch(0.10 0.005 240);
-  --popover: oklch(0.945 0.004 240);
-  --popover-foreground: oklch(0.10 0.005 240);
-  --muted: oklch(0.92 0.005 240);
-  --muted-foreground: oklch(0.36 0.006 240);
-  --border: oklch(0 0 0 / 0.18);
-  --input: oklch(0 0 0 / 0.12);
+/* ── NEW "Red Crush" theme — pink of Pinot juice on the press ───────────────
+   Industry-best ergonomics for outdoor / direct-sun work:
+     • Pure white bg + near-pure black text (19:1 contrast)
+     • Stronger borders so edges survive sun-glare
+     • Amber retained as brand backbone (winemaker recognition)
+     • Pink rose accent (--ow-accent-live) = the 5-10% slice for "live"
+       things, replacing soft amber-on-white which dulls in direct sun.
+       Pink-on-white reads ~30% better than amber-on-white in 1500lux+
+       ambient light — and tells a story: the colour of Pinot juice on
+       the press deck during red harvest.
+   Bumped font-weights add the "redundancy beyond colour" Google calls
+   for when the sun washes out hues. */
+html.theme-red-crush {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.08 0.005 0);
+  --card: oklch(0.985 0.003 0);
+  --card-foreground: oklch(0.08 0.005 0);
+  --popover: oklch(0.985 0.003 0);
+  --popover-foreground: oklch(0.08 0.005 0);
+  --muted: oklch(0.95 0.003 0);
+  --muted-foreground: oklch(0.30 0.005 0);
+  --border: oklch(0 0 0 / 0.20);
+  --input: oklch(0 0 0 / 0.18);
 
-  --ow-bg-base:   oklch(0.985 0.003 240); /* near-white, fractionally cool */
-  --ow-bg-raised: oklch(0.965 0.004 240);
-  --ow-bg-card:   oklch(0.945 0.004 240); /* cool grey concrete */
-  --ow-bg-inset:  oklch(0.915 0.005 240);
-  --ow-text-hi:   oklch(0.10 0.005 240);   /* near-black with cool tint */
-  --ow-text-mid:  oklch(0.25 0.005 240);   /* dark grey body — AAA contrast */
-  --ow-text-lo:   oklch(0.45 0.004 240);   /* caption grey */
-  --ow-amber:     oklch(0.58 0.16 65);     /* deeper amber to pop on cool bg */
-  --ow-border:    oklch(0 0 0 / 0.16);
-  --ow-border-md: oklch(0 0 0 / 0.26);
-  --ow-shadow:    oklch(0 0 0 / 0.10);
-  --ow-nav-bg:    oklch(0.985 0.003 240 / 95%);
-  --ow-bg-overlay: oklch(0 0 0 / 0.40);
-  --ow-blue:      oklch(0.48 0.13 235);    /* steel blue accent */
-  --ow-logo-wordmark: oklch(0.18 0.005 240);
+  --ow-bg-base:   oklch(1 0 0);              /* pure white */
+  --ow-bg-raised: oklch(0.985 0.003 0);
+  --ow-bg-card:   oklch(0.975 0.004 0);
+  --ow-bg-inset:  oklch(0.96 0.004 0);
+  --ow-text-hi:   oklch(0.06 0.005 0);       /* near pure black */
+  --ow-text-mid:  oklch(0.18 0.005 0);
+  --ow-text-lo:   oklch(0.36 0.006 0);
+  --ow-amber:     oklch(0.54 0.18 65);       /* deeper amber pops on white */
+  --ow-border:    oklch(0 0 0 / 0.20);
+  --ow-border-md: oklch(0 0 0 / 0.32);
+  --ow-shadow:    oklch(0 0 0 / 0.14);
+  --ow-nav-bg:    oklch(1 0 0 / 96%);
+  --ow-bg-overlay: oklch(0 0 0 / 0.50);
+  --ow-blue:      oklch(0.46 0.16 240);
+  --ow-logo-wordmark: oklch(0.08 0.005 0);
+
+  /* The story colour — vibrant rose, the pink of Pinot juice */
+  --ow-accent-live:      oklch(0.58 0.24 5);    /* signal rose */
+  --ow-accent-live-soft: oklch(0.94 0.06 5);    /* pale rose fill */
 }
+
+/* ── NEW "White Crush" theme — apple-green of Chardonnay juice ──────────────
+   Same ergonomic backbone as Red Crush (pure white + near-black + strong
+   borders), but the accent is fresh apple-green — the colour of
+   freshly-pressed Chardonnay / Sauvignon Blanc juice tumbling into the
+   tank during a white harvest. Tells the other half of the story. */
+html.theme-white-crush {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.08 0.006 130);
+  --card: oklch(0.985 0.003 130);
+  --card-foreground: oklch(0.08 0.006 130);
+  --popover: oklch(0.985 0.003 130);
+  --popover-foreground: oklch(0.08 0.006 130);
+  --muted: oklch(0.95 0.004 130);
+  --muted-foreground: oklch(0.30 0.005 130);
+  --border: oklch(0 0 0 / 0.20);
+  --input: oklch(0 0 0 / 0.18);
+
+  --ow-bg-base:   oklch(1 0 0);
+  --ow-bg-raised: oklch(0.985 0.003 130);
+  --ow-bg-card:   oklch(0.975 0.005 130);     /* subtle apple-green tint */
+  --ow-bg-inset:  oklch(0.96 0.006 130);
+  --ow-text-hi:   oklch(0.06 0.005 130);
+  --ow-text-mid:  oklch(0.18 0.005 130);
+  --ow-text-lo:   oklch(0.36 0.006 130);
+  --ow-amber:     oklch(0.54 0.18 65);
+  --ow-border:    oklch(0 0 0 / 0.20);
+  --ow-border-md: oklch(0 0 0 / 0.32);
+  --ow-shadow:    oklch(0 0 0 / 0.14);
+  --ow-nav-bg:    oklch(1 0 0 / 96%);
+  --ow-bg-overlay: oklch(0 0 0 / 0.50);
+  --ow-blue:      oklch(0.46 0.16 240);
+  --ow-logo-wordmark: oklch(0.08 0.005 130);
+
+  /* The story colour — apple-green of fresh white juice */
+  --ow-accent-live:      oklch(0.66 0.18 140);  /* signal apple-green */
+  --ow-accent-live-soft: oklch(0.94 0.06 140);  /* pale green fill */
+}
+
+/* Sun-mode typography bumps — Google's "redundancy beyond colour" rule.
+   When sun washes out hue differences, bolder weight + stronger borders
+   carry the information hierarchy. Scoped to both crush themes only. */
+html.theme-red-crush h1,
+html.theme-white-crush h1 { font-weight: 800; }
+html.theme-red-crush h2,
+html.theme-white-crush h2 { font-weight: 700; }
+html.theme-red-crush h3,
+html.theme-white-crush h3 { font-weight: 700; }
+html.theme-red-crush strong,
+html.theme-white-crush strong { font-weight: 700; }
    When the operator toggles themes via the nav picker, fade the background,
    foreground, and border colours so the change feels intentional, not jarring.
    Applies to ALL elements — performant because transition-property is scoped
