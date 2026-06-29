@@ -1155,6 +1155,10 @@ export const outreachContacts = mysqlTable(
     // Triage state — warm = had a real conversation, lukewarm = brief positive,
     // cold = just collected card, sales = vendor/rep not a winemaker, skip = ignore
     status: varchar("status", { length: 16 }).notNull().default("cold"),
+    // CTA A/B-test: timestamp set when the prospect taps the (deterministically
+    // assigned) primary CTA on /hi/:slug. The variant they saw is computed
+    // server-side from a hash of the slug — no storage needed.
+    ctaClickedAt: bigint("cta_clicked_at", { mode: "number" }),
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
   },
   (t) => [

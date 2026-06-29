@@ -168,6 +168,9 @@ export default function AdminContacts() {
         <Kpi label="Demo booked" value={stats.booked} testid="contacts-kpi-booked" />
       </div>
 
+      {/* A/B CTA stats — book demo vs reply RED */}
+      <CtaAbCard />
+
       {/* Triage filter chips */}
       <div className="flex flex-wrap gap-2 mb-6" data-testid="status-filter-bar">
         <FilterChip
@@ -601,3 +604,74 @@ const btn: React.CSSProperties = {
   borderRadius: 4,
   cursor: "pointer",
 };
+
+function CtaAbCard() {
+  const { data, isLoading } = trpc.outreach.ctaStats.useQuery();
+  if (isLoading || !data) return null;
+  const [bookB, replyB] = [
+    data.buckets.find((b) => b.variant === "book"),
+    data.buckets.find((b) => b.variant === "reply"),
+  ];
+  const pct = (n: number, d: number) => (d > 0 ? `${Math.round((n / d) * 100)}%` : "—");
+
+  return (
+    <div
+      className="mb-6 rounded-md p-4"
+      data-testid="cta-ab-card"
+      style={{
+        background: "var(--ow-bg-card)",
+        border: "1px solid var(--ow-border)",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
+        <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ow-amber)", fontWeight: 700, margin: 0 }}>
+          A/B test · CTA on /hi/
+        </p>
+        {!data.enabled && (
+          <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "#dc2626", fontWeight: 600, margin: 0 }}>
+            ⚠ SMS_INBOUND_NUMBER not set — all prospects see &quot;book&quot; variant
+          </p>
+        )}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {[bookB, replyB].map((b, i) => {
+          if (!b) return null;
+          const label = b.variant === "book" ? "📅 Book demo" : "💬 Reply RED";
+          return (
+            <div
+              key={b.variant}
+              data-testid={`cta-variant-${b.variant}`}
+              style={{
+                background: "var(--ow-bg-base)",
+                border: `1px solid ${b.variant === "reply" ? "color-mix(in oklch, var(--ow-amber) 40%, transparent)" : "var(--ow-border)"}`,
+                padding: "0.9rem 1rem",
+                borderRadius: 6,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontFamily: "'Lato',sans-serif", fontWeight: 700, color: "var(--ow-text-hi)", fontSize: "0.92rem" }}>
+                  {label}
+                </span>
+                <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.72rem", color: "var(--ow-text-lo)" }}>
+                  {b.total} prospects
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: 16, marginTop: 8, fontFamily: "'Lato',sans-serif", fontSize: "0.78rem" }}>
+                <span style={{ color: "var(--ow-text-mid)" }}>
+                  Viewed <strong style={{ color: "var(--ow-text-hi)" }}>{b.viewed}</strong> · {pct(b.viewed, b.total)}
+                </span>
+                <span style={{ color: "var(--ow-text-mid)" }}>
+                  Clicked <strong style={{ color: "var(--ow-amber)" }}>{b.clicked}</strong> · {pct(b.clicked, b.viewed)}
+                </span>
+                <span style={{ color: "var(--ow-text-mid)" }}>
+                  Booked <strong style={{ color: "#059669" }}>{b.booked}</strong> · {pct(b.booked, b.total)}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+

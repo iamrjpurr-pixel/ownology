@@ -26,6 +26,7 @@ export default function HiContact() {
     { enabled: !!slug, retry: false }
   );
   const markViewed = trpc.outreach.markViewed.useMutation();
+  const markCtaClicked = trpc.outreach.markCtaClicked.useMutation();
   const fired = useRef(false);
 
   // Auto-fire the harvest crush cascade ~2.5s after the SMS prospect lands,
@@ -64,6 +65,15 @@ export default function HiContact() {
   }
 
   const calendlyUrl = contact.calendlyUrl || ""; // server resolves override → CALENDLY_DEFAULT_URL → null
+  // A/B variant — "reply" gives a one-tap SMS pre-fill back to the operator;
+  // "book" keeps the existing Calendly flow. Server-side deterministic
+  // assignment per slug. Falls back to "book" if SMS_INBOUND_NUMBER unset.
+  const ctaVariant: "book" | "reply" = contact.ctaVariant ?? "book";
+  const smsReplyHref: string | null = contact.smsReplyHref ?? null;
+
+  function logCtaClick() {
+    if (contact?.slug) markCtaClicked.mutate({ slug: contact.slug });
+  }
   // Sample-vintage-log URL is resolved server-side based on contact.winery /
   // event — Hunter Valley prospects get a Hunter-themed view, small/cult
   // labels get a 12-tank boutique view, everyone else gets the 128-tank
@@ -151,13 +161,25 @@ export default function HiContact() {
           ))}
         </ul>
 
-        {/* Primary CTA */}
-        {calendlyUrl ? (
+        {/* Primary CTA — A/B variant chosen server-side per slug. */}
+        {ctaVariant === "reply" && smsReplyHref ? (
+          <a
+            href={smsReplyHref}
+            data-testid="hi-cta-primary"
+            data-cta-variant="reply"
+            onClick={logCtaClick}
+            style={btnPrimary}
+          >
+            💬 Reply RED to lock my onboarding →
+          </a>
+        ) : calendlyUrl ? (
           <a
             href={calendlyUrl}
             target="_blank"
             rel="noopener noreferrer"
             data-testid="hi-cta-primary"
+            data-cta-variant="book"
+            onClick={logCtaClick}
             style={btnPrimary}
           >
             📅 {CALENDLY_FALLBACK_LABEL} →
@@ -166,6 +188,8 @@ export default function HiContact() {
           <a
             href={tryNowHref}
             data-testid="hi-cta-primary"
+            data-cta-variant="fallback"
+            onClick={logCtaClick}
             style={btnPrimary}
           >
             👋 See a real-time vintage log →

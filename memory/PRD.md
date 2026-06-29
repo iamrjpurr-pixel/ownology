@@ -345,6 +345,21 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 - **Manual "✦ Preview harvest mode →" button** added below the hero CTAs (`hero-replay-harvest` testid). Subtle text-link styling, hover-fades to amber. Lets organic visitors trigger the cascade on demand if they missed (or want to re-experience) the auto-fire. Triggers `pickCrushByDay()` variant.
 - Verified live end-to-end: `/hi/nathan-brokenwood-wines` auto-fires Red Crush at T=2.5s, full screen wash captured at T=3.5s; `/home?from=sms-test` auto-fires White Crush (29 June UTC = odd day) at peak; manual button fires cascade on click.
 
+**A/B CTA test on /hi/ — Reply RED vs Book Demo (29 Jun 2026, this session)**
+- Goal: lower the friction to first conversion event. Existing "📅 Book a 20-min demo" requires 5 steps (Calendly date/time/name/email/confirm). "💬 Reply RED to lock my onboarding" requires 1 tap (opens prospect's SMS app pre-filled).
+- **Server `pickCtaVariant(slug)`** in `outreach.ts` — deterministic per-slug hash (`sum(char codes) % 2`) → "book" | "reply". Stable forever per slug; same prospect always sees the same variant. Falls back to "book" if `SMS_INBOUND_NUMBER` env var unset.
+- **`buildSmsReplyHref()`** constructs the `sms:+<number>?body=<text>` link. Body is auto-personalised: `"RED — Hi, it's <firstName> from <winery>. Please lock me in for Ownology onboarding."`. iOS + Android both open SMS app on tap with pre-filled message.
+- **`outreach.bySlug`** now returns `ctaVariant` + `smsReplyHref` alongside existing fields.
+- **New mutations**: `outreach.markCtaClicked({slug})` — idempotent (`COALESCE`) timestamp set when the prospect taps the primary CTA. `outreach.ctaStats` (ownerProcedure) — buckets `book` vs `reply`, computing total/viewed/clicked/booked + percentages per variant.
+- **Schema** — added `cta_clicked_at bigint NULL` column to `outreach_contacts` (migration: `scripts/add-outreach-cta-tracking.mjs`). Variant itself isn't stored — computed from slug.
+- **`HiContact.tsx`** — conditional CTA render: `ctaVariant==="reply"` → renders the SMS pre-fill anchor with the "💬 Reply RED" copy; otherwise existing Calendly anchor. Both fire `markCtaClicked` on click. `data-cta-variant` attribute carries the variant for analytics.
+- **`/admin/contacts` A/B card** — new `<CtaAbCard />` between KPI strip and filter chips. Two columns side-by-side showing `Book demo` vs `Reply RED` with prospect count + Viewed % + Clicked % + Booked %. Amber border on Reply RED side. Shows ⚠ warning if `SMS_INBOUND_NUMBER` not set.
+- **Env vars added** (`.env`):
+  - `SMS_INBOUND_NUMBER` — operator's phone number (empty in dev; YOU must set this to your real mobile in Railway prod for the Reply variant to activate).
+  - `SMS_REPLY_KEYWORD` — defaults to `RED`. Change to any short word you want prospects to send first.
+- **Distribution across 29 active VIVID prospects**: 16 → Book demo, 13 → Reply RED (~55/45 from deterministic hashing). Verified live in iter screenshot.
+- Verified end-to-end: Lou (slug `lou-p-v-meredith`, hash → reply) sees "💬 Reply RED…" with pre-filled SMS body; Nathan (slug `nathan-brokenwood-wines`, hash → book) sees Calendly. Admin A/B card displays both variants with live counts; Lou's test click incremented her variant's Clicked counter.
+
 **Drizzle migration baseline (29 Jun 2026, this session)**
 - **Problem**: Live Railway MySQL had all 34 tables (originally from Manus' `drizzle-kit push` + augmented via raw SQL scripts), but `__drizzle_migrations` tracking table was EMPTY. Any future `drizzle-kit migrate` would have attempted to re-CREATE every existing table → `ER_TABLE_EXISTS_ERROR`.
 - **Fix**:

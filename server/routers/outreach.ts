@@ -101,6 +101,37 @@ function pickCrushVariant(input: {
   return "red-crush";
 }
 
+/** CTA A/B test on /hi/:slug. Deterministic per slug — the same prospect
+ *  always sees the same variant across visits/devices.
+ *    - "book"  → existing big Calendly button (5-step commitment)
+ *    - "reply" → one-tap SMS reply that pre-fills "RED — <name>, <winery>"
+ *      directly to the operator's inbound number. Lower-friction conversion
+ *      event for vintage-busy winemakers who won't pick a calendar slot.
+ *  Falls back to "book" if SMS_INBOUND_NUMBER isn't configured. */
+function pickCtaVariant(slug: string): "book" | "reply" {
+  if (!process.env.SMS_INBOUND_NUMBER?.trim()) return "book";
+  // Simple deterministic hash: sum of char codes mod 2.
+  let h = 0;
+  for (let i = 0; i < slug.length; i++) h = (h + slug.charCodeAt(i)) | 0;
+  return h % 2 === 0 ? "book" : "reply";
+}
+
+/** Build the `sms:` href that pre-fills the operator's number with the
+ *  prospect's identity. iOS and Android both support `sms:+number?body=...`.
+ *  Returns null if no inbound number configured. */
+function buildSmsReplyHref(input: {
+  firstName: string;
+  winery: string | null;
+}): string | null {
+  const num = process.env.SMS_INBOUND_NUMBER?.trim();
+  if (!num) return null;
+  const keyword = process.env.SMS_REPLY_KEYWORD?.trim() || "RED";
+  const body = `${keyword} — Hi, it's ${input.firstName}${input.winery ? ` from ${input.winery}` : ""}. Please lock me in for Ownology onboarding.`;
+  // RFC-compliant body encoding (URLSearchParams encodes spaces as +, but
+  // sms: URI scheme expects %20). encodeURIComponent works on both platforms.
+  return `sms:${num}?&body=${encodeURIComponent(body)}`;
+}
+
 export const outreachRouter = router({
   /** PUBLIC — fetch a single contact by slug for the /hi/:slug page.
    *  Resolves on the server:
@@ -129,7 +160,19 @@ export const outreachRouter = router({
       const variant = pickSampleVintageVariant({ winery: row.winery, event: row.event });
       const sampleVintageLogUrl = `/sample-vintage-log?variant=${variant}&from=sms-${encodeURIComponent(row.slug)}`;
       const crushVariant = pickCrushVariant({ winery: row.winery, event: row.event });
-      return { ...row, calendlyUrl, sampleVintageLogUrl, sampleVintageLogVariant: variant, crushVariant };
+      const ctaVariant = pickCtaVariant(row.slug);
+      const smsReplyHref = ctaVariant === "reply"
+        ? buildSmsReplyHref({ firstName: row.firstName, winery: row.winery })
+        : null;
+      return {
+        ...row,
+        calendlyUrl,
+        sampleVintageLogUrl,
+        sampleVintageLogVariant: variant,
+        crushVariant,
+        ctaVariant,
+        smsReplyHref,
+      };
     }),
 
   /** PUBLIC — mark a slug as viewed (called once on landing-page mount). */
@@ -147,6 +190,50 @@ export const outreachRouter = router({
         .where(eq(schema.outreachContacts.slug, input.slug));
       return { ok: true };
     }),
+
+  /** PUBLIC — record that the prospect tapped the primary CTA on /hi/:slug.
+   *  Idempotent (`COALESCE`) so multi-clicks don't reset the first-click ts.
+   *  Used by /admin/contacts + /admin/funnel to compute conversion per A/B
+   *  variant. */
+  markCtaClicked: publicProcedure
+    .input(z.object({ slug: z.string().min(1).max(80) }))
+    .mutation(async ({ input }) => {
+      const now = Date.now();
+      await db
+        .update(schema.outreachContacts)
+        .set({ ctaClickedAt: sql`COALESCE(cta_clicked_at, ${now})` })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true };
+    }),
+
+  /** OWNER — A/B conversion stats by CTA variant. Computed from the
+   *  deterministic slug-based assignment (no per-row variant stored). */
+  ctaStats: ownerProcedure.query(async () => {
+    const rows = await db
+      .select({
+        slug: schema.outreachContacts.slug,
+        status: schema.outreachContacts.status,
+        firstViewedAt: schema.outreachContacts.firstViewedAt,
+        ctaClickedAt: schema.outreachContacts.ctaClickedAt,
+        demoBookedAt: schema.outreachContacts.demoBookedAt,
+      })
+      .from(schema.outreachContacts);
+    type Bucket = { variant: "book" | "reply"; total: number; viewed: number; clicked: number; booked: number };
+    const buckets: Record<"book" | "reply", Bucket> = {
+      book:  { variant: "book",  total: 0, viewed: 0, clicked: 0, booked: 0 },
+      reply: { variant: "reply", total: 0, viewed: 0, clicked: 0, booked: 0 },
+    };
+    for (const r of rows) {
+      if (r.status === "sales" || r.status === "skip") continue; // exclude noise
+      const v = pickCtaVariant(r.slug);
+      buckets[v].total++;
+      if (r.firstViewedAt) buckets[v].viewed++;
+      if (r.ctaClickedAt) buckets[v].clicked++;
+      if (r.demoBookedAt) buckets[v].booked++;
+    }
+    const enabled = !!process.env.SMS_INBOUND_NUMBER?.trim();
+    return { enabled, buckets: Object.values(buckets) };
+  }),
 
   /** OWNER — list all contacts with their engagement state. */
   list: ownerProcedure.query(async () => {
