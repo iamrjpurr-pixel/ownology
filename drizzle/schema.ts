@@ -1164,3 +1164,27 @@ export const outreachContacts = mysqlTable(
   ]
 );
 
+
+/**
+ * theme_picks — anonymous telemetry of theme selections.
+ *
+ * Logged whenever a visitor picks a theme via the onboarding card or the
+ * nav picker. `session_id` is a random per-browser cookie/localStorage id
+ * (not tied to a user account — fine for cohort sizing). `is_first_pick`
+ * flags the first selection per session so we can split "what new users
+ * picked" from "what existing users switched to". Used by /admin/themes-stats.
+ */
+export const themePicks = mysqlTable(
+  "theme_picks",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    themeId: varchar("theme_id", { length: 32 }).notNull(),
+    sessionId: varchar("session_id", { length: 64 }).notNull(),
+    isFirstPick: int("is_first_pick").notNull().default(0),
+    pickedAt: bigint("picked_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("tp_theme_idx").on(t.themeId),
+    index("tp_picked_at_idx").on(t.pickedAt),
+  ]
+);

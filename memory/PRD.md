@@ -298,6 +298,17 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
   - `Home.tsx` 3 CTAs → `from=homepage-hero|homepage-nav|homepage-mobile`
   - `CompetitiveAdvantage.tsx` → `from=competitive-advantage`
   - `CellarJournal.tsx` → `from=cellar-journal`
+
+**Theme telemetry — `/admin/themes-stats` (28 Jun 2026, this session)**
+- New `theme_picks` MySQL table (`scripts/add-theme-picks-table.mjs`) — `id / theme_id / session_id / is_first_pick / picked_at`, indexed on theme_id + picked_at. Drizzle schema entry in `schema.ts` (`themePicks`).
+- New `themes` tRPC router (`server/routers/themes.ts`):
+  - **`themes.logPick`** (public) — accepts `{themeId ∈ [soft-cellar|parchment|cellar|auto], sessionId(6-64), isFirstPick}`. Zero PII.
+  - **`themes.stats`** (owner) — windowed (1-365 days, default 30) breakdown: first-picks vs switched-to per theme, plus "currently using" derived from the LATEST pick per session and a share percentage of total sessions in window.
+- New `useThemeTelemetry()` hook (`/app/client/src/hooks/useThemeTelemetry.ts`) — stable anonymous session id in localStorage (`ownology-tid`, 24-char base36). Fire-and-forget mutation; failures silent so telemetry never blocks UX. `isFirstPick` detected by absence of `ownology-theme` localStorage key (which is why telemetry must record BEFORE persistence — wired correctly in both ThemeToggle.select and ThemeOnboarding.choose).
+- New page `/admin/themes-stats` (`AdminThemesStats.tsx`) — 3 KPIs (sessions / picks / avg picks/session), 4/7/30/90/365-day window selector, per-theme table with colour dots + green highlight when current share ≥40%, tip line on how to read it.
+- Wired into Admin hub as "Theme Picks · Telemetry" card.
+- Verified live with 5 seeded test picks: Soft Cellar 60% (green), Parchment 20%, Auto 20%, Cellar Night 0%.
+
   - Untagged visits default to `direct`
 - **New `/admin/funnel` page** (`AdminFunnel.tsx`, 200 LOC): inline SVG sparkline (no chart lib), window selector (7/30/90 days), sortable per-source table with friendly display labels, share-of-traffic %, and last-visit-ago. Tip text at the bottom suggests *"if free-paused converts well, consider lowering `DAILY_FREE_BUDGET_USD` to surface the prompt sooner"* — pairs naturally with the tiered budget guard.
 - **Admin hub** (`/admin`) now exposes a "Conversion Funnel" tool card → `/admin/funnel`.

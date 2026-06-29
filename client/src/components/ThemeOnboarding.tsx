@@ -23,6 +23,7 @@ import {
   getEnabledThemes,
   type ThemeId,
 } from "@/lib/themes";
+import { useThemeTelemetry } from "@/hooks/useThemeTelemetry";
 
 const STORAGE_THEME = "ownology-theme";
 const STORAGE_DISMISSED = "ownology-theme-onboarded";
@@ -33,6 +34,7 @@ export default function ThemeOnboarding() {
   const [location] = useLocation();
   const [show, setShow] = useState(false);
   const [picked, setPicked] = useState<ThemeId | null>(null);
+  const telemetry = useThemeTelemetry();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -55,6 +57,8 @@ export default function ThemeOnboarding() {
   }
 
   function choose(id: ThemeId) {
+    // Record FIRST (so isFirstPick=true is detected before we persist)
+    telemetry.record(id);
     if (typeof window !== "undefined") {
       window.localStorage.setItem(STORAGE_THEME, id);
       window.localStorage.setItem(STORAGE_DISMISSED, "1");

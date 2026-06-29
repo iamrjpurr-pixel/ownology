@@ -26,6 +26,7 @@ import {
   THEMES,
   type ThemeId,
 } from "@/lib/themes";
+import { useThemeTelemetry } from "@/hooks/useThemeTelemetry";
 
 const STORAGE_KEY = "ownology-theme";
 // Legacy storage values used by the previous 3-state toggle. Map them onto
@@ -51,6 +52,7 @@ export function useOwnologyTheme() {
     if (typeof window === "undefined") return true;
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
+  const telemetry = useThemeTelemetry();
 
   // Apply + persist on every change
   useEffect(() => {
@@ -77,7 +79,12 @@ export function useOwnologyTheme() {
     applyThemeToDom(themeId);
   }, []);
 
-  const select = useCallback((id: ThemeId) => setThemeId(id), []);
+  const select = useCallback((id: ThemeId) => {
+    // Telemetry must read localStorage BEFORE we persist the new value so
+    // the isFirstPick flag is correctly detected on the very first pick.
+    telemetry.record(id);
+    setThemeId(id);
+  }, [telemetry]);
 
   // Legacy shim — many existing callers do `const { isLight } = useOwnologyTheme()`
   const effectiveKind = themeId === "auto"

@@ -414,6 +414,13 @@ const TOOLS: AdminTool[] = [
     icon: <IconLeads />,
     badge: "Assets",
   },
+  {
+    label: "Theme Picks",
+    description: "Anonymous tally of which themes operators are choosing. See first-time defaults vs. switched-to, plus the percentage currently using each theme. Use it to decide which themes stay enabled.",
+    href: "/admin/themes-stats",
+    icon: <IconLeads />,
+    badge: "Telemetry",
+  },
 ];
 
 export default function Admin() {

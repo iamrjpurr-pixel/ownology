@@ -8,6 +8,7 @@ import { knowledgeRouter } from "./routers/knowledge.js";
 import { tutorRouter } from "./routers/tutor.js";
 import { pricingRouter } from "./routers/pricing.js";
 import { outreachRouter } from "./routers/outreach.js";
+import { themesRouter } from "./routers/themes.js";
 import { wbsAdminRouter } from "./routers/wbsAdmin.js";
 import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
@@ -1622,5 +1623,6 @@ export const appRouter = router({
   trinity: trinityRouter,
   pricing: pricingRouter,
   outreach: outreachRouter,
+  themes: themesRouter,
 });
 export type AppRouter = typeof appRouter;
