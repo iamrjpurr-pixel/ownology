@@ -335,6 +335,16 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 - **Wired into 3 marketing heroes**: `/home` (Home.tsx Hero), `/why-ownology` (WhyOwnology.tsx Hero), `/competitive-advantage` (CompetitiveAdvantage.tsx Hero).
 - Verified live (iter 15, 16/16 frontend checkpoints, 0 critical): cascade fires via picker + via MutationObserver fallback + does NOT fire on page load with stored crush theme + de-dup works on rapid red→white swap. Pattern renders on all 3 pages, recolours on theme switch, blend mode flips correctly between parchment and dark themes.
 
+**Drizzle migration baseline (29 Jun 2026, this session)**
+- **Problem**: Live Railway MySQL had all 34 tables (originally from Manus' `drizzle-kit push` + augmented via raw SQL scripts), but `__drizzle_migrations` tracking table was EMPTY. Any future `drizzle-kit migrate` would have attempted to re-CREATE every existing table → `ER_TABLE_EXISTS_ERROR`.
+- **Fix**:
+  1. Ran `drizzle-kit generate --name resync_baseline` to capture drift between `schema.ts` and snapshot 0020 → produced `drizzle/migrations/0021_resync_baseline.sql` with the two missing tables (`outreach_contacts` + `theme_picks`) and their indexes.
+  2. Tightened `themePicks.isFirstPick` from `int` → `boolean` in `schema.ts` to match the live DB's actual `tinyint(1)` column type (set by `scripts/add-theme-picks-table.mjs`).
+  3. Created `scripts/baseline-drizzle-migrations.mjs` — reads every entry from `_journal.json`, computes SHA-256 of each `.sql` file content (Drizzle's exact algorithm per `node_modules/drizzle-orm/migrator.js:23`), and INSERTS one row per migration into `__drizzle_migrations` with the original `when` epoch as `created_at`. Idempotent.
+  4. Ran the script — 22/22 migrations recorded (0000 through 0021). Verified `drizzle-kit migrate` is now a clean no-op ("migrations applied successfully" with zero new statements). Verified `drizzle-kit generate` reports "No schema changes, nothing to migrate" — confirming schema.ts and live DB are fully aligned.
+- **Net effect**: Future `drizzle-kit migrate` is now SAFE on Railway prod — only newly-generated migration files will run, and the schema-vs-DB drift that bypassed migrations is resolved.
+
+
   1. **Doesn't charge a question** against the user's daily 3/3 quota (free user not punished for an outage)
   2. **Doesn't persist the synthetic message** to the Cellar Journal
   3. **Returns a structured payload** `{ paused: true, pausedTier, pausedMessage, retryAt, questionsUsed, questionsTotal }` so the UI can render the right state

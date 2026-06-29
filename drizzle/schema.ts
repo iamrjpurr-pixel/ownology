@@ -1180,7 +1180,7 @@ export const themePicks = mysqlTable(
     id: int("id").primaryKey().autoincrement(),
     themeId: varchar("theme_id", { length: 32 }).notNull(),
     sessionId: varchar("session_id", { length: 64 }).notNull(),
-    isFirstPick: int("is_first_pick").notNull().default(0),
+    isFirstPick: boolean("is_first_pick").notNull().default(false),
     pickedAt: bigint("picked_at", { mode: "number" }).notNull(),
   },
   (t) => [
