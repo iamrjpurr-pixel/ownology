@@ -14,6 +14,7 @@
 import { useEffect, useRef } from "react";
 import { useRoute, Link } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { useAutoCascade } from "@/hooks/useAutoCascade";
 
 const CALENDLY_FALLBACK_LABEL = "Book a 20-min demo";
 
@@ -26,6 +27,15 @@ export default function HiContact() {
   );
   const markViewed = trpc.outreach.markViewed.useMutation();
   const fired = useRef(false);
+
+  // Auto-fire the harvest crush cascade ~2.5s after the SMS prospect lands,
+  // matched to their winery profile (Hunter / red producers → Red Crush,
+  // white/sparkling producers → White Crush). One-shot per browser tab.
+  useAutoCascade({
+    themeId: contact?.crushVariant,
+    enabled: !!contact?.slug,
+    sessionKey: "ow_hi_cascade_played",
+  });
 
   useEffect(() => {
     // Only log the view if the contact actually exists — avoids dirty 400s

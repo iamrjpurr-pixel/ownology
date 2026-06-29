@@ -9,6 +9,7 @@ import OwnologyLogo from "@/components/OwnologyLogo";
 import FounderStory from "@/components/FounderStory";
 import FAQ from "@/components/FAQ";
 import HeroTheatricalPattern from "@/components/HeroTheatricalPattern";
+import { useAutoCascade, pickCrushByDay } from "@/hooks/useAutoCascade";
 import { Link } from "wouter";
 import ThemeToggle, { useOwnologyTheme } from "@/components/ThemeToggle";
 import { trpc } from "@/lib/trpc";
@@ -544,6 +545,24 @@ function Hero() {
   const { displayed, done } = useTypewriter(aiResponse, 22, 1200);
   const { contentMap } = useSiteContent();
 
+  // Auto-fire the harvest crush cascade for organic visitors who arrived
+  // with an attribution param (?from=*). Day-of-week alternator keeps the
+  // colour mix even across social shares without random per-tab volatility.
+  const hasAttribution = typeof window !== "undefined"
+    && new URLSearchParams(window.location.search).has("from");
+  useAutoCascade({
+    themeId: pickCrushByDay(),
+    enabled: hasAttribution,
+    sessionKey: "ow_home_cascade_played",
+  });
+
+  function replayHarvestPreview() {
+    if (typeof window === "undefined") return;
+    window.dispatchEvent(
+      new CustomEvent("ownology:crush", { detail: { themeId: pickCrushByDay() } })
+    );
+  }
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden grain-overlay">
       {/* Background image */}
@@ -576,6 +595,39 @@ function Hero() {
                 Ask a Compliance Question
               </Link>
             </div>
+            {/* Discoverable "wow moment" trigger for organic visitors who
+                missed the auto-fire (or want to replay it). Subtle enough
+                not to compete with the primary CTAs. */}
+            <button
+              type="button"
+              data-testid="hero-replay-harvest"
+              onClick={replayHarvestPreview}
+              className="mt-4 fade-up fade-up-delay-3"
+              style={{
+                background: "transparent",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+                color: "var(--ow-text-lo)",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.78rem",
+                fontWeight: 400,
+                letterSpacing: "0.06em",
+                textDecoration: "none",
+                opacity: 0.85,
+                transition: "color 180ms ease, opacity 180ms ease",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = "var(--ow-amber)";
+                (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = "var(--ow-text-lo)";
+                (e.currentTarget as HTMLButtonElement).style.opacity = "0.85";
+              }}
+            >
+              ✦ Preview harvest mode →
+            </button>
             {/* Trust bar */}
             <div className="mt-12 flex items-center gap-4 fade-up fade-up-delay-4">
               <div className="amber-rule flex-1 hidden sm:block" />

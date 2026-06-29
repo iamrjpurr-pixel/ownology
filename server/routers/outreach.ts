@@ -77,6 +77,30 @@ function pickSampleVintageVariant(input: {
   return "large";
 }
 
+// Markers that strongly suggest a white-wine-focused producer. Used by
+// pickCrushVariant() to decide which crush cascade to auto-fire on the
+// SMS landing page. Order matters: more specific wins.
+const WHITE_FOCUS_MARKERS = [
+  "chardonnay", "riesling", "sauvignon", "semillon", "sémillon",
+  "viognier", "pinot gris", "pinot grigio", "prosecco", "sparkling",
+  "champagne", "blanc", "white wines", "white house",
+];
+
+/** Decide which crush cascade theme to auto-fire on /hi/:slug.
+ *  Hunter Valley + most boutique reds → red-crush.
+ *  Producers with explicit white/sparkling markers → white-crush.
+ *  Default → red-crush (matches brand wine-rose). */
+function pickCrushVariant(input: {
+  winery: string | null;
+  event: string | null;
+}): "red-crush" | "white-crush" {
+  const haystack = `${input.winery ?? ""} ${input.event ?? ""}`.toLowerCase();
+  if (WHITE_FOCUS_MARKERS.some((m) => haystack.includes(m))) return "white-crush";
+  // Hunter region and explicit boutique-red signals already covered by
+  // the default — return red so the wow-moment matches the brand colour.
+  return "red-crush";
+}
+
 export const outreachRouter = router({
   /** PUBLIC — fetch a single contact by slug for the /hi/:slug page.
    *  Resolves on the server:
@@ -104,7 +128,8 @@ export const outreachRouter = router({
       const calendlyUrl = row.calendlyOverride?.trim() || defaultCalendly || null;
       const variant = pickSampleVintageVariant({ winery: row.winery, event: row.event });
       const sampleVintageLogUrl = `/sample-vintage-log?variant=${variant}&from=sms-${encodeURIComponent(row.slug)}`;
-      return { ...row, calendlyUrl, sampleVintageLogUrl, sampleVintageLogVariant: variant };
+      const crushVariant = pickCrushVariant({ winery: row.winery, event: row.event });
+      return { ...row, calendlyUrl, sampleVintageLogUrl, sampleVintageLogVariant: variant, crushVariant };
     }),
 
   /** PUBLIC — mark a slug as viewed (called once on landing-page mount). */

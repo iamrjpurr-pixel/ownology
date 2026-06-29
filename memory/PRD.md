@@ -336,6 +336,15 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 - **Wired into 3 marketing heroes**: `/home`, `/why-ownology`, `/competitive-advantage`.
 - Verified live: 4s cascade captured at 600ms (wash-in), 1500ms (full hold), 2500ms (still hold), 3500ms (draining) — every frame shows the full solid color wash with crisp title visible during the hold phase.
 
+**Auto-Cascade on Landing — P1 #6 (29 Jun 2026, this session)**
+- Goal: every SMS prospect sees the harvest "wow moment" within ~5 seconds of landing, with zero interaction required.
+- **Server-side variant selection** (`server/routers/outreach.ts`): new `pickCrushVariant({winery, event})` returns `red-crush` | `white-crush` based on white/sparkling markers (`chardonnay, riesling, sauvignon, semillon, viognier, pinot gris/grigio, prosecco, sparkling, champagne, blanc, white wines/house`). Default `red-crush` matches brand wine-rose. `outreach.bySlug` now returns `crushVariant` alongside the other resolved fields. All 31 current VIVID contacts resolve to `red-crush` — perfect for a premium-reds event.
+- **New hook `useAutoCascade`** (`client/src/hooks/useAutoCascade.ts`): one-shot timer that dispatches `ownology:crush` event after configurable `delayMs` (default 2500ms). sessionStorage-gated (one fire per browser tab) so refresh/back-nav doesn't replay. Respects `prefers-reduced-motion`. Helper `pickCrushByDay()` returns red on even UTC dates, white on odd — keeps social shares varied without random per-tab volatility.
+- **Wired into `/hi/:slug`** (`HiContact.tsx`): SMS prospect lands → 2.5s later cascade auto-fires using their winery-matched variant. sessionKey `ow_hi_cascade_played`.
+- **Wired into `/home` Hero** (`Home.tsx`): auto-fires only when an attribution param (`?from=*`) is present — organic visitors without attribution aren't blocked, but anyone arriving from SMS / LinkedIn / email gets the wow moment. Uses `pickCrushByDay()` since no winery profile available. sessionKey `ow_home_cascade_played`.
+- **Manual "✦ Preview harvest mode →" button** added below the hero CTAs (`hero-replay-harvest` testid). Subtle text-link styling, hover-fades to amber. Lets organic visitors trigger the cascade on demand if they missed (or want to re-experience) the auto-fire. Triggers `pickCrushByDay()` variant.
+- Verified live end-to-end: `/hi/nathan-brokenwood-wines` auto-fires Red Crush at T=2.5s, full screen wash captured at T=3.5s; `/home?from=sms-test` auto-fires White Crush (29 June UTC = odd day) at peak; manual button fires cascade on click.
+
 **Drizzle migration baseline (29 Jun 2026, this session)**
 - **Problem**: Live Railway MySQL had all 34 tables (originally from Manus' `drizzle-kit push` + augmented via raw SQL scripts), but `__drizzle_migrations` tracking table was EMPTY. Any future `drizzle-kit migrate` would have attempted to re-CREATE every existing table → `ER_TABLE_EXISTS_ERROR`.
 - **Fix**:
