@@ -8,6 +8,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "@/lib/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
 import UserMenu from "@/components/UserMenu";
+import ThemeSuggestion from "@/components/ThemeSuggestion";
 import ThemeOnboarding from "@/components/ThemeOnboarding";
 import CrushCascade from "@/components/CrushCascade";
 
@@ -329,6 +330,7 @@ function App() {
             <PwaInstallBanner />
             <GlobalThemeToggle />
             <UserMenu />
+            <ThemeSuggestion />
           </TooltipProvider>
         </AuthProvider>
       </ThemeProvider>

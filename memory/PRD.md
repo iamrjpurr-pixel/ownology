@@ -488,12 +488,30 @@ have been folded in or marked complete.)
 
 ## Auth (Emergent Google OAuth — Feb 2026)
 - `/api/auth/exchange` { session_id } → sets `app_session_id` JWT cookie (HS256, 7d, payload `{ openId, name, email, role }`)
-- `/api/auth/me` → returns user from cookie or 401
+- `/api/auth/me` → returns user from cookie or 401 (with dev-bypass fallback)
 - `/api/auth/logout` → clears cookie
 - Frontend: `/login` (Google button) → `https://auth.emergentagent.com` → `/auth/callback#session_id=…` → exchange → redirect
 - Admin allowlist: `ADMIN_EMAILS` (comma-sep) in `.env` — matched emails get `role=admin` on login
 - Gate (`adminGate` in `server/index.ts`): JWT cookie role=admin OR Basic Auth fallback OR dev-bypass active → allow; else SPA→302 `/login?next=…`, API→401 JSON
 - Files: `server/authRouter.ts`, `client/src/lib/useAuth.tsx`, `client/src/pages/Login.tsx`, `client/src/pages/AuthCallback.tsx`
+- UserMenu: top-right widget on `/admin/*`, `/cellar/*`, `/work-mode`, `/free-run/dashboard` — avatar + role badge + sign-out
+
+## Theme system — design language polished (Feb 2026)
+- 6 themes total: Soft Cellar (stainless/concrete), Parchment (cream daylight), Cellar Night (warm timber), Red Crush + White Crush (sun-readable), Auto.
+- **Cellar Night** rebalanced (warm timber, lifted L 0.11→0.13, hue 60→35) — no longer reads as "French château vault."
+- **Soft Cellar** rebuilt as stainless & concrete (cool gray h=40, low chroma) — NOT slate-blue. Authentic to working winery floor.
+- **Red Crush / White Crush** get persistent translucent juice-wash overlay that fades in after the cinematic cascade (2.6s delay).
+- **Theme picker** (ThemeOnboarding) now re-openable any time via `window.dispatchEvent(new CustomEvent("ownology:open-theme-picker"))`. Clicking themes previews live without closing the card; user confirms via "Done".
+- **ThemeToggle** dropdown gained a "Compare themes →" link that fires the open-picker event.
+- **Time-of-day suggestion banner** (`ThemeSuggestion`): once-per-day bottom-center toast suggests a theme based on local clock + harvest-month heuristic. Three dismiss paths.
+- **All themes pass WCAG AA across hi/mid/lo text + amber-on-bg** (audit: `/app/memory/THEME_ERGONOMICS_REVIEW.md`).
+
+## Dev workflow (Feb 2026)
+- **`/admin/dev`** — single jump-off hub for every internal check tool (responsive viewer, theme picker, cascade demo, owner panel, contacts CRM, content links, ref docs).
+- **`/admin/responsive`** — multi-viewport side-by-side viewer (iPhone 390, iPad 768, Desktop 1440) for any path.
+- Standard flow: after a UI change → open `/admin/dev` → Responsive viewer → spot-check 3 viewports → push.
+- See `/app/memory/AGENT_OPERATING_RULES.md` for the agreed "repair by exception" working mode.
+- See `/app/memory/RESPONSIVE_AUDIT.md` for the last layout audit findings.
 
 ## Service URLs
 - Preview: https://ownership-dev.preview.emergentagent.com
