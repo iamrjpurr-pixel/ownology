@@ -461,6 +461,8 @@ have been folded in or marked complete.)
 
 **P3 — Future / post-PMF**
 - [ ] **Ownology Copilot** — vintage-grounded caption generator + SEO flywheel. Full strategic build doc at `/app/memory/COPILOT_BUILD_DOC.md`. Two-layer value: customer feature ($99/mo retention driver) + SEO/distribution engine (story pages, hashtag aggregation, backlink farm). ~1.5 days to ship Phase 1 when greenlit.
+- [ ] **Compliance Reports** — Wine Australia LIP audit pack + ATO WET + FSANZ label compliance + SWA sustainability exports. Full strategic build doc at `/app/memory/COMPLIANCE_REPORTS_BUILD_DOC.md`. Justifies $99/mo Premium 3× over on compliance time savings alone (verified: 46 hrs / $3,040/yr saved per winery). Highest-leverage target: LIP Audit Pack PDF (Phase 1, ~12 hrs). Depends on real auth (P0 #1) + multi-tenant data model (P3).
+- [ ] **Branding feature** — Settings page with Detect-from-URL (logo + colours via node-vibrant) + tier-based Ownology attribution (Free/Premium/Studio). Mockup live at `/branding-mockup`. ~3 hrs to ship full version. Powers branded exports for both Copilot and Compliance Reports above.
 - [ ] Multi-tenant winery data model (`winery_id` FKs throughout).
 - [ ] File/Image uploads via Emergent Object Storage.
 - [ ] Native iOS/Android apps.
