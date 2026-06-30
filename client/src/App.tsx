@@ -80,6 +80,7 @@ const AdminContactsPipeline = lazy(() => import("./pages/AdminContactsPipeline")
 const AdminMarketingKit = lazy(() => import("./pages/AdminMarketingKit"));
 const AdminThemesStats = lazy(() => import("./pages/AdminThemesStats"));
 const CascadeDemo = lazy(() => import("./pages/CascadeDemo"));
+const CopilotMockup = lazy(() => import("./pages/CopilotMockup"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
  *  Sized so it doesn't cause layout shift on first paint. */
@@ -268,6 +269,7 @@ function Router() {
       <Route path={"/admin/marketing-kit"} component={AdminMarketingKit} />
       <Route path={"/admin/themes-stats"} component={AdminThemesStats} />
       <Route path={"/cascade-demo"} component={CascadeDemo} />
+      <Route path={"/copilot-mockup"} component={CopilotMockup} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />

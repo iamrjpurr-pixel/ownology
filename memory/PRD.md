@@ -445,7 +445,7 @@ have been folded in or marked complete.)
 **P1 — High-value compounders**
 - [ ] Trigger cascade from a homepage CTA so cold SMS prospects see the wow moment.
 - [ ] Auto-bypass "Create account" modal in dev (`authCheck` → `isAuthenticated: true` when bypass user active).
-- [ ] Drop Red/White Wine Bible PDFs into `/app/references/` for next ingest pass (USER ACTION required to supply files).
+- [x] ~~Drop Red/White Wine Bible PDFs into `/app/references/`~~ — **DONE** (verified 29 Jun 2026): `red_wine_bible` 102 chunks + `white_wine_bible` 104 chunks + `morew_red_outline` 7 + `morew_white_outline` 7 = 220 wine-bible chunks total grounding the cellar AI.
 - [ ] Convert `admin.llmStats` → `publicProcedure` so `/stats` works post-auth.
 
 **P2 — Polish & operational resilience**
