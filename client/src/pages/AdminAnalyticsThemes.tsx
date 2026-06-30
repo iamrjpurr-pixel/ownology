@@ -61,7 +61,7 @@ export default function AdminAnalyticsThemes() {
           Theme suggestion acceptance
         </h1>
         <p style={{ fontSize: "0.94rem", color: "var(--ow-text-mid)", maxWidth: 720, lineHeight: 1.5 }}>
-          Each bar is one hour of the day (visitor's local time) when the suggestion
+          Each bar is one hour of the day (visitor&apos;s local time) when the suggestion
           banner fired. <strong style={{ color: "var(--ow-amber)" }}>Amber fill = accepted.</strong>{" "}
           Outline = dismissed. Tells you whether our assumed boutique-winery rhythm
           actually matches what real users do.

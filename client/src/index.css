@@ -268,6 +268,39 @@ html.theme-white-crush {
     transparent 100%);
 }
 
+/* ── Global focus-visible (WCAG 2.4.7 + 1.4.11) ───────────────────────────
+   Keyboard-only navigation MUST surface a visible focus ring. Tailwind
+   preflight clears the browser default outline, so without this rule
+   tab navigation is invisible — a fail for keyboard users (the very
+   demographic our older winemaker customers most likely fall into).
+
+   Implementation:
+     • Targets :focus-visible (NOT :focus) so mouse clicks don't paint
+       rings on every button — only keyboard nav does.
+     • Uses --ow-amber which we've verified contrasts ≥4.6:1 on every
+       theme background — clears WCAG 1.4.11 (3:1 non-text contrast).
+     • 2px solid + 2px offset → meets the WCAG 2.2 SC 2.4.13 "Focus
+       Appearance" minimum thickness guidance (2 CSS pixels).
+     • Radix/shadcn primitives that ship their own focus rings will
+       compose with this rule via the outline-offset; if a child wants
+       to suppress (e.g. a custom segmented control) it can add
+       `outline: none` on its own focus state. */
+:focus-visible {
+  outline: 2px solid var(--ow-amber);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+/* Don't paint rings on the body/html or non-interactive containers
+   that pick up tab focus by accident. Buttons, links, inputs, summary,
+   [tabindex] — keep. */
+body:focus-visible,
+html:focus-visible,
+div:focus-visible:not([tabindex]),
+section:focus-visible {
+  outline: none;
+}
+
+
 /* Persistent translucent juice wash — fires on both crush themes after the
    cascade animation drains. Stays in place as a soft top-down gradient so
    the theme keeps its "colour memory" without re-running the animation.

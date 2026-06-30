@@ -109,8 +109,26 @@ Theme-independent. Current findings (carried over from Responsive Audit):
 3. **Color-blind preview mode**: a temporary filter that re-renders the
    page through deutan/protan simulation, so the operator can verify
    their own custom branding (when Branding settings ship) is CVD-safe.
-4. **`prefers-reduced-motion` already respected** in CrushCascade — no
+4. **APCA / Lc check** on dark themes — WCAG sometimes flags pure-white
+   on dark as "too punchy" (halation). Mathematical follow-up only;
+   doesn't block ship.
+5. **`prefers-reduced-motion` already respected** in CrushCascade — no
    action.
+
+## Focus indicators (WCAG 2.4.7 + 2.4.13 + 1.4.11) — Feb 2026
+
+Global `:focus-visible` rule added to `index.css`:
+- `outline: 2px solid var(--ow-amber)` with 2px offset
+- Targets `:focus-visible` only — mouse clicks don't paint rings, only
+  keyboard tab does (matches modern accessibility convention)
+- Amber contrasts ≥4.6:1 on every theme bg → clears WCAG 1.4.11 (3:1
+  non-text minimum) and WCAG 2.4.13 (3:1 focus indicator vs background)
+- 2px width meets WCAG 2.4.13 (new in 2.2) minimum thickness
+- Body/html/non-interactive containers explicitly opt out so a stray
+  Tab into a layout div doesn't paint a misleading ring
+
+Verified: Tab navigation on `/home` shows visible amber ring around nav
+links and CTAs on all themes.
 
 ## Methodology
 Computed via `/tmp/theme_audit.py` (Björn Ottosson OKLab → linear sRGB

@@ -78,6 +78,13 @@ const GROUPS: ToolGroup[] = [
         cta: "Open contacts",
       },
       {
+        title: "Theme acceptance",
+        blurb: "Once-a-day theme suggestion banner: hour-of-day acceptance rates. Validates the boutique-winery rhythm assumption.",
+        href: "/admin/analytics/themes",
+        internal: true,
+        cta: "Open chart",
+      },
+      {
         title: "A/B funnel stats",
         blurb: "Live wins for Reply RED vs Book Demo CTAs on /hi/:slug landings.",
         href: "/admin/contacts",
