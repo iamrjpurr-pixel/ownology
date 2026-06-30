@@ -73,7 +73,7 @@
   --ow-bg-inset:  oklch(0.24 0.018 35);   /* code blocks, inset areas */
   --ow-text-hi:   oklch(0.93 0.020 70);   /* headings — warm cream */
   --ow-text-mid:  oklch(0.72 0.016 70);   /* body copy — slightly lifted */
-  --ow-text-lo:   oklch(0.54 0.012 70);   /* captions, labels */
+  --ow-text-lo:   oklch(0.62 0.014 70);   /* captions — bumped 0.54→0.62 to clear WCAG AA at small sizes */
   --ow-amber:     oklch(0.74 0.13 72);    /* brand amber — lamp-light bright */
   /* Live/active accent — overridden by Crush Pad to vibrant pink.
      In all other themes it inherits the amber for backward compatibility,
@@ -110,7 +110,7 @@ html.theme-parchment {
   --ow-text-hi:   oklch(0.16 0.012 60);   /* headings — near-black warm */
   --ow-text-mid:  oklch(0.32 0.010 60);   /* body copy — dark warm grey */
   --ow-text-lo:   oklch(0.50 0.008 60);   /* captions */
-  --ow-amber:     oklch(0.62 0.14 68);    /* slightly deeper amber for contrast on light */
+  --ow-amber:     oklch(0.55 0.15 65);    /* slightly deeper amber — clears WCAG AA on parchment (was 0.62, 3.4:1) */
   --ow-border:    oklch(0 0 0 / 0.10);
   --ow-border-md: oklch(0 0 0 / 0.18);
   --ow-shadow:    oklch(0 0 0 / 0.12);
@@ -120,53 +120,57 @@ html.theme-parchment {
   --ow-logo-wordmark: oklch(0.28 0.012 60);  /* logo wordmark — warm dark grey in light mode */
 }
 
-/* ── "Soft Cellar" theme — twilight blue-hour mood ─────────────────────────
-   Redesigned (Feb 2026) so this isn't just "Cellar Night with a 7% lightness
-   bump." The brief: a *different time of day*, not a different volume.
+/* ── "Soft Cellar" theme — stainless & concrete at first light ─────────────
+   Redesigned (Feb 2026, second pass) to drop the slate-blue tech-feel
+   while still differentiating clearly from Cellar Night.
 
-   Cellar Night → warm midnight, terracotta accent: the cellar at 11pm,
-   working alone after dinner.
-   Soft Cellar → cool slate blue-hour: the cellar at first light before
-   the harvest crew arrives. Calmer, less smoky, more invitational.
+   Cellar Night → warm red-brown timber: the barrel hall after hours,
+   overhead lamp on French oak.
+   Soft Cellar → cool stainless-and-concrete: the working winery floor
+   at first light, polished tanks catching the early sun, sealed
+   concrete underfoot. Both are real, working environments — same
+   winery, different room.
 
    Mechanism:
-     • Hue shift to ~260 (slate blue) instead of warm umber (60-75)
-     • Lightness lifted further (0.22 vs Cellar Night's 0.11) for clearer
-       distinction at a glance
-     • Cards slightly cool-blue at 0.28L so surfaces lift cleanly off bg
-     • Amber accent unchanged — cool bg makes the warm amber pop harder,
-       which doubles as a brand-recognition win
-   Body-text contrast on the new bg: oklch(0.95 0.012 240) on
-   oklch(0.22 0.020 260) ≈ 11.4:1 → WCAG AAA. */
+     • Hue 40 with very low chroma (0.005) → cool neutral gray that reads
+       as polished metal/concrete, not Slack-blue.
+     • Lightness lifted to 0.24 → notably brighter than Cellar Night
+       (0.13) so the differentiation reads instantly.
+     • Cards at L=0.30 with a TOUCH of warm chroma → like steel catching
+       morning light: cool surface, warm reflection.
+     • Amber accent unchanged — same brand, more contrast against the
+       cool gray base.
+   Body-text contrast: oklch(0.94 0.006 60) on oklch(0.24 0.005 40)
+   ≈ 12.8:1 → WCAG AAA comfortably. */
 html.theme-soft-cellar {
-  --background: oklch(0.22 0.020 260);
-  --foreground: oklch(0.95 0.012 240);
-  --card: oklch(0.28 0.022 262);
-  --card-foreground: oklch(0.95 0.012 240);
-  --popover: oklch(0.28 0.022 262);
-  --popover-foreground: oklch(0.95 0.012 240);
-  --muted: oklch(0.26 0.022 260);
-  --muted-foreground: oklch(0.74 0.018 245);
-  --border: oklch(0.84 0.020 245 / 0.15);
-  --input: oklch(0.84 0.020 245 / 0.18);
+  --background: oklch(0.24 0.005 40);
+  --foreground: oklch(0.94 0.006 60);
+  --card: oklch(0.30 0.008 50);
+  --card-foreground: oklch(0.94 0.006 60);
+  --popover: oklch(0.30 0.008 50);
+  --popover-foreground: oklch(0.94 0.006 60);
+  --muted: oklch(0.28 0.005 40);
+  --muted-foreground: oklch(0.72 0.008 50);
+  --border: oklch(1 0 0 / 0.14);
+  --input: oklch(1 0 0 / 0.16);
 
-  --ow-bg-base:   oklch(0.22 0.020 260);   /* slate blue-hour twilight */
-  --ow-bg-raised: oklch(0.25 0.021 260);
-  --ow-bg-card:   oklch(0.28 0.022 262);   /* cards lift with slight blue */
-  --ow-bg-inset:  oklch(0.32 0.022 262);
-  --ow-text-hi:   oklch(0.96 0.012 240);   /* cool-cast white */
-  --ow-text-mid:  oklch(0.86 0.018 240);   /* body copy */
-  --ow-text-lo:   oklch(0.72 0.018 245);   /* captions */
-  --ow-amber:     oklch(0.74 0.14 70);     /* warmer amber pops on cool bg */
-  --ow-border:    oklch(0.84 0.020 245 / 0.15);
-  --ow-border-md: oklch(0.84 0.020 245 / 0.24);
-  --ow-shadow:    oklch(0 0 0 / 0.45);
-  --ow-nav-bg:    oklch(0.22 0.020 260 / 97%);
-  --ow-bg-overlay: oklch(0.12 0.020 260 / 0.65);
-  --ow-blue:      oklch(0.72 0.13 235);    /* brighter blue label, same hue family */
-  --ow-logo-wordmark: oklch(0.96 0.012 240);
-  --ow-accent-live:      oklch(0.74 0.14 70);
-  --ow-accent-live-soft: color-mix(in oklch, oklch(0.74 0.14 70) 18%, transparent);
+  --ow-bg-base:   oklch(0.24 0.005 40);   /* polished concrete floor */
+  --ow-bg-raised: oklch(0.27 0.006 45);
+  --ow-bg-card:   oklch(0.30 0.008 50);   /* stainless tank catching light */
+  --ow-bg-inset:  oklch(0.34 0.008 50);
+  --ow-text-hi:   oklch(0.95 0.006 60);   /* near-white, very slight warm cast */
+  --ow-text-mid:  oklch(0.84 0.008 60);
+  --ow-text-lo:   oklch(0.68 0.010 60);
+  --ow-amber:     oklch(0.74 0.13 72);    /* lamp-light amber, unchanged */
+  --ow-border:    oklch(1 0 0 / 0.14);
+  --ow-border-md: oklch(1 0 0 / 0.22);
+  --ow-shadow:    oklch(0 0 0 / 0.40);
+  --ow-nav-bg:    oklch(0.24 0.005 40 / 97%);
+  --ow-bg-overlay: oklch(0.12 0.005 40 / 0.65);
+  --ow-blue:      oklch(0.70 0.10 230);
+  --ow-logo-wordmark: oklch(0.95 0.006 60);
+  --ow-accent-live:      oklch(0.74 0.13 72);
+  --ow-accent-live-soft: color-mix(in oklch, oklch(0.74 0.13 72) 18%, transparent);
 }
 
 /* ── NEW "Red Crush" theme — pink of Pinot juice on the press ───────────────
