@@ -260,7 +260,7 @@ html.theme-white-crush body::before {
   right: 0;
   height: 60vh;
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
   background: var(--ow-juice-wash);
   /* Fade in slowly after the cascade settles so it doesn't visually fight
      the 4-second animation — appears at t=3s, holds forever. */
