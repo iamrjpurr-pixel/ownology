@@ -146,6 +146,7 @@ That's a **30× ROI** justified on compliance alone.
 
 - Strategic AI conversation that generated this doc: 30 June 2026 session
 - Web search validation: searched Wine Australia LIP / FSANZ / NSW Food Authority current 2026 requirements (confirmed)
+- **Live LIP template PDFs**: `/app/references/lip-templates/` (6 official templates + README with full field schema extracted, ready for build agent to map directly to `vintage_log_entries`)
 - Related: Branding feature mockup at `/branding-mockup` (provides the export styling layer)
 - Related: Copilot Build Doc at `/app/memory/COPILOT_BUILD_DOC.md` (same flywheel + flow shape)
 - Related: PRD.md § P0 #1 (real auth blocks per-user reports)
