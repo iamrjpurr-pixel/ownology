@@ -64,6 +64,13 @@ const GROUPS: ToolGroup[] = [
     groupBlurb: "Live metrics on the conversion funnel — waitlist, A/B test wins, prospect pipeline.",
     tools: [
       {
+        title: "Settings",
+        blurb: "Per-user prefs: unit system (metric/imperial), theme suggestion toggle, account info.",
+        href: "/admin/settings",
+        internal: true,
+        cta: "Open settings",
+      },
+      {
         title: "Owner panel",
         blurb: "Waitlist size, Founding Member count, merch orders, LLM budget burn.",
         href: "/admin",

@@ -192,6 +192,10 @@ export default function ThemeToggle({ compact = true }: ThemeToggleProps) {
           border: `1px solid ${triggerBorder}`,
           borderRadius: 4,
           padding: compact ? "0.4rem 0.55rem" : "0.5rem 0.85rem",
+          // WCAG 2.5.5 / Apple HIG / Material — interactive elements must be
+          // ≥44×44 px. The original 36px height failed touch ergonomics.
+          minHeight: 44,
+          minWidth: 44,
           cursor: "pointer",
           display: "inline-flex",
           alignItems: "center",

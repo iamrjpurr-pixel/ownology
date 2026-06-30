@@ -319,6 +319,34 @@ const ordersRouter = router({
 // summary for the /admin hub page (avoids multiple round-trips).
 
 const adminRouter = router({
+  /** Current signed-in user (admin or dev-bypass seed). Cheap profile fetch
+   *  for the /admin/settings page. */
+  me: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    return {
+      openId: ctx.user.openId,
+      name: ctx.user.name || dbUser?.name || null,
+      email: ctx.user.email || dbUser?.email || null,
+      role: ctx.user.role || dbUser?.role || "user",
+      unitSystem: (dbUser?.unitSystem as "metric" | "imperial" | undefined) || "metric",
+    };
+  }),
+
+  /** Update the user's preferred unit system. Drives both the AI's response
+   *  formatting (tutor router silently normalises imperial→metric on input
+   *  and prints back in the user's preferred unit) and document exports. */
+  updateUnitSystem: protectedProcedure
+    .input(z.object({ unitSystem: z.enum(["metric", "imperial"]) }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await db
+        .update(schema.users)
+        .set({ unitSystem: input.unitSystem })
+        .where(eq(schema.users.id, dbUser.id));
+      return { ok: true, unitSystem: input.unitSystem };
+    }),
+
   complianceDoctrine: ownerProcedure.query(() => {
     const topics = getTopics();
     const entries = QA_DOCTRINE.map((e) => ({

@@ -88,6 +88,7 @@ const BrandingMockup = lazy(() => import("./pages/BrandingMockup"));
 const AdminResponsive = lazy(() => import("./pages/AdminResponsive"));
 const AdminDev = lazy(() => import("./pages/AdminDev"));
 const AdminAnalyticsThemes = lazy(() => import("./pages/AdminAnalyticsThemes"));
+const AdminSettings = lazy(() => import("./pages/AdminSettings"));
 const Login = lazy(() => import("./pages/Login"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 
@@ -280,6 +281,7 @@ function Router() {
       <Route path={"/admin/responsive"} component={AdminResponsive} />
       <Route path={"/admin/dev"} component={AdminDev} />
       <Route path={"/admin/analytics/themes"} component={AdminAnalyticsThemes} />
+      <Route path={"/admin/settings"} component={AdminSettings} />
       <Route path={"/login"} component={Login} />
       <Route path={"/auth/callback"} component={AuthCallback} />
       <Route path={"/cascade-demo"} component={CascadeDemo} />

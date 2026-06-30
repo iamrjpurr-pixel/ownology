@@ -11,6 +11,7 @@ import ThePressCtaCard from "@/components/ThePressCtaCard";
 import VoiceMicButton from "@/components/VoiceMicButton";
 import { getLoginUrl } from "@/const";
 import { Loader2, ChevronDown, ThumbsUp, ThumbsDown } from "lucide-react";
+import MadeWithOwnology from "@/components/MadeWithOwnology";
 
 // ── Work Mode brand accent (amber) ───────────────────────────────────────────
 const ACCENT = "#B0741A"; // deep amber — text, strokes, active accents
@@ -912,6 +913,11 @@ export default function FreeRun() {
           </div>
         </div>
       )}
+
+      {/* SEO flywheel — Made with Ownology attribution on the free public
+          surface. Free tier always shows this; signed-in paying tiers
+          can opt out (planned). */}
+      <MadeWithOwnology variant="footer" utmSource="free-run" />
     </>
   );
 }
