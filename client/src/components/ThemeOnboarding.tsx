@@ -1,19 +1,21 @@
 /**
- * ThemeOnboarding — first-visit nudge to pick a theme.
+ * ThemeOnboarding — theme picker, available on demand.
  *
- * Shows a subtle bottom-anchored card the first time a visitor lands on
- * the site (no localStorage key set for either the theme picker or the
- * onboarding dismissal). One tap on a theme persists it AND dismisses the
- * onboarding. A close button dismisses without choosing (we still record
- * the dismissal so it doesn't re-prompt next visit).
+ * Originally a one-shot first-visit nudge; refactored to be re-openable any
+ * time via a global `ownology:open-theme-picker` event. Behaviour:
  *
- * Design intent: deliberate-but-tiny. Not a modal — modals block tasks.
- * Just a card the operator can ignore if they want the default, but can't
- * miss if they want to choose. Wineries swing dark/light depending on
- * where you're standing — operators should choose once, on purpose.
+ *   1. First visit (no theme + no dismissal): auto-opens after 800ms.
+ *   2. After dismissal: stays closed unless something dispatches
+ *      `ownology:open-theme-picker` (e.g. the ThemeToggle dropdown's
+ *      "Compare themes" link).
+ *   3. While open: clicking a theme applies it as a live preview (theme
+ *      changes on the page in real time) but DOES NOT close the card.
+ *      Users can click through several themes to compare. They confirm
+ *      via "Done — keep this", or close via × (last preview is kept).
  *
- * Auto-suppressed on /admin/* routes (operator already knows the system),
- * and on /hi/:slug (prospect-facing landing must not feel like a SaaS).
+ * Auto-open is still suppressed on /admin/* and /hi/:slug routes. Manual
+ * re-open (via event) works everywhere — operators sometimes want to flip
+ * theme from the admin shell.
  */
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
@@ -36,18 +38,33 @@ export default function ThemeOnboarding() {
   const [picked, setPicked] = useState<ThemeId | null>(null);
   const telemetry = useThemeTelemetry();
 
+  // First-visit auto-open (suppressed on admin / prospect-facing routes).
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (SUPPRESSED_PREFIXES.some((p) => location.startsWith(p))) return;
     const storedTheme = window.localStorage.getItem(STORAGE_THEME);
     const dismissed = window.localStorage.getItem(STORAGE_DISMISSED);
-    // First time: NO theme + NO dismissal → show
     if (!storedTheme && !dismissed) {
-      // Tiny delay so the page paints first
       const t = setTimeout(() => setShow(true), 800);
       return () => clearTimeout(t);
     }
   }, [location]);
+
+  // Manual re-open hook — any component can fire this event to show the
+  // picker. Wired to the ThemeToggle dropdown's "Compare themes" link.
+  useEffect(() => {
+    function handler() {
+      // Seed the ✓ marker with the currently-active theme so the user knows
+      // where they're starting from.
+      if (typeof window !== "undefined") {
+        const current = window.localStorage.getItem(STORAGE_THEME) as ThemeId | null;
+        setPicked(current);
+      }
+      setShow(true);
+    }
+    window.addEventListener("ownology:open-theme-picker", handler);
+    return () => window.removeEventListener("ownology:open-theme-picker", handler);
+  }, []);
 
   function dismiss() {
     if (typeof window !== "undefined") {
@@ -56,21 +73,19 @@ export default function ThemeOnboarding() {
     setShow(false);
   }
 
-  function choose(id: ThemeId) {
-    // Record FIRST (so isFirstPick=true is detected before we persist)
+  function preview(id: ThemeId) {
+    // Record the pick and persist the chosen theme so a page refresh keeps
+    // it. We deliberately DO NOT set STORAGE_DISMISSED here — the card
+    // stays open until the user clicks "Done" or ×.
     telemetry.record(id);
     if (typeof window !== "undefined") {
       window.localStorage.setItem(STORAGE_THEME, id);
-      window.localStorage.setItem(STORAGE_DISMISSED, "1");
-      // Theatrical cascade for the two crush themes
       if (id === "red-crush" || id === "white-crush") {
         window.dispatchEvent(new CustomEvent("ownology:crush", { detail: { themeId: id } }));
       }
     }
     applyThemeToDom(id);
     setPicked(id);
-    // Briefly hold the "✓ active" state so the choice feels affirmed
-    setTimeout(() => setShow(false), 700);
   }
 
   if (!show) return null;
@@ -121,8 +136,8 @@ export default function ThemeOnboarding() {
               lineHeight: 1.4,
             }}
           >
-            Wineries swing between cellar-dark and harvest-pad bright. Pick the theme that suits your day —
-            you can change it any time from the nav.
+            Tap a theme to preview it live — the page changes instantly. Click through to compare,
+            then hit <strong>Done</strong> to keep your choice.
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {enabled.map((t) => {
@@ -132,7 +147,7 @@ export default function ThemeOnboarding() {
                   key={t.id}
                   type="button"
                   data-testid={`onboarding-theme-${t.id}`}
-                  onClick={() => choose(t.id)}
+                  onClick={() => preview(t.id)}
                   style={{
                     padding: "8px 12px",
                     borderRadius: 4,
@@ -152,12 +167,48 @@ export default function ThemeOnboarding() {
                   title={t.description}
                 >
                   {t.label}
-                  {isPicked && (
-                    <span style={{ marginLeft: 6 }}>✓</span>
-                  )}
+                  {isPicked && <span style={{ marginLeft: 6 }}>✓</span>}
                 </button>
               );
             })}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              marginTop: 12,
+            }}
+          >
+            <button
+              type="button"
+              data-testid="theme-onboarding-done"
+              onClick={dismiss}
+              style={{
+                background: picked ? "var(--ow-amber)" : "transparent",
+                color: picked ? "white" : "var(--ow-text-lo)",
+                border: picked ? "none" : "1px solid var(--ow-border-md)",
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.74rem",
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                padding: "7px 14px",
+                borderRadius: 4,
+                cursor: "pointer",
+              }}
+            >
+              {picked ? "Done — keep this" : "Close"}
+            </button>
+            <span
+              style={{
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.7rem",
+                color: "var(--ow-text-lo)",
+              }}
+            >
+              You can re-open this any time from the theme toggle.
+            </span>
           </div>
         </div>
         <button

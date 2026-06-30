@@ -329,6 +329,47 @@ export default function ThemeToggle({ compact = true }: ThemeToggleProps) {
               </button>
             );
           })}
+          <div
+            style={{
+              borderTop: "1px solid var(--ow-border-md)",
+              marginTop: 4,
+              paddingTop: 4,
+            }}
+          >
+            <button
+              type="button"
+              data-testid="theme-open-onboarding"
+              onClick={() => {
+                setOpen(false);
+                window.dispatchEvent(new CustomEvent("ownology:open-theme-picker"));
+              }}
+              style={{
+                display: "block",
+                width: "100%",
+                padding: "8px 12px",
+                background: "transparent",
+                border: "none",
+                borderRadius: 4,
+                cursor: "pointer",
+                textAlign: "left",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.74rem",
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                color: "var(--ow-amber)",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  "color-mix(in oklch, var(--ow-amber) 8%, transparent)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+              }}
+            >
+              Compare themes →
+            </button>
+          </div>
         </div>
       )}
     </div>
