@@ -473,6 +473,21 @@ have been folded in or marked complete.)
 - [ ] AdminContactsPipeline mobile layout polish (deferred from iter_14).
 
 **Completed (historical — kept for audit trail)**
+- [x] **Public, opt-in vanity audit page — `/audit/:slug` (Feb 2026)**.
+  - New `wineries.public_audit_enabled BOOLEAN NOT NULL DEFAULT FALSE` column. Bootstrap migration runs on every boot (idempotent ALTER TABLE).
+  - `winery.update` mutation accepts `publicAuditEnabled: boolean` — owner-only writes; non-owner gets FORBIDDEN. `winery.current` exposes the flag.
+  - New `server/publicAudit.ts` Express handler at `GET /audit/:slug`:
+    - **404 by default** (privacy-first). Only published wineries return 200. Unpublished wineries also emit `X-Robots-Tag: noindex`.
+    - **No PII leakage**: structured filter `SAFE_KEYS = {what, value, unit, quantity, timing, productName, ratePerHL, fromLocation, toLocation, volumeL, leesStatus}` strips operator notes, reasoning text, and any free-text field that could carry operator names or private context.
+    - **Rate-limited** at 60 req/min/IP (in-memory; sufficient for v1 traffic).
+    - **Branded HTML** — logo (if set), winery name in brand colour, brand-coloured rule, region in metadata, 3 KPI cards, audit table with date · tank · variety · event + safe details.
+    - **SEO-friendly**: emits `X-Robots-Tag: index, follow`, OG meta tags (`og:title`, `og:description`, `og:image`), 5-min public Cache-Control. Indexable when published — `noindex` when not.
+    - **Slug validation**: regex `[a-z0-9-]+` prevents path traversal; max 80 chars.
+  - `vite.config.ts` proxies `/audit/*` to Express (port 8001) so the route works in preview/dev (production Railway serves everything from Express directly).
+  - AdminSettings UI gained an opt-in callout below the winery form: amber-highlighted when published with "PUBLISHED" badge, slug shown as `code` pill, "View live audit page →" link to the published page, privacy explainer ("Operator-private notes and decision reasoning are never exposed"). Toggle button reads "Publish public audit" (off) or "Unpublish" (on). All test-ids on (`winery-public-audit-toggle`, `winery-public-audit-link`, `winery-public-audit-section`).
+  - **Test coverage**: `server/tests/test_winery_rename.mjs` extended — verifies (a) default off, (b) 404 when off, (c) owner can enable, (d) 200 with correct branding when on, (e) reasoning text NEVER appears in HTML, (f) non-owner FORBIDDEN on toggle, (g) unknown slug → 404. **29/29 assertions pass.** Phase 2 cross-winery isolation still passes (regression confirmed).
+  - **Value**: stable, branded, indexable URL winemakers can paste on their About page ("View our live cellar audit →") for SEO + trust signalling AND regulators can verify against without an email attachment. Pairs with the branded PDF for the inverse use-case (offline submission vs online linkability).
+
 - [x] **Per-winery logo on compliance PDF exports + winery rename / region / brand colour (Feb 2026)**.
   - New `wineryRouter` (`server/routers/winery.ts`): `winery.current` returns `{id, name, slug, plan, region, brandColor, logoUrl, isOwner}`; `winery.update` accepts partial `{name, region, brandColor, logoUrl}` patches; only the row's `owner_user_id` can write.
   - Validation: empty-string region/brandColor/logoUrl clears the field; hex colour regex enforces `#RGB` / `#RRGGBB` only; logoUrl regex enforces `https://…` only (rejects `http://`, `javascript:`, `data:` etc. so nothing unsafe ever embeds in a regulator-bound PDF).

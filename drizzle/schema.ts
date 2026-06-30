@@ -1237,6 +1237,9 @@ export const wineries = mysqlTable(
     region: varchar("region", { length: 128 }),
     brandColor: varchar("brand_color", { length: 16 }),
     logoUrl: varchar("logo_url", { length: 512 }),
+    // Opt-in publication of /audit/<slug> public-facing audit page. Default
+    // false — no operational data leaves the winery without explicit consent.
+    publicAuditEnabled: boolean("public_audit_enabled").notNull().default(false),
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
   },
   (t) => [

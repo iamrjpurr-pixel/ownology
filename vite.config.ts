@@ -67,6 +67,13 @@ export default defineConfig({
         target: "http://127.0.0.1:8001",
         changeOrigin: true,
       },
+      // Public vanity audit pages — `/audit/:slug` is served by Express,
+      // not the SPA. Without this proxy entry Vite would intercept the URL
+      // and return index.html, breaking the public audit page in dev.
+      "/audit": {
+        target: "http://127.0.0.1:8001",
+        changeOrigin: true,
+      },
     },
     fs: {
       strict: true,

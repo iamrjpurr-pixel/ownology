@@ -388,6 +388,79 @@ function WinerySection() {
         </div>
       </div>
 
+      {/* Public audit toggle — opt-in, owner-only, big privacy callout */}
+      <div
+        data-testid="winery-public-audit-section"
+        style={{
+          marginTop: "1.6rem",
+          padding: "1rem 1.1rem",
+          background: winery.publicAuditEnabled
+            ? "color-mix(in oklch, var(--ow-amber) 8%, transparent)"
+            : "var(--ow-bg-base)",
+          border: `1px solid ${winery.publicAuditEnabled ? "var(--ow-amber)" : "var(--ow-border-md)"}`,
+          borderRadius: 6,
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
+          <div style={{ flex: "1 1 320px" }}>
+            <div style={{ fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: "0.96rem", marginBottom: 4 }}>
+              Public audit page
+              {winery.publicAuditEnabled && (
+                <span style={{ marginLeft: 8, fontSize: "0.62rem", padding: "2px 7px", background: "var(--ow-amber)", color: "white", borderRadius: 3, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", fontFamily: "'Lato',sans-serif" }}>
+                  Published
+                </span>
+              )}
+            </div>
+            <p style={{ fontSize: "0.82rem", color: "var(--ow-text-mid)", margin: "0 0 0.5rem", lineHeight: 1.55 }}>
+              Publish a live, branded audit page at <code style={{ fontFamily: "ui-monospace,monospace", fontSize: "0.84rem", background: "var(--ow-bg-card)", padding: "1px 6px", borderRadius: 3 }}>/audit/{winery.slug}</code> showing your last 90 days of compliance-relevant cellar activity. Link it from your About page; share with regulators.
+            </p>
+            <p style={{ fontSize: "0.74rem", color: "var(--ow-text-lo)", margin: 0, lineHeight: 1.5 }}>
+              Privacy: only event date · tank · variety · event type + structured measurement values are shown. Operator-private notes and decision reasoning are <strong>never</strong> exposed.
+            </p>
+          </div>
+          {!readOnly && (
+            <button
+              type="button"
+              data-testid="winery-public-audit-toggle"
+              disabled={update.isPending}
+              onClick={() => {
+                update.mutate({ publicAuditEnabled: !winery.publicAuditEnabled });
+              }}
+              style={{
+                minHeight: 36,
+                padding: "0.4rem 1rem",
+                background: winery.publicAuditEnabled ? "transparent" : "var(--ow-amber)",
+                color: winery.publicAuditEnabled ? "var(--ow-text-mid)" : "white",
+                border: winery.publicAuditEnabled ? "1px solid var(--ow-border-md)" : "none",
+                borderRadius: 4,
+                cursor: update.isPending ? "wait" : "pointer",
+                fontSize: "0.74rem",
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            >
+              {winery.publicAuditEnabled ? "Unpublish" : "Publish public audit"}
+            </button>
+          )}
+        </div>
+        {winery.publicAuditEnabled && (
+          <div style={{ marginTop: "0.8rem", paddingTop: "0.8rem", borderTop: "1px dashed var(--ow-border-md)", fontSize: "0.8rem" }}>
+            <a
+              href={`/audit/${winery.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="winery-public-audit-link"
+              style={{ color: "var(--ow-amber)", fontWeight: 700, textDecoration: "none" }}
+            >
+              View live audit page →
+            </a>
+          </div>
+        )}
+      </div>
+
       <div style={{ marginTop: "1.2rem", fontSize: "0.78rem", color: "var(--ow-text-lo)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
         <div>
           <span>Plan · </span>

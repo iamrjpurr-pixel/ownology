@@ -17,6 +17,7 @@ import { trinityNewsletterHandler } from "./scheduled/trinityNewsletter.js";
 import { cellarJournalSitemapHandler, robotsTxtHandler, cellarJournalRssHandler } from "./sitemap.js";
 import { generateAuditTrailPdf } from "./auditTrailPdf.js";
 import { dailyAlertEmailHandler } from "./scheduled/dailyAlertEmail.js";
+import { publicAuditHandler } from "./publicAudit.js";
 import authRouter from "./authRouter.js";
 import { jwtVerify } from "jose";
 import { parse as parseCookies } from "cookie";
@@ -158,6 +159,12 @@ async function startServer() {
   // ── Compliance audit trail PDF (regulator-ready export) ─────────────────────
   app.get("/api/compliance/audit-trail.pdf", generateAuditTrailPdf);
 
+  // ── Public, opt-in vanity audit page (per-winery /audit/:slug) ──────────────
+  // Privacy-first: 404 unless the winery has toggled publicAuditEnabled=true
+  // on /admin/settings. No operator names, no reasoning, no notes — only
+  // regulator-relevant structured event fields. Rate-limited per IP.
+  app.get("/audit/:slug", publicAuditHandler);
+
   // ── SOP Library export (Markdown + PDF) — owner-only ────────────────────────
   // Run `node scripts/export-sops.mjs` to regenerate. These endpoints serve
   // the most recent generated copy. Behind adminGate so only you can grab it.
@@ -265,9 +272,19 @@ async function startServer() {
         void alterErr;
       }
     }
+    // Add public_audit_enabled column to wineries (Feb 2026, vanity URL feature).
+    try {
+      await db.execute(sql`ALTER TABLE wineries ADD COLUMN IF NOT EXISTS public_audit_enabled BOOLEAN NOT NULL DEFAULT FALSE`);
+    } catch {
+      try {
+        await db.execute(sql`ALTER TABLE wineries ADD COLUMN public_audit_enabled BOOLEAN NOT NULL DEFAULT FALSE`);
+      } catch {
+        // already exists
+      }
+    }
+
     // Seed Default Winery containing existing data. Owner is the seed admin.
-    const seedOwnerOpenId = process.env.OWNER_OPEN_ID || "seed-owner-001";
-    const seedRows = await db.execute(sql`SELECT id FROM users WHERE open_id = ${seedOwnerOpenId} LIMIT 1`);
+    const seedOwnerOpenId = process.env.OWNER_OPEN_ID || "seed-owner-001";    const seedRows = await db.execute(sql`SELECT id FROM users WHERE open_id = ${seedOwnerOpenId} LIMIT 1`);
     type SeedRow = { id: number };
     const seedRowArr = (seedRows as unknown as [SeedRow[]])[0] || [];
     if (Array.isArray(seedRowArr) && seedRowArr[0]?.id) {

@@ -143,6 +143,35 @@ async function main() {
     res = await trpcQuery(ownerCookie, "winery.current");
     assert(res[0]?.result?.data?.json?.logoUrl === "https://example.com/logo.png", "logoUrl persisted");
 
+    // 5e. publicAuditEnabled defaults to false
+    assert(res[0]?.result?.data?.json?.publicAuditEnabled === false, "publicAuditEnabled defaults to false");
+
+    // 5f. /audit/:slug returns 404 when not enabled
+    const slug = `pre-rename-${NOW}`;
+    let r = await fetch(`${BASE}/audit/${slug}`);
+    assert(r.status === 404, "GET /audit/:slug → 404 when publicAuditEnabled=false");
+
+    // 5g. owner can enable the public audit
+    res = await trpcMutation(ownerCookie, "winery.update", { publicAuditEnabled: true });
+    assert(res[0]?.result?.data?.json?.ok === true, "owner can enable publicAuditEnabled");
+
+    // 5h. /audit/:slug now returns 200 with HTML + branding
+    r = await fetch(`${BASE}/audit/${slug}`);
+    assert(r.status === 200, "GET /audit/:slug → 200 when enabled");
+    const html = await r.text();
+    assert(html.includes("Renamed Estate"), "page shows winery name (Renamed Estate)");
+    assert(html.includes("Verified by Ownology"), "page shows verified badge");
+    assert(html.includes("Compliance Audit Trail"), "page shows audit trail heading");
+    assert(!html.includes("Cool morning measurement"), "page does NOT leak reasoning text");
+
+    // 5i. non-owner cannot enable on a different winery — covered by FORBIDDEN
+    res = await trpcMutation(memberCookie, "winery.update", { publicAuditEnabled: false });
+    assert(res[0]?.error?.json?.data?.code === "FORBIDDEN", "non-owner cannot toggle publicAuditEnabled");
+
+    // 5j. unknown slug returns 404
+    r = await fetch(`${BASE}/audit/nonexistent-winery-${NOW}`);
+    assert(r.status === 404, "unknown slug → 404");
+
     // 6. clearing region with empty string sets NULL
     res = await trpcMutation(ownerCookie, "winery.update", { region: "" });
     assert(res[0]?.result?.data?.json?.ok === true, "empty region accepted");

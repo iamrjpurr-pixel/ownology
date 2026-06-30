@@ -41,6 +41,7 @@ const wineryRouter = router({
       region: w.region ?? null,
       brandColor: w.brandColor ?? null,
       logoUrl: w.logoUrl ?? null,
+      publicAuditEnabled: !!w.publicAuditEnabled,
       isOwner: w.ownerUserId === dbUser.id,
     };
   }),
@@ -59,6 +60,7 @@ const wineryRouter = router({
       region: z.string().trim().max(128).nullable().optional(),
       brandColor: z.string().trim().max(16).nullable().optional(),
       logoUrl: z.string().trim().max(512).nullable().optional(),
+      publicAuditEnabled: z.boolean().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       const dbUser = await getUserByOpenId(ctx.user.openId);
@@ -94,11 +96,12 @@ const wineryRouter = router({
           });
         }
       }
-      const patch: Partial<{ name: string; region: string | null; brandColor: string | null; logoUrl: string | null }> = {};
+      const patch: Partial<{ name: string; region: string | null; brandColor: string | null; logoUrl: string | null; publicAuditEnabled: boolean }> = {};
       if (input.name !== undefined) patch.name = input.name;
       if (input.region !== undefined) patch.region = input.region === "" ? null : input.region;
       if (input.brandColor !== undefined) patch.brandColor = input.brandColor === "" ? null : input.brandColor;
       if (input.logoUrl !== undefined) patch.logoUrl = input.logoUrl === "" ? null : input.logoUrl;
+      if (input.publicAuditEnabled !== undefined) patch.publicAuditEnabled = input.publicAuditEnabled;
       if (Object.keys(patch).length === 0) {
         return { ok: true, unchanged: true };
       }
