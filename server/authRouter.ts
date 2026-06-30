@@ -192,30 +192,57 @@ router.post("/exchange", express.json(), async (req: Request, res: Response) => 
  * Verifies the existing `app_session_id` cookie and returns the user. The
  * cookie verification reuses the same logic as tRPC's getUserFromCookie so
  * this endpoint stays the single source of truth on the frontend.
+ *
+ * Dev-bypass: when ENABLE_DEV_BYPASS is on (or NODE_ENV !== production
+ * without explicit "false"), and no real cookie is present, return the
+ * seed admin user. Mirrors the tRPC bypass so the client AuthProvider
+ * sees a consistent identity in preview and dev.
  */
+function isDevBypassActive(): boolean {
+  if (process.env.ENABLE_DEV_BYPASS === "false") return false;
+  if (process.env.NODE_ENV === "production" &&
+      process.env.ENABLE_DEV_BYPASS !== "true") return false;
+  return true;
+}
+
 router.get("/me", async (req: Request, res: Response) => {
   const { jwtVerify } = await import("jose");
   const { parse: parseCookies } = await import("cookie");
+  // 1. Try the real cookie first.
   try {
     const cookieHeader = req.headers.cookie;
-    if (!cookieHeader) return res.status(401).json({ error: "no cookie" });
-    const cookies = parseCookies(cookieHeader);
-    const token = cookies[COOKIE_NAME];
-    if (!token) return res.status(401).json({ error: "no session" });
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) return res.status(500).json({ error: "jwt secret missing" });
-    const { payload } = await jwtVerify(token, new TextEncoder().encode(jwtSecret));
+    if (cookieHeader) {
+      const cookies = parseCookies(cookieHeader);
+      const token = cookies[COOKIE_NAME];
+      const jwtSecret = process.env.JWT_SECRET;
+      if (token && jwtSecret) {
+        const { payload } = await jwtVerify(token, new TextEncoder().encode(jwtSecret));
+        return res.json({
+          user: {
+            openId: payload.openId,
+            name: payload.name,
+            email: payload.email,
+            role: payload.role,
+          },
+        });
+      }
+    }
+  } catch { /* fall through to dev-bypass / 401 */ }
+
+  // 2. Dev-bypass: surface the seed admin so the client AuthProvider has a
+  //    user to show in preview environments.
+  if (isDevBypassActive()) {
     return res.json({
       user: {
-        openId: payload.openId,
-        name: payload.name,
-        email: payload.email,
-        role: payload.role,
+        openId: process.env.OWNER_OPEN_ID || "seed-owner-001",
+        name: process.env.OWNER_NAME || "Redstone Ridge Wines",
+        email: "cellar@redstoneridge.com.au",
+        role: "admin",
       },
     });
-  } catch {
-    return res.status(401).json({ error: "invalid session" });
   }
+
+  return res.status(401).json({ error: "no session" });
 });
 
 /**

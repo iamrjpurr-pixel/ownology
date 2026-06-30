@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "@/lib/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
+import UserMenu from "@/components/UserMenu";
 import ThemeOnboarding from "@/components/ThemeOnboarding";
 import CrushCascade from "@/components/CrushCascade";
 
@@ -325,6 +326,7 @@ function App() {
             <Router />
             <PwaInstallBanner />
             <GlobalThemeToggle />
+            <UserMenu />
           </TooltipProvider>
         </AuthProvider>
       </ThemeProvider>

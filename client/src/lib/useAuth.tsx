@@ -51,7 +51,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await r.json();
       setUser(data.user);
       setStatus("authed");
-    } catch {
+    } catch (e: unknown) {
+      // AbortError (HMR / navigation) shouldn't flip us to "anon" — the
+      // next render will retry. Only treat real failures as anonymous.
+      const name = e instanceof Error ? e.name : "";
+      if (name === "AbortError") return;
       setUser(null);
       setStatus("anon");
     }
