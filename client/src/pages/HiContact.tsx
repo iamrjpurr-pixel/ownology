@@ -207,6 +207,17 @@ export default function HiContact() {
           See a sample 2026 vintage log →
         </a>
 
+        {/* Tertiary CTA — the LIVE Cellar Brief running on real seeded vintage
+            data. Lets prospects flip from the static sample (above) to the
+            actual daily-driver workflow. Tagged for funnel attribution. */}
+        <Link
+          href={`/cellar-brief?from=sms-${contact.slug}`}
+          data-testid="hi-cta-cellar-brief"
+          style={btnTertiary}
+        >
+          ✦ See today&apos;s live Cellar Brief →
+        </Link>
+
         {/* Signature */}
         <p style={{ marginTop: "3rem", fontFamily: "'Lato',sans-serif", fontSize: "0.85rem", color: "#6b7280" }}>
           — Built by a working winemaker, for working winemakers.
@@ -270,4 +281,20 @@ const btnSecondary: React.CSSProperties = {
   marginTop: "0.75rem",
   border: "1px solid #b45309",
   borderRadius: 6,
+};
+const btnTertiary: React.CSSProperties = {
+  display: "block",
+  width: "100%",
+  padding: "0.85rem 1.25rem",
+  background: "rgba(180, 83, 9, 0.04)",
+  color: "#7c3a07",
+  fontFamily: "'Lato',sans-serif",
+  fontWeight: 600,
+  fontSize: "0.88rem",
+  textAlign: "center",
+  textDecoration: "none",
+  marginTop: "0.6rem",
+  border: "1px dashed rgba(180, 83, 9, 0.5)",
+  borderRadius: 6,
+  letterSpacing: "0.01em",
 };
