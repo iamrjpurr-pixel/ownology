@@ -291,7 +291,7 @@ async function startServer() {
         CREATE TABLE IF NOT EXISTS cellar_briefs (
           id INT AUTO_INCREMENT PRIMARY KEY,
           winery_id INT NOT NULL,
-          trigger VARCHAR(16) NOT NULL,
+          \`trigger\` VARCHAR(16) NOT NULL,
           attention_count INT NOT NULL DEFAULT 0,
           decisions_due_count INT NOT NULL DEFAULT 0,
           tank_count INT NOT NULL DEFAULT 0,

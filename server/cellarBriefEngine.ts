@@ -114,8 +114,8 @@ export function inferWineColor(variety: string): WineColor {
   if (RED_VARIETIES.has(v)) return "red";
   if (WHITE_VARIETIES.has(v)) return "white";
   // Partial match — handle blends like "Cab Sauv / Shiraz" or "Sauv Blanc — Semillon"
-  for (const r of RED_VARIETIES) if (v.includes(r)) return "red";
-  for (const w of WHITE_VARIETIES) if (v.includes(w)) return "white";
+  for (const r of Array.from(RED_VARIETIES)) if (v.includes(r)) return "red";
+  for (const w of Array.from(WHITE_VARIETIES)) if (v.includes(w)) return "white";
   // Last-ditch heuristic: tokens like "white", "rouge", "noir"
   if (v.includes("white") || v.includes("blanc")) return "white";
   if (v.includes("noir") || v.includes("rouge") || v.includes("red")) return "red";
@@ -123,6 +123,127 @@ export function inferWineColor(variety: string): WineColor {
   // and the red flow is the more conservative classifier (it expects a
   // press event mid-stage that the white flow ignores).
   return "red";
+}
+
+// ─── WBS taxonomy bridge ─────────────────────────────────────────────────────
+//
+// Every Cellar Brief stage maps to one or more WBS process families. Those
+// codes are the join key to sop_library + diy_knowledge_chunks, which lets
+// us hydrate grounding refs dynamically per (stage × wine_color) instead of
+// hardcoding "SOP 11" strings that drift out of sync as the library grows.
+//
+// Stage → WBS code mapping is intentionally narrow: only the codes whose
+// content is actionable for that stage. e.g. SO₂ at Crush (3.3) is only
+// listed in pre_ferment because that's when winemakers act on it.
+
+const STAGE_TO_WBS: Record<CellarBriefStage, { red: string[]; white: string[] }> = {
+  pre_ferment: {
+    // Reds = cold-soak with skins (3.1) + crush SO2 (3.3)
+    red:   ["3.1", "3.3", "4.2"],
+    // Whites = press immediately (4.6), settle/rack (5.3), bench acidity (8.1)
+    white: ["4.6", "5.3", "8.1", "4.2"],
+  },
+  primary_active: {
+    red:   ["4.1", "4.3"],
+    white: ["4.1", "4.3"],
+  },
+  primary_slowing: {
+    red:   ["4.1", "4.4", "8.1"],
+    white: ["4.1", "4.4", "8.1"],
+  },
+  pressed:        { red: ["4.6", "4.8"], white: ["4.6", "4.8"] },
+  mlf_active:     { red: ["4.8"],        white: ["4.8"] },
+  aging_tank:     { red: ["5.2", "5.3"], white: ["5.3", "6.1"] },
+  aging_barrel:   { red: ["5.1", "5.2", "5.4"], white: ["5.1", "5.4", "6.1"] },
+  bottled:        { red: ["7.1"], white: ["7.1"] },
+  unknown:        { red: [], white: [] },
+};
+
+/**
+ * Resolves the WBS codes for a (stage × color) tuple into human-readable
+ * grounding labels. Returns at most 3 SOPs and 2 Wine Bible chapters per
+ * card (any more crowds the UI and dilutes signal).
+ *
+ * Pre-fetches the entire SOP library + bible chapter index once per brief
+ * generation (passed in via the cache param) so we don't N+1 query.
+ */
+type WbsCache = {
+  sopsByWbs: Map<string, Array<{ id: number; title: string }>>;
+  chunksByWbs: Map<string, Array<{ source: string; chapterRef: string; chapterTitle: string }>>;
+};
+
+function resolveGrounding(stage: CellarBriefStage, color: WineColor, cache: WbsCache): string[] {
+  const treatAsWhite = color === "white" || color === "rose";
+  const wbsCodes = STAGE_TO_WBS[stage]?.[treatAsWhite ? "white" : "red"] ?? [];
+  const out: string[] = [];
+  const seenSop = new Set<number>();
+  const seenChunk = new Set<string>();
+  // SOPs first (most actionable for a cellar hand)
+  for (const code of wbsCodes) {
+    const sops = cache.sopsByWbs.get(code) ?? [];
+    for (const s of sops) {
+      if (seenSop.has(s.id)) continue;
+      seenSop.add(s.id);
+      out.push(`SOP ${s.id} ${s.title}`);
+      if (out.filter((l) => l.startsWith("SOP")).length >= 3) break;
+    }
+    if (out.filter((l) => l.startsWith("SOP")).length >= 3) break;
+  }
+  // Bible chapters — filter by colour at the chapter level
+  const SOURCE_LABEL: Record<string, string> = {
+    red_wine_bible: "Red Wine Bible",
+    white_wine_bible: "White Wine Bible",
+    morew_red_outline: "Red Wine Outline",
+    morew_white_outline: "White Wine Outline",
+  };
+  const preferred = treatAsWhite ? ["white_wine_bible", "morew_white_outline"] : ["red_wine_bible", "morew_red_outline"];
+  for (const code of wbsCodes) {
+    const chunks = cache.chunksByWbs.get(code) ?? [];
+    const filtered = chunks
+      .filter((c) => preferred.includes(c.source))
+      .sort((a, b) => preferred.indexOf(a.source) - preferred.indexOf(b.source));
+    for (const c of filtered) {
+      const key = `${c.source}:${c.chapterRef}`;
+      if (seenChunk.has(key)) continue;
+      seenChunk.add(key);
+      const refTrim = String(c.chapterRef).replace(/^Ch/i, "").trim();
+      const refDisplay = /^\d/.test(refTrim) ? `Ch.${refTrim}` : (refTrim || c.chapterRef);
+      out.push(`${SOURCE_LABEL[c.source] ?? c.source} ${refDisplay} — ${c.chapterTitle}`);
+      if (out.filter((l) => !l.startsWith("SOP")).length >= 2) break;
+    }
+    if (out.filter((l) => !l.startsWith("SOP")).length >= 2) break;
+  }
+  return out;
+}
+
+async function buildWbsCache(): Promise<WbsCache> {
+  const sopRows = await db
+    .select({ id: schema.sopLibrary.id, title: schema.sopLibrary.title, wbsCode: schema.sopLibrary.wbsCode })
+    .from(schema.sopLibrary)
+    .where(eq(schema.sopLibrary.published, true));
+  const sopsByWbs = new Map<string, Array<{ id: number; title: string }>>();
+  for (const r of sopRows) {
+    if (!r.wbsCode) continue;
+    let arr = sopsByWbs.get(r.wbsCode);
+    if (!arr) { arr = []; sopsByWbs.set(r.wbsCode, arr); }
+    arr.push({ id: r.id, title: r.title });
+  }
+  const chunkRows = await db
+    .selectDistinct({
+      source: schema.diyKnowledgeChunks.sourceDoc,
+      chapterRef: schema.diyKnowledgeChunks.chapterRef,
+      chapterTitle: schema.diyKnowledgeChunks.chapterTitle,
+      wbsCode: schema.diyKnowledgeChunks.wbsCode,
+    })
+    .from(schema.diyKnowledgeChunks);
+  const chunksByWbs = new Map<string, Array<{ source: string; chapterRef: string; chapterTitle: string }>>();
+  for (const r of chunkRows) {
+    if (!r.wbsCode || !r.source || !r.chapterRef) continue;
+    let arr = chunksByWbs.get(r.wbsCode);
+    if (!arr) { arr = []; chunksByWbs.set(r.wbsCode, arr); }
+    arr.push({ source: r.source, chapterRef: r.chapterRef, chapterTitle: r.chapterTitle ?? "" });
+  }
+  return { sopsByWbs, chunksByWbs };
 }
 
 type LogEntry = typeof schema.vintageLogEntries.$inferSelect;
@@ -298,32 +419,24 @@ function buildCard(
   color: WineColor,
   events: LogEntry[],
   stageInfo: { stage: CellarBriefStage; stageStartAt: number },
+  wbsCache: WbsCache,
 ): CellarBriefCard {
   const { stage, stageStartAt } = stageInfo;
   const daysInStage = Math.max(0, Math.floor((Date.now() - stageStartAt) / ONE_DAY_MS));
   const isWhite = color === "white";
   const isRose = color === "rose";
 
-  // Variety-specific grounding refs. Whites cite White Wine Bible chapters;
-  // reds cite Red Wine Bible. SOP ids are the same library either way.
-  const bibleRed = "Red Wine Bible";
-  const bibleWhite = "White Wine Bible";
-
   let status: CellarBriefStatus = "ok";
   let trajectory = "Insufficient data";
   const todaysWork: string[] = [];
   let decisionDue: string | null = null;
-  const grounding: string[] = [];
+  // Grounding refs are resolved from the WBS taxonomy at the end of the
+  // switch, so they pick up variety-correct SOPs + Wine Bible chapters
+  // automatically from the DB rather than hardcoded strings drifting.
+  const grounding: string[] = resolveGrounding(stage, color, wbsCache);
 
   if (stage === "pre_ferment") {
     if (isWhite || isRose) {
-      // Whites/rosés are NOT cold soaking — they're settling pressed juice
-      // (debourbage) or doing a short skin contact (rosé saignée).
-      grounding.push(
-        "SOP 23 Pressing",
-        "SOP 26 Racking off Gross Lees",
-        `${bibleWhite} Ch.2 Prepare the Juice`,
-      );
       trajectory = daysInStage <= 1
         ? "Juice settling (debourbage) — pre-inoculation"
         : `Settling day ${daysInStage} — lees clarification in progress`;
@@ -335,12 +448,6 @@ function buildCard(
         status = "watch";
       }
     } else {
-      // Reds + skin-contact whites: cold soak with skins
-      grounding.push(
-        "SOP 10 Cold Soak",
-        "SOP 14 Cap Management",
-        `${bibleRed} Ch.2 The Crush`,
-      );
       trajectory = daysInStage <= 1
         ? "Cold soak in progress"
         : `Cold soak day ${daysInStage} — colour & tannin extraction continuing`;
@@ -354,22 +461,6 @@ function buildCard(
       }
     }
   } else if (stage === "primary_active") {
-    if (isWhite || isRose) {
-      // White primary: cooler temps, no cap, no pump-over. Stirring lees
-      // only for Chardonnay-style. Focus on temp control + Brix tracking.
-      grounding.push(
-        "SOP 13 White Wine Fermentation Temperature Control",
-        `${bibleWhite} Ch.3 Choose Yeast & Inoculate`,
-        `${bibleWhite} Ch.4 Track Fermentation`,
-      );
-    } else {
-      grounding.push(
-        "SOP 11 Red Wine Fermentation",
-        "SOP 12 Pump-Over Protocol",
-        "SOP 14 Cap Management",
-        `${bibleRed} Ch.3 Primary Fermentation`,
-      );
-    }
     const { slope, latestValue, pointCount } = brixSlope(events);
     if (latestValue !== null && slope !== null) {
       const slopeStr = `${slope.toFixed(1)}°Bx/day`;
@@ -403,18 +494,6 @@ function buildCard(
       todaysWork.push("YAN check overdue — measure to confirm yeast nutrition adequate");
     }
   } else if (stage === "primary_slowing") {
-    grounding.push("SOP 39 Stuck Fermentation");
-    if (isWhite || isRose) {
-      grounding.push(
-        "SOP 13 White Wine Fermentation Temperature Control",
-        `${bibleWhite} Ch.4 Track Fermentation`,
-      );
-    } else {
-      grounding.push(
-        "SOP 11 Red Wine Fermentation",
-        `${bibleRed} Ch.3 Primary Fermentation`,
-      );
-    }
     const { slope, latestValue } = brixSlope(events);
     if (latestValue !== null) {
       trajectory = `Brix ${latestValue.toFixed(1)} · ferment finishing${slope !== null ? ` (${slope.toFixed(1)}°Bx/day)` : ""}`;
@@ -432,29 +511,16 @@ function buildCard(
         : "Press window open — confirm dryness + bench taste before pressing";
     }
   } else if (stage === "pressed") {
-    // Reds only (whites use the white_aging path below — they don't have
-    // a post-primary press stage). Skin-contact whites use the same red flow.
-    grounding.push(
-      "SOP 23 Pressing",
-      "SOP 24 Free-Run vs Press-Run Separation",
-      "SOP 21 MLF Management",
-      `${bibleRed} Ch.4 The Press`,
-    );
     trajectory = `Pressed ${daysInStage}d ago · awaiting MLF inoculation`;
     if (daysInStage > 3) {
       status = "watch";
       decisionDue = "MLF inoculation overdue — inoculate ML bacteria or co-inoculate if not done";
-      todaysWork.push("Inoculate MLF (Oenococcus oeni) per SOP 22");
+      todaysWork.push("Inoculate MLF (Oenococcus oeni) per the MLF SOP");
     } else {
       todaysWork.push("Allow 24–48h settle before MLF inoculation");
       todaysWork.push("Check temperature (target 18–22°C for MLF)");
     }
   } else if (stage === "mlf_active") {
-    grounding.push(
-      "SOP 21 MLF Management",
-      "SOP 22 MLF Inoculation",
-      isWhite ? `${bibleWhite} Ch.5 Optional MLF` : `${bibleRed} Ch.6 Malolactic Fermentation`,
-    );
     trajectory = `MLF in progress · day ${daysInStage}${isWhite ? " · (optional for whites)" : ""}`;
     todaysWork.push("Weekly malic acid measurement (paper chromatography or enzymatic)");
     todaysWork.push(`Hold temperature ${isWhite ? "16–20°C" : "18–22°C"} — no SO₂ until complete`);
@@ -465,20 +531,6 @@ function buildCard(
       decisionDue = "MLF likely completing — test malic acid (<0.3 g/L = complete)";
     }
   } else if (stage === "aging_tank" || stage === "aging_barrel") {
-    grounding.push("SOP 19 Post-MLF SO₂");
-    if (isWhite || isRose) {
-      grounding.push(
-        stage === "aging_barrel" ? "SOP 33 Oak Programme" : "SOP 27 Fine Lees Stirring (Bâtonnage)",
-        "SOP 28 Cold Stabilisation",
-        `${bibleWhite} Ch.6 Maturation`,
-        `${bibleWhite} Ch.7 Stabilisation`,
-      );
-    } else {
-      grounding.push(
-        stage === "aging_barrel" ? "SOP 37 Barrel Topping" : "SOP 26 Racking off Lees",
-        stage === "aging_barrel" ? `${bibleRed} Ch.8 Maturation` : `${bibleRed} Ch.5 Post-Ferment`,
-      );
-    }
     trajectory = `${stage === "aging_barrel" ? "Barrel" : "Tank"} ageing · day ${daysInStage}`;
     const lastSo2 = events
       .filter((e) => e.eventType === "addition" && /so.?2|sulphit|kms|metabisul/i.test(String(parseDetails(e).productName ?? "") + " " + (e.noteText ?? "")))
@@ -497,7 +549,6 @@ function buildCard(
         todaysWork.push(`Next top-up due in ${Math.max(1, 14 - daysSinceTopup)} days`);
       }
     } else if (isWhite && stage === "aging_tank" && daysInStage < 60) {
-      // Chardonnay-style fine-lees stirring window
       todaysWork.push("Bâtonnage weekly if doing fine-lees ageing (Chardonnay-style)");
     }
     if (daysSinceSo2 === null || daysSinceSo2 > (isWhite ? 60 : 90)) {
@@ -507,13 +558,11 @@ function buildCard(
       todaysWork.push(`Free SO₂ measurement due in ${Math.max(1, (isWhite ? 60 : 90) - daysSinceSo2)} days`);
     }
     todaysWork.push("Monthly tasting sample (taste + visual + nose)");
-    // Pre-bottling: cold stab for whites
     if (isWhite && daysInStage > 60) {
       todaysWork.push("Plan cold stabilisation (−4°C × 7–14 days) before bottling");
     }
   } else if (stage === "bottled") {
     trajectory = `Bottled ${daysInStage}d ago — library/QA stage`;
-    grounding.push("SOP 7 Bottling & Packaging");
     todaysWork.push("Library bottle storage check");
   } else {
     trajectory = "No recent activity — first measurement will classify stage";
@@ -631,15 +680,17 @@ export async function generateCellarBrief(
   }
 
   const cards: CellarBriefCard[] = [];
-  for (const g of groups.values()) {
-    const stageInfo = classifyStage(g.events);
+  const wbsCache = await buildWbsCache();
+  for (const g of Array.from(groups.values())) {
+    const color = inferWineColor(g.variety);
+    const stageInfo = classifyStage(g.events, color);
     // Hide bottled vessels older than 30d (library stage — not actionable)
     if (stageInfo.stage === "bottled") {
       const daysAgo = (Date.now() - stageInfo.stageStartAt) / ONE_DAY_MS;
       if (daysAgo > 30) continue;
     }
     const vesselType: "tank" | "barrel" = /barrel|hogshead|puncheon|^hbd|^fb/i.test(g.tankName) ? "barrel" : "tank";
-    cards.push(buildCard(g.tankName, vesselType, g.variety, g.events, stageInfo));
+    cards.push(buildCard(g.tankName, vesselType, g.variety, color, g.events, stageInfo, wbsCache));
   }
 
   // Sort by status (attention first), then by vessel id
@@ -670,6 +721,10 @@ export async function generateCellarBrief(
     execSummary: summary.execSummary.slice(0, 511),
     generatedAt: Date.now(),
   });
-  const id = (result as unknown as { insertId: number }).insertId;
+  // mysql2 returns [ResultSetHeader, FieldPacket[]] sometimes; normalise.
+  const resultAny = result as unknown as { insertId?: number } | Array<{ insertId?: number }>;
+  const id = Array.isArray(resultAny)
+    ? (resultAny[0]?.insertId ?? 0)
+    : (resultAny.insertId ?? 0);
   return { id, summary };
 }

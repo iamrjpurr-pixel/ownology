@@ -10,6 +10,7 @@ import { pricingRouter } from "./routers/pricing.js";
 import { outreachRouter } from "./routers/outreach.js";
 import { themesRouter } from "./routers/themes.js";
 import { wineryRouter } from "./routers/winery.js";
+import { cellarBriefRouter } from "./routers/cellarBrief.js";
 import { wbsAdminRouter } from "./routers/wbsAdmin.js";
 import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
@@ -1680,5 +1681,6 @@ export const appRouter = router({
   outreach: outreachRouter,
   themes: themesRouter,
   winery: wineryRouter,
+  cellarBrief: cellarBriefRouter,
 });
 export type AppRouter = typeof appRouter;
