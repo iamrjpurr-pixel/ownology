@@ -113,6 +113,10 @@ client/public/__manus__/version.json
 .project-config.json
 .env.*
 *.env
+# Force-include the two placeholder env files Emergent's deployer expects.
+# The real env config for this app lives in /app/.env (single root file).
+!backend/.env
+!frontend/.env
 credentials.json
 *.pem
 *.key
