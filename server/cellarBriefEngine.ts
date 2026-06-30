@@ -41,6 +41,14 @@ export type CellarBriefStage =
 
 export type CellarBriefStatus = "ok" | "watch" | "attention";
 
+export type CellarBriefGhostQuestion = {
+  id: number;
+  question: string;
+  answer: string | null;
+  category: string | null;
+  difficulty: string;
+};
+
 export type CellarBriefCard = {
   vesselId: string;
   vesselType: "tank" | "barrel";
@@ -53,6 +61,9 @@ export type CellarBriefCard = {
   todaysWork: string[];
   decisionDue: string | null;
   grounding: string[];
+  // Surfaced under the card as a "Worth knowing" Q+A teaching block.
+  // null when no ghost question matches this stage × wine_color.
+  ghostQuestion: CellarBriefGhostQuestion | null;
 };
 
 export type CellarBriefSummary = {
@@ -170,6 +181,10 @@ const STAGE_TO_WBS: Record<CellarBriefStage, { red: string[]; white: string[] }>
 type WbsCache = {
   sopsByWbs: Map<string, Array<{ id: number; title: string }>>;
   chunksByWbs: Map<string, Array<{ source: string; chapterRef: string; chapterTitle: string }>>;
+  // Ghost questions indexed by `${wbsCode}::${wineType}`. wine_type is
+  // one of "red" | "white" | "general" — surfaced under each card as
+  // a teaching Q+A block.
+  ghostsByKey: Map<string, CellarBriefGhostQuestion[]>;
 };
 
 function resolveGrounding(stage: CellarBriefStage, color: WineColor, cache: WbsCache): string[] {
@@ -250,7 +265,73 @@ async function buildWbsCache(): Promise<WbsCache> {
     if (!arr) { arr = []; chunksByWbs.set(r.wbsCode, arr); }
     arr.push({ source: r.source, chapterRef: r.chapterRef, chapterTitle: r.chapterTitle ?? "" });
   }
-  return { sopsByWbs, chunksByWbs };
+  // Ghost questions — active only. Indexed by `${wbsCode}::${wineType}` for
+  // O(1) pickGhostQuestion lookup.
+  const ghostRows = await db
+    .select({
+      id: schema.ghostQuestions.id,
+      wbsCode: schema.ghostQuestions.wbsCode,
+      wineType: schema.ghostQuestions.wineType,
+      question: schema.ghostQuestions.question,
+      answer: schema.ghostQuestions.answer,
+      category: schema.ghostQuestions.category,
+      difficulty: schema.ghostQuestions.difficulty,
+    })
+    .from(schema.ghostQuestions)
+    .where(eq(schema.ghostQuestions.active, true));
+  const ghostsByKey = new Map<string, CellarBriefGhostQuestion[]>();
+  for (const r of ghostRows) {
+    if (!r.wbsCode || !r.wineType) continue;
+    const key = `${r.wbsCode}::${r.wineType}`;
+    let arr = ghostsByKey.get(key);
+    if (!arr) { arr = []; ghostsByKey.set(key, arr); }
+    arr.push({
+      id: r.id,
+      question: r.question,
+      answer: r.answer,
+      category: r.category,
+      difficulty: r.difficulty,
+    });
+  }
+  return { sopsByWbs, chunksByWbs, ghostsByKey };
+}
+
+/**
+ * Picks one ghost question relevant to (stage × wine_color). Prefers
+ * questions tagged with the exact wine type ("red" / "white") and falls
+ * back to "general". Vessel-stable: same vessel sees the same question
+ * within a single brief, but rotation across briefs is acceptable.
+ *
+ * Returns null if no question matches — caller treats that as "no
+ * teaching block on this card".
+ */
+function pickGhostQuestion(
+  vesselId: string,
+  stage: CellarBriefStage,
+  color: WineColor,
+  cache: WbsCache,
+): CellarBriefGhostQuestion | null {
+  const treatAsWhite = color === "white" || color === "rose";
+  const wbsCodes = STAGE_TO_WBS[stage]?.[treatAsWhite ? "white" : "red"] ?? [];
+  if (wbsCodes.length === 0) return null;
+  const wineTypePref = treatAsWhite ? "white" : "red";
+  // Collect candidate pool: exact-wine-type matches first, then general.
+  const pool: CellarBriefGhostQuestion[] = [];
+  for (const code of wbsCodes) {
+    pool.push(...(cache.ghostsByKey.get(`${code}::${wineTypePref}`) ?? []));
+  }
+  if (pool.length === 0) {
+    for (const code of wbsCodes) {
+      pool.push(...(cache.ghostsByKey.get(`${code}::general`) ?? []));
+    }
+  }
+  if (pool.length === 0) return null;
+  // Vessel-stable deterministic pick — same vessel always gets the same
+  // question within one brief, but two adjacent vessels get different ones.
+  let hash = 0;
+  for (let i = 0; i < vesselId.length; i++) hash = (hash * 31 + vesselId.charCodeAt(i)) | 0;
+  const idx = Math.abs(hash) % pool.length;
+  return pool[idx];
 }
 
 type LogEntry = typeof schema.vintageLogEntries.$inferSelect;
@@ -588,6 +669,7 @@ function buildCard(
     todaysWork,
     decisionDue,
     grounding,
+    ghostQuestion: pickGhostQuestion(vesselId, stage, color, wbsCache),
   };
 }
 

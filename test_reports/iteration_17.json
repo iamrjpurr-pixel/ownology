@@ -1,0 +1,44 @@
+{
+  "summary": "Iteration_17 end-to-end verification of the new Ghost Questions feature layered on top of the Cellar Brief MVP. Backend pytest 13/13 PASS (5 new ghost-question tests + 8 baseline cellar-brief regression tests). Frontend Playwright on mobile 430x1400 PASS for all ghost-question UX flows. Coverage: 220 active rows in ghost_questions (75 general, 70 red, 75 white as expected — one known 5-row gap for 3.1/red is documented and covered by 'general' fallback). 13/13 cards from /api/trpc/cellarBrief.latest returned a non-null ghostQuestion (100% coverage, ≥70% spec met). All 13 picked questions matched the card's stage→WBS × wine_color rules per STAGE_TO_WBS in /app/server/cellarBriefEngine.ts:150. Vessel-stability confirmed: two consecutive cellarBrief.generateNow POSTs produced identical (vesselId,variety)→ghostQuestion.id maps across all 13 vessels. Frontend renders 10 brief-ghost-<slug> blocks on /cellar-brief (one per expanded card; some ok-status cards remain collapsed) with the ✦ sparkle icon, 'WORTH KNOWING' uppercase label, the question text in brief-ghost-q-<slug>, and the answer correctly HIDDEN by default. Tapping brief-ghost-toggle-<slug> reveals brief-ghost-a-<slug>; tapping again collapses. Regression: exec summary banner, Refresh button, history accordion toggle, attention/decisions/vessels chips, decision-due/today's-work/grounding sections all still render and Tank 3 Shiraz still shows 'Possible stuck ferment — verify temperature, taste for off-notes, plan restart if no movement in 24h' with Brix-every-12h work and SOP 11/12/13 + Red Wine Bible Ch.3 grounding.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/trpc/cellarBrief.latest", "issue": "Known minor coverage gap: 3.1/red has 0 rows (the other 14 WBS codes have 5 red rows each; 70 total instead of 75). Documented by main agent as a transient LLM budget cap during seeding. Cold-soak red cards fall back to 'general' wine_type successfully, so no functional impact in this snapshot. Re-running scripts/seed-ghost-questions.mjs --only=3.1 with the red wine_type would close the gap."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_ghost_questions.py",
+    "/app/backend/tests/test_cellar_brief.py",
+    "/app/test_reports/pytest/iteration_17.xml"
+  ],
+  "action_items": [
+    "(Optional, low-priority) Re-run `node scripts/seed-ghost-questions.mjs --only=3.1` (red wine_type only) to close the 5-row gap and bring totals to 225/75/75/75. Functionally everything works via the general-type fallback today."
+  ],
+  "critical_code_review_comments": [
+    "/app/server/cellarBriefEngine.ts ~line 308 pickGhostQuestion: deterministic hash from vesselId/variety is the right call for stability. Confirm the hash is documented as 'vessel-stable but rotates when the underlying pool changes' so re-seeding doesn't surprise the caller. Currently any new active row inserted into ghost_questions for (wbs,wine_type) would shift the modulo and re-pick — acceptable, but worth a docstring callout.",
+    "/app/server/cellarBriefEngine.ts WbsCache: ghostsByKey eagerly loads ALL 220 active rows on every cache build. That's fine at this scale, but consider keying the cache by tenant (winery_id) once ghost questions become tenant-scoped — currently the cache is global which is correct for shared content but should be intentional.",
+    "/app/client/src/pages/CellarBrief.tsx GhostQuestionBlock (line 431): when `q.answer` is null the toggle still toggles `open` but nothing renders. Either disable the toggle (no chevron, not focusable) when answer is null, OR render a 'Answer not yet available' placeholder so users don't tap a dead control. With current seed all 220 rows have non-null answers so this is dormant, but worth hardening.",
+    "/app/client/src/pages/CellarBrief.tsx line 458: the question paragraph uses data-testid=brief-ghost-q-${slug} INSIDE the toggle button — clicking the question text itself triggers the toggle (good UX), but the question element is therefore not independently selectable for a 'long-press to copy' affordance. Acceptable, just confirming the intent.",
+    "Carry-over from iter_16 (still open): Tank 2 Chardonnay primary_active grounding still emits Red Wine Bible Ch.3 instead of White Wine Bible refs. The variety→color routing for the grounding lookup in buildCard (~line 415) was NOT touched in this iteration. Not a ghost-question regression but the prior iter_16 action item is still outstanding.",
+    "Carry-over from iter_16 (still open): cellarBrief.history pagination via beforeGeneratedAt cursor is broken (the `lt(generatedAt, ...)` AND clause was replaced with a duplicate wineryId condition). Not exercised by this iter's tests but pagination is still effectively first-page-only.",
+    "/app/scripts/_check_ghost.mjs was created during this run for ad-hoc DB validation and has been removed; no checked-in artifacts."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_ghost_questions.py (new — 5 tests)"
+  ],
+  "success_rate": {
+    "backend": "100% (13/13 pytest — 5 ghost-question tests + 8 cellar-brief baseline regression)",
+    "frontend": "100% on the 7 ghost-question spec checkpoints (block renders, ✦ icon, WORTH KNOWING label, question text in brief-ghost-q, answer hidden by default, toggle reveals/collapses, regression banner+refresh+history still render). 10 brief-ghost blocks render as expected for the 13-card feed."
+  },
+  "test_credentials": "Auth bypassed via ENABLE_DEV_BYPASS=seed-owner-001 admin (per /app/memory/test_credentials.md). No login required.",
+  "seed_data_creation": "None. Used the 220 ghost_questions rows already seeded by /app/scripts/seed-ghost-questions.mjs in the main-agent pre-test session, plus the 13 vessels from /app/scripts/seed-twelve-day-vintage.mjs.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Ghost Questions feature is fully wired end-to-end. data-testid slug formula (`${vesselId}-${variety}`.replace(/[^a-zA-Z0-9]+/g,'-').toLowerCase()) is shared with the iter_16 baseline. The 'WORTH KNOWING' label is rendered with CSS uppercase, so DOM text is 'Worth knowing' — match case-insensitively. Card pool currently renders 10 ghost blocks (the engine returns 13 cards but ok-status cards may stay collapsed and hide the inner block until expanded). For DB validation use mysql2 against process.env.DATABASE_URL — schema is MySQL, not Postgres (the seed script reuses mysql2/promise). pickGhostQuestion is vessel-stable via a deterministic hash (modulo pool size), so seeding new rows for an existing (wbs,wine_type) key WILL shift picks — flag any test that depends on a specific id.",
+  "rca of the issue": "No issues found in this iteration. The two carry-over issues (Tank 2 Chardonnay white-Bible grounding + cellarBrief.history pagination cursor) remain open from iter_16 and were re-verified as unresolved during regression — both are unrelated to the ghost-questions scope of this iteration."
+}

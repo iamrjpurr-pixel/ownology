@@ -258,6 +258,13 @@ export default function CellarBrief() {
 }
 
 // ─── BriefCard ────────────────────────────────────────────────────────────
+type GhostQ = {
+  id: number;
+  question: string;
+  answer: string | null;
+  category: string | null;
+  difficulty: string;
+};
 type Card = {
   vesselId: string;
   vesselType: "tank" | "barrel";
@@ -270,6 +277,7 @@ type Card = {
   todaysWork: string[];
   decisionDue: string | null;
   grounding: string[];
+  ghostQuestion: GhostQ | null;
 };
 
 function BriefCard({ card }: { card: Card }) {
@@ -386,6 +394,10 @@ function BriefCard({ card }: { card: Card }) {
             </div>
           )}
 
+          {card.ghostQuestion && (
+            <GhostQuestionBlock slug={slug} q={card.ghostQuestion} />
+          )}
+
           <div className="flex gap-2 mt-1">
             <Link
               href={`/quick-entry?tank=${encodeURIComponent(card.vesselId)}&variety=${encodeURIComponent(card.variety)}`}
@@ -409,3 +421,60 @@ function BriefCard({ card }: { card: Card }) {
     </div>
   );
 }
+
+/**
+ * "Worth knowing" teaching block — surfaces 1 ghost question per card.
+ * Collapsed by default (the answer is educational, not urgent) so it
+ * doesn't compete with the decision-due / today's work content for
+ * a 5:30 AM cellar hand's attention. Tap the question to expand.
+ */
+function GhostQuestionBlock({ slug, q }: { slug: string; q: GhostQ }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div
+      data-testid={`brief-ghost-${slug}`}
+      className="rounded p-3"
+      style={{
+        background: "var(--ow-bg-inset)",
+        border: "1px solid var(--ow-border)",
+      }}
+    >
+      <button
+        data-testid={`brief-ghost-toggle-${slug}`}
+        onClick={() => setOpen((v) => !v)}
+        className="w-full text-left flex items-start gap-2"
+        style={{ background: "transparent", padding: 0 }}
+      >
+        <span aria-hidden="true" style={{ color: "var(--ow-amber)", flexShrink: 0, marginTop: 1 }}>✦</span>
+        <div className="flex-1 min-w-0">
+          <p
+            className="text-xs uppercase tracking-widest font-semibold"
+            style={{ color: "var(--ow-text-lo)", margin: 0 }}
+          >
+            Worth knowing
+          </p>
+          <p
+            className="text-sm mt-1"
+            data-testid={`brief-ghost-q-${slug}`}
+            style={{ color: "var(--ow-text-hi)", margin: 0, lineHeight: 1.35 }}
+          >
+            {q.question}
+          </p>
+        </div>
+        <span style={{ color: "var(--ow-text-lo)", fontSize: "0.7rem", flexShrink: 0 }}>
+          {open ? "▴" : "▾"}
+        </span>
+      </button>
+      {open && q.answer && (
+        <p
+          data-testid={`brief-ghost-a-${slug}`}
+          className="text-sm mt-2"
+          style={{ color: "var(--ow-text-mid)", margin: 0, lineHeight: 1.5, paddingLeft: "1.25rem" }}
+        >
+          {q.answer}
+        </p>
+      )}
+    </div>
+  );
+}
+

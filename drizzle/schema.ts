@@ -891,6 +891,10 @@ export const ghostQuestions = mysqlTable(
     wineType: varchar("wine_type", { length: 10 }).notNull().default("general"),
     // The question text (plain language, home winemaker voice)
     question: text("question").notNull(),
+    // Short teaching answer (≈80–140 words) — surfaced under each
+    // Cellar Brief card to deepen educational context. Nullable so we
+    // can ship a question without an answer if regeneration fails.
+    answer: text("answer"),
     // Difficulty level: "beginner", "intermediate", "advanced"
     difficulty: varchar("difficulty", { length: 20 }).notNull().default("beginner"),
     // Category tag for grouping (e.g. "fermentation", "sanitation", "bottling")
