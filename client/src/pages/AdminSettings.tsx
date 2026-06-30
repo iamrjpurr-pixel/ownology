@@ -42,7 +42,6 @@ export default function AdminSettings() {
       }
     );
   }
-
   return (
     <div
       style={{
@@ -130,6 +129,9 @@ export default function AdminSettings() {
           )}
         </section>
 
+        {/* Winery — name, region, brand colour. Phase 2 multi-tenant container. */}
+        <WinerySection />
+
         {/* Theme suggestion opt-out (reads localStorage) */}
         <section
           style={{
@@ -176,8 +178,282 @@ export default function AdminSettings() {
   );
 }
 
-function ThemeSuggestionOptOutToggle() {
-  const [optedOut, setOptedOut] = useState(false);
+function WinerySection() {
+  const { data: winery, refetch, isLoading } = trpc.winery.current.useQuery();
+  const update = trpc.winery.update.useMutation({
+    onSuccess: () => {
+      refetch();
+      setStatus("saved");
+      window.setTimeout(() => setStatus("idle"), 1800);
+    },
+    onError: (err) => {
+      setStatus("error");
+      setErrorMsg(err.message || "Could not save");
+    },
+  });
+
+  const [name, setName] = useState("");
+  const [region, setRegion] = useState("");
+  const [brandColor, setBrandColor] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
+  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  // Hydrate form when winery loads / refetches
+  useEffect(() => {
+    if (winery) {
+      setName(winery.name);
+      setRegion(winery.region ?? "");
+      setBrandColor(winery.brandColor ?? "");
+      setLogoUrl(winery.logoUrl ?? "");
+    }
+  }, [winery]);
+
+  if (isLoading) return null;
+  if (!winery) return null;
+
+  const dirty = winery.name !== name
+    || (winery.region ?? "") !== region
+    || (winery.brandColor ?? "") !== brandColor
+    || (winery.logoUrl ?? "") !== logoUrl;
+
+  function save() {
+    if (!dirty || update.isPending) return;
+    setStatus("saving");
+    setErrorMsg("");
+    const trimmedName = name.trim();
+    if (trimmedName.length === 0) {
+      setStatus("error");
+      setErrorMsg("Winery name cannot be empty");
+      return;
+    }
+    update.mutate({
+      name: winery!.name !== trimmedName ? trimmedName : undefined,
+      region: (winery!.region ?? "") !== region ? region : undefined,
+      brandColor: (winery!.brandColor ?? "") !== brandColor ? brandColor : undefined,
+      logoUrl: (winery!.logoUrl ?? "") !== logoUrl ? logoUrl : undefined,
+    });
+  }
+
+  function revert() {
+    if (!winery) return;
+    setName(winery.name);
+    setRegion(winery.region ?? "");
+    setBrandColor(winery.brandColor ?? "");
+    setLogoUrl(winery.logoUrl ?? "");
+    setStatus("idle");
+    setErrorMsg("");
+  }
+
+  const labelStyle = {
+    display: "block" as const,
+    fontSize: "0.74rem",
+    color: "var(--ow-text-lo)",
+    letterSpacing: "0.06em",
+    textTransform: "uppercase" as const,
+    fontWeight: 700,
+    marginBottom: 6,
+  };
+  const inputStyle = {
+    width: "100%",
+    minHeight: 44,
+    padding: "0.55rem 0.75rem",
+    background: "var(--ow-bg-base)",
+    border: "1px solid var(--ow-border-md)",
+    borderRadius: 6,
+    color: "var(--ow-text-hi)",
+    fontFamily: "inherit",
+    fontSize: "0.92rem",
+    boxSizing: "border-box" as const,
+  };
+  const readOnly = !winery.isOwner;
+
+  return (
+    <section
+      style={{
+        background: "var(--ow-bg-card)",
+        border: "1px solid var(--ow-border-md)",
+        borderRadius: 8,
+        padding: "1.4rem",
+        marginBottom: "1.4rem",
+      }}
+      data-testid="settings-winery"
+    >
+      <h2 style={{ fontFamily: "'Fraunces',serif", fontSize: "1.1rem", fontWeight: 700, margin: "0 0 0.2rem" }}>
+        Winery
+      </h2>
+      <p style={{ fontSize: "0.86rem", color: "var(--ow-text-mid)", margin: "0 0 1rem", lineHeight: 1.5 }}>
+        {readOnly
+          ? "You're a member of this winery. Only the owner can edit these details."
+          : "Your winery's name, region, and brand colour. Used in document exports and the UserMenu."}
+      </p>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1rem" }}>
+        <div>
+          <label htmlFor="winery-name" style={labelStyle}>Name</label>
+          <input
+            id="winery-name"
+            data-testid="winery-name-input"
+            type="text"
+            value={name}
+            disabled={readOnly || update.isPending}
+            maxLength={255}
+            onChange={(e) => setName(e.target.value)}
+            style={inputStyle}
+          />
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 180px", gap: "1rem" }}>
+          <div>
+            <label htmlFor="winery-region" style={labelStyle}>Region (optional)</label>
+            <input
+              id="winery-region"
+              data-testid="winery-region-input"
+              type="text"
+              value={region}
+              disabled={readOnly || update.isPending}
+              maxLength={128}
+              placeholder="e.g. Hunter Valley, NSW"
+              onChange={(e) => setRegion(e.target.value)}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label htmlFor="winery-brand-color" style={labelStyle}>Brand colour</label>
+            <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
+              <input
+                id="winery-brand-color"
+                data-testid="winery-brand-color-input"
+                type="text"
+                value={brandColor}
+                disabled={readOnly || update.isPending}
+                maxLength={16}
+                placeholder="#b45309"
+                onChange={(e) => setBrandColor(e.target.value)}
+                style={{ ...inputStyle, fontFamily: "ui-monospace, monospace", fontSize: "0.85rem" }}
+              />
+              <div
+                aria-hidden
+                data-testid="winery-brand-color-swatch"
+                style={{
+                  width: 44,
+                  minHeight: 44,
+                  borderRadius: 6,
+                  border: "1px solid var(--ow-border-md)",
+                  background: /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(brandColor)
+                    ? brandColor
+                    : "var(--ow-bg-base)",
+                  flexShrink: 0,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="winery-logo-url" style={labelStyle}>Logo URL (optional)</label>
+          <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
+            <input
+              id="winery-logo-url"
+              data-testid="winery-logo-url-input"
+              type="url"
+              value={logoUrl}
+              disabled={readOnly || update.isPending}
+              maxLength={512}
+              placeholder="https://yourwinery.com/logo.png"
+              onChange={(e) => setLogoUrl(e.target.value)}
+              style={inputStyle}
+            />
+            {/^https:\/\/[^\s]{4,}$/i.test(logoUrl) && (
+              <img
+                src={logoUrl}
+                alt=""
+                data-testid="winery-logo-preview"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                style={{
+                  width: 44,
+                  height: 44,
+                  objectFit: "contain",
+                  borderRadius: 6,
+                  border: "1px solid var(--ow-border-md)",
+                  background: "var(--ow-bg-base)",
+                  flexShrink: 0,
+                }}
+              />
+            )}
+          </div>
+          <p style={{ fontSize: "0.72rem", color: "var(--ow-text-lo)", margin: "0.4rem 0 0", lineHeight: 1.4 }}>
+            Paste an https://… URL to your existing hosted logo. Used on compliance audit PDFs and SOP exports.
+          </p>
+        </div>
+      </div>
+
+      <div style={{ marginTop: "1.2rem", fontSize: "0.78rem", color: "var(--ow-text-lo)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+        <div>
+          <span>Plan · </span>
+          <strong style={{ color: "var(--ow-text-mid)", textTransform: "capitalize" }}>
+            {winery.plan.replace("_", " ")}
+          </strong>
+        </div>
+        {!readOnly && (
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            {status === "saved" && (
+              <span data-testid="winery-saved" style={{ color: "var(--ow-amber)" }}>Saved.</span>
+            )}
+            {status === "error" && (
+              <span data-testid="winery-error" style={{ color: "#b91c1c" }}>{errorMsg}</span>
+            )}
+            {dirty && (
+              <button
+                type="button"
+                onClick={revert}
+                data-testid="winery-revert-btn"
+                style={{
+                  minHeight: 36,
+                  padding: "0.4rem 0.9rem",
+                  background: "transparent",
+                  color: "var(--ow-text-mid)",
+                  border: "1px solid var(--ow-border-md)",
+                  borderRadius: 4,
+                  cursor: "pointer",
+                  fontSize: "0.78rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Revert
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={save}
+              disabled={!dirty || update.isPending}
+              data-testid="winery-save-btn"
+              style={{
+                minHeight: 36,
+                padding: "0.4rem 1.2rem",
+                background: dirty && !update.isPending ? "var(--ow-amber)" : "var(--ow-bg-base)",
+                color: dirty && !update.isPending ? "white" : "var(--ow-text-lo)",
+                border: "none",
+                borderRadius: 4,
+                cursor: dirty && !update.isPending ? "pointer" : "not-allowed",
+                fontSize: "0.78rem",
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+              }}
+            >
+              {update.isPending ? "Saving…" : "Save changes"}
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function ThemeSuggestionOptOutToggle() {  const [optedOut, setOptedOut] = useState(false);
   useEffect(() => {
     if (typeof window === "undefined") return;
     setOptedOut(window.localStorage.getItem("ownology-theme-suggest-opt-out") === "1");

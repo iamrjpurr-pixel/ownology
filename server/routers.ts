@@ -9,6 +9,7 @@ import { tutorRouter } from "./routers/tutor.js";
 import { pricingRouter } from "./routers/pricing.js";
 import { outreachRouter } from "./routers/outreach.js";
 import { themesRouter } from "./routers/themes.js";
+import { wineryRouter } from "./routers/winery.js";
 import { wbsAdminRouter } from "./routers/wbsAdmin.js";
 import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
@@ -409,8 +410,14 @@ const adminRouter = router({
    * LLM cost meter — in-memory aggregator showing what we've spent on LLM
    * calls since the last deploy/reset. Granularity: by model, by source.
    * Zero-cost to operate (no LLM calls, no DB writes).
+   *
+   * Public on purpose: the `/stats` page is a unique trust signal — winemakers
+   * can verify the platform isn't burning their data into a runaway LLM bill.
+   * Switching to publicProcedure also means `/stats` keeps working once real
+   * auth is enforced site-wide (no need to log in to see operating costs).
+   * Contains zero PII — only `{ model, spend, calls, tokens, source }` aggregates.
    */
-  llmStats: ownerProcedure.query(async () => {
+  llmStats: publicProcedure.query(async () => {
     return getLlmStats();
   }),
 
@@ -1672,5 +1679,6 @@ export const appRouter = router({
   pricing: pricingRouter,
   outreach: outreachRouter,
   themes: themesRouter,
+  winery: wineryRouter,
 });
 export type AppRouter = typeof appRouter;
