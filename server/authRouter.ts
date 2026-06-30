@@ -181,8 +181,9 @@ router.post("/exchange", express.json(), async (req: Request, res: Response) => 
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error("[auth/exchange] failed:", msg);
-    return res.status(500).json({ error: "session exchange failed" });
+    const stack = err instanceof Error ? err.stack : undefined;
+    console.error("[auth/exchange] failed:", msg, stack);
+    return res.status(500).json({ error: "session exchange failed", detail: msg });
   }
 });
 
