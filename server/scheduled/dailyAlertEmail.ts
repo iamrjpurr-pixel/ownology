@@ -165,7 +165,7 @@ export async function dailyAlertEmailHandler(req: Request, res: Response): Promi
       results.push({ userId: u.id, email: "", alerts: 0, status: "skipped_no_email" });
       continue;
     }
-    const alerts = await computeAlertsForUser(u.id);
+    const alerts = await computeAlertsForUser(u.id, u.wineryId ?? null);
     if (alerts.length === 0) {
       results.push({ userId: u.id, email: u.email, alerts: 0, status: "skipped_no_alerts" });
       continue;

@@ -4,7 +4,9 @@ import type { Request, Response } from "express";
 import { jwtVerify } from "jose";
 import { parse as parseCookies } from "cookie";
 import { COOKIE_NAME } from "../shared/const.js";
-import { upsertUser } from "./db.js";
+import { upsertUser, db } from "./db.js";
+import * as schema from "../drizzle/schema.js";
+import { eq } from "drizzle-orm";
 
 // --- Context ------------------------------------------------------------------
 export type User = {
@@ -12,6 +14,13 @@ export type User = {
   name?: string;
   email?: string;
   role: "admin" | "user";
+  // Multi-tenant container — Phase 2 (Feb 2026). Null only for legacy rows
+  // not yet backfilled or users created before the bootstrap migration ran.
+  // wineryProcedure asserts non-null before allowing the procedure to run.
+  wineryId: number | null;
+  // DB user id (users.id). Cached on context so procedures don't repeat the
+  // openId → id lookup that nearly every customer-domain procedure needs.
+  userId: number | null;
 };
 
 export type Context = {
@@ -47,10 +56,32 @@ async function getUserFromCookie(req: Request): Promise<User | null> {
       name: (payload.name as string) || undefined,
       email: (payload.email as string) || undefined,
       role: (payload.role as "admin" | "user") || "user",
+      wineryId: null,
+      userId: null,
     };
   } catch {
     return null;
   }
+}
+
+/**
+ * Resolve the user's winery_id + DB id from the users table. Cheap single
+ * query keyed on the indexed open_id column; called once per request.
+ * Best-effort: failure leaves both fields null and the procedure decides.
+ */
+async function hydrateMembership(user: User): Promise<User> {
+  try {
+    const row = await db.query.users.findFirst({
+      where: eq(schema.users.openId, user.openId),
+      columns: { id: true, wineryId: true },
+    });
+    if (row) {
+      return { ...user, userId: row.id, wineryId: row.wineryId ?? null };
+    }
+  } catch {
+    // DB hiccup — leave fields null, procedures will fall back to lookup.
+  }
+  return user;
 }
 
 // AUTH BYPASS: Auth is currently disabled site-wide. Every request is treated
@@ -61,6 +92,8 @@ const DEV_BYPASS_USER: User = {
   name: "Redstone Ridge Wines",
   email: "cellar@redstoneridge.com.au",
   role: "admin",
+  wineryId: null,
+  userId: null,
 };
 
 export async function createContext({
@@ -73,12 +106,14 @@ export async function createContext({
   const cookieUser = await getUserFromCookie(req);
   // AUTH BYPASS: always inject the seed owner if no real session cookie present.
   // This makes the entire app accessible without login (production + dev).
-  const user = cookieUser ?? DEV_BYPASS_USER;
+  const baseUser = cookieUser ?? DEV_BYPASS_USER;
   // Ensure the bypass user exists in the DB so protected routes (which call
   // getUserByOpenId) don't fail. Best-effort; ignore errors.
-  if (user === DEV_BYPASS_USER) {
-    upsertUser(user.openId, user.name, user.email).catch(() => {});
+  if (baseUser === DEV_BYPASS_USER) {
+    await upsertUser(baseUser.openId, baseUser.name, baseUser.email).catch(() => {});
   }
+  // Hydrate the winery membership + DB user id. Cheap indexed lookup.
+  const user = await hydrateMembership(baseUser);
   return { req, res, user };
 }
 
@@ -110,4 +145,38 @@ export const ownerProcedure = t.procedure.use(({ ctx, next }) => {
     throw new TRPCError({ code: "FORBIDDEN", message: "Owner access required" });
   }
   return next({ ctx: { ...ctx, user: ctx.user } });
+});
+
+/**
+ * wineryProcedure — like protectedProcedure but asserts the user has been
+ * assigned to a winery (winery_id is non-null). Use this for any procedure
+ * that reads or writes customer-domain data (vintage logs, batches, barrels,
+ * cellar tasks, etc). The narrowed `ctx.wineryId` and `ctx.userId` are
+ * available to the resolver as plain numbers.
+ *
+ * Multi-tenant Phase 2 (Feb 2026): the bootstrap backfills NULL winery_id
+ * for legacy users to the Default Winery, and authRouter auto-provisions
+ * a fresh winery for every new sign-up. So this guard should never fire
+ * in practice — it's defence-in-depth to catch a regression that bypassed
+ * the bootstrap.
+ */
+export const wineryProcedure = t.procedure.use(({ ctx, next }) => {
+  if (!ctx.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "Please login (10001)" });
+  }
+  const { wineryId, userId } = ctx.user;
+  if (wineryId === null || userId === null) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "No winery membership — contact support if this persists",
+    });
+  }
+  return next({
+    ctx: {
+      ...ctx,
+      user: ctx.user,
+      wineryId,
+      userId,
+    },
+  });
 });

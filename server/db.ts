@@ -13,6 +13,16 @@ const pool = mysql.createPool({
 
 export const db = drizzle(pool, { schema, mode: "default" });
 
+/**
+ * Multi-tenant Phase 2 (Feb 2026). Most customer-domain functions below take
+ * an OPTIONAL `wineryId` argument. When provided, the read/write is also
+ * filtered/tagged by `winery_id` — enforcing cross-winery isolation at the
+ * DB layer. When omitted/null, the function falls back to the legacy
+ * userId-only behaviour so existing internal callers (cron jobs, migrations)
+ * keep working without churn. New tRPC procedures should always pass
+ * `ctx.user.wineryId` (resolved by trpc.ts) to lock in isolation.
+ */
+
 // ─── Users ────────────────────────────────────────────────────────────────────
 
 export async function upsertUser(openId: string, name?: string, email?: string) {
@@ -130,6 +140,7 @@ export type EventType = "addition" | "measurement" | "racking" | "inoculation" |
 
 export async function addVintageLogEntry(data: {
   userId: number;
+  wineryId?: number | null;
   tankName: string;
   variety: string;
   eventType: EventType;
@@ -143,6 +154,7 @@ export async function addVintageLogEntry(data: {
   const now = Date.now();
   const result = await db.insert(schema.vintageLogEntries).values({
     userId: data.userId,
+    wineryId: data.wineryId ?? null,
     tankName: data.tankName.trim(),
     variety: data.variety.trim(),
     eventType: data.eventType,
@@ -157,31 +169,40 @@ export async function addVintageLogEntry(data: {
   return (result as unknown as { insertId: number }).insertId;
 }
 
-export async function listVintageLogEntries(userId: number, limit = 50) {
+export async function listVintageLogEntries(userId: number, limit = 50, wineryId?: number | null) {
+  const base = eq(schema.vintageLogEntries.userId, userId);
   return db.query.vintageLogEntries.findMany({
-    where: eq(schema.vintageLogEntries.userId, userId),
+    where: wineryId != null
+      ? and(base, eq(schema.vintageLogEntries.wineryId, wineryId))
+      : base,
     orderBy: [desc(schema.vintageLogEntries.entryAt)],
     limit,
   });
 }
 
-export async function getUsedTankNames(userId: number): Promise<string[]> {
+export async function getUsedTankNames(userId: number, wineryId?: number | null): Promise<string[]> {
+  const base = eq(schema.vintageLogEntries.userId, userId);
   const rows = await db.query.vintageLogEntries.findMany({
-    where: eq(schema.vintageLogEntries.userId, userId),
+    where: wineryId != null
+      ? and(base, eq(schema.vintageLogEntries.wineryId, wineryId))
+      : base,
     columns: { tankName: true },
   });
   // Return unique tank names sorted alphabetically
   return Array.from(new Set(rows.map((r) => r.tankName))).sort();
 }
 
-export async function deleteVintageLogEntry(id: number, userId: number) {
+export async function deleteVintageLogEntry(id: number, userId: number, wineryId?: number | null) {
+  const base = and(
+    eq(schema.vintageLogEntries.id, id),
+    eq(schema.vintageLogEntries.userId, userId)
+  );
   await db
     .delete(schema.vintageLogEntries)
     .where(
-      and(
-        eq(schema.vintageLogEntries.id, id),
-        eq(schema.vintageLogEntries.userId, userId)
-      )
+      wineryId != null
+        ? and(base, eq(schema.vintageLogEntries.wineryId, wineryId))
+        : base
     );
 }
 
@@ -194,9 +215,12 @@ export async function deleteVintageLogEntry(id: number, userId: number) {
  *
  * Returns an empty string when the user has no logged history (safe to inject).
  */
-export async function getUserCellarContext(userId: number): Promise<string> {
+export async function getUserCellarContext(userId: number, wineryId?: number | null): Promise<string> {
+  const base = eq(schema.vintageLogEntries.userId, userId);
   const entries = await db.query.vintageLogEntries.findMany({
-    where: eq(schema.vintageLogEntries.userId, userId),
+    where: wineryId != null
+      ? and(base, eq(schema.vintageLogEntries.wineryId, wineryId))
+      : base,
     orderBy: [desc(schema.vintageLogEntries.entryAt)],
     limit: 120,
   });
@@ -275,6 +299,7 @@ export type ReminderEventType = "addition" | "measurement" | "racking" | "inocul
 
 export async function upsertTankReminder(data: {
   userId: number;
+  wineryId?: number | null;
   tankName: string;
   eventType: ReminderEventType;
   thresholdHours: number;
@@ -301,6 +326,7 @@ export async function upsertTankReminder(data: {
   } else {
     const result = await db.insert(schema.tankReminders).values({
       userId: data.userId,
+      wineryId: data.wineryId ?? null,
       tankName: data.tankName,
       eventType: data.eventType,
       thresholdHours: data.thresholdHours,
@@ -312,9 +338,10 @@ export async function upsertTankReminder(data: {
   }
 }
 
-export async function listTankReminders(userId: number) {
+export async function listTankReminders(userId: number, wineryId?: number | null) {
+  const base = eq(schema.tankReminders.userId, userId);
   return db.query.tankReminders.findMany({
-    where: eq(schema.tankReminders.userId, userId),
+    where: wineryId != null ? and(base, eq(schema.tankReminders.wineryId, wineryId)) : base,
     orderBy: [desc(schema.tankReminders.updatedAt)],
   });
 }
@@ -501,6 +528,7 @@ export type WineBatchPhaseNotes = {
 
 export async function createWineBatch(data: {
   userId: number;
+  wineryId?: number | null;
   batchId: string;
   vintage: number;
   variety: string;
@@ -516,6 +544,7 @@ export async function createWineBatch(data: {
   const now = Date.now();
   const result = await db.insert(schema.wineBatches).values({
     userId: data.userId,
+    wineryId: data.wineryId ?? null,
     batchId: data.batchId,
     vintage: data.vintage,
     variety: data.variety,
@@ -536,16 +565,18 @@ export async function createWineBatch(data: {
   return (result as unknown as { insertId: number }).insertId;
 }
 
-export async function listWineBatches(userId: number) {
+export async function listWineBatches(userId: number, wineryId?: number | null) {
+  const base = eq(schema.wineBatches.userId, userId);
   return db.query.wineBatches.findMany({
-    where: eq(schema.wineBatches.userId, userId),
+    where: wineryId != null ? and(base, eq(schema.wineBatches.wineryId, wineryId)) : base,
     orderBy: [desc(schema.wineBatches.vintage), desc(schema.wineBatches.createdAt)],
   });
 }
 
-export async function getWineBatch(id: number, userId: number) {
+export async function getWineBatch(id: number, userId: number, wineryId?: number | null) {
+  const base = and(eq(schema.wineBatches.id, id), eq(schema.wineBatches.userId, userId));
   return db.query.wineBatches.findFirst({
-    where: and(eq(schema.wineBatches.id, id), eq(schema.wineBatches.userId, userId)),
+    where: wineryId != null ? and(base, eq(schema.wineBatches.wineryId, wineryId)) : base,
   });
 }
 
@@ -649,15 +680,17 @@ export type EquipmentMaterial =
   | "fibreglass"
   | "other";
 
-export async function listCellarEquipment(userId: number) {
+export async function listCellarEquipment(userId: number, wineryId?: number | null) {
+  const base = eq(schema.cellarEquipment.userId, userId);
   return db.query.cellarEquipment.findMany({
-    where: eq(schema.cellarEquipment.userId, userId),
+    where: wineryId != null ? and(base, eq(schema.cellarEquipment.wineryId, wineryId)) : base,
     orderBy: [desc(schema.cellarEquipment.createdAt)],
   });
 }
 
 export async function addCellarEquipment(data: {
   userId: number;
+  wineryId?: number | null;
   name: string;
   equipmentType: EquipmentType;
   material: EquipmentMaterial;
@@ -668,6 +701,7 @@ export async function addCellarEquipment(data: {
   const now = Date.now();
   const result = await db.insert(schema.cellarEquipment).values({
     userId: data.userId,
+    wineryId: data.wineryId ?? null,
     name: data.name,
     equipmentType: data.equipmentType,
     material: data.material,
@@ -718,15 +752,17 @@ export async function deleteCellarEquipment(id: number, userId: number) {
 
 export type TaskType = "clean" | "sanitise" | "inspect" | "maintain" | "fault_log" | "other";
 
-export async function listCellarTasks(userId: number) {
+export async function listCellarTasks(userId: number, wineryId?: number | null) {
+  const base = eq(schema.cellarTasks.userId, userId);
   return db.query.cellarTasks.findMany({
-    where: eq(schema.cellarTasks.userId, userId),
+    where: wineryId != null ? and(base, eq(schema.cellarTasks.wineryId, wineryId)) : base,
     orderBy: [desc(schema.cellarTasks.createdAt)],
   });
 }
 
 export async function addCellarTask(data: {
   userId: number;
+  wineryId?: number | null;
   equipmentId?: number;
   equipmentName: string;
   taskType: TaskType;
@@ -741,6 +777,7 @@ export async function addCellarTask(data: {
   const now = Date.now();
   const result = await db.insert(schema.cellarTasks).values({
     userId: data.userId,
+    wineryId: data.wineryId ?? null,
     equipmentId: data.equipmentId ?? null,
     equipmentName: data.equipmentName,
     taskType: data.taskType,
@@ -824,15 +861,17 @@ type BarrelFormat =
   | "Foudre (>500L)"
   | "Other";
 
-export async function listBarrels(userId: number) {
+export async function listBarrels(userId: number, wineryId?: number | null) {
+  const base = eq(schema.barrels.userId, userId);
   return db.query.barrels.findMany({
-    where: eq(schema.barrels.userId, userId),
+    where: wineryId != null ? and(base, eq(schema.barrels.wineryId, wineryId)) : base,
     orderBy: [desc(schema.barrels.createdAt)],
   });
 }
 
 export async function createBarrel(input: {
   userId: number;
+  wineryId?: number | null;
   barrelId: string;
   oakType: OakType;
   format: BarrelFormat;
@@ -844,6 +883,7 @@ export async function createBarrel(input: {
   const now = Date.now();
   const [result] = await db.insert(schema.barrels).values({
     userId: input.userId,
+    wineryId: input.wineryId ?? null,
     barrelId: input.barrelId,
     oakType: input.oakType,
     format: input.format,
@@ -889,15 +929,17 @@ export async function deleteBarrel(id: number, userId: number) {
 
 export type PackagingCategory = "bottle" | "label" | "capsule" | "cork" | "box" | "other";
 
-export async function listPackagingInventory(userId: number) {
+export async function listPackagingInventory(userId: number, wineryId?: number | null) {
+  const base = eq(schema.packagingInventory.userId, userId);
   return db.query.packagingInventory.findMany({
-    where: eq(schema.packagingInventory.userId, userId),
+    where: wineryId != null ? and(base, eq(schema.packagingInventory.wineryId, wineryId)) : base,
     orderBy: [desc(schema.packagingInventory.category)],
   });
 }
 
 export async function addPackagingItem(data: {
   userId: number;
+  wineryId?: number | null;
   itemName: string;
   category: PackagingCategory;
   quantityOnHand: number;
@@ -908,6 +950,7 @@ export async function addPackagingItem(data: {
   const now = Date.now();
   const result = await db.insert(schema.packagingInventory).values({
     userId: data.userId,
+    wineryId: data.wineryId ?? null,
     itemName: data.itemName,
     category: data.category,
     quantityOnHand: data.quantityOnHand,
@@ -946,9 +989,10 @@ export async function deletePackagingItem(id: number, userId: number) {
 
 // ─── Vineyard Blocks (DR-06) ──────────────────────────────────────────────────
 
-export async function listVineyardBlocks(userId: number) {
+export async function listVineyardBlocks(userId: number, wineryId?: number | null) {
+  const base = eq(schema.vineyardBlocks.userId, userId);
   return db.query.vineyardBlocks.findMany({
-    where: eq(schema.vineyardBlocks.userId, userId),
+    where: wineryId != null ? and(base, eq(schema.vineyardBlocks.wineryId, wineryId)) : base,
     orderBy: [schema.vineyardBlocks.blockName],
   });
 }
@@ -965,11 +1009,13 @@ export async function createVineyardBlock(
     soilType?: string | null;
     aspect?: string | null;
     notes?: string | null;
-  }
+  },
+  wineryId?: number | null
 ) {
   const now = Date.now();
   await db.insert(schema.vineyardBlocks).values({
     userId,
+    wineryId: wineryId ?? null,
     blockName: data.blockName,
     variety: data.variety,
     areaHa: data.areaHa ?? null,
@@ -1013,8 +1059,9 @@ export async function deleteVineyardBlock(id: number, userId: number) {
     .where(and(eq(schema.vineyardBlocks.id, id), eq(schema.vineyardBlocks.userId, userId)));
 }
 
-export async function listVineyardObservations(userId: number, blockId?: number, vintageYear?: number) {
+export async function listVineyardObservations(userId: number, blockId?: number, vintageYear?: number, wineryId?: number | null) {
   const conditions: ReturnType<typeof eq>[] = [eq(schema.vineyardObservations.userId, userId)];
+  if (wineryId != null) conditions.push(eq(schema.vineyardObservations.wineryId, wineryId));
   if (blockId !== undefined) conditions.push(eq(schema.vineyardObservations.blockId, blockId));
   if (vintageYear !== undefined) conditions.push(eq(schema.vineyardObservations.vintageYear, vintageYear));
   return db.query.vineyardObservations.findMany({
@@ -1033,10 +1080,12 @@ export async function createVineyardObservation(
     value?: number | null;
     unit?: string | null;
     notes?: string | null;
-  }
+  },
+  wineryId?: number | null
 ) {
   await db.insert(schema.vineyardObservations).values({
     userId,
+    wineryId: wineryId ?? null,
     blockId: data.blockId,
     observationType: data.observationType,
     observedAt: data.observedAt,

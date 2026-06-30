@@ -170,6 +170,7 @@ export const tankReminders = mysqlTable(
   {
     id: int("id").autoincrement().primaryKey(),
     userId: int("user_id").notNull(),
+    wineryId: int("winery_id"),
     tankName: varchar("tank_name", { length: 128 }).notNull(),
     // Which event type to watch for; 'any' means any event type resets the clock
     eventType: mysqlEnum("event_type", [
@@ -190,6 +191,7 @@ export const tankReminders = mysqlTable(
   },
   (t) => [
     index("tr_user_idx").on(t.userId),
+    index("tr_winery_idx").on(t.wineryId),
     index("tr_tank_idx").on(t.tankName),
   ]
 );
@@ -241,6 +243,10 @@ export const vintageLogEntries = mysqlTable(
     id: int("id").autoincrement().primaryKey(),
     // Owner of this entry — links to users.id
     userId: int("user_id").notNull(),
+    // Multi-tenant container — Phase 2 (Feb 2026): nullable for legacy rows;
+    // backfilled on bootstrap from users.winery_id. Flips to NOT NULL once
+    // refactor has been live and stable for 24h.
+    wineryId: int("winery_id"),
     // Tank identifier (free text, e.g. "Tank 7", "Barrel 12A")
     tankName: varchar("tank_name", { length: 128 }).notNull(),
     // Grape variety (e.g. "Shiraz", "Chardonnay")
@@ -284,6 +290,7 @@ export const vintageLogEntries = mysqlTable(
   },
   (t) => [
     index("vle_user_idx").on(t.userId),
+    index("vle_winery_idx").on(t.wineryId),
     index("vle_entry_at_idx").on(t.entryAt),
     index("vle_tank_idx").on(t.tankName),
   ]
@@ -299,6 +306,8 @@ export const wineBatches = mysqlTable(
     id: int("id").autoincrement().primaryKey(),
     // Owner of this batch — links to users.id
     userId: int("user_id").notNull(),
+    // Multi-tenant container — Phase 2.
+    wineryId: int("winery_id"),
     // LIP-mandatory: Wine Batch ID (e.g. "26SHZ-001")
     batchId: varchar("batch_id", { length: 32 }).notNull(),
     // LIP-mandatory: vintage year (e.g. 2026)
@@ -332,6 +341,7 @@ export const wineBatches = mysqlTable(
   },
   (t) => [
     index("wb_user_idx").on(t.userId),
+    index("wb_winery_idx").on(t.wineryId),
     index("wb_vintage_idx").on(t.vintage),
     index("wb_batch_id_idx").on(t.batchId),
   ]
@@ -377,6 +387,7 @@ export const cellarEquipment = mysqlTable(
   {
     id: int("id").autoincrement().primaryKey(),
     userId: int("user_id").notNull(),
+    wineryId: int("winery_id"),
     // Equipment name (e.g. "Tank 7", "Bladder Press", "Basket Press")
     name: varchar("name", { length: 128 }).notNull(),
     // Equipment type — drives default task templates
@@ -410,6 +421,7 @@ export const cellarEquipment = mysqlTable(
   },
   (t) => [
     index("ce_user_idx").on(t.userId),
+    index("ce_winery_idx").on(t.wineryId),
     index("ce_type_idx").on(t.equipmentType),
   ]
 );
@@ -423,6 +435,7 @@ export const cellarTasks = mysqlTable(
   {
     id: int("id").autoincrement().primaryKey(),
     userId: int("user_id").notNull(),
+    wineryId: int("winery_id"),
     // Optional link to the equipment item that generated this task
     equipmentId: int("equipment_id"),
     // Equipment display name (denormalised for display without join)
@@ -459,6 +472,7 @@ export const cellarTasks = mysqlTable(
   },
   (t) => [
     index("ct_user_idx").on(t.userId),
+    index("ct_winery_idx").on(t.wineryId),
     index("ct_equipment_idx").on(t.equipmentId),
     index("ct_due_at_idx").on(t.dueAt),
     index("ct_completed_at_idx").on(t.completedAt),
@@ -500,6 +514,7 @@ export const barrels = mysqlTable(
   {
     id: int("id").autoincrement().primaryKey(),
     userId: int("user_id").notNull(),
+    wineryId: int("winery_id"),
     // User-facing barrel identifier, e.g. "B-001" or "FR-2024-01"
     barrelId: varchar("barrel_id", { length: 64 }).notNull(),
     // Oak origin / type
@@ -533,6 +548,7 @@ export const barrels = mysqlTable(
   },
   (t) => [
     index("barrel_user_idx").on(t.userId),
+    index("barrel_winery_idx").on(t.wineryId),
     index("barrel_id_user_idx").on(t.barrelId, t.userId),
   ]
 );
@@ -545,6 +561,7 @@ export const packagingInventory = mysqlTable(
   {
     id: int("id").primaryKey().autoincrement(),
     userId: int("user_id").notNull(),
+    wineryId: int("winery_id"),
     // Item name e.g. "750mL Bordeaux Bottle", "Screwcap 30mm", "Shiraz Front Label"
     itemName: varchar("item_name", { length: 256 }).notNull(),
     // Category for filtering
@@ -569,6 +586,7 @@ export const packagingInventory = mysqlTable(
   },
   (t) => [
     index("pkg_user_idx").on(t.userId),
+    index("pkg_winery_idx").on(t.wineryId),
     index("pkg_category_idx").on(t.category),
   ]
 );
@@ -581,6 +599,7 @@ export const vineyardBlocks = mysqlTable(
   {
     id: int("id").autoincrement().primaryKey(),
     userId: int("user_id").notNull(),
+    wineryId: int("winery_id"),
     // User-facing block identifier, e.g. "Block A", "North Slope"
     blockName: varchar("block_name", { length: 128 }).notNull(),
     variety: varchar("variety", { length: 128 }).notNull(),
@@ -608,6 +627,7 @@ export const vineyardBlocks = mysqlTable(
   },
   (t) => [
     index("vb_user_idx").on(t.userId),
+    index("vb_winery_idx").on(t.wineryId),
     index("vb_block_name_idx").on(t.blockName, t.userId),
   ]
 );
@@ -619,6 +639,7 @@ export const vineyardObservations = mysqlTable(
   {
     id: int("id").autoincrement().primaryKey(),
     userId: int("user_id").notNull(),
+    wineryId: int("winery_id"),
     blockId: int("block_id").notNull(),
     // Observation type
     observationType: mysqlEnum("observation_type", [
@@ -647,6 +668,7 @@ export const vineyardObservations = mysqlTable(
   },
   (t) => [
     index("vo_user_idx").on(t.userId),
+    index("vo_winery_idx").on(t.wineryId),
     index("vo_block_idx").on(t.blockId),
     index("vo_vintage_idx").on(t.vintageYear),
   ]
@@ -720,6 +742,7 @@ export const sopVintageNotes = mysqlTable(
   "sop_vintage_notes",
   {
     id: int("id").autoincrement().primaryKey(),
+    wineryId: int("winery_id"),
     sopId: int("sop_id").notNull(),
     vintageYear: int("vintage_year").notNull(),
     whatWorked: text("what_worked"),
@@ -733,6 +756,7 @@ export const sopVintageNotes = mysqlTable(
   },
   (t) => [
     index("svn_sop_idx").on(t.sopId),
+    index("svn_winery_idx").on(t.wineryId),
     index("svn_vintage_idx").on(t.vintageYear),
   ]
 );
@@ -744,6 +768,7 @@ export const sopTrainingRecords = mysqlTable(
   "sop_training_records",
   {
     id: int("id").autoincrement().primaryKey(),
+    wineryId: int("winery_id"),
     sopId: int("sop_id").notNull(),
     // UTC ms timestamp of the training session
     trainedAt: bigint("trained_at", { mode: "number" }).notNull(),
@@ -759,6 +784,7 @@ export const sopTrainingRecords = mysqlTable(
   },
   (t) => [
     index("str_sop_idx").on(t.sopId),
+    index("str_winery_idx").on(t.wineryId),
     index("str_trainee_idx").on(t.traineeName),
     index("str_trained_at_idx").on(t.trainedAt),
   ]

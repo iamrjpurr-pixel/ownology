@@ -284,6 +284,61 @@ async function startServer() {
         await db.execute(sql`UPDATE users SET winery_id = ${defaultWineryId} WHERE winery_id IS NULL`);
       }
     }
+
+    // ── Phase 2 multi-tenant bootstrap ──────────────────────────────────
+    // Idempotent: for every customer-domain table, add winery_id INT NULL
+    // (no-op if already there), then backfill from the row's userId
+    // → users.winery_id. Safe to run on every boot. Once each table has
+    // been live for 24h with zero NULL inserts, a follow-up migration can
+    // flip these columns to NOT NULL + FK to wineries(id).
+    const customerTables = [
+      { table: "vintage_log_entries", userCol: "user_id", indexName: "vle_winery_idx" },
+      { table: "wine_batches",        userCol: "user_id", indexName: "wb_winery_idx" },
+      { table: "cellar_equipment",    userCol: "user_id", indexName: "ce_winery_idx" },
+      { table: "cellar_tasks",        userCol: "user_id", indexName: "ct_winery_idx" },
+      { table: "barrels",             userCol: "user_id", indexName: "barrel_winery_idx" },
+      { table: "packaging_inventory", userCol: "user_id", indexName: "pkg_winery_idx" },
+      { table: "vineyard_blocks",     userCol: "user_id", indexName: "vb_winery_idx" },
+      { table: "vineyard_observations", userCol: "user_id", indexName: "vo_winery_idx" },
+      { table: "tank_reminders",      userCol: "user_id", indexName: "tr_winery_idx" },
+      // SOP notes/training are keyed by created_by (varchar) — fold via
+      // users.email when present. NULL stays NULL for legacy rows; new
+      // inserts include wineryId directly.
+      { table: "sop_vintage_notes",   userCol: null,      indexName: "svn_winery_idx" },
+      { table: "sop_training_records", userCol: null,     indexName: "str_winery_idx" },
+    ] as const;
+
+    for (const { table, userCol, indexName } of customerTables) {
+      // Add the column (no-op if already exists on MySQL 8.0.29+).
+      try {
+        await db.execute(sql.raw(`ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS winery_id INT NULL`));
+      } catch {
+        try {
+          await db.execute(sql.raw(`ALTER TABLE ${table} ADD COLUMN winery_id INT NULL`));
+        } catch {
+          // Column already exists — fine.
+        }
+      }
+      // Add the index (no-op if exists).
+      try {
+        await db.execute(sql.raw(`CREATE INDEX ${indexName} ON ${table} (winery_id)`));
+      } catch {
+        // Index already exists — fine.
+      }
+      // Backfill from users.winery_id when the row carries a user_id link.
+      if (userCol) {
+        try {
+          await db.execute(sql.raw(
+            `UPDATE ${table} t
+             JOIN users u ON u.id = t.${userCol}
+             SET t.winery_id = u.winery_id
+             WHERE t.winery_id IS NULL AND u.winery_id IS NOT NULL`
+          ));
+        } catch (e) {
+          console.warn(`[bootstrap] backfill ${table} skipped:`, (e as Error).message);
+        }
+      }
+    }
     console.log("[bootstrap] multi-tenant scaffolding ready");
   } catch (e) {
     console.warn("[bootstrap] table create skipped:", (e as Error).message);

@@ -437,10 +437,11 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 have been folded in or marked complete.)
 
 **P0 — Ship blockers for first paying member**
-- [ ] **Real auth** — replace HTTP Basic Auth gate (Emergent Google Login or JWT).
+- [x] **Multi-tenant Phase 2 — winery_id isolation** ✅ (Feb 2026, this session). Cross-winery data isolation now enforced at the DB layer for the 11 customer-domain tables (`vintage_log_entries`, `wine_batches`, `cellar_equipment`, `cellar_tasks`, `barrels`, `packaging_inventory`, `vineyard_blocks`, `vineyard_observations`, `tank_reminders`, `sop_vintage_notes`, `sop_training_records`). See "Multi-Tenant Phase 2" entry below.
 - [ ] **Real Stripe wiring** — `sk_test_stub` is the current placeholder; wire Founding Member + merch checkout end-to-end with `sk_test_emergent`.
 - [ ] **Custom domain DNS** — point `ownology.ai` at Railway (or Emergent preview).
-- [ ] **Verify Railway auto-deploy** post Drizzle baseline.
+- [ ] **Verify Railway auto-deploy** post Drizzle baseline + Phase 2 bootstrap.
+- [ ] **Flip winery_id → NOT NULL + FK** — defer 24h after Phase 2 deploys to prod so any pending NULL inserts flush; then `ALTER TABLE ... MODIFY winery_id INT NOT NULL` + `ADD CONSTRAINT fk_xxx_winery FOREIGN KEY (winery_id) REFERENCES wineries(id) ON DELETE CASCADE`.
 
 **P1 — High-value compounders**
 - [ ] Trigger cascade from a homepage CTA so cold SMS prospects see the wow moment.
@@ -463,13 +464,23 @@ have been folded in or marked complete.)
 - [ ] **Ownology Copilot** — vintage-grounded caption generator + SEO flywheel. Full strategic build doc at `/app/memory/COPILOT_BUILD_DOC.md`. Two-layer value: customer feature ($99/mo retention driver) + SEO/distribution engine (story pages, hashtag aggregation, backlink farm). ~1.5 days to ship Phase 1 when greenlit.
 - [ ] **Compliance Reports** — Wine Australia LIP audit pack + ATO WET + FSANZ label compliance + SWA sustainability exports. Full strategic build doc at `/app/memory/COMPLIANCE_REPORTS_BUILD_DOC.md`. Justifies $99/mo Premium 3× over on compliance time savings alone (verified: 46 hrs / $3,040/yr saved per winery). Highest-leverage target: LIP Audit Pack PDF (Phase 1, ~12 hrs). Depends on real auth (P0 #1) + multi-tenant data model (P3).
 - [ ] **Branding feature** — Settings page with Detect-from-URL (logo + colours via node-vibrant) + tier-based Ownology attribution (Free/Premium/Studio). Mockup live at `/branding-mockup`. ~3 hrs to ship full version. Powers branded exports for both Copilot and Compliance Reports above.
-- [ ] Multi-tenant winery data model (`winery_id` FKs throughout).
+- [ ] Multi-tenant winery data model (`winery_id` FKs throughout). _(Phase 1 + Phase 2 complete — last step is the NOT NULL + FK migration tracked in P0.)_
 - [ ] File/Image uploads via Emergent Object Storage.
 - [ ] Native iOS/Android apps.
 - [ ] Suppress `outreach.markViewed` 400s on non-`/hi` routes (carried from iter_12).
 - [ ] AdminContactsPipeline mobile layout polish (deferred from iter_14).
 
 **Completed (historical — kept for audit trail)**
+- [x] **Multi-Tenant Phase 2 — winery_id isolation across customer-domain tables (Feb 2026)**.
+  - **Schema**: added `winery_id INT NULL` column + index to 11 customer-domain tables (`vintage_log_entries`, `wine_batches`, `cellar_equipment`, `cellar_tasks`, `barrels`, `packaging_inventory`, `vineyard_blocks`, `vineyard_observations`, `tank_reminders`, `sop_vintage_notes`, `sop_training_records`). Platform-shared tables (`cellar_journal`, `sop_library`, `diy_knowledge_chunks`, `vintage_intelligence`, `outreach_contacts`, `theme_picks`, etc.) intentionally NOT tagged — they're shared content or founder-side data.
+  - **Bootstrap** (`server/index.ts`): idempotent `ALTER TABLE ADD COLUMN IF NOT EXISTS winery_id INT NULL` + `CREATE INDEX` + `UPDATE … FROM users` backfill on each boot. Safe to re-run. Verified live: all 32 existing `vintage_log_entries` backfilled to wineryId=1.
+  - **Context** (`server/trpc.ts`): `ctx.user` now carries `wineryId: number | null` + `userId: number | null`, resolved via single indexed `users.open_id` lookup per request inside `hydrateMembership()`. Bypass user works seamlessly (gets seeded winery 1).
+  - **wineryProcedure** helper exported alongside `protectedProcedure` / `ownerProcedure`. Asserts non-null `wineryId` + `userId` and narrows them in the resolver ctx. Available for any future per-winery procedure; existing procedures unchanged.
+  - **db.ts** customer-domain functions take an optional `wineryId?: number | null` argument. When provided: it's added to `.values()` on writes and AND-ed into the WHERE clause on reads. When omitted: legacy behaviour preserved so internal callers (cron jobs) work without churn. Functions updated: `addVintageLogEntry`, `listVintageLogEntries`, `getUsedTankNames`, `deleteVintageLogEntry`, `getUserCellarContext`, `createWineBatch`, `listWineBatches`, `getWineBatch`, `listCellarEquipment`, `addCellarEquipment`, `listCellarTasks`, `addCellarTask`, `listBarrels`, `createBarrel`, `listPackagingInventory`, `addPackagingItem`, `listVineyardBlocks`, `createVineyardBlock`, `listVineyardObservations`, `createVineyardObservation`, `upsertTankReminder`, `listTankReminders`.
+  - **Routers** that pass `dbUser.wineryId ?? null` through: `routers/vintageLog.ts` (`add`, `list`, `getUsedTanks`, `alerts`, `compareTanks`, `generateVintageCard`, `delete`, `bulkSave`), `routers/tutor.ts` (`ask` — cellar context), `routers/scheduled/dailyAlertEmail.ts`, and the legacy inline routers in `routers.ts` (`tankReminders`, `wineBatch`, `cellarEquipment`, `cellarTasks`, `barrel`, `packaging`, `vineyard`, `dashboard.getStats`).
+  - **Test**: `server/tests/test_multitenant_isolation.mjs` — provisions 2 ephemeral users + wineries, writes a vintage log entry as User A, verifies User A can see it / User B canNOT see it via `list`, `getUsedTanks`, and `alerts`. Passes all 9 assertions. Rolls back its own data.
+  - **What's intentionally NOT done**: the `NOT NULL + FOREIGN KEY` migration. Defer 24h after this lands in production so any pending NULL inserts flush, then run the ALTER. Tracked as a P0 follow-up.
+
 - [x] Lift-and-shift Manus codebase into `/app` (27 Jan 2026)
 - [x] LLM model + wiring → claude-sonnet-4-6 + gpt-5.4-mini hybrid (27 Jan 2026)
 - [x] All 38 SOPs seeded across 12 canonical categories (27 Jan 2026, verified 29 Jun 2026: total=38, published=38)

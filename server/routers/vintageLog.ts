@@ -62,6 +62,7 @@ const vintageLogRouter = router({
       const tags = generateTags(input.eventType, input.details, input.variety, input.tankName);
       const id = await addVintageLogEntry({
         userId: dbUser.id,
+        wineryId: dbUser.wineryId ?? null,
         tankName: input.tankName,
         variety: input.variety,
         eventType: input.eventType,
@@ -90,7 +91,7 @@ const vintageLogRouter = router({
     .query(async ({ ctx, input }) => {
       const dbUser = await getUserByOpenId(ctx.user.openId);
       if (!dbUser) return [];
-      const rows = await listVintageLogEntries(dbUser.id, input.limit ?? 50);
+      const rows = await listVintageLogEntries(dbUser.id, input.limit ?? 50, dbUser.wineryId ?? null);
       return rows.map((r) => ({
         ...r,
         details: JSON.parse(r.detailsJson) as Record<string, unknown>,
@@ -101,7 +102,7 @@ const vintageLogRouter = router({
   getUsedTanks: protectedProcedure.query(async ({ ctx }) => {
     const dbUser = await getUserByOpenId(ctx.user.openId);
     if (!dbUser) return [];
-    return getUsedTankNames(dbUser.id);
+    return getUsedTankNames(dbUser.id, dbUser.wineryId ?? null);
   }),
 
   /**
@@ -113,7 +114,7 @@ const vintageLogRouter = router({
   alerts: protectedProcedure.query(async ({ ctx }) => {
     const dbUser = await getUserByOpenId(ctx.user.openId);
     if (!dbUser) return { alerts: [] };
-    const alerts = await computeAlertsForUser(dbUser.id);
+    const alerts = await computeAlertsForUser(dbUser.id, dbUser.wineryId ?? null);
     return { alerts };
   }),
 
@@ -130,7 +131,7 @@ const vintageLogRouter = router({
       const dbUser = await getUserByOpenId(ctx.user.openId);
       if (!dbUser) return { tanks: [] };
 
-      const rows = await listVintageLogEntries(dbUser.id, 800);
+      const rows = await listVintageLogEntries(dbUser.id, 800, dbUser.wineryId ?? null);
       const parseDetails = (s: string): Record<string, unknown> => {
         try { return JSON.parse(s) as Record<string, unknown>; } catch { return {}; }
       };
@@ -233,7 +234,7 @@ const vintageLogRouter = router({
     .mutation(async ({ ctx, input }) => {
       const dbUser = await getUserByOpenId(ctx.user.openId);
       if (!dbUser) throw new Error("User not found");
-      await deleteVintageLogEntry(input.id, dbUser.id);
+      await deleteVintageLogEntry(input.id, dbUser.id, dbUser.wineryId ?? null);
       return { success: true };
     }),
 
@@ -291,12 +292,12 @@ Measurement: ${detailsText}${input.recentContext ? `\nRecent context: ${input.re
       if (!dbUser) throw new Error("User not found");
 
       // Fetch batch details
-      const allBatches = await listWineBatches(dbUser.id);
+      const allBatches = await listWineBatches(dbUser.id, dbUser.wineryId ?? null);
       const batch = allBatches.find((b) => b.batchId === input.batchId);
       if (!batch) throw new Error("Batch not found");
 
       // Fetch all log entries for this tank
-      const allEntries = (await listVintageLogEntries(dbUser.id, 200)).filter(
+      const allEntries = (await listVintageLogEntries(dbUser.id, 200, dbUser.wineryId ?? null)).filter(
         (e) => e.tankName === batch.tankName
       );
 
@@ -482,6 +483,7 @@ Return ONLY a valid JSON array. No markdown, no explanation. If you cannot ident
         const entryAt = entry.entryDate ? new Date(entry.entryDate).getTime() : Date.now();
         await addVintageLogEntry({
           userId: dbUser.id,
+          wineryId: dbUser.wineryId ?? null,
           tankName: entry.tankName,
           variety: entry.variety,
           eventType: entry.eventType,
@@ -513,8 +515,8 @@ export type Alert = {
   action: string;
 };
 
-export async function computeAlertsForUser(userId: number): Promise<Alert[]> {
-  const rows = await listVintageLogEntries(userId, 400);
+export async function computeAlertsForUser(userId: number, wineryId?: number | null): Promise<Alert[]> {
+  const rows = await listVintageLogEntries(userId, 400, wineryId);
   if (rows.length === 0) return [];
 
   const byTank = new Map<string, typeof rows>();

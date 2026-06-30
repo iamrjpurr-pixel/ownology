@@ -547,7 +547,7 @@ ${docContext}`;
         try {
           const dbUser = await getUserByOpenId(ctx.user.openId);
           if (dbUser) {
-            liveCellarContext = await getUserCellarContext(dbUser.id);
+            liveCellarContext = await getUserCellarContext(dbUser.id, dbUser.wineryId ?? null);
           }
         } catch (e) {
           console.warn("[Tutor] cellar context fetch failed:", (e as Error)?.message);

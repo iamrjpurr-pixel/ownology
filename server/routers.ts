@@ -491,6 +491,7 @@ const vintageReminderRouter = router({
       if (!dbUser) throw new Error("User not found");
       const id = await upsertTankReminder({
         userId: dbUser.id,
+        wineryId: dbUser.wineryId ?? null,
         tankName: input.tankName,
         eventType: input.eventType as ReminderEventType,
         thresholdHours: input.thresholdHours,
@@ -502,7 +503,7 @@ const vintageReminderRouter = router({
   list: protectedProcedure.query(async ({ ctx }) => {
     const dbUser = await getUserByOpenId(ctx.user.openId);
     if (!dbUser) return [];
-    return listTankReminders(dbUser.id);
+    return listTankReminders(dbUser.id, dbUser.wineryId ?? null);
   }),
 
   delete: protectedProcedure
@@ -520,7 +521,7 @@ const wineBatchRouter = router({
   list: protectedProcedure.query(async ({ ctx }) => {
     const dbUser = await getUserByOpenId(ctx.user.openId);
     if (!dbUser) return [];
-    return listWineBatches(dbUser.id);
+    return listWineBatches(dbUser.id, dbUser.wineryId ?? null);
   }),
   create: protectedProcedure
     .input(
@@ -541,7 +542,7 @@ const wineBatchRouter = router({
     .mutation(async ({ ctx, input }) => {
       const dbUser = await getUserByOpenId(ctx.user.openId);
       if (!dbUser) throw new Error("User not found");
-      const id = await createWineBatch({ userId: dbUser.id, ...input });
+      const id = await createWineBatch({ userId: dbUser.id, wineryId: dbUser.wineryId ?? null, ...input });
       return { success: true, id };
     }),
   updateNotes: protectedProcedure
@@ -988,7 +989,7 @@ const cellarEquipmentRouter = router({
   list: protectedProcedure.query(async ({ ctx }) => {
     const dbUser = await getUserByOpenId(ctx.user.openId);
     if (!dbUser) return [];
-    return listCellarEquipment(dbUser.id);
+    return listCellarEquipment(dbUser.id, dbUser.wineryId ?? null);
   }),
 
   add: protectedProcedure
@@ -1007,6 +1008,7 @@ const cellarEquipmentRouter = router({
       if (!dbUser) throw new Error("User not found");
       const id = await addCellarEquipment({
         userId: dbUser.id,
+        wineryId: dbUser.wineryId ?? null,
         name: input.name,
         equipmentType: input.equipmentType as EquipmentType,
         material: input.material as EquipmentMaterial,
@@ -1067,6 +1069,7 @@ const cellarEquipmentRouter = router({
       for (const item of input) {
         const id = await addCellarEquipment({
           userId: dbUser.id,
+          wineryId: dbUser.wineryId ?? null,
           name: item.name,
           equipmentType: item.equipmentType as EquipmentType,
           material: item.material as EquipmentMaterial,
@@ -1086,7 +1089,7 @@ const cellarTasksRouter = router({
   list: protectedProcedure.query(async ({ ctx }) => {
     const dbUser = await getUserByOpenId(ctx.user.openId);
     if (!dbUser) return [];
-    return listCellarTasks(dbUser.id);
+    return listCellarTasks(dbUser.id, dbUser.wineryId ?? null);
   }),
 
   add: protectedProcedure
@@ -1110,6 +1113,7 @@ const cellarTasksRouter = router({
       if (!dbUser) throw new Error("User not found");
       const id = await addCellarTask({
         userId: dbUser.id,
+        wineryId: dbUser.wineryId ?? null,
         equipmentId: input.equipmentId,
         equipmentName: input.equipmentName,
         taskType: input.taskType as TaskType,
@@ -1212,6 +1216,7 @@ const cellarTasksRouter = router({
         const taskType = validTypes.includes(t.taskType) ? t.taskType : "other";
         const id = await addCellarTask({
           userId: dbUser.id,
+          wineryId: dbUser.wineryId ?? null,
           equipmentId: input.equipmentId,
           equipmentName: input.equipmentName,
           taskType: taskType as TaskType,
@@ -1239,10 +1244,10 @@ const dashboardRouter = router({
     const fourteenDaysAgo = now - 14 * 24 * 60 * 60 * 1000;
 
     // All log entries for this user (up to 500 for aggregation)
-    const allEntries = await listVintageLogEntries(dbUser.id, 500);
+    const allEntries = await listVintageLogEntries(dbUser.id, 500, dbUser.wineryId ?? null);
 
     // All wine batches
-    const batches = await listWineBatches(dbUser.id);
+    const batches = await listWineBatches(dbUser.id, dbUser.wineryId ?? null);
 
     // Unique tank names from log entries
     const tankNames = Array.from(new Set(allEntries.map((e) => e.tankName))).sort();
@@ -1369,7 +1374,7 @@ const barrelRouter = router({
   list: protectedProcedure.query(async ({ ctx }) => {
     const dbUser = await getUserByOpenId(ctx.user.openId);
     if (!dbUser) return [];
-    return listBarrels(dbUser.id);
+    return listBarrels(dbUser.id, dbUser.wineryId ?? null);
   }),
 
   create: protectedProcedure
@@ -1387,7 +1392,7 @@ const barrelRouter = router({
     .mutation(async ({ ctx, input }) => {
       const dbUser = await getUserByOpenId(ctx.user.openId);
       if (!dbUser) throw new Error("User not found");
-      const id = await createBarrel({ userId: dbUser.id, ...input });
+      const id = await createBarrel({ userId: dbUser.id, wineryId: dbUser.wineryId ?? null, ...input });
       return { success: true, id };
     }),
 
@@ -1439,7 +1444,7 @@ const packagingRouter = router({
   list: protectedProcedure.query(async ({ ctx }) => {
     const dbUser = await getUserByOpenId(ctx.user.openId);
     if (!dbUser) return [];
-    return listPackagingInventory(dbUser.id);
+    return listPackagingInventory(dbUser.id, dbUser.wineryId ?? null);
   }),
 
   add: protectedProcedure
@@ -1454,7 +1459,7 @@ const packagingRouter = router({
     .mutation(async ({ ctx, input }) => {
       const dbUser = await getUserByOpenId(ctx.user.openId);
       if (!dbUser) throw new Error("User not found");
-      const id = await addPackagingItem({ userId: dbUser.id, ...input });
+      const id = await addPackagingItem({ userId: dbUser.id, wineryId: dbUser.wineryId ?? null, ...input });
       return { id };
     }),
 
@@ -1495,7 +1500,7 @@ const vineyardRouter = router({
   listBlocks: protectedProcedure.query(async ({ ctx }) => {
     const dbUser = await getUserByOpenId(ctx.user.openId);
     if (!dbUser) return [];
-    return listVineyardBlocks(dbUser.id);
+    return listVineyardBlocks(dbUser.id, dbUser.wineryId ?? null);
   }),
 
   addBlock: protectedProcedure
@@ -1513,7 +1518,7 @@ const vineyardRouter = router({
     .mutation(async ({ ctx, input }) => {
       const dbUser = await getUserByOpenId(ctx.user.openId);
       if (!dbUser) throw new Error("User not found");
-      await createVineyardBlock(dbUser.id, input);
+      await createVineyardBlock(dbUser.id, input, dbUser.wineryId ?? null);
     }),
 
   updateBlock: protectedProcedure
@@ -1553,7 +1558,7 @@ const vineyardRouter = router({
     .query(async ({ ctx, input }) => {
       const dbUser = await getUserByOpenId(ctx.user.openId);
       if (!dbUser) return [];
-      return listVineyardObservations(dbUser.id, input?.blockId, input?.vintageYear);
+      return listVineyardObservations(dbUser.id, input?.blockId, input?.vintageYear, dbUser.wineryId ?? null);
     }),
 
   addObservation: protectedProcedure
@@ -1569,7 +1574,7 @@ const vineyardRouter = router({
     .mutation(async ({ ctx, input }) => {
       const dbUser = await getUserByOpenId(ctx.user.openId);
       if (!dbUser) throw new Error("User not found");
-      await createVineyardObservation(dbUser.id, input);
+      await createVineyardObservation(dbUser.id, input, dbUser.wineryId ?? null);
     }),
 
   deleteObservation: protectedProcedure
