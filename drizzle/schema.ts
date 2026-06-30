@@ -1291,3 +1291,53 @@ export const themeSuggestions = mysqlTable(
     index("ts_logged_at_idx").on(t.loggedAt),
   ]
 );
+
+// ─── Cellar Briefs (Feb 2026) ────────────────────────────────────────────────
+//
+// Persists every auto-generated Cellar Brief — twice-daily during vintage,
+// weekly during maturation. Forms the customer's audit trail AND your
+// marketing/case-study data layer. Owned by the winery (winery_id FK).
+//
+// summary_json shape:
+//   {
+//     execSummary: string,        // 2-sentence LLM-written headline
+//     attentionCount: number,
+//     decisionsDueCount: number,
+//     cards: Array<{
+//       vesselId: string,           // tank name or barrel id
+//       vesselType: "tank" | "barrel",
+//       variety: string,
+//       stage: string,              // pre_ferment | primary_active | ...
+//       daysInStage: number,
+//       status: "ok" | "watch" | "attention",
+//       trajectory: string,         // human-readable
+//       todaysWork: string[],       // action items
+//       decisionDue: string | null,
+//       grounding: string[],        // e.g. ["SOP 11", "Red Wine Bible Ch.3"]
+//     }>
+//   }
+export const cellarBriefs = mysqlTable(
+  "cellar_briefs",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    wineryId: int("winery_id").notNull(),
+    // Trigger window: 'morning' | 'evening' | 'weekly' | 'manual'
+    trigger: varchar("trigger", { length: 16 }).notNull(),
+    // Roll-up counts (denormalised from summary_json for fast list queries)
+    attentionCount: int("attention_count").notNull().default(0),
+    decisionsDueCount: int("decisions_due_count").notNull().default(0),
+    tankCount: int("tank_count").notNull().default(0),
+    // Full structured payload (cards + executive summary). Text not JSON
+    // because MySQL JSON column has finicky version support; we parse it
+    // in the application layer.
+    summaryJson: text("summary_json").notNull(),
+    // 2-sentence LLM-written headline pulled out for fast list display.
+    execSummary: varchar("exec_summary", { length: 512 }),
+    generatedAt: bigint("generated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("cb_winery_idx").on(t.wineryId),
+    index("cb_generated_at_idx").on(t.generatedAt),
+    index("cb_winery_generated_idx").on(t.wineryId, t.generatedAt),
+  ]
+);

@@ -26,11 +26,12 @@ const knowledgeRouter = router({
       return q.orderBy(asc(schema.sopLibrary.category), asc(schema.sopLibrary.sortOrder));
     }),
 
-  // Public: get a single SOP by id (with vintage notes and training records)
+  // Public: get a single SOP by id (with vintage notes, training records,
+  // and hydrated Wine Bible chapter references).
   getSop: publicProcedure
     .input(z.object({ id: z.number().int() }))
     .query(async ({ input }) => {
-      const { eq, desc } = await import("drizzle-orm");
+      const { eq, desc, and: andOp, inArray } = await import("drizzle-orm");
       const [sop] = await db
         .select()
         .from(schema.sopLibrary)
@@ -47,7 +48,58 @@ const knowledgeRouter = router({
         .from(schema.sopTrainingRecords)
         .where(eq(schema.sopTrainingRecords.sopId, input.id))
         .orderBy(desc(schema.sopTrainingRecords.trainedAt));
-      return { ...sop, vintageNotes, trainingRecords };
+
+      // Hydrate bible chapter titles. `bibleChapters` is a comma-separated
+      // list of "source_doc:chapter_ref" tokens (see seed-sop-bible-chapters.mjs).
+      // Single batched query keyed on the indexed (source_doc, chapter_ref).
+      type BibleRef = { sourceDoc: string; chapterRef: string; chapterTitle: string; label: string };
+      let bibleRefs: BibleRef[] = [];
+      if (sop.bibleChapters && sop.bibleChapters.length > 0) {
+        const tokens = sop.bibleChapters.split(",").map((t) => t.trim()).filter(Boolean);
+        const parsed = tokens.map((t) => {
+          const [src, ref] = t.split(":");
+          return { src, ref };
+        }).filter((x) => x.src && x.ref);
+        if (parsed.length > 0) {
+          const sources = Array.from(new Set(parsed.map((p) => p.src)));
+          const refs = Array.from(new Set(parsed.map((p) => p.ref)));
+          const chunks = await db
+            .selectDistinct({
+              sourceDoc: schema.diyKnowledgeChunks.sourceDoc,
+              chapterRef: schema.diyKnowledgeChunks.chapterRef,
+              chapterTitle: schema.diyKnowledgeChunks.chapterTitle,
+            })
+            .from(schema.diyKnowledgeChunks)
+            .where(andOp(
+              inArray(schema.diyKnowledgeChunks.sourceDoc, sources),
+              inArray(schema.diyKnowledgeChunks.chapterRef, refs),
+            ));
+          // Map back to the original token order so the UI honours the curator's sequence.
+          const lookup = new Map(chunks.map((c) => [`${c.sourceDoc}:${c.chapterRef}`, c]));
+          // Human-friendly labels: "Red Wine Bible — Ch. 2", "White Wine Bible — Ch. 9.4".
+          const SOURCE_LABELS: Record<string, string> = {
+            red_wine_bible: "Red Wine Bible",
+            white_wine_bible: "White Wine Bible",
+            morew_red_outline: "Red Wine Outline",
+            morew_white_outline: "White Wine Outline",
+          };
+          bibleRefs = parsed.flatMap(({ src, ref }) => {
+            const hit = lookup.get(`${src}:${ref}`);
+            if (!hit) return [];
+            const refTrim = String(ref).replace(/^Ch/i, "").trim();
+            const refDisplay = /^\d/.test(refTrim) ? `Ch. ${refTrim}` : (refTrim || ref);
+            const sourceLabel = SOURCE_LABELS[src] ?? src;
+            return [{
+              sourceDoc: src,
+              chapterRef: String(ref),
+              chapterTitle: hit.chapterTitle ?? "",
+              label: `${sourceLabel} — ${refDisplay}`,
+            }];
+          });
+        }
+      }
+
+      return { ...sop, vintageNotes, trainingRecords, bibleRefs };
     }),
 
   // Protected: update decision logic on an SOP

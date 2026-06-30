@@ -693,6 +693,71 @@ function SopDetail({ id }: { id: number }) {
               )}
             </div>
 
+            {/* Wine Bible chapter cross-refs (Feb 2026). Hydrated by the
+                getSop procedure — turns the hidden 220-chunk reference
+                library into a visible "Deepen your understanding" sidebar.
+                Same RAG source the AI tutor uses to ground answers, now
+                surfaced as a tangible educational artefact. */}
+            {Array.isArray((sop as { bibleRefs?: unknown }).bibleRefs) && (sop as { bibleRefs: Array<{ sourceDoc: string; chapterRef: string; chapterTitle: string; label: string }> }).bibleRefs.length > 0 && (
+              <div
+                data-testid="sop-bible-refs"
+                className="mt-6 rounded-md p-5"
+                style={{
+                  background: "var(--ow-bg-base)",
+                  border: "1px solid var(--ow-border-md)",
+                }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden style={{ flexShrink: 0 }}>
+                    <path d="M2 2.5A1.5 1.5 0 0 1 3.5 1H11v11H3.5A1.5 1.5 0 0 1 2 10.5v-8Z" stroke="var(--ow-text-mid)" strokeWidth="1.2" fill="none" />
+                    <path d="M11 1v11" stroke="var(--ow-text-mid)" strokeWidth="1.2" />
+                    <path d="M4 4h5M4 6.5h5M4 9h3" stroke="var(--ow-text-mid)" strokeWidth="0.9" strokeLinecap="round" />
+                  </svg>
+                  <span
+                    style={{
+                      fontFamily: "'Lato',sans-serif",
+                      fontSize: "0.62rem",
+                      fontWeight: 800,
+                      letterSpacing: "0.1em",
+                      color: "var(--ow-text-mid)",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Deepen your understanding
+                  </span>
+                </div>
+                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                  {(sop as { bibleRefs: Array<{ sourceDoc: string; chapterRef: string; chapterTitle: string; label: string }> }).bibleRefs.map((ref, i) => (
+                    <li
+                      key={`${ref.sourceDoc}-${ref.chapterRef}-${i}`}
+                      data-testid={`sop-bible-ref-${i}`}
+                      style={{ display: "flex", gap: "0.6rem", alignItems: "baseline", lineHeight: 1.5 }}
+                    >
+                      <span
+                        style={{
+                          fontFamily: "'Lato',sans-serif",
+                          fontSize: "0.72rem",
+                          fontWeight: 700,
+                          color: "var(--ow-amber)",
+                          letterSpacing: "0.02em",
+                          whiteSpace: "nowrap",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {ref.label}
+                      </span>
+                      <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.86rem", color: "var(--ow-text-hi)" }}>
+                        {ref.chapterTitle}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", color: "var(--ow-text-lo)", margin: "0.9rem 0 0", lineHeight: 1.5 }}>
+                  Source material grounding the cellar AI's answers on this topic.
+                </p>
+              </div>
+            )}
+
             {/* Boutique-scale companion — only present on the 7 SOPs that map onto
                 Red Wine Making Outline sections. Renders as a distinct amber-bordered
                 sidebar so boutique winemakers immediately see scale-appropriate

@@ -283,6 +283,31 @@ async function startServer() {
       }
     }
 
+    // Create cellar_briefs table (Feb 2026, Cellar Brief feature).
+    // Idempotent CREATE TABLE IF NOT EXISTS. Drizzle ORM only handles schema
+    // for queries; the table itself is created here on first boot.
+    try {
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS cellar_briefs (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          winery_id INT NOT NULL,
+          trigger VARCHAR(16) NOT NULL,
+          attention_count INT NOT NULL DEFAULT 0,
+          decisions_due_count INT NOT NULL DEFAULT 0,
+          tank_count INT NOT NULL DEFAULT 0,
+          summary_json TEXT NOT NULL,
+          exec_summary VARCHAR(512),
+          generated_at BIGINT NOT NULL,
+          INDEX cb_winery_idx (winery_id),
+          INDEX cb_generated_at_idx (generated_at),
+          INDEX cb_winery_generated_idx (winery_id, generated_at),
+          CONSTRAINT fk_cb_winery FOREIGN KEY (winery_id) REFERENCES wineries(id) ON DELETE CASCADE
+        )
+      `);
+    } catch (e) {
+      console.warn("[bootstrap] cellar_briefs table create skipped:", (e as Error).message);
+    }
+
     // Seed Default Winery containing existing data. Owner is the seed admin.
     const seedOwnerOpenId = process.env.OWNER_OPEN_ID || "seed-owner-001";    const seedRows = await db.execute(sql`SELECT id FROM users WHERE open_id = ${seedOwnerOpenId} LIMIT 1`);
     type SeedRow = { id: number };
