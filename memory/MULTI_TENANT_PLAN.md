@@ -1,8 +1,16 @@
 # Multi-Tenant Winery Model — Execution Plan
 
-Drafted Feb 2026. Status: NOT STARTED. Estimated effort: 1–2 focused
-sessions. Do NOT execute piecemeal — this is a foundational refactor that
-should land as a single coherent change with a thorough test pass.
+Drafted Feb 2026. Status: NOT STARTED. Estimated effort: 1 focused
+session (~2-3 hours of agent work). Do NOT execute piecemeal — this is
+a foundational refactor that should land as a single coherent change
+with a thorough test pass.
+
+## Decisions locked (Feb 2026, by founder)
+
+- **Entity name in UI**: **Winery** ("Welcome to your winery." · "Switch winery." · "Invite a teammate to your winery.")
+- **Multi-user per winery in v1**: **NO** — one user per winery. Defer teams to v2 until a customer asks. Simpler ship.
+- **Branding scope in v1**: **Name + logo only**. Custom brand colors + custom domains deferred to v2.
+- **Brand identity unchanged**: The platform brand is "Ownology AI." The Winery is the *customer's* container inside it. These are not in conflict.
 
 ## Why this matters
 
