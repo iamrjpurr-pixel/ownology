@@ -5,6 +5,7 @@ import { Route, Switch, Redirect, useLocation } from "wouter";
 import { lazy, Suspense, useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { AuthProvider } from "@/lib/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
 import ThemeOnboarding from "@/components/ThemeOnboarding";
 import CrushCascade from "@/components/CrushCascade";
@@ -83,6 +84,8 @@ const CascadeDemo = lazy(() => import("./pages/CascadeDemo"));
 const CopilotMockup = lazy(() => import("./pages/CopilotMockup"));
 const BrandingMockup = lazy(() => import("./pages/BrandingMockup"));
 const AdminResponsive = lazy(() => import("./pages/AdminResponsive"));
+const Login = lazy(() => import("./pages/Login"));
+const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
  *  Sized so it doesn't cause layout shift on first paint. */
@@ -271,6 +274,8 @@ function Router() {
       <Route path={"/admin/marketing-kit"} component={AdminMarketingKit} />
       <Route path={"/admin/themes-stats"} component={AdminThemesStats} />
       <Route path={"/admin/responsive"} component={AdminResponsive} />
+      <Route path={"/login"} component={Login} />
+      <Route path={"/auth/callback"} component={AuthCallback} />
       <Route path={"/cascade-demo"} component={CascadeDemo} />
       <Route path={"/copilot-mockup"} component={CopilotMockup} />
       <Route path={"/branding-mockup"} component={BrandingMockup} />
@@ -314,12 +319,14 @@ function App() {
         defaultTheme="dark"
         // switchable
       >
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-          <PwaInstallBanner />
-          <GlobalThemeToggle />
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+            <PwaInstallBanner />
+            <GlobalThemeToggle />
+          </TooltipProvider>
+        </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

@@ -17,55 +17,78 @@ import { trinityNewsletterHandler } from "./scheduled/trinityNewsletter.js";
 import { cellarJournalSitemapHandler, robotsTxtHandler, cellarJournalRssHandler } from "./sitemap.js";
 import { generateAuditTrailPdf } from "./auditTrailPdf.js";
 import { dailyAlertEmailHandler } from "./scheduled/dailyAlertEmail.js";
+import authRouter from "./authRouter.js";
+import { jwtVerify } from "jose";
+import { parse as parseCookies } from "cookie";
+import { COOKIE_NAME } from "../shared/const.js";
 
 /**
- * HTTP Basic Auth gate for `/admin/*` pages and admin-only tRPC procedures.
+ * Admin gate (post-auth migration).
  *
- * When `ADMIN_AUTH_USER` + `ADMIN_AUTH_PASS` env vars are BOTH set, the gate
- * is active — any request to an admin URL must include a matching Basic Auth
- * header. When either env var is missing (dev convenience), the gate is
- * disabled so curl + Playwright can still hit endpoints freely.
+ * Replaces the legacy HTTP Basic Auth wall with a JWT-role check that
+ * inspects the `app_session_id` cookie set by /api/auth/exchange (Emergent
+ * Google login). When the cookie verifies and the user's role is "admin",
+ * the request proceeds. Otherwise:
  *
- * Two URL classes are gated:
- *   1. SPA pages — /admin, /admin/* (frontend HTML routes)
- *   2. tRPC procs — /api/trpc/admin.* and /api/trpc/pricing.funnelStats
- *      (the backend admin routes — caught at the URL level so a leaked
- *       deep-link API URL can't be curled blind).
+ *   - SPA admin pages (/admin, /admin/*) → 302 redirect to /login?next=<orig>
+ *   - Admin tRPC endpoints + /api/exports/* → 401 JSON
  *
- * Browser users see the standard browser auth prompt; curl users get a
- * 401 with WWW-Authenticate header (`-u user:pass` works).
+ * Legacy Basic Auth fallback: if ADMIN_AUTH_USER + ADMIN_AUTH_PASS are
+ * both set, a matching Basic Auth header ALSO unlocks the gate. This keeps
+ * any cron/CI scripts that were curling exports working without code
+ * changes. Leave both env vars blank to require JWT login only.
+ *
+ * Dev convenience: when ENABLE_DEV_BYPASS=true (default in non-prod), the
+ * gate is fully open — matches the existing tRPC dev-bypass behaviour so
+ * the preview environment stays usable without configuring an account.
  */
-function adminBasicAuth(req: express.Request, res: express.Response, next: express.NextFunction) {
-  const user = process.env.ADMIN_AUTH_USER;
-  const pass = process.env.ADMIN_AUTH_PASS;
-  // Dev convenience: no credentials configured → gate is OFF.
-  if (!user || !pass) return next();
-
-  const auth = req.headers.authorization;
-  if (!auth || !auth.startsWith("Basic ")) {
-    res.setHeader("WWW-Authenticate", 'Basic realm="Ownology Admin"');
-    return res.status(401).send("Authentication required.");
-  }
-  let decoded: string;
+async function verifyAdminCookie(req: express.Request): Promise<boolean> {
   try {
-    decoded = Buffer.from(auth.slice(6), "base64").toString("utf8");
+    const cookieHeader = req.headers.cookie;
+    if (!cookieHeader) return false;
+    const cookies = parseCookies(cookieHeader);
+    const token = cookies[COOKIE_NAME];
+    if (!token) return false;
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) return false;
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(jwtSecret));
+    return payload.role === "admin";
   } catch {
-    res.setHeader("WWW-Authenticate", 'Basic realm="Ownology Admin"');
-    return res.status(401).send("Authentication required.");
+    return false;
   }
-  const idx = decoded.indexOf(":");
-  const reqUser = idx >= 0 ? decoded.slice(0, idx) : "";
-  const reqPass = idx >= 0 ? decoded.slice(idx + 1) : "";
-  if (reqUser !== user || reqPass !== pass) {
-    res.setHeader("WWW-Authenticate", 'Basic realm="Ownology Admin"');
-    return res.status(401).send("Authentication required.");
-  }
-  next();
 }
 
-/** Apply the admin gate selectively based on URL path. Kept as a single
- *  middleware so the route table stays clean. */
-function adminGate(req: express.Request, res: express.Response, next: express.NextFunction) {
+function checkBasicAuthFallback(req: express.Request): boolean {
+  const user = process.env.ADMIN_AUTH_USER;
+  const pass = process.env.ADMIN_AUTH_PASS;
+  if (!user || !pass) return false;
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith("Basic ")) return false;
+  try {
+    const decoded = Buffer.from(auth.slice(6), "base64").toString("utf8");
+    const idx = decoded.indexOf(":");
+    const reqUser = idx >= 0 ? decoded.slice(0, idx) : "";
+    const reqPass = idx >= 0 ? decoded.slice(idx + 1) : "";
+    return reqUser === user && reqPass === pass;
+  } catch {
+    return false;
+  }
+}
+
+function isDevBypassActive(): boolean {
+  // Off only when explicitly set to "false" OR running in production. This
+  // mirrors trpc.ts's seed-user injection so dev previews are wide open.
+  if (process.env.ENABLE_DEV_BYPASS === "false") return false;
+  if (process.env.NODE_ENV === "production" &&
+      process.env.ENABLE_DEV_BYPASS !== "true") return false;
+  return true;
+}
+
+async function adminGate(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) {
   const p = req.path;
   const isAdminPage = p === "/admin" || p.startsWith("/admin/");
   const isAdminApi =
@@ -76,13 +99,20 @@ function adminGate(req: express.Request, res: express.Response, next: express.Ne
     p.startsWith("/api/trpc/outreach.markSmsSent") ||
     p.startsWith("/api/trpc/outreach.markBooked") ||
     p.startsWith("/api/trpc/outreach.remove");
-  // /api/exports/* serves proprietary IP (e.g. the SOP library export) —
-  // gate it the same as admin pages so only the owner can grab it.
   const isExport = p.startsWith("/api/exports/");
-  if (isAdminPage || isAdminApi || isExport) {
-    return adminBasicAuth(req, res, next);
+
+  if (!isAdminPage && !isAdminApi && !isExport) return next();
+
+  if (isDevBypassActive()) return next();
+  if (checkBasicAuthFallback(req)) return next();
+  if (await verifyAdminCookie(req)) return next();
+
+  // SPA page → soft redirect to /login with returnPath. API → JSON 401.
+  if (isAdminPage) {
+    const nextPath = encodeURIComponent(req.originalUrl || p);
+    return res.redirect(302, `/login?next=${nextPath}`);
   }
-  next();
+  return res.status(401).json({ error: "admin login required" });
 }
 
 const __filename = fileURLToPath(import.meta.url);
@@ -92,10 +122,16 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // ── Admin Basic-Auth gate (first middleware) ─────────────────────────────
-  // Gates /admin/* SPA pages and /api/trpc/admin.* + /api/trpc/pricing.funnelStats
-  // when ADMIN_AUTH_USER + ADMIN_AUTH_PASS are set in env. No-op otherwise.
+  // ── Admin gate (JWT-role + Basic Auth fallback) ───────────────────────────
+  // Verifies `app_session_id` JWT cookie (role=admin) on /admin/* pages and
+  // admin-only tRPC endpoints. Legacy Basic Auth still unlocks via env if
+  // set. Wide-open when ENABLE_DEV_BYPASS is active (default in non-prod).
   app.use(adminGate);
+
+  // ── Auth API (Emergent Google OAuth exchange / me / logout) ───────────────
+  // Mounted BEFORE express.json() because authRouter mounts its own
+  // json() per-route to avoid clashing with /api/stripe/webhook raw body.
+  app.use("/api/auth", authRouter);
 
   // ── Stripe webhook MUST come before express.json() ──────────────────────────
   app.use("/api/stripe/webhook", express.raw({ type: "application/json" }), (req, res, next) => {

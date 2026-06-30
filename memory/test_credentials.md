@@ -1,21 +1,37 @@
 # Test credentials — Ownology
 
-Authentication is **fully bypassed** (both production and dev — updated 28 Jun 2026).
+## Authentication (Emergent Google OAuth — Feb 2026)
 
-Every request without a real session cookie is auto-authenticated as the
-seed admin user (see `server/trpc.ts → DEV_BYPASS_USER`). The user is
-auto-upserted into the `users` table on each request:
+Real auth is now wired. Two modes:
 
-| Field   | Value                                  |
+### Dev / preview (default)
+- `ENABLE_DEV_BYPASS=true` (or unset) → every request is auto-authenticated
+  as the seed admin below. No login required.
+- `/admin/*` SPA pages and admin tRPC endpoints are open.
+- This is the current mode in the preview environment.
+
+| Field   | Value (auto-injected)                  |
 |---------|----------------------------------------|
 | openId  | `seed-owner-001`                       |
 | name    | `Redstone Ridge Wines`                 |
 | email   | `cellar@redstoneridge.com.au`          |
 | role    | `admin`                                |
 
-To act as a different user, set the `app_session_id` cookie to a JWT
-signed with the `JWT_SECRET` from `/app/.env` containing the desired
-`{ openId, name, email, role }` payload (HS256).
+### Production (Railway)
+- Set `ENABLE_DEV_BYPASS=false` AND `NODE_ENV=production`.
+- Users sign in via `/login` → `https://auth.emergentagent.com` → Google →
+  `/auth/callback#session_id=…` → backend exchange → `app_session_id` JWT cookie.
+- Admins are determined by the comma-separated `ADMIN_EMAILS` env var.
+  Add your own email here to be granted `role=admin` on first login.
+- Legacy Basic Auth (`ADMIN_AUTH_USER` / `ADMIN_AUTH_PASS`) still works as a
+  fallback for curl/cron — leave blank to require JWT only.
 
-> When real auth is wired (Emergent Google login or JWT email/password),
-> this file should be updated with the seed account credentials.
+### Endpoints
+- `POST /api/auth/exchange` — body `{ session_id }`, sets cookie
+- `GET  /api/auth/me`       — returns user from cookie or 401
+- `POST /api/auth/logout`   — clears cookie
+
+### To act as a specific user in tests
+Sign a JWT with the `JWT_SECRET` from `/app/.env` containing
+`{ openId, name, email, role }` (HS256) and set it as the `app_session_id`
+cookie. Or just hit `/login` in a real browser.

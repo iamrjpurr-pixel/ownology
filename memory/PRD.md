@@ -478,12 +478,22 @@ have been folded in or marked complete.)
 - [x] HeroTheatricalPattern wired into 3 marketing pages (29 Jun 2026)
 
 ## Test credentials
-- Dev bypass user (auto-injected when NODE_ENV != production):
+- Dev bypass user (auto-injected when `ENABLE_DEV_BYPASS=true` OR `NODE_ENV != production`):
   - openId: `seed-owner-001`
   - name: `Redstone Ridge Wines`
   - email: `cellar@redstoneridge.com.au`
   - role: `admin`
 - No real login required during development.
+- See `/app/memory/test_credentials.md` for full auth details.
+
+## Auth (Emergent Google OAuth — Feb 2026)
+- `/api/auth/exchange` { session_id } → sets `app_session_id` JWT cookie (HS256, 7d, payload `{ openId, name, email, role }`)
+- `/api/auth/me` → returns user from cookie or 401
+- `/api/auth/logout` → clears cookie
+- Frontend: `/login` (Google button) → `https://auth.emergentagent.com` → `/auth/callback#session_id=…` → exchange → redirect
+- Admin allowlist: `ADMIN_EMAILS` (comma-sep) in `.env` — matched emails get `role=admin` on login
+- Gate (`adminGate` in `server/index.ts`): JWT cookie role=admin OR Basic Auth fallback OR dev-bypass active → allow; else SPA→302 `/login?next=…`, API→401 JSON
+- Files: `server/authRouter.ts`, `client/src/lib/useAuth.tsx`, `client/src/pages/Login.tsx`, `client/src/pages/AuthCallback.tsx`
 
 ## Service URLs
 - Preview: https://ownership-dev.preview.emergentagent.com
