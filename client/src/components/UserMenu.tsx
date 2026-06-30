@@ -1,8 +1,11 @@
 /**
  * UserMenu — fixed top-right widget showing signed-in identity + sign-out.
  *
- * Only rendered when an authenticated session exists. Anonymous users
- * never see it, so the public site stays clean.
+ * Only rendered when (a) an authenticated session exists AND (b) the
+ * current route is an admin / authenticated surface. Marketing pages
+ * (/home, /pricing, /knowledge, /hi/*, etc.) stay clean even when a
+ * signed-in admin is browsing them — their existing nav already has a
+ * top-right slot that we'd collide with.
  *
  * Click the trigger to open a small panel with:
  *   - Avatar (Google picture if we have it, otherwise initials)
@@ -14,7 +17,21 @@
  * "Switch winery" entry will live. For now it's identity + logout.
  */
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "wouter";
 import { useAuth } from "@/lib/useAuth";
+
+/** Routes where the UserMenu is allowed to render. Everything else is
+ *  public-facing or has its own header that we don't want to collide with. */
+const AUTH_SURFACE_PREFIXES = [
+  "/admin",
+  "/cellar",
+  "/work-mode",
+  "/free-run/dashboard",
+];
+
+function isAuthSurface(path: string): boolean {
+  return AUTH_SURFACE_PREFIXES.some((p) => path === p || path.startsWith(p + "/"));
+}
 
 function initialsOf(name?: string, email?: string): string {
   const src = (name || email || "?").trim();
@@ -25,6 +42,7 @@ function initialsOf(name?: string, email?: string): string {
 
 export default function UserMenu() {
   const { user, status, logout } = useAuth();
+  const [location] = useLocation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -38,6 +56,7 @@ export default function UserMenu() {
   }, [open]);
 
   if (status !== "authed" || !user) return null;
+  if (!isAuthSurface(location)) return null;
 
   const initials = initialsOf(user.name, user.email);
 
