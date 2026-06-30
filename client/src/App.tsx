@@ -82,6 +82,7 @@ const AdminThemesStats = lazy(() => import("./pages/AdminThemesStats"));
 const CascadeDemo = lazy(() => import("./pages/CascadeDemo"));
 const CopilotMockup = lazy(() => import("./pages/CopilotMockup"));
 const BrandingMockup = lazy(() => import("./pages/BrandingMockup"));
+const AdminResponsive = lazy(() => import("./pages/AdminResponsive"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
  *  Sized so it doesn't cause layout shift on first paint. */
@@ -269,6 +270,7 @@ function Router() {
       <Route path={"/admin/contacts"} component={AdminContacts} />
       <Route path={"/admin/marketing-kit"} component={AdminMarketingKit} />
       <Route path={"/admin/themes-stats"} component={AdminThemesStats} />
+      <Route path={"/admin/responsive"} component={AdminResponsive} />
       <Route path={"/cascade-demo"} component={CascadeDemo} />
       <Route path={"/copilot-mockup"} component={CopilotMockup} />
       <Route path={"/branding-mockup"} component={BrandingMockup} />
