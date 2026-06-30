@@ -38,51 +38,55 @@
 
 :root {
   --radius: 0.375rem;
-  /* Warm black background */
-  --background: oklch(0.11 0.008 60);
-  --foreground: oklch(0.92 0.018 75);
-  /* Charcoal card surfaces */
-  --card: oklch(0.16 0.010 60);
-  --card-foreground: oklch(0.92 0.018 75);
-  --popover: oklch(0.16 0.010 60);
-  --popover-foreground: oklch(0.92 0.018 75);
-  /* Amber gold primary */
-  --primary: oklch(0.72 0.12 75);
-  --primary-foreground: oklch(0.11 0.008 60);
+  /* Warm timber background — Australian boutique cellar at night,
+     not French château vault. Lifted L 0.11→0.13 (opens the room),
+     hue shifted warmer 60→35 (red-brown wood vs muddy umber),
+     chroma boosted 0.008→0.014 (clear timber identity, not flat brown). */
+  --background: oklch(0.13 0.014 35);
+  --foreground: oklch(0.93 0.020 70);
+  /* Card surfaces lifted further so panels feel like lit work areas
+     (overhead barrel-hall lamps), not just slightly-paler walls. */
+  --card: oklch(0.20 0.016 35);
+  --card-foreground: oklch(0.93 0.020 70);
+  --popover: oklch(0.20 0.016 35);
+  --popover-foreground: oklch(0.93 0.020 70);
+  /* Amber gold primary — slightly brighter to read as lamp-light */
+  --primary: oklch(0.74 0.13 72);
+  --primary-foreground: oklch(0.13 0.014 35);
   /* Muted surfaces */
-  --secondary: oklch(0.20 0.010 60);
-  --secondary-foreground: oklch(0.80 0.015 75);
-  --muted: oklch(0.18 0.008 60);
-  --muted-foreground: oklch(0.58 0.018 75);
-  /* Terracotta accent */
-  --accent: oklch(0.62 0.10 45);
+  --secondary: oklch(0.24 0.014 35);
+  --secondary-foreground: oklch(0.82 0.018 70);
+  --muted: oklch(0.22 0.014 35);
+  --muted-foreground: oklch(0.62 0.018 70);
+  /* Terracotta accent — slightly more vibrant against warmer base */
+  --accent: oklch(0.64 0.12 42);
   --accent-foreground: oklch(0.97 0.005 75);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.72 0.12 75);
+  --ring: oklch(0.74 0.13 72);
 
   /* ── Ownology semantic surface tokens (dark mode defaults) ── */
-  --ow-bg-base:   oklch(0.11 0.008 60);   /* page background */
-  --ow-bg-raised: oklch(0.14 0.009 60);   /* slightly lifted section */
-  --ow-bg-card:   oklch(0.16 0.010 60);   /* card / panel surface */
-  --ow-bg-inset:  oklch(0.20 0.010 60);   /* code blocks, inset areas */
-  --ow-text-hi:   oklch(0.92 0.018 75);   /* headings */
-  --ow-text-mid:  oklch(0.68 0.013 75);   /* body copy */
-  --ow-text-lo:   oklch(0.50 0.010 75);   /* captions, labels */
-  --ow-amber:     oklch(0.72 0.12 75);    /* brand amber — unchanged */
+  --ow-bg-base:   oklch(0.13 0.014 35);   /* page background — warm timber */
+  --ow-bg-raised: oklch(0.16 0.015 35);   /* slightly lifted section */
+  --ow-bg-card:   oklch(0.20 0.016 35);   /* card / panel surface — lamp-lit */
+  --ow-bg-inset:  oklch(0.24 0.018 35);   /* code blocks, inset areas */
+  --ow-text-hi:   oklch(0.93 0.020 70);   /* headings — warm cream */
+  --ow-text-mid:  oklch(0.72 0.016 70);   /* body copy — slightly lifted */
+  --ow-text-lo:   oklch(0.54 0.012 70);   /* captions, labels */
+  --ow-amber:     oklch(0.74 0.13 72);    /* brand amber — lamp-light bright */
   /* Live/active accent — overridden by Crush Pad to vibrant pink.
      In all other themes it inherits the amber for backward compatibility,
      so components referencing var(--ow-accent-live) stay safe. */
   --ow-accent-live: var(--ow-amber);
   --ow-accent-live-soft: color-mix(in oklch, var(--ow-amber) 18%, transparent);
-  --ow-border:    oklch(1 0 0 / 0.08);    /* subtle dividers */
-  --ow-border-md: oklch(1 0 0 / 0.14);   /* medium dividers */
+  --ow-border:    oklch(1 0 0 / 0.10);    /* subtle dividers — slightly brighter */
+  --ow-border-md: oklch(1 0 0 / 0.16);    /* medium dividers */
   --ow-shadow:    oklch(0 0 0 / 0.40);    /* card shadows */
-  --ow-nav-bg:    oklch(0.11 0.008 60 / 97%); /* scrolled nav */
+  --ow-nav-bg:    oklch(0.13 0.014 35 / 97%); /* scrolled nav */
   --ow-bg-overlay: oklch(0 0 0 / 0.60);       /* modal/drawer backdrop */
   --ow-blue:      oklch(0.65 0.10 230);       /* blue for ERP/system labels */
-  --ow-logo-wordmark: oklch(0.92 0.018 75);  /* logo wordmark — cream in dark mode */
+  --ow-logo-wordmark: oklch(0.93 0.020 70);  /* logo wordmark — cream in dark mode */
 }
 
 /* ── Light "Cellar Daylight" theme ── */
