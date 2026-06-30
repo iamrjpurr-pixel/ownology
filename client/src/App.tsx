@@ -24,6 +24,7 @@ import QuickEntry from "./pages/QuickEntry";
 import CellarTasks from "./pages/CellarTasks";
 import Today from "./pages/Today";
 import Pricing from "./pages/Pricing";
+import CellarBrief from "./pages/CellarBrief";
 import WorkModeLayout from "@/components/WorkModeLayout";
 import PwaInstallBanner from "./components/PwaInstallBanner";
 
@@ -168,6 +169,13 @@ function TodayPage() {
     </WorkModeLayout>
   );
 }
+function CellarBriefPage() {
+  return (
+    <WorkModeLayout title="Cellar Brief" activeTab="more">
+      <CellarBrief />
+    </WorkModeLayout>
+  );
+}
 function KnowledgePage() {
   return (
     <WorkModeLayout title="Knowledge" wide>
@@ -266,6 +274,7 @@ function Router() {
       <Route path={"/guide"} component={Guide} />
       <Route path={"/import"} component={ImportPage} />
       <Route path={"/today"} component={TodayPage} />
+      <Route path={"/cellar-brief"} component={CellarBriefPage} />
       <Route path={"/demo"} component={Demo} />
       <Route path={"/waitlist"} component={Waitlist} />
       <Route path={"/reference/vine"} component={VineReference} />

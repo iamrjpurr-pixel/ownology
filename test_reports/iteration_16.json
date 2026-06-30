@@ -1,0 +1,54 @@
+{
+  "summary": "Iteration_16 end-to-end verification of the new /cellar-brief mobile-first page + cellarBrief tRPC router (latest, generateNow, history). Tested against https://ownership-dev.preview.emergentagent.com on 430x900 mobile viewport. Backend pytest 8/8 PASS. Frontend Playwright: all 13 spec checkpoints from review_request pass except ONE engine-grounding mismatch (see frontend_issues). Highlights — sticky exec banner + 3 KPI chips render with 2 attention / 6 decisions due / 13 vessels; 13 cards sorted attention→watch→ok; Tank 3 Shiraz has status='attention' + decisionDue 'Possible stuck ferment — verify temperature, taste for off-notes, plan restart if no movement in 24h' + todaysWork includes 'Brix every 12h' and 'Smell-check for VA'; Tank 1 Shiraz, Tank 2 Chardonnay, Tank 4 Pinot Noir all present with correct stage classifications (primary_active, primary_active, mlf_active); Tank 4 grounding includes SOP 21 + 'Red Wine Bible Ch.6 — Malolactic Fermentation'; brief-log/brief-ask buttons render with correct hrefs (/quick-entry?tank=Tank%203&variety=Shiraz and /free-run?from=cellar-brief&tank=Tank%203); Refresh button label transitions '↻ Refresh' → 'Refreshing…' → '↻ Refresh'; collapsed ok-status cards expand on toggle click; History accordion (data-testid=cellar-brief-history) opens with 3 past briefs listed.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Tank 2 Chardonnay grounding refs",
+        "issue": "Review spec requires 'Tank 2 Chardonnay should reference White Wine Bible chapters' but the engine returns ['SOP 11 Red Wine Fermentation', 'SOP 12 Pump-Over Protocol', 'SOP 13 White Wine Fermentation Temperature Control'] — NO White Wine Bible chapter references. The wine-color routing in cellarBriefEngine.buildCard (around line 415) appears to use a single SOP block for all primary_active vessels regardless of wine color. White wines (Chardonnay, Sauvignon Blanc, etc.) should pull from White Wine Bible chapters, not the red-leaning SOP 11 default. Tank 4 Pinot Noir MLF grounding is correct, so the MLF stage routing works; the issue is isolated to the primary_active branch for white varieties.",
+        "affected_selectors": ["[data-testid=brief-grounding-tank-2-chardonnay-*]"]
+      }
+    ],
+    "design_issues": [
+      {
+        "screen": "/cellar-brief mobile",
+        "issues": [
+          "Theme onboarding picker overlay (ThemeOnboarding component, 'CHOOSE YOUR WORKING LIGHT' / 'THEME SUGGESTION') covers the bottom ~25% of the page on mobile 430x900, blocking the brief-log / brief-ask action buttons on the lowermost cards AND the cellar-brief-history-toggle accordion. Users would need to dismiss the picker before tapping these elements. Consider suppressing the theme onboarding on /cellar-brief, or repositioning it so it does not overlap the page's primary action surface."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_cellar_brief.py",
+    "/app/test_reports/pytest/iteration_16.xml"
+  ],
+  "action_items": [
+    "Fix Tank 2 Chardonnay grounding: cellarBriefEngine should branch on wine color (red vs white variety) at the primary_active stage and emit White Wine Bible chapter refs (e.g. 'White Wine Bible Ch.X — Primary Fermentation') for Chardonnay/SauvBlanc/Pinot Gris/Riesling/Viognier instead of Red Wine Bible refs. The variety→color map likely lives near classifyStage(line 294) / buildCard(line 415) in /app/server/cellarBriefEngine.ts.",
+    "Consider hiding or repositioning the theme onboarding picker on /cellar-brief — currently it overlays the bottom of the page on mobile, blocking brief-log/brief-ask and history-toggle tap targets until dismissed."
+  ],
+  "critical_code_review_comments": [
+    "/app/server/routers/cellarBrief.ts:89-92 — history procedure builds 'conditions' then uses input.beforeGeneratedAt ternary but the TRUE branch is `and(...conditions, eq(schema.cellarBriefs.wineryId, ctx.wineryId))` which duplicates the wineryId condition (already in `conditions`) and IGNORES the beforeGeneratedAt cursor entirely. Pagination via beforeGeneratedAt is effectively broken — it returns the same first page regardless of the cursor. Should use `lt(schema.cellarBriefs.generatedAt, input.beforeGeneratedAt)` in the AND.",
+    "/app/client/src/pages/CellarBrief.tsx:74 — history.useQuery is fired on every page load with limit:10 even though the panel is hidden by default behind the accordion toggle. Move the query under `enabled: showHistory` to avoid a wasted round-trip for users who never open history.",
+    "/app/client/src/pages/CellarBrief.tsx:151 — generatedAt timestamp string is rendered inside the sticky banner header but only updates after `latest.refetch` resolves. After `generateNow.mutate` succeeds (line 70) the code calls `utils.cellarBrief.latest.invalidate()` which triggers a refetch — fine — but the user sees no visual indicator between the moment the button reverts to '↻ Refresh' and the moment the new generatedAt appears (race in our test showed identical 'today · 23:07' before and after). Consider showing a brief 'updated' flash or animating the timestamp change.",
+    "/app/server/cellarBriefEngine.ts buildCard (~line 415) — wine-color routing for grounding refs is incomplete: white varieties on primary_active emit Red Wine Bible refs (see Tank 2 Chardonnay in test output). The MLF branch correctly routes (Tank 4 Pinot Noir got Red Wine Bible Ch.6 MLF, which is fine since MLF is red-relevant), so the bug is isolated to the primary fermentation grounding lookup.",
+    "/app/client/src/pages/CellarBrief.tsx:215 — keys use `${c.vesselId}-${idx}` which is stable enough but if cards reorder (status changes between polls) React will re-mount the card and lose the local expanded state. Prefer a stable key like `vesselId-variety`.",
+    "/app/client/src/pages/CellarBrief.tsx:279-282 — slug generation can collide if two cards share vesselId+variety (e.g. two 'Tank 2 Merlot' barrels). Append vesselType or idx to the slug for guaranteed uniqueness of data-testid values."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_cellar_brief.py (new)"
+  ],
+  "success_rate": {
+    "backend": "100% (8/8 pytest — latest, generateNow, history all green; stuck-ferment, sort order, all stage classifications verified)",
+    "frontend": "12/13 spec checkpoints PASS (~92%) — only Tank 2 Chardonnay grounding refs missing White Wine Bible chapters; banner+KPIs+cards+sort+expand/collapse+refresh label transition+action button hrefs+history accordion all verified."
+  },
+  "test_credentials": "Auth bypassed via ENABLE_DEV_BYPASS=seed-owner-001 admin (per /app/memory/test_credentials.md). No login.",
+  "seed_data_creation": "None. Used existing seed (winery_id=1 with 13 active vessels) populated by /app/scripts/seed-twelve-day-vintage.mjs in prior session.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "tRPC v11 input format for GET = ?input=<urlencoded {\"json\":{...}}>; for POST = body {\"json\":{...}}. Response shape = result.data.json.<payload>. Card data-testid slug formula: `${vesselId}-${variety}`.replace(/[^a-zA-Z0-9]+/g,'-').toLowerCase() (e.g. 'Tank 3' + 'Shiraz' → 'tank-3-shiraz'). The /cellar-brief page mounts a ThemeOnboarding/ThemeSuggestion picker overlay at the bottom of the viewport on first visit — dismiss it with the 'CLOSE' or '×' button before testing bottom-of-page elements (brief-log, brief-ask on the last cards, and the cellar-brief-history-toggle accordion). Cards with status='ok' start collapsed; 'watch' and 'attention' start expanded. The seed currently contains 13 vessels for winery_id=1 (not just the 4 freshly seeded ones); accept the broader feed and verify Tank 1/2/3/4 + the canonical Tank 3 Shiraz stuck-ferment within that 13.",
+  "rca of the issue": "Tank 2 Chardonnay grounding bug RCA: classifyStage() correctly returns 'primary_active' for Tank 2 Chardonnay (verified by GET /api/trpc/cellarBrief.latest — stage='primary_active'). However buildCard()'s grounding lookup at /app/server/cellarBriefEngine.ts ~line 415 appears to use a single SOP/Bible block for all primary_active vessels: ['SOP 11 Red Wine Fermentation', 'SOP 12 Pump-Over Protocol', 'SOP 13 White Wine Fermentation Temperature Control', 'Red Wine Bible intro', 'Red Wine Bible Ch.3 — Primary Fermentation']. Notice no White Wine Bible chapter references appear for white varieties. Mitigation: add a `wineColor = isWhiteVariety(variety) ? 'white' : 'red'` switch inside buildCard's grounding builder, and pull from the White Wine Bible index (already ingested per /app/scripts/ingest-white-wine-bible.mjs) when wineColor==='white' on stages primary_active/primary_slowing/pressed. Verify by re-running /api/trpc/cellarBrief.latest and confirming Tank 2 Chardonnay grounding contains at least one 'White Wine Bible Ch.' string."
+}
