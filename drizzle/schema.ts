@@ -8,6 +8,9 @@ export const users = mysqlTable("users", {
   name: varchar("name", { length: 256 }),
   email: varchar("email", { length: 256 }),
   role: mysqlEnum("role", ["admin", "user"]).notNull().default("user"),
+  // 'metric' (AU/NZ default) | 'imperial' (US/legacy preference). Controls
+  // AI answer conversion + SOP boutique companion rendering.
+  unitSystem: varchar("unit_system", { length: 16 }).notNull().default("metric"),
   createdAt: bigint("created_at", { mode: "number" }).notNull(),
 });
 
