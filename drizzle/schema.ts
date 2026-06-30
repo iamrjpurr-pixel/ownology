@@ -11,6 +11,9 @@ export const users = mysqlTable("users", {
   // 'metric' (AU/NZ default) | 'imperial' (US/legacy preference). Controls
   // AI answer conversion + SOP boutique companion rendering.
   unitSystem: varchar("unit_system", { length: 16 }).notNull().default("metric"),
+  // Multi-tenant container — Phase 1 (Feb 2026): nullable for legacy rows;
+  // Phase 2 will flip to NOT NULL once query refactor is complete.
+  wineryId: int("winery_id"),
   createdAt: bigint("created_at", { mode: "number" }).notNull(),
 });
 
@@ -1186,6 +1189,35 @@ export const outreachContacts = mysqlTable(
  * flags the first selection per session so we can split "what new users
  * picked" from "what existing users switched to". Used by /admin/themes-stats.
  */
+/**
+ * wineries — the tenancy container. Every paying customer = 1 winery row.
+ *
+ * Phase 1 (Feb 2026): table exists, every user gets one via auth flow,
+ * but existing queries do NOT yet filter by winery_id. Data is still
+ * shared across users until Phase 2 ships query-level enforcement.
+ *
+ * Bootstrap: created on server boot via CREATE TABLE IF NOT EXISTS in
+ * server/index.ts, plus a Default Winery row containing legacy seed
+ * data so nothing breaks.
+ */
+export const wineries = mysqlTable(
+  "wineries",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    name: varchar("name", { length: 255 }).notNull(),
+    slug: varchar("slug", { length: 64 }).notNull().unique(),
+    ownerUserId: int("owner_user_id").notNull(),
+    plan: mysqlEnum("plan", ["free", "press", "amphora", "coopers", "founding_member"]).notNull().default("free"),
+    region: varchar("region", { length: 128 }),
+    brandColor: varchar("brand_color", { length: 16 }),
+    logoUrl: varchar("logo_url", { length: 512 }),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("wineries_owner_idx").on(t.ownerUserId),
+  ]
+);
+
 export const themePicks = mysqlTable(
   "theme_picks",
   {

@@ -232,8 +232,61 @@ async function startServer() {
         INDEX ts_logged_at_idx (logged_at)
       )
     `);
+    // ── Phase 1 multi-tenant bootstrap ───────────────────────────────────
+    // Idempotent: creates `wineries` table, adds `winery_id` column to
+    // users if missing, seeds a Default Winery, backfills NULL user
+    // memberships to it. Safe to run on every boot. Phase 2 will flip
+    // winery_id to NOT NULL once query refactor completes.
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS wineries (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(255) NOT NULL,
+        slug VARCHAR(64) NOT NULL UNIQUE,
+        owner_user_id INT NOT NULL,
+        plan ENUM('free','press','amphora','coopers','founding_member') NOT NULL DEFAULT 'free',
+        region VARCHAR(128),
+        brand_color VARCHAR(16),
+        logo_url VARCHAR(512),
+        created_at BIGINT NOT NULL,
+        INDEX wineries_owner_idx (owner_user_id)
+      )
+    `);
+    // ALTER TABLE ADD COLUMN IF NOT EXISTS is MySQL 8.0.29+ — most
+    // managed providers including Railway are on it. Wrapped in
+    // try/catch so older MySQL still boots; Phase 2 will validate.
+    try {
+      await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS winery_id INT NULL`);
+    } catch (alterErr) {
+      // Fallback for MySQL <8.0.29 — best-effort, ignore "duplicate column" errors.
+      try {
+        await db.execute(sql`ALTER TABLE users ADD COLUMN winery_id INT NULL`);
+      } catch {
+        // Column already exists, nothing to do.
+        void alterErr;
+      }
+    }
+    // Seed Default Winery containing existing data. Owner is the seed admin.
+    const seedOwnerOpenId = process.env.OWNER_OPEN_ID || "seed-owner-001";
+    const seedRows = await db.execute(sql`SELECT id FROM users WHERE open_id = ${seedOwnerOpenId} LIMIT 1`);
+    type SeedRow = { id: number };
+    const seedRowArr = (seedRows as unknown as [SeedRow[]])[0] || [];
+    if (Array.isArray(seedRowArr) && seedRowArr[0]?.id) {
+      const seedUserId = seedRowArr[0].id;
+      await db.execute(sql`
+        INSERT IGNORE INTO wineries (name, slug, owner_user_id, plan, region, created_at)
+        VALUES ('Redstone Ridge Wines', 'redstone-ridge', ${seedUserId}, 'founding_member', 'Hunter Valley, NSW', ${Date.now()})
+      `);
+      // Backfill: any user with NULL winery_id gets the Default Winery.
+      const defaultRows = await db.execute(sql`SELECT id FROM wineries WHERE slug = 'redstone-ridge' LIMIT 1`);
+      const defaultRowArr = (defaultRows as unknown as [SeedRow[]])[0] || [];
+      const defaultWineryId = Array.isArray(defaultRowArr) ? defaultRowArr[0]?.id : undefined;
+      if (defaultWineryId) {
+        await db.execute(sql`UPDATE users SET winery_id = ${defaultWineryId} WHERE winery_id IS NULL`);
+      }
+    }
+    console.log("[bootstrap] multi-tenant scaffolding ready");
   } catch (e) {
-    console.warn("[bootstrap] theme_suggestions table create skipped:", (e as Error).message);
+    console.warn("[bootstrap] table create skipped:", (e as Error).message);
   }
   server.listen(port, "0.0.0.0", () => {
     console.log(`[server] Running on http://0.0.0.0:${port}/`);

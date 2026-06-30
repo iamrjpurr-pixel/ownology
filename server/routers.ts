@@ -320,15 +320,30 @@ const ordersRouter = router({
 
 const adminRouter = router({
   /** Current signed-in user (admin or dev-bypass seed). Cheap profile fetch
-   *  for the /admin/settings page. */
+   *  for the /admin/settings page. Includes the user's Winery (Phase 1
+   *  multi-tenant) so the UI can render the winery name in the UserMenu. */
   me: protectedProcedure.query(async ({ ctx }) => {
     const dbUser = await getUserByOpenId(ctx.user.openId);
+    let winery: { id: number; name: string; slug: string; plan: string } | null = null;
+    if (dbUser?.wineryId) {
+      try {
+        const w = await db.query.wineries.findFirst({
+          where: eq(schema.wineries.id, dbUser.wineryId),
+        });
+        if (w) {
+          winery = { id: w.id, name: w.name, slug: w.slug, plan: w.plan };
+        }
+      } catch {
+        // wineries table may not exist yet on a fresh boot — fail soft.
+      }
+    }
     return {
       openId: ctx.user.openId,
       name: ctx.user.name || dbUser?.name || null,
       email: ctx.user.email || dbUser?.email || null,
       role: ctx.user.role || dbUser?.role || "user",
       unitSystem: (dbUser?.unitSystem as "metric" | "imperial" | undefined) || "metric",
+      winery,
     };
   }),
 

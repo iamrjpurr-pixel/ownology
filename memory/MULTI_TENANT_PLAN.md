@@ -12,6 +12,29 @@ with a thorough test pass.
 - **Branding scope in v1**: **Name + logo only**. Custom brand colors + custom domains deferred to v2.
 - **Brand identity unchanged**: The platform brand is "Ownology AI." The Winery is the *customer's* container inside it. These are not in conflict.
 
+## Phase 1 — Status: DONE (Feb 2026)
+
+Shipped in the same session as the plan above:
+- ✅ `wineries` table created via idempotent CREATE TABLE IF NOT EXISTS on boot
+- ✅ `winery_id` column added to `users` (nullable for now)
+- ✅ Default Winery "Redstone Ridge Wines" seeded with the founder as owner
+- ✅ Backfill: every legacy user assigned to Default Winery
+- ✅ New Google sign-ins auto-provision their own Winery (named `"{firstName}'s Winery"`)
+- ✅ `admin.me` tRPC returns the user's `winery` object
+- ✅ UserMenu pill + dropdown surfaces the winery name
+- ✅ Verified end-to-end in preview
+
+What this gets us: foundation laid, ZERO existing queries touched, no regression risk. The plumbing is in.
+
+What it DOES NOT get us: actual data isolation. Phase 2 is still required before any second paying customer onboards.
+
+## Phase 2 — Next session
+
+Execute the per-router refactor checklist below. The tRPC procedures
+need a `winery_id` filter in their WHERE clauses + an insert default in
+their `.values()` calls. Foundation is already in place via
+`ctx.user.wineryId` (available in every protectedProcedure).
+
 ## Why this matters
 
 Right now every Founding Member who signs up shares one global data

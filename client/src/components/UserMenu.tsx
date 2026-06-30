@@ -19,6 +19,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/lib/useAuth";
+import { trpc } from "@/lib/trpc";
 
 /** Routes where the UserMenu is allowed to render. Everything else is
  *  public-facing or has its own header that we don't want to collide with. */
@@ -45,6 +46,11 @@ export default function UserMenu() {
   const [location] = useLocation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  // Fetch the full me profile (incl. winery name) once authed. Lightweight.
+  const { data: me } = trpc.admin.me.useQuery(undefined, {
+    enabled: status === "authed",
+    staleTime: 60_000,
+  });
 
   // Close on outside click
   useEffect(() => {
@@ -57,6 +63,11 @@ export default function UserMenu() {
 
   if (status !== "authed" || !user) return null;
   if (!isAuthSurface(location)) return null;
+
+  // Winery name takes the priority slot on the trigger pill — it's the
+  // most useful identifier ("am I in Redstone Ridge or Brokenwood?").
+  // Falls back to role badge if winery isn't loaded / Phase 1 fresh user.
+  const triggerLabel = me?.winery?.name || (user.role === "admin" ? "Admin" : "Account");
 
   const initials = initialsOf(user.name, user.email);
 
@@ -123,9 +134,13 @@ export default function UserMenu() {
             letterSpacing: "0.06em",
             textTransform: "uppercase",
             color: "var(--ow-text-hi)",
+            maxWidth: 140,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
           }}
         >
-          {user.role === "admin" ? "Admin" : "Account"}
+          {triggerLabel}
         </span>
       </button>
 
@@ -203,6 +218,22 @@ export default function UserMenu() {
           </div>
 
           <div style={{ marginBottom: 10 }}>
+            {me?.winery && (
+              <div
+                data-testid="user-menu-winery"
+                style={{
+                  fontSize: "0.74rem",
+                  color: "var(--ow-text-mid)",
+                  marginBottom: 6,
+                  fontWeight: 600,
+                }}
+              >
+                <span style={{ color: "var(--ow-text-lo)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase", marginRight: 6 }}>
+                  Winery
+                </span>
+                {me.winery.name}
+              </div>
+            )}
             <span
               data-testid="user-menu-role"
               style={{

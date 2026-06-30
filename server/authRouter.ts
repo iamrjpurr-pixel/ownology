@@ -100,15 +100,16 @@ function clearSessionCookie(res: Response) {
  * a Google identifier but emails are the stable join key for our existing
  * lead/founding-member tables). When email is missing for whatever reason
  * we fall back to the Emergent id.
+ *
+ * Multi-tenant (Phase 1): every NEW user also gets a freshly-provisioned
+ * Winery row, named after them (e.g. "Sarah's Winery"). They become its
+ * owner. Returning users keep their existing winery_id untouched.
  */
 async function upsertUserFromEmergent(
   data: EmergentSessionData
 ): Promise<{ openId: string; name: string; email: string; role: "admin" | "user" }> {
   const email = data.email?.toLowerCase().trim();
   const role: "admin" | "user" = isAdminEmail(email) ? "admin" : "user";
-  // The `users` table uses `open_id` as the unique external identifier.
-  // We use the Emergent id as our openId so a returning Google user always
-  // matches the same row.
   const openId = `emergent:${data.id}`;
   const now = Date.now();
 
@@ -116,8 +117,6 @@ async function upsertUserFromEmergent(
     where: eq(schema.users.openId, openId),
   });
   if (existing) {
-    // Keep role + name + email fresh on every login (admin allowlist changes
-    // should take effect immediately).
     await db
       .update(schema.users)
       .set({
@@ -129,13 +128,55 @@ async function upsertUserFromEmergent(
     return { openId, name: data.name || existing.name || "", email: email || existing.email || "", role };
   }
 
-  await db.insert(schema.users).values({
+  // Brand-new user — create the row, then provision their Winery.
+  const inserted = await db.insert(schema.users).values({
     openId,
     name: data.name || null,
     email: email || null,
     role,
     createdAt: now,
   });
+  // Drizzle for MySQL returns `[ResultSetHeader, ...]` from execute()s but
+  // .insert() returns a less-typed shape — re-query by openId to get the
+  // canonical id back so we always have a stable handle for the winery
+  // owner_user_id FK.
+  const justCreated = await db.query.users.findFirst({
+    where: eq(schema.users.openId, openId),
+  });
+  if (justCreated?.id) {
+    const wineryName = (data.name || email || "My").split(/\s+/)[0] + "'s Winery";
+    const baseSlug = (data.name || email || "winery")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 48) || "winery";
+    // Slug uniqueness — append a short suffix if collision.
+    const suffix = Math.random().toString(36).slice(2, 6);
+    const slug = `${baseSlug}-${suffix}`;
+    try {
+      await db.insert(schema.wineries).values({
+        name: wineryName,
+        slug,
+        ownerUserId: justCreated.id,
+        plan: "free",
+        createdAt: now,
+      });
+      const newWinery = await db.query.wineries.findFirst({
+        where: eq(schema.wineries.slug, slug),
+      });
+      if (newWinery?.id) {
+        await db
+          .update(schema.users)
+          .set({ wineryId: newWinery.id })
+          .where(eq(schema.users.id, justCreated.id));
+      }
+    } catch (e) {
+      // Winery table may not exist yet on a very fresh DB before bootstrap.
+      // Auth still succeeds — user just lands in legacy shared mode until
+      // next boot runs the bootstrap.
+      console.warn("[auth] winery provisioning skipped:", (e as Error).message);
+    }
+  }
   return { openId, name: data.name || "", email: email || "", role };
 }
 
