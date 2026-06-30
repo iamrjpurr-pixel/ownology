@@ -71,12 +71,12 @@ export default function CellarBrief() {
       void utils.cellarBrief.history.invalidate();
     },
   });
+  const [showHistory, setShowHistory] = useState(false);
   const history = trpc.cellarBrief.history.useQuery({ limit: 10 }, {
     refetchOnWindowFocus: false,
     retry: false,
+    enabled: showHistory,
   });
-
-  const [showHistory, setShowHistory] = useState(false);
 
   const summary = latest.data?.summary;
   const cards = summary?.cards ?? [];

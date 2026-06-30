@@ -30,7 +30,7 @@ import { useThemeTelemetry } from "@/hooks/useThemeTelemetry";
 const STORAGE_THEME = "ownology-theme";
 const STORAGE_DISMISSED = "ownology-theme-onboarded";
 
-const SUPPRESSED_PREFIXES = ["/admin", "/hi/", "/founding-member/success", "/merch/success"];
+const SUPPRESSED_PREFIXES = ["/admin", "/hi/", "/founding-member/success", "/merch/success", "/cellar-brief"];
 
 export default function ThemeOnboarding() {
   const [location] = useLocation();

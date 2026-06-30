@@ -174,7 +174,14 @@ type WbsCache = {
 
 function resolveGrounding(stage: CellarBriefStage, color: WineColor, cache: WbsCache): string[] {
   const treatAsWhite = color === "white" || color === "rose";
-  const wbsCodes = STAGE_TO_WBS[stage]?.[treatAsWhite ? "white" : "red"] ?? [];
+  const baseCodes = STAGE_TO_WBS[stage]?.[treatAsWhite ? "white" : "red"] ?? [];
+  // White Wine Bible chunks were ingested with `D`-prefixed WBS codes
+  // (D4.1, D5.2, …) while SOPs + Red Wine Bible use bare codes (4.1, 5.2).
+  // For whites/rosé we probe BOTH variants so chapter resolution works
+  // regardless of which ingestion script tagged the chunk.
+  const wbsCodes = treatAsWhite
+    ? baseCodes.flatMap((c) => [c, `D${c}`])
+    : baseCodes;
   const out: string[] = [];
   const seenSop = new Set<number>();
   const seenChunk = new Set<string>();

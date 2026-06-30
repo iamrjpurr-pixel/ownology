@@ -15,7 +15,7 @@ import { z } from "zod";
 import { router, wineryProcedure } from "../trpc.js";
 import { db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
-import { and, eq, desc } from "drizzle-orm";
+import { and, eq, lt, desc } from "drizzle-orm";
 import { generateCellarBrief } from "../cellarBriefEngine.js";
 
 const wineryRouter = router;
@@ -74,8 +74,14 @@ export const cellarBriefRouter = wineryRouter({
       beforeGeneratedAt: z.number().int().optional(),
     }))
     .query(async ({ ctx, input }) => {
-      const conditions = [eq(schema.cellarBriefs.wineryId, ctx.wineryId)];
-      // Pagination cursor — return briefs older than the cursor value
+      // Apply the optional pagination cursor: return briefs strictly older
+      // than the cursor timestamp so callers can walk backwards through history.
+      const whereExpr = input.beforeGeneratedAt
+        ? and(
+            eq(schema.cellarBriefs.wineryId, ctx.wineryId),
+            lt(schema.cellarBriefs.generatedAt, input.beforeGeneratedAt),
+          )
+        : eq(schema.cellarBriefs.wineryId, ctx.wineryId);
       const rows = await db
         .select({
           id: schema.cellarBriefs.id,
@@ -87,9 +93,7 @@ export const cellarBriefRouter = wineryRouter({
           generatedAt: schema.cellarBriefs.generatedAt,
         })
         .from(schema.cellarBriefs)
-        .where(input.beforeGeneratedAt
-          ? and(...conditions, eq(schema.cellarBriefs.wineryId, ctx.wineryId))
-          : and(...conditions))
+        .where(whereExpr)
         .orderBy(desc(schema.cellarBriefs.generatedAt))
         .limit(input.limit);
       return rows;

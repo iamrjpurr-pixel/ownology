@@ -34,7 +34,7 @@ const STORAGE_THEME = "ownology-theme";
 const STORAGE_PICKED_AT = "ownology-theme-picked-at"; // ms timestamp
 const STORAGE_SUGGESTED_ON = "ownology-theme-suggested-on"; // YYYY-MM-DD
 const STORAGE_OPT_OUT = "ownology-theme-suggest-opt-out"; // "1"
-const SUPPRESS_PREFIXES = ["/admin", "/hi/", "/auth/", "/login"];
+const SUPPRESS_PREFIXES = ["/admin", "/hi/", "/auth/", "/login", "/cellar-brief"];
 
 type Suggestion = {
   themeId: ThemeId;
