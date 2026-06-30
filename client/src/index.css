@@ -165,29 +165,29 @@ html.theme-soft-cellar {
    Bumped font-weights add the "redundancy beyond colour" Google calls
    for when the sun washes out hues. */
 html.theme-red-crush {
-  --background: oklch(1 0 0);
+  --background: oklch(0.985 0.014 8);
   --foreground: oklch(0.08 0.005 0);
-  --card: oklch(0.985 0.003 0);
+  --card: oklch(0.975 0.018 8);
   --card-foreground: oklch(0.08 0.005 0);
-  --popover: oklch(0.985 0.003 0);
+  --popover: oklch(0.975 0.018 8);
   --popover-foreground: oklch(0.08 0.005 0);
-  --muted: oklch(0.95 0.003 0);
+  --muted: oklch(0.94 0.020 8);
   --muted-foreground: oklch(0.30 0.005 0);
   --border: oklch(0 0 0 / 0.20);
   --input: oklch(0 0 0 / 0.18);
 
-  --ow-bg-base:   oklch(1 0 0);              /* pure white */
-  --ow-bg-raised: oklch(0.985 0.003 0);
-  --ow-bg-card:   oklch(0.975 0.004 0);
-  --ow-bg-inset:  oklch(0.96 0.004 0);
-  --ow-text-hi:   oklch(0.06 0.005 0);       /* near pure black */
+  --ow-bg-base:   oklch(0.985 0.014 8);      /* faint rose-tinted white */
+  --ow-bg-raised: oklch(0.975 0.018 8);
+  --ow-bg-card:   oklch(0.97 0.022 8);
+  --ow-bg-inset:  oklch(0.95 0.024 8);
+  --ow-text-hi:   oklch(0.06 0.005 0);
   --ow-text-mid:  oklch(0.18 0.005 0);
   --ow-text-lo:   oklch(0.36 0.006 0);
-  --ow-amber:     oklch(0.54 0.18 65);       /* deeper amber pops on white */
-  --ow-border:    oklch(0 0 0 / 0.20);
-  --ow-border-md: oklch(0 0 0 / 0.32);
-  --ow-shadow:    oklch(0 0 0 / 0.14);
-  --ow-nav-bg:    oklch(1 0 0 / 96%);
+  --ow-amber:     oklch(0.54 0.18 65);
+  --ow-border:    oklch(0.46 0.20 8 / 0.18); /* rose-cast border */
+  --ow-border-md: oklch(0.46 0.20 8 / 0.34);
+  --ow-shadow:    oklch(0.40 0.20 8 / 0.18);
+  --ow-nav-bg:    oklch(0.985 0.014 8 / 96%);
   --ow-bg-overlay: oklch(0 0 0 / 0.50);
   --ow-blue:      oklch(0.46 0.16 240);
   --ow-logo-wordmark: oklch(0.08 0.005 0);
@@ -195,6 +195,12 @@ html.theme-red-crush {
   /* The story colour — vibrant rose, the pink of Pinot juice */
   --ow-accent-live:      oklch(0.58 0.24 5);    /* signal rose */
   --ow-accent-live-soft: oklch(0.94 0.06 5);    /* pale rose fill */
+  /* Persistent juice-wash overlay — translucent top-down gradient */
+  --ow-juice-wash: linear-gradient(180deg,
+    oklch(0.58 0.24 5 / 0.18) 0%,
+    oklch(0.58 0.24 5 / 0.08) 28%,
+    oklch(0.58 0.24 5 / 0.025) 60%,
+    transparent 100%);
 }
 
 /* ── NEW "White Crush" theme — apple-green of Chardonnay juice ──────────────
@@ -203,29 +209,29 @@ html.theme-red-crush {
    freshly-pressed Chardonnay / Sauvignon Blanc juice tumbling into the
    tank during a white harvest. Tells the other half of the story. */
 html.theme-white-crush {
-  --background: oklch(1 0 0);
+  --background: oklch(0.985 0.014 140);
   --foreground: oklch(0.08 0.006 130);
-  --card: oklch(0.985 0.003 130);
+  --card: oklch(0.975 0.018 138);
   --card-foreground: oklch(0.08 0.006 130);
-  --popover: oklch(0.985 0.003 130);
+  --popover: oklch(0.975 0.018 138);
   --popover-foreground: oklch(0.08 0.006 130);
-  --muted: oklch(0.95 0.004 130);
+  --muted: oklch(0.94 0.020 138);
   --muted-foreground: oklch(0.30 0.005 130);
   --border: oklch(0 0 0 / 0.20);
   --input: oklch(0 0 0 / 0.18);
 
-  --ow-bg-base:   oklch(1 0 0);
-  --ow-bg-raised: oklch(0.985 0.003 130);
-  --ow-bg-card:   oklch(0.975 0.005 130);     /* subtle apple-green tint */
-  --ow-bg-inset:  oklch(0.96 0.006 130);
+  --ow-bg-base:   oklch(0.985 0.014 140);    /* faint apple-green-tinted white */
+  --ow-bg-raised: oklch(0.975 0.018 138);
+  --ow-bg-card:   oklch(0.97 0.022 138);     /* visible apple-green tint */
+  --ow-bg-inset:  oklch(0.95 0.024 138);
   --ow-text-hi:   oklch(0.06 0.005 130);
   --ow-text-mid:  oklch(0.18 0.005 130);
   --ow-text-lo:   oklch(0.36 0.006 130);
   --ow-amber:     oklch(0.54 0.18 65);
-  --ow-border:    oklch(0 0 0 / 0.20);
-  --ow-border-md: oklch(0 0 0 / 0.32);
-  --ow-shadow:    oklch(0 0 0 / 0.14);
-  --ow-nav-bg:    oklch(1 0 0 / 96%);
+  --ow-border:    oklch(0.46 0.20 138 / 0.18);
+  --ow-border-md: oklch(0.46 0.20 138 / 0.34);
+  --ow-shadow:    oklch(0.40 0.20 138 / 0.18);
+  --ow-nav-bg:    oklch(0.985 0.014 140 / 96%);
   --ow-bg-overlay: oklch(0 0 0 / 0.50);
   --ow-blue:      oklch(0.46 0.16 240);
   --ow-logo-wordmark: oklch(0.08 0.005 130);
@@ -233,6 +239,36 @@ html.theme-white-crush {
   /* The story colour — apple-green of fresh white juice */
   --ow-accent-live:      oklch(0.66 0.18 140);  /* signal apple-green */
   --ow-accent-live-soft: oklch(0.94 0.06 140);  /* pale green fill */
+  /* Persistent juice-wash overlay */
+  --ow-juice-wash: linear-gradient(180deg,
+    oklch(0.66 0.18 140 / 0.18) 0%,
+    oklch(0.66 0.18 140 / 0.08) 28%,
+    oklch(0.66 0.18 140 / 0.025) 60%,
+    transparent 100%);
+}
+
+/* Persistent translucent juice wash — fires on both crush themes after the
+   cascade animation drains. Stays in place as a soft top-down gradient so
+   the theme keeps its "colour memory" without re-running the animation.
+   pointer-events: none so it never blocks clicks. */
+html.theme-red-crush body::before,
+html.theme-white-crush body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60vh;
+  pointer-events: none;
+  z-index: 1;
+  background: var(--ow-juice-wash);
+  /* Fade in slowly after the cascade settles so it doesn't visually fight
+     the 4-second animation — appears at t=3s, holds forever. */
+  animation: crushWashSettle 2.4s 2.6s ease-out forwards;
+  opacity: 0;
+}
+@keyframes crushWashSettle {
+  to { opacity: 1; }
 }
 
 /* Sun-mode typography bumps — Google's "redundancy beyond colour" rule.
