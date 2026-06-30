@@ -687,6 +687,11 @@ export const sopLibrary = mysqlTable(
     // Bible chapter cross-references — comma-separated chapter refs from diy_knowledge_chunks
     // e.g. "3,4,6" means this SOP is grounded in Red Wine Bible chapters 3, 4, and 6
     bibleChapters: varchar("bible_chapters", { length: 255 }),
+    // Boutique-scale (5 US gal / ~19 L) companion content for the 7 SOPs that
+    // map onto Red Wine Making Outline sections. Rendered as a sidebar on the
+    // SOP detail page so boutique winemakers see scale-appropriate guidance
+    // alongside the commercial procedure. Null for the other 31 SOPs.
+    boutiqueCompanion: text("boutique_companion"),
     // Whether this SOP is published/visible in the DIY tutor context
     published: boolean("published").notNull().default(false),
     // UTC ms timestamp when published (null if not yet published)

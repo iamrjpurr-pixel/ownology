@@ -692,6 +692,49 @@ function SopDetail({ id }: { id: number }) {
                 </div>
               )}
             </div>
+
+            {/* Boutique-scale companion — only present on the 7 SOPs that map onto
+                Red Wine Making Outline sections. Renders as a distinct amber-bordered
+                sidebar so boutique winemakers immediately see scale-appropriate
+                guidance alongside the commercial procedure above. */}
+            {sop.boutiqueCompanion && (
+              <div
+                data-testid="sop-boutique-companion"
+                className="mt-6 rounded-md p-5"
+                style={{
+                  background: "color-mix(in oklch, var(--ow-amber) 6%, var(--ow-bg-card))",
+                  border: "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)",
+                }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span
+                    style={{
+                      background: "var(--ow-amber)",
+                      color: "white",
+                      fontFamily: "'Lato',sans-serif",
+                      fontSize: "0.62rem",
+                      fontWeight: 800,
+                      letterSpacing: "0.1em",
+                      padding: "0.18rem 0.5rem",
+                      borderRadius: 3,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Boutique scale
+                  </span>
+                  <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "var(--ow-text-mid)" }}>
+                    Same procedure, home/cellar-door units · 5 US gal (~19 L)
+                  </span>
+                </div>
+                <pre
+                  className="whitespace-pre-wrap text-sm"
+                  style={{ fontFamily: "'Lato',sans-serif", color: "var(--ow-text-mid)", lineHeight: 1.7, margin: 0 }}
+                >
+                  {sop.boutiqueCompanion}
+                </pre>
+              </div>
+            )}
+
             {/* S8-D: Know→Learn bridge — link to the related Free Run curiosity topic */}
             {CATEGORY_FREE_RUN_TOPIC[sop.category] && (
               <div className="mt-6 pt-4" style={{ borderTop: "1px solid var(--ow-border)" }}>

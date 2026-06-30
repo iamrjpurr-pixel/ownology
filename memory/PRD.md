@@ -446,6 +446,7 @@ have been folded in or marked complete.)
 - [ ] Trigger cascade from a homepage CTA so cold SMS prospects see the wow moment.
 - [ ] Auto-bypass "Create account" modal in dev (`authCheck` → `isAuthenticated: true` when bypass user active).
 - [x] ~~Drop Red/White Wine Bible PDFs into `/app/references/`~~ — **DONE** (verified 29 Jun 2026): `red_wine_bible` 102 chunks + `white_wine_bible` 104 chunks + `morew_red_outline` 7 + `morew_white_outline` 7 = 220 wine-bible chunks total grounding the cellar AI.
+- [x] **Boutique-scale companions on 7 SOPs** (29 Jun 2026): Red Wine Making Outline content cross-mapped to commercial SOPs (SO₂ at Crush, Yeast Hydration, Cap Management, Pressing, MLF, Post-MLF SO₂, Bottling) as amber-bordered sidebars on the Procedure tab. New `sop_library.boutique_companion TEXT` column; populated by `scripts/add-sop-boutique-companion.mjs`. Boutique VIVID prospects now see scale-appropriate guidance (5 US gal / ~19L, hand tools, K-meta in tsp/grams) alongside commercial procedure.
 - [ ] Convert `admin.llmStats` → `publicProcedure` so `/stats` works post-auth.
 
 **P2 — Polish & operational resilience**
