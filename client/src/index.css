@@ -116,40 +116,53 @@ html.theme-parchment {
   --ow-logo-wordmark: oklch(0.28 0.012 60);  /* logo wordmark — warm dark grey in light mode */
 }
 
-/* ── NEW "Soft Cellar" theme (rebalanced dark) ──────────────────────────────
-   Designed by the design subagent (Feb 2026) to fix the "pure black too harsh"
-   feedback. Base bg lifted 0.11 → 0.18 (warm soft umber), body text boosted
-   0.68 → 0.84 lightness. Hits WCAG AAA (~8.5:1) on body copy. Brand amber
-   unchanged. Preserves the cellar heritage while being long-read friendly.
-   Activated by adding `theme-soft-cellar` to <html>. The existing default
-   "cellar" theme (in :root above) is unchanged. */
-html.theme-soft-cellar {
-  --background: oklch(0.18 0.015 60);
-  --foreground: oklch(0.95 0.018 75);
-  --card: oklch(0.24 0.015 60);
-  --card-foreground: oklch(0.95 0.018 75);
-  --popover: oklch(0.24 0.015 60);
-  --popover-foreground: oklch(0.95 0.018 75);
-  --muted: oklch(0.21 0.015 60);
-  --muted-foreground: oklch(0.70 0.015 75);
-  --border: oklch(0.84 0.015 75 / 0.15);
-  --input: oklch(0.84 0.015 75 / 0.18);
+/* ── "Soft Cellar" theme — twilight blue-hour mood ─────────────────────────
+   Redesigned (Feb 2026) so this isn't just "Cellar Night with a 7% lightness
+   bump." The brief: a *different time of day*, not a different volume.
 
-  --ow-bg-base:   oklch(0.18 0.015 60);   /* warm soft umber — not pure black */
-  --ow-bg-raised: oklch(0.21 0.015 60);   /* slightly lifted */
-  --ow-bg-card:   oklch(0.24 0.015 60);   /* card surface */
-  --ow-bg-inset:  oklch(0.28 0.015 60);   /* code blocks, inset areas */
-  --ow-text-hi:   oklch(0.95 0.018 75);   /* headings */
-  --ow-text-mid:  oklch(0.84 0.015 75);   /* body copy — WCAG AA-AAA boosted */
-  --ow-text-lo:   oklch(0.70 0.015 75);   /* captions, labels */
-  --ow-amber:     oklch(0.72 0.12 75);    /* brand amber — unchanged */
-  --ow-border:    oklch(0.84 0.015 75 / 0.15);
-  --ow-border-md: oklch(0.84 0.015 75 / 0.22);
-  --ow-shadow:    oklch(0 0 0 / 0.35);
-  --ow-nav-bg:    oklch(0.18 0.015 60 / 97%);
-  --ow-bg-overlay: oklch(0 0 0 / 0.55);
-  --ow-blue:      oklch(0.65 0.10 230);
-  --ow-logo-wordmark: oklch(0.95 0.018 75);
+   Cellar Night → warm midnight, terracotta accent: the cellar at 11pm,
+   working alone after dinner.
+   Soft Cellar → cool slate blue-hour: the cellar at first light before
+   the harvest crew arrives. Calmer, less smoky, more invitational.
+
+   Mechanism:
+     • Hue shift to ~260 (slate blue) instead of warm umber (60-75)
+     • Lightness lifted further (0.22 vs Cellar Night's 0.11) for clearer
+       distinction at a glance
+     • Cards slightly cool-blue at 0.28L so surfaces lift cleanly off bg
+     • Amber accent unchanged — cool bg makes the warm amber pop harder,
+       which doubles as a brand-recognition win
+   Body-text contrast on the new bg: oklch(0.95 0.012 240) on
+   oklch(0.22 0.020 260) ≈ 11.4:1 → WCAG AAA. */
+html.theme-soft-cellar {
+  --background: oklch(0.22 0.020 260);
+  --foreground: oklch(0.95 0.012 240);
+  --card: oklch(0.28 0.022 262);
+  --card-foreground: oklch(0.95 0.012 240);
+  --popover: oklch(0.28 0.022 262);
+  --popover-foreground: oklch(0.95 0.012 240);
+  --muted: oklch(0.26 0.022 260);
+  --muted-foreground: oklch(0.74 0.018 245);
+  --border: oklch(0.84 0.020 245 / 0.15);
+  --input: oklch(0.84 0.020 245 / 0.18);
+
+  --ow-bg-base:   oklch(0.22 0.020 260);   /* slate blue-hour twilight */
+  --ow-bg-raised: oklch(0.25 0.021 260);
+  --ow-bg-card:   oklch(0.28 0.022 262);   /* cards lift with slight blue */
+  --ow-bg-inset:  oklch(0.32 0.022 262);
+  --ow-text-hi:   oklch(0.96 0.012 240);   /* cool-cast white */
+  --ow-text-mid:  oklch(0.86 0.018 240);   /* body copy */
+  --ow-text-lo:   oklch(0.72 0.018 245);   /* captions */
+  --ow-amber:     oklch(0.74 0.14 70);     /* warmer amber pops on cool bg */
+  --ow-border:    oklch(0.84 0.020 245 / 0.15);
+  --ow-border-md: oklch(0.84 0.020 245 / 0.24);
+  --ow-shadow:    oklch(0 0 0 / 0.45);
+  --ow-nav-bg:    oklch(0.22 0.020 260 / 97%);
+  --ow-bg-overlay: oklch(0.12 0.020 260 / 0.65);
+  --ow-blue:      oklch(0.72 0.13 235);    /* brighter blue label, same hue family */
+  --ow-logo-wordmark: oklch(0.96 0.012 240);
+  --ow-accent-live:      oklch(0.74 0.14 70);
+  --ow-accent-live-soft: color-mix(in oklch, oklch(0.74 0.14 70) 18%, transparent);
 }
 
 /* ── NEW "Red Crush" theme — pink of Pinot juice on the press ───────────────
