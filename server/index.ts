@@ -213,6 +213,28 @@ async function startServer() {
   });
 
   const port = Number(process.env.PORT) || 8001;
+  // Bootstrap: ensure runtime-only telemetry tables exist (no migration needed).
+  // theme_suggestions tracks acceptance of the once-a-day suggestion banner.
+  try {
+    const { db } = await import("./db.js");
+    const { sql } = await import("drizzle-orm");
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS theme_suggestions (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        suggested_theme_id VARCHAR(32) NOT NULL,
+        session_id VARCHAR(64) NOT NULL,
+        hour_local INT NOT NULL,
+        is_harvest_month BOOLEAN NOT NULL DEFAULT FALSE,
+        action ENUM('accepted','dismissed','opted_out') NOT NULL,
+        logged_at BIGINT NOT NULL,
+        INDEX ts_theme_idx (suggested_theme_id),
+        INDEX ts_hour_idx (hour_local),
+        INDEX ts_logged_at_idx (logged_at)
+      )
+    `);
+  } catch (e) {
+    console.warn("[bootstrap] theme_suggestions table create skipped:", (e as Error).message);
+  }
   server.listen(port, "0.0.0.0", () => {
     console.log(`[server] Running on http://0.0.0.0:${port}/`);
   });

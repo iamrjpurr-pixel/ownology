@@ -1200,3 +1200,33 @@ export const themePicks = mysqlTable(
     index("tp_picked_at_idx").on(t.pickedAt),
   ]
 );
+
+/**
+ * theme_suggestions — events fired by the once-a-day ThemeSuggestion banner.
+ *
+ * Logged each time the banner is shown to a session and the user takes
+ * an action (accepted | dismissed-today | opt-out). Captures the LOCAL
+ * hour of day (0–23) the suggestion fired at so we can compute
+ * acceptance rates by hour for the boutique-winery rhythm story.
+ *
+ * Created at runtime via `CREATE TABLE IF NOT EXISTS` on server boot
+ * (see ensureThemeSuggestionsTable in server/index.ts) so deployments
+ * don't need to run a separate migration step.
+ */
+export const themeSuggestions = mysqlTable(
+  "theme_suggestions",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    suggestedThemeId: varchar("suggested_theme_id", { length: 32 }).notNull(),
+    sessionId: varchar("session_id", { length: 64 }).notNull(),
+    hourLocal: int("hour_local").notNull(),       // 0–23 in the user's local time
+    isHarvestMonth: boolean("is_harvest_month").notNull().default(false),
+    action: mysqlEnum("action", ["accepted", "dismissed", "opted_out"]).notNull(),
+    loggedAt: bigint("logged_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("ts_theme_idx").on(t.suggestedThemeId),
+    index("ts_hour_idx").on(t.hourLocal),
+    index("ts_logged_at_idx").on(t.loggedAt),
+  ]
+);

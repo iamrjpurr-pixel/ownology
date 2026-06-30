@@ -27,6 +27,7 @@ function getOrCreateSessionId(): string {
 
 export function useThemeTelemetry() {
   const logPick = trpc.themes.logPick.useMutation();
+  const logSuggestion = trpc.themes.logSuggestion.useMutation();
 
   return {
     record(themeId: ThemeId) {
@@ -35,11 +36,28 @@ export function useThemeTelemetry() {
       const sessionId = getOrCreateSessionId();
       logPick.mutate(
         { themeId, sessionId, isFirstPick },
+        { onError: () => { /* silent */ } }
+      );
+    },
+    /** Record what the user did with the once-a-day suggestion banner. */
+    recordSuggestion(
+      themeId: ThemeId,
+      action: "accepted" | "dismissed" | "opted_out",
+      now: Date = new Date()
+    ) {
+      if (typeof window === "undefined") return;
+      const sessionId = getOrCreateSessionId();
+      const m = now.getMonth();
+      const isHarvestMonth = m === 1 || m === 2 || m === 3 || m === 7 || m === 8 || m === 9;
+      logSuggestion.mutate(
         {
-          onError: () => {
-            /* silent — never block UX on telemetry */
-          },
-        }
+          suggestedThemeId: themeId,
+          sessionId,
+          hourLocal: now.getHours(),
+          isHarvestMonth,
+          action,
+        },
+        { onError: () => { /* silent */ } }
       );
     },
   };

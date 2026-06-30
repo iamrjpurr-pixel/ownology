@@ -28,6 +28,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
 import { applyThemeToDom, getTheme, type ThemeId } from "@/lib/themes";
+import { useThemeTelemetry } from "@/hooks/useThemeTelemetry";
 
 const STORAGE_THEME = "ownology-theme";
 const STORAGE_PICKED_AT = "ownology-theme-picked-at"; // ms timestamp
@@ -73,6 +74,7 @@ function todayKey(d: Date): string {
 export default function ThemeSuggestion() {
   const [location] = useLocation();
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
+  const telemetry = useThemeTelemetry();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -113,6 +115,7 @@ export default function ThemeSuggestion() {
         window.localStorage.setItem(STORAGE_SUGGESTED_ON, todayKey(new Date()));
       } catch { /* noop */ }
     }
+    if (suggestion) telemetry.recordSuggestion(suggestion.themeId, "dismissed");
     setSuggestion(null);
   }
 
@@ -125,12 +128,12 @@ export default function ThemeSuggestion() {
         window.localStorage.setItem(STORAGE_THEME, suggestion.themeId);
         window.localStorage.setItem(STORAGE_PICKED_AT, String(Date.now()));
         window.localStorage.setItem(STORAGE_SUGGESTED_ON, todayKey(new Date()));
-        // Trigger crush cascade if we suggested one of the crush themes
         if (suggestion.themeId === "red-crush" || suggestion.themeId === "white-crush") {
           window.dispatchEvent(new CustomEvent("ownology:crush", { detail: { themeId: suggestion.themeId } }));
         }
       } catch { /* noop */ }
     }
+    telemetry.recordSuggestion(suggestion.themeId, "accepted");
     setSuggestion(null);
   }
 
@@ -138,6 +141,7 @@ export default function ThemeSuggestion() {
     try {
       window.localStorage.setItem(STORAGE_OPT_OUT, "1");
     } catch { /* noop */ }
+    if (suggestion) telemetry.recordSuggestion(suggestion.themeId, "opted_out");
     setSuggestion(null);
   }
 
