@@ -459,6 +459,7 @@ have been folded in or marked complete.)
 - [ ] HeroTheatricalPattern `blendMode` prop + StrictMode keyframe hardening (forward-looking from iter_15 review).
 
 **P3 — Future / post-PMF**
+- [ ] **Ownology Copilot** — vintage-grounded caption generator + SEO flywheel. Full strategic build doc at `/app/memory/COPILOT_BUILD_DOC.md`. Two-layer value: customer feature ($99/mo retention driver) + SEO/distribution engine (story pages, hashtag aggregation, backlink farm). ~1.5 days to ship Phase 1 when greenlit.
 - [ ] Multi-tenant winery data model (`winery_id` FKs throughout).
 - [ ] File/Image uploads via Emergent Object Storage.
 - [ ] Native iOS/Android apps.
