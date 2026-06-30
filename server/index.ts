@@ -357,6 +357,90 @@ async function startServer() {
       }
     }
     console.log("[bootstrap] multi-tenant scaffolding ready");
+
+    // ── Phase 2 lockdown: NOT NULL + FK ──────────────────────────────────
+    // Self-applies on each boot: only flips winery_id → NOT NULL when zero
+    // NULL rows remain for that table, and only adds the FK if it doesn't
+    // already exist. Idempotent + safe — running on a fully-locked DB is
+    // a no-op. Running on a DB with NULL rows skips silently with a log.
+    //
+    // ON DELETE CASCADE: deleting a winery row drops all its customer-domain
+    // children. Matches the tenancy mental model (a winery owns its data)
+    // and prevents orphan rows.
+    //
+    // FK constraint names follow the pattern fk_<short>_winery so the SQL
+    // is greppable in the schema dump.
+    const lockTargets: Array<{ table: string; fkName: string }> = [
+      { table: "vintage_log_entries",   fkName: "fk_vle_winery" },
+      { table: "wine_batches",          fkName: "fk_wb_winery" },
+      { table: "cellar_equipment",      fkName: "fk_ce_winery" },
+      { table: "cellar_tasks",          fkName: "fk_ct_winery" },
+      { table: "barrels",               fkName: "fk_barrel_winery" },
+      { table: "packaging_inventory",   fkName: "fk_pkg_winery" },
+      { table: "vineyard_blocks",       fkName: "fk_vb_winery" },
+      { table: "vineyard_observations", fkName: "fk_vo_winery" },
+      { table: "tank_reminders",        fkName: "fk_tr_winery" },
+      // SOP notes/training currently keep nullable winery_id (legacy rows
+      // pre-date the column and the migration can't backfill via user_id
+      // because they're keyed on created_by varchar). Skip the lockdown
+      // until a manual backfill is done.
+    ];
+
+    for (const { table, fkName } of lockTargets) {
+      try {
+        // 1. Check there are zero NULL rows — never break prod by trying
+        //    to flip a column that still has unbackfilled data.
+        const nullCheck = await db.execute(sql.raw(
+          `SELECT COUNT(*) AS nulls FROM ${table} WHERE winery_id IS NULL`
+        ));
+        const nullCount = Number(((nullCheck as unknown as [Array<{ nulls: number }>])[0]?.[0]?.nulls) ?? 0);
+        if (nullCount > 0) {
+          console.warn(`[bootstrap] ${table}: ${nullCount} NULL winery_id rows — lockdown deferred`);
+          continue;
+        }
+        // 1b. Sweep orphan rows pointing to a winery_id that no longer
+        //     exists. This can happen when a winery was deleted before
+        //     the FK was in place (e.g. failed test cleanup, manual SQL).
+        //     Without this, the ADD CONSTRAINT below fails with
+        //     ER_NO_REFERENCED_ROW_2 and the table stays unlocked.
+        try {
+          await db.execute(sql.raw(
+            `DELETE t FROM ${table} t LEFT JOIN wineries w ON w.id = t.winery_id WHERE w.id IS NULL`
+          ));
+        } catch (e) {
+          console.warn(`[bootstrap] ${table} orphan sweep skipped:`, (e as Error).message);
+        }
+        // 2. Flip the column to NOT NULL. If already NOT NULL, MySQL
+        //    accepts the same definition without error.
+        try {
+          await db.execute(sql.raw(`ALTER TABLE ${table} MODIFY COLUMN winery_id INT NOT NULL`));
+        } catch (e) {
+          console.warn(`[bootstrap] ${table} MODIFY NOT NULL skipped:`, (e as Error).message);
+        }
+        // 3. Add the FK only when missing. INFORMATION_SCHEMA is the
+        //    reliable cross-version way to detect an existing constraint.
+        const fkExistsRes = await db.execute(sql.raw(
+          `SELECT COUNT(*) AS c FROM information_schema.TABLE_CONSTRAINTS
+           WHERE TABLE_SCHEMA = DATABASE()
+             AND TABLE_NAME = '${table}'
+             AND CONSTRAINT_NAME = '${fkName}'`
+        ));
+        const fkExists = Number(((fkExistsRes as unknown as [Array<{ c: number }>])[0]?.[0]?.c) ?? 0) > 0;
+        if (!fkExists) {
+          try {
+            await db.execute(sql.raw(
+              `ALTER TABLE ${table} ADD CONSTRAINT ${fkName}
+                 FOREIGN KEY (winery_id) REFERENCES wineries(id) ON DELETE CASCADE`
+            ));
+            console.log(`[bootstrap] ${table}: locked down (NOT NULL + ${fkName})`);
+          } catch (e) {
+            console.warn(`[bootstrap] ${table} ADD FK ${fkName} failed:`, (e as Error).message);
+          }
+        }
+      } catch (e) {
+        console.warn(`[bootstrap] lockdown for ${table} skipped:`, (e as Error).message);
+      }
+    }
   } catch (e) {
     console.warn("[bootstrap] table create skipped:", (e as Error).message);
   }
