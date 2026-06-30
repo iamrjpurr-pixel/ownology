@@ -444,6 +444,7 @@ have been folded in or marked complete.)
 - [ ] **Flip winery_id → NOT NULL + FK** — defer 24h after Phase 2 deploys to prod so any pending NULL inserts flush; then `ALTER TABLE ... MODIFY winery_id INT NOT NULL` + `ADD CONSTRAINT fk_xxx_winery FOREIGN KEY (winery_id) REFERENCES wineries(id) ON DELETE CASCADE`.
 
 **P1 — High-value compounders**
+- [ ] **Team members / multi-seat winery onboarding** 💰 (revenue-impacting). Phase 2 already walls data off by `winery_id`, so the DB plumbing is done — what's missing is the UX: invite-by-email flow on `/admin/settings`, pending-invite acceptance on first Google sign-in, role per member (owner / cellarhand / read-only). **Pricing note**: the existing plan tiers already cover per-seat cost, so this is pure value-unlock — agronomists, cellar hands, and assistant winemakers can log entries under the winery without each becoming a phantom solo tenant. Bigger wineries are unblocked, average seats per account goes up, conversion friction on team plans drops. TBC on exact scope when greenlit.
 - [ ] Trigger cascade from a homepage CTA so cold SMS prospects see the wow moment.
 - [ ] Auto-bypass "Create account" modal in dev (`authCheck` → `isAuthenticated: true` when bypass user active).
 - [x] ~~Drop Red/White Wine Bible PDFs into `/app/references/`~~ — **DONE** (verified 29 Jun 2026): `red_wine_bible` 102 chunks + `white_wine_bible` 104 chunks + `morew_red_outline` 7 + `morew_white_outline` 7 = 220 wine-bible chunks total grounding the cellar AI.
