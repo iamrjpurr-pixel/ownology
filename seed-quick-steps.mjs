@@ -1,13 +1,41 @@
 /**
  * Seed script — populates quick_steps for all SOPs in sop_library.
- * Quick steps are 3–5 action-verb bullet points a cellar hand can act on immediately.
- * Run once: node seed-quick-steps.mjs
+ *
+ * ⚠️  OBSOLETE (Feb 2026). This script was authored against the Manus-era
+ * SOP id range (1-3, 15-17, 60001-60007) which was rebaselined when the
+ * codebase moved to /app. The current SOP library uses ids 7-44 and is
+ * already fully populated with quick_steps by `scripts/seed-38-sops.mjs`.
+ *
+ * Running this script today would write zero rows (no IDs match) and
+ * print a flood of "No row found" warnings. The guard below short-circuits
+ * the run when the current library already has full coverage, so the
+ * script is safe to keep around for historical reference.
+ *
+ * If you ever need to re-seed quick_steps:
+ *   1. Truncate sop_library.quick_steps in the DB
+ *   2. Re-run `node scripts/seed-38-sops.mjs` — that script is the source
+ *      of truth for the current id range.
+ *
+ * Run once (historical): node seed-quick-steps.mjs
  */
 import "dotenv/config";
 import mysql from "mysql2/promise";
 
 const connection = await mysql.createConnection(process.env.DATABASE_URL);
 const now = Date.now();
+
+// Coverage guard — exit cleanly when current library already populated.
+const [[coverage]] = await connection.execute(
+  "SELECT SUM(IF(quick_steps IS NULL OR quick_steps = '', 0, 1)) AS withQS, COUNT(*) AS total FROM sop_library"
+);
+const withQS = Number(coverage.withQS || 0);
+const total = Number(coverage.total || 0);
+if (total > 0 && withQS === total) {
+  console.log(`ℹ️  All ${total} SOPs already have quick_steps populated. Nothing to do.`);
+  console.log("   (If you intended to re-seed, run scripts/seed-38-sops.mjs instead.)");
+  await connection.end();
+  process.exit(0);
+}
 
 const quickStepsMap = {
   // ── Barrel Management ───────────────────────────────────────────────────────

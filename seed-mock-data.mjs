@@ -299,25 +299,52 @@ async function seed() {
 
   try {
     // 1. Ensure owner user exists
-    const [existingUsers] = await conn.execute("SELECT id FROM users WHERE id = ?", [OWNER_USER_ID]);
+    const [existingUsers] = await conn.execute("SELECT id, winery_id FROM users WHERE id = ?", [OWNER_USER_ID]);
     if (existingUsers.length === 0) {
       await conn.execute(
-        "INSERT INTO users (id, openId, name, email, role, createdAt) VALUES (?, ?, ?, ?, ?, NOW())",
-        [OWNER_USER_ID, "seed-owner-001", "Redstone Ridge Wines", "cellar@redstoneridge.com.au", "admin"]
+        "INSERT INTO users (id, open_id, name, email, role, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+        [OWNER_USER_ID, "seed-owner-001", "Redstone Ridge Wines", "cellar@redstoneridge.com.au", "admin", Date.now()]
       );
       console.log("✓ Created owner user (id=1)");
     } else {
       console.log("✓ Owner user already exists");
     }
 
+    // 1b. Multi-tenant Phase 2 — resolve the user's winery_id (every
+    //     customer-domain row is now NOT NULL + FK on wineries.id).
+    //     Bootstrap auto-provisions a winery on first auth, but the seed
+    //     can run before any login — so we ensure one exists.
+    let [[ownerRow]] = await conn.execute("SELECT winery_id FROM users WHERE id = ?", [OWNER_USER_ID]);
+    let WINERY_ID = ownerRow?.winery_id;
+    if (!WINERY_ID) {
+      // Try to attach to an existing winery owned by this user, else create.
+      const [[existingWinery]] = await conn.execute(
+        "SELECT id FROM wineries WHERE owner_user_id = ? LIMIT 1",
+        [OWNER_USER_ID]
+      );
+      if (existingWinery?.id) {
+        WINERY_ID = existingWinery.id;
+      } else {
+        await conn.execute(
+          "INSERT INTO wineries (name, slug, owner_user_id, plan, region, created_at) VALUES (?, ?, ?, 'free', ?, ?)",
+          ["Redstone Ridge Wines", "redstone-ridge", OWNER_USER_ID, "Barossa Valley", Date.now()]
+        );
+        const [[w]] = await conn.execute("SELECT id FROM wineries WHERE slug = 'redstone-ridge'");
+        WINERY_ID = w.id;
+        console.log(`✓ Created winery (id=${WINERY_ID})`);
+      }
+      await conn.execute("UPDATE users SET winery_id = ? WHERE id = ?", [WINERY_ID, OWNER_USER_ID]);
+    }
+    console.log(`✓ Owner attached to winery_id=${WINERY_ID}`);
+
     // 2. Wine Batches
     const [existingBatches] = await conn.execute("SELECT COUNT(*) as cnt FROM wine_batches WHERE user_id = ?", [OWNER_USER_ID]);
     if (existingBatches[0].cnt === 0) {
       for (const b of BATCHES) {
         await conn.execute(
-          `INSERT INTO wine_batches (user_id, batch_id, vintage, variety, gi, grower_details, received_at, quantity_value, quantity_unit, tank_name, volume_litres, notes_json, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [OWNER_USER_ID, b.batchId, b.vintage, b.variety, b.gi, b.grower, b.receivedAt, b.quantityValue, b.quantityUnit, b.tankName, b.volumeLitres,
+          `INSERT INTO wine_batches (user_id, winery_id, batch_id, vintage, variety, gi, grower_details, received_at, quantity_value, quantity_unit, tank_name, volume_litres, notes_json, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [OWNER_USER_ID, WINERY_ID, b.batchId, b.vintage, b.variety, b.gi, b.grower, b.receivedAt, b.quantityValue, b.quantityUnit, b.tankName, b.volumeLitres,
            JSON.stringify({ receival: "", fermentation: "", postFerment: "", stabilising: "", bottling: "" }), now, now]
         );
       }
@@ -331,9 +358,9 @@ async function seed() {
     if (existingLogs[0].cnt === 0) {
       for (const e of LOG_ENTRIES) {
         await conn.execute(
-          `INSERT INTO vintage_log_entries (user_id, tank_name, variety, event_type, details_json, note_text, tags_json, entry_at, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [e.userId, e.tankName, e.variety, e.eventType, e.detailsJson, e.noteText, e.tagsJson, e.entryAt, e.createdAt]
+          `INSERT INTO vintage_log_entries (user_id, winery_id, tank_name, variety, event_type, details_json, note_text, tags_json, entry_at, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [e.userId, WINERY_ID, e.tankName, e.variety, e.eventType, e.detailsJson, e.noteText, e.tagsJson, e.entryAt, e.createdAt]
         );
       }
       console.log(`✓ Inserted ${LOG_ENTRIES.length} vintage log entries`);
@@ -346,9 +373,9 @@ async function seed() {
     if (existingBarrels[0].cnt === 0) {
       for (const b of BARRELS) {
         await conn.execute(
-          `INSERT INTO barrels (user_id, barrel_id, oak_type, format, age_years, fill_date, last_topped_date, wine_lot, notes, is_active, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [OWNER_USER_ID, b.barrelId, b.oakType, b.format, b.ageYears, b.fillDate, b.lastToppedDate, b.wineLot, b.notes, b.isActive ? 1 : 0, now, now]
+          `INSERT INTO barrels (user_id, winery_id, barrel_id, oak_type, format, age_years, fill_date, last_topped_date, wine_lot, notes, is_active, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [OWNER_USER_ID, WINERY_ID, b.barrelId, b.oakType, b.format, b.ageYears, b.fillDate, b.lastToppedDate, b.wineLot, b.notes, b.isActive ? 1 : 0, now, now]
         );
       }
       console.log(`✓ Inserted ${BARRELS.length} barrels`);
@@ -361,9 +388,9 @@ async function seed() {
     if (existingEquip[0].cnt === 0) {
       for (const e of EQUIPMENT) {
         await conn.execute(
-          `INSERT INTO cellar_equipment (user_id, name, equipment_type, material, capacity_l, quantity, notes, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [OWNER_USER_ID, e.name, e.equipmentType, e.material, e.capacityL || null, e.quantity, e.notes, now, now]
+          `INSERT INTO cellar_equipment (user_id, winery_id, name, equipment_type, material, capacity_l, quantity, notes, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [OWNER_USER_ID, WINERY_ID, e.name, e.equipmentType, e.material, e.capacityL || null, e.quantity, e.notes, now, now]
         );
       }
       console.log(`✓ Inserted ${EQUIPMENT.length} equipment items`);
@@ -376,9 +403,9 @@ async function seed() {
     if (existingTasks[0].cnt === 0) {
       for (const t of TASKS) {
         await conn.execute(
-          `INSERT INTO cellar_tasks (user_id, equipment_name, task_type, title, method_notes, frequency, due_at, completed_at, completed_by, ai_generated, vessel_id, vessel_type, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [OWNER_USER_ID, t.equipmentName, t.taskType, t.title, t.methodNotes, t.frequency,
+          `INSERT INTO cellar_tasks (user_id, winery_id, equipment_name, task_type, title, method_notes, frequency, due_at, completed_at, completed_by, ai_generated, vessel_id, vessel_type, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [OWNER_USER_ID, WINERY_ID, t.equipmentName, t.taskType, t.title, t.methodNotes, t.frequency,
            t.dueAt || null, t.completedAt || null, t.completedBy || null, t.aiGenerated,
            t.vesselId || null, t.vesselType || null, now, now]
         );
@@ -393,9 +420,9 @@ async function seed() {
     if (existingReminders[0].cnt === 0) {
       for (const r of REMINDERS) {
         await conn.execute(
-          `INSERT INTO tank_reminders (user_id, tank_name, event_type, threshold_hours, is_active, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [OWNER_USER_ID, r.tankName, r.eventType, r.thresholdHours, r.isActive ? 1 : 0, now, now]
+          `INSERT INTO tank_reminders (user_id, winery_id, tank_name, event_type, threshold_hours, is_active, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [OWNER_USER_ID, WINERY_ID, r.tankName, r.eventType, r.thresholdHours, r.isActive ? 1 : 0, now, now]
         );
       }
       console.log(`✓ Inserted ${REMINDERS.length} tank reminders`);

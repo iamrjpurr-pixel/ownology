@@ -136,6 +136,7 @@ export async function publicAuditHandler(req: Request, res: Response): Promise<v
   const logo = sanitizeLogoUrl(winery.logoUrl);
   const html = renderPage({
     wineryName: winery.name,
+    slug: winery.slug,
     region: winery.region,
     brandColor,
     logoUrl: logo,
@@ -169,6 +170,7 @@ a{color:#b45309;font-weight:600;text-decoration:none}
 
 function renderPage(d: {
   wineryName: string;
+  slug: string;
   region: string | null;
   brandColor: string;
   logoUrl: string | null;
@@ -243,6 +245,12 @@ footer{margin-top:2.4rem;padding-top:1.2rem;border-top:1px solid #e7e5e4;font-si
 footer a{color:var(--brand);text-decoration:none;font-weight:600}
 .badge{display:inline-block;padding:.18rem .55rem;background:var(--brand);color:#fff;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border-radius:3px;margin-left:.4rem;vertical-align:middle}
 .disclaimer{font-size:.78rem;color:#78716c;background:#f5f5f4;border-left:3px solid var(--brand);padding:.7rem .9rem;margin:1.4rem 0;line-height:1.55}
+.cta{margin:2.4rem 0 0;padding:1.4rem 1.6rem;background:var(--brand);color:#fff;border-radius:8px;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;justify-content:space-between}
+.cta .copy{flex:1 1 260px}
+.cta .copy h3{font-family:Georgia,serif;font-size:1.15rem;margin:0 0 .25rem;font-weight:700;color:#fff}
+.cta .copy p{margin:0;font-size:.86rem;color:rgba(255,255,255,.86);line-height:1.5}
+.cta a.btn{background:#fff;color:var(--brand);padding:.65rem 1.3rem;text-decoration:none;border-radius:5px;font-weight:700;font-size:.84rem;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;transition:transform .12s ease}
+.cta a.btn:hover{transform:translateY(-1px)}
 @media (max-width:560px){header{flex-direction:column}header h1{font-size:1.55rem}}
 </style></head>
 <body>
@@ -274,6 +282,14 @@ footer a{color:var(--brand);text-decoration:none;font-weight:600}
     <thead><tr><th style="width:130px">Date</th><th style="width:110px">Tank</th><th style="width:140px">Variety</th><th>Event</th></tr></thead>
     <tbody>${entriesHtml}</tbody>
   </table>
+
+  <aside class="cta" data-testid="audit-conversion-cta">
+    <div class="copy">
+      <h3>Want a live audit trail for your winery?</h3>
+      <p>Ownology turns your cellar work into a regulator-ready audit page like this one — in minutes.</p>
+    </div>
+    <a class="btn" href="/pricing?from=public-audit-${escapeHtml(d.slug)}">See pricing →</a>
+  </aside>
 
   <footer>
     Published by ${escapeHtml(d.wineryName)} · Powered by <a href="https://ownology.ai">Ownology — Cellar Intelligence Platform</a><br>
