@@ -621,6 +621,23 @@ have been folded in or marked complete.)
 - **Self-tested (screenshot)**: all 6 new sub-links (`cellar-brief`, `cellar-journal`, `regulations`, `resources`, `the-press-compare`, `free-run`) render correctly on `/guide`, checklist shows 10 items with Cellar Brief at position 1, all 3 role paths open with "Start with your Cellar Brief" CTA.
 - **Files touched**: `client/src/pages/Guide.tsx` (single-file update, ~110 lines changed across 5 sections).
 
+## Founding-Member Onboarding wizard (Feb 2026 — iter 27) ✅
+- **Value-engineered from the original 15hr spec down to ~1.5hr of code** by cutting the node-vibrant domain-scraper (5hr, one-off use), the `onboarding_events` measurement table (defer to Plausible/PostHog post-launch), and the `users.primary_use_case` DB column (localStorage until real signal). What shipped instead:
+  - **Step 1 · Name** → `trpc.winery.update({name, contactName, region})` — real writes to Railway
+  - **Step 2 · Brand** → manual paste of logoUrl + hex (native `<input type="color">` alongside text input for accessibility), with a **live sample LIP PDF header preview** rendered inline so users see the payoff before saving
+  - **Step 3 · Use case** → 5 pill options, persisted to `localStorage.ow-primary-use-case` (dashboard promotion in v2)
+  - **Step 4 · Import** → 3 deep-links to `/import` / `/the-press` / `/cellar-brief`, no in-wizard wiring
+  - **Step 5 · Complete** → auto-fires `referrals.applyToCurrent` if `localStorage.ow-referral-code` exists → renders the delight moment ("Sarah at Redstone Ridge just earned +30 free trial days for referring you"), then clears the code
+- **New tRPC mutation `referrals.applyToCurrent`** — idempotent post-signup back-attribution. Marks the freshest matching `pending` referral row as `converted`, links `referredUserId` + `referredWineryId`, grants +30 trial_credits_days to the referrer, bumps `trialEndsAt` if the referrer is still on trial (no-op if paid). Guards against self-referral and unknown-code. When no pending click on record (user typed URL directly), inserts a fresh converted row rather than dropping the reward.
+- **Stripe success_url swapped**: `foundingMembers.createCheckout` in `server/routers.ts:225` now points to `/onboarding?session_id={CHECKOUT_SESSION_ID}` — every paid Founding Member lands on the wizard instead of the dead-end email-only success page. Legacy `/founding-member/success` retained as a fallback surface.
+- **Self-tested end-to-end**: mounted → filled all 4 steps → winery.update persisted (name='Redstone Ridge Wines', contactName='Sarah', region='Barossa Valley', brandColor='#8b2635') → applyToCurrent correctly returns `{ok:false, reason:'self-referral'}` → localStorage.ow-primary-use-case='lip_audit' set → Complete step rendered with Cellar Brief CTA. Mockup at `/onboarding-mockup` retained for design reference; real wizard lives at `/onboarding`.
+- **Files touched**: `client/src/pages/Onboarding.tsx` (new, ~500 LOC), `client/src/App.tsx` (route add), `server/routers/referrals.ts` (+82 LOC applyToCurrent mutation), `server/routers.ts` (success_url swap).
+- **Deferred to v2 (cost / value did not justify pre-launch)**:
+  - `winery.scrapeBranding` with node-vibrant + SSRF guard — automated logo/palette extraction from a winery URL (5hr)
+  - `onboarding_events` table + funnel measurement (2hr — do with Plausible/PostHog instead)
+  - `users.primary_use_case` DB column + dashboard pillar-promotion logic (2hr — validate localStorage version first)
+  - Buyer-side capture on `wine_batches` — unlocks LIP Audit Pack Section 4 (1hr per iter-24 note)
+
 ## Service URLs
 - Preview: https://ownership-dev.preview.emergentagent.com
 - DB: Railway MySQL — `reseau.proxy.rlwy.net:34291/railway`

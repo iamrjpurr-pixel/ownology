@@ -222,7 +222,7 @@ const foundingMembersRouter = router({
             founding_member: "true",
           },
         },
-        success_url: `${input.origin}/founding-member/success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${input.origin}/onboarding?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${input.origin}/pricing?cancelled=1`,
       });
 

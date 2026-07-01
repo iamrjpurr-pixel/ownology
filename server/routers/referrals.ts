@@ -131,4 +131,85 @@ export const referralsRouter = router({
       });
       return { ok: true as const, referrerName: referrer.name, referrerContact: contactName };
     }),
+
+  /**
+   * applyToCurrent — post-signup back-attribution. The onboarding wizard
+   * reads the ref code from localStorage (set on the visitor's earlier
+   * /join?ref=CODE hit), calls this mutation, and it closes the loop:
+   *   1. Marks the most recent matching `pending` referral as `converted`
+   *   2. Grants +30 trial_credits_days to the referrer (extends their trial
+   *      if they're still on it; ignored if they're paid)
+   *   3. Returns the referrer's attribution ("Sarah at Redstone Ridge") so
+   *      the wizard can render "Great — Sarah just earned 30 free days"
+   * Idempotent — a user who already has referred_user_id set is skipped.
+   */
+  applyToCurrent: protectedProcedure
+    .input(z.object({ code: z.string().trim().min(1).max(32) }))
+    .mutation(async ({ ctx, input }) => {
+      const currentUser = await getUserByOpenId(ctx.user.openId);
+      if (!currentUser?.wineryId) return { ok: false as const, reason: "no-current-winery" };
+
+      const referrer = await db.query.wineries.findFirst({
+        where: eq(schema.wineries.referralCode, input.code),
+      });
+      if (!referrer) return { ok: false as const, reason: "unknown-code" };
+      if (referrer.id === currentUser.wineryId) return { ok: false as const, reason: "self-referral" };
+
+      const existing = await db.select().from(schema.referrals).where(
+        and(
+          eq(schema.referrals.referralCode, input.code),
+          eq(schema.referrals.status, "pending"),
+        )
+      ).limit(20);
+      // Idempotency — if any row already links to us, bail out.
+      if (existing.some((r) => r.referredWineryId === currentUser.wineryId)) {
+        return { ok: true as const, alreadyApplied: true };
+      }
+      // Pick the freshest pending row (best-effort attribution).
+      const target = existing.sort((a, b) => b.createdAt - a.createdAt)[0] ?? null;
+
+      const now = Date.now();
+      if (target) {
+        await db.update(schema.referrals).set({
+          status: "converted",
+          referredUserId: currentUser.id,
+          referredWineryId: currentUser.wineryId,
+          convertedAt: now,
+          rewardDaysGranted: REWARD_DAYS_ON_CONVERT,
+        }).where(eq(schema.referrals.id, target.id));
+      } else {
+        // No pending click on record (they typed the URL directly) —
+        // still count it, just without an anon-lead audit trail.
+        await db.insert(schema.referrals).values({
+          referrerWineryId: referrer.id,
+          referredUserId: currentUser.id,
+          referredWineryId: currentUser.wineryId,
+          referralCode: input.code,
+          status: "converted",
+          rewardDaysGranted: REWARD_DAYS_ON_CONVERT,
+          createdAt: now,
+          convertedAt: now,
+        });
+      }
+
+      // Grant +30 trial days to the referrer. We top up trial_credits_days
+      // and push trial_ends_at forward if they're still on it (no-op if
+      // they're already on paid).
+      const currentTrialCredits = (referrer as unknown as { trialCreditsDays: number | null }).trialCreditsDays ?? 0;
+      const currentTrialEnds = (referrer as unknown as { trialEndsAt: number | null }).trialEndsAt ?? 0;
+      const bump = REWARD_DAYS_ON_CONVERT * 24 * 60 * 60 * 1000;
+      await db.update(schema.wineries).set({
+        trialCreditsDays: currentTrialCredits + REWARD_DAYS_ON_CONVERT,
+        // Only bump if trial hasn't already ended — protects paid customers
+        trialEndsAt: currentTrialEnds > now ? currentTrialEnds + bump : currentTrialEnds,
+      }).where(eq(schema.wineries.id, referrer.id));
+
+      const contactName = (referrer as unknown as { contactName: string | null }).contactName ?? null;
+      return {
+        ok: true as const,
+        referrerName: referrer.name,
+        referrerContact: contactName,
+        rewardDaysGranted: REWARD_DAYS_ON_CONVERT,
+      };
+    }),
 });
