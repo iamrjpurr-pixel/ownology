@@ -90,6 +90,7 @@ const AdminThemesStats = lazy(() => import("./pages/AdminThemesStats"));
 const CascadeDemo = lazy(() => import("./pages/CascadeDemo"));
 const CopilotMockup = lazy(() => import("./pages/CopilotMockup"));
 const BrandingMockup = lazy(() => import("./pages/BrandingMockup"));
+const OnboardingMockup = lazy(() => import("./pages/OnboardingMockup"));
 const AdminResponsive = lazy(() => import("./pages/AdminResponsive"));
 const AdminDev = lazy(() => import("./pages/AdminDev"));
 const AdminAnalyticsThemes = lazy(() => import("./pages/AdminAnalyticsThemes"));
@@ -318,6 +319,7 @@ function Router() {
       <Route path={"/cascade-demo"} component={CascadeDemo} />
       <Route path={"/copilot-mockup"} component={CopilotMockup} />
       <Route path={"/branding-mockup"} component={BrandingMockup} />
+      <Route path={"/onboarding-mockup"} component={OnboardingMockup} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />
