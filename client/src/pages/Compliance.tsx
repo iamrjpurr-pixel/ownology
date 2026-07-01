@@ -547,7 +547,7 @@ export default function Compliance() {
             Knowledge base: Federal · SA · VIC · NSW · WA · QLD · TAS · NT · NZ — last updated June 2026
           </div>
           {/* Audit trail PDF download — regulator-ready compliance export */}
-          <div className="mt-4">
+          <div className="mt-4 flex flex-wrap gap-3 items-center">
             <a
               href="/api/compliance/audit-trail.pdf?days=365"
               target="_blank"
@@ -573,10 +573,36 @@ export default function Compliance() {
               </svg>
               Download audit trail PDF (last 365 days)
             </a>
-            <p className="mt-2" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
-              Regulator-ready chronological export of all SO₂, YAN, additions, racking & measurement entries with operator reasoning.
-            </p>
+            <a
+              href={`/api/compliance/lip-audit-pack.pdf?vintage=${new Date().getFullYear()}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="compliance-lip-audit-pack-download"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.6rem 1rem",
+                background: "transparent",
+                color: "var(--ow-amber)",
+                fontFamily: "'Lato',sans-serif",
+                fontWeight: 600,
+                fontSize: "0.85rem",
+                borderRadius: "4px",
+                textDecoration: "none",
+                border: "1px solid var(--ow-amber)",
+                letterSpacing: "0.02em",
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M7 1v8m0 0L4 6m3 3 3-3M2 12h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Download LIP Audit Pack (vintage {new Date().getFullYear()})
+            </a>
           </div>
+          <p className="mt-2" style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
+            <strong>Audit trail</strong> = chronological cellar operations log with operator reasoning. <strong>LIP Audit Pack</strong> = Wine Australia Act s.39F Label Integrity Programme record — batch inventory, 85% rule check, grower / supplier one-step-back. Change vintage year in the URL if needed (<code style={{ fontSize: "0.72rem" }}>?vintage=YYYY</code>).
+          </p>
         </div>
 
         {/* State selector — sticky below nav */}

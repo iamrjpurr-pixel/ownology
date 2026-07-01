@@ -18,6 +18,7 @@ import { cellarJournalSitemapHandler, robotsTxtHandler, cellarJournalRssHandler 
 import { generateAuditTrailPdf } from "./auditTrailPdf.js";
 import { dailyAlertEmailHandler } from "./scheduled/dailyAlertEmail.js";
 import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
+import { generateLipAuditPackPdf } from "./lipAuditPackPdf.js";
 import { publicAuditHandler } from "./publicAudit.js";
 import authRouter from "./authRouter.js";
 import { jwtVerify } from "jose";
@@ -161,6 +162,7 @@ async function startServer() {
 
   // ── Compliance audit trail PDF (regulator-ready export) ─────────────────────
   app.get("/api/compliance/audit-trail.pdf", generateAuditTrailPdf);
+  app.get("/api/compliance/lip-audit-pack.pdf", generateLipAuditPackPdf);
 
   // ── Public, opt-in vanity audit page (per-winery /audit/:slug) ──────────────
   // Privacy-first: 404 unless the winery has toggled publicAuditEnabled=true
