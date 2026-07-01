@@ -25,6 +25,7 @@
 import { db } from "./db.js";
 import * as schema from "../drizzle/schema.js";
 import { and, eq, gte, desc } from "drizzle-orm";
+import { computeLipCompliance } from "./lipCompliance.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -72,6 +73,26 @@ export type CellarBriefSummary = {
   decisionsDueCount: number;
   tankCount: number;
   cards: CellarBriefCard[];
+  /**
+   * Live LIP (Wine Australia Act s.39F) label-compliance snapshot for the
+   * current vintage. Cheap to compute — same math powers the annual LIP
+   * Audit Pack PDF (see /app/server/lipCompliance.ts). Rendered as an
+   * ambient badge on the Cellar Brief so winemakers see the labelling
+   * implication months earlier, while there's still time to blend or
+   * source another lot.
+   */
+  lipCompliance?: LipComplianceSnapshot | null;
+};
+
+export type LipComplianceSnapshot = {
+  vintage: number;
+  status: "pass" | "watch" | "attention" | "empty";
+  batchCount: number;
+  classCount: number;
+  passingClasses: number;
+  failingClasses: number;
+  worstClass: { variety: string; gi: string; share: number } | null;
+  nudge: string;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -879,12 +900,41 @@ export async function generateCellarBrief(
   });
 
   const execSummary = await buildExecSummary(cards, trigger);
+
+  // ── LIP compliance snapshot for the current vintage ────────────────────
+  // Runs against `wine_batches` (tenancy-scoped) rather than the vintage
+  // log events already loaded above, since batch metadata (variety, GI,
+  // intake weight) is what the 85% rule needs. One extra small query;
+  // cheap enough to run every brief.
+  const currentVintage = new Date().getFullYear();
+  let lipCompliance: LipComplianceSnapshot | null = null;
+  try {
+    const c = await computeLipCompliance(wineryId, currentVintage);
+    lipCompliance = {
+      vintage: c.vintage,
+      status: c.status,
+      batchCount: c.batchCount,
+      classCount: c.classCount,
+      passingClasses: c.passingClasses,
+      failingClasses: c.failingClasses,
+      worstClass: c.worstClass
+        ? { variety: c.worstClass.variety, gi: c.worstClass.gi, share: c.worstClass.share }
+        : null,
+      nudge: c.nudge,
+    };
+  } catch (err) {
+    // Non-fatal — if the badge data can't load we just skip the badge and
+    // the rest of the brief renders. Logged so ops can inspect.
+    console.warn("[cellarBriefEngine] LIP compliance snapshot failed:", err);
+  }
+
   const summary: CellarBriefSummary = {
     execSummary,
     attentionCount: cards.filter((c) => c.status === "attention").length,
     decisionsDueCount: cards.filter((c) => c.decisionDue).length,
     tankCount: cards.length,
     cards,
+    lipCompliance,
   };
 
   // Persist

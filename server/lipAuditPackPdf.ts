@@ -25,8 +25,7 @@ import PDFDocument from "pdfkit";
 import { db } from "./db.js";
 import * as schema from "../drizzle/schema.js";
 import { eq, and } from "drizzle-orm";
-
-const LIP_THRESHOLD = 0.85; // Wine Australia s.39F — 85% rule
+import { computeLipComplianceFromBatches } from "./lipCompliance.js";
 
 function fmtDate(ms: number | null | undefined): string {
   if (!ms) return "—";
@@ -95,29 +94,11 @@ export async function generateLipAuditPackPdf(req: Request, res: Response): Prom
     }
 
     // ── Aggregate by label class {variety, gi} for the 85% calc ────────
-    type ClassRow = { variety: string; gi: string; kg: number; batches: number; l: number };
-    const byClass = new Map<string, ClassRow>();
-    let totalKg = 0;
-    let totalL = 0;
-    for (const b of batches) {
-      const kg = Number(b.quantityValue ?? 0);
-      const qty = b.quantityUnit === "t" ? kg * 1000 : kg; // normalise tonnes → kg
-      const l = b.currentVolumeLitres ?? b.volumeLitres ?? 0;
-      if (b.quantityUnit === "L") {
-        // Juice/wine received — treat as pure volume, not intake weight
-        totalL += Number(b.quantityValue ?? 0);
-      } else {
-        totalKg += qty;
-      }
-      totalL += l;
-      const key = `${b.variety}||${b.gi || "—"}`;
-      const cur = byClass.get(key) ?? { variety: b.variety, gi: b.gi || "—", kg: 0, batches: 0, l: 0 };
-      cur.kg += qty;
-      cur.batches += 1;
-      cur.l += l;
-      byClass.set(key, cur);
-    }
-    const classRows = Array.from(byClass.values()).sort((a, b) => b.kg - a.kg);
+    // Delegated to the shared computeLipComplianceFromBatches so the badge
+    // on the Cellar Brief and this PDF always agree on the number.
+    const compliance = computeLipComplianceFromBatches(vintage, batches);
+    const classRows = compliance.classes;
+    const totalKg = compliance.totalKg;
 
     // ── Build PDF ───────────────────────────────────────────────────────
     const doc = new PDFDocument({ size: "A4", margins: { top: 60, bottom: 72, left: 60, right: 60 } });
@@ -230,14 +211,13 @@ export async function generateLipAuditPackPdf(req: Request, res: Response): Prom
     // Blended labels would need explicit blend-recipe capture (future work).
     for (const cls of classRows) {
       if (y > 740) { renderFooter(doc, wineryName, wineryContact, vintage); doc.addPage(); y = 60; }
-      const pct = totalKg > 0 ? cls.kg / totalKg : 0;
-      const pass = pct >= LIP_THRESHOLD || cls.kg === totalKg;
+      const pass = cls.pass;
       doc.fillColor("#111");
       doc.text(cls.variety, 60, y, { width: 100, ellipsis: true });
       doc.text(cls.gi, 160, y, { width: 130, ellipsis: true });
       doc.text(String(cls.batches), 290, y, { width: 50 });
       doc.text(cls.kg.toLocaleString(), 340, y, { width: 60 });
-      doc.text(`${(pct * 100).toFixed(1)}%`, 400, y, { width: 60 });
+      doc.text(`${(cls.share * 100).toFixed(1)}%`, 400, y, { width: 60 });
       doc.fillColor(pass ? "#166534" : "#b45309");
       doc.text(pass ? "✓ meets 85% rule" : "⚠ blend disclosure", 460, y, { width: 80 });
       doc.fillColor("#111");

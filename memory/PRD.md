@@ -601,6 +601,15 @@ have been folded in or marked complete.)
 - **Files touched**: `server/lipAuditPackPdf.ts` (new, ~305 LOC), `server/index.ts` (import + route), `client/src/pages/Compliance.tsx` (second download button + helper copy).
 - **Roadmap follow-ups (not in P0 scope)**: Buyer capture UI (unlocks Section 4), blend-recipe capture (upgrades 85% calc from single-class weighting to true blend weighting — `byClass` Map is already keyed by variety||gi so infrastructure is ready).
 
+## Live LIP compliance badge on Cellar Brief (Feb 2026 — iter 25) ✅
+- **Value-engineering 5/5**: extracted 85%-rule math from `lipAuditPackPdf.ts` into shared `server/lipCompliance.ts`, then wired the same function into `cellarBriefEngine.ts`. Zero new LLM cost, zero new DB tables — reuses `wine_batches`. Same math now powers both the annual regulator PDF AND a daily ambient signal.
+- **Feature**: `CellarBriefSummary` now carries `lipCompliance: {vintage, status: pass|watch|attention|empty, batchCount, classCount, passingClasses, failingClasses, worstClass, nudge}`. A new `<LipComplianceBadge>` renders above the vessel cards on `/cellar-brief`, showing a compact 3-line summary (`VINTAGE YYYY · <label>` + nudge copy + "Details →" link to `/compliance?vintage=YYYY`). Three visual states: green (pass), amber (watch — near threshold), copper (attention — multi-class informational).
+- **Copy is informational, not scoldy**: multi-class vintages read *"4 distinct classes this vintage. Each can bottle as its own single-varietal label. A whole-vintage blend would require blend disclosure."* Watch state reads *"Shiraz / Barossa Valley at 82.0% — 1.7t short of a single-class label claim if you blend the whole vintage."* Pass state reads *"...at 88% — a whole-vintage blend would still qualify as single-class Shiraz."*
+- **Bulk juice/wine (L units)** are tracked in a separate volume-based classification to keep the fruit-intake 85% math clean (tonnes → kg normalisation preserved).
+- **Refactor bonus**: `lipAuditPackPdf.ts` now uses the shared function too — dropped ~30 LOC of duplicated aggregation code. Both surfaces guaranteed to agree on the numbers forever.
+- **Self-tested**: all 3 status transitions verified live via seed-data manipulation (attention → watch by bumping Shiraz to 46000kg → back to attention with 200000kg because other classes fall below threshold). LIP PDF regression-verified (5286 bytes, valid `%PDF-1.3`, identical to iter-24).
+- **Files touched**: `server/lipCompliance.ts` (new, ~155 LOC), `server/lipAuditPackPdf.ts` (dedupe), `server/cellarBriefEngine.ts` (LipComplianceSnapshot type + populate at generate time), `client/src/pages/CellarBrief.tsx` (badge component + insertion point above vessel cards).
+
 ## Service URLs
 - Preview: https://ownership-dev.preview.emergentagent.com
 - DB: Railway MySQL — `reseau.proxy.rlwy.net:34291/railway`

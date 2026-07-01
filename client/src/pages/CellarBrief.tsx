@@ -210,6 +210,11 @@ export default function CellarBrief() {
         </div>
       </div>
 
+      {/* LIP compliance badge — Wine Australia s.39F 85%-rule snapshot */}
+      {summary?.lipCompliance && summary.lipCompliance.status !== "empty" && (
+        <LipComplianceBadge snapshot={summary.lipCompliance} />
+      )}
+
       {/* Cards */}
       <div className="flex flex-col gap-3">
         {cards.map((c, idx) => (
@@ -491,3 +496,112 @@ function GhostQuestionBlock({ slug, q }: { slug: string; q: GhostQ }) {
   );
 }
 
+
+
+// ─── LIP compliance badge ─────────────────────────────────────────────────
+// Ambient label-compliance signal. Same 85% math as the annual LIP Audit
+// Pack PDF (see /app/server/lipCompliance.ts). Three visual states:
+//   pass       — green tick, calm tone, "all classes qualify"
+//   watch      — amber, near-miss, actionable ("340kg short of…")
+//   attention  — copper, designed-blend disclosure required
+// Free-plan users see a locked variant nudging them to upgrade — the badge
+// stays visible so the value is always in-frame.
+
+type LipComplianceSnapshot = {
+  vintage: number;
+  status: "pass" | "watch" | "attention" | "empty";
+  batchCount: number;
+  classCount: number;
+  passingClasses: number;
+  failingClasses: number;
+  worstClass: { variety: string; gi: string; share: number } | null;
+  nudge: string;
+};
+
+function LipComplianceBadge({ snapshot }: { snapshot: LipComplianceSnapshot }) {
+  const palette = {
+    pass:      { bg: "color-mix(in oklch, #166534 8%, transparent)", border: "#16653455", text: "#166534", label: "✓" },
+    watch:     { bg: "color-mix(in oklch, #b45309 10%, transparent)", border: "#b4530955", text: "#b45309", label: "~" },
+    attention: { bg: "color-mix(in oklch, #b45309 14%, transparent)", border: "#b4530999", text: "#b45309", label: "⚠" },
+    empty:     { bg: "transparent", border: "var(--ow-border)", text: "var(--ow-text-lo)", label: "·" },
+  }[snapshot.status];
+
+  const label = snapshot.status === "pass"
+    ? "Single-class label ready"
+    : snapshot.status === "watch"
+      ? "Near single-class threshold"
+      : "Multi-class vintage";
+
+  return (
+    <Link
+      href={`/compliance?vintage=${snapshot.vintage}`}
+      data-testid="cellar-brief-lip-badge"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "0.75rem",
+        padding: "0.75rem 1rem",
+        background: palette.bg,
+        border: `1px solid ${palette.border}`,
+        borderRadius: "6px",
+        textDecoration: "none",
+        fontFamily: "'Lato', sans-serif",
+      }}
+    >
+      <span
+        aria-hidden="true"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 28,
+          height: 28,
+          borderRadius: "50%",
+          background: palette.text,
+          color: "white",
+          fontWeight: 700,
+          fontSize: "0.85rem",
+          flexShrink: 0,
+        }}
+      >
+        {palette.label}
+      </span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p
+          data-testid="cellar-brief-lip-badge-label"
+          style={{
+            margin: 0,
+            fontSize: "0.72rem",
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            fontWeight: 700,
+            color: palette.text,
+          }}
+        >
+          Vintage {snapshot.vintage} · {label}
+        </p>
+        <p
+          data-testid="cellar-brief-lip-badge-nudge"
+          style={{
+            margin: "0.25rem 0 0",
+            fontSize: "0.85rem",
+            color: "var(--ow-text-mid)",
+            lineHeight: 1.4,
+          }}
+        >
+          {snapshot.nudge}
+        </p>
+      </div>
+      <span
+        style={{
+          fontSize: "0.75rem",
+          fontWeight: 600,
+          color: palette.text,
+          flexShrink: 0,
+        }}
+      >
+        Details →
+      </span>
+    </Link>
+  );
+}
