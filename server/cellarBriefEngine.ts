@@ -97,7 +97,7 @@ const STAGE_LABELS: Record<CellarBriefStage, string> = {
  * optional). Rosé treated as a mid-stage: short skin contact then white-like
  * primary. Orange/skin-contact white = red flow.
  */
-export type WineColor = "red" | "white" | "rose" | "skin_contact_white";
+export type WineColor = "red" | "white" | "rose" | "skin_contact_white" | "sparkling";
 
 const RED_VARIETIES = new Set([
   "shiraz", "syrah", "cabernet sauvignon", "cabernet", "cab sauv", "merlot",
@@ -115,10 +115,30 @@ const WHITE_VARIETIES = new Set([
   "gruner veltliner", "grüner veltliner", "macabeo", "viura",
 ]);
 const ROSE_HINTS = ["rose", "rosé", "rosato", "blush"];
+// Sparkling detection — either the variety label itself signals sparkling
+// intent (e.g. "Chardonnay sparkling base", "Cuvée NV", "Pét-Nat Pinot",
+// "Blanc de Blancs") or it's a variety that's overwhelmingly used for
+// sparkling in Australia (Meunier, Glera/Prosecco). Detection is intent-
+// driven: still Chardonnay stays "white"; sparkling Chardonnay routes to
+// the 9.x WBS branch for tirage/lees/dosage grounding.
+const SPARKLING_HINTS = [
+  "sparkling", "cuvée", "cuvee", "méthode", "methode traditionelle", "methode",
+  "pét-nat", "petnat", "pet-nat", "pet nat", "prosecco", "blanc de blancs",
+  "blanc de noirs", "brut nature", "brut ", "brut-", "extra brut", "extra-brut",
+  "traditionnelle", "ancestral method", "champenoise", "charmat",
+];
+const SPARKLING_VARIETIES = new Set([
+  "pinot meunier", "meunier", "glera",
+]);
 
 export function inferWineColor(variety: string): WineColor {
   const v = variety.toLowerCase().trim();
-  // Explicit rosé / orange hints first
+  // Sparkling intent wins over color — a "Sparkling Chardonnay Cuvée" is
+  // routed to the 9.x branch regardless of the underlying grape colour.
+  if (SPARKLING_HINTS.some((h) => v.includes(h))) return "sparkling";
+  if (SPARKLING_VARIETIES.has(v)) return "sparkling";
+  for (const s of Array.from(SPARKLING_VARIETIES)) if (v.includes(s)) return "sparkling";
+  // Explicit rosé / orange hints
   if (ROSE_HINTS.some((h) => v.includes(h))) return "rose";
   if (v.includes("orange") || v.includes("skin contact") || v.includes("skin-contact") || v.includes("amber")) return "skin_contact_white";
   // Direct match
@@ -147,27 +167,38 @@ export function inferWineColor(variety: string): WineColor {
 // content is actionable for that stage. e.g. SO₂ at Crush (3.3) is only
 // listed in pre_ferment because that's when winemakers act on it.
 
-const STAGE_TO_WBS: Record<CellarBriefStage, { red: string[]; white: string[] }> = {
+const STAGE_TO_WBS: Record<CellarBriefStage, { red: string[]; white: string[]; sparkling: string[] }> = {
   pre_ferment: {
     // Reds = cold-soak with skins (3.1) + crush SO2 (3.3)
     red:   ["3.1", "3.3", "4.2"],
     // Whites = press immediately (4.6), settle/rack (5.3), bench acidity (8.1)
     white: ["4.6", "5.3", "8.1", "4.2"],
+    // Sparkling base = whites-style press early + acidity-critical lab
+    // (base wine wants ~2.9–3.1 pH and 8–10 g/L TA before tirage).
+    sparkling: ["4.6", "5.3", "8.1", "9.1"],
   },
   primary_active: {
     red:   ["4.1", "4.3"],
     white: ["4.1", "4.3"],
+    // Sparkling primary = base wine ferment (9.1) + still-wine primary
+    // guidance (4.1). Base wines want restrained aromatics — no diacetyl.
+    sparkling: ["4.1", "4.3", "9.1"],
   },
   primary_slowing: {
     red:   ["4.1", "4.4", "8.1"],
     white: ["4.1", "4.4", "8.1"],
+    sparkling: ["4.1", "4.4", "9.1"],
   },
-  pressed:        { red: ["4.6", "4.8"], white: ["4.6", "4.8"] },
-  mlf_active:     { red: ["4.8"],        white: ["4.8"] },
-  aging_tank:     { red: ["5.2", "5.3"], white: ["5.3", "6.1"] },
-  aging_barrel:   { red: ["5.1", "5.2", "5.4"], white: ["5.1", "5.4", "6.1"] },
-  bottled:        { red: ["7.1"], white: ["7.1"] },
-  unknown:        { red: [], white: [] },
+  pressed:      { red: ["4.6", "4.8"], white: ["4.6", "4.8"], sparkling: ["9.1", "9.2"] },
+  mlf_active:   { red: ["4.8"],        white: ["4.8"],        sparkling: ["4.8", "9.1"] },
+  aging_tank:   { red: ["5.2", "5.3"], white: ["5.3", "6.1"], sparkling: ["9.1", "9.2", "9.3"] },
+  aging_barrel: { red: ["5.1", "5.2", "5.4"], white: ["5.1", "5.4", "6.1"], sparkling: ["9.1", "9.5"] },
+  // Sparkling "bottled" is where the magic actually starts — tirage, prise
+  // de mousse, aging on lees, riddling, disgorging, dosage. All 9.x codes
+  // are relevant, so we probe them all and let the ghost-question / grounding
+  // resolver pull the best matches by stage.
+  bottled:      { red: ["7.1"], white: ["7.1"], sparkling: ["9.3", "9.4", "9.5", "9.6", "9.7", "9.8", "9.9"] },
+  unknown:      { red: [], white: [], sparkling: [] },
 };
 
 /**
@@ -189,22 +220,45 @@ type WbsCache = {
 
 function resolveGrounding(stage: CellarBriefStage, color: WineColor, cache: WbsCache): string[] {
   const treatAsWhite = color === "white" || color === "rose";
-  const baseCodes = STAGE_TO_WBS[stage]?.[treatAsWhite ? "white" : "red"] ?? [];
+  const isSparkling = color === "sparkling";
+  const branch: "red" | "white" | "sparkling" = isSparkling ? "sparkling" : treatAsWhite ? "white" : "red";
+  const baseCodes = STAGE_TO_WBS[stage]?.[branch] ?? [];
   // White Wine Bible chunks were ingested with `D`-prefixed WBS codes
   // (D4.1, D5.2, …) while SOPs + Red Wine Bible use bare codes (4.1, 5.2).
-  // For whites/rosé we probe BOTH variants so chapter resolution works
-  // regardless of which ingestion script tagged the chunk.
-  const wbsCodes = treatAsWhite
+  // For whites/rosé AND sparkling we probe BOTH variants so chapter
+  // resolution works regardless of which ingestion script tagged the chunk.
+  // Sparkling 9.x codes have no bible chapters yet — grounding for sparkling
+  // falls back to the parallel still-wine WBS codes (4.1, 4.6, 5.3, etc.)
+  // via the STAGE_TO_WBS map, so white-bible content is the right proxy.
+  const wbsCodes = (treatAsWhite || isSparkling)
     ? baseCodes.flatMap((c) => [c, `D${c}`])
     : baseCodes;
   const out: string[] = [];
   const seenSop = new Set<number>();
   const seenChunk = new Set<string>();
+  // Titles that are clearly red-flow only — hide these when the card
+  // is white or sparkling to avoid "SOP 11 Red Wine Fermentation" showing
+  // up on a Chardonnay sparkling base card.
+  const isRedOnlySop = (t: string) => {
+    const lower = t.toLowerCase();
+    return lower.includes("red wine") || lower.includes("pump-over") ||
+           lower.includes("cap manage") || lower.includes("punch") ||
+           lower.includes("skin contact");
+  };
+  const isWhiteOnlySop = (t: string) => {
+    const lower = t.toLowerCase();
+    return lower.includes("white wine");
+  };
   // SOPs first (most actionable for a cellar hand)
   for (const code of wbsCodes) {
     const sops = cache.sopsByWbs.get(code) ?? [];
     for (const s of sops) {
       if (seenSop.has(s.id)) continue;
+      // Skip red-only SOPs when the card is white or sparkling; skip
+      // white-only SOPs when the card is red. Sparkling gets the white
+      // flow's SOPs since sparkling base is a white-wine flow.
+      if ((treatAsWhite || isSparkling) && isRedOnlySop(s.title)) continue;
+      if (!treatAsWhite && !isSparkling && isWhiteOnlySop(s.title)) continue;
       seenSop.add(s.id);
       out.push(`SOP ${s.id} ${s.title}`);
       if (out.filter((l) => l.startsWith("SOP")).length >= 3) break;
@@ -218,7 +272,11 @@ function resolveGrounding(stage: CellarBriefStage, color: WineColor, cache: WbsC
     morew_red_outline: "Red Wine Outline",
     morew_white_outline: "White Wine Outline",
   };
-  const preferred = treatAsWhite ? ["white_wine_bible", "morew_white_outline"] : ["red_wine_bible", "morew_red_outline"];
+  // Sparkling and whites both draw from the white bible (sparkling base
+  // wine is white-wine flow); reds draw from red bible.
+  const preferred = (treatAsWhite || isSparkling)
+    ? ["white_wine_bible", "morew_white_outline"]
+    : ["red_wine_bible", "morew_red_outline"];
   for (const code of wbsCodes) {
     const chunks = cache.chunksByWbs.get(code) ?? [];
     const filtered = chunks
@@ -314,9 +372,11 @@ function pickGhostQuestion(
   cache: WbsCache,
 ): CellarBriefGhostQuestion | null {
   const treatAsWhite = color === "white" || color === "rose";
-  const wbsCodes = STAGE_TO_WBS[stage]?.[treatAsWhite ? "white" : "red"] ?? [];
+  const isSparkling = color === "sparkling";
+  const branch: "red" | "white" | "sparkling" = isSparkling ? "sparkling" : treatAsWhite ? "white" : "red";
+  const wbsCodes = STAGE_TO_WBS[stage]?.[branch] ?? [];
   if (wbsCodes.length === 0) return null;
-  const wineTypePref = treatAsWhite ? "white" : "red";
+  const wineTypePref = isSparkling ? "sparkling" : treatAsWhite ? "white" : "red";
   // Collect candidate pool: exact-wine-type matches first, then general.
   const pool: CellarBriefGhostQuestion[] = [];
   for (const code of wbsCodes) {

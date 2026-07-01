@@ -1091,7 +1091,7 @@ export const cellarJournal = mysqlTable(
     // Citations — JSON array of {label, source_doc, chapter} pulled from chunks
     citations: text("citations"), // JSON string
     // Wine type if detected
-    wineType: mysqlEnum("wine_type", ["red", "white", "both", "unknown"])
+    wineType: mysqlEnum("wine_type", ["red", "white", "both", "unknown", "sparkling"])
       .notNull()
       .default("unknown"),
     // Engagement metrics

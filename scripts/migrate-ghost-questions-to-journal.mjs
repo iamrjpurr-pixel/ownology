@@ -48,6 +48,7 @@ const CATEGORY_TO_TOPIC = {
   stabilisation: "Cold Stabilisation",
   faults: "Faults & Off-Flavours",
   "stuck-ferment": "Stuck Fermentation",
+  sparkling: "Sparkling & Bubbles",
 };
 
 function slugify(q, topic) {
@@ -82,6 +83,7 @@ function buildTeaserAndDiagnosis(full) {
 function mapWineType(gt) {
   if (gt === "red") return "red";
   if (gt === "white") return "white";
+  if (gt === "sparkling") return "sparkling";
   return "both";
 }
 
