@@ -45,14 +45,24 @@ export default function AuthCallback() {
           const data = await r.json().catch(() => ({}));
           throw new Error(data?.error || `Exchange failed (${r.status})`);
         }
+        const payload = await r.json().catch(() => ({} as { isNew?: boolean }));
         await refresh();
-        // Clean fragment + redirect.
+        // Redirect logic — new users go to /onboarding for the 60-second
+        // wizard (same page paid Founding Members land on after Stripe).
+        // Returning users go back to whatever they were doing pre-login, or
+        // /admin as the neutral default. A stored `ow_auth_return` takes
+        // precedence over the isNew fork so a stored intent isn't lost.
         let next = "/admin";
+        let hasStoredReturn = false;
         try {
           const stored = sessionStorage.getItem("ow_auth_return");
-          if (stored && stored.startsWith("/")) next = stored;
+          if (stored && stored.startsWith("/")) {
+            next = stored;
+            hasStoredReturn = true;
+          }
           sessionStorage.removeItem("ow_auth_return");
         } catch { /* noop */ }
+        if (payload?.isNew && !hasStoredReturn) next = "/onboarding";
         window.location.replace(next);
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);

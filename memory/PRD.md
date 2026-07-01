@@ -638,6 +638,13 @@ have been folded in or marked complete.)
   - `users.primary_use_case` DB column + dashboard pillar-promotion logic (2hr — validate localStorage version first)
   - Buyer-side capture on `wine_batches` — unlocks LIP Audit Pack Section 4 (1hr per iter-24 note)
 
+## Trial-signup routes through onboarding wizard (iter-27b) ✅
+- `upsertUserFromEmergent` now returns `{ ..., isNew: boolean }` so `/api/auth/exchange` can tell the client whether this is a fresh user vs. a returning login.
+- `AuthCallback.tsx` reads `isNew` from the exchange payload — new signups redirect to `/onboarding`; returning users still go to their stored `ow_auth_return` intent (or `/admin`). Stored return path always wins over `isNew` so a "come back and finish this" flow isn't hijacked.
+- Net wire-up: ~15 lines across `server/authRouter.ts` (2 return-shape edits + response body) and `client/src/pages/AuthCallback.tsx` (isNew fork + comment). Zero new tables, zero new mutations.
+- Verified: `/api/auth/exchange` still 400s on missing `session_id`, `/api/auth/me` still returns the seed user — no regression.
+- **Impact**: every free-tier signup arriving from `/join?ref=CODE` now flows through the same 60-second wizard as paid Founding Members. That closes the referral loop *at signup* rather than post-checkout, so a referrer earns their +30 days the moment their friend converts to trial rather than months later.
+
 ## Service URLs
 - Preview: https://ownership-dev.preview.emergentagent.com
 - DB: Railway MySQL — `reseau.proxy.rlwy.net:34291/railway`

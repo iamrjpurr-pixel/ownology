@@ -107,7 +107,7 @@ function clearSessionCookie(res: Response) {
  */
 async function upsertUserFromEmergent(
   data: EmergentSessionData
-): Promise<{ openId: string; name: string; email: string; role: "admin" | "user" }> {
+): Promise<{ openId: string; name: string; email: string; role: "admin" | "user"; isNew: boolean }> {
   const email = data.email?.toLowerCase().trim();
   const role: "admin" | "user" = isAdminEmail(email) ? "admin" : "user";
   const openId = `emergent:${data.id}`;
@@ -125,7 +125,7 @@ async function upsertUserFromEmergent(
         role,
       })
       .where(eq(schema.users.id, existing.id));
-    return { openId, name: data.name || existing.name || "", email: email || existing.email || "", role };
+    return { openId, name: data.name || existing.name || "", email: email || existing.email || "", role, isNew: false };
   }
 
   // Brand-new user — create the row, then provision their Winery.
@@ -177,7 +177,7 @@ async function upsertUserFromEmergent(
       console.warn("[auth] winery provisioning skipped:", (e as Error).message);
     }
   }
-  return { openId, name: data.name || "", email: email || "", role };
+  return { openId, name: data.name || "", email: email || "", role, isNew: true };
 }
 
 const router = express.Router();
@@ -219,6 +219,7 @@ router.post("/exchange", express.json(), async (req: Request, res: Response) => 
         role: user.role,
         picture: data.picture || null,
       },
+      isNew: user.isNew,
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
