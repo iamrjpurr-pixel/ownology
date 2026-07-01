@@ -67,6 +67,13 @@ interface RolePath {
 // ─── Checklist data ───────────────────────────────────────────────────────────
 const CHECKLIST: ChecklistItem[] = [
   {
+    id: "open-cellar-brief",
+    label: "Open your first Cellar Brief",
+    description: "Your daily 5:30am briefing — see what needs your attention today across every tank and barrel, with the LIP compliance badge live for the current vintage.",
+    href: "/cellar-brief",
+    linkLabel: "Open Cellar Brief",
+  },
+  {
     id: "register-tank",
     label: "Register your first tank",
     description: "Add a tank to The Press so you can start logging fermentation events against it.",
@@ -109,6 +116,20 @@ const CHECKLIST: ChecklistItem[] = [
     linkLabel: "Open Free Run",
   },
   {
+    id: "cellar-journal",
+    label: "Explore the Cellar Journal",
+    description: "236 winemaker Q&As grounded in real MoreWine and Scott Labs manuals — public, SEO-indexed, and shareable.",
+    href: "/cellar-journal",
+    linkLabel: "Open Cellar Journal",
+  },
+  {
+    id: "lip-audit-pack",
+    label: "Download your LIP Audit Pack",
+    description: "Wine Australia s.39F Label Integrity Programme record — batch inventory, 85% rule check, grower one-step-back, branded with your logo.",
+    href: "/compliance",
+    linkLabel: "Open Compliance",
+  },
+  {
     id: "tribal-knowledge",
     label: "Add your first Tribal Knowledge entry",
     description: "Open any SOP in the Knowledge Platform and record a site-specific note in the Tribal Knowledge field.",
@@ -124,39 +145,39 @@ const ROLE_PATHS: RolePath[] = [
     tagline: "Production visibility, cost intelligence, and compliance readiness.",
     icon: <Layers className="w-6 h-6" />,
     steps: [
+      { label: "Cellar Brief — daily 5:30am briefing", href: "/cellar-brief" },
       { label: "Dashboard — KPIs & tank status", href: "/dashboard" },
       { label: "The Press — Cellar Value tab", href: "/the-press" },
-      { label: "The Press — Export Docs tab", href: "/the-press" },
-      { label: "Compliance AI — regulatory Q&A", href: "/compliance" },
+      { label: "Compliance — LIP Audit Pack export", href: "/compliance" },
     ],
-    startHref: "/dashboard",
-    startLabel: "Start with Dashboard",
+    startHref: "/cellar-brief",
+    startLabel: "Start with your Cellar Brief",
   },
   {
     role: "Head Winemaker",
     tagline: "Fermentation control, protocol management, and decision capture.",
     icon: <FlaskConical className="w-6 h-6" />,
     steps: [
+      { label: "Cellar Brief — daily 5:30am briefing", href: "/cellar-brief" },
       { label: "The Press — Vintage Log", href: "/the-press" },
       { label: "Knowledge Platform — SOPs & Decision Logic", href: "/knowledge" },
       { label: "Free Run — AI assistant", href: "/free-run" },
-      { label: "Knowledge — Vintage Debrief", href: "/knowledge" },
     ],
-    startHref: "/the-press",
-    startLabel: "Start with The Press",
+    startHref: "/cellar-brief",
+    startLabel: "Start with your Cellar Brief",
   },
   {
     role: "Cellar Hand",
     tagline: "Fast entry, clear tasks, and protocol access on the floor.",
     icon: <ClipboardList className="w-6 h-6" />,
     steps: [
+      { label: "Cellar Brief — what needs attention today", href: "/cellar-brief" },
       { label: "Quick Entry — rapid log entry", href: "/quick-entry" },
       { label: "Cellar Tasks — equipment & tasks", href: "/cellar-tasks" },
       { label: "Knowledge Platform — SOP library", href: "/knowledge" },
-      { label: "Vineyard — block observations", href: "/vineyard" },
     ],
-    startHref: "/quick-entry",
-    startLabel: "Start with Quick Entry",
+    startHref: "/cellar-brief",
+    startLabel: "Start with your Cellar Brief",
   },
 ];
 
@@ -204,6 +225,7 @@ const WORKFLOW_STAGES: WorkflowStage[] = [
     title: "Harvest & Reception",
     icon: <MapPin className="w-4 h-4" />,
     nodes: [
+      { stage: "harvest", pillar: "do",    label: "Daily Cellar Brief",    href: "/cellar-brief", description: "5:30am — what needs attention today, with LIP compliance badge" },
       { stage: "harvest", pillar: "do",    label: "Batch Registration",    href: "/the-press",   description: "Create a wine batch in the Batch Book" },
       { stage: "harvest", pillar: "know",  label: "Fermentation SOP",      href: "/knowledge",   description: "Review your inoculation protocol" },
       { stage: "harvest", pillar: "do",    label: "Inoculation Event",     href: "/the-press",   description: "Log inoculation in the Vintage Log" },
@@ -214,6 +236,7 @@ const WORKFLOW_STAGES: WorkflowStage[] = [
     title: "Fermentation",
     icon: <Beaker className="w-4 h-4" />,
     nodes: [
+      { stage: "fermentation", pillar: "do",    label: "Daily Cellar Brief",  href: "/cellar-brief", description: "Attention items across every ferment, plus decision-due flags" },
       { stage: "fermentation", pillar: "do",    label: "Daily Measurements",  href: "/the-press",   description: "Log Brix, temp, pH, and SO₂ readings" },
       { stage: "fermentation", pillar: "learn", label: "Free Run — YAN & DAP", href: "/free-run",    description: "Ask the AI about nutrient additions" },
       { stage: "fermentation", pillar: "do",    label: "Additions",           href: "/the-press",   description: "Log DAP, nutrients, and adjustments" },
@@ -236,6 +259,7 @@ const WORKFLOW_STAGES: WorkflowStage[] = [
     nodes: [
       { stage: "bottling", pillar: "know",  label: "Packaging SOP",       href: "/knowledge",   description: "Review your bottling line protocol" },
       { stage: "bottling", pillar: "do",    label: "Bottling Run",        href: "/the-press",   description: "Log the bottling event" },
+      { stage: "bottling", pillar: "do",    label: "LIP Audit Pack",      href: "/compliance",  description: "Generate the s.39F record — batch inventory, 85% rule, grower one-step-back" },
       { stage: "bottling", pillar: "do",    label: "Export Docs",         href: "/the-press",   description: "Generate AWBC Movement Advice" },
     ],
   },
@@ -524,21 +548,21 @@ export default function Guide() {
             What Ownology does
           </h2>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9375rem", color: TEXT_MID, lineHeight: 1.7, marginBottom: "1.5rem", maxWidth: "520px" }}>
-            Every feature in Ownology belongs to one of four pillars. Understanding the pillars is the fastest way to understand the platform.
+            Every feature in Ownology belongs to one of four pillars. The four cards below cover the anchors — the complete surface map (14 tools, tagged by pillar) sits underneath.
           </p>
           <div className="grid sm:grid-cols-2 gap-4">
             <PillarCard
               pillar="Do"
-              label="Cellar Operations — The Press"
-              description="The Press is your harvest floor command centre. Log fermentation events, track tanks and barrels, manage vineyard blocks, assign cellar tasks, and generate export documentation."
-              href="/the-press"
+              label="Cellar Operations — The Press + Cellar Brief"
+              description="Log fermentation events, track tanks and barrels, manage vineyard blocks, and read your daily Cellar Brief at 5:30am — the one place that tells you what needs attention today across every vessel."
+              href="/cellar-brief"
               icon={<ClipboardList className="w-5 h-5" />}
               color="var(--ow-amber)"
             />
             <PillarCard
               pillar="Know"
-              label="Knowledge Platform"
-              description="38 industry-standard SOPs across 12 categories. Capture Decision Logic, Tribal Knowledge, and Vintage Notes. Your winery's institutional memory, permanent and searchable."
+              label="Knowledge — SOPs + Cellar Journal"
+              description="38 industry-standard SOPs across 12 categories, plus 236 winemaker Q&As in the public Cellar Journal — grounded in real MoreWine and Scott Labs manuals, searchable, shareable."
               href="/knowledge"
               icon={<BookOpen className="w-5 h-5" />}
               color="oklch(0.62 0.10 45)"
@@ -553,12 +577,70 @@ export default function Guide() {
             />
             <PillarCard
               pillar="Guide"
-              label="Compliance & Orientation"
-              description="Compliance AI answers regulatory questions across LIP, FSANZ, and state licensing. This Guide page orients new users and maps the vintage workflow."
+              label="Compliance, Regulations & Audit Exports"
+              description="Compliance AI answers LIP, FSANZ, and state-licensing questions. One-tap LIP Audit Pack PDF (Wine Australia s.39F) with your branding. Plus the regulations library and orientation checklist."
               href="/compliance"
               icon={<ShieldCheck className="w-5 h-5" />}
               color="oklch(0.65 0.10 160)"
             />
+          </div>
+
+          {/* Sub-links under the four pillars — surfaces that don't warrant a
+              pillar of their own but shouldn't be orphaned from Guide. */}
+          <div
+            style={{
+              marginTop: "1.5rem",
+              paddingTop: "1.25rem",
+              borderTop: `1px dashed ${BORDER}`,
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+              gap: "0.75rem 1.25rem",
+            }}
+          >
+            {[
+              { label: "Cellar Brief", href: "/cellar-brief", pillar: "DO" },
+              { label: "The Press", href: "/the-press", pillar: "DO" },
+              { label: "Quick Entry", href: "/quick-entry", pillar: "DO" },
+              { label: "Cellar Tasks", href: "/cellar-tasks", pillar: "DO" },
+              { label: "Vineyard", href: "/vineyard", pillar: "DO" },
+              { label: "Tank QR", href: "/tank-qr", pillar: "DO" },
+              { label: "Knowledge (SOPs)", href: "/knowledge", pillar: "KNOW" },
+              { label: "Cellar Journal (public)", href: "/cellar-journal", pillar: "KNOW" },
+              { label: "Blog", href: "/blog", pillar: "KNOW" },
+              { label: "Free Run — AI", href: "/free-run", pillar: "LEARN" },
+              { label: "The Press — Compare", href: "/the-press/compare", pillar: "LEARN" },
+              { label: "Compliance AI", href: "/compliance", pillar: "GUIDE" },
+              { label: "Regulations library", href: "/regulations", pillar: "GUIDE" },
+              { label: "Resources & kit", href: "/resources", pillar: "GUIDE" },
+            ].map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                data-testid={`guide-sublink-${l.href.replace(/[^a-z0-9]/gi, "-").toLowerCase()}`}
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: "0.6rem",
+                  fontFamily: SANS,
+                  fontSize: "0.85rem",
+                  color: TEXT_MID,
+                  textDecoration: "none",
+                  padding: "0.35rem 0",
+                }}
+              >
+                <span style={{
+                  fontFamily: MONO,
+                  fontSize: "0.6rem",
+                  letterSpacing: "0.1em",
+                  color: PILLAR_COLORS[l.pillar.toLowerCase()] ?? AMBER,
+                  minWidth: 42,
+                  fontWeight: 700,
+                }}>
+                  {l.pillar}
+                </span>
+                <span style={{ color: TEXT_HI }}>{l.label} →</span>
+              </Link>
+            ))}
           </div>
         </section>
 

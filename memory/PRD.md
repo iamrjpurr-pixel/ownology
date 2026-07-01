@@ -610,6 +610,17 @@ have been folded in or marked complete.)
 - **Self-tested**: all 3 status transitions verified live via seed-data manipulation (attention → watch by bumping Shiraz to 46000kg → back to attention with 200000kg because other classes fall below threshold). LIP PDF regression-verified (5286 bytes, valid `%PDF-1.3`, identical to iter-24).
 - **Files touched**: `server/lipCompliance.ts` (new, ~155 LOC), `server/lipAuditPackPdf.ts` (dedupe), `server/cellarBriefEngine.ts` (LipComplianceSnapshot type + populate at generate time), `client/src/pages/CellarBrief.tsx` (badge component + insertion point above vessel cards).
 
+## /guide IA audit + rewire (Feb 2026 — iter 26) ✅
+- **Context**: iter-21 to iter-25 shipped 5 flagship surfaces (Cellar Brief, LIP badge, LIP Audit Pack, Cellar Journal SEO, editable identity) but `/guide` — the orientation page users hit right after paying — hadn't been updated since Sprint 8. New paying users were being pointed at `/the-press` first instead of the daily Cellar Brief.
+- **Fix**: Rewired Four Pillars cards to reflect actual shipped surface (DO now co-headlines Cellar Brief + The Press, KNOW co-headlines SOPs + Cellar Journal, GUIDE now surfaces LIP Audit Pack + regulations). Added a 14-tool sub-links grid below the pillar cards so every route in App.tsx is reachable in 1 click from `/guide`, each tagged with its pillar colour code.
+- **Getting Started checklist**: added 3 new items (open Cellar Brief · explore Cellar Journal · download LIP Audit Pack) → total 10, with "Open your first Cellar Brief" as the new step 1 so paying users see the daily driver immediately.
+- **Role Paths**: all 3 roles (Winery Owner, Head Winemaker, Cellar Hand) now open with Cellar Brief as the entry point — the shared daily surface across every role.
+- **Workflow Map**: Daily Cellar Brief nodes added at Harvest & Fermentation stages; LIP Audit Pack node added at Bottling.
+- **"38 SOPs across 12 categories" claim verified accurate** against Railway `sop_library` (38 rows, 12 distinct categories).
+- **Naming decision**: kept "GUIDE" as the pillar name (rather than renaming to COMPLY/AUDIT). Instead rewrote the card description to be explicit — "Compliance, Regulations & Audit Exports" — removes the ambiguity without a rename.
+- **Self-tested (screenshot)**: all 6 new sub-links (`cellar-brief`, `cellar-journal`, `regulations`, `resources`, `the-press-compare`, `free-run`) render correctly on `/guide`, checklist shows 10 items with Cellar Brief at position 1, all 3 role paths open with "Start with your Cellar Brief" CTA.
+- **Files touched**: `client/src/pages/Guide.tsx` (single-file update, ~110 lines changed across 5 sections).
+
 ## Service URLs
 - Preview: https://ownership-dev.preview.emergentagent.com
 - DB: Railway MySQL — `reseau.proxy.rlwy.net:34291/railway`
