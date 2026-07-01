@@ -86,7 +86,29 @@ async function callLLM(messages) {
   return data.choices?.[0]?.message?.content ?? "";
 }
 
-function buildPrompts(wbs) {
+async function getSparklingContext(wbsCode) {
+  // Pull real MoreWine sparkling content + secondary specialist manuals so
+  // the LLM cites concrete numbers/protocols instead of relying on its own
+  // training data. We fetch primary WBS chunks + the sparkling protocol
+  // documents regardless of WBS (they cover the full flow in one PDF).
+  const [chunks] = await conn.execute(
+    `SELECT source_doc, chapter_title, content
+       FROM diy_knowledge_chunks
+      WHERE published = 1
+        AND (
+          (source_doc IN ('morew_sparkling_yeast','morew_sparkling_proelif'))
+          OR (wbs_code = ? AND source_doc IN ('morew_yeast_hydration','morew_yeast_pairing','morew_so2_mgmt','morew_so2_protocol','morew_mlf_paper','white_wine_bible'))
+        )
+      LIMIT 6`,
+    [wbsCode]
+  );
+  if (chunks.length === 0) return "(no MoreWine grounding available for this WBS code — write from general sparkling knowledge)";
+  return chunks
+    .map((r) => `[${r.source_doc.replace(/_/g, " ")} — ${r.chapter_title ?? ""}]\n${r.content.slice(0, 900)}`)
+    .join("\n\n---\n\n");
+}
+
+function buildPrompts(wbs, context) {
   const system = `You write "ghost questions" for a winemaking knowledge base — Australian sparkling wine focus. Voice: experienced sparkling winemaker teaching a curious junior. Aus/NZ English, metric units.
 
 You return STRICT JSON:
@@ -97,7 +119,7 @@ You return STRICT JSON:
 
 Constraints per item:
 - question: 80–140 chars, ends "?", winemaker voice, plain English
-- answer:   80–140 words, concrete numbers/ranges, at least one regional Australian reference where appropriate (Tasmania — House of Arras / Jansz / Clover Hill / Pipers Brook / Delatite; Yarra Valley — Chandon / Dominique Portet; King Valley — Dal Zotto Prosecco; Adelaide Hills — Deviation Road / Petaluma; Macedon Ranges — Hanging Rock; Great Southern WA; Yarra Ranges)
+- answer:   80–140 words, MUST use concrete numbers from the MoreWine context below where possible (e.g. rehydrate at 35-40°C at 10× water; tirage sugar 22-24 g/L; FSO2 <15 ppm before tirage; 5% starter volume; 1.0-1.5×10⁶ cells/mL; ProElif dose rate; pH >2.9). Also include at least one Australian regional reference where appropriate (Tasmania — House of Arras / Jansz / Clover Hill / Pipers Brook / Delatite; Yarra — Chandon / Dominique Portet; King Valley — Dal Zotto Prosecco; Adelaide Hills — Deviation Road / Petaluma; Macedon — Hanging Rock; Great Southern WA)
 - category:  always "sparkling"
 - difficulty: "beginner" | "intermediate" | "advanced"
 
@@ -112,11 +134,15 @@ Return ONLY the JSON object.`;
 
 The 6 questions should cover a spread:
   1. Practical timing / frequency ("when do I…", "how long…")
-  2. Specific numbers / thresholds
+  2. Specific numbers / thresholds — LEAN ON THE MOREWINE CONTEXT NUMBERS BELOW
   3. Failure mode + recovery
   4. Common misconception or "can I skip…"
   5. Australian regional context — Tasmania or another AU sparkling region
   6. Advanced or comparative (traditional vs Charmat vs ancestral, or vs Champagne)
+
+# GROUNDING CONTEXT (real MoreWine content — cite these numbers verbatim where relevant)
+
+${context.slice(0, 7000)}
 
 Return the JSON now.`;
 
@@ -165,7 +191,8 @@ if (!DRY && !ONLY) {
 for (const wbs of targets) {
   const tag = wbs.code;
   try {
-    const raw = await callLLM(buildPrompts(wbs));
+    const context = await getSparklingContext(wbs.code);
+    const raw = await callLLM(buildPrompts(wbs, context));
     const items = parseLlm(raw).map(validateItem).filter(Boolean);
     if (items.length === 0) { console.log(`  · ${tag} → 0 valid items`); continue; }
     if (DRY) {
