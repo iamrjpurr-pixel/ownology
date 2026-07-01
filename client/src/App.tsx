@@ -92,6 +92,9 @@ const CopilotMockup = lazy(() => import("./pages/CopilotMockup"));
 const BrandingMockup = lazy(() => import("./pages/BrandingMockup"));
 const OnboardingMockup = lazy(() => import("./pages/OnboardingMockup"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Refund = lazy(() => import("./pages/Refund"));
 const AdminResponsive = lazy(() => import("./pages/AdminResponsive"));
 const AdminDev = lazy(() => import("./pages/AdminDev"));
 const AdminAnalyticsThemes = lazy(() => import("./pages/AdminAnalyticsThemes"));
@@ -322,6 +325,9 @@ function Router() {
       <Route path={"/branding-mockup"} component={BrandingMockup} />
       <Route path={"/onboarding-mockup"} component={OnboardingMockup} />
       <Route path={"/onboarding"} component={Onboarding} />
+      <Route path={"/privacy"} component={Privacy} />
+      <Route path={"/terms"} component={Terms} />
+      <Route path={"/refund"} component={Refund} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />

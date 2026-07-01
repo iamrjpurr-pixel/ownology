@@ -1583,12 +1583,20 @@ function Footer() {
         { label: "Why Ownology", href: "/why-ownology" },
       ],
     },
+    {
+      heading: "Legal",
+      links: [
+        { label: "Privacy policy", href: "/privacy", testid: "footer-privacy" },
+        { label: "Terms of service", href: "/terms", testid: "footer-terms" },
+        { label: "Refund policy", href: "/refund", testid: "footer-refund" },
+      ],
+    },
   ];
 
   return (
     <footer className="py-12" style={{ borderTop: "1px solid var(--ow-border)" }}>
       <div className="container">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 md:gap-10">
           <div>
             <OwnologyLogo size={28} />
             <p

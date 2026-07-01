@@ -645,6 +645,14 @@ have been folded in or marked complete.)
 - Verified: `/api/auth/exchange` still 400s on missing `session_id`, `/api/auth/me` still returns the seed user — no regression.
 - **Impact**: every free-tier signup arriving from `/join?ref=CODE` now flows through the same 60-second wizard as paid Founding Members. That closes the referral loop *at signup* rather than post-checkout, so a referrer earns their +30 days the moment their friend converts to trial rather than months later.
 
+## Launch prep — legal + social meta (Feb 2026 — iter 28) ✅
+- **New pages** at `/privacy`, `/terms`, `/refund` — plain-language docs written for a human winemaker, not a lawyer. Cover the actual data we handle (Railway MySQL in Sydney, Resend, LLM providers, Stripe), the 30-day money-back guarantee (with an honest exception for Founding-Member locked pricing), AU Privacy Act + GDPR rights, and South Australia governing law. Each page has `data-testid="{privacy|terms|refund}-page"` for launch tests.
+- **Legal column** added to the Home footer alongside Product / Library / For — 5-column grid on md+, matching testids `footer-{privacy|terms|refund}`.
+- **Home meta rewrite**: title changed from "AI Knowledge Assistant" → "Cellar Intelligence for Boutique Winemakers". Description now leads with three concrete numbers ("Daily 5:30am Cellar Brief, 236 winemaker Q&As from real MoreWine and Scott Labs manuals, one-tap Wine Australia LIP Audit Pack PDF"). Higher CTR on Google + social shares.
+- **Open Graph + Twitter cards**: `og:title`, `og:description`, `og:image` (1200×630 PNG), `og:image:alt`, `twitter:card=summary_large_image`. Canonical URL set to `https://ownology.ai/`.
+- **OG image**: designed at `/app/client/public/og-preview.html` (Fraunces headline + Lato body, three-arc trinity mark, dark warm gradient with grain overlay, 236/38/14-day stat row, ownology.ai URL). Rendered via headless Chromium to `/app/client/public/og-image.png` (299KB, valid `%PNG` magic, served at `/og-image.png` with correct `image/png` Content-Type). Every share on LinkedIn/IG/WhatsApp/Twitter now renders a proper visual card instead of a plain link.
+- **Files touched**: `client/src/pages/Privacy.tsx` (new), `client/src/pages/Terms.tsx` (new), `client/src/pages/Refund.tsx` (new), `client/src/pages/Home.tsx` (+9 lines footer column + grid fix), `client/src/App.tsx` (+4 route registrations), `client/index.html` (+15 lines meta), `client/public/og-preview.html` (new — design source), `client/public/og-image.png` (new — 299KB launch asset).
+
 ## Service URLs
 - Preview: https://ownership-dev.preview.emergentagent.com
 - DB: Railway MySQL — `reseau.proxy.rlwy.net:34291/railway`
