@@ -587,6 +587,20 @@ have been folded in or marked complete.)
   - Files touched: `scripts/add-nurture-fields.mjs` (new), `drizzle/schema.ts`, `server/routers/winery.ts`, `server/routers/referrals.ts`, `server/scheduled/nurtureEmail.ts` (new), `server/index.ts`, `client/src/pages/Join.tsx`, `client/src/pages/AdminSettings.tsx`.
   - Deploy note: Railway cron should hit `POST /api/scheduled/nurture-email` daily with `x-cron-secret: $CRON_SECRET` (same env var as dailyAlertEmail).
 
+## LIP Audit Pack — Compliance Reports P3 shipped (Feb 2026 — iter 24) ✅
+- **Value-engineering scored 5/5**: no LLM cost, reuses existing pdfkit + branded-header pattern from `server/auditTrailPdf.ts`, grounded entirely in existing `wine_batches` rows the winery already keeps. Zero external API.
+- **Feature**: `GET /api/compliance/lip-audit-pack.pdf?vintage=2026` returns a 4-section regulator-ready PDF per Wine Australia Act 2013 s.39F Label Integrity Programme:
+  1. **Batch inventory** — table of Batch ID / Variety / GI / Receival date / Intake / Vol@ferm / Current L.
+  2. **85% compliance by label class** — computes per {variety, GI} intake share of the vintage. Class passes (`✓ meets 85% rule`) when share ≥ 85%; otherwise `⚠ blend disclosure` (label must show class breakdown). Handles tonnes → kg normalisation. Blends single-class 100% correctly.
+  3. **One-step-back — grower / supplier records** — pulled from `wine_batches.growerDetails` per batch, with a fallback prompt when missing.
+  4. **One-step-forward — buyer records** — placeholder section (buyer capture is future work; explicit prompt to add via Work Mode → Sales).
+- **Branded header**: winery logo (3s fetch budget, 2MB cap, PNG/JPEG only), brand-colour rule, wineryContact + wineryName in every-page footer.
+- **UI**: `/compliance` page shows both the audit-trail PDF and the new LIP Audit Pack side-by-side with helper copy explaining the difference. Data-testids: `compliance-lip-audit-pack-download`, `compliance-audit-trail-download`.
+- **Input validation**: `?vintage=abc` → HTTP 400; `?vintage=<year with no batches>` → PDF with clean empty-state copy ("No wine batches have been logged for vintage YYYY").
+- **E2E verified iter-24 (testing_agent_v3_fork)**: 7/7 verification points PASS (100% backend, 100% frontend). All 4 seed batches (26SHZ-001 Shiraz Barossa 40.2%, 26GRN-001 Grenache Barossa 26.6%, 26CAB-001 Cabernet Coonawarra 33.1%, 26KIT-001 Kit Wine SA 0.1%) correctly flagged 'blend disclosure' since no single class hits 85% in the mixed vintage. Iter-21 (trial banner) + iter-22 (email capture) + iter-23 (contactName + nurture cron) all regression-verified — no breakage. See `/app/test_reports/iteration_22.json`.
+- **Files touched**: `server/lipAuditPackPdf.ts` (new, ~305 LOC), `server/index.ts` (import + route), `client/src/pages/Compliance.tsx` (second download button + helper copy).
+- **Roadmap follow-ups (not in P0 scope)**: Buyer capture UI (unlocks Section 4), blend-recipe capture (upgrades 85% calc from single-class weighting to true blend weighting — `byClass` Map is already keyed by variety||gi so infrastructure is ready).
+
 ## Service URLs
 - Preview: https://ownership-dev.preview.emergentagent.com
 - DB: Railway MySQL — `reseau.proxy.rlwy.net:34291/railway`
