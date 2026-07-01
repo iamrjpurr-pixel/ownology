@@ -318,13 +318,28 @@ const tutorRouter = router({
           .where(eq(schema.diyKnowledgeChunks.published, true))
           .limit(300);
 
-        // Filter by detected wine type — if 'both', include all
+        // Filter by detected wine type — if 'both', include all. Specialist
+        // MoreWine manuals (SO₂, MLF, yeast, oak, sanitation, bench trials,
+        // pH meter, fining, oxygen) are colour-agnostic and always included.
+        // Sparkling manuals join the pool for sparkling AND white queries
+        // (sparkling base wine = white-wine flow).
+        const SPECIALIST_MANUALS_SET = new Set([
+          "morew_so2_mgmt", "morew_so2_protocol", "morew_mlf_paper",
+          "morew_yeast_pairing", "morew_yeast_hydration", "morew_oxygen_ferment",
+          "morew_inert_gas", "morew_sanitation", "morew_oak_info",
+          "morew_oak_barrel_care", "morew_ph_meter", "morew_bench_trials",
+          "morew_fining_agents",
+        ]);
+        const SPARKLING_SOURCES = new Set([
+          "morew_sparkling_yeast", "morew_sparkling_proelif",
+        ]);
         const scopedChunks = detectedWineType === "both"
           ? allPublishedChunks
           : allPublishedChunks.filter(c =>
               c.wineType === detectedWineType ||
-              c.sourceDoc === "morew_red_outline" && detectedWineType === "red" ||
-              c.sourceDoc === "morew_white_outline" && detectedWineType === "white"
+              (c.sourceDoc && SPECIALIST_MANUALS_SET.has(c.sourceDoc)) ||
+              (c.sourceDoc && SPARKLING_SOURCES.has(c.sourceDoc) && detectedWineType !== "red") ||
+              (c.sourceDoc === "morew_red_outline" && detectedWineType === "red")
             );
 
         // Score each chunk by expanded keyword overlap
@@ -335,8 +350,14 @@ const tutorRouter = router({
             chunk.content.toLowerCase().slice(0, 800),
           ].join(" ");
           const score = questionWords.reduce((acc, word) => acc + (haystack.includes(word) ? 1 : 0), 0);
-          // Boost outline chunks — they are home-scale by design
-          const sourceBoost = (chunk.sourceDoc === "morew_red_outline" || chunk.sourceDoc === "morew_white_outline") ? 0.5 : 0;
+          // Boost home-scale outlines + the MoreWine specialist manuals — they
+          // are the highest-density practical content in the corpus.
+          const src = chunk.sourceDoc ?? "";
+          const sourceBoost =
+            src === "morew_red_outline" ? 0.5 :
+            SPECIALIST_MANUALS_SET.has(src) ? 0.4 :
+            SPARKLING_SOURCES.has(src) ? 0.6 :  // supplier-grade sparkling data
+            0;
           return { ...chunk, score: score + sourceBoost };
         });
 
@@ -351,14 +372,32 @@ const tutorRouter = router({
 
         console.log(`[DIYTutor] Retrieved ${relevantChunks.length} published chunks (top score: ${topChunks[0]?.score ?? 0}) | sources: ${Array.from(new Set<string>(relevantChunks.map(c => c.sourceDoc ?? ''))).join(', ')}`);
 
-        // Step 2: Build document context with source labels
+        // Step 2: Build document context with source labels — every MoreWine
+        // manual gets a proper human name so the LLM can cite it accurately.
+        const DOC_LABELS: Record<string, string> = {
+          red_wine_bible:          "MoreWine! Guide to Red Winemaking",
+          white_wine_bible:        "MoreWine! Guide to White Winemaking",
+          morew_red_outline:       "MoreWine! Red Winemaking Outline (home scale)",
+          morew_sparkling_yeast:   "MoreWine! Sparkling Wine Protocol — Prise de Mousse Yeast Method",
+          morew_sparkling_proelif: "MoreWine! Sparkling Wine Protocol — ProElif Method",
+          morew_so2_mgmt:          "MoreWine! Guide to SO₂ Management",
+          morew_so2_protocol:      "MoreWine! SO₂ Management Protocols",
+          morew_mlf_paper:         "MoreWine! Malolactic Bacteria Information Paper",
+          morew_yeast_pairing:     "MoreWine! Yeast & Grape Pairing Guide",
+          morew_yeast_hydration:   "MoreWine! Wine Yeast Rehydration Guide",
+          morew_oxygen_ferment:    "MoreWine! Macro-Oxygenation & Fermentation (Shea Comfort)",
+          morew_inert_gas:         "MoreWine! Using Inert Gas in Winemaking",
+          morew_sanitation:        "MoreWine! Sanitization in Winemaking",
+          morew_oak_info:          "MoreWine! Oak Information Manual",
+          morew_oak_barrel_care:   "MoreWine! Oak Barrel Care Guide",
+          morew_ph_meter:          "MoreWine! Use & Care of a pH Meter",
+          morew_bench_trials:      "MoreWine! How to Perform Bench Trials",
+          morew_fining_agents:     "MoreWine! Benchmarking of Fining Agents",
+        };
         const docContext = relevantChunks
           .map((chunk) => {
-            let docLabel: string;
-            if (chunk.sourceDoc === "red_wine_bible") docLabel = "Red Wine Bible";
-            else if (chunk.sourceDoc === "morew_red_outline") docLabel = "MoreWine! Red Winemaking Outline (home scale)";
-            else if (chunk.sourceDoc === "white_wine_bible") docLabel = "White Wine Bible";
-            else docLabel = chunk.sourceDoc ?? "Reference Document";
+            const src = chunk.sourceDoc ?? "";
+            const docLabel = DOC_LABELS[src] ?? (src.startsWith("au_regulations__") ? "Australian Wine Regulations" : src.startsWith("oenology_education__") ? "Oenology Curriculum Reference" : src || "Reference Document");
             return `## ${docLabel} — ${chunk.chapterTitle ?? `Chapter ${chunk.chapterRef}`}\n${chunk.content.slice(0, 2000)}`;
           })
           .join("\n\n---\n\n");
