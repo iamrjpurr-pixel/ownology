@@ -90,9 +90,11 @@ export const referralsRouter = router({
       const referrer = await db.query.wineries.findFirst({
         where: eq(schema.wineries.referralCode, input.code),
       });
-      if (!referrer) return { ok: false, reason: "unknown-code" };
+      if (!referrer) return { ok: false, reason: "unknown-code" as const };
       // Dedupe: don't record duplicate pending rows for the same code+email
-      // (or same code with null email) within a 5-minute window.
+      // (or same code with null email) within a 5-minute window. When an
+      // email arrives later for a previously-anonymous click from this
+      // session, we UPDATE the existing null-email row instead of inserting.
       const recentCutoff = Date.now() - 5 * 60_000;
       const existing = await db.select().from(schema.referrals).where(
         and(
@@ -100,11 +102,24 @@ export const referralsRouter = router({
           eq(schema.referrals.status, "pending"),
         )
       ).limit(20);
+
+      // If we have an email and there's a recent anonymous row for this code,
+      // enrich it rather than creating a duplicate lead.
+      if (input.email) {
+        const anon = existing.find((r) => r.referredEmail === null && r.createdAt >= recentCutoff);
+        if (anon) {
+          await db.update(schema.referrals)
+            .set({ referredEmail: input.email })
+            .where(eq(schema.referrals.id, anon.id));
+          return { ok: true as const, referrerName: referrer.name, enriched: true };
+        }
+      }
+
       const dup = existing.find((r) =>
         (r.referredEmail ?? null) === (input.email ?? null) &&
         r.createdAt >= recentCutoff
       );
-      if (dup) return { ok: true, dedupe: true };
+      if (dup) return { ok: true as const, referrerName: referrer.name, dedupe: true };
       await db.insert(schema.referrals).values({
         referrerWineryId: referrer.id,
         referralCode: input.code,
@@ -113,6 +128,6 @@ export const referralsRouter = router({
         rewardDaysGranted: 0,
         createdAt: Date.now(),
       });
-      return { ok: true };
+      return { ok: true as const, referrerName: referrer.name };
     }),
 });

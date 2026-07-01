@@ -568,15 +568,16 @@ have been folded in or marked complete.)
 - Repo: https://github.com/iamrjpurr-pixel/ownology
 
 
-## Trial + Referral engine (Feb 2026 — iter 21) ✅
+## Trial + Referral engine (Feb 2026 — iter 21 + iter 22) ✅
 - **14-day trial nudge**: `TrialBanner.tsx` renders when `winery.plan==='free' AND trialDaysLeft ≤ 3`. Uses `position:fixed; top:0; z-index:60` so it sits above every marketing / work-mode header. On mount it toggles `html.ow-has-trial-banner` and sets `--ow-trial-banner-h:50px`; global CSS in `client/src/index.css` shifts every `nav.fixed.top-0`, `header.fixed.top-0`, `.sticky.top-0`, and `WorkModeLayout` header down by that variable — no per-page work needed for future marketing pages.
 - **Suppressed routes**: `/hi/`, `/audit/`, `/founding-member/success`, `/merch/success`, `/join` (conversion / kiosk surfaces stay clean).
 - **Dismiss**: per-session via `sessionStorage.ow-trial-banner-dismissed`.
 - **`/trial-ending`**: conversion page. Shows days-left, live counts (briefs / winery name / region / plan), "what you'd lose" list, upgrade CTA → `/pricing?from=trial-ending`, founding-member CTA, and a referral nudge card pointing to `/invite`.
 - **`/invite`**: `referrals.myCode` returns the per-winery code + `sharePath=/join?ref=CODE` + `rewardDaysPerConvert=30`. UI shows Copy link / Copy SMS buttons (2s '✓ Copied' toggle), 4 stat boxes (Clicked / Signed up / Paid / Days earned), and recent-activity list.
-- **`/join?ref=CODE`**: public landing. On mount fires `referrals.trackClick` — logs a `referrals` row (pending). Dedupes same-code+email within 5 min. Invalid codes show a graceful "invite code isn't recognised" message but still allow 14-day trial signup.
-- **Backend**: `server/routers/referrals.ts` (117 LOC — myCode / myList / trackClick), `server/routers/winery.ts::current` returns `trialEndsAt / trialDaysLeft / trialIsExpired / trialBannerVisible / referralCode`. DB adds `wineries.trial_ends_at BIGINT`, `wineries.trial_credits_days INT`, `wineries.referral_code VARCHAR(16) UNIQUE`, and new `referrals` table.
+- **`/join?ref=CODE` (enhanced iter-22)**: public landing. On mount fires `referrals.trackClick` which now returns `referrerName` — headline becomes "REDSTONE RIDGE WINES INVITED YOU TO OWNOLOGY" (personalized warm intro). Below the CTA sits an **email-capture form** ("Not ready yet? Drop your email — we'll send one short walkthrough of what {referrer} finds useful and won't bug you again"). Submitting fires `trackClick({code, email})` which **enriches** the recent anonymous row in place instead of duplicating (anon → emailed within 5-min window). Every SEO/referral click now becomes a warm lead attributable to the winemaker who shared. Invalid codes still show a graceful "invite code isn't recognised" fallback.
+- **Backend**: `server/routers/referrals.ts` (~130 LOC — myCode / myList / trackClick with enrichment path), `server/routers/winery.ts::current` returns `trialEndsAt / trialDaysLeft / trialIsExpired / trialBannerVisible / referralCode`. DB adds `wineries.trial_ends_at BIGINT`, `wineries.trial_credits_days INT`, `wineries.referral_code VARCHAR(16) UNIQUE`, and new `referrals` table.
 - **E2E verified iter-21**: 9/9 review points, 4/4 backend endpoints, banner overlap fix confirmed (nav.fixed.top-0 now at computed top:50px when banner present), trackClick increments invite-list pending count 2→3.
+- **E2E verified iter-22 (self-tested)**: trackClick returns `referrerName` in payload; /join renders "REDSTONE RIDGE WINES INVITED YOU TO OWNOLOGY" headline; email submission shows "✓ Got it. We'll be in touch — and Redstone Ridge Wines will see the intro."; DB row enriched with prospect email visible in `referrals.myList`.
 
 ## Service URLs
 - Preview: https://ownership-dev.preview.emergentagent.com
