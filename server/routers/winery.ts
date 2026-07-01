@@ -33,6 +33,16 @@ const wineryRouter = router({
       where: eq(schema.wineries.id, dbUser.wineryId),
     });
     if (!w) return null;
+    // Compute trial state for the UI. trialEndsAt is created_at + 14 days
+    // (+ any credits earned via referrals). The banner shows when daysLeft
+    // ≤ 3 AND plan is still on the free tier.
+    const trialEndsAt = (w as unknown as { trialEndsAt: number | null }).trialEndsAt;
+    const creditsDays = (w as unknown as { trialCreditsDays: number | null }).trialCreditsDays ?? 0;
+    const referralCode = (w as unknown as { referralCode: string | null }).referralCode ?? null;
+    const effectiveEndsAt = trialEndsAt ? trialEndsAt + creditsDays * 86400000 : null;
+    const msLeft = effectiveEndsAt ? effectiveEndsAt - Date.now() : null;
+    const daysLeft = msLeft !== null ? Math.ceil(msLeft / 86400000) : null;
+    const isOnFreeTier = w.plan === "free";
     return {
       id: w.id,
       name: w.name,
@@ -43,6 +53,14 @@ const wineryRouter = router({
       logoUrl: w.logoUrl ?? null,
       publicAuditEnabled: !!w.publicAuditEnabled,
       isOwner: w.ownerUserId === dbUser.id,
+      // Trial state
+      trialEndsAt: effectiveEndsAt,
+      trialCreditsDays: creditsDays,
+      trialDaysLeft: daysLeft,
+      trialIsExpired: isOnFreeTier && msLeft !== null && msLeft <= 0,
+      trialBannerVisible: isOnFreeTier && daysLeft !== null && daysLeft <= 3,
+      // Referral
+      referralCode,
     };
   }),
 

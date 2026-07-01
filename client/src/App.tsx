@@ -25,6 +25,10 @@ import CellarTasks from "./pages/CellarTasks";
 import Today from "./pages/Today";
 import Pricing from "./pages/Pricing";
 import CellarBrief from "./pages/CellarBrief";
+import TrialEnding from "./pages/TrialEnding";
+import Invite from "./pages/Invite";
+import Join from "./pages/Join";
+import { TrialBanner } from "./components/TrialBanner";
 import WorkModeLayout from "@/components/WorkModeLayout";
 import PwaInstallBanner from "./components/PwaInstallBanner";
 
@@ -176,6 +180,20 @@ function CellarBriefPage() {
     </WorkModeLayout>
   );
 }
+function TrialEndingPage() {
+  return (
+    <WorkModeLayout title="Your trial" activeTab="more">
+      <TrialEnding />
+    </WorkModeLayout>
+  );
+}
+function InvitePage() {
+  return (
+    <WorkModeLayout title="Invite a winemaker" activeTab="more">
+      <Invite />
+    </WorkModeLayout>
+  );
+}
 function KnowledgePage() {
   return (
     <WorkModeLayout title="Knowledge" wide>
@@ -221,6 +239,7 @@ function Router() {
   // We only redirect on the root path so deep-links are not interrupted.
   return (
     <>
+    <TrialBanner />
     <ThemeOnboarding />
     <CrushCascade />
     <Suspense fallback={<PageLoading />}>
@@ -275,6 +294,9 @@ function Router() {
       <Route path={"/import"} component={ImportPage} />
       <Route path={"/today"} component={TodayPage} />
       <Route path={"/cellar-brief"} component={CellarBriefPage} />
+      <Route path={"/trial-ending"} component={TrialEndingPage} />
+      <Route path={"/invite"} component={InvitePage} />
+      <Route path={"/join"} component={Join} />
       <Route path={"/demo"} component={Demo} />
       <Route path={"/waitlist"} component={Waitlist} />
       <Route path={"/reference/vine"} component={VineReference} />
@@ -352,3 +374,4 @@ function App() {
 }
 
 export default App;
+;

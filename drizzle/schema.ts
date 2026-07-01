@@ -1248,6 +1248,13 @@ export const wineries = mysqlTable(
     // Opt-in publication of /audit/<slug> public-facing audit page. Default
     // false — no operational data leaves the winery without explicit consent.
     publicAuditEnabled: boolean("public_audit_enabled").notNull().default(false),
+    // Trial end timestamp (ms). Backfilled as created_at + 14 days by the
+    // migration; extended by trial_credits_days when referrals convert.
+    trialEndsAt: bigint("trial_ends_at", { mode: "number" }),
+    trialCreditsDays: int("trial_credits_days").notNull().default(0),
+    // Unique per-winery invite code (shape: SLUGPREFIX-XXXXXX). Referrals
+    // land as `/hi/:slug?ref=<code>` — click captured, sign-up attributed.
+    referralCode: varchar("referral_code", { length: 16 }),
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
   },
   (t) => [
@@ -1347,5 +1354,32 @@ export const cellarBriefs = mysqlTable(
     index("cb_winery_idx").on(t.wineryId),
     index("cb_generated_at_idx").on(t.generatedAt),
     index("cb_winery_generated_idx").on(t.wineryId, t.generatedAt),
+  ]
+);
+
+/**
+ * referrals — invite-a-winemaker growth loop.
+ * Every winery has a unique referral_code; sharing /join?ref=CODE creates a
+ * pending row; when the referred user signs up + converts to paid, referrer
+ * earns 30 days trial credit.
+ */
+export const referrals = mysqlTable(
+  "referrals",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    referrerWineryId: int("referrer_winery_id").notNull(),
+    referralCode: varchar("referral_code", { length: 16 }).notNull(),
+    referredEmail: varchar("referred_email", { length: 255 }),
+    referredWineryId: int("referred_winery_id"),
+    status: mysqlEnum("status", ["pending", "signed_up", "converted"]).notNull().default("pending"),
+    rewardDaysGranted: int("reward_days_granted").notNull().default(0),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    signedUpAt: bigint("signed_up_at", { mode: "number" }),
+    convertedAt: bigint("converted_at", { mode: "number" }),
+  },
+  (t) => [
+    index("ref_referrer_idx").on(t.referrerWineryId),
+    index("ref_code_idx").on(t.referralCode),
+    index("ref_referred_idx").on(t.referredWineryId),
   ]
 );
