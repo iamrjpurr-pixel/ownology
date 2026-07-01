@@ -139,29 +139,29 @@ export default function OwnologyLogo({
         top: cardPos.top,
         left: cardPos.left,
         width: 268,
-        background: "oklch(0.13 0.010 60)",
-        border: "1px solid oklch(0.72 0.12 75 / 35%)",
+        background: "var(--ow-bg-card)",
+        border: "1px solid var(--ow-border-md)",
         padding: "0.9rem 1rem 0.8rem",
         pointerEvents: "none",
         opacity: 1,
         zIndex: 99999,
-        boxShadow: "0 16px 48px oklch(0 0 0 / 70%)",
+        boxShadow: "0 16px 48px var(--ow-bg-overlay)",
         fontFamily: "'Lato', sans-serif",
-        color: "oklch(0.70 0.015 75)",
+        color: "var(--ow-text-mid)",
         borderRadius: "2px",
       }}
       role="tooltip"
     >
-      <p style={{ fontSize: "0.52rem", letterSpacing: "0.14em", textTransform: "uppercase", color: AMBER, marginBottom: "0.4rem", opacity: 0.85 }}>
+      <p style={{ fontSize: "0.52rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ow-amber)", marginBottom: "0.4rem", opacity: 0.85 }}>
         Design Theory
       </p>
-      <p style={{ fontFamily: "'Fraunces', serif", fontSize: "0.88rem", fontWeight: 600, color: "oklch(0.95 0.018 75)", marginBottom: "0.4rem", lineHeight: 1.3 }}>
+      <p style={{ fontFamily: "'Fraunces', serif", fontSize: "0.88rem", fontWeight: 600, color: "var(--ow-text-hi)", marginBottom: "0.4rem", lineHeight: 1.3 }}>
         The Living Trinity
       </p>
       <p style={{ fontSize: "0.7rem", lineHeight: 1.65, marginBottom: "0.55rem" }}>
         Three arcs. One vine. A hidden eye.
       </p>
-      <div style={{ borderTop: "1px solid oklch(1 0 0 / 7%)", margin: "0.5rem 0" }} />
+      <div style={{ borderTop: "1px solid var(--ow-border)", margin: "0.5rem 0" }} />
       {[
         ["Three arcs", "Vine · Cellar · Knowledge. The three acts of every vintage."],
         ["The vine tendril", "Craft is organic, not mechanical. It grows with every vintage."],
@@ -169,14 +169,14 @@ export default function OwnologyLogo({
         ["I.A.", "Not AI. The intelligence is the winemaker's. Ownology holds it."],
       ].map(([label, desc]) => (
         <div key={label} style={{ display: "flex", gap: "0.4rem", alignItems: "flex-start", marginBottom: "0.35rem" }}>
-          <div style={{ width: 4, height: 4, borderRadius: "50%", background: AMBER, flexShrink: 0, marginTop: "0.38rem", opacity: 0.7 }} />
+          <div style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--ow-amber)", flexShrink: 0, marginTop: "0.38rem", opacity: 0.7 }} />
           <p style={{ fontSize: "0.68rem", lineHeight: 1.55, margin: 0 }}>
-            <span style={{ color: AMBER }}>{label}</span> — {desc}
+            <span style={{ color: "var(--ow-amber)" }}>{label}</span> — {desc}
           </p>
         </div>
       ))}
-      <div style={{ borderTop: "1px solid oklch(1 0 0 / 7%)", margin: "0.55rem 0 0.4rem" }} />
-      <p style={{ fontSize: "0.62rem", opacity: 0.5, fontStyle: "italic", lineHeight: 1.55, margin: 0 }}>
+      <div style={{ borderTop: "1px solid var(--ow-border)", margin: "0.55rem 0 0.4rem" }} />
+      <p style={{ fontSize: "0.62rem", opacity: 0.7, fontStyle: "italic", lineHeight: 1.55, margin: 0, color: "var(--ow-text-lo)" }}>
         The best brand marks reward the curious. We never announce the owl. We let the right people find it.
       </p>
     </div>,
