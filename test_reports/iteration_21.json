@@ -1,0 +1,36 @@
+{
+  "summary": "Iter-21 E2E validation of the 14-day trial conversion flow + Referral 'invite a winemaker' loop. All 9 verification points from the review request PASS end-to-end (backend tRPC v11 + frontend Playwright on real preview URL). TrialBanner overlap fix confirmed working: banner renders at position:fixed top:0 z-index:60 (y=0, h=50), and the marketing nav.fixed.top-0.z-50 on /home is now offset via `html.ow-has-trial-banner` + `--ow-trial-banner-h:50px` so it sits at y=50 (top:50px computed) — banner and nav are stacked, not overlapping. Backend proofs: (a) winery.current returns {plan:'free', trialDaysLeft:3, trialIsExpired:false, trialBannerVisible:true, referralCode:'REDSTO-D671EF'}; (b) referrals.myCode returns {code:'REDSTO-D671EF', sharePath:'/join?ref=REDSTO-D671EF', rewardDaysPerConvert:30}; (c) referrals.myList returned an array (started with 2 rows, incremented to 3 after /join?ref flow); (d) referrals.trackClick with valid code → {ok:true, dedupe:true}, with invalid code → {ok:false, reason:'unknown-code'}. Frontend proofs: (1) [data-testid='trial-banner'] visible at y=0 h=50 on /home, /free-run, /cellar-brief, /invite, /trial-ending with label '⏳ 3 days left on your free trial' and CTA href=/trial-ending; (2) banner correctly SUPPRESSED on /join, /join?ref=..., /hi/redstone-ridge, /founding-member/success, /merch/success; (3) dismiss via [data-testid='trial-banner-dismiss'] hides banner immediately, sessionStorage.ow-trial-banner-dismissed='1', persists across nav to /cellar-brief; (4) /invite renders code REDSTO-D671EF, full link https://ownership-dev.preview.emergentagent.com/join?ref=REDSTO-D671EF, all 4 stat boxes (stat-pending/signed-up/converted/earned), invite-list, and Copy link + Copy SMS buttons toggle to '✓ Copied' and revert after 2s (with clipboard-write perm granted); (5) /trial-ending heading='3 days left on your trial', trial-ending-stats shows briefs(0)/name(Redstone Ridge Wines)/region(Hunter Valley, NSW)/plan(free), upgrade-cta href=/pricing?from=trial-ending, referral-nudge visible with invite-link href=/invite; (6) /join?ref=REDSTO-D671EF renders join-page with '30 days on top of the 14-day free trial' message, join-cta href=/pricing?from=join, and fires trackClick tRPC mutation (verified: invite-list rows went from 2→3, stat-pending='3'); (7) /join?ref=BOGUS-XX9999 shows graceful 'That invite code isn't recognised' message.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_21.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "TrialBanner overlap fix is correctly implemented: position:fixed z-60 + `html.ow-has-trial-banner` class + `--ow-trial-banner-h:50px` CSS var, with global CSS pushing all nav.fixed.top-0 down by that variable. Verified live on /home — MarketingNav (`fixed top-0 left-0 right-0 z-50 backdrop-blur-md ...`) resolves to computed `top:50px` when banner is present.",
+    "SUPPRESSED_PREFIXES array (`['/hi/','/audit/','/founding-member/success','/merch/success','/join']`) correctly suppresses banner on all conversion / kiosk / public surfaces including /join?ref=... (startsWith match).",
+    "Dismiss cleanup useEffect returns a cleanup that removes `ow-has-trial-banner` class and resets the CSS var — good hygiene when TrialBanner unmounts.",
+    "referrals.trackClick correctly dedupes repeated clicks from same session (returns {ok:true, dedupe:true}) — this is why re-hitting /join?ref=REDSTO-D671EF within the same browser context only bumps the pending count once. Confirmed via invite-list count increment 2→3 on first click from a fresh browser context.",
+    "Nit (carry-over from iter-16, not in scope for iter-21): cellarBrief.history pagination via beforeGeneratedAt cursor still has the duplicate wineryId AND clause instead of lt(generatedAt, cursor). Not exercised on /trial-ending since only limit:100 is used.",
+    "Minor React hydration warning on /founding-member/success: `<a>` cannot be a descendant of `<a>` — a nested anchor inside a Link. Not blocking, but worth cleaning up.",
+    "Backend threw sporadic HTTP 429 rate-limit responses when 5+ pages were loaded back-to-back in the same session (visible in console). Not a blocker for real users but testing agents should throttle."
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100% (4/4 tRPC endpoints: winery.current, referrals.myCode, referrals.myList, referrals.trackClick valid + invalid)",
+    "frontend": "100% (9/9 review-request verification points: banner visibility on 5 routes, banner suppression on 5 routes, dismiss+persist, nav offset, /invite page + copy toggle + stats, /trial-ending page + upgrade + referral nudge, /join?ref=CODE tracked and pending count incremented, /join with invalid ref graceful message)"
+  },
+  "test_credentials": "Dev bypass ON (ENABLE_DEV_BYPASS treated as true in non-prod). Auto-authenticated as seed admin owner (winery 'Redstone Ridge Wines', winery_id=1, referralCode REDSTO-D671EF). No manual login required.",
+  "seed_data_creation": "None. Consumed existing seed winery + 2 pre-existing referrals rows. trackClick added 1 new row during test (invite-list 2→3, stat-pending 2→3). No cleanup needed — invite-list is capped to 10 in UI and dedupes on repeat clicks.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "iter-21 validated the TrialBanner overlap fix (previous main-agent screenshots were timing out because the banner was hidden behind marketing pages' fixed nav). The fix converts banner to position:fixed z-60 and toggles `html.ow-has-trial-banner` + `--ow-trial-banner-h:50px` CSS var on mount; global CSS pushes all `nav.fixed.top-0` and `header.sticky.top-0` down by that var. Confirmed working end-to-end. If future iterations add new marketing pages with a `fixed top-0` header, they will automatically inherit the offset from the global CSS rule in /app/client/src/index.css — no per-page work needed. When testing copy-to-clipboard, remember to call `page.context.grant_permissions(['clipboard-read','clipboard-write'], origin=BASE_URL)` — Playwright doesn't grant it by default and navigator.clipboard.writeText() will silently reject, making the '✓ Copied' toggle appear broken. trackClick dedupes per session/user, so re-hitting /join?ref within the same browser context won't add another pending row — spin up a fresh context or use a different ref code to test increment. Stripe checkout is still stubbed (sk_test_stub) — /pricing?from=trial-ending and /pricing?from=join links were verified as hrefs only, not clicked through.",
+  "rca of the issue": "No bugs found. Root cause of previous iteration's UI hang (banner+testids not findable) was correctly identified as z-index/position stacking: marketing pages had nav.fixed.top-0.z-50 covering the sticky z-40 banner visually. Main-agent fix (banner → position:fixed z-60 + html class-based CSS var offset for all fixed/sticky top-0 nav elements) is correctly applied and verified live. All 9 spec verification points pass."
+}

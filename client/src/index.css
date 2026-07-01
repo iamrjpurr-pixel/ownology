@@ -621,3 +621,24 @@ html.theme-white-crush strong { font-weight: 700; }
     color: #666;
   }
 }
+
+/* ── Trial Banner offset ─────────────────────────────────────────────────
+   When TrialBanner mounts and is visible it adds `.ow-has-trial-banner`
+   to <html> and sets `--ow-trial-banner-h` (50px). We use that to push
+   every page's fixed top-0 marketing nav down so the banner sits above
+   without overlap. Body gets top-padding so non-fixed content flows below.
+   Static/relative content is unaffected when the class is absent. */
+html.ow-has-trial-banner body {
+  padding-top: var(--ow-trial-banner-h, 0px);
+}
+html.ow-has-trial-banner nav.fixed.top-0,
+html.ow-has-trial-banner nav.fixed[class*="top-0"],
+html.ow-has-trial-banner header.fixed.top-0,
+html.ow-has-trial-banner header.fixed[class*="top-0"] {
+  top: var(--ow-trial-banner-h, 0px) !important;
+}
+/* Sticky top-0 shells (Blog, Regulations, WorkModeLayout header, etc) */
+html.ow-has-trial-banner .sticky.top-0,
+html.ow-has-trial-banner [class*="sticky"][class*="top-0"] {
+  top: var(--ow-trial-banner-h, 0px) !important;
+}

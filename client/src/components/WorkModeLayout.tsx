@@ -156,7 +156,7 @@ export default function WorkModeLayout({
             borderBottom: "1px solid #E8EAED",
             background: "#FFFFFF",
             position: "sticky",
-            top: 0,
+            top: "var(--ow-trial-banner-h, 0px)",
             zIndex: 50,
           }}
         >

@@ -17,6 +17,7 @@ import { trpc } from "../lib/trpc";
 
 const SUPPRESSED_PREFIXES = ["/hi/", "/audit/", "/founding-member/success", "/merch/success", "/join"];
 const DISMISS_KEY = "ow-trial-banner-dismissed";
+const BANNER_H_PX = 50;
 
 export function TrialBanner() {
   const [location] = useLocation();
@@ -32,10 +33,30 @@ export function TrialBanner() {
     }
   }, []);
 
-  if (!data) return null;
-  if (!data.trialBannerVisible) return null;
-  if (dismissed) return null;
-  if (SUPPRESSED_PREFIXES.some((p) => location.startsWith(p))) return null;
+  // Compute visibility upfront so the effect below can toggle the
+  // `ow-has-trial-banner` class on <html> whenever it changes. That class
+  // is what pushes every `nav.fixed.top-0` on marketing pages down by
+  // BANNER_H_PX so they don't overlap the banner (see index.css).
+  const suppressed = SUPPRESSED_PREFIXES.some((p) => location.startsWith(p));
+  const visible = !!data && !!data.trialBannerVisible && !dismissed && !suppressed;
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const root = document.documentElement;
+    if (visible) {
+      root.classList.add("ow-has-trial-banner");
+      root.style.setProperty("--ow-trial-banner-h", `${BANNER_H_PX}px`);
+    } else {
+      root.classList.remove("ow-has-trial-banner");
+      root.style.setProperty("--ow-trial-banner-h", "0px");
+    }
+    return () => {
+      root.classList.remove("ow-has-trial-banner");
+      root.style.setProperty("--ow-trial-banner-h", "0px");
+    };
+  }, [visible]);
+
+  if (!visible || !data) return null;
 
   const daysLeft = data.trialDaysLeft ?? 0;
   const isExpired = data.trialIsExpired;
@@ -54,9 +75,12 @@ export function TrialBanner() {
     <div
       data-testid="trial-banner"
       style={{
-        position: "sticky",
+        position: "fixed",
         top: 0,
-        zIndex: 40,
+        left: 0,
+        right: 0,
+        height: `${BANNER_H_PX}px`,
+        zIndex: 60,
         background: isExpired ? "oklch(0.62 0.20 25)" : "var(--ow-amber)",
         color: isExpired ? "white" : "oklch(0.10 0.008 60)",
         padding: "0.6rem 1rem",
