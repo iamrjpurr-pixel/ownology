@@ -161,6 +161,11 @@ export default function HiContact() {
           ))}
         </ul>
 
+        {/* Topical journal snippet — surfaces 1 recently-asked question from
+            the public journal as instant social proof. Stable per-contact via
+            slug hash so the same visitor sees the same question on refresh. */}
+        <TopicalJournalCard slug={contact.slug} />
+
         {/* Primary CTA — A/B variant chosen server-side per slug. */}
         {ctaVariant === "reply" && smsReplyHref ? (
           <a
@@ -230,17 +235,85 @@ export default function HiContact() {
   );
 }
 
+/**
+ * TopicalJournalCard — surfaces 1 recently-asked question from the public
+ * /cellar-journal as instant social proof + a soft trust signal for cold
+ * SMS prospects. The choice is deterministic per contact slug so the
+ * same visitor sees the same card across refreshes (avoids the "it changed
+ * between taps" surprise) while different prospects see variety.
+ */
+function TopicalJournalCard({ slug }: { slug: string }) {
+  const { data } = trpc.cellarJournal.list.useQuery({ limit: 24 }, { retry: false });
+  const rows = data?.rows ?? [];
+  if (rows.length === 0) return null;
+  // Deterministic pick — same contact always sees the same journal entry.
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) hash = (hash * 31 + slug.charCodeAt(i)) | 0;
+  const pick = rows[Math.abs(hash) % rows.length];
+  return (
+    <div
+      data-testid="hi-journal-card"
+      style={{
+        marginTop: "2rem",
+        padding: "1rem 1.1rem",
+        background: "rgba(180, 83, 9, 0.05)",
+        border: "1px dashed rgba(180, 83, 9, 0.35)",
+        borderRadius: 8,
+      }}
+    >
+      <p
+        style={{
+          fontFamily: "'Lato',sans-serif",
+          fontSize: "0.7rem",
+          textTransform: "uppercase",
+          letterSpacing: "0.1em",
+          color: "#78350f",
+          margin: 0,
+          fontWeight: 700,
+        }}
+      >
+        ✦ Recently asked in the journal
+      </p>
+      <p
+        data-testid="hi-journal-q"
+        style={{
+          fontFamily: "'Fraunces',serif",
+          fontSize: "1.02rem",
+          lineHeight: 1.35,
+          color: "#111827",
+          margin: "0.5rem 0 0.7rem 0",
+        }}
+      >
+        {pick.question}
+      </p>
+      <Link
+        href={`/cellar-journal/${pick.slug}?from=hi-${slug}`}
+        data-testid="hi-journal-readmore"
+        style={{
+          fontFamily: "'Lato',sans-serif",
+          fontSize: "0.82rem",
+          color: "#b45309",
+          fontWeight: 600,
+          textDecoration: "none",
+        }}
+      >
+        Read the answer →
+      </Link>
+    </div>
+  );
+}
+
+const inner: React.CSSProperties = {
+  width: "100%",
+  maxWidth: 540,
+  padding: "2.5rem 1.5rem 4rem",
+};
 const wrap: React.CSSProperties = {
   minHeight: "100dvh",
   background: "#FAFAF9",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-};
-const inner: React.CSSProperties = {
-  width: "100%",
-  maxWidth: 540,
-  padding: "2.5rem 1.5rem 4rem",
 };
 const loading: React.CSSProperties = {
   minHeight: "100dvh",

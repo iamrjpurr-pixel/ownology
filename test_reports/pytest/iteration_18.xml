@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="8" time="132.078" timestamp="2026-07-01T00:09:55.729070+00:00" hostname="agent-env-41e1256d-ed24-4a28-af90-ca00320ef25a"><testcase classname="backend.tests.test_iter18_coherence.TestCellarJournalList" name="test_total_at_least_250" time="0.693" /><testcase classname="backend.tests.test_iter18_coherence.TestCellarJournalList" name="test_row_shape_has_core_fields" time="0.564" /><testcase classname="backend.tests.test_iter18_coherence.TestCellarJournalList" name="test_ghost_seed_source_via_pagination" time="55.950" /><testcase classname="backend.tests.test_iter18_coherence.TestGetBySlug" name="test_returns_full_entry_with_citations" time="0.589" /><testcase classname="backend.tests.test_iter18_coherence.TestGetBySlug" name="test_missing_slug_returns_null" time="0.437" /><testcase classname="backend.tests.test_iter18_coherence.TestSitemapRss" name="test_sitemap_xml" time="0.300" /><testcase classname="backend.tests.test_iter18_coherence.TestSitemapRss" name="test_rss_valid" time="20.020"><failure message="requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='ownership-dev.preview.emergentagent.com', port=443): Max retries exceeded with url: /api/cellar-journal/rss.xml (Caused by ConnectTimeoutError(&lt;HTTPSConnection(host='ownership-dev.preview.emergentagent.com', port=443) at 0xf8409effad50&gt;, 'Connection to ownership-dev.preview.emergentagent.com timed out. (connect timeout=10)'))">/root/.venv/lib/python3.11/site-packages/urllib3/connection.py:204: in _new_conn
+    sock = connection.create_connection(
+/root/.venv/lib/python3.11/site-packages/urllib3/util/connection.py:85: in create_connection
+    raise err
+/root/.venv/lib/python3.11/site-packages/urllib3/util/connection.py:73: in create_connection
+    sock.connect(sa)
+E   TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:788: in urlopen
+    response = self._make_request(
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:488: in _make_request
+    raise new_e
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:464: in _make_request
+    self._validate_conn(conn)
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:1106: in _validate_conn
+    conn.connect()
+/root/.venv/lib/python3.11/site-packages/urllib3/connection.py:759: in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/urllib3/connection.py:213: in _new_conn
+    raise ConnectTimeoutError(
+E   urllib3.exceptions.ConnectTimeoutError: (&lt;HTTPSConnection(host='ownership-dev.preview.emergentagent.com', port=443) at 0xf8409effad50&gt;, 'Connection to ownership-dev.preview.emergentagent.com timed out. (connect timeout=10)')
+
+The above exception was the direct cause of the following exception:
+/root/.venv/lib/python3.11/site-packages/requests/adapters.py:696: in send
+    resp = conn.urlopen(
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:842: in urlopen
+    retries = retries.increment(
+/root/.venv/lib/python3.11/site-packages/urllib3/util/retry.py:543: in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='ownership-dev.preview.emergentagent.com', port=443): Max retries exceeded with url: /api/cellar-journal/rss.xml (Caused by ConnectTimeoutError(&lt;HTTPSConnection(host='ownership-dev.preview.emergentagent.com', port=443) at 0xf8409effad50&gt;, 'Connection to ownership-dev.preview.emergentagent.com timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+backend/tests/test_iter18_coherence.py:111: in test_rss_valid
+    r = requests.get(f"{BASE}/api/cellar-journal/rss.xml", timeout=10)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/api.py:87: in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/api.py:71: in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:651: in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:784: in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/adapters.py:717: in send
+    raise ConnectTimeout(e, request=request)
+E   requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='ownership-dev.preview.emergentagent.com', port=443): Max retries exceeded with url: /api/cellar-journal/rss.xml (Caused by ConnectTimeoutError(&lt;HTTPSConnection(host='ownership-dev.preview.emergentagent.com', port=443) at 0xf8409effad50&gt;, 'Connection to ownership-dev.preview.emergentagent.com timed out. (connect timeout=10)'))</failure></testcase><testcase classname="backend.tests.test_iter18_coherence.TestBriefJournalDeepLink" name="test_every_ghost_question_has_valid_journal_slug" time="53.374" /></testsuite></testsuites>

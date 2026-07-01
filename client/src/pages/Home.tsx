@@ -641,6 +641,34 @@ function Hero() {
             >
               ✦ Preview harvest mode →
             </button>
+            {/* Cellar Journal library link — soft entry point for organic
+                visitors + SEO-curious winemakers. Feeds them into the 250+
+                Q&A library which then cross-links back into /pricing. */}
+            <div className="mt-3 fade-up fade-up-delay-3">
+              <Link
+                href="/cellar-journal?from=homepage-hero"
+                data-testid="hero-journal-link"
+                style={{
+                  fontFamily: "'Lato', sans-serif",
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.04em",
+                  color: "var(--ow-text-lo)",
+                  textDecoration: "none",
+                  opacity: 0.85,
+                  transition: "color 180ms ease, opacity 180ms ease",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.color = "var(--ow-amber)";
+                  (e.currentTarget as HTMLAnchorElement).style.opacity = "1";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.color = "var(--ow-text-lo)";
+                  (e.currentTarget as HTMLAnchorElement).style.opacity = "0.85";
+                }}
+              >
+                📚 Or browse 250+ winemaking Q&amp;As in the Cellar Journal →
+              </Link>
+            </div>
             {/* Trust bar */}
             <div className="mt-12 flex items-center gap-4 fade-up fade-up-delay-4">
               <div className="amber-rule flex-1 hidden sm:block" />
@@ -1508,46 +1536,138 @@ function CTA() {
 
 // ─── Footer ───────────────────────────────────────────────────────────────────
 function Footer() {
+  // Column-based structure prevents the horizontal-scroll mess of the
+  // previous 10-link row. Each link group has a clear purpose; the
+  // "learn" column surfaces the Cellar Journal prominently.
+  const footerLinkStyle: React.CSSProperties = {
+    fontFamily: "'Lato',sans-serif",
+    fontSize: "0.8125rem",
+    color: "var(--ow-text-lo)",
+    textDecoration: "none",
+    display: "block",
+    padding: "0.15rem 0",
+    transition: "color 180ms ease",
+  };
+  const hover = (e: React.MouseEvent<HTMLAnchorElement>) =>
+    (e.currentTarget.style.color = "var(--ow-amber)");
+  const unhover = (e: React.MouseEvent<HTMLAnchorElement>) =>
+    (e.currentTarget.style.color = "var(--ow-text-lo)");
+
+  const columns: Array<{ heading: string; links: Array<{ label: string; href: string; testid?: string }> }> = [
+    {
+      heading: "Product",
+      links: [
+        { label: "Pricing", href: "/pricing" },
+        { label: "Cellar Brief", href: "/cellar-brief", testid: "footer-cellar-brief" },
+        { label: "Ask Ownology", href: "/free-run" },
+        { label: "Sample vintage log", href: "/sample-vintage-log" },
+        { label: "Merch", href: "/merch" },
+      ],
+    },
+    {
+      heading: "Library",
+      links: [
+        { label: "Cellar Journal", href: "/cellar-journal", testid: "footer-cellar-journal" },
+        { label: "Knowledge base", href: "/knowledge" },
+        { label: "Regulations", href: "/regulations" },
+        { label: "Compliance", href: "/compliance" },
+        { label: "Blog", href: "/blog" },
+      ],
+    },
+    {
+      heading: "For",
+      links: [
+        { label: "Home winemakers", href: "/for-home-winemakers" },
+        { label: "InnoVint users", href: "/for-innovint-users" },
+        { label: "Vintrace users", href: "/for-vintrace-users" },
+        { label: "Why Ownology", href: "/why-ownology" },
+      ],
+    },
+  ];
+
   return (
-    <footer className="py-12" style={{borderTop:"1px solid var(--ow-border)"}}>
-      <div className="container flex flex-col md:flex-row items-center justify-between gap-6">
-        <OwnologyLogo size={28} />
-        <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}>
-          © 2026 Ownology. AI Knowledge Assistant for Boutique Winemakers.
-        </p>
-        <div className="flex gap-6">
-          {["Privacy","Terms","Contact"].map(l=>(
-            <a key={l} href="#" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
-              onMouseEnter={e=>(e.currentTarget.style.color="var(--ow-amber)")}
-              onMouseLeave={e=>(e.currentTarget.style.color="var(--ow-text-lo)")}>{l}</a>
+    <footer className="py-12" style={{ borderTop: "1px solid var(--ow-border)" }}>
+      <div className="container">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8 md:gap-12">
+          <div>
+            <OwnologyLogo size={28} />
+            <p
+              className="mt-4"
+              style={{
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.8125rem",
+                color: "var(--ow-text-lo)",
+                lineHeight: 1.55,
+                margin: "1rem 0 0",
+              }}
+            >
+              AI knowledge assistant for boutique winemakers.
+              <br />
+              Aus &middot; NZ &middot; US.
+            </p>
+          </div>
+          {columns.map((col) => (
+            <div key={col.heading}>
+              <p
+                style={{
+                  fontFamily: "'Lato',sans-serif",
+                  fontSize: "0.72rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  color: "var(--ow-text-mid)",
+                  margin: "0 0 0.75rem 0",
+                  fontWeight: 700,
+                }}
+              >
+                {col.heading}
+              </p>
+              {col.links.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  data-testid={l.testid}
+                  style={footerLinkStyle}
+                  onMouseEnter={hover}
+                  onMouseLeave={unhover}
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </div>
           ))}
-          <Link href="/why-ownology" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
-            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Why Ownology</Link>
-          <Link href="/for-home-winemakers" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
-            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>For Home Winemakers</Link>
-          <Link href="/for-innovint-users" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
-            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>For InnoVint Users</Link>
-          <Link href="/for-vintrace-users" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
-            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>For Vintrace Users</Link>
-          <Link href="/knowledge" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
-            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Knowledge</Link>
-          <Link href="/blog" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
-            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Blog</Link>
-          <Link href="/regulations" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
-            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Reg. Library</Link>
-          <Link href="/compliance" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
-            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Compliance</Link>
-          <Link href="/merch" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}
-            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-amber)")}
-            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color="var(--ow-text-lo)")}>Merch</Link>
+        </div>
+        <div
+          className="mt-10 pt-6 flex flex-col sm:flex-row justify-between gap-3"
+          style={{ borderTop: "1px solid var(--ow-border)" }}
+        >
+          <p
+            style={{
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.75rem",
+              color: "var(--ow-text-lo)",
+              margin: 0,
+            }}
+          >
+            © 2026 Ownology. Made in Adelaide Hills.
+          </p>
+          <div className="flex gap-4">
+            <a
+              href="/api/cellar-journal/rss.xml"
+              style={{ ...footerLinkStyle, padding: 0 }}
+              onMouseEnter={hover}
+              onMouseLeave={unhover}
+            >
+              RSS
+            </a>
+            <a
+              href="/api/sitemap.xml"
+              style={{ ...footerLinkStyle, padding: 0 }}
+              onMouseEnter={hover}
+              onMouseLeave={unhover}
+            >
+              Sitemap
+            </a>
+          </div>
         </div>
       </div>
     </footer>

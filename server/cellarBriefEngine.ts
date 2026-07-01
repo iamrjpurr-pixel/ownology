@@ -274,6 +274,7 @@ async function buildWbsCache(): Promise<WbsCache> {
       wineType: schema.ghostQuestions.wineType,
       question: schema.ghostQuestions.question,
       answer: schema.ghostQuestions.answer,
+      journalSlug: schema.ghostQuestions.journalSlug,
       category: schema.ghostQuestions.category,
       difficulty: schema.ghostQuestions.difficulty,
     })
@@ -289,6 +290,7 @@ async function buildWbsCache(): Promise<WbsCache> {
       id: r.id,
       question: r.question,
       answer: r.answer,
+      journalSlug: r.journalSlug,
       category: r.category,
       difficulty: r.difficulty,
     });

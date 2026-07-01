@@ -1,0 +1,52 @@
+{
+  "summary": "Iteration-18 coherence-pass verification: 253 journal entries published (28 real + 225 ghost.seed), sitemap+RSS surface all rows, and the new deep-links (Cellar Brief → Journal, /hi/:slug snippet, homepage hero library link, homepage 4-col footer) all wire through end-to-end. Backend pytest 21/21 PASS (8 new iter-18 tests in /app/backend/tests/test_iter18_coherence.py + 13 iter-16/17 regression tests all green). Frontend Playwright PASS on all 4 new UI surfaces: (a) /home desktop 1280x900 — [data-testid=hero-journal-link] → '/cellar-journal?from=homepage-hero' with label '📚 Or browse 250+ winemaking Q&As in the Cellar Journal →'; footer restructured into 4-col grid (Ownology brand · Product · Library · For), with data-testid=footer-cellar-journal → /cellar-journal, data-testid=footer-cellar-brief → /cellar-brief, ZERO anchors with href='#', RSS → /api/cellar-journal/rss.xml, Sitemap → /api/sitemap.xml, © row present. (b) /hi/lou-p-v-meredith mobile 430x1200 — [data-testid=hi-journal-card] renders between value-bullets and CTAs with 1px dashed amber border rgba(180,83,9,0.35), [data-testid=hi-journal-q]='What is tannin?', [data-testid=hi-journal-readmore] → '/cellar-journal/tannin-oak-what-is-tannin?from=hi-lou-p-v-meredith' (slug resolves to a real journal entry). (c) /cellar-brief mobile 430x1400 — expanding brief-ghost-toggle-tank-3-shiraz reveals brief-ghost-readmore-<slug>='Read full answer + citations →' with href='/cellar-journal/fermentation-how-often-should-i-punch-down-or-pump-over-a-red-ferment-once-the-cap-is-up?from=cellar-brief'; clicking navigates to the journal detail page with full answer, wax-sealed 'THE EXACT PROTOCOL, SEALED' member paywall CTA and grounding references visible. (d) /cellar-journal index still renders '253 ENTRIES' badge, topic chips with correct counts, and 53 entry links on first page. Backend proofs: /api/trpc/cellarJournal.list total=253 (limit is server-capped at 60, requires paginating with offset); sample-verified source='ghost.seed' rows via getBySlug; /api/sitemap.xml → HTTP 200, content-type application/xml, 254 <loc> tags; /api/cellar-journal/rss.xml → RSS 2.0 valid; every one of 13 cellarBrief.latest cards has ghostQuestion.journalSlug populated AND each slug resolves to an existing journal row.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "/api/trpc/cellarJournal.list",
+        "issue": "Spec in review_request states 'Each row has slug, question, topicTag, wineType, teaserAnswer, source'. Actual list procedure (server/cellarJournalRouter.ts:337-349) returns {id, slug, question, topicTag, diagnosis, wineType, viewCount, askedCount, lastAskedAt, featured} — no `teaserAnswer` and no `source` in list rows. Both fields ARE returned by cellarJournal.getBySlug on the full entry. Not a functional bug (index page/Cellar Brief don't need them), but the spec wording is inconsistent with the implementation."
+      },
+      {
+        "endpoint": "/api/trpc/cellarJournal.list",
+        "issue": "Server caps `limit` at 60 (z.number().max(60)); paginating full corpus requires 5 GETs with offset 0/60/120/180/240. Callers that requested >60 receive 400 BAD_REQUEST. Consider raising the cap for admin/SEO surfaces or documenting."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter18_coherence.py",
+    "/app/backend/tests/test_ghost_questions.py",
+    "/app/backend/tests/test_cellar_brief.py",
+    "/app/test_reports/pytest/iteration_18.xml"
+  ],
+  "action_items": [
+    "(Optional) Either add `source` + `teaserAnswer` to the cellarJournal.list SELECT so the API matches the review-request spec, or update the spec to note those fields are detail-only.",
+    "(Optional) Raise the cellarJournal.list `limit` cap (currently 60) or add a `.all()` procedure for SEO tooling that wants a single-shot dump.",
+    "(Carry-over from iter_16, still open) Tank 2 Chardonnay primary_active grounding still emits Red Wine Bible Ch.3 instead of White Wine Bible refs — variety→color routing for the grounding lookup in cellarBriefEngine.ts buildCard was not touched this iteration.",
+    "(Carry-over from iter_16, still open) cellarBrief.history pagination via beforeGeneratedAt cursor still broken (duplicate wineryId AND clause instead of lt(generatedAt, cursor)) — not exercised by this iter but noted."
+  ],
+  "critical_code_review_comments": [
+    "server/cellarJournalRouter.ts list rows should include `source` when the UI/SEO layer needs to distinguish real vs ghost.seed content — currently every consumer that cares (e.g. RSS pipeline, weekly digest) has to re-fetch each row via getBySlug just to read one column.",
+    "server/sitemap.ts serves 254 <loc> tags for 253 entries — the +1 is the journal index page; confirm this is intentional and matches sitemap_index best practice.",
+    "client/src/pages/CellarBrief.tsx GhostQuestionBlock now correctly renders the readmore link only when q.journalSlug is present — verified in DOM. Consider adding a lightweight 'prefetch on hover' since these are internal links.",
+    "client/src/pages/HiContact.tsx TopicalJournalCard picks deterministically via slug hash off cellarJournal.list({limit:24}) — pool is only 24 entries out of 253, so many /hi/:slug pages will hash to the same handful of Q&As. Consider bumping limit or hashing across the full corpus for better rotation."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter18_coherence.py (new — 8 tests)"
+  ],
+  "success_rate": {
+    "backend": "100% (21/21 pytest: 8 new iter-18 + 5 iter-17 ghost-question + 8 iter-16 cellar-brief baseline)",
+    "frontend": "100% (4/4 UI checkpoints — homepage hero link, homepage footer 4-col grid + RSS/Sitemap/©, /hi/lou-p-v-meredith topical journal card, /cellar-brief ghost-question deep-link + journal detail nav)"
+  },
+  "test_credentials": "Auth bypass on (ENABLE_DEV_BYPASS, seed-owner-001 = winery_id=1). No login required.",
+  "seed_data_creation": "None. Consumed the 253 already-published cellar_journal rows and the 13 vessels from the twelve-day-vintage seed. Journal slug used for the deep-link deep-verification: 'fermentation-how-often-should-i-punch-down-or-pump-over-a-red-ferment-once-the-cap-is-up' (Fermentation / red / ghost.seed).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Journal list limit is server-capped at 60 — always paginate via offset. `source` and `teaserAnswer` are detail-only fields (getBySlug) and NOT in the list row schema despite what the spec text says. Sitemap serves 254 <loc> (1 index + 253 entries). /hi/:slug uses only cellarJournal.list({limit:24}) so the pool of possible snippet questions is small (24 entries) — deterministic hash by contact slug means each /hi/:slug is stable across refreshes but many slugs will land on the same handful of questions. Cellar Brief ghost-question deep-link path is: card.ghostQuestion.journalSlug is populated by the server from ghost_questions.journal_slug column (WbsCache in cellarBriefEngine.ts); the frontend renders brief-ghost-readmore-<vessel-slug> (NOT journal-slug) as the testid — so match toggles/readmores by the card's vessel slug (e.g. 'tank-3-shiraz'), not the journal slug in the href.",
+  "rca of the issue": "No functional bugs found. Only spec/implementation drift on cellarJournal.list row shape (source + teaserAnswer are not in the SELECT — they live on getBySlug). Two carry-over open issues from iter_16 (Tank 2 white-Bible grounding + cellarBrief.history pagination) remain unresolved but are out of scope for this coherence pass."
+}

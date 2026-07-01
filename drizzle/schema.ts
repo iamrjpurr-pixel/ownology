@@ -895,6 +895,10 @@ export const ghostQuestions = mysqlTable(
     // Cellar Brief card to deepen educational context. Nullable so we
     // can ship a question without an answer if regeneration fails.
     answer: text("answer"),
+    // Slug of the public /cellar-journal/<slug> entry mirroring this
+    // ghost question. Populated by migrate-ghost-questions-to-journal.mjs
+    // — gives the Cellar Brief "Worth knowing" block a deep-link target.
+    journalSlug: varchar("journal_slug", { length: 200 }),
     // Difficulty level: "beginner", "intermediate", "advanced"
     difficulty: varchar("difficulty", { length: 20 }).notNull().default("beginner"),
     // Category tag for grouping (e.g. "fermentation", "sanitation", "bottling")

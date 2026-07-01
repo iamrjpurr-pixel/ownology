@@ -264,6 +264,7 @@ type GhostQ = {
   answer: string | null;
   category: string | null;
   difficulty: string;
+  journalSlug: string | null;
 };
 type Card = {
   vesselId: string;
@@ -466,13 +467,25 @@ function GhostQuestionBlock({ slug, q }: { slug: string; q: GhostQ }) {
         </span>
       </button>
       {open && q.answer && (
-        <p
-          data-testid={`brief-ghost-a-${slug}`}
-          className="text-sm mt-2"
-          style={{ color: "var(--ow-text-mid)", margin: 0, lineHeight: 1.5, paddingLeft: "1.25rem" }}
-        >
-          {q.answer}
-        </p>
+        <div style={{ paddingLeft: "1.25rem", marginTop: "0.5rem" }}>
+          <p
+            data-testid={`brief-ghost-a-${slug}`}
+            className="text-sm"
+            style={{ color: "var(--ow-text-mid)", margin: 0, lineHeight: 1.5 }}
+          >
+            {q.answer}
+          </p>
+          {q.journalSlug && (
+            <Link
+              href={`/cellar-journal/${q.journalSlug}?from=cellar-brief`}
+              data-testid={`brief-ghost-readmore-${slug}`}
+              className="inline-block mt-2 text-xs font-semibold"
+              style={{ color: "var(--ow-amber)", textDecoration: "none" }}
+            >
+              Read full answer + citations →
+            </Link>
+          )}
+        </div>
       )}
     </div>
   );
