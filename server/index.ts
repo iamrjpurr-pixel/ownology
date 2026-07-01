@@ -17,6 +17,7 @@ import { trinityNewsletterHandler } from "./scheduled/trinityNewsletter.js";
 import { cellarJournalSitemapHandler, robotsTxtHandler, cellarJournalRssHandler } from "./sitemap.js";
 import { generateAuditTrailPdf } from "./auditTrailPdf.js";
 import { dailyAlertEmailHandler } from "./scheduled/dailyAlertEmail.js";
+import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
 import { publicAuditHandler } from "./publicAudit.js";
 import authRouter from "./authRouter.js";
 import { jwtVerify } from "jose";
@@ -149,6 +150,8 @@ async function startServer() {
   app.post("/api/scheduled/trinity-newsletter", express.json(), trinityNewsletterHandler);
   app.post("/api/scheduled/daily-alert-email", express.json(), dailyAlertEmailHandler);
   app.get("/api/scheduled/daily-alert-email", dailyAlertEmailHandler); // GET allowed for manual triggering / dry-run
+  app.post("/api/scheduled/nurture-email", express.json(), nurtureEmailHandler);
+  app.get("/api/scheduled/nurture-email", nurtureEmailHandler); // GET allowed for dry-run inspection
 
   // ── SEO: sitemap + robots + RSS ──────────────────────────────────────────────
   app.get("/api/cellar-journal/sitemap.xml", cellarJournalSitemapHandler);

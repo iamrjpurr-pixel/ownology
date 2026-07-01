@@ -46,6 +46,7 @@ const wineryRouter = router({
     return {
       id: w.id,
       name: w.name,
+      contactName: (w as unknown as { contactName: string | null }).contactName ?? null,
       slug: w.slug,
       plan: w.plan,
       region: w.region ?? null,
@@ -75,6 +76,7 @@ const wineryRouter = router({
   update: protectedProcedure
     .input(z.object({
       name: z.string().trim().min(1).max(255).optional(),
+      contactName: z.string().trim().max(128).nullable().optional(),
       region: z.string().trim().max(128).nullable().optional(),
       brandColor: z.string().trim().max(16).nullable().optional(),
       logoUrl: z.string().trim().max(512).nullable().optional(),
@@ -114,8 +116,9 @@ const wineryRouter = router({
           });
         }
       }
-      const patch: Partial<{ name: string; region: string | null; brandColor: string | null; logoUrl: string | null; publicAuditEnabled: boolean }> = {};
+      const patch: Partial<{ name: string; contactName: string | null; region: string | null; brandColor: string | null; logoUrl: string | null; publicAuditEnabled: boolean }> = {};
       if (input.name !== undefined) patch.name = input.name;
+      if (input.contactName !== undefined) patch.contactName = input.contactName === "" ? null : input.contactName;
       if (input.region !== undefined) patch.region = input.region === "" ? null : input.region;
       if (input.brandColor !== undefined) patch.brandColor = input.brandColor === "" ? null : input.brandColor;
       if (input.logoUrl !== undefined) patch.logoUrl = input.logoUrl === "" ? null : input.logoUrl;

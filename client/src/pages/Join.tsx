@@ -20,6 +20,7 @@ export default function Join() {
   const [location] = useLocation();
   const [status, setStatus] = useState<"loading" | "tracked" | "invalid" | "no-code">("loading");
   const [referrerName, setReferrerName] = useState<string | null>(null);
+  const [referrerContact, setReferrerContact] = useState<string | null>(null);
   const [refCode, setRefCode] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [emailStatus, setEmailStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -41,6 +42,7 @@ export default function Join() {
         if (res.ok) {
           setStatus("tracked");
           setReferrerName(res.referrerName ?? null);
+          setReferrerContact(res.referrerContact ?? null);
         } else {
           setStatus("invalid");
         }
@@ -48,6 +50,13 @@ export default function Join() {
       onError: () => setStatus("invalid"),
     });
   }, [location]);
+
+  // Compose the friendly attribution: "Sarah at Redstone Ridge Wines" when
+  // both are set; falls back to just the winery name; falls back to a
+  // generic "You've been invited" copy when nothing is known.
+  const attribution = referrerContact && referrerName
+    ? `${referrerContact} at ${referrerName}`
+    : referrerName;
 
   const submitEmail = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,8 +93,8 @@ export default function Join() {
           color: "#78350f",
           margin: 0,
         }}>
-          {status === "tracked" && referrerName
-            ? `${referrerName} invited you to Ownology`
+          {status === "tracked" && attribution
+            ? `${attribution} invited you to Ownology`
             : "You've been invited to Ownology"}
         </p>
         <h1 style={{
@@ -177,7 +186,7 @@ export default function Join() {
                   fontWeight: 600,
                 }}
               >
-                ✓ Got it. We&apos;ll be in touch{referrerName ? ` — and ${referrerName} will see the intro` : ""}.
+                ✓ Got it. We&apos;ll be in touch{attribution ? ` — and ${attribution} will see the intro` : ""}.
               </p>
             ) : (
               <>
@@ -199,7 +208,7 @@ export default function Join() {
                   margin: "0 0 0.75rem",
                   lineHeight: 1.5,
                 }}>
-                  Drop your email — we&apos;ll send one short walkthrough of what {referrerName ?? "your friend"} finds useful and won&apos;t bug you again.
+                  Drop your email — we&apos;ll send one short walkthrough of what {attribution ?? "your friend"} finds useful and won&apos;t bug you again.
                 </p>
                 <form onSubmit={submitEmail} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                   <input

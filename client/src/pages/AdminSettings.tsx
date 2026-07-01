@@ -193,6 +193,7 @@ function WinerySection() {
   });
 
   const [name, setName] = useState("");
+  const [contactName, setContactName] = useState("");
   const [region, setRegion] = useState("");
   const [brandColor, setBrandColor] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
@@ -203,6 +204,7 @@ function WinerySection() {
   useEffect(() => {
     if (winery) {
       setName(winery.name);
+      setContactName(winery.contactName ?? "");
       setRegion(winery.region ?? "");
       setBrandColor(winery.brandColor ?? "");
       setLogoUrl(winery.logoUrl ?? "");
@@ -213,6 +215,7 @@ function WinerySection() {
   if (!winery) return null;
 
   const dirty = winery.name !== name
+    || (winery.contactName ?? "") !== contactName
     || (winery.region ?? "") !== region
     || (winery.brandColor ?? "") !== brandColor
     || (winery.logoUrl ?? "") !== logoUrl;
@@ -229,6 +232,7 @@ function WinerySection() {
     }
     update.mutate({
       name: winery!.name !== trimmedName ? trimmedName : undefined,
+      contactName: (winery!.contactName ?? "") !== contactName ? contactName : undefined,
       region: (winery!.region ?? "") !== region ? region : undefined,
       brandColor: (winery!.brandColor ?? "") !== brandColor ? brandColor : undefined,
       logoUrl: (winery!.logoUrl ?? "") !== logoUrl ? logoUrl : undefined,
@@ -238,6 +242,7 @@ function WinerySection() {
   function revert() {
     if (!winery) return;
     setName(winery.name);
+    setContactName(winery.contactName ?? "");
     setRegion(winery.region ?? "");
     setBrandColor(winery.brandColor ?? "");
     setLogoUrl(winery.logoUrl ?? "");
@@ -301,6 +306,24 @@ function WinerySection() {
             onChange={(e) => setName(e.target.value)}
             style={inputStyle}
           />
+        </div>
+
+        <div>
+          <label htmlFor="winery-contact-name" style={labelStyle}>Your first name (optional)</label>
+          <input
+            id="winery-contact-name"
+            data-testid="winery-contact-name-input"
+            type="text"
+            value={contactName}
+            disabled={readOnly || update.isPending}
+            maxLength={128}
+            placeholder="e.g. Sarah"
+            onChange={(e) => setContactName(e.target.value)}
+            style={inputStyle}
+          />
+          <p style={{ fontSize: "0.72rem", color: "var(--ow-text-lo)", margin: "0.4rem 0 0", lineHeight: 1.4 }}>
+            Personalises invite links (&quot;{contactName.trim() || "Sarah"} at {name.trim() || "your winery"} invited you&quot;) and any nurture emails sent to leads you refer.
+          </p>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 180px", gap: "1rem" }}>

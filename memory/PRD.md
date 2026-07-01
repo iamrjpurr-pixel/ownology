@@ -568,7 +568,7 @@ have been folded in or marked complete.)
 - Repo: https://github.com/iamrjpurr-pixel/ownology
 
 
-## Trial + Referral engine (Feb 2026 — iter 21 + iter 22) ✅
+## Trial + Referral engine (Feb 2026 — iter 21 + iter 22 + iter 23) ✅
 - **14-day trial nudge**: `TrialBanner.tsx` renders when `winery.plan==='free' AND trialDaysLeft ≤ 3`. Uses `position:fixed; top:0; z-index:60` so it sits above every marketing / work-mode header. On mount it toggles `html.ow-has-trial-banner` and sets `--ow-trial-banner-h:50px`; global CSS in `client/src/index.css` shifts every `nav.fixed.top-0`, `header.fixed.top-0`, `.sticky.top-0`, and `WorkModeLayout` header down by that variable — no per-page work needed for future marketing pages.
 - **Suppressed routes**: `/hi/`, `/audit/`, `/founding-member/success`, `/merch/success`, `/join` (conversion / kiosk surfaces stay clean).
 - **Dismiss**: per-session via `sessionStorage.ow-trial-banner-dismissed`.
@@ -578,6 +578,14 @@ have been folded in or marked complete.)
 - **Backend**: `server/routers/referrals.ts` (~130 LOC — myCode / myList / trackClick with enrichment path), `server/routers/winery.ts::current` returns `trialEndsAt / trialDaysLeft / trialIsExpired / trialBannerVisible / referralCode`. DB adds `wineries.trial_ends_at BIGINT`, `wineries.trial_credits_days INT`, `wineries.referral_code VARCHAR(16) UNIQUE`, and new `referrals` table.
 - **E2E verified iter-21**: 9/9 review points, 4/4 backend endpoints, banner overlap fix confirmed (nav.fixed.top-0 now at computed top:50px when banner present), trackClick increments invite-list pending count 2→3.
 - **E2E verified iter-22 (self-tested)**: trackClick returns `referrerName` in payload; /join renders "REDSTONE RIDGE WINES INVITED YOU TO OWNOLOGY" headline; email submission shows "✓ Got it. We'll be in touch — and Redstone Ridge Wines will see the intro."; DB row enriched with prospect email visible in `referrals.myList`.
+- **iter-23 — editable identity + auto-nurture ✅**:
+  - New DB columns: `wineries.contact_name VARCHAR(128) NULL` (the "Sarah" first name) and `referrals.nurtured_at BIGINT NULL` (one-nurture-per-lead guard). Migration script: `scripts/add-nurture-fields.mjs` (idempotent).
+  - `winery.current` now exposes `contactName`; `winery.update` accepts it. `/admin/settings` has a new "Your first name (optional)" input with live helper preview (*"Sarah at Redstone Ridge Wines invited you"*) — owner-only, same edit gate as the rest.
+  - `referrals.trackClick` now returns both `referrerName` (winery name) AND `referrerContact` (person's first name). `/join` composes them into "Sarah at Redstone Ridge Wines" attribution — falls back to just the winery name when contactName is unset, or to a generic "You've been invited" if nothing is known.
+  - **Nurture email cron**: `/api/scheduled/nurture-email` (GET/POST, CRON_SECRET-guarded, `?dryRun=1` supported). Finds pending referrals with an email that are ≥3 days old and haven't been nurtured yet, sends one personalized Resend email ("{contactName} at {wineryName} thought Ownology might help"), then stamps `nurtured_at` so we never send twice. HTML+text versions. Falls back to `ALERT_TEST_TO` in dev the same way as `dailyAlertEmail`. Handler: `server/scheduled/nurtureEmail.ts` (183 LOC).
+  - Verified: contactName save round-trips; /join headline reads "SARAH AT REDSTONE RIDGE WINES INVITED YOU TO OWNOLOGY"; nurture cron finds 1 eligible → dry-runs to `iamrjpurr@gmail.com`; after `nurtured_at` set, the same lead is excluded from the next run.
+  - Files touched: `scripts/add-nurture-fields.mjs` (new), `drizzle/schema.ts`, `server/routers/winery.ts`, `server/routers/referrals.ts`, `server/scheduled/nurtureEmail.ts` (new), `server/index.ts`, `client/src/pages/Join.tsx`, `client/src/pages/AdminSettings.tsx`.
+  - Deploy note: Railway cron should hit `POST /api/scheduled/nurture-email` daily with `x-cron-secret: $CRON_SECRET` (same env var as dailyAlertEmail).
 
 ## Service URLs
 - Preview: https://ownership-dev.preview.emergentagent.com

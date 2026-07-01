@@ -91,6 +91,7 @@ export const referralsRouter = router({
         where: eq(schema.wineries.referralCode, input.code),
       });
       if (!referrer) return { ok: false, reason: "unknown-code" as const };
+      const contactName = (referrer as unknown as { contactName: string | null }).contactName ?? null;
       // Dedupe: don't record duplicate pending rows for the same code+email
       // (or same code with null email) within a 5-minute window. When an
       // email arrives later for a previously-anonymous click from this
@@ -111,7 +112,7 @@ export const referralsRouter = router({
           await db.update(schema.referrals)
             .set({ referredEmail: input.email })
             .where(eq(schema.referrals.id, anon.id));
-          return { ok: true as const, referrerName: referrer.name, enriched: true };
+          return { ok: true as const, referrerName: referrer.name, referrerContact: contactName, enriched: true };
         }
       }
 
@@ -119,7 +120,7 @@ export const referralsRouter = router({
         (r.referredEmail ?? null) === (input.email ?? null) &&
         r.createdAt >= recentCutoff
       );
-      if (dup) return { ok: true as const, referrerName: referrer.name, dedupe: true };
+      if (dup) return { ok: true as const, referrerName: referrer.name, referrerContact: contactName, dedupe: true };
       await db.insert(schema.referrals).values({
         referrerWineryId: referrer.id,
         referralCode: input.code,
@@ -128,6 +129,6 @@ export const referralsRouter = router({
         rewardDaysGranted: 0,
         createdAt: Date.now(),
       });
-      return { ok: true as const, referrerName: referrer.name };
+      return { ok: true as const, referrerName: referrer.name, referrerContact: contactName };
     }),
 });

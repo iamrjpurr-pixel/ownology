@@ -1239,6 +1239,7 @@ export const wineries = mysqlTable(
   {
     id: int("id").primaryKey().autoincrement(),
     name: varchar("name", { length: 255 }).notNull(),
+    contactName: varchar("contact_name", { length: 128 }),
     slug: varchar("slug", { length: 64 }).notNull().unique(),
     ownerUserId: int("owner_user_id").notNull(),
     plan: mysqlEnum("plan", ["free", "press", "amphora", "coopers", "founding_member"]).notNull().default("free"),
@@ -1376,6 +1377,7 @@ export const referrals = mysqlTable(
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
     signedUpAt: bigint("signed_up_at", { mode: "number" }),
     convertedAt: bigint("converted_at", { mode: "number" }),
+    nurturedAt: bigint("nurtured_at", { mode: "number" }),
   },
   (t) => [
     index("ref_referrer_idx").on(t.referrerWineryId),
