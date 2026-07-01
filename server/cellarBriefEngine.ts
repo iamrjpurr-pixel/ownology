@@ -169,30 +169,26 @@ export function inferWineColor(variety: string): WineColor {
 
 const STAGE_TO_WBS: Record<CellarBriefStage, { red: string[]; white: string[]; sparkling: string[] }> = {
   pre_ferment: {
-    // Reds = cold-soak with skins (3.1) + crush SO2 (3.3)
     red:   ["3.1", "3.3", "4.2"],
-    // Whites = press immediately (4.6), settle/rack (5.3), bench acidity (8.1)
     white: ["4.6", "5.3", "8.1", "4.2"],
-    // Sparkling base = whites-style press early + acidity-critical lab
-    // (base wine wants ~2.9–3.1 pH and 8–10 g/L TA before tirage).
-    sparkling: ["4.6", "5.3", "8.1", "9.1"],
+    // Sparkling codes lead so 9.x MoreWine sparkling protocols beat generic
+    // whites in the grounding cap of 2 bible chunks per card.
+    sparkling: ["9.1", "4.6", "5.3", "8.1"],
   },
   primary_active: {
     red:   ["4.1", "4.3"],
     white: ["4.1", "4.3"],
-    // Sparkling primary = base wine ferment (9.1) + still-wine primary
-    // guidance (4.1). Base wines want restrained aromatics — no diacetyl.
-    sparkling: ["4.1", "4.3", "9.1"],
+    sparkling: ["9.1", "4.1", "4.3"],
   },
   primary_slowing: {
     red:   ["4.1", "4.4", "8.1"],
     white: ["4.1", "4.4", "8.1"],
-    sparkling: ["4.1", "4.4", "9.1"],
+    sparkling: ["9.1", "9.3", "4.1", "4.4"],
   },
-  pressed:      { red: ["4.6", "4.8"], white: ["4.6", "4.8"], sparkling: ["9.1", "9.2"] },
-  mlf_active:   { red: ["4.8"],        white: ["4.8"],        sparkling: ["4.8", "9.1"] },
-  aging_tank:   { red: ["5.2", "5.3"], white: ["5.3", "6.1"], sparkling: ["9.1", "9.2", "9.3"] },
-  aging_barrel: { red: ["5.1", "5.2", "5.4"], white: ["5.1", "5.4", "6.1"], sparkling: ["9.1", "9.5"] },
+  pressed:      { red: ["4.6", "4.8"], white: ["4.6", "4.8"], sparkling: ["9.2", "9.1"] },
+  mlf_active:   { red: ["4.8"],        white: ["4.8"],        sparkling: ["9.1", "4.8"] },
+  aging_tank:   { red: ["5.2", "5.3"], white: ["5.3", "6.1"], sparkling: ["9.3", "9.2", "9.1"] },
+  aging_barrel: { red: ["5.1", "5.2", "5.4"], white: ["5.1", "5.4", "6.1"], sparkling: ["9.5", "9.1"] },
   // Sparkling "bottled" is where the magic actually starts — tirage, prise
   // de mousse, aging on lees, riddling, disgorging, dosage. All 9.x codes
   // are relevant, so we probe them all and let the ghost-question / grounding
@@ -227,11 +223,11 @@ function resolveGrounding(stage: CellarBriefStage, color: WineColor, cache: WbsC
   // (D4.1, D5.2, …) while SOPs + Red Wine Bible use bare codes (4.1, 5.2).
   // For whites/rosé AND sparkling we probe BOTH variants so chapter
   // resolution works regardless of which ingestion script tagged the chunk.
-  // Sparkling 9.x codes have no bible chapters yet — grounding for sparkling
-  // falls back to the parallel still-wine WBS codes (4.1, 4.6, 5.3, etc.)
-  // via the STAGE_TO_WBS map, so white-bible content is the right proxy.
+  // Order matters: probing D-prefix FIRST for whites/sparkling ensures the
+  // Wine Bible chunks (D-tagged) get first shot at the 2-chunk cap, rather
+  // than being crowded out by specialist manual chunks tagged at bare 4.1.
   const wbsCodes = (treatAsWhite || isSparkling)
-    ? baseCodes.flatMap((c) => [c, `D${c}`])
+    ? baseCodes.flatMap((c) => [`D${c}`, c])
     : baseCodes;
   const out: string[] = [];
   const seenSop = new Set<number>();
@@ -271,12 +267,42 @@ function resolveGrounding(stage: CellarBriefStage, color: WineColor, cache: WbsC
     white_wine_bible: "White Wine Bible",
     morew_red_outline: "Red Wine Outline",
     morew_white_outline: "White Wine Outline",
+    // MoreWine specialist manuals — surface these anywhere their WBS
+    // code lands on a card. Titles are the human MoreWine names so the
+    // chip reads naturally ("SO₂ Management §p3 — Free SO₂ Targets").
+    morew_sparkling_yeast:   "Sparkling Wine Protocol — Yeast",
+    morew_sparkling_proelif: "Sparkling Wine Protocol — ProElif",
+    morew_so2_mgmt:          "SO₂ Management",
+    morew_so2_protocol:      "SO₂ Management Protocols",
+    morew_mlf_paper:         "Malolactic Bacteria Paper",
+    morew_yeast_pairing:     "Yeast & Grape Pairing",
+    morew_yeast_hydration:   "Yeast Rehydration Guide",
+    morew_oxygen_ferment:    "Oxygenation & Fermentation",
+    morew_inert_gas:         "Inert Gas in Winemaking",
+    morew_sanitation:        "Sanitization Manual",
+    morew_oak_info:          "Oak Information Manual",
+    morew_oak_barrel_care:   "Oak Barrel Care Guide",
+    morew_ph_meter:          "pH Meter Use & Care",
+    morew_bench_trials:      "Bench Trials Primer",
+    morew_fining_agents:     "Fining Agents Benchmark",
   };
-  // Sparkling and whites both draw from the white bible (sparkling base
-  // wine is white-wine flow); reds draw from red bible.
-  const preferred = (treatAsWhite || isSparkling)
-    ? ["white_wine_bible", "morew_white_outline"]
-    : ["red_wine_bible", "morew_red_outline"];
+  // MoreWine specialist manuals are color-agnostic (SO₂, MLF, yeast, oak,
+  // sanitation, pH, bench trials all apply across red/white/sparkling) so
+  // they get added to every branch's preferred sources list.
+  const SPECIALIST_MANUALS = [
+    "morew_so2_mgmt", "morew_so2_protocol", "morew_mlf_paper",
+    "morew_yeast_pairing", "morew_yeast_hydration", "morew_oxygen_ferment",
+    "morew_inert_gas", "morew_sanitation", "morew_oak_info",
+    "morew_oak_barrel_care", "morew_ph_meter", "morew_bench_trials",
+    "morew_fining_agents",
+  ];
+  // Sparkling cards additionally prefer the sparkling protocols first,
+  // then the white bible (sparkling base wine = white-wine flow).
+  const preferred = isSparkling
+    ? ["morew_sparkling_yeast", "morew_sparkling_proelif", "white_wine_bible", ...SPECIALIST_MANUALS]
+    : treatAsWhite
+      ? ["white_wine_bible", "morew_white_outline", ...SPECIALIST_MANUALS]
+      : ["red_wine_bible", "morew_red_outline", ...SPECIALIST_MANUALS];
   for (const code of wbsCodes) {
     const chunks = cache.chunksByWbs.get(code) ?? [];
     const filtered = chunks
