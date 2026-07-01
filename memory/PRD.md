@@ -566,3 +566,19 @@ have been folded in or marked complete.)
 - Preview: https://ownership-dev.preview.emergentagent.com
 - DB: Railway MySQL — `reseau.proxy.rlwy.net:34291/railway`
 - Repo: https://github.com/iamrjpurr-pixel/ownology
+
+
+## Trial + Referral engine (Feb 2026 — iter 21) ✅
+- **14-day trial nudge**: `TrialBanner.tsx` renders when `winery.plan==='free' AND trialDaysLeft ≤ 3`. Uses `position:fixed; top:0; z-index:60` so it sits above every marketing / work-mode header. On mount it toggles `html.ow-has-trial-banner` and sets `--ow-trial-banner-h:50px`; global CSS in `client/src/index.css` shifts every `nav.fixed.top-0`, `header.fixed.top-0`, `.sticky.top-0`, and `WorkModeLayout` header down by that variable — no per-page work needed for future marketing pages.
+- **Suppressed routes**: `/hi/`, `/audit/`, `/founding-member/success`, `/merch/success`, `/join` (conversion / kiosk surfaces stay clean).
+- **Dismiss**: per-session via `sessionStorage.ow-trial-banner-dismissed`.
+- **`/trial-ending`**: conversion page. Shows days-left, live counts (briefs / winery name / region / plan), "what you'd lose" list, upgrade CTA → `/pricing?from=trial-ending`, founding-member CTA, and a referral nudge card pointing to `/invite`.
+- **`/invite`**: `referrals.myCode` returns the per-winery code + `sharePath=/join?ref=CODE` + `rewardDaysPerConvert=30`. UI shows Copy link / Copy SMS buttons (2s '✓ Copied' toggle), 4 stat boxes (Clicked / Signed up / Paid / Days earned), and recent-activity list.
+- **`/join?ref=CODE`**: public landing. On mount fires `referrals.trackClick` — logs a `referrals` row (pending). Dedupes same-code+email within 5 min. Invalid codes show a graceful "invite code isn't recognised" message but still allow 14-day trial signup.
+- **Backend**: `server/routers/referrals.ts` (117 LOC — myCode / myList / trackClick), `server/routers/winery.ts::current` returns `trialEndsAt / trialDaysLeft / trialIsExpired / trialBannerVisible / referralCode`. DB adds `wineries.trial_ends_at BIGINT`, `wineries.trial_credits_days INT`, `wineries.referral_code VARCHAR(16) UNIQUE`, and new `referrals` table.
+- **E2E verified iter-21**: 9/9 review points, 4/4 backend endpoints, banner overlap fix confirmed (nav.fixed.top-0 now at computed top:50px when banner present), trackClick increments invite-list pending count 2→3.
+
+## Service URLs
+- Preview: https://ownership-dev.preview.emergentagent.com
+- DB: Railway MySQL — `reseau.proxy.rlwy.net:34291/railway`
+- Repo: https://github.com/iamrjpurr-pixel/ownology
