@@ -715,3 +715,21 @@ have been folded in or marked complete.)
   - `server/index.ts` (API 404 JSON handler).
 - **Backend regression suite added**: `/app/backend/tests/test_launch_readiness.py` (20 tests — 19 pass, 1 was the api-404 issue now fixed).
 
+
+## Recent Reservations Admin Widget (Feb 2026 — iter 32) ✅
+- **Problem**: reservations were writing to DB and firing owner alert emails, but Sarah had no live pipeline view during launch weekend to see who's landing and follow up within the 24hr promise made in the confirmation email.
+- **Fix**: new `RecentReservations` widget mounted at top of `/admin/settings` — shows all reservations, live counts by status (all/pending/contacted/paid/cancelled), auto-refreshes every 30s, per-row actions.
+- **Actions**:
+  - **Mark contacted** — stamps `contacted_at`, flips status to `contacted`. Shows "contacted just now" inline so we know follow-up speed.
+  - **Mark paid** — flips to `paid` (with confirm dialog). Represents conversion.
+  - **Cancel** — soft-cancel (with confirm). Row retained for pipeline analytics.
+- **Row layout**: `#id` · name (mailto link) + status pill · winery · tier · cycle · phone (tel: link) · relative timestamp · action buttons.
+- **Filter chips** with live counts per status. Clicking `contacted` filters instantly.
+- **Files touched**:
+  - `server/db.ts` — added `updateFoundingReservationStatus(id, status, notes?)` helper.
+  - `server/routers.ts` — added `foundingMembers.updateReservationStatus` (ownerProcedure, mutation).
+  - `client/src/components/RecentReservations.tsx` — new widget.
+  - `client/src/pages/AdminSettings.tsx` — mount widget at top.
+- **testids**: `recent-reservations-widget`, `recent-reservations-total`, `recent-reservations-list`, `recent-reservations-empty`, `reservation-filter-{all|pending|contacted|paid|cancelled}`, `reservation-row-{id}`, `reservation-mark-contacted-{id}`, `reservation-mark-paid-{id}`, `reservation-mark-cancelled-{id}`.
+- **Verified live**: curl'd updateReservationStatus → `{ok:true}`, listReservations shows contactedAt stamped. Screenshot: widget renders 10 rows, "10/99 slots claimed", clicking Mark contacted on #9 flipped its status to CONTACTED with "contacted just now", filter chip updated from CONTACTED 1 → 2, filtering by contacted showed exactly those 2 rows. End-to-end.
+

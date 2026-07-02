@@ -184,6 +184,24 @@ export async function listFoundingReservations(limit = 200) {
   });
 }
 
+export async function updateFoundingReservationStatus(
+  id: number,
+  status: "pending" | "contacted" | "paid" | "cancelled",
+  notes?: string,
+): Promise<void> {
+  const patch: Record<string, unknown> = { status };
+  if (status === "contacted") {
+    patch.contactedAt = Date.now();
+  }
+  if (typeof notes === "string") {
+    patch.notes = notes;
+  }
+  await db
+    .update(schema.foundingReservations)
+    .set(patch)
+    .where(eq(schema.foundingReservations.id, id));
+}
+
 // ─── Vintage Log ──────────────────────────────────────────────────────────────
 
 export type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "pre_harvest_sample" | "bottling_run" | "weather_event" | "sanitation" | "other";

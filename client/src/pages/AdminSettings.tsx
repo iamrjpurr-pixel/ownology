@@ -12,6 +12,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { RecentReservations } from "@/components/RecentReservations";
 
 type UnitSystem = "metric" | "imperial";
 
@@ -68,6 +69,9 @@ export default function AdminSettings() {
         >
           Settings
         </h1>
+
+        {/* Recent Founding-Member reservations — launch-weekend pipeline */}
+        <RecentReservations />
 
         {/* Unit system */}
         <section

@@ -38,6 +38,7 @@ import {
   addFoundingReservation,
   listFoundingReservations,
   getFoundingReservationCount,
+  updateFoundingReservationStatus,
   listVintageLogEntries,
   getUserByOpenId,
   upsertTankReminder,
@@ -304,6 +305,23 @@ const foundingMembersRouter = router({
     .input(z.object({ limit: z.number().min(1).max(500).default(100) }).optional())
     .query(async ({ input }) => {
       return listFoundingReservations(input?.limit ?? 100);
+    }),
+
+  // Owner-only: flip a reservation's status (used by the Recent Reservations
+  // widget on /admin/settings during launch weekend). Contacted-at is stamped
+  // automatically when status transitions to 'contacted' so we know how fast
+  // Sarah followed up.
+  updateReservationStatus: ownerProcedure
+    .input(
+      z.object({
+        id: z.number().int().positive(),
+        status: z.enum(["pending", "contacted", "paid", "cancelled"]),
+        notes: z.string().max(2000).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await updateFoundingReservationStatus(input.id, input.status, input.notes);
+      return { ok: true };
     }),
 });
 
