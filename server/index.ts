@@ -241,6 +241,12 @@ async function startServer() {
   });
 
   const port = Number(process.env.PORT) || 8001;
+  // Emergent's k8s ingress splits requests between two ports: /api/* → :8001
+  // (backend), everything else → :3000 (frontend). This monolithic Express
+  // app serves BOTH from the same handler tree, so we bind on both ports and
+  // the same routes handle whichever the ingress forwards. The FRONTEND_PORT
+  // listener is what unblocks the k8s readiness probe on non-8001 pods.
+  const frontendPort = Number(process.env.FRONTEND_PORT) || 3000;
 
   // ── Start listening FIRST — before the (slow) bootstrap DB queries ─────
   // Original bug: bootstrap ran ~10-30s of sequential Railway MySQL CREATE
@@ -253,6 +259,25 @@ async function startServer() {
   server.listen(port, "0.0.0.0", () => {
     console.log(`[server] Running on http://0.0.0.0:${port}/ (bootstrap running in background)`);
   });
+
+  // ── Also listen on the frontend port so k8s probe on :3000 passes ─────
+  // Emergent's ingress expects a frontend service on :3000. In this
+  // monolithic setup, both ports serve the same Express app (which handles
+  // /api/* AND static SPA assets). Skip if it collides with the backend
+  // port (e.g. someone overrides PORT to 3000).
+  if (frontendPort !== port) {
+    const frontendServer = createServer(app);
+    frontendServer.on("error", (err: NodeJS.ErrnoException) => {
+      if (err.code === "EADDRINUSE") {
+        console.warn(`[server] port ${frontendPort} already in use — frontend listener skipped`);
+      } else {
+        console.error(`[server] frontend listener error on :${frontendPort}:`, err);
+      }
+    });
+    frontendServer.listen(frontendPort, "0.0.0.0", () => {
+      console.log(`[server] Also listening on http://0.0.0.0:${frontendPort}/ (frontend port)`);
+    });
+  }
 
   // Bootstrap: ensure runtime-only telemetry tables exist (no migration needed).
   // theme_suggestions tracks acceptance of the once-a-day suggestion banner.
