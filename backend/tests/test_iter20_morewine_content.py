@@ -13,18 +13,29 @@ Tests:
 
 import os
 import urllib.parse
+from urllib.parse import urlparse
 import pytest
 import pymysql
 import requests
 
 BASE_URL = os.environ["REACT_APP_BACKEND_URL"].rstrip("/")
 
+# Parse DATABASE_URL so we never commit raw credentials to the repo.
+# Expected format: mysql://user:password@host:port/database
+_DB_URL = os.environ.get("DATABASE_URL")
+if not _DB_URL:
+    pytest.skip(
+        "DATABASE_URL env var missing — export it (or run via `pytest` from a shell "
+        "where /app/.env is loaded) before running this test.",
+        allow_module_level=True,
+    )
+_parsed = urlparse(_DB_URL)
 DB_CFG = dict(
-    host="reseau.proxy.rlwy.net",
-    port=34291,
-    user="root",
-    password="xkNuWbTXhvXfStocRRFpWeWRllLJBCmJ",
-    database="railway",
+    host=_parsed.hostname,
+    port=_parsed.port or 3306,
+    user=_parsed.username,
+    password=_parsed.password,
+    database=(_parsed.path or "").lstrip("/") or "railway",
     cursorclass=pymysql.cursors.DictCursor,
     autocommit=True,
 )

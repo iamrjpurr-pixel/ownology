@@ -1,5 +1,6 @@
 """Iteration-18 coherence-pass regression: 253 published journal entries,
 sitemap+RSS, cellar brief ghost-question deep-links wire back to journal."""
+import json
 import os
 import re
 import urllib.parse
@@ -14,7 +15,7 @@ def _trpc_query(path: str, payload: dict) -> requests.Response:
     """tRPC v11 GET (query procedure) with `?input={"json": {...}}`"""
     return requests.get(
         f"{BASE}/api/trpc/{path}",
-        params={"input": '{"json":' + __import__("json").dumps(payload) + "}"},
+        params={"input": json.dumps({"json": payload})},
         timeout=20,
     )
 
