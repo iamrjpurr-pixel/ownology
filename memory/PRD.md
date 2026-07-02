@@ -694,3 +694,24 @@ have been folded in or marked complete.)
 - **Verified live**: curl reserve returned `{ok:true, slotNumber:1, emails:{customerSent:false,ownerSent:true}}` (customer email correctly blocked by Resend testing-mode restriction on unverified domain — expected until `ownology.ai` is verified at resend.com/domains). Screenshot E2E: clicked "Enter The Press" → modal → filled form → success "SLOT #2 OF 99". End-to-end.
 - **testids**: `reservation-modal-backdrop`, `reservation-modal`, `reservation-modal-close`, `reservation-modal-slot-counter`, `reservation-form`, `reservation-name-input`, `reservation-email-input`, `reservation-winery-input`, `reservation-phone-input`, `reservation-submit-btn`, `reservation-error`, `reservation-success`, `reservation-close-btn`.
 - **Post-launch**: verify `ownology.ai` domain in Resend to unlock customer email delivery. Reservations already flow correctly and owner alerts arrive today.
+
+## Launch-Readiness Bug Hunt (Feb 2026 — iter 31) ✅
+- **Trigger**: user requested "scenario tests and bug hunt for go to market" while Emergent prod deploy is blocked on infra (support ticket open). Ran `testing_agent_v3_fork` full sweep (20 pytest cases + Playwright e2e on preview).
+- **Test verdict**: 19/20 backend pass, reservation flow verified end-to-end (all 6 tier×cycle combos), 10 real reservations written to DB via UI + tRPC, DevBypassToggle verified, /cellar-journal has 53 entries, sitemap/RSS/robots.txt all valid, LIP Audit Pack PDF returns 200 with `%PDF` bytes, legal pages render real content, /admin/settings loads without 500.
+- **5 bugs found and fixed in this iteration**:
+  1. **P1 · Reservation modal: Escape key didn't close it** — fixed by adding a scoped `document.addEventListener('keydown', esc→onClose)` inside `useEffect(open)` in `FoundingReservationModal.tsx`.
+  2. **P1 · No global footer on public pages** — extracted `Footer` from Home.tsx into new `client/src/components/SiteFooter.tsx`, mounted site-wide via `App.tsx`, auto-hides on kiosk routes (`/admin`, `/hi/`, `/auth/`, `/login`, `/cellar-brief`, `/onboarding`). Legal-link footer now on `/pricing`, `/join`, `/cellar-journal`, `/privacy`, `/terms`, `/refund`, `/guide`, and every other public page.
+  3. **P2 · Pricing banner vs reservation-modal counter mismatch** — pricing page banner was reading `FOUNDING_SPOTS_REMAINING = 99` (hard-coded, paid-only) while the modal read `foundingMembers.getReservationCount.total` (paid + reserved). Warm-list visitor saw "99 spots remaining" in the banner but "10 of 99 claimed" once they opened the modal. Unified: banner now uses the same live tRPC query with 60s refetch. Verified: banner "89 SPOTS REMAINING · 10 of 99 founding spots claimed · 10% claimed" matches modal "10 of 99 spots claimed — 89 left".
+  4. **P2 · Theme-suggestion toast covered Founding CTAs on first visit** — added `/pricing`, `/join`, `/onboarding` to `SUPPRESS_PREFIXES` in `ThemeSuggestion.tsx`. Toast now suppressed on all conversion pages so nothing overlays the "Enter The Press" button.
+  5. **P3 · `/api/*` unknowns returned SPA HTML instead of 404 JSON** — added `app.use("/api", …)` 404 JSON handler in `server/index.ts` before the SPA catch-all. Verified: `/api/does-not-exist` → `{"error":"not_found"}` 404; `/` still returns SPA HTML 200; `/api/health` still 200.
+- **testids added**: `site-footer`, `footer-privacy`, `footer-terms`, `footer-refund`, `footer-cellar-brief`, `footer-cellar-journal`, `pricing-spots-remaining`, `pricing-spots-claimed`.
+- **Files touched**:
+  - `client/src/components/FoundingReservationModal.tsx` (Escape handler).
+  - `client/src/components/SiteFooter.tsx` (new).
+  - `client/src/App.tsx` (mount SiteFooter).
+  - `client/src/pages/Home.tsx` (removed inline Footer — now uses site-wide).
+  - `client/src/pages/Pricing.tsx` (live count from `foundingMembers.getReservationCount`, removed `FOUNDING_SPOTS_REMAINING` static).
+  - `client/src/components/ThemeSuggestion.tsx` (added conversion pages to SUPPRESS_PREFIXES).
+  - `server/index.ts` (API 404 JSON handler).
+- **Backend regression suite added**: `/app/backend/tests/test_launch_readiness.py` (20 tests — 19 pass, 1 was the api-404 issue now fixed).
+

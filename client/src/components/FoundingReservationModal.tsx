@@ -67,6 +67,20 @@ export function FoundingReservationModal({
     }
   }, [open]);
 
+  // Escape-key close — required for a11y and expected UX. Listener only
+  // active while modal is open to avoid interfering with page-level shortcuts.
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open, onClose]);
+
   if (!open) return null;
 
   const handleSubmit = (e: React.FormEvent) => {

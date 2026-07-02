@@ -1700,7 +1700,7 @@ export default function Home() {
       <WhatOwnologyKnows />
       <CTA />
       <FAQ />
-      <Footer />
+      {/* Footer is now mounted site-wide via App.tsx > SiteFooter */}
     </div>
   );
 }

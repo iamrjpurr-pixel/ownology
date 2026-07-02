@@ -1037,6 +1037,17 @@ function StickyMobileCTA({
 export default function Pricing() {
   const [cycle, setCycle] = useState<BillingCycle>("annual");
 
+  // Live scarcity: pull the same reservation count the modal uses so the
+  // banner and the in-modal counter stay in sync. Falls back to "99" when
+  // the query hasn't resolved yet (soft-render, doesn't block layout).
+  const reservationCount = trpc.foundingMembers.getReservationCount.useQuery(undefined, {
+    refetchInterval: 60_000,
+  });
+  const claimedCount = reservationCount.data?.total ?? 0;
+  const capCount = reservationCount.data?.cap ?? 99;
+  const spotsRemaining = Math.max(0, capCount - claimedCount);
+  const percentClaimed = capCount > 0 ? Math.round((claimedCount / capCount) * 100) : 0;
+
   // flashRef holds the flash() callback registered by The Press TierCard
   const flashRef = useRef<(() => void) | null>(null);
   const pressCardRef = useRef<HTMLDivElement | null>(null);
@@ -1209,8 +1220,8 @@ export default function Pricing() {
               </p>
             </div>
             <div className="flex-shrink-0 text-center px-5 py-3 rounded-sm" style={{ background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}>
-              <p style={{ fontFamily: "'Fira Code', monospace", fontSize: "2rem", fontWeight: 700, color: "var(--ow-amber)", lineHeight: 1 }}>
-                {FOUNDING_SPOTS_REMAINING}
+              <p data-testid="pricing-spots-remaining" style={{ fontFamily: "'Fira Code', monospace", fontSize: "2rem", fontWeight: 700, color: "var(--ow-amber)", lineHeight: 1 }}>
+                {spotsRemaining}
               </p>
               <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.65rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: "0.25rem" }}>
                 spots remaining
@@ -1219,18 +1230,18 @@ export default function Pricing() {
           </div>
           <div>
             <div className="flex justify-between mb-1.5">
-              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "var(--ow-text-lo)" }}>
-                {99 - FOUNDING_SPOTS_REMAINING} of 99 founding spots claimed
+              <span data-testid="pricing-spots-claimed" style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "var(--ow-text-lo)" }}>
+                {claimedCount} of {capCount} founding spots claimed
               </span>
               <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "var(--ow-amber)" }}>
-                {Math.round(((99 - FOUNDING_SPOTS_REMAINING) / 99) * 100)}% claimed
+                {percentClaimed}% claimed
               </span>
             </div>
             <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: "var(--ow-bg-inset)" }}>
               <div
                 className="h-full rounded-full transition-all duration-1000"
                 style={{
-                  width: `${Math.max(2, ((99 - FOUNDING_SPOTS_REMAINING) / 99) * 100)}%`,
+                  width: `${Math.max(2, percentClaimed)}%`,
                   background: "linear-gradient(90deg, oklch(0.65 0.10 75), var(--ow-amber))",
                 }}
               />

@@ -235,6 +235,14 @@ async function startServer() {
 
   app.use(express.static(staticPath));
 
+  // API 404 JSON — any /api/* path not matched by a real route above should
+  // return 404 JSON, NOT the SPA HTML index. Registered AFTER all real /api
+  // routers so it only catches unmatched paths. Prevents warm-list-clicked
+  // links to old/renamed endpoints from silently serving the SPA.
+  app.use("/api", (_req, res) => {
+    res.status(404).json({ error: "not_found", message: "API endpoint not found" });
+  });
+
   // Client-side routing fallback
   app.get("*", (_req, res) => {
     res.sendFile(path.join(staticPath, "index.html"));
