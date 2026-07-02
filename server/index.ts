@@ -130,14 +130,17 @@ async function startServer() {
   const server = createServer(app);
 
   // ── Health probe (MUST be registered before adminGate/routers) ───────────
-  // k8s readiness/liveness probes hit /api/health. Returns 200 immediately
-  // without touching the DB so a slow Railway MySQL cold-start can't kill
-  // the pod during boot. See "Deployment hardening" notes for why we don't
-  // gate this behind bootstrap DB checks.
+  // k8s readiness/liveness probes hit /api/health, /healthz, or /health.
+  // Returns 200 immediately without touching the DB so a slow Railway MySQL
+  // cold-start can't kill the pod during boot. Emergent's default backend
+  // contract expects GET /health returning status < 500.
   app.get("/api/health", (_req, res) => {
     res.status(200).json({ status: "ok", uptime: process.uptime() });
   });
   app.get("/healthz", (_req, res) => {
+    res.status(200).json({ status: "ok", uptime: process.uptime() });
+  });
+  app.get("/health", (_req, res) => {
     res.status(200).json({ status: "ok", uptime: process.uptime() });
   });
 
@@ -284,6 +287,27 @@ async function startServer() {
     });
     frontendServer.listen(frontendPort, "0.0.0.0", () => {
       console.log(`[server] Also listening on http://0.0.0.0:${frontendPort}/ (frontend port)`);
+    });
+  }
+
+  // ── Bind port 8080 too — Emergent's default deploy contract ───────────
+  // Emergent's platform default readiness probe targets :8080 with either
+  // GET / (frontend contract) or GET /health (backend contract). Support
+  // already adjusted THIS deploy's manifest to :8001, but binding 8080
+  // future-proofs us against fresh deploys / forks reverting to the
+  // default probe port. Belt + braces.
+  const platformPort = 8080;
+  if (platformPort !== port && platformPort !== frontendPort) {
+    const platformServer = createServer(app);
+    platformServer.on("error", (err: NodeJS.ErrnoException) => {
+      if (err.code === "EADDRINUSE") {
+        console.warn(`[server] port ${platformPort} already in use — platform listener skipped`);
+      } else {
+        console.error(`[server] platform listener error on :${platformPort}:`, err);
+      }
+    });
+    platformServer.listen(platformPort, "0.0.0.0", () => {
+      console.log(`[server] Also listening on http://0.0.0.0:${platformPort}/ (platform default probe port)`);
     });
   }
 
