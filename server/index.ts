@@ -19,6 +19,7 @@ import { generateAuditTrailPdf } from "./auditTrailPdf.js";
 import { dailyAlertEmailHandler } from "./scheduled/dailyAlertEmail.js";
 import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
 import { generateLipAuditPackPdf } from "./lipAuditPackPdf.js";
+import { isRuntimeBypassActive } from "./devBypassRuntime.js";
 import { publicAuditHandler } from "./publicAudit.js";
 import authRouter from "./authRouter.js";
 import { jwtVerify } from "jose";
@@ -79,6 +80,9 @@ function checkBasicAuthFallback(req: express.Request): boolean {
 }
 
 function isDevBypassActive(): boolean {
+  // Runtime override wins first (admin toggled via /admin/dev-mode). Falls
+  // through to env-var evaluation if the runtime flag is off.
+  if (isRuntimeBypassActive()) return true;
   // Off only when explicitly set to "false" OR running in production. This
   // mirrors trpc.ts's seed-user injection so dev previews are wide open.
   if (process.env.ENABLE_DEV_BYPASS === "false") return false;

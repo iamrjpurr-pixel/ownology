@@ -7,6 +7,7 @@ import { COOKIE_NAME } from "../shared/const.js";
 import { upsertUser, db } from "./db.js";
 import * as schema from "../drizzle/schema.js";
 import { eq } from "drizzle-orm";
+import { isRuntimeBypassActive } from "./devBypassRuntime.js";
 
 // --- Context ------------------------------------------------------------------
 export type User = {
@@ -84,9 +85,20 @@ async function hydrateMembership(user: User): Promise<User> {
   return user;
 }
 
-// AUTH BYPASS: Auth is currently disabled site-wide. Every request is treated
-// as the seed owner account so all features work without login.
-// To re-enable real auth, restore the NODE_ENV check below.
+// Dev-bypass — auto-injects the seed owner when either the env-var says so
+// OR an admin has flipped the runtime override on via /admin/dev-mode. This
+// mirrors authRouter::isDevBypassActive and server/index.ts::isDevBypassActive
+// so all three surfaces (auth /me endpoint, tRPC context, admin gate) stay
+// in lockstep. When both env AND runtime say off, tRPC returns ctx.user=null
+// and any protectedProcedure throws UNAUTHORIZED.
+function isDevBypassActive(): boolean {
+  if (isRuntimeBypassActive()) return true;
+  if (process.env.ENABLE_DEV_BYPASS === "false") return false;
+  if (process.env.NODE_ENV === "production" &&
+      process.env.ENABLE_DEV_BYPASS !== "true") return false;
+  return true;
+}
+
 const DEV_BYPASS_USER: User = {
   openId: "seed-owner-001",
   name: "Redstone Ridge Wines",
@@ -104,16 +116,18 @@ export async function createContext({
   res: Response;
 }): Promise<Context> {
   const cookieUser = await getUserFromCookie(req);
-  // AUTH BYPASS: always inject the seed owner if no real session cookie present.
-  // This makes the entire app accessible without login (production + dev).
-  const baseUser = cookieUser ?? DEV_BYPASS_USER;
-  // Ensure the bypass user exists in the DB so protected routes (which call
-  // getUserByOpenId) don't fail. Best-effort; ignore errors.
-  if (baseUser === DEV_BYPASS_USER) {
-    await upsertUser(baseUser.openId, baseUser.name, baseUser.email).catch(() => {});
+  // Real cookie wins first. When no cookie, only fall back to the seed owner
+  // if the dev-bypass is active (env var OR runtime override). Otherwise
+  // leave user null so protectedProcedure/ownerProcedure gate correctly.
+  let baseUser: User | null = cookieUser;
+  if (!baseUser && isDevBypassActive()) {
+    baseUser = DEV_BYPASS_USER;
+    // Ensure the seed user exists in the DB so downstream getUserByOpenId
+    // lookups don't fail. Best-effort; ignore errors.
+    await upsertUser(DEV_BYPASS_USER.openId, DEV_BYPASS_USER.name, DEV_BYPASS_USER.email).catch(() => {});
   }
   // Hydrate the winery membership + DB user id. Cheap indexed lookup.
-  const user = await hydrateMembership(baseUser);
+  const user = baseUser ? await hydrateMembership(baseUser) : null;
   return { req, res, user };
 }
 

@@ -16,6 +16,7 @@
  * /admin/* route protection).
  */
 import { Link } from "wouter";
+import { DevBypassToggle } from "../components/DevBypassToggle";
 
 type ToolCard = {
   title: string;
@@ -215,6 +216,9 @@ export default function AdminDev() {
             difference between catching a bug in 30 seconds and pushing it to prod.
           </p>
         </div>
+
+        {/* Runtime auth-bypass toggle */}
+        <DevBypassToggle />
 
         {/* Quick-check banner */}
         <div

@@ -15,6 +15,7 @@ import { referralsRouter } from "./routers/referrals.js";
 import { wbsAdminRouter } from "./routers/wbsAdmin.js";
 import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
+import { getRuntimeBypassState, setRuntimeBypass } from "./devBypassRuntime.js";
 import { getLlmStats, resetLlmStats, resetDailyBudget } from "./_core/llmMeter.js";
 import { buildScopedKnowledgeBase, buildSourceDoctrineSummary } from "./complianceKnowledgeBase.js";
 import { buildQADoctrineSummary, QA_DOCTRINE, getTopics } from "./complianceQADoctrine.js";
@@ -478,6 +479,44 @@ const adminRouter = router({
       .limit(50);
     return rows;
   }),
+
+  /**
+   * Runtime dev-bypass toggle — lets an authenticated admin flip auth on/off
+   * without editing .env or restarting the server. The override is ephemeral
+   * (24h hard cap, resets on restart) so a stale toggle can't accidentally
+   * leak to prod. Env vars still take precedence when set to "true".
+   */
+  getDevBypassState: ownerProcedure.query(() => {
+    const runtime = getRuntimeBypassState();
+    const envValue = process.env.ENABLE_DEV_BYPASS;
+    const nodeEnv = process.env.NODE_ENV;
+    // Effective active = env explicit "true" OR runtime override OR dev default
+    const envActive =
+      envValue === "true" ||
+      (envValue !== "false" && nodeEnv !== "production");
+    return {
+      runtime, // { active, expiresAt, setBy, setAt }
+      envActive,
+      effectiveActive: envActive || runtime.active,
+      envValue: envValue ?? null,
+      nodeEnv: nodeEnv ?? null,
+    };
+  }),
+
+  setDevBypass: ownerProcedure
+    .input(
+      z.object({
+        active: z.boolean(),
+        // Duration in minutes when enabling. Ignored when disabling.
+        // Capped server-side at 24h.
+        minutes: z.number().int().min(1).max(1440).default(60),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      const setBy = ctx.user.email || ctx.user.openId || "admin";
+      const next = setRuntimeBypass(input.active, input.minutes, setBy);
+      return { ok: true, runtime: next };
+    }),
 });
 
 

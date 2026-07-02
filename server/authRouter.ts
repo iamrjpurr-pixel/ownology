@@ -25,6 +25,7 @@ import { db } from "./db.js";
 import * as schema from "../drizzle/schema.js";
 import { eq } from "drizzle-orm";
 import { COOKIE_NAME, ONE_YEAR_MS } from "../shared/const.js";
+import { isRuntimeBypassActive } from "./devBypassRuntime.js";
 
 const EMERGENT_SESSION_DATA_URL =
   "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data";
@@ -241,6 +242,7 @@ router.post("/exchange", express.json(), async (req: Request, res: Response) => 
  * sees a consistent identity in preview and dev.
  */
 function isDevBypassActive(): boolean {
+  if (isRuntimeBypassActive()) return true;
   if (process.env.ENABLE_DEV_BYPASS === "false") return false;
   if (process.env.NODE_ENV === "production" &&
       process.env.ENABLE_DEV_BYPASS !== "true") return false;

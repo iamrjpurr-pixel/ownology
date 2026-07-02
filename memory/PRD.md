@@ -657,3 +657,20 @@ have been folded in or marked complete.)
 - Preview: https://ownership-dev.preview.emergentagent.com
 - DB: Railway MySQL — `reseau.proxy.rlwy.net:34291/railway`
 - Repo: https://github.com/iamrjpurr-pixel/ownology
+
+
+## Runtime Dev-Auth Bypass Toggle (Feb 2026 — iter 29) ✅
+- **Problem**: to test the real Google-OAuth login flow we had to edit `.env` (`ENABLE_DEV_BYPASS=false`) and restart the server. Iterating on auth-gated behaviour was slow.
+- **Fix**: admin-only card on `/admin/dev` that flips a runtime override on/off with a duration (15m / 1h / 4h / 24h hard cap). Runtime override is ephemeral — 24h max, resets on server restart, so a stale toggle can never leak to prod.
+- **Precedence** (identical across authRouter `/me`, tRPC context, server admin gate):
+  1. Real session cookie always wins.
+  2. Runtime override (this UI) — auto-injects the seed owner.
+  3. Env `ENABLE_DEV_BYPASS=true` — same behaviour, static.
+  4. Otherwise: `ctx.user = null`, protected/owner procedures throw UNAUTHORIZED.
+- **Files touched**:
+  - `server/trpc.ts` — `createContext` now respects `isDevBypassActive()` (was unconditional seed inject).
+  - `server/routers.ts` — added `admin.getDevBypassState` (query) + `admin.setDevBypass` (mutation).
+  - `client/src/components/DevBypassToggle.tsx` — new admin card with status pill, env/runtime breakdown, duration select, enable/disable buttons, 30s-refresh countdown.
+  - `client/src/pages/AdminDev.tsx` — mounts `<DevBypassToggle />` at the top.
+- **Verified live**: curl-tested `admin.getDevBypassState` returns `{envActive:true, runtime:{active:false}}`; `admin.setDevBypass({active:true,minutes:15})` flips to `active:true` with correct `expiresAt` + `setBy` logged; UI screenshot confirmed ON pill + "Disable bypass" button + "1h left" countdown; disable returns to OFF + "inactive". End-to-end.
+- **testids**: `dev-bypass-toggle-card`, `dev-bypass-status-pill`, `dev-bypass-duration`, `dev-bypass-enable-btn`, `dev-bypass-disable-btn`, `dev-bypass-runtime-active`, `dev-bypass-error`.
