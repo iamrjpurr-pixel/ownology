@@ -674,3 +674,23 @@ have been folded in or marked complete.)
   - `client/src/pages/AdminDev.tsx` — mounts `<DevBypassToggle />` at the top.
 - **Verified live**: curl-tested `admin.getDevBypassState` returns `{envActive:true, runtime:{active:false}}`; `admin.setDevBypass({active:true,minutes:15})` flips to `active:true` with correct `expiresAt` + `setBy` logged; UI screenshot confirmed ON pill + "Disable bypass" button + "1h left" countdown; disable returns to OFF + "inactive". End-to-end.
 - **testids**: `dev-bypass-toggle-card`, `dev-bypass-status-pill`, `dev-bypass-duration`, `dev-bypass-enable-btn`, `dev-bypass-disable-btn`, `dev-bypass-runtime-active`, `dev-bypass-error`.
+
+
+## Founding-Member Reservation Modal (Feb 2026 — iter 30) ✅
+- **Problem**: Stripe live keys are pending, so the Pricing page "Start Founding Member" CTA was calling `foundingMembers.createCheckout` → 500 (STRIPE_SECRET_KEY=sk_test_stub). Broken CTA = burned warm list on launch weekend.
+- **Fix**: Pricing CTA now opens a reservation modal that captures name + email + winery + optional phone, writes to a new `founding_reservations` MySQL table, and fires two Resend emails (customer confirmation + owner alert). Zero Stripe dependency.
+- **Design decisions**:
+  - Slot counter reads paid `founding_members` + pending reservations combined; capped at 99. Live scarcity: "X of 99 spots claimed — Y left."
+  - Success state shows the slot number ("SLOT #X OF 99 · You're in the club"), tier/cycle context, and "I'll DM you in 24 hours" — turns every reservation into a phone call opportunity (per GO_LIVE_PLAN §3 rationale).
+  - Emails are best-effort — a failure never blocks the DB write. Owner alert always fires (via `ALERT_TEST_TO`) so a human circles back even if the customer email lands in spam.
+- **Files touched**:
+  - `drizzle/schema.ts` — added `foundingReservations` table.
+  - `server/index.ts` — bootstrap `CREATE TABLE IF NOT EXISTS founding_reservations` (idempotent).
+  - `server/db.ts` — `addFoundingReservation`, `getFoundingReservationCount`, `listFoundingReservations`.
+  - `server/foundingReservationEmail.ts` — new. `sendReservationEmails()` sends customer confirmation + owner alert.
+  - `server/routers.ts` — added `foundingMembers.reserve` (publicProcedure), `.getReservationCount` (publicProcedure), `.listReservations` (ownerProcedure).
+  - `client/src/components/FoundingReservationModal.tsx` — new modal (form + success + slot counter).
+  - `client/src/pages/Pricing.tsx` — CTA now opens modal instead of Stripe checkout.
+- **Verified live**: curl reserve returned `{ok:true, slotNumber:1, emails:{customerSent:false,ownerSent:true}}` (customer email correctly blocked by Resend testing-mode restriction on unverified domain — expected until `ownology.ai` is verified at resend.com/domains). Screenshot E2E: clicked "Enter The Press" → modal → filled form → success "SLOT #2 OF 99". End-to-end.
+- **testids**: `reservation-modal-backdrop`, `reservation-modal`, `reservation-modal-close`, `reservation-modal-slot-counter`, `reservation-form`, `reservation-name-input`, `reservation-email-input`, `reservation-winery-input`, `reservation-phone-input`, `reservation-submit-btn`, `reservation-error`, `reservation-success`, `reservation-close-btn`.
+- **Post-launch**: verify `ownology.ai` domain in Resend to unlock customer email delivery. Reservations already flow correctly and owner alerts arrive today.

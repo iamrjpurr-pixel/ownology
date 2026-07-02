@@ -16,6 +16,7 @@ import { wbsAdminRouter } from "./routers/wbsAdmin.js";
 import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
 import { getRuntimeBypassState, setRuntimeBypass } from "./devBypassRuntime.js";
+import { sendReservationEmails } from "./foundingReservationEmail.js";
 import { getLlmStats, resetLlmStats, resetDailyBudget } from "./_core/llmMeter.js";
 import { buildScopedKnowledgeBase, buildSourceDoctrineSummary } from "./complianceKnowledgeBase.js";
 import { buildQADoctrineSummary, QA_DOCTRINE, getTopics } from "./complianceQADoctrine.js";
@@ -34,6 +35,9 @@ import {
   getFoundingMemberCount,
   listFoundingMembers,
   addFoundingMember,
+  addFoundingReservation,
+  listFoundingReservations,
+  getFoundingReservationCount,
   listVintageLogEntries,
   getUserByOpenId,
   upsertTankReminder,
@@ -228,6 +232,78 @@ const foundingMembersRouter = router({
       });
 
       return { url: session.url };
+    }),
+
+  // Public: get the count of Founding-Member reservations (used for the
+  // "Slot #X of 99" scarcity indicator on the Pricing modal). Combines
+  // paid members + pending reservations because both hold a slot.
+  getReservationCount: publicProcedure.query(async () => {
+    const paid = await getFoundingMemberCount();
+    const reserved = await getFoundingReservationCount();
+    return { total: paid + reserved, paid, reserved, cap: 99 };
+  }),
+
+  // Public: reserve a Founding-Member slot without paying. Captures the
+  // warm lead, fires two Resend emails (customer confirmation + owner
+  // alert), and returns the slot number for the success state.
+  //
+  // Design: email/tier fail-open on Resend errors — a lead in the DB is
+  // more valuable than a stalled UI. The owner alert exists so a real
+  // human circles back within 24hrs even if the confirmation email lands
+  // in spam.
+  reserve: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email().max(256),
+        name: z.string().min(1).max(256),
+        wineryName: z.string().min(1).max(256),
+        phone: z.string().max(64).optional(),
+        tier: z.enum(["cellar", "press", "cellar_master"]).default("cellar"),
+        cycle: z.enum(["monthly", "annual"]).default("monthly"),
+        referralCode: z.string().max(64).optional(),
+        source: z.string().max(64).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { slotNumber } = await addFoundingReservation({
+        email: input.email.toLowerCase().trim(),
+        name: input.name.trim(),
+        wineryName: input.wineryName.trim(),
+        phone: input.phone?.trim(),
+        tier: input.tier,
+        cycle: input.cycle,
+        referralCode: input.referralCode?.trim(),
+        source: input.source,
+      });
+
+      // Best-effort emails — don't block the response on Resend errors.
+      const emails = await sendReservationEmails({
+        slotNumber,
+        name: input.name.trim(),
+        email: input.email.toLowerCase().trim(),
+        wineryName: input.wineryName.trim(),
+        phone: input.phone?.trim() ?? null,
+        tier: input.tier,
+        cycle: input.cycle,
+        referralCode: input.referralCode?.trim() ?? null,
+      }).catch((err) => {
+        console.error("[foundingMembers.reserve] email send failed:", err);
+        return { customerSent: false, ownerSent: false };
+      });
+
+      return {
+        ok: true,
+        slotNumber,
+        cap: 99,
+        emails,
+      };
+    }),
+
+  // Owner-only: list every reservation (Founding-Member pipeline view).
+  listReservations: ownerProcedure
+    .input(z.object({ limit: z.number().min(1).max(500).default(100) }).optional())
+    .query(async ({ input }) => {
+      return listFoundingReservations(input?.limit ?? 100);
     }),
 });
 

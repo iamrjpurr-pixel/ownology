@@ -162,6 +162,35 @@ export const foundingMembers = mysqlTable("founding_members", {
   notes: text("notes"),
 });
 
+// ─── Founding Reservations ────────────────────────────────────────────────────
+// Pre-payment reservations captured from the Pricing modal while Stripe live
+// keys are still pending. Each row is one warm lead who said "hold my slot".
+// Once Stripe is live, the reservation is converted (manually) into a paying
+// founding_members row and `status` flips to 'paid'.
+export const foundingReservations = mysqlTable(
+  "founding_reservations",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    email: varchar("email", { length: 256 }).notNull(),
+    name: varchar("name", { length: 256 }).notNull(),
+    wineryName: varchar("winery_name", { length: 256 }).notNull(),
+    phone: varchar("phone", { length: 64 }),
+    tier: mysqlEnum("tier", ["cellar", "press", "cellar_master"]).notNull().default("cellar"),
+    cycle: mysqlEnum("cycle", ["monthly", "annual"]).notNull().default("monthly"),
+    referralCode: varchar("referral_code", { length: 64 }),
+    source: varchar("source", { length: 64 }).notNull().default("pricing_modal"),
+    status: mysqlEnum("status", ["pending", "contacted", "paid", "cancelled"]).notNull().default("pending"),
+    reservedAt: bigint("reserved_at", { mode: "number" }).notNull(),
+    contactedAt: bigint("contacted_at", { mode: "number" }),
+    notes: text("notes"),
+  },
+  (t) => [
+    index("fr_email_idx").on(t.email),
+    index("fr_status_idx").on(t.status),
+    index("fr_reserved_at_idx").on(t.reservedAt),
+  ]
+);
+
 // ─── Tank Reminders ──────────────────────────────────────────────────────────────────────────────
 // One row per (user, tank, eventType) reminder. A Heartbeat cron fires hourly
 // and checks whether any active reminder's tank is overdue.

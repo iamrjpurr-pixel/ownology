@@ -134,6 +134,56 @@ export async function addFoundingMember(data: {
   });
 }
 
+// ─── Founding Reservations ────────────────────────────────────────────────────
+
+export async function getFoundingReservationCount(): Promise<number> {
+  const rows = await db.query.foundingReservations.findMany({
+    columns: { id: true },
+  });
+  return rows.length;
+}
+
+export async function addFoundingReservation(data: {
+  email: string;
+  name: string;
+  wineryName: string;
+  phone?: string;
+  tier?: "cellar" | "press" | "cellar_master";
+  cycle?: "monthly" | "annual";
+  referralCode?: string;
+  source?: string;
+}): Promise<{ id: number; slotNumber: number }> {
+  const now = Date.now();
+  await db.insert(schema.foundingReservations).values({
+    email: data.email,
+    name: data.name,
+    wineryName: data.wineryName,
+    phone: data.phone ?? null,
+    tier: data.tier ?? "cellar",
+    cycle: data.cycle ?? "monthly",
+    referralCode: data.referralCode ?? null,
+    source: data.source ?? "pricing_modal",
+    reservedAt: now,
+  });
+  // Re-query to get the auto-increment id (mirrors upsertUserFromEmergent
+  // pattern — drizzle MySQL insert() doesn't reliably return insertId).
+  const row = await db.query.foundingReservations.findFirst({
+    where: eq(schema.foundingReservations.email, data.email),
+    orderBy: [desc(schema.foundingReservations.reservedAt)],
+  });
+  const totalPaid = (await db.query.foundingMembers.findMany({ columns: { id: true } })).length;
+  const totalReserved = (await db.query.foundingReservations.findMany({ columns: { id: true } })).length;
+  const slotNumber = totalPaid + totalReserved; // 1-indexed by virtue of the just-inserted row
+  return { id: row?.id ?? 0, slotNumber };
+}
+
+export async function listFoundingReservations(limit = 200) {
+  return db.query.foundingReservations.findMany({
+    orderBy: [desc(schema.foundingReservations.reservedAt)],
+    limit,
+  });
+}
+
 // ─── Vintage Log ──────────────────────────────────────────────────────────────
 
 export type EventType = "addition" | "measurement" | "racking" | "inoculation" | "observation" | "pre_harvest_sample" | "bottling_run" | "weather_event" | "sanitation" | "other";

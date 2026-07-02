@@ -3,6 +3,7 @@ import { Link, useSearch } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
+import { FoundingReservationModal } from "@/components/FoundingReservationModal";
 
 // ─── Waitlist CTA ─────────────────────────────────────────────────────────────
 function WaitlistCapture() {
@@ -488,33 +489,23 @@ function TierCard({
     };
   }, [flashRef]);
 
-  // Stripe checkout for paid tiers
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const checkoutMutation = trpc.foundingMembers.createCheckout.useMutation();
+  // Stripe live keys are pending — Founding-Member CTAs open a reservation
+  // modal instead (captures warm lead, Resend confirmation, owner alert).
+  // Once STRIPE_SECRET_KEY is real, we can flip this back to createCheckout.
+  const [reservationOpen, setReservationOpen] = useState(false);
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (tier.monthlyPrice === 0) {
       // Free tier — scroll to waitlist
       document.querySelector("#waitlist")?.scrollIntoView({ behavior: "smooth" });
       return;
     }
-    setCheckoutLoading(true);
-    try {
-      const tierId = tier.id as "cellar" | "press" | "cellar_master";
-      const result = await checkoutMutation.mutateAsync({
-        tier: tierId,
-        cycle: cycle === "annual" ? "annual" : "monthly",
-        origin: window.location.origin,
-      });
-      if (result.url) {
-        window.open(result.url, "_blank");
-      }
-    } catch (err) {
-      console.error("[Checkout Error]", err);
-    } finally {
-      setCheckoutLoading(false);
-    }
+    setReservationOpen(true);
   };
+
+  // Retained for future re-enable of real Stripe checkout — currently unused
+  // because reservation modal owns the founding-member flow.
+  const checkoutLoading = false;
 
   return (
     <div
@@ -779,6 +770,13 @@ function TierCard({
           {checkoutLoading ? "Opening checkout…" : tier.cta}
         </button>
       </div>
+
+      <FoundingReservationModal
+        open={reservationOpen}
+        onClose={() => setReservationOpen(false)}
+        tier={tier.id as "cellar" | "press" | "cellar_master"}
+        cycle={cycle === "annual" ? "annual" : "monthly"}
+      />
     </div>
   );
 }

@@ -317,6 +317,35 @@ async function startServer() {
       console.warn("[bootstrap] cellar_briefs table create skipped:", (e as Error).message);
     }
 
+    // Create founding_reservations table (Feb 2026, launch-pivot feature).
+    // Captures pre-payment warm leads while Stripe live keys are pending.
+    // No FK: reservations can pre-date a users row entirely (Founding
+    // Member reserves before they've ever logged in).
+    try {
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS founding_reservations (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          email VARCHAR(256) NOT NULL,
+          name VARCHAR(256) NOT NULL,
+          winery_name VARCHAR(256) NOT NULL,
+          phone VARCHAR(64),
+          tier ENUM('cellar','press','cellar_master') NOT NULL DEFAULT 'cellar',
+          cycle ENUM('monthly','annual') NOT NULL DEFAULT 'monthly',
+          referral_code VARCHAR(64),
+          source VARCHAR(64) NOT NULL DEFAULT 'pricing_modal',
+          status ENUM('pending','contacted','paid','cancelled') NOT NULL DEFAULT 'pending',
+          reserved_at BIGINT NOT NULL,
+          contacted_at BIGINT,
+          notes TEXT,
+          INDEX fr_email_idx (email),
+          INDEX fr_status_idx (status),
+          INDEX fr_reserved_at_idx (reserved_at)
+        )
+      `);
+    } catch (e) {
+      console.warn("[bootstrap] founding_reservations table create skipped:", (e as Error).message);
+    }
+
     // Seed Default Winery containing existing data. Owner is the seed admin.
     const seedOwnerOpenId = process.env.OWNER_OPEN_ID || "seed-owner-001";    const seedRows = await db.execute(sql`SELECT id FROM users WHERE open_id = ${seedOwnerOpenId} LIMIT 1`);
     type SeedRow = { id: number };
