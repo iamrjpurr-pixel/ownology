@@ -129,6 +129,18 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
+  // ── Health probe (MUST be registered before adminGate/routers) ───────────
+  // k8s readiness/liveness probes hit /api/health. Returns 200 immediately
+  // without touching the DB so a slow Railway MySQL cold-start can't kill
+  // the pod during boot. See "Deployment hardening" notes for why we don't
+  // gate this behind bootstrap DB checks.
+  app.get("/api/health", (_req, res) => {
+    res.status(200).json({ status: "ok", uptime: process.uptime() });
+  });
+  app.get("/healthz", (_req, res) => {
+    res.status(200).json({ status: "ok", uptime: process.uptime() });
+  });
+
   // ── Admin gate (JWT-role + Basic Auth fallback) ───────────────────────────
   // Verifies `app_session_id` JWT cookie (role=admin) on /admin/* pages and
   // admin-only tRPC endpoints. Legacy Basic Auth still unlocks via env if
@@ -229,6 +241,19 @@ async function startServer() {
   });
 
   const port = Number(process.env.PORT) || 8001;
+
+  // ── Start listening FIRST — before the (slow) bootstrap DB queries ─────
+  // Original bug: bootstrap ran ~10-30s of sequential Railway MySQL CREATE
+  // TABLE / ALTER TABLE / ADD FK queries BEFORE server.listen(). On k8s the
+  // readiness probe fired before the port was open, killing the pod. Now
+  // the HTTP layer is live in <100ms and bootstrap runs afterwards. Any
+  // request that lands mid-bootstrap either serves static assets (fine) or
+  // hits a route whose table is being created (rare, returns 500 caught
+  // by the frontend's retry — the /api/health probe never touches DB).
+  server.listen(port, "0.0.0.0", () => {
+    console.log(`[server] Running on http://0.0.0.0:${port}/ (bootstrap running in background)`);
+  });
+
   // Bootstrap: ensure runtime-only telemetry tables exist (no migration needed).
   // theme_suggestions tracks acceptance of the once-a-day suggestion banner.
   try {
@@ -507,9 +532,8 @@ async function startServer() {
   } catch (e) {
     console.warn("[bootstrap] table create skipped:", (e as Error).message);
   }
-  server.listen(port, "0.0.0.0", () => {
-    console.log(`[server] Running on http://0.0.0.0:${port}/`);
-  });
+  // NOTE: server.listen() has already been called above (before bootstrap).
+  // Do NOT re-listen here — that would throw EADDRINUSE.
 }
 
 startServer().catch(console.error);
