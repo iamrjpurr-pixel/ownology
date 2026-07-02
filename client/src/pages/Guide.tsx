@@ -1019,6 +1019,12 @@ export default function Guide() {
                 tag: "COMMUNITY",
               },
               {
+                label: "Wine Folly — The 4-Step Tasting Method",
+                href: "https://winefolly.com/tips/the-wine-tasting-method-video/",
+                blurb: "The best consumer-tasting framework on the internet (Look / Smell / Taste / Conclude). Use it to build your mental library of what 'good' tastes like — separate from Ownology's fault-detection grid.",
+                tag: "TASTING",
+              },
+              {
                 label: "Australian Grape & Wine — Compliance Updates",
                 href: "https://www.agw.org.au/",
                 blurb: "Industry body for federal and state changes. Subscribe to their bulletin for regulation shifts before they hit your DA notice.",
