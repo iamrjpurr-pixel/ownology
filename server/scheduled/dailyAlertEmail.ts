@@ -134,6 +134,7 @@ export async function dailyAlertEmailHandler(req: Request, res: Response): Promi
   const apiKey = process.env.RESEND_API_KEY;
   const fromEmail = process.env.ALERT_FROM_EMAIL ?? "onboarding@resend.dev";
   const fromName = process.env.ALERT_FROM_NAME ?? "Ownology Cellar Brief";
+  const replyTo = process.env.ALERT_REPLY_TO?.trim() || null;
   const testTo = process.env.ALERT_TEST_TO?.trim() || null;
   const cronSecret = process.env.CRON_SECRET?.trim() || null;
   const providedSecret = (req.headers["x-cron-secret"] as string | undefined)?.trim()
@@ -187,6 +188,7 @@ export async function dailyAlertEmailHandler(req: Request, res: Response): Promi
       const send = await resend.emails.send({
         from: `${fromName} <${fromEmail}>`,
         to: [recipient],
+        ...(replyTo ? { replyTo } : {}),
         subject,
         html,
         text,
