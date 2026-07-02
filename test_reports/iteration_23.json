@@ -1,0 +1,55 @@
+{
+  "summary": "Iter-23 launch-readiness bug hunt on preview URL. Backend pytest suite (20 tests, /app/backend/tests/test_launch_readiness.py): 19/20 PASS. Frontend Playwright drive of Founding-Member reservation modal on /pricing, DevBypassToggle on /admin/dev, legal pages, footer, home, /join, /cellar-journal, and 404 fallback. Reservation flow WORKS end-to-end: modal opens on 'Enter The Press' CTA (once theme-suggestion toast dismissed), title correctly reads 'The Press · Monthly'/'The Press · Annual' reflecting page toggle, slot counter shows 'X of 99 spots claimed — Y left', all 6 tier×cycle combinations reserve successfully via tRPC (foundingMembers.reserve returns {ok:true, slotNumber, cap:99, emails}), getReservationCount increments, listReservations (owner-only) returns the new lead with iamrjpurr@gmail.com present. Real reservation submitted via UI landed slot #10 with correct 'SLOT #10 OF 99' + 'You're in the club' success state. HTML5 form validation catches invalid email + empty required fields. DevBypassToggle card + status pill + duration + enable button all render on /admin/dev; runtime bypass toggles ON via tRPC (admin.setDevBypass returns {ok:true, runtime:{active:true, expiresAt}}), and runtime-active indicator element appears in DOM. Env-forced-ON messaging is correctly displayed ('Env var is forcing bypass ON. Set ENABLE_DEV_BYPASS=false in prod to lock down'). SEO: /api/sitemap.xml valid urlset, /api/cellar-journal/rss.xml valid feed, /api/robots.txt present. LIP Audit Pack PDF: 200 %PDF for vintage=2026, 400 for vintage=abc. Legal pages /privacy, /terms, /refund all render real content (not placeholders). /cellar-journal index has 53 entry links. /join renders 'YOU'VE BEEN INVITED TO OWNOLOGY' headline. /admin/settings loads without 500. SPA 404 shows proper 'Page Not Found' component.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/does-not-exist", "issue": "Returns HTML 200 (SPA fallback) instead of JSON 404. Spec requires /api/* unknowns to return 404 JSON. Root cause: Express catch-all SPA middleware in server/index.ts is registered before an API 404 handler."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "FoundingReservationModal", "issue": "Escape key does NOT close the modal — spec explicitly required. Verified on both fresh modal and success-state modal. No keydown listener exists in the component (only backdrop onClick).", "selector": "[data-testid='reservation-modal']", "priority": "MEDIUM"},
+      {"component": "Home / global layout", "issue": "Home page has NO <footer> element and NO links to /privacy, /terms, or /refund anywhere on the page. Spec: 'legal pages … be linked from the footer. Check the footer on the Home page links to each.' Warm-list winemaker has no way to reach legal pages from the landing page — potential compliance blocker for GDPR/AU Privacy Act.", "selector": "footer, a[href='/privacy']", "priority": "MEDIUM"},
+      {"component": "Pricing page — Founding Member banner vs modal counter", "issue": "Founding-Member banner on /pricing shows '0 of 99 founding spots claimed / 99 SPOTS REMAINING' (uses paid-only count) while the reservation modal counter shows '10 of 99 spots claimed — 89 left' (uses paid+reserved). Inconsistent scarcity messaging for warm-list winemakers on the same page. Recommend both use the same getReservationCount total.", "selector": "text=/of 99 founding spots claimed/", "priority": "MEDIUM"},
+      {"component": "Pricing page — 'Theme Suggestion' toast overlays CTA", "issue": "A 'Try Soft Cellar for now?' theme-suggestion toast pops up over the Founding Member CTAs on first visit and covers the 'Enter The Press' button until dismissed. Playwright had to dismiss it to click through. Warm-list first-visit conversion risk.", "selector": "text=/Try Soft Cellar/", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Pricing page", "issues": ["Theme-suggestion toast overlay may cover primary CTAs on first visit"]},
+      {"screen": "Home page", "issues": ["No footer / no links to legal pages"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_launch_readiness.py",
+    "/app/test_reports/pytest/iter23_launch.xml",
+    "/app/test_reports/iteration_23.json"
+  ],
+  "action_items": [
+    "P1 — Add Escape-key close to FoundingReservationModal (useEffect + document.addEventListener('keydown', esc→onClose) while open).",
+    "P1 — Add a global footer with /privacy /terms /refund links on Home (and ideally site-wide) — compliance + trust signal for warm-list DMs.",
+    "P2 — Unify Founding-Member scarcity counter: pricing-page banner should use foundingMembers.getReservationCount (paid+reserved) same as the modal, or explicitly label the banner 'paid subscribers' vs the modal's 'slots claimed'.",
+    "P2 — Suppress or delay the 'Try Soft Cellar' theme-suggestion toast until user scrolls / interacts, so it doesn't cover Founding CTAs on first paint of /pricing.",
+    "P3 — Add an API 404 JSON handler in server/index.ts before the SPA catch-all so /api/* unknowns return 404 JSON, not the SPA HTML."
+  ],
+  "critical_code_review_comments": [
+    "FoundingReservationModal.tsx (402 lines) — well-structured, single responsibility. Missing Escape handler is the only functional gap. Inline styles are extensive (~150 lines) — future refactor could extract to CSS module but not blocking.",
+    "server/routers.ts foundingMembers.reserve (lines 254-300) — correctly fail-open on Resend errors (email failure won't roll back the DB write), which is the right choice for warm-lead capture. Zod schema properly validates email + non-empty name/wineryName. tier/cycle enums default to safe values. Cross-tier reservation was verified — all 6 combinations write successfully.",
+    "server/routers.ts admin.setDevBypass (lines 582-595) — 24h cap enforced via Zod .max(1440). Owner-only via ownerProcedure. Good.",
+    "server/routers.ts admin.getDevBypassState — correctly composes effectiveActive = envActive || runtime.active, so a runtime toggle can't defeat an env-forced OFF in prod. Verified in UI copy 'Env var is forcing bypass ON'.",
+    "getReservationCount (line 240-244) returns {total, paid, reserved, cap} — but the pricing-page banner appears to only read `paid` while the modal reads `total`. This is the RCA for the counter inconsistency listed under UI bugs.",
+    "Persistent nit carried from iter-16: cellarBrief.history pagination duplicate wineryId AND clause. Out of scope."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_launch_readiness.py (new)"
+  ],
+  "success_rate": {
+    "backend": "95% (19/20 pytest — only api-404 handler missing)",
+    "frontend": "70% (reservation flow + admin/dev + legal pages + cellar-journal + join + 404 all work; 3 medium UI issues: no Escape close, no home footer, banner-vs-modal counter mismatch, toast covers CTA)"
+  },
+  "test_credentials": "Dev bypass ON (env-forced). Auto-authenticated as seed admin owner cellar@redstoneridge.com.au (winery Redstone Ridge Wines, id=1, referralCode REDSTO-D671EF). Real email for Resend delivery test: iamrjpurr@gmail.com (Resend testing mode restriction).",
+  "seed_data_creation": "Testing created 8 new rows in founding_reservations table via tRPC + 1 via UI: (a) 1 press/monthly + all 6 tier×cycle combinations via backend pytest, all with email=iamrjpurr@gmail.com, source=backend_test_iter23 / backend_test_iter23_multi, (b) 1 UI-submitted reservation press/annual iamrjpurr@gmail.com slot #10, source=pricing_modal. Reservation counter went from 2 → 10 during this iteration. All test-created rows use the real ALERT_TEST_TO email so Resend confirmations actually sent — visible in Sarah's inbox as expected. No spam data.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "For fast regression: (a) `pytest /app/backend/tests/test_launch_readiness.py -v` — expect 19/20 (only api-404 failing until fixed). (b) tRPC GET /api/trpc/foundingMembers.getReservationCount returns {total, paid:0, reserved:>=10, cap:99}. (c) UI reservation smoke — go to /pricing, dismiss 'Try Soft Cellar' toast, click 'Enter The Press', fill form with iamrjpurr@gmail.com, submit, expect 'SLOT #X OF 99' + 'You're in the club'. (d) After Escape-key fix lands, verify with page.keyboard.press('Escape') on both fresh and success-state modals. (e) After footer fix lands, verify home has <footer> with links to /privacy /terms /refund. (f) After counter unification, verify pricing banner 'X of 99 founding spots claimed' matches modal 'X of 99 spots claimed — Y left' — both should track total (paid+reserved). Preview URL rate-limits to ~5 QPS from same session. Emails: RESEND_API_KEY set, but only iamrjpurr@gmail.com will actually deliver (Resend testing-mode restriction — other addresses log 'confirmation FAILED', which is expected until ownology.ai domain verified in Resend dashboard).",
+  "rca of the issue": "1) Escape close: FoundingReservationModal.tsx has no useEffect(document.addEventListener('keydown')) — only backdrop onClick handles close. Fix ~10 lines. 2) Footer: Home.tsx has no <footer> render. A shared Footer component appears to exist elsewhere but isn't mounted in the Home layout — either mount it in App layout or in Home.tsx. 3) Counter mismatch: pricing page banner uses foundingMembers.getCount (paid) whereas modal uses foundingMembers.getReservationCount (paid+reserved). Unify to getReservationCount total for consistent scarcity messaging. 4) API 404: In server/index.ts the express.static + SPA `res.sendFile('index.html')` catch-all runs before any /api 404 guard. Add `app.use('/api/*', (req, res) => res.status(404).json({error:'not_found'}))` before the SPA fallback."
+}
