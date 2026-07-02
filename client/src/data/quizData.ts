@@ -356,6 +356,32 @@ export const WINES: Wine[] = [
     palate: { fruit: "red", body: "medium", sweetness: "bone_dry", grip: "soft", age: "young" },
   },
   {
+    slug: "beaujolais-villages",
+    variety: "Gamay (Beaujolais-Villages)",
+    region: "Beaujolais",
+    country: "France",
+    ageWindow: "1–3 years",
+    price: "under_25",
+    richsPick: "The Tuesday-night red for people who don't want a heavy wine. Bright red cherry, a whisper of earth, almost weightless tannin. Serve slightly chilled — a proper 15°C, not fridge-cold — and it drinks like something twice the price. Perfect with roast chicken or a cheese board.",
+    gelsNote: "Semi-carbonic maceration preserves fresh primary fruit; low alcohol, low extract, high drinkability.",
+    producers: ["Georges Duboeuf", "Louis Jadot", "Domaine Dupeuble"],
+    alsoTry: ["Cru Beaujolais (Fleurie)", "Loire Pinot Noir"],
+    palate: { fruit: "red", body: "light", sweetness: "bone_dry", grip: "bright", age: "young" },
+  },
+  {
+    slug: "pinot-noir-yarra-entry",
+    variety: "Pinot Noir (entry-level)",
+    region: "Yarra Valley or Tasmania",
+    country: "Australia",
+    ageWindow: "1–3 years",
+    price: "under_25",
+    richsPick: "Under $25 Aussie Pinot used to be a gamble — thin, herbal, disappointing. That's changed. Second-label bottlings from serious cool-climate producers now deliver bright red cherry, faint sous-bois, gentle grip. Not a Grand Cru moment, but honest Pinot for a Wednesday. Serve cool.",
+    gelsNote: "Entry-tier fruit off cool-climate vineyards; minimal oak, short maceration, drink young.",
+    producers: ["De Bortoli Villages", "Delatite", "Josef Chromy"],
+    alsoTry: ["Mornington entry Pinot", "Central Otago Pinot second labels"],
+    palate: { fruit: "red", body: "light", sweetness: "bone_dry", grip: "bright", age: "young" },
+  },
+  {
     slug: "burgundy-old-white",
     variety: "Chardonnay (Meursault or Puligny-Montrachet)",
     region: "Côte de Beaune, Burgundy",
@@ -371,8 +397,12 @@ export const WINES: Wine[] = [
 ];
 
 // ─── Scoring — deterministic, zero LLM ────────────────────────────────────
-// Each axis has a small score contribution. Best-fit wine wins.
-const AXIS_WEIGHTS = { fruit: 3, body: 2, sweetness: 3, grip: 2, age: 2, budget: 5 };
+// Each axis has a small score contribution. Fruit gets the highest weight
+// because the quiz is fundamentally a "what do you like to taste" question;
+// budget shouldn't override that (previously budget=5 > fruit=3 meant a red-
+// fruit lover on a $25 budget could get served a white wine when no red
+// matched the budget). Budget is now a strong-but-secondary tiebreaker.
+const AXIS_WEIGHTS = { fruit: 6, body: 3, sweetness: 4, grip: 3, age: 2, budget: 4 };
 
 export function scoreWine(w: Wine, a: QuizAnswers): number {
   let score = 0;

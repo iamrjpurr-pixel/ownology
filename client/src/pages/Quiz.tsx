@@ -5,7 +5,7 @@
  */
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
-import { pickWine, type QuizAnswers, type Fruit, type Body as B, type Sweetness, type Grip, type Age, type Budget } from "@/data/quizData";
+import { pickWine, type QuizAnswers, type Budget } from "@/data/quizData";
 
 const AMBER = "var(--ow-amber)";
 const BG = "var(--ow-bg-base)";
@@ -230,8 +230,8 @@ export default function Quiz() {
               <p style={{ fontFamily: SANS, fontSize: "0.9rem", color: MID, lineHeight: 1.55, margin: "0 0 1rem" }}>
                 Ownology's the tool we built for exactly this. Your first cellar plan, grounded in real winemaking manuals, tailored to the style you just picked.
               </p>
-              <Link href="/pricing" data-testid="quiz-cta-founding">
-                <a style={ctaStyle}>See a Founding-Member plan →</a>
+              <Link href="/pricing" data-testid="quiz-cta-founding" style={ctaStyle}>
+                See a Founding-Member plan →
               </Link>
             </div>
 
@@ -239,10 +239,11 @@ export default function Quiz() {
               <button data-testid="quiz-retake-btn" onClick={reset} style={{ background: "transparent", border: `1px solid ${BORDER}`, color: MID, padding: "0.6rem 1rem", borderRadius: 4, fontFamily: SANS, fontSize: "0.82rem", cursor: "pointer" }}>
                 Retake the quiz
               </button>
-              <Link href="/cellar-journal">
-                <a style={{ background: "transparent", border: `1px solid ${BORDER}`, color: MID, padding: "0.6rem 1rem", borderRadius: 4, fontFamily: SANS, fontSize: "0.82rem", textDecoration: "none", display: "inline-block" }}>
-                  Read the journal
-                </a>
+              <Link
+                href="/cellar-journal"
+                style={{ background: "transparent", border: `1px solid ${BORDER}`, color: MID, padding: "0.6rem 1rem", borderRadius: 4, fontFamily: SANS, fontSize: "0.82rem", textDecoration: "none", display: "inline-block" }}
+              >
+                Read the journal
               </Link>
             </div>
           </div>
