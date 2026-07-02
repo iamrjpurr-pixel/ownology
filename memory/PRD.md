@@ -424,6 +424,16 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 - Regression file: `/app/backend/tests/test_batch2_features.py`.
 
 ## What's been implemented (27 Jan 2026)
+
+**Wine Recommender Quiz — `/quiz` (Feb 2026, this session)**
+- New `/quiz` route wired in `App.tsx` (lazy import). Public, no auth.
+- `Quiz.tsx` (state machine: intro → 6 questions → result) + `quizData.ts` (27 hand-curated wines with palate signatures + Rich/Gel voice notes + producers + also-try).
+- 6 axes: fruit, body, sweetness, grip, age, budget. Deterministic scoring — zero LLM at runtime. `AXIS_WEIGHTS = {fruit:6, body:3, sweetness:4, grip:3, age:2, budget:4}` — fruit intentionally outweighs budget so a red-fruit lover on a $25 budget doesn't get served a white wine.
+- Result card: variety headline, region/country, age/budget line, "Rich says" blockquote (60-120 words), amber "Gel adds" technical note, producers list, also-try list.
+- Bridge CTA to `/pricing` (`quiz-cta-founding`) — the Trojan horse: "Curious what it'd take to make one yourself?" → funnels drinkers into aspirational winemakers.
+- Discovery: `hero-quiz-link` teaser on `/home` under the hero, `footer-quiz` entry in SiteFooter Learn column.
+- Verified live (iter 25, 100% frontend pass, zero console errors, all 5 scoring combos coherent).
+
 - Mockup page in Emergent's default React stack ("Cellar Journal" aesthetic) — used as design exploration before the lift-and-shift.
 - Full lift-and-shift import of the Manus codebase into `/app`.
 - pnpm install of all 100+ deps; Drizzle schema pushed to Railway MySQL.
