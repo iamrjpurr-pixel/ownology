@@ -1,0 +1,40 @@
+{
+  "summary": "Frontend-only test of the new /quiz feature. 80/81 assertions passed. All state-machine transitions (intro → 6 questions → result → retake), data-testids, progress bar, back button state preservation, bridge CTA to /pricing, hero-quiz-link and footer-quiz all working. Regression on 6 other routes returns 200. Found 1 real bug (nested <a> hydration warning in the result CTA) and 1 scoring-coherence quirk.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Quiz.tsx result view",
+        "issue": "Hydration/DOM validation error: nested <a> inside <a>. `<Link href=\"/pricing\">` (wouter) renders an <a>, and its child is another <a> element with `data-testid=quiz-cta-founding`. Same pattern for the 'Read the journal' Link (child is an <a>). Console errors: 'In HTML, <a> cannot be a descendant of <a>' and '<a> cannot contain a nested <a>'. Reproduces on every result render.",
+        "selector": "[data-testid=quiz-cta-founding]",
+        "priority": "MEDIUM"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Scoring — 'red fruit + light body + bone_dry + bright + young + under_25' returns Riesling (a white) instead of a light red / rosé",
+        "issue": "AXIS_WEIGHTS.budget (5) dominates fruit (3). For this combo no red wine matches budget=under_25, so Riesling (perfect on all other axes + under_25) beats Rosé Provence (matches fruit + body + bright but priced 25_50) and Cru Beaujolais (grip=soft, priced 25_50). Reviewer explicitly flagged this combo as needing a light red/rosé. Two mitigations: (a) reduce budget weight to ~3, or (b) add a light-red under-$25 wine (e.g. entry-level Beaujolais-Villages or an Aussie Pinot under $25). Big-red and crisp-white combos scored correctly (Cabernet Sauvignon, Riesling).",
+        "affected_selectors": ["[data-testid=quiz-result-variety]"]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Fix nested <a> in Quiz.tsx result: replace `<Link href=\"/pricing\"><a ...>...</a></Link>` with `<Link href=\"/pricing\" data-testid=\"quiz-cta-founding\" style={ctaStyle}>See a Founding-Member plan →</Link>` (wouter Link forwards props to the anchor it renders). Same fix for the 'Read the journal' Link below the retake button.",
+    "Tune scoring so red-fruit answers don't return a white wine. Either lower AXIS_WEIGHTS.budget from 5 → 3 (so fruit isn't overridden) OR add 1-2 light-red / rosé wines priced under_25 to the dataset."
+  ],
+  "critical_code_review_comments": [
+    "Quiz.tsx: nested <a> inside wouter <Link> — real bug producing console errors on every result render.",
+    "quizData.ts: budget weight (5) is higher than fruit weight (3); this makes the fruit answer semantically overridable by price, which contradicts the spirit of a wine quiz. Consider re-balancing.",
+    "Quiz.tsx line 8 imports several types (Fruit, B, Sweetness, Grip, Age) that are unused — only Budget is used at runtime. Minor cleanup.",
+    "Result Retake+Journal row also nests <a> inside a Link (same pattern) — same fix required."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (not tested per request)", "frontend": "99% (80/81)"},
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Quiz flow, testids, routes, and regressions all verified. Two open issues to retest after main agent fix: (1) confirm no nested-<a> hydration console errors on /quiz result view, (2) confirm red-fruit + light-body + under_25 combo returns a light red or rosé (not a white).",
+  "rca_of_the_issue": "Nested <a>: wouter's <Link> renders its own <a> and the code additionally wraps content in an <a>. Fix by removing the inner <a> and passing testid/style to the Link itself. Scoring quirk: AXIS_WEIGHTS.budget=5 outweighs AXIS_WEIGHTS.fruit=3, so when no red wine matches the budget, a same-budget white with matching remaining axes wins."
+}

@@ -669,6 +669,32 @@ function Hero() {
                 📚 Or browse 250+ winemaking Q&amp;As in the Cellar Journal →
               </Link>
             </div>
+            {/* Wine Quiz teaser — viral lead-magnet, human-curated by Gel & Rich */}
+            <div className="mt-2 fade-up fade-up-delay-3">
+              <Link
+                href="/quiz?from=homepage-hero"
+                data-testid="hero-quiz-link"
+                style={{
+                  fontFamily: "'Lato', sans-serif",
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.04em",
+                  color: "var(--ow-text-lo)",
+                  textDecoration: "none",
+                  opacity: 0.85,
+                  transition: "color 180ms ease, opacity 180ms ease",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.color = "var(--ow-amber)";
+                  (e.currentTarget as HTMLAnchorElement).style.opacity = "1";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.color = "var(--ow-text-lo)";
+                  (e.currentTarget as HTMLAnchorElement).style.opacity = "0.85";
+                }}
+              >
+                🍷 Take our 6-question wine quiz — Gel &amp; Rich pick one for you →
+              </Link>
+            </div>
             {/* Trust bar */}
             <div className="mt-12 flex items-center gap-4 fade-up fade-up-delay-4">
               <div className="amber-rule flex-1 hidden sm:block" />
