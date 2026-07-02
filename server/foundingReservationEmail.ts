@@ -1,6 +1,6 @@
 /**
  * foundingReservationEmail.ts — sends two Resend emails on reservation:
- *   1. Confirmation to the customer ("Slot #X reserved · Sarah will DM you")
+ *   1. Confirmation to the customer ("Slot #X reserved · Gel & Rich will DM you")
  *   2. Alert to the owner (ALERT_TEST_TO) with the reservation payload
  *
  * Both are best-effort. A failure here MUST NOT block the reservation write
@@ -38,17 +38,17 @@ function renderCustomerHtml(p: ReservationPayload): string {
   <p style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #b45309; margin: 0 0 8px;">Founding-Member reservation confirmed</p>
   <h1 style="font-family: Georgia, serif; font-size: 24px; margin: 0 0 16px; line-height: 1.3;">Slot #${p.slotNumber} of 99 — reserved for ${escapeHtml(p.wineryName)}.</h1>
   <p>Hi ${escapeHtml(p.name)},</p>
-  <p>Your Founding-Member slot is locked in on the <strong>${escapeHtml(tierLabel)}</strong> tier (${p.cycle === "annual" ? "annual" : "monthly"}). I'll personally reach out within 24 hours to arrange payment and walk you through the 60-second onboarding.</p>
+  <p>Your Founding-Member slot is locked in on the <strong>${escapeHtml(tierLabel)}</strong> tier (${p.cycle === "annual" ? "annual" : "monthly"}). We'll personally reach out within 24 hours to arrange payment and walk you through the 60-second onboarding.</p>
   <p style="margin: 24px 0; padding: 16px; background: #fef3c7; border-left: 3px solid #b45309; border-radius: 4px;">
     <strong style="color: #78350f;">What happens next:</strong><br>
-    1. I'll DM or email you inside 24hrs to say hi.<br>
+    1. We'll DM or email you inside 24hrs to say hi.<br>
     2. Once payment's arranged, you get a 44-day trial (14 standard + 30 Founding-Member bonus).<br>
     3. Your locked-in tier pricing is <strong>fixed for life</strong> — no annual increases, ever.
   </p>
   <p>While you wait — the ${p.referralCode ? "referrer's" : "public"} <a href="${PUBLIC_SITE_URL}/cellar-journal" style="color: #78350f;">Cellar Journal</a> has 236 winemaker Q&amp;As grounded in real MoreWine and Scott Labs manuals. Free, no signup, forever.</p>
   <p style="font-size: 14px; color: #4b5563; margin-top: 32px;">If you didn't request this, just ignore the email — no charge, no follow-up.</p>
   <p style="font-size: 12px; color: #9ca3af; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
-    Ownology · Redstone Ridge Wines · Hunter Valley, NSW<br>
+    Ownology · Geraldine &amp; Richard · Adelaide Hills, SA<br>
     Reply to this email if you have any questions.
   </p>
 </body></html>`;
@@ -61,10 +61,10 @@ function renderCustomerText(p: ReservationPayload): string {
     ``,
     `Hi ${p.name},`,
     ``,
-    `Your Founding-Member slot is locked in on the ${tierLabel} tier (${p.cycle}). I'll reach out within 24hrs to arrange payment.`,
+    `Your Founding-Member slot is locked in on the ${tierLabel} tier (${p.cycle}). We'll reach out within 24hrs to arrange payment.`,
     ``,
     `What happens next:`,
-    `1. I'll DM or email you inside 24hrs.`,
+    `1. We'll DM or email you inside 24hrs.`,
     `2. Once payment's arranged, you get a 44-day trial (14 + 30 Founding bonus).`,
     `3. Your locked-in pricing is fixed for life — no annual increases.`,
     ``,
@@ -72,7 +72,7 @@ function renderCustomerText(p: ReservationPayload): string {
     ``,
     `If you didn't request this, just ignore the email.`,
     ``,
-    `— Sarah at Redstone Ridge · Ownology`,
+    `— Gel & Rich · Ownology`,
   ].join("\n");
 }
 
