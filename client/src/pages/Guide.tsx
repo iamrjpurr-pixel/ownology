@@ -976,6 +976,111 @@ export default function Guide() {
           </div>
         </section>
 
+        {/* ── Further Reading — external authoritative sources ── */}
+        <section style={{ marginBottom: "3rem" }} data-testid="further-reading-section">
+          <h2 style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "1.75rem", color: TEXT_HI, marginBottom: "0.5rem" }}>
+            Further reading
+          </h2>
+          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9rem", color: TEXT_MID, marginBottom: "1.5rem", maxWidth: "48rem" }}>
+            The public authorities we cross-reference (but don't clone). These sources are curated — not comprehensive.
+            Ownology grounds its AI in the technical/production side (MoreWine, Scott Labs, AWRI, AU compliance).
+            The links below are the trade, tasting, and marketing side you'll need eventually.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "0.75rem" }}>
+            {[
+              {
+                label: "Wine Australia — Australian Wine Discovered",
+                href: "https://www.wineaustralia.com/education",
+                blurb: "28 modules on AU regions and varieties + 300 downloadable trade-education assets. Best when you're SELLING your wine.",
+                tag: "TRADE",
+              },
+              {
+                label: "AWRI — Sensory Assessment & Wine Faults",
+                href: "https://www.awri.com.au/industry_support/winemaking_resources/sensory_assessment/",
+                blurb: "The Australian Wine Research Institute's fact sheets on fault detection, aroma triangulation, and lab tests. The gold standard.",
+                tag: "TECHNICAL",
+              },
+              {
+                label: "WSET — Systematic Approach to Tasting",
+                href: "https://www.wsetglobal.com/qualifications/wset-level-2-award-in-wines/",
+                blurb: "The evaluation grid the trade uses. WSET Level 2 SAT is the shorthand behind Ownology's evaluation card.",
+                tag: "EVALUATION",
+              },
+              {
+                label: "Wine Australia — LIP & Record-Keeping (s.39F)",
+                href: "https://www.wineaustralia.com/labelling/label-integrity-program",
+                blurb: "The AU Label Integrity Program you need to know cold. Ownology's LIP Audit Pack exports directly to this schema.",
+                tag: "COMPLIANCE",
+              },
+              {
+                label: "WineMaker Magazine — Troubleshooting Guide",
+                href: "https://winemakermag.com/technique",
+                blurb: "The friendliest home-winemaker troubleshooting archive. Great for pre-Ownology stage debugging.",
+                tag: "COMMUNITY",
+              },
+              {
+                label: "Australian Grape & Wine — Compliance Updates",
+                href: "https://www.agw.org.au/",
+                blurb: "Industry body for federal and state changes. Subscribe to their bulletin for regulation shifts before they hit your DA notice.",
+                tag: "COMPLIANCE",
+              },
+            ].map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid={`further-reading-${item.tag.toLowerCase()}`}
+                style={{
+                  display: "block",
+                  background: BG_CARD,
+                  border: `1px solid ${BORDER}`,
+                  borderRadius: "4px",
+                  padding: "1rem 1.1rem",
+                  textDecoration: "none",
+                  transition: "border-color 180ms ease, transform 180ms ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = AMBER;
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = BORDER;
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
+                  <span style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.86rem", color: TEXT_HI, lineHeight: 1.35 }}>
+                    {item.label}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: SANS,
+                      fontSize: "0.6rem",
+                      fontWeight: 700,
+                      color: AMBER,
+                      background: "color-mix(in oklch, currentColor 14%, transparent)",
+                      padding: "2px 6px",
+                      borderRadius: 3,
+                      letterSpacing: "0.06em",
+                      whiteSpace: "nowrap",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {item.tag}
+                  </span>
+                </div>
+                <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.78rem", color: TEXT_MID, lineHeight: 1.5, margin: 0 }}>
+                  {item.blurb}
+                </p>
+                <p style={{ fontFamily: SANS, fontSize: "0.68rem", color: AMBER, marginTop: 8, marginBottom: 0 }}>
+                  Open in new tab →
+                </p>
+              </a>
+            ))}
+          </div>
+        </section>
+
         {/* ── Footer note ── */}
         <div style={{
           background: BG_CARD, border: `1px solid ${BORDER}`, borderRadius: "4px",
