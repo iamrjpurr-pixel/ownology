@@ -397,12 +397,14 @@ export const WINES: Wine[] = [
 ];
 
 // ─── Scoring — deterministic, zero LLM ────────────────────────────────────
-// Each axis has a small score contribution. Fruit gets the highest weight
-// because the quiz is fundamentally a "what do you like to taste" question;
-// budget shouldn't override that (previously budget=5 > fruit=3 meant a red-
-// fruit lover on a $25 budget could get served a white wine when no red
-// matched the budget). Budget is now a strong-but-secondary tiebreaker.
-const AXIS_WEIGHTS = { fruit: 6, body: 3, sweetness: 4, grip: 3, age: 2, budget: 4 };
+// Weights: fruit is the primary style signal (red/dark/citrus/savoury
+// essentially locks the wine's colour and family). A user who says "dark
+// fruit — blackberry, plum" is picking a red — no combination of matching
+// body/grip/age/budget should override that into a white. Fruit weight is
+// deliberately dominant (12) — larger than the sum of any single other
+// axis but not by so much that a perfect 5/6 match on a slightly-off fruit
+// (savoury vs dark) still loses to a 1/6 match with the exact fruit.
+const AXIS_WEIGHTS = { fruit: 12, body: 3, sweetness: 4, grip: 3, age: 2, budget: 4 };
 
 export function scoreWine(w: Wine, a: QuizAnswers): number {
   let score = 0;
@@ -415,8 +417,34 @@ export function scoreWine(w: Wine, a: QuizAnswers): number {
   return score;
 }
 
+// Budget-tier ordering — higher-priced tiers include lower-priced ones only
+// when the user picks the top tier. Anyone under $50 should NEVER see a
+// $100+ wine (that's not "close enough", that's out of budget entirely).
+const BUDGET_RANK: Record<Budget, number> = {
+  under_25: 0,
+  "25_50": 1,
+  "50_100": 2,
+  "100_plus": 3,
+};
+
+/** Which price tiers are acceptable given the user's budget answer.
+ *  Rule: never recommend ABOVE the user's tier (that's bad shopping advice).
+ *  Below their tier is fine — a great $22 bottle beats a mediocre $45 one. */
+function acceptableTiers(budget: Budget): Set<Budget> {
+  const max = BUDGET_RANK[budget];
+  return new Set(
+    (Object.keys(BUDGET_RANK) as Budget[]).filter((b) => BUDGET_RANK[b] <= max)
+  );
+}
+
 export function pickWine(a: QuizAnswers): Wine {
-  const scored = WINES.map((w) => ({ w, s: scoreWine(w, a) }));
+  // HARD budget filter — never suggest above the user's stated tier.
+  const allowed = acceptableTiers(a.budget);
+  const inBudget = WINES.filter((w) => allowed.has(w.price));
+  // If somehow no wines match (shouldn't happen — we always have under_25),
+  // fall back to the full list rather than crash.
+  const pool = inBudget.length > 0 ? inBudget : WINES;
+  const scored = pool.map((w) => ({ w, s: scoreWine(w, a) }));
   scored.sort((x, y) => y.s - x.s);
   return scored[0].w;
 }
