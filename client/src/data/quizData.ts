@@ -22,6 +22,22 @@ export type QuizAnswers = {
   budget: Budget;
 };
 
+export type Region = "AU" | "NZ" | "US" | "UK" | "OTHER";
+
+/** Region-specific availability + tariff/tax context. Written honestly —
+ *  what a friend would tell you before you drove to the bottle shop. */
+export type RegionalNote = {
+  /** "easy" = in every major bottle shop; "moderate" = specialist stores;
+   *  "hard" = order online / direct import; "rare" = you're chasing unicorns */
+  availability: "easy" | "moderate" | "hard" | "rare";
+  /** Local price range for a decent bottle in this region, in local currency
+   *  string (with $ sign). Reflects retail after all local duties/tariffs. */
+  priceRange: string;
+  /** One-line honest advice: where to buy, tariff/tax context, seasonality,
+   *  or a "wait for X sale" note. Written in Rich's voice. */
+  advice: string;
+};
+
 export type Wine = {
   slug: string;
   variety: string;
@@ -40,6 +56,9 @@ export type Wine = {
     grip: Grip;
     age: Age;
   };
+  /** Optional per-region availability/price advice. If missing for a region,
+   *  the quiz uses a generic fallback. Populate honestly. */
+  regional?: Partial<Record<Region, RegionalNote>>;
 };
 
 export const WINES: Wine[] = [
@@ -468,3 +487,195 @@ export function pickWine(a: QuizAnswers): Wine {
   }
   return winner;
 }
+
+// ─── Region detection + Honest trade-off layer ───────────────────────────
+// Rationale: even inside a budget cap, the wine that BEST matches a user's
+// palate might be regionally rare / heavily tariffed / seasonal. Instead of
+// silently returning "second-best", we surface the honest trade-off:
+//
+//   "Your true match is X. But in your region it's <hard to find / above
+//    budget after tariffs / seasonal>. So we're picking Y for you instead."
+//
+// This is what makes the quiz feel like a friend, not an algorithm.
+
+/** Detect the user's region from browser locale. Falls back to OTHER.
+ *  Safe on server (returns OTHER when window undefined). */
+export function detectRegion(): Region {
+  if (typeof navigator === "undefined") return "OTHER";
+  const lang = (navigator.language || "").toUpperCase();
+  const langs = (navigator.languages || []).map((l) => l.toUpperCase());
+  const all = [lang, ...langs].join(" ");
+  if (/\bEN-AU\b|-AU\b/.test(all)) return "AU";
+  if (/\bEN-NZ\b|-NZ\b/.test(all)) return "NZ";
+  if (/\bEN-GB\b|-GB\b|-UK\b/.test(all)) return "UK";
+  if (/\bEN-US\b|-US\b/.test(all)) return "US";
+  return "OTHER";
+}
+
+/** Fallback regional note used when a wine doesn't have an explicit entry
+ *  for the user's region. Written honestly rather than overpromising. */
+function fallbackRegionalNote(w: Wine, region: Region): RegionalNote {
+  const regionLabel: Record<Region, string> = { AU: "Australia", NZ: "New Zealand", US: "the US", UK: "the UK", OTHER: "your region" };
+  return {
+    availability: "moderate",
+    priceRange: `~${w.price === "under_25" ? "$25" : w.price === "25_50" ? "$25-50" : w.price === "50_100" ? "$50-100" : "$100+"} (local currency)`,
+    advice: `Check specialist wine merchants or direct import in ${regionLabel[region]}. Local taxes/duties may push the shelf price above our estimate — worth checking a couple of shops before buying.`,
+  };
+}
+
+/** Curated per-wine regional notes for the most-frequently-picked wines.
+ *  Written honestly with real tariff/tax/availability context as of 2026.
+ *  Keyed by wine slug. Wines not in this map get the generic fallback.
+ *
+ *  If any of this becomes stale (tariffs shift, retailers rebrand), update
+ *  here — it's the single source of truth for buying advice. */
+const REGIONAL_NOTES: Record<string, Partial<Record<Region, RegionalNote>>> = {
+  "beaujolais-villages": {
+    AU: { availability: "easy", priceRange: "$22-30", advice: "Widely available at Dan Murphy's, First Choice, Vintage Cellars. Louis Jadot and Georges Duboeuf are the reliable supermarket-tier bottlings. Serve slightly chilled (~15°C)." },
+    NZ: { availability: "moderate", priceRange: "NZ$28-38", advice: "Glengarry and Fine Wine Delivery stock rotating Beaujolais. Not on every shelf but easy to order online. FTA with EU means no meaningful tariff — you're mostly paying freight + GST." },
+    US: { availability: "easy", priceRange: "US$18-28", advice: "Duboeuf and Jadot are Total Wine / BevMo staples. Post-2025 EU tariff instability means keep an eye on shelf prices — some importers pass through, some absorb. Trader Joe's often has entry-level Beaujolais under $12." },
+    UK: { availability: "easy", priceRange: "£12-18", advice: "Every major supermarket and Majestic stocks Beaujolais-Villages. Post-Brexit still-wine duty went up in 2023 (~£2.67/bottle now) which hit mid-tier hardest. Cru Beaujolais is the value sweet spot right now." },
+  },
+  "malbec-mendoza": {
+    AU: { availability: "easy", priceRange: "$18-28", advice: "Argentina's Malbec is the value king in AU. Catena, Trapiche, Norton at Dan Murphy's; Susana Balbi and Zuccardi at Vintage Cellars. Argentina isn't in the FTA queue — freight + WET + 5% duty adds up but volumes keep prices competitive." },
+    NZ: { availability: "moderate", priceRange: "NZ$22-32", advice: "Glengarry, Regional Wines stock a rotating range. NZ market is smaller — fewer Argentine imports than AU, but the top brands (Catena, Zuccardi) are usually findable online." },
+    US: { availability: "easy", priceRange: "US$15-25", advice: "Malbec's booming in the US — every supermarket and Costco carries Catena / Trapiche / Alamos. No US-Argentina tariff friction. Best mid-tier value on shelves under $25." },
+    UK: { availability: "easy", priceRange: "£12-20", advice: "Waitrose, Marks & Spencer, Majestic all stock quality Argentine Malbec. Post-2023 duty structure favours Malbec's typical 13-14% ABV — priced very competitively vs Bordeaux." },
+  },
+  "riesling-clare": {
+    AU: { availability: "easy", priceRange: "$22-35", advice: "This is your backyard. Grosset, Pikes, Kilikanoon, Pewsey Vale all at Dan Murphy's / Prince Wine Store. Pewsey Vale Contours (5-year library release) is stupidly good value at ~$45. No import costs — you're basically buying at the source." },
+    NZ: { availability: "moderate", priceRange: "NZ$28-40", advice: "AU Rieslings cross the Tasman freely (ANZCERTA — no tariff). Glengarry stocks the top names. NZ also makes brilliant Riesling of its own (Framingham, Felton Road) — worth considering too." },
+    US: { availability: "hard", priceRange: "US$28-45", advice: "Rare in mainstream US stores — this is a specialist-order item. Grosset lands via Old Bridge Cellars distribution; try K&L, Chambers Street Wines, or direct-ship states via WineBid. German Rieslings are far easier to find." },
+    UK: { availability: "moderate", priceRange: "£20-32", advice: "Australian Riesling exists but isn't front-of-shelf — try Wine Society, Berry Bros, or Handford. Post-2023 duty on dry <11.5% ABV is favourable, so pricing is reasonable when you find it. Otherwise consider Mosel or Rheingau Riesling — both easier here." },
+  },
+  "pinot-noir-mornington": {
+    AU: { availability: "easy", priceRange: "$45-75", advice: "Ten Minutes by Tractor, Yabby Lake, Paringa, Kooyong all at Prince Wine Store, Vintage Cellars. Under $45 is a value hunt — Yarra Valley entry-tier (De Bortoli, Innocent Bystander) is your friend for that price point." },
+    NZ: { availability: "easy", priceRange: "NZ$40-70", advice: "NZ's home turf for Pinot. Central Otago and Martinborough dominate. Felton Road, Rippon, Ata Rangi — every quality retailer stocks them. AU Pinots also freely traded — no tariff." },
+    US: { availability: "moderate", priceRange: "US$55-95", advice: "Aus/NZ Pinot is available but pricey after freight. Domestic OR / CA Pinot (Adelsheim, Bethel Heights, Sea Smoke, Belle Glos) is often the better value play. Post-2025 EU tariff uncertainty has actually helped Aus/NZ imports look competitive." },
+    UK: { availability: "moderate", priceRange: "£35-60", advice: "Berry Bros and Wine Society carry Australian and NZ Pinot. Burgundy is right there — for £35-60 you could also drink Village-level Burgundy which is a different (and arguably better) experience for the money. Depends what you're chasing." },
+  },
+  "montepulciano-abruzzo": {
+    AU: { availability: "easy", priceRange: "$18-28", advice: "Masciarelli is the workhorse — under $20 at most bottle shops. Emidio Pepe (the natural-wine benchmark) available at Prince Wine Store, Blackhearts & Sparrows. Italy-AU trade is smooth — no meaningful tariff friction." },
+    NZ: { availability: "moderate", priceRange: "NZ$22-32", advice: "Regional Wines, Glengarry stock the essentials. Italian imports slightly pricier in NZ vs AU due to smaller volumes, but still one of the best value-red categories." },
+    US: { availability: "easy", priceRange: "US$14-22", advice: "Trader Joe's, Total Wine — everywhere. Masciarelli, Umani Ronchi, Cataldi Madonna are all common. 2019-2021 tariff on Italian wines was 25% — that's since ended, prices have normalised. Great $15 red." },
+    UK: { availability: "easy", priceRange: "£10-18", advice: "Waitrose, M&S, Aldi all stock Montepulciano d'Abruzzo. Post-2023 duty hit mid-tier — but Montepulciano at 13% ABV is priced sensibly. Best sub-£15 red option going." },
+  },
+  "nebbiolo-barolo": {
+    AU: { availability: "moderate", priceRange: "$95-180", advice: "Prince Wine Store, Dan Murphy's Premium, Randall's. Top houses (Giacosa, Vietti, Bartolo Mascarello) command Bordeaux-level pricing. Second-tier (Fontanafredda, Marchesi di Barolo) is more reachable. Look for Langhe Nebbiolo <$50 as an intro." },
+    NZ: { availability: "hard", priceRange: "NZ$110-200", advice: "Specialist merchants only — Glengarry Fine Wine, Caro's. Smaller market means fewer top-tier producers on shelf; you may need to pre-order or wait for allocation." },
+    US: { availability: "moderate", priceRange: "US$70-160", advice: "Post-2025 EU tariff instability threatens this category — buying window matters. K&L, Zachys, Wine.com. Italian tariff was 25% in 2019-2021 (now lifted). Watch news; buy on dips." },
+    UK: { availability: "moderate", priceRange: "£55-140", advice: "Berry Bros, Justerini & Brooks, Handford Wines — deep Barolo lists. Post-Brexit tariffs on EU still wines are zero (FTA-adjacent), but 2023 duty reform pushed high-ABV Barolo (14-14.5%) up ~£1.50/bottle. Still fair value for what it is." },
+  },
+  "amarone": {
+    AU: { availability: "moderate", priceRange: "$65-140", advice: "Amarone is expensive in AU — big producers (Masi, Zenato, Allegrini) around $70-90. Rarely under $50 unless it's a discount. If you're on a mid-budget and want Amarone-style, look for Valpolicella Ripasso — same style, half the price." },
+    NZ: { availability: "hard", priceRange: "NZ$85-160", advice: "Speciality Italian merchants (Regional Wines) and top hotels. Not a supermarket item. Small market means limited allocation — consider Ripasso as the accessible cousin." },
+    US: { availability: "moderate", priceRange: "US$50-120", advice: "Total Wine and Costco stock volume-brand Amarone (Zenato, Cesari). Post-2025 EU tariff situation is the big variable — Italian wines faced 25% tariffs in 2019-2021. Watch for tariff news before splurging." },
+    UK: { availability: "moderate", priceRange: "£45-100", advice: "Wine Society, Majestic, most quality wine merchants. Post-2023 duty hit high-ABV wines hard — Amarone at 15-16% ABV now carries the maximum duty (£3.21/bottle). That's the biggest reason a £30 Amarone doesn't really exist here anymore." },
+  },
+  "sauternes": {
+    AU: { availability: "moderate", priceRange: "$60-180", advice: "Half-bottles are common (375ml at $30-50). Château d'Yquem at $600+ is silly money; Château Guiraud and Château Rieussec are the accessible fine tier at $80-140. Prince Wine Store, Randall's. Watch the alcohol duty — 14% ABV plus sugar = fully-taxed." },
+    NZ: { availability: "hard", priceRange: "NZ$80-220", advice: "Specialist only — sweet wine is a niche in NZ. Consider Framingham F-Series Riesling (lush late-harvest, NZ-made, half the price). Or Kracher Beerenauslese from Austria, easier to find." },
+    US: { availability: "moderate", priceRange: "US$40-140", advice: "K&L, Wine.com, high-end grocery. Half-bottles are the entry — under $40 for a 375ml Guiraud. Post-2025 EU tariff uncertainty applies. Also consider Tokaji Aszú from Hungary as an alternative — often exempt from EU-wide tariffs." },
+    UK: { availability: "easy", priceRange: "£25-80 (half-bottle) / £45-160 (full)", advice: "Berry Bros, Wine Society, most fine wine merchants. UK is the biggest historical Sauternes market outside France — best selection outside the EU itself." },
+  },
+  "port-vintage": {
+    AU: { availability: "easy", priceRange: "$50-160", advice: "Dan Murphy's stocks Graham's, Taylor's, Warre's. Australia also makes exceptional 'Vintage Fortified' (formerly 'Vintage Port' before EU GI restrictions) — Seppeltsfield, Yalumba Museum, All Saints. Local versions are often better value and taste basically identical." },
+    NZ: { availability: "moderate", priceRange: "NZ$60-180", advice: "Fortified wine is a small category in NZ. Glengarry stocks the major Portuguese houses. Consider AU 'Vintage Fortified' as a value alternative — freely traded across the Tasman." },
+    US: { availability: "easy", priceRange: "US$40-140", advice: "Total Wine, K&L, wine.com. Portugal isn't affected by EU-wide tariff drama the same way France/Italy are — Port has been stable. 20-year Tawny is the reliable go-to at $50-70." },
+    UK: { availability: "easy", priceRange: "£25-100", advice: "Berry Bros, Fortnum & Mason, Waitrose. UK has a 300-year love affair with Port — best-priced market outside Portugal itself. Post-2023 duty on fortified wine hit sub-£20 bracket the hardest; premium Port still fair value." },
+  },
+  "vermouth-torino": {
+    AU: { availability: "moderate", priceRange: "$45-90", advice: "Specialty wine and spirits merchants — Vintage Cellars, Prince Wine Store, cocktail-focused liquor stores (Cellarmaster). Carpano Antica, Cocchi Storico, Punt e Mes are the essentials. Not a supermarket item in AU yet." },
+    NZ: { availability: "hard", priceRange: "NZ$55-110", advice: "Cocktail bars and specialist merchants (Regional Wines). Vermouth is under-represented in NZ retail; you may need to order online. Cocchi Americano is worth the hunt for cocktails." },
+    US: { availability: "easy", priceRange: "US$25-60", advice: "Booming cocktail culture means Total Wine, BevMo, Whole Foods all carry premium vermouth. Carpano Antica, Cocchi, Dolin, Punt e Mes — spoiled for choice. Under $30 for excellent quality." },
+    UK: { availability: "moderate", priceRange: "£20-45", advice: "The Whisky Exchange, Master of Malt, Fortnum & Mason. Not on every supermarket shelf but well-stocked online. Post-2023 spirits duty is more punishing than wine duty — vermouth sits in a favourable bracket." },
+  },
+  "cabernet-coonawarra": {
+    AU: { availability: "easy", priceRange: "$28-95", advice: "Coonawarra Cab is quintessentially Australian — every bottle shop stocks Wynns, Katnook, Balnaves. Wynns Black Label ($30-40) is the value gold standard. Coonawarra region has a fanatical following in AU." },
+    NZ: { availability: "easy", priceRange: "NZ$32-110", advice: "Kiwi retailers love AU Cabernet — Glengarry, Fine Wine Delivery, Regional Wines carry the top Coonawarra names. Trans-Tasman trade is friction-free." },
+    US: { availability: "moderate", priceRange: "US$25-90", advice: "Old Bridge Cellars imports Wynns and Balnaves. Available at K&L, better wine shops. Napa Cab is your obvious competitor at the same price point — different style, similar bracket." },
+    UK: { availability: "moderate", priceRange: "£22-70", advice: "Wine Society, Berry Bros, Majestic (larger stores). Coonawarra is niche in the UK — you'll find one or two producers rather than the full range. Bordeaux at this price is the alternative." },
+  },
+  "syrah-northern-rhone": {
+    AU: { availability: "hard", priceRange: "$90-250", advice: "Northern Rhône Syrah is niche in AU — Prince Wine Store, City Wine Shop, specialty merchants. Consider Aussie Shiraz alternatives: Barossa Old Vine (Rockford, Torbreck), or cool-climate Aussie Shiraz (Yering Station, Craiglee) for similar profile at half the price." },
+    NZ: { availability: "hard", priceRange: "NZ$110-300", advice: "Fine-wine merchants only. NZ also makes stellar Syrah — Trinity Hill, Man O' War, Bilancia — worth considering as a locally-produced alternative that's easier to source." },
+    US: { availability: "moderate", priceRange: "US$65-220", advice: "K&L, Zachys, Chambers Street. Post-2025 EU tariff instability — Northern Rhône was hit by the 2019-2021 25% tariff and could be again. Buy on dips. Washington State Syrah (Cayuse, K Vintners) is the domestic parallel." },
+    UK: { availability: "moderate", priceRange: "£55-180", advice: "Berry Bros, Wine Society, Justerini & Brooks. UK loves the Rhône — deeper selection than most anywhere outside France. Post-2023 duty on ~13% ABV Syrah is manageable." },
+  },
+  "grillo-sicily": {
+    AU: { availability: "moderate", priceRange: "$22-38", advice: "Sicilian whites are growing in AU — Dan Murphy's Premium, Prince Wine Store. Planeta, Tasca d'Almerita are the reliable names. Under $30 you're getting Sicilian sunshine in a bottle." },
+    NZ: { availability: "moderate", priceRange: "NZ$28-42", advice: "Glengarry, Regional Wines carry the main Sicilian producers. Fewer options than AU but the top brands are available." },
+    US: { availability: "easy", priceRange: "US$16-28", advice: "Trader Joe's, Total Wine, most Italian-focused retailers. Sicily has been growing in US shelf space. Planeta and Donnafugata are the volume options." },
+    UK: { availability: "easy", priceRange: "£12-22", advice: "Waitrose, M&S, Sainsbury's Taste the Difference. Sicilian whites are trending — best value alternative to Sauvignon Blanc at similar price points." },
+  },
+  "chenin-blanc-loire": {
+    AU: { availability: "moderate", priceRange: "$32-70", advice: "Loire wines are specialist territory in AU — Prince Wine Store, Blackhearts & Sparrows. Domaine Huët, Vincent Carême are the top names. Off-dry (demi-sec) is the sweet spot — pairs with anything spicy." },
+    NZ: { availability: "moderate", priceRange: "NZ$38-80", advice: "Glengarry, Caro's for the top houses. NZ also grows Chenin (small quantities — Millton Vineyards is worth seeking) as a local alternative." },
+    US: { availability: "moderate", priceRange: "US$25-55", advice: "K&L, Chambers Street, Astor Wines have deep Loire selections. South African Chenin (Ken Forrester, Mullineux) is the underrated alternative — half the price, comparable quality." },
+    UK: { availability: "easy", priceRange: "£18-40", advice: "Wine Society, Waitrose, Berry Bros — Loire is well-served in UK retail. Post-Brexit tariff on EU wine is nil; Chenin at 12-13% ABV benefits from the 2023 duty structure." },
+  },
+};
+
+/** Return the regional note for a wine + region, using fallback if needed. */
+export function regionalNoteFor(w: Wine, region: Region): RegionalNote {
+  return REGIONAL_NOTES[w.slug]?.[region]
+    || w.regional?.[region]
+    || fallbackRegionalNote(w, region);
+}
+
+/** The full quiz result — winner AND honest trade-off narration. */
+export type QuizResult = {
+  winner: Wine;
+  /** The palate-only best match, ignoring budget. If different from winner,
+   *  we're constraining below the user's dream wine — narrate honestly. */
+  trueMatch: Wine;
+  /** True when budget forced us to pick something other than trueMatch. */
+  budgetConstrained: boolean;
+  /** True when trueMatch has "hard" or "rare" availability in this region. */
+  regionallyRare: boolean;
+  region: Region;
+  regionalNote: RegionalNote;
+  /** Rich's one-paragraph honest narration when constrained. Empty when the
+   *  winner IS the true match — no need to over-narrate. */
+  honestFraming: string;
+};
+
+/** Enhanced pick that returns the full honest picture. Use this in the
+ *  Quiz UI. Backwards-compatible with pickWine — just call .winner. */
+export function pickWineWithHonesty(a: QuizAnswers, region?: Region): QuizResult {
+  const r = region ?? detectRegion();
+  const winner = pickWine(a);
+
+  // Find the palate-only best (ignore budget). This is the "true match".
+  const allScores = WINES.map((w) => ({ w, s: scoreWine(w, a) }));
+  allScores.sort((x, y) => y.s - x.s);
+  const trueMatch = allScores[0].w;
+
+  const budgetConstrained =
+    BUDGET_RANK[trueMatch.price] > BUDGET_RANK[a.budget] && trueMatch.slug !== winner.slug;
+
+  const trueMatchNote = regionalNoteFor(trueMatch, r);
+  const regionallyRare = trueMatchNote.availability === "hard" || trueMatchNote.availability === "rare";
+  const regionalNote = regionalNoteFor(winner, r);
+
+  let honestFraming = "";
+  if (budgetConstrained || (regionallyRare && trueMatch.slug !== winner.slug)) {
+    const priceGap = BUDGET_RANK[trueMatch.price] - BUDGET_RANK[a.budget];
+    const budgetLabel: Record<Budget, string> = {
+      under_25: "under $25", "25_50": "$25-50", "50_100": "$50-100", "100_plus": "$100+",
+    };
+    const parts: string[] = [];
+    parts.push(`Your true palate match is **${trueMatch.variety}** from ${trueMatch.region}.`);
+    if (priceGap > 0) {
+      parts.push(`But it sits at ${budgetLabel[trueMatch.price]} — above your ${budgetLabel[a.budget]} budget.`);
+    }
+    if (regionallyRare) {
+      parts.push(trueMatchNote.advice);
+    }
+    parts.push(`So we're picking **${winner.variety}** for you instead — hits most of your marks at your budget.`);
+    honestFraming = parts.join(" ");
+  }
+
+  return { winner, trueMatch, budgetConstrained, regionallyRare, region: r, regionalNote, honestFraming };
+}
+

@@ -5,7 +5,7 @@
  */
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
-import { pickWine, type QuizAnswers, type Budget } from "@/data/quizData";
+import { pickWine, pickWineWithHonesty, type QuizAnswers, type Budget, type QuizResult } from "@/data/quizData";
 
 const AMBER = "var(--ow-amber)";
 const BG = "var(--ow-bg-base)";
@@ -62,6 +62,10 @@ export default function Quiz() {
 
   const complete = QUESTIONS.every((q) => answers[q.key]);
   const wine = useMemo(() => (complete ? pickWine(answers as QuizAnswers) : null), [answers, complete]);
+  const honest: QuizResult | null = useMemo(
+    () => (complete ? pickWineWithHonesty(answers as QuizAnswers) : null),
+    [answers, complete]
+  );
 
   function pick(key: keyof QuizAnswers, value: string) {
     const next = { ...answers, [key]: value } as Partial<QuizAnswers>;
@@ -185,6 +189,30 @@ export default function Quiz() {
               {wine.ageWindow} · {budgetLabel(wine.price)}
             </p>
 
+            {/* ── Honest trade-off narration (only when budget-constrained) ── */}
+            {honest?.honestFraming && (
+              <div
+                data-testid="quiz-honest-tradeoff"
+                style={{
+                  background: "color-mix(in oklch, var(--ow-amber) 6%, transparent)",
+                  border: `1px dashed color-mix(in oklch, var(--ow-amber) 40%, transparent)`,
+                  borderRadius: 6,
+                  padding: "0.9rem 1.1rem",
+                  marginBottom: "1.2rem",
+                }}
+              >
+                <p style={{ fontFamily: SANS, fontSize: "0.66rem", color: AMBER, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700, margin: "0 0 6px" }}>
+                  Being honest with you
+                </p>
+                <p
+                  style={{ fontFamily: SANS, fontSize: "0.84rem", color: MID, lineHeight: 1.6, margin: 0 }}
+                  dangerouslySetInnerHTML={{
+                    __html: honest.honestFraming.replace(/\*\*(.+?)\*\*/g, `<strong style="color: var(--ow-text-hi)">$1</strong>`),
+                  }}
+                />
+              </div>
+            )}
+
             <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 6, padding: "1.2rem 1.3rem", marginBottom: "1rem" }}>
               <p style={{ fontFamily: SERIF, fontSize: "1rem", color: HI, lineHeight: 1.65, margin: 0 }}>
                 {wine.richsPick}
@@ -218,6 +246,27 @@ export default function Quiz() {
                 {wine.alsoTry.join(" · ")}
               </p>
             </div>
+
+            {/* ── Regional availability + tariff/tax context ─────────────── */}
+            {honest?.regionalNote && (
+              <div
+                data-testid="quiz-regional-note"
+                style={{
+                  background: CARD,
+                  border: `1px solid ${BORDER}`,
+                  borderRadius: 6,
+                  padding: "1rem 1.2rem",
+                  marginBottom: "1.5rem",
+                }}
+              >
+                <p style={{ fontFamily: SANS, fontSize: "0.68rem", color: LO, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700, margin: "0 0 8px" }}>
+                  Buying in {regionLabel(honest.region)} · {availabilityLabel(honest.regionalNote.availability)} · {honest.regionalNote.priceRange}
+                </p>
+                <p style={{ fontFamily: SANS, fontSize: "0.83rem", color: MID, lineHeight: 1.6, margin: 0 }}>
+                  {honest.regionalNote.advice}
+                </p>
+              </div>
+            )}
 
             {/* Bridge CTA — the Trojan horse */}
             <div style={{ background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", border: `1.5px solid ${AMBER}`, borderRadius: 6, padding: "1.4rem 1.4rem 1.2rem", marginBottom: "1.4rem" }}>
@@ -272,3 +321,12 @@ const ctaStyle: React.CSSProperties = {
 function budgetLabel(b: Budget): string {
   return { under_25: "under $25 AUD", "25_50": "$25–50 AUD", "50_100": "$50–100 AUD", "100_plus": "$100+ AUD" }[b];
 }
+
+function regionLabel(r: string): string {
+  return { AU: "Australia 🇦🇺", NZ: "New Zealand 🇳🇿", US: "the US 🇺🇸", UK: "the UK 🇬🇧", OTHER: "your region" }[r as "AU"|"NZ"|"US"|"UK"|"OTHER"] || "your region";
+}
+
+function availabilityLabel(a: string): string {
+  return { easy: "Widely available", moderate: "Moderate availability", hard: "Hard to find", rare: "Rare — worth the hunt" }[a as "easy"|"moderate"|"hard"|"rare"] || "Availability varies";
+}
+
