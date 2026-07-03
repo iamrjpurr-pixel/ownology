@@ -279,8 +279,8 @@ router.get("/me", async (req: Request, res: Response) => {
     return res.json({
       user: {
         openId: process.env.OWNER_OPEN_ID || "seed-owner-001",
-        name: process.env.OWNER_NAME || "Redstone Ridge Wines",
-        email: "cellar@redstoneridge.com.au",
+        name: process.env.OWNER_NAME || "Ownology Cellars",
+        email: "richard@ownology.ai",
         role: "admin",
       },
     });
