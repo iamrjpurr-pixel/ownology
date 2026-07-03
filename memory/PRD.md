@@ -425,6 +425,19 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 
 ## What's been implemented (27 Jan 2026)
 
+**Cellar Brief email — end-to-end verified live (Feb 2026, this session)**
+- Resend domain `ownology.ai` fully verified (DKIM at apex `resend._domainkey.ownology.ai` TXT, SPF at `send.ownology.ai` TXT, MX at `send.ownology.ai` → `feedback-smtp.us-east-1.amazonses.com`). Region: `us-east-1`.
+- Live send verified: Resend msg ID `c0b73f05-d90a-40a2-96df-1d1df391b541`, delivered to gmail inbox 3 Jul 2026 10:42 AEST.
+- Env vars set in preview `.env`:
+  - `RESEND_API_KEY` — live key from Resend dashboard
+  - `ALERT_FROM_EMAIL=alerts@ownology.ai`
+  - `ALERT_FROM_NAME=Geraldine & Richard`
+  - `ALERT_REPLY_TO=support@ownology.ai` *(NEW — replies land in Google Workspace inbox once MX cuts over)*
+  - `ALERT_TEST_TO=iamrjpurr@gmail.com` *(dev override — leave EMPTY in production)*
+- `dailyAlertEmail.ts` now sets `replyTo` header on every Resend `emails.send` call.
+- MAIL SETTINGS in Namecheap flipped from "Private Email" → "Custom MX" so custom MX records can coexist. `mx1/mx2.privateemail.com` retained at apex during Google Workspace transition.
+
+
 **Wine Recommender Quiz — `/quiz` (Feb 2026, this session)**
 - New `/quiz` route wired in `App.tsx` (lazy import). Public, no auth.
 - `Quiz.tsx` (state machine: intro → 6 questions → result) + `quizData.ts` (27 hand-curated wines with palate signatures + Rich/Gel voice notes + producers + also-try).
