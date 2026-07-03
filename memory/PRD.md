@@ -425,6 +425,14 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 
 ## What's been implemented (27 Jan 2026)
 
+**Theme leak fix & OwnologyLogo hover regression (Feb 2026)**
+- Bug: `document.documentElement` was carrying both `theme-parchment` (light) AND `dark` (Tailwind flag) at the same time. OwnologyLogo trinity hover card + shadcn portals rendered in cellar-dark styling regardless of the active Ownology theme.
+- Root cause: two writers fighting for the html class list — `lib/themes.ts::applyThemeToDom` set the light theme, then `ThemeContext.tsx`'s state effect immediately re-added `dark` because it init'd to "dark" before the theme system had finished mounting.
+- Fix: made `applyThemeToDom` the SOLE writer of both theme classes AND the shadcn `dark` class (adds/removes based on `theme.kind === "dark"`). Downgraded `ThemeContext` to a read-only observer (MutationObserver watches html class; no writes). Verified across all 6 themes (parchment / soft-cellar / red-crush / white-crush / cellar / auto) — no more `dark + light-mode` mix.
+- Also suppressed the ThemeSuggestion toast on `/quiz` (was overlapping the founding-member CTA on the result screen).
+- Iter 26 testing: 100% pass, 0 critical bugs.
+
+
 **Ownology Cellars — fake demo winery + 10-wine naming system (Feb 2026)**
 - Seed winery renamed: `Redstone Ridge Wines` → **`Ownology Cellars`** (Hunter Valley, NSW). Same trademark family as parent Ownology brand — no new registration needed.
 - Seed admin email: `cellar@redstoneridge.com.au` → `richard@ownology.ai`

@@ -218,7 +218,7 @@ export function FoundingReservationModal({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     style={fieldInputStyle}
-                    placeholder="Sarah Winemaker"
+                    placeholder="Your name"
                     autoFocus
                     maxLength={256}
                   />
