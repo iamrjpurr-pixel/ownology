@@ -425,6 +425,18 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 
 ## What's been implemented (27 Jan 2026)
 
+**Ownology Cellars — 2026 Hunter Valley vintage demo data (Feb 2026)**
+- New idempotent seeder `/app/scripts/seed-ownology-cellars-vintage.mjs` populates the seed winery (id=1) with:
+  - **10 wine batches** — one per wine in the System 1 lineup (First Row · Free Run · Cellar Journal · Small Hours · The Press · The Vineyard · The Curl · The Craft · Convergence · First Light)
+  - Realistic July-2026 vintage state — whites through ferment, reds in MLF or barrel, sparkling in tirage, rosé bottled
+  - Real Hunter Valley sub-region references (Broke-Fordwich · Pokolbin · Wollombi · Cessnock · Bulga · Mount View · Denman)
+  - Real winemaking chemistry (SO₂ 32ppm, pH 3.02, TA 6.8, malic 0.6 g/L, RC212 yeast, X5, QA23, EC1118 yeasts, foot-tread whole-bunch 30%, tirage 22g/L, screw-cap tin-liner OTR spec)
+  - **10 vintage-log entries** — one recent event per batch (SO₂ addition, TA measurement, first racking, tirage bottling, sensory observation, etc.)
+  - **10 pending cellar tasks** — one upcoming task per batch (bench trial, MLF check, topping schedule, aphrometer sampling, etc.)
+- Idempotent (safe to re-run): rows tagged with `[OC-SEED]` marker, upsert-on-match by `batch_id` + `winery_id`
+- Verified live in DB — 12 batches total registered, 145 vintage-log entries, 16 pending tasks
+
+
 **Theme leak fix & OwnologyLogo hover regression (Feb 2026)**
 - Bug: `document.documentElement` was carrying both `theme-parchment` (light) AND `dark` (Tailwind flag) at the same time. OwnologyLogo trinity hover card + shadcn portals rendered in cellar-dark styling regardless of the active Ownology theme.
 - Root cause: two writers fighting for the html class list — `lib/themes.ts::applyThemeToDom` set the light theme, then `ThemeContext.tsx`'s state effect immediately re-added `dark` because it init'd to "dark" before the theme system had finished mounting.
