@@ -29,6 +29,17 @@ export default function PwaInstallBanner() {
     }
   }, []);
 
+  // Advertise banner presence to sibling floating UI (e.g. GlobalThemeToggle
+  // in App.tsx uses this to lift its bottom offset so the two don't overlap).
+  const isVisible = !isInstalled && !dismissed && (canInstall || canInstallIos);
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (isVisible) {
+      document.body.classList.add("has-pwa-banner");
+      return () => document.body.classList.remove("has-pwa-banner");
+    }
+  }, [isVisible]);
+
   function handleDismiss() {
     localStorage.setItem(DISMISSED_KEY, "1");
     setDismissed(true);
@@ -121,6 +132,33 @@ export default function PwaInstallBanner() {
             Install
           </button>
         )}
+        {/* Explicit X — some users can't parse "Not now" as a dismiss. This
+            gives them a universally-understood close affordance. */}
+        <button
+          type="button"
+          data-testid="pwa-install-close"
+          aria-label="Close install banner"
+          onClick={handleDismiss}
+          style={{
+            background: "transparent",
+            border: "1px solid oklch(1 0 0 / 12%)",
+            color: "oklch(0.65 0.010 75)",
+            width: 36,
+            height: 36,
+            minHeight: 36,
+            minWidth: 36,
+            borderRadius: 4,
+            cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "1.05rem",
+            lineHeight: 1,
+          }}
+          title="Close"
+        >
+          ×
+        </button>
       </div>
     </div>
   );
