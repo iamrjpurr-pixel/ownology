@@ -439,6 +439,8 @@ function acceptableTiers(budget: Budget): Set<Budget> {
 
 export function pickWine(a: QuizAnswers): Wine {
   // HARD budget filter — never suggest above the user's stated tier.
+  // This is non-negotiable: if a user says "$25-50", showing them a $100
+  // wine is bad advice, not "the best fit". Budget wins over palate.
   const allowed = acceptableTiers(a.budget);
   const inBudget = WINES.filter((w) => allowed.has(w.price));
   // If somehow no wines match (shouldn't happen — we always have under_25),
@@ -446,5 +448,23 @@ export function pickWine(a: QuizAnswers): Wine {
   const pool = inBudget.length > 0 ? inBudget : WINES;
   const scored = pool.map((w) => ({ w, s: scoreWine(w, a) }));
   scored.sort((x, y) => y.s - x.s);
-  return scored[0].w;
+  const winner = scored[0].w;
+
+  // ── Defensive runtime assertion ─────────────────────────────────────────
+  // Guarantees no future edit can accidentally return an above-budget wine.
+  // If this ever throws in production, we WANT to know — surface a loud
+  // error via console instead of silently mis-advising a user.
+  if (BUDGET_RANK[winner.price] > BUDGET_RANK[a.budget]) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `[quiz] BUDGET ASSERTION FAILED: user budget=${a.budget}, picked ${winner.variety} (${winner.price}). This should be impossible — check acceptableTiers / BUDGET_RANK.`
+    );
+    // Fall back to the highest-scoring in-budget wine we can find. If NONE
+    // exists (impossible unless WINES is empty), return the cheapest wine.
+    const safeInBudget = scored.filter((s) => BUDGET_RANK[s.w.price] <= BUDGET_RANK[a.budget]);
+    if (safeInBudget.length > 0) return safeInBudget[0].w;
+    const cheapest = [...WINES].sort((x, y) => BUDGET_RANK[x.price] - BUDGET_RANK[y.price])[0];
+    return cheapest;
+  }
+  return winner;
 }
