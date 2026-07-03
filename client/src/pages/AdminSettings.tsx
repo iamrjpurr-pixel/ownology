@@ -321,12 +321,12 @@ function WinerySection() {
             value={contactName}
             disabled={readOnly || update.isPending}
             maxLength={128}
-            placeholder="e.g. Sarah"
+            placeholder="e.g. Rich"
             onChange={(e) => setContactName(e.target.value)}
             style={inputStyle}
           />
           <p style={{ fontSize: "0.72rem", color: "var(--ow-text-lo)", margin: "0.4rem 0 0", lineHeight: 1.4 }}>
-            Personalises invite links (&quot;{contactName.trim() || "Sarah"} at {name.trim() || "your winery"} invited you&quot;) and any nurture emails sent to leads you refer.
+            Personalises invite links (&quot;{contactName.trim() || "Rich"} at {name.trim() || "your winery"} invited you&quot;) and any nurture emails sent to leads you refer.
           </p>
         </div>
 

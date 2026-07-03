@@ -13,8 +13,8 @@ Real auth is now wired. Two modes:
 | Field   | Value (auto-injected)                  |
 |---------|----------------------------------------|
 | openId  | `seed-owner-001`                       |
-| name    | `Redstone Ridge Wines`                 |
-| email   | `cellar@redstoneridge.com.au`          |
+| name    | `Ownology Cellars`                     |
+| email   | `richard@ownology.ai`                  |
 | role    | `admin`                                |
 
 ### Production (Railway)

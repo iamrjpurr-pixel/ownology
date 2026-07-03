@@ -101,8 +101,8 @@ function isDevBypassActive(): boolean {
 
 const DEV_BYPASS_USER: User = {
   openId: "seed-owner-001",
-  name: "Redstone Ridge Wines",
-  email: "cellar@redstoneridge.com.au",
+  name: "Ownology Cellars",
+  email: "richard@ownology.ai",
   role: "admin",
   wineryId: null,
   userId: null,

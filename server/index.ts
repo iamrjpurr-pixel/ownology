@@ -436,7 +436,7 @@ async function startServer() {
       const seedUserId = seedRowArr[0].id;
       await db.execute(sql`
         INSERT IGNORE INTO wineries (name, slug, owner_user_id, plan, region, created_at)
-        VALUES ('Redstone Ridge Wines', 'redstone-ridge', ${seedUserId}, 'founding_member', 'Hunter Valley, NSW', ${Date.now()})
+        VALUES ('Ownology Cellars', 'ownology-cellars', ${seedUserId}, 'founding_member', 'Hunter Valley, NSW', ${Date.now()})
       `);
       // Backfill: any user with NULL winery_id gets the Default Winery.
       const defaultRows = await db.execute(sql`SELECT id FROM wineries WHERE slug = 'redstone-ridge' LIMIT 1`);

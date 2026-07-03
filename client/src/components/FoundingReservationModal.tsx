@@ -245,7 +245,7 @@ export function FoundingReservationModal({
                     value={wineryName}
                     onChange={(e) => setWineryName(e.target.value)}
                     style={fieldInputStyle}
-                    placeholder="Redstone Ridge Wines"
+                    placeholder="Ownology Cellars"
                     maxLength={256}
                   />
                 </label>

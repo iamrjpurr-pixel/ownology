@@ -333,18 +333,18 @@ function StepName({ state, setState, onNext, saving }: {
           data-testid="onb-name-winery"
           value={state.wineryName}
           onChange={(e) => setState((s) => ({ ...s, wineryName: e.target.value }))}
-          placeholder="Redstone Ridge Wines"
+          placeholder="Ownology Cellars"
           style={inputStyle}
           disabled={saving}
         />
       </Field>
 
-      <Field label="Your first name" hint='Used in warm-intro links ("Sarah at Redstone Ridge invited you") and nurture emails.'>
+      <Field label="Your first name" hint='Used in warm-intro links ("Rich at Ownology Cellars invited you") and nurture emails.'>
         <input
           data-testid="onb-name-contact"
           value={state.contactName}
           onChange={(e) => setState((s) => ({ ...s, contactName: e.target.value }))}
-          placeholder="Sarah"
+          placeholder="Rich"
           style={inputStyle}
           disabled={saving}
         />
@@ -355,7 +355,7 @@ function StepName({ state, setState, onNext, saving }: {
           data-testid="onb-name-region"
           value={state.region}
           onChange={(e) => setState((s) => ({ ...s, region: e.target.value }))}
-          placeholder="Barossa Valley"
+          placeholder="Hunter Valley"
           style={inputStyle}
           disabled={saving}
         />

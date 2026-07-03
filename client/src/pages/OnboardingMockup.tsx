@@ -87,7 +87,7 @@ const FAUX_SCRAPE: Record<string, { logo: string; colors: string[]; detectedName
   DEFAULT: {
     logo: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=200&h=200&fit=crop&auto=format",
     colors: ["#8b2635", "#c17817", "#3d5a3d"],
-    detectedName: "Redstone Ridge Wines",
+    detectedName: "Ownology Cellars",
   },
 };
 
@@ -283,17 +283,17 @@ function StepName({ state, setState, onNext }: {
           data-testid="onb-name-winery"
           value={state.wineryName}
           onChange={(e) => setState((s) => ({ ...s, wineryName: e.target.value }))}
-          placeholder="Redstone Ridge Wines"
+          placeholder="Ownology Cellars"
           style={inputStyle}
         />
       </Field>
 
-      <Field label="Your first name" hint="Used in warm-intro links (e.g. &quot;Sarah at Redstone Ridge invited you&quot;) and nurture emails.">
+      <Field label="Your first name" hint="Used in warm-intro links (e.g. &quot;Rich at Ownology Cellars invited you&quot;) and nurture emails.">
         <input
           data-testid="onb-name-contact"
           value={state.contactName}
           onChange={(e) => setState((s) => ({ ...s, contactName: e.target.value }))}
-          placeholder="Sarah"
+          placeholder="Rich"
           style={inputStyle}
         />
       </Field>
@@ -303,7 +303,7 @@ function StepName({ state, setState, onNext }: {
           data-testid="onb-name-region"
           value={state.region}
           onChange={(e) => setState((s) => ({ ...s, region: e.target.value }))}
-          placeholder="Barossa Valley"
+          placeholder="Hunter Valley"
           style={inputStyle}
         />
       </Field>
@@ -338,7 +338,7 @@ function StepBrand({ state, setState, onScrape, onNext, onBack }: {
               data-testid="onb-brand-url"
               value={state.websiteUrl}
               onChange={(e) => setState((s) => ({ ...s, websiteUrl: e.target.value }))}
-              placeholder="https://redstoneridgewines.com.au"
+              placeholder="https://ownology.ai"
               style={inputStyle}
               disabled={state.brandStatus === "loading"}
             />

@@ -1,0 +1,40 @@
+{
+  "summary": "Frontend-only batch validation of theme bug fix, Quiz flow, rename propagation (Ownology Cellars / Rich / Hunter Valley / richard@ownology.ai), Founding-Member modal, Cellar Brief dry-run, and smoke pages. All 4 target features PASS. Theme regression PASS across all 6 themes.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "ThemeSuggestion toast", "issue": "Toast (bottom-center) overlays the Quiz result CTA 'See a Founding-Member plan →' and the Pricing 'Claim The Vigneron' area. In Playwright, force-clicks were intercepted by the toast — needed to dismiss it first to observe the /pricing navigation from quiz-cta-founding. Real user clicks still succeed via event bubbling, but the CTA is visually obstructed and click-target overlap is a UX risk.", "selector": "[data-testid=\"theme-suggestion\"]", "priority": "MINOR"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "OPTIONAL: Auto-hide the ThemeSuggestion toast on /quiz result step, or reposition so it doesn't overlap the primary CTA (currently blocks 'See a Founding-Member plan →').",
+    "OPTIONAL: The reservation modal 'Your Name' placeholder still reads 'Sarah Winemaker' — if the rename brief covers user-facing placeholders, consider updating to 'Rich Winemaker' or a generic archetype consistent with Onboarding/Admin.",
+    "OBSERVATION: Onboarding step 1 pre-fills 'Your First Name' input with value 'Sarah' (from state) — placeholder is 'Rich' as required, but the visible seeded value is stale. Not part of this brief; only surfacing.",
+    "MINOR: Theme id 'cellar' applies the 'dark' token but no matching 'theme-cellar' class on <html> — every other theme applies exactly one 'theme-*' token. No BAD_MIX, but the missing token is inconsistent with the pattern."
+  ],
+  "critical_code_review_comments": [
+    "Theme invariants (regression fix) verified: for each of {parchment, soft-cellar, red-crush, white-crush, cellar, auto}, <html> never carries both 'dark' AND 'light-mode' simultaneously. applyThemeToDom is functioning as the single writer.",
+    "Quiz scoring behaves as expected — light red under $25 → Gamay (Beaujolais-Villages); citrus light under $25 → Clare Valley Riesling. quiz-cta-founding href='/pricing' and navigates correctly."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (dry-run endpoint only)", "frontend": "100%"},
+  "seed_data_creation": "None. Used existing dev-bypass seed user (Ownology Cellars / richard@ownology.ai).",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Base URL https://ownership-dev.preview.emergentagent.com. Dev-bypass active. Note: theme-suggestion toast (bottom-center) can intercept Playwright clicks — always dismiss via [data-testid=theme-suggestion-close] before interacting with lower-page CTAs. Quiz value keys are: fruit, body, sweetness (bone_dry, hint, off_dry, sweet), grip, age, budget (under_25, 25_50, 50_100, 100_plus). Reservation modal has data-testid=reservation-modal-backdrop with inputs reservation-{name,email,winery,phone}-input. daily-alert-email dry-run returned fromEmail=alerts@ownology.ai and totals.errors=0.",
+  "verification_details": {
+    "REGRESSION-1_theme": "PASS — 6 themes tested, none produce dark+light-mode mix. Logo hover captured in both light (parchment) and dark (soft-cellar) themes.",
+    "REGRESSION-2_quiz": "PASS — Combo (red,light,bone_dry,bright,young,under_25) → Gamay (Beaujolais-Villages). Combo (citrus,light,bone_dry,bright,young,under_25) → Clare Valley Riesling. quiz-cta-founding → /pricing (navigates after dismissing theme toast).",
+    "FEATURE-1_admin_settings": "PASS — winery-name value='Ownology Cellars', winery-contact-name placeholder='e.g. Rich', winery-region='Hunter Valley, NSW', seed contact email 'richard@ownology.ai' visible; no 'Redstone' or 'cellar@redstoneridge' references remain.",
+    "FEATURE-2_onboarding": "PASS — placeholders: onb-name-winery='Ownology Cellars', onb-name-contact='Rich', onb-name-region='Hunter Valley'. Hint text: 'Used in warm-intro links (\"Rich at Ownology Cellars invited you\") and nurture emails.' No 'Sarah'/'Redstone'/'Barossa' text present.",
+    "FEATURE-3_reservation_modal": "PASS — reservation-winery-input placeholder='Ownology Cellars'.",
+    "FEATURE-4_alert_email_config": "PASS — POST /api/scheduled/daily-alert-email?dryRun=1 returned fromEmail='alerts@ownology.ai', testToOverride='iamrjpurr@gmail.com', totals.errors=0, no 'domain not verified'.",
+    "SMOKE": "PASS — /home, /pricing, /cellar-journal, /free-run, /the-press, /admin/contacts all HTTP 200 with 0 critical console errors (single benign 400 on a static resource across all pages)."
+  }
+}
