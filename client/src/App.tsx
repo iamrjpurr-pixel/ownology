@@ -3,7 +3,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect, useLocation } from "wouter";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "@/lib/useAuth";
@@ -347,16 +347,31 @@ function Router() {
 //   to keep consistent foreground/background color across components
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
-/** GlobalThemeToggle — fixed bottom-right button visible on every page */
+/** GlobalThemeToggle — fixed bottom-right button visible on every page.
+ *  Lifts up when the PWA install banner is visible so the two floating
+ *  elements don't overlap (previously the theme pill covered the banner's
+ *  dismiss button, leaving users unable to close the install prompt). */
 function GlobalThemeToggle() {
+  const [hasBanner, setHasBanner] = useState(false);
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const check = () => setHasBanner(document.body.classList.contains("has-pwa-banner"));
+    check();
+    const obs = new MutationObserver(check);
+    obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    return () => obs.disconnect();
+  }, []);
   return (
     <div
       style={{
         position: "fixed",
-        bottom: "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
+        // Add ~64px when the PWA banner is showing so the pill sits above it
+        bottom: hasBanner
+          ? "calc(4.75rem + env(safe-area-inset-bottom, 0px))"
+          : "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
         right: "1.25rem",
         zIndex: 9999,
-        // Avoid overlapping the PWA install banner or mobile bottom tab bar
+        transition: "bottom 200ms ease",
       }}
     >
       <ThemeToggle compact={false} />
