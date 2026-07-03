@@ -107,7 +107,7 @@ export default function Quiz() {
             </p>
             <p style={{ fontFamily: SANS, fontSize: "1rem", color: MID, lineHeight: 1.65, marginBottom: "1rem" }}>We don't do any of that.</p>
             <p style={{ fontFamily: SANS, fontSize: "1rem", color: MID, lineHeight: 1.65, marginBottom: "1rem" }}>
-              We're <strong style={{ color: HI }}>Rich</strong> — teaching myself to make wine in the Adelaide Hills. And <strong style={{ color: HI }}>Gel</strong> — my very patient, very technical partner who runs the numbers when I get things wrong (which is often).
+              I'm <strong style={{ color: HI }}>Rich</strong> — short for Richard, not a lifestyle. Teaching myself to make wine in the Adelaide Hills. My partner <strong style={{ color: HI }}>Gel</strong> — Geraldine — runs the numbers when I get things wrong (which is often).
             </p>
             <p style={{ fontFamily: SANS, fontSize: "1rem", color: MID, lineHeight: 1.65, marginBottom: "2rem" }}>
               This quiz gives you <em>our</em> pick. Not an algorithm's. Six questions, one bottle. And if you're curious what it takes to make wine like that — we'll show you at the end.
