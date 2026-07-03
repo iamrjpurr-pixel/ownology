@@ -105,7 +105,8 @@ async function adminGate(
     p.startsWith("/api/trpc/outreach.create") ||
     p.startsWith("/api/trpc/outreach.markSmsSent") ||
     p.startsWith("/api/trpc/outreach.markBooked") ||
-    p.startsWith("/api/trpc/outreach.remove");
+    p.startsWith("/api/trpc/outreach.remove") ||
+    p.startsWith("/api/admin/");
   const isExport = p.startsWith("/api/exports/");
 
   if (!isAdminPage && !isAdminApi && !isExport) return next();
