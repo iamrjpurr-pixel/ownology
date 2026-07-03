@@ -104,7 +104,10 @@ export function resolveAutoTheme(): Theme {
 }
 
 /** Apply a theme to <html>. Strips all known theme classes first to keep
- *  the class list clean. Auto resolves dynamically. */
+ *  the class list clean. Auto resolves dynamically. Also manages the
+ *  shadcn/Tailwind `dark` class so it always tracks the resolved theme's
+ *  kind (dark vs light) — this prevents a stale `dark` class from leaking
+ *  into hover cards / portaled UI when the user switches to a light theme. */
 export function applyThemeToDom(themeId: ThemeId): void {
   if (typeof document === "undefined") return;
   const html = document.documentElement;
@@ -114,11 +117,18 @@ export function applyThemeToDom(themeId: ThemeId): void {
     if (!t.htmlClass) continue;
     for (const c of t.htmlClass.split(/\s+/)) classesToStrip.add(c);
   }
+  // Also strip the shadcn dark-mode flag — we re-add it below only if the
+  // resolved theme is dark-kind. This is what keeps the OwnologyLogo hover
+  // card / theory panel in sync with the active theme.
+  classesToStrip.add("dark");
   classesToStrip.forEach((c) => html.classList.remove(c));
 
   const theme = getTheme(themeId);
   const target = theme.kind === "system" ? resolveAutoTheme() : theme;
   if (target.htmlClass) {
     target.htmlClass.split(/\s+/).forEach((c) => html.classList.add(c));
+  }
+  if (target.kind === "dark") {
+    html.classList.add("dark");
   }
 }

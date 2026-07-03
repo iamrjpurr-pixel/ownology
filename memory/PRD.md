@@ -425,6 +425,26 @@ After shipping the `wide` prop on `WorkModeLayout` to fix `/knowledge`, swept ev
 
 ## What's been implemented (27 Jan 2026)
 
+**Ownology Cellars — fake demo winery + 10-wine naming system (Feb 2026)**
+- Seed winery renamed: `Redstone Ridge Wines` → **`Ownology Cellars`** (Hunter Valley, NSW). Same trademark family as parent Ownology brand — no new registration needed.
+- Seed admin email: `cellar@redstoneridge.com.au` → `richard@ownology.ai`
+- Founder voice: `Rich & Gel` casual everywhere; `Richard & Geraldine` only on FounderStory / Our Story page
+- 10-wine naming convention — **System 1: Reuse Ownology page names** (SEO compounding — each wine name doubles as a site-page keyword):
+
+| Style | Variety | Wine name | Brand hook |
+|---|---|---|---|
+| White | Semillon | **First Row** | Hunter Valley signature; first vineyard row |
+| White | Chardonnay | **Free Run** | Reuses `/free-run` product page |
+| White | Vermentino | **Cellar Journal** | Reuses `/cellar-journal` |
+| White | Riesling | **Small Hours** | "Awake at 1am" IA badge motif |
+| Red | Shiraz | **The Press** | Reuses `/the-press` product page |
+| Red | Cabernet Sauvignon | **The Vineyard** | Divine Trinity house |
+| Red | Pinot Noir | **The Curl** | Vine tendril from Ownology logo |
+| Red | Nebbiolo | **The Craft** | Divine Trinity house |
+| Sparkling | Blanc de Blancs | **Convergence** | Where three logo arcs meet |
+| Rosé | Grenache | **First Light** | Dawn after the 1am vigil |
+
+
 **Cellar Brief email — end-to-end verified live (Feb 2026, this session)**
 - Resend domain `ownology.ai` fully verified (DKIM at apex `resend._domainkey.ownology.ai` TXT, SPF at `send.ownology.ai` TXT, MX at `send.ownology.ai` → `feedback-smtp.us-east-1.amazonses.com`). Region: `us-east-1`.
 - Live send verified: Resend msg ID `c0b73f05-d90a-40a2-96df-1d1df391b541`, delivered to gmail inbox 3 Jul 2026 10:42 AEST.
