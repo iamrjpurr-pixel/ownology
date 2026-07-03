@@ -14,7 +14,7 @@ import { regulationMonitorHandler } from "./scheduled/regulationMonitor.js";
 import { fermentationWatchHandler } from "./scheduled/fermentationWatch.js";
 import { trinityClusterHandler } from "./scheduled/trinityCluster.js";
 import { trinityNewsletterHandler } from "./scheduled/trinityNewsletter.js";
-import { cellarJournalSitemapHandler, robotsTxtHandler, cellarJournalRssHandler } from "./sitemap.js";
+import { cellarJournalSitemapHandler, mainSitemapHandler, robotsTxtHandler, cellarJournalRssHandler } from "./sitemap.js";
 import { generateAuditTrailPdf } from "./auditTrailPdf.js";
 import { dailyAlertEmailHandler } from "./scheduled/dailyAlertEmail.js";
 import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
@@ -176,7 +176,7 @@ async function startServer() {
 
   // ── SEO: sitemap + robots + RSS ──────────────────────────────────────────────
   app.get("/api/cellar-journal/sitemap.xml", cellarJournalSitemapHandler);
-  app.get("/api/sitemap.xml", cellarJournalSitemapHandler);
+  app.get("/api/sitemap.xml", mainSitemapHandler);
   app.get("/api/cellar-journal/rss.xml", cellarJournalRssHandler);
   app.get("/api/robots.txt", robotsTxtHandler);
 

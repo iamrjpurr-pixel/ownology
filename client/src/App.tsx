@@ -103,6 +103,7 @@ const AdminSettings = lazy(() => import("./pages/AdminSettings"));
 const Login = lazy(() => import("./pages/Login"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 const Quiz = lazy(() => import("./pages/Quiz"));
+const SiteMapPage = lazy(() => import("./pages/SiteMap"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
  *  Sized so it doesn't cause layout shift on first paint. */
@@ -331,6 +332,7 @@ function Router() {
       <Route path={"/terms"} component={Terms} />
       <Route path={"/refund"} component={Refund} />
       <Route path={"/quiz"} component={Quiz} />
+      <Route path={"/site-map"} component={SiteMapPage} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />

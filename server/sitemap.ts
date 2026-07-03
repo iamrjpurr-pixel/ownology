@@ -27,6 +27,76 @@ function xmlEscape(s: string): string {
     .replace(/'/g, "&apos;");
 }
 
+/** Static marketing / product pages that live in the SPA and should appear
+ *  in the root sitemap. Priority + changefreq reflect our SEO strategy:
+ *  Quiz and Pricing are the two conversion funnels; the Cellar Journal
+ *  index is the SEO compounder; blog / product pages sit between. */
+const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }> = [
+  { path: "/",                     priority: "1.0", changefreq: "daily" },
+  { path: "/quiz",                 priority: "0.9", changefreq: "monthly" },
+  { path: "/pricing",              priority: "0.9", changefreq: "weekly" },
+  { path: "/cellar-journal",       priority: "0.9", changefreq: "daily" },
+  { path: "/our-story",            priority: "0.7", changefreq: "monthly" },
+  { path: "/why-ownology",         priority: "0.7", changefreq: "monthly" },
+  { path: "/the-press",            priority: "0.7", changefreq: "monthly" },
+  { path: "/free-run",             priority: "0.7", changefreq: "monthly" },
+  { path: "/blog",                 priority: "0.7", changefreq: "weekly" },
+  { path: "/for-home-winemakers",  priority: "0.6", changefreq: "monthly" },
+  { path: "/for-home-winemakers/troubleshooting", priority: "0.5", changefreq: "monthly" },
+  { path: "/for-home-winemakers/glossary",         priority: "0.5", changefreq: "monthly" },
+  { path: "/compliance",           priority: "0.5", changefreq: "monthly" },
+  { path: "/regulations",          priority: "0.5", changefreq: "monthly" },
+  { path: "/resources",            priority: "0.5", changefreq: "monthly" },
+  { path: "/merch",                priority: "0.4", changefreq: "monthly" },
+];
+
+/** GET /api/sitemap.xml — ROOT sitemap. Lists all public marketing pages
+ *  PLUS every published Cellar Journal entry. This is the URL Google
+ *  crawls first and the one referenced by robots.txt. */
+export async function mainSitemapHandler(_req: Request, res: Response) {
+  try {
+    const journalRows = await db
+      .select({
+        slug: schema.cellarJournal.slug,
+        lastAskedAt: schema.cellarJournal.lastAskedAt,
+        askedCount: schema.cellarJournal.askedCount,
+        featured: schema.cellarJournal.featured,
+      })
+      .from(schema.cellarJournal)
+      .where(eq(schema.cellarJournal.published, true))
+      .orderBy(desc(schema.cellarJournal.lastAskedAt))
+      .limit(50000);
+
+    const staticUrls = STATIC_PAGES.map(
+      (p) => `  <url>
+    <loc>${SITE_ORIGIN}${p.path}</loc>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`
+    );
+    const journalUrls = journalRows.map(
+      (r) => `  <url>
+    <loc>${SITE_ORIGIN}/cellar-journal/${xmlEscape(r.slug)}</loc>
+    <lastmod>${isoFromMs(r.lastAskedAt)}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>${r.featured ? "0.9" : r.askedCount >= 5 ? "0.8" : "0.6"}</priority>
+  </url>`
+    );
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${[...staticUrls, ...journalUrls].join("\n")}
+</urlset>
+`;
+    res.setHeader("Content-Type", "application/xml; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=600");
+    res.send(xml);
+  } catch (err) {
+    console.error("[sitemap] main sitemap failed:", err);
+    res.status(500).send("sitemap generation failed");
+  }
+}
+
 /** GET /api/cellar-journal/sitemap.xml — every published journal entry */
 export async function cellarJournalSitemapHandler(_req: Request, res: Response) {
   try {
