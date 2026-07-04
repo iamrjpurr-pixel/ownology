@@ -1027,3 +1027,48 @@ Framework showed these don't address any actual HF lens weakness:
 - 375×750 viewport: sticky CTA does NOT overlap Continue button ✅
 - Reaching Step 7 auto-clears resume state (verified in unit test flow)
 
+
+## `/try` isolation + member-route redirect wall (Feb 2026 — this session) ✅
+
+### Why
+Auditing `/try` for "can prospects escape the sandbox" surfaced **two separate issues**:
+
+1. **Global chrome bleeding through** — TrialBanner ("Your free trial has ended"), ThemeSuggestion ("Try Cellar Night" popup), ThemeOnboarding first-visit modal, PwaInstallBanner all rendered on `/try`, breaking the sandbox story
+2. **BIGGER LEAK** — anonymous visitors typing `/dashboard`, `/cellar-brief`, `/quick-entry` etc. see the **real Ownology Cellars production data** (6 live cellar alerts, 12 batches, tank status, log counters). Same seed-owner-001 default that affects the LIP audit PDF endpoint. Would leak every future customer's data too once auth-scoping is added.
+
+### What shipped
+
+**Chrome suppression on `/try`** (kept minimal — one array entry each):
+- `TrialBanner.SUPPRESSED_PREFIXES` — added `/try`
+- `ThemeSuggestion.SUPPRESS_PREFIXES` — added `/try`
+- `ThemeOnboarding.SUPPRESSED_PREFIXES` — added `/try`
+- `PwaInstallBanner` — new `SUPPRESSED_PREFIXES = ["/try", "/hi/", "/audit/", "/join", "/founding-member/success"]` with `useLocation()` gating (banner had no route-based gating at all before)
+
+**Anonymous → `/try` redirect wall in `server/index.ts`**:
+- New middleware registered AFTER `express.static` and BEFORE the OG-meta injector
+- Intercepts HTML requests to member-only prefixes: `/dashboard`, `/cellar-brief`, `/cellar-tasks`, `/quick-entry`, `/the-press`, `/free-run/dashboard`, `/batch-book`, `/work-mode`, `/cellar/*`, `/orders`
+- Reads `app_session_id` cookie via `parseCookies`. If missing → 302 to `/try?from=<original-path>`
+- Cookie present (any value — actual JWT verification happens downstream in tRPC) → `next()`, SPA renders as normal for authenticated members
+- Assets (JS/CSS/images) served by `express.static` above never hit this handler because they don't set `Accept: text/html`
+
+**Verified via curl against Express port 8001:**
+- `GET /dashboard` anonymous → `302 Location: /try?from=%2Fdashboard` ✅
+- `GET /dashboard` with `Cookie: app_session_id=fake` → `200 OK` (SPA renders) ✅
+- `GET /try` anonymous → `200 OK` (public) ✅
+- `GET /pricing` anonymous → `200 OK` (public marketing surface) ✅
+
+### Scope note (important)
+In **dev** the redirect never fires because Vite on port 3000 serves the SPA before requests reach Express. In **production** Express serves the built SPA and the middleware works. That's the correct scope — real prospects hit `ownology.ai` (production only). Confirmed by curl-ing localhost:8001 directly (bypasses ingress/Vite): redirect fires as expected.
+
+### Why this is still a stopgap, not the final answer
+The middleware only blocks HTML SPA rendering. The underlying data leak — tRPC endpoints defaulting to `seed-owner-001` when no auth context exists — is still there. A determined attacker could hit `/api/trpc/*` directly and pull the same data.
+
+**Real fix (deferred, ~4-6 hrs)**: audit every tRPC query, require an authenticated user context, scope reads to `ctx.user.wineryId`. Same shape as the "Free-tier gate on LIP audit PDF" backlog item — the pattern applies to ALL member endpoints. Do this before onboarding real customers whose data can't be exposed the same way.
+
+### Files touched
+- `server/index.ts` — added `MEMBER_ONLY_PREFIXES` array + Express handler with cookie check + 302 redirect
+- `client/src/components/TrialBanner.tsx` — one array entry
+- `client/src/components/ThemeSuggestion.tsx` — one array entry
+- `client/src/components/ThemeOnboarding.tsx` — one array entry
+- `client/src/components/PwaInstallBanner.tsx` — new `useLocation()` import + `SUPPRESSED_PREFIXES` + inclusion in `isVisible` and early-return checks
+

@@ -250,6 +250,46 @@ async function startServer() {
 
   app.use(express.static(staticPath));
 
+  // ── Anonymous → /try redirect for member-only surfaces ─────────────────
+  // Interim safety wall (until proper per-endpoint auth gating is in place).
+  // These routes render the SPA which then calls tRPC endpoints defaulting
+  // to the seed owner — exposing real Ownology Cellars data to anyone
+  // who types the URL. Redirect anonymous visitors to /try so they see
+  // the sandbox story instead of live cellar operations.
+  //
+  // A "logged in" visitor is anyone with the app_session_id cookie present
+  // (we don't verify it here — actual tRPC endpoints do that). If the
+  // cookie is missing, they're anonymous → send to /try.
+  //
+  // This is a stopgap. Proper fix: audit every member tRPC endpoint,
+  // require authenticated user context, scope queries to the user's
+  // winery. See LIP audit PDF gate item on the backlog for the pattern.
+  const MEMBER_ONLY_PREFIXES = [
+    "/dashboard",
+    "/cellar-brief",
+    "/cellar-tasks",
+    "/cellar-brief.pdf",
+    "/quick-entry",
+    "/the-press",
+    "/free-run/dashboard",
+    "/batch-book",
+    "/work-mode",
+    "/cellar/",
+    "/orders",
+  ];
+  app.get(MEMBER_ONLY_PREFIXES.flatMap((p) => (p.endsWith("/") ? [p + "*"] : [p, p + "/*"])), (req, res, next) => {
+    // Only intercept HTML SPA requests. Assets (JS/CSS/PNG) go through
+    // express.static above and won't hit this handler.
+    const accept = req.headers.accept || "";
+    if (!accept.includes("text/html")) return next();
+    const cookieHeader = req.headers.cookie || "";
+    const cookies = parseCookies(cookieHeader);
+    const hasSession = Boolean(cookies[COOKIE_NAME]);
+    if (hasSession) return next();
+    // Anonymous → send to sandbox with a hint we came from a wall
+    res.redirect(302, `/try?from=${encodeURIComponent(req.path)}`);
+  });
+
   // ── Per-route meta injection for social share cards ────────────────────
   // The SPA ships a single index.html with generic OG tags for `/`. But
   // WhatsApp/Twitter/Slack/LinkedIn crawlers ONLY read the raw HTML they

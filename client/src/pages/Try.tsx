@@ -1020,6 +1020,33 @@ function Step7Close() {
 }
 
 // ─── Main container ─────────────────────────────────────────────────────
+/** Friendly labels for the member routes we might have redirected the
+ *  user from. Keyed by pathname (matches server/index.ts MEMBER_ONLY_PREFIXES).
+ *  Used to show a contextual "you were reaching for X" banner at Step 1. */
+const FROM_ROUTE_LABELS: Record<string, string> = {
+  "/dashboard": "the Dashboard",
+  "/cellar-brief": "the Cellar Brief",
+  "/cellar-tasks": "Cellar Tasks",
+  "/quick-entry": "Quick Entry",
+  "/the-press": "The Press",
+  "/batch-book": "the Batch Book",
+  "/work-mode": "Work Mode",
+  "/orders": "your Orders",
+};
+
+function readFromParam(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const p = new URLSearchParams(window.location.search).get("from");
+    if (!p) return null;
+    // Only surface labels we know about — silently ignore anything else so
+    // a random `?from=/whatever` doesn't produce a broken banner.
+    return FROM_ROUTE_LABELS[p] ? p : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function Try() {
   // Hydrate from localStorage on first render — if a prospect got
   // interrupted mid-flow within the last 7 days, drop them back exactly
@@ -1030,6 +1057,12 @@ export default function Try() {
   const [pickedDecision, setPickedDecisionState] = useState<DemoDecision | null>(
     initial?.pickedDecision ? (DECISIONS.find((d) => d.key === initial.pickedDecision) ?? null) : null
   );
+  // "You were reaching for X" contextual banner — populated when a
+  // logged-out visitor was redirected here from a member-only route via
+  // ?from=<path> (see server/index.ts MEMBER_ONLY_PREFIXES middleware).
+  // Only shown on Step 1 — once they engage with the sandbox we don't
+  // want a persistent "you tried X" nag.
+  const [fromRoute] = useState<string | null>(() => readFromParam());
   // Show a subtle "welcome back" banner for 4 seconds after a resume,
   // then auto-dismiss. Explains WHY they're not at Step 1.
   const [showResumeBanner, setShowResumeBanner] = useState<boolean>(initial !== null && (initial?.step ?? 1) > 1);
@@ -1122,7 +1155,32 @@ export default function Try() {
         </div>
       )}
 
-      {step === 1 && <Step1Landing onNext={goNext} />}
+      {step === 1 && (
+        <>
+          {fromRoute && FROM_ROUTE_LABELS[fromRoute] && (
+            <div
+              data-testid="try-from-banner"
+              style={{
+                maxWidth: 720,
+                margin: "1.5rem auto 0",
+                padding: "0.85rem 1.15rem",
+                background: "oklch(from var(--ow-amber) l c h / 0.14)",
+                border: `1px solid ${AMBER}`,
+                borderRadius: 4,
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.85rem",
+                color: TEXT_HI,
+                lineHeight: 1.55,
+              }}
+            >
+              You reached for <strong>{FROM_ROUTE_LABELS[fromRoute]}</strong> —{" "}
+              <code style={mono}>{fromRoute}</code>. That's members-only, but the sandbox below shows you exactly what
+              it looks like end-to-end. Walk through the 7 steps, then reserve to unlock the real one for your winery.
+            </div>
+          )}
+          <Step1Landing onNext={goNext} />
+        </>
+      )}
       {step === 2 && (
         <Step2Brief onNext={goNext} onPickAlert={setPickedAlert} pickedAlert={pickedAlert} />
       )}
