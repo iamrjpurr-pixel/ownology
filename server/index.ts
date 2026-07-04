@@ -284,6 +284,18 @@ async function startServer() {
     // express.static above and won't hit this handler.
     const accept = req.headers.accept || "";
     if (!accept.includes("text/html")) return next();
+
+    // ─── Dev-only routes ────────────────────────────────────────────────
+    // /todo and /roadmap are the internal working roadmap — deliberately
+    // NOT for production. Return 404 on any live ownology.ai hostname so
+    // curious visitors can't discover our security backlog. Still works
+    // on preview/dev hosts.
+    const DEV_ONLY_PATHS = new Set(["/todo", "/roadmap"]);
+    const PROD_HOSTS = new Set(["ownology.ai", "www.ownology.ai"]);
+    if (DEV_ONLY_PATHS.has(req.path) && PROD_HOSTS.has(req.hostname)) {
+      return res.status(404).send("Not Found");
+    }
+
     const cookieHeader = req.headers.cookie || "";
     const cookies = parseCookies(cookieHeader);
     const hasSession = Boolean(cookies[COOKIE_NAME]);
