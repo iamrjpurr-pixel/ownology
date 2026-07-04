@@ -926,7 +926,8 @@ function Step6Journal({ onNext }: { onNext: () => void }) {
 }
 
 // ─── Step 7 — CTA close ─────────────────────────────────────────────────
-function Step7Close() {
+function Step7Close({ fromRoute }: { fromRoute: string | null }) {
+  const unlockLine = fromRoute ? UNLOCK_COPY[fromRoute] : null;
   return (
     <StepCard testid="try-step-7" eyebrow="Ten minutes, one workflow" title={FINAL_CTA_COPY.headline}>
       <p>{FINAL_CTA_COPY.narration}</p>
@@ -1003,6 +1004,30 @@ function Step7Close() {
         </Link>
       </div>
 
+      {/* Personalised "you came here for X" close — only surfaces when
+          the user arrived via the ?from redirect wall. Placed BELOW the
+          primary CTA so it acts as a nudge, not a wall of text before
+          the button. */}
+      {unlockLine && (
+        <p
+          data-testid="try-step-7-unlock-line"
+          style={{
+            marginTop: "1rem",
+            padding: "0.75rem 1rem",
+            background: "oklch(from var(--ow-amber) l c h / 0.10)",
+            borderLeft: `3px solid ${AMBER}`,
+            borderRadius: 3,
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.85rem",
+            color: TEXT_HI,
+            lineHeight: 1.55,
+            margin: "1rem 0 0",
+          }}
+        >
+          {unlockLine}
+        </p>
+      )}
+
       <div style={{ marginTop: "2rem", padding: "1rem", background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 4 }}>
         <p style={{ color: TEXT_LO, fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", margin: 0, marginBottom: "0.5rem" }}>
           What you just did (in real winemaking terms)
@@ -1032,6 +1057,29 @@ const FROM_ROUTE_LABELS: Record<string, string> = {
   "/batch-book": "the Batch Book",
   "/work-mode": "Work Mode",
   "/orders": "your Orders",
+};
+
+/** Personalised "unlock" line shown above the Step 7 CTA when the user
+ *  arrived via the ?from redirect. Each entry is a single sentence that
+ *  reinforces "you came here looking for X → reserve = you get X". Keeps
+ *  the marketing message tight to the specific hunger they showed. */
+const UNLOCK_COPY: Record<string, string> = {
+  "/dashboard":
+    "You came here looking for the Dashboard. Reserve now and yours goes live within the hour — your batches, your tanks, your alerts.",
+  "/cellar-brief":
+    "You came here looking for the Cellar Brief. Reserve now and yours arrives in your inbox tomorrow at 5:30am — your data, your alerts, one email.",
+  "/cellar-tasks":
+    "You came here looking for Cellar Tasks. Reserve now and your task list is ready by Day 1 — imported from your existing spreadsheet.",
+  "/quick-entry":
+    "You came here looking for Quick Entry. Reserve now and you're logging additions in under 40 seconds by tomorrow morning.",
+  "/the-press":
+    "You came here looking for The Press. Reserve now and your grape-intake ledger is ready before your next vintage.",
+  "/batch-book":
+    "You came here looking for the Batch Book. Reserve now and your LIP-compliant records write themselves from every entry.",
+  "/work-mode":
+    "You came here looking for Work Mode. Reserve now and your gloves-friendly cellar-floor UI is ready by Day 1.",
+  "/orders":
+    "You came here looking for Orders. Reserve now and your merch fulfilment is wired up before your first bottle ships.",
 };
 
 function readFromParam(): string | null {
@@ -1190,7 +1238,7 @@ export default function Try() {
       {step === 4 && <Step4Log onNext={goNext} />}
       {step === 5 && <Step5Ask onNext={goNext} />}
       {step === 6 && <Step6Journal onNext={goNext} />}
-      {step === 7 && <Step7Close />}
+      {step === 7 && <Step7Close fromRoute={fromRoute} />}
 
       <StickyCta />
     </div>
