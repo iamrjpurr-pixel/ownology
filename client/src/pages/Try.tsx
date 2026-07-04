@@ -13,7 +13,7 @@
  *
  * Mounted at /try. Suppressed from SiteFooter to keep the frame clean.
  */
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import {
@@ -28,6 +28,53 @@ import {
   type DemoDecision,
 } from "@/data/tryDemoData";
 
+// ─── Resume state (Lens 5 · Fatigue) ───────────────────────────────────
+// Real prospects get interrupted. Phone rings, kid cries, tasting starts.
+// If we lose their progress on refresh, we lose the conversion. Persist
+// current step + picks in localStorage with a 7-day TTL so a busy user
+// can come back tomorrow and pick up where they left off.
+const RESUME_KEY = "ownology_try_state_v1";
+const RESUME_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+interface ResumeState {
+  step: number;
+  pickedAlert: string | null;
+  pickedDecision: string | null;
+  savedAt: number;
+}
+
+function loadResumeState(): ResumeState | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(RESUME_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as ResumeState;
+    if (!parsed.savedAt || Date.now() - parsed.savedAt > RESUME_TTL_MS) {
+      window.localStorage.removeItem(RESUME_KEY);
+      return null;
+    }
+    if (parsed.step < 1 || parsed.step > TOTAL_STEPS) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function saveResumeState(s: Omit<ResumeState, "savedAt">) {
+  if (typeof window === "undefined") return;
+  try {
+    const payload: ResumeState = { ...s, savedAt: Date.now() };
+    window.localStorage.setItem(RESUME_KEY, JSON.stringify(payload));
+  } catch {
+    // storage quota / private mode — silent fallback
+  }
+}
+
+function clearResumeState() {
+  if (typeof window === "undefined") return;
+  try { window.localStorage.removeItem(RESUME_KEY); } catch { /* noop */ }
+}
+
 const TOTAL_STEPS = 7;
 
 // ─── Design tokens ──────────────────────────────────────────────────────
@@ -40,7 +87,7 @@ const CARD_BG = "var(--ow-card-bg)";
 const BG = "var(--ow-bg)";
 
 // ─── Shared UI bits ─────────────────────────────────────────────────────
-function ProgressBar({ step }: { step: number }) {
+function ProgressBar({ step, onRestart }: { step: number; onRestart: () => void }) {
   const pct = (step / TOTAL_STEPS) * 100;
   return (
     <div
@@ -75,6 +122,27 @@ function ProgressBar({ step }: { step: number }) {
             style={{ width: `${pct}%`, height: "100%", background: AMBER, transition: "width 350ms ease" }}
           />
         </div>
+        {step > 1 && (
+          <button
+            type="button"
+            onClick={onRestart}
+            data-testid="try-restart-btn"
+            className="try-restart-btn"
+            style={{
+              background: "none",
+              border: `1px solid ${BORDER}`,
+              padding: "0.3rem 0.65rem",
+              borderRadius: 4,
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.7rem",
+              color: TEXT_LO,
+              cursor: "pointer",
+              letterSpacing: "0.04em",
+            }}
+          >
+            Start over
+          </button>
+        )}
       </div>
     </div>
   );
@@ -260,6 +328,24 @@ function Step1Landing({ onNext }: { onNext: () => void }) {
         Everything you see is real data from our actual cellar. Same schema we'd use for your winery. Same alerts we
         get. Same brief we read. What you can't do is break anything.
       </GelSays>
+      <div
+        data-testid="try-step-1-excel"
+        style={{
+          marginTop: "1.25rem",
+          padding: "0.85rem 1rem",
+          border: `1px dashed ${BORDER}`,
+          borderRadius: 4,
+          background: "oklch(0 0 0 / 0.04)",
+          fontFamily: "'Lato', sans-serif",
+          fontSize: "0.82rem",
+          color: TEXT_MID,
+          lineHeight: 1.55,
+        }}
+      >
+        <strong style={{ color: TEXT_HI }}>Already have a spreadsheet?</strong> Good — keep it. On Day 1, Ownology
+        imports it. On Day 30, you'll notice you've stopped opening it. We don't ask you to switch systems on trust —
+        we earn our place.
+      </div>
     </StepCard>
   );
 }
@@ -846,7 +932,45 @@ function Step7Close() {
       <p>{FINAL_CTA_COPY.narration}</p>
       <p style={{ marginTop: "1rem" }}>{FINAL_CTA_COPY.offer}</p>
 
-      <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "center" }}>
+      {/* Day 1 timeline — Lens 1 (Communication): don't ask them to leap
+          blindly. Show them exactly what week one looks like. */}
+      <div
+        data-testid="try-step-7-day-one"
+        style={{
+          marginTop: "1.75rem",
+          background: CARD_BG,
+          border: `1px solid ${BORDER}`,
+          borderRadius: 4,
+          padding: "1.15rem 1.25rem",
+        }}
+      >
+        <p style={{ color: AMBER, fontSize: "0.66rem", letterSpacing: "0.14em", textTransform: "uppercase", fontFamily: "'Lato', sans-serif", fontWeight: 700, margin: 0, marginBottom: "0.75rem" }}>
+          What happens when you reserve
+        </p>
+        <ol style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "0.65rem" }}>
+          {[
+            { when: "Within 4 hours", what: "Rich replies personally. Books a 20-min call to hear your vintage story." },
+            { when: "Day 1", what: "Ownology imports your existing spreadsheet — batches, tanks, logs. Nothing lost." },
+            { when: "Day 2 · 5:30am", what: "First Cellar Brief lands in your inbox. Real data, real alerts, real chemistry." },
+            { when: "Day 7", what: "First LIP Audit Pack draft is ready — Wine Australia §39F compliant. One click." },
+            { when: "Day 30", what: "You notice you've stopped opening the spreadsheet." },
+          ].map((row, idx) => (
+            <li
+              key={idx}
+              style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: "0.75rem", fontFamily: "'Lato', sans-serif" }}
+            >
+              <span style={{ color: TEXT_LO, fontSize: "0.72rem", fontFamily: "'JetBrains Mono', monospace", paddingTop: "0.15rem", letterSpacing: "0.02em" }}>
+                {row.when}
+              </span>
+              <span style={{ color: TEXT_HI, fontSize: "0.84rem", lineHeight: 1.5 }}>
+                {row.what}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div style={{ marginTop: "1.75rem", display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "center" }}>
         <Link
           href="/pricing"
           data-testid="try-step-7-primary-cta"
@@ -897,13 +1021,40 @@ function Step7Close() {
 
 // ─── Main container ─────────────────────────────────────────────────────
 export default function Try() {
-  const [step, setStep] = useState(1);
-  const [pickedAlert, setPickedAlert] = useState<string | null>(null);
-  const [pickedDecision, setPickedDecision] = useState<DemoDecision | null>(null);
+  // Hydrate from localStorage on first render — if a prospect got
+  // interrupted mid-flow within the last 7 days, drop them back exactly
+  // where they were rather than making them re-do everything.
+  const initial = typeof window !== "undefined" ? loadResumeState() : null;
+  const [step, setStep] = useState(initial?.step ?? 1);
+  const [pickedAlert, setPickedAlertState] = useState<string | null>(initial?.pickedAlert ?? null);
+  const [pickedDecision, setPickedDecisionState] = useState<DemoDecision | null>(
+    initial?.pickedDecision ? (DECISIONS.find((d) => d.key === initial.pickedDecision) ?? null) : null
+  );
+  // Show a subtle "welcome back" banner for 4 seconds after a resume,
+  // then auto-dismiss. Explains WHY they're not at Step 1.
+  const [showResumeBanner, setShowResumeBanner] = useState<boolean>(initial !== null && (initial?.step ?? 1) > 1);
+
+  useEffect(() => {
+    if (showResumeBanner) {
+      const t = setTimeout(() => setShowResumeBanner(false), 4500);
+      return () => clearTimeout(t);
+    }
+  }, [showResumeBanner]);
+
+  // Persist every state change (throttle unnecessary here — user actions
+  // are already sparse).
+  useEffect(() => {
+    saveResumeState({ step, pickedAlert, pickedDecision: pickedDecision?.key ?? null });
+  }, [step, pickedAlert, pickedDecision]);
 
   const goNext = useCallback(() => {
-    setStep((s) => Math.min(TOTAL_STEPS, s + 1));
-    // scroll to top after step change
+    setStep((s) => {
+      const next = Math.min(TOTAL_STEPS, s + 1);
+      // If they hit the final step, clear resume state so a fresh visit
+      // doesn't put them straight into the CTA screen.
+      if (next === TOTAL_STEPS) clearResumeState();
+      return next;
+    });
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -911,12 +1062,65 @@ export default function Try() {
 
   const onPickDecision = useCallback((key: string) => {
     const found = DECISIONS.find((d) => d.key === key) ?? null;
-    setPickedDecision(found);
+    setPickedDecisionState(found);
+  }, []);
+
+  const setPickedAlert = useCallback((id: string) => setPickedAlertState(id), []);
+
+  const handleRestart = useCallback(() => {
+    clearResumeState();
+    setStep(1);
+    setPickedAlertState(null);
+    setPickedDecisionState(null);
+    setShowResumeBanner(false);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   return (
     <div style={{ minHeight: "100vh", background: BG }}>
-      <ProgressBar step={step} />
+      {/* Inline CSS for mobile-only overrides — inline-styles-only files
+          can't express media queries without a <style> block. This is the
+          minimum needed to unbreak <640px viewports (Lens 6 · Environment). */}
+      <style>{`
+        @media (max-width: 640px) {
+          [data-testid^="try-step-"] { padding-left: 1rem !important; padding-right: 1rem !important; }
+          [data-testid="try-sticky-cta"] { right: 0.6rem !important; bottom: 0.6rem !important; padding: 0.55rem 0.85rem !important; font-size: 0.75rem !important; }
+          [data-testid="try-step-3-chemistry"] { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+          [data-testid="try-step-3-chemistry"] table { min-width: 480px; }
+          [data-testid="try-progress-bar"] > div > span:first-of-type + span { font-size: 0.62rem !important; letter-spacing: 0.06em !important; }
+          .try-restart-btn { font-size: 0.65rem !important; }
+        }
+      `}</style>
+
+      <ProgressBar step={step} onRestart={handleRestart} />
+
+      {showResumeBanner && (
+        <div
+          data-testid="try-resume-banner"
+          style={{
+            position: "sticky",
+            top: 56,
+            zIndex: 39,
+            background: "oklch(from var(--ow-amber) l c h / 0.14)",
+            borderBottom: `1px solid ${BORDER}`,
+            padding: "0.55rem 1rem",
+            textAlign: "center",
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.78rem",
+            color: TEXT_MID,
+          }}
+        >
+          Welcome back — resuming at <strong>Step {step}</strong>.{" "}
+          <button
+            type="button"
+            onClick={handleRestart}
+            data-testid="try-resume-restart"
+            style={{ background: "none", border: "none", color: AMBER, cursor: "pointer", padding: 0, font: "inherit", textDecoration: "underline" }}
+          >
+            Start over instead
+          </button>
+        </div>
+      )}
 
       {step === 1 && <Step1Landing onNext={goNext} />}
       {step === 2 && (

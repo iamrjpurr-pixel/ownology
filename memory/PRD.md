@@ -970,3 +970,60 @@ When you share the link:
 - **Twitter/X**: card debugger at `cards-dev.twitter.com/validator`
 - **Facebook/Meta**: `developers.facebook.com/tools/debug`
 
+
+## `/try` Human-Factors 10-Lens conversion pass (Feb 2026 — this session) ✅
+
+### Framework
+Ran the sandbox through the **Human Factors 10-Lens Assessment** — a structured safety/design methodology (aviation, medicine, HRO industries) that evaluates how environment, workload, fatigue, and 7 other lenses interact to affect human performance. Applied here to identify what actually blocks a busy, technical winemaker from converting.
+
+### What the framework surfaced (and I built)
+Four fixes chosen by lens, not by feature-list intuition. All shipped this session.
+
+**Fix #1 · Save/resume state (Lens 5 · Fatigue)**
+- Real prospects get interrupted mid-flow. Without state persistence, a refresh loses everything.
+- Persist `{step, pickedAlert, pickedDecision, savedAt}` in `localStorage` under `ownology_try_state_v1` with 7-day TTL.
+- On mount, hydrate. If a returning visitor is past Step 1, show a subtle amber "Welcome back — resuming at Step N" banner (auto-dismiss after 4.5s).
+- Add a "Start over" button in the ProgressBar (only visible past Step 1) that wipes localStorage and returns to Step 1.
+- On reaching Step 7 (CTA), auto-clear resume state so fresh visits don't skip the sandbox.
+
+**Fix #2 · Mobile-first pass (Lens 6 · Environment)**
+- Every WhatsApp/SMS click opens in a phone browser. Verified at 375×750:
+  - Sticky "Get real" pill: `right/bottom: 0.6rem`, smaller padding + font at ≤640px so it never covers "Continue"
+  - Chemistry table: wrapped in `overflow-x: auto`, `-webkit-overflow-scrolling: touch`, table `min-width: 480px` so it stays legible on 375px viewports (scrolls horizontally instead of squashing)
+  - StepCard padding reduced 1.5rem → 1rem
+  - Progress bar label letter-spacing tightened
+- Media queries inline via a `<style>` block at the Try component root so the rest of the file stays inline-style-only.
+
+**Fix #3 · "Your Day 1" timeline in Step 7 (Lens 1 · Communication)**
+- The CTA was a leap of faith — no explanation of what happens after "Reserve my spot".
+- New panel `[data-testid=try-step-7-day-one]` between narration and CTA with 5-row timeline:
+  - Within 4 hours: Rich replies personally, books a 20-min call
+  - Day 1: Ownology imports your existing spreadsheet
+  - Day 2 · 5:30am: First Cellar Brief email lands
+  - Day 7: First LIP Audit Pack draft ready
+  - Day 30: You notice you've stopped opening the spreadsheet
+- Removes the "what am I signing up for?" objection before it forms.
+
+**Fix #4 · "Keep your spreadsheet" reassurance in Step 1 (Lens 10 · Organizational)**
+- Every technical winemaker's first objection: "I already have a system that works."
+- New dashed-outline callout box below Gel-says in Step 1: *"Already have a spreadsheet? Good — keep it. On Day 1, Ownology imports it. On Day 30, you'll notice you've stopped opening it. We don't ask you to switch systems on trust — we earn our place."*
+- Kills the switching-cost fear at the point of highest engagement (60 seconds into the flow).
+
+### What was deprioritized (and why)
+Framework showed these don't address any actual HF lens weakness:
+- Branching Alerts 2 & 3 — only helps contrarian clickers; red-alert path is the tightest story
+- Analytics pulse — zero direct impact on prospect experience; 5-min phone calls with first 5 prospects tell you more than analytics ever will
+- LIP Audit Pack live demo drop — cool feature but doesn't address any HF blocker (already implicitly covered in Day 1 timeline)
+- Social proof strip / founder avatars — cosmetic
+
+### Files touched
+- `client/src/pages/Try.tsx` — added `ResumeState` type + load/save/clear helpers, updated `ProgressBar` to accept `onRestart` prop, added resume banner + Start-over button, added `try-step-1-excel` callout, added `try-step-7-day-one` timeline, added inline mobile-only `<style>` block
+
+### Verified live via Playwright
+- Excel line rendered on Step 1 ✅
+- Advance to Step 3, reload → resume banner appears at Step 3 with correct text ✅
+- Start-over button visible past Step 1, clears state and returns to Step 1 ✅
+- Full flow to Step 7 renders Day 1 timeline with 5 rows ✅
+- 375×750 viewport: sticky CTA does NOT overlap Continue button ✅
+- Reaching Step 7 auto-clears resume state (verified in unit test flow)
+
