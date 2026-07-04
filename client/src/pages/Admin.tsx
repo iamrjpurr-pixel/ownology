@@ -321,6 +321,13 @@ function AccessDenied({ isForbidden }: { isForbidden: boolean }) {
 
 const TOOLS: AdminTool[] = [
   {
+    label: "Operator Guide",
+    description: "Not sure where to start? This is the manual — daily rhythm, when-to-use-what, and troubleshooting. Bookmark it on your phone.",
+    href: "/admin/operator-guide",
+    icon: <IconKnowledge />,
+    badge: "Start here",
+  },
+  {
     label: "Campaign Metrics",
     description: "Week-by-week KPI snapshots — waitlist growth, MRR trajectory, email open rates, organic sessions, and compliance query volume.",
     href: "/campaign-metrics",

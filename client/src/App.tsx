@@ -87,6 +87,7 @@ const HiContact = lazy(() => import("./pages/HiContact"));
 const AdminContacts = lazy(() => import("./pages/AdminContacts"));
 const AdminContactsPipeline = lazy(() => import("./pages/AdminContactsPipeline"));
 const AdminMarketingKit = lazy(() => import("./pages/AdminMarketingKit"));
+const AdminOperatorGuide = lazy(() => import("./pages/AdminOperatorGuide"));
 const AdminThemesStats = lazy(() => import("./pages/AdminThemesStats"));
 const CascadeDemo = lazy(() => import("./pages/CascadeDemo"));
 const CopilotMockup = lazy(() => import("./pages/CopilotMockup"));
@@ -319,6 +320,7 @@ function Router() {
       <Route path={"/admin/contacts/pipeline"} component={AdminContactsPipeline} />
       <Route path={"/admin/contacts"} component={AdminContacts} />
       <Route path={"/admin/marketing-kit"} component={AdminMarketingKit} />
+      <Route path={"/admin/operator-guide"} component={AdminOperatorGuide} />
       <Route path={"/admin/themes-stats"} component={AdminThemesStats} />
       <Route path={"/admin/responsive"} component={AdminResponsive} />
       <Route path={"/admin/dev"} component={AdminDev} />
