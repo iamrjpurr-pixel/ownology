@@ -1057,6 +1057,8 @@ const FROM_ROUTE_LABELS: Record<string, string> = {
   "/batch-book": "the Batch Book",
   "/work-mode": "Work Mode",
   "/orders": "your Orders",
+  "/todo": "our internal roadmap",
+  "/roadmap": "our internal roadmap",
 };
 
 /** Personalised "unlock" line shown above the Step 7 CTA when the user
@@ -1080,6 +1082,10 @@ const UNLOCK_COPY: Record<string, string> = {
     "You came here looking for Work Mode. Reserve now and your gloves-friendly cellar-floor UI is ready by Day 1.",
   "/orders":
     "You came here looking for Orders. Reserve now and your merch fulfilment is wired up before your first bottle ships.",
+  "/todo":
+    "You came here looking for our internal roadmap. That's members-only, but the sandbox above shows you what we've built. Reserve now and you'll see everything else the moment it ships.",
+  "/roadmap":
+    "You came here looking for our internal roadmap. That's members-only, but the sandbox above shows you what we've built. Reserve now and you'll see everything else the moment it ships.",
 };
 
 function readFromParam(): string | null {

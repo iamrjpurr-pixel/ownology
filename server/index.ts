@@ -276,6 +276,8 @@ async function startServer() {
     "/work-mode",
     "/cellar/",
     "/orders",
+    "/todo",
+    "/roadmap",
   ];
   app.get(MEMBER_ONLY_PREFIXES.flatMap((p) => (p.endsWith("/") ? [p + "*"] : [p, p + "/*"])), (req, res, next) => {
     // Only intercept HTML SPA requests. Assets (JS/CSS/PNG) go through

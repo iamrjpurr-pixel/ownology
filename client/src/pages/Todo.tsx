@@ -272,7 +272,7 @@ export default function Todo() {
           data-testid="todo-eyebrow"
           style={{ color: AMBER, fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", fontFamily: SANS, marginBottom: "0.6rem" }}
         >
-          Public roadmap · {totalOpen} open items
+          Internal roadmap · {totalOpen} open items
         </p>
 
         {/* Title */}
@@ -280,20 +280,17 @@ export default function Todo() {
           data-testid="todo-title"
           style={{ fontFamily: SERIF, fontSize: "clamp(2rem, 5vw, 3rem)", color: HI, lineHeight: 1.1, marginBottom: "1rem" }}
         >
-          What Rich &amp; Gel are building next.
+          What we're building next.
         </h1>
 
         <p style={{ fontFamily: SANS, fontSize: "0.95rem", color: MID, lineHeight: 1.6, maxWidth: 640, marginBottom: "0.6rem" }}>
-          Ownology is being built in the open. This page is the single source of truth for what's on our workbench,
-          what's coming next, and what already shipped. It updates whenever we finish, add, or reprioritise something —
-          which is often.
+          The honest, blunt working roadmap. Includes known gaps, security items, and internal notes that aren't ready
+          for public consumption. Members-only — anonymous visitors get redirected to <code style={{ fontFamily: MONO, fontSize: "0.85em", background: "oklch(0 0 0 / 0.15)", padding: "0.05rem 0.4rem", borderRadius: 2 }}>/try</code>.
         </p>
         <p style={{ fontFamily: SANS, fontSize: "0.85rem", color: LO, marginBottom: "2.25rem", lineHeight: 1.55 }}>
-          If something here matters to you as a prospective founding member, tell us —{" "}
-          <a href="mailto:hello@ownology.ai" style={{ color: AMBER, textDecoration: "none", borderBottom: `1px dotted ${AMBER}` }}>
-            hello@ownology.ai
-          </a>{" "}
-          — and we'll move it up.
+          When we're ready for a public roadmap, we'll build a sanitised customer-safe version at{" "}
+          <code style={{ fontFamily: MONO, fontSize: "0.85em", background: "oklch(0 0 0 / 0.15)", padding: "0.05rem 0.4rem", borderRadius: 2 }}>/public-roadmap</code>{" "}
+          — see the "How to keep it fresh" note at the bottom.
         </p>
 
         {/* Priority bands */}

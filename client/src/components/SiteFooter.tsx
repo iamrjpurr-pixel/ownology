@@ -42,7 +42,6 @@ const COLUMNS: Array<{ heading: string; links: Array<{ label: string; href: stri
     links: [
       { label: "Cellar Journal", href: "/cellar-journal", testid: "footer-cellar-journal" },
       { label: "Try the sandbox", href: "/try", testid: "footer-try" },
-      { label: "Public roadmap", href: "/todo", testid: "footer-todo" },
       { label: "Wine Quiz", href: "/quiz", testid: "footer-quiz" },
       { label: "Our Story", href: "/#our-story" },
       { label: "Weight of Harvest", href: "/#weight-of-harvest" },
