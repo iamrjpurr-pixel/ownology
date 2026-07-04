@@ -240,6 +240,23 @@ export default function SiteMap() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--ow-bg)", paddingBottom: "4rem" }}>
+      {/* Print stylesheet — turns the dark UI into a clean, ink-friendly PDF
+          when the user hits "Save as PDF" from the browser print dialog.
+          Every anchor stays clickable in the exported PDF. */}
+      <style>{`
+        @media print {
+          body, html { background: #ffffff !important; }
+          .no-print, footer, header, nav { display: none !important; }
+          [data-testid="sitemap-eyebrow"] { color: #8a5a2c !important; }
+          h1, h2 { color: #111 !important; break-after: avoid; }
+          p, span, div { color: #222 !important; }
+          section { break-inside: avoid; page-break-inside: avoid; }
+          a { color: #1e4d8a !important; text-decoration: underline !important; }
+          code { background: #f2efe8 !important; color: #111 !important; }
+          .sitemap-row { border-color: #ddd !important; background: #fff !important; }
+          @page { margin: 15mm 12mm; }
+        }
+      `}</style>
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "3rem 1.5rem 1rem" }}>
         <p
           data-testid="sitemap-eyebrow"
@@ -256,9 +273,78 @@ export default function SiteMap() {
         <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.95rem", color: TEXT_MID, lineHeight: 1.6, maxWidth: 620, marginBottom: "0.6rem" }}>
           Grouped by audience. Green = public. Teal = for logged-in winemakers. Red = admin. Every link opens in this tab so you can chain them together.
         </p>
-        <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.72rem", color: TEXT_LO, marginBottom: "2rem" }}>
-          Entry: <span style={{ color: AMBER }}>{entry}</span> · Cross-reference this against <a href="https://github.com" style={{ color: AMBER }}>your repo's App.tsx</a> if a route is missing.
+        <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.72rem", color: TEXT_LO, marginBottom: "1.25rem" }}>
+          Entry: <span style={{ color: AMBER }}>{entry}</span> · Cross-reference this against <a href="https://github.com" style={{ color: AMBER }}>your repo&apos;s App.tsx</a> if a route is missing.
         </p>
+
+        {/* Save as PDF — uses the browser's native print-to-PDF. Keeps every
+            link clickable in the exported PDF. Bookmarkable via /site-map#print. */}
+        <div
+          className="no-print"
+          style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginBottom: "2rem" }}
+        >
+          <button
+            data-testid="sitemap-print-btn"
+            onClick={() => window.print()}
+            style={{
+              background: AMBER,
+              color: "oklch(0.10 0.008 60)",
+              border: "none",
+              padding: "0.75rem 1.25rem",
+              borderRadius: 4,
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.88rem",
+              fontWeight: 700,
+              letterSpacing: "0.03em",
+              cursor: "pointer",
+            }}
+          >
+            Save as PDF / print
+          </button>
+          <button
+            data-testid="sitemap-copy-btn"
+            onClick={async () => {
+              const lines: string[] = [`Ownology · Site Map · ${totalRoutes} routes\n`];
+              const base = window.location.origin;
+              SECTIONS.forEach((s) => {
+                lines.push(`\n## ${s.title}`);
+                lines.push(s.blurb);
+                s.routes.forEach((r) => lines.push(`  ${r.label} — ${base}${r.path}\n    ${r.desc}`));
+              });
+              try {
+                await navigator.clipboard.writeText(lines.join("\n"));
+                alert(`Copied ${totalRoutes} URLs to clipboard as plain text.`);
+              } catch {
+                alert("Copy failed — please try the Save as PDF button instead.");
+              }
+            }}
+            style={{
+              background: "transparent",
+              color: AMBER,
+              border: `1px solid ${AMBER}`,
+              padding: "0.75rem 1.25rem",
+              borderRadius: 4,
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.88rem",
+              fontWeight: 700,
+              letterSpacing: "0.03em",
+              cursor: "pointer",
+            }}
+          >
+            Copy all URLs as text
+          </button>
+          <span
+            className="no-print"
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.75rem",
+              color: TEXT_LO,
+              alignSelf: "center",
+            }}
+          >
+            Tip: in the print dialog, choose <em>Save as PDF</em> as the destination — every link stays clickable.
+          </span>
+        </div>
 
         {SECTIONS.map((section) => (
           <section key={section.title} data-testid={`sitemap-section-${section.title.split(" ")[0].toLowerCase()}`} style={{ marginBottom: "2.5rem" }}>
