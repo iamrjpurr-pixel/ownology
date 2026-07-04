@@ -15,13 +15,21 @@
  */
 
 import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 import { usePwaInstall } from "@/hooks/usePwaInstall";
 
 const DISMISSED_KEY = "ownology_pwa_banner_dismissed";
 
+/** Prospect / conversion surfaces where the install nudge would distract
+ *  from the story we're telling. `/try` is the main sandbox — asking a
+ *  visitor to install a PWA before they've even subscribed is friction. */
+const SUPPRESSED_PREFIXES = ["/try", "/hi/", "/audit/", "/join", "/founding-member/success"];
+
 export default function PwaInstallBanner() {
+  const [location] = useLocation();
   const { canInstall, canInstallIos, promptInstall, isInstalled } = usePwaInstall();
   const [dismissed, setDismissed] = useState(false);
+  const suppressed = SUPPRESSED_PREFIXES.some((p) => location.startsWith(p));
 
   useEffect(() => {
     if (localStorage.getItem(DISMISSED_KEY) === "1") {
@@ -31,7 +39,7 @@ export default function PwaInstallBanner() {
 
   // Advertise banner presence to sibling floating UI (e.g. GlobalThemeToggle
   // in App.tsx uses this to lift its bottom offset so the two don't overlap).
-  const isVisible = !isInstalled && !dismissed && (canInstall || canInstallIos);
+  const isVisible = !isInstalled && !dismissed && !suppressed && (canInstall || canInstallIos);
   useEffect(() => {
     if (typeof document === "undefined") return;
     if (isVisible) {
@@ -50,7 +58,7 @@ export default function PwaInstallBanner() {
     handleDismiss();
   }
 
-  if (isInstalled || dismissed) return null;
+  if (isInstalled || dismissed || suppressed) return null;
   if (!canInstall && !canInstallIos) return null;
 
   const isIos = !canInstall && canInstallIos;

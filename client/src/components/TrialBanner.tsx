@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { trpc } from "../lib/trpc";
 
-const SUPPRESSED_PREFIXES = ["/hi/", "/audit/", "/founding-member/success", "/merch/success", "/join"];
+const SUPPRESSED_PREFIXES = ["/hi/", "/audit/", "/founding-member/success", "/merch/success", "/join", "/try"];
 const DISMISS_KEY = "ow-trial-banner-dismissed";
 const BANNER_H_PX = 50;
 
