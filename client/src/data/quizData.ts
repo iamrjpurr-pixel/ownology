@@ -59,6 +59,10 @@ export type Wine = {
   /** Optional per-region availability/price advice. If missing for a region,
    *  the quiz uses a generic fallback. Populate honestly. */
   regional?: Partial<Record<Region, RegionalNote>>;
+  /** Specialty/aperitif wines that shouldn't dominate the recommendation
+   *  space. Applies a small score penalty so they only win on very close
+   *  palate matches, not by mopping up under-represented axis combos. */
+  specialty?: boolean;
 };
 
 export const WINES: Wine[] = [
@@ -73,7 +77,7 @@ export const WINES: Wine[] = [
     gelsNote: "Aromatic thiols carry the tropical + salt character. High TA, low RS, minimal oak.",
     producers: ["COS", "Marco De Bartoli", "Cusumano Alta Mora"],
     alsoTry: ["Assyrtiko (Santorini)", "Vermentino (Sardinia)"],
-    palate: { fruit: "citrus", body: "light", sweetness: "bone_dry", grip: "bright", age: "developed" },
+    palate: { fruit: "citrus", body: "light", sweetness: "bone_dry", grip: "grippy", age: "developed" },
   },
   {
     slug: "riesling-clare",
@@ -86,7 +90,7 @@ export const WINES: Wine[] = [
     gelsNote: "pH < 3.0 typical; high tartaric preserves aromatic precursors for decades.",
     producers: ["Grosset", "Jim Barry Florita", "Pikes"],
     alsoTry: ["Eden Valley Riesling", "Mosel Kabinett"],
-    palate: { fruit: "citrus", body: "light", sweetness: "bone_dry", grip: "bright", age: "young" },
+    palate: { fruit: "citrus", body: "light", sweetness: "bone_dry", grip: "bright", age: "developed" },
   },
   {
     slug: "chardonnay-adelaide-hills",
@@ -99,7 +103,7 @@ export const WINES: Wine[] = [
     gelsNote: "Partial MLF, older oak, extended lees contact — the modern Aus playbook.",
     producers: ["Shaw + Smith M3", "Ashton Hills", "Tapanappa Tiers"],
     alsoTry: ["Chablis (Burgundy)", "Yarra Valley Chardonnay"],
-    palate: { fruit: "citrus", body: "medium", sweetness: "bone_dry", grip: "bright", age: "developed" },
+    palate: { fruit: "citrus", body: "medium", sweetness: "bone_dry", grip: "both", age: "developed" },
   },
   {
     slug: "sauvignon-blanc-marlborough",
@@ -282,6 +286,7 @@ export const WINES: Wine[] = [
     producers: ["Cocchi Storico", "Carpano Antica Formula", "Mancino"],
     alsoTry: ["Sherry Amontillado", "Madeira Sercial"],
     palate: { fruit: "savoury", body: "medium", sweetness: "off_dry", grip: "soft", age: "young" },
+    specialty: true,
   },
   {
     slug: "assyrtiko-santorini",
@@ -398,7 +403,7 @@ export const WINES: Wine[] = [
     gelsNote: "Entry-tier fruit off cool-climate vineyards; minimal oak, short maceration, drink young.",
     producers: ["De Bortoli Villages", "Delatite", "Josef Chromy"],
     alsoTry: ["Mornington entry Pinot", "Central Otago Pinot second labels"],
-    palate: { fruit: "red", body: "light", sweetness: "bone_dry", grip: "bright", age: "young" },
+    palate: { fruit: "red", body: "light", sweetness: "bone_dry", grip: "soft", age: "young" },
   },
   {
     slug: "burgundy-old-white",
@@ -425,14 +430,59 @@ export const WINES: Wine[] = [
 // (savoury vs dark) still loses to a 1/6 match with the exact fruit.
 const AXIS_WEIGHTS = { fruit: 12, body: 3, sweetness: 4, grip: 3, age: 2, budget: 4 };
 
+// Family bonus / cross-family penalty — enforce the colour-family line.
+// A user asking for red fruit and getting a Gewürztraminer is being
+// mis-advised no matter how many other axes align. Family match earns a
+// modest bonus (below exact-fruit but above no-signal); cross-family
+// receives an explicit penalty so it can only win when there is literally
+// no in-family option at the user's budget + axes.
+const FAMILY_BONUS = 5;
+const CROSS_FAMILY_PENALTY = 6;
+const RED_FAMILY: ReadonlySet<Fruit> = new Set(["red", "dark", "savoury"] as Fruit[]);
+const WHITE_FAMILY: ReadonlySet<Fruit> = new Set(["citrus"] as Fruit[]);
+function sameFamily(a: Fruit, b: Fruit): boolean {
+  if (a === b) return true;
+  if (RED_FAMILY.has(a) && RED_FAMILY.has(b)) return true;
+  if (WHITE_FAMILY.has(a) && WHITE_FAMILY.has(b)) return true;
+  return false;
+}
+
+// Specialty penalty — applied to aperitif/oddity wines (currently only
+// Vermouth) so they only surface on very close palate matches instead of
+// mopping up under-represented axis combos and dominating the result set.
+const SPECIALTY_PENALTY = 5;
+
+// Sweetness is a scale, not a category. Someone who asks for "sweet" and
+// gets a bone-dry wine is being mis-advised in a way that matching "light"
+// body against "medium" body isn't. Score by distance on a 0–3 scale so
+// adjacent picks (hint↔off_dry) are near-neutral, opposite-end mismatches
+// (bone_dry↔sweet) carry a real penalty.
+const SWEETNESS_LEVEL: Record<Sweetness, number> = {
+  bone_dry: 0, hint: 1, off_dry: 2, sweet: 3,
+};
+function sweetnessScore(userS: Sweetness, wineS: Sweetness): number {
+  const diff = Math.abs(SWEETNESS_LEVEL[userS] - SWEETNESS_LEVEL[wineS]);
+  if (diff === 0) return AXIS_WEIGHTS.sweetness; // exact = +4
+  if (diff === 1) return 1;                       // adjacent = tiny partial
+  if (diff === 2) return -3;                      // clear mismatch
+  return -8;                                       // opposite ends (bone_dry↔sweet)
+}
+
 export function scoreWine(w: Wine, a: QuizAnswers): number {
   let score = 0;
-  if (w.palate.fruit === a.fruit) score += AXIS_WEIGHTS.fruit;
+  if (w.palate.fruit === a.fruit) {
+    score += AXIS_WEIGHTS.fruit;
+  } else if (sameFamily(w.palate.fruit, a.fruit)) {
+    score += FAMILY_BONUS;
+  } else {
+    score -= CROSS_FAMILY_PENALTY;
+  }
   if (w.palate.body === a.body) score += AXIS_WEIGHTS.body;
-  if (w.palate.sweetness === a.sweetness) score += AXIS_WEIGHTS.sweetness;
+  score += sweetnessScore(a.sweetness, w.palate.sweetness);
   if (w.palate.grip === a.grip) score += AXIS_WEIGHTS.grip;
   if (w.palate.age === a.age) score += AXIS_WEIGHTS.age;
   if (w.price === a.budget) score += AXIS_WEIGHTS.budget;
+  if (w.specialty) score -= SPECIALTY_PENALTY;
   return score;
 }
 

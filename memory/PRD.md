@@ -796,3 +796,42 @@ have been folded in or marked complete.)
 - **testids**: `recent-reservations-widget`, `recent-reservations-total`, `recent-reservations-list`, `recent-reservations-empty`, `reservation-filter-{all|pending|contacted|paid|cancelled}`, `reservation-row-{id}`, `reservation-mark-contacted-{id}`, `reservation-mark-paid-{id}`, `reservation-mark-cancelled-{id}`.
 - **Verified live**: curl'd updateReservationStatus → `{ok:true}`, listReservations shows contactedAt stamped. Screenshot: widget renders 10 rows, "10/99 slots claimed", clicking Mark contacted on #9 flipped its status to CONTACTED with "contacted just now", filter chip updated from CONTACTED 1 → 2, filtering by contacted showed exactly those 2 rows. End-to-end.
 
+
+
+## Site Map footer link + Quiz algorithm hardening (Feb 2026 — this session) ✅
+
+### Site Map linkability
+- User asked "what does /site-map do? i cant link it?" — the page was already public in App.tsx, just wasn't linked from the site chrome.
+- **Fix**: added three links to `SiteFooter.tsx` bottom bar → **RSS · Site map · Sitemap.xml**.
+  - `[data-testid=footer-sitemap-page]` → `/site-map` (human-readable page, wouter Link)
+  - `[data-testid=footer-sitemap-xml]` → `/api/sitemap.xml` (SEO XML)
+  - `[data-testid=footer-rss]` → `/api/cellar-journal/rss.xml`
+- The `?k=carrie2026` key is cosmetic (changes entry label from "admin session" to "shared key") — the page itself is public, safe to link without the key.
+
+### Quiz algorithm hardening (`client/src/data/quizData.ts`)
+Previous exhaustive test showed 3 flaws across 1,296+ permutations:
+1. Red-fruit + sweet → Sauternes (a white) instead of Port
+2. Vermouth dominated 14.7% of picks
+3. Sauv Blanc / Assyrtiko / entry Pinot Noir *never* picked (tied palates lost on array order)
+
+**Scoring changes**:
+- **Colour family scoring** — exact fruit `+12`, same-family fruit (red/dark/savoury ↔ red/dark/savoury; citrus solo) `+5`, cross-family `-6`. Enforces the colour line hard.
+- **Sweetness distance scoring** — 0-3 scale (bone_dry→sweet). Exact `+4`, adjacent `+1`, off-by-2 `-3`, opposite ends `-8`. Stops "user asks sweet, gets bone-dry" mis-advice.
+- **Specialty penalty** — Vermouth flagged `specialty: true`, applies `-5` penalty. It now only wins on very close palate matches instead of mopping up under-represented axis combos.
+
+**Palate signature differentiation**:
+- Riesling Clare age: young → **developed** (real ageing profile; frees Sauv Blanc for young-drinker path)
+- Grillo grip: bright → **grippy** (salt/mineral is its signature; frees Assyrtiko for bright path)
+- Chardonnay Adelaide Hills grip: bright → **both** (partial MLF gives soft+bright texture)
+- Pinot Noir (entry) grip: bright → **soft** (entry-tier phenolics; frees Beaujolais-Villages)
+
+**Verification**: `scripts/test-quiz-permutations.mjs` runs all 2,304 combos and reports pick distribution, cross-family errors, and red+sweet+100+ audit. **All 4 gates pass**:
+- Never-picked: 0 (was 3)
+- Dominators (>12%): 0 (Vermouth 14.7% → 8.6%, Malbec 11.1%)
+- Cross-family semantic errors: 0 (was 60+)
+- Red+sweet+100+ → Port: 36/36 (was 10/36)
+
+**Files touched**:
+- `client/src/data/quizData.ts` — Wine type, scoring, palate tweaks
+- `client/src/components/SiteFooter.tsx` — three-link footer bottom bar
+- `scripts/test-quiz-permutations.mjs` — regression harness (new)
