@@ -26,6 +26,17 @@ import { jwtVerify } from "jose";
 import { parse as parseCookies } from "cookie";
 import { COOKIE_NAME } from "../shared/const.js";
 
+/** HTML-attribute-safe escape for injected meta content. Handles the
+ *  characters that would break out of a `content="..."` attribute or the
+ *  `<title>` element. Kept alongside the meta-injection middleware. */
+function escapeHtmlAttr(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 /**
  * Admin gate (post-auth migration).
  *
@@ -238,6 +249,98 @@ async function startServer() {
       : path.resolve(__dirname, "..", "dist", "public");
 
   app.use(express.static(staticPath));
+
+  // ── Per-route meta injection for social share cards ────────────────────
+  // The SPA ships a single index.html with generic OG tags for `/`. But
+  // WhatsApp/Twitter/Slack/LinkedIn crawlers ONLY read the raw HTML they
+  // fetch — they don't run JS. So updating meta tags client-side does
+  // nothing for previews. The fix is server-side: intercept the HTML
+  // request for specific routes, read index.html from disk, string-swap
+  // the OG block, and serve.
+  //
+  // Kept as a static map keyed by pathname so adding new share cards is a
+  // one-line change. `image` must be an absolute-from-root URL under
+  // /client/public/.
+  //
+  // In dev this middleware never fires (Vite serves /try on :3000 directly).
+  // Social crawlers only crawl production, so that's the correct scope.
+  const ROUTE_META: Record<
+    string,
+    { title: string; description: string; image: string; canonicalPath: string }
+  > = {
+    "/try": {
+      title: "Try Ownology — Run a winery for 10 minutes",
+      description:
+        "A guided sandbox with real 12-batch cellar data from Ownology Cellars. Fix a stuck ferment. Log the action. Publish the lesson. No signup, no credit card, no writes to anyone's data.",
+      image: "https://ownology.ai/og-try.png",
+      canonicalPath: "/try",
+    },
+  };
+
+  app.get(Object.keys(ROUTE_META), async (req, res, next) => {
+    try {
+      const meta = ROUTE_META[req.path];
+      if (!meta) return next();
+      const fs = await import("fs/promises");
+      const raw = await fs.readFile(path.join(staticPath, "index.html"), "utf8");
+      const canonical = `https://ownology.ai${meta.canonicalPath}`;
+      // Swap the whole <title> and the OG/Twitter meta blocks. We match on
+      // the exact strings that ship in index.html so this stays deterministic;
+      // if that file changes shape, the swaps become no-ops and the page
+      // still serves — just with the default OG card.
+      const html = raw
+        .replace(
+          /<title>[^<]*<\/title>/,
+          `<title>${escapeHtmlAttr(meta.title)}</title>`
+        )
+        .replace(
+          /<meta name="description" content="[^"]*"\s*\/?>/,
+          `<meta name="description" content="${escapeHtmlAttr(meta.description)}" />`
+        )
+        .replace(
+          /<meta property="og:title" content="[^"]*"\s*\/?>/,
+          `<meta property="og:title" content="${escapeHtmlAttr(meta.title)}" />`
+        )
+        .replace(
+          /<meta property="og:description" content="[^"]*"\s*\/?>/,
+          `<meta property="og:description" content="${escapeHtmlAttr(meta.description)}" />`
+        )
+        .replace(
+          /<meta property="og:url" content="[^"]*"\s*\/?>/,
+          `<meta property="og:url" content="${canonical}" />`
+        )
+        .replace(
+          /<meta property="og:image" content="[^"]*"\s*\/?>/,
+          `<meta property="og:image" content="${meta.image}" />`
+        )
+        .replace(
+          /<meta property="og:image:alt" content="[^"]*"\s*\/?>/,
+          `<meta property="og:image:alt" content="${escapeHtmlAttr(meta.title)}" />`
+        )
+        .replace(
+          /<meta name="twitter:title" content="[^"]*"\s*\/?>/,
+          `<meta name="twitter:title" content="${escapeHtmlAttr(meta.title)}" />`
+        )
+        .replace(
+          /<meta name="twitter:description" content="[^"]*"\s*\/?>/,
+          `<meta name="twitter:description" content="${escapeHtmlAttr(meta.description)}" />`
+        )
+        .replace(
+          /<meta name="twitter:image" content="[^"]*"\s*\/?>/,
+          `<meta name="twitter:image" content="${meta.image}" />`
+        )
+        .replace(
+          /<link rel="canonical" href="[^"]*"\s*\/?>/,
+          `<link rel="canonical" href="${canonical}" />`
+        );
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      res.setHeader("Cache-Control", "public, max-age=300");
+      res.send(html);
+    } catch (err) {
+      // If disk read fails, fall through to the SPA fallback below.
+      next(err);
+    }
+  });
 
   // API 404 JSON — any /api/* path not matched by a real route above should
   // return 404 JSON, NOT the SPA HTML index. Registered AFTER all real /api

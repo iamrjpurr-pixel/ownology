@@ -928,3 +928,45 @@ Playwright walked the full 7-step flow: Step 1 title rendered, wrong alert (low-
 - **`/hi/{name}` personalized landing** — prepend Step 1 with "Rich sent this to you, {Name}" from a URL query param. High-leverage cold outreach touch.
 - **Prospect analytics** — event log which step users drop on. All testids are in place; just need an event pipeline.
 
+
+## `/try` social share card (Feb 2026 — this session) ✅
+
+### Why
+`/try` is Rich's best cold-outreach asset now. When a link gets shared on WhatsApp / SMS / Twitter / LinkedIn / Slack, those platforms scrape the raw HTML on delivery — no JS. Without per-route OG tags, `/try` inherited the generic homepage card ("Cellar Intelligence for Boutique Winemakers"), which doesn't advertise what the sandbox is.
+
+### Shape
+- **1200×630 PNG at `/og-try.png`** — hand-built with Python PIL, ~55 KB.
+  - Cream `#f7f0e3` background (matches `--ow-bg` light theme)
+  - Left: "OWNOLOGY · SANDBOX" eyebrow, serif headline "Run a winery for ten minutes.", 3-line subhead ("A real 12-batch cellar. Real 2026 vintage. Fix a stuck ferment. Log the action. Publish the lesson. No signup."), amber pill `ownology.ai/try` at bottom, "guided sandbox · from Rich & Gel" tagline
+  - Right: dark-brown accent block (~28% width) with an amber wine-glass emblem, "OWNOLOGY CELLARS · HUNTER VALLEY · NSW · VINTAGE 2026 · SANDBOX" typography
+- **Server-side per-route meta-injection middleware** in `server/index.ts`:
+  - Registered before the SPA wildcard fallback
+  - `ROUTE_META` map keyed by pathname → `{ title, description, image, canonicalPath }`
+  - On matching path, reads `dist/public/index.html` from disk, string-swaps the `<title>`, `<meta name="description">`, all `og:*`, all `twitter:*`, and `<link rel="canonical">` tags with route-specific values
+  - Uses `escapeHtmlAttr()` for safe injection
+  - Cache-Control: `public, max-age=300` (5 min TTL — long enough for scraper convenience, short enough that copy edits propagate)
+  - Fires only in production (Express serves the SPA); in dev Vite serves `/try` directly so the middleware is bypassed — that's fine since social crawlers only hit production
+
+### Verification
+- 7-of-7 regex swaps hit against the actual `client/index.html` (verified via Node test)
+- `/og-try.png` serves with `Content-Type: image/png` at the preview URL — 200 OK, 55 KB
+- Rendered image inspected — no font-fallback ugliness, no clipping, brand colours accurate
+
+### Files touched
+- `client/public/og-try.png` — the 1200×630 share card (new)
+- `scripts/build-og-try-image.py` — the PIL generator (new, re-run whenever copy changes)
+- `server/index.ts` — added `escapeHtmlAttr()` helper + `ROUTE_META` map + meta-injection middleware just before the SPA fallback
+
+### Extensibility
+Adding a share card for any other route (e.g. `/quiz`, `/pricing`) is now a 3-step move:
+1. Generate the PNG (copy `build-og-try-image.py`, tweak copy, save to `client/public/og-<route>.png`)
+2. Add an entry to `ROUTE_META` in `server/index.ts`
+3. Done — no route-specific code needed, the middleware handles everything
+
+### Distribution instructions for Rich
+When you share the link:
+- **WhatsApp / SMS**: paste `ownology.ai/try` → card renders within 2-3 seconds
+- **LinkedIn**: use the Post Inspector (`linkedin.com/post-inspector`) to force-refresh their cache after any edit
+- **Twitter/X**: card debugger at `cards-dev.twitter.com/validator`
+- **Facebook/Meta**: `developers.facebook.com/tools/debug`
+
