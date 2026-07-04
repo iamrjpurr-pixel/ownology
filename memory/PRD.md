@@ -3,6 +3,49 @@
 ## Original problem statement
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
+
+**Voice-Memo → Whisper → Structured Entry Pipeline (Feb 2026, this session)**
+- The flagship "Import Anything" feature promised on `/try`. Winemakers speak a
+  voice memo in the cellar (hands-free / muddy hands) → we transcribe with
+  OpenAI Whisper via the Emergent LLM Key → we structure the transcription
+  into cellar log entries → user reviews + saves via the existing bulkSave.
+- **Backend**: new tRPC procedure `vintageLog.parseFromVoice` (approx
+  `/app/server/routers/vintageLog.ts:462`). Accepts
+  `{ audioBase64, mimeType, language? }`. Two-step pipeline:
+  1. Multipart POST to
+     `https://integrations.emergentagent.com/llm/openai/v1/audio/transcriptions`
+     with `model=whisper-1`, `response_format=json`, and a domain vocabulary
+     prompt hint ("DAP, YAN, Brix, pH, TA, SO2, MLF, EC1118, RC212, QA23…")
+     that massively boosts accuracy on cellar terminology Whisper otherwise
+     mishears (SO₂ → "so too", DAP → "map", Brix → "bricks", MLF → "am elf").
+  2. Feeds the transcription into the same structuring LLM prompt as
+     `parseFromText` (with additional speech-recognition normalisation rules)
+     and returns `{ entries, transcription }`.
+  - `x-ow-source: vintageLog.parseFromVoice` tag for cost metering.
+  - Graceful degradation: if the structuring LLM fails, we still return the
+    raw transcription so the user can copy it manually.
+- **Frontend**: new `VoiceTab` component in `/app/client/src/pages/Import.tsx`
+  (approx lines 196-500). MediaRecorder API-based recorder with:
+  - Cross-browser codec picker (webm/opus → mp4/m4a for iOS Safari)
+  - Live RMS audio meter (visual "recording is on" feedback)
+  - Elapsed-time counter with a 3-minute auto-stop safety cap
+  - In-browser playback of the captured memo before submitting
+  - Post-transcription echo ("We heard: …") — critical trust signal
+  - `data-testid`s: `voice-tab`, `voice-start-btn`, `voice-stop-btn`,
+    `voice-timer`, `voice-level-meter`, `voice-playback`, `voice-discard-btn`,
+    `voice-transcribe-btn`, `voice-transcription-block`, `voice-error`.
+- **Wiring**: Voice is now the DEFAULT active tab on `/import` (was Camera).
+  Tab bar grew from 3 → 4 columns (`grid-cols-4`). `bulkSave` `importSource`
+  enum extended with `"voice"`. `express.json({ limit: "40mb" })` bump in
+  `server/index.ts` accommodates base64-encoded audio (25MB Whisper cap +
+  ~33% base64 overhead → ~33.4MB; 40MB gives headroom so the friendly
+  "Audio exceeds 25MB Whisper limit" error actually fires).
+- **Verified live** (`/app/test_reports/iteration_27.json` — 6/6 backend +
+  100% frontend, 0 critical): synthesized MP3 voice memo saying "Tank 7
+  Shiraz, added 2.6 kilograms of DAP. Brix is 14.2, pH 3.42." transcribed
+  perfectly and yielded 3 correctly-structured entries (1 addition + 2
+  measurements) attributed to Tank 7 / Shiraz.
+
 ## Architecture (after import — 27 Jan 2026)
 
 **Stack (kept from upstream)**
