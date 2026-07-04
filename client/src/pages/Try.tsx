@@ -1044,6 +1044,197 @@ function Step7Close({ fromRoute }: { fromRoute: string | null }) {
   );
 }
 
+// ─── Intro flow (3 auto-cycling story screens) ─────────────────────────
+// Before the sandbox proper we run a 3-screen emotional/product intro so
+// prospects don't get dumped straight into "you're the winemaker" cold.
+// Each screen auto-advances after AUTO_ADVANCE_MS. If the user clicks the
+// screen or the "Continue →" button, auto-advance for the remaining
+// intro screens is cancelled (they're engaged — respect their pace).
+// Once past the intro, the sandbox's 7 steps run as normal.
+const AUTO_ADVANCE_MS = 9000; // 9 seconds — comfortable reading pace
+
+interface IntroScreen {
+  key: "hook" | "story" | "why";
+  eyebrow: string;
+  title: string;
+  body: React.ReactNode;
+}
+
+const INTRO_SCREENS: IntroScreen[] = [
+  {
+    key: "hook",
+    eyebrow: "Ownology",
+    title: "Every vintage is a story. Most winemakers lose theirs.",
+    body: (
+      <>
+        <p>
+          Lost to a spreadsheet that fell out of the shared folder. Lost to a paper log soaked in Semillon. Lost to
+          the 3am ferment panic that ate the year and left no notes.
+        </p>
+        <p style={{ marginTop: "1rem" }}>
+          The most valuable thing in your cellar isn't the wine. It's what you learned making it. Ownology exists so
+          you don't lose that.
+        </p>
+      </>
+    ),
+  },
+  {
+    key: "story",
+    eyebrow: "Our story",
+    title: "Rich & Gel. Amateur winemakers. Second-career scientists.",
+    body: (
+      <>
+        <p>
+          We run <strong>Ownology Cellars</strong> — a boutique winery in the Hunter Valley, NSW. 12 batches in the
+          shed. Vintage 2026 in full swing. Semillon on lees, Shiraz through malo, Chardonnay in barrel.
+        </p>
+        <p style={{ marginTop: "1rem" }}>
+          We got sick of losing our own vintage story to spreadsheets, PDFs, and half-remembered conversations with
+          our winemaking consultant. So we built the tool we wished we had. Everything you're about to see runs on
+          our actual cellar data.
+        </p>
+      </>
+    ),
+  },
+  {
+    key: "why",
+    eyebrow: "Why Ownology",
+    title: "One system. Four surfaces. It fits your day.",
+    body: (
+      <ul style={{ padding: 0, margin: "0.5rem 0 0", listStyle: "none" }}>
+        {[
+          ["Cellar Brief", "An AI reads yesterday's logs while you sleep. In your inbox at 5:30am — what needs doing today, ranked."],
+          ["Cellar Journal", "Every lesson you record ranks on Google over time. Your voice, your knowledge, your marketing."],
+          ["Batch Book", "Your Wine Australia LIP Audit Pack writes itself from every entry. One click, PDF, compliant."],
+          ["Ask Ownology", "A winemaker's assistant that knows YOUR cellar's history — not a generic wine chatbot."],
+        ].map(([label, desc]) => (
+          <li key={label} style={{ marginBottom: "0.9rem", display: "grid", gridTemplateColumns: "150px 1fr", gap: "0.75rem", alignItems: "baseline" }}>
+            <strong style={{ color: TEXT_HI, fontFamily: "'Fraunces', serif", fontSize: "0.98rem" }}>{label}</strong>
+            <span style={{ color: TEXT_MID, fontSize: "0.86rem", lineHeight: 1.55 }}>{desc}</span>
+          </li>
+        ))}
+      </ul>
+    ),
+  },
+];
+
+function IntroScreenView({
+  screen,
+  index,
+  total,
+  onNext,
+  onSkipIntro,
+}: {
+  screen: IntroScreen;
+  index: number;
+  total: number;
+  onNext: () => void;
+  onSkipIntro: () => void;
+}) {
+  const isLast = index === total - 1;
+  return (
+    <section
+      data-testid={`try-intro-${screen.key}`}
+      style={{ maxWidth: 720, margin: "0 auto", padding: "2.5rem 1.5rem 4rem" }}
+    >
+      {/* Story-dots progress */}
+      <div
+        data-testid="try-intro-dots"
+        style={{ display: "flex", gap: "0.4rem", marginBottom: "1.5rem", alignItems: "center" }}
+      >
+        {Array.from({ length: total }).map((_, i) => (
+          <span
+            key={i}
+            style={{
+              width: i === index ? 26 : 6,
+              height: 6,
+              borderRadius: 999,
+              background: i <= index ? AMBER : BORDER,
+              transition: "width 300ms ease, background 200ms ease",
+            }}
+          />
+        ))}
+        <span style={{ marginLeft: "auto", fontFamily: "'Lato', sans-serif", fontSize: "0.7rem", color: TEXT_LO, letterSpacing: "0.08em" }}>
+          Story {index + 1} of {total}
+        </span>
+      </div>
+
+      <p
+        style={{
+          color: AMBER,
+          fontSize: "0.7rem",
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          fontFamily: "'Lato', sans-serif",
+          marginBottom: "0.6rem",
+        }}
+      >
+        {screen.eyebrow}
+      </p>
+      <h1
+        data-testid={`try-intro-${screen.key}-title`}
+        style={{
+          fontFamily: "'Fraunces', serif",
+          fontSize: "clamp(1.8rem, 4.5vw, 2.8rem)",
+          color: TEXT_HI,
+          lineHeight: 1.15,
+          marginBottom: "1.5rem",
+        }}
+      >
+        {screen.title}
+      </h1>
+      <div style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.95rem", color: TEXT_MID, lineHeight: 1.65 }}>
+        {screen.body}
+      </div>
+
+      <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap", marginTop: "2rem" }}>
+        <button
+          type="button"
+          onClick={onNext}
+          data-testid={`try-intro-${screen.key}-next`}
+          style={{
+            background: AMBER,
+            color: "white",
+            border: "none",
+            padding: "0.85rem 1.6rem",
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.9rem",
+            fontWeight: 700,
+            borderRadius: 4,
+            cursor: "pointer",
+          }}
+        >
+          {isLast ? "Start the sandbox →" : "Continue →"}
+        </button>
+        {!isLast && (
+          <button
+            type="button"
+            onClick={onSkipIntro}
+            data-testid="try-intro-skip"
+            style={{
+              background: "none",
+              border: "none",
+              padding: "0.85rem 0.5rem",
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.82rem",
+              color: TEXT_LO,
+              cursor: "pointer",
+              textDecoration: "underline",
+              textDecorationColor: BORDER,
+              textUnderlineOffset: 3,
+            }}
+          >
+            Skip intro
+          </button>
+        )}
+      </div>
+      <p style={{ marginTop: "0.85rem", fontFamily: "'Lato', sans-serif", fontSize: "0.7rem", color: TEXT_LO, fontStyle: "italic" }}>
+        {isLast ? "" : "Auto-advances in a few seconds — or tap to continue at your own pace."}
+      </p>
+    </section>
+  );
+}
+
 // ─── Main container ─────────────────────────────────────────────────────
 /** Friendly labels for the member routes we might have redirected the
  *  user from. Keyed by pathname (matches server/index.ts MEMBER_ONLY_PREFIXES).
@@ -1111,12 +1302,40 @@ export default function Try() {
   const [pickedDecision, setPickedDecisionState] = useState<DemoDecision | null>(
     initial?.pickedDecision ? (DECISIONS.find((d) => d.key === initial.pickedDecision) ?? null) : null
   );
-  // "You were reaching for X" contextual banner — populated when a
-  // logged-out visitor was redirected here from a member-only route via
-  // ?from=<path> (see server/index.ts MEMBER_ONLY_PREFIXES middleware).
-  // Only shown on Step 1 — once they engage with the sandbox we don't
-  // want a persistent "you tried X" nag.
   const [fromRoute] = useState<string | null>(() => readFromParam());
+
+  // Intro flow — 3 auto-cycling story screens before the sandbox proper.
+  // If the visitor has resume state (they've been here before mid-sandbox)
+  // we skip the intro entirely and drop them back where they were.
+  const [introIdx, setIntroIdx] = useState<number>(() => (initial ? INTRO_SCREENS.length : 0));
+  const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState<boolean>(true);
+  const inIntro = introIdx < INTRO_SCREENS.length;
+
+  // Auto-advance the intro screens unless the user has interacted OR
+  // prefers-reduced-motion. Each timer runs for AUTO_ADVANCE_MS then bumps
+  // to the next intro screen. When we finish intro, the timer stops.
+  useEffect(() => {
+    if (!inIntro || !autoAdvanceEnabled) return;
+    if (typeof window !== "undefined") {
+      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (prefersReduced) return; // respect accessibility preference
+    }
+    const t = setTimeout(() => setIntroIdx((i) => i + 1), AUTO_ADVANCE_MS);
+    return () => clearTimeout(t);
+  }, [inIntro, introIdx, autoAdvanceEnabled]);
+
+  const advanceIntro = useCallback(() => {
+    setAutoAdvanceEnabled(false); // user engaged — stop auto-cycle
+    setIntroIdx((i) => i + 1);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  const skipIntro = useCallback(() => {
+    setAutoAdvanceEnabled(false);
+    setIntroIdx(INTRO_SCREENS.length);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   // Show a subtle "welcome back" banner for 4 seconds after a resume,
   // then auto-dismiss. Explains WHY they're not at Step 1.
   const [showResumeBanner, setShowResumeBanner] = useState<boolean>(initial !== null && (initial?.step ?? 1) > 1);
@@ -1160,6 +1379,8 @@ export default function Try() {
     setPickedAlertState(null);
     setPickedDecisionState(null);
     setShowResumeBanner(false);
+    setIntroIdx(0);
+    setAutoAdvanceEnabled(true);
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
@@ -1170,7 +1391,7 @@ export default function Try() {
           minimum needed to unbreak <640px viewports (Lens 6 · Environment). */}
       <style>{`
         @media (max-width: 640px) {
-          [data-testid^="try-step-"] { padding-left: 1rem !important; padding-right: 1rem !important; }
+          [data-testid^="try-step-"], [data-testid^="try-intro-"] { padding-left: 1rem !important; padding-right: 1rem !important; }
           [data-testid="try-sticky-cta"] { right: 0.6rem !important; bottom: 0.6rem !important; padding: 0.55rem 0.85rem !important; font-size: 0.75rem !important; }
           [data-testid="try-step-3-chemistry"] { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
           [data-testid="try-step-3-chemistry"] table { min-width: 480px; }
@@ -1179,9 +1400,21 @@ export default function Try() {
         }
       `}</style>
 
-      <ProgressBar step={step} onRestart={handleRestart} />
+      {/* Intro flow — 3 auto-cycling story screens. Once done, we render
+          the sandbox proper below. */}
+      {inIntro ? (
+        <IntroScreenView
+          screen={INTRO_SCREENS[introIdx]}
+          index={introIdx}
+          total={INTRO_SCREENS.length}
+          onNext={advanceIntro}
+          onSkipIntro={skipIntro}
+        />
+      ) : (
+        <>
+          <ProgressBar step={step} onRestart={handleRestart} />
 
-      {showResumeBanner && (
+          {showResumeBanner && (
         <div
           data-testid="try-resume-banner"
           style={{
@@ -1245,6 +1478,8 @@ export default function Try() {
       {step === 5 && <Step5Ask onNext={goNext} />}
       {step === 6 && <Step6Journal onNext={goNext} />}
       {step === 7 && <Step7Close fromRoute={fromRoute} />}
+        </>
+      )}
 
       <StickyCta />
     </div>
