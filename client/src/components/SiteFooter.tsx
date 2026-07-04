@@ -11,7 +11,7 @@
 import { Link, useLocation } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
 
-const SUPPRESS_PREFIXES = ["/admin", "/hi/", "/auth/", "/login", "/cellar-brief", "/onboarding"];
+const SUPPRESS_PREFIXES = ["/admin", "/hi/", "/auth/", "/login", "/cellar-brief", "/onboarding", "/try"];
 
 const footerLinkStyle: React.CSSProperties = {
   fontFamily: "'Lato',sans-serif",
@@ -41,6 +41,7 @@ const COLUMNS: Array<{ heading: string; links: Array<{ label: string; href: stri
     heading: "Learn",
     links: [
       { label: "Cellar Journal", href: "/cellar-journal", testid: "footer-cellar-journal" },
+      { label: "Try the sandbox", href: "/try", testid: "footer-try" },
       { label: "Wine Quiz", href: "/quiz", testid: "footer-quiz" },
       { label: "Our Story", href: "/#our-story" },
       { label: "Weight of Harvest", href: "/#weight-of-harvest" },

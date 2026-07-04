@@ -878,3 +878,53 @@ Playwright: page loaded, `[data-testid=playbook-title]` = "Learn Ownology by cli
 ### Not built (deliberately deferred)
 - `/how-to-use` — customer-facing simpler version. Blocked on Rich internalising the SOPs first, so he can validate which steps customers need vs. admin-only steps.
 
+
+## `/try` — Conversion Sandbox (Feb 2026 — this session) ✅
+
+### Why
+Rich said the main app is "too busy — cog overload" for a first-time visitor and asked for a stripped-down mini-site with **ghost questions + winery data**, no auth, no risk to prod, driven by the Playbook workflow. Target audience: "teenagers with oenology knowledge showing their scientist parents." A conversion sandbox, not a marketing page.
+
+### Shape
+- **Route**: `/try` — public, no auth, no DB writes, no backend calls of any kind. Uses static demo data.
+- **7-step linear guided tour** (~10 min prospect experience). Each step is a self-contained card that only advances when the correct action is taken (or immediately, for narrative steps).
+- **Story arc** (the same shape as Rich & Gel's Daily 10 SOP):
+  1. **Landing** — meet Ownology Cellars (12 batches, Vintage 2026)
+  2. **Cellar Brief** — 3 alerts (high/med/low). Must click the red (stuck ferment) to advance
+  3. **Diagnose** — vintage log for Batch 04 rendered as a real table with day/brix/temp/note. 3-option decision. Gel's voice explains each option honestly. Must pick "cool the tank first" to advance
+  4. **Log the fix** — Quick Entry pre-filled from the decision; big Save button + 🔒 chip
+  5. **Ask Ownology** — hardcoded scripted answer that cites the exact demo data (batch, YAN, temp) as if grounded in a real cellar
+  6. **Publish journal** — Cellar Journal draft, Publish button + 🔒 chip, shows the would-be URL `ownology.ai/cellar-journal/...`
+  7. **CTA close** — "You just ran a winery for 10 minutes" + reservation CTA to `/pricing` + secondary CTA to `/quiz`
+
+### Product invariants
+- **Zero backend coupling** — the sandbox works even if MySQL/tRPC are down. Data is a hand-authored `tryDemoData.ts` module.
+- **Persistent 🔒 chips** on every action button ("In real Ownology this saves. Here it's the demo.") — the paywall is soft, honest, everywhere.
+- **Bottom-right sticky "Get real →" pill** on every step → `/pricing`. Follows scroll.
+- **Progress bar** top-of-viewport, sticky, shows `Step N of 7 · Ownology Cellars`.
+- **Correct-answer gating** on Steps 2 and 3 — the "Continue" button stays disabled until the user picks the right alert / decision. Wrong picks trigger a Gel-voiced correction, not a red error. This is teaching, not testing.
+
+### Files touched
+- `client/src/data/tryDemoData.ts` — new (~110 LOC) — winery, alerts, batch chemistry history, 3 decision options with outcomes + Gel voice, Quick Entry pre-fill, scripted AI Q&A with citations, Cellar Journal draft, final CTA copy
+- `client/src/pages/Try.tsx` — new (~500 LOC) — single-file page with 7 step-components, ProgressBar, StickyCta, Chip, GelSays, StepCard shared UI
+- `client/src/App.tsx` — lazy-import + `/try` route
+- `client/src/components/SiteFooter.tsx` — suppress footer on `/try` + add "Try the sandbox" to the Learn column
+- `client/src/pages/SiteMap.tsx` — add `/try` under Public section with clear "send this URL to cold prospects" description
+
+### testids
+Every interactive element has one for A/B testing and prospect analytics later:
+- `try-progress-bar`, `try-progress-fill`, `try-sticky-cta`
+- `try-step-{n}`, `try-step-{n}-title`, `try-step-{n}-next`
+- `try-alert-{id}`, `try-decision-{key}`, `try-decision-feedback-{key}`
+- `try-step-4-save`, `try-step-4-form`, `try-step-4-lock`, `try-step-4-gel`
+- `try-step-5-ask`, `try-step-5-answer`, `try-step-5-question`
+- `try-step-6-publish`, `try-step-6-preview`, `try-step-6-gel`
+- `try-step-7-primary-cta` (→ /pricing), `try-step-7-secondary-cta` (→ /quiz)
+
+### Verified live
+Playwright walked the full 7-step flow: Step 1 title rendered, wrong alert (low-severity) correctly disabled Continue, right alert (stuck ferment) enabled it, wrong decision (wait) blocked advance with Gel correction, correct decision (cool tank) advanced, save/publish/ask buttons all fired, Step 7 primary CTA links to `/pricing`, sticky "Get real" CTA present at every step. End-to-end.
+
+### Upgrade path (deferred)
+- **Live LLM instead of hardcoded answer in Step 5** — user picked "ship hardcoded first, upgrade once we've watched 5 prospects go through it". When wired: use Emergent LLM key with a system prompt pinning the model to Ownology Cellars demo data only.
+- **`/hi/{name}` personalized landing** — prepend Step 1 with "Rich sent this to you, {Name}" from a URL query param. High-leverage cold outreach touch.
+- **Prospect analytics** — event log which step users drop on. All testids are in place; just need an event pipeline.
+

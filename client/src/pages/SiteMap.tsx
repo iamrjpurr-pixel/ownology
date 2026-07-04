@@ -35,6 +35,7 @@ const SECTIONS: Section[] = [
     blurb: "Anyone can hit these. This is what real users see.",
     routes: [
       { path: "/",                     label: "Home",                desc: "Hero, pricing teaser, blog feed", audience: "public" },
+      { path: "/try",                  label: "Try Ownology (sandbox)", desc: "10-min guided demo using Ownology Cellars data — no signup, no writes. Send this URL to cold prospects.", audience: "public" },
       { path: "/quiz",                 label: "Wine Recommender Quiz", desc: "6 questions → wine pick → Founding Member funnel", audience: "public" },
       { path: "/pricing",              label: "Pricing",             desc: "Founding Member plans + reservation modal", audience: "public" },
       { path: "/cellar-journal",       label: "Cellar Journal",      desc: "Public SOPs + Q&A index — the SEO compounder", audience: "public" },
