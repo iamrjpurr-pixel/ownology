@@ -835,3 +835,46 @@ Previous exhaustive test showed 3 flaws across 1,296+ permutations:
 - `client/src/data/quizData.ts` — Wine type, scoring, palate tweaks
 - `client/src/components/SiteFooter.tsx` — three-link footer bottom bar
 - `scripts/test-quiz-permutations.mjs` — regression harness (new)
+
+## Clickable Playbook page at /admin/playbook (Feb 2026 — this session) ✅
+
+### Why
+User (Rich) said he doesn't know the site yet and wants to **learn by clicking through actual URLs**, not by reading a document. The previous handoff had claimed `/admin/playbook` existed but it was memory-only (`/app/memory/PLAYBOOK.md`) — no route was ever wired.
+
+### Shape
+- **9 sections, 45 steps**, each step = 1 sentence + 1 clickable URL button (in-app `<Link>` or external `<a>`).
+- Grouped by cadence with a colour-coded badge:
+  - **DAILY** (green) — The Daily 10 Minutes (5 steps)
+  - **WEEKLY** (teal) — The Weekly 30 Minutes (5 steps)
+  - **VINTAGE-CRITICAL** (red) — 6 non-negotiable checkpoints
+  - **WORKFLOW SOP** (amber) — SOPs 1-5 (bench trial log, act on alert, VIVID SMS, publish Journal, handle reservation)
+  - **TROUBLESHOOTING** (grey) — When things break (5 rows)
+- Per-section progress counter (e.g. "1/5") turns green when 100%.
+- Jump-index at top for one-scroll navigation.
+- **localStorage checkboxes** with auto-reset:
+  - `daily` rows keyed by `YYYY-MM-DD` → reset at midnight
+  - `weekly` rows keyed by ISO Monday → reset each Monday
+  - `sop` / `vintage` / `break` rows keyed as `stable` → stay ticked once done
+- Placeholder rows with `href="#"` render "(offline)" instead of a broken link (for phone-call steps in SOP 5).
+- External URLs (Gmail, Emergent Dashboard, Calendly, cron endpoints) render `open ↗` with target=_blank; in-app routes render the actual path as the button text so the user learns the URL by seeing it.
+
+### Files touched
+- `client/src/pages/AdminPlaybook.tsx` — new page (~460 LOC, single self-contained file)
+- `client/src/App.tsx` — lazy-imported and mounted at `/admin/playbook`
+- `client/src/pages/SiteMap.tsx` — added `/admin/playbook` to the Admin section of the human sitemap so it's discoverable
+
+### testids
+Every section, step, checkbox, jump, and link has a `data-testid`:
+- `playbook-title`, `playbook-eyebrow`, `playbook-jumps`
+- `playbook-section-{id}`, `playbook-progress-{id}`
+- `playbook-step-{sectionId}-{idx}`
+- `playbook-check-{sectionId}-{idx}` — the tickbox
+- `playbook-link-{sectionId}-{idx}` — the URL button
+- `playbook-jump-{sectionId}` — top-nav jump link
+
+### Verified live
+Playwright: page loaded, `[data-testid=playbook-title]` = "Learn Ownology by clicking through it.", 9 sections found, 45 steps rendered, clicking `[data-testid=playbook-check-daily-10-0]` toggled the checkbox (step 1 struck-through with green ✓, progress counter went from 0/5 → 1/5).
+
+### Not built (deliberately deferred)
+- `/how-to-use` — customer-facing simpler version. Blocked on Rich internalising the SOPs first, so he can validate which steps customers need vs. admin-only steps.
+

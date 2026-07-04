@@ -73,6 +73,7 @@ const SECTIONS: Section[] = [
     blurb: "Weekly cadence. Section §2 of the Playbook lives here.",
     routes: [
       { path: "/admin",                label: "Admin landing",       desc: "Links to everything below", audience: "admin" },
+      { path: "/admin/playbook",       label: "Playbook",            desc: "Clickable SOP index — Daily 10 / Weekly 30 / Vintage-critical / 5 workflow SOPs / troubleshooting", audience: "admin" },
       { path: "/admin/settings",       label: "Admin Settings",      desc: "Winery name, contact, Recent Reservations, dev-bypass toggle", audience: "admin" },
       { path: "/admin/contacts",       label: "Contacts Pipeline",   desc: "VIVID 31-contact SMS pipeline", audience: "admin" },
       { path: "/admin/leads",          label: "Leads",               desc: "Inbound leads from all sources", audience: "admin" },
