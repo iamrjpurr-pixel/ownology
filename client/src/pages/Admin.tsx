@@ -328,6 +328,13 @@ const TOOLS: AdminTool[] = [
     badge: "Start here",
   },
   {
+    label: "Site Map",
+    description: "Every route on the site — marketing, member, admin, SEO — grouped by audience with one-tap links. The reference when you can't remember where something lives.",
+    href: "/site-map",
+    icon: <IconKnowledge />,
+    badge: "All URLs",
+  },
+  {
     label: "Campaign Metrics",
     description: "Week-by-week KPI snapshots — waitlist growth, MRR trajectory, email open rates, organic sessions, and compliance query volume.",
     href: "/campaign-metrics",
