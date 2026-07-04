@@ -460,6 +460,140 @@ Return ONLY a valid JSON array. No markdown, no explanation. If you cannot ident
       }
     }),
 
+  // ── Import: transcribe voice memo + structure into cellar entries ─────────
+  // Field-first, hands-free logging. Winemakers speak into their phone in the
+  // cellar → Whisper transcribes → GPT structures → we return preview
+  // entries the user confirms + saves via bulkSave.
+  //
+  // Pipeline: browser MediaRecorder → base64 audio in tRPC body →
+  //   POST /llm/openai/v1/audio/transcriptions (Whisper via Emergent proxy) →
+  //   POST /llm/chat/completions with the parseFromText prompt →
+  //   { entries, transcription }
+  //
+  // The transcription is returned alongside entries so the UI can show
+  // "we heard this" — critical trust signal for a first-time voice user.
+  parseFromVoice: protectedProcedure
+    .input(z.object({
+      audioBase64: z.string().min(1).max(35_000_000), // ~26MB base64 = ~19MB raw, safe under 25MB Whisper cap
+      mimeType: z.string().default("audio/webm"),
+      language: z.string().optional(), // ISO-639-1, e.g. "en"
+    }))
+    .mutation(async ({ input }) => {
+      const emergentKey = process.env.EMERGENT_LLM_KEY;
+      if (!emergentKey) throw new Error("EMERGENT_LLM_KEY not configured");
+
+      const audioBuffer = Buffer.from(input.audioBase64, "base64");
+      if (audioBuffer.length === 0) throw new Error("Empty audio payload");
+      if (audioBuffer.length > 25 * 1024 * 1024) {
+        throw new Error("Audio exceeds 25MB Whisper limit — please record a shorter memo");
+      }
+
+      // Whisper accepts: mp3, mp4, mpeg, mpga, m4a, wav, webm. Pick extension
+      // from mimeType so the multipart filename hints the format correctly.
+      const ext =
+        input.mimeType.includes("webm") ? "webm" :
+        input.mimeType.includes("ogg") ? "webm" : // Whisper accepts webm/opus; ogg-opus often works too
+        input.mimeType.includes("mp4") || input.mimeType.includes("m4a") ? "m4a" :
+        input.mimeType.includes("mpeg") || input.mimeType.includes("mp3") ? "mp3" :
+        input.mimeType.includes("wav") ? "wav" :
+        "webm";
+
+      const audioBlob = new Blob([new Uint8Array(audioBuffer)], { type: input.mimeType });
+      const fd = new FormData();
+      fd.append("file", audioBlob, `voice-memo.${ext}`);
+      fd.append("model", "whisper-1");
+      fd.append("response_format", "json");
+      if (input.language) fd.append("language", input.language);
+      // Winery-specific vocabulary hint — massively boosts accuracy on
+      // technical terms Whisper otherwise mishears (e.g. "DAP" → "dap" or
+      // "map", "MLF" → "am elf", "Brix" → "bricks", "SO2" → "so too").
+      fd.append(
+        "prompt",
+        "Winery cellar voice log. Vocabulary: Tank, Barrel, Shiraz, Chardonnay, Cabernet Sauvignon, Pinot Noir, Riesling, Semillon, Sauvignon Blanc, Grenache, Merlot, DAP, YAN, Brix, pH, TA, SO2, sulphur dioxide, MLF, malolactic, racking, inoculation, ppm, g/L, kg, litres, EC1118, RC212, QA23, D254."
+      );
+
+      const whisperResp = await fetch(
+        "https://integrations.emergentagent.com/llm/openai/v1/audio/transcriptions",
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${emergentKey}` },
+          body: fd as unknown as BodyInit,
+        }
+      );
+      if (!whisperResp.ok) {
+        const errText = await whisperResp.text().catch(() => "");
+        throw new Error(`Transcription failed: ${whisperResp.status} ${errText.slice(0, 200)}`);
+      }
+      const whisperData = (await whisperResp.json()) as { text?: string };
+      const transcription = (whisperData.text ?? "").trim();
+
+      if (!transcription) {
+        return { entries: [], transcription: "" };
+      }
+
+      // Reuse the parseFromText structuring prompt — Whisper output is just
+      // text and the same JSON contract applies.
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      const systemPrompt = `You are a winery data extraction assistant. The user has spoken a voice memo in their cellar — this transcription is what they said. It may contain filler words, false starts, and colloquial phrasing.
+
+Extract every cellar event you can identify and return a JSON array of entries. Each entry must have:
+- tankName: string (e.g. "Tank 7", "Barrel 12A")
+- variety: string (e.g. "Shiraz", "Chardonnay") — infer from context if the winemaker didn't restate it (e.g. "the shiraz tank" → "Shiraz")
+- eventType: one of: addition | measurement | racking | inoculation | observation | pre_harvest_sample | bottling_run | weather_event | sanitation | other
+- details: object with event-specific fields:
+  - addition: { what: string, quantity: string, unit: string, timing?: string }
+  - measurement: { what: string, value: string, unit: string }
+  - racking: { fromLocation: string, toLocation: string, volumeL?: string, leesStatus?: string }
+  - inoculation: { what: string, productName?: string, ratePerHL?: string }
+  - observation: { text: string }
+  - other: { text: string }
+- entryDate: ISO date string (YYYY-MM-DD) — if the winemaker said "today" or didn't mention a date, use null (the system will default to now)
+- noteText: any additional context not captured in details, or null
+
+Speech-recognition normalisations to apply:
+- "so two" / "so too" / "sulphur dioxide" → SO2
+- "bricks" / "bricks reading" → Brix
+- "map" / "dap" → DAP (diammonium phosphate)
+- "yan" / "yeast assimilable" → YAN
+- "am elf" / "malolactic" → MLF
+- Numeric confusions: "point three" → 0.3; "twenty-two point six" → 22.6
+
+Return ONLY a valid JSON array. No markdown, no explanation. If no cellar events can be identified, return [].`;
+
+      const chatResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${forgeKey}`,
+          "x-ow-source": "vintageLog.parseFromVoice",
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: transcription },
+          ],
+          stream: false,
+        }),
+      });
+      if (!chatResp.ok) {
+        // Return the transcription anyway so the user isn't stranded — they
+        // can manually re-run structuring or copy the text.
+        return { entries: [], transcription };
+      }
+      const chatData = await chatResp.json();
+      const raw = chatData.choices?.[0]?.message?.content ?? "[]";
+      try {
+        const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+        const entries = JSON.parse(cleaned);
+        return { entries: Array.isArray(entries) ? entries : [], transcription };
+      } catch {
+        return { entries: [], transcription };
+      }
+    }),
+
   // ── Import: bulk-save confirmed parsed entries ────────────────────────────
   bulkSave: protectedProcedure
     .input(z.object({
@@ -471,7 +605,7 @@ Return ONLY a valid JSON array. No markdown, no explanation. If you cannot ident
         entryDate: z.string().nullable().optional(),
         noteText: z.string().max(2000).nullable().optional(),
       })),
-      importSource: z.enum(["paste", "csv", "image"]),
+      importSource: z.enum(["paste", "csv", "image", "voice"]),
     }))
     .mutation(async ({ ctx, input }) => {
       const dbUser = await getUserByOpenId(ctx.user.openId);

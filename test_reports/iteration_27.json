@@ -1,0 +1,49 @@
+{
+  "summary": "Voice-memo → Whisper → structured entry pipeline verified end-to-end. Backend: 6/6 pytest cases pass (parseFromVoice happy path with real MP3, empty/invalid rejection, oversize rejection, bulkSave voice source, unknown source rejection). Frontend: /import loads with Voice as default active tab, 4-tab bar renders correctly, example prompt present, mic-permission-denied path shows voice-error as expected in headless. Regression on /dashboard, /the-press, /quick-entry all load cleanly with no page errors.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/trpc/vintageLog.parseFromVoice", "issue": "Oversize audio (>30MB base64) is rejected by Express body-parser as HTML PayloadTooLargeError (HTTP 413) BEFORE reaching the server-side 25MB check. The zod max(35_000_000) + server 'Audio exceeds 25MB' check are effectively unreachable — express.json({limit:'30mb'}) rejects first with a generic HTML error page rather than a clean tRPC error. Rejection still happens (test passes), but the user would see an unstyled HTML error instead of a graceful message."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_voice_import.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "OPTIONAL: Consider raising express.json limit above 33.5mb (base64 overhead of 25MB raw) OR lowering the server-side threshold to align with the 30mb express limit, so the friendly '25MB Whisper limit' error message is actually reachable. Currently users uploading long recordings get a raw Express HTML error page."
+  ],
+  "critical_code_review_comments": [
+    "parseFromVoice pipeline is well-structured: Whisper prompt includes winery vocabulary hint (excellent for accuracy on DAP/Brix/MLF/SO2), and graceful fallback returns transcription even if structuring LLM fails so user is never stranded. Good defensive coding.",
+    "Empty transcription path returns { entries: [], transcription: '' } with 200 OK — consider whether the UI should show a 'nothing heard' state or if the empty transcription block already handles this.",
+    "Body limit '30mb' at server/index.ts is slightly under what 25MB raw audio base64-encodes to (~33.4MB). See minor issue above."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_voice_import.py (new)"
+  ],
+  "success_rate": {"backend": "100% (6/6 tests)", "frontend": "100%"},
+  "test_credentials": "Dev-bypass active — auto-authenticated as seed admin (openId=seed-owner-001, richard@ownology.ai).",
+  "seed_data_creation": "test_bulk_save_voice_source persisted 1 vintage log entry tagged noteText='TEST_voice_import' (Tank 7 / Shiraz / addition). Not cleaned up — trivial single row.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Backend voice import fully working. tRPC single-call body shape is {\"json\": {audioBase64, mimeType, language?}}. Import page is React.lazy — wait for [data-testid=voice-tab] with ~20s timeout on first load. Voice tab has data-testids: voice-tab, voice-start-btn, voice-stop-btn, voice-timer, voice-level-meter, voice-playback, voice-discard-btn, voice-transcribe-btn, voice-transcription-block, voice-error. Tab buttons themselves DO NOT have data-testid — use text selectors ('Voice'/'Camera'/'Paste'/'CSV') for tab switching. Headless mic permission → shows 'No microphone found on this device' via voice-error (expected).",
+  "verification_details": {
+    "BACKEND-1_parseFromVoice_happy": "PASS — Whisper transcribed /tmp/voice-test.mp3, structuring LLM returned entries with tankName='Tank 7' variety='Shiraz'.",
+    "BACKEND-2_empty_audio": "PASS — Empty audioBase64 rejected (zod min(1)).",
+    "BACKEND-3_invalid_base64": "PASS — Non-base64 payload rejected.",
+    "BACKEND-4_oversize": "PASS — 26MB raw / ~34MB base64 rejected with 413 (see minor issue re. error page format).",
+    "BACKEND-5_bulkSave_voice": "PASS — importSource='voice' accepted, entry persisted.",
+    "BACKEND-6_bulkSave_bogus_source": "PASS — Unknown importSource rejected by zod enum.",
+    "FRONTEND-1_default_tab": "PASS — /import loads with Voice tab active (first tab has amber background). data-testid=voice-tab and voice-start-btn present on load.",
+    "FRONTEND-2_tab_bar": "PASS — grid-cols-4 renders 4 tabs in order [Voice, Camera, Paste, CSV], no overflow.",
+    "FRONTEND-3_example_prompt": "PASS — Voice tab contains example: 'Tank 7 Shiraz, added 2 point 6 kilos of DAP, Brix is 14 point 2, pH 3 point 4 2.'",
+    "FRONTEND-4_recording_start": "PASS — Clicking voice-start-btn triggers permission flow; in headless env voice-error shows 'No microphone found on this device' (acceptable path per spec).",
+    "FRONTEND-5_regression_other_tabs": "PASS — Camera tab shows file input, Paste tab shows textarea, CSV tab shows file uploader. Switching between tabs works.",
+    "FRONTEND-6_regression_pages": "PASS — /dashboard (5602 chars), /the-press (1002 chars), /quick-entry (655 chars) all load with 0 page errors."
+  }
+}

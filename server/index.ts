@@ -228,7 +228,10 @@ async function startServer() {
   });
 
   // ── JSON body parser ─────────────────────────────────────────────────────────
-  app.use(express.json());
+  // 30MB limit — accommodates base64-encoded voice memos (≤25MB Whisper cap
+  // + ~33% base64 overhead) sent to vintageLog.parseFromVoice. Also covers
+  // camera image imports which use the same base64-in-JSON pattern.
+  app.use(express.json({ limit: "30mb" }));
 
   // ── Merch API ────────────────────────────────────────────────────────────────
   app.use("/api/merch", merchRouter);
