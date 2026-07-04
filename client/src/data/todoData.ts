@@ -90,6 +90,17 @@ export const TODO: TodoItem[] = [
     updatedAt: "2026-02-04",
   },
   {
+    id: "import-engine-voice-ocr",
+    title: "Import Anything engine — CSV, OCR paper logs, voice-memo transcription",
+    description:
+      "Kill the switching-cost objection at Day 1. Build the pipeline that ingests: (a) Excel/Google Sheets/CSV via drag-drop, (b) photographs of paper cellar logs via OCR (GPT-5.2 multimodal or Google Cloud Vision), and (c) voice memos via Whisper transcription that get parsed into chemistry-grade log entries. This is the 'Import Anything' promise we make in the /try sandbox — needs the actual engine behind it before we take the first paying customer.",
+    priority: "p1",
+    effort: "~8-10 hours (three lanes: CSV, OCR, Whisper)",
+    status: "not-started",
+    category: "Product",
+    updatedAt: "2026-02-04",
+  },
+  {
     id: "quiz-red-white-and-v-and-v",
     title: "Quiz refactor: Red or White as Q1, plus source citations everywhere",
     description:

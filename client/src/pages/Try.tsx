@@ -332,19 +332,33 @@ function Step1Landing({ onNext }: { onNext: () => void }) {
         data-testid="try-step-1-excel"
         style={{
           marginTop: "1.25rem",
-          padding: "0.85rem 1rem",
-          border: `1px dashed ${BORDER}`,
+          padding: "1rem 1.15rem",
+          border: `1px dashed ${AMBER}`,
           borderRadius: 4,
-          background: "oklch(0 0 0 / 0.04)",
+          background: "oklch(from var(--ow-amber) l c h / 0.06)",
           fontFamily: "'Lato', sans-serif",
-          fontSize: "0.82rem",
+          fontSize: "0.85rem",
           color: TEXT_MID,
-          lineHeight: 1.55,
+          lineHeight: 1.6,
         }}
       >
-        <strong style={{ color: TEXT_HI }}>Already have a spreadsheet?</strong> Good — keep it. On Day 1, Ownology
-        imports it. On Day 30, you'll notice you've stopped opening it. We don't ask you to switch systems on trust —
-        we earn our place.
+        <p style={{ color: AMBER, fontSize: "0.66rem", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700, margin: 0, marginBottom: "0.5rem" }}>
+          Import Anything — Day 1
+        </p>
+        <p style={{ margin: 0 }}>
+          <strong style={{ color: TEXT_HI }}>Already have a spreadsheet, paper logs, or voice memos?</strong> Good —
+          keep all of it. On Day 1 Ownology ingests whatever you've got:
+        </p>
+        <ul style={{ margin: "0.6rem 0 0", padding: "0 0 0 1.1rem", color: TEXT_MID, fontSize: "0.82rem" }}>
+          <li>Excel, Google Sheets, CSV, or exports from any winery software</li>
+          <li>Photograph paper logs — OCR digitises them into structured entries</li>
+          <li>Record a voice memo — we transcribe it into a chemistry-grade log line</li>
+          <li>Email us a scanned notebook — we handle it</li>
+        </ul>
+        <p style={{ margin: "0.6rem 0 0", fontStyle: "italic", fontSize: "0.78rem", color: TEXT_LO }}>
+          On Day 30 you'll notice you've stopped opening the spreadsheet. We earn our place — we don't ask you to
+          switch systems on trust.
+        </p>
       </div>
     </StepCard>
   );
@@ -1064,16 +1078,16 @@ const INTRO_SCREENS: IntroScreen[] = [
   {
     key: "hook",
     eyebrow: "Ownology",
-    title: "Every vintage is a story. Most winemakers lose theirs.",
+    title: "Every vintage is a story. Some winemakers have lost theirs.",
     body: (
       <>
         <p>
-          Lost to a spreadsheet that fell out of the shared folder. Lost to a paper log soaked in Semillon. Lost to
-          the 3am ferment panic that ate the year and left no notes.
+          Some to lost paper. Some to spreadsheets that fell out of the shared folder. Some to the 3am ferment panic
+          that ate the year.
         </p>
         <p style={{ marginTop: "1rem" }}>
-          The most valuable thing in your cellar isn't the wine. It's what you learned making it. Ownology exists so
-          you don't lose that.
+          The most valuable thing in a cellar isn't the wine itself — it's what you learned making it. Ownology keeps
+          that.
         </p>
       </>
     ),
@@ -1081,17 +1095,16 @@ const INTRO_SCREENS: IntroScreen[] = [
   {
     key: "story",
     eyebrow: "Our story",
-    title: "Rich & Gel. Amateur winemakers. Second-career scientists.",
+    title: "Rich & Gel. Ownology Cellars, Hunter Valley.",
     body: (
       <>
         <p>
-          We run <strong>Ownology Cellars</strong> — a boutique winery in the Hunter Valley, NSW. 12 batches in the
-          shed. Vintage 2026 in full swing. Semillon on lees, Shiraz through malo, Chardonnay in barrel.
+          12 batches. One shed. Three and a half hectares. Vintage 2026 in full swing — Semillon on lees, Shiraz
+          through malo, Chardonnay in barrel.
         </p>
         <p style={{ marginTop: "1rem" }}>
-          We got sick of losing our own vintage story to spreadsheets, PDFs, and half-remembered conversations with
-          our winemaking consultant. So we built the tool we wished we had. Everything you're about to see runs on
-          our actual cellar data.
+          We're scientists by training. We think a cellar deserves the same rigour as a lab. What you're about to see
+          is our own cellar's data, wired to a tool we built for ourselves — and now for you.
         </p>
       </>
     ),
@@ -1099,7 +1112,7 @@ const INTRO_SCREENS: IntroScreen[] = [
   {
     key: "why",
     eyebrow: "Why Ownology",
-    title: "One system. Four surfaces. It fits your day.",
+    title: "One system. Five surfaces. It fits your day.",
     body: (
       <ul style={{ padding: 0, margin: "0.5rem 0 0", listStyle: "none" }}>
         {[
@@ -1107,6 +1120,7 @@ const INTRO_SCREENS: IntroScreen[] = [
           ["Cellar Journal", "Every lesson you record ranks on Google over time. Your voice, your knowledge, your marketing."],
           ["Batch Book", "Your Wine Australia LIP Audit Pack writes itself from every entry. One click, PDF, compliant."],
           ["Ask Ownology", "A winemaker's assistant that knows YOUR cellar's history — not a generic wine chatbot."],
+          ["Import Anything", "Excel, Google Sheets, CSV. Photograph a paper log — OCR digitises it. Record a voice memo — we transcribe it into a proper entry. Your data. Your format. Our job to make it work."],
         ].map(([label, desc]) => (
           <li key={label} style={{ marginBottom: "0.9rem", display: "grid", gridTemplateColumns: "150px 1fr", gap: "0.75rem", alignItems: "baseline" }}>
             <strong style={{ color: TEXT_HI, fontFamily: "'Fraunces', serif", fontSize: "0.98rem" }}>{label}</strong>
