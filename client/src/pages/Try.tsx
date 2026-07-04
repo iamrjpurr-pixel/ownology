@@ -277,15 +277,19 @@ function Step2Brief({
   return (
     <StepCard
       testid="try-step-2"
-      eyebrow="Step 1 of Rich's Daily 10"
-      title="This is what you see with your first coffee."
+      eyebrow="The Cellar Brief · Step 1 of the Daily 10"
+      title="This is your morning at 5:30am."
       onNext={onNext}
       nextLabel="Investigate the red alert →"
       nextDisabled={pickedAlert !== "alert-1"}
     >
       <p>
-        Three alerts this morning. Colour tells you severity. Click into the <strong style={{ color: "oklch(0.62 0.20 25)" }}>red</strong>{" "}
-        one — that's the one that damages wine if you ignore it.
+        The <strong>Cellar Brief</strong> is Ownology's daily AI summary — one email at 5:30am, one bookmarkable page
+        at <code style={mono}>/cellar-brief</code>. Same data, same alerts, same colour language you see here.
+      </p>
+      <p style={{ marginTop: "0.75rem" }}>
+        Three alerts this morning. Colour tells you severity. Click the <strong style={{ color: "oklch(0.62 0.20 25)" }}>red</strong> one —
+        that's the one that damages wine if you ignore it.
       </p>
       <div style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
         {ALERTS.map((alert) => {
@@ -334,6 +338,21 @@ function Step2Brief({
           );
         })}
       </div>
+
+      {/* Quiet-batch reinforcement — the story of "12 batches" needs to land */}
+      <p
+        data-testid="try-step-2-quiet-line"
+        style={{
+          marginTop: "0.9rem",
+          fontFamily: "'Lato', sans-serif",
+          fontSize: "0.78rem",
+          color: TEXT_LO,
+          fontStyle: "italic",
+        }}
+      >
+        · and 9 more batches quietly doing their thing — no alerts today.
+      </p>
+
       {pickedAlert && pickedAlert !== "alert-1" && (
         <p
           data-testid="try-step-2-hint"
@@ -453,9 +472,90 @@ function Step3Diagnose({
       </div>
 
       {pickedDecision && (
-        <GelSays testid={`try-decision-feedback-${pickedDecision.key}`}>{pickedDecision.gelSays}</GelSays>
+        <>
+          <GelSays testid={`try-decision-feedback-${pickedDecision.key}`}>{pickedDecision.gelSays}</GelSays>
+          <SourcesPanel sources={pickedDecision.sources} testid={`try-decision-sources-${pickedDecision.key}`} />
+        </>
       )}
     </StepCard>
+  );
+}
+
+/** Compact "Cited from" panel — small, unshouty, rendered below Gel's
+ *  voice. Every claim in the sandbox should be defensible against a
+ *  challenge like "who says?" from a scientist parent. */
+function SourcesPanel({ sources, testid }: { sources: import("@/data/tryDemoData").DemoSource[]; testid: string }) {
+  if (!sources || sources.length === 0) return null;
+  return (
+    <div
+      data-testid={testid}
+      style={{
+        marginTop: "0.75rem",
+        padding: "0.85rem 1rem",
+        background: "oklch(0 0 0 / 0.06)",
+        borderRadius: 4,
+        border: `1px solid ${BORDER}`,
+      }}
+    >
+      <p
+        style={{
+          color: TEXT_LO,
+          fontSize: "0.66rem",
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          fontFamily: "'Lato', sans-serif",
+          fontWeight: 700,
+          margin: 0,
+          marginBottom: "0.6rem",
+        }}
+      >
+        Cited from
+      </p>
+      <ol style={{ margin: 0, padding: 0, listStyle: "none" }}>
+        {sources.map((s, idx) => (
+          <li
+            key={idx}
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.78rem",
+              color: TEXT_MID,
+              lineHeight: 1.55,
+              paddingBottom: idx === sources.length - 1 ? 0 : "0.55rem",
+              marginBottom: idx === sources.length - 1 ? 0 : "0.55rem",
+              borderBottom: idx === sources.length - 1 ? "none" : `1px dashed ${BORDER}`,
+              display: "grid",
+              gridTemplateColumns: "auto 1fr",
+              gap: "0.55rem",
+            }}
+          >
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.72rem", color: TEXT_LO }}>
+              [{idx + 1}]
+            </span>
+            <span>
+              <strong style={{ color: TEXT_HI, fontWeight: 700 }}>{s.publisher}</strong>
+              <span style={{ color: TEXT_LO }}> — </span>
+              {s.url ? (
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: AMBER, textDecoration: "none", borderBottom: `1px dotted ${AMBER}` }}
+                >
+                  {s.title}
+                </a>
+              ) : (
+                <em style={{ color: TEXT_HI }}>{s.title}</em>
+              )}
+              {s.detail && (
+                <p style={{ margin: "0.25rem 0 0", color: TEXT_LO, fontSize: "0.75rem", lineHeight: 1.5 }}>
+                  {s.detail}
+                </p>
+              )}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 

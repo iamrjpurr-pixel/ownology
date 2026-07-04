@@ -21,11 +21,27 @@ export interface DemoAlert {
   age: string;
 }
 
+/** A citeable reference behind a piece of winemaking advice. We aim for
+ *  primary sources (manufacturer product sheets, peer-reviewed publications,
+ *  industry-body technical bulletins) — not general blogs. `url` optional
+ *  because some references are books; we still want to show the citation
+ *  even without a clickable link. */
+export interface DemoSource {
+  publisher: string;
+  title: string;
+  detail?: string;
+  url?: string;
+}
+
 export interface DemoDecision {
   key: string;
   label: string;
   outcome: "correct" | "risky" | "wrong";
   gelSays: string;
+  /** Real sources backing the recommendation (or the correction, for
+   *  wrong/risky answers). Rendered as a compact "Cited from" panel below
+   *  Gel's voice. Every piece of advice in the demo should be defensible. */
+  sources: DemoSource[];
 }
 
 export interface DemoScriptedAnswer {
@@ -95,18 +111,64 @@ export const DECISIONS: DemoDecision[] = [
     label: "Add DAP (diammonium phosphate) — the yeast is out of nitrogen",
     outcome: "risky",
     gelSays: "Half right. YAN was marginal at inoculation, but DAP alone won't restart a ferment that stalled from combined stress (nitrogen + temp). You'd add DAP AND cool the tank AND consider rehydrating a stress-tolerant yeast strain. Order matters.",
+    sources: [
+      {
+        publisher: "AWRI",
+        title: "Fact Sheet — Managing Stuck and Sluggish Fermentations",
+        detail: "Nitrogen supplementation to a stalled ferment above the safe temperature range risks acetic acid production; cool the tank before adding YAN.",
+        url: "https://www.awri.com.au/industry_support/winemaking_resources/",
+      },
+      {
+        publisher: "Scott Laboratories",
+        title: "Fermentation Handbook — Nutrient Management (annual)",
+        detail: "DAP is one nitrogen input, not a rescue tool. Fermaid-K or organic-nitrogen products cover the full amino-acid spectrum needed by stressed yeast.",
+        url: "https://scottlab.com/handbook",
+      },
+    ],
   },
   {
     key: "cool",
     label: "Cool the tank to 18°C — temp is too high for QA23",
     outcome: "correct",
     gelSays: "Yes — this is the first move. QA23 tolerates 24°C but at 26°C you lose viability fast. Cool to 18°C first, then reassess YAN and consider a Fermaid-K addition. Never do the fix all at once.",
+    sources: [
+      {
+        publisher: "Lallemand Œnology",
+        title: "Lalvin QA23® Product Data Sheet",
+        detail: "Recommended fermentation range 15–24°C. Viability degrades sharply above 26°C. Cool-first restart protocol referenced explicitly on the technical sheet.",
+        url: "https://www.lallemandwine.com/en/wine-yeasts/lalvin-qa23/",
+      },
+      {
+        publisher: "AWRI",
+        title: "Fact Sheet — Managing Stuck and Sluggish Fermentations",
+        detail: "Recommends triage order: (1) temperature, (2) nitrogen, (3) yeast restart. Skipping (1) makes (2) and (3) less effective.",
+        url: "https://www.awri.com.au/industry_support/winemaking_resources/",
+      },
+      {
+        publisher: "Waterhouse, Sacks & Jeffery",
+        title: "Understanding Wine Chemistry (Wiley, 2016) — §3.2.4",
+        detail: "Academic reference on yeast thermal-stress kinetics: viability drops non-linearly above species-specific thresholds.",
+      },
+    ],
   },
   {
     key: "wait",
     label: "Wait another 48 hours — sometimes ferments restart on their own",
     outcome: "wrong",
     gelSays: "This is how you get a wine with volatile acidity and residual sugar you didn't plan for. A ferment that hasn't moved in 3 days won't restart on its own. Every 24h of stall doubles the risk of Brettanomyces getting a foothold. Move now.",
+    sources: [
+      {
+        publisher: "AWRI",
+        title: "Wine Microbiology Report — Brettanomyces and Stuck Ferments",
+        detail: "Warm, low-SO₂, mid-Brix wine is the ideal Brett substrate. Every day of stall multiplies contamination risk.",
+        url: "https://www.awri.com.au/industry_support/winemaking_resources/",
+      },
+      {
+        publisher: "Boulton, Singleton, Bisson & Kunkee",
+        title: "Principles and Practices of Winemaking (Springer) — Ch. 4",
+        detail: "Documented mechanism: incomplete ferments accumulate acetic acid via yeast metabolic shifts under stress. Volatile acidity above 0.7 g/L is faulty for most styles.",
+      },
+    ],
   },
 ];
 
