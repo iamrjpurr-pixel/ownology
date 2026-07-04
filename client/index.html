@@ -7,6 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#1a1512" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ownology" />
@@ -37,9 +38,13 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script
-      defer
-      src="%VITE_ANALYTICS_ENDPOINT%/umami"
-      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
+    <!--
+      Umami analytics — enable by (1) setting VITE_ANALYTICS_ENDPOINT and
+      VITE_ANALYTICS_WEBSITE_ID at build time, and (2) uncommenting below.
+      Left commented so unconfigured builds don't 400 on a placeholder URL.
+
+      <script defer src="%VITE_ANALYTICS_ENDPOINT%/umami"
+        data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
+    -->
   </body>
 </html>
