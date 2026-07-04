@@ -36,6 +36,7 @@ const SECTIONS: Section[] = [
     routes: [
       { path: "/",                     label: "Home",                desc: "Hero, pricing teaser, blog feed", audience: "public" },
       { path: "/try",                  label: "Try Ownology (sandbox)", desc: "10-min guided demo using Ownology Cellars data — no signup, no writes. Send this URL to cold prospects.", audience: "public" },
+      { path: "/todo",                 label: "Public roadmap",      desc: "What's being built next, in priority order, updated whenever we ship. Also lives at /roadmap.", audience: "public" },
       { path: "/quiz",                 label: "Wine Recommender Quiz", desc: "6 questions → wine pick → Founding Member funnel", audience: "public" },
       { path: "/pricing",              label: "Pricing",             desc: "Founding Member plans + reservation modal", audience: "public" },
       { path: "/cellar-journal",       label: "Cellar Journal",      desc: "Public SOPs + Q&A index — the SEO compounder", audience: "public" },
