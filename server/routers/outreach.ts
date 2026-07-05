@@ -581,6 +581,140 @@ Speech-recognition normalisations do NOT apply here — this is scraped HTML. Bu
       }
     }),
 
+  // ── OWNER — Deep research from just a business name ────────────────────
+  // Paste a winery name → Perplexity Sonar-Pro multi-hop web-searches for
+  // the winemaker, phone, email, IG, website, address → returns structured
+  // JSON with citations. Same review-then-Save UX as parseFromUrl.
+  //
+  // Cost: ~$0.005-$0.015 per lookup (search fee + tokens). $5 credit gets
+  // ~500-1000 lookups depending on how many sources Sonar pulls per query.
+  // Timeout: 60s (deep research takes 15-30s of real time).
+  //
+  // Citations are on the response's TOP-LEVEL `citations` array — must use
+  // raw fetch (not openai SDK — the SDK strips citations).
+  deepResearch: ownerProcedure
+    .input(z.object({
+      businessName: z.string().min(2).max(200),
+    }))
+    .mutation(async ({ input }) => {
+      const key = process.env.PERPLEXITY_API_KEY;
+      if (!key) throw new Error("PERPLEXITY_API_KEY not configured");
+
+      // Structured-output schema. Fields align to our outreachContacts
+      // table + the extra channels (email, instagram) we already stash
+      // into notes on the parseFromUrl flow.
+      const contactSchema = {
+        type: "object",
+        properties: {
+          firstName: { type: ["string", "null"] },
+          lastName: { type: ["string", "null"] },
+          winery: { type: ["string", "null"] },
+          role: { type: ["string", "null"] }, // e.g. "Winemaker & Founder"
+          mobileAu: { type: ["string", "null"] },
+          email: { type: ["string", "null"] },
+          instagram: { type: ["string", "null"] },
+          facebook: { type: ["string", "null"] },
+          linkedin: { type: ["string", "null"] },
+          website: { type: ["string", "null"] },
+          region: { type: ["string", "null"] },
+          address: { type: ["string", "null"] },
+          painPoint: { type: ["string", "null"] },
+          notes: { type: ["string", "null"] },
+          confidence: { type: "string", enum: ["high", "medium", "low"] },
+        },
+        required: ["firstName", "winery", "confidence"],
+        additionalProperties: false,
+      };
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60_000);
+      let resp: Response;
+      try {
+        resp = await fetch("https://api.perplexity.ai/chat/completions", {
+          method: "POST",
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${key}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "sonar-pro",
+            max_tokens: 1500,
+            messages: [
+              {
+                role: "system",
+                content: `You are a wine-industry sales-research assistant. Given a business or person name, deep-search the public web for CURRENT contact details. Prioritise official winery websites, verified LinkedIn profiles, Instagram bios, and reputable trade publications (Halliday, WBM, Real Review, Winetitles). Ignore stale info — if two sources disagree, prefer the more recent one.
+
+For "role", identify the primary point-of-contact — winemaker, founder, GM, or cellar-door manager — in that priority order. Skip marketing / admin staff.
+
+For "mobileAu" — normalise to "04XX XXX XXX". If only a landline is public, use "(0X) XXXX XXXX". If only an international mobile, keep original format.
+
+For "instagram" — return the handle WITHOUT the @ (e.g. "lesfruitswine", not "@lesfruitswine"). Skip if only content-farm shares are indexed.
+
+For "painPoint" — write ONE sentence describing what a cellar-intelligence AI tool could help this producer with, inferred from their scale / focus / recent public commentary. Examples: "Small natural-wine producer, minimal digital record-keeping"; "Established mid-sized producer scaling into cellar-door tourism"; "Cool-climate boutique estate with vintage variability challenges".
+
+For "confidence":
+- "high" = named person + at least 2 direct channels (phone/email/verified IG) found
+- "medium" = winery + 1 channel found, no named person OR named person + only 1 channel
+- "low" = only the winery name confirmed, no direct contact channels
+
+Return ONLY the requested JSON — no prose, no explanation. Use null for any field you cannot verify. Do NOT invent URLs, phone numbers, or emails — null is always correct over hallucination.`,
+              },
+              {
+                role: "user",
+                content: `Business/winery name: ${input.businessName}\n\nFind the primary contact. Return the structured JSON.`,
+              },
+            ],
+            response_format: {
+              type: "json_schema",
+              json_schema: { schema: contactSchema },
+            },
+          }),
+        });
+        clearTimeout(timeoutId);
+      } catch (err) {
+        clearTimeout(timeoutId);
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes("aborted")) {
+          throw new Error("Perplexity took too long (>60s). Try again or paste a direct URL instead.");
+        }
+        throw new Error(`Perplexity request failed: ${msg}`);
+      }
+
+      if (!resp.ok) {
+        const errText = await resp.text().catch(() => "");
+        // Common cases: 401 (bad key), 402 (out of credit), 429 (rate limited)
+        if (resp.status === 401) throw new Error("Perplexity key invalid — check PERPLEXITY_API_KEY.");
+        if (resp.status === 402) throw new Error("Perplexity credit exhausted — top up at console.perplexity.ai.");
+        if (resp.status === 429) throw new Error("Perplexity rate-limited — wait a minute and retry.");
+        throw new Error(`Perplexity ${resp.status}: ${errText.slice(0, 200)}`);
+      }
+
+      const data = await resp.json() as {
+        choices?: Array<{ message?: { content?: string } }>;
+        citations?: string[];
+        usage?: { total_tokens?: number };
+      };
+
+      const content = data.choices?.[0]?.message?.content ?? "";
+      const citations = Array.isArray(data.citations) ? data.citations.slice(0, 10) : [];
+
+      let draft: Record<string, unknown> | null = null;
+      try {
+        const cleaned = content.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+        const parsed = JSON.parse(cleaned);
+        if (parsed && typeof parsed === "object") draft = parsed;
+      } catch {
+        // Fall through — return null draft with citations so UI can show sources
+      }
+
+      return {
+        draft,
+        citations,
+        tokensUsed: data.usage?.total_tokens ?? null,
+      };
+    }),
+
   /** OWNER — update triage status (warm/lukewarm/cold/sales/skip). */
   setStatus: ownerProcedure
     .input(

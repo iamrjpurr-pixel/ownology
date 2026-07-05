@@ -62,6 +62,7 @@ export default function AdminContacts() {
   const createMutation = trpc.outreach.create.useMutation();
   const parseFromVoiceMutation = trpc.outreach.parseFromVoice.useMutation();
   const parseFromUrlMutation = trpc.outreach.parseFromUrl.useMutation();
+  const deepResearchMutation = trpc.outreach.deepResearch.useMutation();
   const markSmsSentMutation = trpc.outreach.markSmsSent.useMutation();
   const markBookedMutation = trpc.outreach.markBooked.useMutation();
   const setStatusMutation = trpc.outreach.setStatus.useMutation();
@@ -84,6 +85,10 @@ export default function AdminContacts() {
   const [urlQuickAdd, setUrlQuickAdd] = useState("");
   const [urlErr, setUrlErr] = useState<string | null>(null);
   const [urlLastFetched, setUrlLastFetched] = useState<string | null>(null);
+  const [deepSearchName, setDeepSearchName] = useState("");
+  const [deepSearchErr, setDeepSearchErr] = useState<string | null>(null);
+  const [deepSearchCitations, setDeepSearchCitations] = useState<string[]>([]);
+  const [deepSearchConfidence, setDeepSearchConfidence] = useState<string | null>(null);
 
   const allContacts = useMemo(() => data?.contacts ?? [], [data]);
   const contacts = useMemo(() => {
@@ -123,6 +128,57 @@ export default function AdminContacts() {
       utils.outreach.list.invalidate();
     } catch (e2) {
       setErr(e2 instanceof Error ? e2.message : String(e2));
+    }
+  }
+
+  // ── Deep research from just a name ─────────────────────────────────────
+  // Perplexity Sonar-Pro multi-hop web research. Same review-then-Save UX
+  // as the URL flow, but the input is just the business name.
+  async function handleDeepSearch(e: React.FormEvent) {
+    e.preventDefault();
+    setDeepSearchErr(null);
+    setDeepSearchCitations([]);
+    setDeepSearchConfidence(null);
+    const name = deepSearchName.trim();
+    if (!name || name.length < 2) {
+      setDeepSearchErr("Enter a winery or business name (2+ characters).");
+      return;
+    }
+    try {
+      const result = await deepResearchMutation.mutateAsync({ businessName: name });
+      if (!result.draft || !result.draft.firstName) {
+        setDeepSearchErr("Perplexity couldn't confirm a contact for that name. Try adding the region (e.g. 'Les Fruits Adelaide Hills') or paste a direct URL instead.");
+        setDeepSearchCitations(result.citations || []);
+        return;
+      }
+      const d = result.draft as Record<string, unknown>;
+      // Merge extras that don't map to form fields into notes.
+      const extras: string[] = [];
+      if (typeof d.email === "string" && d.email) extras.push(`Email: ${d.email}`);
+      if (typeof d.instagram === "string" && d.instagram) extras.push(`IG: @${d.instagram}`);
+      if (typeof d.linkedin === "string" && d.linkedin) extras.push(`LinkedIn: ${d.linkedin}`);
+      if (typeof d.website === "string" && d.website) extras.push(`Web: ${d.website}`);
+      if (typeof d.address === "string" && d.address) extras.push(`Addr: ${d.address}`);
+      if (typeof d.role === "string" && d.role) extras.push(`Role: ${d.role}`);
+      if (typeof d.region === "string" && d.region) extras.push(`Region: ${d.region}`);
+      const notesBase = typeof d.notes === "string" ? d.notes : "";
+      const combinedNotes = [notesBase, ...extras].filter(Boolean).join(" · ");
+
+      setForm({
+        firstName: typeof d.firstName === "string" ? d.firstName : "",
+        lastName: typeof d.lastName === "string" ? d.lastName : "",
+        mobileAu: typeof d.mobileAu === "string" ? d.mobileAu : "",
+        winery: typeof d.winery === "string" ? d.winery : "",
+        event: form.event,
+        painPoint: typeof d.painPoint === "string" ? d.painPoint : "",
+        calendlyOverride: form.calendlyOverride,
+        notes: combinedNotes,
+      });
+      setDeepSearchCitations(result.citations || []);
+      setDeepSearchConfidence(typeof d.confidence === "string" ? d.confidence : null);
+      setDeepSearchName("");
+    } catch (e2) {
+      setDeepSearchErr(e2 instanceof Error ? e2.message : String(e2));
     }
   }
 
@@ -265,6 +321,114 @@ export default function AdminContacts() {
           />
         ))}
       </div>
+
+      {/* Deep Research from a name — Perplexity Sonar-Pro multi-hop research */}
+      <form
+        onSubmit={handleDeepSearch}
+        className="mb-3 rounded p-4"
+        data-testid="deep-research-panel"
+        style={{
+          background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
+          border: "1.5px solid color-mix(in oklch, var(--ow-amber) 55%, transparent)",
+        }}
+      >
+        <div className="flex items-baseline justify-between mb-2">
+          <p className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-amber)" }}>
+            Deep research — just a name
+          </p>
+          <p className="text-xs" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif" }}>
+            Perplexity Sonar · ~15–30s · &lt; 1¢ per lookup
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={deepSearchName}
+            onChange={(e) => setDeepSearchName(e.target.value)}
+            placeholder="e.g. Les Fruits Adelaide Hills"
+            disabled={deepResearchMutation.isPending}
+            data-testid="deep-research-input"
+            style={{
+              flex: 1,
+              padding: "0.6rem 0.8rem",
+              background: "var(--ow-bg-card)",
+              border: "1px solid var(--ow-border)",
+              borderRadius: 4,
+              color: "var(--ow-text-hi)",
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.9rem",
+            }}
+          />
+          <button
+            type="submit"
+            disabled={deepResearchMutation.isPending || deepSearchName.trim().length < 2}
+            data-testid="deep-research-btn"
+            style={{
+              padding: "0.6rem 1.2rem",
+              background: "var(--ow-amber)",
+              color: "oklch(0.10 0.008 60)",
+              border: "none",
+              borderRadius: 4,
+              fontFamily: "'Lato',sans-serif",
+              fontWeight: 700,
+              fontSize: "0.82rem",
+              cursor: deepResearchMutation.isPending ? "wait" : "pointer",
+              opacity: deepResearchMutation.isPending || deepSearchName.trim().length < 2 ? 0.6 : 1,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {deepResearchMutation.isPending ? "Researching…" : "Research →"}
+          </button>
+        </div>
+        <p className="text-xs mt-2" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", lineHeight: 1.5 }}>
+          Type any winery / winemaker name and we&apos;ll deep-search the web for their contact details, painpoint, and role.
+          Adding the region (Adelaide Hills, McLaren Vale) improves accuracy.
+        </p>
+        {deepSearchErr && (
+          <p data-testid="deep-research-error" style={{ marginTop: 8, color: "#b91c1c", fontFamily: "'Lato',sans-serif", fontSize: "0.82rem" }}>
+            {deepSearchErr}
+          </p>
+        )}
+        {deepSearchCitations.length > 0 && (
+          <details
+            data-testid="deep-research-citations"
+            style={{ marginTop: 10, padding: "0.5rem 0.8rem", background: "var(--ow-bg-card)", borderRadius: 4, border: "1px solid var(--ow-border)" }}
+          >
+            <summary style={{ cursor: "pointer", fontSize: "0.78rem", color: "var(--ow-text-mid)", fontFamily: "'Lato',sans-serif" }}>
+              {deepSearchConfidence && (
+                <span
+                  style={{
+                    display: "inline-block",
+                    marginRight: 8,
+                    padding: "0.1rem 0.5rem",
+                    borderRadius: 3,
+                    fontSize: "0.65rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    background:
+                      deepSearchConfidence === "high" ? "#16a34a" :
+                      deepSearchConfidence === "medium" ? "#ca8a04" : "#9ca3af",
+                    color: "white",
+                  }}
+                >
+                  {deepSearchConfidence} confidence
+                </span>
+              )}
+              {deepSearchCitations.length} source{deepSearchCitations.length === 1 ? "" : "s"} — tap to verify before saving
+            </summary>
+            <ul style={{ margin: "0.6rem 0 0", padding: "0 0 0 1.2rem", fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", lineHeight: 1.7 }}>
+              {deepSearchCitations.map((c, i) => (
+                <li key={i}>
+                  <a href={c} target="_blank" rel="noreferrer" style={{ color: "var(--ow-amber)", textDecoration: "underline" }}>
+                    {c.length > 90 ? c.slice(0, 90) + "…" : c}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
+      </form>
 
       {/* URL Quick-Add — paste any URL, we extract contact details */}
       <form
