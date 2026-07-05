@@ -288,6 +288,299 @@ export const outreachRouter = router({
       return { ok: true, slug };
     }),
 
+  // ── OWNER — Voice-quick-add a contact ──────────────────────────────────
+  // Speak the contact detail while driving / walking / muddy hands. Same
+  // Whisper → structuring LLM pipeline that powers /import voice memos.
+  //
+  // Example memo: "Add Nathan Purr from Brokenwood Wines, mobile 0400 123
+  //   456, met him at the Hunter Valley trade fair last week, he's worried
+  //   about a stuck ferment in his 2025 Semillon."
+  //
+  // Returns a DRAFT contact object the UI shows for review + confirm.
+  // Nothing is saved server-side here — the client then calls create()
+  // once the user has approved / corrected the fields. Same pattern as
+  // vintageLog.parseFromVoice → bulkSave.
+  parseFromVoice: ownerProcedure
+    .input(z.object({
+      audioBase64: z.string().min(1).max(35_000_000),
+      mimeType: z.string().default("audio/webm"),
+      language: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const emergentKey = process.env.EMERGENT_LLM_KEY;
+      if (!emergentKey) throw new Error("EMERGENT_LLM_KEY not configured");
+
+      const audioBuffer = Buffer.from(input.audioBase64, "base64");
+      if (audioBuffer.length === 0) throw new Error("Empty audio payload");
+      if (audioBuffer.length > 25 * 1024 * 1024) {
+        throw new Error("Audio exceeds 25MB Whisper limit — please record a shorter memo");
+      }
+
+      const ext =
+        input.mimeType.includes("webm") ? "webm" :
+        input.mimeType.includes("ogg") ? "webm" :
+        input.mimeType.includes("mp4") || input.mimeType.includes("m4a") ? "m4a" :
+        input.mimeType.includes("mpeg") || input.mimeType.includes("mp3") ? "mp3" :
+        input.mimeType.includes("wav") ? "wav" :
+        "webm";
+
+      const audioBlob = new Blob([new Uint8Array(audioBuffer)], { type: input.mimeType });
+      const fd = new FormData();
+      fd.append("file", audioBlob, `contact-memo.${ext}`);
+      fd.append("model", "whisper-1");
+      fd.append("response_format", "json");
+      if (input.language) fd.append("language", input.language);
+      // Vocabulary hint — winery names are the #1 thing Whisper mishears.
+      // Also seed common Australian wine-industry terms + phone-number
+      // pattern words ("oh" → 0, "double oh" → 00) that come up in memos.
+      fd.append(
+        "prompt",
+        "Australian wine industry contact log. Vocabulary: Brokenwood, Tyrrell's, McGuigan, Audrey Wilkinson, Hunter Valley, Barossa, Margaret River, McLaren Vale, Adelaide Hills, Yarra Valley, Coonawarra, Semillon, Shiraz, Chardonnay, Pinot Noir, stuck ferment, MLF, malolactic, LIP audit, Wine Australia, cellar door. Phone digits — 'oh' means 0, 'double oh' means 00."
+      );
+
+      const whisperResp = await fetch(
+        "https://integrations.emergentagent.com/llm/openai/v1/audio/transcriptions",
+        { method: "POST", headers: { Authorization: `Bearer ${emergentKey}` }, body: fd as unknown as BodyInit }
+      );
+      if (!whisperResp.ok) {
+        const errText = await whisperResp.text().catch(() => "");
+        throw new Error(`Transcription failed: ${whisperResp.status} ${errText.slice(0, 200)}`);
+      }
+      const whisperData = (await whisperResp.json()) as { text?: string };
+      const transcription = (whisperData.text ?? "").trim();
+
+      if (!transcription) {
+        return { draft: null, transcription: "" };
+      }
+
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      const systemPrompt = `You are extracting structured contact-record fields from a wine-industry sales voice memo. The winemaker (Rich) is dictating notes about a person they just met.
+
+Return a single JSON object with these fields:
+- firstName: string (required)
+- lastName: string | null
+- mobileAu: string | null — normalise Australian mobiles to "04XX XXX XXX" format. If Rich says "oh four hundred one twenty three four fifty six" → "0400 123 456"
+- winery: string | null — the business/winery name they work for
+- event: string | null — where they met (e.g. "Hunter Valley Wine Show 2026")
+- painPoint: string | null — the specific problem or interest they mentioned (e.g. "stuck ferment on 2025 Semillon", "compliance PDFs", "budget under $5k")
+- notes: string | null — anything else worth remembering (referrals, mutual contacts, follow-up context)
+- status: "warm" | "lukewarm" | "cold" | "sales" | "skip" — infer from Rich's tone. "warm" = actively interested, "lukewarm" = curious but not urgent, "cold" = polite courtesy contact, default to "warm" if unclear.
+
+Speech-recognition normalisations:
+- Numbers spoken as words → digits ("four hundred" → 400, "twenty-six" → 26)
+- Common winery names Whisper mishears: "Broken wood" → "Brokenwood", "Tyrell's" → "Tyrrell's"
+- Interpret ambiguous "he/she said" attributions as belonging to the contact, not to Rich
+
+Return ONLY valid JSON. No markdown. If no contact can be identified, return {"firstName": null}. If a field wasn't mentioned, use null (do NOT invent).`;
+
+      const chatResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${forgeKey}`,
+          "x-ow-source": "outreach.parseFromVoice",
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: transcription },
+          ],
+          stream: false,
+        }),
+      });
+      if (!chatResp.ok) {
+        return { draft: null, transcription };
+      }
+      const chatData = await chatResp.json();
+      const raw = chatData.choices?.[0]?.message?.content ?? "{}";
+      try {
+        const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+        const draft = JSON.parse(cleaned);
+        if (!draft || typeof draft !== "object" || !draft.firstName) {
+          return { draft: null, transcription };
+        }
+        return { draft, transcription };
+      } catch {
+        return { draft: null, transcription };
+      }
+    }),
+
+  // ── OWNER — URL-quick-add a contact ────────────────────────────────────
+  // Paste a URL (winery website, Google Business listing, LinkedIn page,
+  // Instagram profile, wine-show exhibitor page). We fetch, extract every
+  // signal we can — JSON-LD schema.org, tel:/mailto: links, social handles,
+  // main page text — and feed it to an LLM to structure into contact
+  // fields. Returns a DRAFT the UI shows for review + confirm.
+  parseFromUrl: ownerProcedure
+    .input(z.object({
+      url: z.string().url("Please paste a full URL starting with https:// or http://"),
+    }))
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      // Validate protocol — refuse file://, javascript:, data:, etc.
+      const parsed = new URL(input.url);
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        throw new Error("URL must use http:// or https://");
+      }
+
+      // Fetch with realistic UA + 12s timeout. Some winery sites 403 the
+      // default node UA, so we masquerade as a modern browser.
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12_000);
+      let html: string;
+      try {
+        const resp = await fetch(input.url, {
+          signal: controller.signal,
+          redirect: "follow",
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+            Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-AU,en;q=0.9",
+          },
+        });
+        clearTimeout(timeoutId);
+        if (!resp.ok) throw new Error(`Fetch failed: ${resp.status} ${resp.statusText}`);
+        const contentType = resp.headers.get("content-type") ?? "";
+        if (!contentType.includes("html") && !contentType.includes("text")) {
+          throw new Error(`Unsupported content type: ${contentType}`);
+        }
+        // 2MB cap — plenty for any winery page, refuses bloated PDFs served as text
+        const buf = await resp.arrayBuffer();
+        if (buf.byteLength > 2 * 1024 * 1024) throw new Error("Page too large (>2MB)");
+        html = new TextDecoder("utf-8", { fatal: false }).decode(buf);
+      } catch (err) {
+        clearTimeout(timeoutId);
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes("aborted")) throw new Error("Page took too long to load (>12s). Try a different URL.");
+        throw new Error(`Could not load page — ${msg}`);
+      }
+
+      // ── Signal extraction ─────────────────────────────────────────────
+      // JSON-LD schema.org — the gold-standard. Wineries with proper SEO
+      // publish LocalBusiness or Organization blocks with everything we
+      // need (name, telephone, email, address, sameAs social links).
+      const jsonLdBlocks: unknown[] = [];
+      const ldRe = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+      for (const m of html.matchAll(ldRe)) {
+        try {
+          const parsed = JSON.parse(m[1].trim());
+          jsonLdBlocks.push(parsed);
+        } catch { /* malformed JSON — skip */ }
+      }
+
+      // <title> + <meta description>
+      const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+      const descMatch = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i)
+        ?? html.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i);
+      const ogSiteMatch = html.match(/<meta\s+property=["']og:site_name["']\s+content=["']([^"']+)["']/i);
+
+      // Regex sweep for contact primitives — these fire even when JSON-LD is absent
+      const telLinks = Array.from(html.matchAll(/href=["']tel:([^"']+)["']/gi)).map((m) => m[1].trim());
+      const mailtoLinks = Array.from(html.matchAll(/href=["']mailto:([^"'?]+)/gi)).map((m) => m[1].trim());
+      const instagram = Array.from(html.matchAll(/(?:https?:\/\/(?:www\.)?)?instagram\.com\/([A-Za-z0-9_.]+)/gi))
+        .map((m) => m[1]).filter((h) => h.length > 1 && !["reel", "p", "explore", "accounts"].includes(h.toLowerCase()));
+      const facebook = Array.from(html.matchAll(/(?:https?:\/\/(?:www\.)?)?facebook\.com\/([A-Za-z0-9_.-]+)/gi))
+        .map((m) => m[1]).filter((h) => h.length > 2 && !["sharer", "share", "dialog"].includes(h.toLowerCase()));
+      const linkedin = Array.from(html.matchAll(/(?:https?:\/\/(?:www\.)?)?linkedin\.com\/(?:in|company)\/([A-Za-z0-9_.-]+)/gi)).map((m) => m[1]);
+      // Free-form phone numbers in text (0400 123 456 style; +61 4XX XXX XXX)
+      const phoneMatches = Array.from(html.replace(/<[^>]+>/g, " ").matchAll(/(\+?61[\s.-]?4\d{2}[\s.-]?\d{3}[\s.-]?\d{3}|\b04\d{2}[\s.-]?\d{3}[\s.-]?\d{3}|\b0[2378][\s.-]?\d{4}[\s.-]?\d{4})/g)).map((m) => m[1]);
+      // Free-form emails in text
+      const emailMatches = Array.from(html.replace(/<[^>]+>/g, " ").matchAll(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi)).map((m) => m[0]);
+
+      // Main text — strip scripts/styles/nav/footer, then collapse whitespace.
+      // Cap at 5000 chars to keep the LLM prompt small.
+      const stripped = html
+        .replace(/<script[\s\S]*?<\/script>/gi, " ")
+        .replace(/<style[\s\S]*?<\/style>/gi, " ")
+        .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+        .replace(/<footer[\s\S]*?<\/footer>/gi, " ")
+        .replace(/<header[\s\S]*?<\/header>/gi, " ")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/&[a-z]+;/gi, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 5000);
+
+      // Build the extraction payload for the LLM. Dedupe.
+      const uniq = <T,>(arr: T[]) => Array.from(new Set(arr));
+      const signals = {
+        url: input.url,
+        pageTitle: titleMatch?.[1]?.trim() ?? null,
+        pageDescription: descMatch?.[1]?.trim() ?? null,
+        siteName: ogSiteMatch?.[1]?.trim() ?? null,
+        jsonLd: jsonLdBlocks.length > 0 ? JSON.stringify(jsonLdBlocks).slice(0, 4000) : null,
+        telLinks: uniq(telLinks).slice(0, 5),
+        phoneMatchesInText: uniq(phoneMatches).slice(0, 5),
+        mailtoLinks: uniq(mailtoLinks).slice(0, 5),
+        emailMatchesInText: uniq(emailMatches).slice(0, 5),
+        instagram: uniq(instagram).slice(0, 3),
+        facebook: uniq(facebook).slice(0, 3),
+        linkedin: uniq(linkedin).slice(0, 3),
+        mainText: stripped,
+      };
+
+      const systemPrompt = `You extract structured wine-industry contact fields from a scraped webpage. The user pastes a URL — a winery website, Google Business listing, LinkedIn page, Instagram profile, or wine-show exhibitor page — and you return the best contact record you can from the extracted signals.
+
+Prefer JSON-LD structured data when present (that's the source of truth). Fall back to regex-matched tel:/mailto: links, then to free-form phone/email in the page text. Use pageTitle/siteName for the winery/business name. Use pageDescription and mainText to infer the person's role or the winery's specialty (which becomes the painPoint hint).
+
+Return a single JSON object with these fields:
+- firstName: string — the primary contact person, if identifiable. If the page is a company (no named person), use the winery/business name here (we'll flip it in the UI).
+- lastName: string | null
+- mobileAu: string | null — first Australian mobile you find, normalised to "04XX XXX XXX". If only a landline is available, use that raw.
+- email: string | null — first business email you find
+- winery: string | null — the winery/company name
+- website: string | null — the URL passed in (echo it back so it lands in notes)
+- instagram: string | null — Instagram handle WITHOUT the @ (just the username)
+- event: string | null — if the URL is a wine-show/exhibitor page, name the event
+- painPoint: string | null — a one-sentence summary of what the business focuses on that a wine-tech tool could help with (e.g. "Boutique Hunter Semillon producer, no digital cellar records", "Emerging cool-climate Chardonnay estate; 3-person team")
+- notes: string | null — anything else worth remembering (address, hours, size of operation, distinctive detail). Include the source URL as a suffix.
+- status: "warm" | "lukewarm" | "cold" — default to "cold" (this is a prospecting-from-URL flow, not a warm-intro)
+- confidence: "high" | "medium" | "low" — high if you found a named person + phone/email; medium if you found the business + one contact channel; low if you only got the business name
+
+Speech-recognition normalisations do NOT apply here — this is scraped HTML. But:
+- Strip any trailing punctuation from phone numbers ("0400 123 456." → "0400 123 456")
+- Instagram handles: strip @ sign if present, remove trailing "/"
+- If multiple people are listed, pick the winemaker/founder/GM over marketing/admin
+- Return ONLY valid JSON. No markdown fences. If no useful data can be extracted, return {"firstName": null, "confidence": "low"}.`;
+
+      const chatResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${forgeKey}`,
+          "x-ow-source": "outreach.parseFromUrl",
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: JSON.stringify(signals) },
+          ],
+          stream: false,
+        }),
+      });
+      if (!chatResp.ok) {
+        throw new Error(`LLM extraction failed: ${chatResp.status}`);
+      }
+      const chatData = await chatResp.json();
+      const raw = chatData.choices?.[0]?.message?.content ?? "{}";
+      try {
+        const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+        const draft = JSON.parse(cleaned);
+        if (!draft || typeof draft !== "object" || !draft.firstName) {
+          return { draft: null, signals };
+        }
+        return { draft, signals };
+      } catch {
+        return { draft: null, signals };
+      }
+    }),
+
   /** OWNER — update triage status (warm/lukewarm/cold/sales/skip). */
   setStatus: ownerProcedure
     .input(

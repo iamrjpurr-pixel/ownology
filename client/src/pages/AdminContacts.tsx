@@ -48,8 +48,20 @@ const STATUS_META: Record<ContactStatus, { label: string; color: string }> = Obj
 
 export default function AdminContacts() {
   const utils = trpc.useUtils();
-  const { data, isLoading } = trpc.outreach.list.useQuery();
+  // Disable auto-refetch on window focus. tRPC's react-query defaults refetch
+  // every time the tab gets focus — with an SMS-editor open, a mid-typed draft
+  // in the Add form, or the voice recorder mid-recording, the refetch resets
+  // component state and looks/feels like the page is "refreshing". Owner
+  // manually pulls fresh data via a Refresh button below.
+  const { data, isLoading, refetch } = trpc.outreach.list.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    staleTime: 60_000, // 1 min — the pipeline changes are user-driven, not real-time
+  });
   const createMutation = trpc.outreach.create.useMutation();
+  const parseFromVoiceMutation = trpc.outreach.parseFromVoice.useMutation();
+  const parseFromUrlMutation = trpc.outreach.parseFromUrl.useMutation();
   const markSmsSentMutation = trpc.outreach.markSmsSent.useMutation();
   const markBookedMutation = trpc.outreach.markBooked.useMutation();
   const setStatusMutation = trpc.outreach.setStatus.useMutation();
@@ -69,6 +81,9 @@ export default function AdminContacts() {
   const [err, setErr] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<Record<string, "url" | "sms" | null>>({});
   const [statusFilter, setStatusFilter] = useState<ContactStatus | "all">("all");
+  const [urlQuickAdd, setUrlQuickAdd] = useState("");
+  const [urlErr, setUrlErr] = useState<string | null>(null);
+  const [urlLastFetched, setUrlLastFetched] = useState<string | null>(null);
 
   const allContacts = useMemo(() => data?.contacts ?? [], [data]);
   const contacts = useMemo(() => {
@@ -108,6 +123,50 @@ export default function AdminContacts() {
       utils.outreach.list.invalidate();
     } catch (e2) {
       setErr(e2 instanceof Error ? e2.message : String(e2));
+    }
+  }
+
+  // ── URL Quick-Add ─────────────────────────────────────────────────────
+  // Paste a URL (winery site, Google Business listing, LinkedIn, Instagram)
+  // and we fetch + extract → pre-fills the Add form below. User reviews and
+  // taps Save. Zero-keyboard prospecting.
+  async function handleUrlQuickAdd(e: React.FormEvent) {
+    e.preventDefault();
+    setUrlErr(null);
+    const url = urlQuickAdd.trim();
+    if (!url) {
+      setUrlErr("Paste a URL to fetch from.");
+      return;
+    }
+    try {
+      const result = await parseFromUrlMutation.mutateAsync({ url });
+      if (!result.draft || !result.draft.firstName) {
+        setUrlErr("Couldn't find contact details on that page. Try one with a phone, email, or a named contact person.");
+        return;
+      }
+      const d = result.draft as Record<string, unknown>;
+      // Extras that don't map to form fields go into notes so nothing is lost.
+      const extras: string[] = [];
+      if (typeof d.email === "string" && d.email) extras.push(`Email: ${d.email}`);
+      if (typeof d.instagram === "string" && d.instagram) extras.push(`IG: @${d.instagram}`);
+      if (typeof d.website === "string" && d.website) extras.push(`Web: ${d.website}`);
+      const notesBase = typeof d.notes === "string" ? d.notes : "";
+      const combinedNotes = [notesBase, ...extras].filter(Boolean).join(" · ");
+
+      setForm({
+        firstName: typeof d.firstName === "string" ? d.firstName : "",
+        lastName: typeof d.lastName === "string" ? d.lastName : "",
+        mobileAu: typeof d.mobileAu === "string" ? d.mobileAu : "",
+        winery: typeof d.winery === "string" ? d.winery : "",
+        event: typeof d.event === "string" ? d.event : form.event,
+        painPoint: typeof d.painPoint === "string" ? d.painPoint : "",
+        calendlyOverride: form.calendlyOverride,
+        notes: combinedNotes,
+      });
+      setUrlLastFetched(url);
+      setUrlQuickAdd("");
+    } catch (e2) {
+      setUrlErr(e2 instanceof Error ? e2.message : String(e2));
     }
   }
 
@@ -191,6 +250,79 @@ export default function AdminContacts() {
           />
         ))}
       </div>
+
+      {/* URL Quick-Add — paste any URL, we extract contact details */}
+      <form
+        onSubmit={handleUrlQuickAdd}
+        className="mb-4 rounded p-4"
+        data-testid="url-quickadd-panel"
+        style={{
+          background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)",
+          border: "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)",
+        }}
+      >
+        <div className="flex items-baseline justify-between mb-2">
+          <p className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-amber)" }}>
+            Quick-add from a URL
+          </p>
+          <p className="text-xs" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif" }}>
+            Winery site · LinkedIn · Instagram · Google Business
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <input
+            type="url"
+            value={urlQuickAdd}
+            onChange={(e) => setUrlQuickAdd(e.target.value)}
+            placeholder="https://www.brokenwood.com.au/contact"
+            disabled={parseFromUrlMutation.isPending}
+            data-testid="url-quickadd-input"
+            style={{
+              flex: 1,
+              padding: "0.6rem 0.8rem",
+              background: "var(--ow-bg-card)",
+              border: "1px solid var(--ow-border)",
+              borderRadius: 4,
+              color: "var(--ow-text-hi)",
+              fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+              fontSize: "0.85rem",
+            }}
+          />
+          <button
+            type="submit"
+            disabled={parseFromUrlMutation.isPending || !urlQuickAdd.trim()}
+            data-testid="url-quickadd-fetch-btn"
+            style={{
+              padding: "0.6rem 1.2rem",
+              background: "var(--ow-amber)",
+              color: "oklch(0.10 0.008 60)",
+              border: "none",
+              borderRadius: 4,
+              fontFamily: "'Lato',sans-serif",
+              fontWeight: 700,
+              fontSize: "0.82rem",
+              cursor: parseFromUrlMutation.isPending ? "wait" : "pointer",
+              opacity: parseFromUrlMutation.isPending || !urlQuickAdd.trim() ? 0.6 : 1,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {parseFromUrlMutation.isPending ? "Fetching…" : "Fetch details →"}
+          </button>
+        </div>
+        <p className="text-xs mt-2" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", lineHeight: 1.5 }}>
+          We scrape phone, email, Instagram, address, and any named contact — then pre-fill the form below. You review and hit Save.
+        </p>
+        {urlErr && (
+          <p data-testid="url-quickadd-error" style={{ marginTop: 8, color: "#b91c1c", fontFamily: "'Lato',sans-serif", fontSize: "0.82rem" }}>
+            {urlErr}
+          </p>
+        )}
+        {urlLastFetched && !urlErr && !parseFromUrlMutation.isPending && (
+          <p data-testid="url-quickadd-success" style={{ marginTop: 8, color: "#16a34a", fontFamily: "'Lato',sans-serif", fontSize: "0.82rem" }}>
+            ✓ Prefilled the form below from <code style={{ fontSize: "0.75rem" }}>{urlLastFetched.slice(0, 80)}</code>{urlLastFetched.length > 80 ? "…" : ""} — review, edit if needed, then Save.
+          </p>
+        )}
+      </form>
 
       {/* Add form */}
       <form onSubmit={handleCreate} className="mb-8 rounded p-5" style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}>
