@@ -56,7 +56,7 @@ const QUESTIONS: Q[] = [
         hoverInfo: "WSET SAT collapses three white-fruit families here — citrus (lemon, grapefruit), stone (peach, apricot), tropical (pineapple, mango). Combining them keeps the quiz snappy; the algorithm still ranks against each variety's specific profile." },
       // Both — savoury / earthy shows up on both sides (Nebbiolo, aged Riesling)
       { emoji: "🍄", label: "Something savoury — earth, mushroom, wet leaves", value: "savoury",
-        hoverInfo: "Halliday-standard descriptor; WSET SAT 'earthy / vegetal / tertiary'. Genuinely applies to both reds (Nebbiolo, aged Pinot) and whites (aged Riesling, Assyrtiko, skin-contact whites)." },
+        hoverInfo: "WSET SAT tertiary-aroma family: 'forest floor / sous bois / mushroom / earth'. Textbook descriptors for aged Pinot Noir (Burgundy, Mornington), aged Nebbiolo (Barolo), aged Riesling. James Halliday uses 'sous bois' and 'forest floor' constantly in the Australian Wine Companion for developed reds. Chemistry: driven by geosmin (same compound that gives petrichor after rain) and TCA-adjacent volatiles that emerge with bottle age — UC Davis sensory research." },
     ],
     citation: {
       text: "Aroma-family clustering follows the WSET Systematic Approach to Tasting (SAT) primary-aroma categories, cross-referenced with UC Davis Viticulture & Enology sensory research on varietal aroma compounds.",
