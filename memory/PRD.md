@@ -4,6 +4,34 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Inline click-to-edit on contact rows (Feb 2026, this session)**
+- Contact row on `/admin/contacts` now supports one-click inline editing for
+  `name` (first + last), `winery`, and `mobile` — no need to open the full
+  edit form to fix a spelling captured at an event.
+- **Backend** (tRPC, `/app/server/routers/outreach.ts`): three new
+  `ownerProcedure` mutations — `setName`, `setWinery`, `setMobile`. Each is
+  owner-scoped, slug-keyed, trims strings, and stores empty as NULL.
+  `setMobile` reuses the existing `normaliseMobile()` helper so
+  "0481 564 796", "+61 481 564 796" and "0481-564-796" all canonicalise to
+  `+61481564796` — exactly the same normalisation the `create` mutation uses.
+- **Frontend** (`AdminContacts.tsx`): three independent slug-keyed
+  edit-state buffers (`editingName`, `editingWinery`, `editingMobile`) so
+  the operator can bounce between rows without losing an in-flight edit.
+  UX rules:
+  - Click the h3 name → firstName + lastName inputs with Save/Cancel.
+  - Click the "{winery} · {event}" line → winery input with Save/Cancel.
+  - Amber mobile chip still copies on click (muscle memory preserved) —
+    a small dashed ✏️ pencil next to it flips into an editable input.
+  - Rows without a mobile show a clickable "+ add mobile" chip.
+- **Ancillary fix (KPI counter)**: `outreach.list` query changed from
+  `refetchOnMount: false / staleTime: 60s` to
+  `refetchOnMount: "always" / staleTime: 0`, and `handleCreate` now
+  `await`s the invalidate + explicit `refetch()`. Prevents the KPI
+  Contacts / "All (n)" chip looking stuck after adding a contact from
+  another tab.
+
+
+
 **Voice-Memo → Whisper → Structured Entry Pipeline (Feb 2026, this session)**
 - The flagship "Import Anything" feature promised on `/try`. Winemakers speak a
   voice memo in the cellar (hands-free / muddy hands) → we transcribe with
