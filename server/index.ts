@@ -493,6 +493,30 @@ async function startServer() {
         INDEX ts_logged_at_idx (logged_at)
       )
     `);
+    // quiz_picks — one row per /quiz completion. See drizzle/schema.ts
+    // for the design rationale. Created here so it lives without a
+    // migration step.
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS quiz_picks (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        session_id VARCHAR(64) NOT NULL,
+        wine_type VARCHAR(16) NOT NULL,
+        fruit VARCHAR(16) NOT NULL,
+        body VARCHAR(16) NOT NULL,
+        sweetness VARCHAR(16) NOT NULL,
+        grip VARCHAR(16) NOT NULL,
+        age VARCHAR(16) NOT NULL,
+        budget VARCHAR(16) NOT NULL,
+        winner_slug VARCHAR(80) NOT NULL,
+        true_match_slug VARCHAR(80) NOT NULL,
+        region VARCHAR(8) NOT NULL,
+        cta_clicked_at BIGINT NULL,
+        picked_at BIGINT NOT NULL,
+        INDEX qp_picked_at_idx (picked_at),
+        INDEX qp_winner_idx (winner_slug),
+        INDEX qp_session_idx (session_id)
+      )
+    `);
     // ── Phase 1 multi-tenant bootstrap ───────────────────────────────────
     // Idempotent: creates `wineries` table, adds `winery_id` column to
     // users if missing, seeds a Default Winery, backfills NULL user

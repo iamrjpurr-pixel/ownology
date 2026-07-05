@@ -435,6 +435,13 @@ const TOOLS: AdminTool[] = [
     icon: <IconLeads />,
     badge: "Telemetry",
   },
+  {
+    label: "Quiz Picks",
+    description: "What the /quiz recommender is picking in the wild — winner distribution, swap rate (algorithm overriding the pure-palate best), buying-market split, and CTA click-through to the Founding-Member plan. Use it to fine-tune quizData.ts.",
+    href: "/admin/quiz-picks",
+    icon: <IconLeads />,
+    badge: "Telemetry",
+  },
 ];
 
 export default function Admin() {

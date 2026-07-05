@@ -3,9 +3,10 @@
  * Voice: Gel & Rich, two-person plural, unashamedly amateur.
  * Zero LLM at runtime — all data lives in quizData.ts. See it for the moat.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { pickWine, pickWineWithHonesty, getCurveballs, detectRegion, type QuizAnswers, type Budget, type QuizResult, type Region } from "@/data/quizData";
+import { trpc } from "@/lib/trpc";
 
 const AMBER = "var(--ow-amber)";
 const BG = "var(--ow-bg-base)";
@@ -167,6 +168,48 @@ export default function Quiz() {
     () => (complete ? pickWineWithHonesty(answers as QuizAnswers, region) : null),
     [answers, complete, region]
   );
+
+  // ── Anonymous telemetry ───────────────────────────────────────────────
+  // We log every quiz completion so we can review what the algorithm is
+  // actually recommending in the wild (see /admin/quiz-picks). No PII —
+  // just the six answers, winner slug, trueMatch slug, region. A per-tab
+  // session id lets us dedupe rapid reloads without pretending to
+  // identify humans. Fire-and-forget: if the network is offline the
+  // quiz still works, we just miss one data point.
+  const logQuizPick = trpc.quiz.logPick.useMutation();
+  const logQuizCtaClick = trpc.quiz.logCtaClick.useMutation();
+  const sessionIdRef = useRef<string>("");
+  if (!sessionIdRef.current && typeof window !== "undefined") {
+    const KEY = "ow-quiz-session";
+    const existing = window.sessionStorage.getItem(KEY);
+    if (existing) {
+      sessionIdRef.current = existing;
+    } else {
+      const rand = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+      window.sessionStorage.setItem(KEY, rand);
+      sessionIdRef.current = rand;
+    }
+  }
+  const loggedKey = useRef<string>(""); // dedupe per (session, answers, winner, region)
+  useEffect(() => {
+    if (!complete || !honest || !wine) return;
+    const key = `${sessionIdRef.current}|${answers.wineType}|${answers.fruit}|${answers.body}|${answers.sweetness}|${answers.grip}|${answers.age}|${answers.budget}|${wine.slug}|${region}`;
+    if (loggedKey.current === key) return;
+    loggedKey.current = key;
+    logQuizPick.mutate({
+      sessionId: sessionIdRef.current,
+      wineType: answers.wineType as "red" | "white",
+      fruit: answers.fruit as "red" | "dark" | "citrus" | "savoury",
+      body: answers.body as "light" | "medium" | "full",
+      sweetness: answers.sweetness as "bone_dry" | "hint" | "off_dry" | "sweet",
+      grip: answers.grip as "bright" | "grippy" | "soft" | "both",
+      age: answers.age as "young" | "developed" | "old",
+      budget: answers.budget as Budget,
+      winnerSlug: wine.slug,
+      trueMatchSlug: honest.trueMatch.slug,
+      region,
+    });
+  }, [complete, honest?.trueMatch.slug, wine?.slug, region, answers.wineType, answers.fruit, answers.body, answers.sweetness, answers.grip, answers.age, answers.budget, logQuizPick]);
 
   function pick(key: keyof QuizAnswers, value: string) {
     const next = { ...answers, [key]: value } as Partial<QuizAnswers>;
@@ -537,7 +580,22 @@ export default function Quiz() {
               <p style={{ fontFamily: SANS, fontSize: "0.9rem", color: MID, lineHeight: 1.55, margin: "0 0 1rem" }}>
                 Ownology&apos;s the tool we built for exactly this. Your first cellar plan, grounded in real winemaking manuals, tailored to the style you just picked.
               </p>
-              <Link href="/pricing" data-testid="quiz-cta-founding" style={ctaStyle}>
+              <Link
+                href="/pricing"
+                data-testid="quiz-cta-founding"
+                style={ctaStyle}
+                onClick={() => {
+                  // Fire-and-forget conversion signal so we can compute
+                  // "which recommendations lead to a Founding-Member
+                  // click" on /admin/quiz-picks.
+                  if (wine) {
+                    logQuizCtaClick.mutate({
+                      sessionId: sessionIdRef.current,
+                      winnerSlug: wine.slug,
+                    });
+                  }
+                }}
+              >
                 See a Founding-Member plan →
               </Link>
             </div>

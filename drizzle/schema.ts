@@ -1414,3 +1414,58 @@ export const referrals = mysqlTable(
     index("ref_referred_idx").on(t.referredWineryId),
   ]
 );
+
+
+/**
+ * quiz_picks — anonymous telemetry of wine quiz completions.
+ *
+ * One row per user who reaches the result page. We store the six answers
+ * (as compact strings), the winner slug we ended up recommending, the
+ * "true match" slug (which is what pure palate scoring would have picked
+ * ignoring budget + home-market bias), the region context the user was
+ * seeing, and a session id so we can dedupe rapid page reloads without
+ * pretending to identify humans.
+ *
+ * Why: today the quiz is 100% client-side — we have no idea what wines
+ * are actually being recommended, how often the home-market bias fires,
+ * or which recommendations lead to a "See a Founding-Member Plan" click.
+ * This table is the foundation for both post-hoc tuning AND a future
+ * "learn as we go" feedback loop.
+ *
+ * Created at runtime via CREATE TABLE IF NOT EXISTS in server/index.ts.
+ */
+export const quizPicks = mysqlTable(
+  "quiz_picks",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    sessionId: varchar("session_id", { length: 64 }).notNull(),
+    // Six quiz answers, one column each — keeps SQL grouping trivial for
+    // "how often did red+bone_dry+grippy+young end up as Barossa Shiraz".
+    wineType: varchar("wine_type", { length: 16 }).notNull(),
+    fruit: varchar("fruit", { length: 16 }).notNull(),
+    body: varchar("body", { length: 16 }).notNull(),
+    sweetness: varchar("sweetness", { length: 16 }).notNull(),
+    grip: varchar("grip", { length: 16 }).notNull(),
+    age: varchar("age", { length: 16 }).notNull(),
+    budget: varchar("budget", { length: 16 }).notNull(),
+    // What we actually recommended (winner) and what pure palate scoring
+    // would have picked (trueMatch). When these differ we did a budget
+    // downgrade or home-market swap — see the honest-framing narration.
+    winnerSlug: varchar("winner_slug", { length: 80 }).notNull(),
+    trueMatchSlug: varchar("true_match_slug", { length: 80 }).notNull(),
+    // Buying-market context. AU/NZ are the primary audience; US/UK are
+    // reachable via the "travelling?" chip. Recorded per pick so we can
+    // see how often visitors flip market post-result.
+    region: varchar("region", { length: 8 }).notNull(),
+    // Set later via a separate `logCtaClick` mutation if the user taps
+    // the "See a Founding-Member Plan" CTA. Correlation is what makes
+    // this table valuable for tuning.
+    ctaClickedAt: bigint("cta_clicked_at", { mode: "number" }),
+    pickedAt: bigint("picked_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("qp_picked_at_idx").on(t.pickedAt),
+    index("qp_winner_idx").on(t.winnerSlug),
+    index("qp_session_idx").on(t.sessionId),
+  ]
+);
