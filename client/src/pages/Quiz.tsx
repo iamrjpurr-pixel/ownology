@@ -25,7 +25,7 @@ type Citation = {
 type Q = {
   key: keyof QuizAnswers;
   prompt: string;
-  options: { emoji: string; label: string; value: string }[];
+  options: { emoji: string; label: string; value: string; onlyFor?: "red" | "white" }[];
   /** Optional "About this question" citation shown as a collapsible
    *  disclosure. Present on the 4 palate questions (Q2-Q5). Skipped on
    *  Q1 Red/White (self-evident) and Q6 Budget (subjective). */
@@ -45,9 +45,12 @@ const QUESTIONS: Q[] = [
     key: "fruit",
     prompt: "When you smell a wine, which pulls you in first?",
     options: [
-      { emoji: "🍒", label: "Bright red fruit — strawberry, cherry, cranberry", value: "red" },
-      { emoji: "🍇", label: "Dark and brooding — blackberry, plum, blueberry", value: "dark" },
-      { emoji: "🍋", label: "Citrus, stone fruit, tropical", value: "citrus" },
+      // Red-only options — red-fruit and dark-fruit only exist in reds
+      { emoji: "🍒", label: "Bright red fruit — strawberry, cherry, cranberry", value: "red", onlyFor: "red" },
+      { emoji: "🍇", label: "Dark and brooding — blackberry, plum, blueberry", value: "dark", onlyFor: "red" },
+      // White-only — citrus/stone/tropical is a white-wine descriptor
+      { emoji: "🍋", label: "Citrus, stone fruit, tropical", value: "citrus", onlyFor: "white" },
+      // Both — savoury / earthy shows up on both sides (Nebbiolo, aged Riesling)
       { emoji: "🍄", label: "Something savoury — earth, mushroom, wet leaves", value: "savoury" },
     ],
     citation: {
@@ -73,7 +76,10 @@ const QUESTIONS: Q[] = [
       { emoji: "🏜️", label: "Bone dry — nothing sweet at all", value: "bone_dry" },
       { emoji: "🌾", label: "Barely a hint", value: "hint" },
       { emoji: "🍯", label: "Off-dry / medium — you can taste it", value: "off_dry" },
-      { emoji: "🍮", label: "Give me dessert wine", value: "sweet" },
+      // Dessert wines in our pool are all curveballs (Sauternes, Port) — kept
+      // in the primary pool this would be misleading. Point users at the
+      // wildcards reveal instead.
+      { emoji: "🍮", label: "Give me dessert wine (opens wildcards)", value: "sweet" },
     ],
     citation: {
       text: "Residual-sugar bands per WSET SAT: bone-dry (<4 g/L), off-dry (4–12 g/L), medium-sweet (12–45 g/L), sweet (>45 g/L). James Halliday uses this same scale throughout the Australian Wine Companion tasting notes.",
@@ -83,10 +89,16 @@ const QUESTIONS: Q[] = [
     key: "grip",
     prompt: "A great wine makes your mouth feel…",
     options: [
+      // Bright acid — the primary structural element in whites, also present
+      // in light reds (Pinot, Gamay). Shown to both.
       { emoji: "💦", label: "Watering — bright, salivating, food-friendly", value: "bright" },
-      { emoji: "✋", label: "Grippy — mouth-drying, tea-tannin, structured", value: "grippy" },
+      // Grippy tannin — a red-wine descriptor. Skin-contact whites can have
+      // grip but they're rare enough to skip at Q1-choice level.
+      { emoji: "✋", label: "Grippy — mouth-drying, tea-tannin, structured", value: "grippy", onlyFor: "red" },
+      // Soft — mainly applies to whites and light reds. Kept universal.
       { emoji: "☁️", label: "Soft — no drying, no puckering, just smooth", value: "soft" },
-      { emoji: "🥊", label: "Both bright and grippy — big red territory", value: "both" },
+      // Both — explicitly a big-red descriptor. Never applies to whites.
+      { emoji: "🥊", label: "Both bright and grippy — big red territory", value: "both", onlyFor: "red" },
     ],
     citation: {
       text: "Tannin and acidity structure follows WSET SAT (low / medium / high on each axis). Naked Wines simplified the two into consumer-friendly labels — 'bright' (high acid) and 'grippy' (high tannin) — because that's how people describe mouth-feel without a wine vocabulary.",
@@ -187,7 +199,9 @@ export default function Quiz() {
               {QUESTIONS[step].prompt}
             </h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {QUESTIONS[step].options.map((opt) => (
+              {QUESTIONS[step].options
+                .filter((opt) => !opt.onlyFor || opt.onlyFor === answers.wineType)
+                .map((opt) => (
                 <button
                   key={opt.value}
                   data-testid={`quiz-answer-${QUESTIONS[step].key}-${opt.value}`}
