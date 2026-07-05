@@ -490,6 +490,28 @@ function sameFamily(a: Fruit, b: Fruit): boolean {
 // mopping up under-represented axis combos and dominating the result set.
 const SPECIALTY_PENALTY = 5;
 
+// Home-market bonus — nudges the winner toward wines the user can actually
+// buy at Dan Murphy's / First Choice (AU) or Glengarry / New World (NZ)
+// when browsing from Australia or New Zealand. Sized deliberately:
+//   +6 = beats one full non-fruit axis mismatch (body 3, grip 3, age 2)
+//        AND edges past the cross-family penalty (6), so an AU/NZ wine
+//        with a *slightly* off fruit family still won't outrank a
+//        genuine Old-World palate match. Fruit (12) still dominates —
+//        which preserves Red/White integrity and prevents a Sicilian
+//        white winning for someone who asked for a Barossa Shiraz style.
+// This runs in `scoreWine` for the RETURNED WINNER only. The "true palate
+// match" narration inside pickWineWithHonesty explicitly recomputes WITHOUT
+// the bonus, so we can still tell the user honestly: "Your true match is
+// Chablis — but here's an Adelaide Hills Chard you can actually get for
+// half the freight." That honest framing is the whole point of the layer.
+const HOME_MARKET_BONUS = 6;
+const AUSTRALASIAN_COUNTRIES: ReadonlySet<string> = new Set(["Australia", "New Zealand"]);
+function homeMarketBonus(w: Wine, region?: Region): number {
+  if (!region) return 0;
+  if (region !== "AU" && region !== "NZ") return 0;
+  return AUSTRALASIAN_COUNTRIES.has(w.country) ? HOME_MARKET_BONUS : 0;
+}
+
 // Sweetness is a scale, not a category. Someone who asks for "sweet" and
 // gets a bone-dry wine is being mis-advised in a way that matching "light"
 // body against "medium" body isn't. Score by distance on a 0–3 scale so
@@ -506,7 +528,7 @@ function sweetnessScore(userS: Sweetness, wineS: Sweetness): number {
   return -8;                                       // opposite ends (bone_dry↔sweet)
 }
 
-export function scoreWine(w: Wine, a: QuizAnswers): number {
+export function scoreWine(w: Wine, a: QuizAnswers, region?: Region): number {
   let score = 0;
   if (w.palate.fruit === a.fruit) {
     score += AXIS_WEIGHTS.fruit;
@@ -521,6 +543,7 @@ export function scoreWine(w: Wine, a: QuizAnswers): number {
   if (w.palate.age === a.age) score += AXIS_WEIGHTS.age;
   if (w.price === a.budget) score += AXIS_WEIGHTS.budget;
   if (w.specialty) score -= SPECIALTY_PENALTY;
+  score += homeMarketBonus(w, region);
   return score;
 }
 
@@ -544,7 +567,7 @@ function acceptableTiers(budget: Budget): Set<Budget> {
   );
 }
 
-export function pickWine(a: QuizAnswers): Wine {
+export function pickWine(a: QuizAnswers, region?: Region): Wine {
   // ── Q1 HARD filter — never cross Red/White boundary ────────────────────
   // This is the #1 quiz UX fix: someone who says "Red" should NEVER receive
   // a white wine, even if the remaining palate axes happen to align with
@@ -562,7 +585,7 @@ export function pickWine(a: QuizAnswers): Wine {
   // If somehow no wines match (shouldn't happen — we always have under_25),
   // fall back to the by-type list (still respects Red/White) or full list.
   const pool = inBudget.length > 0 ? inBudget : (byType.length > 0 ? byType : WINES);
-  const scored = pool.map((w) => ({ w, s: scoreWine(w, a) }));
+  const scored = pool.map((w) => ({ w, s: scoreWine(w, a, region) }));
   scored.sort((x, y) => y.s - x.s);
   const winner = scored[0].w;
 
@@ -595,18 +618,28 @@ export function pickWine(a: QuizAnswers): Wine {
 //
 // This is what makes the quiz feel like a friend, not an algorithm.
 
-/** Detect the user's region from browser locale. Falls back to OTHER.
- *  Safe on server (returns OTHER when window undefined). */
+/** Detect the user's region from browser locale.
+ *  Ownology's primary market right now is Australia + New Zealand — we
+ *  sell to AU/NZ winemakers, and we want the quiz to recommend wines
+ *  they can actually walk into Dan Murphy's / Glengarry and buy.
+ *
+ *  So the detection is DELIBERATELY biased: only an explicit `en-NZ`
+ *  locale escapes to NZ. Everything else — including en-US / en-GB
+ *  browsers used by expat Aussies, en-AU Chrome installs, unknown
+ *  locales, server-side rendering — defaults to AU. US and UK are
+ *  still reachable via the "travelling?" toggle on the result page
+ *  so overseas visitors aren't stranded, they're just not the
+ *  default audience the algorithm optimises for. */
 export function detectRegion(): Region {
-  if (typeof navigator === "undefined") return "OTHER";
+  if (typeof navigator === "undefined") return "AU";
   const lang = (navigator.language || "").toUpperCase();
   const langs = (navigator.languages || []).map((l) => l.toUpperCase());
   const all = [lang, ...langs].join(" ");
-  if (/\bEN-AU\b|-AU\b/.test(all)) return "AU";
   if (/\bEN-NZ\b|-NZ\b/.test(all)) return "NZ";
-  if (/\bEN-GB\b|-GB\b|-UK\b/.test(all)) return "UK";
-  if (/\bEN-US\b|-US\b/.test(all)) return "US";
-  return "OTHER";
+  // AU is the default for everyone else — including en-US / en-GB —
+  // because that's the market Ownology is currently selling to. Users
+  // who want US or UK context can flip explicitly via the region chip.
+  return "AU";
 }
 
 /** Fallback regional note used when a wine doesn't have an explicit entry
@@ -741,11 +774,16 @@ export type QuizResult = {
  *  Quiz UI. Backwards-compatible with pickWine — just call .winner. */
 export function pickWineWithHonesty(a: QuizAnswers, region?: Region): QuizResult {
   const r = region ?? detectRegion();
-  const winner = pickWine(a);
+  // Winner uses the home-market bias so the recommendation is something the
+  // user can actually walk into a local bottle-o and buy.
+  const winner = pickWine(a, r);
 
-  // Find the palate-only best (ignore budget) — but STAY inside the user's
-  // wineType so we don't narrate "your true match is Champagne" when they
-  // picked Red. This preserves the Q1 hard-filter integrity everywhere.
+  // Find the palate-only best (ignore budget AND home-market bias) — but
+  // STAY inside the user's wineType so we don't narrate "your true match
+  // is Champagne" when they picked Red. This preserves the Q1 hard-filter
+  // integrity everywhere. Deliberately NOT passing `region` here so the
+  // honest framing can say "your true palate match is Chablis — but…"
+  // without the AU/NZ nudge muddying the water.
   const inType = WINES.filter((w) => w.wineType === a.wineType);
   const allScores = inType.map((w) => ({ w, s: scoreWine(w, a) }));
   allScores.sort((x, y) => y.s - x.s);
@@ -758,8 +796,18 @@ export function pickWineWithHonesty(a: QuizAnswers, region?: Region): QuizResult
   const regionallyRare = trueMatchNote.availability === "hard" || trueMatchNote.availability === "rare";
   const regionalNote = regionalNoteFor(winner, r);
 
+  // Home-market swap detection — when the pure-palate best is Old World
+  // but we picked an AU/NZ winner (because of the home-market bonus), we
+  // want to be honest about that swap too, not just budget/rare cases.
+  const isAusOrKiwi = (w: Wine) => AUSTRALASIAN_COUNTRIES.has(w.country);
+  const homeMarketSwap =
+    (r === "AU" || r === "NZ") &&
+    trueMatch.slug !== winner.slug &&
+    !isAusOrKiwi(trueMatch) &&
+    isAusOrKiwi(winner);
+
   let honestFraming = "";
-  if (budgetConstrained || (regionallyRare && trueMatch.slug !== winner.slug)) {
+  if (budgetConstrained || (regionallyRare && trueMatch.slug !== winner.slug) || homeMarketSwap) {
     const priceGap = BUDGET_RANK[trueMatch.price] - BUDGET_RANK[a.budget];
     const budgetLabel: Record<Budget, string> = {
       under_25: "under $25", "25_50": "$25-50", "50_100": "$50-100", "100_plus": "$100+",
@@ -772,7 +820,13 @@ export function pickWineWithHonesty(a: QuizAnswers, region?: Region): QuizResult
     if (regionallyRare) {
       parts.push(trueMatchNote.advice);
     }
-    parts.push(`So we're picking **${winner.variety}** for you instead — hits most of your marks at your budget.`);
+    if (homeMarketSwap && !budgetConstrained && !regionallyRare) {
+      const homeName = r === "AU" ? "Australia" : "New Zealand";
+      parts.push(`It's Old World though — freight, tariffs, and cellar temp between there and here all add up.`);
+      parts.push(`So we're picking **${winner.variety}** from ${winner.region} for you instead — a ${homeName}-grown wine that hits the same notes and you can actually get your hands on this week.`);
+    } else {
+      parts.push(`So we're picking **${winner.variety}** for you instead — hits most of your marks at your budget.`);
+    }
     honestFraming = parts.join(" ");
   }
 

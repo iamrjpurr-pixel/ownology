@@ -5,7 +5,7 @@
  */
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
-import { pickWine, pickWineWithHonesty, getCurveballs, type QuizAnswers, type Budget, type QuizResult } from "@/data/quizData";
+import { pickWine, pickWineWithHonesty, getCurveballs, detectRegion, type QuizAnswers, type Budget, type QuizResult, type Region } from "@/data/quizData";
 
 const AMBER = "var(--ow-amber)";
 const BG = "var(--ow-bg-base)";
@@ -154,12 +154,18 @@ const QUESTIONS: Q[] = [
 export default function Quiz() {
   const [step, setStep] = useState(-1); // -1 = intro, 0..5 = questions, 6 = result
   const [answers, setAnswers] = useState<Partial<QuizAnswers>>({});
+  // User's home market. Starts from browser locale (which now defaults
+  // to AU per detectRegion), then the AU/NZ toggle chip on the result
+  // page lets them flip. We keep US/UK reachable via the same chip for
+  // completeness but they're de-emphasised — Ownology's audience today
+  // is Aus + Kiwi winemakers.
+  const [region, setRegion] = useState<Region>(() => detectRegion());
 
   const complete = QUESTIONS.every((q) => answers[q.key]);
-  const wine = useMemo(() => (complete ? pickWine(answers as QuizAnswers) : null), [answers, complete]);
+  const wine = useMemo(() => (complete ? pickWine(answers as QuizAnswers, region) : null), [answers, complete, region]);
   const honest: QuizResult | null = useMemo(
-    () => (complete ? pickWineWithHonesty(answers as QuizAnswers) : null),
-    [answers, complete]
+    () => (complete ? pickWineWithHonesty(answers as QuizAnswers, region) : null),
+    [answers, complete, region]
   );
 
   function pick(key: keyof QuizAnswers, value: string) {
@@ -422,8 +428,97 @@ export default function Quiz() {
                   marginBottom: "1.5rem",
                 }}
               >
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center", marginBottom: 10 }}>
+                  <span style={{ fontFamily: SANS, fontSize: "0.68rem", color: LO, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700 }}>
+                    Buying in
+                  </span>
+                  {/* AU + NZ are surfaced first — that's the audience. US /
+                      UK live behind an opt-in reveal so expat / travel
+                      viewers can still get context without polluting the
+                      primary card. */}
+                  {(["AU", "NZ"] as const).map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      data-testid={`quiz-region-${r.toLowerCase()}`}
+                      onClick={() => setRegion(r)}
+                      style={{
+                        padding: "3px 10px",
+                        borderRadius: 999,
+                        border: `1px solid ${region === r ? AMBER : BORDER}`,
+                        background: region === r ? "color-mix(in oklch, var(--ow-amber) 22%, transparent)" : "transparent",
+                        color: region === r ? HI : MID,
+                        fontFamily: SANS,
+                        fontSize: "0.74rem",
+                        fontWeight: region === r ? 700 : 500,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {regionLabel(r)}
+                    </button>
+                  ))}
+                  {(region === "US" || region === "UK") && (
+                    <button
+                      key={region}
+                      type="button"
+                      data-testid={`quiz-region-${region.toLowerCase()}`}
+                      onClick={() => setRegion(region)}
+                      style={{
+                        padding: "3px 10px",
+                        borderRadius: 999,
+                        border: `1px solid ${AMBER}`,
+                        background: "color-mix(in oklch, var(--ow-amber) 22%, transparent)",
+                        color: HI,
+                        fontFamily: SANS,
+                        fontSize: "0.74rem",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {regionLabel(region)}
+                    </button>
+                  )}
+                  <details style={{ display: "inline-block" }}>
+                    <summary
+                      data-testid="quiz-region-more"
+                      style={{
+                        listStyle: "none",
+                        cursor: "pointer",
+                        fontFamily: SANS,
+                        fontSize: "0.72rem",
+                        color: LO,
+                        padding: "3px 8px",
+                      }}
+                    >
+                      travelling?
+                    </summary>
+                    <div style={{ display: "inline-flex", gap: 6, marginLeft: 6 }}>
+                      {(["US", "UK"] as const).map((r) => (
+                        <button
+                          key={r}
+                          type="button"
+                          data-testid={`quiz-region-${r.toLowerCase()}`}
+                          onClick={() => setRegion(r)}
+                          style={{
+                            padding: "3px 10px",
+                            borderRadius: 999,
+                            border: `1px solid ${region === r ? AMBER : BORDER}`,
+                            background: region === r ? "color-mix(in oklch, var(--ow-amber) 22%, transparent)" : "transparent",
+                            color: region === r ? HI : MID,
+                            fontFamily: SANS,
+                            fontSize: "0.74rem",
+                            fontWeight: region === r ? 700 : 500,
+                            cursor: "pointer",
+                          }}
+                        >
+                          {regionLabel(r)}
+                        </button>
+                      ))}
+                    </div>
+                  </details>
+                </div>
                 <p style={{ fontFamily: SANS, fontSize: "0.68rem", color: LO, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700, margin: "0 0 8px" }}>
-                  Buying in {regionLabel(honest.region)} · {availabilityLabel(honest.regionalNote.availability)} · {honest.regionalNote.priceRange}
+                  {availabilityLabel(honest.regionalNote.availability)} · {honest.regionalNote.priceRange}
                 </p>
                 <p style={{ fontFamily: SANS, fontSize: "0.83rem", color: MID, lineHeight: 1.6, margin: 0 }}>
                   {honest.regionalNote.advice}
