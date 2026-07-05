@@ -61,28 +61,33 @@ const QUESTIONS: Q[] = [
     key: "body",
     prompt: "Close your eyes. The wine you love feels like…",
     options: [
-      { emoji: "💧", label: "Water for wine — light, refreshing", value: "light" },
-      { emoji: "🥛", label: "Milk — medium, some weight", value: "medium" },
-      { emoji: "🥃", label: "Cream — full, coating your mouth", value: "full" },
+      // WSET teaching analogy — light/medium/full body taught by asking
+      // students to hold water, milk, then cream in the mouth to feel the
+      // three viscosity levels. Named varieties anchor intent.
+      { emoji: "💧", label: "Water — light-bodied (Pinot Grigio, Beaujolais, light Pinot Noir)", value: "light" },
+      { emoji: "🥛", label: "Milk — medium-bodied (Chianti, dry Riesling, Sangiovese)", value: "medium" },
+      { emoji: "🥃", label: "Cream — full-bodied, coats the palate (Shiraz, oaked Chardonnay, Cabernet)", value: "full" },
     ],
     citation: {
-      text: "Body scaled per WSET SAT (light / medium / full), which ties body to alcohol level (<11% → light, 13.5%+ → full), phenolics, and dry extract. Naked Wines' consumer matcher uses the same three buckets because non-experts recognise them instantly.",
+      text: "Body scale per WSET SAT (light / medium / full), taught with the water-milk-cream mouthfeel test that all Level 1 students practise. Ties to alcohol level (<11% → light, 13.5%+ → full), phenolics, and dry extract. Naked Wines' consumer matcher uses the same three buckets because non-experts recognise them instantly.",
     },
   },
   {
     key: "sweetness",
     prompt: "How dry are we talking?",
     options: [
-      { emoji: "🏜️", label: "Bone dry — nothing sweet at all", value: "bone_dry" },
-      { emoji: "🌾", label: "Barely a hint", value: "hint" },
-      { emoji: "🍯", label: "Off-dry / medium — you can taste it", value: "off_dry" },
+      // WSET SAT residual-sugar bands — every label ties to the numeric g/L
+      // threshold so intent is verifiable, not invented.
+      { emoji: "🏜️", label: "Bone-dry — under 2 g/L (most reds, Chablis, Barossa Shiraz)", value: "bone_dry" },
+      { emoji: "🌾", label: "Dry — up to 12 g/L (dry Riesling, most Sauvignon Blanc)", value: "hint" },
+      { emoji: "🍯", label: "Off-dry / medium — 12–45 g/L (Kabinett Riesling, Vouvray)", value: "off_dry" },
       // Dessert wines in our pool are all curveballs (Sauternes, Port) — kept
       // in the primary pool this would be misleading. Point users at the
       // wildcards reveal instead.
-      { emoji: "🍮", label: "Give me dessert wine (opens wildcards)", value: "sweet" },
+      { emoji: "🍮", label: "Sweet / dessert — 45+ g/L (opens wildcards: Sauternes, Port)", value: "sweet" },
     ],
     citation: {
-      text: "Residual-sugar bands per WSET SAT: bone-dry (<4 g/L), off-dry (4–12 g/L), medium-sweet (12–45 g/L), sweet (>45 g/L). James Halliday uses this same scale throughout the Australian Wine Companion tasting notes.",
+      text: "Residual-sugar bands per WSET SAT: bone-dry (<2 g/L), dry (2–12 g/L), off-dry / medium (12–45 g/L), sweet (>45 g/L). James Halliday uses this same scale throughout the Australian Wine Companion tasting notes.",
     },
   },
   {
