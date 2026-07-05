@@ -138,6 +138,21 @@ export default function AdminContacts() {
       setUrlErr("Paste a URL to fetch from.");
       return;
     }
+    // Search-engine guard — Google/DDG/Bing all bot-detect server fetches
+    // and return CAPTCHAs. Save the user a wasted round-trip.
+    try {
+      const host = new URL(url).hostname.toLowerCase();
+      const searchHosts = [
+        "google.com", "www.google.com", "google.com.au",
+        "duckduckgo.com", "html.duckduckgo.com",
+        "bing.com", "www.bing.com",
+        "search.yahoo.com", "yahoo.com",
+      ];
+      if (searchHosts.some((h) => host === h || host.endsWith(`.${h}`))) {
+        setUrlErr("That's a search-results page — search engines block server-side scrapers with CAPTCHAs. Click through to the actual site (the top result), then paste that URL.");
+        return;
+      }
+    } catch { /* invalid URL — let the server give the error message */ }
     try {
       const result = await parseFromUrlMutation.mutateAsync({ url });
       if (!result.draft || !result.draft.firstName) {
