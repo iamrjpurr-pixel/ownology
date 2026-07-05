@@ -88,6 +88,70 @@ export const ALERTS: DemoAlert[] = [
   },
 ];
 
+/**
+ * ALERT_RESOLUTIONS — what Ownology *does* about each alert, shown as an
+ * inline expanded card in Step 2 after the visitor clicks. Each severity
+ * teaches a different pattern of the product story:
+ *   red   — "drop everything, diagnose, decide, log" (crisis mode)
+ *   amber — "scheduled task added to your day, done" (routine)
+ *   low   — "task queue, weekly cadence, done" (background)
+ *
+ * ctaLabel + branch determine what happens when you click Next. Red follows
+ * the full crisis flow (Steps 3-7). Amber and grey skip straight to Ask
+ * Ownology (Step 5) because there's nothing to diagnose — the action is
+ * defined.
+ */
+export const ALERT_RESOLUTIONS: Record<
+  string,
+  {
+    heading: string;
+    lines: string[];
+    citation?: { source: string; url?: string };
+    ctaLabel: string;
+    branch: "crisis" | "scheduled" | "task_queue";
+  }
+> = {
+  "alert-1": {
+    heading: "Crisis mode",
+    lines: [
+      "Ownology already flagged Tank 7 at 3:47am when the third static Brix reading landed.",
+      "Next 3 minutes: we'll walk you through the vintage log, diagnose the cause (YAN + temp), and pick a repair.",
+    ],
+    citation: {
+      source: "AWRI Fact Sheet 5.7 — Stuck & Sluggish Fermentation",
+      url: "https://www.awri.com.au",
+    },
+    ctaLabel: "Investigate the red alert →",
+    branch: "crisis",
+  },
+  "alert-2": {
+    heading: "Scheduled action",
+    lines: [
+      "MLF endpoint reached (malic < 0.1 g/L is AWRI's completion threshold).",
+      "Ownology has pre-drafted the addition: +30 ppm free SO₂ to Batch 09 within 48h.",
+      "Tap Schedule and it drops into your task list for 5pm today — with the exact grams of KMS to weigh out for the tank volume.",
+    ],
+    citation: {
+      source: "AWRI Fact Sheet 4.1 — Sulfur dioxide use in wine",
+      url: "https://www.awri.com.au",
+    },
+    ctaLabel: "Schedule the SO₂ addition →",
+    branch: "scheduled",
+  },
+  "alert-3": {
+    heading: "Task queue",
+    lines: [
+      "Barrel A3 evaporation rate is normal for our cellar humidity (68%). No urgency.",
+      "Ownology adds this to your weekly task list — it groups with the other 3 barrels due for topping this week so you fill them in one trip.",
+    ],
+    citation: {
+      source: "Halliday Wine Companion — Barrel maintenance chapter",
+    },
+    ctaLabel: "Add topping to task list →",
+    branch: "task_queue",
+  },
+};
+
 /** Chemistry context surfaced when the user clicks the stuck-ferment alert. */
 export const BATCH_04_CONTEXT = {
   tank: "Tank 7 · Semillon · 800L",

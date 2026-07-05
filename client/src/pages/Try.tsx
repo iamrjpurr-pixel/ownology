@@ -19,6 +19,7 @@ import OwnologyLogo from "@/components/OwnologyLogo";
 import {
   WINERY,
   ALERTS,
+  ALERT_RESOLUTIONS,
   BATCH_04_CONTEXT,
   DECISIONS,
   QUICK_ENTRY_DRAFT,
@@ -374,22 +375,22 @@ function Step2Brief({
   onPickAlert: (id: string) => void;
   pickedAlert: string | null;
 }) {
+  const resolution = pickedAlert ? ALERT_RESOLUTIONS[pickedAlert] : null;
   return (
     <StepCard
       testid="try-step-2"
       eyebrow="The Cellar Brief · Step 1 of the Daily 10"
       title="This is your morning at 5:30am."
       onNext={onNext}
-      nextLabel="Investigate the red alert →"
-      nextDisabled={pickedAlert !== "alert-1"}
+      nextLabel={resolution?.ctaLabel ?? "Pick an alert to continue →"}
+      nextDisabled={!pickedAlert}
     >
       <p>
         The <strong>Cellar Brief</strong> is Ownology's daily AI summary — one email at 5:30am, one bookmarkable page
         at <code style={mono}>/cellar-brief</code>. Same data, same alerts, same colour language you see here.
       </p>
       <p style={{ marginTop: "0.75rem" }}>
-        Three alerts this morning. Colour tells you severity. Click the <strong style={{ color: "oklch(0.62 0.20 25)" }}>red</strong> one —
-        that's the one that damages wine if you ignore it.
+        Three alerts this morning. Colour tells you severity. Click any one — Ownology handles each differently, and we'll show you how.
       </p>
       <div style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
         {ALERTS.map((alert) => {
@@ -453,14 +454,36 @@ function Step2Brief({
         · and 9 more batches quietly doing their thing — no alerts today.
       </p>
 
-      {pickedAlert && pickedAlert !== "alert-1" && (
-        <p
-          data-testid="try-step-2-hint"
-          style={{ marginTop: "1rem", fontSize: "0.8rem", color: TEXT_LO, fontStyle: "italic" }}
+      {/* Per-severity resolution card — inline expansion after picking any
+          alert. Teaches the prospect the actual severity-differentiated
+          handling: crisis / scheduled / task-queue. Grounded citations
+          (AWRI, Halliday) build credibility. */}
+      {resolution && (
+        <div
+          data-testid={`try-alert-resolution-${pickedAlert}`}
+          style={{
+            marginTop: "1.4rem",
+            padding: "1rem 1.15rem",
+            background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)",
+            border: `1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)`,
+            borderRadius: 4,
+            fontFamily: "'Lato', sans-serif",
+          }}
         >
-          That one can wait until after coffee. Pick the red alert — the stuck ferment. Every hour we don't act, it gets
-          worse.
-        </p>
+          <p style={{ margin: 0, fontSize: "0.68rem", color: AMBER, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700 }}>
+            {resolution.heading}
+          </p>
+          {resolution.lines.map((line, i) => (
+            <p key={i} style={{ margin: "8px 0 0", fontSize: "0.85rem", color: TEXT_MID, lineHeight: 1.55 }}>
+              {line}
+            </p>
+          ))}
+          {resolution.citation && (
+            <p style={{ margin: "10px 0 0", fontSize: "0.72rem", color: TEXT_LO, fontStyle: "italic" }}>
+              Source: {resolution.citation.source}
+            </p>
+          )}
+        </div>
       )}
     </StepCard>
   );
@@ -1369,6 +1392,18 @@ export default function Try() {
 
   const goNext = useCallback(() => {
     setStep((s) => {
+      // Alert-branching (C3): amber (scheduled) and low (task_queue) alerts
+      // skip the crisis-diagnose + quick-entry crisis flow (Steps 3 + 4)
+      // because there's nothing to diagnose — the action is pre-defined.
+      // They land straight in Ask Ownology (Step 5) so the prospect still
+      // sees the AI-conversation part of the story. Red alert follows the
+      // full 7-step crisis flow.
+      if (s === 2 && pickedAlert) {
+        const res = ALERT_RESOLUTIONS[pickedAlert];
+        if (res && res.branch !== "crisis") {
+          return 5; // jump to Ask Ownology
+        }
+      }
       const next = Math.min(TOTAL_STEPS, s + 1);
       // If they hit the final step, clear resume state so a fresh visit
       // doesn't put them straight into the CTA screen.
@@ -1378,7 +1413,7 @@ export default function Try() {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, []);
+  }, [pickedAlert]);
 
   const onPickDecision = useCallback((key: string) => {
     const found = DECISIONS.find((d) => d.key === key) ?? null;
