@@ -811,6 +811,45 @@ Return ONLY the requested JSON — no prose, no explanation. Use null for any fi
       return { ok: true };
     }),
 
+  /** OWNER — update the winery on an existing contact via inline
+   *  click-to-edit on the contact row. Empty string clears the field. */
+  setWinery: ownerProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+        winery: z.string().max(200),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const value = input.winery.trim() || null;
+      await db
+        .update(schema.outreachContacts)
+        .set({ winery: value })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true };
+    }),
+
+  /** OWNER — update the mobile on an existing contact via inline
+   *  click-to-edit. Runs the same AU normalisation as create() so
+   *  "0412 345 678" and "+61 412 345 678" store as one canonical
+   *  format. Empty string clears the field. */
+  setMobile: ownerProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+        mobileAu: z.string().max(30),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const raw = input.mobileAu.trim();
+      const value = raw.length > 0 ? normaliseMobile(raw) : null;
+      await db
+        .update(schema.outreachContacts)
+        .set({ mobileAu: value })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true, mobileAu: value };
+    }),
+
   /** OWNER — update the private notes on an existing contact.
    *  Notes are the source-of-truth for extra channels (IG-personal,
    *  LinkedIn, Email, Web, Addr) rendered as chips on the contact row. */

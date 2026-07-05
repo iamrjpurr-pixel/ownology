@@ -104,6 +104,8 @@ export default function AdminContacts() {
   const setSmsDraftMutation = trpc.outreach.setSmsDraft.useMutation();
   const setNotesMutation = trpc.outreach.setNotes.useMutation();
   const setNameMutation = trpc.outreach.setName.useMutation();
+  const setWineryMutation = trpc.outreach.setWinery.useMutation();
+  const setMobileMutation = trpc.outreach.setMobile.useMutation();
   const removeMutation = trpc.outreach.remove.useMutation();
 
   const [form, setForm] = useState({
@@ -135,6 +137,13 @@ export default function AdminContacts() {
   const [editingName, setEditingName] = useState<string | null>(null);
   const [nameBuffer, setNameBuffer] = useState<{ firstName: string; lastName: string }>({ firstName: "", lastName: "" });
   const [nameErr, setNameErr] = useState<string | null>(null);
+  // Inline winery + mobile editing — same slug-keyed pattern. Kept as
+  // separate buffers so the operator can bounce between rows without
+  // losing an in-flight edit.
+  const [editingWinery, setEditingWinery] = useState<string | null>(null);
+  const [wineryBuffer, setWineryBuffer] = useState("");
+  const [editingMobile, setEditingMobile] = useState<string | null>(null);
+  const [mobileBuffer, setMobileBuffer] = useState("");
 
   const allContacts = useMemo(() => data?.contacts ?? [], [data]);
   const contacts = useMemo(() => {
@@ -791,39 +800,226 @@ export default function AdminContacts() {
                       </span>
                     </h3>
                   )}
-                  <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)", margin: "2px 0 6px" }}>
-                    {c.winery ?? "—"} · {c.event ?? "—"}
-                  </p>
-                  {/* Mobile — front-and-centre so you can copy or call in one tap.
-                      Falls back to a clear "no mobile" chip so missing numbers
-                      are visually obvious across the pipeline. */}
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
-                    {c.mobileAu ? (
+                  {editingWinery === c.slug ? (
+                    <div
+                      data-testid={`winery-editor-${c.slug}`}
+                      style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center", margin: "4px 0 8px" }}
+                    >
+                      <input
+                        data-testid={`winery-input-${c.slug}`}
+                        autoFocus
+                        value={wineryBuffer}
+                        onChange={(e) => setWineryBuffer(e.target.value)}
+                        placeholder="Winery / business"
+                        style={{
+                          padding: "3px 8px",
+                          borderRadius: 4,
+                          border: "1px solid var(--ow-border)",
+                          background: "var(--ow-bg-card)",
+                          color: "var(--ow-text-mid)",
+                          fontFamily: "'Lato',sans-serif",
+                          fontSize: "0.82rem",
+                          minWidth: 220,
+                        }}
+                      />
                       <button
                         type="button"
-                        data-testid={`mobile-chip-${c.slug}`}
-                        onClick={() => copy(c.slug, "url", c.mobileAu!)}
-                        title="Tap to copy · long-press on mobile to call"
+                        data-testid={`winery-save-${c.slug}`}
+                        disabled={setWineryMutation.isPending}
+                        onClick={() =>
+                          setWineryMutation.mutate(
+                            { slug: c.slug, winery: wineryBuffer },
+                            {
+                              onSuccess: () => {
+                                setEditingWinery(null);
+                                utils.outreach.list.invalidate();
+                              },
+                            }
+                          )
+                        }
                         style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: 6,
-                          padding: "0.28rem 0.6rem",
-                          background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)",
-                          border: "1px solid color-mix(in oklch, var(--ow-amber) 45%, transparent)",
+                          padding: "3px 10px",
                           borderRadius: 4,
-                          color: "var(--ow-text-hi)",
-                          fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-                          fontSize: "0.86rem",
+                          border: "1px solid var(--ow-amber)",
+                          background: "var(--ow-amber)",
+                          color: "#111",
+                          fontFamily: "'Lato',sans-serif",
+                          fontSize: "0.74rem",
                           fontWeight: 600,
                           cursor: "pointer",
                         }}
                       >
-                        📱 {c.mobileAu}
+                        {setWineryMutation.isPending ? "Saving…" : "Save"}
                       </button>
+                      <button
+                        type="button"
+                        data-testid={`winery-cancel-${c.slug}`}
+                        onClick={() => setEditingWinery(null)}
+                        style={{
+                          padding: "3px 10px",
+                          borderRadius: 4,
+                          border: "1px solid var(--ow-border)",
+                          background: "transparent",
+                          color: "var(--ow-text-mid)",
+                          fontFamily: "'Lato',sans-serif",
+                          fontSize: "0.74rem",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <p
+                      data-testid={`contact-winery-${c.slug}`}
+                      onClick={() => {
+                        setEditingWinery(c.slug);
+                        setWineryBuffer(c.winery ?? "");
+                      }}
+                      title="Click to edit winery"
+                      style={{
+                        fontFamily: "'Lato',sans-serif",
+                        fontSize: "0.78rem",
+                        color: "var(--ow-text-lo)",
+                        margin: "2px 0 6px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {c.winery ?? "—"} · {c.event ?? "—"}
+                    </p>
+                  )}
+                  {/* Mobile — front-and-centre so you can copy or call in one tap.
+                      Falls back to a clear "no mobile" chip so missing numbers
+                      are visually obvious across the pipeline. */}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+                    {editingMobile === c.slug ? (
+                      <div
+                        data-testid={`mobile-editor-${c.slug}`}
+                        style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}
+                      >
+                        <input
+                          data-testid={`mobile-input-${c.slug}`}
+                          autoFocus
+                          value={mobileBuffer}
+                          onChange={(e) => setMobileBuffer(e.target.value)}
+                          placeholder="0412 345 678"
+                          inputMode="tel"
+                          style={{
+                            padding: "3px 8px",
+                            borderRadius: 4,
+                            border: "1px solid var(--ow-border)",
+                            background: "var(--ow-bg-card)",
+                            color: "var(--ow-text-hi)",
+                            fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                            fontSize: "0.86rem",
+                            minWidth: 160,
+                          }}
+                        />
+                        <button
+                          type="button"
+                          data-testid={`mobile-save-${c.slug}`}
+                          disabled={setMobileMutation.isPending}
+                          onClick={() =>
+                            setMobileMutation.mutate(
+                              { slug: c.slug, mobileAu: mobileBuffer },
+                              {
+                                onSuccess: () => {
+                                  setEditingMobile(null);
+                                  utils.outreach.list.invalidate();
+                                },
+                              }
+                            )
+                          }
+                          style={{
+                            padding: "3px 10px",
+                            borderRadius: 4,
+                            border: "1px solid var(--ow-amber)",
+                            background: "var(--ow-amber)",
+                            color: "#111",
+                            fontFamily: "'Lato',sans-serif",
+                            fontSize: "0.74rem",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                          }}
+                        >
+                          {setMobileMutation.isPending ? "Saving…" : "Save"}
+                        </button>
+                        <button
+                          type="button"
+                          data-testid={`mobile-cancel-${c.slug}`}
+                          onClick={() => setEditingMobile(null)}
+                          style={{
+                            padding: "3px 10px",
+                            borderRadius: 4,
+                            border: "1px solid var(--ow-border)",
+                            background: "transparent",
+                            color: "var(--ow-text-mid)",
+                            fontFamily: "'Lato',sans-serif",
+                            fontSize: "0.74rem",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : c.mobileAu ? (
+                      <>
+                        <button
+                          type="button"
+                          data-testid={`mobile-chip-${c.slug}`}
+                          onClick={() => copy(c.slug, "url", c.mobileAu!)}
+                          title="Tap to copy · long-press on mobile to call"
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 6,
+                            padding: "0.28rem 0.6rem",
+                            background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)",
+                            border: "1px solid color-mix(in oklch, var(--ow-amber) 45%, transparent)",
+                            borderRadius: 4,
+                            color: "var(--ow-text-hi)",
+                            fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                            fontSize: "0.86rem",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                          }}
+                        >
+                          📱 {c.mobileAu}
+                        </button>
+                        <button
+                          type="button"
+                          data-testid={`edit-mobile-btn-${c.slug}`}
+                          onClick={() => {
+                            setEditingMobile(c.slug);
+                            setMobileBuffer(c.mobileAu ?? "");
+                          }}
+                          title="Edit mobile"
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
+                            padding: "0.28rem 0.5rem",
+                            background: "transparent",
+                            border: "1px dashed var(--ow-border)",
+                            borderRadius: 4,
+                            color: "var(--ow-text-lo)",
+                            fontFamily: "'Lato',sans-serif",
+                            fontSize: "0.72rem",
+                            cursor: "pointer",
+                          }}
+                        >
+                          ✏️
+                        </button>
+                      </>
                     ) : (
-                      <span
+                      <button
+                        type="button"
                         data-testid={`mobile-missing-${c.slug}`}
+                        onClick={() => {
+                          setEditingMobile(c.slug);
+                          setMobileBuffer("");
+                        }}
+                        title="Click to add a mobile number"
                         style={{
                           display: "inline-block",
                           padding: "0.28rem 0.6rem",
@@ -834,10 +1030,11 @@ export default function AdminContacts() {
                           fontFamily: "'Lato',sans-serif",
                           fontSize: "0.75rem",
                           fontStyle: "italic",
+                          cursor: "pointer",
                         }}
                       >
-                        no mobile yet
-                      </span>
+                        + add mobile
+                      </button>
                     )}
                     {(() => {
                       const ch = extractChannels(c.notes);
