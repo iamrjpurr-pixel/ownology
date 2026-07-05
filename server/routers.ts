@@ -10,6 +10,7 @@ import { pricingRouter } from "./routers/pricing.js";
 import { outreachRouter } from "./routers/outreach.js";
 import { themesRouter } from "./routers/themes.js";
 import { quizRouter } from "./routers/quiz.js";
+import { producersRouter } from "./routers/producers.js";
 import { wineryRouter } from "./routers/winery.js";
 import { cellarBriefRouter } from "./routers/cellarBrief.js";
 import { referralsRouter } from "./routers/referrals.js";
@@ -1816,6 +1817,7 @@ export const appRouter = router({
   outreach: outreachRouter,
   themes: themesRouter,
   quiz: quizRouter,
+  producers: producersRouter,
   winery: wineryRouter,
   cellarBrief: cellarBriefRouter,
   referrals: referralsRouter,

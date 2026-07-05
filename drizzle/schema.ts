@@ -1469,3 +1469,77 @@ export const quizPicks = mysqlTable(
     index("qp_session_idx").on(t.sessionId),
   ]
 );
+
+
+/**
+ * gate_events — audit log for the shared-password wall (S3).
+ * One row per verify attempt (success or fail) + one per rate-limit block.
+ * Powers /admin/gate-log so the operator can spot brute-force attempts and
+ * see legitimate team-member sign-ins.
+ */
+export const gateEvents = mysqlTable(
+  "gate_events",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    kind: varchar("kind", { length: 24 }).notNull(), // "success" | "fail" | "rate_limited" | "logout" | "ip_allowlisted"
+    ip: varchar("ip", { length: 64 }).notNull(),
+    userAgent: varchar("user_agent", { length: 300 }),
+    path: varchar("path", { length: 300 }),
+    occurredAt: bigint("occurred_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("ge_occurred_idx").on(t.occurredAt),
+    index("ge_kind_idx").on(t.kind),
+    index("ge_ip_idx").on(t.ip),
+  ]
+);
+
+/**
+ * quiz_leads — email captured post-quiz (A5). Anonymous → known lead.
+ */
+export const quizLeads = mysqlTable(
+  "quiz_leads",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    sessionId: varchar("session_id", { length: 64 }).notNull(),
+    email: varchar("email", { length: 200 }).notNull(),
+    firstName: varchar("first_name", { length: 80 }),
+    winery: varchar("winery", { length: 120 }),
+    winnerSlug: varchar("winner_slug", { length: 80 }),
+    region: varchar("region", { length: 8 }),
+    capturedAt: bigint("captured_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("ql_captured_idx").on(t.capturedAt),
+    index("ql_email_idx").on(t.email),
+  ]
+);
+
+/**
+ * wine_producers — the AU + NZ winery directory foundation (A2 stub).
+ * Table exists so future CSV imports drop straight in.
+ */
+export const wineProducers = mysqlTable(
+  "wine_producers",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    name: varchar("name", { length: 200 }).notNull(),
+    country: varchar("country", { length: 4 }).notNull(),
+    region: varchar("region", { length: 120 }),
+    website: varchar("website", { length: 300 }),
+    email: varchar("email", { length: 200 }),
+    contactName: varchar("contact_name", { length: 120 }),
+    contactRole: varchar("contact_role", { length: 120 }),
+    sizeBracket: varchar("size_bracket", { length: 24 }),
+    phase1Source: varchar("phase1_source", { length: 60 }),
+    lastTouchedAt: bigint("last_touched_at", { mode: "number" }),
+    touchCount: int("touch_count").notNull().default(0),
+    outreachStatus: varchar("outreach_status", { length: 24 }).notNull().default("untouched"),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("wp_country_idx").on(t.country),
+    index("wp_region_idx").on(t.region),
+    index("wp_outreach_idx").on(t.outreachStatus),
+  ]
+);

@@ -612,6 +612,19 @@ export default function Quiz() {
               </Link>
             </div>
 
+            {/* ── Lead capture (A5) ────────────────────────────────────────
+                Anonymous quiz completion → known lead. Deliberately soft:
+                one email field, everything else optional. Placed below the
+                primary CTA so it acts as a secondary hook for the visitor
+                who's not ready to click through to /pricing yet. */}
+            {complete && wine && (
+              <QuizLeadCapture
+                sessionId={sessionIdRef.current}
+                winnerSlug={wine.slug}
+                region={region}
+              />
+            )}
+
             {/* ── Curveballs — wildcards reveal ─────────────────────────
                 A delight-surprise for the adventurous. Rosé, sparkling,
                 dessert, fortified, and vermouth all live here. Kept out of
@@ -754,6 +767,171 @@ function CurveballReveal({ answers }: { answers: QuizAnswers }) {
         </>
       )}
     </div>
+  );
+}
+
+
+/**
+ * QuizLeadCapture — soft post-quiz email capture.
+ *
+ * One email field + optional first-name + optional winery. On success,
+ * shows a friendly "we'll be in touch" state. Deliberately minimal —
+ * every extra field halves fill rate at this point in the funnel.
+ *
+ * Not a substitute for /pricing conversion; this is the "not ready to
+ * buy yet but interested" bucket. Feeds /admin/quiz-picks → leads tab.
+ */
+function QuizLeadCapture({
+  sessionId,
+  winnerSlug,
+  region,
+}: {
+  sessionId: string;
+  winnerSlug: string;
+  region: string;
+}) {
+  const captureMutation = trpc.quiz.captureLead.useMutation();
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [winery, setWinery] = useState("");
+  const [status, setStatus] = useState<"idle" | "ok" | "err">("idle");
+  const [errMsg, setErrMsg] = useState<string>("");
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) return;
+    try {
+      await captureMutation.mutateAsync({
+        sessionId,
+        email: email.trim(),
+        firstName: firstName.trim() || undefined,
+        winery: winery.trim() || undefined,
+        winnerSlug,
+        region,
+      });
+      setStatus("ok");
+    } catch (e2) {
+      setStatus("err");
+      setErrMsg(e2 instanceof Error ? e2.message : "Something went wrong.");
+    }
+  }
+
+  if (status === "ok") {
+    return (
+      <div
+        data-testid="quiz-lead-capture-ok"
+        style={{
+          marginTop: "2rem",
+          padding: "1rem 1.2rem",
+          background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+          border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+          borderRadius: 6,
+          fontFamily: SANS,
+          fontSize: "0.86rem",
+          color: MID,
+          lineHeight: 1.55,
+        }}
+      >
+        Nice — we&apos;ll drop you a hand-written note next week with the exact producers Rich would buy in your region. No spam, no lists — one person, one email.
+      </div>
+    );
+  }
+
+  return (
+    <form
+      data-testid="quiz-lead-capture-form"
+      onSubmit={submit}
+      style={{
+        marginTop: "2rem",
+        padding: "1.2rem 1.2rem 1rem",
+        background: CARD,
+        border: `1px solid ${BORDER}`,
+        borderRadius: 6,
+      }}
+    >
+      <p style={{ fontFamily: SANS, fontSize: "0.68rem", color: LO, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700, margin: "0 0 6px" }}>
+        Not ready to commit?
+      </p>
+      <p style={{ fontFamily: SANS, fontSize: "0.86rem", color: MID, margin: "0 0 12px", lineHeight: 1.5 }}>
+        Drop your email and we&apos;ll send you a one-off note next week — the exact producers Rich would buy this month for the style you just picked. No signup, no drip sequence.
+      </p>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
+        <input
+          data-testid="quiz-lead-firstname"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          placeholder="First name (optional)"
+          style={{
+            padding: "8px 10px",
+            borderRadius: 4,
+            border: `1px solid ${BORDER}`,
+            background: BG,
+            color: HI,
+            fontFamily: SANS,
+            fontSize: "0.86rem",
+          }}
+        />
+        <input
+          data-testid="quiz-lead-winery"
+          value={winery}
+          onChange={(e) => setWinery(e.target.value)}
+          placeholder="Winery (optional)"
+          style={{
+            padding: "8px 10px",
+            borderRadius: 4,
+            border: `1px solid ${BORDER}`,
+            background: BG,
+            color: HI,
+            fontFamily: SANS,
+            fontSize: "0.86rem",
+          }}
+        />
+      </div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <input
+          data-testid="quiz-lead-email"
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@yourwinery.com"
+          style={{
+            flex: 1,
+            minWidth: 220,
+            padding: "8px 10px",
+            borderRadius: 4,
+            border: `1px solid ${BORDER}`,
+            background: BG,
+            color: HI,
+            fontFamily: SANS,
+            fontSize: "0.86rem",
+          }}
+        />
+        <button
+          type="submit"
+          data-testid="quiz-lead-submit"
+          disabled={captureMutation.isPending || !email.trim()}
+          style={{
+            padding: "8px 16px",
+            borderRadius: 4,
+            border: `1px solid ${AMBER}`,
+            background: AMBER,
+            color: "#111",
+            fontFamily: SANS,
+            fontSize: "0.86rem",
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          {captureMutation.isPending ? "Sending…" : "Send me the note →"}
+        </button>
+      </div>
+      {status === "err" && (
+        <p data-testid="quiz-lead-err" style={{ margin: "8px 0 0", color: "#ef4444", fontFamily: SANS, fontSize: "0.75rem" }}>
+          {errMsg}
+        </p>
+      )}
+    </form>
   );
 }
 

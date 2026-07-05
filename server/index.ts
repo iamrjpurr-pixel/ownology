@@ -30,6 +30,8 @@ import {
   checkGateRateLimit,
   recordGateAttempt,
   clientIpOf,
+  isIpAllowlisted,
+  rateLimitCheck,
 } from "./gate.js";
 import { jwtVerify } from "jose";
 import { parse as parseCookies } from "cookie";
@@ -132,6 +134,7 @@ async function adminGate(
   if (!isAdminPage && !isAdminApi && !isExport) return next();
 
   if (isDevBypassActive()) return next();
+  if (isIpAllowlisted(clientIpOf(req))) return next();
   if (checkBasicAuthFallback(req)) return next();
   if (await verifyAdminCookie(req)) return next();
   // Shared-secret password wall (Feb 2026): if the team member unlocked
@@ -170,6 +173,67 @@ async function startServer() {
     res.status(200).json({ status: "ok", uptime: process.uptime() });
   });
 
+  // ── Deep health probe (O2) — checks downstream dependencies. Runs a
+  // quick timeout-bounded ping on each integration and returns per-
+  // service status. Use for post-deploy smoke tests and alerting.
+  app.get("/api/health/deep", async (_req, res) => {
+    const results: Record<string, { ok: boolean; ms?: number; error?: string }> = {};
+    async function timed<T>(name: string, fn: () => Promise<T>): Promise<void> {
+      const start = Date.now();
+      try {
+        await Promise.race([
+          fn(),
+          new Promise((_r, rej) => setTimeout(() => rej(new Error("timeout")), 3000)),
+        ]);
+        results[name] = { ok: true, ms: Date.now() - start };
+      } catch (e) {
+        results[name] = { ok: false, ms: Date.now() - start, error: e instanceof Error ? e.message : String(e) };
+      }
+    }
+    await timed("mysql", async () => {
+      const { db } = await import("./db.js");
+      const { sql } = await import("drizzle-orm");
+      await db.execute(sql`SELECT 1`);
+    });
+    await timed("perplexity_key", async () => {
+      if (!process.env.PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY missing");
+    });
+    await timed("resend_key", async () => {
+      if (!process.env.RESEND_API_KEY) throw new Error("RESEND_API_KEY missing");
+    });
+    await timed("emergent_llm_key", async () => {
+      if (!process.env.EMERGENT_LLM_KEY) throw new Error("EMERGENT_LLM_KEY missing");
+    });
+    await timed("gate_password", async () => {
+      if (!process.env.OWNOLOGY_GATE_PASSWORD) throw new Error("OWNOLOGY_GATE_PASSWORD missing");
+    });
+    const allOk = Object.values(results).every((r) => r.ok);
+    res.status(allOk ? 200 : 503).json({ ok: allOk, services: results });
+  });
+
+  // ── tRPC + scheduled rate limits (S2) ────────────────────────────────
+  // Blanket per-IP throttling to protect the Perplexity + Resend budgets
+  // and the Emergent LLM key from bot loops. Health probes are exempt so
+  // k8s liveness never gets rate-limited.
+  app.use("/api/trpc", (req, res, next) => {
+    const ip = clientIpOf(req);
+    const r = rateLimitCheck("trpc", ip, 60_000, 100); // 100 req/min per IP
+    if (!r.allowed) {
+      res.setHeader("Retry-After", String(Math.ceil((r.retryAfterMs ?? 0) / 1000)));
+      return res.status(429).json({ error: "rate limited" });
+    }
+    next();
+  });
+  app.use("/api/scheduled", (req, res, next) => {
+    const ip = clientIpOf(req);
+    const r = rateLimitCheck("scheduled", ip, 60_000, 20); // 20 req/min per IP
+    if (!r.allowed) {
+      res.setHeader("Retry-After", String(Math.ceil((r.retryAfterMs ?? 0) / 1000)));
+      return res.status(429).json({ error: "rate limited" });
+    }
+    next();
+  });
+
   // ── Admin gate (JWT-role + Basic Auth fallback) ───────────────────────────
   // Verifies `app_session_id` JWT cookie (role=admin) on /admin/* pages and
   // admin-only tRPC endpoints. Legacy Basic Auth still unlocks via env if
@@ -190,8 +254,15 @@ async function startServer() {
   // entirely (existing app_session_id cookie is still respected).
   app.post("/api/gate/verify", express.json(), async (req, res) => {
     const ip = clientIpOf(req);
+    const ua = String(req.headers["user-agent"] || "").slice(0, 300);
     const rate = checkGateRateLimit(ip);
     if (!rate.allowed) {
+      // Log the rate-limit event (S3) — best-effort; never let logging
+      // failures affect the client response.
+      import("./db.js").then(async ({ db }) => {
+        const { sql } = await import("drizzle-orm");
+        await db.execute(sql`INSERT INTO gate_events (kind, ip, user_agent, path, occurred_at) VALUES ('rate_limited', ${ip}, ${ua}, '/api/gate/verify', ${Date.now()})`);
+      }).catch(() => {});
       res.setHeader("Retry-After", String(Math.ceil((rate.retryAfterMs ?? 0) / 1000)));
       return res.status(429).json({ ok: false, error: "Too many attempts. Try again in 15 minutes." });
     }
@@ -204,7 +275,10 @@ async function startServer() {
     const body = req.body as { password?: unknown } | undefined;
     const candidate = typeof body?.password === "string" ? body.password : "";
     if (!candidate || candidate !== expected) {
-      // Deliberately generic — don't reveal whether password was empty vs wrong.
+      import("./db.js").then(async ({ db }) => {
+        const { sql } = await import("drizzle-orm");
+        await db.execute(sql`INSERT INTO gate_events (kind, ip, user_agent, path, occurred_at) VALUES ('fail', ${ip}, ${ua}, '/api/gate/verify', ${Date.now()})`);
+      }).catch(() => {});
       return res.status(401).json({ ok: false, error: "Wrong password." });
     }
     const token = await mintGateToken();
@@ -212,6 +286,10 @@ async function startServer() {
       return res.status(503).json({ ok: false, error: "Gate not configured (JWT_SECRET missing)." });
     }
     setGateCookie(res, token);
+    import("./db.js").then(async ({ db }) => {
+      const { sql } = await import("drizzle-orm");
+      await db.execute(sql`INSERT INTO gate_events (kind, ip, user_agent, path, occurred_at) VALUES ('success', ${ip}, ${ua}, '/api/gate/verify', ${Date.now()})`);
+    }).catch(() => {});
     return res.json({ ok: true });
   });
   app.get("/api/gate/status", async (req, res) => {
@@ -249,7 +327,17 @@ async function startServer() {
 
   // ── Compliance audit trail PDF (regulator-ready export) ─────────────────────
   app.get("/api/compliance/audit-trail.pdf", generateAuditTrailPdf);
-  app.get("/api/compliance/lip-audit-pack.pdf", generateLipAuditPackPdf);
+  // LIP audit pack PDF — regulator-ready export. Gated (O3): only
+  // Google-authenticated users OR password-unlocked visitors can download.
+  // Anonymous requests get bounced to /try like other member pages.
+  app.get("/api/compliance/lip-audit-pack.pdf", async (req, res, next) => {
+    const cookieHeader = req.headers.cookie || "";
+    const cookies = parseCookies(cookieHeader);
+    if (cookies[COOKIE_NAME]) return generateLipAuditPackPdf(req, res, next);
+    if (isIpAllowlisted(clientIpOf(req))) return generateLipAuditPackPdf(req, res, next);
+    if (await verifyGateCookie(req)) return generateLipAuditPackPdf(req, res, next);
+    return res.status(401).json({ error: "auth required — unlock via /try or login" });
+  });
 
   // ── Public, opt-in vanity audit page (per-winery /audit/:slug) ──────────────
   // Privacy-first: 404 unless the winery has toggled publicAuditEnabled=true
@@ -382,6 +470,7 @@ async function startServer() {
     const cookies = parseCookies(cookieHeader);
     const hasSession = Boolean(cookies[COOKIE_NAME]);
     if (hasSession) return next();
+    if (isIpAllowlisted(clientIpOf(req))) return next();
     const hasGate = await verifyGateCookie(req);
     if (hasGate) return next();
     // Anonymous → send to sandbox with a hint we came from a wall
@@ -594,6 +683,58 @@ async function startServer() {
         INDEX qp_picked_at_idx (picked_at),
         INDEX qp_winner_idx (winner_slug),
         INDEX qp_session_idx (session_id)
+      )
+    `);
+    // gate_events (S3) — audit log for the shared-password wall.
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS gate_events (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        kind VARCHAR(24) NOT NULL,
+        ip VARCHAR(64) NOT NULL,
+        user_agent VARCHAR(300),
+        path VARCHAR(300),
+        occurred_at BIGINT NOT NULL,
+        INDEX ge_occurred_idx (occurred_at),
+        INDEX ge_kind_idx (kind),
+        INDEX ge_ip_idx (ip)
+      )
+    `);
+    // quiz_leads (A5) — post-quiz email capture.
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS quiz_leads (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        session_id VARCHAR(64) NOT NULL,
+        email VARCHAR(200) NOT NULL,
+        first_name VARCHAR(80),
+        winery VARCHAR(120),
+        winner_slug VARCHAR(80),
+        region VARCHAR(8),
+        captured_at BIGINT NOT NULL,
+        INDEX ql_captured_idx (captured_at),
+        INDEX ql_email_idx (email)
+      )
+    `);
+    // wine_producers (A2 stub) — AU/NZ winery directory. Populated in a
+    // later session from Wine Australia + NZ Wine public registers.
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS wine_producers (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(200) NOT NULL,
+        country VARCHAR(4) NOT NULL,
+        region VARCHAR(120),
+        website VARCHAR(300),
+        email VARCHAR(200),
+        contact_name VARCHAR(120),
+        contact_role VARCHAR(120),
+        size_bracket VARCHAR(24),
+        phase1_source VARCHAR(60),
+        last_touched_at BIGINT,
+        touch_count INT NOT NULL DEFAULT 0,
+        outreach_status VARCHAR(24) NOT NULL DEFAULT 'untouched',
+        created_at BIGINT NOT NULL,
+        INDEX wp_country_idx (country),
+        INDEX wp_region_idx (region),
+        INDEX wp_outreach_idx (outreach_status)
       )
     `);
     // ── Phase 1 multi-tenant bootstrap ───────────────────────────────────

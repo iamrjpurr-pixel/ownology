@@ -442,6 +442,13 @@ const TOOLS: AdminTool[] = [
     icon: <IconLeads />,
     badge: "Telemetry",
   },
+  {
+    label: "Producers",
+    description: "AU + NZ winery directory — foundation for the 3-touch cold-email engine. Seed 10 real wineries or drop a CSV to build your pipeline.",
+    href: "/admin/producers",
+    icon: <IconLeads />,
+    badge: "Pipeline",
+  },
 ];
 
 export default function Admin() {

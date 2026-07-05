@@ -130,3 +130,48 @@ export function clientIpOf(req: express.Request): string {
   }
   return req.ip || req.socket.remoteAddress || "unknown";
 }
+
+// ─── IP allowlist bypass (S4) ─────────────────────────────────────────────
+// Team members hitting the app from a known IP (home, office) skip the
+// password wall entirely. Set OWNOLOGY_GATE_IP_ALLOWLIST as a comma-
+// separated list of IPs or IP prefixes. Prefix match: "203.0.113." matches
+// 203.0.113.42 etc. Deliberately simple — no CIDR parsing — since the
+// operator manages the list by hand.
+export function isIpAllowlisted(ip: string): boolean {
+  const raw = process.env.OWNOLOGY_GATE_IP_ALLOWLIST;
+  if (!raw) return false;
+  const entries = raw.split(",").map((s) => s.trim()).filter(Boolean);
+  for (const entry of entries) {
+    if (entry === ip) return true;
+    if (entry.endsWith(".") && ip.startsWith(entry)) return true;
+  }
+  return false;
+}
+
+// ─── Generic per-IP rate limiter (S2) ─────────────────────────────────────
+// Reused across /api/gate/verify, /api/trpc/*, /api/scheduled/*. Each call
+// site passes its own bucket name so limits are independent.
+const buckets = new Map<string, { count: number; windowStart: number }>();
+
+/** Check + record one request against a named bucket. Returns { allowed,
+ *  retryAfterMs } and increments the counter on the way through. */
+export function rateLimitCheck(
+  bucket: string,
+  ip: string,
+  windowMs: number,
+  max: number
+): { allowed: boolean; retryAfterMs?: number } {
+  const key = `${bucket}::${ip}`;
+  const now = Date.now();
+  const cur = buckets.get(key);
+  if (!cur || now - cur.windowStart > windowMs) {
+    buckets.set(key, { count: 1, windowStart: now });
+    return { allowed: true };
+  }
+  if (cur.count >= max) {
+    return { allowed: false, retryAfterMs: windowMs - (now - cur.windowStart) };
+  }
+  cur.count += 1;
+  buckets.set(key, cur);
+  return { allowed: true };
+}

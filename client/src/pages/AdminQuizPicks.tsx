@@ -46,6 +46,8 @@ export default function AdminQuizPicks() {
   const [days, setDays] = useState<number>(30);
   const { data: stats, isLoading: statsLoading } = trpc.quiz.stats.useQuery({ days });
   const { data: listData, isLoading: listLoading } = trpc.quiz.list.useQuery({ limit: 100 });
+  const { data: leadsData } = trpc.quiz.leads.useQuery({ limit: 50 });
+  const { data: gateData } = trpc.quiz.gateLog.useQuery({ limit: 50 });
 
   const totalRegion = (stats?.regions ?? []).reduce((sum, r) => sum + r.count, 0);
   const totalWinners = (stats?.winners ?? []).reduce((sum, w) => sum + w.count, 0);
@@ -215,6 +217,80 @@ export default function AdminQuizPicks() {
                       {p.winnerSlug !== p.trueMatchSlug && " · swap"}
                     </Td>
                     <Td>{p.ctaClickedAt ? "✓" : ""}</Td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Section>
+
+      {/* Quiz leads (A5) — email captures from post-result form. */}
+      <Section title="Recent quiz leads">
+        {leadsData && leadsData.leads.length === 0 && <Empty>No email captures yet.</Empty>}
+        {leadsData && leadsData.leads.length > 0 && (
+          <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: SANS, fontSize: "0.82rem" }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--ow-border)" }}>
+                <Th>When</Th>
+                <Th>Email</Th>
+                <Th>Name</Th>
+                <Th>Winery</Th>
+                <Th>Pick</Th>
+                <Th>Region</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {leadsData.leads.map((l) => (
+                <tr key={l.id} data-testid={`admin-quiz-lead-${l.id}`} style={{ borderBottom: "1px solid var(--ow-border)" }}>
+                  <Td>{fmtDate(Number(l.capturedAt))}</Td>
+                  <Td><strong style={{ color: "var(--ow-text-hi)" }}>{l.email}</strong></Td>
+                  <Td>{l.firstName ?? "—"}</Td>
+                  <Td>{l.winery ?? "—"}</Td>
+                  <Td>{l.winnerSlug ?? "—"}</Td>
+                  <Td>{l.region ?? "—"}</Td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </Section>
+
+      {/* Gate audit log (S3) — every unlock attempt. */}
+      <Section title="Gate access log · brute-force watch">
+        {gateData && gateData.topFailingIps.length > 0 && (
+          <div style={{ marginBottom: 12, padding: "8px 12px", background: "color-mix(in oklch, #ef4444 12%, transparent)", border: "1px solid color-mix(in oklch, #ef4444 30%, transparent)", borderRadius: 4 }}>
+            <p style={{ margin: 0, fontFamily: SANS, fontSize: "0.78rem", color: "var(--ow-text-hi)", fontWeight: 700 }}>
+              Top failing IPs (last {gateData.events.length} events):
+            </p>
+            <p style={{ margin: "4px 0 0", fontFamily: "'JetBrains Mono', monospace", fontSize: "0.78rem", color: "var(--ow-text-mid)" }}>
+              {gateData.topFailingIps.map((f) => `${f.ip} (${f.count})`).join(" · ")}
+            </p>
+          </div>
+        )}
+        {gateData && gateData.events.length === 0 && <Empty>No gate events yet.</Empty>}
+        {gateData && gateData.events.length > 0 && (
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: SANS, fontSize: "0.78rem" }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid var(--ow-border)" }}>
+                  <Th>When</Th>
+                  <Th>Kind</Th>
+                  <Th>IP</Th>
+                  <Th>Path</Th>
+                  <Th>User-agent</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {gateData.events.map((e) => (
+                  <tr key={e.id} data-testid={`admin-gate-event-${e.id}`} style={{ borderBottom: "1px solid var(--ow-border)" }}>
+                    <Td>{fmtDate(Number(e.occurredAt))}</Td>
+                    <Td style={{ color: e.kind === "success" ? "#10b981" : e.kind === "fail" || e.kind === "rate_limited" ? "#ef4444" : "var(--ow-text-mid)" }}>
+                      {e.kind}
+                    </Td>
+                    <Td><code style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.72rem" }}>{e.ip}</code></Td>
+                    <Td>{e.path ?? "—"}</Td>
+                    <Td style={{ maxWidth: 300, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.userAgent ?? "—"}</Td>
                   </tr>
                 ))}
               </tbody>

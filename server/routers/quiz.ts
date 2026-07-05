@@ -177,4 +177,72 @@ export const quizRouter = router({
         .limit(limit);
       return { picks: rows };
     }),
+
+  /** PUBLIC — post-quiz email capture (A5). Anonymous quiz completions
+   *  become known leads the operator can follow up with. We keep the
+   *  input tiny — email is required, everything else optional — because
+   *  quiz visitors are 3 taps from bailing and every extra field halves
+   *  the fill rate. */
+  captureLead: publicProcedure
+    .input(
+      z.object({
+        sessionId: z.string().min(6).max(64),
+        email: z.string().email().max(200),
+        firstName: z.string().max(80).optional(),
+        winery: z.string().max(120).optional(),
+        winnerSlug: z.string().max(80).optional(),
+        region: z.string().max(8).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await db.insert(schema.quizLeads).values({
+        sessionId: input.sessionId,
+        email: input.email.trim().toLowerCase(),
+        firstName: input.firstName?.trim() || null,
+        winery: input.winery?.trim() || null,
+        winnerSlug: input.winnerSlug ?? null,
+        region: input.region ?? null,
+        capturedAt: Date.now(),
+      });
+      return { ok: true };
+    }),
+
+  /** OWNER — recent quiz leads for /admin/quiz-picks. */
+  leads: ownerProcedure
+    .input(z.object({ limit: z.number().int().min(1).max(500).default(100) }).optional())
+    .query(async ({ input }) => {
+      const limit = input?.limit ?? 100;
+      const rows = await db
+        .select()
+        .from(schema.quizLeads)
+        .orderBy(desc(schema.quizLeads.capturedAt))
+        .limit(limit);
+      return { leads: rows };
+    }),
+
+  /** OWNER — gate audit log (S3). Piggybacks on the quiz router since
+   *  we're already surfacing telemetry there. Recent gate_events rows,
+   *  newest first, with kind/ip/user-agent/timestamp for /admin views. */
+  gateLog: ownerProcedure
+    .input(z.object({ limit: z.number().int().min(1).max(500).default(100) }).optional())
+    .query(async ({ input }) => {
+      const limit = input?.limit ?? 100;
+      const rows = await db
+        .select()
+        .from(schema.gateEvents)
+        .orderBy(desc(schema.gateEvents.occurredAt))
+        .limit(limit);
+      // Aggregate top attempted IPs so brute-force patterns pop out.
+      const failsByIp = new Map<string, number>();
+      for (const r of rows) {
+        if (r.kind === "fail" || r.kind === "rate_limited") {
+          failsByIp.set(r.ip, (failsByIp.get(r.ip) ?? 0) + 1);
+        }
+      }
+      const topFailingIps = Array.from(failsByIp.entries())
+        .map(([ip, count]) => ({ ip, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+      return { events: rows, topFailingIps };
+    }),
 });

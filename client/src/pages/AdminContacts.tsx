@@ -361,6 +361,12 @@ export default function AdminContacts() {
         <Kpi label="Demo booked" value={stats.booked} testid="contacts-kpi-booked" />
       </div>
 
+      {/* Bulk activation strip — A1. Shows the count of cold contacts
+          with mobile numbers who haven't been SMS'd yet, plus a single
+          "Copy all + mark sent" action that fills the clipboard with a
+          personalised SMS batch and stamps smsSentAt on the whole set. */}
+      <BulkActivateStrip onDone={() => utils.outreach.list.invalidate()} />
+
       {/* A/B CTA stats — book demo vs reply RED */}
       <CtaAbCard />
 
@@ -1632,6 +1638,126 @@ function CtaAbCard() {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+
+/**
+ * BulkActivateStrip — A1 zero-friction activation of un-SMS'd cold
+ * contacts. Fetches the un-activated cold pool (contacts with a mobile,
+ * status='cold', smsSentAt IS NULL). Renders as an inline strip that
+ * disappears when the pool is empty.
+ *
+ * "Copy all" fills the clipboard with a single blob:
+ *   Name  |  Mobile  |  SMS draft
+ * so the operator pastes it into a spreadsheet / bulk-SMS tool. Once
+ * copied, one click marks the whole batch as smsSentAt=now so KPIs
+ * advance and the strip vanishes.
+ *
+ * NOT an automatic outbound engine — we still send SMS via the phone.
+ * This is the "sitting on 25 cold contacts" activation lever.
+ */
+function BulkActivateStrip({ onDone }: { onDone: () => void }) {
+  const { data, isLoading, refetch } = trpc.outreach.unactivatedCold.useQuery(undefined, {
+    refetchOnMount: "always",
+  });
+  const markSent = trpc.outreach.markSmsSentBulk.useMutation();
+  const [copied, setCopied] = useState(false);
+
+  if (isLoading || !data || data.contacts.length === 0) return null;
+
+  const pool = data.contacts;
+
+  async function copyAll() {
+    const rows = pool.map((c) => {
+      const draft = smsDraft({
+        firstName: c.firstName,
+        winery: c.winery,
+        event: null,
+        painPoint: null,
+        slug: c.slug,
+      });
+      return `${c.firstName}${c.lastName ? ` ${c.lastName}` : ""}\t${c.mobileAu}\t${draft}`;
+    });
+    const blob = `Name\tMobile\tSMS draft\n${rows.join("\n")}`;
+    try {
+      await navigator.clipboard.writeText(blob);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2400);
+    } catch {
+      setCopied(false);
+    }
+  }
+
+  async function markAllSent() {
+    await markSent.mutateAsync({ slugs: pool.map((c) => c.slug) });
+    await refetch();
+    onDone();
+  }
+
+  return (
+    <div
+      data-testid="bulk-activate-strip"
+      className="rounded p-4 mb-6"
+      style={{
+        background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
+        border: "1.5px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)",
+      }}
+    >
+      <div className="flex items-baseline justify-between flex-wrap gap-3 mb-2">
+        <div>
+          <p className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-amber)", fontFamily: "'Lato',sans-serif", fontWeight: 700 }}>
+            Bulk activation · {pool.length} cold contacts un-SMS&apos;d
+          </p>
+          <h3 style={{ fontFamily: "'Fraunces',serif", fontSize: "1.15rem", color: "var(--ow-text-hi)", margin: "4px 0 0" }}>
+            The 20-second activation
+          </h3>
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          <button
+            type="button"
+            data-testid="bulk-copy-btn"
+            onClick={copyAll}
+            style={{
+              padding: "6px 14px",
+              borderRadius: 4,
+              border: "1px solid var(--ow-amber)",
+              background: copied ? "color-mix(in oklch, var(--ow-amber) 35%, transparent)" : "var(--ow-amber)",
+              color: "#111",
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.82rem",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            {copied ? "✓ Copied — paste into Messages" : `Copy ${pool.length} SMS drafts →`}
+          </button>
+          <button
+            type="button"
+            data-testid="bulk-mark-sent-btn"
+            disabled={!copied || markSent.isPending}
+            onClick={markAllSent}
+            style={{
+              padding: "6px 14px",
+              borderRadius: 4,
+              border: "1px solid var(--ow-border)",
+              background: "transparent",
+              color: copied ? "var(--ow-text-hi)" : "var(--ow-text-lo)",
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.82rem",
+              fontWeight: 600,
+              cursor: copied ? "pointer" : "not-allowed",
+              opacity: copied ? 1 : 0.55,
+            }}
+          >
+            {markSent.isPending ? "Marking…" : `Mark all ${pool.length} as sent`}
+          </button>
+        </div>
+      </div>
+      <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.82rem", color: "var(--ow-text-mid)", margin: "6px 0 0", lineHeight: 1.5 }}>
+        Click <strong>Copy</strong> to grab Name / Mobile / personalised SMS for all {pool.length} contacts (TSV format — paste straight into Messages or a spreadsheet). After you&apos;ve sent them, click <strong>Mark as sent</strong> to advance the pipeline.
+      </p>
     </div>
   );
 }

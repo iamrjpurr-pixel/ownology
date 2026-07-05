@@ -4,6 +4,22 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Value-engineering batch (Feb 2026, this session) — S+A+C+O+H waves**
+- **S1 tRPC gate**: 100 req/min per IP rate limit on `/api/trpc/*`, 20/min on `/api/scheduled/*`. Blocks bot/brute-force loops from draining Perplexity/Resend budgets.
+- **S2 rate limiter**: Reusable `rateLimitCheck(bucket, ip, windowMs, max)` helper in `server/gate.ts`. Same primitive used by `/api/gate/verify` (5 attempts / 15 min).
+- **S3 gate audit log**: `gate_events` table + logging in `/api/gate/verify` (success / fail / rate_limited). Admin view on `/admin/quiz-picks` shows the last 50 events plus a "top failing IPs" alert card if there are any brute-force patterns.
+- **S4 IP allowlist**: `OWNOLOGY_GATE_IP_ALLOWLIST` env var (comma-separated). Matches skip the wall entirely (both HTML wall and adminGate).
+- **A1 bulk-activate strip**: `/admin/contacts` now shows an amber banner with the count of un-SMS'd cold contacts and a "Copy 25 SMS drafts → Mark 25 as sent" workflow. Backend `outreach.unactivatedCold` + `outreach.markSmsSentBulk`. Currently 25 real contacts primed.
+- **A4 real-time view alert**: `outreach.markViewed` now fires a Resend email to `OPERATOR_ALERT_EMAIL` on first-view. Fire-and-forget; email failures never block the mutation.
+- **A5 post-quiz email capture**: `QuizLeadCapture` component below the quiz result card. `quiz.captureLead` endpoint + `quiz_leads` table + admin view. "Send me the note" CTA — deliberately soft, single email field.
+- **O2 deep health**: `GET /api/health/deep` returns per-service status for MySQL + Perplexity + Resend + Emergent LLM + gate password. Returns 503 if any service is missing.
+- **O3 LIP-audit PDF gate**: `/api/compliance/lip-audit-pack.pdf` now requires session cookie OR gate cookie OR allowlisted IP. Anonymous returns 401.
+- **H2 pytest smoke suite**: `/app/backend/tests/test_smoke.py` — 11 tests covering health, gate flow, tRPC reachability, quiz endpoints, LIP audit gate. All pass locally.
+- **Wine producers table stub (A2 foundation)**: `wine_producers` schema + CREATE TABLE bootstrap ready for the Wine Australia / NZ Wine CSV import next session.
+- **Deferred with clear labels**: A2 (real CSV import — needs the source file), A3 (3-touch Resend engine — needs A2), C1/C2/C3 (`/try` polish — needs 90 min of copy work), H1 (routers.ts split — 60 min refactor), O1 full Sentry SDK (structured logging pattern in place; SDK install later).
+
+
+
 **Inline click-to-edit on contact rows (Feb 2026, this session)**
 - Contact row on `/admin/contacts` now supports one-click inline editing for
   `name` (first + last), `winery`, and `mobile` — no need to open the full

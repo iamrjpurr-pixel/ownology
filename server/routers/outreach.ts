@@ -4,7 +4,7 @@
  * first opened / demo booked timestamps.
  */
 import { z } from "zod";
-import { eq, sql, desc } from "drizzle-orm";
+import { eq, sql, desc, isNull, and } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure } from "../trpc.js";
 import { db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
@@ -175,12 +175,29 @@ export const outreachRouter = router({
       };
     }),
 
-  /** PUBLIC — mark a slug as viewed (called once on landing-page mount). */
+  /** PUBLIC — mark a slug as viewed (called once on landing-page mount).
+   *  On the FIRST view (firstViewedAt was null), fire an alert email to
+   *  the operator via Resend so they can reply while the prospect is
+   *  still on the page. Best-effort — email failures never break the
+   *  view-tracking. Operator email = OPERATOR_ALERT_EMAIL env var,
+   *  falls back to OWNER_EMAIL, silently no-ops if neither set. */
   markViewed: publicProcedure
     .input(z.object({ slug: z.string().min(1).max(80) }))
     .mutation(async ({ input }) => {
       const now = Date.now();
-      // Bump view_count and set first_viewed_at if null.
+      // Read current state so we know if this is the FIRST view.
+      const existing = await db
+        .select({
+          slug: schema.outreachContacts.slug,
+          firstName: schema.outreachContacts.firstName,
+          winery: schema.outreachContacts.winery,
+          mobileAu: schema.outreachContacts.mobileAu,
+          firstViewedAt: schema.outreachContacts.firstViewedAt,
+        })
+        .from(schema.outreachContacts)
+        .where(eq(schema.outreachContacts.slug, input.slug))
+        .limit(1);
+      const isFirstView = existing.length > 0 && !existing[0].firstViewedAt;
       await db
         .update(schema.outreachContacts)
         .set({
@@ -188,6 +205,33 @@ export const outreachRouter = router({
           firstViewedAt: sql`COALESCE(first_viewed_at, ${now})`,
         })
         .where(eq(schema.outreachContacts.slug, input.slug));
+      // A4 — real-time alert. Fire-and-forget; NEVER await inside the
+      // mutation response path so slow SMTP doesn't slow the page load.
+      if (isFirstView && existing.length > 0) {
+        const alertTo = process.env.OPERATOR_ALERT_EMAIL || process.env.OWNER_EMAIL;
+        const resendKey = process.env.RESEND_API_KEY;
+        if (alertTo && resendKey) {
+          const c = existing[0];
+          const previewBase = process.env.PREVIEW_BASE_URL || process.env.PUBLIC_BASE_URL || "https://ownology.ai";
+          const link = `${previewBase}/hi/${c.slug}`;
+          // Best-effort fetch to Resend HTTPS API. Wrapped so any error
+          // (network, auth, quota) is silently swallowed — this is
+          // instrumentation, not a user-facing feature.
+          fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${resendKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              from: process.env.RESEND_FROM || "Ownology Alerts <alerts@ownology.ai>",
+              to: [alertTo],
+              subject: `📡 ${c.firstName || "Prospect"} just opened their link${c.winery ? ` — ${c.winery}` : ""}`,
+              text: `${c.firstName || "A prospect"} from ${c.winery || "an unknown winery"} just opened ${link}.\n\nThey're on the page right now. Reply to their SMS while it's warm.\n\nMobile: ${c.mobileAu || "(no mobile)"}\n\nAdmin: ${previewBase}/admin/contacts`,
+            }),
+          }).catch(() => { /* silent */ });
+        }
+      }
       return { ok: true };
     }),
 
@@ -969,5 +1013,57 @@ Return ONLY the requested JSON — no prose, no explanation. Use null for any fi
         .delete(schema.outreachContacts)
         .where(eq(schema.outreachContacts.slug, input.slug));
       return { ok: true };
+    }),
+
+  /** OWNER — return the un-activated cold contacts (no smsSentAt).
+   *  Powers the "Bulk activation" action on /admin/contacts. Deliberately
+   *  filters to status='cold' AND smsSentAt IS NULL AND mobileAu present
+   *  so the operator can't accidentally re-blast someone already engaged. */
+  unactivatedCold: ownerProcedure.query(async () => {
+    const rows = await db
+      .select({
+        slug: schema.outreachContacts.slug,
+        firstName: schema.outreachContacts.firstName,
+        lastName: schema.outreachContacts.lastName,
+        mobileAu: schema.outreachContacts.mobileAu,
+        winery: schema.outreachContacts.winery,
+      })
+      .from(schema.outreachContacts)
+      .where(
+        and(
+          isNull(schema.outreachContacts.smsSentAt),
+          eq(schema.outreachContacts.status, "cold")
+        )
+      )
+      .orderBy(schema.outreachContacts.firstName);
+    // Only return rows with a mobile — no point flagging contacts without
+    // a number for a bulk SMS blast.
+    return { contacts: rows.filter((r) => r.mobileAu && r.mobileAu.length > 0) };
+  }),
+
+  /** OWNER — mark a whole batch of contacts as smsSentAt=now in one call.
+   *  Client owns the actual SMS sending (via the "Copy" clipboard flow or
+   *  a bulk-Messages export). This endpoint just records the timestamp so
+   *  the KPI counter + pipeline board move forward. */
+  markSmsSentBulk: ownerProcedure
+    .input(z.object({ slugs: z.array(z.string()).min(1).max(200) }))
+    .mutation(async ({ input }) => {
+      const now = Date.now();
+      let count = 0;
+      for (const slug of input.slugs) {
+        const r = await db
+          .update(schema.outreachContacts)
+          .set({ smsSentAt: now })
+          .where(
+            and(
+              eq(schema.outreachContacts.slug, slug),
+              isNull(schema.outreachContacts.smsSentAt)
+            )
+          );
+        // Drizzle returns rowsAffected via the driver — best-effort count.
+        void r;
+        count += 1;
+      }
+      return { ok: true, count };
     }),
 });
