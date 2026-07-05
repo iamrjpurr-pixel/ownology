@@ -22,6 +22,15 @@ import { generateLipAuditPackPdf } from "./lipAuditPackPdf.js";
 import { isRuntimeBypassActive } from "./devBypassRuntime.js";
 import { publicAuditHandler } from "./publicAudit.js";
 import authRouter from "./authRouter.js";
+import {
+  verifyGateCookie,
+  mintGateToken,
+  setGateCookie,
+  clearGateCookie,
+  checkGateRateLimit,
+  recordGateAttempt,
+  clientIpOf,
+} from "./gate.js";
 import { jwtVerify } from "jose";
 import { parse as parseCookies } from "cookie";
 import { COOKIE_NAME } from "../shared/const.js";
@@ -125,6 +134,11 @@ async function adminGate(
   if (isDevBypassActive()) return next();
   if (checkBasicAuthFallback(req)) return next();
   if (await verifyAdminCookie(req)) return next();
+  // Shared-secret password wall (Feb 2026): if the team member unlocked
+  // via /api/gate/verify, treat that as sufficient to view admin pages
+  // and call admin APIs. Not a substitute for the P0 tRPC auth-scope
+  // audit — the wall is a UX fence, not per-user authorisation.
+  if (await verifyGateCookie(req)) return next();
 
   // SPA page → soft redirect to /login with returnPath. API → JSON 401.
   if (isAdminPage) {
@@ -166,6 +180,48 @@ async function startServer() {
   // Mounted BEFORE express.json() because authRouter mounts its own
   // json() per-route to avoid clashing with /api/stripe/webhook raw body.
   app.use("/api/auth", authRouter);
+
+  // ── Gate API (shared-secret password wall) ────────────────────────────────
+  // POST /api/gate/verify {password} → sets `ow_gate` cookie on match.
+  // GET  /api/gate/status              → { unlocked: boolean } for the UI.
+  // POST /api/gate/logout              → clears the cookie.
+  // Rate-limited to 5 attempts / 15 min per IP. Password source of truth
+  // is env var OWNOLOGY_GATE_PASSWORD — leave blank to disable the wall
+  // entirely (existing app_session_id cookie is still respected).
+  app.post("/api/gate/verify", express.json(), async (req, res) => {
+    const ip = clientIpOf(req);
+    const rate = checkGateRateLimit(ip);
+    if (!rate.allowed) {
+      res.setHeader("Retry-After", String(Math.ceil((rate.retryAfterMs ?? 0) / 1000)));
+      return res.status(429).json({ ok: false, error: "Too many attempts. Try again in 15 minutes." });
+    }
+    recordGateAttempt(ip);
+
+    const expected = process.env.OWNOLOGY_GATE_PASSWORD;
+    if (!expected) {
+      return res.status(503).json({ ok: false, error: "Gate not configured. Ask the operator to set OWNOLOGY_GATE_PASSWORD." });
+    }
+    const body = req.body as { password?: unknown } | undefined;
+    const candidate = typeof body?.password === "string" ? body.password : "";
+    if (!candidate || candidate !== expected) {
+      // Deliberately generic — don't reveal whether password was empty vs wrong.
+      return res.status(401).json({ ok: false, error: "Wrong password." });
+    }
+    const token = await mintGateToken();
+    if (!token) {
+      return res.status(503).json({ ok: false, error: "Gate not configured (JWT_SECRET missing)." });
+    }
+    setGateCookie(res, token);
+    return res.json({ ok: true });
+  });
+  app.get("/api/gate/status", async (req, res) => {
+    const unlocked = await verifyGateCookie(req);
+    return res.json({ unlocked });
+  });
+  app.post("/api/gate/logout", (_req, res) => {
+    clearGateCookie(res);
+    return res.json({ ok: true });
+  });
 
   // ── Stripe webhook MUST come before express.json() ──────────────────────────
   app.use("/api/stripe/webhook", express.raw({ type: "application/json" }), (req, res, next) => {
@@ -274,6 +330,7 @@ async function startServer() {
     "/cellar-brief",
     "/cellar-tasks",
     "/cellar-brief.pdf",
+    "/cellar-journal",
     "/quick-entry",
     "/the-press",
     "/free-run/dashboard",
@@ -283,8 +340,21 @@ async function startServer() {
     "/orders",
     "/todo",
     "/roadmap",
+    // Feb 2026 — added when we shipped the shared-secret password wall.
+    // These were leaking to anonymous visitors under the old blocklist:
+    "/import",
+    "/copilot",
+    "/copilot-mockup",
+    "/site-map",
+    "/campaign-metrics",
+    "/build-index",
+    "/vineyard",
+    "/compliance",
+    "/regulations",
+    "/tank-qr",
+    "/today",
   ];
-  app.get(MEMBER_ONLY_PREFIXES.flatMap((p) => (p.endsWith("/") ? [p + "*"] : [p, p + "/*"])), (req, res, next) => {
+  app.get(MEMBER_ONLY_PREFIXES.flatMap((p) => (p.endsWith("/") ? [p + "*"] : [p, p + "/*"])), async (req, res, next) => {
     // Only intercept HTML SPA requests. Assets (JS/CSS/PNG) go through
     // express.static above and won't hit this handler.
     const accept = req.headers.accept || "";
@@ -301,10 +371,19 @@ async function startServer() {
       return res.status(404).send("Not Found");
     }
 
+    // Two paths through the wall:
+    //   1. Google-authenticated user (has app_session_id cookie set by
+    //      /api/auth/exchange) — the real, per-user route.
+    //   2. Shared-secret password unlock (has ow_gate cookie set by
+    //      /api/gate/verify) — the pragmatic bridge for team members
+    //      and trusted testers before we ship full auth.
+    // Either grants entry. Missing both → redirect to /try honeypot.
     const cookieHeader = req.headers.cookie || "";
     const cookies = parseCookies(cookieHeader);
     const hasSession = Boolean(cookies[COOKIE_NAME]);
     if (hasSession) return next();
+    const hasGate = await verifyGateCookie(req);
+    if (hasGate) return next();
     // Anonymous → send to sandbox with a hint we came from a wall
     res.redirect(302, `/try?from=${encodeURIComponent(req.path)}`);
   });

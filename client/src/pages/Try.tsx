@@ -1495,7 +1495,194 @@ export default function Try() {
         </>
       )}
 
+      {/* Team-access password prompt — shared-secret wall for members
+          and trusted testers before we ship full auth. Deliberately
+          quiet: a small text link at the bottom of the page. When the
+          visitor arrived via a MEMBER_ONLY_PREFIXES redirect (raw
+          ?from=), the link is pre-expanded so they don't have to hunt
+          for it. Everyone else gets the discreet collapsed version.
+          Reads the raw ?from param — deliberately NOT coupled to
+          FROM_ROUTE_LABELS (that filter is for the sales banner). */}
+      <TeamAccessPrompt />
+
       <StickyCta />
+    </div>
+  );
+}
+
+/**
+ * TeamAccessPrompt — inline password field for team members / trusted
+ * testers. POSTs to /api/gate/verify; on success sets the ow_gate cookie
+ * and redirects to `?from` (or home if no from param). Deliberately
+ * small + text-only so it doesn't compete with the sales-funnel CTAs.
+ *
+ * Reads the raw `?from` URL param directly — NOT the FROM_ROUTE_LABELS
+ * filter that the sales banner uses. Anyone hitting /try via the wall
+ * (regardless of path) should see the pre-expanded password box.
+ *
+ * NOT a real auth mechanism — see server/gate.ts header. The tRPC
+ * auth-scope audit (P0) is what actually protects data.
+ */
+function TeamAccessPrompt() {
+  // Read raw ?from param — decoupled from FROM_ROUTE_LABELS so ANY
+  // gated-page redirect pre-expands the box.
+  const rawFrom = (() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const p = new URLSearchParams(window.location.search).get("from");
+      // Only accept safe same-origin paths starting with /.
+      if (p && p.startsWith("/") && !p.startsWith("//")) return p;
+      return null;
+    } catch {
+      return null;
+    }
+  })();
+  const [open, setOpen] = useState<boolean>(Boolean(rawFrom));
+  const [password, setPassword] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "err" | "ok">("idle");
+  const [errMsg, setErrMsg] = useState<string>("");
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!password.trim()) return;
+    setStatus("loading");
+    setErrMsg("");
+    try {
+      const res = await fetch("/api/gate/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ password }),
+      });
+      const data: { ok: boolean; error?: string } = await res.json();
+      if (res.ok && data.ok) {
+        setStatus("ok");
+        const dest = rawFrom && rawFrom.startsWith("/") ? rawFrom : "/";
+        window.location.assign(dest);
+        return;
+      }
+      setStatus("err");
+      setErrMsg(data.error || "Wrong password.");
+    } catch {
+      setStatus("err");
+      setErrMsg("Network error. Try again.");
+    }
+  }
+
+  return (
+    <div
+      data-testid="try-team-access"
+      style={{
+        marginTop: "3rem",
+        paddingTop: "1.4rem",
+        borderTop: "1px dashed var(--ow-border)",
+        fontFamily: "'Lato',sans-serif",
+        fontSize: "0.78rem",
+        color: "var(--ow-text-lo)",
+        maxWidth: 560,
+      }}
+    >
+      {!open ? (
+        <button
+          type="button"
+          data-testid="try-team-access-toggle"
+          onClick={() => setOpen(true)}
+          style={{
+            background: "transparent",
+            border: "none",
+            color: "var(--ow-text-lo)",
+            fontFamily: "'Lato',sans-serif",
+            fontSize: "0.76rem",
+            padding: 0,
+            cursor: "pointer",
+            textDecoration: "underline dotted",
+            textUnderlineOffset: 3,
+          }}
+        >
+          Team member? Enter access password →
+        </button>
+      ) : (
+        <form
+          data-testid="try-team-access-form"
+          onSubmit={submit}
+          style={{ display: "flex", flexDirection: "column", gap: 8 }}
+        >
+          <p style={{ margin: 0, color: "var(--ow-text-mid)" }}>
+            {rawFrom ? (
+              <>
+                You reached for <code style={{ background: "color-mix(in oklch, white 4%, transparent)", padding: "1px 6px", borderRadius: 3, fontSize: "0.75rem" }}>{rawFrom}</code>. Enter the team password to unlock.
+              </>
+            ) : (
+              <>Enter the shared team password to unlock member pages.</>
+            )}
+          </p>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+            <input
+              data-testid="try-team-access-input"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              style={{
+                padding: "6px 10px",
+                borderRadius: 4,
+                border: "1px solid var(--ow-border)",
+                background: "var(--ow-bg-card)",
+                color: "var(--ow-text-hi)",
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.85rem",
+                minWidth: 180,
+              }}
+            />
+            <button
+              type="submit"
+              data-testid="try-team-access-submit"
+              disabled={status === "loading" || !password.trim()}
+              style={{
+                padding: "6px 14px",
+                borderRadius: 4,
+                border: "1px solid var(--ow-amber)",
+                background: "var(--ow-amber)",
+                color: "#111",
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.8rem",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              {status === "loading" ? "Checking…" : "Unlock"}
+            </button>
+            <button
+              type="button"
+              data-testid="try-team-access-cancel"
+              onClick={() => {
+                setOpen(false);
+                setPassword("");
+                setStatus("idle");
+                setErrMsg("");
+              }}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "var(--ow-text-lo)",
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.76rem",
+                cursor: "pointer",
+                textDecoration: "underline dotted",
+                textUnderlineOffset: 3,
+              }}
+            >
+              Not me
+            </button>
+          </div>
+          {status === "err" && errMsg && (
+            <p data-testid="try-team-access-err" style={{ margin: 0, color: "#ef4444", fontFamily: "'Lato',sans-serif", fontSize: "0.75rem" }}>
+              {errMsg}
+            </p>
+          )}
+        </form>
+      )}
     </div>
   );
 }
