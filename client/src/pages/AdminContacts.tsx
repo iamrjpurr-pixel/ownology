@@ -83,11 +83,16 @@ export default function AdminContacts() {
   // in the Add form, or the voice recorder mid-recording, the refetch resets
   // component state and looks/feels like the page is "refreshing". Owner
   // manually pulls fresh data via a Refresh button below.
+  // The pipeline is user-driven, small (<200 rows), and low-cost to fetch.
+  // We DO want a refetch every time you land on the page so the KPI counter
+  // reflects reality after adding a contact from another tab / device — the
+  // old "cache for 60s, never refetch on mount" was masking new inserts and
+  // making the counter look stuck.
   const { data, isLoading, refetch } = trpc.outreach.list.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchOnMount: false,
-    staleTime: 60_000, // 1 min — the pipeline changes are user-driven, not real-time
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMount: "always",
+    staleTime: 0,
   });
   const createMutation = trpc.outreach.create.useMutation();
   const parseFromVoiceMutation = trpc.outreach.parseFromVoice.useMutation();
@@ -166,7 +171,12 @@ export default function AdminContacts() {
     try {
       await createMutation.mutateAsync(form);
       setForm({ firstName: "", lastName: "", mobileAu: "", winery: "", event: form.event, painPoint: "", calendlyOverride: form.calendlyOverride, notes: "" });
-      utils.outreach.list.invalidate();
+      // Await the invalidation AND kick an explicit refetch so the KPI
+      // counter + "All (n)" chip update in the same tick as the new row
+      // appears in the list. Previously the KPI could look stuck when a
+      // stale cache served the pre-insert count.
+      await utils.outreach.list.invalidate();
+      await refetch();
     } catch (e2) {
       setErr(e2 instanceof Error ? e2.message : String(e2));
     }
