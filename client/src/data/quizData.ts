@@ -12,8 +12,15 @@ export type Sweetness = "bone_dry" | "hint" | "off_dry" | "sweet";
 export type Grip = "bright" | "grippy" | "soft" | "both";
 export type Age = "young" | "developed" | "old";
 export type Budget = "under_25" | "25_50" | "50_100" | "100_plus";
+/** Hard filter that runs BEFORE palate scoring — eliminates Red/White
+ *  crossovers (the #1 quiz-result WTF). Set on Q1. Curveball wines
+ *  (rosé, sparkling, dessert, fortified, vermouth) are excluded from
+ *  both main pools and only surface via the "wildcards" reveal on the
+ *  result page. */
+export type WineType = "red" | "white" | "curveball";
 
 export type QuizAnswers = {
+  wineType: "red" | "white"; // Q1 — hard filter, no curveball choice at Q1
   fruit: Fruit;
   body: Body;
   sweetness: Sweetness;
@@ -45,6 +52,10 @@ export type Wine = {
   country: string;
   ageWindow: string;
   price: Budget;
+  /** Hard-filter category from Q1. Curveballs (rosé, sparkling, dessert,
+   *  fortified, vermouth) are excluded from the main red/white pool and
+   *  only surface via the "wildcards" reveal on the result page. */
+  wineType: WineType;
   richsPick: string; // 60-120 words, Rich's voice
   gelsNote: string;  // 1 line, technical
   producers: string[];
@@ -69,6 +80,7 @@ export const WINES: Wine[] = [
   {
     slug: "grillo-sicily",
     variety: "Grillo",
+    wineType: "white",
     region: "Western Sicily",
     country: "Italy",
     ageWindow: "4–8 years old",
@@ -82,6 +94,7 @@ export const WINES: Wine[] = [
   {
     slug: "riesling-clare",
     variety: "Riesling",
+    wineType: "white",
     region: "Clare Valley",
     country: "Australia",
     ageWindow: "Current vintage or up to 5 years",
@@ -95,6 +108,7 @@ export const WINES: Wine[] = [
   {
     slug: "chardonnay-adelaide-hills",
     variety: "Chardonnay",
+    wineType: "white",
     region: "Adelaide Hills",
     country: "Australia",
     ageWindow: "2–6 years",
@@ -108,6 +122,7 @@ export const WINES: Wine[] = [
   {
     slug: "sauvignon-blanc-marlborough",
     variety: "Sauvignon Blanc",
+    wineType: "white",
     region: "Marlborough",
     country: "New Zealand",
     ageWindow: "1–2 years, drink young",
@@ -121,6 +136,7 @@ export const WINES: Wine[] = [
   {
     slug: "chenin-blanc-loire",
     variety: "Chenin Blanc",
+    wineType: "white",
     region: "Vouvray, Loire Valley",
     country: "France",
     ageWindow: "5–15 years",
@@ -134,6 +150,7 @@ export const WINES: Wine[] = [
   {
     slug: "pinot-noir-mornington",
     variety: "Pinot Noir",
+    wineType: "red",
     region: "Mornington Peninsula",
     country: "Australia",
     ageWindow: "3–8 years",
@@ -147,6 +164,7 @@ export const WINES: Wine[] = [
   {
     slug: "beaujolais-cru",
     variety: "Gamay (Cru Beaujolais)",
+    wineType: "red",
     region: "Morgon or Fleurie",
     country: "France",
     ageWindow: "2–6 years",
@@ -160,6 +178,7 @@ export const WINES: Wine[] = [
   {
     slug: "grenache-mclaren-vale",
     variety: "Grenache",
+    wineType: "red",
     region: "McLaren Vale",
     country: "Australia",
     ageWindow: "3–8 years",
@@ -173,6 +192,7 @@ export const WINES: Wine[] = [
   {
     slug: "nebbiolo-barolo",
     variety: "Nebbiolo (Barolo)",
+    wineType: "red",
     region: "Piedmont",
     country: "Italy",
     ageWindow: "10–20 years",
@@ -186,6 +206,7 @@ export const WINES: Wine[] = [
   {
     slug: "shiraz-barossa",
     variety: "Shiraz",
+    wineType: "red",
     region: "Barossa Valley",
     country: "Australia",
     ageWindow: "5–15 years",
@@ -199,6 +220,7 @@ export const WINES: Wine[] = [
   {
     slug: "cabernet-coonawarra",
     variety: "Cabernet Sauvignon",
+    wineType: "red",
     region: "Coonawarra",
     country: "Australia",
     ageWindow: "6–18 years",
@@ -212,6 +234,7 @@ export const WINES: Wine[] = [
   {
     slug: "malbec-mendoza",
     variety: "Malbec",
+    wineType: "red",
     region: "Uco Valley, Mendoza",
     country: "Argentina",
     ageWindow: "3–8 years",
@@ -225,6 +248,7 @@ export const WINES: Wine[] = [
   {
     slug: "chianti-classico",
     variety: "Sangiovese (Chianti Classico)",
+    wineType: "red",
     region: "Tuscany",
     country: "Italy",
     ageWindow: "3–10 years",
@@ -238,6 +262,7 @@ export const WINES: Wine[] = [
   {
     slug: "amarone",
     variety: "Corvina blend (Amarone)",
+    wineType: "red",
     region: "Valpolicella",
     country: "Italy",
     ageWindow: "8–20 years",
@@ -251,6 +276,7 @@ export const WINES: Wine[] = [
   {
     slug: "champagne-vintage",
     variety: "Champagne (Vintage)",
+    wineType: "curveball",
     region: "Champagne",
     country: "France",
     ageWindow: "8–15 years",
@@ -264,6 +290,7 @@ export const WINES: Wine[] = [
   {
     slug: "sauternes",
     variety: "Sémillon-Sauvignon (Sauternes)",
+    wineType: "curveball",
     region: "Bordeaux",
     country: "France",
     ageWindow: "10–30 years",
@@ -277,6 +304,7 @@ export const WINES: Wine[] = [
   {
     slug: "vermouth-di-torino",
     variety: "Vermouth di Torino",
+    wineType: "curveball",
     region: "Piedmont",
     country: "Italy",
     ageWindow: "Non-vintage, drink fresh",
@@ -291,6 +319,7 @@ export const WINES: Wine[] = [
   {
     slug: "assyrtiko-santorini",
     variety: "Assyrtiko",
+    wineType: "white",
     region: "Santorini",
     country: "Greece",
     ageWindow: "2–6 years",
@@ -304,6 +333,7 @@ export const WINES: Wine[] = [
   {
     slug: "gewurztraminer-alsace",
     variety: "Gewürztraminer",
+    wineType: "white",
     region: "Alsace",
     country: "France",
     ageWindow: "3–8 years",
@@ -317,6 +347,7 @@ export const WINES: Wine[] = [
   {
     slug: "port-vintage",
     variety: "Port (Vintage)",
+    wineType: "curveball",
     region: "Douro Valley",
     country: "Portugal",
     ageWindow: "20–40 years",
@@ -330,6 +361,7 @@ export const WINES: Wine[] = [
   {
     slug: "prosecco-superiore",
     variety: "Glera (Prosecco Superiore DOCG)",
+    wineType: "curveball",
     region: "Valdobbiadene",
     country: "Italy",
     ageWindow: "1–2 years",
@@ -343,6 +375,7 @@ export const WINES: Wine[] = [
   {
     slug: "syrah-northern-rhone",
     variety: "Syrah",
+    wineType: "red",
     region: "Northern Rhône (Crozes-Hermitage / St-Joseph)",
     country: "France",
     ageWindow: "5–15 years",
@@ -356,6 +389,7 @@ export const WINES: Wine[] = [
   {
     slug: "rose-provence",
     variety: "Grenache-Cinsault Rosé",
+    wineType: "curveball",
     region: "Provence",
     country: "France",
     ageWindow: "Current vintage only",
@@ -369,6 +403,7 @@ export const WINES: Wine[] = [
   {
     slug: "montepulciano-abruzzo",
     variety: "Montepulciano d'Abruzzo",
+    wineType: "red",
     region: "Abruzzo",
     country: "Italy",
     ageWindow: "2–5 years",
@@ -382,6 +417,7 @@ export const WINES: Wine[] = [
   {
     slug: "beaujolais-villages",
     variety: "Gamay (Beaujolais-Villages)",
+    wineType: "red",
     region: "Beaujolais",
     country: "France",
     ageWindow: "1–3 years",
@@ -395,6 +431,7 @@ export const WINES: Wine[] = [
   {
     slug: "pinot-noir-yarra-entry",
     variety: "Pinot Noir (entry-level)",
+    wineType: "red",
     region: "Yarra Valley or Tasmania",
     country: "Australia",
     ageWindow: "1–3 years",
@@ -408,6 +445,7 @@ export const WINES: Wine[] = [
   {
     slug: "burgundy-old-white",
     variety: "Chardonnay (Meursault or Puligny-Montrachet)",
+    wineType: "white",
     region: "Côte de Beaune, Burgundy",
     country: "France",
     ageWindow: "8–15 years",
@@ -507,14 +545,23 @@ function acceptableTiers(budget: Budget): Set<Budget> {
 }
 
 export function pickWine(a: QuizAnswers): Wine {
+  // ── Q1 HARD filter — never cross Red/White boundary ────────────────────
+  // This is the #1 quiz UX fix: someone who says "Red" should NEVER receive
+  // a white wine, even if the remaining palate axes happen to align with
+  // one. Cross-type recommendations were the biggest source of confused
+  // result-page reactions. Curveballs (rosé, sparkling, dessert, vermouth,
+  // fortified) are excluded here entirely — they surface via getCurveballs
+  // on the result page as an opt-in "wildcards" reveal.
+  const byType = WINES.filter((w) => w.wineType === a.wineType);
+
   // HARD budget filter — never suggest above the user's stated tier.
   // This is non-negotiable: if a user says "$25-50", showing them a $100
   // wine is bad advice, not "the best fit". Budget wins over palate.
   const allowed = acceptableTiers(a.budget);
-  const inBudget = WINES.filter((w) => allowed.has(w.price));
+  const inBudget = byType.filter((w) => allowed.has(w.price));
   // If somehow no wines match (shouldn't happen — we always have under_25),
-  // fall back to the full list rather than crash.
-  const pool = inBudget.length > 0 ? inBudget : WINES;
+  // fall back to the by-type list (still respects Red/White) or full list.
+  const pool = inBudget.length > 0 ? inBudget : (byType.length > 0 ? byType : WINES);
   const scored = pool.map((w) => ({ w, s: scoreWine(w, a) }));
   scored.sort((x, y) => y.s - x.s);
   const winner = scored[0].w;
@@ -696,10 +743,13 @@ export function pickWineWithHonesty(a: QuizAnswers, region?: Region): QuizResult
   const r = region ?? detectRegion();
   const winner = pickWine(a);
 
-  // Find the palate-only best (ignore budget). This is the "true match".
-  const allScores = WINES.map((w) => ({ w, s: scoreWine(w, a) }));
+  // Find the palate-only best (ignore budget) — but STAY inside the user's
+  // wineType so we don't narrate "your true match is Champagne" when they
+  // picked Red. This preserves the Q1 hard-filter integrity everywhere.
+  const inType = WINES.filter((w) => w.wineType === a.wineType);
+  const allScores = inType.map((w) => ({ w, s: scoreWine(w, a) }));
   allScores.sort((x, y) => y.s - x.s);
-  const trueMatch = allScores[0].w;
+  const trueMatch = allScores.length > 0 ? allScores[0].w : winner;
 
   const budgetConstrained =
     BUDGET_RANK[trueMatch.price] > BUDGET_RANK[a.budget] && trueMatch.slug !== winner.slug;
@@ -727,5 +777,23 @@ export function pickWineWithHonesty(a: QuizAnswers, region?: Region): QuizResult
   }
 
   return { winner, trueMatch, budgetConstrained, regionallyRare, region: r, regionalNote, honestFraming };
+}
+
+// ─── Curveballs — the "wildcards" reveal on the result page ─────────────
+// Rosé, sparkling, dessert, fortified, and vermouth are excluded from the
+// main Q1 red/white pool so the primary recommendation stays clean and
+// predictable. But they're too interesting to drop entirely — a user who
+// picks Red + light + off-dry + bright + young might genuinely enjoy a
+// Prosecco Superiore, and telling them so is delightful.
+//
+// The result page shows a hidden "Feeling adventurous? Show me the
+// wildcards →" toggle; clicking it reveals the top 3 curveballs ranked
+// by palate score (budget still respected). Zero re-quiz needed.
+export function getCurveballs(a: QuizAnswers, limit = 3): Wine[] {
+  const allowed = acceptableTiers(a.budget);
+  const pool = WINES.filter((w) => w.wineType === "curveball" && allowed.has(w.price));
+  const scored = pool.map((w) => ({ w, s: scoreWine(w, a) }));
+  scored.sort((x, y) => y.s - x.s);
+  return scored.slice(0, limit).map((s) => s.w);
 }
 

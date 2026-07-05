@@ -5,7 +5,7 @@
  */
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
-import { pickWine, pickWineWithHonesty, type QuizAnswers, type Budget, type QuizResult } from "@/data/quizData";
+import { pickWine, pickWineWithHonesty, getCurveballs, type QuizAnswers, type Budget, type QuizResult } from "@/data/quizData";
 
 const AMBER = "var(--ow-amber)";
 const BG = "var(--ow-bg-base)";
@@ -17,43 +17,103 @@ const LO = "var(--ow-text-lo)";
 const SERIF = "'Fraunces', serif";
 const SANS = "'Lato', sans-serif";
 
-type Q = { key: keyof QuizAnswers; prompt: string; options: { emoji: string; label: string; value: string }[] };
+type Citation = {
+  /** Short one-line description shown when the disclosure opens. */
+  text: string;
+};
+
+type Q = {
+  key: keyof QuizAnswers;
+  prompt: string;
+  options: { emoji: string; label: string; value: string }[];
+  /** Optional "About this question" citation shown as a collapsible
+   *  disclosure. Present on the 4 palate questions (Q2-Q5). Skipped on
+   *  Q1 Red/White (self-evident) and Q6 Budget (subjective). */
+  citation?: Citation;
+};
 
 const QUESTIONS: Q[] = [
-  { key: "fruit", prompt: "When you smell a wine, which pulls you in first?", options: [
-    { emoji: "🍒", label: "Bright red fruit — strawberry, cherry, cranberry", value: "red" },
-    { emoji: "🍇", label: "Dark and brooding — blackberry, plum, blueberry", value: "dark" },
-    { emoji: "🍋", label: "Citrus, stone fruit, tropical", value: "citrus" },
-    { emoji: "🍄", label: "Something savoury — earth, mushroom, wet leaves", value: "savoury" },
-  ]},
-  { key: "body", prompt: "Close your eyes. The wine you love feels like…", options: [
-    { emoji: "💧", label: "Water for wine — light, refreshing", value: "light" },
-    { emoji: "🥛", label: "Milk — medium, some weight", value: "medium" },
-    { emoji: "🥃", label: "Cream — full, coating your mouth", value: "full" },
-  ]},
-  { key: "sweetness", prompt: "How dry are we talking?", options: [
-    { emoji: "🏜️", label: "Bone dry — nothing sweet at all", value: "bone_dry" },
-    { emoji: "🌾", label: "Barely a hint", value: "hint" },
-    { emoji: "🍯", label: "Off-dry / medium — you can taste it", value: "off_dry" },
-    { emoji: "🍮", label: "Give me dessert wine", value: "sweet" },
-  ]},
-  { key: "grip", prompt: "A great wine makes your mouth feel…", options: [
-    { emoji: "💦", label: "Watering — bright, salivating, food-friendly", value: "bright" },
-    { emoji: "✋", label: "Grippy — mouth-drying, tea-tannin, structured", value: "grippy" },
-    { emoji: "☁️", label: "Soft — no drying, no puckering, just smooth", value: "soft" },
-    { emoji: "🥊", label: "Both bright and grippy — big red territory", value: "both" },
-  ]},
-  { key: "age", prompt: "You want the wine to taste…", options: [
-    { emoji: "🌱", label: "Just picked — recent vintage, fruity, vibrant", value: "young" },
-    { emoji: "🍁", label: "Some time on it — developed, tertiary notes appearing", value: "developed" },
-    { emoji: "🏛️", label: "Old soul — 10+ years, mushroom, leather, forest floor", value: "old" },
-  ]},
-  { key: "budget", prompt: "Where does this bottle land?", options: [
-    { emoji: "🍕", label: "A Tuesday night — under $25 AUD", value: "under_25" },
-    { emoji: "🍽️", label: "A dinner with friends — $25–50", value: "25_50" },
-    { emoji: "🥂", label: "A moment — $50–100", value: "50_100" },
-    { emoji: "🎁", label: "A big deal — $100+", value: "100_plus" },
-  ]},
+  {
+    key: "wineType",
+    prompt: "Reds or whites tonight?",
+    options: [
+      { emoji: "🍷", label: "Red — anything from a light Pinot to a big Shiraz", value: "red" },
+      { emoji: "🥂", label: "White — bone-dry Riesling all the way to buttery Chardonnay", value: "white" },
+    ],
+  },
+  {
+    key: "fruit",
+    prompt: "When you smell a wine, which pulls you in first?",
+    options: [
+      { emoji: "🍒", label: "Bright red fruit — strawberry, cherry, cranberry", value: "red" },
+      { emoji: "🍇", label: "Dark and brooding — blackberry, plum, blueberry", value: "dark" },
+      { emoji: "🍋", label: "Citrus, stone fruit, tropical", value: "citrus" },
+      { emoji: "🍄", label: "Something savoury — earth, mushroom, wet leaves", value: "savoury" },
+    ],
+    citation: {
+      text: "Aroma-family clustering follows the WSET Systematic Approach to Tasting (SAT) primary-aroma categories, cross-referenced with UC Davis Viticulture & Enology sensory research on varietal aroma compounds.",
+    },
+  },
+  {
+    key: "body",
+    prompt: "Close your eyes. The wine you love feels like…",
+    options: [
+      { emoji: "💧", label: "Water for wine — light, refreshing", value: "light" },
+      { emoji: "🥛", label: "Milk — medium, some weight", value: "medium" },
+      { emoji: "🥃", label: "Cream — full, coating your mouth", value: "full" },
+    ],
+    citation: {
+      text: "Body scaled per WSET SAT (light / medium / full), which ties body to alcohol level (<11% → light, 13.5%+ → full), phenolics, and dry extract. Naked Wines' consumer matcher uses the same three buckets because non-experts recognise them instantly.",
+    },
+  },
+  {
+    key: "sweetness",
+    prompt: "How dry are we talking?",
+    options: [
+      { emoji: "🏜️", label: "Bone dry — nothing sweet at all", value: "bone_dry" },
+      { emoji: "🌾", label: "Barely a hint", value: "hint" },
+      { emoji: "🍯", label: "Off-dry / medium — you can taste it", value: "off_dry" },
+      { emoji: "🍮", label: "Give me dessert wine", value: "sweet" },
+    ],
+    citation: {
+      text: "Residual-sugar bands per WSET SAT: bone-dry (<4 g/L), off-dry (4–12 g/L), medium-sweet (12–45 g/L), sweet (>45 g/L). James Halliday uses this same scale throughout the Australian Wine Companion tasting notes.",
+    },
+  },
+  {
+    key: "grip",
+    prompt: "A great wine makes your mouth feel…",
+    options: [
+      { emoji: "💦", label: "Watering — bright, salivating, food-friendly", value: "bright" },
+      { emoji: "✋", label: "Grippy — mouth-drying, tea-tannin, structured", value: "grippy" },
+      { emoji: "☁️", label: "Soft — no drying, no puckering, just smooth", value: "soft" },
+      { emoji: "🥊", label: "Both bright and grippy — big red territory", value: "both" },
+    ],
+    citation: {
+      text: "Tannin and acidity structure follows WSET SAT (low / medium / high on each axis). Naked Wines simplified the two into consumer-friendly labels — 'bright' (high acid) and 'grippy' (high tannin) — because that's how people describe mouth-feel without a wine vocabulary.",
+    },
+  },
+  {
+    key: "age",
+    prompt: "You want the wine to taste…",
+    options: [
+      { emoji: "🌱", label: "Just picked — recent vintage, fruity, vibrant", value: "young" },
+      { emoji: "🍁", label: "Some time on it — developed, tertiary notes appearing", value: "developed" },
+      { emoji: "🏛️", label: "Old soul — 10+ years, mushroom, leather, forest floor", value: "old" },
+    ],
+    citation: {
+      text: "Development stage per WSET SAT primary / secondary / tertiary aroma classification. James Halliday's cellaring windows (drink-through-year ranges) inform the developed vs. old boundary. UC Davis research on aging-driven aldehyde and sotolon formation underpins the tertiary aroma set.",
+    },
+  },
+  {
+    key: "budget",
+    prompt: "Where does this bottle land?",
+    options: [
+      { emoji: "🍕", label: "A Tuesday night — under $25 AUD", value: "under_25" },
+      { emoji: "🍽️", label: "A dinner with friends — $25–50", value: "25_50" },
+      { emoji: "🥂", label: "A moment — $50–100", value: "50_100" },
+      { emoji: "🎁", label: "A big deal — $100+", value: "100_plus" },
+    ],
+  },
 ];
 
 export default function Quiz() {
@@ -109,12 +169,12 @@ export default function Quiz() {
               There are lots of good wine quizzes on the internet. <strong style={{ color: HI }}>Vivino</strong> knows the market.{" "}
               <strong style={{ color: HI }}>Good Pair Days</strong> ships bottles. <strong style={{ color: HI }}>Naked Wines</strong> funds indie winemakers.
             </p>
-            <p style={{ fontFamily: SANS, fontSize: "1rem", color: MID, lineHeight: 1.65, marginBottom: "1rem" }}>We don't do any of that.</p>
+            <p style={{ fontFamily: SANS, fontSize: "1rem", color: MID, lineHeight: 1.65, marginBottom: "1rem" }}>We don&apos;t do any of that.</p>
             <p style={{ fontFamily: SANS, fontSize: "1rem", color: MID, lineHeight: 1.65, marginBottom: "1rem" }}>
-              I'm <strong style={{ color: HI }}>Rich</strong> — short for Richard, not a lifestyle. Teaching myself to make wine in the Adelaide Hills. My partner <strong style={{ color: HI }}>Gel</strong> — Geraldine — runs the numbers when I get things wrong (which is often).
+              I&apos;m <strong style={{ color: HI }}>Rich</strong> — short for Richard, not a lifestyle. Teaching myself to make wine in the Adelaide Hills. My partner <strong style={{ color: HI }}>Gel</strong> — Geraldine — runs the numbers when I get things wrong (which is often).
             </p>
             <p style={{ fontFamily: SANS, fontSize: "1rem", color: MID, lineHeight: 1.65, marginBottom: "2rem" }}>
-              This quiz gives you <em>our</em> pick. Not an algorithm's. Six questions, one bottle. And if you're curious what it takes to make wine like that — we'll show you at the end.
+              This quiz gives you <em>our</em> pick. Not an algorithm&apos;s. Six questions, one bottle. And if you&apos;re curious what it takes to make wine like that — we&apos;ll show you at the end.
             </p>
             <button data-testid="quiz-start-btn" onClick={() => setStep(0)} style={ctaStyle}>Start the quiz →</button>
           </div>
@@ -161,6 +221,50 @@ export default function Quiz() {
                 </button>
               ))}
             </div>
+
+            {/* Q1 reassurance sub-copy — reduces decision anxiety on the
+                binary Red/White gate without offering a third path. */}
+            {QUESTIONS[step].key === "wineType" && (
+              <p
+                data-testid="quiz-q1-subcopy"
+                style={{ fontFamily: SANS, fontSize: "0.78rem", color: LO, marginTop: "1rem", lineHeight: 1.55 }}
+              >
+                Not sure? Pick the one you had last time — a 15-second retake if it misses.
+                Sparkling, rosé, orange, and dessert wines are curveballs — they&apos;re on the result page as wildcards.
+              </p>
+            )}
+
+            {/* Citation disclosure — collapsed by default. WSET / Naked Wines
+                / Halliday / UC Davis grounding for the four palate axes. */}
+            {QUESTIONS[step].citation && (
+              <details
+                data-testid={`quiz-citation-${QUESTIONS[step].key}`}
+                style={{
+                  marginTop: "1.4rem",
+                  padding: "0.6rem 0.9rem",
+                  border: `1px solid ${BORDER}`,
+                  borderRadius: 4,
+                  background: "color-mix(in oklch, white 2%, transparent)",
+                }}
+              >
+                <summary
+                  style={{
+                    cursor: "pointer",
+                    fontFamily: SANS,
+                    fontSize: "0.74rem",
+                    color: LO,
+                    letterSpacing: "0.06em",
+                    listStyle: "none",
+                  }}
+                >
+                  About this question — how we cluster
+                </summary>
+                <p style={{ fontFamily: SANS, fontSize: "0.82rem", color: MID, lineHeight: 1.65, margin: "0.7rem 0 0.2rem" }}>
+                  {QUESTIONS[step].citation!.text}
+                </p>
+              </details>
+            )}
+
             {step > 0 && (
               <button
                 data-testid="quiz-back-btn"
@@ -271,13 +375,13 @@ export default function Quiz() {
             {/* Bridge CTA — the Trojan horse */}
             <div style={{ background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", border: `1.5px solid ${AMBER}`, borderRadius: 6, padding: "1.4rem 1.4rem 1.2rem", marginBottom: "1.4rem" }}>
               <p style={{ fontFamily: SANS, fontSize: "0.7rem", color: AMBER, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700, margin: "0 0 8px" }}>
-                The winemaker's move
+                The winemaker&apos;s move
               </p>
               <h3 style={{ fontFamily: SERIF, fontSize: "1.4rem", fontWeight: 500, margin: "0 0 8px", lineHeight: 1.25 }}>
-                Curious what it'd take to make one yourself?
+                Curious what it&apos;d take to make one yourself?
               </h3>
               <p style={{ fontFamily: SANS, fontSize: "0.9rem", color: MID, lineHeight: 1.55, margin: "0 0 1rem" }}>
-                Ownology's the tool we built for exactly this. Your first cellar plan, grounded in real winemaking manuals, tailored to the style you just picked.
+                Ownology&apos;s the tool we built for exactly this. Your first cellar plan, grounded in real winemaking manuals, tailored to the style you just picked.
               </p>
               <Link href="/pricing" data-testid="quiz-cta-founding" style={ctaStyle}>
                 See a Founding-Member plan →
@@ -294,6 +398,43 @@ export default function Quiz() {
               >
                 Read the journal
               </Link>
+            </div>
+
+            {/* ── Curveballs — wildcards reveal ─────────────────────────
+                A delight-surprise for the adventurous. Rosé, sparkling,
+                dessert, fortified, and vermouth all live here. Kept out of
+                the main Q1 filter so the primary rec stays predictable. */}
+            {complete && (
+              <CurveballReveal answers={answers as QuizAnswers} />
+            )}
+
+            {/* ── Framework citation footer ─────────────────────────────
+                The credibility payoff. Consolidated at the end so the
+                quiz feels defensible without feeling academic. */}
+            <div
+              data-testid="quiz-citation-footer"
+              style={{
+                marginTop: "2.5rem",
+                paddingTop: "1.2rem",
+                borderTop: `1px solid ${BORDER}`,
+                fontFamily: SANS,
+                fontSize: "0.72rem",
+                color: LO,
+                lineHeight: 1.65,
+              }}
+            >
+              <p style={{ margin: "0 0 0.5rem", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 700, color: MID, fontSize: "0.66rem" }}>
+                Recommendation reasoning grounded in
+              </p>
+              <p style={{ margin: 0 }}>
+                <strong style={{ color: MID }}>WSET SAT</strong> — the industry-standard Systematic Approach to Tasting scales (body, sweetness, tannin, acidity, development).
+                <br />
+                <strong style={{ color: MID }}>Naked Wines consumer matcher</strong> — proven consumer-friendly labels (bright / grippy / soft) that translate expert vocabulary.
+                <br />
+                <strong style={{ color: MID }}>James Halliday</strong> — Australian regional-varietal defaults and cellaring windows.
+                <br />
+                <strong style={{ color: MID }}>UC Davis Viticulture & Enology</strong> — grape chemistry and sensory-research backbone.
+              </p>
             </div>
           </div>
         )}
@@ -328,5 +469,79 @@ function regionLabel(r: string): string {
 
 function availabilityLabel(a: string): string {
   return { easy: "Widely available", moderate: "Moderate availability", hard: "Hard to find", rare: "Rare — worth the hunt" }[a as "easy"|"moderate"|"hard"|"rare"] || "Availability varies";
+}
+
+// ─── CurveballReveal — the "wildcards" delight-surprise ─────────────────
+// Excluded from Q1 to keep the primary rec clean, but too interesting to
+// drop entirely. Collapsed by default. One tap reveals top 3 curveballs
+// matched to the user's palate + budget. Zero re-quiz needed.
+function CurveballReveal({ answers }: { answers: QuizAnswers }) {
+  const [open, setOpen] = useState(false);
+  const curveballs = useMemo(() => getCurveballs(answers, 3), [answers]);
+  if (curveballs.length === 0) return null; // budget too low to show any
+
+  return (
+    <div
+      data-testid="quiz-curveballs"
+      style={{ marginTop: "2rem", padding: "1.2rem 1.3rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 6 }}
+    >
+      {!open ? (
+        <button
+          data-testid="quiz-curveballs-reveal-btn"
+          onClick={() => setOpen(true)}
+          style={{
+            background: "transparent",
+            border: "none",
+            padding: 0,
+            color: HI,
+            fontFamily: SANS,
+            fontSize: "0.92rem",
+            cursor: "pointer",
+            textAlign: "left",
+            width: "100%",
+          }}
+        >
+          <span style={{ fontFamily: SANS, fontSize: "0.66rem", color: AMBER, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700, display: "block", marginBottom: 6 }}>
+            Feeling adventurous?
+          </span>
+          Show me the wildcards →
+          <span style={{ display: "block", fontFamily: SANS, fontSize: "0.76rem", color: LO, lineHeight: 1.55, marginTop: 6 }}>
+            Rosé, sparkling, dessert, fortified, vermouth. Left out of the main rec on purpose — but if you fancy something unexpected, we&apos;ve picked three that match your palate.
+          </span>
+        </button>
+      ) : (
+        <>
+          <p style={{ fontFamily: SANS, fontSize: "0.66rem", color: AMBER, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700, margin: "0 0 12px" }}>
+            The wildcards
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {curveballs.map((w) => (
+              <div
+                key={w.slug}
+                data-testid={`quiz-curveball-${w.slug}`}
+                style={{ paddingBottom: 12, borderBottom: `1px solid ${BORDER}` }}
+              >
+                <p style={{ fontFamily: SERIF, fontSize: "1.1rem", color: HI, margin: "0 0 2px", fontWeight: 500 }}>
+                  {w.variety}
+                </p>
+                <p style={{ fontFamily: SANS, fontSize: "0.78rem", color: LO, margin: "0 0 6px" }}>
+                  {w.region}, {w.country} · {budgetLabel(w.price)}
+                </p>
+                <p style={{ fontFamily: SANS, fontSize: "0.84rem", color: MID, lineHeight: 1.55, margin: 0 }}>
+                  {w.gelsNote}
+                </p>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => setOpen(false)}
+            style={{ marginTop: 10, background: "transparent", border: "none", color: LO, fontFamily: SANS, fontSize: "0.78rem", cursor: "pointer", padding: 0 }}
+          >
+            Hide wildcards
+          </button>
+        </>
+      )}
+    </div>
+  );
 }
 
