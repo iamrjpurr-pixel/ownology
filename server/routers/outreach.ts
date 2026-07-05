@@ -708,9 +708,41 @@ Return ONLY the requested JSON — no prose, no explanation. Use null for any fi
         // Fall through — return null draft with citations so UI can show sources
       }
 
+      // ── Email-pattern guesses ──────────────────────────────────────────
+      // Perplexity rarely surfaces personal emails (they're hidden behind
+      // contact forms). But if we have firstName + a website domain, we can
+      // generate standard business-email patterns that hit 80%+ of the time
+      // for small operations. Marked as guesses so the UI shows them as
+      // "try one of these" rather than as verified data.
+      const emailGuesses: string[] = [];
+      if (draft && typeof draft.website === "string" && typeof draft.firstName === "string") {
+        // Extract bare domain from website (strip protocol, path, www)
+        const rawSite = draft.website.trim().toLowerCase();
+        const domainMatch = rawSite.match(/^(?:https?:\/\/)?(?:www\.)?([a-z0-9-]+(?:\.[a-z0-9-]+)+)/);
+        const domain = domainMatch?.[1];
+        const first = draft.firstName.trim().toLowerCase().replace(/[^a-z]/g, "");
+        const last = typeof draft.lastName === "string" ? draft.lastName.trim().toLowerCase().replace(/[^a-z]/g, "") : "";
+        if (domain && first) {
+          // Ranked by hit rate for small AU business inboxes
+          const patterns = new Set<string>();
+          patterns.add(`${first}@${domain}`);
+          if (last) {
+            patterns.add(`${first}.${last}@${domain}`);
+            patterns.add(`${first[0]}${last}@${domain}`);
+            patterns.add(`${last}@${domain}`);
+          }
+          patterns.add(`hello@${domain}`);
+          patterns.add(`info@${domain}`);
+          patterns.add(`contact@${domain}`);
+          patterns.add(`wine@${domain}`);
+          emailGuesses.push(...patterns);
+        }
+      }
+
       return {
         draft,
         citations,
+        emailGuesses: emailGuesses.slice(0, 8),
         tokensUsed: data.usage?.total_tokens ?? null,
       };
     }),

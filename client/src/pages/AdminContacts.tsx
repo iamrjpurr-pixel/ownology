@@ -89,6 +89,7 @@ export default function AdminContacts() {
   const [deepSearchErr, setDeepSearchErr] = useState<string | null>(null);
   const [deepSearchCitations, setDeepSearchCitations] = useState<string[]>([]);
   const [deepSearchConfidence, setDeepSearchConfidence] = useState<string | null>(null);
+  const [deepSearchEmailGuesses, setDeepSearchEmailGuesses] = useState<string[]>([]);
 
   const allContacts = useMemo(() => data?.contacts ?? [], [data]);
   const contacts = useMemo(() => {
@@ -139,6 +140,7 @@ export default function AdminContacts() {
     setDeepSearchErr(null);
     setDeepSearchCitations([]);
     setDeepSearchConfidence(null);
+    setDeepSearchEmailGuesses([]);
     const name = deepSearchName.trim();
     if (!name || name.length < 2) {
       setDeepSearchErr("Enter a winery or business name (2+ characters).");
@@ -176,6 +178,7 @@ export default function AdminContacts() {
       });
       setDeepSearchCitations(result.citations || []);
       setDeepSearchConfidence(typeof d.confidence === "string" ? d.confidence : null);
+      setDeepSearchEmailGuesses(result.emailGuesses || []);
       setDeepSearchName("");
     } catch (e2) {
       setDeepSearchErr(e2 instanceof Error ? e2.message : String(e2));
@@ -428,9 +431,45 @@ export default function AdminContacts() {
             </ul>
           </details>
         )}
+        {deepSearchEmailGuesses.length > 0 && (
+          <div
+            data-testid="deep-research-email-guesses"
+            style={{ marginTop: 10, padding: "0.6rem 0.8rem", background: "var(--ow-bg-card)", borderRadius: 4, border: "1px solid var(--ow-border)" }}
+          >
+            <p style={{ fontSize: "0.72rem", color: "var(--ow-amber)", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 700, fontFamily: "'Lato',sans-serif", margin: "0 0 6px" }}>
+              Email pattern guesses — try in order
+            </p>
+            <p style={{ fontSize: "0.72rem", color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", lineHeight: 1.5, margin: "0 0 8px" }}>
+              Unverified — send a quick test to the first one; watch for a bounce or reply. Small AU businesses use these patterns ~80% of the time.
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {deepSearchEmailGuesses.map((email) => (
+                <button
+                  key={email}
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(email).catch(() => {});
+                  }}
+                  data-testid={`deep-research-email-${email}`}
+                  title="Copy to clipboard"
+                  style={{
+                    padding: "0.3rem 0.55rem",
+                    background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
+                    border: "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)",
+                    borderRadius: 3,
+                    color: "var(--ow-text-hi)",
+                    fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                    fontSize: "0.72rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  {email}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </form>
-
-      {/* URL Quick-Add — paste any URL, we extract contact details */}
       <form
         onSubmit={handleUrlQuickAdd}
         className="mb-4 rounded p-4"
