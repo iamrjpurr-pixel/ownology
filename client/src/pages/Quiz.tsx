@@ -25,7 +25,7 @@ type Citation = {
 type Q = {
   key: keyof QuizAnswers;
   prompt: string;
-  options: { emoji: string; label: string; value: string; onlyFor?: "red" | "white" }[];
+  options: { emoji: string; label: string; value: string; onlyFor?: "red" | "white"; hoverInfo?: string }[];
   /** Optional "About this question" citation shown as a collapsible
    *  disclosure. Present on the 4 palate questions (Q2-Q5). Skipped on
    *  Q1 Red/White (self-evident) and Q6 Budget (subjective). */
@@ -46,12 +46,16 @@ const QUESTIONS: Q[] = [
     prompt: "When you smell a wine, which pulls you in first?",
     options: [
       // Red-only options — red-fruit and dark-fruit only exist in reds
-      { emoji: "🍒", label: "Bright red fruit — strawberry, cherry, cranberry", value: "red", onlyFor: "red" },
-      { emoji: "🍇", label: "Dark and brooding — blackberry, plum, blueberry", value: "dark", onlyFor: "red" },
+      { emoji: "🍒", label: "Bright red fruit — strawberry, cherry, cranberry", value: "red", onlyFor: "red",
+        hoverInfo: "WSET SAT Level 3 primary-aroma 'red fruit' family. Canonical descriptors: strawberry, cherry, raspberry, cranberry, redcurrant. Signals cool-climate reds: Pinot Noir, Gamay, cool-climate Grenache." },
+      { emoji: "🍇", label: "Dark and brooding — blackberry, plum, blueberry", value: "dark", onlyFor: "red",
+        hoverInfo: "WSET SAT 'black fruit' family. Canonical descriptors: blackberry, blueberry, black plum, cassis. Signals warm-climate reds: Shiraz, Cabernet Sauvignon, Malbec." },
       // White-only — citrus/stone/tropical is a white-wine descriptor
-      { emoji: "🍋", label: "Citrus, stone fruit, tropical", value: "citrus", onlyFor: "white" },
+      { emoji: "🍋", label: "Citrus, stone fruit, tropical", value: "citrus", onlyFor: "white",
+        hoverInfo: "WSET SAT collapses three white-fruit families here — citrus (lemon, grapefruit), stone (peach, apricot), tropical (pineapple, mango). Combining them keeps the quiz snappy; the algorithm still ranks against each variety's specific profile." },
       // Both — savoury / earthy shows up on both sides (Nebbiolo, aged Riesling)
-      { emoji: "🍄", label: "Something savoury — earth, mushroom, wet leaves", value: "savoury" },
+      { emoji: "🍄", label: "Something savoury — earth, mushroom, wet leaves", value: "savoury",
+        hoverInfo: "Halliday-standard descriptor; WSET SAT 'earthy / vegetal / tertiary'. Genuinely applies to both reds (Nebbiolo, aged Pinot) and whites (aged Riesling, Assyrtiko, skin-contact whites)." },
     ],
     citation: {
       text: "Aroma-family clustering follows the WSET Systematic Approach to Tasting (SAT) primary-aroma categories, cross-referenced with UC Davis Viticulture & Enology sensory research on varietal aroma compounds.",
@@ -64,9 +68,12 @@ const QUESTIONS: Q[] = [
       // WSET teaching analogy — light/medium/full body taught by asking
       // students to hold water, milk, then cream in the mouth to feel the
       // three viscosity levels. Named varieties anchor intent.
-      { emoji: "💧", label: "Water — light-bodied (Pinot Grigio, Beaujolais, light Pinot Noir)", value: "light" },
-      { emoji: "🥛", label: "Milk — medium-bodied (Chianti, dry Riesling, Sangiovese)", value: "medium" },
-      { emoji: "🥃", label: "Cream — full-bodied, coats the palate (Shiraz, oaked Chardonnay, Cabernet)", value: "full" },
+      { emoji: "💧", label: "Water — light-bodied (Pinot Grigio, Beaujolais, light Pinot Noir)", value: "light",
+        hoverInfo: "WSET Level 1 teaches body with the water-milk-cream mouthfeel test: hold water in your mouth, then milk, then cream — that's the three viscosity levels. Light-bodied wines feel like water: <11% alcohol typically, low phenolics, low dry-extract." },
+      { emoji: "🥛", label: "Milk — medium-bodied (Chianti, dry Riesling, Sangiovese)", value: "medium",
+        hoverInfo: "Same WSET water-milk-cream test. Medium-bodied wines feel like milk on the palate — noticeable weight without coating. Typically 11.5–13.5% alcohol." },
+      { emoji: "🥃", label: "Cream — full-bodied, coats the palate (Shiraz, oaked Chardonnay, Cabernet)", value: "full",
+        hoverInfo: "Same WSET water-milk-cream test. Full-bodied wines coat the palate like cream — high alcohol (13.5%+), high phenolics, high dry-extract. Typical of warm-climate reds and oaked whites." },
     ],
     citation: {
       text: "Body scale per WSET SAT (light / medium / full), taught with the water-milk-cream mouthfeel test that all Level 1 students practise. Ties to alcohol level (<11% → light, 13.5%+ → full), phenolics, and dry extract. Naked Wines' consumer matcher uses the same three buckets because non-experts recognise them instantly.",
@@ -78,13 +85,17 @@ const QUESTIONS: Q[] = [
     options: [
       // WSET SAT residual-sugar bands — every label ties to the numeric g/L
       // threshold so intent is verifiable, not invented.
-      { emoji: "🏜️", label: "Bone-dry — under 2 g/L (most reds, Chablis, Barossa Shiraz)", value: "bone_dry" },
-      { emoji: "🌾", label: "Dry — up to 12 g/L (dry Riesling, most Sauvignon Blanc)", value: "hint" },
-      { emoji: "🍯", label: "Off-dry / medium — 12–45 g/L (Kabinett Riesling, Vouvray)", value: "off_dry" },
+      { emoji: "🏜️", label: "Bone-dry — under 2 g/L (most reds, Chablis, Barossa Shiraz)", value: "bone_dry",
+        hoverInfo: "WSET SAT 'bone-dry' band: residual sugar under 2 g/L. Every classical dry red and most Old-World whites (Chablis, Sancerre, Barossa Shiraz) sit here. You cannot taste any sweetness." },
+      { emoji: "🌾", label: "Dry — up to 12 g/L (dry Riesling, most Sauvignon Blanc)", value: "hint",
+        hoverInfo: "WSET SAT 'dry' band: residual sugar between 2 and 12 g/L. Balanced by acidity, so sweetness is imperceptible or barely a hint. Includes 'Trocken' Riesling, most New-World Sauvignon Blanc." },
+      { emoji: "🍯", label: "Off-dry / medium — 12–45 g/L (Kabinett Riesling, Vouvray)", value: "off_dry",
+        hoverInfo: "WSET SAT 'off-dry to medium' band: residual sugar between 12 and 45 g/L. Detectable sweetness balanced against acidity. Includes Kabinett Riesling, demi-sec Vouvray, off-dry Chenin Blanc." },
       // Dessert wines in our pool are all curveballs (Sauternes, Port) — kept
       // in the primary pool this would be misleading. Point users at the
       // wildcards reveal instead.
-      { emoji: "🍮", label: "Sweet / dessert — 45+ g/L (opens wildcards: Sauternes, Port)", value: "sweet" },
+      { emoji: "🍮", label: "Sweet / dessert — 45+ g/L (opens wildcards: Sauternes, Port)", value: "sweet",
+        hoverInfo: "WSET SAT 'sweet' band: over 45 g/L residual sugar. All dessert wines (Sauternes, ice-wine, late-harvest) and fortified sweet wines (Port, PX Sherry). In our pool these are all curveballs — picking this opens the wildcards reveal on the result page." },
     ],
     citation: {
       text: "Residual-sugar bands per WSET SAT: bone-dry (<2 g/L), dry (2–12 g/L), off-dry / medium (12–45 g/L), sweet (>45 g/L). James Halliday uses this same scale throughout the Australian Wine Companion tasting notes.",
@@ -96,14 +107,18 @@ const QUESTIONS: Q[] = [
     options: [
       // Bright acid — the primary structural element in whites, also present
       // in light reds (Pinot, Gamay). Shown to both.
-      { emoji: "💦", label: "Watering — bright, salivating, food-friendly", value: "bright" },
+      { emoji: "💦", label: "Watering — bright, salivating, food-friendly", value: "bright",
+        hoverInfo: "Naked Wines consumer-label for WSET SAT 'high acidity'. The saliva response is a physiological signal: your palate is watering to buffer the acid. Classical food-wine trait — Sancerre, Chablis, Barbera, Chianti Classico." },
       // Grippy tannin — a red-wine descriptor. Skin-contact whites can have
       // grip but they're rare enough to skip at Q1-choice level.
-      { emoji: "✋", label: "Grippy — mouth-drying, tea-tannin, structured", value: "grippy", onlyFor: "red" },
+      { emoji: "✋", label: "Grippy — mouth-drying, tea-tannin, structured", value: "grippy", onlyFor: "red",
+        hoverInfo: "Naked Wines consumer-label for WSET SAT 'medium-plus to high tannin'. The mouth-drying feel is tannins binding to salivary proteins — same reaction as strong black tea. Nebbiolo, young Cabernet, tannic Shiraz." },
       // Soft — mainly applies to whites and light reds. Kept universal.
-      { emoji: "☁️", label: "Soft — no drying, no puckering, just smooth", value: "soft" },
+      { emoji: "☁️", label: "Soft — no drying, no puckering, just smooth", value: "soft",
+        hoverInfo: "WSET SAT 'low tannin / medium acidity' territory. No drying, no puckering — wines that feel round and easy. Merlot, oaked Chardonnay, ripe Grenache, Viognier." },
       // Both — explicitly a big-red descriptor. Never applies to whites.
-      { emoji: "🥊", label: "Both bright and grippy — big red territory", value: "both", onlyFor: "red" },
+      { emoji: "🥊", label: "Both bright and grippy — big red territory", value: "both", onlyFor: "red",
+        hoverInfo: "Halliday's shorthand for structural big reds — high acidity AND high tannin together. Old-World classics (Barolo, Chianti Classico Riserva) and structured New-World (Coonawarra Cab, Barossa Shiraz)." },
     ],
     citation: {
       text: "Tannin and acidity structure follows WSET SAT (low / medium / high on each axis). Naked Wines simplified the two into consumer-friendly labels — 'bright' (high acid) and 'grippy' (high tannin) — because that's how people describe mouth-feel without a wine vocabulary.",
@@ -113,9 +128,12 @@ const QUESTIONS: Q[] = [
     key: "age",
     prompt: "You want the wine to taste…",
     options: [
-      { emoji: "🌱", label: "Just picked — recent vintage, fruity, vibrant", value: "young" },
-      { emoji: "🍁", label: "Some time on it — developed, tertiary notes appearing", value: "developed" },
-      { emoji: "🏛️", label: "Old soul — 10+ years, mushroom, leather, forest floor", value: "old" },
+      { emoji: "🌱", label: "Just picked — recent vintage, fruity, vibrant", value: "young",
+        hoverInfo: "WSET SAT 'youthful' — primary aromas dominate. Fresh fruit, floral, herbaceous. Drink within 2 years of vintage. Most New-World wines are designed for this window." },
+      { emoji: "🍁", label: "Some time on it — developed, tertiary notes appearing", value: "developed",
+        hoverInfo: "WSET SAT 'developing' — secondary aromas (yeast, oak, MLF) and early tertiary (nut, dried fruit, honey) alongside remaining primary. 3–8 years typically." },
+      { emoji: "🏛️", label: "Old soul — 10+ years, mushroom, leather, forest floor", value: "old",
+        hoverInfo: "WSET SAT 'fully developed / tertiary'. Primary fruit has faded; tertiary aromas dominate — mushroom, leather, forest floor, tobacco. UC Davis research: driven by sotolon, aldehyde formation, ester hydrolysis. Halliday's canonical 'old soul' language." },
     ],
     citation: {
       text: "Development stage per WSET SAT primary / secondary / tertiary aroma classification. James Halliday's cellaring windows (drink-through-year ranges) inform the developed vs. old boundary. UC Davis research on aging-driven aldehyde and sotolon formation underpins the tertiary aroma set.",
@@ -211,6 +229,7 @@ export default function Quiz() {
                   key={opt.value}
                   data-testid={`quiz-answer-${QUESTIONS[step].key}-${opt.value}`}
                   onClick={() => pick(QUESTIONS[step].key, opt.value)}
+                  title={opt.hoverInfo ?? undefined}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -236,7 +255,28 @@ export default function Quiz() {
                   }}
                 >
                   <span style={{ fontSize: "1.6rem" }}>{opt.emoji}</span>
-                  <span>{opt.label}</span>
+                  <span style={{ flex: 1 }}>{opt.label}</span>
+                  {opt.hoverInfo && (
+                    <span
+                      aria-hidden="true"
+                      title={opt.hoverInfo}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 20,
+                        height: 20,
+                        borderRadius: "50%",
+                        border: `1px solid ${BORDER}`,
+                        color: LO,
+                        fontSize: "0.72rem",
+                        fontFamily: SANS,
+                        flexShrink: 0,
+                      }}
+                    >
+                      ⓘ
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
