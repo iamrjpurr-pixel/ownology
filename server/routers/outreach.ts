@@ -784,6 +784,33 @@ Return ONLY the requested JSON — no prose, no explanation. Use null for any fi
       return { ok: true, cleared: value === null };
     }),
 
+  /** OWNER — update the display name (firstName + optional lastName) on
+   *  an existing contact. Used by the inline pencil-edit UI on each row
+   *  so the operator can quickly correct a name they misheard at an
+   *  event (e.g. "Sally" → "Sally Rainbows") without opening the full
+   *  edit form. Trims both fields; empty lastName is stored as null. */
+  setName: ownerProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+        firstName: z.string().min(1).max(120),
+        lastName: z.string().max(120).nullable().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const firstName = input.firstName.trim();
+      if (!firstName) {
+        throw new Error("First name is required.");
+      }
+      const lastRaw = (input.lastName ?? "").trim();
+      const lastName = lastRaw.length > 0 ? lastRaw : null;
+      await db
+        .update(schema.outreachContacts)
+        .set({ firstName, lastName })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true };
+    }),
+
   /** OWNER — update the private notes on an existing contact.
    *  Notes are the source-of-truth for extra channels (IG-personal,
    *  LinkedIn, Email, Web, Addr) rendered as chips on the contact row. */

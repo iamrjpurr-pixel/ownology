@@ -98,6 +98,7 @@ export default function AdminContacts() {
   const setStatusMutation = trpc.outreach.setStatus.useMutation();
   const setSmsDraftMutation = trpc.outreach.setSmsDraft.useMutation();
   const setNotesMutation = trpc.outreach.setNotes.useMutation();
+  const setNameMutation = trpc.outreach.setName.useMutation();
   const removeMutation = trpc.outreach.remove.useMutation();
 
   const [form, setForm] = useState({
@@ -123,6 +124,12 @@ export default function AdminContacts() {
   const [deepSearchEmailGuesses, setDeepSearchEmailGuesses] = useState<string[]>([]);
   const [editingNotes, setEditingNotes] = useState<string | null>(null); // slug being edited
   const [notesBuffer, setNotesBuffer] = useState("");
+  // Inline name edit — click on the name to quickly fix a spelling or add
+  // a surname captured after the initial event conversation (e.g. "Sally"
+  // → "Sally Rainbows"). Uses same slug-keyed pattern as notes editing.
+  const [editingName, setEditingName] = useState<string | null>(null);
+  const [nameBuffer, setNameBuffer] = useState<{ firstName: string; lastName: string }>({ firstName: "", lastName: "" });
+  const [nameErr, setNameErr] = useState<string | null>(null);
 
   const allContacts = useMemo(() => data?.contacts ?? [], [data]);
   const contacts = useMemo(() => {
@@ -641,9 +648,139 @@ export default function AdminContacts() {
             >
               <div className="flex items-baseline justify-between flex-wrap gap-2 mb-2">
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <h3 style={{ fontFamily: "'Fraunces',serif", fontSize: "1.1rem", color: "var(--ow-text-hi)", margin: 0 }}>
-                    {c.firstName} {c.lastName ?? ""}
-                  </h3>
+                  {editingName === c.slug ? (
+                    <div
+                      data-testid={`name-editor-${c.slug}`}
+                      style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center", marginBottom: 6 }}
+                    >
+                      <input
+                        data-testid={`name-first-input-${c.slug}`}
+                        autoFocus
+                        value={nameBuffer.firstName}
+                        onChange={(e) => setNameBuffer({ ...nameBuffer, firstName: e.target.value })}
+                        placeholder="First name"
+                        style={{
+                          padding: "4px 8px",
+                          borderRadius: 4,
+                          border: "1px solid var(--ow-border)",
+                          background: "var(--ow-bg-card)",
+                          color: "var(--ow-text-hi)",
+                          fontFamily: "'Fraunces',serif",
+                          fontSize: "1rem",
+                          minWidth: 120,
+                        }}
+                      />
+                      <input
+                        data-testid={`name-last-input-${c.slug}`}
+                        value={nameBuffer.lastName}
+                        onChange={(e) => setNameBuffer({ ...nameBuffer, lastName: e.target.value })}
+                        placeholder="Last name (optional)"
+                        style={{
+                          padding: "4px 8px",
+                          borderRadius: 4,
+                          border: "1px solid var(--ow-border)",
+                          background: "var(--ow-bg-card)",
+                          color: "var(--ow-text-hi)",
+                          fontFamily: "'Fraunces',serif",
+                          fontSize: "1rem",
+                          minWidth: 140,
+                        }}
+                      />
+                      <button
+                        type="button"
+                        data-testid={`name-save-${c.slug}`}
+                        disabled={setNameMutation.isPending || !nameBuffer.firstName.trim()}
+                        onClick={() => {
+                          const fn = nameBuffer.firstName.trim();
+                          if (!fn) {
+                            setNameErr("First name is required.");
+                            return;
+                          }
+                          setNameErr(null);
+                          setNameMutation.mutate(
+                            { slug: c.slug, firstName: fn, lastName: nameBuffer.lastName.trim() || null },
+                            {
+                              onSuccess: () => {
+                                setEditingName(null);
+                                utils.outreach.list.invalidate();
+                              },
+                              onError: (e2) => setNameErr(e2.message),
+                            }
+                          );
+                        }}
+                        style={{
+                          padding: "4px 10px",
+                          borderRadius: 4,
+                          border: "1px solid var(--ow-amber)",
+                          background: "var(--ow-amber)",
+                          color: "#111",
+                          fontFamily: "'Lato',sans-serif",
+                          fontSize: "0.78rem",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        {setNameMutation.isPending ? "Saving…" : "Save"}
+                      </button>
+                      <button
+                        type="button"
+                        data-testid={`name-cancel-${c.slug}`}
+                        onClick={() => {
+                          setEditingName(null);
+                          setNameErr(null);
+                        }}
+                        style={{
+                          padding: "4px 10px",
+                          borderRadius: 4,
+                          border: "1px solid var(--ow-border)",
+                          background: "transparent",
+                          color: "var(--ow-text-mid)",
+                          fontFamily: "'Lato',sans-serif",
+                          fontSize: "0.78rem",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Cancel
+                      </button>
+                      {nameErr && (
+                        <span data-testid={`name-err-${c.slug}`} style={{ color: "#ef4444", fontFamily: "'Lato',sans-serif", fontSize: "0.72rem" }}>
+                          {nameErr}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <h3
+                      data-testid={`contact-name-${c.slug}`}
+                      onClick={() => {
+                        setEditingName(c.slug);
+                        setNameBuffer({ firstName: c.firstName ?? "", lastName: c.lastName ?? "" });
+                        setNameErr(null);
+                      }}
+                      title="Click to edit name"
+                      style={{
+                        fontFamily: "'Fraunces',serif",
+                        fontSize: "1.1rem",
+                        color: "var(--ow-text-hi)",
+                        margin: 0,
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                      }}
+                    >
+                      {c.firstName} {c.lastName ?? ""}
+                      <span
+                        aria-hidden
+                        style={{
+                          fontSize: "0.72rem",
+                          color: "var(--ow-text-lo)",
+                          fontFamily: "'Lato',sans-serif",
+                        }}
+                      >
+                        ✏️
+                      </span>
+                    </h3>
+                  )}
                   <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)", margin: "2px 0 6px" }}>
                     {c.winery ?? "—"} · {c.event ?? "—"}
                   </p>
