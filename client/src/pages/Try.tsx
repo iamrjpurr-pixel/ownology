@@ -13,7 +13,8 @@
  *
  * Mounted at /try. Suppressed from SiteFooter to keep the frame clean.
  */
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import {
@@ -777,20 +778,57 @@ function FormRow({ label, children }: { label: string; children: React.ReactNode
 const mono: React.CSSProperties = { fontFamily: "'JetBrains Mono', monospace", fontSize: "0.78rem", background: "oklch(0 0 0 / 0.12)", padding: "0.05rem 0.35rem", borderRadius: 2 };
 const tagStyle: React.CSSProperties = { background: "oklch(from var(--ow-amber) l c h / 0.10)", color: AMBER, padding: "0.15rem 0.5rem", borderRadius: 999, fontSize: "0.7rem", fontFamily: "'Lato', sans-serif", fontWeight: 700 };
 
-// ─── Step 5 — Ask Ownology ──────────────────────────────────────────────
+// ─── Step 5 — Ask Ownology (C2 live LLM) ────────────────────────────────
 function Step5Ask({ onNext }: { onNext: () => void }) {
-  const [asked, setAsked] = useState(false);
+  const [question, setQuestion] = useState<string>(SCRIPTED_QA.question);
+  const [answer, setAnswer] = useState<string | null>(null);
+  const [status, setStatus] = useState<"idle" | "loading" | "done" | "limit" | "err">("idle");
+  const [errMsg, setErrMsg] = useState<string>("");
+  const askMutation = trpc.tutor.sandboxAsk.useMutation();
+  // Persist session id across renders — Ask limit is per session, not per mount.
+  const sessionIdRef = useRef<string>("");
+  if (!sessionIdRef.current && typeof window !== "undefined") {
+    const KEY = "ow-try-session";
+    const existing = window.sessionStorage.getItem(KEY);
+    if (existing) {
+      sessionIdRef.current = existing;
+    } else {
+      const rand = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+      window.sessionStorage.setItem(KEY, rand);
+      sessionIdRef.current = rand;
+    }
+  }
+
+  async function ask() {
+    if (!question.trim() || status === "loading") return;
+    setStatus("loading");
+    setAnswer(null);
+    setErrMsg("");
+    try {
+      const res = await askMutation.mutateAsync({
+        sessionId: sessionIdRef.current,
+        question: question.trim(),
+      });
+      setAnswer(res.answer);
+      setStatus(res.limitReached ? "limit" : res.ok ? "done" : "err");
+      if (!res.ok && !res.limitReached) setErrMsg(res.answer);
+    } catch (e) {
+      setStatus("err");
+      setErrMsg(e instanceof Error ? e.message : "Something went wrong.");
+    }
+  }
+
   return (
     <StepCard
       testid="try-step-5"
-      eyebrow="Ask Ownology"
+      eyebrow="Ask Ownology · live LLM"
       title="Now ask the assistant — it knows your cellar, not just wine in general."
       onNext={onNext}
       nextLabel="Publish today's lesson →"
     >
       <p>
         Ask Ownology answers using YOUR log entries, YOUR chemistry, YOUR batches. Not a generic sommelier chatbot — a
-        winemaker's assistant grounded in your own cellar's history.
+        winemaker's assistant grounded in your own cellar's history. This is a real Claude Sonnet call, not a canned response.
       </p>
 
       <div
@@ -806,35 +844,50 @@ function Step5Ask({ onNext }: { onNext: () => void }) {
         }}
       >
         <p style={{ color: TEXT_LO, fontSize: "0.7rem", letterSpacing: "0.08em", textTransform: "uppercase", margin: 0, marginBottom: "0.5rem" }}>
-          Question
+          Ask about Batch 04 (or anything about this cellar)
         </p>
-        <p style={{ margin: 0, color: TEXT_HI, fontSize: "0.95rem", lineHeight: 1.5 }}>
-          {SCRIPTED_QA.question}
-        </p>
-        {!asked && (
-          <button
-            type="button"
-            onClick={() => setAsked(true)}
-            data-testid="try-step-5-ask"
-            style={{
-              background: AMBER,
-              color: "white",
-              border: "none",
-              padding: "0.55rem 1rem",
-              borderRadius: 4,
-              cursor: "pointer",
-              fontFamily: "'Lato', sans-serif",
-              fontSize: "0.82rem",
-              fontWeight: 700,
-              marginTop: "1rem",
-            }}
-          >
-            Ask →
-          </button>
-        )}
+        <textarea
+          data-testid="try-step-5-input"
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          disabled={status === "loading" || status === "limit"}
+          rows={2}
+          style={{
+            width: "100%",
+            background: "oklch(0 0 0 / 0.08)",
+            color: TEXT_HI,
+            border: `1px solid ${BORDER}`,
+            borderRadius: 3,
+            padding: "0.5rem 0.7rem",
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.9rem",
+            resize: "vertical",
+          }}
+        />
+        <button
+          type="button"
+          onClick={ask}
+          disabled={!question.trim() || status === "loading" || status === "limit"}
+          data-testid="try-step-5-ask"
+          style={{
+            background: AMBER,
+            color: "white",
+            border: "none",
+            padding: "0.55rem 1rem",
+            borderRadius: 4,
+            cursor: status === "loading" || status === "limit" ? "not-allowed" : "pointer",
+            opacity: status === "loading" || status === "limit" ? 0.6 : 1,
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.82rem",
+            fontWeight: 700,
+            marginTop: "0.75rem",
+          }}
+        >
+          {status === "loading" ? "Thinking…" : status === "limit" ? "Limit reached" : "Ask →"}
+        </button>
       </div>
 
-      {asked && (
+      {answer !== null && (
         <div
           data-testid="try-step-5-answer"
           style={{
@@ -850,29 +903,17 @@ function Step5Ask({ onNext }: { onNext: () => void }) {
           }}
         >
           <p style={{ color: AMBER, fontSize: "0.68rem", letterSpacing: "0.14em", textTransform: "uppercase", margin: 0, marginBottom: "0.6rem" }}>
-            Ownology's answer
+            {status === "limit" ? "Demo limit" : status === "err" ? "Error" : "Ownology's answer"}
           </p>
-          {SCRIPTED_QA.answer.split("\n\n").map((para, idx) => (
-            <p key={idx} style={{ margin: idx === 0 ? "0 0 0.9rem" : "0.6rem 0", whiteSpace: "pre-line" }}>
-              {para.split(/(\*\*[^*]+\*\*)/).map((chunk, i) =>
-                chunk.startsWith("**") && chunk.endsWith("**") ? (
-                  <strong key={i} style={{ color: TEXT_HI }}>{chunk.slice(2, -2)}</strong>
-                ) : (
-                  <span key={i}>{chunk}</span>
-                )
-              )}
+          <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{answer}</p>
+          {status === "done" && (
+            <p style={{ margin: "10px 0 0", color: TEXT_LO, fontSize: "0.7rem", fontStyle: "italic" }}>
+              Grounded in the sandbox context: Batch 04 Semillon, Tank 7 · YAN 148 ppm · temp 26°C · AWRI / Halliday sourcing.
             </p>
-          ))}
-          <div style={{ marginTop: "1rem", padding: "0.75rem", background: "oklch(0 0 0 / 0.08)", borderRadius: 3 }}>
-            <p style={{ color: TEXT_LO, fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", margin: 0, marginBottom: "0.4rem" }}>
-              Grounded in
-            </p>
-            {SCRIPTED_QA.citations.map((c) => (
-              <p key={c} style={{ margin: 0, fontSize: "0.75rem", color: TEXT_MID, lineHeight: 1.5 }}>
-                · {c}
-              </p>
-            ))}
-          </div>
+          )}
+          {errMsg && status === "err" && (
+            <p style={{ margin: "8px 0 0", color: "#ef4444", fontSize: "0.72rem" }}>{errMsg}</p>
+          )}
         </div>
       )}
     </StepCard>

@@ -163,3 +163,16 @@ def test_producers_bulk_import_dedupes():
     body = r.json()["result"]["data"]["json"]
     # First call: 1 inserted, 1 skipped (dedupe inside batch).
     assert body["inserted"] + body["skipped"] == 2
+
+
+def test_tutor_sandbox_ask_returns_grounded_answer():
+    """C2 smoke — live LLM call. Slow (~5s); skip if EMERGENT_LLM_KEY missing."""
+    r = requests.post(
+        f"{API_URL}/api/trpc/tutor.sandboxAsk",
+        json={"json": {"sessionId": "pytest-c2-smoke", "question": "Why did YAN drop?"}},
+        timeout=20,
+    )
+    assert r.status_code == 200
+    body = r.json()["result"]["data"]["json"]
+    assert body["ok"] is True
+    assert len(body["answer"]) > 30

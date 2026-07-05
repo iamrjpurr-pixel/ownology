@@ -10,6 +10,7 @@ import * as schema from "../../drizzle/schema.js";
 import { routeQuery } from "../queryRouter.js";
 import { backfillSopEmbeddings } from "../sopEmbeddings.js";
 import { persistJournalEntry } from "../cellarJournalRouter.js";
+import { chatCompletion, MODELS } from "../_core/llm.js";
 
 // ─── Tutor Router (Scoped RAG — SOP-backed winemaking AI) ──────────────────────
 
@@ -838,6 +839,77 @@ ${sopContext}${vintageContext ? `\n\n---\n\n## Regional Vintage Context\n${vinta
       });
       return { ok: true };
     }),
+  sandboxAsk: publicProcedure
+    .input(
+      z.object({
+        sessionId: z.string().min(6).max(64),
+        question: z.string().min(3).max(300),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const count = bumpAsk(input.sessionId);
+      if (count > 3) {
+        return {
+          ok: false,
+          answer:
+            "Demo limit reached (3 questions). In the real app, Ask Ownology has no cap — sign up for a Founding-Member plan to keep going.",
+          limitReached: true as const,
+        };
+      }
+      const system = `You are Ownology's Cellar Advisor answering inside a product demo. The visitor is a small Australian or New Zealand winemaker exploring the sandbox.
+
+The visitor's cellar right now:
+- Batch 04, Semillon, Tank 7 (800L)
+- Inoculation date: 18 Feb 2026, yeast Lalvin QA23
+- Last three Brix readings: 8.2 → 8.1 → 8.0 over 72h (STUCK)
+- YAN at inoculation: 148 ppm (marginal — AWRI recommends >200 ppm)
+- Cellar temp Tank 7: hit 26°C at 2pm yesterday
+- Free SO₂ last measured 8 ppm (Batch 09 Shiraz, MLF complete)
+- Batch 11 Chardonnay in Barrel A3 — weekly topping due
+
+Rules:
+- Answer in 2–3 short sentences. No preamble.
+- Cite AWRI, Halliday, or UC Davis when you make a factual claim about winemaking chemistry or process.
+- Never invent numbers not in the context above.
+- If asked something outside winemaking, redirect briefly to Ownology's scope.
+- Australian English spelling (colour, favourite, oxidise).`;
+
+      try {
+        const answer = await chatCompletion(
+          [
+            { role: "system", content: system },
+            { role: "user", content: input.question },
+          ],
+          {
+            model: MODELS.PREMIUM,
+            maxTokens: 220,
+            temperature: 0.4,
+            source: "try.sandboxAsk",
+          }
+        );
+        return { ok: true, answer: answer.trim(), limitReached: false as const };
+      } catch (e) {
+        return {
+          ok: false,
+          answer:
+            "Sorry — Ownology is momentarily offline for this demo. In the real app you'd have retry + failover. " +
+            (e instanceof Error ? e.message : ""),
+          limitReached: false as const,
+        };
+      }
+    }),
 });
+
+/**
+ * sandboxAsk — C2 live LLM answer for the /try sandbox Step 5.
+ * Rate limited to 3 questions per session (fair for a demo).
+ */
+const sandboxAsks = new Map<string, number>();
+function bumpAsk(sessionId: string): number {
+  const n = (sandboxAsks.get(sessionId) ?? 0) + 1;
+  sandboxAsks.set(sessionId, n);
+  return n;
+}
+
 
 export { tutorRouter };
