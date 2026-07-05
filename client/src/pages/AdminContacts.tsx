@@ -20,6 +20,31 @@ function fmtAgo(ms: number | null | undefined): string {
   return `${Math.floor(diff / 86_400_000)}d ago`;
 }
 
+/**
+ * Deep-research and URL-quick-add flows stash extra channels
+ * (Instagram, LinkedIn, email, website) into `notes` as a "Label: value · "
+ * separated list. Parse them back out so we can render each as a
+ * distinct chip on the contact row.
+ */
+function extractChannels(notes: string | null | undefined): {
+  instagram: string | null;
+  linkedin: string | null;
+  email: string | null;
+  website: string | null;
+} {
+  if (!notes) return { instagram: null, linkedin: null, email: null, website: null };
+  const igMatch = notes.match(/IG:\s*@?([A-Za-z0-9_.]+)/i);
+  const liMatch = notes.match(/LinkedIn:\s*([^\s·|]+)/i);
+  const emMatch = notes.match(/Email:\s*([^\s·|]+@[^\s·|]+)/i);
+  const wbMatch = notes.match(/Web:\s*([^\s·|]+)/i);
+  return {
+    instagram: igMatch?.[1] ?? null,
+    linkedin: liMatch?.[1] ?? null,
+    email: emMatch?.[1] ?? null,
+    website: wbMatch?.[1] ?? null,
+  };
+}
+
 function smsDraft(c: { firstName: string; winery?: string | null; event?: string | null; painPoint?: string | null; slug: string }): string {
   const where = c.event ? `at ${c.event}` : "the other day";
   const url = `${PREVIEW_BASE}/hi/${c.slug}`;
@@ -606,13 +631,127 @@ export default function AdminContacts() {
               }}
             >
               <div className="flex items-baseline justify-between flex-wrap gap-2 mb-2">
-                <div>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <h3 style={{ fontFamily: "'Fraunces',serif", fontSize: "1.1rem", color: "var(--ow-text-hi)", margin: 0 }}>
                     {c.firstName} {c.lastName ?? ""}
                   </h3>
-                  <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)", margin: 0 }}>
-                    {c.winery ?? "—"} · {c.event ?? "—"} · {c.mobileAu ?? "no mobile"}
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)", margin: "2px 0 6px" }}>
+                    {c.winery ?? "—"} · {c.event ?? "—"}
                   </p>
+                  {/* Mobile — front-and-centre so you can copy or call in one tap.
+                      Falls back to a clear "no mobile" chip so missing numbers
+                      are visually obvious across the pipeline. */}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+                    {c.mobileAu ? (
+                      <button
+                        type="button"
+                        data-testid={`mobile-chip-${c.slug}`}
+                        onClick={() => copy(c.slug, "url", c.mobileAu!)}
+                        title="Tap to copy · long-press on mobile to call"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 6,
+                          padding: "0.28rem 0.6rem",
+                          background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)",
+                          border: "1px solid color-mix(in oklch, var(--ow-amber) 45%, transparent)",
+                          borderRadius: 4,
+                          color: "var(--ow-text-hi)",
+                          fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                          fontSize: "0.86rem",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        📱 {c.mobileAu}
+                      </button>
+                    ) : (
+                      <span
+                        data-testid={`mobile-missing-${c.slug}`}
+                        style={{
+                          display: "inline-block",
+                          padding: "0.28rem 0.6rem",
+                          background: "color-mix(in oklch, white 4%, transparent)",
+                          border: "1px dashed var(--ow-border)",
+                          borderRadius: 4,
+                          color: "var(--ow-text-lo)",
+                          fontFamily: "'Lato',sans-serif",
+                          fontSize: "0.75rem",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        no mobile yet
+                      </span>
+                    )}
+                    {(() => {
+                      const ch = extractChannels(c.notes);
+                      const chipStyle: React.CSSProperties = {
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4,
+                        padding: "0.28rem 0.55rem",
+                        background: "color-mix(in oklch, white 4%, transparent)",
+                        border: "1px solid var(--ow-border)",
+                        borderRadius: 4,
+                        color: "var(--ow-text-hi)",
+                        fontFamily: "'Lato',sans-serif",
+                        fontSize: "0.78rem",
+                        textDecoration: "none",
+                        cursor: "pointer",
+                      };
+                      return (
+                        <>
+                          {ch.instagram && (
+                            <a
+                              href={`https://instagram.com/${ch.instagram}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              data-testid={`ig-chip-${c.slug}`}
+                              style={chipStyle}
+                              title={`Open @${ch.instagram} on Instagram`}
+                            >
+                              📷 @{ch.instagram}
+                            </a>
+                          )}
+                          {ch.linkedin && (
+                            <a
+                              href={ch.linkedin.startsWith("http") ? ch.linkedin : `https://linkedin.com/in/${ch.linkedin}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              data-testid={`linkedin-chip-${c.slug}`}
+                              style={chipStyle}
+                              title="Open LinkedIn"
+                            >
+                              💼 LinkedIn
+                            </a>
+                          )}
+                          {ch.email && (
+                            <button
+                              type="button"
+                              data-testid={`email-chip-${c.slug}`}
+                              onClick={() => copy(c.slug, "url", ch.email!)}
+                              style={{ ...chipStyle, border: "1px solid var(--ow-border)" }}
+                              title="Tap to copy email"
+                            >
+                              ✉ {ch.email}
+                            </button>
+                          )}
+                          {ch.website && (
+                            <a
+                              href={ch.website.startsWith("http") ? ch.website : `https://${ch.website}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              data-testid={`web-chip-${c.slug}`}
+                              style={chipStyle}
+                              title="Open website"
+                            >
+                              🌐 site
+                            </a>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
                 </div>
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
                   <Pill color={meta.color}>{meta.label}</Pill>
