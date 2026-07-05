@@ -28,17 +28,22 @@ function fmtAgo(ms: number | null | undefined): string {
  */
 function extractChannels(notes: string | null | undefined): {
   instagram: string | null;
+  instagramPersonal: string | null;
   linkedin: string | null;
   email: string | null;
   website: string | null;
 } {
-  if (!notes) return { instagram: null, linkedin: null, email: null, website: null };
-  const igMatch = notes.match(/IG:\s*@?([A-Za-z0-9_.]+)/i);
+  if (!notes) return { instagram: null, instagramPersonal: null, linkedin: null, email: null, website: null };
+  // "IG-personal:" MUST match before the generic "IG:" — same prefix.
+  const igPersonalMatch = notes.match(/IG-personal:\s*@?([A-Za-z0-9_.]+)/i);
+  // Match the winery IG but exclude the "IG-personal:" prefix collision.
+  const igMatch = notes.match(/(?<!IG-personal:\s*)(?<![A-Za-z-])IG:\s*@?([A-Za-z0-9_.]+)/i);
   const liMatch = notes.match(/LinkedIn:\s*([^\s·|]+)/i);
   const emMatch = notes.match(/Email:\s*([^\s·|]+@[^\s·|]+)/i);
   const wbMatch = notes.match(/Web:\s*([^\s·|]+)/i);
   return {
     instagram: igMatch?.[1] ?? null,
+    instagramPersonal: igPersonalMatch?.[1] ?? null,
     linkedin: liMatch?.[1] ?? null,
     email: emMatch?.[1] ?? null,
     website: wbMatch?.[1] ?? null,
@@ -183,6 +188,7 @@ export default function AdminContacts() {
       const extras: string[] = [];
       if (typeof d.email === "string" && d.email) extras.push(`Email: ${d.email}`);
       if (typeof d.instagram === "string" && d.instagram) extras.push(`IG: @${d.instagram}`);
+      if (typeof d.instagramPersonal === "string" && d.instagramPersonal) extras.push(`IG-personal: @${d.instagramPersonal}`);
       if (typeof d.linkedin === "string" && d.linkedin) extras.push(`LinkedIn: ${d.linkedin}`);
       if (typeof d.website === "string" && d.website) extras.push(`Web: ${d.website}`);
       if (typeof d.address === "string" && d.address) extras.push(`Addr: ${d.address}`);
@@ -708,9 +714,25 @@ export default function AdminContacts() {
                               rel="noreferrer"
                               data-testid={`ig-chip-${c.slug}`}
                               style={chipStyle}
-                              title={`Open @${ch.instagram} on Instagram`}
+                              title={`Open @${ch.instagram} on Instagram · winery / business account`}
                             >
                               📷 @{ch.instagram}
+                            </a>
+                          )}
+                          {ch.instagramPersonal && (
+                            <a
+                              href={`https://instagram.com/${ch.instagramPersonal}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              data-testid={`ig-personal-chip-${c.slug}`}
+                              style={{
+                                ...chipStyle,
+                                background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+                                border: "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)",
+                              }}
+                              title={`Open @${ch.instagramPersonal} · PERSONAL account · use only with a specific hook`}
+                            >
+                              📷 @{ch.instagramPersonal} · personal
                             </a>
                           )}
                           {ch.linkedin && (

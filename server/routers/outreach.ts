@@ -613,6 +613,7 @@ Speech-recognition normalisations do NOT apply here — this is scraped HTML. Bu
           mobileAu: { type: ["string", "null"] },
           email: { type: ["string", "null"] },
           instagram: { type: ["string", "null"] },
+          instagramPersonal: { type: ["string", "null"] },
           facebook: { type: ["string", "null"] },
           linkedin: { type: ["string", "null"] },
           website: { type: ["string", "null"] },
@@ -649,7 +650,9 @@ For "role", identify the primary point-of-contact — winemaker, founder, GM, or
 
 For "mobileAu" — normalise to "04XX XXX XXX". If only a landline is public, use "(0X) XXXX XXXX". If only an international mobile, keep original format.
 
-For "instagram" — return the handle WITHOUT the @ (e.g. "lesfruitswine", not "@lesfruitswine"). Skip if only content-farm shares are indexed.
+For "instagram" — return the primary handle WITHOUT the @ (e.g. "lesfruitswine"). This should be the WINERY / BUSINESS account (the public brand handle).
+
+For "instagramPersonal" — if the winemaker / founder has a SEPARATE personal Instagram AND it's publicly cross-linked with the winery account (either the winery bio mentions the person's handle, or the person's bio mentions the winery, or trade press links the two), return that personal handle without the @. If they've deliberately kept them separate, return null — that separation is a signal to respect.
 
 For "painPoint" — write ONE sentence describing what a cellar-intelligence AI tool could help this producer with, inferred from their scale / focus / recent public commentary. Examples: "Small natural-wine producer, minimal digital record-keeping"; "Established mid-sized producer scaling into cellar-door tourism"; "Cool-climate boutique estate with vintage variability challenges".
 
