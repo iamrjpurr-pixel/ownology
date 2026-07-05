@@ -97,6 +97,7 @@ export default function AdminContacts() {
   const markBookedMutation = trpc.outreach.markBooked.useMutation();
   const setStatusMutation = trpc.outreach.setStatus.useMutation();
   const setSmsDraftMutation = trpc.outreach.setSmsDraft.useMutation();
+  const setNotesMutation = trpc.outreach.setNotes.useMutation();
   const removeMutation = trpc.outreach.remove.useMutation();
 
   const [form, setForm] = useState({
@@ -120,6 +121,8 @@ export default function AdminContacts() {
   const [deepSearchCitations, setDeepSearchCitations] = useState<string[]>([]);
   const [deepSearchConfidence, setDeepSearchConfidence] = useState<string | null>(null);
   const [deepSearchEmailGuesses, setDeepSearchEmailGuesses] = useState<string[]>([]);
+  const [editingNotes, setEditingNotes] = useState<string | null>(null); // slug being edited
+  const [notesBuffer, setNotesBuffer] = useState("");
 
   const allContacts = useMemo(() => data?.contacts ?? [], [data]);
   const contacts = useMemo(() => {
@@ -770,6 +773,24 @@ export default function AdminContacts() {
                               🌐 site
                             </a>
                           )}
+                          <button
+                            type="button"
+                            data-testid={`edit-notes-btn-${c.slug}`}
+                            onClick={() => {
+                              setEditingNotes(c.slug);
+                              setNotesBuffer(c.notes ?? "");
+                            }}
+                            style={{
+                              ...chipStyle,
+                              background: "transparent",
+                              border: "1px dashed var(--ow-border)",
+                              color: "var(--ow-text-lo)",
+                              fontSize: "0.72rem",
+                            }}
+                            title="Edit notes — add IG-personal: @handle, LinkedIn:, Email:, Web:, or free text"
+                          >
+                            ✏️ Edit
+                          </button>
                         </>
                       );
                     })()}
@@ -806,6 +827,91 @@ export default function AdminContacts() {
                   {c.demoBookedAt && <Pill color="#10b981">Booked {fmtAgo(c.demoBookedAt)}</Pill>}
                 </div>
               </div>
+              {/* Inline notes editor. Opens when user clicks ✏️ Edit chip.
+                  Free-form textarea — user can add IG-personal:, LinkedIn:,
+                  Email:, Web:, Addr: labels or any private prose. Notes
+                  are the source-of-truth for the channel chips above. */}
+              {editingNotes === c.slug && (
+                <div
+                  data-testid={`notes-editor-${c.slug}`}
+                  style={{
+                    marginTop: 6,
+                    marginBottom: 10,
+                    padding: 10,
+                    background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)",
+                    border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+                    borderRadius: 4,
+                  }}
+                >
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "var(--ow-text-lo)", margin: "0 0 6px", lineHeight: 1.5 }}>
+                    Free text plus channel labels. Recognised labels: <code>IG:</code>, <code>IG-personal:</code>, <code>LinkedIn:</code>, <code>Email:</code>, <code>Web:</code>, <code>Addr:</code>, <code>Role:</code>, <code>Region:</code>. Separate multiple with <code> · </code>.
+                  </p>
+                  <textarea
+                    value={notesBuffer}
+                    onChange={(e) => setNotesBuffer(e.target.value)}
+                    rows={4}
+                    data-testid={`notes-textarea-${c.slug}`}
+                    style={{
+                      width: "100%",
+                      padding: "0.5rem 0.7rem",
+                      background: "var(--ow-bg-card)",
+                      border: "1px solid var(--ow-border)",
+                      borderRadius: 3,
+                      color: "var(--ow-text-hi)",
+                      fontFamily: "'Lato',sans-serif",
+                      fontSize: "0.85rem",
+                      resize: "vertical",
+                    }}
+                  />
+                  <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                    <button
+                      type="button"
+                      data-testid={`notes-save-${c.slug}`}
+                      disabled={setNotesMutation.isPending}
+                      onClick={() => {
+                        setNotesMutation.mutate(
+                          { slug: c.slug, notes: notesBuffer },
+                          {
+                            onSuccess: () => {
+                              setEditingNotes(null);
+                              utils.outreach.list.invalidate();
+                            },
+                          }
+                        );
+                      }}
+                      style={{
+                        padding: "0.4rem 0.9rem",
+                        background: "var(--ow-amber)",
+                        color: "oklch(0.10 0.008 60)",
+                        border: "none",
+                        borderRadius: 3,
+                        fontFamily: "'Lato',sans-serif",
+                        fontSize: "0.78rem",
+                        fontWeight: 700,
+                        cursor: setNotesMutation.isPending ? "wait" : "pointer",
+                      }}
+                    >
+                      {setNotesMutation.isPending ? "Saving…" : "Save notes"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setEditingNotes(null); setNotesBuffer(""); }}
+                      style={{
+                        padding: "0.4rem 0.9rem",
+                        background: "transparent",
+                        color: "var(--ow-text-mid)",
+                        border: "1px solid var(--ow-border)",
+                        borderRadius: 3,
+                        fontFamily: "'Lato',sans-serif",
+                        fontSize: "0.78rem",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
               {c.painPoint && <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.85rem", color: "var(--ow-text-mid)", fontStyle: "italic", marginBottom: 8 }}>“{c.painPoint}”</p>}
               {isSilent ? (
                 <p

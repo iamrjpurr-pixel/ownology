@@ -147,19 +147,69 @@ export default function HiContact() {
           </p>
         )}
 
-        {/* Value bullets */}
-        <ul style={{ listStyle: "none", padding: 0, margin: "2rem 0", fontFamily: "'Lato',sans-serif", fontSize: "0.95rem", color: "#374151" }}>
-          {[
-            "AI cellar assistant grounded in 348 chunks of winemaking bibles + AU/NZ regulations",
-            "Tracks YOUR vintage log → recommendations reference your actual tanks and tracks",
-            "30 seconds on your phone in the cellar — no laptop, no 40 tabs",
-          ].map((s, i) => (
-            <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", marginBottom: "0.7rem" }}>
-              <span style={{ color: "#b45309", flexShrink: 0, marginTop: 2 }}>✦</span>
-              <span>{s}</span>
-            </li>
-          ))}
-        </ul>
+        {/* Value bullets — 5 winemaker-native variants that rotate on each
+            visit. Starting variant is deterministic per contact slug (so
+            first-time visitors see a stable index that's different across
+            prospects). Each subsequent view advances by one, so if you
+            resend the link the returning visitor gets fresh copy.
+
+            Vocabulary rule: no developer jargon (no "chunks", no "40 tabs"),
+            no vague verbs ("tracks" → "cross-references", "reads"). Every
+            bullet grounds the promise in a specific winery artefact —
+            AWRI, tank number, Amerine, LIP audit trail. */}
+        {(() => {
+          const VARIANTS: string[][] = [
+            // 0 — The winemaker's assistant
+            [
+              "Reads the AWRI protocols and Winetitles bibles you already trust — you just ask the question in plain language.",
+              "Every answer references your actual tanks — 2026 Semillon, batch 04, the Grenache you racked on Tuesday.",
+              "Ask from the ferment room, answer on your phone. No spreadsheet gymnastics, no laptop, no 40 open tabs.",
+            ],
+            // 1 — The compliance safety-net
+            [
+              "LIP audit trail written for you as you log — one-tap PDF export when Wine Australia knocks.",
+              "SO₂ tracking that flags before you drift out of the FSANZ ceiling, not after the samples come back.",
+              "Every decision timestamped and reasoned — the paper trail you wish you'd kept last vintage.",
+            ],
+            // 2 — The pattern spotter
+            [
+              "Compares this vintage against your last three — flags a ferment stall before you'd have noticed.",
+              "Cross-tank benchmarking without a spreadsheet — which Shiraz outperformed and why.",
+              "Answers grounded in your data, not a Reddit thread with 40 wrong replies underneath.",
+            ],
+            // 3 — The second winemaker
+            [
+              "Like having a second winemaker on the floor — one who's read every AWRI paper and forgets nothing.",
+              "Wine chemistry answers grounded in Boulton, Amerine and Ribéreau-Gayon, with your specific tank pulled up alongside.",
+              "Your <em>Why?</em> captured on every decision — the reasoning trail no clipboard captures.",
+            ],
+            // 4 — The hands-free field kit
+            [
+              "Voice-memo a decision from the crush pad — we transcribe and log the entry, muddy hands and all.",
+              "Import spreadsheets, notebook photos, or spoken notes — whatever's already in your workflow, in.",
+              "Every entry live on your phone, your laptop, and (when the regulator asks) as a signed PDF.",
+            ],
+          ];
+          // Deterministic per-slug starting index → each prospect gets a
+          // stable "first look" that differs across contacts.
+          let h = 0;
+          for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) | 0;
+          const startIdx = Math.abs(h) % VARIANTS.length;
+          // Advance one variant per prior view — first visit = startIdx,
+          // second visit = startIdx+1, etc. Cycles back around after 5.
+          const viewCount = contact.viewCount ?? 0;
+          const bullets = VARIANTS[(startIdx + viewCount) % VARIANTS.length];
+          return (
+            <ul style={{ listStyle: "none", padding: 0, margin: "2rem 0", fontFamily: "'Lato',sans-serif", fontSize: "0.95rem", color: "#374151" }}>
+              {bullets.map((s, i) => (
+                <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", marginBottom: "0.7rem" }}>
+                  <span style={{ color: "#b45309", flexShrink: 0, marginTop: 2 }}>✦</span>
+                  <span dangerouslySetInnerHTML={{ __html: s }} />
+                </li>
+              ))}
+            </ul>
+          );
+        })()}
 
         {/* Topical journal snippet — surfaces 1 recently-asked question from
             the public journal as instant social proof. Stable per-contact via

@@ -784,6 +784,25 @@ Return ONLY the requested JSON — no prose, no explanation. Use null for any fi
       return { ok: true, cleared: value === null };
     }),
 
+  /** OWNER — update the private notes on an existing contact.
+   *  Notes are the source-of-truth for extra channels (IG-personal,
+   *  LinkedIn, Email, Web, Addr) rendered as chips on the contact row. */
+  setNotes: ownerProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+        notes: z.string().max(2000),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const value = input.notes.trim() || null;
+      await db
+        .update(schema.outreachContacts)
+        .set({ notes: value })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true };
+    }),
+
   /** OWNER — drag-and-drop pipeline stage transition. Sets the canonical
    *  timestamps in one atomic write so the derived board view stays
    *  consistent. Stages:
