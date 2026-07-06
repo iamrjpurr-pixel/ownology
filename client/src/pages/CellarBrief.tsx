@@ -404,6 +404,8 @@ function BriefCard({ card }: { card: Card }) {
             <GhostQuestionBlock slug={slug} q={card.ghostQuestion} />
           )}
 
+          <QualFlagsBlock slug={slug} vesselId={card.vesselId} />
+
           <div className="flex gap-2 mt-1">
             <Link
               href={`/quick-entry?tank=${encodeURIComponent(card.vesselId)}&variety=${encodeURIComponent(card.variety)}`}
@@ -421,6 +423,173 @@ function BriefCard({ card }: { card: Card }) {
             >
               Ask Ownology
             </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * QualFlagsBlock — qualitative risk capture on the vessel card.
+ * Displays active (unresolved) flags as amber chips + a "flag" button
+ * that opens a small picker (brett / TCA / oxidation / H₂S / sanitation /
+ * other) with an optional note. Resolution captures a note too, so audit
+ * trail survives collapse.
+ *
+ * Doctrine: /risk-management (public) explains the framework.
+ */
+type QualFlagType = "brett" | "tca" | "oxidation" | "h2s" | "sanitation" | "other";
+const FLAG_LABELS: Record<QualFlagType, string> = {
+  brett: "Brett",
+  tca: "TCA / cork taint",
+  oxidation: "Oxidation",
+  h2s: "H₂S / reduction",
+  sanitation: "Sanitation",
+  other: "Other",
+};
+
+function QualFlagsBlock({ slug, vesselId }: { slug: string; vesselId: string }) {
+  const utils = trpc.useUtils();
+  const activeQ = trpc.qualFlags.listActive.useQuery();
+  const flagMut = trpc.qualFlags.flag.useMutation({
+    onSuccess: () => utils.qualFlags.listActive.invalidate(),
+  });
+  const resolveMut = trpc.qualFlags.resolve.useMutation({
+    onSuccess: () => utils.qualFlags.listActive.invalidate(),
+  });
+
+  const [picking, setPicking] = useState<QualFlagType | null>(null);
+  const [note, setNote] = useState("");
+  const [showPicker, setShowPicker] = useState(false);
+
+  const myFlags = (activeQ.data ?? []).filter((f) => f.vesselId === vesselId);
+
+  async function submitFlag() {
+    if (!picking) return;
+    await flagMut.mutateAsync({ vesselId, flagType: picking, note: note.trim() || undefined });
+    setPicking(null);
+    setNote("");
+    setShowPicker(false);
+  }
+
+  async function resolve(id: number) {
+    const resolvedNote = prompt("Resolution note (optional):") ?? undefined;
+    await resolveMut.mutateAsync({ id, resolvedNote: resolvedNote?.trim() || undefined });
+  }
+
+  return (
+    <div data-testid={`qual-flags-${slug}`}>
+      <p className="text-xs uppercase tracking-widest font-semibold" style={{ color: "var(--ow-text-lo)", margin: 0 }}>
+        Qualitative risk
+      </p>
+      {myFlags.length === 0 && !showPicker && (
+        <div className="mt-2 flex items-center gap-2">
+          <span className="text-xs" style={{ color: "var(--ow-text-lo)" }}>None flagged</span>
+          <button
+            type="button"
+            data-testid={`qual-flag-open-${slug}`}
+            onClick={() => setShowPicker(true)}
+            className="text-xs underline"
+            style={{ color: "var(--ow-amber)", background: "transparent", border: "none", padding: 0, cursor: "pointer" }}
+          >
+            🚩 flag one
+          </button>
+        </div>
+      )}
+      {myFlags.length > 0 && (
+        <ul className="mt-2 flex flex-wrap gap-1.5" style={{ listStyle: "none", padding: 0 }}>
+          {myFlags.map((f) => (
+            <li key={f.id} data-testid={`qual-flag-chip-${f.id}`}>
+              <span
+                className="text-xs px-2 py-1 rounded inline-flex items-center gap-2"
+                style={{ background: "color-mix(in oklch, gold 15%, transparent)", color: "#b45309", border: "1px solid color-mix(in oklch, gold 40%, transparent)" }}
+              >
+                🚩 {FLAG_LABELS[f.flagType as QualFlagType] ?? f.flagType}
+                {f.note ? <span style={{ color: "var(--ow-text-mid)", fontStyle: "italic" }}>· {f.note}</span> : null}
+                <button
+                  type="button"
+                  data-testid={`qual-flag-resolve-${f.id}`}
+                  onClick={() => resolve(f.id)}
+                  className="ml-1 text-xs underline"
+                  style={{ color: "#059669", background: "transparent", border: "none", padding: 0, cursor: "pointer" }}
+                >
+                  resolve
+                </button>
+              </span>
+            </li>
+          ))}
+          {!showPicker && (
+            <li>
+              <button
+                type="button"
+                data-testid={`qual-flag-open-more-${slug}`}
+                onClick={() => setShowPicker(true)}
+                className="text-xs underline"
+                style={{ color: "var(--ow-amber)", background: "transparent", border: "none", padding: "2px 0", cursor: "pointer" }}
+              >
+                + another
+              </button>
+            </li>
+          )}
+        </ul>
+      )}
+      {showPicker && (
+        <div
+          className="mt-2 p-3 rounded"
+          data-testid={`qual-flag-picker-${slug}`}
+          style={{ background: "var(--ow-bg-inset)", border: "1px solid var(--ow-border)" }}
+        >
+          <div className="flex flex-wrap gap-1.5">
+            {(Object.keys(FLAG_LABELS) as QualFlagType[]).map((k) => (
+              <button
+                key={k}
+                type="button"
+                data-testid={`qual-flag-pick-${slug}-${k}`}
+                onClick={() => setPicking(k)}
+                className="text-xs px-3 py-1 rounded"
+                style={{
+                  background: picking === k ? "color-mix(in oklch, gold 20%, transparent)" : "transparent",
+                  color: picking === k ? "var(--ow-text-hi)" : "var(--ow-text-mid)",
+                  border: `1px solid ${picking === k ? "var(--ow-amber)" : "var(--ow-border)"}`,
+                  fontWeight: picking === k ? 600 : 500,
+                  cursor: "pointer",
+                }}
+              >
+                {FLAG_LABELS[k]}
+              </button>
+            ))}
+          </div>
+          <input
+            type="text"
+            data-testid={`qual-flag-note-${slug}`}
+            placeholder="Optional note (e.g. 'band-aid on nose during pump-over')"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            className="mt-2 w-full text-sm px-2 py-1 rounded"
+            style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)", color: "var(--ow-text-hi)" }}
+            maxLength={500}
+          />
+          <div className="mt-2 flex gap-2">
+            <button
+              type="button"
+              data-testid={`qual-flag-submit-${slug}`}
+              onClick={submitFlag}
+              disabled={!picking || flagMut.isPending}
+              className="text-xs px-3 py-1.5 rounded font-semibold"
+              style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", opacity: !picking ? 0.5 : 1, cursor: !picking ? "not-allowed" : "pointer", border: "none" }}
+            >
+              {flagMut.isPending ? "Flagging…" : "🚩 Flag"}
+            </button>
+            <button
+              type="button"
+              data-testid={`qual-flag-cancel-${slug}`}
+              onClick={() => { setShowPicker(false); setPicking(null); setNote(""); }}
+              className="text-xs px-3 py-1.5 rounded"
+              style={{ background: "transparent", color: "var(--ow-text-mid)", border: "1px solid var(--ow-border)", cursor: "pointer" }}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}

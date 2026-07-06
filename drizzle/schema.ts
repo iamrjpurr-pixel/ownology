@@ -1609,3 +1609,29 @@ export const marketingCoachLines = mysqlTable(
   (t) => [index("mcl_localdate_idx").on(t.localDate)]
 );
 
+/**
+ * vessel_qual_flags — Qualitative Risk capture on Cellar Brief cards
+ * (Feb 2026). The quant side is derived (SO₂ decay, Brix stall, etc.);
+ * the qual side is winemaker taste/smell observation. Flag types tie
+ * to the Risk Management doctrine page.
+ * Multi-tenant isolated via wineryId — cellarBrief endpoints are
+ * wineryProcedure so the JOIN is transparent.
+ */
+export const vesselQualFlags = mysqlTable(
+  "vessel_qual_flags",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    wineryId: int("winery_id").notNull(),
+    vesselId: varchar("vessel_id", { length: 40 }).notNull(),
+    flagType: varchar("flag_type", { length: 32 }).notNull(), // brett/tca/oxidation/h2s/sanitation/other
+    note: varchar("note", { length: 500 }),
+    flaggedAt: bigint("flagged_at", { mode: "number" }).notNull(),
+    resolvedAt: bigint("resolved_at", { mode: "number" }),
+    resolvedNote: varchar("resolved_note", { length: 500 }),
+  },
+  (t) => [
+    index("vqf_winery_vessel_idx").on(t.wineryId, t.vesselId),
+    index("vqf_active_idx").on(t.wineryId, t.resolvedAt),
+  ]
+);
+

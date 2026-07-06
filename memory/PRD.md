@@ -4,6 +4,19 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Risk Management framework (v1) — SHIPPED (Feb 2026, this session)**
+- **Decision**: kept scope tight on wine-quality risks only. Worker-safety / WHS is deliberately OUT of scope (deferred to v2 — see `memory/ROADMAP.md` for the JSEA/SWMS/equipment-training future vision).
+- **Two-tier framework**:
+  - **Tier 1 — Quantitative wine-quality risks** (derived from lab readings, no operator prompts): SO₂ decay, stuck ferment, ferment temp excursion, MLF drift, silent barrel, days-since-check drift, LIP compliance. Already detected by the existing `cellarBriefEngine.ts` — the doctrine page just names + cites what was previously implicit.
+  - **Tier 2 — Qualitative wine-quality risks** (winemaker observation, one-tap capture): Brett, TCA, oxidation, H₂S/reduction, sanitation lapse.
+- **Doctrine page** `/risk-management` (PUBLIC): full framework, definitions + trigger + action + AWRI citations per risk, "Book a demo" CTA, explicit scope footer that points prospects to Safe Work Australia / AWRI Safety / state regulators for WHS (positions Ownology as focused, not evasive). Verified rendering all 12 risk cards + CTA + scope footer.
+- **Qualitative capture on Cellar Brief cards**: new `QualFlagsBlock` component on every vessel card. One-tap picker (6 flag types + optional note), active flags render as amber chips with inline "resolve" (resolution captures a note for audit trail), "+ another" button for multi-flag vessels. Backed by `vessel_qual_flags` table (winery_id + vessel_id scoped, resolved_at soft-delete for audit trail).
+- **New tRPC procedures** in `server/routers/qualFlags.ts` (all `wineryProcedure` — multi-tenant isolated): `listActive`, `flag`, `resolve`, `history`.
+- **DB**: `vessel_qual_flags` table + CREATE TABLE bootstrap in `server/index.ts`. Drizzle schema in `drizzle/schema.ts`.
+- **Verified end-to-end**: `/risk-management` public HTTP 200 (no gate), all 12 risk cards render with real citations (AWRI Sulfur dioxide, Restarting stuck ferments, Malolactic fermentation, Brettanomyces, TCA), scope footer shows Safe Work Australia + AWRI + state regulators. qualFlags.listActive returns `[]` for empty state. Pytest 14/14 green. Lint clean.
+
+
+
 **Gate wall flipped to default-DENY — SHIPPED (Feb 2026, this session)**
 - **Security posture change**: previously the wall was **opt-in** (block-list of MEMBER_ONLY_PREFIXES — any new page not added leaked publicly). Now **default-deny** (allowlist of ~50 explicit public paths + 6 public prefixes — anything else redirects to `/try`).
 - **Reason for change**: user asked for certainty that ANY guessed URL like `ownology.ai/whatever` is gated. Under the old model, forgetting to add a new page to the block-list would silently leak it. Under new model, forgetting means the page is safely gated — the correct fail direction for startup with private customer cellar data.

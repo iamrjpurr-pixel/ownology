@@ -6,6 +6,57 @@ Last consolidated: 28 Jun 2026.
 
 ---
 
+## 🌱 v2 Vision — Safety + Training Compliance (Feb 2026, deferred by design)
+
+**Original problem**: Rich flagged the SafeWork NSW Winery Guide (Model WHS Act) as a potential product surface. We chose to keep Ownology focused on **wine-quality risk** for v1 (see `/risk-management`) — but stored the safety/training thesis here so it survives session compaction.
+
+### The compounding-data thesis
+
+Ownology's real moat activates when three data sets are populated for a winery:
+
+1. **Asset list** — specific equipment (crusher-destemmer model X, press model Y, tank vintage/size Z, forklift make/model). Structured, per-winery, versioned.
+2. **Vintage records** — historical + live vessel journal (already in the app).
+3. **Employee + training records** — who's on-site during vintage, what tickets they hold (forklift, confined-space, first aid, senior first aid, chemical handling).
+
+Once you have all three, several compounding features become trivial to ship:
+
+### Feature 1 — Equipment-specific operating training manuals
+- **Input**: winemaker registers a `willmes-basket-press-1200`.
+- **Ownology synthesizes**: a training manual using (a) the 13 MoreWine SOP references already indexed in `cellarBriefEngine.ts` (SO₂ mgmt, sanitation, MLF paper, yeast pairing, inert gas, sparkling protocols, etc), (b) manufacturer manuals if uploaded, (c) AWRI equipment-specific technical notes if they exist.
+- **Output**: a printable / signable "Operator Training Manual for the Willmes 1200" scoped to that winery's exact asset + varietal use.
+- **Business value**: winemakers currently patch this together from PDFs. Ownology turns "operator training documentation" into a single-click artifact.
+
+### Feature 2 — On-demand JSEA / SWMS generation
+- **Input**: an activity ("cleaning tank T3", "pressing white grapes", "confined-space entry into T7") + which employees will do it + the asset involved.
+- **Ownology synthesizes**: a **Job Safety and Environmental Analysis (JSEA)** or **Safe Work Method Statement (SWMS)** using Model WHS Act principles + SafeWork state-specific compliance + AWRI safety references + the winery's own asset + employee training data (so the SWMS shows which trained ops can perform which steps).
+- **Output**: signable PDF ready for the on-site whiteboard and audit trail.
+- **Regulatory anchor**: Model WHS Act 2011 (7 of 8 AU jurisdictions harmonized; WA joined March 2022; Victoria uses OHS Act 2004 with functionally equivalent principles).
+- **State adaptivity**: winery region determines which regulator + reporting form appears in the "notify" footer of the SWMS (mapping table already sketched in Feb 2026 session).
+
+### Feature 3 — Employee-training compliance dashboard
+- **Input**: employee records + training tickets + expiry dates.
+- **Ownology surfaces**: who's coming up for renewal, which activities they're currently cleared for, which vessels/assets they can operate, gap analysis (are we vintage-crew-ready?).
+- **Cross-links**: the Marketing Ops daily coach could nudge Rich when a critical ticket is 30 days from expiring during vintage prep.
+
+### Positioning discipline
+
+**Not until asset + training data is in the app.** These features REQUIRE the underlying data to be present — otherwise they're guessing, which is worse than nothing. The v1 doctrine at `/risk-management` deliberately says WHS is out of scope (points to Safe Work Australia + AWRI + state regulators) precisely so the v2 pivot is EARNED by data, not oversold prematurely.
+
+### Rough sequencing
+1. Ship v1 Risk Management (Quant + Qual wine-quality) — Feb 2026 (**this session**)
+2. Get 5 paying members using the wine-quality product
+3. Add asset registry as a first-class model (small addition to schema)
+4. Add employee + training record model
+5. Feature 1 — Equipment operating training manuals (leverages existing MoreWine SOPs)
+6. Feature 3 — Employee training compliance dashboard
+7. Feature 2 — JSEA / SWMS on-demand (needs all prior three)
+
+Estimated combined build: 3-4 weeks after data models are in. Don't start until the wine-quality product has retained users.
+
+
+
+---
+
 ## 🎯 P0 — Strategic / Revenue
 
 ### Demo to a real winemaker

@@ -74,6 +74,7 @@ const PUBLIC_EXACT = new Set<string>([
   "/trial-ending",
   "/preview",
   "/404",
+  "/risk-management",
   "/app", // redirects to /free-run
   "/robots.txt",
   "/sitemap.xml",

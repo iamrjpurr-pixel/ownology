@@ -13,6 +13,7 @@ import { quizRouter } from "./routers/quiz.js";
 import { producersRouter } from "./routers/producers.js";
 import { marketingOpsRouter } from "./routers/marketingOps.js";
 import { gateRouter } from "./routers/gate.js";
+import { qualFlagsRouter } from "./routers/qualFlags.js";
 import { wineryRouter } from "./routers/winery.js";
 import { cellarBriefRouter } from "./routers/cellarBrief.js";
 import { referralsRouter } from "./routers/referrals.js";
@@ -1825,5 +1826,6 @@ export const appRouter = router({
   referrals: referralsRouter,
   marketingOps: marketingOpsRouter,
   gate: gateRouter,
+  qualFlags: qualFlagsRouter,
 });
 export type AppRouter = typeof appRouter;

@@ -526,6 +526,7 @@ async function startServer() {
     "/trial-ending",
     "/preview",
     "/404",
+    "/risk-management",
     "/app", // redirects to /free-run
     "/robots.txt",
     "/sitemap.xml",
@@ -862,6 +863,21 @@ async function startServer() {
         season VARCHAR(24),
         generated_at BIGINT NOT NULL,
         INDEX mcl_localdate_idx (local_date)
+      )
+    `);
+    // vessel_qual_flags — qualitative risk capture on Cellar Brief cards.
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS vessel_qual_flags (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        winery_id INT NOT NULL,
+        vessel_id VARCHAR(40) NOT NULL,
+        flag_type VARCHAR(32) NOT NULL,
+        note VARCHAR(500),
+        flagged_at BIGINT NOT NULL,
+        resolved_at BIGINT,
+        resolved_note VARCHAR(500),
+        INDEX vqf_winery_vessel_idx (winery_id, vessel_id),
+        INDEX vqf_active_idx (winery_id, resolved_at)
       )
     `);
     await db.execute(sql`
