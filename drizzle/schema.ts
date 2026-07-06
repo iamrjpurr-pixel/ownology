@@ -1543,3 +1543,44 @@ export const wineProducers = mysqlTable(
     index("wp_outreach_idx").on(t.outreachStatus),
   ]
 );
+
+/**
+ * marketing_task_completions — daily/weekly rituals in /admin/marketing-ops.
+ * Task definitions live in code (see server/routers/marketingOps.ts).
+ * Reset behaviour: a task counts as "done" if a row exists for the current
+ * local calendar day (daily) or ISO week (weekly). Timezone: Australia/Adelaide.
+ */
+export const marketingTaskCompletions = mysqlTable(
+  "marketing_task_completions",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    taskSlug: varchar("task_slug", { length: 64 }).notNull(),
+    completedAt: bigint("completed_at", { mode: "number" }).notNull(),
+    localDate: varchar("local_date", { length: 10 }).notNull(), // "YYYY-MM-DD" Adelaide
+    isoWeek: varchar("iso_week", { length: 8 }).notNull(), // "2026-W07"
+    notes: varchar("notes", { length: 500 }),
+  },
+  (t) => [
+    index("mtc_task_idx").on(t.taskSlug),
+    index("mtc_localdate_idx").on(t.localDate),
+    index("mtc_isoweek_idx").on(t.isoWeek),
+  ]
+);
+
+/**
+ * marketing_coach_lines — daily-cached AI coach one-liner. One row per
+ * local calendar day. If today's row exists we serve it; otherwise call
+ * Claude Sonnet with current season/day/time/KPI context, store, serve.
+ */
+export const marketingCoachLines = mysqlTable(
+  "marketing_coach_lines",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    localDate: varchar("local_date", { length: 10 }).notNull(),
+    line: varchar("line", { length: 800 }).notNull(),
+    season: varchar("season", { length: 24 }),
+    generatedAt: bigint("generated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [index("mcl_localdate_idx").on(t.localDate)]
+);
+

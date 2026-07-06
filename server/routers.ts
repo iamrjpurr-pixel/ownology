@@ -11,6 +11,7 @@ import { outreachRouter } from "./routers/outreach.js";
 import { themesRouter } from "./routers/themes.js";
 import { quizRouter } from "./routers/quiz.js";
 import { producersRouter } from "./routers/producers.js";
+import { marketingOpsRouter } from "./routers/marketingOps.js";
 import { wineryRouter } from "./routers/winery.js";
 import { cellarBriefRouter } from "./routers/cellarBrief.js";
 import { referralsRouter } from "./routers/referrals.js";

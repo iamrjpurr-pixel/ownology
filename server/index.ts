@@ -717,6 +717,29 @@ async function startServer() {
     // wine_producers (A2 stub) — AU/NZ winery directory. Populated in a
     // later session from Wine Australia + NZ Wine public registers.
     await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS marketing_task_completions (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        task_slug VARCHAR(64) NOT NULL,
+        completed_at BIGINT NOT NULL,
+        local_date VARCHAR(10) NOT NULL,
+        iso_week VARCHAR(8) NOT NULL,
+        notes VARCHAR(500),
+        INDEX mtc_task_idx (task_slug),
+        INDEX mtc_localdate_idx (local_date),
+        INDEX mtc_isoweek_idx (iso_week)
+      )
+    `);
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS marketing_coach_lines (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        local_date VARCHAR(10) NOT NULL,
+        line VARCHAR(800) NOT NULL,
+        season VARCHAR(24),
+        generated_at BIGINT NOT NULL,
+        INDEX mcl_localdate_idx (local_date)
+      )
+    `);
+    await db.execute(sql`
       CREATE TABLE IF NOT EXISTS wine_producers (
         id INT PRIMARY KEY AUTO_INCREMENT,
         name VARCHAR(200) NOT NULL,
