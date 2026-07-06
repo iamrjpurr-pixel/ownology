@@ -17,6 +17,7 @@
  * (the "Related surfaces" strip at the top) so staff can jump between
  * the operational manual and the reference book seamlessly.
  */
+import { useEffect } from "react";
 import { Link } from "wouter";
 
 const AMBER = "var(--ow-amber)";
@@ -328,6 +329,25 @@ const CATEGORIES: Category[] = [
 ];
 
 export default function RiskGlossary() {
+  // Wouter (SPA client-side routing) doesn't auto-scroll to URL hashes the
+  // way the browser does on a full page load. If the user arrives from
+  // /risk-briefing → /risk-glossary#lip-... via a client-side Link, we
+  // need to manually scroll to the target on mount + when the hash changes.
+  useEffect(() => {
+    const scrollToHash = () => {
+      const hash = window.location.hash.replace(/^#/, "");
+      if (!hash) return;
+      const el = document.getElementById(hash);
+      if (el) {
+        // Small delay lets the layout settle before scrolling.
+        setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+      }
+    };
+    scrollToHash();
+    window.addEventListener("hashchange", scrollToHash);
+    return () => window.removeEventListener("hashchange", scrollToHash);
+  }, []);
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--ow-bg-base)", paddingBottom: "5rem" }}>
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "3rem 1.5rem 1rem" }}>
@@ -373,16 +393,23 @@ export default function RiskGlossary() {
               {cat.intro}
             </p>
             <div style={{ display: "grid", gap: "0.7rem" }}>
-              {cat.terms.map((t) => (
+              {cat.terms.map((t) => {
+                const slug = t.term
+                  .replace(/[^A-Za-z0-9]+/g, "-")
+                  .replace(/^-|-$/g, "")
+                  .toLowerCase();
+                return (
                 <article
                   key={t.term}
-                  data-testid={`glossary-term-${t.term.replace(/[^A-Za-z0-9]+/g, "-").toLowerCase()}`}
+                  id={slug}
+                  data-testid={`glossary-term-${slug}`}
                   style={{
                     background: CARD,
                     border: `1px solid ${BORDER}`,
                     borderLeft: `3px solid ${cat.accent}`,
                     borderRadius: 6,
                     padding: "0.85rem 1rem",
+                    scrollMarginTop: "1.5rem",
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem", alignItems: "baseline", flexWrap: "wrap" }}>
@@ -403,7 +430,8 @@ export default function RiskGlossary() {
                     Source: {t.source}
                   </p>
                 </article>
-              ))}
+                );
+              })}
             </div>
           </section>
         ))}

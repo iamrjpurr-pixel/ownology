@@ -117,26 +117,31 @@ const COMPLIANCE_ITEMS = [
     heading: "FSANZ Food Standards Code 4.5.1 — Wine Production Requirements",
     body: "The quantitative engine flags LIP / compliance drift automatically. Every reading you take goes to the audit trail export (/admin at LIP Audit Pack). If a regulator turns up, you generate the PDF in one click — chronological, cited, tamper-evident.",
     audience: "Owner / Head Winemaker",
+    glossaryAnchor: "fsanz",
   },
   {
     heading: "Wine Australia LIP (Label Integrity Program)",
     body: "The Cellar Brief engine tags any batch with LIP-declared varieties or regions. Silent-barrel + missed-compliance alerts fire specifically against those tags so you cannot miss a required reading window.",
     audience: "Head Winemaker / Cellar Lead",
+    glossaryAnchor: "lip-label-integrity-program",
   },
   {
     heading: "AWRI Technical Review 227 (cellar humidity)",
     body: "The Tier 3 environmental thresholds (55-75% RH ideal) come directly from AWRI TR227. Every environmental alert is defensible — no numbers we made up.",
     audience: "Anyone facing an auditor or importer",
+    glossaryAnchor: "awri",
   },
   {
     heading: "OIV / OIV-OENO compendium",
     body: "Tartrate stability + storage temperature thresholds source from OIV. If you export, cite this in your production dossier.",
     audience: "Export-focused wineries",
+    glossaryAnchor: "oiv",
   },
   {
     heading: "WHS positioning — deliberately out of scope",
     body: "Ownology does NOT replace Safe Work Australia, AWRI Safety, or state WHS regulators. For chemical handling, confined-space entry, forklift tickets, and JSEA/SWMS documentation, refer to your state regulator + AWRI Safety. Ownology's risk tool covers wine-quality risks only. This is a deliberate scope choice — see /risk-management for the public doctrine.",
     audience: "All staff",
+    glossaryAnchor: "whs-work-health-safety",
   },
 ];
 
@@ -295,6 +300,22 @@ export default function RiskBriefing() {
               <p style={{ fontFamily: SANS, fontSize: "0.85rem", color: MID, lineHeight: 1.6, margin: "0.4rem 0 0" }}>
                 {c.body}
               </p>
+              <Link
+                href={`/risk-glossary#${c.glossaryAnchor}`}
+                data-testid={`compliance-glossary-link-${c.glossaryAnchor}`}
+                style={{
+                  display: "inline-block",
+                  marginTop: "0.5rem",
+                  fontFamily: SANS,
+                  fontSize: "0.72rem",
+                  letterSpacing: "0.06em",
+                  color: AMBER,
+                  fontWeight: 700,
+                  textDecoration: "none",
+                }}
+              >
+                📖 See in glossary →
+              </Link>
             </div>
           ))}
           <div style={{ marginTop: "1rem", padding: "0.85rem 1rem", background: RAISED, border: `1px dashed ${AMBER}`, borderRadius: 6 }}>
