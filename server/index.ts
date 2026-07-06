@@ -865,6 +865,24 @@ async function startServer() {
         INDEX mcl_localdate_idx (local_date)
       )
     `);
+    // weather_advice_cache — Tier 3 (Environmental) LLM-contextualised
+    // recommendations, one row per (winery, alert_kind, calendar-date).
+    // Zero unauthenticated hits — gated behind the paying-plan check in
+    // server/routers/weather.ts. Feb 2026.
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS weather_advice_cache (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        winery_id INT NOT NULL,
+        alert_kind VARCHAR(40) NOT NULL,
+        local_date VARCHAR(10) NOT NULL,
+        advice TEXT NOT NULL,
+        current_reading VARCHAR(200),
+        model VARCHAR(64),
+        generated_at BIGINT NOT NULL,
+        UNIQUE KEY wac_dedupe_key (winery_id, alert_kind, local_date),
+        INDEX wac_localdate_idx (local_date)
+      )
+    `);
     // vessel_qual_flags — qualitative risk capture on Cellar Brief cards.
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS vessel_qual_flags (

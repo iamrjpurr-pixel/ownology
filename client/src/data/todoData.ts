@@ -58,7 +58,7 @@ export const TODO: TodoItem[] = [
     id: "weather-widget-sop-and-vintage-log-integration",
     title: "Weather widget → SOP deep-links + Vintage Log flag",
     description:
-      "When an environmental alert fires (e.g. Humidity high >75%), we currently show why + action inline. Slice 3: add a 'Log this' button that (a) writes an environmental_event row to vintage_log_entries so a wine's exposure history is auditable, and (b) deep-links to a matching SOP ('Increase Ventilation SOP' — needs to be authored and added to sop_library first). Turns the widget from informational into workflow-integrated.",
+      "When an environmental alert fires (e.g. Humidity high >75%), we currently show why + action inline + LLM cellar-grounded advice for paid tiers. Slice 3: add a 'Log this' button that (a) writes an environmental_event row to vintage_log_entries so a wine's exposure history is auditable, and (b) deep-links to a matching SOP ('Increase Ventilation SOP' — needs to be authored and added to sop_library first). Turns the widget from informational into workflow-integrated.",
     priority: "p2",
     effort: "~2 hours + ~1 hour SOP authoring",
     status: "not-started",
@@ -428,6 +428,13 @@ export interface ShippedItem {
 }
 
 export const RECENTLY_SHIPPED: ShippedItem[] = [
+  {
+    id: "weather-ai-contextual-advice-gated",
+    title: "Weather widget · LLM-contextualised advice · Founding-Member gated",
+    description:
+      "Slice 2b of Tier 3. New tRPC mutation weather.contextualAdvice — takes the fired alert kind + current reading + 48h forecast summary, injects the winemaker's actual cellar history (via getUserCellarContext), calls Claude Sonnet 4.6 via Emergent LLM key. Returns 90-word cellar-floor advice that names specific tanks/barrels by number + variety + current state. Verified live: humidity_high alert returned 'Your biggest exposure is Barrel Rack A (Chardonnay, MLF just confirmed complete on 28 June — those barrels need sulfuring and are sitting unsealed and vulnerable)…'. Cached per (winery, alert_kind, YYYY-MM-DD Sydney) in weather_advice_cache table — one call per day per alert type. Plan-gated: paid tiers (press/amphora/coopers/founding_member) OR admin role get the LLM output; free tier gets a 🔒 Founding Member upsell teaser (both states verified with role/plan flip test).",
+    shippedAt: "2026-02-06",
+  },
   {
     id: "weather-widget-tier-3-environmental",
     title: "Weather widget · Tier 3 environmental risk on /dashboard",
