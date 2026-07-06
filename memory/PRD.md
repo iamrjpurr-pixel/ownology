@@ -4,6 +4,32 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Compose Button + Prospect Cellar Brief Preview — SHIPPED (Feb 2026, this session)**
+- **Value-engineering decision**: user was going to build A3 (3-touch automated cold email). Recon showed the 21-prospect pool is too thin for automation to move the needle + the 5-hour real build cost (view-pixel, reply-tracking, unsubscribe, deliverability warmup) doesn't clear the bar. User picked instead: (a) 1-click Compose button so Rich sends handwritten emails from his own inbox and (b) Cellar Brief preview page baked into every cold email — piggy-backing on his enrichment data to demonstrate the product concretely on a per-prospect URL.
+
+- **A. Compose Modal** (`client/src/pages/AdminProducers.tsx`):
+  - Visible only when a producer has BOTH email + enriched contactName. "▶ Compose" link renders under each contact cell.
+  - Modal opens with 3 pill-style template variants: **Cellar Brief demo** (mid-length), **Vintage-log intro** (short, question-focused), **Peer share (soft)** (delete-if-not-useful frame). Each substitutes `{firstName}`, `{winery}`, `{region}`, `{countryLabel}`, `{previewUrl}`.
+  - Fully editable subject + 14-row textarea body before sending.
+  - Three actions: **▶ Open in mail app** (uses `mailto:` URI — email leaves Rich's own inbox with his sender reputation), **Copy body**, **Copy all** (To/Subject/Body concatenated for paste into Superhuman etc.).
+  - Deliberately manual — no automated send, no queue, no cron. Aligned with the "1:1 voice wins at this scale" thesis.
+
+- **B. Public Cellar Brief Preview** at `/hi/producers/:id` (`client/src/pages/HiProducerPreview.tsx`):
+  - New PUBLIC route (bypasses gate-wall via wouter route order — `/hi/producers/:id` listed BEFORE `/hi/:slug` for wouter specificity).
+  - New public tRPC procedure `producers.publicPreview({id})` — returns only { id, name, country, region, firstName }; deliberately narrow to avoid leaking enrichment metadata (contactRole confidence, outreach_status, phase1Source, etc.) to unauthenticated URLs. Missing/bad IDs return `null` (not 404) so we don't leak existence.
+  - Personalized greeting: "G'day Blair — this is what your Cellar Brief could look like today."
+  - Region-aware seasonal template: Central Otago (pinot noir + chard), Marlborough (sauv blanc + chard + rosé + pinot gris), Hawke's Bay (syrah + chard + merlot + sauv blanc), Auckland/Waiheke/Kumeu/Northland (chardonnay + syrah + pinot gris), Generic (shiraz + chard + cab sav + reserve chard). All templates deliberately reflect **Feb/Q1 = late-summer AU/NZ vintage-crush period** so the content feels plausibly real for the moment.
+  - Renders in visual parity with the real `/cellar-brief` page: sticky exec summary, KPI chips (attention/decisions/vessels), status-coloured left-border cards (red/amber/green), stage emoji, headline + detail + action lines.
+  - "Book a 20-min demo" amber CTA at bottom → Calendly. Zero LLM cost per view — safe to link at scale from cold outreach.
+
+- **Verified end-to-end**:
+  - Public endpoint tested via curl WITHOUT cookie/gate → returns `{ id: 8, name: "Felton Road", region: "Central Otago", firstName: "Blair" }`.
+  - `/hi/producers/8` renders: greeting, 4 Central-Otago pinot/chard cards, CTA — no auth wall.
+  - `/admin/producers` shows 20 Compose buttons, modal opens for Paroa Bay (id 27) with Margot Best's personalized template, template swap works (Cellar Brief demo ↔ Peer share ↔ Vintage-log intro), preview URL baked into all bodies, To: pt@paroabay.com displayed correctly.
+  - Pytest 14/14 green. Lint clean.
+
+
+
 **Producer enrichment (Perplexity Sonar Pro) — SHIPPED (Feb 2026, this session)**
 - **New tRPC procedures** in `server/routers/producers.ts`:
   - `enrichContact({id})` — narrow Perplexity Sonar Pro call (~2-6s, ~500 max tokens) that finds the primary point-of-contact (winemaker → founder → GM → cellar-door manager) for one producer. Idempotent (skips if `contactName` already set), fills only NULL columns.

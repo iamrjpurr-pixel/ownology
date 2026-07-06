@@ -92,6 +92,7 @@ const AdminThemesStats = lazy(() => import("./pages/AdminThemesStats"));
 const AdminQuizPicks = lazy(() => import("./pages/AdminQuizPicks"));
 const AdminProducers = lazy(() => import("./pages/AdminProducers"));
 const AdminMarketingOps = lazy(() => import("./pages/AdminMarketingOps"));
+const HiProducerPreview = lazy(() => import("./pages/HiProducerPreview"));
 const CascadeDemo = lazy(() => import("./pages/CascadeDemo"));
 const CopilotMockup = lazy(() => import("./pages/CopilotMockup"));
 const BrandingMockup = lazy(() => import("./pages/BrandingMockup"));
@@ -319,6 +320,7 @@ function Router() {
       <Route path={"/stats"} component={Stats} />
       <Route path={"/tank-qr"} component={TankQr} />
       <Route path={"/the-press/compare"} component={VintageCompare} />
+      <Route path={"/hi/producers/:id"} component={HiProducerPreview} />
       <Route path={"/hi/:slug"} component={HiContact} />
       <Route path={"/admin/contacts/pipeline"} component={AdminContactsPipeline} />
       <Route path={"/admin/contacts"} component={AdminContacts} />

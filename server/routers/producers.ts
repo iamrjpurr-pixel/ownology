@@ -16,7 +16,7 @@
  */
 import { z } from "zod";
 import { and, desc, eq, sql } from "drizzle-orm";
-import { router, ownerProcedure } from "../trpc.js";
+import { router, publicProcedure, ownerProcedure } from "../trpc.js";
 import { db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
 
@@ -54,6 +54,38 @@ const SAMPLE_PRODUCERS: Array<{
 ];
 
 export const producersRouter = router({
+  /**
+   * PUBLIC — minimal profile lookup for the cold-email prospect preview page
+   * (/hi/producers/:id). Returns ONLY the fields the preview needs so we
+   * don't leak enrichment metadata (contactRole confidence, phase1Source,
+   * outreach_status, touch_count, etc.) to an unauth'd URL.
+   */
+  publicPreview: publicProcedure
+    .input(z.object({ id: z.number().int() }))
+    .query(async ({ input }) => {
+      const rows = await db
+        .select({
+          id: schema.wineProducers.id,
+          name: schema.wineProducers.name,
+          country: schema.wineProducers.country,
+          region: schema.wineProducers.region,
+          contactName: schema.wineProducers.contactName,
+        })
+        .from(schema.wineProducers)
+        .where(eq(schema.wineProducers.id, input.id))
+        .limit(1);
+      const p = rows[0];
+      if (!p) return null;
+      const firstName = p.contactName ? p.contactName.split(/\s+/)[0] : null;
+      return {
+        id: p.id,
+        name: p.name,
+        country: p.country,
+        region: p.region,
+        firstName,
+      };
+    }),
+
   /** OWNER — list producers, optional country + status filter. */
   list: ownerProcedure
     .input(

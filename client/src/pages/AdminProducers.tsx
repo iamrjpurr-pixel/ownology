@@ -126,6 +126,25 @@ export default function AdminProducers() {
   >({ phase: "idle" });
   const [rowEnriching, setRowEnriching] = useState<number | null>(null);
 
+  // Compose modal — pre-fills a personalized draft using enriched data and
+  // opens it either in the operator's default mail client (mailto:) or on
+  // the clipboard. NEVER sends anything — this is deliberately manual
+  // because a hand-touched send from Rich's own inbox out-performs any
+  // automated sequence for a 21-prospect cohort. Preview URL is baked into
+  // the templates so a click from the recipient hits /hi/producers/:id.
+  const [composeFor, setComposeFor] = useState<
+    | null
+    | {
+        id: number;
+        name: string;
+        region: string | null;
+        country: "AU" | "NZ";
+        email: string;
+        contactName: string;
+        contactRole: string | null;
+      }
+  >(null);
+
   const [preview, setPreview] = useState<Row[] | null>(null);
   const [previewErrors, setPreviewErrors] = useState<string[]>([]);
   const [previewSource, setPreviewSource] = useState<string>("csv_upload");
@@ -397,7 +416,29 @@ Cloudy Bay,NZ,Marlborough,https://cloudybay.co.nz,,Nick Blampied,winemaker,mid
                   <Td>{p.email ?? "—"}</Td>
                   <Td>
                     {p.contactName ? (
-                      `${p.contactName}${p.contactRole ? ` (${p.contactRole})` : ""}`
+                      <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+                        <span>{p.contactName}{p.contactRole ? ` (${p.contactRole})` : ""}</span>
+                        {p.email && (
+                          <button
+                            type="button"
+                            data-testid={`prod-compose-${p.id}`}
+                            onClick={() =>
+                              setComposeFor({
+                                id: p.id,
+                                name: p.name,
+                                region: p.region ?? null,
+                                country: p.country,
+                                email: p.email!,
+                                contactName: p.contactName!,
+                                contactRole: p.contactRole ?? null,
+                              })
+                            }
+                            style={{ background: "transparent", border: "none", color: AMBER, fontFamily: SANS, fontSize: "0.7rem", cursor: "pointer", textDecoration: "underline dotted", padding: 0 }}
+                          >
+                            ▶ Compose
+                          </button>
+                        )}
+                      </div>
                     ) : (
                       <button
                         type="button"
@@ -451,6 +492,260 @@ Cloudy Bay,NZ,Marlborough,https://cloudybay.co.nz,,Nick Blampied,winemaker,mid
           </table>
         </div>
       )}
+      {composeFor && <ComposeModal producer={composeFor} onClose={() => setComposeFor(null)} />}
+    </div>
+  );
+}
+
+// ── Compose modal ─────────────────────────────────────────────────────────
+// Three deliberately different template variants. Each substitutes {first},
+// {winery}, {region}, {previewUrl}, {countryLabel}. Rich reviews + edits in
+// the modal, then either copies to clipboard or launches mailto: — so the
+// email leaves from HIS inbox with HIS reputation, not an automated sender.
+type ComposeProducer = {
+  id: number;
+  name: string;
+  region: string | null;
+  country: "AU" | "NZ";
+  email: string;
+  contactName: string;
+  contactRole: string | null;
+};
+
+type TemplateKey = "brief_demo" | "vintage_intro" | "peer_share";
+
+const TEMPLATES: Record<
+  TemplateKey,
+  { label: string; subject: (p: ComposeProducer) => string; body: (p: ComposeProducer, previewUrl: string) => string }
+> = {
+  brief_demo: {
+    label: "Cellar Brief demo",
+    subject: (p) => `${p.contactName.split(" ")[0]} — a Monday morning brief for ${p.name}`,
+    body: (p, url) => {
+      const first = p.contactName.split(" ")[0];
+      const region = p.region ?? (p.country === "NZ" ? "New Zealand" : "Australia");
+      return `Hi ${first},
+
+I built a plausible preview of what an Ownology Cellar Brief could look like for ${p.name} on a Monday morning during vintage — no data entry, just synthesized from your existing lab logs and tank sheets.
+
+Quick look (30 seconds, no login): ${url}
+
+The cards are a ${region} template at your scale — your real cellar would replace them with your actual vessels. If it's off-target I'd rather know than not.
+
+Happy to walk you through the real thing on a 20-min call if it's useful.
+
+Cheers,
+Rich
+Ownology`;
+    },
+  },
+  vintage_intro: {
+    label: "Vintage-log intro",
+    subject: (p) => `Vintage log tool — thought of ${p.name}`,
+    body: (p, url) => {
+      const first = p.contactName.split(" ")[0];
+      const role = p.contactRole?.toLowerCase() ?? "team";
+      return `Hi ${first},
+
+Short one — I've been building a vintage log tool aimed at boutique winemakers who don't have time to babysit spreadsheets. ${p.contactRole?.includes("Winemaker") ? `As ${p.name}'s ${role}` : `At ${p.name}`}, you're exactly the operator I've been designing for.
+
+Rough sketch of what your Monday brief could look like: ${url}
+
+Would 20 mins on a call in the next week or two be useful? I'd rather learn what breaks than pitch.
+
+Cheers,
+Rich
+Ownology`;
+    },
+  },
+  peer_share: {
+    label: "Peer share (soft)",
+    subject: (p) => `Something for ${p.name}'s cellar`,
+    body: (p, url) => {
+      const first = p.contactName.split(" ")[0];
+      return `Hi ${first},
+
+I've been building something in the winemaker-ops space and wanted to share a preview I made specifically for ${p.name}: ${url}
+
+It's a mock-up of a daily Cellar Brief, region-tuned. Zero data-collection until you actually connect anything — it's just a preview.
+
+If it looks useful, reply and I'll set up a real demo. If not, delete this and no hard feelings.
+
+Cheers,
+Rich
+Ownology`;
+    },
+  },
+};
+
+function ComposeModal({ producer, onClose }: { producer: ComposeProducer; onClose: () => void }) {
+  const [templateKey, setTemplateKey] = useState<TemplateKey>("brief_demo");
+  const previewUrl = `${window.location.origin}/hi/producers/${producer.id}`;
+  const template = TEMPLATES[templateKey];
+  const [subject, setSubject] = useState(template.subject(producer));
+  const [body, setBody] = useState(template.body(producer, previewUrl));
+  const [copied, setCopied] = useState<"none" | "body" | "all">("none");
+
+  // Re-generate copy when the user swaps templates.
+  const swapTemplate = (k: TemplateKey) => {
+    setTemplateKey(k);
+    setSubject(TEMPLATES[k].subject(producer));
+    setBody(TEMPLATES[k].body(producer, previewUrl));
+    setCopied("none");
+  };
+
+  const mailtoHref = `mailto:${encodeURIComponent(producer.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  const copyBody = async () => {
+    await navigator.clipboard.writeText(body);
+    setCopied("body");
+    setTimeout(() => setCopied("none"), 2000);
+  };
+  const copyAll = async () => {
+    await navigator.clipboard.writeText(`To: ${producer.email}\nSubject: ${subject}\n\n${body}`);
+    setCopied("all");
+    setTimeout(() => setCopied("none"), 2000);
+  };
+
+  return (
+    <div
+      data-testid="compose-modal"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "color-mix(in oklch, black 55%, transparent)",
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "center",
+        padding: "40px 20px",
+        zIndex: 100,
+        overflow: "auto",
+      }}
+    >
+      <div
+        style={{
+          background: CARD,
+          border: `1px solid ${BORDER}`,
+          borderRadius: 12,
+          width: "100%",
+          maxWidth: 720,
+          padding: "22px 24px",
+          boxShadow: "0 20px 60px color-mix(in oklch, black 40%, transparent)",
+        }}
+      >
+        <header style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
+          <div>
+            <p style={{ fontFamily: SANS, fontSize: "0.68rem", letterSpacing: "0.12em", color: AMBER, textTransform: "uppercase", margin: 0 }}>Compose personalized email</p>
+            <h2 style={{ fontFamily: SERIF, fontSize: "1.35rem", color: HI, margin: "4px 0 0" }}>
+              {producer.contactName} · {producer.name}
+            </h2>
+          </div>
+          <button
+            type="button"
+            data-testid="compose-close"
+            onClick={onClose}
+            style={{ background: "transparent", border: "none", color: LO, fontSize: "1.4rem", cursor: "pointer", lineHeight: 1 }}
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </header>
+
+        {/* Template picker */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
+          {(Object.keys(TEMPLATES) as TemplateKey[]).map((k) => (
+            <button
+              key={k}
+              type="button"
+              data-testid={`compose-template-${k}`}
+              onClick={() => swapTemplate(k)}
+              style={{
+                fontFamily: SANS,
+                fontSize: "0.72rem",
+                padding: "5px 12px",
+                borderRadius: 999,
+                border: templateKey === k ? `1px solid ${AMBER}` : `1px solid ${BORDER}`,
+                background: templateKey === k ? "color-mix(in oklch, gold 12%, transparent)" : "transparent",
+                color: templateKey === k ? HI : MID,
+                fontWeight: templateKey === k ? 600 : 500,
+                cursor: "pointer",
+              }}
+            >
+              {TEMPLATES[k].label}
+            </button>
+          ))}
+        </div>
+
+        {/* To */}
+        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8, fontFamily: SANS, fontSize: "0.75rem", color: MID }}>
+          <span style={{ letterSpacing: "0.08em", textTransform: "uppercase", color: LO, minWidth: 60, fontSize: "0.65rem", fontWeight: 700 }}>To</span>
+          <span data-testid="compose-to" style={{ color: HI }}>{producer.email}</span>
+        </div>
+
+        {/* Subject */}
+        <div style={{ marginBottom: 10 }}>
+          <label style={{ fontFamily: SANS, fontSize: "0.65rem", letterSpacing: "0.08em", textTransform: "uppercase", color: LO, fontWeight: 700 }}>
+            Subject
+          </label>
+          <input
+            data-testid="compose-subject"
+            type="text"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            style={{ display: "block", width: "100%", padding: "8px 10px", marginTop: 4, background: "var(--ow-bg-inset)", border: `1px solid ${BORDER}`, borderRadius: 6, color: HI, fontFamily: SANS, fontSize: "0.85rem" }}
+          />
+        </div>
+
+        {/* Body */}
+        <div style={{ marginBottom: 10 }}>
+          <label style={{ fontFamily: SANS, fontSize: "0.65rem", letterSpacing: "0.08em", textTransform: "uppercase", color: LO, fontWeight: 700 }}>
+            Body — edit before sending
+          </label>
+          <textarea
+            data-testid="compose-body"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            rows={14}
+            style={{ display: "block", width: "100%", padding: "10px 12px", marginTop: 4, background: "var(--ow-bg-inset)", border: `1px solid ${BORDER}`, borderRadius: 6, color: HI, fontFamily: SANS, fontSize: "0.85rem", lineHeight: 1.5, resize: "vertical" }}
+          />
+          <p style={{ fontFamily: SANS, fontSize: "0.7rem", color: LO, marginTop: 6 }}>
+            Preview URL <a href={previewUrl} target="_blank" rel="noreferrer" style={{ color: AMBER, textDecoration: "none" }}>{previewUrl}</a> is baked into every template.
+          </p>
+        </div>
+
+        {/* Actions */}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
+          <a
+            data-testid="compose-open-mail"
+            href={mailtoHref}
+            onClick={onClose}
+            style={{ padding: "8px 18px", background: AMBER, color: "oklch(0.10 0.008 60)", fontFamily: SANS, fontSize: "0.82rem", fontWeight: 700, borderRadius: 4, textDecoration: "none", letterSpacing: "0.02em" }}
+          >
+            ▶ Open in mail app
+          </a>
+          <button
+            type="button"
+            data-testid="compose-copy-body"
+            onClick={copyBody}
+            style={{ padding: "8px 14px", background: "transparent", border: `1px solid ${BORDER}`, color: MID, fontFamily: SANS, fontSize: "0.82rem", fontWeight: 600, borderRadius: 4, cursor: "pointer" }}
+          >
+            {copied === "body" ? "✓ Copied" : "Copy body"}
+          </button>
+          <button
+            type="button"
+            data-testid="compose-copy-all"
+            onClick={copyAll}
+            style={{ padding: "8px 14px", background: "transparent", border: `1px solid ${BORDER}`, color: MID, fontFamily: SANS, fontSize: "0.82rem", fontWeight: 600, borderRadius: 4, cursor: "pointer" }}
+          >
+            {copied === "all" ? "✓ Copied To+Subject+Body" : "Copy all (To/Subject/Body)"}
+          </button>
+        </div>
+
+        <p style={{ marginTop: 14, fontFamily: SANS, fontSize: "0.7rem", color: LO }}>
+          Ownology never sends this for you. Your inbox, your reputation, your handwritten voice — that&apos;s the whole point.
+        </p>
+      </div>
     </div>
   );
 }
