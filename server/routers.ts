@@ -14,6 +14,7 @@ import { producersRouter } from "./routers/producers.js";
 import { marketingOpsRouter } from "./routers/marketingOps.js";
 import { gateRouter } from "./routers/gate.js";
 import { qualFlagsRouter } from "./routers/qualFlags.js";
+import { weatherRouter } from "./routers/weather.js";
 import { wineryRouter } from "./routers/winery.js";
 import { cellarBriefRouter } from "./routers/cellarBrief.js";
 import { referralsRouter } from "./routers/referrals.js";
@@ -1827,5 +1828,6 @@ export const appRouter = router({
   marketingOps: marketingOpsRouter,
   gate: gateRouter,
   qualFlags: qualFlagsRouter,
+  weather: weatherRouter,
 });
 export type AppRouter = typeof appRouter;

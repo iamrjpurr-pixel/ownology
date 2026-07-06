@@ -44,6 +44,28 @@ export const LAST_UPDATED = "2026-02-06";
 export const TODO: TodoItem[] = [
   // ═══ 🔴 P0 · Must-fix before first paying customer ═══
   {
+    id: "weather-widget-per-winery-config",
+    title: "Per-winery weather widget location + threshold config",
+    description:
+      "Widget shipped Feb 06 with hardcoded Hunter Valley GPS + default AWRI-aligned thresholds. Slice 2: add /admin/settings inputs for winery lat/lng (or address → geocode), cellar-type (passive/active/mixed), and custom threshold overrides (humidity high/low, temp high/low). Store on the existing users or new winery_environmental_config table. When plumbed, the WeatherWidget already accepts lat/lng/label as tRPC input — just needs the UI + persistence layer.",
+    priority: "p1",
+    effort: "~2-3 hours",
+    status: "not-started",
+    category: "Product",
+    updatedAt: "2026-02-06",
+  },
+  {
+    id: "weather-widget-sop-and-vintage-log-integration",
+    title: "Weather widget → SOP deep-links + Vintage Log flag",
+    description:
+      "When an environmental alert fires (e.g. Humidity high >75%), we currently show why + action inline. Slice 3: add a 'Log this' button that (a) writes an environmental_event row to vintage_log_entries so a wine's exposure history is auditable, and (b) deep-links to a matching SOP ('Increase Ventilation SOP' — needs to be authored and added to sop_library first). Turns the widget from informational into workflow-integrated.",
+    priority: "p2",
+    effort: "~2 hours + ~1 hour SOP authoring",
+    status: "not-started",
+    category: "Product",
+    updatedAt: "2026-02-06",
+  },
+  {
     id: "auth-scope-endpoints",
     title: "Hide member data from anonymous API calls",
     description:
@@ -406,6 +428,13 @@ export interface ShippedItem {
 }
 
 export const RECENTLY_SHIPPED: ShippedItem[] = [
+  {
+    id: "weather-widget-tier-3-environmental",
+    title: "Weather widget · Tier 3 environmental risk on /dashboard",
+    description:
+      "Third axis of the Risk Management framework — live ambient telemetry from Open-Meteo (no API key, no cost). Renders current humidity/temp/dew-point/pressure/cloud/wind + 7-day forecast + 24h sparkline + 5 threshold-based alerts (humidity high/low, temp high/low, dew-point approach) with 48h forecast-side pre-warning for incoming spikes. Alert thresholds cited to AWRI TR227 + Bulletin 2019 + OIV. /risk-management doctrine page updated with a Tier 3 section. Multi-location tested: Hunter Valley (81% RH · warning), Marlborough (92% RH · critical), Barossa (72% RH · forecast pre-warning). Widget component accepts lat/lng/label as input — ready for Slice 2 per-winery config.",
+    shippedAt: "2026-02-06",
+  },
   {
     id: "invite-token-routing-fix",
     title: "/i/:token magic-link invite routing fix",

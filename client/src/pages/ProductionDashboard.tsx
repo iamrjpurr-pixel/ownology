@@ -17,6 +17,7 @@ import {
   DollarSign,
   Boxes,
 } from "lucide-react";
+import { WeatherWidget } from "@/components/WeatherWidget";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -283,6 +284,9 @@ export default function ProductionDashboard() {
             </Link>
           </div>
         )}
+
+        {/* ── Cellar Environment Widget (Tier 3 risk — Feb 2026) ── */}
+        <WeatherWidget />
 
         {/* ── KPI Grid ── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

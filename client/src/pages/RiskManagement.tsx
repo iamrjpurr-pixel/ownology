@@ -145,12 +145,13 @@ export default function RiskManagement() {
         Ownology · Risk Management Doctrine
       </p>
       <h1 style={{ fontFamily: SERIF, fontSize: "2.4rem", color: HI, margin: "8px 0 6px", lineHeight: 1.15 }}>
-        The 12 risks we watch, in one framework.
+        The risks we watch, in one framework.
       </h1>
       <p style={{ fontFamily: SANS, color: MID, fontSize: "1rem", maxWidth: 720, lineHeight: 1.55 }}>
-        Every risk that can cost a boutique winery a barrel falls into one of two categories: things we can <em>measure</em>,
-        and things you have to <em>taste</em>. Ownology handles the first automatically and prompts you on the second — no gaps
-        between them. Threshold, trigger, action for every risk, all cited to AWRI or Wine Australia.
+        Every risk that can cost a boutique winery a barrel falls into one of three categories: things we can <em>measure</em> in the lab,
+        things you have to <em>taste</em>, and things the <em>environment</em> forces on you. Ownology handles the first automatically,
+        prompts you on the second, and streams the third live from local weather — no gaps between them. Threshold, trigger, action
+        for every risk, all cited to AWRI, OIV, Wine Australia or the Bureau of Meteorology.
       </p>
 
       {/* Tier 1 — Quantitative */}
@@ -209,6 +210,53 @@ export default function RiskManagement() {
             <RiskCard key={r.key} risk={r} tier="qual" />
           ))}
         </div>
+      </section>
+
+      {/* Tier 3 — Environmental */}
+      <section style={{ marginTop: 40 }} data-testid="env-tier">
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12, flexWrap: "wrap" }}>
+          <span
+            style={{
+              fontFamily: SANS,
+              fontSize: "0.72rem",
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              padding: "4px 10px",
+              borderRadius: 4,
+              background: "color-mix(in oklch, dodgerblue 18%, transparent)",
+              color: "#1e40af",
+              fontWeight: 700,
+            }}
+          >
+            Tier 3 · Environmental
+          </span>
+          <span style={{ fontFamily: SANS, fontSize: "0.85rem", color: LO }}>
+            Live ambient telemetry — humidity, dew-point, temperature, pressure — streamed from local weather to your Dashboard
+          </span>
+        </div>
+        <div
+          style={{
+            background: RAISED,
+            border: `1px solid ${BORDER}`,
+            borderRadius: 8,
+            padding: "16px 18px",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: 14,
+          }}
+        >
+          <EnvRow title="Humidity high" range=">75% RH" why="Above ~80% RH: mould on labels, cork softening, condensation on cool tank walls (AWRI TR227)." action="Increase ventilation or run a dehumidifier." />
+          <EnvRow title="Humidity low" range="<55% RH" why="Cork drying accelerates oxygen ingress; angel's-share evaporation from barrels increases." action="Introduce moisture; store bottles on side." />
+          <EnvRow title="Temperature high" range=">18°C ambient" why="Bottled-wine oxidation kinetics roughly double every 8°C — shelf life shortens." action="Insulate, close cellar in hot hours, or run A/C during heat waves." />
+          <EnvRow title="Temperature low" range="<10°C ambient" why="Sub-10°C ambient can precipitate potassium bitartrate ('wine diamonds') in bottled wines — cosmetic but alarms consumers." action="Cold-stabilise pre-bottling if exposure is chronic." />
+          <EnvRow title="Dew-point approach" range="< 2°C margin to cellar temp" why="Ambient dew point meeting a cool surface = condensation = mould + label + biofilm risk." action="Close cellar to hot humid air; wipe cool surfaces dry." />
+          <EnvRow title="Forecast pre-warning" range="48h horizon" why="Early notice of a spike so the cellar can be prepped before it hits — insulation, standby dehumidifier, move sensitive lots." action="Prep before the weather does." />
+        </div>
+        <p style={{ fontFamily: SANS, fontSize: "0.78rem", color: LO, marginTop: 10, lineHeight: 1.55 }}>
+          Data source: Open-Meteo (CC-BY-4.0 free tier, no auth). Thresholds informed by AWRI Technical Review 227 (cellar humidity),
+          AWRI Bulletin 2019 (wine storage temperature), and OIV compendium (tartrate stability).
+          Refreshes every 5 minutes on the <a href="/dashboard" style={{ color: AMBER, textDecoration: "underline" }}>Dashboard</a> Weather widget.
+        </p>
       </section>
 
       {/* CTA */}
@@ -328,3 +376,30 @@ function RiskCard({ risk, tier }: { risk: Risk; tier: "quant" | "qual" }) {
     </article>
   );
 }
+
+function EnvRow({ title, range, why, action }: { title: string; range: string; why: string; action: string }) {
+  return (
+    <div
+      data-testid={`env-row-${title.replace(/\s+/g, "-").toLowerCase()}`}
+      style={{
+        background: CARD,
+        border: `1px solid ${BORDER}`,
+        borderLeft: `3px solid #1e40af`,
+        borderRadius: 6,
+        padding: "10px 12px",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "baseline", marginBottom: 4 }}>
+        <h4 style={{ fontFamily: SERIF, fontSize: "0.95rem", color: HI, margin: 0 }}>{title}</h4>
+        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.7rem", color: "#1e40af", fontWeight: 700 }}>{range}</span>
+      </div>
+      <p style={{ fontFamily: SANS, fontSize: "0.76rem", color: MID, margin: "0 0 4px", lineHeight: 1.5 }}>
+        <strong style={{ color: HI }}>Why:</strong> {why}
+      </p>
+      <p style={{ fontFamily: SANS, fontSize: "0.76rem", color: "#1e40af", margin: 0, lineHeight: 1.5, fontWeight: 600 }}>
+        → {action}
+      </p>
+    </div>
+  );
+}
+
