@@ -154,7 +154,7 @@ export default function RiskBriefing() {
           This page is for you — the cellar team. It explains the three tiers of risk Ownology watches, exactly what each alert means when it fires on your screen, and where to find the compliance-audit trail every reading feeds. Bookmark it. Point new hires at it on day one.
         </p>
         <p style={{ fontFamily: SANS, fontSize: "0.82rem", color: LO, lineHeight: 1.55, marginTop: "0.75rem" }}>
-          Related surfaces: <Link href="/risk-management" style={{ color: AMBER }}>/risk-management</Link> (public doctrine), <Link href="/dashboard" style={{ color: AMBER }}>/dashboard</Link> (live widgets), <Link href="/cellar-brief" style={{ color: AMBER }}>/cellar-brief</Link> (today&rsquo;s cards + one-tap qual flags), <Link href="/admin/playbook" style={{ color: AMBER }}>/admin/playbook</Link> (Daily 10 / Weekly 30 / Vintage-critical cadence).
+          Related surfaces: <Link href="/risk-management" style={{ color: AMBER }}>/risk-management</Link> (public doctrine), <Link href="/risk-glossary" style={{ color: AMBER }}>/risk-glossary</Link> (every term defined, with citations), <Link href="/dashboard" style={{ color: AMBER }}>/dashboard</Link> (live widgets), <Link href="/cellar-brief" style={{ color: AMBER }}>/cellar-brief</Link> (today&rsquo;s cards + one-tap qual flags), <Link href="/admin/playbook" style={{ color: AMBER }}>/admin/playbook</Link> (Daily 10 / Weekly 30 / Vintage-critical cadence).
         </p>
 
         {/* ═══ Section 1 — Three tiers ═══ */}
@@ -170,6 +170,11 @@ export default function RiskBriefing() {
               tier="Tier 1"
               color="#059669"
               name="Quantitative"
+              tierExplainer={
+                "Quantitative = risks you can COUNT.\n\n" +
+                "Anything expressed in numbers: SO₂ in ppm, Brix in °Bx, temperature in °C, malic acid in g/L, days since last check. The Cellar Brief engine reads these values from your log and fires an alert the moment they cross a threshold — no operator judgement needed.\n\n" +
+                "The word comes from research methodology (quantitative vs qualitative research). It signals: measurable, comparable across batches, auditable."
+              }
               who="The system — from lab readings you enter"
               where="/dashboard Cellar Alerts banner + /cellar-brief card status colour"
               example="Tank 2 Brix flatlined 12 hrs above dryness → red alert 'Possible stuck ferment'"
@@ -178,6 +183,11 @@ export default function RiskBriefing() {
               tier="Tier 2"
               color="#b45309"
               name="Qualitative"
+              tierExplainer={
+                "Qualitative = risks you can PERCEIVE but not (easily) measure.\n\n" +
+                "No probe catches Brett, TCA, oxidation, H₂S, or a dirty hose — those need a trained nose, palate, and eye. Tier 2 turns each observation into a one-tap record: pick the flag, add a note, submit. Two seconds, permanent audit trail.\n\n" +
+                "'Qualitative' comes from the same research-methodology pair as Quantitative. Different mode of knowing, same rigour."
+              }
               who="You — nose, palate, sight"
               where="/cellar-brief 🚩 flag button on every vessel card"
               example="Barrel Rack A smells barnyardy during pump-over → tap Brett → 2-second capture"
@@ -186,6 +196,11 @@ export default function RiskBriefing() {
               tier="Tier 3"
               color="#1e40af"
               name="Environmental"
+              tierExplainer={
+                "Environmental = risks the OUTSIDE world imposes on your cellar.\n\n" +
+                "Ambient humidity, temperature, dew point, atmospheric pressure — things you don't control but that quietly shape how your wine ages. Streamed live from Open-Meteo, cross-referenced to AWRI TR227 thresholds.\n\n" +
+                "Distinct from Occupational Environment (people-safety, covered by Safe Work Australia — deliberately NOT our scope). This tier watches the wine-quality effects only: humidity → mould/condensation, temp → oxidation kinetics, dew point → surface wetness."
+              }
               who="The sky — streamed live from local weather"
               where="/dashboard Cellar Environment widget"
               example="Ambient RH 82% + 97% forecast Friday → dehumidifier standby before the spike"
@@ -302,14 +317,41 @@ export default function RiskBriefing() {
 }
 
 // ── Sub-components ─────────────────────────────────────────────────────
-function TierRow({ tier, color, name, who, where, example }: { tier: string; color: string; name: string; who: string; where: string; example: string }) {
+function TierRow({ tier, color, name, tierExplainer, who, where, example }: { tier: string; color: string; name: string; tierExplainer: string; who: string; where: string; example: string }) {
   return (
     <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${color}`, borderRadius: 6, padding: "0.9rem 1rem" }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: "0.75rem", flexWrap: "wrap" }}>
         <span style={{ fontFamily: SANS, fontSize: "0.66rem", letterSpacing: "0.14em", textTransform: "uppercase", color, fontWeight: 700, padding: "0.15rem 0.5rem", background: `color-mix(in oklch, ${color} 15%, transparent)`, borderRadius: 3 }}>
           {tier}
         </span>
-        <h3 style={{ fontFamily: SERIF, fontSize: "1.15rem", color: HI, margin: 0 }}>{name}</h3>
+        <h3 style={{ fontFamily: SERIF, fontSize: "1.15rem", color: HI, margin: 0, display: "inline-flex", alignItems: "center" }}>
+          {name}
+          <span
+            data-testid={`tier-info-${name.toLowerCase()}`}
+            title={tierExplainer}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 15,
+              height: 15,
+              borderRadius: "50%",
+              border: `1px solid ${color}`,
+              background: `color-mix(in oklch, ${color} 12%, transparent)`,
+              color,
+              fontSize: "0.6rem",
+              fontWeight: 700,
+              marginLeft: "0.5rem",
+              cursor: "help",
+              userSelect: "none",
+              lineHeight: 1,
+              fontFamily: SANS,
+            }}
+            aria-label={`What ${name} means`}
+          >
+            i
+          </span>
+        </h3>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "0.3rem 0.9rem", marginTop: "0.55rem", fontFamily: SANS, fontSize: "0.82rem", color: MID }}>
         <span style={{ color: LO, letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.64rem", fontWeight: 700, alignSelf: "start", paddingTop: 3 }}>Who</span>
