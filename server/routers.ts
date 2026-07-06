@@ -1822,5 +1822,6 @@ export const appRouter = router({
   winery: wineryRouter,
   cellarBrief: cellarBriefRouter,
   referrals: referralsRouter,
+  marketingOps: marketingOpsRouter,
 });
 export type AppRouter = typeof appRouter;

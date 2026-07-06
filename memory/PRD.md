@@ -4,6 +4,20 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Marketing Ops Dashboard — `/admin/marketing-ops` (Feb 2026, this session) — SHIPPED**
+- Winemaker-psychology-aware daily/weekly ritual dashboard. Five zones on one page:
+  1. **Season strip** — colour-coded Southern-Hemisphere season chip (vintage / dormant / pruning_spring / pre_summer / holiday) with a cold-outreach gate label (peak / ok / avoid / pause). Adelaide TZ.
+  2. **AI Coach line** — one 40-word Claude-Sonnet-generated sentence per Adelaide calendar day (cached in `marketing_coach_lines`). Reads season + day + funnel snapshot (sent / replied / opened-no-reply / unsent-with-mobile) and tells the operator EXACTLY what to focus on. Falls back to a rule-based sentence if LLM fails. Refresh button + Cached/Fresh chip.
+  3. **KPI strip** — Streak (consecutive days with ≥1 completion, 60-day back-scan), Done today (n/n), 7d sent, Reply rate %, 7d Booked demos.
+  4. **Today's focus** — daily + today's weekly tasks. Each row: title, category chip (warm_reach/pipeline/cold_reach/content/review/product), cadence, ⏱ estimate, 🕒 time hint, why-line, quick-link. Tap the checkbox → `complete` mutation. Un-tap → `uncomplete`. Season-blocked tasks render dimmed with "Blocked — off-season" chip.
+  5. **Weekly rhythm board** — 7 columns (Mon → Sun), today highlighted in amber, each weekly task shown with ✓ done / · pending / ⊘ blocked.
+- **Backend**: `server/routers/marketingOps.ts` — 5 tRPC procedures: `today`, `complete`, `uncomplete`, `coachLine`, `wins`, `listDefs`. 11 task defs (5 daily + 6 weekly) coded in-file. All are `ownerProcedure` (gate-protected).
+- **DB**: `marketing_task_completions` (task_slug, completed_at, local_date, iso_week, notes) + `marketing_coach_lines` (local_date, line, season, generated_at). CREATE TABLE bootstrap in `server/index.ts`; Drizzle schema in `drizzle/schema.ts`.
+- **Wiring closed this session**: `marketingOpsRouter` registered in `appRouter`; route `/admin/marketing-ops` added to `App.tsx` (lazy-loaded); "Marketing Ops · AI Coach" card added to `/admin` hub.
+- **Verified live end-to-end**: gate unlocked → page renders → season chip "Dormant · peak pitching window" → Claude Sonnet coach line quoting real funnel numbers ("With 2 warm link-openers sitting silent and 30 unsent contacts…") → 6 daily task rows + 7 weekly columns. All 5 tRPC endpoints tested via curl. Pytest 14/14 green.
+
+
+
 **Value-engineering batch (Feb 2026, this session) — S+A+C+O+H waves**
 - **S1 tRPC gate**: 100 req/min per IP rate limit on `/api/trpc/*`, 20/min on `/api/scheduled/*`. Blocks bot/brute-force loops from draining Perplexity/Resend budgets.
 - **S2 rate limiter**: Reusable `rateLimitCheck(bucket, ip, windowMs, max)` helper in `server/gate.ts`. Same primitive used by `/api/gate/verify` (5 attempts / 15 min).

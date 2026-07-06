@@ -449,6 +449,13 @@ const TOOLS: AdminTool[] = [
     icon: <IconLeads />,
     badge: "Pipeline",
   },
+  {
+    label: "Marketing Ops",
+    description: "Your daily/weekly marketing ritual dashboard. AI Coach reads the season + funnel state and tells you exactly what to do today. Tick tasks, hold your streak, watch the reply-rate KPI.",
+    href: "/admin/marketing-ops",
+    icon: <IconLeads />,
+    badge: "AI Coach",
+  },
 ];
 
 export default function Admin() {
