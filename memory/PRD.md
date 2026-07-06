@@ -4,6 +4,19 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**A2 · NZ Wine directory scraper — SHIPPED (Feb 2026, this session)**
+- **Source**: `nzwine.com/en/winery-directory/` — fully server-rendered static HTML, no Playwright needed. The originally-assumed `directory.wineaustralia.com` doesn't exist (it's the Wine Australia Export Label directory, no producer contacts).
+- **Script**: `scripts/scrape-nz-winery-directory.mjs` — native `fetch` + regex parsing (no new deps), retry-with-backoff, auto-paginates until empty page, `--dry-run` / `--limit` / `--delay` / `--keyword` / `--tourism=sip,dine` / `--region=hawkes-bay` flags. Idempotent upserts on `(name, country="NZ")` — only fills BLANK columns so manual admin edits are never overwritten.
+- **What it extracts**: name, region (from `c-layout-header__lede` with a fallback that counts `/en/regions/<slug>/` occurrences ≥2 for wineries that don't set the lede), website (first non-social external href), email (first `mailto:`). Decodes Māori macrons (`&#x101;` → ā, etc.).
+- **Seeded data — targeted flywheel**: user filtered to `keyword=winery` × `tourism=sip AND dine` = the 23 highest-value NZ wineries (cellar-door hospitality + food = actively marketing, cellar-door software TAM). Inserted 23/23 rows; 21 with emails, 23 with websites, 23 with regions. Two emailless (Church Road Winery; Monte Christo Gibbston Cellar Door) flagged for manual enrichment. Full-directory scrape (all 534) was dry-run-verified and works too — user opted for the tighter cohort.
+- **DB state after**: Total 35 producers · AU 8 · NZ 27 (was 4) · Untouched 35 — ready for A3 3-touch Resend cold-email sequence.
+- **Run examples**:
+  - `node scripts/scrape-nz-winery-directory.mjs --dry-run --keyword=winery --tourism=sip,dine` (23 targets)
+  - `node scripts/scrape-nz-winery-directory.mjs --tourism=sip,dine --region=hawkes-bay` (per-region live)
+  - `node scripts/scrape-nz-winery-directory.mjs` (all 534, ~6 min)
+
+
+
 **Marketing Ops Dashboard — `/admin/marketing-ops` (Feb 2026, this session) — SHIPPED**
 - Winemaker-psychology-aware daily/weekly ritual dashboard. Five zones on one page:
   1. **Season strip** — colour-coded Southern-Hemisphere season chip (vintage / dormant / pruning_spring / pre_summer / holiday) with a cold-outreach gate label (peak / ok / avoid / pause). Adelaide TZ.
