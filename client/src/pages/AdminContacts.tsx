@@ -101,6 +101,7 @@ export default function AdminContacts() {
   const markSmsSentMutation = trpc.outreach.markSmsSent.useMutation();
   const markBookedMutation = trpc.outreach.markBooked.useMutation();
   const setStatusMutation = trpc.outreach.setStatus.useMutation();
+  const setPipelineStageMutation = trpc.outreach.setPipelineStage.useMutation();
   const setSmsDraftMutation = trpc.outreach.setSmsDraft.useMutation();
   const setNotesMutation = trpc.outreach.setNotes.useMutation();
   const setNameMutation = trpc.outreach.setName.useMutation();
@@ -166,8 +167,13 @@ export default function AdminContacts() {
     const total = allContacts.length;
     const sent = allContacts.filter((c) => c.smsSentAt).length;
     const opened = allContacts.filter((c) => (c.viewCount ?? 0) > 0).length;
+    const replied = allContacts.filter((c) => c.repliedAt).length;
     const booked = allContacts.filter((c) => c.demoBookedAt).length;
-    return { total, sent, opened, booked };
+    // Reply rate is the single most-important funnel metric — if <10%,
+    // your SMS copy or targeting is off. Computed against SENT so it
+    // shows the actual conversion, not diluted by un-blasted contacts.
+    const replyRatePct = sent > 0 ? Math.round((replied / sent) * 100) : 0;
+    return { total, sent, opened, replied, booked, replyRatePct };
   }, [allContacts]);
 
   async function handleCreate(e: React.FormEvent) {
@@ -354,10 +360,11 @@ export default function AdminContacts() {
       </div>
 
       {/* Headline stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
         <Kpi label="Contacts" value={stats.total} testid="contacts-kpi-total" />
         <Kpi label="SMS sent" value={stats.sent} testid="contacts-kpi-sent" />
         <Kpi label="Opened link" value={stats.opened} testid="contacts-kpi-opened" />
+        <Kpi label={`Replied · ${stats.replyRatePct}%`} value={stats.replied} testid="contacts-kpi-replied" />
         <Kpi label="Demo booked" value={stats.booked} testid="contacts-kpi-booked" />
       </div>
 
@@ -1174,6 +1181,38 @@ export default function AdminContacts() {
                   </select>
                   {c.smsSentAt && <Pill color="#6b7280">SMS sent {fmtAgo(c.smsSentAt)}</Pill>}
                   {(c.viewCount ?? 0) > 0 && <Pill color="#b45309">{c.viewCount} view{c.viewCount === 1 ? "" : "s"}</Pill>}
+                  {c.repliedAt && <Pill color="#7c3aed">Replied {fmtAgo(c.repliedAt)}</Pill>}
+                  {/* Reply tracker (Feb 2026) — one-click marker for the
+                      "they wrote back on SMS/DM/email" moment. Only shows
+                      when the contact has been SMS'd but hasn't been
+                      marked replied yet. Uses setPipelineStage which
+                      stamps repliedAt server-side and advances the
+                      pipeline stage from 'awaiting' → 'replied'. */}
+                  {c.smsSentAt && !c.repliedAt && (
+                    <button
+                      type="button"
+                      data-testid={`mark-replied-${c.slug}`}
+                      onClick={() =>
+                        setPipelineStageMutation.mutate(
+                          { slug: c.slug, stage: "replied" },
+                          { onSuccess: () => utils.outreach.list.invalidate() }
+                        )
+                      }
+                      style={{
+                        padding: "3px 10px",
+                        borderRadius: 999,
+                        border: "1px solid color-mix(in oklch, #7c3aed 40%, transparent)",
+                        background: "color-mix(in oklch, #7c3aed 15%, transparent)",
+                        color: "#a78bfa",
+                        fontFamily: "'Lato',sans-serif",
+                        fontSize: "0.72rem",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                      }}
+                    >
+                      💬 Mark replied
+                    </button>
+                  )}
                   {c.demoBookedAt && <Pill color="#10b981">Booked {fmtAgo(c.demoBookedAt)}</Pill>}
                 </div>
               </div>
