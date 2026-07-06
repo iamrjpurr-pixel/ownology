@@ -48,6 +48,14 @@ interface ResumeState {
 function loadResumeState(): ResumeState | null {
   if (typeof window === "undefined") return null;
   try {
+    // Explicit ?intro=1 forces the visitor back into the 3-page story
+    // intro (bypassing localStorage resume). Bookmarkable + shareable —
+    // e.g. tell a prospect "check https://ownology.ai/try?intro=1".
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("intro") === "1") {
+      window.localStorage.removeItem(RESUME_KEY);
+      return null;
+    }
     const raw = window.localStorage.getItem(RESUME_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as ResumeState;
@@ -89,7 +97,7 @@ const CARD_BG = "var(--ow-card-bg)";
 const BG = "var(--ow-bg)";
 
 // ─── Shared UI bits ─────────────────────────────────────────────────────
-function ProgressBar({ step, onRestart }: { step: number; onRestart: () => void }) {
+function ProgressBar({ step, onRestart, onReplayIntro }: { step: number; onRestart: () => void; onReplayIntro: () => void }) {
   const pct = (step / TOTAL_STEPS) * 100;
   return (
     <div
@@ -124,6 +132,25 @@ function ProgressBar({ step, onRestart }: { step: number; onRestart: () => void 
             style={{ width: `${pct}%`, height: "100%", background: AMBER, transition: "width 350ms ease" }}
           />
         </div>
+        <button
+          type="button"
+          onClick={onReplayIntro}
+          data-testid="try-intro-replay"
+          className="try-restart-btn"
+          style={{
+            background: "none",
+            border: `1px solid ${BORDER}`,
+            padding: "0.3rem 0.65rem",
+            borderRadius: 4,
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.7rem",
+            color: AMBER,
+            cursor: "pointer",
+            letterSpacing: "0.04em",
+          }}
+        >
+          ▶ Story intro
+        </button>
         {step > 1 && (
           <button
             type="button"
@@ -1081,7 +1108,7 @@ function Step7Close({ fromRoute }: { fromRoute: string | null }) {
           {FINAL_CTA_COPY.ctaLabel} →
         </Link>
         <Link
-          href="/quiz"
+          href="/cellar-journal"
           data-testid="try-step-7-secondary-cta"
           style={{
             color: TEXT_MID,
@@ -1092,7 +1119,7 @@ function Step7Close({ fromRoute }: { fromRoute: string | null }) {
             borderBottom: `1px solid ${BORDER}`,
           }}
         >
-          Or try the Wine Quiz first
+          Or read the Cellar Journal first →
         </Link>
       </div>
 
@@ -1488,6 +1515,18 @@ export default function Try() {
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  // Replay the 3-page story intro WITHOUT clearing sandbox progress. The
+  // intro overlays the whole page (see `inIntro` render branch); when the
+  // visitor advances past the third screen, `introIdx` reaches
+  // INTRO_SCREENS.length and they drop back into their sandbox at exactly
+  // the step + picks they had. Non-destructive by design.
+  const handleReplayIntro = useCallback(() => {
+    setShowResumeBanner(false);
+    setIntroIdx(0);
+    setAutoAdvanceEnabled(true);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   return (
     <div style={{ minHeight: "100vh", background: BG }}>
       {/* Inline CSS for mobile-only overrides — inline-styles-only files
@@ -1516,7 +1555,7 @@ export default function Try() {
         />
       ) : (
         <>
-          <ProgressBar step={step} onRestart={handleRestart} />
+          <ProgressBar step={step} onRestart={handleRestart} onReplayIntro={handleReplayIntro} />
 
           {showResumeBanner && (
         <div

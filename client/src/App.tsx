@@ -259,6 +259,17 @@ function Router() {
   // S8-I: Post-login redirect to /guide for new users
   // The Guide page sets 'ownology_guide_seen' in localStorage on mount.
   // We only redirect on the root path so deep-links are not interrupted.
+  // Also — scroll to top of window on every route change. Wouter's <Link>
+  // preserves scroll by default, which meant deep-scrolled visitors landed
+  // on the next page mid-footer. This restores natural "top of page" UX.
+  const [pathname] = useLocation();
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    // Skip when navigating to an in-page anchor (e.g. /#our-story) — the
+    // browser's native anchor scrolling should still work in that case.
+    if (window.location.hash) return;
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname]);
   return (
     <>
     <TrialBanner />
@@ -400,7 +411,11 @@ function GlobalThemeToggle() {
         bottom: hasBanner
           ? "calc(4.75rem + env(safe-area-inset-bottom, 0px))"
           : "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
-        right: "1.25rem",
+        // Moved to bottom-LEFT to avoid conflicts with mobile bottom nav +
+        // right-anchored floating action pills (FreeRun, ThePress, CellarTasks,
+        // AdminProducers, WorkModeLayout FAB). Bottom-left is nearly always
+        // empty across every page in the app.
+        left: "1.25rem",
         zIndex: 9999,
         transition: "bottom 200ms ease",
       }}
