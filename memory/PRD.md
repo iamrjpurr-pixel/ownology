@@ -4,6 +4,23 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Gate wall flipped to default-DENY — SHIPPED (Feb 2026, this session)**
+- **Security posture change**: previously the wall was **opt-in** (block-list of MEMBER_ONLY_PREFIXES — any new page not added leaked publicly). Now **default-deny** (allowlist of ~50 explicit public paths + 6 public prefixes — anything else redirects to `/try`).
+- **Reason for change**: user asked for certainty that ANY guessed URL like `ownology.ai/whatever` is gated. Under the old model, forgetting to add a new page to the block-list would silently leak it. Under new model, forgetting means the page is safely gated — the correct fail direction for startup with private customer cellar data.
+- **What's public** (allowlist, explicit): homepage, /home, /why-ownology, /for-* (all four subtenant pages + knowledge + troubleshooting + glossary), /blog + /blog/:slug, /pricing, /quiz, /try, /free-run, /waitlist, /demo, /join, /invite, /login, /auth/callback, /onboarding, /privacy, /terms, /refund, /resources + /resources/home-winery-kit, /regulations/detail (only), /merch + /success + /cancel, /cellar-journal + /cellar-journal/:slug, /branding-mockup, /onboarding-mockup, /cascade-demo, /reference/vine + /reference/*, /guide, /resume, /stats, /founding-member/success, /trial-ending, /preview, /404, /app, /hi/:slug, /hi/producers/:id, /robots.txt, /sitemap.xml, /favicon.ico, /manifest.json. Plus /api/* (endpoints enforce own auth at the procedure layer).
+- **What's gated** (everything else automatically, including any future page): /dashboard, /cellar-brief, /cellar-tasks, /cellar-journal (root), /quick-entry, /the-press, /free-run/dashboard, /batch-book, /work-mode, /cellar/*, /orders, /import, /copilot, /copilot-mockup, /site-map, /campaign-metrics, /build-index, /vineyard, /compliance, /regulations (root), /tank-qr, /today, /admin/* (all), /todo, /roadmap. Plus any unknown/typo/attack path.
+- **Files changed**: `server/index.ts` (replaced MEMBER_ONLY_PREFIXES + array-based express.get() with `app.get("*", ...)` allowlist matcher). `viteGateWall.ts` (mirrored allowlist to Vite dev plugin, kept sync comment). Both files reference each other so drift is obvious in review.
+- **Verified end-to-end**:
+  - 13 public paths (`/`, /pricing, /quiz, /try, /blog, /blog/some-post, /hi/producers/8, /hi/some-slug, /for-home-winemakers, /privacy, /terms, /free-run, /login) → HTTP 200, no redirect.
+  - 14 gated paths (`/dashboard`, /cellar-brief, /admin, /admin/contacts, /admin/producers, /tank-qr, /orders, /todo, /site-map, /copilot, /regulations, `/newpage-that-doesnt-exist`, /xxx, /admin/marketing-ops) → HTTP 302 → `/try?from=…`.
+  - With `ow_gate` cookie: all 8 tested admin/member paths → HTTP 200 (Rich's normal experience intact).
+  - `/api/*` endpoints → HTTP 200 (tRPC auth still enforced at procedure layer).
+  - Vite `/@vite/client` static asset → HTTP 200 (SPA loads normally).
+  - Pytest 14/14 green.
+- **Behaviour on preview & prod**: identical model in Vite dev plugin (viteGateWall) and Express prod (server/index.ts). No env-var-gated logic — the allowlist is the same everywhere. On production hostname (`ownology.ai`), `/todo` and `/roadmap` additionally return HTTP 404 (rather than the redirect) so the internal roadmap URLs aren't even hint-discoverable.
+
+
+
 **Compose Button + Prospect Cellar Brief Preview — SHIPPED (Feb 2026, this session)**
 - **Value-engineering decision**: user was going to build A3 (3-touch automated cold email). Recon showed the 21-prospect pool is too thin for automation to move the needle + the 5-hour real build cost (view-pixel, reply-tracking, unsubscribe, deliverability warmup) doesn't clear the bar. User picked instead: (a) 1-click Compose button so Rich sends handwritten emails from his own inbox and (b) Cellar Brief preview page baked into every cold email — piggy-backing on his enrichment data to demonstrate the product concretely on a per-prospect URL.
 

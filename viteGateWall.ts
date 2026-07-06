@@ -1,14 +1,19 @@
 /**
- * viteGateWall — Vite dev-server plugin that mirrors the production
- * MEMBER_ONLY_PREFIXES wall in server/index.ts.
+ * viteGateWall — Vite dev-server plugin mirroring the production
+ * default-deny gate wall in server/index.ts.
  *
- * Why this exists: in the Emergent dev preview, Vite serves the SPA
- * directly on port 3000 for all non-`/api/*` paths — so the Express
- * wall in server/index.ts never sees HTML page requests. Without this
- * plugin, /import, /admin/quiz-picks etc. would be reachable to anyone
- * on preview URLs even though production redirects them to /try.
+ * Model (Feb 2026, flipped from opt-in to opt-out):
+ *   - PUBLIC_EXACT + PUBLIC_PREFIXES = the ONLY paths anyone can hit
+ *     without a session or gate cookie.
+ *   - Everything else → redirect to /try?from=<original>.
  *
- * Keep the prefix list in sync with server/index.ts MEMBER_ONLY_PREFIXES.
+ * Why this dev plugin exists: in the Emergent dev preview, Vite serves
+ * the SPA directly on port 3000 for all non-`/api/*` paths — so the
+ * Express wall in server/index.ts never sees HTML page requests. Without
+ * this plugin, gated pages would be reachable to anyone on preview URLs
+ * even though production redirects them to /try.
+ *
+ * Keep PUBLIC_EXACT + PUBLIC_PREFIXES in sync with server/index.ts.
  * Password verification is delegated to the shared /api/gate/verify
  * endpoint on Express, so this middleware only reads cookies — never
  * mints or compares passwords.
@@ -23,45 +28,70 @@ import "dotenv/config"; // Load /app/.env into process.env so we can read JWT_SE
 const APP_SESSION_COOKIE = "app_session_id";
 const GATE_COOKIE = "ow_gate";
 
-// Prefix list — keep in sync with server/index.ts MEMBER_ONLY_PREFIXES.
-// Trailing slash means "prefix match, only this and below". No slash
-// means "this path exactly OR anything under this/*".
-const MEMBER_ONLY_PREFIXES = [
-  "/dashboard",
-  "/cellar-brief",
-  "/cellar-tasks",
-  "/cellar-brief.pdf",
+// ── Public allowlist — keep in sync with server/index.ts ─────────────────
+// Anything NOT matched here needs a session or gate cookie.
+const PUBLIC_EXACT = new Set<string>([
+  "/",
+  "/home",
+  "/why-ownology",
+  "/for-innovint-users",
+  "/for-vintrace-users",
+  "/for-home-winemakers",
+  "/for-home-winemakers/troubleshooting",
+  "/for-home-winemakers/glossary",
+  "/for-home-winemakers/knowledge",
+  "/blog",
+  "/pricing",
+  "/quiz",
+  "/try",
+  "/free-run",
+  "/waitlist",
+  "/demo",
+  "/join",
+  "/invite",
+  "/login",
+  "/auth/callback",
+  "/onboarding",
+  "/privacy",
+  "/terms",
+  "/refund",
+  "/resources",
+  "/resources/home-winery-kit",
+  "/regulations/detail",
+  "/merch",
+  "/merch/success",
+  "/merch/cancel",
   "/cellar-journal",
-  "/quick-entry",
-  "/the-press",
-  "/free-run/dashboard",
-  "/batch-book",
-  "/work-mode",
-  "/cellar/",
-  "/orders",
-  "/todo",
-  "/roadmap",
-  "/import",
-  "/copilot",
-  "/copilot-mockup",
-  "/site-map",
-  "/campaign-metrics",
-  "/build-index",
-  "/vineyard",
-  "/compliance",
-  "/regulations",
-  "/tank-qr",
-  "/today",
-  "/admin",
+  "/branding-mockup",
+  "/onboarding-mockup",
+  "/cascade-demo",
+  "/reference/vine",
+  "/guide",
+  "/resume",
+  "/stats",
+  "/founding-member/success",
+  "/trial-ending",
+  "/preview",
+  "/404",
+  "/app", // redirects to /free-run
+  "/robots.txt",
+  "/sitemap.xml",
+  "/favicon.ico",
+  "/manifest.json",
+]);
+const PUBLIC_PREFIXES = [
+  "/api/", // tRPC + REST endpoints enforce own auth
+  "/blog/",
+  "/hi/",
+  "/cellar-journal/",
+  "/for-home-winemakers/knowledge/",
+  "/reference/",
 ];
 
-function pathIsMemberOnly(pathname: string): boolean {
-  for (const p of MEMBER_ONLY_PREFIXES) {
-    if (p.endsWith("/")) {
-      if (pathname === p.slice(0, -1) || pathname.startsWith(p)) return true;
-    } else {
-      if (pathname === p || pathname.startsWith(p + "/")) return true;
-    }
+function isPublicPath(pathname: string): boolean {
+  if (PUBLIC_EXACT.has(pathname)) return true;
+  for (const p of PUBLIC_PREFIXES) {
+    if (pathname.startsWith(p)) return true;
   }
   return false;
 }
@@ -91,11 +121,21 @@ export function viteGateWall(): Plugin {
         // etc. should never trigger the wall.
         const accept = req.headers.accept || "";
         if (!accept.includes("text/html")) return next();
-        // Vite serves /@vite/, /@fs/, /@id/, /node_modules/ etc.
-        if (url.startsWith("/@") || url.startsWith("/api/") || url.startsWith("/node_modules/")) return next();
+        // Vite serves /@vite/, /@fs/, /@id/, /node_modules/ etc. Also skip
+        // the internal HMR ping and any explicit dev endpoints.
+        if (
+          url.startsWith("/@") ||
+          url.startsWith("/api/") ||
+          url.startsWith("/node_modules/") ||
+          url.startsWith("/src/") ||
+          url.startsWith("/client/")
+        ) {
+          return next();
+        }
 
         const pathname = url.split("?")[0];
-        if (!pathIsMemberOnly(pathname)) return next();
+        // Anything on the public allowlist → pass through untouched.
+        if (isPublicPath(pathname)) return next();
 
         const cookieHeader = req.headers.cookie || "";
         const cookies = parseCookies(cookieHeader);

@@ -402,60 +402,100 @@ async function startServer() {
 
   app.use(express.static(staticPath));
 
-  // ── Anonymous → /try redirect for member-only surfaces ─────────────────
-  // Interim safety wall (until proper per-endpoint auth gating is in place).
-  // These routes render the SPA which then calls tRPC endpoints defaulting
-  // to the seed owner — exposing real Ownology Cellars data to anyone
-  // who types the URL. Redirect anonymous visitors to /try so they see
-  // the sandbox story instead of live cellar operations.
+  // ── Default-DENY gate wall ────────────────────────────────────────────
+  // Feb 2026 — flipped from opt-in (MEMBER_ONLY_PREFIXES) to opt-out
+  // (PUBLIC_PATHS + PUBLIC_PREFIXES). Rationale: the previous model was
+  // fail-open — any new page not added to the block-list was publicly
+  // reachable. This model is fail-closed — any new page is gated by
+  // default and must be explicitly added to the allowlist to be public.
   //
-  // A "logged in" visitor is anyone with the app_session_id cookie present
-  // (we don't verify it here — actual tRPC endpoints do that). If the
-  // cookie is missing, they're anonymous → send to /try.
+  // Static assets (JS/CSS/images) already bypass this via the
+  // `text/html` accept-header check inside the handler.
   //
-  // This is a stopgap. Proper fix: audit every member tRPC endpoint,
-  // require authenticated user context, scope queries to the user's
-  // winery. See LIP audit PDF gate item on the backlog for the pattern.
-  const MEMBER_ONLY_PREFIXES = [
-    "/dashboard",
-    "/cellar-brief",
-    "/cellar-tasks",
-    "/cellar-brief.pdf",
+  // /api/* is deliberately public here because tRPC/REST endpoints
+  // enforce their own auth at the procedure level (ownerProcedure,
+  // wineryProcedure) — we don't want to double-gate them at the URL
+  // layer or the OAuth callback flow would break.
+  //
+  // Redirect target: /try honeypot, matching the old behaviour.
+  const PUBLIC_EXACT = new Set<string>([
+    "/",
+    "/home",
+    "/why-ownology",
+    "/for-innovint-users",
+    "/for-vintrace-users",
+    "/for-home-winemakers",
+    "/for-home-winemakers/troubleshooting",
+    "/for-home-winemakers/glossary",
+    "/for-home-winemakers/knowledge",
+    "/blog",
+    "/pricing",
+    "/quiz",
+    "/try",
+    "/free-run",
+    "/waitlist",
+    "/demo",
+    "/join",
+    "/invite",
+    "/login",
+    "/auth/callback",
+    "/onboarding",
+    "/privacy",
+    "/terms",
+    "/refund",
+    "/resources",
+    "/resources/home-winery-kit",
+    "/regulations/detail",
+    "/merch",
+    "/merch/success",
+    "/merch/cancel",
     "/cellar-journal",
-    "/quick-entry",
-    "/the-press",
-    "/free-run/dashboard",
-    "/batch-book",
-    "/work-mode",
-    "/cellar/",
-    "/orders",
-    "/todo",
-    "/roadmap",
-    // Feb 2026 — added when we shipped the shared-secret password wall.
-    // These were leaking to anonymous visitors under the old blocklist:
-    "/import",
-    "/copilot",
-    "/copilot-mockup",
-    "/site-map",
-    "/campaign-metrics",
-    "/build-index",
-    "/vineyard",
-    "/compliance",
-    "/regulations",
-    "/tank-qr",
-    "/today",
+    "/branding-mockup",
+    "/onboarding-mockup",
+    "/cascade-demo",
+    "/reference/vine",
+    "/guide",
+    "/resume",
+    "/stats",
+    "/founding-member/success",
+    "/trial-ending",
+    "/preview",
+    "/404",
+    "/app", // redirects to /free-run
+    "/robots.txt",
+    "/sitemap.xml",
+    "/favicon.ico",
+    "/manifest.json",
+  ]);
+  const PUBLIC_PREFIXES = [
+    "/api/", // tRPC + REST endpoints enforce own auth at the procedure layer
+    "/blog/", // /blog/:slug
+    "/hi/", // /hi/:slug + /hi/producers/:id
+    "/cellar-journal/", // /cellar-journal/:slug
+    "/for-home-winemakers/knowledge/", // /for-home-winemakers/knowledge/:section
+    "/reference/", // future /reference/* pages
   ];
-  app.get(MEMBER_ONLY_PREFIXES.flatMap((p) => (p.endsWith("/") ? [p + "*"] : [p, p + "/*"])), async (req, res, next) => {
-    // Only intercept HTML SPA requests. Assets (JS/CSS/PNG) go through
-    // express.static above and won't hit this handler.
+  const isPublicPath = (pathname: string): boolean => {
+    if (PUBLIC_EXACT.has(pathname)) return true;
+    for (const p of PUBLIC_PREFIXES) {
+      if (pathname.startsWith(p)) return true;
+    }
+    return false;
+  };
+  app.get("*", async (req, res, next) => {
+    // Only intercept HTML SPA requests. Assets (JS/CSS/PNG) served by
+    // express.static above never carry `text/html` in Accept.
     const accept = req.headers.accept || "";
     if (!accept.includes("text/html")) return next();
+
+    // Anything explicitly public → pass through.
+    if (isPublicPath(req.path)) return next();
 
     // ─── Dev-only routes ────────────────────────────────────────────────
     // /todo and /roadmap are the internal working roadmap — deliberately
     // NOT for production. Return 404 on any live ownology.ai hostname so
     // curious visitors can't discover our security backlog. Still works
-    // on preview/dev hosts.
+    // on preview/dev hosts (they'll flow through to the gate check).
     const DEV_ONLY_PATHS = new Set(["/todo", "/roadmap"]);
     const PROD_HOSTS = new Set(["ownology.ai", "www.ownology.ai"]);
     if (DEV_ONLY_PATHS.has(req.path) && PROD_HOSTS.has(req.hostname)) {
