@@ -56,9 +56,9 @@ const SEVERITY_LABEL: Record<Alert["severity"], string> = {
 /** Plain-text rendering for the multipart text/plain fallback. */
 function renderText(userName: string, alerts: Alert[]): string {
   const lines: string[] = [];
-  lines.push(`Good morning, ${userName}.`);
+  lines.push(`Morning ${userName}.`);
   lines.push("");
-  lines.push(`Today's cellar brief — ${alerts.length} alert${alerts.length === 1 ? "" : "s"}:`);
+  lines.push(`${alerts.length} thing${alerts.length === 1 ? "" : "s"} want${alerts.length === 1 ? "s" : ""} your eye today. In priority order:`);
   lines.push("");
   for (const a of alerts) {
     lines.push(`[${SEVERITY_LABEL[a.severity]}] ${a.title}`);
@@ -68,7 +68,8 @@ function renderText(userName: string, alerts: Alert[]): string {
   }
   lines.push("Open Ownology: https://ownology.ai/dashboard");
   lines.push("");
-  lines.push("— Ownology");
+  lines.push("— Owen");
+  lines.push("Ownology's AI cellar-hand in your inbox. Reply anytime — the Ownology team reads every response. STOP to pause.");
   return lines.join("\n");
 }
 
@@ -106,8 +107,8 @@ function renderHtml(userName: string, alerts: Alert[]): string {
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:6px;overflow:hidden;border:1px solid #e5e7eb;">
         <tr><td style="padding:24px 24px 0;">
           <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:2px;color:#b45309;text-transform:uppercase;font-weight:700;margin-bottom:8px;">Cellar Brief · ${new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", timeZone: "Australia/Sydney" })}</div>
-          <h1 style="font-family:Georgia,serif;font-size:28px;color:#111827;margin:0 0 6px;line-height:1.2;">Good morning, ${escapeHtml(userName)}.</h1>
-          <p style="font-family:Arial,sans-serif;font-size:14px;color:#6b7280;margin:0 0 20px;">Here's what needs your attention in the cellar today — ${alerts.length} alert${alerts.length === 1 ? "" : "s"}.</p>
+          <h1 style="font-family:Georgia,serif;font-size:28px;color:#111827;margin:0 0 6px;line-height:1.2;">Morning ${escapeHtml(userName)}.</h1>
+          <p style="font-family:Arial,sans-serif;font-size:14px;color:#6b7280;margin:0 0 20px;">${alerts.length} thing${alerts.length === 1 ? "" : "s"} want${alerts.length === 1 ? "s" : ""} your eye today. In priority order.</p>
         </td></tr>
         <tr><td style="padding:0 8px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
@@ -117,8 +118,11 @@ function renderHtml(userName: string, alerts: Alert[]): string {
         <tr><td style="padding:24px;text-align:center;">
           <a href="https://ownology.ai/dashboard" style="display:inline-block;background:#b45309;color:#ffffff;text-decoration:none;font-family:Arial,sans-serif;font-size:14px;font-weight:600;padding:12px 28px;border-radius:4px;letter-spacing:0.5px;">Open Ownology dashboard →</a>
         </td></tr>
-        <tr><td style="padding:0 24px 24px;text-align:center;">
-          <p style="font-family:Arial,sans-serif;font-size:12px;color:#9ca3af;margin:0;">You're receiving this because cellar alerts are enabled for your account.<br>Reply STOP to disable.</p>
+        <tr><td style="padding:0 24px 8px;">
+          <p style="font-family:Georgia,serif;font-size:15px;color:#374151;margin:0;line-height:1.5;">— Owen</p>
+        </td></tr>
+        <tr><td style="padding:0 24px 24px;">
+          <p style="font-family:Arial,sans-serif;font-size:11px;color:#9ca3af;margin:0;line-height:1.5;">Owen is Ownology&apos;s AI cellar-hand. Reply anytime — the Ownology team reads every response. Reply STOP to pause.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -132,9 +136,9 @@ function escapeHtml(s: string): string {
 
 export async function dailyAlertEmailHandler(req: Request, res: Response): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.ALERT_FROM_EMAIL ?? "onboarding@resend.dev";
-  const fromName = process.env.ALERT_FROM_NAME ?? "Ownology Cellar Brief";
-  const replyTo = process.env.ALERT_REPLY_TO?.trim() || null;
+  const fromEmail = process.env.ALERT_FROM_EMAIL ?? "owen@ownology.ai";
+  const fromName = process.env.ALERT_FROM_NAME ?? "Owen · Ownology Cellars";
+  const replyTo = process.env.ALERT_REPLY_TO?.trim() || "support@ownology.ai";
   const testTo = process.env.ALERT_TEST_TO?.trim() || null;
   const cronSecret = process.env.CRON_SECRET?.trim() || null;
   const providedSecret = (req.headers["x-cron-secret"] as string | undefined)?.trim()
@@ -157,8 +161,12 @@ export async function dailyAlertEmailHandler(req: Request, res: Response): Promi
   const results: EmailResult[] = [];
 
   // Pull every user. v1 = single-tenant so this is fine; when multi-tenant,
-  // filter to users who have opted in.
+  // filter to users who have opted in. Winery names cached for the per-user
+  // "Owen · <winery name>" sender-line personalisation.
   const users = await db.select().from(schema.users);
+  const allWineries = await db.select().from(schema.wineries);
+  const wineryNameById = new Map<number, string>();
+  for (const w of allWineries) wineryNameById.set(w.id, w.name);
   console.log(`[daily-alert-email] starting — ${users.length} user(s), dryRun=${dryRun}`);
 
   for (const u of users) {
@@ -174,19 +182,25 @@ export async function dailyAlertEmailHandler(req: Request, res: Response): Promi
 
     const userName = u.name ?? "winemaker";
     const recipient = testTo ?? u.email;
-    const subject = `Cellar brief — ${alerts.length} alert${alerts.length === 1 ? "" : "s"} this morning`;
+    const subject = `Cellar brief — ${alerts.length} thing${alerts.length === 1 ? "" : "s"} for your eye this morning`;
     const html = renderHtml(userName, alerts);
     const text = renderText(userName, alerts);
+    // Owen adapts to the recipient's winery — Ownology is quietly powering
+    // it in the footer. When wineries multi-tenant, each user sees Owen
+    // writing from THEIR winery's name. Fallback to fromName env if
+    // the user isn't linked to a winery yet.
+    const wineryName = u.wineryId ? wineryNameById.get(u.wineryId) : null;
+    const senderDisplay = wineryName ? `Owen · ${wineryName}` : fromName;
 
     if (dryRun || !resend) {
-      console.log(`[daily-alert-email] DRY-RUN would send to ${recipient}: ${subject}`);
+      console.log(`[daily-alert-email] DRY-RUN would send to ${recipient} as "${senderDisplay}": ${subject}`);
       results.push({ userId: u.id, email: recipient, alerts: alerts.length, status: "dry_run" });
       continue;
     }
 
     try {
       const send = await resend.emails.send({
-        from: `${fromName} <${fromEmail}>`,
+        from: `${senderDisplay} <${fromEmail}>`,
         to: [recipient],
         ...(replyTo ? { replyTo } : {}),
         subject,
