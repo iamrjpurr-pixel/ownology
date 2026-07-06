@@ -18,12 +18,12 @@ import * as schema from "../../drizzle/schema.js";
 import { chatCompletion, MODELS } from "../_core/llm.js";
 
 // ── Timezone helpers ──────────────────────────────────────────────────────
-// Australia/Adelaide is the reference tz — matches Ownology HQ. NZ ops in
+// Australia/Sydney is the reference tz — matches Ownology HQ. NZ ops in
 // future would be a config option, not a hard-code.
-const TZ = "Australia/Adelaide";
+const TZ = "Australia/Sydney";
 
 function localDateStr(d: Date = new Date()): string {
-  // "YYYY-MM-DD" in Adelaide
+  // "YYYY-MM-DD" in Sydney
   return new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
 }
 
@@ -200,6 +200,127 @@ const TASKS: TaskDef[] = [
   },
 ];
 
+/**
+ * Generate (or serve cached) coach line for today. Exported so the scheduled
+ * 7am email can reuse the exact same logic + cache as the /admin page.
+ */
+export async function getOrCreateCoachLine(now: Date = new Date()): Promise<{ line: string; cached: boolean; localDate: string }> {
+  const today = localDateStr(now);
+  const cached = await db
+    .select()
+    .from(schema.marketingCoachLines)
+    .where(eq(schema.marketingCoachLines.localDate, today))
+    .orderBy(desc(schema.marketingCoachLines.generatedAt))
+    .limit(1);
+  if (cached.length > 0) return { line: cached[0].line, cached: true, localDate: today };
+
+  const seasonInfo = currentSeason(now);
+  const dow = localDayOfWeek(now);
+  const hour = localHour(now);
+  const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+  const contactRows = await db.select().from(schema.outreachContacts);
+  const sent = contactRows.filter((c) => c.smsSentAt).length;
+  const replied = contactRows.filter((c) => c.repliedAt).length;
+  const openedNoReply = contactRows.filter(
+    (c) => c.smsSentAt && (c.viewCount ?? 0) > 0 && !c.repliedAt
+  ).length;
+  const unsent = contactRows.filter((c) => !c.smsSentAt && c.mobileAu).length;
+
+  const context = `
+Today is ${dayNames[dow]}, ${today}, ${hour}:00 in Sydney.
+Season: ${seasonInfo.label} (cold outreach: ${seasonInfo.coldGate}).
+Funnel snapshot:
+- ${sent} contacts SMS-sent, ${replied} replied (${sent > 0 ? Math.round((replied / sent) * 100) : 0}% reply rate)
+- ${openedNoReply} prospects OPENED their link but haven't replied yet — priority follow-ups
+- ${unsent} contacts still unsent with a mobile number (bulk-activate lever)`.trim();
+
+  const system = `You are the marketing coach for Rich, a boutique wine-tech founder growing a customer base of AU + NZ winemakers. Your job: read the day/season/funnel state and write ONE sentence (40 words max) telling Rich exactly what to focus on TODAY.
+
+Rules:
+- One sentence. No preamble. No "Hi Rich".
+- Reference the specific season + day + a specific funnel number.
+- Be direct: "Skip the cold blast today — you're in vintage, they'll hate it. Reply to the 3 warm views instead."
+- Australian English.
+- Never invent numbers not in the funnel snapshot.`;
+
+  let line = "";
+  try {
+    line = (
+      await chatCompletion(
+        [
+          { role: "system", content: system },
+          { role: "user", content: context },
+        ],
+        { model: MODELS.PREMIUM, maxTokens: 120, temperature: 0.5, source: "marketingOps.coach" }
+      )
+    ).trim();
+  } catch {
+    if (seasonInfo.coldGate === "pause") {
+      line = `It's ${seasonInfo.label} — pause cold outreach. Reply to any warm views (${openedNoReply} waiting) and mark any SMS replies you've received.`;
+    } else if (dow === 1) {
+      line = `Tuesday morning — the peak send window. Fire off the bulk-activate strip (${unsent} un-SMS'd) before 9am while they're on their first coffee.`;
+    } else {
+      line = `${openedNoReply} prospects opened their link but haven't replied. Reply to those before you do anything else.`;
+    }
+  }
+
+  await db.insert(schema.marketingCoachLines).values({
+    localDate: today,
+    line,
+    season: seasonInfo.season,
+    generatedAt: Date.now(),
+  });
+  return { line, cached: false, localDate: today };
+}
+
+/**
+ * Snapshot of today's focus for downstream renderers (email, briefings).
+ * Returns the same shape as the tRPC `today` procedure minus the streak
+ * back-scan (which the email doesn't need).
+ */
+export async function getTodayFocusSnapshot(now: Date = new Date()): Promise<{
+  today: string;
+  dow: number;
+  hour: number;
+  season: ReturnType<typeof currentSeason>;
+  tasks: Array<{ slug: string; title: string; why: string; estimateMin: number; timeHint?: string; quickLink?: string; category: TaskDef["category"]; cadence: TaskDef["cadence"]; blocked: boolean }>;
+}> {
+  const today = localDateStr(now);
+  const week = isoWeekStr(now);
+  const dow = localDayOfWeek(now);
+  const hour = localHour(now);
+  const seasonInfo = currentSeason(now);
+  const [todayRows, weekRows] = await Promise.all([
+    db.select().from(schema.marketingTaskCompletions).where(eq(schema.marketingTaskCompletions.localDate, today)),
+    db.select().from(schema.marketingTaskCompletions).where(eq(schema.marketingTaskCompletions.isoWeek, week)),
+  ]);
+  const doneToday = new Set(todayRows.map((r) => r.taskSlug));
+  const doneWeek = new Set(weekRows.map((r) => r.taskSlug));
+  const relevant = TASKS.filter((t) => {
+    if (t.cadence === "daily") return true;
+    if (t.dayOfWeek === undefined) return true;
+    return t.dayOfWeek === dow;
+  });
+  const tasks = relevant
+    .filter((t) => {
+      const done = t.cadence === "daily" ? doneToday.has(t.slug) : doneWeek.has(t.slug);
+      return !done; // email lists remaining focus only
+    })
+    .map((t) => ({
+      slug: t.slug,
+      title: t.title,
+      why: t.why,
+      estimateMin: t.estimateMin,
+      timeHint: t.timeHint,
+      quickLink: t.quickLink,
+      category: t.category,
+      cadence: t.cadence,
+      blocked: t.seasonGate ? t.seasonGate(seasonInfo.season) === "block" : false,
+    }));
+  return { today, dow, hour, season: seasonInfo, tasks };
+}
+
 // ── Router ────────────────────────────────────────────────────────────────
 export const marketingOpsRouter = router({
   /** OWNER — today's context: season, day, time, tasks (with done flag),
@@ -356,76 +477,8 @@ export const marketingOpsRouter = router({
    *  cached in marketing_coach_lines. Falls back to a rule-based sentence
    *  if the LLM fails. */
   coachLine: ownerProcedure.query(async () => {
-    const now = new Date();
-    const today = localDateStr(now);
-    const cached = await db
-      .select()
-      .from(schema.marketingCoachLines)
-      .where(eq(schema.marketingCoachLines.localDate, today))
-      .orderBy(desc(schema.marketingCoachLines.generatedAt))
-      .limit(1);
-    if (cached.length > 0) return { line: cached[0].line, cached: true };
-
-    const seasonInfo = currentSeason(now);
-    const dow = localDayOfWeek(now);
-    const hour = localHour(now);
-    const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-    // Pull a few KPI signals for context
-    const contactRows = await db.select().from(schema.outreachContacts);
-    const sent = contactRows.filter((c) => c.smsSentAt).length;
-    const replied = contactRows.filter((c) => c.repliedAt).length;
-    const openedNoReply = contactRows.filter(
-      (c) => c.smsSentAt && (c.viewCount ?? 0) > 0 && !c.repliedAt
-    ).length;
-    const unsent = contactRows.filter((c) => !c.smsSentAt && c.mobileAu).length;
-
-    const context = `
-Today is ${dayNames[dow]}, ${today}, ${hour}:00 in Adelaide.
-Season: ${seasonInfo.label} (cold outreach: ${seasonInfo.coldGate}).
-Funnel snapshot:
-- ${sent} contacts SMS-sent, ${replied} replied (${sent > 0 ? Math.round((replied / sent) * 100) : 0}% reply rate)
-- ${openedNoReply} prospects OPENED their link but haven't replied yet — priority follow-ups
-- ${unsent} contacts still unsent with a mobile number (bulk-activate lever)`.trim();
-
-    const system = `You are the marketing coach for Rich, a boutique wine-tech founder growing a customer base of AU + NZ winemakers. Your job: read the day/season/funnel state and write ONE sentence (40 words max) telling Rich exactly what to focus on TODAY.
-
-Rules:
-- One sentence. No preamble. No "Hi Rich".
-- Reference the specific season + day + a specific funnel number.
-- Be direct: "Skip the cold blast today — you're in vintage, they'll hate it. Reply to the 3 warm views instead."
-- Australian English.
-- Never invent numbers not in the funnel snapshot.`;
-
-    let line = "";
-    try {
-      line = (
-        await chatCompletion(
-          [
-            { role: "system", content: system },
-            { role: "user", content: context },
-          ],
-          { model: MODELS.PREMIUM, maxTokens: 120, temperature: 0.5, source: "marketingOps.coach" }
-        )
-      ).trim();
-    } catch {
-      // Fallback rule
-      if (seasonInfo.coldGate === "pause") {
-        line = `It's ${seasonInfo.label} — pause cold outreach. Reply to any warm views (${openedNoReply} waiting) and mark any SMS replies you've received.`;
-      } else if (dow === 1) {
-        line = `Tuesday morning — the peak send window. Fire off the bulk-activate strip (${unsent} un-SMS'd) before 9am while they're on their first coffee.`;
-      } else {
-        line = `${openedNoReply} prospects opened their link but haven't replied. Reply to those before you do anything else.`;
-      }
-    }
-
-    await db.insert(schema.marketingCoachLines).values({
-      localDate: today,
-      line,
-      season: seasonInfo.season,
-      generatedAt: Date.now(),
-    });
-    return { line, cached: false };
+    const result = await getOrCreateCoachLine();
+    return { line: result.line, cached: result.cached };
   }),
 
   /** OWNER — yesterday's wins + rolling 7d KPIs. */

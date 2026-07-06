@@ -19,6 +19,29 @@
 
 
 **Value-engineering batch (Feb 2026, this session) — S+A+C+O+H waves**
+
+**Marketing Coach Email — 7am Sydney push (Feb 2026, this session) — SHIPPED**
+- Follow-up to the Marketing Ops dashboard: same coach line and today's-focus list, delivered to Rich's inbox at 07:00 Sydney via Resend.
+- **Route**: `GET/POST /api/scheduled/marketing-coach-email` (Railway cron target). Reuses the existing scheduled-endpoint rate limiter (20 req/min per IP) and the shared `CRON_SECRET` header pattern already in `daily-alert-email`.
+- **Zero extra LLM cost**: extracted `getOrCreateCoachLine()` and `getTodayFocusSnapshot()` helpers from `server/routers/marketingOps.ts`. Both the tRPC endpoint AND the 7am email now share the same daily cache in `marketing_coach_lines` — one Claude Sonnet call per Sydney calendar day regardless of how many surfaces read it.
+- **Rendering**: same HTML idiom as `dailyAlertEmail.ts` (inline CSS, 600px table, Georgia serif for headlines). Includes:
+  1. Header with weekday + season chip in cold-gate colour
+  2. Amber-highlighted AI Coach card ("Good morning, Rich" + one-line sentence)
+  3. Today's focus list — only OPEN tasks (already-ticked ones filtered out server-side by `getTodayFocusSnapshot`)
+  4. "Open Marketing Ops →" CTA linking `${APP_BASE_URL}/admin/marketing-ops`
+  5. STOP-to-disable footer
+- **Env vars** (all optional except when going live):
+  - `RESEND_API_KEY` — required for live send (already set)
+  - `MARKETING_COACH_TO_EMAIL` — recipient. Falls back to `ALERT_TEST_TO`. **Must be set to Rich's inbox before enabling the cron.**
+  - `MARKETING_COACH_FROM_NAME` — display name (default "Ownology Marketing Coach")
+  - `ALERT_FROM_EMAIL`, `ALERT_REPLY_TO`, `CRON_SECRET`, `APP_BASE_URL` — inherited defaults
+- **Dry-run**: `?dryRun=1` returns a JSON preview (subject, coach line, task count, first 20 text lines) without calling Resend — verified in dev, coach line quotes real funnel numbers.
+- **Verified end-to-end**: dry-run returned `subject="Marketing Coach — Dormant · peak pitching window · 6 focus items"` and the coach line matched the cached tRPC response exactly. Sydney TZ (not Adelaide) confirmed on the season strip: "Mon · 11:00 Sydney · 2026-07-06".
+
+**Timezone correction — Adelaide → Sydney (Feb 2026, this session)**
+- `server/routers/marketingOps.ts` and `client/src/pages/AdminMarketingOps.tsx` both hard-coded `Australia/Adelaide` as the ops timezone. User is Sydney-based — swapped to `Australia/Sydney` (matches the existing `dailyAlertEmail.ts` pattern). Cleared today's cached Adelaide coach line so a fresh Sydney-context line was generated. Site-wide "Adelaide Hills" narrative copy (Home footer, Quiz story, Terms) left untouched — that's Rich's personal narrative, not an ops reference.
+
+
 - **S1 tRPC gate**: 100 req/min per IP rate limit on `/api/trpc/*`, 20/min on `/api/scheduled/*`. Blocks bot/brute-force loops from draining Perplexity/Resend budgets.
 - **S2 rate limiter**: Reusable `rateLimitCheck(bucket, ip, windowMs, max)` helper in `server/gate.ts`. Same primitive used by `/api/gate/verify` (5 attempts / 15 min).
 - **S3 gate audit log**: `gate_events` table + logging in `/api/gate/verify` (success / fail / rate_limited). Admin view on `/admin/quiz-picks` shows the last 50 events plus a "top failing IPs" alert card if there are any brute-force patterns.

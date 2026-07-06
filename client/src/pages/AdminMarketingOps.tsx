@@ -9,7 +9,7 @@
  *   4. Weekly rhythm — 7-column board for the whole ISO week
  *   5. Wins — streak, done-today, rolling 7d sent/replied/booked/reply-rate
  *
- * Backend: server/routers/marketingOps.ts (Australia/Adelaide timezone).
+ * Backend: server/routers/marketingOps.ts (Australia/Sydney timezone).
  */
 import { useMemo } from "react";
 import { Link } from "wouter";
@@ -182,7 +182,7 @@ export default function AdminMarketingOps() {
               {seasonColor.label}
             </Chip>
             <div style={{ fontFamily: SANS, fontSize: "0.85rem", marginLeft: "auto" }}>
-              {dayLabel} · {String(today.hour).padStart(2, "0")}:00 Adelaide · {today.today}
+              {dayLabel} · {String(today.hour).padStart(2, "0")}:00 Sydney · {today.today}
             </div>
           </section>
 
@@ -448,7 +448,7 @@ export default function AdminMarketingOps() {
           {/* Footer tip */}
           <p style={{ marginTop: 28, fontFamily: SANS, fontSize: "0.75rem", color: LO }}>
             Yesterday you completed {wins?.yesterdayDone ?? 0}{" "}
-            {wins?.yesterdayDone === 1 ? "task" : "tasks"}. Coach line is Claude Sonnet via the Emergent LLM Key, cached once per Adelaide calendar day.
+            {wins?.yesterdayDone === 1 ? "task" : "tasks"}. Coach line is Claude Sonnet via the Emergent LLM Key, cached once per Sydney calendar day.
           </p>
         </>
       )}
