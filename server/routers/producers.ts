@@ -242,4 +242,226 @@ export const producersRouter = router({
         .where(eq(schema.wineProducers.id, input.id));
       return { ok: true };
     }),
+
+  /**
+   * OWNER — enrich a single producer row with winemaker / GM name + role
+   * via Perplexity Sonar Pro. Idempotent: only touches contactName /
+   * contactRole when currently NULL, so manual admin edits win.
+   *
+   * Prompt is intentionally narrow (name + role only, not full contact
+   * research) so it's fast (~5-12s) and cheap. For fuller enrichment
+   * (phone, IG, painPoint) use outreach.deepResearch.
+   *
+   * The frontend calls this in a serial loop for batch enrichment —
+   * that gives real-time progress + tolerates individual failures.
+   */
+  enrichContact: ownerProcedure
+    .input(z.object({ id: z.number().int() }))
+    .mutation(async ({ input }) => {
+      const key = process.env.PERPLEXITY_API_KEY;
+      if (!key) throw new Error("PERPLEXITY_API_KEY not configured");
+
+      const rows = await db
+        .select()
+        .from(schema.wineProducers)
+        .where(eq(schema.wineProducers.id, input.id))
+        .limit(1);
+      const producer = rows[0];
+      if (!producer) throw new Error("producer not found");
+      if (producer.contactName) {
+        return { ok: true, skipped: true, reason: "already has contactName" };
+      }
+
+      const contactSchema = {
+        type: "object",
+        properties: {
+          firstName: { type: ["string", "null"] },
+          lastName: { type: ["string", "null"] },
+          role: { type: ["string", "null"] },
+          confidence: { type: "string", enum: ["high", "medium", "low"] },
+        },
+        required: ["confidence"],
+        additionalProperties: false,
+      };
+
+      const websiteHint = producer.website ? `\nWebsite: ${producer.website}` : "";
+      const regionHint = producer.region ? `\nRegion: ${producer.region}` : "";
+      const countryHint = producer.country === "NZ" ? "New Zealand" : "Australia";
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45_000);
+      let resp: Response;
+      try {
+        resp = await fetch("https://api.perplexity.ai/chat/completions", {
+          method: "POST",
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${key}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "sonar-pro",
+            max_tokens: 500,
+            messages: [
+              {
+                role: "system",
+                content: `You are a wine-industry sales-research assistant. Given a winery, find the CURRENT primary point-of-contact.
+
+Priority order for "role":
+1. Winemaker (or Chief Winemaker / Head Winemaker)
+2. Founder / Owner / Proprietor
+3. General Manager
+4. Cellar Door Manager
+Skip marketing, admin, and sommelier staff.
+
+Role format: return the CLEANEST 1-3 word title. Examples of good roles: "Winemaker", "Chief Winemaker", "Founder", "GM", "Cellar Door Manager". Do NOT append parentheticals, qualifiers, or explanatory phrases like "(primary point-of-contact)" or "– NZ" — those are noise.
+
+Sources: official winery website, verified LinkedIn profiles, Halliday, WBM, Real Review, Winetitles, NZ Wine Grower, industry press releases.
+
+Return ONLY the requested JSON — no prose. Use null for any field you can't verify from a reputable source. Do NOT invent names — null is always correct over hallucination.
+
+Confidence:
+- "high" = named person + role confirmed on official winery website or LinkedIn
+- "medium" = named person from trade press or older source
+- "low" = you're guessing or only inferring from the winery name`,
+              },
+              {
+                role: "user",
+                content: `Winery: ${producer.name} (${countryHint})${regionHint}${websiteHint}\n\nWho is the primary point-of-contact (winemaker → founder → GM → cellar door manager)? Return firstName, lastName, role, confidence as JSON.`,
+              },
+            ],
+            response_format: {
+              type: "json_schema",
+              json_schema: { schema: contactSchema },
+            },
+          }),
+        });
+        clearTimeout(timeoutId);
+      } catch (err) {
+        clearTimeout(timeoutId);
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes("aborted")) throw new Error("Perplexity took too long (>45s).");
+        throw new Error(`Perplexity request failed: ${msg}`);
+      }
+
+      if (!resp.ok) {
+        const errText = await resp.text().catch(() => "");
+        if (resp.status === 401) throw new Error("Perplexity key invalid.");
+        if (resp.status === 402) throw new Error("Perplexity credit exhausted.");
+        if (resp.status === 429) throw new Error("Perplexity rate-limited — wait a minute.");
+        throw new Error(`Perplexity ${resp.status}: ${errText.slice(0, 200)}`);
+      }
+
+      const data = (await resp.json()) as {
+        choices?: Array<{ message?: { content?: string } }>;
+      };
+      const content = data.choices?.[0]?.message?.content ?? "";
+      let parsed: {
+        firstName?: string | null;
+        lastName?: string | null;
+        role?: string | null;
+        confidence?: string;
+      } | null = null;
+      try {
+        const cleaned = content
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/```\s*$/i, "")
+          .trim();
+        parsed = JSON.parse(cleaned);
+      } catch {
+        // Sonar Pro sometimes wraps the JSON in reasoning prose. Grab the
+        // first {...} object in the content and try that.
+        const braceMatch = content.match(/\{[\s\S]*\}/);
+        if (braceMatch) {
+          try {
+            parsed = JSON.parse(braceMatch[0]);
+          } catch {
+            /* still bad — parse_failed will be returned */
+          }
+        }
+      }
+      if (!parsed) {
+        console.log(`[producers.enrich] parse_failed for id=${input.id} · content: ${content.slice(0, 300)}`);
+        return { ok: false, skipped: false, error: "parse_failed" };
+      }
+
+      const firstName = typeof parsed.firstName === "string" ? parsed.firstName.trim() : "";
+      const lastName = typeof parsed.lastName === "string" ? parsed.lastName.trim() : "";
+      const fullName = [firstName, lastName].filter(Boolean).join(" ").slice(0, 120) || null;
+      let role: string | null = typeof parsed.role === "string" ? parsed.role.trim() : null;
+      // Belt-and-braces: strip trailing parentheticals, em-dash qualifiers,
+      // and "primary point-of-contact" style noise even if the LLM ignored
+      // the prompt. Occasionally Sonar Pro leaks reasoning into the role
+      // field (comma-separated alternatives + explanatory prose) — in that
+      // case fall back to the first token only.
+      if (role) {
+        role = role
+          .replace(/\s*\([^)]*\)\s*/g, "") // any (…) segment
+          .replace(/\s*[–—-]\s+.*$/g, "") // trailing – NZ / — primary winemaker
+          .replace(/\s+/g, " ")
+          .trim();
+        // If still noisy (commas, apostrophes, LLM prose "but priority says…"),
+        // keep just the first clean role token from a short whitelist.
+        if (/[,;']|but priority|actually|should be/i.test(role)) {
+          const ROLE_CANDIDATES = [
+            "Chief Winemaker",
+            "Head Winemaker",
+            "Consulting Winemaker",
+            "Winemaker",
+            "Founder",
+            "Co-Founder",
+            "Owner-Operator",
+            "Owner",
+            "Proprietor",
+            "General Manager",
+            "GM",
+            "Cellar Door Manager",
+          ];
+          const found = ROLE_CANDIDATES.find((c) => new RegExp(`\\b${c}\\b`, "i").test(role!));
+          role = found ?? role.split(/[,;]/)[0].trim();
+        }
+        role = role.slice(0, 120);
+        if (role.length === 0) role = null;
+      }
+      const confidence = parsed.confidence ?? "low";
+
+      // Only write if we have SOMETHING to write. Low confidence still saved
+      // so the operator sees the guess — but we prefix the role with "?"
+      // so it's visually distinct from high-confidence data.
+      if (!fullName && !role) {
+        return { ok: false, skipped: true, reason: "no name found", confidence };
+      }
+      const displayRole = confidence === "low" && role ? `? ${role}` : role;
+
+      await db
+        .update(schema.wineProducers)
+        .set({
+          contactName: fullName ?? sql`contact_name`,
+          contactRole: displayRole ?? sql`contact_role`,
+        })
+        .where(eq(schema.wineProducers.id, input.id));
+
+      return {
+        ok: true,
+        skipped: false,
+        contactName: fullName,
+        contactRole: displayRole,
+        confidence,
+      };
+    }),
+
+  /**
+   * OWNER — list producers that are candidates for enrichment
+   * (contactName IS NULL). Used by the batch UI so the client knows the
+   * queue up front and can show a live progress bar.
+   */
+  needsEnrichment: ownerProcedure.query(async () => {
+    const rows = await db
+      .select({ id: schema.wineProducers.id, name: schema.wineProducers.name })
+      .from(schema.wineProducers)
+      .where(sql`contact_name IS NULL`)
+      .orderBy(schema.wineProducers.name);
+    return rows;
+  }),
 });

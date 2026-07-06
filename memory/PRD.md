@@ -4,6 +4,22 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Producer enrichment (Perplexity Sonar Pro) — SHIPPED (Feb 2026, this session)**
+- **New tRPC procedures** in `server/routers/producers.ts`:
+  - `enrichContact({id})` — narrow Perplexity Sonar Pro call (~2-6s, ~500 max tokens) that finds the primary point-of-contact (winemaker → founder → GM → cellar-door manager) for one producer. Idempotent (skips if `contactName` already set), fills only NULL columns.
+  - `needsEnrichment` — query returning IDs of all producers without a `contactName`, used by the UI to show a queue-count badge.
+- **Prompt engineering**: tight system prompt with role priority + explicit "1-3 word title, no parentheticals, no explanatory prose" instructions. Belt-and-braces post-processing strips trailing `(…)`, `– NZ` qualifiers, and if the LLM leaks reasoning (commas, apostrophes, "but priority says…") we fall back to matching against a role whitelist (Chief Winemaker / Head Winemaker / Winemaker / Founder / Co-Founder / Owner-Operator / Owner / Proprietor / GM / General Manager / Cellar Door Manager).
+- **JSON parse resilience**: primary parse via `response_format: json_schema`; fallback that extracts the first `{…}` block if Sonar Pro wraps the JSON in reasoning prose. Both retry paths tested — one transient `parse_failed` in a 35-row batch went through on the retry.
+- **Frontend** (`AdminProducers.tsx`):
+  - Top-level "▶ Enrich N missing contacts (Perplexity)" button (visible only when queue > 0)
+  - Live progress strip: current producer name, N/total, running found/skipped/failed counts, amber progress bar
+  - Row-level "Enrich →" link on every empty Contact cell (amber underline-dotted) — for one-off re-runs
+  - Batch runs serially with 700ms pauses (rate-limit-friendly for the shared PERPLEXITY_API_KEY)
+- **Verified live-run**: 35 producers queued → **32/35 = 91% found on first pass** (real names + clean roles: Stephen Henschke, Virginia Willcock, Sue Hodder, Blair Walter, Michael Brajkovich, Sam Middleton, etc.). One transient parse_failed (Mt. Beautiful → Robert Watkins on retry) + one LLM-noise role (Linden Estate — Alex Hendry on retry). Final state: **34/35 rows enriched** (only Akaroa Winery has no public POC data + Pytest Winery is a test placeholder = 34/34 = 100% of real producers).
+- **Cost**: each call ≈ 500 tokens output → ~$0.001 per row → 35 rows ≈ $0.035 total. Full 534-scrape enrichment would be ~$0.55.
+
+
+
 **A2 · NZ Wine directory scraper — SHIPPED (Feb 2026, this session)**
 - **Source**: `nzwine.com/en/winery-directory/` — fully server-rendered static HTML, no Playwright needed. The originally-assumed `directory.wineaustralia.com` doesn't exist (it's the Wine Australia Export Label directory, no producer contacts).
 - **Script**: `scripts/scrape-nz-winery-directory.mjs` — native `fetch` + regex parsing (no new deps), retry-with-backoff, auto-paginates until empty page, `--dry-run` / `--limit` / `--delay` / `--keyword` / `--tourism=sip,dine` / `--region=hawkes-bay` flags. Idempotent upserts on `(name, country="NZ")` — only fills BLANK columns so manual admin edits are never overwritten.

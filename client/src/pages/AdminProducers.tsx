@@ -115,6 +115,16 @@ export default function AdminProducers() {
   const bulkImport = trpc.producers.bulkImport.useMutation();
   const updateStatus = trpc.producers.updateStatus.useMutation();
   const removeMut = trpc.producers.remove.useMutation();
+  const enrichMut = trpc.producers.enrichContact.useMutation();
+  const needsEnrichQ = trpc.producers.needsEnrichment.useQuery();
+
+  // Batch enrichment state
+  const [batchState, setBatchState] = useState<
+    | { phase: "idle" }
+    | { phase: "running"; current: number; total: number; currentName: string; found: number; skipped: number; failed: number }
+    | { phase: "done"; total: number; found: number; skipped: number; failed: number }
+  >({ phase: "idle" });
+  const [rowEnriching, setRowEnriching] = useState<number | null>(null);
 
   const [preview, setPreview] = useState<Row[] | null>(null);
   const [previewErrors, setPreviewErrors] = useState<string[]>([]);
@@ -144,6 +154,51 @@ export default function AdminProducers() {
     setPreviewErrors([]);
     utils.producers.list.invalidate();
     utils.producers.stats.invalidate();
+  }
+
+  /**
+   * Batch-enrich all producers that don't yet have a contactName. We run
+   * serially (not Promise.all) because Perplexity Sonar Pro is rate-limited
+   * and the shared PERPLEXITY_API_KEY has finite QPS. Between calls we
+   * pause 700ms so we're a good citizen. If a single call fails we log and
+   * continue — one bad row shouldn't kill the batch.
+   */
+  async function enrichAll() {
+    const queue = needsEnrichQ.data ?? [];
+    if (queue.length === 0) return;
+    if (!confirm(`Enrich ${queue.length} producer${queue.length === 1 ? "" : "s"} via Perplexity Sonar Pro?\n\nThis takes ~10-20s each (${Math.round((queue.length * 15) / 60)} min total) and consumes your Perplexity credits.`)) return;
+    let found = 0;
+    let skipped = 0;
+    let failed = 0;
+    for (let i = 0; i < queue.length; i++) {
+      const row = queue[i];
+      setBatchState({ phase: "running", current: i + 1, total: queue.length, currentName: row.name, found, skipped, failed });
+      try {
+        const result = await enrichMut.mutateAsync({ id: row.id });
+        if (result.ok && !result.skipped) found++;
+        else skipped++;
+      } catch {
+        failed++;
+      }
+      // small pause between calls to be nice to the shared API key
+      await new Promise((r) => setTimeout(r, 700));
+    }
+    setBatchState({ phase: "done", total: queue.length, found, skipped, failed });
+    utils.producers.list.invalidate();
+    utils.producers.needsEnrichment.invalidate();
+  }
+
+  async function enrichOne(id: number) {
+    setRowEnriching(id);
+    try {
+      await enrichMut.mutateAsync({ id });
+    } catch (err) {
+      alert(`Enrichment failed: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setRowEnriching(null);
+      utils.producers.list.invalidate();
+      utils.producers.needsEnrichment.invalidate();
+    }
   }
 
   return (
@@ -202,7 +257,36 @@ export default function AdminProducers() {
             <input type="file" accept=".csv,text/csv" onChange={onFile} data-testid="prod-csv-input" style={{ display: "none" }} />
             Upload CSV…
           </label>
+          {(needsEnrichQ.data?.length ?? 0) > 0 && (
+            <button
+              type="button"
+              data-testid="prod-enrich-all-btn"
+              disabled={batchState.phase === "running"}
+              onClick={enrichAll}
+              style={{ padding: "6px 14px", borderRadius: 4, border: `1px solid ${BORDER}`, background: "color-mix(in oklch, white 4%, transparent)", color: HI, fontFamily: SANS, fontSize: "0.82rem", fontWeight: 600, cursor: batchState.phase === "running" ? "wait" : "pointer" }}
+            >
+              {batchState.phase === "running"
+                ? `Enriching ${batchState.current}/${batchState.total}…`
+                : `▶ Enrich ${needsEnrichQ.data?.length} missing contact${needsEnrichQ.data?.length === 1 ? "" : "s"} (Perplexity)`}
+            </button>
+          )}
         </div>
+        {batchState.phase === "running" && (
+          <div data-testid="prod-enrich-progress" style={{ marginTop: 12, padding: "10px 14px", background: "color-mix(in oklch, gold 8%, transparent)", border: `1px solid ${AMBER}`, borderRadius: 4, fontFamily: SANS, fontSize: "0.82rem", color: HI }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
+              <span>Enriching <strong>{batchState.currentName}</strong>… ({batchState.current}/{batchState.total})</span>
+              <span style={{ color: MID }}>found <strong style={{ color: "#059669" }}>{batchState.found}</strong> · skipped {batchState.skipped} · failed {batchState.failed}</span>
+            </div>
+            <div style={{ height: 4, background: BORDER, borderRadius: 2, overflow: "hidden" }}>
+              <div style={{ width: `${(batchState.current / batchState.total) * 100}%`, height: "100%", background: AMBER, transition: "width 0.3s" }} />
+            </div>
+          </div>
+        )}
+        {batchState.phase === "done" && (
+          <div data-testid="prod-enrich-done" style={{ marginTop: 12, padding: "8px 14px", background: "color-mix(in oklch, forestgreen 8%, transparent)", border: `1px solid #059669`, borderRadius: 4, fontFamily: SANS, fontSize: "0.82rem", color: HI }}>
+            ✓ Enrichment run complete — <strong>{batchState.found}</strong> contacts found · {batchState.skipped} skipped (no data) · {batchState.failed} failed
+          </div>
+        )}
         <details style={{ marginBottom: 8 }}>
           <summary style={{ cursor: "pointer", fontFamily: SANS, fontSize: "0.78rem", color: LO }}>
             CSV format
@@ -311,7 +395,21 @@ Cloudy Bay,NZ,Marlborough,https://cloudybay.co.nz,,Nick Blampied,winemaker,mid
                   <Td>{p.country}</Td>
                   <Td>{p.website ? <a href={p.website} target="_blank" rel="noreferrer" style={{ color: AMBER, textDecoration: "none" }}>{p.website.replace(/^https?:\/\//, "")}</a> : "—"}</Td>
                   <Td>{p.email ?? "—"}</Td>
-                  <Td>{p.contactName ? `${p.contactName}${p.contactRole ? ` (${p.contactRole})` : ""}` : "—"}</Td>
+                  <Td>
+                    {p.contactName ? (
+                      `${p.contactName}${p.contactRole ? ` (${p.contactRole})` : ""}`
+                    ) : (
+                      <button
+                        type="button"
+                        data-testid={`prod-enrich-${p.id}`}
+                        disabled={rowEnriching === p.id || batchState.phase === "running"}
+                        onClick={() => enrichOne(p.id)}
+                        style={{ background: "transparent", border: "none", color: rowEnriching === p.id ? LO : AMBER, fontFamily: SANS, fontSize: "0.75rem", cursor: rowEnriching === p.id ? "wait" : "pointer", textDecoration: "underline dotted", padding: 0 }}
+                      >
+                        {rowEnriching === p.id ? "Enriching…" : "Enrich →"}
+                      </button>
+                    )}
+                  </Td>
                   <Td>
                     <select
                       data-testid={`prod-status-${p.id}`}
