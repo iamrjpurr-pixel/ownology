@@ -28,7 +28,7 @@
  */
 import { z } from "zod";
 import { router, publicProcedure, wineryProcedure } from "../trpc.js";
-import { db, getUserCellarContext } from "../db.js";
+import { db, getUserCellarContext, addVintageLogEntry } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
 import { eq, sql } from "drizzle-orm";
 import { chatCompletion, MODELS } from "../_core/llm.js";
@@ -623,5 +623,95 @@ ${cellarContext || "(no history yet — new user)"}
         generatedAt: now,
         localDate: today,
       };
+    }),
+
+  /**
+   * Log an environmental event to the winemaker's vintage_log_entries.
+   *
+   * Creates a `weather_event` row (existing EventType — no schema change).
+   * By default the entry is attached to a synthetic "CELLAR" tank/variety
+   * so it doesn't clutter any real vessel's timeline, but the caller can
+   * override tankName + variety when the observation is specific to a
+   * vessel (e.g. "Barrel Rack A, Chardonnay — condensation on 2 barrels").
+   *
+   * Includes the alert kind, current reading, forecast summary, and any
+   * AI advice text in detailsJson so the audit trail survives if the
+   * weather-advice cache is later purged. Available to all logged-in
+   * winery users — logging your own observations is not a paid feature,
+   * only the AI-generated advice is.
+   */
+  logEnvironmentalEvent: wineryProcedure
+    .input(
+      z.object({
+        alertKind: z.enum([
+          "humidity_high",
+          "humidity_low",
+          "temp_high",
+          "temp_low",
+          "dewpoint_approach",
+        ]),
+        alertTitle: z.string().min(1).max(200),
+        currentReading: z.object({
+          temperature_c: z.number(),
+          humidity_pct: z.number(),
+          dew_point_c: z.number(),
+        }),
+        forecastSummary: z
+          .object({
+            temp_min_c: z.number(),
+            temp_max_c: z.number(),
+            humidity_min_pct: z.number(),
+            humidity_max_pct: z.number(),
+          })
+          .optional(),
+        adviceText: z.string().max(2000).optional(),
+        tankName: z.string().max(64).optional(),
+        variety: z.string().max(64).optional(),
+        note: z.string().max(500).optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const details = {
+        source: "weather_widget",
+        alertKind: input.alertKind,
+        alertTitle: input.alertTitle,
+        currentReading: input.currentReading,
+        forecastSummary: input.forecastSummary ?? null,
+        adviceText: input.adviceText ?? null,
+        loggedAt: Date.now(),
+      };
+      const tagSet = ["environmental", "weather", input.alertKind];
+      const humanNote =
+        input.note?.trim() ||
+        `Ambient ${input.currentReading.temperature_c.toFixed(1)}°C · ${input.currentReading.humidity_pct.toFixed(0)}% RH · DP ${input.currentReading.dew_point_c.toFixed(1)}°C. ${input.alertTitle}.`;
+
+      // addVintageLogEntry returns the drizzle-mysql2 insertId which isn't
+      // always reliably populated across drivers. We pin the entry with an
+      // explicit entryAt so we can round-trip the ID back for the UI.
+      const entryAt = details.loggedAt;
+      await addVintageLogEntry({
+        userId: ctx.userId,
+        wineryId: ctx.wineryId,
+        tankName: input.tankName?.trim() || "CELLAR",
+        variety: input.variety?.trim() || "environment",
+        eventType: "weather_event",
+        detailsJson: JSON.stringify(details),
+        noteText: humanNote,
+        tagsJson: JSON.stringify(tagSet),
+        entryAt,
+        importSource: "weather_widget",
+      });
+      // Round-trip the ID via (userId + entryAt) — cheap; the pair is
+      // effectively unique because entryAt is a ms epoch we just minted.
+      const rows = await db
+        .select({ id: schema.vintageLogEntries.id })
+        .from(schema.vintageLogEntries)
+        .where(
+          sql`user_id = ${ctx.userId} AND entry_at = ${entryAt} AND event_type = 'weather_event'`,
+        )
+        .limit(1);
+      const entryId = rows[0]?.id ?? null;
+
+      return { ok: true as const, entryId, loggedAt: entryAt };
     }),
 });

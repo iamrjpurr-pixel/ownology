@@ -333,6 +333,38 @@ function BriefCard({ card }: { card: Card }) {
             <span className="text-xs px-2 py-0.5 rounded font-semibold" style={{ background: `color-mix(in oklch, ${c} 18%, transparent)`, color: c }}>
               {statusLabel(card.status)}
             </span>
+            <span
+              data-testid={`quant-info-${slug}`}
+              title={
+                "Quantitative risk (Tier 1) — this status fired from lab readings, no operator prompt. Ownology watches 7 quantitative risks:\n" +
+                "• SO₂ decay in aging vessels\n" +
+                "• Stuck / sluggish ferment (Brix flatline)\n" +
+                "• Ferment temp excursion\n" +
+                "• MLF drift / stall\n" +
+                "• Silent barrel / tank (>30 days no check)\n" +
+                "• LIP / compliance drift\n" +
+                "• Days-since-check drift on aging vessels\n\n" +
+                "Green = pass, amber = watch (near-miss), red = attention required. Full staff briefing at /risk-briefing."
+              }
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 14,
+                height: 14,
+                borderRadius: "50%",
+                border: "1px solid var(--ow-border)",
+                color: "var(--ow-text-mid)",
+                fontSize: "0.55rem",
+                fontWeight: 700,
+                cursor: "help",
+                userSelect: "none",
+                lineHeight: 1,
+              }}
+              aria-label="Quantitative risk info"
+            >
+              i
+            </span>
           </div>
           <p className="text-sm mt-2" style={{ color: "var(--ow-text-hi)", margin: 0 }}>{card.trajectory}</p>
         </div>
@@ -449,6 +481,69 @@ const FLAG_LABELS: Record<QualFlagType, string> = {
   other: "Other",
 };
 
+/**
+ * Tribal-knowledge tooltips for each qualitative risk. Rendered on hover
+ * over each pick button in the picker AND on the "Qualitative risk" heading
+ * itself (as an inline info dot). Deliberately concise — cellar staff need
+ * "what to sniff for" not a research paper. Full doctrine at /risk-briefing.
+ */
+const FLAG_TOOLTIPS: Record<QualFlagType, { look: string; then: string }> = {
+  brett: {
+    look: "Barnyard, band-aid, sweaty leather, horse-stable. Volatile phenols (4-EP, 4-EG). Often masks fruit character. Barrel-aged reds are most at risk.",
+    then: "Confirm on the palate (mouse ferment?). Isolate the vessel, tighten SO₂, taste weekly. Escalate to blend/bottling call within 2 weeks.",
+  },
+  tca: {
+    look: "Musty basement, wet cardboard, damp cellar. Even at 2-3 ng/L it flattens the wine's fruit and finish. Corked bottles are the classic case, but cellar contamination is possible.",
+    then: "Never one-off — check adjacent barrels, corks, and hoses. Escalate to a sensory bench with two other tasters; TCA below your threshold still costs finesse.",
+  },
+  oxidation: {
+    look: "Colour drift (browning in whites, brick in reds), aroma flattening, sherry / bruised-apple notes, faded fruit. Metallic edge on the palate.",
+    then: "Check ullage, headspace, and last SO₂ addition. Top-up, dose SO₂ against the current pH/molecular target, reduce racking exposure.",
+  },
+  h2s: {
+    look: "Rotten egg, struck match, burnt rubber, drain. Often mid to late ferment. Untreated turns into mercaptan (skunky) then disulfide (garlic) — much harder to fix.",
+    then: "Splash-rack for aeration immediately, add DAP if pre-inoc, add Cu (5-10 mg/L) if post-inoc & persistent. Retaste in 24h — escalate to fining if unresolved.",
+  },
+  sanitation: {
+    look: "Visible mould, biofilm on hose interior, chalky residue on tank walls, off-clean smell, sticky fittings. Any vessel returning to service without a full clean cycle.",
+    then: "Re-clean full cycle: caustic → rinse → citric → rinse → sanitiser → rinse. Log the observation so it's traceable if a downstream batch shows issues.",
+  },
+  other: {
+    look: "Anything the winemaker's nose or eye caught that doesn't fit the five above. Freeform capture — write what you saw.",
+    then: "Note vessel + observation. Follow up within 48h with a targeted lab test or blind bench-taste if warranted.",
+  },
+};
+
+// Small reusable info-dot for hover tooltips (uses browser <title> so no
+// portal/z-index headaches; readable by screen readers).
+function InfoDot({ tip, testId }: { tip: string; testId?: string }) {
+  return (
+    <span
+      data-testid={testId}
+      title={tip}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 14,
+        height: 14,
+        borderRadius: "50%",
+        border: "1px solid var(--ow-border)",
+        color: "var(--ow-text-mid)",
+        fontSize: "0.55rem",
+        fontWeight: 700,
+        marginLeft: "0.35rem",
+        cursor: "help",
+        userSelect: "none",
+        lineHeight: 1,
+      }}
+      aria-label="More info"
+    >
+      i
+    </span>
+  );
+}
+
 function QualFlagsBlock({ slug, vesselId }: { slug: string; vesselId: string }) {
   const utils = trpc.useUtils();
   const activeQ = trpc.qualFlags.listActive.useQuery();
@@ -480,8 +575,21 @@ function QualFlagsBlock({ slug, vesselId }: { slug: string; vesselId: string }) 
 
   return (
     <div data-testid={`qual-flags-${slug}`}>
-      <p className="text-xs uppercase tracking-widest font-semibold" style={{ color: "var(--ow-text-lo)", margin: 0 }}>
+      <p className="text-xs uppercase tracking-widest font-semibold flex items-center" style={{ color: "var(--ow-text-lo)", margin: 0 }}>
         Qualitative risk
+        <InfoDot
+          testId={`qual-info-${slug}`}
+          tip={
+            "Winemaker-observation risks (taste, smell, sight). 6 flag types:\n" +
+            "• Brett — barnyard / band-aid volatile phenols\n" +
+            "• TCA — musty / wet-cardboard cork taint\n" +
+            "• Oxidation — browning + sherry notes + faded fruit\n" +
+            "• H₂S — rotten-egg / struck-match reduction (mid-late ferment)\n" +
+            "• Sanitation — visible mould, biofilm, off-clean vessel\n" +
+            "• Other — anything else the nose caught\n\n" +
+            "Full staff briefing at /risk-briefing."
+          }
+        />
       </p>
       {myFlags.length === 0 && !showPicker && (
         <div className="mt-2 flex items-center gap-2">
@@ -547,6 +655,7 @@ function QualFlagsBlock({ slug, vesselId }: { slug: string; vesselId: string }) 
                 type="button"
                 data-testid={`qual-flag-pick-${slug}-${k}`}
                 onClick={() => setPicking(k)}
+                title={`LOOK FOR: ${FLAG_TOOLTIPS[k].look}\n\nTHEN: ${FLAG_TOOLTIPS[k].then}`}
                 className="text-xs px-3 py-1 rounded"
                 style={{
                   background: picking === k ? "color-mix(in oklch, gold 20%, transparent)" : "transparent",
@@ -560,6 +669,24 @@ function QualFlagsBlock({ slug, vesselId }: { slug: string; vesselId: string }) 
               </button>
             ))}
           </div>
+          {picking && (
+            <div
+              data-testid={`qual-flag-education-${slug}`}
+              className="mt-2 p-2.5 rounded text-xs"
+              style={{
+                background: "color-mix(in oklch, var(--ow-amber) 6%, transparent)",
+                borderLeft: "2px solid var(--ow-amber)",
+                lineHeight: 1.55,
+              }}
+            >
+              <p style={{ margin: 0, color: "var(--ow-text-hi)" }}>
+                <strong style={{ color: "var(--ow-amber)" }}>Look for:</strong> {FLAG_TOOLTIPS[picking].look}
+              </p>
+              <p style={{ margin: "0.35rem 0 0", color: "var(--ow-text-mid)" }}>
+                <strong style={{ color: "var(--ow-amber)" }}>Then:</strong> {FLAG_TOOLTIPS[picking].then}
+              </p>
+            </div>
+          )}
           <input
             type="text"
             data-testid={`qual-flag-note-${slug}`}

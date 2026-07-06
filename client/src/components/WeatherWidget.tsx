@@ -471,6 +471,7 @@ function AlertCard({ alert: a, currentReading, forecastSummary }: AlertCardProps
   const canAskAi = AI_ELIGIBLE_KINDS.has(a.kind);
 
   const mutation = trpc.weather.contextualAdvice.useMutation();
+  const logMutation = trpc.weather.logEnvironmentalEvent.useMutation();
 
   const askAi = () => {
     if (!canAskAi) return;
@@ -490,6 +491,24 @@ function AlertCard({ alert: a, currentReading, forecastSummary }: AlertCardProps
   const gated = result && "gated" in result && result.gated;
   const advice = result && !gated && "advice" in result ? result.advice : null;
   const error = result && !gated && "error" in result ? result.error : mutation.error?.message;
+
+  const logIt = () => {
+    if (!AI_ELIGIBLE_KINDS.has(a.kind)) return;
+    logMutation.mutate({
+      alertKind: a.kind as
+        | "humidity_high"
+        | "humidity_low"
+        | "temp_high"
+        | "temp_low"
+        | "dewpoint_approach",
+      alertTitle: a.title,
+      currentReading,
+      forecastSummary,
+      adviceText: advice ?? undefined,
+    });
+  };
+  const logged = logMutation.data?.ok === true;
+  const loggedEntryId = logMutation.data?.entryId;
 
   return (
     <article
@@ -626,6 +645,67 @@ function AlertCard({ alert: a, currentReading, forecastSummary }: AlertCardProps
         >
           Advice unavailable: {error}
         </p>
+      )}
+
+      {/* ── Log this observation to vintage_log_entries ── */}
+      {canAskAi && !logged && (
+        <div style={{ marginTop: "0.55rem", display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+          <button
+            type="button"
+            data-testid={`weather-alert-log-${a.kind}`}
+            onClick={logIt}
+            disabled={logMutation.isPending}
+            style={{
+              background: "transparent",
+              color: "var(--ow-text-mid)",
+              border: `1px dashed var(--ow-border)`,
+              padding: "0.3rem 0.7rem",
+              borderRadius: 3,
+              fontSize: "0.7rem",
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              cursor: logMutation.isPending ? "wait" : "pointer",
+              fontFamily: "'Lato', sans-serif",
+            }}
+          >
+            {logMutation.isPending ? "Logging…" : "📝 Log this observation to vintage log"}
+          </button>
+          {logMutation.error && (
+            <span style={{ fontSize: "0.7rem", color: "oklch(0.65 0.18 25)" }}>
+              Log failed: {logMutation.error.message}
+            </span>
+          )}
+        </div>
+      )}
+      {logged && (
+        <div
+          data-testid={`weather-alert-logged-${a.kind}`}
+          style={{
+            marginTop: "0.55rem",
+            padding: "0.4rem 0.7rem",
+            background: "color-mix(in oklch, oklch(0.62 0.16 145) 10%, transparent)",
+            border: "1px solid color-mix(in oklch, oklch(0.62 0.16 145) 40%, transparent)",
+            borderRadius: 4,
+            fontSize: "0.72rem",
+            color: "var(--ow-text-hi)",
+            fontFamily: "'Lato', sans-serif",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+          }}
+        >
+          <span style={{ color: "oklch(0.62 0.16 145)", fontWeight: 700 }}>✓</span>
+          <span>
+            Logged to your vintage log as entry <code style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.68rem" }}>#{loggedEntryId}</code>{" "}
+            (tank <em>CELLAR</em> · <em>weather_event</em>).
+          </span>
+          <a
+            href="/the-press"
+            style={{ marginLeft: "auto", color: "var(--ow-amber)", fontWeight: 700, textDecoration: "underline" }}
+          >
+            Open The Press →
+          </a>
+        </div>
       )}
     </article>
   );

@@ -56,11 +56,11 @@ export const TODO: TodoItem[] = [
   },
   {
     id: "weather-widget-sop-and-vintage-log-integration",
-    title: "Weather widget → SOP deep-links + Vintage Log flag",
+    title: "Weather widget → SOP deep-links",
     description:
-      "When an environmental alert fires (e.g. Humidity high >75%), we currently show why + action inline + LLM cellar-grounded advice for paid tiers. Slice 3: add a 'Log this' button that (a) writes an environmental_event row to vintage_log_entries so a wine's exposure history is auditable, and (b) deep-links to a matching SOP ('Increase Ventilation SOP' — needs to be authored and added to sop_library first). Turns the widget from informational into workflow-integrated.",
+      "Vintage-log logging is SHIPPED (Feb 06) — see 'Weather widget · Log environmental observation' in Recently Shipped. Slice 3 remaining: deep-link the alert to a matching SOP ('Increase Ventilation SOP', 'Cellar Insulation SOP', 'Cold-Stabilisation SOP') from sop_library. Requires authoring 2-3 environmental SOPs first (~1 hour each, MoreWine references + AWRI TR227). Once shipped, each alert card gets a '📖 See the SOP' link alongside the Ask AI + Log This buttons.",
     priority: "p2",
-    effort: "~2 hours + ~1 hour SOP authoring",
+    effort: "~1 hour wiring + ~3 hours SOP authoring",
     status: "not-started",
     category: "Product",
     updatedAt: "2026-02-06",
