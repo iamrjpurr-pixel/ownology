@@ -31,7 +31,15 @@ Real auth is now wired. Two modes:
 - `GET  /api/auth/me`       — returns user from cookie or 401
 - `POST /api/auth/logout`   — clears cookie
 
+Check `/app/memory/test_credentials.md` and `OWNOLOGY_GATE_PASSWORD` in `/app/.env` (Password is `middx99` — rotated Feb 2026).
+
 ### To act as a specific user in tests
 Sign a JWT with the `JWT_SECRET` from `/app/.env` containing
 `{ openId, name, email, role }` (HS256) and set it as the `app_session_id`
 cookie. Or just hit `/login` in a real browser.
+
+### Gate wall password (preview + prod)
+- `OWNOLOGY_GATE_PASSWORD=middx99` (rotated Feb 2026 from the default `changeme-set-real-password`).
+- Used at `/api/gate/verify` (POST { password }) → sets `ow_gate` cookie → 24-month expiry.
+- The gate wall protects all non-allowlisted SPA routes under default-deny (see `server/index.ts` `PUBLIC_EXACT` + `PUBLIC_PREFIXES`).
+- Alternative bypass: mint a per-prospect magic link at `/admin/gate-invites` → share `/i/<token>` URL.
