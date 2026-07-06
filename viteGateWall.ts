@@ -21,6 +21,7 @@
 import type { Plugin } from "vite";
 import { parse as parseCookies } from "cookie";
 import { jwtVerify } from "jose";
+import mysql from "mysql2/promise";
 import "dotenv/config"; // Load /app/.env into process.env so we can read JWT_SECRET.
 
 // Same names as production so cookies are cross-compatible with the
@@ -83,6 +84,7 @@ const PUBLIC_PREFIXES = [
   "/api/", // tRPC + REST endpoints enforce own auth
   "/blog/",
   "/hi/",
+  "/i/", // /i/:token — magic-link invites
   "/cellar-journal/",
   "/for-home-winemakers/knowledge/",
   "/reference/",
@@ -96,6 +98,38 @@ function isPublicPath(pathname: string): boolean {
   return false;
 }
 
+// Shared MySQL pool for the invite-revocation check. Kept small (1 conn)
+// because the Vite dev server is single-process, low-traffic. Falls back
+// to "not revoked" if the DB is unreachable — dev-preview usability wins
+// over strict revocation on that failure mode.
+let dbPool: mysql.Pool | null = null;
+function getDbPool(): mysql.Pool | null {
+  if (dbPool) return dbPool;
+  const url = process.env.DATABASE_URL;
+  if (!url) return null;
+  dbPool = mysql.createPool({ uri: url, connectionLimit: 1, connectTimeout: 3000 });
+  return dbPool;
+}
+
+async function isInviteActive(inviteId: number): Promise<boolean> {
+  const pool = getDbPool();
+  if (!pool) return true; // Dev preview usability — never fail-closed on missing DB
+  try {
+    const [rows] = await pool.execute(
+      "SELECT revoked_at, expires_at FROM gate_invites WHERE id = ? LIMIT 1",
+      [inviteId]
+    );
+    const list = rows as Array<{ revoked_at: number | null; expires_at: number | null }>;
+    const row = list[0];
+    if (!row) return false;
+    if (row.revoked_at) return false;
+    if (row.expires_at && row.expires_at < Date.now()) return false;
+    return true;
+  } catch {
+    return true; // DB blip — don't lock Rich out of dev preview
+  }
+}
+
 async function hasValidGateCookie(cookieHeader: string): Promise<boolean> {
   if (!cookieHeader) return false;
   const cookies = parseCookies(cookieHeader);
@@ -105,7 +139,11 @@ async function hasValidGateCookie(cookieHeader: string): Promise<boolean> {
   if (!secret) return false;
   try {
     const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
-    return payload.gate === "ok";
+    if (payload.gate === "ok") return true;
+    if (payload.gate === "invite" && typeof payload.id === "number") {
+      return await isInviteActive(payload.id);
+    }
+    return false;
   } catch {
     return false;
   }

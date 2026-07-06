@@ -19,6 +19,9 @@
 import { SignJWT, jwtVerify } from "jose";
 import type express from "express";
 import { parse as parseCookies } from "cookie";
+import { db } from "./db.js";
+import * as schema from "../drizzle/schema.js";
+import { eq } from "drizzle-orm";
 
 /** Cookie name — deliberately distinct from `app_session_id` (Google OAuth
  *  cookie) so both can co-exist and one doesn't invalidate the other. */
@@ -31,8 +34,9 @@ function getSecret(): Uint8Array | null {
   return new TextEncoder().encode(s);
 }
 
-/** Mint an ow_gate cookie value. Returns null if JWT_SECRET is missing
- *  (in which case the caller should refuse to create the cookie at all). */
+/** Mint an ow_gate cookie value for the SHARED-PASSWORD path. Returns null
+ *  if JWT_SECRET is missing (in which case the caller should refuse to
+ *  create the cookie at all). */
 export async function mintGateToken(): Promise<string | null> {
   const secret = getSecret();
   if (!secret) return null;
@@ -43,9 +47,27 @@ export async function mintGateToken(): Promise<string | null> {
     .sign(secret);
 }
 
-/** Verify an incoming ow_gate cookie. Returns true iff the signature +
- *  expiry are valid AND JWT_SECRET is configured. Any error returns false
- *  (never throws — the caller uses the boolean directly). */
+/** Mint an ow_gate cookie value scoped to a specific INVITE. Payload
+ *  includes the invite ID so verifyGateCookie can check the DB row for
+ *  revocation on every request — that's what makes individual revoke
+ *  work. Returns null if JWT_SECRET is missing. */
+export async function mintInviteToken(inviteId: number): Promise<string | null> {
+  const secret = getSecret();
+  if (!secret) return null;
+  return await new SignJWT({ gate: "invite", id: inviteId })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime(`${GATE_MAX_AGE_SECONDS}s`)
+    .sign(secret);
+}
+
+/** Verify an incoming ow_gate cookie. Returns true iff the JWT signature
+ *  + expiry are valid AND (for invite tokens) the underlying invite row
+ *  is not revoked or expired. Two paths:
+ *   - Shared-password JWT `{ gate: "ok" }` → JWT signature check only.
+ *   - Invite JWT `{ gate: "invite", id: N }` → JWT check + DB lookup for
+ *     the invite row, verify not revoked and not past expires_at.
+ *  Any error returns false (never throws — caller uses the boolean). */
 export async function verifyGateCookie(req: express.Request): Promise<boolean> {
   try {
     const cookieHeader = req.headers.cookie;
@@ -56,7 +78,20 @@ export async function verifyGateCookie(req: express.Request): Promise<boolean> {
     const secret = getSecret();
     if (!secret) return false;
     const { payload } = await jwtVerify(token, secret);
-    return payload.gate === "ok";
+    if (payload.gate === "ok") return true;
+    if (payload.gate === "invite" && typeof payload.id === "number") {
+      const rows = await db
+        .select()
+        .from(schema.gateInvites)
+        .where(eq(schema.gateInvites.id, payload.id))
+        .limit(1);
+      const row = rows[0];
+      if (!row) return false;
+      if (row.revokedAt) return false;
+      if (row.expiresAt && row.expiresAt < Date.now()) return false;
+      return true;
+    }
+    return false;
   } catch {
     return false;
   }

@@ -456,6 +456,13 @@ const TOOLS: AdminTool[] = [
     icon: <IconLeads />,
     badge: "AI Coach",
   },
+  {
+    label: "Gate invites",
+    description: "Per-tester magic links (/i/<token>). Share individual invites with beta users, see who's active, revoke individually without rotating the shared password.",
+    href: "/admin/gate-invites",
+    icon: <IconLeads />,
+    badge: "Access",
+  },
 ];
 
 export default function Admin() {

@@ -1472,6 +1472,31 @@ export const quizPicks = mysqlTable(
 
 
 /**
+ * gate_invites — per-tester magic-link invites (Feb 2026).
+ * Rich generates one row per beta tester at /admin/gate-invites. Sharing
+ * the link `/i/<token>` is equivalent to sharing the password wall
+ * password — except it can be revoked individually and use is tracked.
+ */
+export const gateInvites = mysqlTable(
+  "gate_invites",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    token: varchar("token", { length: 48 }).notNull().unique(),
+    label: varchar("label", { length: 120 }).notNull(),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    expiresAt: bigint("expires_at", { mode: "number" }), // null = never
+    firstUsedAt: bigint("first_used_at", { mode: "number" }),
+    lastUsedAt: bigint("last_used_at", { mode: "number" }),
+    useCount: int("use_count").notNull().default(0),
+    revokedAt: bigint("revoked_at", { mode: "number" }),
+  },
+  (t) => [
+    index("gi_token_idx").on(t.token),
+    index("gi_revoked_idx").on(t.revokedAt),
+  ]
+);
+
+/**
  * gate_events — audit log for the shared-password wall (S3).
  * One row per verify attempt (success or fail) + one per rate-limit block.
  * Powers /admin/gate-log so the operator can spot brute-force attempts and

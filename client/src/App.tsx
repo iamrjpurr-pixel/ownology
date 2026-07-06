@@ -92,6 +92,7 @@ const AdminThemesStats = lazy(() => import("./pages/AdminThemesStats"));
 const AdminQuizPicks = lazy(() => import("./pages/AdminQuizPicks"));
 const AdminProducers = lazy(() => import("./pages/AdminProducers"));
 const AdminMarketingOps = lazy(() => import("./pages/AdminMarketingOps"));
+const AdminGateInvites = lazy(() => import("./pages/AdminGateInvites"));
 const HiProducerPreview = lazy(() => import("./pages/HiProducerPreview"));
 const CascadeDemo = lazy(() => import("./pages/CascadeDemo"));
 const CopilotMockup = lazy(() => import("./pages/CopilotMockup"));
@@ -330,6 +331,7 @@ function Router() {
       <Route path={"/admin/quiz-picks"} component={AdminQuizPicks} />
       <Route path={"/admin/producers"} component={AdminProducers} />
       <Route path={"/admin/marketing-ops"} component={AdminMarketingOps} />
+      <Route path={"/admin/gate-invites"} component={AdminGateInvites} />
       <Route path={"/admin/responsive"} component={AdminResponsive} />
       <Route path={"/admin/dev"} component={AdminDev} />
       <Route path={"/admin/analytics/themes"} component={AdminAnalyticsThemes} />

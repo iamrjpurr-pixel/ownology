@@ -26,6 +26,7 @@ import authRouter from "./authRouter.js";
 import {
   verifyGateCookie,
   mintGateToken,
+  mintInviteToken,
   setGateCookie,
   clearGateCookie,
   checkGateRateLimit,
@@ -302,6 +303,70 @@ async function startServer() {
     return res.json({ ok: true });
   });
 
+  // ── Invite magic-link endpoint ─────────────────────────────────────────
+  // GET /i/:token — anyone with a valid, un-revoked, un-expired invite
+  // token gets an ow_gate cookie scoped to that invite and lands on /admin.
+  // Uses same rate-limiter bucket as password verify so a scattergun
+  // attack against random tokens hits the same wall (5 attempts / 15 min
+  // per IP).
+  app.get("/i/:token", async (req, res) => {
+    const ip = clientIpOf(req);
+    const ua = String(req.headers["user-agent"] || "").slice(0, 300);
+    const rl = checkGateRateLimit(ip);
+    if (!rl.allowed) {
+      import("./db.js").then(async ({ db }) => {
+        const { sql } = await import("drizzle-orm");
+        await db.execute(sql`INSERT INTO gate_events (kind, ip, user_agent, path, occurred_at) VALUES ('rate_limited', ${ip}, ${ua}, '/i/*', ${Date.now()})`);
+      }).catch(() => {});
+      return res.status(429).send("Too many attempts. Try again in a few minutes.");
+    }
+
+    const token = String(req.params.token || "").trim();
+    if (!token || token.length < 20 || token.length > 48) {
+      recordGateAttempt(ip);
+      return res.status(400).send("Invalid invite link.");
+    }
+
+    const { db } = await import("./db.js");
+    const { sql, eq } = await import("drizzle-orm");
+    const { gateInvites } = await import("../drizzle/schema.js");
+    const rows = await db
+      .select()
+      .from(gateInvites)
+      .where(eq(gateInvites.token, token))
+      .limit(1);
+    const invite = rows[0];
+    if (!invite) {
+      recordGateAttempt(ip);
+      await db.execute(sql`INSERT INTO gate_events (kind, ip, user_agent, path, occurred_at) VALUES ('fail', ${ip}, ${ua}, '/i/token-not-found', ${Date.now()})`).catch(() => {});
+      return res.status(404).send("Invite link not found or already revoked.");
+    }
+    if (invite.revokedAt) {
+      await db.execute(sql`INSERT INTO gate_events (kind, ip, user_agent, path, occurred_at) VALUES ('fail', ${ip}, ${ua}, ${'/i/revoked/' + String(invite.id)}, ${Date.now()})`).catch(() => {});
+      return res.status(403).send("This invite has been revoked. Please ask for a fresh link.");
+    }
+    if (invite.expiresAt && invite.expiresAt < Date.now()) {
+      return res.status(403).send("This invite has expired. Please ask for a fresh link.");
+    }
+
+    const cookieToken = await mintInviteToken(invite.id);
+    if (!cookieToken) return res.status(503).send("Gate not configured. Ask the operator.");
+    setGateCookie(res, cookieToken);
+    // Update usage counters (fire-and-forget)
+    const now = Date.now();
+    db.update(gateInvites)
+      .set({
+        firstUsedAt: invite.firstUsedAt ?? now,
+        lastUsedAt: now,
+        useCount: (invite.useCount ?? 0) + 1,
+      })
+      .where(eq(gateInvites.id, invite.id))
+      .catch(() => {});
+    await db.execute(sql`INSERT INTO gate_events (kind, ip, user_agent, path, occurred_at) VALUES ('success', ${ip}, ${ua}, ${'/i/invite/' + String(invite.id)}, ${Date.now()})`).catch(() => {});
+    // Land on the admin hub — most invites are for team/beta testers.
+    return res.redirect(302, "/admin");
+  });
+
   // ── Stripe webhook MUST come before express.json() ──────────────────────────
   app.use("/api/stripe/webhook", express.raw({ type: "application/json" }), (req, res, next) => {
     req.url = "/webhook";
@@ -471,6 +536,7 @@ async function startServer() {
     "/api/", // tRPC + REST endpoints enforce own auth at the procedure layer
     "/blog/", // /blog/:slug
     "/hi/", // /hi/:slug + /hi/producers/:id
+    "/i/", // /i/:token — magic-link invites (see server/routers/gate.ts)
     "/cellar-journal/", // /cellar-journal/:slug
     "/for-home-winemakers/knowledge/", // /for-home-winemakers/knowledge/:section
     "/reference/", // future /reference/* pages
@@ -740,6 +806,22 @@ async function startServer() {
         INDEX ge_occurred_idx (occurred_at),
         INDEX ge_kind_idx (kind),
         INDEX ge_ip_idx (ip)
+      )
+    `);
+    // gate_invites — per-tester magic links (Feb 2026).
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS gate_invites (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        token VARCHAR(48) NOT NULL UNIQUE,
+        label VARCHAR(120) NOT NULL,
+        created_at BIGINT NOT NULL,
+        expires_at BIGINT,
+        first_used_at BIGINT,
+        last_used_at BIGINT,
+        use_count INT NOT NULL DEFAULT 0,
+        revoked_at BIGINT,
+        INDEX gi_token_idx (token),
+        INDEX gi_revoked_idx (revoked_at)
       )
     `);
     // quiz_leads (A5) — post-quiz email capture.
