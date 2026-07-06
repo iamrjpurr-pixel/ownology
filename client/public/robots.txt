@@ -1,8 +1,20 @@
 # Ownology — robots.txt
 User-agent: *
 Allow: /
+
+# Admin surfaces — gated + not for indexing
 Disallow: /admin
+Disallow: /admin/
+
+# API endpoints (tRPC + REST) — machine-facing, not for crawlers
 Disallow: /api/
+
+# Magic-link invites — SECRET, must never be indexed
+Disallow: /i/
+
+# Per-prospect personalized URLs — public but not for indexing
+# (they're outreach targets, not evergreen content)
+Disallow: /hi/
 
 # Sitemaps
 Sitemap: https://ownology.ai/api/sitemap.xml

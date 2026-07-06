@@ -30,22 +30,27 @@ function xmlEscape(s: string): string {
 /** Static marketing / product pages that live in the SPA and should appear
  *  in the root sitemap. Priority + changefreq reflect our SEO strategy:
  *  Quiz and Pricing are the two conversion funnels; the Cellar Journal
- *  index is the SEO compounder; blog / product pages sit between. */
+ *  index is the SEO compounder; blog / product pages sit between.
+ *
+ *  IMPORTANT: only include PAGES THAT ARE PUBLIC under the default-deny
+ *  gate wall (see PUBLIC_EXACT in server/index.ts + viteGateWall.ts).
+ *  Advertising gated pages to Google leaks internal URLs and drops SEO
+ *  authority to redirects. */
 const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }> = [
   { path: "/",                     priority: "1.0", changefreq: "daily" },
   { path: "/quiz",                 priority: "0.9", changefreq: "monthly" },
   { path: "/pricing",              priority: "0.9", changefreq: "weekly" },
   { path: "/cellar-journal",       priority: "0.9", changefreq: "daily" },
-  { path: "/our-story",            priority: "0.7", changefreq: "monthly" },
+  { path: "/risk-management",      priority: "0.8", changefreq: "monthly" },
   { path: "/why-ownology",         priority: "0.7", changefreq: "monthly" },
-  { path: "/the-press",            priority: "0.7", changefreq: "monthly" },
   { path: "/free-run",             priority: "0.7", changefreq: "monthly" },
   { path: "/blog",                 priority: "0.7", changefreq: "weekly" },
   { path: "/for-home-winemakers",  priority: "0.6", changefreq: "monthly" },
   { path: "/for-home-winemakers/troubleshooting", priority: "0.5", changefreq: "monthly" },
   { path: "/for-home-winemakers/glossary",         priority: "0.5", changefreq: "monthly" },
-  { path: "/compliance",           priority: "0.5", changefreq: "monthly" },
-  { path: "/regulations",          priority: "0.5", changefreq: "monthly" },
+  { path: "/for-innovint-users",   priority: "0.5", changefreq: "monthly" },
+  { path: "/for-vintrace-users",   priority: "0.5", changefreq: "monthly" },
+  { path: "/regulations/detail",   priority: "0.5", changefreq: "monthly" },
   { path: "/resources",            priority: "0.5", changefreq: "monthly" },
   { path: "/merch",                priority: "0.4", changefreq: "monthly" },
 ];
