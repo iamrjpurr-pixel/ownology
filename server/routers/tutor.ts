@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { router, publicProcedure, ownerProcedure } from "../trpc.js";
+import { TRPCError } from "@trpc/server";
 import { eq, or, like, and } from "drizzle-orm";
 import {
   getUserByOpenId,
@@ -11,6 +12,38 @@ import { routeQuery } from "../queryRouter.js";
 import { backfillSopEmbeddings } from "../sopEmbeddings.js";
 import { persistJournalEntry } from "../cellarJournalRouter.js";
 import { chatCompletion, MODELS } from "../_core/llm.js";
+
+// ─── Public /ask rate limiter — per-IP, sliding 1-hour window ───────────────
+// Only applied to anonymous callers of tutor.ask (the /ask SEO flywheel page).
+// Signed-in users are exempt so paying members never hit a cap. Kept in-memory
+// intentionally — cost + spam protection is the goal, not perfect distributed
+// consistency. Same trade-off as the /gate rate limiter today.
+const PUBLIC_ASK_WINDOW_MS = 60 * 60 * 1000;
+const PUBLIC_ASK_MAX_PER_IP = 5;
+const publicAskLog = new Map<string, number[]>();
+function checkPublicAskRate(ip: string): { allowed: boolean; remaining: number; resetIn: number } {
+  const now = Date.now();
+  const cutoff = now - PUBLIC_ASK_WINDOW_MS;
+  const hits = (publicAskLog.get(ip) ?? []).filter((t) => t > cutoff);
+  const allowed = hits.length < PUBLIC_ASK_MAX_PER_IP;
+  if (allowed) {
+    hits.push(now);
+    publicAskLog.set(ip, hits);
+  }
+  const oldest = hits[0] ?? now;
+  return {
+    allowed,
+    remaining: Math.max(0, PUBLIC_ASK_MAX_PER_IP - hits.length),
+    resetIn: Math.max(0, PUBLIC_ASK_WINDOW_MS - (now - oldest)),
+  };
+}
+function extractClientIp(req: { headers: Record<string, unknown>; socket?: { remoteAddress?: string | null } | null }): string {
+  const xff = req.headers?.["x-forwarded-for"];
+  if (typeof xff === "string" && xff.length > 0) {
+    return xff.split(",")[0]!.trim();
+  }
+  return req.socket?.remoteAddress ?? "unknown";
+}
 
 // ─── Tutor Router (Scoped RAG — SOP-backed winemaking AI) ──────────────────────
 
@@ -133,6 +166,21 @@ const tutorRouter = router({
       if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
 
       const isHomeWinemaker = input.mode === "home_winemaker";
+
+      // ── /ask public flywheel rate limit (anonymous DIY callers only) ──────
+      // Any signed-in user is exempt (paying members shouldn't hit a cap).
+      // Anonymous DIY calls (the /ask SEO flywheel) get 5/hour/IP to protect
+      // LLM budget from scrapers/spam without hurting real curious visitors.
+      if (isHomeWinemaker && !ctx.user) {
+        const ip = extractClientIp(ctx.req);
+        const gate = checkPublicAskRate(ip);
+        if (!gate.allowed) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: `Free /ask limit reached (${PUBLIC_ASK_MAX_PER_IP} per hour). Reserve a Founding Member seat for unlimited Owen.`,
+          });
+        }
+      }
 
       // ═══════════════════════════════════════════════════════════════════════
       // DIY HOME WINEMAKER PATH — Document-grounded bible chunk retrieval
@@ -506,25 +554,37 @@ ${docContext}`;
           diyAnswer = diyRawContent;
         }
 
-        // ── Persist to Cellar Journal (fire-and-forget) ──
-        persistJournalEntry({
-          question: input.question,
-          topicTag:
-            Array.isArray(diySourceChapters) && diySourceChapters.length > 0
-              ? diySourceChapters[0]
-              : "Home Winemaking",
-          fullAnswer: diyAnswer,
-          source: "tutor.ask",
-          audience: "home_winemaker",
-          wineType: detectedWineType ?? "unknown",
-          citations: (diySourceChapters || []).map((c) => ({ label: c })),
-        }).catch((e) => console.warn("[CellarJournal] persist failed:", e?.message));
+        // ── Persist to Cellar Journal (awaited so we can return the slug) ──
+        // The /ask page uses the returned slug to link visitors to the
+        // permanent /cellar-journal/:slug page — the SEO flywheel payoff.
+        let journalSlug: string | null = null;
+        let journalIsNew = false;
+        try {
+          const persisted = await persistJournalEntry({
+            question: input.question,
+            topicTag:
+              Array.isArray(diySourceChapters) && diySourceChapters.length > 0
+                ? diySourceChapters[0]
+                : "Home Winemaking",
+            fullAnswer: diyAnswer,
+            source: "tutor.ask",
+            audience: "home_winemaker",
+            wineType: detectedWineType ?? "unknown",
+            citations: (diySourceChapters || []).map((c) => ({ label: c })),
+          });
+          journalSlug = persisted.slug;
+          journalIsNew = persisted.isNew;
+        } catch (e) {
+          console.warn("[CellarJournal] persist failed:", (e as Error)?.message);
+        }
 
         return {
           answer: diyAnswer,
           sopTitles: diySourceChapters,
           disclaimer: diyDisclaimer,
           riskLevel: diyRiskLevel,
+          journalSlug,
+          journalIsNew,
         };
       }
 

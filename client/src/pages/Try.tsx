@@ -217,7 +217,7 @@ function GelSays({ children, testid }: { children: React.ReactNode; testid?: str
         fontStyle: "italic",
       }}
     >
-      <strong style={{ color: TEXT_HI, fontStyle: "normal" }}>Gel says: </strong>
+      <strong style={{ color: TEXT_HI, fontStyle: "normal" }}>Owen says: </strong>
       {children}
     </div>
   );
@@ -319,16 +319,30 @@ function Step1Landing({ onNext }: { onNext: () => void }) {
         full swing. Semillon fermenting. Shiraz through malo. Chardonnay in barrel.
       </p>
       <p style={{ marginTop: "1rem" }}>
-        You just walked into the cellar. Your phone buzzes — the Cellar Brief for today is ready. It's the same brief
-        Rich and Gel get every morning at 5:30am, generated from every log entry, every measurement, every alert.
+        You just walked into the cellar. Your phone buzzes — the Cellar Brief for today is ready. It's the same brief{" "}
+        <abbr
+          data-testid="try-owen-intro-tooltip"
+          title="Owen (also Eoghan / Owain) — a Celtic name meaning 'well-born' or 'noble'. Owen is Ownology's AI cellar-hand: he reads yesterday's logs while you sleep and writes the brief you wake up to."
+          style={{
+            textDecoration: "underline dotted",
+            textUnderlineOffset: "3px",
+            textDecorationColor: AMBER,
+            cursor: "help",
+            fontStyle: "normal",
+          }}
+        >
+          Owen
+        </abbr>{" "}
+        — Ownology's AI cellar-hand — writes for us every morning at 7am, generated from every log entry, every
+        measurement, every alert.
       </p>
       <p style={{ marginTop: "1rem" }}>
         No signup. No credit card. Nothing you do here saves. When you're done, you'll know if Ownology's the tool
         you've been reaching for.
       </p>
       <GelSays testid="try-step-1-gel">
-        Everything you see is real data from our actual cellar. Same schema we'd use for your winery. Same alerts we
-        get. Same brief we read. What you can't do is break anything.
+        Everything you see is real data from our actual cellar. Same schema you'd get for your winery. Same alerts we
+        read every morning. Same brief I write. What you can't do is break anything.
       </GelSays>
       <div
         data-testid="try-step-1-excel"
@@ -381,13 +395,13 @@ function Step2Brief({
     <StepCard
       testid="try-step-2"
       eyebrow="The Cellar Brief · Step 1 of the Daily 10"
-      title="This is your morning at 5:30am."
+      title="This is your morning at 7am."
       onNext={onNext}
       nextLabel={resolution?.ctaLabel ?? "Pick an alert to continue →"}
       nextDisabled={!pickedAlert}
     >
       <p>
-        The <strong>Cellar Brief</strong> is Ownology's daily AI summary — one email at 5:30am, one bookmarkable page
+        The <strong>Cellar Brief</strong> is Ownology's daily AI summary, written by Owen — one email at 7am, one bookmarkable page
         at <code style={mono}>/cellar-brief</code>. Same data, same alerts, same colour language you see here.
       </p>
       <p style={{ marginTop: "0.75rem" }}>
@@ -1030,7 +1044,7 @@ function Step7Close({ fromRoute }: { fromRoute: string | null }) {
           {[
             { when: "Within 4 hours", what: "Rich replies personally. Books a 20-min call to hear your vintage story." },
             { when: "Day 1", what: "Ownology imports your existing spreadsheet — batches, tanks, logs. Nothing lost." },
-            { when: "Day 2 · 5:30am", what: "First Cellar Brief lands in your inbox. Real data, real alerts, real chemistry." },
+            { when: "Day 2 · 7am", what: "Owen sends your first Cellar Brief. Real data, real alerts, real chemistry." },
             { when: "Day 7", what: "First LIP Audit Pack draft is ready — Wine Australia §39F compliant. One click." },
             { when: "Day 30", what: "You notice you've stopped opening the spreadsheet." },
           ].map((row, idx) => (
@@ -1180,7 +1194,7 @@ const INTRO_SCREENS: IntroScreen[] = [
     body: (
       <ul style={{ padding: 0, margin: "0.5rem 0 0", listStyle: "none" }}>
         {[
-          ["Cellar Brief", "An AI reads yesterday's logs while you sleep. In your inbox at 5:30am — what needs doing today, ranked."],
+          ["Cellar Brief", "Owen reads yesterday's logs while you sleep. In your inbox at 7am — what needs doing today, ranked."],
           ["Cellar Journal", "Every lesson you record ranks on Google over time. Your voice, your knowledge, your marketing."],
           ["Batch Book", "Your Wine Australia LIP Audit Pack writes itself from every entry. One click, PDF, compliant."],
           ["Ask Ownology", "A winemaker's assistant that knows YOUR cellar's history — not a generic wine chatbot."],
@@ -1338,7 +1352,7 @@ const UNLOCK_COPY: Record<string, string> = {
   "/dashboard":
     "You came here looking for the Dashboard. Reserve now and yours goes live within the hour — your batches, your tanks, your alerts.",
   "/cellar-brief":
-    "You came here looking for the Cellar Brief. Reserve now and yours arrives in your inbox tomorrow at 5:30am — your data, your alerts, one email.",
+    "You came here looking for the Cellar Brief. Reserve now and Owen has yours in your inbox tomorrow at 7am — your data, your alerts, one email.",
   "/cellar-tasks":
     "You came here looking for Cellar Tasks. Reserve now and your task list is ready by Day 1 — imported from your existing spreadsheet.",
   "/quick-entry":

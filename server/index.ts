@@ -497,6 +497,7 @@ async function startServer() {
     "/pricing",
     "/quiz",
     "/try",
+    "/ask",
     "/free-run",
     "/waitlist",
     "/demo",
@@ -611,6 +612,13 @@ async function startServer() {
         "A guided sandbox with real 12-batch cellar data from Ownology Cellars. Fix a stuck ferment. Log the action. Publish the lesson. No signup, no credit card, no writes to anyone's data.",
       image: "https://ownology.ai/og-try.png",
       canonicalPath: "/try",
+    },
+    "/ask": {
+      title: "Ask Ownology — free winemaking answers, cited from the bibles",
+      description:
+        "Any winemaking question, answered by Owen from the Red & White Wine Bibles and the MoreWine! manuals. Free, no signup, and every answer becomes a permanent Cellar Journal entry.",
+      image: "https://ownology.ai/og-try.png",
+      canonicalPath: "/ask",
     },
   };
 
