@@ -117,6 +117,26 @@ export default function AdminProducers() {
   const removeMut = trpc.producers.remove.useMutation();
   const enrichMut = trpc.producers.enrichContact.useMutation();
   const needsEnrichQ = trpc.producers.needsEnrichment.useQuery();
+  const bootstrapMut = trpc.producers.bootstrapRegion.useMutation();
+
+  // Region bootstrap state — the review panel between LLM output and DB insert.
+  const [bootstrapRegion, setBootstrapRegion] = useState("");
+  const [bootstrapCountry, setBootstrapCountry] = useState<"AU" | "NZ">("AU");
+  const [bootstrapPreview, setBootstrapPreview] = useState<
+    | null
+    | {
+        source: string;
+        candidates: Array<{
+          name: string;
+          country: "AU" | "NZ";
+          region: string;
+          website?: string;
+          description?: string;
+          alreadyInDb: boolean;
+          selected: boolean;
+        }>;
+      }
+  >(null);
 
   // Batch enrichment state
   const [batchState, setBatchState] = useState<
@@ -173,6 +193,47 @@ export default function AdminProducers() {
     setPreviewErrors([]);
     utils.producers.list.invalidate();
     utils.producers.stats.invalidate();
+  }
+
+  /**
+   * Bootstrap a region — hits Perplexity Sonar Pro for a candidate list
+   * of ~25 wineries. Returned to the preview panel; NOT committed yet.
+   * User toggles selected, then clicks Import.
+   */
+  async function runBootstrap() {
+    if (bootstrapRegion.trim().length < 2) return;
+    try {
+      const result = await bootstrapMut.mutateAsync({
+        region: bootstrapRegion.trim(),
+        country: bootstrapCountry,
+        limit: 25,
+        focus: "boutique",
+      });
+      setBootstrapPreview({
+        source: result.source,
+        candidates: result.candidates.map((c) => ({
+          ...c,
+          country: c.country as "AU" | "NZ",
+          selected: !c.alreadyInDb, // pre-select only new ones
+        })),
+      });
+    } catch (err) {
+      alert(`Bootstrap failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  async function commitBootstrap() {
+    if (!bootstrapPreview) return;
+    const rows = bootstrapPreview.candidates
+      .filter((c) => c.selected && !c.alreadyInDb)
+      .map((c) => ({ name: c.name, country: c.country, region: c.region, website: c.website }));
+    if (rows.length === 0) return;
+    await bulkImport.mutateAsync({ source: bootstrapPreview.source, producers: rows });
+    setBootstrapPreview(null);
+    setBootstrapRegion("");
+    utils.producers.list.invalidate();
+    utils.producers.stats.invalidate();
+    utils.producers.needsEnrichment.invalidate();
   }
 
   /**
@@ -276,6 +337,34 @@ export default function AdminProducers() {
             <input type="file" accept=".csv,text/csv" onChange={onFile} data-testid="prod-csv-input" style={{ display: "none" }} />
             Upload CSV…
           </label>
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <input
+              data-testid="prod-bootstrap-region"
+              type="text"
+              value={bootstrapRegion}
+              onChange={(e) => setBootstrapRegion(e.target.value)}
+              placeholder="Region (e.g. Barossa Valley)"
+              style={{ padding: "6px 10px", borderRadius: 4, border: `1px solid ${BORDER}`, background: "var(--ow-bg-inset)", color: HI, fontFamily: SANS, fontSize: "0.82rem", minWidth: 180 }}
+            />
+            <select
+              data-testid="prod-bootstrap-country"
+              value={bootstrapCountry}
+              onChange={(e) => setBootstrapCountry(e.target.value as "AU" | "NZ")}
+              style={{ padding: "6px 8px", borderRadius: 4, border: `1px solid ${BORDER}`, background: "var(--ow-bg-inset)", color: HI, fontFamily: SANS, fontSize: "0.82rem" }}
+            >
+              <option value="AU">AU</option>
+              <option value="NZ">NZ</option>
+            </select>
+            <button
+              type="button"
+              data-testid="prod-bootstrap-btn"
+              disabled={bootstrapMut.isPending || bootstrapRegion.trim().length < 2}
+              onClick={runBootstrap}
+              style={{ padding: "6px 14px", borderRadius: 4, border: `1px solid ${BORDER}`, background: "color-mix(in oklch, gold 12%, transparent)", color: HI, fontFamily: SANS, fontSize: "0.82rem", fontWeight: 600, cursor: bootstrapMut.isPending ? "wait" : "pointer" }}
+            >
+              {bootstrapMut.isPending ? "Asking Perplexity…" : "▶ Bootstrap region (Perplexity)"}
+            </button>
+          </div>
           {(needsEnrichQ.data?.length ?? 0) > 0 && (
             <button
               type="button"
@@ -304,6 +393,84 @@ export default function AdminProducers() {
         {batchState.phase === "done" && (
           <div data-testid="prod-enrich-done" style={{ marginTop: 12, padding: "8px 14px", background: "color-mix(in oklch, forestgreen 8%, transparent)", border: `1px solid #059669`, borderRadius: 4, fontFamily: SANS, fontSize: "0.82rem", color: HI }}>
             ✓ Enrichment run complete — <strong>{batchState.found}</strong> contacts found · {batchState.skipped} skipped (no data) · {batchState.failed} failed
+          </div>
+        )}
+        {bootstrapPreview && (
+          <div data-testid="bootstrap-preview" style={{ marginTop: 12, padding: "14px 16px", background: CARD, border: `1px solid ${AMBER}`, borderRadius: 6 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 8 }}>
+              <div>
+                <p style={{ fontFamily: SANS, fontSize: "0.68rem", letterSpacing: "0.1em", color: AMBER, textTransform: "uppercase", margin: 0, fontWeight: 700 }}>
+                  Perplexity candidates · {bootstrapPreview.source}
+                </p>
+                <p style={{ fontFamily: SANS, color: MID, fontSize: "0.82rem", margin: "4px 0 0" }}>
+                  {bootstrapPreview.candidates.length} returned · {bootstrapPreview.candidates.filter((c) => c.selected).length} selected · {bootstrapPreview.candidates.filter((c) => c.alreadyInDb).length} already in DB
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: 6 }}>
+                <button
+                  type="button"
+                  data-testid="bootstrap-import"
+                  onClick={commitBootstrap}
+                  disabled={bulkImport.isPending || bootstrapPreview.candidates.filter((c) => c.selected && !c.alreadyInDb).length === 0}
+                  style={{ padding: "6px 14px", borderRadius: 4, border: "none", background: AMBER, color: "#111", fontFamily: SANS, fontSize: "0.82rem", fontWeight: 700, cursor: "pointer" }}
+                >
+                  {bulkImport.isPending ? "Importing…" : `▶ Import ${bootstrapPreview.candidates.filter((c) => c.selected && !c.alreadyInDb).length} selected`}
+                </button>
+                <button
+                  type="button"
+                  data-testid="bootstrap-cancel"
+                  onClick={() => setBootstrapPreview(null)}
+                  style={{ padding: "6px 10px", borderRadius: 4, border: `1px solid ${BORDER}`, background: "transparent", color: MID, fontFamily: SANS, fontSize: "0.82rem", cursor: "pointer" }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: SANS, fontSize: "0.78rem", marginTop: 6 }}>
+              <thead>
+                <tr style={{ borderBottom: `1px solid ${BORDER}` }}>
+                  <th style={{ padding: "4px 8px", textAlign: "left", color: LO, fontSize: "0.66rem", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 700, width: 40 }}>✓</th>
+                  <th style={{ padding: "4px 8px", textAlign: "left", color: LO, fontSize: "0.66rem", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 700 }}>Winery</th>
+                  <th style={{ padding: "4px 8px", textAlign: "left", color: LO, fontSize: "0.66rem", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 700 }}>Sub-region</th>
+                  <th style={{ padding: "4px 8px", textAlign: "left", color: LO, fontSize: "0.66rem", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 700 }}>Website</th>
+                  <th style={{ padding: "4px 8px", textAlign: "left", color: LO, fontSize: "0.66rem", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 700 }}>Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                {bootstrapPreview.candidates.map((c, i) => (
+                  <tr key={i} data-testid={`bootstrap-row-${i}`} style={{ borderBottom: `1px solid ${BORDER}`, opacity: c.alreadyInDb ? 0.5 : 1 }}>
+                    <td style={{ padding: "6px 8px" }}>
+                      <input
+                        type="checkbox"
+                        data-testid={`bootstrap-check-${i}`}
+                        checked={c.selected}
+                        disabled={c.alreadyInDb}
+                        onChange={() =>
+                          setBootstrapPreview((prev) =>
+                            prev ? { ...prev, candidates: prev.candidates.map((x, j) => (j === i ? { ...x, selected: !x.selected } : x)) } : prev
+                          )
+                        }
+                      />
+                    </td>
+                    <td style={{ padding: "6px 8px", color: HI, fontWeight: 600 }}>
+                      {c.name}
+                      {c.alreadyInDb && <span style={{ marginLeft: 6, fontSize: "0.66rem", color: LO }}>· in DB</span>}
+                    </td>
+                    <td style={{ padding: "6px 8px", color: MID }}>{c.region}</td>
+                    <td style={{ padding: "6px 8px" }}>
+                      {c.website ? (
+                        <a href={c.website} target="_blank" rel="noreferrer" style={{ color: AMBER, textDecoration: "none" }}>
+                          {c.website.replace(/^https?:\/\/(www\.)?/, "").slice(0, 32)}
+                        </a>
+                      ) : (
+                        <span style={{ color: LO }}>—</span>
+                      )}
+                    </td>
+                    <td style={{ padding: "6px 8px", color: LO, fontStyle: "italic" }}>{c.description ?? "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
         <details style={{ marginBottom: 8 }}>

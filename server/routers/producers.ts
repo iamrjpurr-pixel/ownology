@@ -141,6 +141,158 @@ export const producersRouter = router({
   /** OWNER — bulk insert. Dedupes by (name + country) inside the call
    *  so importing the same CSV twice is safe. Returns counts of inserted
    *  vs. skipped rows so the operator sees exactly what happened. */
+  /**
+   * OWNER — bootstrap a candidate list of producers for a region via
+   * Perplexity Sonar Pro. Does NOT write to the DB — returns a preview
+   * list that Rich reviews before calling bulkImport to commit.
+   *
+   * Deliberately human-in-the-loop: an unvetted LLM list would poison
+   * the pipeline. The preview UI shows Rich exactly what's proposed
+   * so he can toggle each row.
+   *
+   * Cost: ~500-800 output tokens per call = ~$0.02 per region.
+   * Rate: one region per ~15 seconds. Typical use: seed 5-10 regions
+   * during a single session, total ~$0.20.
+   */
+  bootstrapRegion: ownerProcedure
+    .input(
+      z.object({
+        region: z.string().trim().min(2).max(80),
+        country: COUNTRY,
+        limit: z.number().int().min(5).max(50).default(25),
+        focus: z.enum(["boutique", "cellar_door", "any"]).default("boutique"),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const key = process.env.PERPLEXITY_API_KEY;
+      if (!key) throw new Error("PERPLEXITY_API_KEY not configured");
+
+      const countryLabel = input.country === "NZ" ? "New Zealand" : "Australia";
+      const focusLabel =
+        input.focus === "boutique"
+          ? "small-to-mid boutique wineries (production < 100k cases/yr) that operate a cellar door"
+          : input.focus === "cellar_door"
+            ? "wineries that operate a public cellar door for tastings"
+            : "wineries of any scale";
+
+      const listSchema = {
+        type: "object",
+        properties: {
+          producers: {
+            type: "array",
+            maxItems: input.limit,
+            items: {
+              type: "object",
+              properties: {
+                name: { type: "string" },
+                website: { type: ["string", "null"] },
+                subregion: { type: ["string", "null"] },
+                description: { type: ["string", "null"] },
+              },
+              required: ["name"],
+              additionalProperties: false,
+            },
+          },
+        },
+        required: ["producers"],
+        additionalProperties: false,
+      };
+
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), 60_000);
+      let resp: Response;
+      try {
+        resp = await fetch("https://api.perplexity.ai/chat/completions", {
+          method: "POST",
+          signal: controller.signal,
+          headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "sonar-pro",
+            max_tokens: 2500,
+            messages: [
+              {
+                role: "system",
+                content: `You are a wine-industry sales-research assistant. Given a wine region, list the top ${focusLabel} in that region.
+
+Sources: official region association member lists, Halliday Wine Companion, Winetitles, Wine Australia region pages, NZ Wine, AWRI, verified winery websites.
+
+Rules:
+- Return between 15 and ${input.limit} producers — quality over quantity. Never invent wineries. If you can't verify from a reputable source, don't include it.
+- website: absolute URL of the winery's public homepage. Prefer https. Null if you can't verify a domain.
+- subregion: the specific sub-appellation within the region if known (e.g. "Eden Valley" within "Barossa", "Coldstream" within "Yarra Valley"). Null if just the general region.
+- description: 8-15 word neutral description (varietals + scale). No marketing copy.
+
+Return ONLY the requested JSON — no prose.`,
+              },
+              {
+                role: "user",
+                content: `Region: ${input.region}, ${countryLabel}\nList up to ${input.limit} ${focusLabel} in this region.`,
+              },
+            ],
+            response_format: {
+              type: "json_schema",
+              json_schema: { schema: listSchema },
+            },
+          }),
+        });
+        clearTimeout(t);
+      } catch (err) {
+        clearTimeout(t);
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes("aborted")) throw new Error("Perplexity took too long (>60s).");
+        throw new Error(`Perplexity request failed: ${msg}`);
+      }
+      if (!resp.ok) {
+        const t2 = await resp.text().catch(() => "");
+        if (resp.status === 401) throw new Error("Perplexity key invalid.");
+        if (resp.status === 402) throw new Error("Perplexity credit exhausted.");
+        if (resp.status === 429) throw new Error("Perplexity rate-limited — wait a minute.");
+        throw new Error(`Perplexity ${resp.status}: ${t2.slice(0, 200)}`);
+      }
+
+      const data = (await resp.json()) as {
+        choices?: Array<{ message?: { content?: string } }>;
+      };
+      const content = data.choices?.[0]?.message?.content ?? "";
+      let parsed: { producers?: Array<{ name?: string; website?: string | null; subregion?: string | null; description?: string | null }> } | null = null;
+      try {
+        const cleaned = content
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/```\s*$/i, "")
+          .trim();
+        parsed = JSON.parse(cleaned);
+      } catch {
+        const brace = content.match(/\{[\s\S]*\}/);
+        if (brace) {
+          try { parsed = JSON.parse(brace[0]); } catch { /* fall through */ }
+        }
+      }
+      if (!parsed?.producers) {
+        return { candidates: [], source: `perplexity:${input.region.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`, error: "parse_failed" };
+      }
+
+      // Dedupe against existing DB rows so the preview shows Rich only new ones.
+      const existing = await db
+        .select({ name: schema.wineProducers.name, country: schema.wineProducers.country })
+        .from(schema.wineProducers);
+      const seen = new Set(existing.map((e) => `${e.country}::${e.name.toLowerCase().trim()}`));
+
+      const source = `perplexity:${input.region.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+      const candidates = parsed.producers
+        .filter((p) => p.name && p.name.trim().length >= 2)
+        .map((p) => ({
+          name: p.name!.trim(),
+          country: input.country,
+          region: p.subregion?.trim() || input.region,
+          website: p.website?.trim() || undefined,
+          description: p.description?.trim() || undefined,
+          alreadyInDb: seen.has(`${input.country}::${p.name!.toLowerCase().trim()}`),
+        }));
+
+      return { candidates, source, requestedRegion: input.region };
+    }),
+
   bulkImport: ownerProcedure
     .input(
       z.object({

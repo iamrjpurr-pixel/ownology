@@ -4,6 +4,16 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**A2 · AU-side producer bootstrap via Perplexity — SHIPPED (Feb 2026, this session)**
+- **Decision**: rejected Halliday Playwright scraper (Cloudflare-protected, fragile, ToS grey), Winetitles (paywalled), regional-assoc scraping (8-12 hrs of bespoke per-site code), Google Places API (rich but rarely returns emails). Chose the leaner path — extend existing Perplexity infrastructure with a **region bootstrap** endpoint.
+- **New tRPC procedure** `producers.bootstrapRegion({region, country, limit, focus})` in `server/routers/producers.ts`. Perplexity Sonar Pro call (~500-2500 tokens, ~$0.02/call, ~10s per region) with strict JSON-schema response format (`{producers: [{name, website, subregion, description}]}`). Sources cited: Halliday, Winetitles, Wine Australia, NZ Wine, AWRI, verified winery sites. Deliberately human-in-the-loop — returns candidates for review, does NOT auto-commit.
+- **Frontend** (`AdminProducers.tsx`): new input row alongside Seed / Upload CSV → "Region (e.g. Barossa Valley)" text input + AU/NZ dropdown + "▶ Bootstrap region (Perplexity)" button. On success, an amber-highlighted review table appears with a checkbox per candidate, sub-region, clickable website, and neutral description. Rows already in DB are dimmed + auto-unchecked. Single "▶ Import N selected" button commits via existing `bulkImport` (which dedupes on name+country, so re-runs are safe).
+- **Verified live**: 15-producer Barossa Valley query returned Rockford / Elderton / Torbreck / Two Hands / Turkey Flat / Pindarie etc — all real, all verifiable, all with correct sub-regions (Krondorf, Nuriootpa, Marananga, Tanunda, Vine Vale). Full 25-producer McLaren Vale query returned Hastwell & Lightfoot / Oliver's Taranga / Samuel's Gorge / Bekkers / Paxton / Mitolo / Alpha Box & Dice / Gemtree / Fox Creek / DogRidge / Hugh Hamilton / Kay Brothers / Chalk Hill / etc — top-tier boutiques with real websites. Zero hallucinated wineries observed in either run.
+- **Cost projection**: 10 AU regions × 25 producers each = 250 candidates for ~$0.20 in Perplexity credits. Then existing per-row `enrichContact` finds winemaker names for another ~$0.001/row = ~$0.25 total for a full AU pipeline.
+- **Works for NZ too** — the same endpoint accepts NZ country, so future NZ deep-region searches (e.g. specific Central Otago sub-regions like Bannockburn or Bendigo) can bootstrap fresh candidates without touching the NZ Wine scraper.
+
+
+
 **Risk Management framework (v1) — SHIPPED (Feb 2026, this session)**
 - **Decision**: kept scope tight on wine-quality risks only. Worker-safety / WHS is deliberately OUT of scope (deferred to v2 — see `memory/ROADMAP.md` for the JSEA/SWMS/equipment-training future vision).
 - **Two-tier framework**:
