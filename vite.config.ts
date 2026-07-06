@@ -75,6 +75,15 @@ export default defineConfig({
         target: "http://127.0.0.1:8001",
         changeOrigin: true,
       },
+      // Magic-link invite bypass — `/i/:token` is an Express handler that
+      // sets an ow_gate cookie + 302 → /admin. On K8s ingress deploys
+      // (preview.emergentagent.com) non-/api paths land on Vite (port 3000),
+      // so without this proxy the SPA shell is served and the cookie is
+      // never set. In Railway prod Express serves everything anyway.
+      "/i": {
+        target: "http://127.0.0.1:8001",
+        changeOrigin: true,
+      },
     },
     fs: {
       strict: true,

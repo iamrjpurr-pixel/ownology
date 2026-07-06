@@ -4,6 +4,28 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Pre-marketing-calls E2E validation + Invite routing fix — SHIPPED (Feb 2026, this session)**
+- Ran full pre-demo E2E validation via testing_agent_v3_fork ahead of Rich's marketing calls. 54/56 pytest green; every demo-critical surface (gate wall enforcement, `/hi/producers/:id` public cold-email preview, `/admin/producers` Compose flow, `/admin/marketing-ops` AI coach, `/try` LLM sandbox, `/risk-management` doctrine, `/pricing`, sample-vintage-log 3 variants, sitemap, health, tRPC endpoints) verified green.
+- **Bug found + fixed — `/i/:token` magic-link invite broken on Emergent K8s preview URL**: Express handler at `server/index.ts:312` works on `localhost:8001` but on the preview URL, K8s ingress routes non-`/api/*` paths to Vite (port 3000), so `/i/*` was landing on the SPA shell and never setting the `ow_gate` cookie. Fix: added `/i` proxy entry to `vite.config.ts` server.proxy (matches the existing `/audit` pattern) so Vite dev server proxies `/i/*` → Express on 8001. Verified end-to-end on preview: anonymous `GET /i/<token>` → 302 → `/admin` + sets ow_gate invite JWT cookie; follow-on `/admin`, `/admin/producers`, `/admin/marketing-ops`, `/dashboard` all → 200.
+- **Site Map (`client/src/pages/SiteMap.tsx`) audience-tag realignment**: cross-checked every route in the registry against `PUBLIC_EXACT` + `PUBLIC_PREFIXES` in `server/index.ts` and fixed all mismatches:
+  - `/competitive-advantage`, `/compliance`, `/regulations` → re-tagged MEMBER (gated under default-deny; only `/regulations/detail` stays PUBLIC per allowlist).
+  - `/stats` → re-tagged PUBLIC (allowlisted — LLM cost meter is safe to link from investor deck).
+  - `/cascade-demo`, `/branding-mockup`, `/onboarding-mockup`, `/resume` → re-tagged PUBLIC in the Dev-only section (allowlisted).
+  - Added 4 missing admin surfaces to the Admin section: `/admin/producers`, `/admin/marketing-ops`, `/admin/gate-invites`, `/admin/quiz-picks`.
+  - Added the `/hi/producers/:id` cold-email preview + `/i/:token` magic-link entry to the SMS Outreach section.
+  - Updated intro-blurb colour legend to match actual badge palette (Amber=PUBLIC / Teal=MEMBER / Red=ADMIN) and noted the default-deny model.
+- **Findings for prod-hardening (not fixed for tomorrow's demo)**:
+  - `/api/gate/verify` rate limiter (5 attempts / 15 min per IP) is aggressive — trips easily under legitimate QA hammering. In-memory bucket per-pod → multi-replica prod deploys can dodge it. Move to Redis-backed limiter + widen window (or add allowlist for known preview IPs) before Railway multi-replica.
+  - `server/index.ts` is 1168 LOC — well over the 700-line threshold. Extract gate middleware, meta injection, invite handler, scheduled handlers into modules when Phase 2 router refactor picks up.
+  - Docs drift: PRD referred to `gate.createInvite/listInvites/revokeInvite` but actual tRPC procedures are `gate.create/list/revoke`. `producers.needsEnrichment` returns `[{id,name}]` not `{ids:[…]}`. `marketingOps.today` does NOT include `coachLine` (that's a separate `.coachLine` procedure).
+- **Verified end-to-end on preview URL** (`https://ownership-dev.preview.emergentagent.com`):
+  - 13 public paths → HTTP 200
+  - 7 gated paths → HTTP 302 → `/try?from=…`
+  - `/api/gate/verify` (password) → 200 + `ow_gate` cookie
+  - `/i/<token>` (anon) → 302 → `/admin` + invite cookie ✓
+  - Pytest smoke 14/14 green (3 gate tests failed on final run due to the same rate-limiter self-trip; expected, clears in 15 min)
+
+
 **A2 · AU-side producer bootstrap via Perplexity — SHIPPED (Feb 2026, this session)**
 - **Decision**: rejected Halliday Playwright scraper (Cloudflare-protected, fragile, ToS grey), Winetitles (paywalled), regional-assoc scraping (8-12 hrs of bespoke per-site code), Google Places API (rich but rarely returns emails). Chose the leaner path — extend existing Perplexity infrastructure with a **region bootstrap** endpoint.
 - **New tRPC procedure** `producers.bootstrapRegion({region, country, limit, focus})` in `server/routers/producers.ts`. Perplexity Sonar Pro call (~500-2500 tokens, ~$0.02/call, ~10s per region) with strict JSON-schema response format (`{producers: [{name, website, subregion, description}]}`). Sources cited: Halliday, Winetitles, Wine Australia, NZ Wine, AWRI, verified winery sites. Deliberately human-in-the-loop — returns candidates for review, does NOT auto-commit.

@@ -59,6 +59,15 @@ Estimated combined build: 3-4 weeks after data models are in. Don't start until 
 
 ## 🎯 P0 — Strategic / Revenue
 
+### Gate rate-limiter hardening (found Feb 2026 pre-demo E2E)
+`/api/gate/verify` uses in-memory 5-attempts-per-15min-per-IP bucket. Two issues:
+1. Trips too easily under legitimate QA / operator retries (self-tripped 3× during pre-demo validation).
+2. In-memory per-pod — multi-replica Railway prod deploys would let attackers dodge it by hitting different pods.
+Fix: swap for Redis-backed limiter, widen window to 30/hour, and add optional allowlist env var `OWNOLOGY_GATE_RATE_LIMIT_ALLOWLIST` for preview / office IPs. ~90 min build.
+
+### `server/index.ts` split (found Feb 2026 pre-demo E2E)
+File is 1168 LOC — well past the 700-line threshold. Candidates for extraction: gate middleware + invite handler → `server/gateHandlers.ts`; scheduled handlers → `server/scheduled/index.ts`; SPA meta injection → `server/spaMeta.ts`; sample-vintage-log alias + audit route → `server/publicRoutes.ts`. Do this as part of the Phase 2 router refactor already planned.
+
 ### Demo to a real winemaker
 The full moat (personal history + reasoning + alerts + bibles + AU/NZ regulations) is **end-to-end demoable** on the live URL right now. Outreach targets:
 - Tamburlaine (Orange, NSW) — boutique premium
