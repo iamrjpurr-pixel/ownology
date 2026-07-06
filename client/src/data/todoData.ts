@@ -44,14 +44,36 @@ export const LAST_UPDATED = "2026-02-06";
 export const TODO: TodoItem[] = [
   // ═══ 🔴 P0 · Must-fix before first paying customer ═══
   {
+    id: "daily-cellar-brief-email-cron",
+    title: "Wire Railway cron for the 7am Sydney Cellar Brief email",
+    description:
+      "ENDPOINT + PIPELINE ARE LIVE (shipped Feb 06 — verified real send with Resend). All that's left: a scheduled trigger. Options: (a) Railway cron entry `0 21 * * *` UTC = 7am AEDT, POST to /api/scheduled/daily-alert-email with x-cron-secret header — recommended once prod deploy sync unblocks. (b) External free scheduler (cron-job.org, EasyCron) hitting the preview URL. (c) Emergent's built-in scheduler if available. ~5 minutes to configure whichever path.",
+    priority: "p1",
+    effort: "~5 min config",
+    status: "in-progress",
+    category: "Growth",
+    updatedAt: "2026-02-06",
+  },
+  {
     id: "weather-widget-per-winery-config",
     title: "Per-winery weather widget location + threshold config",
     description:
-      "Widget shipped Feb 06 with hardcoded Hunter Valley GPS + default AWRI-aligned thresholds. Slice 2: add /admin/settings inputs for winery lat/lng (or address → geocode), cellar-type (passive/active/mixed), and custom threshold overrides (humidity high/low, temp high/low). Store on the existing users or new winery_environmental_config table. When plumbed, the WeatherWidget already accepts lat/lng/label as tRPC input — just needs the UI + persistence layer.",
-    priority: "p1",
+      "Widget shipped Feb 06 with hardcoded Hunter Valley GPS + default AWRI-aligned thresholds. Widget component already accepts lat/lng/label as tRPC input. Slice 2 needed: (a) add lat/lng + weather_thresholds_json columns to wineries table via ALTER TABLE (or new winery_environmental_config table), (b) build /admin/settings/environment inputs for winery lat/lng (address → geocode via Open-Meteo geocoding API, no key), cellar type (passive/active/mixed), and custom threshold overrides, (c) rewire WeatherWidget to first fetch winery.currentEnv config then pass lat/lng into weather.currentAndForecast. Highest demo-value item for tomorrow's calls — prospects not in Hunter Valley see the wrong weather right now.",
+    priority: "p0",
     effort: "~2-3 hours",
     status: "not-started",
     category: "Product",
+    updatedAt: "2026-02-06",
+  },
+  {
+    id: "ask-seo-flywheel",
+    title: "Public /ask page — SEO flywheel",
+    description:
+      "Single new public page where any visitor types any winemaking question → AI answers grounded in our private bible-RAG → every Q auto-saves to cellar_journal as a gated public SEO page. cellar_journal table already has embedding + variants columns for Trinity-style dedup — leverage that. Include JSON-LD Article schema in HTML source for Google. Each answer = 1 new SEO entry growing organic traffic for free. Zero infrastructure cost, compounds monthly.",
+    priority: "p2",
+    effort: "~2 hours",
+    status: "not-started",
+    category: "Growth",
     updatedAt: "2026-02-06",
   },
   {
@@ -428,6 +450,27 @@ export interface ShippedItem {
 }
 
 export const RECENTLY_SHIPPED: ShippedItem[] = [
+  {
+    id: "daily-cellar-brief-email-live",
+    title: "Daily 7am Cellar Brief email · LIVE end-to-end",
+    description:
+      "Endpoint at POST /api/scheduled/daily-alert-email (x-cron-secret header required). Verified send to iamrjpurr@gmail.com Feb 06 — Resend ID 719603fe-f348-44b0-994a-4a6cfba100a1, 6 real cellar alerts rendered, alerts@ownology.ai domain verified, CRON_SECRET enforced, ALERT_TEST_TO override active. All that's left for daily delivery: point a cron (Railway `0 21 * * *` UTC, or Emergent scheduler, or cron-job.org) at the endpoint. Demo-ready NOW — screenshot the actual 7am email on Rich's phone during marketing calls.",
+    shippedAt: "2026-02-06",
+  },
+  {
+    id: "risk-glossary-anchor-jump",
+    title: "Risk framework — full 3-page depth (briefing + glossary + doctrine)",
+    description:
+      "Tier tooltips on /risk-briefing (Quantitative / Qualitative / Environmental info-dots). New /risk-glossary reference book (29 terms across 5 categories with plain-English definition + why-it-matters + source citation). Deep-link jump from every compliance card on /risk-briefing → specific term anchor on /risk-glossary (with wouter-safe useEffect scrolling). SiteMap updated. All member-gated.",
+    shippedAt: "2026-02-06",
+  },
+  {
+    id: "linkedin-brand-asset-pack",
+    title: "LinkedIn brand asset pack (mark-only + banners)",
+    description:
+      "v2 profile icons designed for LinkedIn's circle-crop (82-86% fill, mark-only, no text): ownology-profile-icon-dark-1024.png, -light-1024.png, -mono-1024.png. v2 banners with stronger typography: linkedin-cover-v2-1128x191.png, linkedin-personal-v2-1584x396.png, x-header-1500x500.png. 4200x700 cover for other channels. All served via /ownology-*.png on the preview URL.",
+    shippedAt: "2026-02-06",
+  },
   {
     id: "risk-briefing-staff-training-page",
     title: "/risk-briefing · staff training + compliance benefits",

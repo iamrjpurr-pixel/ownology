@@ -963,6 +963,24 @@ async function startServer() {
       }
     }
 
+    // Environmental config columns on wineries (Feb 2026 — Weather widget Slice 2).
+    // Each winery can override the hardcoded Hunter Valley defaults with its
+    // own GPS + cellar type + thresholds. Nullable — falls back to defaults
+    // when a value is missing. All idempotent ALTERs.
+    for (const alter of [
+      "ADD COLUMN IF NOT EXISTS location_lat FLOAT NULL",
+      "ADD COLUMN IF NOT EXISTS location_lng FLOAT NULL",
+      "ADD COLUMN IF NOT EXISTS location_label VARCHAR(255) NULL",
+      "ADD COLUMN IF NOT EXISTS cellar_type VARCHAR(24) NULL",
+      "ADD COLUMN IF NOT EXISTS weather_thresholds_json TEXT NULL",
+    ]) {
+      try {
+        await db.execute(sql.raw(`ALTER TABLE wineries ${alter}`));
+      } catch {
+        // Column already exists (MySQL <8.0.29 or re-run). Best-effort.
+      }
+    }
+
     // Create cellar_briefs table (Feb 2026, Cellar Brief feature).
     // Idempotent CREATE TABLE IF NOT EXISTS. Drizzle ORM only handles schema
     // for queries; the table itself is created here on first boot.

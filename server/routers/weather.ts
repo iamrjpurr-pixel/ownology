@@ -393,11 +393,135 @@ function sydneyLocalDate(now = new Date()): string {
 // ── Router ──────────────────────────────────────────────────────────────
 export const weatherRouter = router({
   /**
+   * Get the caller's winery environmental config (lat/lng/label/cellar type +
+   * threshold overrides). Returns defaults where not yet set. Public because
+   * we also want the same shape available anonymously for the sandbox — in
+   * that case the DEFAULT_* Hunter Valley values are returned.
+   */
+  getWineryConfig: publicProcedure.query(async ({ ctx }) => {
+    const wineryId = ctx.wineryId ?? null;
+    if (!wineryId) {
+      return {
+        location: {
+          lat: DEFAULT_LAT,
+          lng: DEFAULT_LNG,
+          label: DEFAULT_LABEL,
+          isDefault: true,
+        },
+        cellarType: "passive" as const,
+        thresholds: DEFAULT_THRESHOLDS,
+      };
+    }
+    const rows = await db.execute(sql`
+      SELECT location_lat, location_lng, location_label, cellar_type, weather_thresholds_json
+      FROM wineries WHERE id = ${wineryId} LIMIT 1
+    `);
+    const row = Array.isArray(rows) && Array.isArray(rows[0])
+      ? (rows[0][0] as {
+          location_lat: number | null;
+          location_lng: number | null;
+          location_label: string | null;
+          cellar_type: string | null;
+          weather_thresholds_json: string | null;
+        } | undefined)
+      : undefined;
+    const hasCoords = row && row.location_lat != null && row.location_lng != null;
+    let thresholds = { ...DEFAULT_THRESHOLDS };
+    if (row?.weather_thresholds_json) {
+      try {
+        thresholds = { ...DEFAULT_THRESHOLDS, ...JSON.parse(row.weather_thresholds_json) };
+      } catch {
+        // corrupt JSON — fall back to defaults
+      }
+    }
+    return {
+      location: {
+        lat: hasCoords ? Number(row!.location_lat) : DEFAULT_LAT,
+        lng: hasCoords ? Number(row!.location_lng) : DEFAULT_LNG,
+        label: row?.location_label || DEFAULT_LABEL,
+        isDefault: !hasCoords,
+      },
+      cellarType: (row?.cellar_type || "passive") as "passive" | "active" | "mixed",
+      thresholds,
+    };
+  }),
+
+  /**
+   * Persist per-winery weather config. Only paid tiers or admin (matches the
+   * contextualAdvice gate — this feature is a subscription differentiator).
+   * All fields optional so callers can update just one at a time.
+   */
+  saveWineryConfig: wineryProcedure
+    .input(
+      z.object({
+        lat: z.number().min(-90).max(90).optional(),
+        lng: z.number().min(-180).max(180).optional(),
+        label: z.string().max(255).optional(),
+        cellarType: z.enum(["passive", "active", "mixed"]).optional(),
+        thresholds: z
+          .object({
+            humidity_high_pct: z.number().min(20).max(100).optional(),
+            humidity_low_pct: z.number().min(0).max(80).optional(),
+            temp_high_c: z.number().min(0).max(50).optional(),
+            temp_low_c: z.number().min(-20).max(30).optional(),
+            dewpoint_approach_margin_c: z.number().min(0).max(10).optional(),
+            assumed_cellar_temp_c: z.number().min(0).max(30).optional(),
+          })
+          .optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const isAdmin = ctx.user.role === "admin";
+      const plan = await getWineryPlan(ctx.wineryId);
+      const isPaid = plan !== null && PAID_PLANS.has(plan);
+      if (!isAdmin && !isPaid) {
+        return {
+          gated: true as const,
+          reason: "founding_member_only" as const,
+          currentPlan: plan ?? "free",
+          message: "Custom cellar environment config is available on Press, Amphora, Coopers, and Founding Member plans.",
+        };
+      }
+
+      // Merge thresholds with existing config so callers only send what they change.
+      const merged: Record<string, number> = { ...DEFAULT_THRESHOLDS };
+      const existing = await db.execute(sql`
+        SELECT weather_thresholds_json FROM wineries WHERE id = ${ctx.wineryId} LIMIT 1
+      `);
+      const existingRow = Array.isArray(existing) && Array.isArray(existing[0])
+        ? (existing[0][0] as { weather_thresholds_json: string | null } | undefined)
+        : undefined;
+      if (existingRow?.weather_thresholds_json) {
+        try {
+          Object.assign(merged, JSON.parse(existingRow.weather_thresholds_json));
+        } catch {
+          // corrupt — ignore
+        }
+      }
+      if (input.thresholds) Object.assign(merged, input.thresholds);
+      const mergedJson = JSON.stringify(merged);
+
+      await db.execute(sql`
+        UPDATE wineries
+        SET
+          location_lat = COALESCE(${input.lat ?? null}, location_lat),
+          location_lng = COALESCE(${input.lng ?? null}, location_lng),
+          location_label = COALESCE(${input.label ?? null}, location_label),
+          cellar_type = COALESCE(${input.cellarType ?? null}, cellar_type),
+          weather_thresholds_json = ${mergedJson}
+        WHERE id = ${ctx.wineryId}
+      `);
+
+      return { gated: false as const, ok: true, savedAt: Date.now() };
+    }),
+
+  /**
    * Get current + 7-day forecast + derived environmental alerts for a
-   * given location. In v1 the caller may omit lat/lng and the default
-   * Ownology Cellars (Hunter Valley) location is used. Public procedure
-   * — no auth needed; anyone browsing /dashboard on the sandbox sees the
-   * same widget content.
+   * given location. If no lat/lng passed by the caller AND the caller has
+   * a winery with configured coords, those are used. Otherwise the
+   * Ownology Cellars (Hunter Valley) default. Public procedure — no auth
+   * needed; anyone browsing /dashboard on the sandbox sees the same
+   * widget content.
    */
   currentAndForecast: publicProcedure
     .input(
@@ -409,13 +533,44 @@ export const weatherRouter = router({
         })
         .optional(),
     )
-    .query(async ({ input }) => {
-      const lat = input?.lat ?? DEFAULT_LAT;
-      const lng = input?.lng ?? DEFAULT_LNG;
-      const label = input?.locationLabel ?? DEFAULT_LABEL;
+    .query(async ({ input, ctx }) => {
+      let lat = input?.lat ?? DEFAULT_LAT;
+      let lng = input?.lng ?? DEFAULT_LNG;
+      let label = input?.locationLabel ?? DEFAULT_LABEL;
+      let thresholds: typeof DEFAULT_THRESHOLDS = { ...DEFAULT_THRESHOLDS };
+
+      // If caller didn't explicitly pass coords AND they have a winery
+      // with configured location, prefer that. Falls back to defaults
+      // when the winery hasn't configured location yet.
+      if (input?.lat == null && input?.lng == null && ctx.wineryId) {
+        const rows = await db.execute(sql`
+          SELECT location_lat, location_lng, location_label, weather_thresholds_json
+          FROM wineries WHERE id = ${ctx.wineryId} LIMIT 1
+        `);
+        const row = Array.isArray(rows) && Array.isArray(rows[0])
+          ? (rows[0][0] as {
+              location_lat: number | null;
+              location_lng: number | null;
+              location_label: string | null;
+              weather_thresholds_json: string | null;
+            } | undefined)
+          : undefined;
+        if (row?.location_lat != null && row.location_lng != null) {
+          lat = Number(row.location_lat);
+          lng = Number(row.location_lng);
+          label = row.location_label || label;
+        }
+        if (row?.weather_thresholds_json) {
+          try {
+            thresholds = { ...DEFAULT_THRESHOLDS, ...JSON.parse(row.weather_thresholds_json) };
+          } catch {
+            // corrupt — use defaults
+          }
+        }
+      }
 
       const { current, hourly, daily } = await fetchOpenMeteo(lat, lng);
-      const alerts = deriveAlerts(current, hourly, DEFAULT_THRESHOLDS);
+      const alerts = deriveAlerts(current, hourly, thresholds);
 
       return {
         location: {
@@ -424,7 +579,7 @@ export const weatherRouter = router({
           lng,
           timezone: "Australia/Sydney",
         },
-        thresholds: DEFAULT_THRESHOLDS,
+        thresholds,
         current,
         hourly: hourly.slice(0, 48),
         daily,
