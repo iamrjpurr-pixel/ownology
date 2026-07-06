@@ -1,0 +1,67 @@
+{
+  "summary": "Pre-demo E2E validation of Ownology. Ran 14 smoke tests + 42 new demo-critical tests + browser validation of /hi/producers/8, /risk-management, /try. Result: 54/56 pytest pass. The demo-critical path IS READY (cold-prospect page, admin gate, tRPC endpoints, sample vintage log variants, sitemap, health, LLM sandbox all green). Two failures found: (1) /i/:token magic-link invite is BROKEN through the preview URL due to K8s ingress routing — works fine on backend-direct localhost:8001; (2) transient gate rate-limit false-positive from test hammering — not a real bug.",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "/i/:token",
+        "issue": "INGRESS ROUTING BUG: The magic-link invite endpoint is defined in Express at /app/server/index.ts:312 and works correctly on http://localhost:8001/i/<token> (returns 302 + sets ow_gate cookie + Location: /admin). But through the preview URL https://ownership-dev.preview.emergentagent.com/i/<token> it returns 200 HTML (SPA shell) and does NOT set the cookie. Root cause: Kubernetes ingress routes non-/api/* paths to the frontend service (port 3000), so /i/* never reaches Express (port 8001). Fix options: (a) add ingress rule to route /i/* to backend, or (b) move endpoint to /api/i/:token and update the invite URL generation.",
+        "priority": "CRITICAL"
+      }
+    ],
+    "minor": [
+      {
+        "endpoint": "/api/gate/verify",
+        "issue": "Rate limiter (5/15min per IP) is aggressive — legitimate testing/QA hits 429 quickly. Consider allowlisting internal test IPs or bumping window for beta preview. This caused 1 spurious test failure after ~10 verify calls in one session."
+      },
+      {
+        "endpoint": "/api/trpc/gate.createInvite (as referenced in review request)",
+        "issue": "Review request referenced gate.createInvite / gate.listInvites / gate.revokeInvite — but actual procedure names are gate.create / gate.list / gate.revoke. Docs/PRD should be updated so team knows correct names."
+      },
+      {
+        "endpoint": "/api/trpc/producers.needsEnrichment",
+        "issue": "Review request stated response is { ids: [...] } but actual shape is a list of { id, name } objects. Not a bug — just docs drift."
+      },
+      {
+        "endpoint": "/api/trpc/marketingOps.today",
+        "issue": "Review request said response includes coachLine at top level — actual keys are today, dow, hour, season, tasks, weeklyBoard, streak, doneTodayCount, totalTodayCount. coachLine is served by the separate /api/trpc/marketingOps.coachLine endpoint (which works)."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Invite magic-link bypass",
+        "issue": "See /i/:token ingress bug above — a demo tester who receives an invite link cannot get into the gated app because the route never reaches the backend on the preview URL.",
+        "affected_selectors": []
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_demo_e2e.py",
+    "/app/backend/tests/test_smoke.py",
+    "/app/test_reports/pytest/demo_e2e_results.xml",
+    "/app/test_reports/pytest/smoke_results.xml"
+  ],
+  "action_items": [
+    "PRIORITY 1 (demo-critical): Fix /i/:token routing on preview URL — either add ingress rule for /i/* → backend, or rename endpoint to /api/i/:token. Without this the magic-link invite flow is unusable for demo attendees.",
+    "Consider expanding gate verify rate-limit window from 5/15min or adding an allowlist for known preview testers.",
+    "Update PRD.md with correct tRPC procedure names (gate.create not gate.createInvite; needsEnrichment returns list not {ids})."
+  ],
+  "critical_code_review_comments": [
+    "server/index.ts is 1168 lines — well over 700-line threshold. Consider extracting: gate middleware, meta injection, invite handler, scheduled handlers into separate modules.",
+    "The gate wall design (require 'Accept: text/html' to enforce redirect) is elegant but means non-browser clients (curl without header, monitoring bots) will silently get 200s instead of 302s. Confirmed this is intentional — API and asset requests should not be gated.",
+    "Rate limiter uses in-memory buckets (per pod). Multi-replica deploys would let attackers dodge it by hitting different pods. OK for preview, needs Redis-backed limiter for prod."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_demo_e2e.py (new — 42 tests covering gate wall, publicPreview, tRPC endpoints, sitemap, sample vintage log variants, health, invite flow)"
+  ],
+  "success_rate": {"backend": "96%", "frontend": "100%"},
+  "test_credentials": "OWNOLOGY_GATE_PASSWORD=changeme-set-real-password (from /app/.env). Dev bypass auto-injects seed admin for tRPC ownerProcedure endpoints.",
+  "seed_data_creation": "gate_invites row created via gate.create tRPC mutation during invite test (label='pytest-e2e' or 'probe', expiresInDays=1). Safe to leave; auto-expires in 1 day.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Rate limiter blocks /api/gate/verify after ~5 attempts per IP in 15 min. If tests fail on gate unlock with 429, that's the reason — wait 15 min or run from a different IP. The /i/:token ingress bug is the ONLY real bug found; every other demo-critical surface is green. Test file at /app/backend/tests/test_demo_e2e.py has 42 tests; run with API_URL=https://ownership-dev.preview.emergentagent.com.",
+  "rca of the issue": "INVITE MAGIC-LINK BUG — Reproduction: (1) POST /api/gate/verify to get cookie, (2) POST /api/trpc/gate.create with {label,expiresInDays}, (3) copy token from response, (4) anonymously GET https://ownership-dev.preview.emergentagent.com/i/<token> with Accept: text/html — expected 302 + ow_gate cookie, got 200 HTML. Confirmed working on http://localhost:8001/i/<token> (302 + cookie). Root cause: Kubernetes ingress in this preview environment routes /api/* to backend:8001 and everything else to frontend:3000, so the Express /i/:token handler never sees the request. Mitigation options: (a) add ingress rule matching ^/i/ → backend, (b) rename endpoint to /api/i/:token and update mintInviteUrl(). Option (b) is more portable across deployment topologies."
+}

@@ -41,7 +41,7 @@ const SECTIONS: Section[] = [
       { path: "/pricing",              label: "Pricing",             desc: "Founding Member plans + reservation modal", audience: "public" },
       { path: "/why-ownology",         label: "Why Ownology",        desc: "Long-form value proposition", audience: "public" },
       { path: "/risk-management",      label: "Risk Management doctrine", desc: "The 12 wine-quality risks Ownology watches (7 Quant + 5 Qual). Sales weapon, links from cold email + /why-ownology. Feb 2026.", audience: "public" },
-      { path: "/competitive-advantage", label: "Competitive Advantage", desc: "How Ownology compares to Vintrace / InnoVint / spreadsheets", audience: "public" },
+      { path: "/competitive-advantage", label: "Competitive Advantage", desc: "How Ownology compares to Vintrace / InnoVint / spreadsheets. GATED under default-deny — add to allowlist if it should be public.", audience: "member" },
       { path: "/free-run",             label: "Free Run (product intro)", desc: "Product page — AI assistant intro. Note: /free-run/dashboard is gated.", audience: "public" },
       { path: "/guide",                label: "Guide",               desc: "How to use Ownology (public overview)", audience: "public" },
       { path: "/demo",                 label: "Demo",                desc: "Marketing demo landing", audience: "public" },
@@ -77,11 +77,11 @@ const SECTIONS: Section[] = [
   },
   {
     title: "Compliance & regulations",
-    blurb: "FSANZ · Wine Australia · state licensing.",
+    blurb: "FSANZ · Wine Australia · state licensing. Now gated under default-deny (Feb 2026) — members only.",
     routes: [
-      { path: "/compliance",           label: "Compliance",          desc: "LIP FSANZ + state licensing overview + audit-trail PDF export", audience: "public" },
-      { path: "/regulations",          label: "Regulations",         desc: "Wine Australia + FSANZ regulatory links index", audience: "public" },
-      { path: "/regulations/detail",   label: "Regulations detail",  desc: "Per-regulation deep-dive", audience: "public" },
+      { path: "/compliance",           label: "Compliance",          desc: "LIP FSANZ + state licensing overview + audit-trail PDF export. GATED.", audience: "member" },
+      { path: "/regulations",          label: "Regulations",         desc: "Wine Australia + FSANZ regulatory links index. GATED.", audience: "member" },
+      { path: "/regulations/detail",   label: "Regulations detail",  desc: "Per-regulation deep-dive. Public SEO surface.", audience: "public" },
     ],
   },
   {
@@ -93,7 +93,7 @@ const SECTIONS: Section[] = [
       { path: "/cellar-tasks",         label: "Cellar Tasks",        desc: "One-off + recurring to-dos with due dates", audience: "member" },
       { path: "/quick-entry",          label: "Quick Entry",         desc: "The primary logging surface — additions, measurements, trials", audience: "member" },
       { path: "/import",               label: "Import Anything",     desc: "Voice memo · camera · paste · CSV. 4 tabs, one preview-then-save flow.", audience: "member" },
-      { path: "/the-press",            label: "The Press",           desc: "The live vintage log — every entry, filterable", audience: "member" },
+      { path: "/the-press",            label: "The Press",           desc: "The live vintage log — every entry, filterable. GATED.", audience: "member" },
       { path: "/the-press/compare",    label: "Vintage Comparison",  desc: "Side-by-side compare of 2–6 tanks", audience: "member" },
       { path: "/free-run",             label: "Free Run — ask AI",   desc: "Ask any winemaking question. Auto-saves to Cellar Journal.", audience: "member" },
       { path: "/today",                label: "Today",               desc: "Single-column alert feed for cellar-floor use", audience: "member" },
@@ -101,7 +101,7 @@ const SECTIONS: Section[] = [
       { path: "/vineyard",             label: "Vineyard",            desc: "Vineyard blocks + observations", audience: "member" },
       { path: "/tank-qr",              label: "Tank QR codes",       desc: "Printable QR per tank → scan opens pre-filled Quick Entry", audience: "member" },
       { path: "/orders",               label: "Orders",              desc: "Merch orders (if you sell any)", audience: "member" },
-      { path: "/stats",                label: "LLM Stats",           desc: "Live LLM cost meter + per-tier daily budget", audience: "member" },
+      { path: "/stats",                label: "LLM Stats",           desc: "Live LLM cost meter + per-tier daily budget. Allowlisted PUBLIC — safe to link from investor deck.", audience: "public" },
       { path: "/campaign-metrics",     label: "Campaign Metrics",    desc: "Weekly KPI snapshots — waitlist, MRR, opens, sessions", audience: "member" },
     ],
   },
@@ -125,6 +125,10 @@ const SECTIONS: Section[] = [
       { path: "/site-map",             label: "Site Map (this page)", desc: "Every route on the site. You're here.", audience: "admin" },
       { path: "/admin/contacts",       label: "Contacts CRM",        desc: "VIVID 31-contact SMS pipeline — per-row status + inline SMS editor", audience: "admin" },
       { path: "/admin/contacts/pipeline", label: "Pipeline Board",   desc: "Trello-style board: Lead → Sent → Awaiting → Replied → Booked", audience: "admin" },
+      { path: "/admin/producers",      label: "Producers · Perplexity",  desc: "Cold-outreach engine: bulk region-bootstrap (Perplexity), per-row winemaker enrichment, 1-click Compose modal, mailto: send. Feb 2026.", audience: "admin" },
+      { path: "/admin/marketing-ops",  label: "Marketing Ops · AI Coach", desc: "Daily/weekly ritual dashboard — season strip, Claude-generated coach line, KPI streak, Today's focus, weekly rhythm board. 7am Sydney email push. Feb 2026.", audience: "admin" },
+      { path: "/admin/gate-invites",   label: "Gate Invite Tokens",  desc: "Generate /i/:token magic-link URLs that bypass the default-deny gate. For beta testers + demo prospects. Feb 2026.", audience: "admin" },
+      { path: "/admin/quiz-picks",     label: "Quiz Picks + Gate Audit", desc: "Wine quiz result tally + gate_events audit log (last 50 verify attempts, top failing IPs).", audience: "admin" },
       { path: "/admin/marketing-kit",  label: "Marketing Kit",       desc: "One-click copy for sample-vintage-log URLs, LinkedIn DMs, email signatures", audience: "admin" },
       { path: "/admin/funnel",         label: "Conversion Funnel",   desc: "Where paid signups come from — per-source visits + Conv %", audience: "admin" },
       { path: "/admin/leads",          label: "Leads CRM",           desc: "Every inbound email + source tag + notes + CSV export", audience: "admin" },
@@ -140,10 +144,12 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    title: "SMS outreach & reservations",
-    blurb: "Per-prospect personalised landings + warm-intro paths.",
+    title: "SMS outreach & cold-email previews",
+    blurb: "Per-prospect personalised landings + warm-intro paths + cold-email Cellar Brief previews.",
     routes: [
       { path: "/hi/nathan-brokenwood-wines", label: "SMS landing — example (Nathan)", desc: "Any /hi/:slug renders a personalised card. Nathan resolves to Hunter + Book demo variant.", audience: "public" },
+      { path: "/hi/producers/8",       label: "Cellar Brief preview — example (Felton Road)", desc: "Public Cellar Brief mockup baked into every cold email. Any /hi/producers/:id renders a region-aware sample. Zero LLM cost. Feb 2026.", audience: "public" },
+      { path: "/i/example-token",      label: "Invite magic link",   desc: "Any /i/:token bypasses the default-deny gate for one prospect. Generated at /admin/gate-invites.", audience: "public" },
       { path: "/join",                 label: "Join / warm intro",   desc: "Warm-intro entry point for referred prospects", audience: "public" },
       { path: "/invite",               label: "Invite",              desc: "Invitation-code entry (per-prospect gated onboarding)", audience: "public" },
       { path: "/trial-ending",         label: "Trial ending",        desc: "End-of-trial nudge page", audience: "public" },
@@ -180,16 +186,16 @@ const SECTIONS: Section[] = [
   },
   {
     title: "Dev-only & internal (preview host)",
-    blurb: "Deliberately return 404 on ownology.ai. Only visible on the preview host. Not for public consumption.",
+    blurb: "/todo and /roadmap deliberately return 404 on ownology.ai; only visible on the preview host. The mockups are technically allowlisted PUBLIC so demo screenshots work, but they're not on any customer nav.",
     routes: [
-      { path: "/todo",               label: "Internal roadmap",    desc: "Working backlog — honest, blunt, includes security items. Also at /roadmap.", audience: "admin" },
-      { path: "/roadmap",            label: "Roadmap (alias)",     desc: "Same as /todo", audience: "admin" },
-      { path: "/cascade-demo",       label: "Cascade demo",        desc: "Test rig for the harvest-crush theme cascade animation", audience: "admin" },
-      { path: "/copilot-mockup",     label: "Copilot mockup",      desc: "UX prototype — not wired to real data", audience: "admin" },
-      { path: "/branding-mockup",    label: "Branding mockup",     desc: "Visual identity exploration", audience: "admin" },
-      { path: "/onboarding-mockup",  label: "Onboarding mockup",   desc: "UX prototype of the first-time-user flow", audience: "admin" },
-      { path: "/resume",             label: "Resume",              desc: "Founder résumé (used for warm-intro credibility)", audience: "admin" },
-      { path: "/build-index",        label: "Build index",         desc: "Internal indexing utility", audience: "admin" },
+      { path: "/todo",               label: "Internal roadmap",    desc: "Working backlog — honest, blunt, includes security items. Also at /roadmap. GATED on prod (404).", audience: "admin" },
+      { path: "/roadmap",            label: "Roadmap (alias)",     desc: "Same as /todo. GATED on prod (404).", audience: "admin" },
+      { path: "/cascade-demo",       label: "Cascade demo",        desc: "Test rig for the harvest-crush theme cascade animation. Allowlisted PUBLIC.", audience: "public" },
+      { path: "/copilot-mockup",     label: "Copilot mockup",      desc: "UX prototype — not wired to real data. GATED.", audience: "admin" },
+      { path: "/branding-mockup",    label: "Branding mockup",     desc: "Visual identity exploration. Allowlisted PUBLIC.", audience: "public" },
+      { path: "/onboarding-mockup",  label: "Onboarding mockup",   desc: "UX prototype of the first-time-user flow. Allowlisted PUBLIC.", audience: "public" },
+      { path: "/resume",             label: "Resume",              desc: "Founder résumé (used for warm-intro credibility). Allowlisted PUBLIC.", audience: "public" },
+      { path: "/build-index",        label: "Build index",         desc: "Internal indexing utility. GATED.", audience: "admin" },
     ],
   },
 ];
@@ -271,7 +277,7 @@ export default function SiteMap() {
           Every page on Ownology.
         </h1>
         <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.95rem", color: TEXT_MID, lineHeight: 1.6, maxWidth: 620, marginBottom: "0.6rem" }}>
-          Grouped by audience. Green = public. Teal = for logged-in winemakers. Red = admin. Every link opens in this tab so you can chain them together.
+          Grouped by audience. <span style={{ color: AMBER }}>Amber = PUBLIC</span> (in the default-deny allowlist). <span style={{ color: "#4a9d8a" }}>Teal = MEMBER</span> (gated — anonymous visitors redirect to /try). <span style={{ color: "#b0413e" }}>Red = ADMIN</span>. Every link opens in this tab so you can chain them together.
         </p>
         <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.72rem", color: TEXT_LO, marginBottom: "1.25rem" }}>
           Entry: <span style={{ color: AMBER }}>{entry}</span> · Cross-reference this against <a href="https://github.com" style={{ color: AMBER }}>your repo&apos;s App.tsx</a> if a route is missing.
