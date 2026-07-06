@@ -154,7 +154,7 @@ export default function RiskBriefing() {
           This page is for you — the cellar team. It explains the three tiers of risk Ownology watches, exactly what each alert means when it fires on your screen, and where to find the compliance-audit trail every reading feeds. Bookmark it. Point new hires at it on day one.
         </p>
         <p style={{ fontFamily: SANS, fontSize: "0.82rem", color: LO, lineHeight: 1.55, marginTop: "0.75rem" }}>
-          Related surfaces: <Link href="/risk-management" style={{ color: AMBER }}>/risk-management</Link> (public doctrine), <Link href="/dashboard" style={{ color: AMBER }}>/dashboard</Link> (live widgets), <Link href="/cellar-brief" style={{ color: AMBER }}>/cellar-brief</Link> (today's cards + one-tap qual flags), <Link href="/admin/playbook" style={{ color: AMBER }}>/admin/playbook</Link> (Daily 10 / Weekly 30 / Vintage-critical cadence).
+          Related surfaces: <Link href="/risk-management" style={{ color: AMBER }}>/risk-management</Link> (public doctrine), <Link href="/dashboard" style={{ color: AMBER }}>/dashboard</Link> (live widgets), <Link href="/cellar-brief" style={{ color: AMBER }}>/cellar-brief</Link> (today&rsquo;s cards + one-tap qual flags), <Link href="/admin/playbook" style={{ color: AMBER }}>/admin/playbook</Link> (Daily 10 / Weekly 30 / Vintage-critical cadence).
         </p>
 
         {/* ═══ Section 1 — Three tiers ═══ */}

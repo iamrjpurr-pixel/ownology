@@ -429,6 +429,27 @@ export interface ShippedItem {
 
 export const RECENTLY_SHIPPED: ShippedItem[] = [
   {
+    id: "risk-briefing-staff-training-page",
+    title: "/risk-briefing · staff training + compliance benefits",
+    description:
+      "New member-only page for cellar-team training. Explains the 3-tier risk framework operationally: Section 1 (three tiers with who catches / where lives / example), Section 2 (7 quantitative alerts with fires-when + do-this + AWRI/FSANZ source), Section 3 (5 qualitative flags with look-for + then + source), Section 4 (6 environmental alerts), Section 5 (Daily 10 / Weekly 30 / Vintage-critical rhythm), Section 6 (compliance: FSANZ 4.5.1, Wine Australia LIP, AWRI TR227, OIV, WHS out-of-scope). Registered at /risk-briefing (member-only, default-deny) + added to SiteMap.",
+    shippedAt: "2026-02-06",
+  },
+  {
+    id: "cellar-brief-info-tooltips",
+    title: "Cellar Brief · info-dot tooltips on every quant + qual risk",
+    description:
+      "24 quantitative info-dots (next to WATCH / PASS / ATTENTION status labels) + 19 qualitative info-dots (next to 'Qualitative risk' headers) on every Cellar Brief vessel card. Hover reveals full risk taxonomy: 7 quant risks with what-fires-them, 6 qual flags with what-to-sniff-for. Every tooltip footer links to /risk-briefing for the full staff training doctrine. Also added inline 'Look for / Then' education strip in the flag picker — the moment a staffer clicks Brett/TCA/H₂S/etc, they see the tribal knowledge before submitting.",
+    shippedAt: "2026-02-06",
+  },
+  {
+    id: "linkedin-logo-assets",
+    title: "Ownology brand asset set (4 PNGs)",
+    description:
+      "Programmatic generation via Playwright of 4 LinkedIn/social sizes from the Living-Trinity SVG mark: ownology-logo-1024.png (avatar dark), ownology-logo-1024-light.png (parchment variant), ownology-logo-mark-512.png (transparent PNG-α), ownology-logo-linkedin-personal-1584x396.png (profile background), ownology-logo-linkedin-company-1128x191.png (company page cover), ownology-logo-x-header-1500x500.png (Twitter/X). All at /app/client/public/ served directly by the preview URL.",
+    shippedAt: "2026-02-06",
+  },
+  {
     id: "weather-ai-contextual-advice-gated",
     title: "Weather widget · LLM-contextualised advice · Founding-Member gated",
     description:

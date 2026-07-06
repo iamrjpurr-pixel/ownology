@@ -41,6 +41,7 @@ const SECTIONS: Section[] = [
       { path: "/pricing",              label: "Pricing",             desc: "Founding Member plans + reservation modal", audience: "public" },
       { path: "/why-ownology",         label: "Why Ownology",        desc: "Long-form value proposition", audience: "public" },
       { path: "/risk-management",      label: "Risk Management doctrine", desc: "The 12 wine-quality risks Ownology watches (7 Quant + 5 Qual). Sales weapon, links from cold email + /why-ownology. Feb 2026.", audience: "public" },
+      { path: "/risk-briefing",         label: "Risk Briefing (staff)", desc: "MEMBER-only staff training page. How to use the 3-tier risk tool day-to-day + compliance benefits (FSANZ + LIP + AWRI TR227 + OIV). Bookmark for new hires. Feb 2026.", audience: "member" },
       { path: "/competitive-advantage", label: "Competitive Advantage", desc: "How Ownology compares to Vintrace / InnoVint / spreadsheets. GATED under default-deny — add to allowlist if it should be public.", audience: "member" },
       { path: "/free-run",             label: "Free Run (product intro)", desc: "Product page — AI assistant intro. Note: /free-run/dashboard is gated.", audience: "public" },
       { path: "/guide",                label: "Guide",               desc: "How to use Ownology (public overview)", audience: "public" },
