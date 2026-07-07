@@ -39,6 +39,7 @@ const NAV_ITEMS = [
     id: "ask" as const,
     label: "Ask",
     href: "/free-run",
+    pillar: "Learn" as const,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
@@ -51,6 +52,7 @@ const NAV_ITEMS = [
     id: "press" as const,
     label: "Press",
     href: "/the-press",
+    pillar: "Know" as const,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
@@ -62,6 +64,7 @@ const NAV_ITEMS = [
     id: "log" as const,
     label: "Log",
     href: "/quick-entry",
+    pillar: "Do" as const,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
@@ -73,6 +76,7 @@ const NAV_ITEMS = [
     id: "tasks" as const,
     label: "Tasks",
     href: "/cellar-tasks",
+    pillar: "Do" as const,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
@@ -84,6 +88,7 @@ const NAV_ITEMS = [
     id: "more" as const,
     label: "More",
     href: "/dashboard",
+    pillar: "Guide" as const,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <circle cx="6" cy="12" r="1.5" fill="currentColor" />
@@ -270,6 +275,27 @@ export default function WorkModeLayout({
                     }}
                   >
                     {item.label}
+                  </span>
+                  {/* ── UI_PILLARS_V1 · Feb 2026 · pillar tag ──
+                       Small serif italic label mapping this tab to one of
+                       Do / Know / Learn / Guide so the 4-pillar mental model
+                       is present at every glance in the cellar. Additive —
+                       flip the flag in config/ui.ts or delete this span to
+                       revert. Non-destructive to nav function. */}
+                  <span
+                    data-testid={`worknav-pillar-${item.id}`}
+                    style={{
+                      fontFamily: "'Fraunces', Georgia, serif",
+                      fontSize: "0.56rem",
+                      fontStyle: "italic",
+                      letterSpacing: "0.02em",
+                      color: isActive ? "#B0741A" : "#c9b590",
+                      marginTop: "-0.1rem",
+                      lineHeight: 1,
+                      opacity: isActive ? 0.95 : 0.7,
+                    }}
+                  >
+                    {item.pillar}
                   </span>
                 </button>
               );

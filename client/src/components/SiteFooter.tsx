@@ -159,15 +159,6 @@ export function SiteFooter() {
             >
               RSS
             </a>
-            <Link
-              href="/site-map"
-              style={{ ...footerLinkStyle, padding: 0 }}
-              onMouseEnter={hover}
-              onMouseLeave={unhover}
-              data-testid="footer-sitemap-page"
-            >
-              Site map
-            </Link>
             <a
               href="/api/sitemap.xml"
               style={{ ...footerLinkStyle, padding: 0 }}

@@ -9,6 +9,8 @@ import OwnologyLogo from "@/components/OwnologyLogo";
 import FounderStory from "@/components/FounderStory";
 import FAQ from "@/components/FAQ";
 import HeroTheatricalPattern from "@/components/HeroTheatricalPattern";
+import { HeroPillarsSection } from "@/components/HeroPillarsSection";
+import { useUiPillarsV1 } from "@/config/ui";
 import { useAutoCascade, pickCrushByDay } from "@/hooks/useAutoCascade";
 import { Link } from "wouter";
 import ThemeToggle, { useOwnologyTheme } from "@/components/ThemeToggle";
@@ -541,6 +543,7 @@ function Nav() {
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 function Hero() {
+  const usePillarsV1 = useUiPillarsV1();
   const aiResponse = "Based on your current YAN of 120ppm and a starting Brix of 24.3, I recommend adding 2.6 kg of DAP to Tank 7 — split 50% at inoculation, 50% at ⅓ sugar depletion. This targets a YAN of 200ppm, optimal for your Shiraz house style.";
   const { displayed, done } = useTypewriter(aiResponse, 22, 1200);
   const { contentMap } = useSiteContent();
@@ -575,6 +578,14 @@ function Hero() {
       {/* Theatrical juice-trail pattern — sits above the bg image, below copy */}
       <HeroTheatricalPattern />
 
+      {/* ── Hero body — flag-gated. UI_PILLARS_V1 (Feb 2026):
+             new 4-pillar flash-card variant ships live; append ?ui=v0 to
+             any URL to preview the original apprentice hero side-by-side.
+             See /app/client/src/config/ui.ts for the flag definition +
+             kill-switch strategy. ─────────────────────────────────────── */}
+      {usePillarsV1 ? (
+        <HeroPillarsSection />
+      ) : (
       <div className="container relative z-10 pt-32 pb-24">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left — copy */}
@@ -773,6 +784,7 @@ function Hero() {
           </div>
         </div>
       </div>
+      )}
     </section>
   );
 }
