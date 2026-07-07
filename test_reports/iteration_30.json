@@ -1,0 +1,36 @@
+{
+  "summary": "Iteration 30 — Progressive-Exposure + Members Command Center. Backend: 17/17 pytest passed on new test_members_command_center.py covering full members.* CRUD lifecycle (issue → detail → extendTrial → pause/resume → updateNote → advanceTier → reissueLink → revoke), summary tiles, list + tier filter, both signal beacons (signalOnboardingComplete, signalCellarBriefOpen), instrumentation on vintageLog.bulkSave + tutor.ask (mode=winemaking), email.subscribe honeypot silently discards bots, and gate cookie tier enforcement (/import allowed for trial, /admin → 302 /trial-locked?from=%2Fadmin). Frontend: /admin/members loads with heading 'Members · Command Center', 4 summary tiles (tile-trials/members/silent/conversions), tier + health filter chips (all work), 12+ member rows, Issue Invite drawer opens/creates trial invite with /i/<token> link + Copy button, member detail drawer renders 5-pillar progress meter + Activity + private note (save persists) + 5 action buttons + audit log, filter chips filter correctly, onboarding Step 3 multi-select works (LIP + Team memory both highlight simultaneously, 'onb-usecase-count' shows '2 selected'), Step 4 demo card copy verified in source ('real, fully-populated vintage — deep in the weeds. Take your time'), /trial-locked page has all 4 trial surfaces + 'Book a founding-partner call' CTA linking to /join, /join book-call form has honeypot input in off-screen parent (position:absolute; left:-10000px, tabindex=-1, name=companyWebsite) and submission with honeypot filled returns success card while backend silently discards the lead.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/onboarding", "issues": ["Theme picker overlay ('CHOOSE YOUR WORKING LIGHT') intercepts pointer events on Continue button during automated tests. Not a functional bug — a user would close/dismiss it — but the overlay z-index is high enough that Playwright can't click past it without force. Consider auto-dismissing after user chooses a theme or reducing pointer-event capture on the overlay."]},
+      {"screen": "/join carousel", "issues": ["BookCallForm is Card 06 of 6 — user must click ›/‹ five times to reach it. Not new to this iteration but noted for CTA reachability from /trial-locked which deep-links to /join expecting the form. Consider a query-string like /join?card=6 or #book to jump straight to the form when arriving from the trial-locked CTA."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_members_command_center.py",
+    "/app/test_reports/pytest/iter30_members.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server/routers/members.ts:154 and :482 use fragile double-cast on db.execute() result — `(activityRows as unknown as [Array<Record<string, number>>])[0]`. This relies on mysql2's `[rows, fields]` tuple return shape. If drizzle-orm swaps the driver or upgrades and returns rows directly, both endpoints silently return empty arrays. Recommend extracting a typed helper like `const [rows] = await db.execute<T>(sql\\`...\\`);` or use drizzle's aggregate helpers once the bigint mode:number issue is resolved.",
+    "server/index.ts trial-tier redirect (line 596) is correct in code but NOT exercised at the public preview URL because the k8s ingress routes non-/api HTML requests to the Vite dev server on :3000, which serves index.html directly and bypasses Express's SPA gate wall. The test verifies redirect works against localhost:8001 directly. In production (where ingress routes HTML to Express) the redirect will fire — but this environmental gap means QA can only assert enforcement via direct-to-Express calls, not via a real browser session on the preview host.",
+    "server/routers/members.ts:213 returns `total: filtered.length` — this is the post-filter count, not the total invite count. If UI shows 'N members shown / M total' the M is missing. Currently the AdminMembers.tsx page shows 'N members shown · Legacy invite table →' which reads fine as filtered-count only, but if a total-count summary is later needed, add an `unfilteredTotal` field.",
+    "server/routers/members.ts:483 reads `rows[0]?.n` — the alias 'n' is lowercase but MySQL sometimes returns column names case-insensitively depending on driver. This appears to work now but is worth adding a case-tolerant fallback (`row['n'] ?? row['N'] ?? 0`) or using COUNT(*) with an explicit `AS conversion_count` and matching key."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_members_command_center.py (new — 17 tests covering members.* router, instrumentation, honeypot, gate-tier enforcement)"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "Gate password OWNOLOGY_GATE_PASSWORD=middx99 (posted to /api/gate/verify to unlock /admin/*). Dev-bypass active (ENABLE_DEV_BYPASS unset → treated as true in preview) auto-injects seed admin richard@ownology.ai (role=admin) for all ownerProcedure calls. JWT_SECRET in /app/.env for programmatic ow_gate mint if rate-limited.",
+  "seed_data_creation": "Created PYTEST_ prefixed trial invites during backend tests: PYTEST_trial_alpha (full lifecycle test), PYTEST_gate_enforcement (twice — trial-tier redirect test), plus PYTEST_debug/debug2 (adhoc). All easily identifiable by 'PYTEST_' label prefix for rollback. Also PYTEST_frontend (created via /admin/members UI test). Note: existing seed included 5 legacy gate-tier invites (demo-verify, pytest-e2e x2, probe, Test Beta User) — the command-center list correctly displays them.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "test_members_command_center.py is authoritative regression for the members router. The trial-tier redirect test hits http://localhost:8001 directly because the preview k8s ingress bypasses Express for HTML routes. If E1 changes the ingress or moves to a prod-like config, that test can be flipped back to BASE_URL. Rate limiter (5/15min per IP) applies to /api/gate/verify and /i/:token — if you see 429 in bulk QA, restart backend (in-memory buckets reset) or wait 15 min. For frontend, the theme picker overlay ('CHOOSE YOUR WORKING LIGHT') sometimes intercepts clicks — use force=True on button clicks or dismiss it first.",
+  "rca of the issue": "N/A — no bugs found. One environmental note documented: preview ingress routes HTML → Vite dev server (:3000) instead of Express (:8001), so /admin trial-tier redirect only fires via direct Express hit. Verified via localhost:8001 curl → 302 /trial-locked?from=%2Fadmin as expected."
+}
