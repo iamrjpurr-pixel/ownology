@@ -34,7 +34,10 @@ import {
 } from "lucide-react";
 
 const REF_STORAGE_KEY = "ow-referral-code";
-const USECASE_STORAGE_KEY = "ow-primary-use-case";
+// Storage key was 'ow-primary-use-case' (single-value) up until Feb 2026.
+// We now persist an array — see multi-select flip below. Keeping the new
+// key distinct so legacy single-value blobs don't get JSON.parsed by mistake.
+const USECASE_STORAGE_KEY = "ow-primary-use-cases";
 
 type StepId = "name" | "brand" | "usecase" | "import" | "complete";
 type UseCase = "lip_audit" | "cellar_decisions" | "marketing" | "team_memory" | "exploring";
@@ -46,7 +49,7 @@ type WizardState = {
   region: string;
   logoUrl: string;
   brandColor: string;
-  useCase: UseCase | null;
+  useCases: UseCase[];
   saveStatus: "idle" | "saving" | "saved" | "error";
   saveError: string | null;
   attribution: string | null;
@@ -60,7 +63,7 @@ const INITIAL: WizardState = {
   region: "",
   logoUrl: "",
   brandColor: "#b45309",
-  useCase: null,
+  useCases: [],
   saveStatus: "idle",
   saveError: null,
   attribution: null,
@@ -84,6 +87,7 @@ export default function Onboarding() {
   });
   const updateWinery = trpc.winery.update.useMutation();
   const applyReferral = trpc.referrals.applyToCurrent.useMutation();
+  const signalOnbComplete = trpc.members.signalOnboardingComplete.useMutation();
 
   // Hydrate defaults from current winery on first load — a Founding Member
   // may already have some fields set from Stripe checkout or a prior visit.
@@ -156,8 +160,8 @@ export default function Onboarding() {
   };
 
   const persistUseCaseAndAdvance = () => {
-    if (s.useCase) {
-      try { localStorage.setItem(USECASE_STORAGE_KEY, s.useCase); } catch { /* private mode */ }
+    if (s.useCases.length > 0) {
+      try { localStorage.setItem(USECASE_STORAGE_KEY, JSON.stringify(s.useCases)); } catch { /* private mode */ }
     }
     advance();
   };
@@ -183,6 +187,15 @@ export default function Onboarding() {
         }
       } catch { /* soft-fail — completion still works */ }
     }
+    // Fire the progress-meter beacon so /admin/members shows this
+    // winemaker as "onboarded". Non-blocking; if it fails the wizard
+    // still completes.
+    try {
+      await signalOnbComplete.mutateAsync({
+        useCases: s.useCases,
+        wineryName: s.wineryName || undefined,
+      });
+    } catch { /* soft-fail */ }
     goto("complete");
   };
 
@@ -508,16 +521,22 @@ function StepUseCase({ state, setState, onNext, onBack }: {
     <Card>
       <StepIcon><Compass size={28} /></StepIcon>
       <Heading>What are you here to solve?</Heading>
-      <Sub>Pick one — we&apos;ll promote the parts of Ownology that solve this first on your dashboard. You can always change it later.</Sub>
+      <Sub>Pick everything that fits — we&apos;ll promote the parts of Ownology that solve these first on your dashboard. You can always change it later.</Sub>
 
       <div style={{ display: "grid", gap: "0.5rem" }}>
         {options.map((opt) => {
-          const active = state.useCase === opt.id;
+          const active = state.useCases.includes(opt.id);
           return (
             <button
               key={opt.id}
               data-testid={`onb-usecase-${opt.id}`}
-              onClick={() => setState((s) => ({ ...s, useCase: opt.id }))}
+              onClick={() => setState((s) => {
+                const has = s.useCases.includes(opt.id);
+                return {
+                  ...s,
+                  useCases: has ? s.useCases.filter((c) => c !== opt.id) : [...s.useCases, opt.id],
+                };
+              })}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -543,11 +562,17 @@ function StepUseCase({ state, setState, onNext, onBack }: {
         })}
       </div>
 
+      {state.useCases.length > 1 && (
+        <p style={{ marginTop: "0.75rem", fontSize: "0.8rem", color: "var(--ow-text-lo)" }} data-testid="onb-usecase-count">
+          {state.useCases.length} selected — your dashboard will surface all of these in order.
+        </p>
+      )}
+
       <ButtonRow>
         <SecondaryButton data-testid="onb-usecase-back" onClick={onBack}><ArrowLeft size={16} /> Back</SecondaryButton>
         <div style={{ display: "flex", gap: "0.5rem" }}>
           <SecondaryButton data-testid="onb-usecase-skip" onClick={onNext}>Skip</SecondaryButton>
-          <PrimaryButton data-testid="onb-usecase-continue" onClick={onNext} disabled={!state.useCase}>
+          <PrimaryButton data-testid="onb-usecase-continue" onClick={onNext} disabled={state.useCases.length === 0}>
             Continue <ArrowRight size={16} />
           </PrimaryButton>
         </div>
@@ -561,7 +586,7 @@ function StepImport({ onNext, onBack }: { onNext: () => void; onBack: () => void
   const options: Array<{ id: string; icon: React.ReactNode; label: string; sub: string; href: string }> = [
     { id: "csv",   icon: <Upload size={20} />,       label: "Import from CSV",     sub: "Your last 30\u201390 days of vintage-log entries. We\u2019ll parse it.", href: "/import" },
     { id: "fresh", icon: <FlaskConical size={20} />, label: "Start fresh",         sub: "Log your first entry manually. The Cellar Brief comes alive after ~5 entries.", href: "/the-press" },
-    { id: "demo",  icon: <Sparkles size={20} />,     label: "Use demo data",       sub: "Preview a fully-populated 12-day vintage before touching real cellar data.", href: "/cellar-brief" },
+    { id: "demo",  icon: <Sparkles size={20} />,     label: "Use demo data",       sub: "Preview a real, fully-populated vintage — deep in the weeds. Take your time; this is what a working cellar looks like inside Ownology.", href: "/cellar-brief" },
   ];
   return (
     <Card>

@@ -25,6 +25,8 @@ import { publicAuditHandler } from "./publicAudit.js";
 import authRouter from "./authRouter.js";
 import {
   verifyGateCookie,
+  verifyGateCookieDetailed,
+  isTrialAllowedPath,
   mintGateToken,
   mintInviteToken,
   setGateCookie,
@@ -528,6 +530,7 @@ async function startServer() {
     "/stats",
     "/founding-member/success",
     "/trial-ending",
+    "/trial-locked",
     "/preview",
     "/404",
     "/risk-management",
@@ -585,8 +588,16 @@ async function startServer() {
     const hasSession = Boolean(cookies[COOKIE_NAME]);
     if (hasSession) return next();
     if (isIpAllowlisted(clientIpOf(req))) return next();
-    const hasGate = await verifyGateCookie(req);
-    if (hasGate) return next();
+    // Progressive-exposure check: a trial-tier cookie only unlocks
+    // TRIAL_ALLOWED_PREFIXES. Any other route returns them to /trial-locked
+    // with a "here's what's included / here's how to upgrade" landing.
+    const gateDetail = await verifyGateCookieDetailed(req);
+    if (gateDetail) {
+      if (gateDetail.tier === "trial" && !isTrialAllowedPath(req.path)) {
+        return res.redirect(302, `/trial-locked?from=${encodeURIComponent(req.path)}`);
+      }
+      return next();
+    }
     // Anonymous → send to sandbox with a hint we came from a wall
     res.redirect(302, `/try?from=${encodeURIComponent(req.path)}`);
   });
@@ -1058,6 +1069,70 @@ async function startServer() {
       `);
     } catch (e) {
       console.warn("[bootstrap] founding_reservations table create skipped:", (e as Error).message);
+    }
+
+    // ── Progressive-exposure + command-center tables (Feb 2026) ─────────
+    // See drizzle/schema.ts for shape/comments. Idempotent DDL: safe to run
+    // on every boot; MySQL will no-op if the tables + columns already exist.
+    try {
+      // Extend gate_invites with tier + operator metadata. Each ALTER runs
+      // through a try/catch because MySQL 8.0.29+ supports "IF NOT EXISTS"
+      // but Railway may still be on 8.0.27 in some pods.
+      const alterInviteCols = [
+        "ADD COLUMN tier VARCHAR(12) NOT NULL DEFAULT 'gate'",
+        "ADD COLUMN member_name VARCHAR(120)",
+        "ADD COLUMN winery_name VARCHAR(120)",
+        "ADD COLUMN private_note TEXT",
+        "ADD COLUMN paused_at BIGINT",
+      ];
+      for (const alter of alterInviteCols) {
+        try {
+          await db.execute(sql.raw(`ALTER TABLE gate_invites ${alter.replace("ADD COLUMN", "ADD COLUMN IF NOT EXISTS")}`));
+        } catch {
+          try { await db.execute(sql.raw(`ALTER TABLE gate_invites ${alter}`)); } catch { /* column already exists */ }
+        }
+      }
+      try { await db.execute(sql`ALTER TABLE gate_invites ADD INDEX gi_tier_idx (tier)`); } catch { /* index already exists */ }
+
+      // Member activity — one row per meaningful event. Powers progress
+      // meter, health signals, timeline drawer, adoption analytics.
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS member_activity (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          gate_invite_id INT,
+          user_id INT,
+          kind VARCHAR(40) NOT NULL,
+          details TEXT,
+          device_fp VARCHAR(64),
+          ip VARCHAR(64),
+          user_agent VARCHAR(300),
+          occurred_at BIGINT NOT NULL,
+          INDEX ma_invite_idx (gate_invite_id, occurred_at),
+          INDEX ma_user_idx (user_id, occurred_at),
+          INDEX ma_kind_idx (kind, occurred_at),
+          INDEX ma_recent_idx (occurred_at)
+        )
+      `);
+
+      // Admin actions audit log — every override written here (reset,
+      // extend, pause, revoke, advance, note, impersonate). Forensic trail
+      // for "who changed what" and reversibility.
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS admin_actions (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          actor_email VARCHAR(200) NOT NULL,
+          target_gate_invite_id INT,
+          target_label VARCHAR(200),
+          action VARCHAR(40) NOT NULL,
+          payload TEXT,
+          occurred_at BIGINT NOT NULL,
+          INDEX aa_target_idx (target_gate_invite_id, occurred_at),
+          INDEX aa_actor_idx (actor_email, occurred_at),
+          INDEX aa_recent_idx (occurred_at)
+        )
+      `);
+    } catch (e) {
+      console.warn("[bootstrap] command-center tables create skipped:", (e as Error).message);
     }
 
     // Seed Default Winery containing existing data. Owner is the seed admin.

@@ -13,6 +13,7 @@ import { quizRouter } from "./routers/quiz.js";
 import { producersRouter } from "./routers/producers.js";
 import { marketingOpsRouter } from "./routers/marketingOps.js";
 import { gateRouter } from "./routers/gate.js";
+import { membersRouter } from "./routers/members.js";
 import { qualFlagsRouter } from "./routers/qualFlags.js";
 import { weatherRouter } from "./routers/weather.js";
 import { wineryRouter } from "./routers/winery.js";
@@ -751,9 +752,20 @@ const emailRouter = router({
         source: z.string().optional(),
         name: z.string().optional(),
         wineryName: z.string().optional(),
+        // Honeypot field — client renders an invisible input named
+        // `companyWebsite` (styled off-screen, aria-hidden, tabindex=-1).
+        // Real users never fill it. Bots that auto-fill every input get
+        // silently 200'd without the lead being persisted. Feb 2026 anti-
+        // bot layer, phase E of the progressive-exposure plan.
+        companyWebsite: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
+      // Honeypot trip — return ok, log for diagnostics, discard the write.
+      if (input.companyWebsite && input.companyWebsite.trim().length > 0) {
+        console.warn("[emailRouter] honeypot triggered", { email: input.email.slice(0, 6) + "…", value: input.companyWebsite.slice(0, 40) });
+        return { ok: true };
+      }
       const source = input.source ?? (input.tags?.[0] ?? "unknown");
       const tags = input.tags ?? [];
 
@@ -1827,6 +1839,7 @@ export const appRouter = router({
   referrals: referralsRouter,
   marketingOps: marketingOpsRouter,
   gate: gateRouter,
+  members: membersRouter,
   qualFlags: qualFlagsRouter,
   weather: weatherRouter,
 });

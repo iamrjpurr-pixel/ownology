@@ -12,6 +12,7 @@ import { routeQuery } from "../queryRouter.js";
 import { backfillSopEmbeddings } from "../sopEmbeddings.js";
 import { persistJournalEntry } from "../cellarJournalRouter.js";
 import { chatCompletion, MODELS } from "../_core/llm.js";
+import { logMemberActivity } from "../memberActivity.js";
 
 // ─── Public /ask rate limiter — per-IP, sliding 1-hour window ───────────────
 // Only applied to anonymous callers of tutor.ask (the /ask SEO flywheel page).
@@ -853,6 +854,17 @@ ${sopContext}${vintageContext ? `\n\n---\n\n## Regional Vintage Context\n${vinta
         answer = rawContent;
       }
 
+            // Instrumentation for /admin/members — feeds first_question
+            // pillar and Ask Owen activity timeline.
+            logMemberActivity({
+              req: ctx.req,
+              kind: "ask_owen_question",
+              details: {
+                mode: input.mode,
+                question: input.question.slice(0, 200),
+                sopCount: sopTitles.length,
+              },
+            });
             return { answer, sopTitles, disclaimer };
     }),
 

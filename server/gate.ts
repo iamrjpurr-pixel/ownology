@@ -61,6 +61,69 @@ export async function mintInviteToken(inviteId: number): Promise<string | null> 
     .sign(secret);
 }
 
+// ─── Trial-tier cookie mint (Feb 2026) ────────────────────────────────────
+// Same JWT shape as an invite cookie — verifyGateCookieDetailed reads the
+// invite row to discover the tier. This helper exists purely for symmetry
+// and readability at call sites. The 14-day expiry is enforced by the
+// invite row's `expires_at`, not the JWT itself (JWT still uses the
+// 30-day GATE_MAX_AGE for consistency).
+export async function mintTrialInviteToken(inviteId: number): Promise<string | null> {
+  return mintInviteToken(inviteId);
+}
+
+/** Membership tiers granted by a valid gate cookie. Feb 2026 progressive-
+ *  exposure model:
+ *   - "gate"   → legacy shared-password (or invite with tier='gate').
+ *                Full public + member-facing surfaces (subject to /admin
+ *                role checks). Used for existing beta testers.
+ *   - "trial"  → 14-day trial invite. LIMITED to TRIAL_ALLOWED_PREFIXES.
+ *   - "member" → Paying member invite (or legacy 'gate' promoted after
+ *                Stripe conversion). Full non-admin surface.
+ *  Return `null` when there is no valid cookie. */
+export type GateTier = "gate" | "trial" | "member";
+
+export interface GateVerification {
+  tier: GateTier;
+  inviteId: number | null;   // null for shared-password path
+}
+
+/** Extended verifier: returns full verification result (tier + invite id)
+ *  or null. Legacy `verifyGateCookie` remains for boolean callers. */
+export async function verifyGateCookieDetailed(req: express.Request): Promise<GateVerification | null> {
+  try {
+    const cookieHeader = req.headers.cookie;
+    if (!cookieHeader) return null;
+    const cookies = parseCookies(cookieHeader);
+    const token = cookies[GATE_COOKIE_NAME];
+    if (!token) return null;
+    const secret = getSecret();
+    if (!secret) return null;
+    const { payload } = await jwtVerify(token, secret);
+    // Shared-password JWT — legacy 'gate' tier.
+    if (payload.gate === "ok") {
+      return { tier: "gate", inviteId: null };
+    }
+    // Invite JWT — look up the row for tier + revocation + pause state.
+    if (payload.gate === "invite" && typeof payload.id === "number") {
+      const rows = await db
+        .select()
+        .from(schema.gateInvites)
+        .where(eq(schema.gateInvites.id, payload.id))
+        .limit(1);
+      const row = rows[0];
+      if (!row) return null;
+      if (row.revokedAt) return null;
+      if (row.pausedAt) return null;                 // soft-pause
+      if (row.expiresAt && row.expiresAt < Date.now()) return null;
+      const tier: GateTier = (row.tier === "trial" || row.tier === "member") ? row.tier : "gate";
+      return { tier, inviteId: row.id };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 /** Verify an incoming ow_gate cookie. Returns true iff the JWT signature
  *  + expiry are valid AND (for invite tokens) the underlying invite row
  *  is not revoked or expired. Two paths:
@@ -69,32 +132,35 @@ export async function mintInviteToken(inviteId: number): Promise<string | null> 
  *     the invite row, verify not revoked and not past expires_at.
  *  Any error returns false (never throws — caller uses the boolean). */
 export async function verifyGateCookie(req: express.Request): Promise<boolean> {
-  try {
-    const cookieHeader = req.headers.cookie;
-    if (!cookieHeader) return false;
-    const cookies = parseCookies(cookieHeader);
-    const token = cookies[GATE_COOKIE_NAME];
-    if (!token) return false;
-    const secret = getSecret();
-    if (!secret) return false;
-    const { payload } = await jwtVerify(token, secret);
-    if (payload.gate === "ok") return true;
-    if (payload.gate === "invite" && typeof payload.id === "number") {
-      const rows = await db
-        .select()
-        .from(schema.gateInvites)
-        .where(eq(schema.gateInvites.id, payload.id))
-        .limit(1);
-      const row = rows[0];
-      if (!row) return false;
-      if (row.revokedAt) return false;
-      if (row.expiresAt && row.expiresAt < Date.now()) return false;
-      return true;
-    }
-    return false;
-  } catch {
-    return false;
+  const detail = await verifyGateCookieDetailed(req);
+  return detail !== null;
+}
+
+// ─── Trial-tier allowlist ────────────────────────────────────────────────
+// When a cookie's tier is 'trial', the SPA can only reach these prefixes.
+// Everything else redirects to /trial-locked (a landing page explaining
+// what's included in the trial vs full membership).
+export const TRIAL_ALLOWED_PREFIXES = [
+  "/onboarding",
+  "/the-press",
+  "/cellar-brief",
+  "/import",
+  "/ask",
+  "/try",           // sandbox still available
+  "/join",          // /join Card 06 is the upgrade CTA
+  "/founding-partners",
+  "/pricing",
+  "/upgrade",       // future
+  "/trial-locked",  // the landing shown to trial users who click a locked route
+];
+
+/** Returns true if a `trial`-tier cookie is allowed to reach this path. */
+export function isTrialAllowedPath(pathname: string): boolean {
+  for (const p of TRIAL_ALLOWED_PREFIXES) {
+    if (pathname === p) return true;
+    if (pathname.startsWith(p + "/")) return true;
   }
+  return false;
 }
 
 /** Send the ow_gate cookie header on a response. httpOnly + SameSite=Lax

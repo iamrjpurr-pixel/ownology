@@ -93,6 +93,8 @@ const AdminProducers = lazy(() => import("./pages/AdminProducers"));
 const AdminMarketingOps = lazy(() => import("./pages/AdminMarketingOps"));
 const AdminEnvironment = lazy(() => import("./pages/AdminEnvironment"));
 const AdminGateInvites = lazy(() => import("./pages/AdminGateInvites"));
+const AdminMembers = lazy(() => import("./pages/AdminMembers"));
+const TrialLocked = lazy(() => import("./pages/TrialLocked"));
 const RiskManagement = lazy(() => import("./pages/RiskManagement"));
 const RiskBriefing = lazy(() => import("./pages/RiskBriefing"));
 const RiskGlossary = lazy(() => import("./pages/RiskGlossary"));
@@ -350,6 +352,8 @@ function Router() {
       <Route path={"/admin/marketing-ops"} component={AdminMarketingOps} />
       <Route path={"/admin/environment"} component={AdminEnvironment} />
       <Route path={"/admin/gate-invites"} component={AdminGateInvites} />
+      <Route path={"/admin/members"} component={AdminMembers} />
+      <Route path={"/trial-locked"} component={TrialLocked} />
       <Route path={"/risk-management"} component={RiskManagement} />
       <Route path={"/risk-briefing"} component={RiskBriefing} />
       <Route path={"/risk-glossary"} component={RiskGlossary} />

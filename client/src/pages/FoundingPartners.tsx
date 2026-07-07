@@ -277,6 +277,10 @@ function BookCallForm({ refTag }: { refTag: string | null }) {
   const [name, setName] = React.useState("");
   const [winery, setWinery] = React.useState("");
   const [note, setNote] = React.useState("");
+  // Honeypot — bots that auto-fill every input trip this and are silently
+  // 200'd server-side without the lead being persisted. Real users never
+  // see the field (it's tabindex=-1, aria-hidden, positioned off-screen).
+  const [companyWebsite, setCompanyWebsite] = React.useState("");
   const subscribeMutation = trpc.email.subscribe.useMutation();
 
   const submit = async (e: React.FormEvent) => {
@@ -291,6 +295,7 @@ function BookCallForm({ refTag }: { refTag: string | null }) {
         wineryName: winery.trim() || undefined,
         source: "cold-call",
         tags,
+        companyWebsite,   // honeypot — must be empty for a real submission
       });
     } catch {
       /* the mutation surfaces its own error state */
@@ -326,6 +331,27 @@ function BookCallForm({ refTag }: { refTag: string | null }) {
 
   return (
     <form onSubmit={submit} data-testid="fp-form" style={{ display: "grid", gap: "0.85rem" }}>
+      {/* Honeypot — invisible to humans, tempting to bots. Positioned off-
+          screen (not display:none, since some bots skip hidden fields). */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute", left: "-10000px", top: "auto",
+          width: 1, height: 1, overflow: "hidden",
+        }}
+      >
+        <label htmlFor="fp-companyWebsite">Company website (leave blank)</label>
+        <input
+          id="fp-companyWebsite"
+          type="text"
+          name="companyWebsite"
+          value={companyWebsite}
+          onChange={(e) => setCompanyWebsite(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          data-testid="fp-form-honeypot"
+        />
+      </div>
       <div>
         <label htmlFor="fp-name" className="fp-label">Your name</label>
         <input

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../trpc.js";
+import { logMemberActivity } from "../memberActivity.js";
 import {
   addVintageLogEntry,
   listVintageLogEntries,
@@ -629,6 +630,23 @@ Return ONLY a valid JSON array. No markdown, no explanation. If no cellar events
           importBatchId: batchId,
         });
         saved++;
+      }
+      // Instrumentation for /admin/members progress meter + health signals.
+      // Two events: one for the import batch itself (feeds bulk_import pillar
+      // when appropriate), one flagged as vintage_log_entry (first-entry pillar).
+      logMemberActivity({
+        req: ctx.req,
+        userId: dbUser.id,
+        kind: input.importSource === "bulk" ? "bulk_import_run" : "import_run",
+        details: { source: input.importSource, saved, batchId },
+      });
+      if (saved > 0) {
+        logMemberActivity({
+          req: ctx.req,
+          userId: dbUser.id,
+          kind: "vintage_log_entry",
+          details: { count: saved, source: input.importSource, batchId },
+        });
       }
       return { saved, batchId };
     }),

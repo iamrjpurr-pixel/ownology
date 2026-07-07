@@ -1483,6 +1483,28 @@ export const gateInvites = mysqlTable(
     id: int("id").primaryKey().autoincrement(),
     token: varchar("token", { length: 48 }).notNull().unique(),
     label: varchar("label", { length: 120 }).notNull(),
+    // Membership tier this invite grants when redeemed. Feb 2026 progressive-
+    // exposure model:
+    //   "gate"   = legacy shared-password style. Full site (subject to admin
+    //              role checks). Backwards-compat default for existing rows.
+    //   "trial"  = 14-day trial cookie. Access limited to /onboarding,
+    //              /the-press, /cellar-brief, /import, /ask (see
+    //              TRIAL_ALLOWED_PREFIXES in server/gate.ts).
+    //   "member" = Paying member. Full public/member site, /admin still gated
+    //              on Google OAuth role=admin.
+    tier: varchar("tier", { length: 12 }).notNull().default("gate"),
+    // Optional per-member cellar name captured at invite-mint time so the
+    // command center table can show "Ricky · Yering Farm" without needing
+    // to wait for the user to complete onboarding.
+    memberName: varchar("member_name", { length: 120 }),
+    wineryName: varchar("winery_name", { length: 120 }),
+    // Optional Rich-private note keyed to the invite. Never surfaced to the
+    // holder — only visible in /admin/members. Free-form.
+    privateNote: text("private_note"),
+    // Soft-pause: freezes the tier check without deleting/revoking. Set by
+    // the operator via /admin/members. When non-null, verifyGateCookie
+    // treats the invite as unusable until unset. Reversible.
+    pausedAt: bigint("paused_at", { mode: "number" }),
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
     expiresAt: bigint("expires_at", { mode: "number" }), // null = never
     firstUsedAt: bigint("first_used_at", { mode: "number" }),
@@ -1493,6 +1515,7 @@ export const gateInvites = mysqlTable(
   (t) => [
     index("gi_token_idx").on(t.token),
     index("gi_revoked_idx").on(t.revokedAt),
+    index("gi_tier_idx").on(t.tier),
   ]
 );
 
@@ -1632,6 +1655,76 @@ export const vesselQualFlags = mysqlTable(
   (t) => [
     index("vqf_winery_vessel_idx").on(t.wineryId, t.vesselId),
     index("vqf_active_idx").on(t.wineryId, t.resolvedAt),
+  ]
+);
+
+// ─── Member Activity (Feb 2026 command center — M1) ───────────────────────
+// One row per meaningful event on a trial/member cookie. Drives:
+//   - Progress meter on /admin/members
+//   - Health signals (silent-N-days) for outreach targeting
+//   - Detail-drawer activity timeline
+//   - Feature-adoption analytics
+//
+// Design choice: keyed on gateInviteId (not userId), because the trial-tier
+// cookie doesn't necessarily have a users-table row until Google OAuth
+// completes. For member-tier users who DO have a userId, we also record it
+// so joins to the users table are cheap.
+export const memberActivity = mysqlTable(
+  "member_activity",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    gateInviteId: int("gate_invite_id"),   // nullable — password-tier events don't have an invite
+    userId: int("user_id"),                // nullable — trial users may not have a user row yet
+    // Coarse activity type. Keeps the schema stable while allowing rich detail
+    // in the JSON. Enum values match the progress-meter pillars:
+    //   onboarding_step, onboarding_complete,
+    //   vintage_log_entry, ask_owen_question, cellar_brief_open,
+    //   bulk_import_run, import_run,
+    //   tier_change, magic_link_redeem, magic_link_reissue,
+    //   admin_impersonate_start, admin_impersonate_end
+    kind: varchar("kind", { length: 40 }).notNull(),
+    // Free-form JSON payload for kind-specific details (question text,
+    // entry count, file counts, tier before/after, etc.). Kept as text so
+    // MySQL doesn't need JSON column support at this scale.
+    details: text("details"),
+    // Client-side signal — device fingerprint hash for anti-bot detection.
+    // Null on server-emitted events.
+    deviceFp: varchar("device_fp", { length: 64 }),
+    ip: varchar("ip", { length: 64 }),
+    userAgent: varchar("user_agent", { length: 300 }),
+    occurredAt: bigint("occurred_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("ma_invite_idx").on(t.gateInviteId, t.occurredAt),
+    index("ma_user_idx").on(t.userId, t.occurredAt),
+    index("ma_kind_idx").on(t.kind, t.occurredAt),
+    index("ma_recent_idx").on(t.occurredAt),
+  ]
+);
+
+// ─── Admin Actions Audit Log (Feb 2026 — M3) ──────────────────────────────
+// Every operator override written here — reset onboarding, extend trial,
+// pause/resume, revoke, advance tier, note-edit, impersonate. Read by the
+// diagnostic panel + used for forensic 'who changed what' trace.
+export const adminActions = mysqlTable(
+  "admin_actions",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    actorEmail: varchar("actor_email", { length: 200 }).notNull(), // whoever hit the action
+    targetGateInviteId: int("target_gate_invite_id"),              // primary key of the affected invite
+    targetLabel: varchar("target_label", { length: 200 }),         // human-readable target name (winery / label)
+    action: varchar("action", { length: 40 }).notNull(),
+    // e.g. "extend_trial_7d", "advance_to_member", "reissue_link",
+    //      "pause", "resume", "revoke", "reset_onboarding", "add_note",
+    //      "impersonate_start", "impersonate_end"
+    // Free-form JSON with before/after state, reason strings, etc.
+    payload: text("payload"),
+    occurredAt: bigint("occurred_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("aa_target_idx").on(t.targetGateInviteId, t.occurredAt),
+    index("aa_actor_idx").on(t.actorEmail, t.occurredAt),
+    index("aa_recent_idx").on(t.occurredAt),
   ]
 );
 
