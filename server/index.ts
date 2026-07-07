@@ -624,7 +624,7 @@ async function startServer() {
     "/founding-partners": {
       title: "Ownology — For our founding partners.",
       description:
-        "For the 2027 vintage. It's winter in AU/NZ, fruit isn't in the tanks yet. This is the window to design your harvest before it designs you. We're onboarding twelve founding partners this quarter — book a 20-min chat with Rich.",
+        "Vintage 2026 is fermenting across Australia and New Zealand right now. YAN calls, MLF timing, stuck tanks — every decision in the next 90 days shapes this vintage. We're onboarding twelve founding partners to shape the platform through their live 2026 ferment — and every vintage after.",
       image: "https://ownology.ai/og-try.png",
       canonicalPath: "/founding-partners",
     },

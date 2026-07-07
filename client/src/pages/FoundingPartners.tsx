@@ -118,7 +118,7 @@ const FLASH_CARDS: FlashCard[] = [
         </li>
         <li style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.95rem", lineHeight: 1.55 }}>
           <strong style={{ color: "var(--ow-amber)", fontFamily: "'Fraunces', serif", fontStyle: "italic", marginRight: "0.5rem" }}>iii.</strong>
-          Do you want your next vintage to be better because you thought about it in the off-season?
+          Are you making calls on live fermentations right now and wishing the reasoning was written down for next year?
         </li>
       </ul>
     ),
@@ -439,11 +439,11 @@ export default function FoundingPartners() {
         <title>Ownology — For our founding partners.</title>
         <meta
           name="description"
-          content="For the 2027 vintage. It's winter in Australia and New Zealand — fruit isn't in the tanks yet. This is the window to design your harvest before it designs you. We're onboarding twelve founding partners this quarter."
+          content="Vintage 2026 is fermenting across Australia and New Zealand right now. YAN calls, MLF timing, stuck tanks — every decision in the next 90 days shapes this vintage. We're onboarding twelve founding partners to shape the platform through their live 2026 ferment — and every vintage after."
         />
         <link rel="canonical" href="https://ownology.ai/founding-partners" />
         <meta property="og:title" content="Ownology — For our founding partners." />
-        <meta property="og:description" content="Twelve boutique winemakers, one vintage, one platform built with them." />
+        <meta property="og:description" content="Fruit's in the tanks. Vintage 2026 is fermenting. This is where Ownology earns its keep." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://ownology.ai/founding-partners" />
       </Helmet>
@@ -491,7 +491,7 @@ export default function FoundingPartners() {
             margin: 0,
           }}
         >
-          For the 2027 vintage{refTag && ` · Hi ${refTag.replace(/[-_.]/g, " ")}`}
+          Mid-ferment 2026 · and every vintage after{refTag && ` · Hi ${refTag.replace(/[-_.]/g, " ")}`}
         </p>
         <p
           data-testid="fp-strapline"
@@ -520,8 +520,8 @@ export default function FoundingPartners() {
             textWrap: "balance" as "balance",
           }}
         >
-          It's winter in AU / NZ.<br />
-          Fruit isn't in the tanks yet.
+          Fruit's in the tanks.<br />
+          This is where Ownology earns its keep.
         </h1>
         <p
           style={{
@@ -530,13 +530,16 @@ export default function FoundingPartners() {
             lineHeight: 1.65,
             color: "var(--ow-text-mid)",
             margin: "1.5rem 0 0",
-            maxWidth: "700px",
+            maxWidth: "720px",
           }}
         >
-          This is the window to design your harvest before it designs you.
-          We're onboarding <strong style={{ color: "var(--ow-text-hi)" }}>twelve founding partners</strong>{" "}
-          this quarter — boutique winemakers who help shape Ownology into the
-          cellar-floor tool they actually need.
+          Vintage 2026 is fermenting across Australia and New Zealand right now.
+          YAN calls. MLF timing. Stuck tanks. Every decision in the next 90 days
+          shapes whether this year is your best vintage or the one you'd rather
+          forget. We're onboarding{" "}
+          <strong style={{ color: "var(--ow-text-hi)" }}>twelve founding partners</strong>{" "}
+          to shape the platform through their live 2026 ferment — and every
+          vintage after.
         </p>
 
         <FlashCards />
