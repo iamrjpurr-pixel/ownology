@@ -138,12 +138,17 @@ function WhatsNewRibbon() {
 
 // ─── Nav ──────────────────────────────────────────────────────────────────────
 type NavItem = { label: string; href: string; external?: boolean };
-// Primary links — always visible in desktop nav
+// Primary links — always visible in desktop nav.
+// Story-flow order (Rich, Feb 2026): How → Why → What → Depth → Money.
+// Everything else surfaces through workflow (pillar-card clicks, in-page
+// links, footer). Anonymous visitors never see the "More" dropdown to
+// avoid the sitemap-shopping-mall effect. Admins get the full mega-menu.
 const PRIMARY_NAV: NavItem[] = [
-  { label: "How It Works",      href: "#how-it-works" },
+  { label: "How It Works",      href: "#hero-pillars-section" },
   { label: "Why Ownology",      href: "/why-ownology" },
   { label: "Features",          href: "#features" },
   { label: "Knowledge",         href: "/knowledge" },
+  { label: "Pricing",           href: "/pricing" },
 ];
 // Secondary links — grouped by four product pillars
 // DO pillar: operational cellar tools
@@ -193,7 +198,7 @@ function NavLink({ item, close }: { item: NavItem; close: () => void }) {
   );
 }
 
-function MoreDropdown({ extraItems }: { extraItems?: NavItem[] }) {
+function MoreDropdown({ extraItems, showFullMenu = false }: { extraItems?: NavItem[]; showFullMenu?: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setOpen(false), []);
@@ -206,10 +211,18 @@ function MoreDropdown({ extraItems }: { extraItems?: NavItem[] }) {
     return () => document.removeEventListener("mousedown", handler);
   }, [close]);
 
-  const generalLinks: NavItem[] = [
-    { label: "Our Story", href: "#our-story" },
-    { label: "Pricing",   href: "/pricing" },
-    { label: "FAQ",       href: "#faq" },
+  // ── Public dropdown (default) — 6 essentials, no bibliography. ──
+  // Rich's feedback (Feb 2026): the mega-menu felt like a sitemap — the very
+  // thing a prospect should never see. The cellar-floor tabs (Dashboard,
+  // The Press, Cellar Tasks) belong in Work Mode, not in the marketing nav.
+  // Logged-in admins get the full 4-column mega-menu below.
+  const publicLinks: NavItem[] = [
+    { label: "Our Story",           href: "#our-story" },
+    { label: "Pricing",             href: "/pricing" },
+    { label: "Getting Started",     href: "/guide" },
+    { label: "Blog",                href: "/blog" },
+    { label: "For Home Winemakers", href: "/for-home-winemakers" },
+    { label: "FAQ",                 href: "#faq" },
   ];
 
   return (
@@ -228,20 +241,34 @@ function MoreDropdown({ extraItems }: { extraItems?: NavItem[] }) {
           <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>
-      {open && (
+      {open && !showFullMenu && (
+        // ── Public: single concise column ─────────────────────────────
         <div
           className="absolute top-full right-0 mt-2 rounded-sm"
+          data-testid="more-dropdown-public"
+          style={{background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)", minWidth: "220px", boxShadow: "0 8px 24px var(--ow-shadow)", zIndex: 100}}
+        >
+          <div className="py-2 px-1">
+            {publicLinks.map(item => <NavLink key={item.label} item={item} close={close} />)}
+          </div>
+        </div>
+      )}
+      {open && showFullMenu && (
+        // ── Admin: full 4-column mega-menu (was the original public menu) ─
+        <div
+          className="absolute top-full right-0 mt-2 rounded-sm"
+          data-testid="more-dropdown-admin"
           style={{background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)", minWidth: "320px", boxShadow: "0 8px 24px var(--ow-shadow)", zIndex: 100}}
         >
           {/* General links */}
           <div className="py-2 px-1">
-            {generalLinks.map(item => <NavLink key={item.label} item={item} close={close} />)}
+            {publicLinks.map(item => <NavLink key={item.label} item={item} close={close} />)}
           </div>
           {/* Four-column pillar section */}
           <div className="grid grid-cols-4" style={{borderTop: "1px solid var(--ow-border)", minWidth: "420px"}}>
             <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.25rem"}}>In the Cellar</p>
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.55rem", letterSpacing:"0.06em", color:"var(--ow-text-lo)", padding:"0 0.75rem 0.5rem", fontStyle:"italic"}}>The Press plan</p>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.25rem"}}>Do</p>
+              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.55rem", letterSpacing:"0.06em", color:"var(--ow-text-lo)", padding:"0 0.75rem 0.5rem", fontStyle:"italic"}}>In the cellar</p>
               {VINTAGE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
             </div>
             <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
@@ -331,7 +358,13 @@ function Nav() {
             ))}
             {/* More dropdown */}
             {/* S8-B/J: Build Index removed from nav (internal only — still reachable via direct URL /build-index) */}
-            <MoreDropdown extraItems={isOwner ? [{ label: "Admin", href: "/admin" }] : []} />
+            {/* "More" dropdown — hidden for anonymous visitors (cog-load
+                reduction). Everything essential now lives in PRIMARY_NAV +
+                the hero pillar cards + footer. Admins (Rich/Gel/team) get
+                the full 4-column mega-menu for internal navigation. */}
+            {isOwner && (
+              <MoreDropdown extraItems={[{ label: "Admin", href: "/admin" }]} showFullMenu={true} />
+            )}
           </div>
 
           <div className="hidden md:flex items-center gap-3">
@@ -1738,20 +1771,33 @@ function Footer() {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function Home() {
+  // ── UI_PILLARS_V1 · Feb 2026 · flag-gated section pruning ──
+  // When the 4-pillar hero is live, the top-fold already IS the "How It
+  // Works" story (Do · Know · Learn · Guide with 4 flash-cards each linking
+  // to a live surface). Rendering the legacy <HowItWorks/> section right
+  // below would repeat the same 4 pillars a second time — cognitive
+  // duplication that undermines the simplicity the hero just promised.
+  //
+  // Also pruned when flag ON: <PainPoints/>, <WeightOfHarvest/>,
+  // <WhatOwnologyKnows/>. All three are prose-heavy scroll-forever blocks
+  // that dilute the ruthless top-fold discipline we're testing this cycle.
+  // The core marketing story becomes: Hero → Features → Demo → Testimonials
+  // → Founder → Pricing → CTA → FAQ. Old page returns instantly on ?ui=v0.
+  const pillarsV1 = useUiPillarsV1();
   return (
     <div className="min-h-screen" style={{background:"var(--ow-bg-base)"}}>
       <Nav />
       <WhatsNewRibbon />
       <Hero />
-      <PainPoints />
+      {!pillarsV1 && <PainPoints />}
       <Features />
-      <HowItWorks />
+      {!pillarsV1 && <HowItWorks />}
       <DemoVideo />
       <Testimonials />
       <FounderStory />
       <Pricing />
-      <WeightOfHarvest />
-      <WhatOwnologyKnows />
+      {!pillarsV1 && <WeightOfHarvest />}
+      {!pillarsV1 && <WhatOwnologyKnows />}
       <CTA />
       <FAQ />
       {/* Footer is now mounted site-wide via App.tsx > SiteFooter */}
