@@ -605,7 +605,7 @@ Return ONLY a valid JSON array. No markdown, no explanation. If no cellar events
         entryDate: z.string().nullable().optional(),
         noteText: z.string().max(2000).nullable().optional(),
       })),
-      importSource: z.enum(["paste", "csv", "image", "voice"]),
+      importSource: z.enum(["paste", "csv", "image", "voice", "bulk"]),
     }))
     .mutation(async ({ ctx, input }) => {
       const dbUser = await getUserByOpenId(ctx.user.openId);
