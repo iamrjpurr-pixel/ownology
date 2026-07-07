@@ -84,6 +84,17 @@ export default defineConfig({
         target: "http://127.0.0.1:8001",
         changeOrigin: true,
       },
+      // Built asset bundles — on the Emergent K8s preview edge, HTML
+      // requests land on Express (:8001) which serves dist/public/index.html
+      // (referencing hashed /assets/*.js files). Sub-resource requests for
+      // those hashed assets, however, land on Vite (:3000) which doesn't
+      // have prebuilt bundles and 404s. Proxy /assets to Express so both
+      // legs hit the same static tree. In Railway prod Express serves
+      // everything anyway.
+      "/assets": {
+        target: "http://127.0.0.1:8001",
+        changeOrigin: true,
+      },
     },
     fs: {
       strict: true,

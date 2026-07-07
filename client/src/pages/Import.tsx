@@ -1057,10 +1057,13 @@ function CSVTab({
 const BULK_MAX_FILES = 50;
 const BULK_MAX_IMAGE_BYTES = 8 * 1024 * 1024;   // 8MB per image
 const BULK_MAX_TEXT_BYTES = 200 * 1024;         // 200KB per text file
+const BULK_MAX_PDF_BYTES = 15 * 1024 * 1024;    // 15MB per PDF
+const BULK_MAX_XLSX_BYTES = 10 * 1024 * 1024;   // 10MB per spreadsheet
+const BULK_MAX_AUDIO_BYTES = 18 * 1024 * 1024;  // ~18MB raw = safely under 25MB Whisper cap after base64
 const BULK_CONCURRENCY = 3;
 
 type BulkFileStatus = "queued" | "processing" | "done" | "error" | "skipped";
-type BulkFileKind = "image" | "text" | "unsupported" | "toolarge";
+type BulkFileKind = "image" | "text" | "pdf" | "xlsx" | "whatsapp" | "audio" | "unsupported" | "toolarge";
 type BulkConfidence = "green" | "amber" | "red" | null;
 
 interface BulkFile {
@@ -1134,17 +1137,44 @@ function ragLabel(c: BulkConfidence): string {
 
 function classifyFile(file: File): BulkFileKind {
   const name = file.name.toLowerCase();
-  const ext = name.slice(name.lastIndexOf("."));
+  const lastDot = name.lastIndexOf(".");
+  const ext = lastDot >= 0 ? name.slice(lastDot) : "";
   const IMG_EXT = [".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp"];
   const TXT_EXT = [".csv", ".txt", ".md", ".tsv"];
-  const PHASE2_EXT = [".pdf", ".docx", ".doc", ".xlsx", ".xls", ".pptx", ".rtf"];
+  const XLSX_EXT = [".xlsx", ".xls", ".ods"];
+  const AUDIO_EXT = [".m4a", ".mp3", ".mp4", ".wav", ".ogg", ".webm", ".mpga", ".mpeg"];
+  const PHASE2_EXT = [".docx", ".doc", ".pptx", ".rtf", ".key", ".pages", ".numbers", ".zip"];
+
+  // WhatsApp exports come as either "WhatsApp Chat - ....txt" (unzipped),
+  // or "_chat.txt" (raw). Treat those as a distinct kind so we can strip
+  // timestamp scaffolding before sending to the text LLM.
+  const isWhatsAppTxt =
+    ext === ".txt" &&
+    (name.includes("whatsapp") || name.includes("_chat") || name.startsWith("chat "));
+
   if (IMG_EXT.includes(ext)) {
     if (file.size > BULK_MAX_IMAGE_BYTES) return "toolarge";
     return "image";
   }
+  if (isWhatsAppTxt) {
+    if (file.size > BULK_MAX_TEXT_BYTES * 4) return "toolarge"; // WhatsApp exports can be chunky
+    return "whatsapp";
+  }
   if (TXT_EXT.includes(ext)) {
     if (file.size > BULK_MAX_TEXT_BYTES) return "toolarge";
     return "text";
+  }
+  if (ext === ".pdf") {
+    if (file.size > BULK_MAX_PDF_BYTES) return "toolarge";
+    return "pdf";
+  }
+  if (XLSX_EXT.includes(ext)) {
+    if (file.size > BULK_MAX_XLSX_BYTES) return "toolarge";
+    return "xlsx";
+  }
+  if (AUDIO_EXT.includes(ext)) {
+    if (file.size > BULK_MAX_AUDIO_BYTES) return "toolarge";
+    return "audio";
   }
   if (PHASE2_EXT.includes(ext)) return "unsupported";
   return "unsupported";
@@ -1171,6 +1201,90 @@ function readFileAsText(file: File): Promise<string> {
     reader.onload = () => resolve((reader.result as string) ?? "");
     reader.readAsText(file);
   });
+}
+
+function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Failed to read file"));
+    reader.onload = () => resolve(reader.result as ArrayBuffer);
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+// PDF text extraction via pdfjs-dist. Only reads the *text layer* — image-only
+// scans come back empty and are surfaced as red/discarded to the user (we
+// don't silently fake OCR on scans).
+async function readPdfAsText(file: File): Promise<string> {
+  const buf = await readFileAsArrayBuffer(file);
+  // Dynamic import keeps ~2MB of pdf.js out of the main bundle until needed.
+  const pdfjs = await import("pdfjs-dist");
+  // Disable the worker — the small perf hit is worth avoiding CORS / worker
+  // config complexity on the Emergent preview edge.
+  const { GlobalWorkerOptions } = pdfjs as unknown as { GlobalWorkerOptions: { workerSrc: string } };
+  try { GlobalWorkerOptions.workerSrc = ""; } catch { /* older builds */ }
+
+  const loadingTask = pdfjs.getDocument({ data: buf, disableWorker: true } as unknown as Parameters<typeof pdfjs.getDocument>[0]);
+  const pdf = await loadingTask.promise;
+  const pageTexts: string[] = [];
+  const pageCount = Math.min(pdf.numPages, 30); // don't blow the LLM context
+  for (let i = 1; i <= pageCount; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const text = (content.items as Array<{ str?: string }>).map((it) => it.str ?? "").join(" ");
+    if (text.trim()) pageTexts.push(text);
+  }
+  return pageTexts.join("\n\n").slice(0, 50000);
+}
+
+// XLSX / XLS / ODS → flatten each sheet to CSV-ish text.
+// SheetJS's `sheet_to_csv` gives us the LLM a familiar structured shape.
+async function readXlsxAsText(file: File): Promise<string> {
+  const buf = await readFileAsArrayBuffer(file);
+  const XLSX = await import("xlsx");
+  const wb = XLSX.read(buf, { type: "array" });
+  const sections: string[] = [];
+  for (const sheetName of wb.SheetNames) {
+    const sheet = wb.Sheets[sheetName];
+    if (!sheet) continue;
+    const csv = XLSX.utils.sheet_to_csv(sheet, { blankrows: false });
+    if (csv.trim()) sections.push(`### Sheet: ${sheetName}\n${csv}`);
+  }
+  return sections.join("\n\n").slice(0, 50000);
+}
+
+// WhatsApp exports look like: "12/03/2024, 07:14 - Rich: added 30g DAP to T7"
+// or (iOS) "[12/03/2024, 07:14:22] Rich: added 30g DAP to T7"
+// Strip system noise ("Messages and calls are end-to-end encrypted", media
+// omitted placeholders, join/leave events) so the LLM sees clean turns.
+function cleanWhatsAppText(raw: string): string {
+  const lines = raw.split(/\r?\n/);
+  const keep: string[] = [];
+  const NOISE_HINTS = [
+    "end-to-end encrypted",
+    "messages and calls are",
+    "<Media omitted>",
+    "image omitted",
+    "video omitted",
+    "audio omitted",
+    "sticker omitted",
+    "GIF omitted",
+    "document omitted",
+    "You deleted this message",
+    "This message was deleted",
+    "created group",
+    "added you",
+    "changed the subject",
+    "changed this group's icon",
+    "left",
+    "joined using this group",
+  ];
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    if (NOISE_HINTS.some((n) => line.includes(n))) continue;
+    keep.push(line);
+  }
+  return keep.join("\n").slice(0, 50000);
 }
 
 async function runPool<T>(items: T[], concurrency: number, worker: (item: T) => Promise<void>): Promise<void> {
@@ -1203,6 +1317,7 @@ function BulkTab({
   const filesInputRef = useRef<HTMLInputElement>(null);
   const parseFromText = trpc.vintageLog.parseFromText.useMutation();
   const parseFromImage = trpc.vintageLog.parseFromImage.useMutation();
+  const parseFromVoice = trpc.vintageLog.parseFromVoice.useMutation();
 
   const addFiles = useCallback((incoming: File[]) => {
     if (incoming.length === 0) return;
@@ -1299,6 +1414,47 @@ function BulkTab({
           }
           const res = await parseFromText.mutateAsync({ rawText: raw.slice(0, 50000) });
           entries = (res.entries as Omit<ParsedEntry, "id">[]) ?? [];
+        } else if (bf.kind === "pdf") {
+          updateFile(bf.id, { message: "Extracting PDF text…" });
+          const raw = await readPdfAsText(bf.file);
+          if (!raw.trim()) {
+            // Text layer empty → almost certainly a scan. Mark red + honest.
+            updateFile(bf.id, {
+              status: "done",
+              entryCount: 0,
+              confidence: "red",
+              message: "Scanned PDF — no text layer. Export pages as images and drop them here instead.",
+              entries: [],
+            });
+            return;
+          }
+          const res = await parseFromText.mutateAsync({ rawText: raw });
+          entries = (res.entries as Omit<ParsedEntry, "id">[]) ?? [];
+        } else if (bf.kind === "xlsx") {
+          updateFile(bf.id, { message: "Flattening spreadsheet…" });
+          const raw = await readXlsxAsText(bf.file);
+          if (!raw.trim()) {
+            updateFile(bf.id, { status: "skipped", message: "Spreadsheet had no readable data" });
+            return;
+          }
+          const res = await parseFromText.mutateAsync({ rawText: raw });
+          entries = (res.entries as Omit<ParsedEntry, "id">[]) ?? [];
+        } else if (bf.kind === "whatsapp") {
+          updateFile(bf.id, { message: "Cleaning WhatsApp export…" });
+          const rawTxt = await readFileAsText(bf.file);
+          const cleaned = cleanWhatsAppText(rawTxt);
+          if (!cleaned.trim()) {
+            updateFile(bf.id, { status: "skipped", message: "WhatsApp export had no readable turns" });
+            return;
+          }
+          const res = await parseFromText.mutateAsync({ rawText: cleaned });
+          entries = (res.entries as Omit<ParsedEntry, "id">[]) ?? [];
+        } else if (bf.kind === "audio") {
+          updateFile(bf.id, { message: "Transcribing audio…" });
+          const b64 = await readFileAsBase64(bf.file);
+          const mime = bf.file.type || "audio/mpeg";
+          const res = await parseFromVoice.mutateAsync({ audioBase64: b64, mimeType: mime, language: "en" });
+          entries = (res.entries as Omit<ParsedEntry, "id">[]) ?? [];
         }
         const { confidence, amberCount } = fileConfidence(entries);
         const greenCount = entries.length - amberCount;
@@ -1348,7 +1504,6 @@ function BulkTab({
     if (collected.length > 0) {
       toast.success(`${collected.length} ${collected.length === 1 ? "entry" : "entries"} ready to review.`);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [processed, includeAmber, files]);
 
   const supportedCount = files.filter((f) => f.status === "queued" || f.status === "processing" || f.status === "done").length;
@@ -1427,7 +1582,7 @@ function BulkTab({
           Drop a folder or files here
         </p>
         <p className="text-xs mt-1" style={{ color: "var(--ow-text-lo)" }}>
-          Notebook photos, spreadsheets, plain-text cellar notes — up to {BULK_MAX_FILES} files.
+          Notebook photos · spreadsheets (CSV/XLSX) · plain-text notes · text-layer PDFs · WhatsApp chat exports · voice notes (.m4a/.mp3). Up to {BULK_MAX_FILES} files.
         </p>
 
         <div className="flex flex-wrap gap-2 justify-center mt-4">
@@ -1482,7 +1637,7 @@ function BulkTab({
           type="file"
           className="hidden"
           multiple
-          accept=".csv,.txt,.md,.tsv,.jpg,.jpeg,.png,.webp,.gif,.bmp"
+          accept=".csv,.txt,.md,.tsv,.jpg,.jpeg,.png,.webp,.gif,.bmp,.pdf,.xlsx,.xls,.ods,.m4a,.mp3,.mp4,.wav,.ogg,.webm,.mpga"
           onChange={(e) => handleFolderPick(e.target.files)}
           data-testid="bulk-files-input"
         />
@@ -1505,16 +1660,34 @@ function BulkTab({
                 style={{ borderColor: "var(--ow-bg-inset)" }}
                 data-testid={`bulk-file-row-${f.status}`}
               >
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 flex items-center gap-2">
                   {f.status === "queued" && <FileText size={14} style={{ color: "var(--ow-text-lo)" }} />}
                   {f.status === "processing" && <Loader2 size={14} className="animate-spin" style={{ color: "var(--ow-amber)" }} />}
-                  {f.status === "done" && <CheckCircle2 size={14} style={{ color: "oklch(0.65 0.15 145)" }} />}
-                  {f.status === "error" && <AlertCircle size={14} style={{ color: "oklch(0.65 0.18 25)" }} />}
+                  {f.status === "done" && (
+                    <span
+                      title={ragLabel(f.confidence)}
+                      style={{
+                        width: 10, height: 10, borderRadius: 10,
+                        background: ragColor(f.confidence),
+                        display: "inline-block",
+                        boxShadow: `0 0 0 2px oklch(0.20 0.02 60)`,
+                      }}
+                      data-testid={`bulk-rag-${f.confidence}`}
+                    />
+                  )}
+                  {f.status === "error" && <AlertCircle size={14} style={{ color: ragColor("red") }} />}
                   {f.status === "skipped" && <AlertCircle size={14} style={{ color: "var(--ow-text-lo)" }} />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="truncate font-medium" style={{ color: "var(--ow-text-hi)" }}>{f.path}</div>
-                  <div className="truncate mt-0.5" style={{ color: "var(--ow-text-lo)" }}>{f.message}</div>
+                  <div className="truncate mt-0.5" style={{ color: f.confidence === "red" || f.status === "error" ? ragColor("red") : "var(--ow-text-lo)" }}>
+                    {f.status === "done" && f.confidence && (
+                      <span className="mr-1.5" style={{ color: ragColor(f.confidence), fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.03em" }}>
+                        {ragLabel(f.confidence)} ·
+                      </span>
+                    )}
+                    {f.message}
+                  </div>
                 </div>
                 {!processing && f.status !== "processing" && (
                   <button
@@ -1545,9 +1718,53 @@ function BulkTab({
             )}
           </Button>
 
-          {aggEntries.length > 0 && !processing && (
-            <div className="text-xs text-center" style={{ color: "var(--ow-text-lo)" }} data-testid="bulk-summary">
-              {aggEntries.length} {aggEntries.length === 1 ? "entry" : "entries"} ready below — review and save.
+          {/* ── Batch summary + amber toggle ─────────────────────────────── */}
+          {/* Only appears after we've finished a run. Explains what landed  */}
+          {/* in the preview vs what got binned, and lets the user opt out  */}
+          {/* of low-confidence entries before saving.                       */}
+          {processed && !processing && (
+            <div
+              className="rounded-lg p-3 space-y-2"
+              style={{ background: "var(--ow-bg-base)", border: "1px solid var(--ow-bg-inset)" }}
+              data-testid="bulk-summary"
+            >
+              <div className="flex items-center gap-3 text-xs" style={{ color: "var(--ow-text-mid)" }}>
+                <span className="inline-flex items-center gap-1.5">
+                  <span style={{ width: 8, height: 8, borderRadius: 8, background: ragColor("green"), display: "inline-block" }} />
+                  <strong style={{ color: "var(--ow-text-hi)" }}>{greenFiles}</strong> clean
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span style={{ width: 8, height: 8, borderRadius: 8, background: ragColor("amber"), display: "inline-block" }} />
+                  <strong style={{ color: "var(--ow-text-hi)" }}>{amberFiles}</strong> review
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span style={{ width: 8, height: 8, borderRadius: 8, background: ragColor("red"), display: "inline-block" }} />
+                  <strong style={{ color: "var(--ow-text-hi)" }}>{redFiles}</strong> discarded
+                </span>
+                <span className="ml-auto" style={{ color: "var(--ow-text-lo)" }}>
+                  {totalEntries} {totalEntries === 1 ? "entry" : "entries"} · {totalAmber} amber
+                </span>
+              </div>
+              <label
+                className="flex items-center gap-2 cursor-pointer select-none"
+                data-testid="bulk-amber-toggle"
+              >
+                <input
+                  type="checkbox"
+                  checked={includeAmber}
+                  onChange={(e) => setIncludeAmber(e.target.checked)}
+                  className="accent-amber-600"
+                />
+                <span className="text-xs" style={{ color: "var(--ow-text-mid)" }}>
+                  Include amber entries in preview{" "}
+                  <span style={{ color: "var(--ow-text-lo)" }}>
+                    (thin or ambiguous — recommended for a first pass, uncheck for cleaner history)
+                  </span>
+                </span>
+              </label>
+              <p className="text-xs pt-1" style={{ color: "var(--ow-text-lo)", borderTop: "1px solid var(--ow-bg-inset)" }}>
+                Entries land in your vintage log only. Nothing touches tanks, asset lists, or dashboards until you review + save below.
+              </p>
             </div>
           )}
         </div>
