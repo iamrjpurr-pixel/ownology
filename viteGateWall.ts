@@ -47,6 +47,7 @@ const PUBLIC_EXACT = new Set<string>([
   "/try",
   "/ask",
   "/founding-partners",
+  "/referral",
   "/free-run",
   "/waitlist",
   "/demo",

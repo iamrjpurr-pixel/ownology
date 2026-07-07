@@ -28,7 +28,6 @@ import Pricing from "./pages/Pricing";
 import CellarBrief from "./pages/CellarBrief";
 import TrialEnding from "./pages/TrialEnding";
 import Invite from "./pages/Invite";
-import Join from "./pages/Join";
 import { TrialBanner } from "./components/TrialBanner";
 import WorkModeLayout from "@/components/WorkModeLayout";
 import PwaInstallBanner from "./components/PwaInstallBanner";
@@ -118,6 +117,7 @@ const SiteMapPage = lazy(() => import("./pages/SiteMap"));
 const Try = lazy(() => import("./pages/Try"));
 const Ask = lazy(() => import("./pages/Ask"));
 const FoundingPartners = lazy(() => import("./pages/FoundingPartners"));
+const Referral = lazy(() => import("./pages/Join"));
 const Todo = lazy(() => import("./pages/Todo"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
@@ -330,7 +330,6 @@ function Router() {
       <Route path={"/cellar-brief"} component={CellarBriefPage} />
       <Route path={"/trial-ending"} component={TrialEndingPage} />
       <Route path={"/invite"} component={InvitePage} />
-      <Route path={"/join"} component={Join} />
       <Route path={"/demo"} component={Demo} />
       <Route path={"/waitlist"} component={Waitlist} />
       <Route path={"/reference/vine"} component={VineReference} />
@@ -372,7 +371,13 @@ function Router() {
       <Route path={"/site-map"} component={SiteMapPage} />
       <Route path={"/try"} component={Try} />
       <Route path={"/ask"} component={Ask} />
+      {/* /join — cold-call target (renders FoundingPartners).
+          /founding-partners — kept as alias so any URLs Rich has already sent
+          keep working. /referral — the winery→winery invite flow (formerly
+          served at /join). Route order matters: exact matches first. */}
+      <Route path={"/join"} component={FoundingPartners} />
       <Route path={"/founding-partners"} component={FoundingPartners} />
+      <Route path={"/referral"} component={Referral} />
       <Route path={"/todo"} component={Todo} />
       <Route path={"/roadmap"} component={Todo} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>

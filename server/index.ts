@@ -499,6 +499,7 @@ async function startServer() {
     "/try",
     "/ask",
     "/founding-partners",
+    "/referral",
     "/free-run",
     "/waitlist",
     "/demo",
@@ -626,7 +627,14 @@ async function startServer() {
       description:
         "Vintage 2026 is fermenting across Australia and New Zealand right now. YAN calls, MLF timing, stuck tanks — every decision in the next 90 days shapes this vintage. We're onboarding twelve founding partners to shape the platform through their live 2026 ferment — and every vintage after.",
       image: "https://ownology.ai/og-try.png",
-      canonicalPath: "/founding-partners",
+      canonicalPath: "/join",
+    },
+    "/join": {
+      title: "Ownology — For our founding partners.",
+      description:
+        "Vintage 2026 is fermenting across Australia and New Zealand right now. YAN calls, MLF timing, stuck tanks — every decision in the next 90 days shapes this vintage. We're onboarding twelve founding partners to shape the platform through their live 2026 ferment — and every vintage after.",
+      image: "https://ownology.ai/og-try.png",
+      canonicalPath: "/join",
     },
   };
 

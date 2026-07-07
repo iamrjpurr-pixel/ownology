@@ -426,7 +426,18 @@ export default function FoundingPartners() {
   React.useEffect(() => {
     if (typeof window === "undefined") return;
     const ref = new URLSearchParams(window.location.search).get("ref");
-    if (ref && /^[a-zA-Z0-9._-]{2,40}$/.test(ref)) setRefTag(ref);
+    if (!ref) return;
+    // ── Back-compat safety net ────────────────────────────────────────
+    // `/join?ref=CODE` used to be the winery-to-winery referral flow. If
+    // someone lands with a value that looks like an ALL-CAPS invite code
+    // (e.g. "WNR-A7B9"), quietly redirect them to /referral?code=CODE so
+    // the correct handler picks it up. Cold-call refs are always lowercase
+    // person-slugs like "jenny-smith" — those stay here.
+    if (/^[A-Z0-9-]{4,20}$/.test(ref)) {
+      window.location.replace(`/referral?code=${encodeURIComponent(ref)}`);
+      return;
+    }
+    if (/^[a-zA-Z0-9._-]{2,40}$/.test(ref)) setRefTag(ref);
   }, []);
 
   return (
@@ -441,11 +452,11 @@ export default function FoundingPartners() {
           name="description"
           content="Vintage 2026 is fermenting across Australia and New Zealand right now. YAN calls, MLF timing, stuck tanks — every decision in the next 90 days shapes this vintage. We're onboarding twelve founding partners to shape the platform through their live 2026 ferment — and every vintage after."
         />
-        <link rel="canonical" href="https://ownology.ai/founding-partners" />
+        <link rel="canonical" href="https://ownology.ai/join" />
         <meta property="og:title" content="Ownology — For our founding partners." />
         <meta property="og:description" content="Fruit's in the tanks. Vintage 2026 is fermenting. This is where Ownology earns its keep." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://ownology.ai/founding-partners" />
+        <meta property="og:url" content="https://ownology.ai/join" />
       </Helmet>
 
       {/* ── Minimal top chrome — logo + one link back to marketing site ── */}
