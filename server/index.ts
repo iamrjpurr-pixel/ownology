@@ -531,6 +531,7 @@ async function startServer() {
     "/founding-member/success",
     "/trial-ending",
     "/trial-locked",
+    "/join/landscape",
     "/preview",
     "/404",
     "/risk-management",

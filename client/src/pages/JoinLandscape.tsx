@@ -21,12 +21,12 @@ const BORDER = "var(--ow-border)";
 const SERIF = "'Fraunces', serif";
 
 const CATEGORY_ROWS = [
-  { cat: "Wine apps (scanning, ratings, community)", who: "Vivino · Delectable · CellarTracker", fits: "No scanning, no ratings, no crowd", verdict: "❌" },
-  { cat: "Wine education", who: "Wine Folly · WSET · GuildSomm", fits: "Not evergreen articles, not certification", verdict: "❌" },
-  { cat: "Wine media", who: "Jancis Robinson · Decanter · VinePair", fits: "Not editorial", verdict: "❌" },
-  { cat: "Enterprise winery software", who: "Vintrace · Ekos · Innovint · VinScape", fits: "Too heavy, no AI, wrong price", verdict: "❌" },
-  { cat: "AI wine tools (early)", who: "Preferabli · CleverPour · ChatGPT wrappers", fits: "Closest, but all shallow", verdict: "⚠️" },
-  { cat: "Consumer AI Q&A", who: "Perplexity · ChatGPT", fits: "No persona, memory, or grounding", verdict: "❌" },
+  { cat: "Wine apps (scanning, ratings, community)", who: "The big-brand wine-scanner category", fits: "No scanning, no ratings, no crowd", verdict: "❌" },
+  { cat: "Wine education", who: "The evergreen-content and certification category", fits: "Not evergreen articles, not certification-track", verdict: "❌" },
+  { cat: "Wine media", who: "The editorial and reviews category", fits: "Not editorial", verdict: "❌" },
+  { cat: "Enterprise winery software", who: "The heavy ERP category — $500-$3,000/mo tier", fits: "Too heavy, no AI, wrong price", verdict: "❌" },
+  { cat: "AI wine tools (early)", who: "Shallow generic-AI wrappers and adjacent plays", fits: "Closest neighbours, but all shallow", verdict: "⚠️" },
+  { cat: "Consumer AI Q&A (generic)", who: "Generic-purpose AI answer tools", fits: "No wine grounding, no persona, no memory", verdict: "❌" },
 ];
 
 export default function JoinLandscape() {
@@ -111,11 +111,11 @@ export default function JoinLandscape() {
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: "0.75rem" }}>
             <li style={{ padding: "0.85rem 1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 6, fontSize: "0.9rem", color: MID, lineHeight: 1.5 }}>
               <strong style={{ color: HI }}>Consumer flank (DIY).</strong>{" "}
-              Wine Folly + Perplexity had a baby. Answer engine, real depth, voice.
+              Answer engine, real depth, voice. What every generic AI wine question is missing: grounding.
             </li>
             <li style={{ padding: "0.85rem 1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 6, fontSize: "0.9rem", color: MID, lineHeight: 1.5 }}>
               <strong style={{ color: HI }}>Professional flank (cellar).</strong>{" "}
-              GPT-5 met a cellar hand. Institutional memory, SOP-grounded, opinion-forward.
+              A cellar hand&apos;s voice with institutional memory. SOP-grounded, opinion-forward, remembers your vintages.
             </li>
           </ul>
           <p style={{ margin: "1rem 0 0", color: MID, fontSize: "0.9rem", lineHeight: 1.55 }}>
@@ -159,10 +159,10 @@ export default function JoinLandscape() {
 
           <div style={{ padding: "1rem 1.15rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 8, marginTop: "0.75rem" }}>
             <p style={{ margin: 0, color: LO, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-              &quot;What makes you different from Vivino / Wine Folly / ChatGPT?&quot;
+              &quot;What makes you different from the other wine apps and AI tools?&quot;
             </p>
             <p style={{ margin: "0.6rem 0 0", color: MID, fontStyle: "italic", fontSize: "0.9rem", lineHeight: 1.55 }}>
-              &quot;Vivino tells you what the crowd thinks about a bottle. Wine Folly teaches you evergreen wine concepts. ChatGPT will guess at wine questions with confidence but no depth. Ownology sits somewhere else — it&apos;s the answer engine grounded in real oenology, and on the professional side, a cellar hand that remembers your last three vintages. Different job. Different tool.&quot;
+              &quot;Big wine apps tell you what the crowd thinks about a bottle. Wine-education sites teach evergreen concepts. Generic AI will guess at wine questions with confidence but no depth. Ownology sits somewhere else — it&apos;s the answer engine grounded in real oenology, and on the professional side, a cellar hand that remembers your last three vintages. Different job. Different tool.&quot;
             </p>
           </div>
 

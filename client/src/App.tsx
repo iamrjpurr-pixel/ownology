@@ -355,6 +355,7 @@ function Router() {
       <Route path={"/admin/gate-invites"} component={AdminGateInvites} />
       <Route path={"/admin/members"} component={AdminMembers} />
       <Route path={"/trial-locked"} component={TrialLocked} />
+      <Route path={"/join/landscape"} component={JoinLandscape} />
       <Route path={"/risk-management"} component={RiskManagement} />
       <Route path={"/risk-briefing"} component={RiskBriefing} />
       <Route path={"/risk-glossary"} component={RiskGlossary} />

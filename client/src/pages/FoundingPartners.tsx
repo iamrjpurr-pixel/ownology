@@ -598,6 +598,11 @@ export default function FoundingPartners() {
         <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)", margin: 0 }}>
           © 2026 Ownology · Made in Adelaide Hills · support@ownology.ai
         </p>
+        <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.72rem", color: "var(--ow-text-lo)", margin: "0.75rem 0 0" }}>
+          <Link href="/join/landscape" data-testid="fp-landscape-link" style={{ color: "var(--ow-text-lo)", textDecoration: "underline" }}>
+            How Ownology sits in the market →
+          </Link>
+        </p>
       </footer>
 
       <style>{`

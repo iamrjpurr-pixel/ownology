@@ -1466,3 +1466,41 @@ PWA + iOS install tutorial + share cards covers 90% of both iOS and Android at ~
 - Regional pricing tiers
 - App Store presence
 - Home Winemaker bridge tier
+
+---
+
+## 2026-02-08 (Sydney 09:19) — Marketing analysis locked, landscape page shipped
+
+### Shipped this session
+- **`/join/landscape` public page** — Rich's phone-side reference during cold calls. Category map, positioning, sample talking-points. Mobile-optimised. Linked discreetly from `/join` footer.
+- **`/app/memory/MARKETING_ANALYSIS.md`** — full internal analysis (categories, competitive threats, positioning, geography, moat, talking-points).
+- **`/app/memory/DESIGN_RULES.md`** — three locked non-negotiable rules for every future page:
+  1. Show the demo, always (Owen answer visible next to any positioning phrase)
+  2. Never name a competitor (implicit contrast only — no Vivino, Wine Folly, ChatGPT, Vintrace, Ekos, Delectable, etc.)
+  3. Every Owen answer gets the "grounded, but not perfect" disclosure line
+- **HFE 10-lens review** of positioning applied to five sharpening questions (in MARKETING_ANALYSIS.md). Surfaced two insights not in the earlier stakeholder review:
+  1. "Wine Answer Engine" fails HFE mental-model test alone → must ship with a live demo
+  2. Named anti-positioning fails HFE cognitive-load test → all competitor names removed
+
+### Locked positioning (three phrases baked into all copy from here)
+- **"The Wine Answer Engine"** — master positioning
+- **"Owen — the AI cellar hand who remembers"** — pro sub-positioning
+- **"Grounded, not guessed"** — three-word differentiator vs generic AI
+
+### Pricing schedule finalised (session start decision)
+**DIY packs:** Pour $2/3 · Glass $5/8 · Flight $10/18 (⭐) · Cellar $20/40. Per-credit ladder fixed (was broken — Glass was worse than Pour).
+**DIY subs:** Sipper $4/mo (15 questions, weekly digest) · Enthusiast $9/mo (unlimited, ~500 fair-use cap in ToS) · Enthusiast Annual $90/yr.
+**Pro:** Founding Pilot free 6mo for first 3 wineries (invite-only, case study rights). Cellar Member pricing deferred ($79-149 USD indicative range). Enthusiast $9/mo positioned as commercial evaluation tier with 3-month refund if accepted into pilot.
+**Currency:** USD-only for launch. Regional pricing after first 3 paying customers signal PMF.
+
+### Next Action Items (in order)
+1. 🔴 **PWA polish** (manifest, service worker, iOS Add-to-Home-Screen tutorial) — 2-3 days
+2. 🔴 **Share card generator** (OpenGraph + iMessage/WhatsApp render for every Ask Owen answer) — 1 day
+3. 🔴 **Ship `/free-run` pricing page** with 6 SKUs — blocked ONLY on Rich pasting `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` into `/app/.env`. Bootstrap script creates all Stripe objects in ~5 seconds.
+4. 🟡 **Rewrite `/join`** — kill "founding partner 25 seats" theatre → "first 3 wineries free for 6 months in exchange for case study rights"
+5. 🟡 **Two-lane landing fork on `/`** — "I make wine" vs "I love wine"
+6. 🟡 **First 5 evergreen `/ask` pages** — Rich provides topic list, agent writes in Owen's voice
+7. 🟡 **Apply Design Rules across existing pages** — audit `/free-run`, `/cellars`, `/join`, `/ask` for compliance with the 3 non-negotiables
+
+### Future / Backlog (unchanged)
+Impersonate mode (M4) · Diagnostic panels (M6) · Morning brief email (M7) · Analytics tiles (M8) · Staged reveal (Phase D) · Regional multi-currency SKUs · Home Winemaker bridge tier · Capacitor wrap for App Store (only if PWA retention data justifies) · Sensory Assessment on `/cellar-brief` (Sometimes Always steal) · Owen voice guide (100-word North Star)
