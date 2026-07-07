@@ -31,32 +31,14 @@ const hover = (e: React.MouseEvent<HTMLAnchorElement>) =>
 const unhover = (e: React.MouseEvent<HTMLAnchorElement>) =>
   (e.currentTarget.style.color = "var(--ow-text-lo)");
 
+// ── Public footer ───────────────────────────────────────────────────────
+// Rich, Feb 2026: "we're sharing too much info on the main site."
+// Trimmed from 4 columns × ~13 links → single essentials-only column
+// (Legal only). Everything else — Pricing, Try, Cellar Journal, Cellar
+// Brief, Guide, Blog — lives in primary nav, in-page pillar cards, or
+// contextual links. Prospects should not need a shopping-mall footer to
+// find their way around.
 const COLUMNS: Array<{ heading: string; links: Array<{ label: string; href: string; testid?: string }> }> = [
-  {
-    heading: "Product",
-    links: [
-      { label: "Pricing", href: "/pricing" },
-      { label: "Cellar Brief", href: "/cellar-brief", testid: "footer-cellar-brief" },
-      { label: "Guide", href: "/guide" },
-    ],
-  },
-  {
-    heading: "Learn",
-    links: [
-      { label: "Cellar Journal", href: "/cellar-journal", testid: "footer-cellar-journal" },
-      { label: "Try the sandbox", href: "/try", testid: "footer-try" },
-      { label: "Wine Quiz", href: "/quiz", testid: "footer-quiz" },
-      { label: "Our Story", href: "/#our-story" },
-      { label: "Weight of Harvest", href: "/#weight-of-harvest" },
-    ],
-  },
-  {
-    heading: "Company",
-    links: [
-      { label: "Join", href: "/join" },
-      { label: "Onboarding", href: "/onboarding" },
-    ],
-  },
   {
     heading: "Legal",
     links: [
@@ -74,8 +56,8 @@ export function SiteFooter() {
   return (
     <footer className="py-12" data-testid="site-footer" style={{ borderTop: "1px solid var(--ow-border)" }}>
       <div className="container">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 md:gap-10">
-          <div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
+          <div style={{ maxWidth: "360px" }}>
             <OwnologyLogo size={28} />
             <p
               className="mt-4"

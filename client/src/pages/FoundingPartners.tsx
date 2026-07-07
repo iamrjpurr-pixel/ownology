@@ -28,7 +28,7 @@ import { Link } from "wouter";
 import { Helmet } from "react-helmet";
 import { trpc } from "@/lib/trpc";
 import OwnologyLogo from "@/components/OwnologyLogo";
-import { ArrowRight, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 
 // ─── Cycling flash-cards data ────────────────────────────────────────────
 interface FlashCard {
@@ -36,8 +36,7 @@ interface FlashCard {
   title: string;
   body: React.ReactNode;
   quote?: string;
-  ctaLabel?: string;
-  ctaHref?: string;
+  isBookForm?: boolean;
 }
 
 const FLASH_CARDS: FlashCard[] = [
@@ -53,8 +52,6 @@ const FLASH_CARDS: FlashCard[] = [
     ),
     quote:
       '"Tank 7 (Shiraz, day 5 of ferment) — dropped from 12°Brix to 11.8°Brix in 18 hours. YAN of 148 was low at inoculation. Recommend DAP addition of 2.6 kg (see MoreWine! DIY-Red §4.3)."',
-    ctaLabel: "See a sample brief",
-    ctaHref: "/cellar-brief?from=founding-partners",
   },
   {
     eyebrow: "02 · Any winemaking question. Answered.",
@@ -62,14 +59,12 @@ const FLASH_CARDS: FlashCard[] = [
     body: (
       <>
         Grounded in the Red &amp; White Wine Bibles and the MoreWine!
-        manuals. Cited every time. Free forever. Every answer becomes a
-        permanent Cellar Journal entry the whole industry can search.
+        manuals. Cited every time. Every answer becomes a permanent Cellar
+        Journal entry the whole industry can search.
       </>
     ),
     quote:
       '"When should I rack off the gross lees? — Rack once fermentation is finished (SG ≤0.995) and turbidity has dropped below 200 NTU. Typically 5-14 days post-ferment for reds, sooner for whites…"',
-    ctaLabel: "Ask Owen a question",
-    ctaHref: "/ask?from=founding-partners",
   },
   {
     eyebrow: "03 · Notes from the cellar floor",
@@ -81,8 +76,6 @@ const FLASH_CARDS: FlashCard[] = [
         shareable, indexable. Your name on the ones you asked.
       </>
     ),
-    ctaLabel: "Browse the journal",
-    ctaHref: "/cellar-journal?from=founding-partners",
   },
   {
     eyebrow: "04 · What makes founding partners different",
@@ -123,29 +116,30 @@ const FLASH_CARDS: FlashCard[] = [
       </ul>
     ),
   },
+  {
+    // End-of-preso card: only place the book form appears. Slide 6.
+    eyebrow: "06 · One next action",
+    title: "Book a 20-min chat with Rich.",
+    body: null,
+    isBookForm: true,
+  },
 ];
 
-const AUTO_CYCLE_MS = 8000;
-
 // ─── Flash-card cycler ───────────────────────────────────────────────────
-function FlashCards() {
+// Presentation mode (Rich, Feb 2026): NO auto-cycle. Prospect drives the
+// deck at their own pace. Auto-cycle used to skip past slide 1 while the
+// visitor read the hero — landing them on slide 2 with no context.
+function FlashCards({ refTag }: { refTag: string | null }) {
   const [idx, setIdx] = React.useState(0);
-  const [paused, setPaused] = React.useState(false);
   const total = FLASH_CARDS.length;
 
-  React.useEffect(() => {
-    if (paused) return;
-    const t = window.setInterval(() => setIdx((i) => (i + 1) % total), AUTO_CYCLE_MS);
-    return () => window.clearInterval(t);
-  }, [paused, total]);
-
   const card = FLASH_CARDS[idx];
+  const isLast = idx === total - 1;
+  const isFirst = idx === 0;
 
   return (
     <section
       data-testid="fp-flashcards"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
       style={{
         marginTop: "3.5rem",
         padding: "2rem 2rem 1.75rem",
@@ -176,8 +170,9 @@ function FlashCards() {
             type="button"
             aria-label="Previous card"
             data-testid="fp-flashcard-prev"
-            onClick={() => setIdx((i) => (i - 1 + total) % total)}
-            style={{ background: "transparent", border: "1px solid var(--ow-border)", borderRadius: "4px", padding: "0.15rem 0.35rem", cursor: "pointer", color: "var(--ow-text-mid)" }}
+            onClick={() => !isFirst && setIdx((i) => i - 1)}
+            disabled={isFirst}
+            style={{ background: "transparent", border: "1px solid var(--ow-border)", borderRadius: "4px", padding: "0.15rem 0.35rem", cursor: isFirst ? "not-allowed" : "pointer", color: "var(--ow-text-mid)", opacity: isFirst ? 0.35 : 1 }}
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
@@ -185,8 +180,9 @@ function FlashCards() {
             type="button"
             aria-label="Next card"
             data-testid="fp-flashcard-next"
-            onClick={() => setIdx((i) => (i + 1) % total)}
-            style={{ background: "transparent", border: "1px solid var(--ow-border)", borderRadius: "4px", padding: "0.15rem 0.35rem", cursor: "pointer", color: "var(--ow-text-mid)" }}
+            onClick={() => !isLast && setIdx((i) => i + 1)}
+            disabled={isLast}
+            style={{ background: "transparent", border: "1px solid var(--ow-border)", borderRadius: "4px", padding: "0.15rem 0.35rem", cursor: isLast ? "not-allowed" : "pointer", color: "var(--ow-text-mid)", opacity: isLast ? 0.35 : 1 }}
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
@@ -207,51 +203,46 @@ function FlashCards() {
         {card.title}
       </h3>
 
-      <div style={{ fontFamily: "'Lato', sans-serif", fontSize: "1rem", lineHeight: 1.65, color: "var(--ow-text-mid)", marginBottom: card.quote ? "1.25rem" : 0 }}>
-        {card.body}
-      </div>
+      {card.isBookForm ? (
+        // ── End-of-preso: the ONLY place the book form appears ──
+        <div style={{ marginTop: "0.5rem" }} data-testid="fp-form-block">
+          <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "1rem", lineHeight: 1.65, color: "var(--ow-text-mid)", margin: "0 0 1.5rem" }}>
+            No slides. No script. Just tell me what's broken in your cellar right
+            now and I'll show you whether Ownology solves it. If it doesn't, I'll
+            say so — and probably point you at someone who does.
+          </p>
+          <BookCallForm refTag={refTag} />
+        </div>
+      ) : (
+        <>
+          {card.body && (
+            <div style={{ fontFamily: "'Lato', sans-serif", fontSize: "1rem", lineHeight: 1.65, color: "var(--ow-text-mid)", marginBottom: card.quote ? "1.25rem" : 0 }}>
+              {card.body}
+            </div>
+          )}
 
-      {card.quote && (
-        <blockquote
-          data-testid="fp-flashcard-quote"
-          style={{
-            borderLeft: "3px solid var(--ow-amber)",
-            paddingLeft: "1rem",
-            margin: "0 0 1.25rem",
-            fontFamily: "'Fraunces', Georgia, serif",
-            fontStyle: "italic",
-            fontSize: "0.95rem",
-            lineHeight: 1.6,
-            color: "var(--ow-text-hi)",
-            opacity: 0.85,
-          }}
-        >
-          {card.quote}
-        </blockquote>
+          {card.quote && (
+            <blockquote
+              data-testid="fp-flashcard-quote"
+              style={{
+                borderLeft: "3px solid var(--ow-amber)",
+                paddingLeft: "1rem",
+                margin: "0 0 1.25rem",
+                fontFamily: "'Fraunces', Georgia, serif",
+                fontStyle: "italic",
+                fontSize: "0.95rem",
+                lineHeight: 1.6,
+                color: "var(--ow-text-hi)",
+                opacity: 0.85,
+              }}
+            >
+              {card.quote}
+            </blockquote>
+          )}
+        </>
       )}
 
-      {card.ctaLabel && card.ctaHref && (
-        <Link
-          href={card.ctaHref}
-          data-testid="fp-flashcard-cta"
-          style={{
-            fontFamily: "'Lato', sans-serif",
-            fontSize: "0.8rem",
-            fontWeight: 700,
-            color: "var(--ow-amber)",
-            letterSpacing: "0.04em",
-            textTransform: "uppercase",
-            textDecoration: "none",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.35rem",
-          }}
-        >
-          {card.ctaLabel} <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
-      )}
-
-      {/* Dot pager */}
+      {/* Dot pager — shows deck progress + jump-to */}
       <div style={{ marginTop: "1.5rem", display: "flex", gap: "0.4rem", justifyContent: "center" }} data-testid="fp-flashcard-dots">
         {FLASH_CARDS.map((_, i) => (
           <button
@@ -553,99 +544,7 @@ export default function FoundingPartners() {
           vintage after.
         </p>
 
-        <FlashCards />
-      </section>
-
-      {/* ── Book-a-call form ────────────────────────────────────────── */}
-      <section
-        style={{
-          maxWidth: "980px",
-          margin: "3.5rem auto 0",
-          padding: "0 1.75rem",
-        }}
-      >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "2.5rem",
-            padding: "2.5rem 2rem",
-            border: "1px solid var(--ow-border)",
-            borderRadius: "10px",
-            background: "var(--ow-bg-card, oklch(0.98 0.008 90))",
-          }}
-          data-testid="fp-form-block"
-        >
-          <div>
-            <p
-              style={{
-                fontFamily: "'Lato', sans-serif",
-                fontSize: "0.72rem",
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: "var(--ow-amber)",
-                fontWeight: 700,
-                margin: 0,
-              }}
-            >
-              One next action
-            </p>
-            <h2
-              style={{
-                fontFamily: "'Fraunces', serif",
-                fontWeight: 700,
-                fontSize: "clamp(1.75rem, 3vw, 2.35rem)",
-                color: "var(--ow-text-hi)",
-                margin: "0.75rem 0 1rem",
-                letterSpacing: "-0.015em",
-                lineHeight: 1.1,
-              }}
-            >
-              Book a 20-min chat with Rich.
-            </h2>
-            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "1rem", lineHeight: 1.65, color: "var(--ow-text-mid)", margin: 0 }}>
-              No slides. No script. Just tell me what's broken in your cellar right
-              now and I'll show you whether Ownology solves it. If it doesn't, I'll
-              say so — and probably point you at someone who does.
-            </p>
-          </div>
-          <BookCallForm refTag={refTag} />
-        </div>
-      </section>
-
-      {/* ── Secondary escape hatch ──────────────────────────────────── */}
-      <section
-        style={{
-          maxWidth: "980px",
-          margin: "3rem auto 0",
-          padding: "0 1.75rem",
-          textAlign: "center",
-        }}
-      >
-        <p
-          style={{
-            fontFamily: "'Lato', sans-serif",
-            fontSize: "0.9rem",
-            color: "var(--ow-text-lo)",
-            margin: 0,
-            lineHeight: 1.65,
-          }}
-        >
-          Not ready to book yet? That's fine.{" "}
-          <Link
-            href="/ask"
-            data-testid="fp-escape-ask"
-            style={{
-              color: "var(--ow-amber)",
-              textDecoration: "underline",
-              textDecorationStyle: "dotted",
-              textUnderlineOffset: "3px",
-            }}
-          >
-            Ask Owen any winemaking question
-          </Link>{" "}
-          — free, no signup, cited from the bibles. That's the product.
-        </p>
+        <FlashCards refTag={refTag} />
       </section>
 
       {/* ── Minimal footer ──────────────────────────────────────────── */}
