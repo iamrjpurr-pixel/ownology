@@ -140,10 +140,10 @@ function WhatsNewRibbon() {
 type NavItem = { label: string; href: string; external?: boolean };
 // Primary links — always visible in desktop nav
 const PRIMARY_NAV: NavItem[] = [
-  { label: "Features",          href: "#features" },
   { label: "How It Works",      href: "#how-it-works" },
-  { label: "Knowledge",         href: "/knowledge" },
   { label: "Why Ownology",      href: "/why-ownology" },
+  { label: "Features",          href: "#features" },
+  { label: "Knowledge",         href: "/knowledge" },
 ];
 // Secondary links — grouped by four product pillars
 // DO pillar: operational cellar tools
