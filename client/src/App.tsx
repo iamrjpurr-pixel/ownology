@@ -118,6 +118,7 @@ const Try = lazy(() => import("./pages/Try"));
 const Ask = lazy(() => import("./pages/Ask"));
 const FoundingPartners = lazy(() => import("./pages/FoundingPartners"));
 const Referral = lazy(() => import("./pages/Join"));
+const CallPlaybook = lazy(() => import("./pages/CallPlaybook"));
 const Todo = lazy(() => import("./pages/Todo"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
@@ -378,6 +379,7 @@ function Router() {
       <Route path={"/join"} component={FoundingPartners} />
       <Route path={"/founding-partners"} component={FoundingPartners} />
       <Route path={"/referral"} component={Referral} />
+      <Route path={"/call-playbook"} component={CallPlaybook} />
       <Route path={"/todo"} component={Todo} />
       <Route path={"/roadmap"} component={Todo} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>

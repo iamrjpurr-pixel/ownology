@@ -500,6 +500,7 @@ async function startServer() {
     "/ask",
     "/founding-partners",
     "/referral",
+    "/call-playbook",
     "/free-run",
     "/waitlist",
     "/demo",

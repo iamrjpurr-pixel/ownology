@@ -14,7 +14,7 @@ import OwnologyLogo from "@/components/OwnologyLogo";
 // Suppress on any page that provides its own minimal footer or has none at
 // all (admin surfaces, gated auth flows, work-mode-adjacent pages). This
 // keeps prospect surfaces free of the shopping-mall marketing footer.
-const SUPPRESS_PREFIXES = ["/admin", "/hi/", "/auth/", "/login", "/cellar-brief", "/onboarding", "/try", "/founding-partners", "/join"];
+const SUPPRESS_PREFIXES = ["/admin", "/hi/", "/auth/", "/login", "/cellar-brief", "/onboarding", "/try", "/founding-partners", "/join", "/call-playbook"];
 
 const footerLinkStyle: React.CSSProperties = {
   fontFamily: "'Lato',sans-serif",
