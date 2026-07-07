@@ -30,7 +30,7 @@ export const themesRouter = router({
       await db.insert(schema.themePicks).values({
         themeId: input.themeId,
         sessionId: input.sessionId,
-        isFirstPick: input.isFirstPick ? 1 : 0,
+        isFirstPick: input.isFirstPick,
         pickedAt: Date.now(),
       });
       return { ok: true };

@@ -217,7 +217,7 @@ export default function CellarBrief() {
 
       {/* Cards */}
       <div className="flex flex-col gap-3">
-        {cards.map((c, idx) => (
+        {cards.map((c: Card, idx: number) => (
           <BriefCard key={`${c.vesselId}-${idx}`} card={c} />
         ))}
       </div>

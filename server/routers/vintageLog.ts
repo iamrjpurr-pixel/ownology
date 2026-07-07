@@ -8,6 +8,7 @@ import {
   deleteVintageLogEntry,
   getUserByOpenId,
   updateTankVolumeOnRacking,
+  listWineBatches,
   type EventType,
 } from "../db.js";
 

@@ -399,7 +399,7 @@ export const weatherRouter = router({
    * that case the DEFAULT_* Hunter Valley values are returned.
    */
   getWineryConfig: publicProcedure.query(async ({ ctx }) => {
-    const wineryId = ctx.wineryId ?? null;
+    const wineryId = ctx.user?.wineryId ?? null;
     if (!wineryId) {
       return {
         location: {
@@ -542,10 +542,10 @@ export const weatherRouter = router({
       // If caller didn't explicitly pass coords AND they have a winery
       // with configured location, prefer that. Falls back to defaults
       // when the winery hasn't configured location yet.
-      if (input?.lat == null && input?.lng == null && ctx.wineryId) {
+      if (input?.lat == null && input?.lng == null && ctx.user?.wineryId) {
         const rows = await db.execute(sql`
           SELECT location_lat, location_lng, location_label, weather_thresholds_json
-          FROM wineries WHERE id = ${ctx.wineryId} LIMIT 1
+          FROM wineries WHERE id = ${ctx.user.wineryId} LIMIT 1
         `);
         const row = Array.isArray(rows) && Array.isArray(rows[0])
           ? (rows[0][0] as {

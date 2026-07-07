@@ -149,6 +149,7 @@ export const outreachRouter = router({
           event: schema.outreachContacts.event,
           painPoint: schema.outreachContacts.painPoint,
           calendlyOverride: schema.outreachContacts.calendlyOverride,
+          viewCount: schema.outreachContacts.viewCount,
         })
         .from(schema.outreachContacts)
         .where(eq(schema.outreachContacts.slug, input.slug))

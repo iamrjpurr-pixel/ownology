@@ -318,7 +318,7 @@ export const cellarJournalRouter = router({
           limit: z.number().min(1).max(60).default(24),
           offset: z.number().min(0).default(0),
         })
-        .default({})
+        .default({ limit: 24, offset: 0 })
     )
     .query(async ({ input }) => {
       const cj = schema.cellarJournal;
@@ -438,7 +438,7 @@ export const cellarJournalRouter = router({
           windowDays: z.number().min(1).max(90).default(7),
           limit: z.number().min(1).max(20).default(5),
         })
-        .default({})
+        .default({ windowDays: 7, limit: 5 })
     )
     .query(async ({ input }) => {
       const cj = schema.cellarJournal;
@@ -465,7 +465,7 @@ export const cellarJournalRouter = router({
    *  into Zapier/n8n via the outbound webhook. */
   weeklyDigest: publicProcedure
     .input(
-      z.object({ windowDays: z.number().min(1).max(90).default(7) }).default({})
+      z.object({ windowDays: z.number().min(1).max(90).default(7) }).default({ windowDays: 7 })
     )
     .query(async ({ input }) => {
       const cj = schema.cellarJournal;

@@ -403,9 +403,9 @@ async function startServer() {
   app.get("/api/compliance/lip-audit-pack.pdf", async (req, res, next) => {
     const cookieHeader = req.headers.cookie || "";
     const cookies = parseCookies(cookieHeader);
-    if (cookies[COOKIE_NAME]) return generateLipAuditPackPdf(req, res, next);
-    if (isIpAllowlisted(clientIpOf(req))) return generateLipAuditPackPdf(req, res, next);
-    if (await verifyGateCookie(req)) return generateLipAuditPackPdf(req, res, next);
+    if (cookies[COOKIE_NAME]) return generateLipAuditPackPdf(req, res);
+    if (isIpAllowlisted(clientIpOf(req))) return generateLipAuditPackPdf(req, res);
+    if (await verifyGateCookie(req)) return generateLipAuditPackPdf(req, res);
     return res.status(401).json({ error: "auth required — unlock via /try or login" });
   });
 

@@ -172,7 +172,6 @@ export const referralsRouter = router({
       if (target) {
         await db.update(schema.referrals).set({
           status: "converted",
-          referredUserId: currentUser.id,
           referredWineryId: currentUser.wineryId,
           convertedAt: now,
           rewardDaysGranted: REWARD_DAYS_ON_CONVERT,
@@ -182,7 +181,6 @@ export const referralsRouter = router({
         // still count it, just without an anon-lead audit trail.
         await db.insert(schema.referrals).values({
           referrerWineryId: referrer.id,
-          referredUserId: currentUser.id,
           referredWineryId: currentUser.wineryId,
           referralCode: input.code,
           status: "converted",

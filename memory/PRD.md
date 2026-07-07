@@ -5,6 +5,34 @@
 
 
 
+**TypeScript cleanup — 46 → 0 errors + admin QR-for-this-page badge — SHIPPED (Feb 2026, this session)**
+
+*Two-part sweep: admin utility + clean typecheck.*
+
+**Admin "QR for this page" badge (`client/src/components/AdminQrBadge.tsx`, ~110 LOC)**:
+- Floating pill mounted once at `<Router>` level in `App.tsx` — visible on every page for authenticated admins (uses the same `trpc.admin.summary` probe as the existing admin mega-menu; self-hides for anonymous prod visitors).
+- Click opens `/join/qr?url=<current-full-url>&label=<derived-from-path>` in a new tab, turning the one-off booking QR into a whole cold-call asset library: any team member can print a QR for any Ownology URL they're on in one click.
+- Self-hides on `/join/qr` itself, `/try`, `/login`, `/auth/callback`, and Work Mode (`/free-run`, `/work/*`) so the cellar-floor phone shell stays chrome-free.
+- `JoinQr.tsx` extended to accept `?label=` param (in addition to the existing `?url=`) so the badge can preload a sensible card label like "Admin · Members".
+
+**TypeScript cleanup — 46 → 0 errors**:
+- **`tsconfig.json`**: added `"target": "ES2022"` (was defaulting to ES3) — killed 7 `TS2802` iterator errors across `pricing.ts`, `outreach.ts`, `marketingOps.ts`, `themes.ts`, `vintageLog.ts`.
+- **`client/src/types/qrcode.d.ts`**: ambient module shim for the `qrcode` npm package (used by `JoinQr.tsx` + `TankQr.tsx`), avoiding the full `@types/qrcode` install.
+- **Real drift fixes** (non-cosmetic — these were latent runtime bugs):
+  - `server/routers/vintageLog.ts`: missing `listWineBatches` import (rewriteVintageStory mutation would have thrown at runtime).
+  - `server/routers/weather.ts` (3 spots): `ctx.wineryId` → `ctx.user?.wineryId` in `publicProcedure` handlers — the winery config lookup was always falling to defaults because `ctx.wineryId` is only exposed by `wineryProcedure`.
+  - `server/routers/outreach.ts::bySlug`: added `viewCount` to the SELECT projection so `HiContact.tsx`'s variant-rotation logic actually gets a real count.
+  - `server/routers/referrals.ts`: removed non-existent `referredUserId` column from insert + update (would have failed at DB layer).
+  - `server/routers/themes.ts::logPick`: changed `isFirstPick: input.isFirstPick ? 1 : 0` → boolean (schema is `boolean`, MySQL was silently coercing).
+  - `server/cellarBriefEngine.ts`: added `journalSlug` field to `CellarBriefGhostQuestion` type (was read from DB then dropped by type widening).
+  - `server/cellarJournalRouter.ts` (3 spots): `.default({})` → `.default({ …explicit defaults })` for Zod object wrappers with inner-defaulted fields.
+  - `server/index.ts` (3 spots): removed extra `next` arg from `generateLipAuditPackPdf(req, res, next)` calls (function is 2-arity).
+  - `client/src/pages/Demo.tsx`: `pastedText` → `rawText` (mutation input mismatch — parse-from-text was silently no-op).
+- **Cosmetic type fixes**: explicit types on inferred-any callback params in `themes.ts` (client + server), `CellarBrief.tsx`, `AdminProducers.tsx` (country narrowing to `"AU" | "NZ"`), `QuickEntry.tsx` (IIFE return-type annotation), `Today.tsx` (documented dormant `nextRunAt`/`cadence` reminder shape drift — feature was dead-code, kept dead pending intentional migration).
+- **Verified**: `npx tsc --noEmit` returns clean, home page + admin QR badge render, backend `admin.summary` HTTP 200.
+
+
+
 **`/join/qr` printable QR code page — SHIPPED (Feb 2026, this session)**
 - New public page (`client/src/pages/JoinQr.tsx`, ~280 LOC) generates a scannable QR code pointing at `https://ownology.ai/join#book` by default so Rich can flash it at trade shows / cellar doors / cold-call meetings for instant pilot booking (no typing, no lost URL).
 - Uses the already-installed `qrcode` npm library to render a 720-px data-URL PNG client-side (error-correction M, 2-module margin, ink `#1a1210` on white for high-contrast print).

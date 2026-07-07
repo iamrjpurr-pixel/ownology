@@ -37,7 +37,7 @@ export default function Demo() {
     if (!notes.trim()) return;
     setStep("parsing");
     try {
-      const res = await parseMutation.mutateAsync({ pastedText: notes.trim() });
+      const res = await parseMutation.mutateAsync({ rawText: notes.trim() });
       const rows = (res?.entries ?? []).slice(0, 8).map((e: { tankName?: string; variety?: string; eventType?: string; details?: Record<string, unknown> }) => ({
         tank: e.tankName ?? "—",
         variety: e.variety ?? "—",

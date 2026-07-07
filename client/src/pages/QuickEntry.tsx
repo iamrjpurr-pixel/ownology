@@ -456,7 +456,7 @@ export default function QuickEntry() {
   }
 
   function buildDetails(): Record<string, string> {
-    const base: Record<string, string> = (() => {
+    const base: Record<string, string> = ((): Record<string, string> => {
       if (eventType === "measurement") { const u = MEASURES.find(m => m.label === mType)?.unit ?? ""; return { what: mType, value: mValue, unit: u }; }
       if (eventType === "addition")    return { what: aType, quantity: aQty, unit: aUnit, timing: aTiming };
       if (eventType === "racking")     return { to: rackTo ?? "", leesStatus: lees };

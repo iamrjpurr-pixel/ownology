@@ -78,9 +78,15 @@ export default function Today() {
     });
   }
 
-  // Reminders — show if due in next 24h or overdue
+  // Reminders — show if due in next 24h or overdue.
+  // NOTE (Feb 2026 TS-cleanup): `nextRunAt` and `cadence` were removed
+  // from the `tank_reminders` schema; the row now only carries
+  // `thresholdHours` + `updatedAt`. This block is effectively dormant
+  // until the Today page is migrated to compute-from-thresholdHours.
+  // Casts here preserve current runtime behaviour (empty reminder feed).
   for (const r of reminders ?? []) {
-    const nextAt = r.nextRunAt ?? 0;
+    const rAny = r as { nextRunAt?: number; cadence?: string } & typeof r;
+    const nextAt = rAny.nextRunAt ?? 0;
     if (!nextAt || nextAt > now + day) continue;
     const overdue = nextAt < now;
     feed.push({
@@ -88,7 +94,7 @@ export default function Today() {
       severity: overdue ? "high" : "medium",
       source: "reminder",
       title: `${r.tankName}: ${r.eventType} reminder`,
-      detail: `${overdue ? "Overdue" : "Due today"} · ${r.cadence ?? "scheduled"}`,
+      detail: `${overdue ? "Overdue" : "Due today"} · ${rAny.cadence ?? "scheduled"}`,
       tank: r.tankName,
     });
   }

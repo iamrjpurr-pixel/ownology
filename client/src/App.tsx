@@ -12,6 +12,7 @@ import UserMenu from "@/components/UserMenu";
 import ThemeSuggestion from "@/components/ThemeSuggestion";
 import ThemeOnboarding from "@/components/ThemeOnboarding";
 import CrushCascade from "@/components/CrushCascade";
+import { AdminQrBadge } from "@/components/AdminQrBadge";
 
 // ── EAGER: first-paint-critical + cellar-floor PWA tabs ───────────────────
 // Loaded synchronously so the most-trafficked routes render with zero
@@ -281,6 +282,7 @@ function Router() {
     <TrialBanner />
     <ThemeOnboarding />
     <CrushCascade />
+    <AdminQrBadge />
     <Suspense fallback={<PageLoading />}>
     <Switch>
       <Route path={"/"} component={MobileHomeRoute} />

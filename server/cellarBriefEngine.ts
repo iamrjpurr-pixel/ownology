@@ -46,6 +46,7 @@ export type CellarBriefGhostQuestion = {
   id: number;
   question: string;
   answer: string | null;
+  journalSlug: string | null;
   category: string | null;
   difficulty: string;
 };

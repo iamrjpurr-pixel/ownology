@@ -594,7 +594,7 @@ Cloudy Bay,NZ,Marlborough,https://cloudybay.co.nz,,Nick Blampied,winemaker,mid
                                 id: p.id,
                                 name: p.name,
                                 region: p.region ?? null,
-                                country: p.country,
+                                country: p.country as "AU" | "NZ",
                                 email: p.email!,
                                 contactName: p.contactName!,
                                 contactRole: p.contactRole ?? null,

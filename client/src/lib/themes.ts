@@ -74,11 +74,11 @@ export const DEFAULT_THEME_ID: ThemeId = "auto";
 
 /** Read enabled themes from Vite env. Missing/empty → all enabled. */
 function getEnabledThemeIds(): Set<ThemeId> {
-  const raw = (import.meta.env.VITE_ENABLED_THEMES ?? "").trim();
+  const raw: string = String(import.meta.env.VITE_ENABLED_THEMES ?? "").trim();
   if (!raw) return new Set(THEMES.map((t) => t.id));
-  const ids = raw.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
-  const valid = new Set(THEMES.map((t) => t.id));
-  return new Set(ids.filter((id): id is ThemeId => valid.has(id as ThemeId)));
+  const ids = raw.split(",").map((s: string) => s.trim().toLowerCase()).filter(Boolean);
+  const valid = new Set<string>(THEMES.map((t) => String(t.id)));
+  return new Set(ids.filter((id: string): id is ThemeId => valid.has(id)));
 }
 
 /** Themes that admin has enabled for end users. Includes the default

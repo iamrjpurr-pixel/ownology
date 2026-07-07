@@ -33,7 +33,12 @@ export default function JoinQr() {
   }, []);
 
   const [target, setTarget] = useState(initialTarget);
-  const [label, setLabel] = useState("Book a pilot");
+  const initialLabel = useMemo(() => {
+    if (typeof window === "undefined") return "Book a pilot";
+    const p = new URLSearchParams(window.location.search).get("label");
+    return p && p.length > 0 ? p.slice(0, 80) : "Book a pilot";
+  }, []);
+  const [label, setLabel] = useState(initialLabel);
   const [dataUrl, setDataUrl] = useState<string>("");
   const [err, setErr] = useState<string>("");
 
