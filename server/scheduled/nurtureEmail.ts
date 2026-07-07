@@ -54,7 +54,7 @@ function renderHtml(opts: { contactName: string | null; wineryName: string; code
   <p>Here's the short version of what ${opts.contactName ? escapeHtml(opts.contactName) : escapeHtml(opts.wineryName)} finds useful:</p>
   <ul style="padding-left: 20px;">
     <li>A daily <strong>Cellar Brief</strong> at 7am — every tank's vintage-log summary + what needs action today, written by Owen.</li>
-    <li><strong>Ask Ownology</strong> — 236 winemaker Q&amp;As grounded in real MoreWine and Scott Labs technical manuals.</li>
+    <li><strong>Ask Ownology</strong> — 236 winemaker Q&amp;As grounded in industry-standard oenology references.</li>
     <li>One-tap <strong>compliance exports</strong> for Wine Australia LIP audits (or your local regulator).</li>
   </ul>
   <p style="margin: 24px 0;">
@@ -80,7 +80,7 @@ function renderText(opts: { contactName: string | null; wineryName: string; code
     ``,
     `What ${opts.contactName ?? opts.wineryName} finds useful:`,
     ` • A daily Cellar Brief at 7am — every tank's summary + what needs action today, written by Owen.`,
-    ` • Ask Ownology — 236 Q&As grounded in real MoreWine and Scott Labs manuals.`,
+    ` • Ask Ownology — 236 Q&As grounded in industry-standard oenology references.`,
     ` • One-tap compliance exports for LIP audits.`,
     ``,
     `Claim your 44-day trial: ${joinUrl}`,

@@ -2,7 +2,7 @@
  * /ask — the public Ownology SEO flywheel.
  *
  * Any visitor (no signup) can ask a winemaking question. Owen answers from
- * the bible-RAG corpus (Red/White Wine Bibles + MoreWine! manuals). Every
+ * the bible-RAG corpus (published technical references curated privately).
  * answer is auto-saved as a permanent `/cellar-journal/:slug` page with
  * Trinity dedupe clustering (see server/cellarJournalRouter.ts), so the
  * long tail of winemaking questions compounds into indexable pages over
@@ -81,7 +81,7 @@ export default function Ask() {
         <title>Ask Ownology — free winemaking answers, cited from the bibles.</title>
         <meta
           name="description"
-          content="Ask any winemaking question — fermentation, SO₂, MLF, faults, racking, acid, oak. Owen answers from the Red &amp; White Wine Bibles and MoreWine! manuals. Free. No signup. Every answer becomes a permanent Cellar Journal entry."
+          content="Ask any winemaking question — fermentation, SO₂, MLF, faults, racking, acid, oak. Owen answers from grounded industry references — the technical libraries boutique winemakers actually use. Free. No signup. Every answer becomes a permanent Cellar Journal entry."
         />
         <link rel="canonical" href="https://ownology.ai/ask" />
         <meta property="og:title" content="Ask Ownology — free winemaking answers" />
@@ -118,9 +118,9 @@ export default function Ask() {
         </h1>
 
         <p className="mt-6 text-lg md:text-xl leading-relaxed opacity-80">
-          Owen — Ownology&apos;s AI cellar-hand — reads from the Red &amp; White Wine
-          Bibles and the MoreWine! manuals to answer any question a winemaker
-          might ask on the cellar floor. Every answer is saved forever as a
+          Owen — Ownology&apos;s AI cellar-hand — is grounded in the technical
+          references boutique winemakers actually use, distilled into an
+          instantly answerable form. Every answer is saved forever as a
           permanent{" "}
           <Link
             href="/cellar-journal"

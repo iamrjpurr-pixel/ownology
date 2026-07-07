@@ -51,16 +51,16 @@ const FLASH_CARDS: FlashCard[] = [
       </>
     ),
     quote:
-      '"Tank 7 (Shiraz, day 5 of ferment) — dropped from 12°Brix to 11.8°Brix in 18 hours. YAN of 148 was low at inoculation. Recommend DAP addition of 2.6 kg (see MoreWine! DIY-Red §4.3)."',
+      '"Tank 7 (Shiraz, day 5 of ferment) — dropped from 12°Brix to 11.8°Brix in 18 hours. YAN of 148 was low at inoculation. Recommend DAP addition of 2.6 kg (see red-ferment nutrient SOP)."',
   },
   {
     eyebrow: "02 · Any winemaking question. Answered.",
     title: "Ask Owen.",
     body: (
       <>
-        Grounded in the Red &amp; White Wine Bibles and the MoreWine!
-        manuals. Cited every time. Every answer becomes a permanent Cellar
-        Journal entry the whole industry can search.
+        Grounded in the standard oenology references boutique winemakers
+        actually use. Cited every time. Every answer becomes a permanent
+        Cellar Journal entry the whole industry can search.
       </>
     ),
     quote:

@@ -843,7 +843,7 @@ function Hero() {
               {/* Source citation */}
               {done && (
                 <p className="mt-3 text-xs" style={{color:"var(--ow-text-lo)", fontFamily:"'Lato',sans-serif"}}>
-                  ↳ Sourced from: <em>Your Shiraz SOP · Scott Labs YAN Guide</em>
+                  ↳ Sourced from: <em>Your Shiraz SOP · Industry YAN Guidance</em>
                 </p>
               )}
             </div>

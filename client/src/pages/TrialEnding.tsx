@@ -81,7 +81,7 @@ export default function TrialEnding() {
           <ul className="mt-3 flex flex-col gap-2" style={{ color: "var(--ow-text-mid)", listStyle: "none", padding: 0 }}>
             {[
               "Your daily Cellar Brief automation — no more 5:30am SWOT waiting for you",
-              "Access to 236 MoreWine-grounded knowledge chunks + Ask Ownology tutor",
+              "Access to 236 industry-grounded knowledge chunks + Ask Ownology tutor",
               "Your winery&apos;s branded exports (LIP audit pack, vintage log PDF)",
               "Public /audit/" + winery.slug + " vanity page (when enabled)",
               "Your team-member seats and per-vessel history",

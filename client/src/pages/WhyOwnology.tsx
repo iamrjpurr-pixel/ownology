@@ -126,7 +126,7 @@ function TwoSystems() {
             </ul>
             <div className="mt-6 p-4 rounded-sm" style={{ background: BG_BASE, border: "1px solid color-mix(in oklch, var(--ow-amber) 15%, transparent)" }}>
               <p style={{ fontFamily: MONO, fontSize: "0.8125rem", color: AMBER, lineHeight: 1.6 }}>"Tank 7 is at 8.4 Brix — should I add more yeast nutrient?"</p>
-              <p style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_MID, marginTop: "0.5rem" }}>Answers from your Shiraz SOP + Scott Labs YAN guide.</p>
+              <p style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_MID, marginTop: "0.5rem" }}>Answers from your Shiraz SOP + standard yeast-nutrient guides.</p>
             </div>
           </div>
         </div>

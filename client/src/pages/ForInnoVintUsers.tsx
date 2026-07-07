@@ -104,7 +104,7 @@ function GapSection() {
       note: "InnoVint logs the reading. Ownology reads your stuck ferment SOP.",
     },
     {
-      q: "How much DAP does the Scott Labs guide recommend for a YAN of 120ppm?",
+      q: "How much DAP does the standard yeast-nutrient guide recommend for a YAN of 120ppm?",
       note: "InnoVint tracks your additions. Ownology answers the 'how much' question.",
     },
     {

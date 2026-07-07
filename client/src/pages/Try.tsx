@@ -1208,8 +1208,10 @@ const INTRO_SCREENS: IntroScreen[] = [
           through malo, Chardonnay in barrel.
         </p>
         <p style={{ marginTop: "1rem" }}>
-          We're scientists by training. We think a cellar deserves the same rigour as a lab. What you're about to see
-          is our own cellar's data, wired to a tool we built for ourselves — and now for you.
+          We&apos;re analysts by background — arts and science degrees, years spent inside ISO 9001 and 14001
+          quality-and-environment systems, then learning the cellar the way any boutique winemaker does: with our own
+          knowledge, our own mistakes, and Owen&apos;s support. What you&apos;re about to see is our own cellar&apos;s
+          data, wired to a tool we built for ourselves — and now for you.
         </p>
       </>
     ),
