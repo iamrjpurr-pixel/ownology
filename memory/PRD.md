@@ -1360,3 +1360,49 @@ The middleware only blocks HTML SPA rendering. The underlying data leak — tRPC
 - `client/src/components/ThemeOnboarding.tsx` — one array entry
 - `client/src/components/PwaInstallBanner.tsx` — new `useLocation()` import + `SUPPRESSED_PREFIXES` + inclusion in `isVisible` and early-return checks
 
+
+---
+
+## 2026-02-07 — Progressive-Exposure Gating + Members Command Center
+
+Multi-tier auth model + operator dashboard shipped. Foundations for scaling the cellar-first professional line (trial → paid) with observability + intervention tooling from day one.
+
+### What shipped
+- **Trial cookie tier** — new `gate_invites.tier` column (`gate | trial | member`). Trial cookies are scoped to `TRIAL_ALLOWED_PREFIXES` (`/onboarding · /the-press · /cellar-brief · /import · /ask · /try · /join`). Anything else 302s to `/trial-locked` with attribution. See `/app/server/gate.ts` (`verifyGateCookieDetailed`, `TRIAL_ALLOWED_PREFIXES`, `isTrialAllowedPath`) + `/app/server/index.ts` (SPA gate wall ~L583-600).
+- **`/admin/members` — Command Center** — one-line-per-invite operator dashboard. Tier badge, 5-dot progress meter (Onboarded · First entry · First Ask · First brief · Bulk import), health signal (healthy / silent 3d / silent 7d / expiring / paused / revoked), attribution, last-activity time. Filter chips (tier + health). Summary tiles (trials · members · silent · 30d conversions).
+- **Detail drawer** — click a row → full activity timeline (last 200 events) + audit log (last 50 admin actions) + private note editor + one-click actions.
+- **Issue-invite drawer** — mint a `trial | member | gate` invite in one form. Auto-defaults expiry to 14d for trial. Returns copyable `/i/<token>` link.
+- **Operator actions** (all logged to `admin_actions`, reversible):
+  - Re-issue magic link (revokes old, mints new; preserves tier + expiry)
+  - Extend trial N days
+  - Advance tier (trial → member auto-clears expiry)
+  - Pause / Resume (soft-freeze without deleting)
+  - Revoke
+  - Update private note (Rich's cellar-notes on the member, never shown to member)
+- **M1 instrumentation** — `member_activity` table + `logMemberActivity()` helper. Write hooks on `vintageLog.bulkSave` (kinds: `bulk_import_run`, `vintage_log_entry`, `import_run`), `tutor.ask` (`ask_owen_question`), and public signal beacons `members.signalOnboardingComplete` + `members.signalCellarBriefOpen` (called client-side from `Onboarding.tsx` finish + wherever `/cellar-brief` mounts — the latter is wired only if needed later, endpoint ready).
+- **Onboarding polish (Phase A)**:
+  - Step 3 — now multi-select. `useCase: string` → `useCases: string[]`. Both selections highlight simultaneously with an "N selected" hint.
+  - Step 4 — Demo card copy updated: "Preview a real, fully-populated vintage — deep in the weeds. Take your time…"
+  - Client fires `signalOnboardingComplete({ useCases, wineryName })` after wizard finish so `/admin/members` progress meter reflects it.
+- **Honeypot on /join lead form (Phase E)** — invisible off-screen `companyWebsite` input. Bots that auto-fill trip it, server silently returns success without persisting the lead. Real users unaffected.
+- **`/trial-locked` landing** — friendly page for trial users hitting a member-only route. Lists included surfaces + upgrade CTA (deep-links to `/join#book` for direct booking form).
+- **`/join` deep-link** — `#book` anchor jumps to the final BookCallForm card immediately (previously required 5 next-clicks from a trial-locked upgrade).
+
+### Testing
+- **Iteration 30**: 100% pass (17/17 pytest, all frontend flows).
+- New backend test: `/app/backend/tests/test_members_command_center.py`
+- Trial-tier redirect enforcement verified against `localhost:8001` directly (preview k8s ingress routes HTML to Vite; production Express will fire correctly).
+
+### Known follow-ups (deferred, not blocking)
+- **DIY / consumer tier** — Rich flagged the DIY market (curiosity users on `/free-run` and `/ask` public) needs its own tier + pricing model. Draft proposal in the last agent turn: `diy_sipper` ($1/wk) + `diy_enthusiast` ($6/mo) + Stripe-webhook-driven auto-issue. Deferred to next session. USD pricing throughout (my earlier draft used £ — corrected).
+- **M4 Impersonate ("View as")** — endpoint scaffold exists in the audit log kinds (`admin_impersonate_start/end`) but UI not built.
+- **M5 Detail drawer expansions** — bulk-import quality history + Ask Owen question log per member.
+- **M6 Diagnostic panels** — failed magic-link redemptions, failed extractions, gate rate-limit trips, Stripe webhook log.
+- **M7 Morning brief email** — 7am cron via Resend.
+- **M8 Analytics tiles** — MRR, LLM cost per member.
+- **Phase C — Stripe live** — blocked on real `STRIPE_SECRET_KEY`. Cutover: replace `sk_test_stub`, wire webhook to promote `trial → member`.
+- **Phase D — Staged reveal for paying members** — `member_progress` table + dashboard hides Learn/Guide surfaces until Do/Know are used. Needs a UX pass.
+- **Pre-existing TS errors** — `server/index.ts:406` (`generateLipAuditPackPdf` signature) + `vintageLog.ts:296+688` (implicit-any + downlevelIteration flag). P2 cleanup.
+- **Code quality nits from iteration_30 review** — `members.ts:154, 482` fragile `db.execute` tuple unwrap. Add typed helper on next touch.
+- **Command center row limit** — hardcoded 500. Add pagination when member count grows past that.
+- **Import.tsx size** — now 1980 lines. Extract `BulkTab` into its own file when we next touch it.

@@ -103,7 +103,7 @@ export default function TrialLocked() {
           </p>
           <div style={{ marginTop: "0.9rem", display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
             <Link
-              href="/join"
+              href="/join#book"
               data-testid="trial-locked-upgrade"
               style={{
                 padding: "0.6rem 1.1rem", background: AMBER, color: "oklch(0.10 0.008 60)",

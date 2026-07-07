@@ -133,7 +133,13 @@ const FLASH_CARDS: FlashCard[] = [
 // deck at their own pace. Auto-cycle used to skip past slide 1 while the
 // visitor read the hero — landing them on slide 2 with no context.
 function FlashCards({ refTag }: { refTag: string | null }) {
-  const [idx, setIdx] = React.useState(0);
+  // Deep-link support (#book) — the /trial-locked upgrade CTA + any email
+  // link that pastes /join#book should jump straight to the final card
+  // (BookCallForm) without forcing the reader through the whole deck.
+  const initialIdx = typeof window !== "undefined" && window.location.hash === "#book"
+    ? FLASH_CARDS.length - 1
+    : 0;
+  const [idx, setIdx] = React.useState(initialIdx);
   const total = FLASH_CARDS.length;
 
   const card = FLASH_CARDS[idx];
