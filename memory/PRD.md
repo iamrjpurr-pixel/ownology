@@ -4,6 +4,16 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+
+**`/join/qr` printable QR code page — SHIPPED (Feb 2026, this session)**
+- New public page (`client/src/pages/JoinQr.tsx`, ~280 LOC) generates a scannable QR code pointing at `https://ownology.ai/join#book` by default so Rich can flash it at trade shows / cellar doors / cold-call meetings for instant pilot booking (no typing, no lost URL).
+- Uses the already-installed `qrcode` npm library to render a 720-px data-URL PNG client-side (error-correction M, 2-module margin, ink `#1a1210` on white for high-contrast print).
+- Printable card layout: Ownology wordmark + "The Wine Answer Engine." strapline above the QR, editable label + full destination URL below. `@media print` hides page chrome and controls so `Ctrl+P` yields a clean single-card printable.
+- Buttons: **Download PNG** (auto-slugged filename e.g. `ownology-qr-ownology-ai-join-book.png` for decks/handouts) and **Print card**.
+- Customise panel lets Rich edit the destination URL and card label on the fly (state-driven regeneration), and supports `?url=…` preload so any team member can build a QR for `/ask`, `/founding-partners`, etc. without a code change.
+- Wired into `PUBLIC_EXACT` in both `server/index.ts` and `viteGateWall.ts`, plus a Wouter Route in `App.tsx`. Verified live: page renders at `/join/qr`, QR image generates, label + URL text match expected values.
+
+
 **`/founding-partners` cold-call landing + Home HF pruning + More dropdown consolidation — SHIPPED (Feb 2026, this session)**
 
 *Strategic context (Rich)*: "I'm bullet-proofing the cold-calling phase before I start. Site felt complex, prospects would run a mile if they saw the sitemap. Winter in AU/NZ — fruit isn't in the tanks — is the perfect narrative window."

@@ -532,6 +532,7 @@ async function startServer() {
     "/trial-ending",
     "/trial-locked",
     "/join/landscape",
+    "/join/qr",
     "/preview",
     "/404",
     "/risk-management",

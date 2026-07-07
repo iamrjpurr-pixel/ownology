@@ -96,6 +96,7 @@ const AdminGateInvites = lazy(() => import("./pages/AdminGateInvites"));
 const AdminMembers = lazy(() => import("./pages/AdminMembers"));
 const TrialLocked = lazy(() => import("./pages/TrialLocked"));
 const JoinLandscape = lazy(() => import("./pages/JoinLandscape"));
+const JoinQr = lazy(() => import("./pages/JoinQr"));
 const RiskManagement = lazy(() => import("./pages/RiskManagement"));
 const RiskBriefing = lazy(() => import("./pages/RiskBriefing"));
 const RiskGlossary = lazy(() => import("./pages/RiskGlossary"));
@@ -356,6 +357,7 @@ function Router() {
       <Route path={"/admin/members"} component={AdminMembers} />
       <Route path={"/trial-locked"} component={TrialLocked} />
       <Route path={"/join/landscape"} component={JoinLandscape} />
+      <Route path={"/join/qr"} component={JoinQr} />
       <Route path={"/risk-management"} component={RiskManagement} />
       <Route path={"/risk-briefing"} component={RiskBriefing} />
       <Route path={"/risk-glossary"} component={RiskGlossary} />
