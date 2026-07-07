@@ -95,6 +95,7 @@ const AdminEnvironment = lazy(() => import("./pages/AdminEnvironment"));
 const AdminGateInvites = lazy(() => import("./pages/AdminGateInvites"));
 const AdminMembers = lazy(() => import("./pages/AdminMembers"));
 const TrialLocked = lazy(() => import("./pages/TrialLocked"));
+const JoinLandscape = lazy(() => import("./pages/JoinLandscape"));
 const RiskManagement = lazy(() => import("./pages/RiskManagement"));
 const RiskBriefing = lazy(() => import("./pages/RiskBriefing"));
 const RiskGlossary = lazy(() => import("./pages/RiskGlossary"));
