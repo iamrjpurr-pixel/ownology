@@ -4,6 +4,30 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**`/founding-partners` cold-call landing + Home HF pruning + More dropdown consolidation — SHIPPED (Feb 2026, this session)**
+
+*Strategic context (Rich)*: "I'm bullet-proofing the cold-calling phase before I start. Site felt complex, prospects would run a mile if they saw the sitemap. Winter in AU/NZ — fruit isn't in the tanks — is the perfect narrative window."
+
+- **`/founding-partners` isolated landing page** (`client/src/pages/FoundingPartners.tsx`, ~640 LOC):
+  - Fully self-contained shell (small logo header + minimal footer; NO PRIMARY_NAV bar, NO SiteFooter bibliography) — prospect visually cannot wander into the wider site
+  - Hero: kicker "For the 2027 vintage" + strapline "You are the must. Ownology is the ferment." + H1 "It's winter in AU/NZ. Fruit isn't in the tanks yet." + 700-pixel subtitle framing the founding-partner offer
+  - 5 auto-cycling flash cards (`AUTO_CYCLE_MS=8000`, pause on hover, dot pager + prev/next arrows): (1) Cellar Brief sample, (2) Ask Owen sample, (3) Cellar Journal, (4) 4 founding-partner benefits with amber checkmarks, (5) 3-question fit filter (boutique / AU-NZ-US / off-season)
+  - Book-a-call form → `trpc.email.subscribe` with `source="cold-call"` + tags `["cold-call", "founding-partner", "ref:<slug>", "note:<80 chars>"]`. Success state shows "Rich will be in touch within 24 hours" + escape link to `/ask`
+  - `?ref=` param sanitised (`/^[a-zA-Z0-9._-]{2,40}$/`) then rendered in the eyebrow as "Hi Firstname Lastname" personalisation, and appended to the lead's tags for admin filtering
+- **Public allowlist + sitemap wiring**: `/founding-partners` added to `PUBLIC_EXACT` in `server/index.ts` + `viteGateWall.ts`, plus `sitemap.ts` (`priority=0.95`), plus OG meta card in `ROUTE_META` (`server/index.ts`)
+- **Home HF pruning (flag ON only)**: `Home.tsx::Home()` now conditionally hides `<PainPoints/>`, `<HowItWorks/>` (was duplicating the pillar hero), `<WeightOfHarvest/>`, `<WhatOwnologyKnows/>` when `useUiPillarsV1()` is true. New page order: Hero → Features → Demo → Testimonials → Founder → Pricing → CTA → FAQ. Old page returns via `?ui=v0`.
+- **"How It Works" nav anchor rewired**: PRIMARY_NAV item now points to `#hero-pillars-section` (the new hero) instead of `#how-it-works` (the now-hidden section)
+- **"More" dropdown consolidation**:
+  - **Hidden entirely for anonymous visitors** (cog-load reduction — no more mini-sitemap in the marketing nav)
+  - **Admins (isOwner) get the full 4-column mega-menu** with pillar-grouped internal surfaces + Admin link + Clear Cache
+  - New public "essentials" list (6 items) available if we ever want a public dropdown back: Our Story, Pricing, Getting Started, Blog, For Home Winemakers, FAQ
+- **"Pricing" added to PRIMARY_NAV** — cold-call prospects need a direct money-page hop, not a nested dropdown click
+- **`/site-map` link removed from public SiteFooter** — route + file still exist for team use, just invisible to prospects
+- **Work Mode button redesign** (`Home.tsx::Nav()`): the previous large amber "+ WORK MODE" pill was too loud and unexplained. Now a compact bordered chip with a 4-cell grid icon (visually echoes the 4-tab Work Mode nav) + native tooltip: "Work Mode — Ownology's mobile-first shell for the cellar floor. Daily brief, one-tap logs, task list, tank readings. Optimised for a phone in a shed."
+- **Verified end-to-end**: `/founding-partners` HTTP 200; `?ref=jenny-smith` → eyebrow reads "FOR THE 2027 VINTAGE · HI JENNY SMITH"; dot pager jumps between all 5 cards; form submits via `email.subscribe` with correct source + tags (curl → HTTP 200 → `{ok: true}`); sitemap contains `/founding-partners`; `/admin` still gated (302 → /try); 14/14 pytest smoke green.
+- **Value engineering**: `/pricing` (1402 LOC) and `/why-ownology` (438 LOC) HF trims deliberately deferred — cold-call conversion happens via the `/founding-partners` form, not by prospects clicking to `/pricing`. Better as a separate focused session with data.
+
+
 **UI_PILLARS_V1 · 4-pillar (Do · Know · Learn · Guide) hero + Work Mode nav — SHIPPED behind flag (Feb 2026, this session)**
 - **Strategic rationale (from Rich)**: "Site is complex now — if a prospect saw the sitemap they'd run a mile. Dramatise how simple the 4 pillars are." Solved by making Do · Know · Learn · Guide the primary product architecture, visible in marketing AND in-product, so the whole system reads in one glance.
 - **New `HeroPillarsSection` component** (`client/src/components/HeroPillarsSection.tsx`): 4 tappable flash-cards (Do → `/quick-entry`, Know → `/cellar-brief`, Learn → `/ask`, Guide → `/guide`), each with an amber pillar number (01–04), pillar name in Fraunces serif, one-line promise, 3-item bullet list, and an amber CTA link. Grid: auto-fit 260-pixel minimum → single column on mobile, 2×2 on tablet, 4-column on desktop. Above the grid: strapline "You are the must. Ownology is the ferment." + H1 "Do. Know. Learn. Guide." + 620-pixel subtitle "Four things. That is Ownology."

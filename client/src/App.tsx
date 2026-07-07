@@ -117,6 +117,7 @@ const Quiz = lazy(() => import("./pages/Quiz"));
 const SiteMapPage = lazy(() => import("./pages/SiteMap"));
 const Try = lazy(() => import("./pages/Try"));
 const Ask = lazy(() => import("./pages/Ask"));
+const FoundingPartners = lazy(() => import("./pages/FoundingPartners"));
 const Todo = lazy(() => import("./pages/Todo"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
@@ -371,6 +372,7 @@ function Router() {
       <Route path={"/site-map"} component={SiteMapPage} />
       <Route path={"/try"} component={Try} />
       <Route path={"/ask"} component={Ask} />
+      <Route path={"/founding-partners"} component={FoundingPartners} />
       <Route path={"/todo"} component={Todo} />
       <Route path={"/roadmap"} component={Todo} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>

@@ -498,6 +498,7 @@ async function startServer() {
     "/quiz",
     "/try",
     "/ask",
+    "/founding-partners",
     "/free-run",
     "/waitlist",
     "/demo",
@@ -619,6 +620,13 @@ async function startServer() {
         "Any winemaking question, answered by Owen from the Red & White Wine Bibles and the MoreWine! manuals. Free, no signup, and every answer becomes a permanent Cellar Journal entry.",
       image: "https://ownology.ai/og-try.png",
       canonicalPath: "/ask",
+    },
+    "/founding-partners": {
+      title: "Ownology — For our founding partners.",
+      description:
+        "For the 2027 vintage. It's winter in AU/NZ, fruit isn't in the tanks yet. This is the window to design your harvest before it designs you. We're onboarding twelve founding partners this quarter — book a 20-min chat with Rich.",
+      image: "https://ownology.ai/og-try.png",
+      canonicalPath: "/founding-partners",
     },
   };
 
