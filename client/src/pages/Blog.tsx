@@ -20,6 +20,16 @@ const BG_BASE = "var(--ow-bg-base)";
 
 const ARTICLES = [
   {
+    slug: "whats-in-the-tank-2026",
+    title: "What's in the Tank: A Cross-Country Snapshot of the 2026 Vintage Across AU & NZ",
+    excerpt:
+      "Australia and New Zealand are in the middle of Vintage 2026. Individual wineries publish. The industry, collectively, does not. Here's the snapshot no one else is writing — Verdelho at Tyrrells, Grenache in a tulip at Elderton, Gewürztraminer at Misha's, Chardonnay to oak at Babich.",
+    date: "Feb 2026",
+    readTime: "6 min read",
+    category: "Vintage Report",
+    tags: ["vintage 2026", "australian wine", "new zealand wine", "ferment", "cross-country vintage"],
+  },
+  {
     slug: "two-philosophies",
     title: "Two Philosophies, One Grape: What Boutique and Commercial Winemaking Actually Have in Common — and Where They Diverge",
     excerpt:

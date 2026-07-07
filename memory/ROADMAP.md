@@ -6,6 +6,36 @@ Last consolidated: 28 Jun 2026.
 
 ---
 
+## 🆕 TODO — Copilot Fork B · Vintage-log → regional narrative (Feb 2026)
+
+**Idea (from Rich)**: Winemakers already publish their vintage logs into Ownology's Insta Copilot. Take the *narrative* from those logs, anonymise the winery-specific bits, and auto-write a **generic sub-regional narrative** (e.g. "What Adelaide Hills tanks look like this week" / "Marlborough Sauv Blanc ferments — Vintage 2026") for LinkedIn / Instagram.
+
+**Why it matters (SEO + brand)**:
+- Google search Feb 2026 for *"wineries across Australia and New Zealand full production what's in the tank"* returns individual-winery vintage reports (Tyrrells, Elderton, Misha's Vineyard, Babich, Crabtree, Pyramids Road) but **no industry-wide aggregation**. Massive content vacuum.
+- Positions Ownology as the "single source of vintage-wide truth" — the aggregator no one else can produce because no one else holds the private vintage-log data across many boutique wineries.
+- Individual wineries get their tank story amplified anonymously in a regional narrative — social-currency incentive to keep logging in Ownology.
+- Compounds year-on-year: 2026 vs 2027 vs 2028 vintage comparisons at regional scale become uniquely ours.
+
+**Prior art shipped in same session** (proof of the manual angle):
+- `/blog/whats-in-the-tank-2026` — hand-crafted cross-country snapshot citing 7 public winery vintage reports. Proof the content angle works. Auto-generation is the scaled version.
+
+**Feature scope (Copilot Fork B)**:
+1. **Regional aggregator engine**: reads all logged `vintage_log_entries` across wineries in the same sub-region (e.g. Adelaide Hills, Marlborough) filtered by variety + week-of-vintage.
+2. **Anonymisation pass**: strips winery names, tank IDs, staff names. Preserves varietal / regional / stage-of-ferment / notable-observation shape.
+3. **LLM narrative synth**: passes anonymised aggregate to Claude Sonnet with a brief-writer prompt. Output: 300-word narrative + suggested LinkedIn caption + suggested Insta caption (already the Copilot format).
+4. **Publication path**: post to Ownology's own LinkedIn + Insta on a weekly cadence during vintage (Feb-May AU/NZ). Each post links back to `/blog/whats-in-the-tank-{year}` for the deep-dive.
+5. **Opt-in per winery**: participating wineries get a badge and their sub-region gets earlier/more coverage. Non-participating wineries excluded from aggregation entirely.
+
+**Dependencies**:
+- Existing Insta Copilot (already in Fork B scope).
+- `vintage_log_entries` table (already exists).
+- `wineries.location_label` (already exists).
+- Multi-tenant `winery_id` FKs (currently in P2 backlog — this feature makes multi-tenant urgent).
+
+**Owner**: Copilot Fork B session.
+
+---
+
 ## 🌱 v2 Vision — Safety + Training Compliance (Feb 2026, deferred by design)
 
 **Original problem**: Rich flagged the SafeWork NSW Winery Guide (Model WHS Act) as a potential product surface. We chose to keep Ownology focused on **wine-quality risk** for v1 (see `/risk-management`) — but stored the safety/training thesis here so it survives session compaction.

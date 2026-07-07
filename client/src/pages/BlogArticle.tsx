@@ -6,11 +6,13 @@
 import { useParams, Link } from "wouter";
 import BlogWeightOfHarvest from "./BlogWeightOfHarvest";
 import BlogTwoPhilosophies from "./BlogTwoPhilosophies";
+import BlogWhatsInTheTank from "./BlogWhatsInTheTank";
 import OwnologyLogo from "@/components/OwnologyLogo";
 
 const ARTICLE_MAP: Record<string, React.ComponentType> = {
   "weight-of-harvest": BlogWeightOfHarvest,
   "two-philosophies": BlogTwoPhilosophies,
+  "whats-in-the-tank-2026": BlogWhatsInTheTank,
 };
 
 export default function BlogArticle() {
