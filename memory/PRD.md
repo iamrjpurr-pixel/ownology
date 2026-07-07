@@ -1406,3 +1406,63 @@ Multi-tier auth model + operator dashboard shipped. Foundations for scaling the 
 - **Code quality nits from iteration_30 review** — `members.ts:154, 482` fragile `db.execute` tuple unwrap. Add typed helper on next touch.
 - **Command center row limit** — hardcoded 500. Add pagination when member count grows past that.
 - **Import.tsx size** — now 1980 lines. Extract `BulkTab` into its own file when we next touch it.
+
+---
+
+## 2026-02-07 (late) — Pricing model + honest 90-day marketing plan
+
+### Pricing locked (subject to real market feedback)
+
+**DIY credit packs (one-off)** — Pour $2 (3 credits) · Glass $5 (5) · Flight $10 (15, MOST POPULAR) · Cellar $20 (40). Each with an emotional strap-line: "A Splash of Curiosity" · "A Glass of Questions" · "A Flight of Discoveries" · "The Whole Cellar".
+
+**DIY subscriptions** — Sipper $4/mo (30 questions + weekly digest) · Enthusiast $9/mo (unlimited + saved history).
+
+**Professional tiers — DELIBERATELY NOT PRICED YET.** First 3 wineries get 6 months free in exchange for case study rights, referrals, and unlimited feedback calls. Winery pricing set from real conversion data, not projection.
+
+**Regional pricing (deferred)** — Ship USD-only for launch. Multi-currency Stripe SKUs only after first 3 paying customers of any kind. AU/NZ 1.5× FX shock is real but not addressable until we know what price works.
+
+### Two-lane brand architecture agreed
+- `/free-run` — For Wine Lovers (curiosity, discovery, credit packs, Sipper, Enthusiast)
+- `/cellars` — For Winemakers (cellar-work, brief, audit prep, memory)
+- Landing-page fork on `/` — "I make wine" vs "I love wine"
+
+### Honesty reset — agent over-corrected sunny-side
+Documented misses:
+- Revenue projections were fantasy (Y3 $215k → real Y1 base case $6-15k).
+- Founding-partner scarcity ("22 seats left") was theatre pre-first-sale.
+- SEO 6-month flywheel was 12-18 month reality.
+- ROI framing over-stated certainty.
+- AU wine market contraction (shiraz vine-pulls, 5-10% winery attrition/yr) was ignored.
+
+### 90-day marketing plan committed
+Weeks 1-4: Foundation (PWA polish, iOS install tutorial, share cards, Stripe live, /join rewrite, SEO baseline).
+Weeks 5-8: Distribution (36 evergreen /ask pages target, Reddit engagement, 15 wine-shop outreach emails, 5 winemaker pilot approaches).
+Weeks 9-12: Data + iterate (retention read, user interviews, winemaker case study drafting).
+
+**Success ranges (honest):** 100-400 organic sessions/week · 50-200 email subs · 1-3 paying DIY · 1-3 winemaker pilots active · 30-100 PWA installs.
+
+**Kill criteria named.** No paid ads. No App Store submission (revisit after 6 months). No pricing changes on DIY side until 90 days of real data.
+
+**Hard cost through Day 90: ~$100 AUD (QR prints). Real cost: Rich's 5-10 hrs/week.**
+
+### Mobile strategy — PWA first, App Store deferred
+PWA + iOS install tutorial + share cards covers 90% of both iOS and Android at ~$0. App Store (via Capacitor wrap) revisited only if >500 MAUs AND iOS retention gap measurable AND business case supports the 30% platform fee. Not before.
+
+### Next session priorities
+1. Ship PWA manifest + service worker + iOS install tutorial (2-3 days)
+2. Share card generator for Ask Owen answers (1 day)
+3. `/free-run` pricing page with 6 SKUs (0.5 day, blocked on Stripe live key from Rich)
+4. `/join` rewrite: free-pilot framing, no pricing numbers, "3 wineries only" invite-only cap
+5. Publish first 5 evergreen `/ask` pages (SEO seed content)
+6. Stripe live-key handoff + bootstrap script (~90 sec from Rich + automated from agent)
+7. Landing-page fork on `/` ("I make wine" vs "I love wine")
+
+### Deferred / no
+- Impersonate mode (M4)
+- Diagnostic panels (M6)
+- Morning brief email (M7)
+- Analytics tiles (M8)
+- Staged reveal (Phase D)
+- Regional pricing tiers
+- App Store presence
+- Home Winemaker bridge tier
