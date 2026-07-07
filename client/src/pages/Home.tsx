@@ -369,13 +369,46 @@ function Nav() {
 
           <div className="hidden md:flex items-center gap-3">
             <ThemeToggle compact />
+            {/* ── "Work Mode" utility button ─────────────────────────────
+               Sub-nav shortcut to Ownology's mobile-first cellar shell
+               (Ask/Press/Log/Tasks/More). Deliberately quiet — small
+               square icon + small caption + native tooltip. It's for
+               members who already know what Work Mode is, not for cold
+               prospects (they'll discover it through the pillar cards).
+               Rich, Feb 2026: "the big amber plus felt ugly + unclear". */}
             <Link
               href="/free-run"
-              className="btn-ghost text-xs inline-flex items-center gap-1.5 rounded-full"
-              style={{ textDecoration: "none" }}
+              data-testid="nav-work-mode"
+              title="Work Mode — Ownology's mobile-first shell for the cellar floor. Daily brief, one-tap logs, task list, tank readings. Optimised for a phone in a shed."
+              aria-label="Open Work Mode — mobile cellar shell"
+              className="inline-flex items-center gap-1.5 rounded-md transition-colors"
+              style={{
+                padding: "0.35rem 0.65rem",
+                border: "1px solid var(--ow-border)",
+                background: "transparent",
+                color: "var(--ow-text-mid)",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.72rem",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase",
+                fontWeight: 500,
+                textDecoration: "none",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "var(--ow-amber)";
+                e.currentTarget.style.borderColor = "var(--ow-amber)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "var(--ow-text-mid)";
+                e.currentTarget.style.borderColor = "var(--ow-border)";
+              }}
             >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              {/* 4-cell grid icon = the 4-pillar Work Mode bottom nav */}
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+                <rect x="0.5" y="0.5" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />
+                <rect x="6.5" y="0.5" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />
+                <rect x="0.5" y="6.5" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />
+                <rect x="6.5" y="6.5" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />
               </svg>
               Work Mode
             </Link>
