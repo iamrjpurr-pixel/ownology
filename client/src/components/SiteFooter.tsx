@@ -88,6 +88,22 @@ export function SiteFooter() {
               <br />
               Aus &middot; NZ &middot; US.
             </p>
+            <p
+              data-testid="footer-strapline"
+              style={{
+                fontFamily: "Georgia, serif",
+                fontSize: "0.85rem",
+                color: "var(--ow-amber)",
+                fontStyle: "italic",
+                lineHeight: 1.4,
+                margin: "0.75rem 0 0",
+                letterSpacing: "0.01em",
+              }}
+            >
+              You are the must.
+              <br />
+              Ownology is the ferment.
+            </p>
           </div>
           {COLUMNS.map((col) => (
             <div key={col.heading}>

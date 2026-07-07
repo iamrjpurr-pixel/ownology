@@ -121,6 +121,9 @@ function renderHtml(userName: string, alerts: Alert[]): string {
         <tr><td style="padding:0 24px 8px;">
           <p style="font-family:Georgia,serif;font-size:15px;color:#374151;margin:0;line-height:1.5;">— Owen</p>
         </td></tr>
+        <tr><td style="padding:8px 24px 0;">
+          <p style="font-family:Georgia,serif;font-size:13px;color:#8A5A2C;margin:0;font-style:italic;line-height:1.5;">You are the must. Ownology is the ferment.</p>
+        </td></tr>
         <tr><td style="padding:0 24px 24px;">
           <p style="font-family:Arial,sans-serif;font-size:11px;color:#9ca3af;margin:0;line-height:1.5;">Owen is Ownology&apos;s AI cellar-hand. Reply anytime — the Ownology team reads every response. Reply STOP to pause.</p>
         </td></tr>

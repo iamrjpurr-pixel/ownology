@@ -580,6 +580,22 @@ function Hero() {
           {/* Left — copy */}
           <div>
             <EditableText contentKey="home.hero.label" defaultValue="Cellar Intelligence Platform for Winemakers" as="p" className="section-label mb-6 fade-up" contentMap={contentMap} />
+            <p
+              data-testid="hero-strapline"
+              className="fade-up fade-up-delay-1"
+              style={{
+                fontFamily: "'Fraunces', serif",
+                fontStyle: "italic",
+                fontSize: "clamp(1.05rem, 1.6vw, 1.3rem)",
+                color: "var(--ow-amber)",
+                lineHeight: 1.35,
+                margin: "0 0 1.25rem",
+                letterSpacing: "0.005em",
+                maxWidth: "480px",
+              }}
+            >
+              You are the must. Ownology is the ferment.
+            </p>
             <h1 className="fade-up fade-up-delay-1"
               style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,4rem)", lineHeight:1.1, color:"var(--ow-text-hi)", letterSpacing:"-0.02em", textWrap: "balance" as "balance" }}>
               <EditableText contentKey="home.hero.headline" defaultValue="Your cellar's most knowledgeable apprentice." contentMap={contentMap} />

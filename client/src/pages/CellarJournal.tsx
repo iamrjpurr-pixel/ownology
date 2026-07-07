@@ -56,6 +56,17 @@ export function CellarJournalIndex() {
         <h1 className="font-serif italic text-5xl md:text-7xl leading-[0.95] mt-4 tracking-tight" data-testid="cj-title">
           Notes from the<br />cellar floor.
         </h1>
+        <p
+          data-testid="cj-strapline"
+          className="mt-4 font-serif italic"
+          style={{
+            fontSize: "1.05rem",
+            color: "var(--ow-amber, #b8924a)",
+            letterSpacing: "0.01em",
+          }}
+        >
+          You are the must. Ownology is the ferment.
+        </p>
         <p className="mt-6 text-lg md:text-xl max-w-2xl leading-relaxed opacity-80">
           Every question a winemaker asks Ownology becomes a page here — grounded in
           real references, written for the cellar at 2&nbsp;am.

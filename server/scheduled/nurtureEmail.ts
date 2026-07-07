@@ -53,7 +53,7 @@ function renderHtml(opts: { contactName: string | null; wineryName: string; code
   <p>You clicked ${attribution}'s Ownology invite a few days back but didn't sign up. Totally fine — most winemakers we talk to are heads-down through harvest.</p>
   <p>Here's the short version of what ${opts.contactName ? escapeHtml(opts.contactName) : escapeHtml(opts.wineryName)} finds useful:</p>
   <ul style="padding-left: 20px;">
-    <li>A daily <strong>Cellar Brief</strong> at 5:30am — every tank's vintage-log summary + what needs action today.</li>
+    <li>A daily <strong>Cellar Brief</strong> at 7am — every tank's vintage-log summary + what needs action today, written by Owen.</li>
     <li><strong>Ask Ownology</strong> — 236 winemaker Q&amp;As grounded in real MoreWine and Scott Labs technical manuals.</li>
     <li>One-tap <strong>compliance exports</strong> for Wine Australia LIP audits (or your local regulator).</li>
   </ul>
@@ -63,6 +63,7 @@ function renderHtml(opts: { contactName: string | null; wineryName: string; code
   <p style="font-size: 14px; color: #4b5563;">
     Not ready? <a href="${journalUrl}" style="color: #78350f;">Just browse the 236-Q&amp;A cellar journal</a> — no signup, no email prompt, forever free.
   </p>
+  <p style="font-family: Georgia, serif; font-size: 13px; color: #8A5A2C; font-style: italic; margin: 28px 0 0; letter-spacing: 0.3px;">You are the must. Ownology is the ferment.</p>
   <p style="font-size: 12px; color: #9ca3af; margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
     You got this because ${attribution} shared their Ownology invite with you and you left your email on the landing page. We only send one nurture email per referral — no follow-ups after this.
   </p>
@@ -78,13 +79,15 @@ function renderText(opts: { contactName: string | null; wineryName: string; code
     `You clicked ${attribution}'s Ownology invite a few days back but didn't sign up. Totally fine.`,
     ``,
     `What ${opts.contactName ?? opts.wineryName} finds useful:`,
-    ` • A daily Cellar Brief at 5:30am — every tank's summary + what needs action today.`,
+    ` • A daily Cellar Brief at 7am — every tank's summary + what needs action today, written by Owen.`,
     ` • Ask Ownology — 236 Q&As grounded in real MoreWine and Scott Labs manuals.`,
     ` • One-tap compliance exports for LIP audits.`,
     ``,
     `Claim your 44-day trial: ${joinUrl}`,
     ``,
     `Not ready? Browse the free journal: ${PUBLIC_SITE_URL}/cellar-journal`,
+    ``,
+    `— You are the must. Ownology is the ferment.`,
     ``,
     `— You got this because ${attribution} shared their Ownology invite and you left your email on the landing page. We only send one nurture email per referral.`,
   ].join("\n");

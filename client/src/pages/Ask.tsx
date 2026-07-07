@@ -413,6 +413,20 @@ export default function Ask() {
 
         {/* ── Footer link back to journal ─────────────────────────────── */}
         <div className="mt-16 pt-8 border-t" style={{ borderColor: "var(--ow-border)" }}>
+          <p
+            data-testid="ask-strapline"
+            className="text-center mb-6"
+            style={{
+              fontFamily: "'Fraunces', serif",
+              fontStyle: "italic",
+              fontSize: "1.1rem",
+              color: "var(--ow-amber)",
+              letterSpacing: "0.01em",
+              lineHeight: 1.4,
+            }}
+          >
+            You are the must. Ownology is the ferment.
+          </p>
           <p className="text-sm opacity-70" style={{ fontFamily: "'Lato', sans-serif" }}>
             Every answer here compounds into a searchable library. Browse the{" "}
             <Link
