@@ -67,15 +67,18 @@ const FLASH_CARDS: FlashCard[] = [
       '"When should I rack off the gross lees? — Rack once fermentation is finished (SG ≤0.995) and turbidity has dropped below 200 NTU. Typically 5-14 days post-ferment for reds, sooner for whites…"',
   },
   {
-    eyebrow: "03 · Notes from the cellar floor",
-    title: "The Cellar Journal.",
+    eyebrow: "03 · Bring your history with you",
+    title: "Your last three vintages, ingested.",
     body: (
       <>
-        Hundreds of Q&amp;As, each auto-clustered by Trinity dedupe so the
-        same question doesn't fork ten times. Every answer permanent,
-        shareable, indexable. Your name on the ones you asked.
+        Voice notes. Spreadsheets. Notebook photos. Supplier PDFs. WhatsApp
+        threads. Ownology&apos;s import surface reads all of them and turns them
+        into a searchable, chronological cellar timeline.{" "}
+        <em>Your history compounds against every new decision.</em>
       </>
     ),
+    quote:
+      '"Semillon 2024 notebook · page 6 of 12 · 43 entries extracted across pump-overs, additions, and observations. Ready to review."',
   },
   {
     eyebrow: "04 · What makes founding partners different",
