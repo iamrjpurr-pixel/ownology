@@ -148,6 +148,7 @@ export const outreachRouter = router({
           winery: schema.outreachContacts.winery,
           event: schema.outreachContacts.event,
           painPoint: schema.outreachContacts.painPoint,
+          notes: schema.outreachContacts.notes,
           calendlyOverride: schema.outreachContacts.calendlyOverride,
           viewCount: schema.outreachContacts.viewCount,
           persona: schema.outreachContacts.persona,
@@ -1080,6 +1081,190 @@ Return ONLY the requested JSON — no prose, no explanation. Use null for any fi
     // a number for a bulk SMS blast.
     return { contacts: rows.filter((r) => r.mobileAu && r.mobileAu.length > 0) };
   }),
+
+  // ── OWNER — Parse a wine-event page → producer + winemaker line-up ──
+  // Paste any wine-festival / trade-tasting URL (Humanitix, Eventbrite,
+  // winery website, or the event host's own page) and we extract:
+  //   - event metadata (name, ISO date, venue, city, tickets URL)
+  //   - the full producer lineup (winery + winemaker where named)
+  //   - which producers are named vs mentioned only in a list
+  //
+  // Returns a DRAFT the operator reviews on /admin/event-ingest. From
+  // there they tick which producers to research (per-row deepResearch)
+  // and batch-save selected contacts into the CRM with `event` pre-filled.
+  //
+  // Why: event lineups are the single best cold-outbound signal in the
+  // wine trade — every producer listed is (a) actively marketing, (b)
+  // attending live trade events, and (c) gives us a natural warm-open
+  // line ("see you at LITF" / "loved your grenache at LITF").
+  parseEventUrl: ownerProcedure
+    .input(z.object({
+      url: z.string().url("Please paste a full URL starting with https:// or http://"),
+    }))
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      const parsed = new URL(input.url);
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        throw new Error("URL must use http:// or https://");
+      }
+
+      // Fetch with browser-like UA + 15s timeout.
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15_000);
+      let html: string;
+      try {
+        const resp = await fetch(input.url, {
+          signal: controller.signal,
+          redirect: "follow",
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+            Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-AU,en;q=0.9",
+          },
+        });
+        clearTimeout(timeoutId);
+        if (!resp.ok) throw new Error(`Fetch failed: ${resp.status} ${resp.statusText}`);
+        const contentType = resp.headers.get("content-type") ?? "";
+        if (!contentType.includes("html") && !contentType.includes("text")) {
+          throw new Error(`Unsupported content type: ${contentType}`);
+        }
+        const buf = await resp.arrayBuffer();
+        if (buf.byteLength > 3 * 1024 * 1024) throw new Error("Page too large (>3MB)");
+        html = new TextDecoder("utf-8", { fatal: false }).decode(buf);
+      } catch (err) {
+        clearTimeout(timeoutId);
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes("aborted")) throw new Error("Page took too long to load (>15s). Try a different URL.");
+        throw new Error(`Could not load page — ${msg}`);
+      }
+
+      // Signal extraction — reuse the same recipe as parseFromUrl.
+      const jsonLdBlocks: unknown[] = [];
+      const ldRe = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+      for (const m of html.matchAll(ldRe)) {
+        try { jsonLdBlocks.push(JSON.parse(m[1].trim())); } catch { /* skip */ }
+      }
+      const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+      const descMatch = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i)
+        ?? html.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i);
+
+      // Main text — event pages have long producer lists so we cap higher (10k).
+      const stripped = html
+        .replace(/<script[\s\S]*?<\/script>/gi, " ")
+        .replace(/<style[\s\S]*?<\/style>/gi, " ")
+        .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+        .replace(/<footer[\s\S]*?<\/footer>/gi, " ")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/&[a-z]+;/gi, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 10_000);
+
+      const signals = {
+        url: input.url,
+        pageTitle: titleMatch?.[1]?.trim() ?? null,
+        pageDescription: descMatch?.[1]?.trim() ?? null,
+        jsonLd: jsonLdBlocks.length > 0 ? JSON.stringify(jsonLdBlocks).slice(0, 6000) : null,
+        mainText: stripped,
+      };
+
+      const systemPrompt = `You extract structured data from a wine-industry event page. The page could be a festival, trade tasting, masterclass, or exhibitor listing.
+
+Return a single JSON object:
+- eventName: string — the official event title (e.g. "Lost in the F.O.G.", "Barossa Wine Show 2026")
+- eventDateIso: string | null — start date in "YYYY-MM-DD" format. Look in JSON-LD startDate first, then in body text ("Saturday 1 August 2026", "1 Aug"). If year is missing, assume the closest upcoming year. Return null if you cannot confidently determine a specific date.
+- eventDateDisplay: string | null — human-readable date as it appears on the page (e.g. "Sat, 1 Aug 2026, 2pm–5pm AEST")
+- venue: string | null — venue name (e.g. "The Wine Bar at The International")
+- address: string | null — venue street address
+- city: string | null — Australian city (Sydney, Melbourne, Adelaide, etc.)
+- ticketsUrl: string | null — direct link to buy tickets (Humanitix / Eventbrite / venue booking page)
+- eventKind: "festival" | "trade-tasting" | "masterclass" | "wine-show" | "other" — inferred from copy
+- producers: Array of { winery: string, winemakerName: string | null, role: string | null, notes: string | null }
+    * INCLUDE every producer / winery / brand named in the copy, whether they're described in a paragraph OR only listed as a name in a lineup
+    * winery = the business/brand name as it appears
+    * winemakerName = only fill this if the copy explicitly links a named person to the winery (e.g. "Alex Head of Head Wines", "Amelia Nolan of Alkina"). Otherwise null.
+    * role = "Winemaker", "Founder", "Chief Winemaker", "Owner" etc when stated. Otherwise null.
+    * notes = one sentence of context from the page copy about that producer's style/region/reputation. Null if none.
+    * DO NOT invent producers. Only include names the page explicitly mentions.
+
+Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine event, return {"eventName": null, "producers": []}.`;
+
+      const chatResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${forgeKey}`,
+          "x-ow-source": "outreach.parseEventUrl",
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: JSON.stringify(signals) },
+          ],
+          stream: false,
+        }),
+      });
+      if (!chatResp.ok) {
+        const errText = await chatResp.text().catch(() => "");
+        throw new Error(`LLM extraction failed: ${chatResp.status} ${errText.slice(0, 200)}`);
+      }
+      const chatData = await chatResp.json();
+      const raw = chatData.choices?.[0]?.message?.content ?? "{}";
+      let draft: {
+        eventName: string | null;
+        eventDateIso: string | null;
+        eventDateDisplay: string | null;
+        venue: string | null;
+        address: string | null;
+        city: string | null;
+        ticketsUrl: string | null;
+        eventKind: string | null;
+        producers: Array<{ winery: string; winemakerName: string | null; role: string | null; notes: string | null }>;
+      } | null = null;
+      try {
+        const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+        const p = JSON.parse(cleaned);
+        if (p && typeof p === "object") {
+          draft = {
+            eventName: typeof p.eventName === "string" ? p.eventName : null,
+            eventDateIso: typeof p.eventDateIso === "string" ? p.eventDateIso : null,
+            eventDateDisplay: typeof p.eventDateDisplay === "string" ? p.eventDateDisplay : null,
+            venue: typeof p.venue === "string" ? p.venue : null,
+            address: typeof p.address === "string" ? p.address : null,
+            city: typeof p.city === "string" ? p.city : null,
+            ticketsUrl: typeof p.ticketsUrl === "string" ? p.ticketsUrl : null,
+            eventKind: typeof p.eventKind === "string" ? p.eventKind : null,
+            producers: Array.isArray(p.producers)
+              ? p.producers
+                  .filter((prod: unknown): prod is { winery?: unknown } => !!prod && typeof prod === "object" && typeof (prod as { winery?: unknown }).winery === "string")
+                  .map((prod: { winery: string; winemakerName?: unknown; role?: unknown; notes?: unknown }) => ({
+                    winery: String(prod.winery).trim(),
+                    winemakerName: typeof prod.winemakerName === "string" ? prod.winemakerName.trim() : null,
+                    role: typeof prod.role === "string" ? prod.role.trim() : null,
+                    notes: typeof prod.notes === "string" ? prod.notes.trim() : null,
+                  }))
+                  .filter((prod: { winery: string }) => prod.winery.length > 0)
+              : [],
+          };
+        }
+      } catch {
+        draft = null;
+      }
+
+      // Sanity-check the ISO date so the client can trust past/future logic.
+      let eventStatus: "past" | "future" | "unknown" = "unknown";
+      if (draft?.eventDateIso) {
+        const parsedDate = new Date(draft.eventDateIso);
+        if (!Number.isNaN(parsedDate.getTime())) {
+          eventStatus = parsedDate.getTime() >= Date.now() ? "future" : "past";
+        }
+      }
+
+      return { draft, eventStatus };
+    }),
 
   /** OWNER — mark a whole batch of contacts as smsSentAt=now in one call.
    *  Client owns the actual SMS sending (via the "Copy" clipboard flow or

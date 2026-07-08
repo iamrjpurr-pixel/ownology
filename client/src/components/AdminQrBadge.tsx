@@ -14,6 +14,7 @@
  *  - Self-hiding on /join/qr (avoid recursive UX) and on Work Mode
  *    surfaces (cellar-floor mobile view shouldn't have desktop chrome).
  */
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { QrCode } from "lucide-react";
 import { trpc } from "@/lib/trpc";
@@ -47,6 +48,19 @@ export function AdminQrBadge() {
   });
   const isOwner = !!adminData;
 
+  // Track PWA install banner so we can lift the QR pill by the same amount
+  // that GlobalThemeToggle lifts — keeps the stack (QR on top, theme below)
+  // above the banner without either colliding into it.
+  const [hasBanner, setHasBanner] = useState(false);
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const check = () => setHasBanner(document.body.classList.contains("has-pwa-banner"));
+    check();
+    const obs = new MutationObserver(check);
+    obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    return () => obs.disconnect();
+  }, []);
+
   if (!isOwner) return null;
   if (HIDE_ON_EXACT.has(pathname)) return null;
   if (HIDE_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
@@ -69,7 +83,12 @@ export function AdminQrBadge() {
       aria-label="Generate QR code for this page"
       style={{
         position: "fixed",
-        bottom: "1.1rem",
+        // Sits ABOVE the GlobalThemeToggle pill (also anchored bottom-left,
+        // ~1.25rem + ~44px pill height). Lifts extra when the PWA install
+        // banner pushes the theme pill up, so the two never collide.
+        bottom: hasBanner
+          ? "calc(4.75rem + 3.25rem + env(safe-area-inset-bottom, 0px))"
+          : "calc(1.25rem + 3.25rem + env(safe-area-inset-bottom, 0px))",
         left: "1.1rem",
         zIndex: 90, // below toasts (~100) but above content
         display: "inline-flex",
@@ -87,7 +106,7 @@ export function AdminQrBadge() {
         letterSpacing: "0.02em",
         cursor: "pointer",
         opacity: 0.82,
-        transition: "opacity 140ms ease, transform 140ms ease",
+        transition: "opacity 140ms ease, transform 140ms ease, bottom 200ms ease",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.opacity = "1";

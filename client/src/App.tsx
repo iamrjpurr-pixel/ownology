@@ -86,6 +86,7 @@ const VintageCompare = lazy(() => import("./pages/VintageCompare"));
 const HiContact = lazy(() => import("./pages/HiContact"));
 const AdminContacts = lazy(() => import("./pages/AdminContacts"));
 const AdminContactsPipeline = lazy(() => import("./pages/AdminContactsPipeline"));
+const AdminEventIngest = lazy(() => import("./pages/AdminEventIngest"));
 const AdminMarketingKit = lazy(() => import("./pages/AdminMarketingKit"));
 const AdminOperatorGuide = lazy(() => import("./pages/AdminOperatorGuide"));
 const AdminThemesStats = lazy(() => import("./pages/AdminThemesStats"));
@@ -350,6 +351,7 @@ function Router() {
       <Route path={"/hi/:slug"} component={HiContact} />
       <Route path={"/admin/contacts/pipeline"} component={AdminContactsPipeline} />
       <Route path={"/admin/contacts"} component={AdminContacts} />
+      <Route path={"/admin/event-ingest"} component={AdminEventIngest} />
       <Route path={"/admin/marketing-kit"} component={AdminMarketingKit} />
       <Route path={"/admin/operator-guide"} component={AdminOperatorGuide} />
       <Route path={"/admin/themes-stats"} component={AdminThemesStats} />

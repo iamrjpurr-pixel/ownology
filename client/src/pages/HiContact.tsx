@@ -84,6 +84,16 @@ export default function HiContact() {
   const tryNowHref = contact.sampleVintageLogUrl
     ?? `/sample-vintage-log.html?from=sms-${encodeURIComponent(contact.slug)}`;
 
+  // Detect if this contact is tied to a *future* event (via EventDate stashed
+  // in notes by /admin/event-ingest). Future events flip the warm-open copy
+  // from past-tense "We crossed paths at" → forward-tense "Looking forward
+  // to catching you at" — so the pitch lands right on either side of the
+  // tasting.
+  const eventDateMatch = contact.notes?.match(/EventDate:\s*(\d{4}-\d{2}-\d{2})/);
+  const eventIsFuture = eventDateMatch
+    ? new Date(eventDateMatch[1]).getTime() >= Date.now() - 24 * 3_600_000
+    : false;
+
   return (
     <div style={wrap} data-testid="hi-page">
       {/* Top accent bar */}
@@ -107,8 +117,17 @@ export default function HiContact() {
 
         {contact.event && (
           <p style={{ fontFamily: "'Fraunces',serif", fontSize: "1.25rem", color: "#374151", marginTop: "0.6rem", marginBottom: 0, fontStyle: "italic" }}>
-            We crossed paths at <strong style={{ color: "#b45309", fontStyle: "normal" }}>{contact.event}</strong>
-            {contact.winery ? <> — sending this your way for <strong style={{ color: "#b45309", fontStyle: "normal" }}>{contact.winery}</strong>.</> : "."}
+            {eventIsFuture ? (
+              <>
+                Looking forward to catching you at <strong style={{ color: "#b45309", fontStyle: "normal" }}>{contact.event}</strong>
+                {contact.winery ? <> — sending this ahead for <strong style={{ color: "#b45309", fontStyle: "normal" }}>{contact.winery}</strong>.</> : "."}
+              </>
+            ) : (
+              <>
+                We crossed paths at <strong style={{ color: "#b45309", fontStyle: "normal" }}>{contact.event}</strong>
+                {contact.winery ? <> — sending this your way for <strong style={{ color: "#b45309", fontStyle: "normal" }}>{contact.winery}</strong>.</> : "."}
+              </>
+            )}
           </p>
         )}
 

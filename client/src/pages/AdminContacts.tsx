@@ -5,7 +5,7 @@
  * + an SMS draft ready to copy & send. Tracks who opened the link and who
  * booked a demo.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 
@@ -63,6 +63,73 @@ function smsDraft(c: { firstName: string; winery?: string | null; event?: string
 }
 
 type ContactStatus = "warm" | "lukewarm" | "cold" | "sales" | "skip";
+
+type SortMode =
+  | "newest"
+  | "oldest"
+  | "name-az"
+  | "winery-az"
+  | "region-az"
+  | "state-az"
+  | "status";
+
+const SORT_OPTIONS: { value: SortMode; label: string }[] = [
+  { value: "newest",    label: "Newest first" },
+  { value: "oldest",    label: "Oldest first" },
+  { value: "name-az",   label: "Name (A→Z)" },
+  { value: "winery-az", label: "Winery (A→Z)" },
+  { value: "region-az", label: "Region (A→Z)" },
+  { value: "state-az",  label: "State (A→Z)" },
+  { value: "status",    label: "Status (Warm→Cold)" },
+];
+
+// Extract "Region: xxx" stashed into notes by event-ingest / deep-research.
+function extractRegion(notes: string | null | undefined): string {
+  if (!notes) return "";
+  const m = notes.match(/Region:\s*([^·|]+)/i);
+  return m ? m[1].trim() : "";
+}
+
+// Infer Australian state from region text. Falls back to "" if unknown so
+// unmapped regions cluster at the top/bottom depending on sort order.
+const STATE_BY_REGION: Record<string, string> = {
+  "hunter valley": "NSW", "hunter": "NSW", "orange": "NSW", "mudgee": "NSW",
+  "riverina": "NSW", "canberra": "ACT", "hilltops": "NSW", "tumbarumba": "NSW",
+  "cowra": "NSW", "shoalhaven": "NSW", "southern highlands": "NSW",
+  "barossa": "SA", "barossa valley": "SA", "eden valley": "SA",
+  "mclaren vale": "SA", "adelaide hills": "SA", "clare valley": "SA",
+  "coonawarra": "SA", "wrattonbully": "SA", "padthaway": "SA",
+  "langhorne creek": "SA", "riverland": "SA", "kangaroo island": "SA",
+  "adelaide plains": "SA", "southern flinders": "SA",
+  "yarra valley": "VIC", "mornington peninsula": "VIC", "geelong": "VIC",
+  "heathcote": "VIC", "bendigo": "VIC", "grampians": "VIC", "pyrenees": "VIC",
+  "king valley": "VIC", "beechworth": "VIC", "rutherglen": "VIC", "goulburn valley": "VIC",
+  "macedon ranges": "VIC", "gippsland": "VIC", "sunbury": "VIC", "murray darling": "VIC",
+  "margaret river": "WA", "great southern": "WA", "swan valley": "WA",
+  "perth hills": "WA", "geographe": "WA", "pemberton": "WA", "manjimup": "WA",
+  "peel": "WA", "blackwood valley": "WA", "porongurup": "WA", "frankland river": "WA",
+  "mount barker": "WA", "denmark": "WA", "albany": "WA",
+  "tasmania": "TAS", "tamar valley": "TAS", "coal river": "TAS", "east coast": "TAS",
+  "pipers river": "TAS", "north west": "TAS", "derwent valley": "TAS", "huon": "TAS",
+  "granite belt": "QLD", "south burnett": "QLD",
+  "alice springs": "NT",
+};
+function extractState(notes: string | null | undefined): string {
+  const region = extractRegion(notes).toLowerCase();
+  if (!region) return "";
+  // Exact match first, then partial (e.g. "McLaren Vale, SA" → mclaren vale)
+  if (STATE_BY_REGION[region]) return STATE_BY_REGION[region];
+  for (const key of Object.keys(STATE_BY_REGION)) {
+    if (region.includes(key)) return STATE_BY_REGION[key];
+  }
+  // Explicit AU state code in the notes wins as a last resort.
+  const codeMatch = region.match(/\b(NSW|VIC|SA|WA|TAS|QLD|ACT|NT)\b/i);
+  return codeMatch ? codeMatch[1].toUpperCase() : "";
+}
+
+const STATUS_RANK: Record<ContactStatus, number> = {
+  warm: 0, lukewarm: 1, cold: 2, sales: 3, skip: 4,
+};
 
 const STATUS_OPTIONS: { value: ContactStatus; label: string; color: string }[] = [
   { value: "warm",     label: "Warm",     color: "#16a34a" },
@@ -124,6 +191,14 @@ export default function AdminContacts() {
   const [err, setErr] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<Record<string, "url" | "sms" | null>>({});
   const [statusFilter, setStatusFilter] = useState<ContactStatus | "all">("all");
+  // Sort order for the pipeline list. Persisted in localStorage so operator
+  // preference survives page reloads. Region + State are parsed out of the
+  // notes field (deep-research + event-ingest stash "Region: xxx" there).
+  const [sortBy, setSortBy] = useState<SortMode>(() => {
+    if (typeof window === "undefined") return "newest";
+    const saved = window.localStorage.getItem("ow_contacts_sort") as SortMode | null;
+    return saved && SORT_OPTIONS.some((o) => o.value === saved) ? saved : "newest";
+  });
   const [urlQuickAdd, setUrlQuickAdd] = useState("");
   const [urlErr, setUrlErr] = useState<string | null>(null);
   const [urlLastFetched, setUrlLastFetched] = useState<string | null>(null);
@@ -150,9 +225,61 @@ export default function AdminContacts() {
 
   const allContacts = useMemo(() => data?.contacts ?? [], [data]);
   const contacts = useMemo(() => {
-    if (statusFilter === "all") return allContacts;
-    return allContacts.filter((c) => (c.status ?? "cold") === statusFilter);
-  }, [allContacts, statusFilter]);
+    const filtered = statusFilter === "all"
+      ? allContacts
+      : allContacts.filter((c) => (c.status ?? "cold") === statusFilter);
+    // Sort in a fresh array so we don't mutate react-query's cache.
+    const arr = filtered.slice();
+    const cmpStr = (a: string, b: string) =>
+      a.localeCompare(b, "en-AU", { sensitivity: "base" });
+    switch (sortBy) {
+      case "newest":
+        arr.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+        break;
+      case "oldest":
+        arr.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
+        break;
+      case "name-az":
+        arr.sort((a, b) => cmpStr(
+          `${a.firstName ?? ""} ${a.lastName ?? ""}`.trim(),
+          `${b.firstName ?? ""} ${b.lastName ?? ""}`.trim(),
+        ));
+        break;
+      case "winery-az":
+        arr.sort((a, b) => cmpStr(a.winery ?? "\uffff", b.winery ?? "\uffff"));
+        break;
+      case "region-az":
+        arr.sort((a, b) => {
+          const rA = extractRegion(a.notes) || "\uffff";
+          const rB = extractRegion(b.notes) || "\uffff";
+          return cmpStr(rA, rB);
+        });
+        break;
+      case "state-az":
+        arr.sort((a, b) => {
+          const sA = extractState(a.notes) || "\uffff";
+          const sB = extractState(b.notes) || "\uffff";
+          return cmpStr(sA, sB);
+        });
+        break;
+      case "status":
+        arr.sort((a, b) => {
+          const rA = STATUS_RANK[(a.status ?? "cold") as ContactStatus] ?? 99;
+          const rB = STATUS_RANK[(b.status ?? "cold") as ContactStatus] ?? 99;
+          if (rA !== rB) return rA - rB;
+          return (b.createdAt ?? 0) - (a.createdAt ?? 0);
+        });
+        break;
+    }
+    return arr;
+  }, [allContacts, statusFilter, sortBy]);
+
+  // Persist sort preference so operator's choice survives reloads.
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("ow_contacts_sort", sortBy);
+    }
+  }, [sortBy]);
 
   const statusCounts = useMemo(() => {
     const counts: Record<ContactStatus, number> = { warm: 0, lukewarm: 0, cold: 0, sales: 0, skip: 0 };
@@ -343,6 +470,24 @@ export default function AdminContacts() {
             </p>
           </div>
           <Link
+            href="/admin/event-ingest"
+            data-testid="link-to-event-ingest"
+            style={{
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              padding: "8px 14px",
+              border: "1px solid var(--ow-amber)",
+              borderRadius: 6,
+              color: "var(--ow-amber)",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            + Event ingest →
+          </Link>
+          <Link
             href="/admin/contacts/pipeline"
             data-testid="link-to-pipeline"
             style={{
@@ -381,8 +526,8 @@ export default function AdminContacts() {
       {/* A/B CTA stats — book demo vs reply RED */}
       <CtaAbCard />
 
-      {/* Triage filter chips */}
-      <div className="flex flex-wrap gap-2 mb-6" data-testid="status-filter-bar">
+      {/* Triage filter chips + sort selector */}
+      <div className="flex flex-wrap items-center gap-2 mb-6" data-testid="status-filter-bar">
         <FilterChip
           label={`All (${allContacts.length})`}
           active={statusFilter === "all"}
@@ -400,6 +545,42 @@ export default function AdminContacts() {
             testid={`filter-${s.value}`}
           />
         ))}
+        {/* Sort dropdown — sits on the right on wide screens, wraps below on mobile.
+            Persisted via localStorage so operator preference sticks. */}
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <label
+            htmlFor="contacts-sort-select"
+            style={{
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.72rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              color: "var(--ow-text-lo)",
+            }}
+          >
+            Sort
+          </label>
+          <select
+            id="contacts-sort-select"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as SortMode)}
+            data-testid="contacts-sort-select"
+            style={{
+              padding: "0.4rem 0.7rem",
+              background: "var(--ow-bg-card)",
+              color: "var(--ow-text-hi)",
+              border: "1px solid var(--ow-border)",
+              borderRadius: 4,
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.85rem",
+              cursor: "pointer",
+            }}
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Deep Research from a name — Perplexity Sonar-Pro multi-hop research */}
