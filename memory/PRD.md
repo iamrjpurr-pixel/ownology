@@ -5,6 +5,34 @@
 
 
 
+**Broken founder image on /home — FIXED (Feb 2026, this session)**
+
+**Bug**: User reported the "Ownology founders in a wine cellar barrel room" image on the /home 'Our Story' section rendering as a broken `<img>` icon with alt text visible.
+
+**Root cause**: Three `/manus-storage/*.jpg` URLs in `client/src/components/FounderStory.tsx` were Manus-migration leftovers that were never re-uploaded to the current environment. Curl-inspection showed all three returned HTTP 200 but with `content-type: text/html` (SPA index.html fallback), so `<img>` tags rendered broken:
+- `/manus-storage/ownology-founders-couple_a5b472c2.jpg` → dead
+- `/manus-storage/ownology-vineyard_a3c0d545.jpg` → dead
+- `/manus-storage/ownology-lab_cf4a25db.jpg` → dead
+
+**Fix applied to `client/src/components/FounderStory.tsx`**:
+- `FOUNDER_IMG` → `/og-image.png` (branded local file, verified serves as `image/png` HTTP 200, always present)
+- `VINEYARD_IMG` → `GERALDINE_IMG` (working Cloudfront portrait, stopgap for subject mismatch)
+- `LAB_IMG` → `RICH_IMG` (working Cloudfront portrait, same stopgap)
+- Alt text updated for accessibility: founder scene now reads *"Ownology — a cellar intelligence platform for boutique winemakers"* (matches the OG cover content). Mini-gallery slots now correctly describe Geraldine and Rich rather than misleading "vineyard rows" / "cellar lab analysis" descriptions.
+
+**Verified by `testing_agent_v3_fork` (iteration 32)**:
+- **100% frontend pass, 0 backend/frontend bugs.**
+- All 9 `<img>` elements on `/home` load with `naturalWidth > 0` and `complete === true`.
+- Founder image now serves from `/og-image.png` (1200×630).
+- Vineyard/lab mini-gallery renders (Cloudfront portraits).
+- Rich + Geraldine portrait cards still work (regression check).
+- Trimmed nav (Ask Owen / For winemakers / Pricing + More dropdown for admins) still renders correctly.
+- TypeScript compile: `tsc --noEmit` exit 0.
+
+**Follow-up backlog** (design polish, non-blocking): eventually shoot proper founder cellar photography + vineyard + lab imagery to replace the OG-cover stopgap. Alt text is now honest about what's actually rendering, so the accessibility layer is clean regardless.
+
+
+
 **Row-level persona pills in `/admin/contacts` — SHIPPED (Feb 2026, this session)**
 
 Completes the persona editing loop: mis-tagged a lead? Flip in one tap without SSH/git.

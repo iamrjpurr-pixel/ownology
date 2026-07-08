@@ -87,7 +87,7 @@ export default function FounderStory() {
             >
               <img
                 src={FOUNDER_IMG}
-                alt="Ownology founders in a wine cellar barrel room"
+                alt="Ownology — a cellar intelligence platform for boutique winemakers"
                 className="w-full object-cover"
                 style={{ aspectRatio: "3/4", display: "block" }}
               />
@@ -166,7 +166,7 @@ export default function FounderStory() {
 
             {/* Small vineyard + lab gallery below founders' portrait */}
             <div className="grid grid-cols-2 gap-1.5 mt-1.5">
-              {[{ src: VINEYARD_IMG, alt: "Vineyard rows at golden hour" }, { src: LAB_IMG, alt: "Cellar lab analysis" }].map((img) => (
+              {[{ src: VINEYARD_IMG, alt: "Geraldine, co-founder — chemistry & science lead" }, { src: LAB_IMG, alt: "Rich, co-founder — CEO & founder" }].map((img) => (
                 <div
                   key={img.alt}
                   className="overflow-hidden"
