@@ -30,7 +30,38 @@ import { useThemeTelemetry } from "@/hooks/useThemeTelemetry";
 const STORAGE_THEME = "ownology-theme";
 const STORAGE_DISMISSED = "ownology-theme-onboarded";
 
-const SUPPRESSED_PREFIXES = ["/admin", "/hi/", "/founding-member/success", "/merch/success", "/cellar-brief", "/try", "/todo", "/roadmap"];
+// Suppressed on: admin surfaces, personalised cold-call landings, gated
+// working surfaces, AND every prospect-facing marketing page (a first-time
+// visitor lands on /join / /ask / /pricing / etc. and MUST NOT be greeted
+// by a full-screen theme picker over the pitch). Any new marketing page
+// added later should be appended here.
+const SUPPRESSED_PREFIXES = [
+  "/admin",
+  "/hi/",
+  "/founding-member/success",
+  "/merch/success",
+  "/cellar-brief",
+  "/try",
+  "/todo",
+  "/roadmap",
+  // Marketing / prospect-facing surfaces — never interrupt a lead.
+  "/join",
+  "/ask",
+  "/pricing",
+  "/founding-partners",
+  "/demo",
+  "/blog",
+  "/cellar-journal",
+  "/for-home-winemakers",
+  "/call-playbook",
+  "/pwa",
+  "/install-ios",
+  "/waitlist",
+  "/referral",
+  "/privacy",
+  "/terms",
+  "/refund",
+];
 
 export default function ThemeOnboarding() {
   const [location] = useLocation();

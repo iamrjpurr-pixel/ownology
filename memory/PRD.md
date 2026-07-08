@@ -5,6 +5,29 @@
 
 
 
+**Pre-cold-call full-site audit — 100% pass (Feb 2026, this session)**
+
+Deep test pass before user goes into full cold-call marketing mode. Testing agent iteration 31 verified 16 targeted flows across backend + frontend, all green. Zero backend issues, zero frontend bugs, 100% success rate. Two polish items surfaced from the audit were fixed inline:
+
+- **`/join` overlay pollution fix** — `ThemeOnboarding`'s `SUPPRESSED_PREFIXES` list was missing every prospect-facing marketing route. Added `/join`, `/ask`, `/pricing`, `/founding-partners`, `/demo`, `/blog`, `/cellar-journal`, `/for-home-winemakers`, `/call-playbook`, `/pwa`, `/install-ios`, `/waitlist`, `/referral`, `/privacy`, `/terms`, `/refund`. Cold-call visitors landing on `/join?ref=…` no longer get greeted by a "CHOOSE YOUR WORKING LIGHT" modal covering the first card of the pitch. Verified via localStorage-cleared screenshot: HI JENNY SMITH eyebrow visible, "Fruit's in the tanks. This is where Ownology earns its keep." hero clean, Card 01 Cellar Brief fully readable.
+- **Sitemap coverage** — `/founding-partners`, `/demo`, and `/waitlist` were missing from `/api/sitemap.xml`. Added with priorities 0.9 / 0.8 / 0.7. Sitemap grew from 328 → 333 URLs.
+
+**Audit coverage (all green)**:
+- Sitemap (328→333 URLs), robots.txt (both sitemaps listed, /admin + /api/ disallowed), cellar-journal sitemap (311 URLs).
+- Public HTTP: `/`, `/home`, `/ask`, `/try`, `/join`, `/join/landscape`, `/join/qr`, `/pwa/install`, `/pwa/ios`, `/founding-partners`, `/demo`, `/pricing`, `/free-run`, `/waitlist`, `/blog`, `/cellar-journal`, `/for-home-winemakers`, `/call-playbook`, `/referral`, `/privacy`, `/terms`, `/refund`, `/sw.js`, `/manifest.json`, `/api/sitemap.xml`, `/api/robots.txt` — all 200.
+- Gated: `/admin/*`, `/cellar-brief`, `/tasting`, `/quick-entry` correctly 302 to `/try`.
+- Marketing flow: `/join?ref=jenny-smith` shows personalised HI JENNY SMITH eyebrow, 6-card carousel with dot pager + arrow prev/next, book form with honeypot + attribution.
+- Ask Owen: submit → answer renders, sources cite, mandatory Owen disclaimer footer with "grounded, but not perfect", journal permalink follows through to a real `/cellar-journal/:slug` entry.
+- Tasting → Brief flywheel: form loads, tank chips from `getUsedTanks`, submit sets `details_json.tasting = { flavor, structure }`, success screen renders live preview.
+- Admin: `/admin/members` shows KPI tiles, filter chips, 12+ member rows. Floating "QR for this page" badge visible bottom-left, opens `/join/qr?url=<current>&label=…` in new tab.
+- `/hi/lou-p-v-meredith` rotation working — viewCount:6 flows through, deterministic index = (startIdx-from-hash + viewCount) % 5.
+- PWA: `/sw.js` returns CACHE_VERSION="ow-v3" with STATIC + RUNTIME caches, bypass list for LLM streaming + OAuth.
+- Dynamic OG for `/cellar-journal/:slug` verified server-side on direct-Express hit (question-specific og:title). Preview environment routes HTML to Vite so preview URL still shows generic OG — production ownology.ai host will inject correctly.
+
+**TypeScript**: `npx tsc --noEmit` clean, 0 errors.
+
+
+
 **Sensory tasting → brief flywheel — SHIPPED (Feb 2026, this session)**
 
 Turned the sensory block from an *inferred visualisation* into a genuine tasting-history dashboard. Log one tasting → the bars snap to real numbers on the next brief.
