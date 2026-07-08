@@ -18,7 +18,7 @@ import pytest
 import pymysql
 import requests
 
-BASE_URL = os.environ["REACT_APP_BACKEND_URL"].rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", os.environ.get("API_URL", "http://localhost:8001")).rstrip("/")
 
 # Parse DATABASE_URL so we never commit raw credentials to the repo.
 # Expected format: mysql://user:password@host:port/database

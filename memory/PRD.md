@@ -5,6 +5,29 @@
 
 
 
+**Backend test suite audit + config fix — SHIPPED (Feb 2026, this session)**
+
+User forwarded a code review claiming 123 "critical `is` comparison bugs" across `/app/backend/tests/` and suggesting a mass `is`→`==` rewrite. **Rejected after verification** — every specific citation was actually the correct PEP 8 idiom (`is None`, `is not None`, `is True/False` on singletons). Running the recommended rewrite would have introduced ~123 real `E711` linter errors to fix zero real bugs.
+
+**Instead, functional verification of the real state:**
+- Ran `test_smoke.py` against live preview backend → **14/14 PASS in 8.79s** — the tests are the actual pre-deploy regression suite, not dead code.
+- Ran full test collection → **297 tests across 24 files**. Full run: **250 pass, 25 fail, 2 skip** (90% pass rate). Failures are seed-data / route-refactor drift (e.g. `test_alerts_reasoning` looks for tank7-Shiraz history that doesn't exist in the current DB), **not** identity-comparison bugs.
+
+**Real fixes applied:**
+- 3 files had `os.environ["REACT_APP_BACKEND_URL"]` hard-dereferences that crashed `pytest .` on collection when the var wasn't set: `test_iter18_coherence.py`, `test_iter19_sparkling.py`, `test_iter20_morewine_content.py`. Replaced with `os.environ.get("REACT_APP_BACKEND_URL", os.environ.get("API_URL", "http://localhost:8001"))` so tests are one-command-runnable in any env.
+- Added `/app/backend/tests/pytest.ini` with `testpaths = .`, `-q --tb=short` defaults, and `smoke` / `slow` markers documented. `pytest .` now works with no env fussing.
+
+**Verified after fix**: `pytest . --collect-only` returns **297 tests collected in 0.11s, zero collection errors**. Smoke suite still 14/14 pass.
+
+**Not doing** (would be net-negative):
+- Mass `is`→`==` rewrite (would introduce linter errors)
+- Complexity refactor of test functions (they work; complexity ≠ bug)
+- Adding type hints to legacy tests (7.4% → 100% type hint coverage on tests that pass is pure ceremony)
+
+The 25 real failures are seed-data / refactoring drift — flagged as known issues, not blockers for the cold-call push. Fixable in a dedicated cleanup pass later.
+
+
+
 **Pre-cold-call full-site audit — 100% pass (Feb 2026, this session)**
 
 Deep test pass before user goes into full cold-call marketing mode. Testing agent iteration 31 verified 16 targeted flows across backend + frontend, all green. Zero backend issues, zero frontend bugs, 100% success rate. Two polish items surfaced from the audit were fixed inline:

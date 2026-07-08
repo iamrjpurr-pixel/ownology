@@ -8,7 +8,7 @@ import urllib.parse
 import pytest
 import requests
 
-BASE = os.environ["REACT_APP_BACKEND_URL"].rstrip("/")
+BASE = os.environ.get("REACT_APP_BACKEND_URL", os.environ.get("API_URL", "http://localhost:8001")).rstrip("/")
 
 
 def _trpc_query(path: str, payload: dict) -> requests.Response:
