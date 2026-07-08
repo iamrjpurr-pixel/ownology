@@ -274,7 +274,7 @@ export default function FreeRun() {
   return (
     <>
       <div style={{ padding: "1.5rem 1rem", maxWidth: "640px", margin: "0 auto", width: "100%" }}>
-        {/* Daily limit indicator */}
+        {/* Daily limit indicator + Journal link */}
         <div
           style={{
             marginBottom: "1.5rem",
@@ -284,14 +284,32 @@ export default function FreeRun() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            gap: "0.75rem",
+            flexWrap: "wrap",
           }}
         >
           <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: "#1A1A1A", fontWeight: 600 }}>
             Today&apos;s Questions
           </span>
-          <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: ACCENT, fontWeight: 700 }}>
-            {questionsUsed} / 3
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <a
+              href="/free-run/journal"
+              data-testid="free-run-my-journal-link"
+              style={{
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.75rem",
+                color: ACCENT,
+                textDecoration: "none",
+                fontWeight: 600,
+                letterSpacing: "0.02em",
+              }}
+            >
+              📔 My Journal →
+            </a>
+            <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.875rem", color: ACCENT, fontWeight: 700 }}>
+              {questionsUsed} / 3
+            </span>
+          </div>
         </div>
 
         {/* If no messages, show curiosity cards */}

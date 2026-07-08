@@ -506,6 +506,7 @@ async function startServer() {
     "/referral",
     "/call-playbook",
     "/free-run",
+    "/free-run/journal",
     "/waitlist",
     "/demo",
     "/join",

@@ -21,6 +21,7 @@ import { AdminQrBadge } from "@/components/AdminQrBadge";
 // they may never touch.
 import Home from "./pages/Home";
 import FreeRun from "./pages/FreeRun";
+const FreeRunJournal = lazy(() => import("./pages/FreeRunJournal"));
 import ThePress from "./pages/ThePress";
 import QuickEntry from "./pages/QuickEntry";
 import CellarTasks from "./pages/CellarTasks";
@@ -309,6 +310,7 @@ function Router() {
       <Route path={"/resources"} component={RegulatoryLinks} />
       <Route path={"/resources/home-winery-kit"} component={HomeWineryKit} />
       <Route path={"/compliance"} component={Compliance} />
+      <Route path={"/free-run/journal"} component={FreeRunJournal} />
       <Route path={"/free-run"} component={FreeRunPage} />
       <Route path={"/the-press"} component={ThePressPage} />
       <Route path={"/pricing"} component={Pricing} />

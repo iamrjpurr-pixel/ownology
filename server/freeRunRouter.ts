@@ -14,7 +14,7 @@
  */
 
 import { z } from "zod";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { router, protectedProcedure, publicProcedure } from "./trpc.js";
 import * as schema from "../drizzle/schema.js";
 import { db, getUserByOpenId } from "./db.js";
@@ -337,6 +337,35 @@ Write "The Craft" panel — explain how a winemaker shapes, controls, or exploit
         wasFreeHook: isFirstEver,
       };
     }),
+
+  /**
+   * List the current user's past Divine Trinity reveals — powers the
+   * "My Journal" page (/free-run/journal). Every reveal is persisted
+   * permanently against the user's account, so this is a value-story
+   * as much as it is a feature: paid credits produce durable artifacts,
+   * not one-shot answers.
+   */
+  listMyReveals: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return { reveals: [] };
+    const rows = await db
+      .select({
+        id: schema.goDeeperReveals.id,
+        question: schema.goDeeperReveals.question,
+        topicTag: schema.goDeeperReveals.topicTag,
+        surfaceAnswer: schema.goDeeperReveals.surfaceAnswer,
+        sciencePanel: schema.goDeeperReveals.sciencePanel,
+        vineyardPanel: schema.goDeeperReveals.vineyardPanel,
+        craftPanel: schema.goDeeperReveals.craftPanel,
+        wasFreeHook: schema.goDeeperReveals.wasFreeHook,
+        createdAt: schema.goDeeperReveals.createdAt,
+      })
+      .from(schema.goDeeperReveals)
+      .where(eq(schema.goDeeperReveals.userId, dbUser.id))
+      .orderBy(desc(schema.goDeeperReveals.createdAt))
+      .limit(200);
+    return { reveals: rows };
+  }),
 
   /**
    * Submit thumbs up/down feedback for a Deep Dive panel.

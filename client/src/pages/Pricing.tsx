@@ -1258,7 +1258,11 @@ export default function Pricing() {
               Top up when you need it.
             </h2>
             <p className="mt-2 max-w-xl" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9375rem", color: "var(--ow-text-lo)", lineHeight: 1.7 }}>
-              One credit unlocks the Divine Trinity for one question — The Science, The Vineyard, and The Craft — three acts that take your curiosity one level deeper. Packs never expire. Your knowledge investment has no use-by date.
+              One credit unlocks the Divine Trinity for one question — The Science, The Vineyard, and The Craft — three acts that take your curiosity one level deeper.
+              <br />
+              <strong style={{ color: "var(--ow-text-mid)", fontWeight: 500 }}>
+                Every reveal is yours forever — saved to your private Journal, searchable, re-readable. Packs never expire; neither do the answers they unlock.
+              </strong>
             </p>
           </div>
         </div>
