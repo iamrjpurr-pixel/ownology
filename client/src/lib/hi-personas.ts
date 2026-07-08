@@ -85,6 +85,12 @@ export const HI_VARIANTS_BY_PERSONA: Record<HiPersona, string[][]> = {
       "Multi-vineyard, multi-region, multi-vintage — one library, one Q&A, one story.",
       "When you're ready to sell, the vintage history is a real asset. Ownology keeps it clean, searchable, transferable.",
     ],
+    // 5 — APCO deadline (Feb 2026 wedge)
+    [
+      "APCO's Annual Report is due 31 March. Ownology's Assistant drafts it from your bottle, closure, label, and carton data — in the format APCO expects.",
+      "Consultants charge $5-15K/yr for APCO compliance. The Vigneron founding tier is $88/mo — same job, ~1/6 the cost, forever.",
+      "Dan's, Coles and Endeavour ask what APCO tier you're on. Ownology tells you — and tells you what closes the gap.",
+    ],
   ],
 
   // ── WINEMAKER — Chief / Assistant Winemaker ──────────────────────
@@ -156,6 +162,12 @@ export const HI_VARIANTS_BY_PERSONA: Record<HiPersona, string[][]> = {
       "The next generation of your winery will inherit clean records, not shoeboxes of paper. Ownology is the archive that writes itself.",
       "Your name on the bottle deserves better than 40 open tabs. This is where the craft lives now.",
       "Founding-partner pilot: $9/month, shape the tool with us, keep the founder's rate forever.",
+    ],
+    // 5 — APCO deadline (Feb 2026 wedge)
+    [
+      "APCO's 31 March deadline is looming. Ownology drafts the Annual Report + Action Plan from your packaging data — no consultant, no scramble.",
+      "Every APCO criterion — Governance, Design, Recycled Content, Recoverability, Labelling, Waste, Problematic Materials — handled in one flow.",
+      "Retailers ask what APCO tier you're on before they extend the range. Ownology shows the number and closes the gap.",
     ],
   ],
 

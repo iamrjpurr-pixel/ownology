@@ -1284,6 +1284,60 @@ export default function Pricing() {
         </div>
       </div>
 
+      {/* APCO Assistant strip — flagship reason to reach for The Vigneron
+          right now (Feb 2026, weeks out from the 31 March deadline). Deep
+          link into the /apco marketing page for the full pitch. */}
+      <div className="container max-w-7xl mx-auto mb-8 px-4 sm:px-6">
+        <a
+          href="/apco"
+          data-testid="pricing-apco-strip"
+          className="rounded-sm px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 transition-opacity hover:opacity-90"
+          style={{
+            display: "flex",
+            textDecoration: "none",
+            background: "oklch(0.14 0.010 60)",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "'Fira Code', monospace",
+              fontSize: "0.65rem",
+              padding: "0.25rem 0.6rem",
+              borderRadius: 999,
+              background: "var(--ow-amber)",
+              color: "oklch(0.10 0.008 60)",
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              flexShrink: 0,
+            }}
+          >
+            NEW
+          </span>
+          <div style={{ flex: 1, fontFamily: "'Lato', sans-serif" }}>
+            <p style={{ fontSize: "0.95rem", color: "oklch(0.95 0.010 75)", margin: 0, fontWeight: 500 }}>
+              APCO Assistant — included with The Vigneron
+            </p>
+            <p style={{ fontSize: "0.8rem", color: "oklch(0.72 0.015 75)", margin: "0.15rem 0 0", lineHeight: 1.5 }}>
+              Drafts your APCO Annual Report + Action Plan from your packaging data. 31 March deadline. Consultants charge $5-15K/yr. We do it for the price of a coffee run.
+            </p>
+          </div>
+          <span
+            style={{
+              fontFamily: "'Lato', sans-serif",
+              fontSize: "0.8rem",
+              color: "var(--ow-amber)",
+              fontWeight: 700,
+              whiteSpace: "nowrap",
+              letterSpacing: "0.03em",
+            }}
+          >
+            See how →
+          </span>
+        </a>
+      </div>
+
       {/* Tier cards */}
       <section className="container max-w-7xl mx-auto mb-16 sm:mb-20 px-4 sm:px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 pb-24 sm:pb-0">
