@@ -40,7 +40,7 @@ export default function HomeV2() {
       {/* ── Zone 1: HERO — audience self-sort ────────────────────────── */}
       <section style={{ padding: "clamp(3rem, 8vw, 6rem) 1.25rem 3.5rem", maxWidth: 1000, margin: "0 auto", textAlign: "center" }}>
         <p className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-amber)", fontFamily: "'Lato',sans-serif", marginBottom: "1rem" }}>
-          Ownology · Est. 2026
+          Ownology · Est. 2026 · Meet Owen
         </p>
         <h1
           data-testid="v2-hero-headline"
@@ -50,18 +50,30 @@ export default function HomeV2() {
             lineHeight: 1.05,
             margin: 0,
             letterSpacing: "-0.01em",
-            maxWidth: 820,
+            maxWidth: 900,
             marginInline: "auto",
           }}
         >
-          AI that understands wine.
+          Owen is the apprentice
           <br />
-          <span style={{ color: "var(--ow-amber)" }}>Free to ask.</span>
-          <br />
-          Professional-grade if you make it for a living.
+          who <span style={{ color: "var(--ow-amber)" }}>never leaves the cellar</span>.
         </h1>
+        <p
+          style={{
+            fontFamily: "'Lato',sans-serif",
+            fontSize: "clamp(1rem, 1.6vw, 1.2rem)",
+            lineHeight: 1.65,
+            color: "var(--ow-text-mid)",
+            marginTop: "1.5rem",
+            maxWidth: 640,
+            marginInline: "auto",
+          }}
+        >
+          Read every wine book. Answers in seconds. Free to ask —
+          professional-grade if you make it for a living.
+        </p>
 
-        {/* The audience self-sort — biggest single UX win */}
+        {/* The audience self-sort — Owen-first CTAs */}
         <div className="flex flex-wrap justify-center gap-4 mt-10" data-testid="v2-hero-cta-row">
           <Link
             href="/ask"
@@ -75,7 +87,7 @@ export default function HomeV2() {
               fontFamily: "'Lato',sans-serif",
               fontSize: "1rem",
               textDecoration: "none",
-              minWidth: 240,
+              minWidth: 260,
               textAlign: "center",
               fontWeight: 500,
             }}
@@ -84,7 +96,7 @@ export default function HomeV2() {
               For the curious
             </span>
             <span style={{ fontFamily: "'Fraunces',serif", fontSize: "1.25rem" }}>
-              I'm curious about wine →
+              Ask Owen a question →
             </span>
           </Link>
           <Link
@@ -99,7 +111,7 @@ export default function HomeV2() {
               fontFamily: "'Lato',sans-serif",
               fontSize: "1rem",
               textDecoration: "none",
-              minWidth: 240,
+              minWidth: 260,
               textAlign: "center",
               fontWeight: 700,
             }}
@@ -108,7 +120,7 @@ export default function HomeV2() {
               For professionals
             </span>
             <span style={{ fontFamily: "'Fraunces',serif", fontSize: "1.25rem" }}>
-              I make wine →
+              Hire Owen for your cellar →
             </span>
           </Link>
         </div>
