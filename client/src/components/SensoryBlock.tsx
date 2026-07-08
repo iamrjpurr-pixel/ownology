@@ -60,6 +60,7 @@ export function SensoryBlock({
   structure,
   assessedAt,
   compact = false,
+  logHref,
   testid = "sensory-block",
 }: {
   flavor: FlavorProfile | null;
@@ -68,6 +69,9 @@ export function SensoryBlock({
   assessedAt?: number | null;
   /** Compact = smaller icons + shorter bars for card interiors. */
   compact?: boolean;
+  /** If set, renders a small "Log tasting" link that navigates here.
+   *  Typically /tasting?tank=T7&variety=Shiraz. */
+  logHref?: string;
   testid?: string;
 }) {
   // Auto-hide with no data — DESIGN_RULES.md: no claim without evidence.
@@ -104,19 +108,36 @@ export function SensoryBlock({
             color: "var(--ow-text-lo)",
           }}
         >
-          Sensory snapshot
+          {assessedAt ? "Sensory snapshot" : "Sensory snapshot · inferred"}
         </div>
-        {assessedAt && (
-          <div
-            style={{
-              fontSize: compact ? "0.62rem" : "0.7rem",
-              color: "var(--ow-text-lo)",
-              fontStyle: "italic",
-            }}
-          >
-            {formatAgo(assessedAt)}
-          </div>
-        )}
+        <div style={{ display: "flex", gap: "0.6rem", alignItems: "baseline" }}>
+          {assessedAt && (
+            <div
+              style={{
+                fontSize: compact ? "0.62rem" : "0.7rem",
+                color: "var(--ow-text-lo)",
+                fontStyle: "italic",
+              }}
+            >
+              {formatAgo(assessedAt)}
+            </div>
+          )}
+          {logHref && (
+            <a
+              href={logHref}
+              data-testid={`${testid}-log-link`}
+              style={{
+                fontSize: compact ? "0.62rem" : "0.7rem",
+                color: "var(--ow-amber)",
+                textDecoration: "underline dotted",
+                textUnderlineOffset: 3,
+                fontFamily: "'Lato', sans-serif",
+              }}
+            >
+              {assessedAt ? "Log new tasting →" : "Log a tasting →"}
+            </a>
+          )}
+        </div>
       </div>
 
       {/* Flavor icons row */}

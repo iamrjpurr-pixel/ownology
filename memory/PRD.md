@@ -5,6 +5,35 @@
 
 
 
+**Sensory tasting → brief flywheel — SHIPPED (Feb 2026, this session)**
+
+Turned the sensory block from an *inferred visualisation* into a genuine tasting-history dashboard. Log one tasting → the bars snap to real numbers on the next brief.
+
+**Server (`server/cellarBriefEngine.ts`)**:
+- Extended `CellarBriefCard` type with `sensoryFlavor`, `sensoryStructure`, `sensoryAssessedAt` (all nullable).
+- New `extractLatestSensory(events)` function: scans newest-first for the most recent `observation` entry whose `details_json.tasting` object contains a `flavor` and/or `structure` block; returns clamped 0..5 integers per dimension plus the `entryAt` timestamp. Returns nulls when no tasting exists yet.
+- Exported new types `SensoryFlavor` and `SensoryStructure`.
+
+**Client (`client/src/pages/CellarBrief.tsx`)**:
+- `Card` type now has optional `sensoryFlavor` / `sensoryStructure` / `sensoryAssessedAt` fields.
+- Rendering prefers `card.sensoryFlavor ?? inferSensoryFlavor(...)` — real logged data overrides the variety+stage inference, but the block never goes blank.
+- Passes `logHref="/tasting?tank=…&variety=…"` to the sensory block so each vessel has a one-tap route to log a fresh tasting.
+
+**`<SensoryBlock />` (`client/src/components/SensoryBlock.tsx`)**:
+- New `logHref` prop renders a small dotted-underline "Log a tasting →" / "Log new tasting →" call-to-action next to the timestamp.
+- Header label switches to "Sensory snapshot · inferred" when no `assessedAt` is set — signals honestly that the values are inferred, not measured.
+
+**`/tasting` — the tasting-entry page (`client/src/pages/TastingEntry.tsx`, ~350 LOC)**:
+- Cellar-floor mobile-first flow: 5 flavor dimensions (fruit / earth / oak / spice / floral) + 5 structure dimensions (body / acidity / tannin / sweetness / finish), each scored 0–5 with 38-px tap targets. Vessel picker with chips from `getUsedTanks`. Optional 500-char note.
+- Live preview panel below the sliders — winemaker sees the exact `<SensoryBlock />` they're about to commit before hitting Log.
+- Submits via existing `trpc.vintageLog.add` mutation with `eventType: "observation"` and `details.tasting = { flavor, structure, note? }`. Zero new tRPC procedures required — pure reuse.
+- Success state confirms the flywheel: *"Your Sensory Snapshot on {tank} will update on the next brief. Log one tasting → see it in your brief tomorrow morning → let the wine tell its story over the vintage."* Then shows the just-logged preview + "→ View the brief" / "Log another" buttons.
+- Gated (behind auth) since it writes to `vintage_log_entries`; unlocks via existing gate password or Google session.
+
+**End-to-end verified**: form filled with Fruit=5, Oak=4, Tannin=4 → submit → toast "Tasting logged for T7" → success screen renders the preview with correct values. Backend accepted the payload. Next `/cellar-brief` generation for T7 will surface real numbers instead of the Shiraz+ferment_primary inference.
+
+
+
 **PWA polish + DESIGN_RULES.md audit + Sensory Assessment Block — SHIPPED (Feb 2026, this session)**
 
 Three P1/P2 backlog items batched into a single pass, plus the outreach `bySlug` viewCount fix (side-effect of TS cleanup — see prior entry).

@@ -51,6 +51,22 @@ export type CellarBriefGhostQuestion = {
   difficulty: string;
 };
 
+export type SensoryFlavor = {
+  fruit: number;
+  earth: number;
+  oak: number;
+  spice: number;
+  floral: number;
+};
+
+export type SensoryStructure = {
+  body: number;
+  acid: number;
+  tannin: number;
+  sweetness: number;
+  finish: number;
+};
+
 export type CellarBriefCard = {
   vesselId: string;
   vesselType: "tank" | "barrel";
@@ -66,6 +82,14 @@ export type CellarBriefCard = {
   // Surfaced under the card as a "Worth knowing" Q+A teaching block.
   // null when no ghost question matches this stage × wine_color.
   ghostQuestion: CellarBriefGhostQuestion | null;
+  // Most recent logged tasting for this vessel — either flavor, structure,
+  // or both (some quick tastings only score one axis). Nulls mean the
+  // client falls back to the variety+stage inference. Set when a log
+  // entry of type="observation" has details_json.tasting = { flavor?,
+  // structure?, ... } — see QuickEntry.tsx tasting form.
+  sensoryFlavor: SensoryFlavor | null;
+  sensoryStructure: SensoryStructure | null;
+  sensoryAssessedAt: number | null;
 };
 
 export type CellarBriefSummary = {
@@ -780,7 +804,68 @@ function buildCard(
     decisionDue,
     grounding,
     ghostQuestion: pickGhostQuestion(vesselId, stage, color, wbsCache),
+    ...extractLatestSensory(events),
   };
+}
+
+// ─── Sensory extraction ──────────────────────────────────────────────────────
+// Read the most-recent observation with details_json.tasting set. This is
+// what makes the brief a genuine tasting-history dashboard: log one tasting
+// via QuickEntry → the bars snap to real numbers next brief. Missing / bad
+// data returns nulls and the client falls back to the variety+stage inference.
+
+function clampSensory05(n: unknown): number {
+  const num = typeof n === "number" ? n : Number(n);
+  if (!Number.isFinite(num)) return 0;
+  return Math.max(0, Math.min(5, Math.round(num)));
+}
+
+function extractLatestSensory(events: LogEntry[]): {
+  sensoryFlavor: SensoryFlavor | null;
+  sensoryStructure: SensoryStructure | null;
+  sensoryAssessedAt: number | null;
+} {
+  // Search newest-first; take the first entry that has a `tasting` object.
+  const sorted = [...events].sort((a, b) => b.entryAt - a.entryAt);
+  for (const e of sorted) {
+    if (e.eventType !== "observation") continue;
+    const d = parseDetails(e);
+    const t = d.tasting as { flavor?: Record<string, unknown>; structure?: Record<string, unknown> } | undefined;
+    if (!t || typeof t !== "object") continue;
+
+    let flavor: SensoryFlavor | null = null;
+    if (t.flavor && typeof t.flavor === "object") {
+      const f = t.flavor;
+      flavor = {
+        fruit:  clampSensory05(f.fruit),
+        earth:  clampSensory05(f.earth),
+        oak:    clampSensory05(f.oak),
+        spice:  clampSensory05(f.spice),
+        floral: clampSensory05(f.floral),
+      };
+    }
+
+    let structure: SensoryStructure | null = null;
+    if (t.structure && typeof t.structure === "object") {
+      const s = t.structure;
+      structure = {
+        body:      clampSensory05(s.body),
+        acid:      clampSensory05(s.acid),
+        tannin:    clampSensory05(s.tannin),
+        sweetness: clampSensory05(s.sweetness),
+        finish:    clampSensory05(s.finish),
+      };
+    }
+
+    if (flavor || structure) {
+      return {
+        sensoryFlavor: flavor,
+        sensoryStructure: structure,
+        sensoryAssessedAt: e.entryAt,
+      };
+    }
+  }
+  return { sensoryFlavor: null, sensoryStructure: null, sensoryAssessedAt: null };
 }
 
 // ─── Executive summary (single LLM call) ──────────────────────────────────────

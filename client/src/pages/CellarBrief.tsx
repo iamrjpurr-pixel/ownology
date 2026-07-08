@@ -289,6 +289,9 @@ type Card = {
   decisionDue: string | null;
   grounding: string[];
   ghostQuestion: GhostQ | null;
+  sensoryFlavor?: FlavorProfile | null;
+  sensoryStructure?: StructureProfile | null;
+  sensoryAssessedAt?: number | null;
 };
 
 function BriefCard({ card }: { card: Card }) {
@@ -443,13 +446,16 @@ function BriefCard({ card }: { card: Card }) {
 
           <QualFlagsBlock slug={slug} vesselId={card.vesselId} />
 
-          {/* Sensory snapshot — inferred from variety + stage until a real
-              tasting is logged. Renders as a visual anchor so winemakers
-              see the shape of the wine at a glance. Log a tasting via the
-              sensory-evaluation SOP to replace with real data. */}
+          {/* Sensory snapshot — prefers a real logged tasting when available
+              (details_json.tasting on an observation entry), otherwise falls
+              back to variety+stage inference so the block is always useful.
+              Log a tasting via Quick Entry → Observation → "Log tasting" to
+              replace the inferred values with real numbers. */}
           <SensoryBlock
-            flavor={inferSensoryFlavor(card.variety, card.stage)}
-            structure={inferSensoryStructure(card.variety, card.stage)}
+            flavor={card.sensoryFlavor ?? inferSensoryFlavor(card.variety, card.stage)}
+            structure={card.sensoryStructure ?? inferSensoryStructure(card.variety, card.stage)}
+            assessedAt={card.sensoryAssessedAt ?? null}
+            logHref={`/tasting?tank=${encodeURIComponent(card.vesselId)}&variety=${encodeURIComponent(card.variety)}`}
             compact
             testid={`brief-sensory-${slug}`}
           />
