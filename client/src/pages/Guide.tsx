@@ -844,7 +844,7 @@ export default function Guide() {
               },
               {
                 tier: "The Press",
-                price: "$41/mo",
+                price: "$34/mo",
                 audience: "Boutique winery teams",
                 highlight: true,
                 pillars: [
@@ -857,11 +857,11 @@ export default function Guide() {
               },
               {
                 tier: "The Vigneron",
-                price: "$83/mo",
+                price: "$69/mo",
                 audience: "Owner-operator boutique vignerons",
                 highlight: false,
                 pillars: [
-                  { label: "DO",    color: "var(--ow-amber)",  desc: "Full cellar operations + 3 team seats" },
+                  { label: "DO",    color: "var(--ow-amber)",  desc: "Full cellar operations + team seats" },
                   { label: "KNOW",  color: "oklch(0.62 0.10 45)",  desc: "Knowledge Platform + team editing" },
                   { label: "LEARN", color: "oklch(0.65 0.10 220)", desc: "Unlimited AI tutor credits" },
                   { label: "GUIDE", color: "oklch(0.65 0.10 160)", desc: "Onboarding call + annual review" },

@@ -16,6 +16,10 @@ Disallow: /i/
 # (they're outreach targets, not evergreen content)
 Disallow: /hi/
 
+# Competitor-migration pages — for warm outreach only, not for crawlers
+Disallow: /for-innovint-users
+Disallow: /for-vintrace-users
+
 # Sitemaps
 Sitemap: https://ownology.ai/api/sitemap.xml
 Sitemap: https://ownology.ai/api/cellar-journal/sitemap.xml

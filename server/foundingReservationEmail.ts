@@ -45,7 +45,7 @@ function renderCustomerHtml(p: ReservationPayload): string {
     2. Once payment's arranged, you get a 44-day trial (14 standard + 30 Founding-Member bonus).<br>
     3. Your locked-in tier pricing is <strong>fixed for life</strong> — no annual increases, ever.
   </p>
-  <p>While you wait — the ${p.referralCode ? "referrer's" : "public"} <a href="${PUBLIC_SITE_URL}/cellar-journal" style="color: #78350f;">Cellar Journal</a> has 236 winemaker Q&amp;As grounded in real MoreWine and Scott Labs manuals. Free, no signup, forever.</p>
+  <p>While you wait — the ${p.referralCode ? "referrer's" : "public"} <a href="${PUBLIC_SITE_URL}/cellar-journal" style="color: #78350f;">Cellar Journal</a> has 236 winemaker Q&amp;As grounded in industry-standard oenology references. Free, no signup, forever.</p>
   <p style="font-size: 14px; color: #4b5563; margin-top: 32px;">If you didn't request this, just ignore the email — no charge, no follow-up.</p>
   <p style="font-size: 12px; color: #9ca3af; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
     Ownology · Geraldine &amp; Richard · Adelaide Hills, SA<br>

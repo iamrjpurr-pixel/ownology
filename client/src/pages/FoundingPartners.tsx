@@ -476,7 +476,7 @@ export default function FoundingPartners() {
         <title>Ownology — For our founding partners.</title>
         <meta
           name="description"
-          content="Vintage 2026 is fermenting across Australia and New Zealand right now. YAN calls, MLF timing, stuck tanks — every decision in the next 90 days shapes this vintage. We're onboarding twelve founding partners to shape the platform through their live 2026 ferment — and every vintage after."
+          content="Vintage 2026 is fermenting across Australia and New Zealand right now. YAN calls, MLF timing, stuck tanks — every decision in the next 90 days shapes this vintage. We're onboarding a small circle of founding partners to shape the platform through their live 2026 ferment — and every vintage after."
         />
         <link rel="canonical" href="https://ownology.ai/join" />
         <meta property="og:title" content="Ownology — For our founding partners." />
@@ -574,7 +574,7 @@ export default function FoundingPartners() {
           YAN calls. MLF timing. Stuck tanks. Every decision in the next 90 days
           shapes whether this year is your best vintage or the one you'd rather
           forget. We're onboarding{" "}
-          <strong style={{ color: "var(--ow-text-hi)" }}>twelve founding partners</strong>{" "}
+          <strong style={{ color: "var(--ow-text-hi)" }}>a small circle of founding partners</strong>{" "}
           to shape the platform through their live 2026 ferment — and every
           vintage after.
         </p>

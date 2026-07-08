@@ -489,8 +489,10 @@ async function startServer() {
     "/",
     "/home",
     "/why-ownology",
-    "/for-innovint-users",
-    "/for-vintrace-users",
+    // Competitor-migration pages (`/for-innovint-users`, `/for-vintrace-users`)
+    // are deliberately NOT in PUBLIC_EXACT. They stay routable for warm-outreach
+    // links (invite-token / /hi/:slug) but a public crawler hits the gate wall
+    // instead — keeps us out of trademark/tortious-interference territory.
     "/for-home-winemakers",
     "/for-home-winemakers/troubleshooting",
     "/for-home-winemakers/glossary",
@@ -634,22 +636,21 @@ async function startServer() {
     },
     "/ask": {
       title: "Ask Ownology — free winemaking answers, cited from the bibles",
-      description:
-        "Any winemaking question, answered by Owen from the Red & White Wine Bibles and the MoreWine! manuals. Free, no signup, and every answer becomes a permanent Cellar Journal entry.",
+      description: "Any winemaking question, answered by Owen from industry-standard oenology references. Free, no signup, and every answer becomes a permanent Cellar Journal entry.",
       image: "https://ownology.ai/og-try.png",
       canonicalPath: "/ask",
     },
     "/founding-partners": {
       title: "Ownology — For our founding partners.",
       description:
-        "Vintage 2026 is fermenting across Australia and New Zealand right now. YAN calls, MLF timing, stuck tanks — every decision in the next 90 days shapes this vintage. We're onboarding twelve founding partners to shape the platform through their live 2026 ferment — and every vintage after.",
+        "Vintage 2026 is fermenting across Australia and New Zealand right now. YAN calls, MLF timing, stuck tanks — every decision in the next 90 days shapes this vintage. We're onboarding a small circle of founding partners to shape the platform through their live 2026 ferment — and every vintage after.",
       image: "https://ownology.ai/og-try.png",
       canonicalPath: "/join",
     },
     "/join": {
       title: "Ownology — For our founding partners.",
       description:
-        "Vintage 2026 is fermenting across Australia and New Zealand right now. YAN calls, MLF timing, stuck tanks — every decision in the next 90 days shapes this vintage. We're onboarding twelve founding partners to shape the platform through their live 2026 ferment — and every vintage after.",
+        "Vintage 2026 is fermenting across Australia and New Zealand right now. YAN calls, MLF timing, stuck tanks — every decision in the next 90 days shapes this vintage. We're onboarding a small circle of founding partners to shape the platform through their live 2026 ferment — and every vintage after.",
       image: "https://ownology.ai/og-try.png",
       canonicalPath: "/join",
     },
@@ -760,7 +761,7 @@ async function startServer() {
       const diagnosis = rawDiag.length > 180 ? rawDiag.slice(0, 177) + "…" : rawDiag;
       const topic = row.topicTag ? ` · ${row.topicTag}` : "";
       const title = `${question} — Owen answers${topic}`;
-      const description = diagnosis || "Winemaker Q&A answered by Owen, grounded in the Red & White Wine Bibles and MoreWine! manuals. Free, no signup.";
+      const description = diagnosis || "Winemaker Q&A answered by Owen, grounded in industry-standard oenology references. Free, no signup.";
       const image = "https://ownology.ai/og-try.png";
 
       const html = raw

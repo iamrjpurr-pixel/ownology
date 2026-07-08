@@ -53,8 +53,8 @@ const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }
   { path: "/for-home-winemakers",  priority: "0.6", changefreq: "monthly" },
   { path: "/for-home-winemakers/troubleshooting", priority: "0.5", changefreq: "monthly" },
   { path: "/for-home-winemakers/glossary",         priority: "0.5", changefreq: "monthly" },
-  { path: "/for-innovint-users",   priority: "0.5", changefreq: "monthly" },
-  { path: "/for-vintrace-users",   priority: "0.5", changefreq: "monthly" },
+  // Competitor-migration pages intentionally excluded from sitemap + PUBLIC_EXACT
+  // (see server/index.ts). They exist for warm outreach only.
   { path: "/regulations/detail",   priority: "0.5", changefreq: "monthly" },
   { path: "/resources",            priority: "0.5", changefreq: "monthly" },
   { path: "/merch",                priority: "0.4", changefreq: "monthly" },
@@ -161,6 +161,10 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /api/
+Disallow: /for-innovint-users
+Disallow: /for-vintrace-users
+Disallow: /hi/
+Disallow: /i/
 
 # Sitemap
 Sitemap: ${SITE_ORIGIN}/api/sitemap.xml

@@ -201,7 +201,7 @@ const TIERS = [
       "Decision Logic + Tribal Knowledge",
       "Priority Compliance AI",
       "Vintage log PDF export",
-      "Phone & chat support",
+      "Email support",
     ],
     cta: "Enter The Press",
     ctaHref: "#waitlist",
@@ -220,8 +220,7 @@ const TIERS = [
     features: [
       "Everything in The Press",
       "Unlimited Divine Trinity reveals",
-      "3 team seats included",
-      "Onboarding call \u2014 30 min",
+      "Team seats (roll-out with multi-tenant)",
       "Annual knowledge base review",
       "Vigneron badge + number",
     ],
@@ -293,7 +292,7 @@ const FAQS = [
   },
   {
     q: "Is there a team plan?",
-    a: "Yes — The Vigneron includes 3 team seats. For larger teams (4+ users), contact us for an enterprise quote.",
+    a: "Yes — The Vigneron includes team seats. Seat count and multi-tenant tooling roll out with the team platform update; founding Vignerons get early access as it lands.",
   },
 ];
 
@@ -1049,13 +1048,12 @@ export default function Pricing() {
   // Live scarcity: pull the same reservation count the modal uses so the
   // banner and the in-modal counter stay in sync. Falls back to "99" when
   // the query hasn't resolved yet (soft-render, doesn't block layout).
-  const reservationCount = trpc.foundingMembers.getReservationCount.useQuery(undefined, {
+  // Note: the live claimed-count progress bar was removed pre-launch (Stripe
+  // was in test mode → the numbers weren't real). We still poll the count so
+  // any downstream widget (e.g. Admin dashboard) stays fresh in one place.
+  trpc.foundingMembers.getReservationCount.useQuery(undefined, {
     refetchInterval: 60_000,
   });
-  const claimedCount = reservationCount.data?.total ?? 0;
-  const capCount = reservationCount.data?.cap ?? 99;
-  const spotsRemaining = Math.max(0, capCount - claimedCount);
-  const percentClaimed = capCount > 0 ? Math.round((claimedCount / capCount) * 100) : 0;
 
   // flashRef holds the flash() callback registered by The Press TierCard
   const flashRef = useRef<(() => void) | null>(null);
@@ -1207,13 +1205,15 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Founding member banner */}
+      {/* Founding member banner — de-risked: no live claim counter until we
+          have real paid subscribers to count. Keep the offer, drop the
+          fabricated "N of 99 claimed" bar (Stripe was in test mode). */}
       <div className="container max-w-7xl mx-auto mb-8 px-4 sm:px-6">
         <div
           className="rounded-sm px-6 py-5"
           style={{ background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)" }}
         >
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div className="w-8 h-8 rounded-sm flex items-center justify-center flex-shrink-0" style={{ background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)" }}>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M8 2l1.5 3.5L13 6l-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-.5L8 2z" stroke="var(--ow-amber)" strokeWidth="1.2" strokeLinejoin="round" />
@@ -1221,39 +1221,11 @@ export default function Pricing() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium" style={{ fontFamily: "'Lato', sans-serif", color: "var(--ow-text-mid)" }}>
-                Founding Member Offer — First 99 paid subscribers
+                Founding Member Offer — for the first 99 paid subscribers
               </p>
               <p className="text-xs mt-0.5" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)" }}>
                 Pricing locked for life · Permanent founding badge · Direct product input · Name in Our Story (optional).
-                Numbers 1–9 reserved; public subscriptions begin at #11.
               </p>
-            </div>
-            <div className="flex-shrink-0 text-center px-5 py-3 rounded-sm" style={{ background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)" }}>
-              <p data-testid="pricing-spots-remaining" style={{ fontFamily: "'Fira Code', monospace", fontSize: "2rem", fontWeight: 700, color: "var(--ow-amber)", lineHeight: 1 }}>
-                {spotsRemaining}
-              </p>
-              <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.65rem", color: "var(--ow-text-lo)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: "0.25rem" }}>
-                spots remaining
-              </p>
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between mb-1.5">
-              <span data-testid="pricing-spots-claimed" style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "var(--ow-text-lo)" }}>
-                {claimedCount} of {capCount} founding spots claimed
-              </span>
-              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.7rem", color: "var(--ow-amber)" }}>
-                {percentClaimed}% claimed
-              </span>
-            </div>
-            <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: "var(--ow-bg-inset)" }}>
-              <div
-                className="h-full rounded-full transition-all duration-1000"
-                style={{
-                  width: `${Math.max(2, percentClaimed)}%`,
-                  background: "linear-gradient(90deg, oklch(0.65 0.10 75), var(--ow-amber))",
-                }}
-              />
             </div>
           </div>
         </div>
