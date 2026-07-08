@@ -748,6 +748,29 @@ function TierCard({
               ${tier.annualPrice}/yr · save ${(tier.monthlyPrice * 12) - tier.annualPrice}
             </p>
           )}
+          {/* Founding → retail ladder chip — desktop layout. */}
+          {tier.monthlyPrice > 0 && tier.retailMonthlyPrice && (
+            <p
+              className="mt-1"
+              data-testid={`tier-retail-chip-desktop-${tier.id}`}
+              style={{
+                fontFamily: "'Fira Code', monospace",
+                fontSize: "0.65rem",
+                color: tier.highlight ? "oklch(0.75 0.015 75)" : "var(--ow-text-lo)",
+                letterSpacing: "0.03em",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Retail from #100:{" "}
+              {cycle === "annual"
+                ? `$${tier.retailMonthlyPrice * 10}/yr`
+                : `$${tier.retailMonthlyPrice}/mo`}{" "}
+              ·{" "}
+              <span style={{ color: "var(--ow-amber)", fontWeight: 700 }}>
+                {Math.round((1 - tier.monthlyPrice / tier.retailMonthlyPrice) * 100)}% off founding
+              </span>
+            </p>
+          )}
           {tier.note && (
             <p className="mt-2 text-xs" style={{ fontFamily: "'Lato', sans-serif", fontStyle: "italic", color: "var(--ow-text-lo)" }}>
               {tier.note}

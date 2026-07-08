@@ -433,7 +433,7 @@ export function CellarJournalEntry({ slug }: { slug: string }) {
                 style={{ background: "var(--ow-amber)", color: "#1a1410" }}
               >
                 <span>
-                  <span className="block text-[10px] opacity-70">From $16/mo</span>
+                  <span className="block text-[10px] opacity-70">From $22/mo</span>
                   Unlock the full cellar
                 </span>
                 <Sparkles className="w-4 h-4" />

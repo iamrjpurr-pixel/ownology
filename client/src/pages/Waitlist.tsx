@@ -16,8 +16,8 @@ const TIERS = [
   {
     id: "press" as const,
     name: "The Press",
-    price: "$41/mo",
-    annual: "$410/yr",
+    price: "$44/mo",
+    annual: "$440/yr",
     description: "Full winemaking AI — SOPs, technique, vintage log, cellar tracking.",
     forWho: "Home winemakers and serious hobbyists",
     badge: null,
@@ -25,9 +25,9 @@ const TIERS = [
   {
     id: "cellar_master" as const,
     name: "The Vigneron",
-    price: "$83/mo",
-    annual: "$830/yr",
-    description: "Everything in The Press + 3 team seats, dedicated onboarding, annual knowledge review.",
+    price: "$88/mo",
+    annual: "$880/yr",
+    description: "Everything in The Press + team seats, annual knowledge review, Vigneron badge.",
     forWho: "Owner-operator boutique vignerons",
     badge: "Most popular",
   },
