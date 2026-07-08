@@ -23,6 +23,7 @@ import Home from "./pages/Home";
 import FreeRun from "./pages/FreeRun";
 const FreeRunJournal = lazy(() => import("./pages/FreeRunJournal"));
 const Apco = lazy(() => import("./pages/Apco"));
+const HomeV2 = lazy(() => import("./pages/HomeV2"));
 import ThePress from "./pages/ThePress";
 import QuickEntry from "./pages/QuickEntry";
 import CellarTasks from "./pages/CellarTasks";
@@ -314,6 +315,7 @@ function Router() {
       <Route path={"/free-run/journal"} component={FreeRunJournal} />
       <Route path={"/free-run"} component={FreeRunPage} />
       <Route path={"/apco"} component={Apco} />
+      <Route path={"/home-v2"} component={HomeV2} />
       <Route path={"/the-press"} component={ThePressPage} />
       <Route path={"/pricing"} component={Pricing} />
       <Route path={"/merch/success"} component={MerchSuccess} />

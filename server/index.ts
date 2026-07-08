@@ -508,6 +508,7 @@ async function startServer() {
     "/free-run",
     "/free-run/journal",
     "/apco",
+    "/home-v2",
     "/waitlist",
     "/demo",
     "/join",

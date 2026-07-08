@@ -75,11 +75,15 @@ export function AdminQrBadge() {
     window.open(`/join/qr?${qs.toString()}`, "_blank", "noopener,noreferrer");
   };
 
-  // Feb 2026 (Rich feedback): pills were "annoying" — collapse to a compact
-  // icon-only chip by default, expand-with-label only on hover. Same click
-  // target size (36px) but a lot less visual noise on every page.
-  const [expanded, setExpanded] = useState(false);
+  return (
+    <QrBadgeButton onClick={onClick} hasBanner={hasBanner} />
+  );
+}
 
+function QrBadgeButton({ onClick, hasBanner }: { onClick: () => void; hasBanner: boolean }) {
+  // useState lives here so it's always after the parent's early-return
+  // guards — never conditional on isOwner/pathname (rules-of-hooks safe).
+  const [expanded, setExpanded] = useState(false);
   return (
     <button
       onClick={onClick}
@@ -92,14 +96,11 @@ export function AdminQrBadge() {
       aria-label="Generate QR code for this page"
       style={{
         position: "fixed",
-        // Sits ABOVE the GlobalThemeToggle pill (also anchored bottom-left,
-        // ~1.25rem + ~44px pill height). Lifts extra when the PWA install
-        // banner pushes the theme pill up, so the two never collide.
         bottom: hasBanner
           ? "calc(4.75rem + 3.25rem + env(safe-area-inset-bottom, 0px))"
           : "calc(1.25rem + 3.25rem + env(safe-area-inset-bottom, 0px))",
         left: "1.1rem",
-        zIndex: 90, // below toasts (~100) but above content
+        zIndex: 90,
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
