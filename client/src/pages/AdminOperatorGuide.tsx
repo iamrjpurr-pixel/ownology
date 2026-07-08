@@ -21,6 +21,7 @@ import {
 import { CrmFlashCards } from "@/components/CrmFlashCards";
 import { PipelineFlashCards } from "@/components/PipelineFlashCards";
 import { ComplianceFlashCards } from "@/components/ComplianceFlashCards";
+import { ImportFlashCards } from "@/components/ImportFlashCards";
 
 type Step = {
   href: string;
@@ -381,7 +382,7 @@ export default function AdminOperatorGuide() {
                 14 cards · 5 columns · KPIs · morning ritual.
               </span>
             </span>
-            <span style={{ display: "block" }}>
+            <span style={{ display: "block", marginBottom: "0.35rem" }}>
               <a
                 href="#compliance-flash-cards"
                 data-testid="op-guide-toc-compliance-flashcards"
@@ -391,6 +392,18 @@ export default function AdminOperatorGuide() {
               </a>{" "}
               <span style={{ fontStyle: "italic" }}>
                 16 cards · Ask · Audit · LIP · APCO · escalate.
+              </span>
+            </span>
+            <span style={{ display: "block" }}>
+              <a
+                href="#import-flash-cards"
+                data-testid="op-guide-toc-import-flashcards"
+                style={{ color: "var(--ow-amber)", textDecoration: "none", fontWeight: 600 }}
+              >
+                ★ Import &amp; OCR flash-card deck →
+              </a>{" "}
+              <span style={{ fontStyle: "italic" }}>
+                19 cards · Voice · Camera · Paste · CSV · Bulk · Review.
               </span>
             </span>
           </p>
@@ -404,6 +417,9 @@ export default function AdminOperatorGuide() {
 
         {/* Compliance flash-card deck */}
         <ComplianceFlashCards />
+
+        {/* Import & OCR flash-card deck */}
+        <ImportFlashCards />
 
         {/* Sections */}
         {SECTIONS.map((section) => (

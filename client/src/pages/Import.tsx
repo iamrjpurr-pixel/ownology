@@ -1917,6 +1917,8 @@ export default function Import() {
             <button
               key={tab.id}
               onClick={() => { setActiveTab(tab.id); setEntries([]); setSaved(false); }}
+              data-testid={`import-tab-${tab.id}`}
+              aria-selected={activeTab === tab.id}
               className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-lg transition-all"
               style={{
                 background: activeTab === tab.id ? "var(--ow-amber)" : "transparent",
