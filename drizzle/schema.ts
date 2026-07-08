@@ -1250,6 +1250,46 @@ export const outreachContacts = mysqlTable(
 
 
 /**
+ * event_ingests — history of every wine-event URL the operator has fed
+ * through /admin/event-ingest. Persists the full parse snapshot so the
+ * operator can re-open past events and pull "Add more from this event"
+ * without re-running the LLM extraction. Same URL = same row (upserted
+ * on re-parse).
+ *
+ * `producers_json` is the LLM's snapshot at parse time — { winery,
+ * winemakerName, role, notes } tuples. When the operator clicks "Load"
+ * on a history row, we hydrate this back into the main view.
+ */
+export const eventIngests = mysqlTable(
+  "event_ingests",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    url: varchar("url", { length: 500 }).notNull().unique(),
+    eventName: varchar("event_name", { length: 200 }),
+    eventDateIso: varchar("event_date_iso", { length: 12 }), // "YYYY-MM-DD"
+    eventDateDisplay: varchar("event_date_display", { length: 120 }),
+    venue: varchar("venue", { length: 200 }),
+    address: varchar("address", { length: 300 }),
+    city: varchar("city", { length: 80 }),
+    ticketsUrl: varchar("tickets_url", { length: 500 }),
+    eventKind: varchar("event_kind", { length: 32 }),
+    // JSON blob — array of { winery, winemakerName, role, notes }. Text
+    // (not JSON column) so it survives cross-MySQL-version differences.
+    producersJson: text("producers_json"),
+    producerCount: int("producer_count").notNull().default(0),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+    // Bumped whenever the operator opens the history row (for sort-by-recent).
+    lastUsedAt: bigint("last_used_at", { mode: "number" }),
+  },
+  (t) => [
+    index("ei_created_idx").on(t.createdAt),
+    index("ei_event_name_idx").on(t.eventName),
+  ]
+);
+
+
+/**
  * theme_picks — anonymous telemetry of theme selections.
  *
  * Logged whenever a visitor picks a theme via the onboarding card or the

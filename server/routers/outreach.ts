@@ -1263,7 +1263,163 @@ Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine
         }
       }
 
-      return { draft, eventStatus };
+      // ── Persist the parse to event_ingests so the operator can revisit
+      // this event later ("Add more from this event") without another
+      // LLM round-trip. Upsert on URL — re-parsing the same URL bumps
+      // updatedAt + refreshes the snapshot.
+      let ingestId: number | null = null;
+      if (draft && draft.eventName) {
+        const now = Date.now();
+        const producersJson = JSON.stringify(draft.producers);
+        try {
+          // Try insert first. MySQL will throw a duplicate-key error if
+          // the URL already exists; we then fall through to an update.
+          const inserted = await db.insert(schema.eventIngests).values({
+            url: input.url,
+            eventName: draft.eventName,
+            eventDateIso: draft.eventDateIso,
+            eventDateDisplay: draft.eventDateDisplay,
+            venue: draft.venue,
+            address: draft.address,
+            city: draft.city,
+            ticketsUrl: draft.ticketsUrl,
+            eventKind: draft.eventKind,
+            producersJson,
+            producerCount: draft.producers.length,
+            createdAt: now,
+            updatedAt: now,
+            lastUsedAt: now,
+          });
+          // mysql2 returns insertId on the raw result — narrow safely.
+          const anyResult = inserted as unknown as { insertId?: number } | Array<{ insertId?: number }>;
+          const insertId = Array.isArray(anyResult) ? anyResult[0]?.insertId : anyResult?.insertId;
+          if (typeof insertId === "number" && insertId > 0) ingestId = insertId;
+        } catch {
+          // Duplicate URL — update the existing row.
+          await db
+            .update(schema.eventIngests)
+            .set({
+              eventName: draft.eventName,
+              eventDateIso: draft.eventDateIso,
+              eventDateDisplay: draft.eventDateDisplay,
+              venue: draft.venue,
+              address: draft.address,
+              city: draft.city,
+              ticketsUrl: draft.ticketsUrl,
+              eventKind: draft.eventKind,
+              producersJson,
+              producerCount: draft.producers.length,
+              updatedAt: now,
+              lastUsedAt: now,
+            })
+            .where(eq(schema.eventIngests.url, input.url));
+          const existing = await db
+            .select({ id: schema.eventIngests.id })
+            .from(schema.eventIngests)
+            .where(eq(schema.eventIngests.url, input.url))
+            .limit(1);
+          ingestId = existing[0]?.id ?? null;
+        }
+      }
+
+      return { draft, eventStatus, ingestId };
+    }),
+
+  // ── OWNER — List past event ingests (history panel) ────────────────────
+  // Returns the last 30 events the operator has parsed, each with a count
+  // of contacts already saved from that event (matched by exact `event`
+  // name on outreach_contacts). Powers the "Recent event ingests" panel
+  // on /admin/event-ingest.
+  listIngests: ownerProcedure.query(async () => {
+    const rows = await db
+      .select({
+        id: schema.eventIngests.id,
+        url: schema.eventIngests.url,
+        eventName: schema.eventIngests.eventName,
+        eventDateIso: schema.eventIngests.eventDateIso,
+        eventDateDisplay: schema.eventIngests.eventDateDisplay,
+        venue: schema.eventIngests.venue,
+        city: schema.eventIngests.city,
+        eventKind: schema.eventIngests.eventKind,
+        producerCount: schema.eventIngests.producerCount,
+        createdAt: schema.eventIngests.createdAt,
+        updatedAt: schema.eventIngests.updatedAt,
+        lastUsedAt: schema.eventIngests.lastUsedAt,
+      })
+      .from(schema.eventIngests)
+      .orderBy(desc(schema.eventIngests.updatedAt))
+      .limit(30);
+
+    // For each ingest, count how many contacts we've already saved with
+    // event = eventName. Small N (≤30) so an N+1 is fine here.
+    const withCounts = await Promise.all(
+      rows.map(async (r) => {
+        const savedCount = r.eventName
+          ? await db
+              .select({ c: sql<number>`COUNT(*)` })
+              .from(schema.outreachContacts)
+              .where(eq(schema.outreachContacts.event, r.eventName))
+              .then((res) => Number(res[0]?.c ?? 0))
+          : 0;
+        return { ...r, savedCount };
+      })
+    );
+    return { ingests: withCounts };
+  }),
+
+  // ── OWNER — Load the full producer snapshot for one past ingest ────────
+  // Returns the same shape as parseEventUrl (draft + eventStatus) but
+  // hydrated from the persisted JSON — no LLM call, no network. Bumps
+  // lastUsedAt so the history sorts recently-touched first.
+  getIngest: ownerProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(async ({ input }) => {
+      const rows = await db
+        .select()
+        .from(schema.eventIngests)
+        .where(eq(schema.eventIngests.id, input.id))
+        .limit(1);
+      const row = rows[0];
+      if (!row) throw new Error("Event ingest not found");
+
+      await db
+        .update(schema.eventIngests)
+        .set({ lastUsedAt: Date.now() })
+        .where(eq(schema.eventIngests.id, input.id));
+
+      let producers: Array<{ winery: string; winemakerName: string | null; role: string | null; notes: string | null }> = [];
+      try {
+        const parsed = JSON.parse(row.producersJson ?? "[]");
+        if (Array.isArray(parsed)) producers = parsed;
+      } catch { /* corrupt JSON — return empty list */ }
+
+      const draft = {
+        eventName: row.eventName,
+        eventDateIso: row.eventDateIso,
+        eventDateDisplay: row.eventDateDisplay,
+        venue: row.venue,
+        address: row.address,
+        city: row.city,
+        ticketsUrl: row.ticketsUrl,
+        eventKind: row.eventKind,
+        producers,
+      };
+      let eventStatus: "past" | "future" | "unknown" = "unknown";
+      if (row.eventDateIso) {
+        const parsedDate = new Date(row.eventDateIso);
+        if (!Number.isNaN(parsedDate.getTime())) {
+          eventStatus = parsedDate.getTime() >= Date.now() ? "future" : "past";
+        }
+      }
+      return { draft, eventStatus, url: row.url, ingestId: row.id };
+    }),
+
+  // ── OWNER — Remove a past ingest from history (irreversible) ───────────
+  deleteIngest: ownerProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(async ({ input }) => {
+      await db.delete(schema.eventIngests).where(eq(schema.eventIngests.id, input.id));
+      return { ok: true };
     }),
 
   /** OWNER — mark a whole batch of contacts as smsSentAt=now in one call.

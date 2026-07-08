@@ -64,10 +64,41 @@ export default function AdminEventIngest() {
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [research, setResearch] = useState<Record<number, ResearchState>>({});
   const [isResearching, setIsResearching] = useState(false);
+  // When true, the operator hydrated the view from a past ingest (not a
+  // fresh parse). Used to badge the header + hide the auto-select-all.
+  const [loadedFromHistory, setLoadedFromHistory] = useState(false);
 
+  const utils = trpc.useUtils();
   const parseMutation = trpc.outreach.parseEventUrl.useMutation();
   const deepResearchMutation = trpc.outreach.deepResearch.useMutation();
   const createMutation = trpc.outreach.create.useMutation();
+  const getIngestMutation = trpc.outreach.getIngest.useMutation();
+  const deleteIngestMutation = trpc.outreach.deleteIngest.useMutation();
+
+  // History panel — recent event parses, sorted by last touch.
+  const { data: ingestsData } = trpc.outreach.listIngests.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    staleTime: 30_000,
+  });
+  const ingests = ingestsData?.ingests ?? [];
+
+  // Existing contacts — used to detect "already saved" producers when
+  // hydrating a past event, so we can grey them out and let the operator
+  // focus on truly new ones ("Add more from this event").
+  const { data: contactsData } = trpc.outreach.list.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    staleTime: 30_000,
+  });
+  const savedWineryKeys = useMemo(() => {
+    if (!contactsData?.contacts || !event?.eventName) return new Set<string>();
+    const eventName = event.eventName.toLowerCase().trim();
+    const keys = new Set<string>();
+    for (const c of contactsData.contacts) {
+      if ((c.event ?? "").toLowerCase().trim() !== eventName) continue;
+      if (c.winery) keys.add(c.winery.toLowerCase().trim());
+    }
+    return keys;
+  }, [contactsData, event?.eventName]);
 
   const producers = event?.producers ?? [];
   const selectedCount = selected.size;
@@ -82,6 +113,7 @@ export default function AdminEventIngest() {
     setEvent(null);
     setSelected(new Set());
     setResearch({});
+    setLoadedFromHistory(false);
     try {
       const result = await parseMutation.mutateAsync({ url: url.trim() });
       if (!result.draft || !result.draft.eventName) {
@@ -92,8 +124,73 @@ export default function AdminEventIngest() {
       setEventStatus(result.eventStatus);
       // Auto-tick every named producer (operator can untick).
       setSelected(new Set(result.draft.producers.map((_, i) => i)));
+      utils.outreach.listIngests.invalidate();
     } catch (err) {
       alert(`Parse failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  // Hydrate the main view from a past ingest — no LLM call, no network
+  // scrape. Producers already saved (matched by winery + event) are
+  // *not* auto-ticked so the operator's default action is "add the new
+  // ones I missed last time".
+  async function handleLoadHistory(id: number) {
+    setResearch({});
+    try {
+      const result = await getIngestMutation.mutateAsync({ id });
+      if (!result.draft || !result.draft.eventName) return;
+      setEvent(result.draft as EventDraft);
+      setEventStatus(result.eventStatus);
+      setUrl(result.url);
+      setLoadedFromHistory(true);
+      // Auto-tick only producers we haven't saved yet.
+      const eventLc = result.draft.eventName.toLowerCase().trim();
+      const alreadySaved = new Set<string>();
+      for (const c of contactsData?.contacts ?? []) {
+        if ((c.event ?? "").toLowerCase().trim() === eventLc && c.winery) {
+          alreadySaved.add(c.winery.toLowerCase().trim());
+        }
+      }
+      const fresh = new Set<number>();
+      result.draft.producers.forEach((p, i) => {
+        if (!alreadySaved.has(p.winery.toLowerCase().trim())) fresh.add(i);
+      });
+      setSelected(fresh);
+      utils.outreach.listIngests.invalidate();
+    } catch (err) {
+      alert(`Load failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  async function handleReparse(historyUrl: string) {
+    setUrl(historyUrl);
+    // Trigger the same flow as pasting + clicking "Pull lineup"
+    setEvent(null);
+    setSelected(new Set());
+    setResearch({});
+    setLoadedFromHistory(false);
+    try {
+      const result = await parseMutation.mutateAsync({ url: historyUrl });
+      if (!result.draft || !result.draft.eventName) {
+        alert("Re-parse returned no producers — try a different URL.");
+        return;
+      }
+      setEvent(result.draft);
+      setEventStatus(result.eventStatus);
+      setSelected(new Set(result.draft.producers.map((_, i) => i)));
+      utils.outreach.listIngests.invalidate();
+    } catch (err) {
+      alert(`Re-parse failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  async function handleDeleteHistory(id: number) {
+    if (!confirm("Remove this event from ingest history? (Contacts already saved from it are unaffected.)")) return;
+    try {
+      await deleteIngestMutation.mutateAsync({ id });
+      utils.outreach.listIngests.invalidate();
+    } catch (err) {
+      alert(`Delete failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
