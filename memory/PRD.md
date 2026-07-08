@@ -5,6 +5,38 @@
 
 
 
+**Persona picker in `/admin/contacts` create form + Digital Outreach Cheatsheet — SHIPPED (Feb 2026, this session)**
+
+Rich flagged (rightly): shipping the persona wiring without a UI to set persona at save-time was an incomplete value delivery. Fixed inline.
+
+**`client/src/pages/AdminContacts.tsx`**:
+- Added `persona: "winemaker"` to the form state (default = safest fallback).
+- New pill-row row between the address block and the pain-point field: `PERSONA · [MD/GM] [Winemaker] [Owner] [Sales Rep]  (which pitch shows on their /hi/ page)`. Amber-fill on selected, hollow otherwise. 34-px tap-height minimum. `data-testid="form-persona-row"` + `form-persona-{md|winemaker|owner|sales-rep}`.
+- `deepResearch` result flow now auto-selects the persona pill from Perplexity's `suggestedPersona` field — operator sees the AI's guess pre-filled and either confirms or overrides in one tap.
+- `Event` field placeholder expanded from `"McLaren Vale 2025"` → `"McLaren Vale 2025 · Pluto Wine Bar takeover · Perplexity research"` so the operator remembers to fill it in with the actual source-of-contact (so the `/hi/:slug` greeting reads "We crossed paths at X — sending this your way for Y").
+- Form-reset after save preserves `persona` at the default (`winemaker`) — same pattern as `event` and `calendlyOverride` reset behaviour.
+
+**`/app/memory/digital_outreach_cheatsheet.md`** (NEW, ~180 lines):
+- One-page cheat sheet covering the modern digital outreach flow — Perplexity → `/hi/{slug}` → persona-tuned pitches → track opens → follow up.
+- 20-minute Monday-morning routine (add 5, message 5, nudge 2 old ghosts).
+- Two-URL decision matrix (`/join?ref=` for pure cold, `/hi/{slug}` for researched/met).
+- Three ways to add contacts (Perplexity 15-sec research / URL Quick-Add / Manual after in-person meet).
+- Four personas explained plainly with sample bullets — MD (cashflow), Winemaker (default cellar peace-of-mind), Owner (legacy), Sales Rep (pocket cheat-sheet, honest for spirits/beer).
+- What Sarah/James/Sam sees on their personal URL (worked example).
+- SMS / IG DM / Email templates.
+- Signals to watch in `/admin/contacts` (viewCount / smsSentAt / ctaClickedAt / demoBookedAt).
+- Do/Don't list.
+- Troubleshooting.
+
+**`/app/memory/cold_call_playbook.md`**:
+- Header updated to cross-reference the new cheatsheet as the "modern digital workflow" companion.
+- Landing-page section now explains the two URL choices (`/join?ref=` for pure cold, `/hi/{slug}` for researched — with "prefer `/hi/` whenever possible" guidance).
+- Phone-script content (opener, branches, objections, voicemail, email follow-up) left untouched — it's still fully current.
+
+**Verified via screenshot**: form renders the persona pills correctly. TypeScript still 0 errors.
+
+
+
 **Role-based persona pitches on `/hi/:slug` — SHIPPED (Feb 2026, this session)**
 
 Rich's insight after James Wilkinson (Poole's Rock) review: the old 5 winemaker-native variants pitched too scientifically (AWRI, FSANZ, PhD-author name-drops) and killed the humanity in front of anyone who wasn't a chemistry buff. The new model is **role-based** — same winery, four different people to call, four completely different pitches.

@@ -118,6 +118,7 @@ export default function AdminContacts() {
     painPoint: "",
     calendlyOverride: "",
     notes: "",
+    persona: "winemaker" as "md" | "winemaker" | "owner" | "sales-rep",
   });
   const [err, setErr] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<Record<string, "url" | "sms" | null>>({});
@@ -185,7 +186,7 @@ export default function AdminContacts() {
     }
     try {
       await createMutation.mutateAsync(form);
-      setForm({ firstName: "", lastName: "", mobileAu: "", winery: "", event: form.event, painPoint: "", calendlyOverride: form.calendlyOverride, notes: "" });
+      setForm({ firstName: "", lastName: "", mobileAu: "", winery: "", event: form.event, painPoint: "", calendlyOverride: form.calendlyOverride, notes: "", persona: "winemaker" });
       // Await the invalidation AND kick an explicit refetch so the KPI
       // counter + "All (n)" chip update in the same tick as the new row
       // appears in the list. Previously the KPI could look stuck when a
@@ -241,6 +242,7 @@ export default function AdminContacts() {
         painPoint: typeof d.painPoint === "string" ? d.painPoint : "",
         calendlyOverride: form.calendlyOverride,
         notes: combinedNotes,
+        persona: (result.suggestedPersona as typeof form.persona) ?? "winemaker",
       });
       setDeepSearchCitations(result.citations || []);
       setDeepSearchConfidence(typeof d.confidence === "string" ? d.confidence : null);
@@ -302,6 +304,7 @@ export default function AdminContacts() {
         painPoint: typeof d.painPoint === "string" ? d.painPoint : "",
         calendlyOverride: form.calendlyOverride,
         notes: combinedNotes,
+        persona: form.persona,
       });
       setUrlLastFetched(url);
       setUrlQuickAdd("");
@@ -623,8 +626,48 @@ export default function AdminContacts() {
           <Field label="Last name" testid="form-lastName" value={form.lastName} onChange={(v) => setForm({ ...form, lastName: v })} />
           <Field label="Mobile (AU)" placeholder="0412 345 678" testid="form-mobile" value={form.mobileAu} onChange={(v) => setForm({ ...form, mobileAu: v })} />
           <Field label="Winery" testid="form-winery" value={form.winery} onChange={(v) => setForm({ ...form, winery: v })} />
-          <Field label="Event" placeholder="McLaren Vale 2025" testid="form-event" value={form.event} onChange={(v) => setForm({ ...form, event: v })} />
+          <Field label="Event" placeholder="McLaren Vale 2025 · Pluto Wine Bar takeover · Perplexity research" testid="form-event" value={form.event} onChange={(v) => setForm({ ...form, event: v })} />
           <Field label="Calendly URL (optional override)" testid="form-calendly" value={form.calendlyOverride} onChange={(v) => setForm({ ...form, calendlyOverride: v })} />
+        </div>
+        {/* Persona picker — determines which of the 4 role-tuned bullet sets
+            the /hi/:slug page serves. Perplexity's deepResearch pre-selects
+            a suggestion; operator can override before saving. Placement here
+            (as its own row, above pain-point) is deliberate — persona
+            frames the whole pitch, so it's a conscious decision, not
+            buried in a form field.  */}
+        <div style={{ marginTop: 8, marginBottom: 8, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }} data-testid="form-persona-row">
+          <label style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)", letterSpacing: "0.08em", textTransform: "uppercase", minWidth: 90 }}>
+            Persona
+          </label>
+          {(["md","winemaker","owner","sales-rep"] as const).map((p) => {
+            const labels: Record<typeof p, string> = { md: "MD/GM", winemaker: "Winemaker", owner: "Owner", "sales-rep": "Sales Rep" };
+            const selected = form.persona === p;
+            return (
+              <button
+                key={p}
+                type="button"
+                data-testid={`form-persona-${p}`}
+                onClick={() => setForm({ ...form, persona: p })}
+                style={{
+                  padding: "0.4rem 0.85rem",
+                  borderRadius: 999,
+                  border: `1px solid ${selected ? "var(--ow-amber)" : "var(--ow-border)"}`,
+                  background: selected ? "var(--ow-amber)" : "transparent",
+                  color: selected ? "oklch(0.11 0.008 60)" : "var(--ow-text-hi)",
+                  fontFamily: "'Lato',sans-serif",
+                  fontSize: "0.78rem",
+                  fontWeight: selected ? 700 : 500,
+                  cursor: "pointer",
+                  minHeight: 34,
+                }}
+              >
+                {labels[p]}
+              </button>
+            );
+          })}
+          <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", color: "var(--ow-text-lo)", fontStyle: "italic", marginLeft: 4 }}>
+            (which pitch shows on their <code>/hi/</code> page)
+          </span>
         </div>
         <Field label="Pain point they mentioned" testid="form-pain" value={form.painPoint} placeholder="VA issues on Tank 9 last year" onChange={(v) => setForm({ ...form, painPoint: v })} />
         <Field label="Private notes" testid="form-notes" value={form.notes} onChange={(v) => setForm({ ...form, notes: v })} />

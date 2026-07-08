@@ -1,7 +1,10 @@
 # Ownology · Cold-Call Playbook
 
 **Purpose**: bullet-proof scripts for the founding-partner outreach phase.
-**Landing page**: `ownology.ai/join?ref=firstname-lastname`
+**Companion doc**: `digital_outreach_cheatsheet.md` — the modern digital workflow (Perplexity research → `/hi/{slug}` → persona-tuned pitches → track opens). Use it for anyone you've researched or met in person. This playbook covers the phone leg.
+**Landing pages**:
+  - `ownology.ai/join?ref=firstname-lastname` — generic Founding-Partner pitch for pure-cold callees with no prior research.
+  - `ownology.ai/hi/{slug}` — persona-tuned personal page for anyone you've saved in the CRM. Prefer this whenever possible.
 **Attribution**: check `/admin/contacts` filtered by `source=cold-call`.
 
 ---
