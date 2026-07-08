@@ -232,10 +232,74 @@ export function HeroPillarsSection() {
         ))}
       </div>
 
+      {/* ── Audience router — soft self-sort chips (Feb 2026, Rich)
+             Introduced after the /home-v2 experiment showed a dual-door
+             framing helps DIY visitors and Pros both feel welcome without
+             leaning too hard on the Owen character. Kept intentionally
+             low-contrast so it never competes with the pillar grid or the
+             Start Free Trial primary CTA. ────────────────────────────── */}
+      <div
+        className="mt-10 flex flex-wrap items-center gap-3 fade-up fade-up-delay-3"
+        data-testid="hero-pillars-audience-router"
+        style={{
+          padding: "0.75rem 0",
+          borderTop: "1px dashed var(--ow-border-md, oklch(0.87 0.015 80))",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.72rem",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "var(--ow-text-lo)",
+            fontWeight: 600,
+          }}
+        >
+          Which are you?
+        </span>
+        <Link
+          href="/ask?from=hero-router-curious"
+          data-testid="hero-router-curious"
+          className="hero-router-chip"
+          style={{
+            padding: "0.4rem 0.85rem",
+            borderRadius: "999px",
+            border: "1px solid var(--ow-border-md, oklch(0.87 0.015 80))",
+            background: "transparent",
+            color: "var(--ow-text-mid)",
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.85rem",
+            textDecoration: "none",
+            transition: "border-color 180ms ease, color 180ms ease, background 180ms ease",
+          }}
+        >
+          🍷 Just curious about wine →
+        </Link>
+        <Link
+          href="/join?from=hero-router-pro"
+          data-testid="hero-router-pro"
+          className="hero-router-chip"
+          style={{
+            padding: "0.4rem 0.85rem",
+            borderRadius: "999px",
+            border: "1px solid var(--ow-border-md, oklch(0.87 0.015 80))",
+            background: "transparent",
+            color: "var(--ow-text-mid)",
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.85rem",
+            textDecoration: "none",
+            transition: "border-color 180ms ease, color 180ms ease, background 180ms ease",
+          }}
+        >
+          🍇 Making wine yourself →
+        </Link>
+      </div>
+
       {/* ── Secondary CTAs — preserved from the original hero so we don't
              lose the "Start Free Trial" primary conversion path ────────── */}
       <div
-        className="mt-10 flex flex-col sm:flex-row flex-wrap gap-3 fade-up fade-up-delay-3"
+        className="mt-6 flex flex-col sm:flex-row flex-wrap gap-3 fade-up fade-up-delay-3"
         data-testid="hero-pillars-ctas"
       >
         <a
@@ -264,6 +328,11 @@ export function HeroPillarsSection() {
           transform: translateY(-2px);
           border-color: var(--ow-amber) !important;
           box-shadow: 0 8px 32px -12px color-mix(in oklch, var(--ow-amber) 25%, transparent);
+        }
+        .hero-router-chip:hover {
+          border-color: var(--ow-amber) !important;
+          color: var(--ow-amber) !important;
+          background: color-mix(in oklch, var(--ow-amber) 8%, transparent) !important;
         }
       `}</style>
     </div>

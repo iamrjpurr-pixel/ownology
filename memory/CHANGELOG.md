@@ -5,6 +5,15 @@ problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
 ## Feb 2026
+### Home 1 shop-window polish — trust chips · APCO strip · sync pricing · bookend router  (Feb 2026)
+- **Audience router pill strip** added under the 4-pillar hero grid ("Which are you? 🍷 Just curious about wine → · 🍇 Making wine yourself →"). Borrowed the self-sort UX from `/home-v2` mockup without importing the Owen-heavy framing Rich flagged.
+- **Trust chip strip** — compact credibility band directly below the hero: 🇦🇺 Australian-built · Wine Australia LIP-audit ready · APCO Assistant · Founding cohort 99.
+- **APCO strip** — new compliance-wedge section between FounderStory and Pricing. Two-column layout: strip narrative + "What Ownology handles" bullet card. Deep-links to `/apco` and `/pricing`.
+- **Home Pricing block synced** — was showing stale $16 / $41 / $83; now correctly reflects `/pricing` values with founding-→-retail ladder: $22/$28 · $44/$59 · $88/$124 + inline strikethrough retail chip.
+- **Final CTA enhanced** — replaced generic "Talk to Us" mailto with "Play the 10-min sandbox" + bookend audience-router chips ("Not sure yet? 🍷 Try answer engine · 🍇 Book a winemaker call").
+- **Verdict from user**: Home V2 was "very Owen", Home 1 "very rich and gel when you scrolled". Kept Home 1's density, added V2's best structural moves (self-sort + trust chips + APCO strip). `/home-v2` remains as hidden reference mockup.
+
+
 
 ### Nav slim-down — public gets 3 links, operator quick-links move to /admin  (Feb 2026)
 - **C. Public "More" dropdown deleted from desktop chrome entirely.** Old

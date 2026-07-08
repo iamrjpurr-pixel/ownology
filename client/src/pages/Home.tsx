@@ -1041,27 +1041,197 @@ function Testimonials() {
   );
 }
 
+// ─── Trust chips ─────────────────────────────────────────────────────────────
+// Compact credibility strip, borrowed from the /home-v2 experiment. Placed
+// directly below the hero on a wide viewport so a cold visitor sees the
+// four credentials that matter (Australian-built · LIP-audit ready · APCO
+// Assistant · Founding cohort 99) before scrolling to any prose.
+function TrustChips() {
+  const chips = [
+    { icon: "🇦🇺", label: "Australian-built" },
+    { icon: "🍇", label: "Wine Australia LIP-audit ready" },
+    { icon: "📋", label: "APCO Assistant · Compliance-first" },
+    { icon: "✦",  label: "Founding cohort · first 99 winemakers" },
+  ];
+  return (
+    <section
+      data-testid="home-trust-chips"
+      style={{
+        background: "var(--ow-bg-card)",
+        borderTop: "1px solid var(--ow-border)",
+        borderBottom: "1px solid var(--ow-border)",
+        padding: "1.1rem 1rem",
+      }}
+    >
+      <div
+        className="container flex flex-wrap justify-center items-center"
+        style={{
+          gap: "1rem 2.25rem",
+          fontFamily: "'Lato',sans-serif",
+          fontSize: "0.72rem",
+          color: "var(--ow-text-lo)",
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+          fontWeight: 500,
+        }}
+      >
+        {chips.map((c) => (
+          <span
+            key={c.label}
+            data-testid={`trust-chip-${c.label.replace(/[^a-z0-9]+/gi,'-').toLowerCase()}`}
+            style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}
+          >
+            <span aria-hidden="true" style={{ fontSize: "0.95rem" }}>{c.icon}</span>
+            {c.label}
+          </span>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ─── APCO strip ──────────────────────────────────────────────────────────────
+// Compact compliance-wedge section on the home page. Captures winemakers
+// googling APCO / packaging compliance panic. Deep-links to the full
+// /apco marketing page. Placed between Testimonials and Pricing so the
+// visitor is warm on story before hitting the pitch.
+function ApcoStrip() {
+  const { ref, inView } = useInView(0.15);
+  return (
+    <section
+      ref={ref}
+      data-testid="home-apco-strip"
+      style={{
+        background: "var(--ow-bg-raised)",
+        borderTop: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
+        borderBottom: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
+        padding: "3.5rem 1rem",
+      }}
+    >
+      <div className={`container grid md:grid-cols-[1.4fr_1fr] gap-8 items-center ${inView ? "fade-up" : "opacity-0"}`}>
+        <div>
+          <p
+            className="section-label mb-3"
+            style={{ color: "var(--ow-amber)" }}
+          >
+            NEW · APCO Assistant · Compliance wedge
+          </p>
+          <h2
+            style={{
+              fontFamily: "'Fraunces',serif",
+              fontWeight: 700,
+              fontSize: "clamp(1.5rem, 2.6vw, 2rem)",
+              lineHeight: 1.15,
+              color: "var(--ow-text-hi)",
+              margin: 0,
+              letterSpacing: "-0.01em",
+              textWrap: "balance" as "balance",
+            }}
+          >
+            The APCO Annual Report is due 31 March.
+            <br />
+            Ownology drafts yours in an afternoon.
+          </h2>
+          <p
+            className="mt-4"
+            style={{
+              fontFamily: "'Lato',sans-serif",
+              fontWeight: 300,
+              fontSize: "0.98rem",
+              lineHeight: 1.7,
+              color: "var(--ow-text-mid)",
+              maxWidth: "560px",
+            }}
+          >
+            Boutique winemakers lose 15–40 hours a year to APCO packaging reporting.
+            Ownology's APCO Assistant vaults your bottle · closure · carton data
+            once, then generates the Action Plan and Annual Report on demand —
+            included with The Press ($44/mo founding · $59 retail).
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/apco?from=home-apco-strip"
+              data-testid="home-apco-cta"
+              className="btn-amber inline-flex items-center"
+            >
+              See how APCO Assistant works →
+            </Link>
+            <Link
+              href="/pricing?from=home-apco-strip"
+              data-testid="home-apco-pricing"
+              className="btn-ghost inline-flex items-center"
+              style={{ borderColor: "var(--ow-border-md)" }}
+            >
+              Pricing
+            </Link>
+          </div>
+        </div>
+        {/* Compliance stat card */}
+        <div
+          style={{
+            background: "var(--ow-bg-card)",
+            border: "1px solid var(--ow-border)",
+            borderRadius: 6,
+            padding: "1.5rem",
+            fontFamily: "'Lato',sans-serif",
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "'Fira Code',monospace",
+              fontSize: "0.62rem",
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "var(--ow-amber)",
+              fontWeight: 700,
+              marginBottom: "1rem",
+            }}
+          >
+            What Ownology handles
+          </p>
+          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.65rem" }}>
+            {[
+              "Bottle, closure & label data vault",
+              "Sustainable Packaging Guidelines self-audit",
+              "Auto-drafted Action Plan (Claude Sonnet 4.6)",
+              "Annual Report → APCO portal-ready format",
+            ].map((line) => (
+              <li key={line} style={{ display: "flex", alignItems: "flex-start", gap: "0.55rem", fontSize: "0.87rem", color: "var(--ow-text-mid)", lineHeight: 1.55 }}>
+                <span style={{ color: "var(--ow-amber)", fontWeight: 700, flexShrink: 0 }}>✓</span>
+                <span>{line}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Pricing ──────────────────────────────────────────────────────────────────
 function Pricing() {
   const { ref, inView } = useInView();
   const tiers = [
     {
-      name:"Free Run", price:"Free", period:"", sub:"No credit card needed",
+      name:"Free Run", price:"Free", period:"", retail:"", sub:"No credit card needed",
       features:["3 curiosity questions / day","Flavour science & varietals","Divine Trinity — first reveal free","Free account — no card needed"],
       cta:"Start Exploring", href:"/free-run", highlight:false,
     },
     {
-      name:"The Cellar Hand", price:"$16", period:"/mo", sub:"$190/yr · save $38",
+      name:"The Cellar Hand", price:"$22", period:"/mo", retail:"$28/mo retail",
+      sub:"Founding · $220/yr · save 21%",
       features:["Full curiosity AI — 40+ subjects","30 Divine Trinity reveals per month","Unlimited Compliance AI","Vintage log (unlimited entries)","Email support","Founding member badge (first 99)"],
       cta:"Join The Cellar Hand", href:"/pricing", highlight:false,
     },
     {
-      name:"The Press", price:"$41", period:"/mo", sub:"$410/yr · save $82",
+      name:"The Press", price:"$44", period:"/mo", retail:"$59/mo retail",
+      sub:"Founding · $440/yr · save 25%",
       features:["Full cellar operations suite","38 SOPs across 12 categories","Decision Logic + Tribal Knowledge","Priority Compliance AI","Vintage log PDF export","Phone & chat support"],
       cta:"Enter The Press", href:"/pricing", highlight:true,
     },
     {
-      name:"The Vigneron", price:"$83", period:"/mo", sub:"$830/yr · save $166",
+      name:"The Vigneron", price:"$88", period:"/mo", retail:"$124/mo retail",
+      sub:"Founding · $880/yr · save 29%",
       features:["Everything in The Press","Unlimited Divine Trinity reveals","3 team seats included","Onboarding call — 30 min","Annual knowledge base review","Vigneron badge + number"],
       cta:"Claim The Vigneron", href:"/pricing", highlight:false,
     },
@@ -1098,6 +1268,22 @@ function Pricing() {
                 <span style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"2.25rem", color: t.highlight ? "oklch(0.92 0.018 75)" : "var(--ow-text-hi)", lineHeight:1}}>{t.price}</span>
                 {t.period && <span style={{fontFamily:"'Lato',sans-serif", fontSize:"0.875rem", color: t.highlight ? "oklch(0.70 0.015 75)" : "var(--ow-text-lo)", paddingBottom:"0.35rem"}}>{t.period}</span>}
               </div>
+              {t.retail && (
+                <p
+                  data-testid={`home-tier-retail-${t.name.replace(/\s+/g,'-').toLowerCase()}`}
+                  style={{
+                    fontFamily: "'Fira Code',monospace",
+                    fontSize: "0.68rem",
+                    letterSpacing: "0.04em",
+                    color: t.highlight ? "oklch(0.60 0.015 75)" : "var(--ow-text-lo)",
+                    marginBottom: "0.25rem",
+                    textDecoration: "line-through",
+                    opacity: 0.7,
+                  }}
+                >
+                  {t.retail}
+                </p>
+              )}
               <p className="data-readout text-xs mb-5" style={{color: t.highlight ? "oklch(0.60 0.015 75)" : "var(--ow-text-lo)"}}>{t.sub}</p>
               <div className="amber-rule mb-5" />
               <ul className="flex flex-col gap-2.5 flex-1 mb-7">
@@ -1509,8 +1695,59 @@ function CTA() {
           Start your 14-day free trial. No credit card. No setup fee. Cancel anytime.
         </p>
         <div className="flex flex-wrap justify-center gap-4 mt-10">
-          <a href="/pricing" className="btn-amber">Start Free Trial</a>
-          <a href="mailto:support@ownology.ai" className="btn-ghost">Talk to Us</a>
+          <a href="/pricing?from=home-final-cta" className="btn-amber" data-testid="home-final-cta-trial">Start 14-Day Free Trial</a>
+          <Link href="/try?from=home-final-cta" className="btn-ghost" data-testid="home-final-cta-sandbox" style={{ borderColor: "var(--ow-amber)", color: "var(--ow-amber)", fontWeight: 600 }}>
+            Play the 10-min sandbox
+          </Link>
+        </div>
+        {/* Bookend audience router — mirrors the hero pill strip so we
+            end the page with the same "which are you?" self-sort. */}
+        <div
+          className="mt-8 flex flex-wrap justify-center items-center gap-3"
+          data-testid="home-final-cta-audience-router"
+        >
+          <span
+            style={{
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.72rem",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "var(--ow-text-lo)",
+              fontWeight: 600,
+            }}
+          >
+            Not sure yet?
+          </span>
+          <Link
+            href="/ask?from=home-final-router-curious"
+            data-testid="home-final-router-curious"
+            style={{
+              padding: "0.4rem 0.85rem",
+              borderRadius: "999px",
+              border: "1px solid var(--ow-border-md)",
+              color: "var(--ow-text-mid)",
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.85rem",
+              textDecoration: "none",
+            }}
+          >
+            🍷 Try the answer engine (free) →
+          </Link>
+          <Link
+            href="/join?from=home-final-router-pro"
+            data-testid="home-final-router-pro"
+            style={{
+              padding: "0.4rem 0.85rem",
+              borderRadius: "999px",
+              border: "1px solid var(--ow-border-md)",
+              color: "var(--ow-text-mid)",
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.85rem",
+              textDecoration: "none",
+            }}
+          >
+            🍇 Book a winemaker call →
+          </Link>
         </div>
         <p className="mt-8" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.8125rem", color:"var(--ow-text-lo)"}}>
           Questions? Email us at <span style={{color:"var(--ow-amber)"}}>support@ownology.ai</span>
@@ -1688,12 +1925,14 @@ export default function Home() {
       <Nav />
       <WhatsNewRibbon />
       <Hero />
+      <TrustChips />
       {!pillarsV1 && <PainPoints />}
       <Features />
       {!pillarsV1 && <HowItWorks />}
       <DemoVideo />
       <Testimonials />
       <FounderStory />
+      <ApcoStrip />
       <Pricing />
       {!pillarsV1 && <WeightOfHarvest />}
       {!pillarsV1 && <WhatOwnologyKnows />}
