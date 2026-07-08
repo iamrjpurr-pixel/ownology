@@ -24,11 +24,16 @@ import Stripe from "stripe";
 // Pricing finalised Feb 2026 (Rich): AUD-only for now (AU + NZ market),
 // USD tier structure to be added when the US launch begins. See Pricing.tsx
 // for the corresponding client-side pack cards.
+// Feb 2026 (Rich): doubled credit counts across every pack so credit-pack
+// $/credit beats the Cellar Hand sub ($0.53/cr). Divine Trinity cost is
+// ~$0.05 USD/credit (3× Claude Sonnet calls), so gross margin at the most
+// generous tier (80cr/$20 = $0.25/cr) still lands at ~68%. See
+// /app/memory/VALUE-ENGINEERING.md for the cost doctrine.
 export const CREDIT_PACKS = [
-  { id: "pour",   name: "Pour",   credits: 3,  priceAud: 200,  description: "3 Divine Trinity reveals" },
-  { id: "glass",  name: "Glass",  credits: 8,  priceAud: 500,  description: "8 Divine Trinity reveals" },
-  { id: "flight", name: "Flight", credits: 18, priceAud: 1000, description: "18 Divine Trinity reveals" },
-  { id: "cellar", name: "Cellar", credits: 40, priceAud: 2000, description: "40 Divine Trinity reveals" },
+  { id: "pour",   name: "Pour",   credits: 5,  priceAud: 200,  description: "5 Divine Trinity reveals" },
+  { id: "glass",  name: "Glass",  credits: 15, priceAud: 500,  description: "15 Divine Trinity reveals" },
+  { id: "flight", name: "Flight", credits: 35, priceAud: 1000, description: "35 Divine Trinity reveals" },
+  { id: "cellar", name: "Cellar", credits: 80, priceAud: 2000, description: "80 Divine Trinity reveals" },
 ] as const;
 
 function getStripe(): Stripe {

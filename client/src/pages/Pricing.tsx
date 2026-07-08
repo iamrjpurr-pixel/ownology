@@ -234,37 +234,37 @@ const CREDIT_PACKS = [
   {
     id: "pour",
     name: "Pour",
-    credits: 3,
+    credits: 5,
     price: 2,
-    perCredit: "$0.67",
-    tagline: "Three Divine Trinity reveals. Packs never expire.",
+    perCredit: "$0.40",
+    tagline: "Five reveals — cheaper than a coffee, a week of curiosity.",
     badge: null,
   },
   {
     id: "glass",
     name: "Glass",
-    credits: 8,
+    credits: 15,
     price: 5,
-    perCredit: "$0.63",
-    tagline: "A tasting flight of eight questions.",
+    perCredit: "$0.33",
+    tagline: "Fifteen reveals — a weekend research pack.",
     badge: null,
   },
   {
     id: "flight",
     name: "Flight",
-    credits: 18,
+    credits: 35,
     price: 10,
-    perCredit: "$0.56",
-    tagline: "Eighteen reveals \u2014 the working winemaker's pack.",
+    perCredit: "$0.29",
+    tagline: "Thirty-five reveals — a month+ of daily learning at 42% off.",
     badge: "MOST POPULAR",
   },
   {
     id: "cellar",
     name: "Cellar",
-    credits: 40,
+    credits: 80,
     price: 20,
-    perCredit: "$0.50",
-    tagline: "Forty reveals. Best per-credit rate. For the genuinely wine-obsessed.",
+    perCredit: "$0.25",
+    tagline: "Eighty reveals. A vintage's worth of curiosity, at the best rate.",
     badge: "BEST VALUE",
   },
 ];
@@ -1262,7 +1262,7 @@ export default function Pricing() {
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8">
           {CREDIT_PACKS.map(pack => (
             <CreditPackCard key={pack.id} pack={pack} />
           ))}
