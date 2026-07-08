@@ -5,6 +5,29 @@ problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
 ## Feb 2026
+### Import surface: Paste tab accepts clipboard IMAGES + OCR + spell-check + quality score  (Feb 2026)
+- **Backend**: New tRPC mutation `vintageLog.ocrImageToCleanText` — 2-stage pipeline. Stage 1 = verbatim vision OCR (marks uncertain words with `[unclear?]`). Stage 2 = spell/grammar clean-up returning JSON with `cleanedText` + a `corrections[]` array of `{original, corrected, reason}`.
+- **Frontend PasteTab**: `onPaste` handler detects `clipboardData.items` containing `image/*`, prevents default text-paste, converts to base64, calls the new endpoint.
+- **Score card UI** renders after OCR: "N / M words recognised · X%" — green ≥85, amber 60–84, red <60. Colour-coded per Rich's ask ("47 out of 234 words maybe??").
+- **Raw vs Cleaned toggle** — operators can flip between the verbatim OCR and the spell-checked version. Disabled + tooltipped when no corrections were needed (nit from testing agent, addressed).
+- **Corrections list** — shows the first 8 word-level corrections inline (e.g. "shrza → Shiraz — spelling"), collapsible if more.
+- **Image preview** — pasted screenshot renders as a thumbnail so operators can see what they pasted.
+- **Auto-fills the textarea** with cleaned text so the existing `Extract Entries` flow just works. No new save path.
+- **Testing**: end-to-end validated via testing_agent_v3_fork — 100% pass on frontend + backend. Simulated ClipboardEvent → OCR round-trip (~30s) → score card renders → discard clears state.
+
+### Operator Guide: 4 flash-card decks · 69 cards total  (Feb 2026)
+- **CRM deck** (20 cards) — Add · Prep · Send SMS · Call · Track · Bulk · Fix.
+- **Pipeline board deck** (14 cards) — 5 columns · KPIs · drag rules · morning ritual · common pitfalls.
+- **Compliance deck** (16 cards) — Ask · Audit trail PDF · LIP Audit Pack · APCO · Regulations · When to escalate.
+- **Import & OCR deck** (19 cards) — Voice · Camera OCR · Paste (now with image + OCR score) · CSV · Bulk · Review · Fix.
+- Reusable `FlashCardDeck.tsx` renderer — future decks are ~200 lines of typed data instead of 500 lines of UI + data.
+- Live at `/admin/operator-guide` with `#crm-flash-cards`, `#pipeline-flash-cards`, `#compliance-flash-cards`, `#import-flash-cards` anchors.
+
+### /home-v3 mockup — "The Storytelling Scroll"  (Feb 2026)
+- Third homepage experiment: cinematic dark palette, cold-open at 3:47am, 7-chapter narrative (old way → transition → the answer → four chapters → cost → the choice).
+- Live at `/home-v3` behind the gate (allowlisted). `/home-v2` remains as reference.
+
+
 ### Home 1 shop-window polish — trust chips · APCO strip · sync pricing · bookend router  (Feb 2026)
 - **Audience router pill strip** added under the 4-pillar hero grid ("Which are you? 🍷 Just curious about wine → · 🍇 Making wine yourself →"). Borrowed the self-sort UX from `/home-v2` mockup without importing the Owen-heavy framing Rich flagged.
 - **Trust chip strip** — compact credibility band directly below the hero: 🇦🇺 Australian-built · Wine Australia LIP-audit ready · APCO Assistant · Founding cohort 99.

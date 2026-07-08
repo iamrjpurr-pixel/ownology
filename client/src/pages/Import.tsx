@@ -910,8 +910,20 @@ function PasteTab({
                   type="button"
                   data-testid="paste-ocr-toggle-raw"
                   onClick={() => setShowRaw((s) => !s)}
+                  disabled={ocrResult.corrections.length === 0 && ocrResult.rawOcrText === ocrResult.cleanedText}
                   className="text-xs px-2.5 py-1 rounded"
-                  style={{ background: "transparent", border: "1px solid var(--ow-border-md)", color: "var(--ow-text-mid)", cursor: "pointer" }}
+                  style={{
+                    background: "transparent",
+                    border: "1px solid var(--ow-border-md)",
+                    color: "var(--ow-text-mid)",
+                    cursor: (ocrResult.corrections.length === 0 && ocrResult.rawOcrText === ocrResult.cleanedText) ? "not-allowed" : "pointer",
+                    opacity: (ocrResult.corrections.length === 0 && ocrResult.rawOcrText === ocrResult.cleanedText) ? 0.5 : 1,
+                  }}
+                  title={
+                    ocrResult.corrections.length === 0 && ocrResult.rawOcrText === ocrResult.cleanedText
+                      ? "No corrections were needed — raw and cleaned are identical"
+                      : "Toggle between raw OCR and spell-checked text"
+                  }
                 >
                   {showRaw ? "Show cleaned" : "Show raw"}
                 </button>
