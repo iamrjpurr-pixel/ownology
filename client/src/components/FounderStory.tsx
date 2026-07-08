@@ -23,11 +23,19 @@ function useInView(threshold = 0.1) {
   return { ref, inView };
 }
 
-const FOUNDER_IMG = "/manus-storage/ownology-founders-couple_a5b472c2.jpg";
+// Founder scene-setter — use the branded /og-image.png (local, always
+// present, no external dependency). Original Manus-era Cloudfront URLs
+// (ownology-founders-couple / ownology-vineyard / ownology-lab) 404'd
+// after the migration and were never re-uploaded — see bug report Feb 2026.
+const FOUNDER_IMG = "/og-image.png";
 const RICH_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-rich-portrait-VfvrGF78hUnSKCT9KWUNEb.webp";
 const GERALDINE_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663548872701/kjXA9MRaPtPLGHog5yynHZ/ownology-geraldine-v2-m57Nkp7FDBsiZ4EGyESMwQ.webp";
-const VINEYARD_IMG = "/manus-storage/ownology-vineyard_a3c0d545.jpg";
-const LAB_IMG = "/manus-storage/ownology-lab_cf4a25db.jpg";
+// Small gallery below the founder scene — reuse the working Cloudfront
+// portraits rather than pointing at a second broken Manus URL. Not ideal
+// long-term (we should shoot vineyard + lab imagery for the section) but
+// zero-dead-link is more important than perfect subject match for now.
+const VINEYARD_IMG = GERALDINE_IMG;
+const LAB_IMG = RICH_IMG;
 
 export default function FounderStory() {
   const { ref, inView } = useInView(0.1);
