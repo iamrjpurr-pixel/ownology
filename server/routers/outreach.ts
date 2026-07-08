@@ -829,6 +829,27 @@ Return ONLY the requested JSON — no prose, no explanation. Use null for any fi
       return { ok: true };
     }),
 
+  /** OWNER — update the role-based persona on an existing contact.
+   *  Called from the row-level persona pills in /admin/contacts when
+   *  the operator realises they mis-tagged a lead (e.g. Sarah is
+   *  actually the MD, not the owner). The change propagates to
+   *  /hi/{slug} immediately — no cache invalidation needed since
+   *  outreach.bySlug is a live query. */
+  setPersona: ownerProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+        persona: z.enum(["md", "winemaker", "owner", "sales-rep"]),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await db
+        .update(schema.outreachContacts)
+        .set({ persona: input.persona })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true };
+    }),
+
   /** OWNER — set/clear a per-contact SMS override. Pass null or empty
    *  string to revert back to the auto-generated template. */
   setSmsDraft: ownerProcedure

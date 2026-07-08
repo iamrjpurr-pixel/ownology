@@ -5,6 +5,27 @@
 
 
 
+**Row-level persona pills in `/admin/contacts` — SHIPPED (Feb 2026, this session)**
+
+Completes the persona editing loop: mis-tagged a lead? Flip in one tap without SSH/git.
+
+**Server (`server/routers/outreach.ts`)**:
+- New `outreach.setPersona` mutation (`ownerProcedure`) — takes `{ slug, persona: enum }` and writes the field. Change propagates immediately to `/hi/{slug}` (bySlug is a live query, no cache invalidation).
+
+**Client (`client/src/pages/AdminContacts.tsx`)**:
+- New `setPersonaMutation = trpc.outreach.setPersona.useMutation()` hook.
+- Compact inline pill row on **every contact card** — `PERSONA · MD · WM · OWN · REP` (22-px height, amber-fill on selected). Sits in the row-actions strip next to Copy Link / Copy SMS / Preview / Mark SMS Sent / Mark Booked / Delete.
+- `data-testid="persona-row-{slug}"` + `data-testid="persona-{md|winemaker|owner|sales-rep}-{slug}"` per pill.
+- `onClick` fires the mutation with `{ slug, persona }`, invalidates the list query on success → all rows re-render with fresh selection state instantly.
+
+**Verified live**: Sarah's row showed `OWN` selected → clicked `MD` → `outreach.bySlug` on the next fetch returned `persona: "md"` → clicked back to `OWN` → confirmed via direct MySQL SELECT. All 32 contact rows now have persona pills.
+
+**Value engineering closure**: the persona system is now end-to-end editable without leaving `/admin/contacts` — Perplexity suggests on research, operator can override at save-time (create form pills), and can flip anytime later (row-level pills). No DB access, no code deploy needed for wording iterations at the persona-tagging layer.
+
+TypeScript: `npx tsc --noEmit` still 0 errors.
+
+
+
 **Persona picker in `/admin/contacts` create form + Digital Outreach Cheatsheet — SHIPPED (Feb 2026, this session)**
 
 Rich flagged (rightly): shipping the persona wiring without a UI to set persona at save-time was an incomplete value delivery. Fixed inline.

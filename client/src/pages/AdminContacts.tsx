@@ -104,6 +104,7 @@ export default function AdminContacts() {
   const setPipelineStageMutation = trpc.outreach.setPipelineStage.useMutation();
   const setSmsDraftMutation = trpc.outreach.setSmsDraft.useMutation();
   const setNotesMutation = trpc.outreach.setNotes.useMutation();
+  const setPersonaMutation = trpc.outreach.setPersona.useMutation();
   const setNameMutation = trpc.outreach.setName.useMutation();
   const setWineryMutation = trpc.outreach.setWinery.useMutation();
   const setMobileMutation = trpc.outreach.setMobile.useMutation();
@@ -1354,6 +1355,43 @@ export default function AdminContacts() {
                 </p>
               ) : (
                 <div className="flex flex-wrap gap-2 mt-2">
+                  {/* Row-level persona pills — flip an existing contact's
+                      persona in one tap. The change propagates instantly
+                      to /hi/{slug} on the next page load. */}
+                  <div style={{ display: "flex", gap: 4, alignItems: "center", padding: "2px 8px", background: "var(--ow-bg-inset, rgba(0,0,0,0.03))", borderRadius: 999 }} data-testid={`persona-row-${c.slug}`}>
+                    <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.65rem", color: "var(--ow-text-lo)", letterSpacing: "0.08em", textTransform: "uppercase", marginRight: 4 }}>
+                      Persona
+                    </span>
+                    {(["md","winemaker","owner","sales-rep"] as const).map((p) => {
+                      const labels: Record<typeof p, string> = { md: "MD", winemaker: "WM", owner: "OWN", "sales-rep": "REP" };
+                      const selected = (c.persona ?? "winemaker") === p;
+                      return (
+                        <button
+                          key={p}
+                          type="button"
+                          data-testid={`persona-${p}-${c.slug}`}
+                          onClick={() => setPersonaMutation.mutate({ slug: c.slug, persona: p }, { onSuccess: () => utils.outreach.list.invalidate() })}
+                          disabled={setPersonaMutation.isPending}
+                          title={`Set persona → ${p}`}
+                          style={{
+                            padding: "2px 8px",
+                            borderRadius: 999,
+                            border: `1px solid ${selected ? "var(--ow-amber)" : "transparent"}`,
+                            background: selected ? "var(--ow-amber)" : "transparent",
+                            color: selected ? "oklch(0.11 0.008 60)" : "var(--ow-text-mid)",
+                            fontFamily: "'Lato',sans-serif",
+                            fontSize: "0.65rem",
+                            fontWeight: selected ? 700 : 500,
+                            cursor: setPersonaMutation.isPending ? "wait" : "pointer",
+                            minHeight: 22,
+                            letterSpacing: "0.04em",
+                          }}
+                        >
+                          {labels[p]}
+                        </button>
+                      );
+                    })}
+                  </div>
                   <button
                     data-testid={`copy-url-${c.slug}`}
                     onClick={() => copy(c.slug, "url", url)}
