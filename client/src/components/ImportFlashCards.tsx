@@ -136,17 +136,30 @@ const CARDS: FlashCard[] = [
   // ── ④ Paste ──────────────────────────────────────────────────────
   {
     n: "09", deck: "paste",
-    title: "Paste anything — Excel, email, notes",
-    outcome: "Data from ANY source becomes structured entries.",
+    title: "Paste anything — text OR a clipboard image",
+    outcome: "Data from ANY source becomes structured entries — screenshots included.",
     steps: [
       "Open /import. Tap the Paste tab.",
-      "In your source (Excel, email, notes app), select the cells / lines you want.",
-      "Copy them (Cmd+C / Ctrl+C).",
-      "Come back to /import Paste tab. Click into the big textarea. Paste.",
-      "Tap Extract Entries. The AI structures it.",
-      "Review. Save.",
+      "For TEXT — copy from Excel/email/notes, click the textarea, paste. Tap Extract Entries.",
+      "For an IMAGE — copy a screenshot (Cmd+Shift+Ctrl+4 on Mac, Snip on Windows, or copy any image), click the textarea, paste.",
+      "The system detects the image, runs OCR, spell-checks, shows a quality score, then auto-fills the textarea with the cleaned text.",
+      "Review the cleaned text (or tap Show raw to see the verbatim OCR). Edit if needed.",
+      "Tap Extract Entries.",
     ],
-    gotcha: "Copy from Excel and it usually comes across as tab-separated — perfect for the AI. Copy from a PDF and it might come across as one long unformatted string — still works, but review more carefully.",
+    gotcha: "Screenshots paste beautifully. Actual .jpg / .png FILES go via the Camera tab instead (or drop into Bulk).",
+  },
+  {
+    n: "09b", deck: "paste",
+    title: "Reading the OCR quality score",
+    outcome: "You know whether to trust the OCR or reshoot the source.",
+    steps: [
+      "After image paste, look for the amber card at the top: \"N / M words recognised · X%\".",
+      "≥ 85% (green) — trust it, review the cleaned text briefly, extract.",
+      "60-84% (amber) — check the corrections list AND toggle Show raw to spot-check unclear words before extracting.",
+      "< 60% (red) — the source is too messy. Discard, retake the photo, or type it manually.",
+      "The score comes from counting bracketed uncertainty markers in the raw OCR — the AI's own confidence signal.",
+    ],
+    gotcha: "The score is about WORDS RECOGNISED, not accuracy. A 100% recognised transcription can still be wrong — always sanity-check numeric readings (Brix / pH) against the original before saving.",
   },
   {
     n: "10", deck: "paste",

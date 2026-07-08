@@ -401,6 +401,118 @@ Return ONLY a valid JSON array. No markdown, no explanation. If you cannot ident
       }
     }),
 
+  // ── Import: OCR a pasted image → clean, spell-checked text (Paste tab) ────
+  // Rich, Feb 2026: "no point offering misspelt rubbish". This endpoint
+  // is a two-stage pipeline:
+  //   1. Vision LLM reads the image → raw OCR transcription (verbatim, warts and all).
+  //   2. Same LLM (text mode) spell/grammar-checks the raw transcription
+  //      → cleanedText with a corrections report + word-quality score.
+  //
+  // Returned so the UI can display: raw vs cleaned toggle, a score card
+  // (e.g. "218 / 234 words recognised · 93%"), and the list of corrections
+  // made so the operator can spot-check the cleanup.
+  ocrImageToCleanText: protectedProcedure
+    .input(z.object({
+      imageBase64: z.string().min(1),
+      mimeType: z.string().default("image/png"),
+    }))
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      // ── Stage 1: verbatim OCR ─────────────────────────────────────
+      const ocrSystemPrompt = `You are a verbatim OCR engine for cellar records. Transcribe EVERY word visible in the image, exactly as written — including misspellings, abbreviations, and unclear words. Do NOT correct anything. Do NOT summarise. Do NOT paraphrase.
+
+For each word that is unclear or you cannot confidently read, wrap it in square brackets with a question mark: [unclear?] or [Br?x] if you're guessing.
+
+Preserve line breaks. Preserve numbers exactly as shown. If you see nothing readable, return the single word: EMPTY.`;
+
+      const ocrResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}`, "x-ow-source": "vintageLog.ocrImageToCleanText.ocr" },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: ocrSystemPrompt },
+            {
+              role: "user",
+              content: [
+                { type: "image_url", image_url: { url: `data:${input.mimeType};base64,${input.imageBase64}`, detail: "high" } },
+                { type: "text", text: "Transcribe every word verbatim. Mark uncertainty with brackets." },
+              ],
+            },
+          ],
+          stream: false,
+        }),
+      });
+      if (!ocrResp.ok) throw new Error("OCR request failed");
+      const ocrData = await ocrResp.json();
+      const rawOcrText = (ocrData.choices?.[0]?.message?.content ?? "").trim();
+      if (!rawOcrText || rawOcrText === "EMPTY") {
+        return {
+          rawOcrText: "",
+          cleanedText: "",
+          totalWords: 0,
+          recognisedWords: 0,
+          confidencePct: 0,
+          corrections: [] as Array<{ original: string; corrected: string; reason: string }>,
+        };
+      }
+
+      // Word-quality score — count of bracketed uncertainty markers vs total words
+      const totalWords = (rawOcrText.match(/\b[\w'.-]+\b/g) ?? []).length;
+      const uncertainMatches = rawOcrText.match(/\[[^\]]*\?\]/g) ?? [];
+      const uncertainCount = uncertainMatches.length;
+      const recognisedWords = Math.max(0, totalWords - uncertainCount);
+      const confidencePct = totalWords === 0 ? 0 : Math.round((recognisedWords / totalWords) * 100);
+
+      // ── Stage 2: spell + grammar clean-up ─────────────────────────
+      const cleanSystemPrompt = `You are a spell/grammar corrector for winemaking notes. Take the raw OCR transcription and produce a cleaned version.
+
+Rules:
+- Fix obvious spelling errors (e.g. "shrza" → "Shiraz", "Br?x" → "Brix").
+- Expand common cellar abbreviations only where safe: "temp" → "temperature", "ppm" stays as "ppm".
+- Fix casing (proper nouns: variety names, tank labels).
+- Do NOT invent data. If a number is unclear, leave it bracketed.
+- Do NOT summarise. Preserve every log entry.
+- Do NOT reorder lines.
+
+Return a JSON object with:
+{
+  "cleanedText": "<the cleaned transcription>",
+  "corrections": [
+    { "original": "<what was there>", "corrected": "<what you changed it to>", "reason": "<one-line why>" }
+  ]
+}
+
+Return ONLY the JSON. No markdown fences, no explanation.`;
+
+      const cleanResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}`, "x-ow-source": "vintageLog.ocrImageToCleanText.clean" },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: cleanSystemPrompt },
+            { role: "user", content: `Raw OCR transcription:\n\n${rawOcrText}` },
+          ],
+          stream: false,
+        }),
+      });
+      if (!cleanResp.ok) {
+        // Clean-up failed — return raw with empty corrections so the UI still functions
+        return { rawOcrText, cleanedText: rawOcrText, totalWords, recognisedWords, confidencePct, corrections: [] };
+      }
+      const cleanData = await cleanResp.json();
+      const cleanRaw = (cleanData.choices?.[0]?.message?.content ?? "").trim();
+      const stripped = cleanRaw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+      let parsed: { cleanedText?: string; corrections?: Array<{ original: string; corrected: string; reason: string }> } = {};
+      try { parsed = JSON.parse(stripped); } catch { /* fall through */ }
+      const cleanedText = (parsed.cleanedText ?? rawOcrText).trim();
+      const corrections = Array.isArray(parsed.corrections) ? parsed.corrections.slice(0, 50) : [];
+
+      return { rawOcrText, cleanedText, totalWords, recognisedWords, confidencePct, corrections };
+    }),
+
   // ── Import: parse an image (camera/scan) into structured entries ─────────
   parseFromImage: protectedProcedure
     .input(z.object({
