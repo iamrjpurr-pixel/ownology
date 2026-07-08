@@ -168,14 +168,15 @@ const TIERS = [
     name: "The Cellar Hand",
     tagline: "Learn the science. Stay compliant.",
     audience: "Home winemakers and wine students who want to learn.",
-    monthlyPrice: 19,
-    annualPrice: 190,
+    monthlyPrice: 22,
+    annualPrice: 220,
+    retailMonthlyPrice: 28,
     highlight: false,
     badge: "FOUNDING MEMBER",
     color: "oklch(0.65 0.08 75)",
     features: [
       "Full curiosity AI \u2014 40+ subjects",
-      "30 Divine Trinity reveals / mo",
+      "100 Divine Trinity reveals / mo",
       "Unlimited Compliance AI",
       "Vintage log \u2014 unlimited entries",
       "Email support",
@@ -190,8 +191,9 @@ const TIERS = [
     name: "The Press",
     tagline: "Full cellar operations + institutional knowledge.",
     audience: "Boutique winery teams who need operations and protocol management.",
-    monthlyPrice: 41,
-    annualPrice: 410,
+    monthlyPrice: 44,
+    annualPrice: 440,
+    retailMonthlyPrice: 59,
     highlight: true,
     badge: "MOST POPULAR",
     color: "var(--ow-amber)",
@@ -200,6 +202,7 @@ const TIERS = [
       "38 SOPs across 12 categories",
       "Decision Logic + Tribal Knowledge",
       "Priority Compliance AI",
+      "Unlimited Divine Trinity reveals",
       "Vintage log PDF export",
       "Email support",
     ],
@@ -212,8 +215,9 @@ const TIERS = [
     name: "The Vigneron",
     tagline: "Your whole operation. Your whole team. Your institutional knowledge.",
     audience: "Owner-operator boutique vignerons — you grow the grapes and make the wine.",
-    monthlyPrice: 83,
-    annualPrice: 830,
+    monthlyPrice: 88,
+    annualPrice: 880,
+    retailMonthlyPrice: 124,
     highlight: false,
     badge: "TEAM",
     color: "oklch(0.80 0.14 75)",
@@ -588,6 +592,32 @@ function TierCard({
             )}
           </div>
         </div>
+
+        {/* Founding → retail ladder chip (Feb 2026). Shows the "was/will-be"
+            anchor so a prospect sees the founding discount is genuine, not
+            marketing puff. Retail applies from subscriber #100 onwards.
+            Renders on both monthly + annual cycles with cycle-aware copy. */}
+        {tier.monthlyPrice > 0 && tier.retailMonthlyPrice && (
+          <p
+            data-testid={`tier-retail-chip-${tier.id}`}
+            style={{
+              fontFamily: "'Fira Code', monospace",
+              fontSize: "0.65rem",
+              color: tier.highlight ? "oklch(0.75 0.015 75)" : "var(--ow-text-lo)",
+              marginBottom: "0.375rem",
+              letterSpacing: "0.03em",
+            }}
+          >
+            Retail from #100:{" "}
+            {cycle === "annual"
+              ? `$${tier.retailMonthlyPrice * 10}/yr`
+              : `$${tier.retailMonthlyPrice}/mo`}{" "}
+            ·{" "}
+            <span style={{ color: "var(--ow-amber)", fontWeight: 700 }}>
+              {Math.round((1 - tier.monthlyPrice / tier.retailMonthlyPrice) * 100)}% off founding
+            </span>
+          </p>
+        )}
 
         {/* Annual savings callout */}
         {tier.monthlyPrice > 0 && cycle === "annual" && (
@@ -1224,7 +1254,7 @@ export default function Pricing() {
                 Founding Member Offer — for the first 99 paid subscribers
               </p>
               <p className="text-xs mt-0.5" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)" }}>
-                Pricing locked for life · Permanent founding badge · Direct product input · Name in Our Story (optional).
+                Pricing locked for life · 21% off Cellar Hand · 25% off The Press · 29% off The Vigneron · Permanent founding badge · Direct product input · Name in Our Story (optional).
               </p>
             </div>
           </div>

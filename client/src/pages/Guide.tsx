@@ -832,7 +832,7 @@ export default function Guide() {
               },
               {
                 tier: "The Cellar Hand",
-                price: "$16/mo",
+                price: "$22/mo",
                 audience: "Home winemakers & wine students",
                 highlight: false,
                 pillars: [
@@ -844,7 +844,7 @@ export default function Guide() {
               },
               {
                 tier: "The Press",
-                price: "$34/mo",
+                price: "$44/mo",
                 audience: "Boutique winery teams",
                 highlight: true,
                 pillars: [
@@ -857,7 +857,7 @@ export default function Guide() {
               },
               {
                 tier: "The Vigneron",
-                price: "$69/mo",
+                price: "$88/mo",
                 audience: "Owner-operator boutique vignerons",
                 highlight: false,
                 pillars: [
