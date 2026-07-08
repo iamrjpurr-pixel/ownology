@@ -21,10 +21,14 @@ import { db, getUserByOpenId } from "./db.js";
 import Stripe from "stripe";
 
 // ─── Credit Pack Definitions ─────────────────────────────────────────────────
+// Pricing finalised Feb 2026 (Rich): AUD-only for now (AU + NZ market),
+// USD tier structure to be added when the US launch begins. See Pricing.tsx
+// for the corresponding client-side pack cards.
 export const CREDIT_PACKS = [
-  { id: "bottle",   name: "A Bottle of Curiosity",  credits: 5,  priceAud: 400,  description: "5 Deep Dive reveals" },
-  { id: "case",     name: "A Case of Questions",    credits: 15, priceAud: 900,  description: "15 Deep Dive reveals" },
-  { id: "obsessed", name: "The Obsessive",           credits: 40, priceAud: 1600, description: "40 Divine Trinity reveals" },
+  { id: "pour",   name: "Pour",   credits: 3,  priceAud: 200,  description: "3 Divine Trinity reveals" },
+  { id: "glass",  name: "Glass",  credits: 8,  priceAud: 500,  description: "8 Divine Trinity reveals" },
+  { id: "flight", name: "Flight", credits: 18, priceAud: 1000, description: "18 Divine Trinity reveals" },
+  { id: "cellar", name: "Cellar", credits: 40, priceAud: 2000, description: "40 Divine Trinity reveals" },
 ] as const;
 
 function getStripe(): Stripe {
@@ -359,7 +363,7 @@ Write "The Craft" panel — explain how a winemaker shapes, controls, or exploit
   createCreditPackCheckout: protectedProcedure
     .input(
       z.object({
-        packId: z.enum(["bottle", "case", "obsessed"]),
+        packId: z.enum(["pour", "glass", "flight", "cellar"]),
         origin: z.string().url(),
       })
     )
