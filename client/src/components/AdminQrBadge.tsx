@@ -75,9 +75,18 @@ export function AdminQrBadge() {
     window.open(`/join/qr?${qs.toString()}`, "_blank", "noopener,noreferrer");
   };
 
+  // Feb 2026 (Rich feedback): pills were "annoying" — collapse to a compact
+  // icon-only chip by default, expand-with-label only on hover. Same click
+  // target size (36px) but a lot less visual noise on every page.
+  const [expanded, setExpanded] = useState(false);
+
   return (
     <button
       onClick={onClick}
+      onMouseEnter={() => setExpanded(true)}
+      onMouseLeave={() => setExpanded(false)}
+      onFocus={() => setExpanded(true)}
+      onBlur={() => setExpanded(false)}
       data-testid="admin-qr-badge"
       title="QR for this page — opens the QR generator preloaded with the current URL"
       aria-label="Generate QR code for this page"
@@ -93,32 +102,29 @@ export function AdminQrBadge() {
         zIndex: 90, // below toasts (~100) but above content
         display: "inline-flex",
         alignItems: "center",
-        gap: "0.4rem",
-        padding: "0.45rem 0.75rem",
+        justifyContent: "center",
+        gap: expanded ? "0.4rem" : 0,
+        width: expanded ? "auto" : 32,
+        height: 32,
+        padding: expanded ? "0 0.7rem 0 0.55rem" : 0,
         borderRadius: 999,
         background: "var(--ow-bg-card, #f3ece4)",
         color: "var(--ow-text-hi, #1a1210)",
         border: "1px solid var(--ow-border, rgba(0,0,0,0.15))",
         boxShadow: "0 4px 14px -6px rgba(0,0,0,0.35)",
-        fontSize: "0.72rem",
+        fontSize: "0.7rem",
         fontFamily: "'Lato', sans-serif",
         fontWeight: 500,
         letterSpacing: "0.02em",
         cursor: "pointer",
-        opacity: 0.82,
-        transition: "opacity 140ms ease, transform 140ms ease, bottom 200ms ease",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.opacity = "1";
-        e.currentTarget.style.transform = "translateY(-1px)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.opacity = "0.82";
-        e.currentTarget.style.transform = "translateY(0)";
+        opacity: expanded ? 1 : 0.5,
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+        transition: "opacity 160ms ease, width 200ms ease, padding 200ms ease, gap 200ms ease, bottom 200ms ease",
       }}
     >
-      <QrCode size={13} strokeWidth={2} />
-      <span>QR for this page</span>
+      <QrCode size={14} strokeWidth={2} />
+      {expanded && <span>QR for this page</span>}
     </button>
   );
 }

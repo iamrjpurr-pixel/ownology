@@ -451,7 +451,10 @@ function GlobalThemeToggle() {
         transition: "bottom 200ms ease",
       }}
     >
-      <ThemeToggle compact={false} />
+      {/* Feb 2026 (Rich): switched to compact mode — icon only, no "PARCHMENT"
+          text label. Kept the floating pill anchored bottom-left so the QR
+          badge can stack above it, but the visual weight drops by ~70%. */}
+      <ThemeToggle compact={true} />
     </div>
   );
 }
