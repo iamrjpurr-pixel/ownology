@@ -11,6 +11,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "../lib/trpc";
+import { OwenDisclaimer } from "@/components/OwenDisclaimer";
 
 const SAMPLE_NOTES = `Tank 7 - Shiraz - 2024 Vintage
 18 March: Brix 24.3, YAN 120ppm. Pretty hot day, fruit picked at 14 brix lab confirm.
@@ -172,6 +173,7 @@ export default function Demo() {
           <div data-testid="demo-answer" className="rounded p-4" style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-amber)" }}>
             <p className="text-xs uppercase tracking-widest mb-2" style={{ color: "var(--ow-amber)" }}>Grounded in YOUR notes + 348 bible references</p>
             <div className="whitespace-pre-wrap" style={{ color: "var(--ow-text-hi)", lineHeight: 1.6 }}>{answer || "(no answer)"}</div>
+            <OwenDisclaimer testid="demo-owen-disclaimer" />
           </div>
           <div className="flex gap-3">
             <Link href="/waitlist" data-testid="demo-signup-link" className="px-5 py-2.5 rounded font-semibold" style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}>

@@ -98,6 +98,7 @@ const AdminMembers = lazy(() => import("./pages/AdminMembers"));
 const TrialLocked = lazy(() => import("./pages/TrialLocked"));
 const JoinLandscape = lazy(() => import("./pages/JoinLandscape"));
 const JoinQr = lazy(() => import("./pages/JoinQr"));
+const InstallIos = lazy(() => import("./pages/InstallIos"));
 const RiskManagement = lazy(() => import("./pages/RiskManagement"));
 const RiskBriefing = lazy(() => import("./pages/RiskBriefing"));
 const RiskGlossary = lazy(() => import("./pages/RiskGlossary"));
@@ -360,6 +361,9 @@ function Router() {
       <Route path={"/trial-locked"} component={TrialLocked} />
       <Route path={"/join/landscape"} component={JoinLandscape} />
       <Route path={"/join/qr"} component={JoinQr} />
+      <Route path={"/install-ios"} component={InstallIos} />
+      <Route path={"/pwa/install"} component={InstallIos} />
+      <Route path={"/pwa/ios"} component={InstallIos} />
       <Route path={"/risk-management"} component={RiskManagement} />
       <Route path={"/risk-briefing"} component={RiskBriefing} />
       <Route path={"/risk-glossary"} component={RiskGlossary} />

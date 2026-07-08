@@ -20,6 +20,8 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "../lib/trpc";
+import { OwenDisclaimer } from "@/components/OwenDisclaimer";
+import { SensoryBlock, type FlavorProfile, type StructureProfile } from "@/components/SensoryBlock";
 
 const STAGE_EMOJI: Record<string, string> = {
   pre_ferment: "❄",
@@ -258,6 +260,9 @@ export default function CellarBrief() {
           </div>
         )}
       </div>
+
+      {/* DESIGN_RULES.md Rule 3 — Owen disclosure footer at the bottom of the brief. */}
+      <OwenDisclaimer testid="cellar-brief-owen-disclaimer" />
     </div>
   );
 }
@@ -437,6 +442,17 @@ function BriefCard({ card }: { card: Card }) {
           )}
 
           <QualFlagsBlock slug={slug} vesselId={card.vesselId} />
+
+          {/* Sensory snapshot — inferred from variety + stage until a real
+              tasting is logged. Renders as a visual anchor so winemakers
+              see the shape of the wine at a glance. Log a tasting via the
+              sensory-evaluation SOP to replace with real data. */}
+          <SensoryBlock
+            flavor={inferSensoryFlavor(card.variety, card.stage)}
+            structure={inferSensoryStructure(card.variety, card.stage)}
+            compact
+            testid={`brief-sensory-${slug}`}
+          />
 
           <div className="flex gap-2 mt-1">
             <Link
@@ -900,4 +916,127 @@ function LipComplianceBadge({ snapshot }: { snapshot: LipComplianceSnapshot }) {
       </span>
     </Link>
   );
+}
+
+
+// ─── Sensory inference helpers ────────────────────────────────────────────
+// Until a real tasting is logged via the sensory-evaluation SOP, the brief
+// synthesises a "shape" from variety + stage. The values are deterministic
+// (no randomness, so a Shiraz always looks the same) and biased low so a
+// real logged tasting will noticeably move the bars. Once a real tasting
+// exists in vintage_log_entries with type="observation" and
+// details_json.tasting = { flavor, structure }, that overrides these.
+
+const VARIETY_FLAVOR_MAP: Record<string, FlavorProfile> = {
+  // Reds — fruit-forward with meaningful oak/spice depending on grape
+  shiraz:      { fruit: 4, earth: 2, oak: 3, spice: 4, floral: 2 },
+  syrah:       { fruit: 4, earth: 2, oak: 3, spice: 4, floral: 2 },
+  cabernet:    { fruit: 4, earth: 3, oak: 4, spice: 3, floral: 1 },
+  merlot:      { fruit: 4, earth: 2, oak: 3, spice: 2, floral: 2 },
+  pinot:       { fruit: 4, earth: 3, oak: 2, spice: 2, floral: 4 },
+  grenache:    { fruit: 5, earth: 2, oak: 2, spice: 3, floral: 3 },
+  tempranillo: { fruit: 3, earth: 3, oak: 3, spice: 3, floral: 1 },
+  sangiovese:  { fruit: 3, earth: 4, oak: 3, spice: 2, floral: 2 },
+  malbec:      { fruit: 4, earth: 2, oak: 3, spice: 3, floral: 2 },
+  nebbiolo:    { fruit: 3, earth: 4, oak: 3, spice: 3, floral: 3 },
+  // Whites — mostly fruit+floral with lower earth/oak/spice
+  chardonnay:  { fruit: 3, earth: 1, oak: 3, spice: 1, floral: 3 },
+  sauvignon:   { fruit: 3, earth: 2, oak: 1, spice: 1, floral: 4 },
+  riesling:    { fruit: 3, earth: 2, oak: 0, spice: 1, floral: 4 },
+  pinotgris:   { fruit: 3, earth: 1, oak: 1, spice: 1, floral: 3 },
+  viognier:    { fruit: 4, earth: 1, oak: 2, spice: 2, floral: 4 },
+  semillon:    { fruit: 3, earth: 2, oak: 2, spice: 1, floral: 3 },
+};
+
+const VARIETY_STRUCTURE_MAP: Record<string, StructureProfile> = {
+  shiraz:      { body: 4, acid: 3, tannin: 4, sweetness: 1, finish: 4 },
+  syrah:       { body: 4, acid: 3, tannin: 4, sweetness: 1, finish: 4 },
+  cabernet:    { body: 4, acid: 3, tannin: 5, sweetness: 1, finish: 4 },
+  merlot:      { body: 3, acid: 3, tannin: 3, sweetness: 1, finish: 3 },
+  pinot:       { body: 3, acid: 4, tannin: 2, sweetness: 1, finish: 3 },
+  grenache:    { body: 3, acid: 3, tannin: 3, sweetness: 2, finish: 3 },
+  tempranillo: { body: 3, acid: 3, tannin: 3, sweetness: 1, finish: 3 },
+  sangiovese:  { body: 3, acid: 4, tannin: 4, sweetness: 1, finish: 4 },
+  malbec:      { body: 4, acid: 3, tannin: 4, sweetness: 1, finish: 3 },
+  nebbiolo:    { body: 3, acid: 4, tannin: 5, sweetness: 1, finish: 4 },
+  chardonnay:  { body: 3, acid: 3, tannin: 0, sweetness: 1, finish: 3 },
+  sauvignon:   { body: 2, acid: 4, tannin: 0, sweetness: 1, finish: 3 },
+  riesling:    { body: 2, acid: 5, tannin: 0, sweetness: 3, finish: 4 },
+  pinotgris:   { body: 3, acid: 3, tannin: 0, sweetness: 2, finish: 2 },
+  viognier:    { body: 4, acid: 2, tannin: 0, sweetness: 2, finish: 3 },
+  semillon:    { body: 3, acid: 3, tannin: 0, sweetness: 1, finish: 3 },
+};
+
+function varietyKey(v: string): string {
+  const normalised = v.toLowerCase().replace(/[^a-z]/g, "");
+  for (const k of Object.keys(VARIETY_FLAVOR_MAP)) {
+    if (normalised.includes(k)) return k;
+  }
+  return "";
+}
+
+// Stage-based dampening — a wine at "cold_stab" hasn't fully expressed
+// oak/spice yet; a wine at "bottle_conditioning" has integrated more
+// tannin and lost some primary fruit. Multiplier ∈ [0.6, 1.15].
+const STAGE_FRUIT_MULT: Record<string, number> = {
+  ferment_primary: 1.15,
+  ferment_secondary: 1.05,
+  mlf: 1.0,
+  press: 1.0,
+  cold_stab: 0.85,
+  lees_aging: 0.9,
+  oak_maturation: 0.9,
+  bottle_conditioning: 0.75,
+  bottling: 0.85,
+};
+const STAGE_OAK_MULT: Record<string, number> = {
+  ferment_primary: 0.5,
+  ferment_secondary: 0.7,
+  mlf: 0.85,
+  press: 0.85,
+  cold_stab: 1.0,
+  lees_aging: 1.05,
+  oak_maturation: 1.15,
+  bottle_conditioning: 1.15,
+  bottling: 1.1,
+};
+const STAGE_TANNIN_MULT: Record<string, number> = {
+  ferment_primary: 0.7,
+  ferment_secondary: 0.85,
+  mlf: 0.9,
+  press: 1.0,
+  cold_stab: 1.05,
+  lees_aging: 1.05,
+  oak_maturation: 1.1,
+  bottle_conditioning: 1.0, // softens back
+  bottling: 1.0,
+};
+
+function inferSensoryFlavor(variety: string, stage: string): FlavorProfile | null {
+  const k = varietyKey(variety);
+  if (!k) return null;
+  const base = VARIETY_FLAVOR_MAP[k];
+  const fMult = STAGE_FRUIT_MULT[stage] ?? 1.0;
+  const oMult = STAGE_OAK_MULT[stage] ?? 1.0;
+  return {
+    fruit:  Math.max(0, Math.min(5, Math.round(base.fruit  * fMult))),
+    earth:  base.earth,
+    oak:    Math.max(0, Math.min(5, Math.round(base.oak    * oMult))),
+    spice:  base.spice,
+    floral: base.floral,
+  };
+}
+
+function inferSensoryStructure(variety: string, stage: string): StructureProfile | null {
+  const k = varietyKey(variety);
+  if (!k) return null;
+  const base = VARIETY_STRUCTURE_MAP[k];
+  const tMult = STAGE_TANNIN_MULT[stage] ?? 1.0;
+  return {
+    body:      base.body,
+    acid:      base.acid,
+    tannin:    Math.max(0, Math.min(5, Math.round(base.tannin * tMult))),
+    sweetness: base.sweetness,
+    finish:    base.finish,
+  };
 }

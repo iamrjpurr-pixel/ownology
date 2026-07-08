@@ -5,6 +5,35 @@
 
 
 
+**PWA polish + DESIGN_RULES.md audit + Sensory Assessment Block — SHIPPED (Feb 2026, this session)**
+
+Three P1/P2 backlog items batched into a single pass, plus the outreach `bySlug` viewCount fix (side-effect of TS cleanup — see prior entry).
+
+**PWA polish (P1)**:
+- **Service worker** (`client/public/sw.js`, ~130 LOC): two-cache strategy — STATIC (cache-first for JS/CSS/fonts/images) + RUNTIME (network-first for `/api/*` with fallback to last-cached response when offline). HTML navigation is network-first with cached-shell fallback. Bypass list for LLM streaming (`tutor.*`), voice (`voice.*`), OAuth, and Stripe so those never serve stale. `CACHE_VERSION` bump auto-purges old caches on activate.
+- **`client/src/lib/registerServiceWorker.ts`**: opt-out registration — no-ops in Vite dev (default) unless `VITE_ENABLE_SW=true`, always on in prod. Auto-reloads the tab on controllerchange so deploys ship the new bundle without a hard-refresh.
+- **`/pwa/install` + `/pwa/ios`** (`client/src/pages/InstallIos.tsx`, ~230 LOC): 4-step iOS Add-to-Home-Screen walkthrough (Safari → Share → Add to Home Screen → Add). Also renders the "Why install?" bullets — fullscreen, offline, one-tap, no App Store tax. Linked from `PwaInstallBanner`'s iOS variant via a new "Show me how" button (replaces the passive "Tap Share → Add to Home Screen" hint text).
+- **Ingress-workaround**: `/install-ios` was silently routed to a stale Express dist by an unknown k8s ingress rule (returned old `index.html` from before the route was added). Solved by adding `/pwa/install` and `/pwa/ios` as the canonical paths — new routes hit Vite properly.
+- **Dynamic OG for `/cellar-journal/:slug`** (`server/index.ts::app.get("/cellar-journal/:slug", ...)`): every published Cellar Journal permalink now emits its own OG card — actual question in the title, Owen's diagnosis in the description, `og:type=article`. This makes Ask Owen answers viral: paste a link into a group chat / LinkedIn / Reddit and the preview reads like a real Q&A, not a generic marketing card. Fires in production only (Vite serves the un-templated shell in dev; matches the existing `/try`, `/ask`, `/join` OG pattern).
+
+**DESIGN_RULES.md audit (P1)**:
+- New shared component `client/src/components/OwenDisclaimer.tsx` (~55 LOC) — renders the DESIGN_RULES Rule 3 footer: *"Owen is Ownology's AI — grounded, but not perfect. For medical or business decisions, verify with a human expert."* Two variants: full block (page footer) + compact one-liner (inline chat).
+- Applied to:
+  - **`/ask`** — mandatory footer under every Owen answer (in addition to the existing risk-specific `result.disclaimer` when returned by the backend).
+  - **`/demo`** — footer inside the answer card.
+  - **`/cellar-brief`** — footer at the bottom of the daily brief.
+- Rules 1 & 2 (phrase+demo pairing, no competitor names) audited across `/`, `/join`, `/join/landscape`, `/pricing` — all pass. No changes needed.
+
+**Sensory Assessment Block (P2)**:
+- New shared component `client/src/components/SensoryBlock.tsx` (~230 LOC): 5-icon flavor profile (fruit / earth / oak / spice / floral, opacity-scaled by intensity) + 5-dimension structure bars (body / acidity / tannin / sweetness / finish, gradient-filled 0..5 scale). Auto-hides when no data.
+- Mounted inside the expanded `BriefCard` on `/cellar-brief` (compact variant).
+- Deterministic inference from `variety × stage` until real sensory-eval SOP data flows through: 16 varieties (Shiraz, Cabernet, Pinot Noir, Grenache, Nebbiolo, Chardonnay, Sauvignon Blanc, Riesling, Viognier, etc.) mapped to baseline flavor+structure profiles, then modulated by stage (ferment_primary bumps fruit +15%, oak_maturation bumps oak +15%, bottle_conditioning softens tannin). Once a real tasting is logged via the sensory-evaluation SOP (`scripts/seed-sensory-evaluation-sop.mjs`), the API can surface the actual values and override the inference cleanly.
+
+**Follow-through**:
+- The `outreach.bySlug::viewCount` drop (fixed in the TS-cleanup pass) means the `/hi/<slug>` variant rotation is now cycling correctly for every prior recipient (Lou's viewCount was 6 at time of verification, so she'll see bullet-set 6 on her next open — was frozen on set 0 for weeks).
+
+
+
 **TypeScript cleanup — 46 → 0 errors + admin QR-for-this-page badge — SHIPPED (Feb 2026, this session)**
 
 *Two-part sweep: admin utility + clean typecheck.*

@@ -15,7 +15,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { usePwaInstall } from "@/hooks/usePwaInstall";
 
 const DISMISSED_KEY = "ownology_pwa_banner_dismissed";
@@ -139,6 +139,26 @@ export default function PwaInstallBanner() {
           >
             Install
           </button>
+        )}
+        {isIos && (
+          <Link
+            href="/pwa/install"
+            data-testid="pwa-install-ios-guide"
+            className="text-xs px-4 py-1.5 rounded-sm font-semibold"
+            style={{
+              background: "oklch(0.72 0.12 75)",
+              color: "oklch(0.11 0.008 60)",
+              fontFamily: "'Lato', sans-serif",
+              cursor: "pointer",
+              border: "none",
+              minHeight: 36,
+              display: "inline-flex",
+              alignItems: "center",
+              textDecoration: "none",
+            }}
+          >
+            Show me how
+          </Link>
         )}
         {/* Explicit X — some users can't parse "Not now" as a dismiss. This
             gives them a universally-understood close affordance. */}

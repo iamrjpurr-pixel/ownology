@@ -22,6 +22,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { trpc } from "@/lib/trpc";
 import { Sparkles, BookOpen, ArrowRight, AlertTriangle } from "lucide-react";
+import { OwenDisclaimer } from "@/components/OwenDisclaimer";
 
 // Sample prompts to seed curiosity + kickstart the flywheel with high-value
 // topics for both the LLM (they hit rich chapters) and SEO (long-tail keywords).
@@ -343,6 +344,9 @@ export default function Ask() {
                 {result.disclaimer}
               </p>
             )}
+
+            {/* DESIGN_RULES.md Rule 3 — mandatory Owen disclosure on every answer. */}
+            <OwenDisclaimer testid="ask-owen-disclaimer" />
 
             {/* ── SEO flywheel payoff — permanent journal link ─────────── */}
             {result.journalSlug && (

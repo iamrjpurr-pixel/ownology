@@ -533,6 +533,9 @@ async function startServer() {
     "/trial-locked",
     "/join/landscape",
     "/join/qr",
+    "/install-ios",
+    "/pwa/install",
+    "/pwa/ios",
     "/preview",
     "/404",
     "/risk-management",
@@ -714,6 +717,103 @@ async function startServer() {
     } catch (err) {
       // If disk read fails, fall through to the SPA fallback below.
       next(err);
+    }
+  });
+
+  // ── Dynamic OG for /cellar-journal/:slug ────────────────────────────────
+  // Every Cellar Journal permalink gets its own shareable card: the actual
+  // winemaker question in the title, Owen's diagnosis in the description.
+  // This is what makes Ask Owen answers viral — someone pastes the link
+  // into a group chat / LinkedIn / Reddit and the preview reads like a
+  // real Q&A, not a generic marketing card.
+  app.get("/cellar-journal/:slug", async (req, res, next) => {
+    try {
+      const slug = req.params.slug;
+      if (!slug || slug === "sitemap.xml" || slug === "rss.xml") return next();
+      const { db } = await import("./db.js");
+      const schemaMod = await import("../drizzle/schema.js");
+      const { eq, and } = await import("drizzle-orm");
+      const rows = await db
+        .select({
+          question: schemaMod.cellarJournal.question,
+          diagnosis: schemaMod.cellarJournal.diagnosis,
+          topicTag: schemaMod.cellarJournal.topicTag,
+        })
+        .from(schemaMod.cellarJournal)
+        .where(
+          and(
+            eq(schemaMod.cellarJournal.slug, slug),
+            eq(schemaMod.cellarJournal.published, true)
+          )
+        )
+        .limit(1);
+      const row = rows[0];
+      if (!row) return next(); // 404 → SPA fallback → NotFound
+
+      const fs = await import("fs/promises");
+      const raw = await fs.readFile(path.join(staticPath, "index.html"), "utf8");
+      const canonical = `https://ownology.ai/cellar-journal/${encodeURIComponent(slug)}`;
+
+      // Trim to safe OG lengths — LinkedIn cuts at ~200 chars for description.
+      const question = String(row.question ?? "").slice(0, 100);
+      const rawDiag = String(row.diagnosis ?? "").replace(/\s+/g, " ").trim();
+      const diagnosis = rawDiag.length > 180 ? rawDiag.slice(0, 177) + "…" : rawDiag;
+      const topic = row.topicTag ? ` · ${row.topicTag}` : "";
+      const title = `${question} — Owen answers${topic}`;
+      const description = diagnosis || "Winemaker Q&A answered by Owen, grounded in the Red & White Wine Bibles and MoreWine! manuals. Free, no signup.";
+      const image = "https://ownology.ai/og-try.png";
+
+      const html = raw
+        .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtmlAttr(title)}</title>`)
+        .replace(
+          /<meta name="description" content="[^"]*"\s*\/?>/,
+          `<meta name="description" content="${escapeHtmlAttr(description)}" />`
+        )
+        .replace(
+          /<meta property="og:type" content="[^"]*"\s*\/?>/,
+          `<meta property="og:type" content="article" />`
+        )
+        .replace(
+          /<meta property="og:title" content="[^"]*"\s*\/?>/,
+          `<meta property="og:title" content="${escapeHtmlAttr(title)}" />`
+        )
+        .replace(
+          /<meta property="og:description" content="[^"]*"\s*\/?>/,
+          `<meta property="og:description" content="${escapeHtmlAttr(description)}" />`
+        )
+        .replace(
+          /<meta property="og:url" content="[^"]*"\s*\/?>/,
+          `<meta property="og:url" content="${canonical}" />`
+        )
+        .replace(
+          /<meta property="og:image" content="[^"]*"\s*\/?>/,
+          `<meta property="og:image" content="${image}" />`
+        )
+        .replace(
+          /<meta property="og:image:alt" content="[^"]*"\s*\/?>/,
+          `<meta property="og:image:alt" content="${escapeHtmlAttr(question)}" />`
+        )
+        .replace(
+          /<meta name="twitter:title" content="[^"]*"\s*\/?>/,
+          `<meta name="twitter:title" content="${escapeHtmlAttr(title)}" />`
+        )
+        .replace(
+          /<meta name="twitter:description" content="[^"]*"\s*\/?>/,
+          `<meta name="twitter:description" content="${escapeHtmlAttr(description)}" />`
+        )
+        .replace(
+          /<meta name="twitter:image" content="[^"]*"\s*\/?>/,
+          `<meta name="twitter:image" content="${image}" />`
+        )
+        .replace(
+          /<link rel="canonical" href="[^"]*"\s*\/?>/,
+          `<link rel="canonical" href="${canonical}" />`
+        );
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      res.setHeader("Cache-Control", "public, max-age=300");
+      return res.send(html);
+    } catch (err) {
+      return next(err);
     }
   });
 
