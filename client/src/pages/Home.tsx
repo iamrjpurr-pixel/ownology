@@ -139,16 +139,18 @@ function WhatsNewRibbon() {
 // ─── Nav ──────────────────────────────────────────────────────────────────────
 type NavItem = { label: string; href: string; external?: boolean };
 // Primary links — always visible in desktop nav.
-// Story-flow order (Rich, Feb 2026): How → Why → What → Depth → Money.
-// Everything else surfaces through workflow (pillar-card clicks, in-page
-// links, footer). Anonymous visitors never see the "More" dropdown to
-// avoid the sitemap-shopping-mall effect. Admins get the full mega-menu.
+// New way forward (Feb 2026, Rich): two-funnel discipline.
+//   1. DIY consumer  → /ask (the answer engine = the moat)
+//   2. Winemaker pro → /join (Founding Partner cold-call landing)
+//   3. Anyone ready to buy → /pricing
+// Everything else stays indexed by Google (footer + sitemap intact) but
+// gets out of the primary path so a cold-called visitor who types
+// ownology.ai lands on ONE clear next step, not five parallel doors.
+// Admins still see the full "More" mega-menu.
 const PRIMARY_NAV: NavItem[] = [
-  { label: "How It Works",      href: "#hero-pillars-section" },
-  { label: "Why Ownology",      href: "/why-ownology" },
-  { label: "Features",          href: "#features" },
-  { label: "Knowledge",         href: "/knowledge" },
-  { label: "Pricing",           href: "/pricing" },
+  { label: "Ask Owen",         href: "/ask" },
+  { label: "For winemakers",   href: "/join" },
+  { label: "Pricing",          href: "/pricing" },
 ];
 // Secondary links — grouped by four product pillars
 // DO pillar: operational cellar tools
@@ -412,8 +414,8 @@ function Nav() {
               </svg>
               Work Mode
             </Link>
-            <a href="/pricing?from=homepage-nav" className="btn-amber text-xs inline-flex items-center">
-              Start Free Trial
+            <a href="/join?from=homepage-nav" className="btn-amber text-xs inline-flex items-center" data-testid="nav-cta-winemakers">
+              For winemakers
             </a>
           </div>
 

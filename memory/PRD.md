@@ -5,6 +5,27 @@
 
 
 
+**Nav simplified to the two-funnel model — SHIPPED (Feb 2026, this session)**
+
+Rich's "new way forward" is two-funnel discipline (DIY consumer via /ask · Winemaker pro via /join · Everyone → /pricing). The desktop nav still carried the old 5-item product-marketing structure (`How It Works` / `Why Ownology` / `Features` / `Knowledge` / `Pricing`), which pulled visitors 5 different directions instead of one.
+
+**`client/src/pages/Home.tsx`**:
+- `PRIMARY_NAV` trimmed from 5 → 3 items: `Ask Owen` → `/ask`, `For winemakers` → `/join`, `Pricing` → `/pricing`. Story-flow order changed from `How → Why → What → Depth → Money` to `Try it → Talk to us → Buy it` (Rich's cold-call funnel).
+- Header amber CTA button repointed from "Start Free Trial" → `/pricing?from=homepage-nav` to **"For winemakers"** → `/join?from=homepage-nav`. Cold-called winemakers who type `ownology.ai` bare-URL now see two doors to `/join`: the nav item and the amber CTA.
+- Admin "More" mega-menu still shows 15+ links (`Our Story`, `The Press`, `Dashboard`, `Cellar Tasks`, `Vineyard`, `Free Run`, `Knowledge Platform`, `Compliance AI`, `Blog`, `Why Ownology`, `For Home Winemakers`, `Guide`, `Regulations Library`) — so Rich/Gel/team keep full access.
+- Cleaned up 4 lines of orphan garbage at end of Home.tsx (`oter */}` leftover from an earlier refactor that was causing a Vite babel parse error). Homepage now compiles cleanly.
+
+**SEO-preserved:**
+- All 21 top-level marketing pages remain in `/api/sitemap.xml` (333 URLs total).
+- Footer's 20-link 4-column grid unchanged — `/why-ownology`, `/knowledge`, `/for-innovint-users`, `/for-vintrace-users`, `/for-home-winemakers`, `/regulations`, `/compliance`, `/blog`, `/sample-vintage-log`, `/merch`, etc. all still receive internal PageRank flow.
+- Google will continue crawling and indexing every page. Only anon **navigation cognitive load** dropped.
+
+**Visible outcome (verified via screenshot)**: nav bar reads `Ownology  |  Ask Owen · For winemakers · Pricing · More▾  |  ☀️ Work Mode  |  FOR WINEMAKERS` — a first-time visitor now sees three clear choices instead of five parallel doors.
+
+TypeScript: `npx tsc --noEmit` clean, 0 errors.
+
+
+
 **Backend test suite audit + config fix — SHIPPED (Feb 2026, this session)**
 
 User forwarded a code review claiming 123 "critical `is` comparison bugs" across `/app/backend/tests/` and suggesting a mass `is`→`==` rewrite. **Rejected after verification** — every specific citation was actually the correct PEP 8 idiom (`is None`, `is not None`, `is True/False` on singletons). Running the recommended rewrite would have introduced ~123 real `E711` linter errors to fix zero real bugs.
