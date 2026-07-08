@@ -5,6 +5,44 @@
 
 
 
+**Credit-pack pricing revision — SHIPPED (Feb 2026, this session)**
+
+**Bug**: User reported the `/pricing` page showed stale pack tiers (Bottle of Curiosity / Case of Questions / The Obsessive at $4/$9/$16) despite a pricing revision from the prior night's session. Fork context loss meant the code was never actually updated after the discussion.
+
+**Fix — client + server, AUD-only** (USD/NZ parity deferred until US launch — see subscription discussion notes below):
+
+**`client/src/pages/Pricing.tsx`** (`CREDIT_PACKS` array):
+- Pour · $2 AUD · 3 credits · $0.67/credit
+- Glass · $5 AUD · 8 credits · $0.63/credit
+- Flight · $10 AUD · 18 credits · $0.56/credit · **MOST POPULAR** badge
+- Cellar · $20 AUD · 40 credits · $0.50/credit · **BEST VALUE** badge
+
+Tapered per-credit rate so bigger packs earn better economics — 25% saving on Cellar vs Pour.
+
+**`server/freeRunRouter.ts`** (`CREDIT_PACKS` server config + Stripe Zod validator):
+- Pack IDs updated: `pour` / `glass` / `flight` / `cellar` (was `bottle` / `case` / `obsessed`).
+- `priceAud` in cents: 200 / 500 / 1000 / 2000.
+- Zod enum on the Stripe checkout mutation constrained to the 4 new IDs — any lingering old link with `?pack=obsessed` will now reject with a Zod validation error rather than silently mis-charge.
+- Header comment added: *"Pricing finalised Feb 2026 (Rich): AUD-only for now (AU + NZ market), USD tier structure to be added when the US launch begins."*
+
+**Subscription tiers deliberately UNCHANGED**: Free Run / The Cellar Hand ($16) / The Press ($34) / The Vigneron ($69) preserved as-is. User is re-deriving those separately from the economic research — the prior night's chat about USD/AUD/NZ parity was lost in the fork and needs a fresh pass.
+
+**Currency-parity discussion recap** (for the follow-up subscription rewrite):
+- **Option A — Number parity** ($9 across USD/AUD/NZD): easy but undercharges home market.
+- **Option B — Purchasing-power parity** (per-market feels-like cost): fair but needs currency detection at checkout.
+- **Option C — AU/NZ in AUD, US as separate USD tier at ~1.5–2x**: industry norm (Vintrace / InnoVint). Recommended when US launch begins.
+
+**Verified by `testing_agent_v3_fork` (iteration 33)**:
+- **100% pass, 0 backend/frontend issues.**
+- All 4 new pack cards render with correct prices, credits, per-credit rates, and badges.
+- Zero stale strings in the served HTML (no "Bottle of Curiosity" / "Case of Questions" / "The Obsessive" anywhere).
+- Server pack config verified via file read.
+- Subscription tiers untouched (regression check passes).
+- TypeScript `tsc --noEmit` clean, exit 0.
+- No console errors/warnings on `/pricing`.
+
+
+
 **Broken founder image on /home — FIXED (Feb 2026, this session)**
 
 **Bug**: User reported the "Ownology founders in a wine cellar barrel room" image on the /home 'Our Story' section rendering as a broken `<img>` icon with alt text visible.
