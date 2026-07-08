@@ -150,6 +150,7 @@ export const outreachRouter = router({
           painPoint: schema.outreachContacts.painPoint,
           calendlyOverride: schema.outreachContacts.calendlyOverride,
           viewCount: schema.outreachContacts.viewCount,
+          persona: schema.outreachContacts.persona,
         })
         .from(schema.outreachContacts)
         .where(eq(schema.outreachContacts.slug, input.slug))
@@ -303,6 +304,7 @@ export const outreachRouter = router({
         notes: z.string().max(500).optional(),
         slug: z.string().max(80).optional(),
         status: z.enum(["warm", "lukewarm", "cold", "sales", "skip"]).optional(),
+        persona: z.enum(["md", "winemaker", "owner", "sales-rep"]).optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -320,6 +322,7 @@ export const outreachRouter = router({
           calendlyOverride: input.calendlyOverride?.trim() || null,
           notes: input.notes?.trim() || null,
           status: input.status ?? "cold",
+          persona: input.persona ?? null,
           viewCount: 0,
           createdAt: Date.now(),
         });
@@ -787,11 +790,26 @@ Return ONLY the requested JSON — no prose, no explanation. Use null for any fi
         }
       }
 
+      // Auto-suggest role-based persona from Perplexity's role + notes.
+      // The operator sees this pre-populated in the create form and can
+      // override before saving. Import at the top of the file below the
+      // other imports.
+      let suggestedPersona: "md" | "winemaker" | "owner" | "sales-rep" = "winemaker";
+      if (draft) {
+        const role = String(draft.role ?? "").toLowerCase();
+        const notes = String(draft.notes ?? "").toLowerCase();
+        const blob = `${role} ${notes}`;
+        if (/\b(managing director|general manager|\bmd\b|\bgm\b|\bceo\b)\b/.test(blob)) suggestedPersona = "md";
+        else if (/\b(owner|founder|proprietor|principal|generation|family[- ]owned|patriarch)\b/.test(blob)) suggestedPersona = "owner";
+        else if (/\b(sales rep|sales representative|brand ambassador|distributor|cellar door manager|events|trade)\b/.test(blob)) suggestedPersona = "sales-rep";
+      }
+
       return {
         draft,
         citations,
         emailGuesses: emailGuesses.slice(0, 8),
         tokensUsed: data.usage?.total_tokens ?? null,
+        suggestedPersona,
       };
     }),
 

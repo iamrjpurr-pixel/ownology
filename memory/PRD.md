@@ -5,6 +5,35 @@
 
 
 
+**Role-based persona pitches on `/hi/:slug` — SHIPPED (Feb 2026, this session)**
+
+Rich's insight after James Wilkinson (Poole's Rock) review: the old 5 winemaker-native variants pitched too scientifically (AWRI, FSANZ, PhD-author name-drops) and killed the humanity in front of anyone who wasn't a chemistry buff. The new model is **role-based** — same winery, four different people to call, four completely different pitches.
+
+**Four role-based personas** (`/app/client/src/lib/hi-personas.ts`, ~215 LOC, 20 variants total):
+- **MD** — Managing Director / GM. Cashflow, staff hours, board reporting, margin. "$9/month costs less than the coffees your winemaker buys on the way to the cellar."
+- **Winemaker** — Chief / Assistant winemaker. Cellar chemistry, avoiding 3am disasters. "Vintage is chaos. Ownology is the quiet assistant who remembers what you did to tank 4 on Tuesday."
+- **Owner** — Founder / Family / Brand. Legacy, staff loyalty, generational hand-off. "The next generation of your winery will inherit clean records, not shoeboxes of paper."
+- **Sales Rep** — Cellar door / Trade / Distribution. Pocket cheat-sheet at trade shows. "Every wine you sell has a story — the vintage weather, the ferment call, the block it came from. Ownology puts that story on your phone at the tasting bench."
+
+Every variant follows **Feel → Look → Save**: emotional anchor first, one concrete scene second, outcome-in-their-words third. Zero PhD name-drops. Max one acronym per variant and only regulator-owned ("Wine Australia"). All 20 variants have HTML-safe inline emphasis for the key phrases.
+
+**Schema + wiring**:
+- Added `persona VARCHAR(32) NULL` to `outreach_contacts` (Drizzle schema + live ALTER on Railway MySQL).
+- `outreach.bySlug` now returns `persona` in the payload.
+- `outreach.create` accepts a `persona` field with a Zod enum validator.
+- `outreach.deepResearch` (Perplexity) auto-suggests a persona from Sonar's `role` + `notes` fields — regex matches on "managing director / GM / CEO" → `md`, "owner / founder / generation / family-owned" → `owner`, "sales rep / brand ambassador / distributor / cellar door manager / events" → `sales-rep`, else defaults to `winemaker` (largest cold-call bucket). Returned as `suggestedPersona` so the operator sees it pre-filled in the create form and can override.
+- `HiContact.tsx` reads `contact.persona`, defaults to `winemaker` when null, applies the same deterministic slug-hash + `viewCount` rotation across the persona-specific variant set.
+
+**Retro-tagged all 34 existing contacts**: 30 → `winemaker`, 2 → `owner` (Sarah Feehan / Parley Wines, Tim Stock / Les Fruits Wine — both founder-run), 2 → `sales-rep` (Matt / Manly Spirits, Guillermo / Archie Rose — spirits makers where the honest fit is trade / cellar-door rather than winemaking).
+
+**Verified live**: `/hi/sarah-parley-wines` now serves the owner variant ("The next generation of your winery will inherit clean records, not shoeboxes of paper. Ownology is the archive that writes itself"). `/hi/matt-manly-spirits` serves the sales-rep variant. `/hi/lou-p-v-meredith` (winemaker) rotates through the 5 winemaker variants (viewCount:7 → variant idx 2 = "Learn from your own vintages").
+
+**Source-of-contact greeting**: the `event` field was already wired in the hero ("We crossed paths at {event} — sending this your way for {winery}") — but the recent Perplexity-saved contacts (Sarah, Tim, Matteo) don't have `event` set because they weren't met in person. The `/hi/` page falls back gracefully to the "we didn't get long to chat" honest framing. For future in-person meets (e.g. "Pluto Wine Bar takeover winemakers dinner"), operator sets `event` at save time and the greeting weaves it in automatically. No code change needed on that flow.
+
+TypeScript: `npx tsc --noEmit` clean, 0 errors.
+
+
+
 **Nav simplified to the two-funnel model — SHIPPED (Feb 2026, this session)**
 
 Rich's "new way forward" is two-funnel discipline (DIY consumer via /ask · Winemaker pro via /join · Everyone → /pricing). The desktop nav still carried the old 5-item product-marketing structure (`How It Works` / `Why Ownology` / `Features` / `Knowledge` / `Pricing`), which pulled visitors 5 different directions instead of one.

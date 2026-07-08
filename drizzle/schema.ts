@@ -1234,6 +1234,12 @@ export const outreachContacts = mysqlTable(
     // server-side from a hash of the slug — no storage needed.
     ctaClickedAt: bigint("cta_clicked_at", { mode: "number" }),
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    // Role-based persona for /hi/:slug variant rotation.
+    // One of: "md" | "winemaker" | "owner" | "sales-rep" | null.
+    // Null falls back to "winemaker" (safest generic pitch).
+    // Auto-suggested by outreach.deepResearch from Perplexity's `role`
+    // + `notes` fields; operator can override on save.
+    persona: varchar("persona", { length: 32 }),
   },
   (t) => [
     index("oc_slug_idx").on(t.slug),
