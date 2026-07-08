@@ -319,6 +319,52 @@ function AccessDenied({ isForbidden }: { isForbidden: boolean }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
+// Operator's Marketing quick-links — the ex-mega-menu that used to live in
+// the public "More" dropdown. Feb 2026: moved here so prospects never see
+// a sitemap-style menu, but admins keep one-click access for spot-checks.
+// Columns mirror the four product pillars.
+const QUICKLINK_COLUMNS: Array<{
+  label: string;
+  hint?: string;
+  links: Array<{ label: string; href: string }>;
+}> = [
+  {
+    label: "Do",
+    hint: "In the cellar",
+    links: [
+      { label: "The Press",    href: "/the-press" },
+      { label: "Dashboard",    href: "/dashboard" },
+      { label: "Cellar Tasks", href: "/cellar-tasks" },
+      { label: "Vineyard",     href: "/vineyard" },
+    ],
+  },
+  {
+    label: "Know",
+    links: [
+      { label: "Free Run",           href: "/free-run" },
+      { label: "Knowledge Platform", href: "/knowledge" },
+      { label: "Compliance AI",      href: "/compliance" },
+    ],
+  },
+  {
+    label: "Learn",
+    links: [
+      { label: "Blog",                href: "/blog" },
+      { label: "Why Ownology",        href: "/why-ownology" },
+      { label: "For Home Winemakers", href: "/for-home-winemakers" },
+    ],
+  },
+  {
+    label: "Guide",
+    links: [
+      { label: "Getting Started",     href: "/guide" },
+      { label: "Regulations Library", href: "/regulations" },
+      { label: "FAQ",                 href: "/#faq" },
+      { label: "Our Story",           href: "/#our-story" },
+    ],
+  },
+];
+
 const TOOLS: AdminTool[] = [
   {
     label: "Operator Guide",
@@ -586,6 +632,114 @@ export default function Admin() {
           {TOOLS.map((tool) => (
             <ToolCard key={tool.href + tool.label} tool={tool} />
           ))}
+        </div>
+      </div>
+
+      {/* Marketing quick-links — moved out of the public "More" mega-menu
+          (Feb 2026). Public visitors never need to see the 4-column DO/
+          KNOW/LEARN/GUIDE grid; it was pure operator convenience so it
+          belongs here. Each column mirrors a customer-facing product
+          pillar so you can spot-check a page in one click. */}
+      <div className="container pb-10">
+        <div
+          style={{
+            border: "1px solid var(--ow-border)",
+            borderRadius: 6,
+            padding: "1.5rem",
+            background: "var(--ow-bg-card)",
+          }}
+        >
+          <div className="flex items-baseline justify-between flex-wrap gap-2 mb-4">
+            <p
+              style={{
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.7rem",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--ow-text-lo)",
+              }}
+            >
+              Marketing Quick-Links
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.clear();
+                sessionStorage.clear();
+                document.cookie.split(";").forEach((c) => {
+                  document.cookie = c
+                    .replace(/^ +/, "")
+                    .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
+                window.location.reload();
+              }}
+              data-testid="admin-clear-cache"
+              style={{
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.72rem",
+                color: "var(--ow-text-lo)",
+                background: "none",
+                border: "1px solid var(--ow-border)",
+                borderRadius: 4,
+                padding: "0.35rem 0.75rem",
+                cursor: "pointer",
+              }}
+            >
+              ⟳ Clear Cache & Reload
+            </button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {QUICKLINK_COLUMNS.map((col) => (
+              <div key={col.label}>
+                <p
+                  style={{
+                    fontFamily: "'Lato',sans-serif",
+                    fontSize: "0.62rem",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "var(--ow-amber)",
+                    marginBottom: "0.15rem",
+                  }}
+                >
+                  {col.label}
+                </p>
+                {col.hint && (
+                  <p
+                    style={{
+                      fontFamily: "'Lato',sans-serif",
+                      fontSize: "0.62rem",
+                      color: "var(--ow-text-lo)",
+                      fontStyle: "italic",
+                      marginBottom: "0.6rem",
+                    }}
+                  >
+                    {col.hint}
+                  </p>
+                )}
+                <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                  {col.links.map((l) => (
+                    <li key={l.href}>
+                      <Link
+                        href={l.href}
+                        data-testid={`admin-quicklink-${l.href.replace(/[^a-z0-9]+/gi, "-")}`}
+                        style={{
+                          fontFamily: "'Lato',sans-serif",
+                          fontSize: "0.85rem",
+                          fontWeight: 300,
+                          color: "var(--ow-text-mid)",
+                          textDecoration: "none",
+                          display: "block",
+                          padding: "0.3rem 0",
+                        }}
+                      >
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

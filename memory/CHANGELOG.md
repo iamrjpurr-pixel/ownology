@@ -6,6 +6,24 @@ backlog. This file just records what actually shipped, and when.
 
 ## Feb 2026
 
+### Nav slim-down — public gets 3 links, operator quick-links move to /admin  (Feb 2026)
+- **C. Public "More" dropdown deleted from desktop chrome entirely.** Old
+  version had 6 links (Our Story, Pricing, Getting Started, Blog, For
+  Home Winemakers, FAQ). Prospects now see just PRIMARY_NAV (Ask Owen ·
+  For winemakers · Pricing) + the hero pillar cards. Mobile drawer
+  keeps a compact 3-item MORE_NAV (Our Story · Getting Started · FAQ)
+  for touch users.
+- **B. 4-column DO/KNOW/LEARN/GUIDE mega-menu moved to `/admin`.** Now
+  lives as a "Marketing Quick-Links" panel below the Owner Tools grid,
+  with the Clear Cache & Reload button relocated to its top-right.
+  Public visitors never see a sitemap-style menu; operator keeps
+  one-click access from the admin dashboard.
+- **Mobile "Clear Cache" gated to admins only** — was globally visible
+  before, no reason a prospect ever needs it.
+- Dead code removed from Home.tsx: `MoreDropdown`, `NavLink`,
+  `VINTAGE_NAV`, `KNOWLEDGE_NAV`, `BUSINESS_NAV`, `GUIDE_NAV`,
+  `publicLinks`, `NAV_LINKS` (~130 LOC).
+
 ### Pre-redeploy de-risk sweep — public-surface audit  (Feb 2026)
 - **Fake social proof killed**: removed the "N of 99 claimed" progress
   bar + counter from `/pricing`. Kept the founding-member offer copy

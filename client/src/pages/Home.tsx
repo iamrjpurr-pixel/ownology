@@ -139,167 +139,34 @@ function WhatsNewRibbon() {
 // ─── Nav ──────────────────────────────────────────────────────────────────────
 type NavItem = { label: string; href: string; external?: boolean };
 // Primary links — always visible in desktop nav.
-// New way forward (Feb 2026, Rich): two-funnel discipline.
+// Two-funnel discipline (Feb 2026, Rich):
 //   1. DIY consumer  → /ask (the answer engine = the moat)
 //   2. Winemaker pro → /join (Founding Partner cold-call landing)
 //   3. Anyone ready to buy → /pricing
 // Everything else stays indexed by Google (footer + sitemap intact) but
 // gets out of the primary path so a cold-called visitor who types
 // ownology.ai lands on ONE clear next step, not five parallel doors.
-// Admins still see the full "More" mega-menu.
 const PRIMARY_NAV: NavItem[] = [
   { label: "Ask Owen",         href: "/ask" },
   { label: "For winemakers",   href: "/join" },
   { label: "Pricing",          href: "/pricing" },
 ];
-// Secondary links — grouped by four product pillars
-// DO pillar: operational cellar tools
-const VINTAGE_NAV: NavItem[] = [
-  { label: "The Press",    href: "/the-press" },
-  { label: "Dashboard",    href: "/dashboard" },
-  { label: "Cellar Tasks", href: "/cellar-tasks" },
-  { label: "Vineyard",     href: "/vineyard" },
-];
-// KNOW pillar: knowledge platform + compliance
-const KNOWLEDGE_NAV: NavItem[] = [
-  { label: "Free Run",           href: "/free-run" },
-  { label: "Knowledge Platform", href: "/knowledge" },
-  { label: "Compliance AI",      href: "/compliance" },
-];
-// LEARN pillar + business
-const BUSINESS_NAV: NavItem[] = [
-  { label: "Blog",                href: "/blog" },
-  { label: "Why Ownology",        href: "/why-ownology" },
-  { label: "For Home Winemakers", href: "/for-home-winemakers" },
-];
-// GUIDE pillar
-const GUIDE_NAV: NavItem[] = [
-  { label: "Guide — Getting Started", href: "/guide" },
-  { label: "Regulations Library",     href: "/regulations" },
-];
+
+// Mobile-only "More" section — public visitors see just these three.
+// Feb 2026 (Rich): dropped the marketing "More ▾" mega-menu entirely from
+// the desktop chrome. Anything an operator needs lives in /admin. Anything
+// a prospect needs lives in the hero pillars, primary nav, or the footer.
 const MORE_NAV: NavItem[] = [
-  { label: "Our Story",    href: "#our-story" },
-  { label: "Pricing",      href: "/pricing" },
-  { label: "FAQ",          href: "#faq" },
-  ...VINTAGE_NAV,
-  ...KNOWLEDGE_NAV,
-  ...BUSINESS_NAV,
+  { label: "Our Story",       href: "#our-story" },
+  { label: "Getting Started", href: "/guide" },
+  { label: "FAQ",             href: "#faq" },
 ];
-const NAV_LINKS: NavItem[] = [...PRIMARY_NAV, ...MORE_NAV];
 
-// ─── More dropdown ───────────────────────────────────────────────────────────
-function NavLink({ item, close }: { item: NavItem; close: () => void }) {
-  const cls = "block px-4 py-1.5 text-sm transition-colors";
-  const sty = {color: "var(--ow-text-mid)", fontFamily: "'Lato',sans-serif", fontWeight: 300 as const};
-  const enter = (e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-amber)");
-  const leave = (e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-text-mid)");
-  return item.href.startsWith("/") ? (
-    <Link href={item.href} onClick={close} className={cls} style={sty} onMouseEnter={enter} onMouseLeave={leave}>{item.label}</Link>
-  ) : (
-    <a href={item.href} onClick={close} className={cls} style={sty} onMouseEnter={enter} onMouseLeave={leave}>{item.label}</a>
-  );
-}
-
-function MoreDropdown({ extraItems, showFullMenu = false }: { extraItems?: NavItem[]; showFullMenu?: boolean }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const close = useCallback(() => setOpen(false), []);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) close();
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [close]);
-
-  // ── Public dropdown (default) — 6 essentials, no bibliography. ──
-  // Rich's feedback (Feb 2026): the mega-menu felt like a sitemap — the very
-  // thing a prospect should never see. The cellar-floor tabs (Dashboard,
-  // The Press, Cellar Tasks) belong in Work Mode, not in the marketing nav.
-  // Logged-in admins get the full 4-column mega-menu below.
-  const publicLinks: NavItem[] = [
-    { label: "Our Story",           href: "#our-story" },
-    { label: "Pricing",             href: "/pricing" },
-    { label: "Getting Started",     href: "/guide" },
-    { label: "Blog",                href: "/blog" },
-    { label: "For Home Winemakers", href: "/for-home-winemakers" },
-    { label: "FAQ",                 href: "#faq" },
-  ];
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-1 text-sm font-light tracking-wide transition-colors"
-        style={{color: "var(--ow-text-mid)", fontFamily: "'Lato',sans-serif", background: "none", border: "none", cursor: "pointer", padding: 0}}
-        onMouseEnter={e => (e.currentTarget.style.color = "var(--ow-amber)")}
-        onMouseLeave={e => (e.currentTarget.style.color = "var(--ow-text-mid)")}
-        aria-haspopup="true"
-        aria-expanded={open}
-      >
-        More
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{marginTop:"1px", transition:"transform 0.2s", transform: open ? "rotate(180deg)" : "none"}}>
-          <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </button>
-      {open && !showFullMenu && (
-        // ── Public: single concise column ─────────────────────────────
-        <div
-          className="absolute top-full right-0 mt-2 rounded-sm"
-          data-testid="more-dropdown-public"
-          style={{background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)", minWidth: "220px", boxShadow: "0 8px 24px var(--ow-shadow)", zIndex: 100}}
-        >
-          <div className="py-2 px-1">
-            {publicLinks.map(item => <NavLink key={item.label} item={item} close={close} />)}
-          </div>
-        </div>
-      )}
-      {open && showFullMenu && (
-        // ── Admin: full 4-column mega-menu (was the original public menu) ─
-        <div
-          className="absolute top-full right-0 mt-2 rounded-sm"
-          data-testid="more-dropdown-admin"
-          style={{background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)", minWidth: "320px", boxShadow: "0 8px 24px var(--ow-shadow)", zIndex: 100}}
-        >
-          {/* General links */}
-          <div className="py-2 px-1">
-            {publicLinks.map(item => <NavLink key={item.label} item={item} close={close} />)}
-          </div>
-          {/* Four-column pillar section */}
-          <div className="grid grid-cols-4" style={{borderTop: "1px solid var(--ow-border)", minWidth: "420px"}}>
-            <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.25rem"}}>Do</p>
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.55rem", letterSpacing:"0.06em", color:"var(--ow-text-lo)", padding:"0 0.75rem 0.5rem", fontStyle:"italic"}}>In the cellar</p>
-              {VINTAGE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
-            </div>
-            <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Know</p>
-              {KNOWLEDGE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
-            </div>
-            <div className="py-3 px-1" style={{borderRight: "1px solid var(--ow-border)"}}>
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Learn</p>
-              {BUSINESS_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
-            </div>
-            <div className="py-3 px-1">
-              <p style={{fontFamily:"'Lato',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"var(--ow-amber)", textTransform:"uppercase", padding:"0 0.75rem 0.5rem"}}>Guide</p>
-              {GUIDE_NAV.map(item => <NavLink key={item.label} item={item} close={close} />)}
-              {extraItems?.map(item => <NavLink key={item.label} item={item} close={close} />)}
-              <button
-                onClick={() => { localStorage.clear(); sessionStorage.clear(); document.cookie.split(";").forEach(c => { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); }); close(); window.location.reload(); }}
-                className="block w-full text-left px-4 py-1.5 text-sm transition-colors"
-                style={{color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", fontWeight: 300, background: "none", border: "none", cursor: "pointer"}}
-                onMouseEnter={e => (e.currentTarget.style.color = "var(--ow-amber)")}
-                onMouseLeave={e => (e.currentTarget.style.color = "var(--ow-text-lo)")}>
-                ⟳ Clear Cache
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+// ─── Nav ─────────────────────────────────────────────────────────────────────
+// Feb 2026 (Rich): the old MoreDropdown mega-menu was removed. Public
+// visitors get just PRIMARY_NAV (3 links) on desktop; a compact "More"
+// section with MORE_NAV lives in the mobile drawer only. Operator quick-
+// links moved to /admin.
 
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -360,13 +227,10 @@ function Nav() {
             ))}
             {/* More dropdown */}
             {/* S8-B/J: Build Index removed from nav (internal only — still reachable via direct URL /build-index) */}
-            {/* "More" dropdown — hidden for anonymous visitors (cog-load
-                reduction). Everything essential now lives in PRIMARY_NAV +
-                the hero pillar cards + footer. Admins (Rich/Gel/team) get
-                the full 4-column mega-menu for internal navigation. */}
-            {isOwner && (
-              <MoreDropdown extraItems={[{ label: "Admin", href: "/admin" }]} showFullMenu={true} />
-            )}
+            {/* Feb 2026 (Rich): the desktop "More" mega-menu was removed entirely.
+                Public visitors get PRIMARY_NAV only + hero pillar cards + footer.
+                Admin quick-links moved to /admin. Mobile drawer still exposes a
+                compact 3-item More section (MORE_NAV) for touch users. */}
           </div>
 
           <div className="hidden md:flex items-center gap-3">
@@ -573,10 +437,11 @@ function Nav() {
             {/* S8-B/J: Build Index removed from mobile nav (internal only — still reachable via /build-index direct URL) */}
           </div>
 
-          {/* Cache clear button */}
-          <div className="pt-2 pb-2">
-            <button
-              onClick={() => { localStorage.clear(); sessionStorage.clear(); document.cookie.split(";").forEach(c => { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); }); setMenuOpen(false); window.location.reload(); }}
+          {/* Cache clear button — admin-only utility */}
+          {isOwner && (
+            <div className="pt-2 pb-2">
+              <button
+                onClick={() => { localStorage.clear(); sessionStorage.clear(); document.cookie.split(";").forEach(c => { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); }); setMenuOpen(false); window.location.reload(); }}
               className="flex items-center gap-2 w-full transition-colors"
               style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "0.875rem", color: "var(--ow-text-lo)", background: "none", border: "none", cursor: "pointer", borderBottom: "1px solid var(--ow-border)", minHeight: "44px", padding: 0 }}
             >
@@ -584,8 +449,7 @@ function Nav() {
               Clear Cache &amp; Reload
             </button>
           </div>
-
-          {/* Spacer */}
+          )}
           <div className="flex-1" />
 
           {/* CTA */}
