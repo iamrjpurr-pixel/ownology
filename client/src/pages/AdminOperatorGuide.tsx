@@ -18,6 +18,7 @@ import {
   ArrowLeft,
   ExternalLink,
 } from "lucide-react";
+import { CrmFlashCards } from "@/components/CrmFlashCards";
 
 type Step = {
   href: string;
@@ -350,7 +351,25 @@ export default function AdminOperatorGuide() {
           >
             One-line summary: every morning, pipeline board → SMS drafts → funnel. Every cellar visit, voice memo. Everything else is reactive.
           </p>
+          <p
+            className="text-xs mt-3"
+            style={{ color: "var(--ow-text-lo)" }}
+          >
+            <a
+              href="#crm-flash-cards"
+              data-testid="op-guide-toc-flashcards"
+              style={{ color: "var(--ow-amber)", textDecoration: "none", fontWeight: 600 }}
+            >
+              ★ NEW · CRM flash-card deck →
+            </a>{" "}
+            <span style={{ fontStyle: "italic" }}>
+              20 idiot-proof cards covering view · call · text · pipeline.
+            </span>
+          </p>
         </div>
+
+        {/* CRM Flash Cards — the idiot's guide to viewing, calling, texting */}
+        <CrmFlashCards />
 
         {/* Sections */}
         {SECTIONS.map((section) => (
