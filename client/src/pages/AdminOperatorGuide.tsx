@@ -19,6 +19,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { CrmFlashCards } from "@/components/CrmFlashCards";
+import { PipelineFlashCards } from "@/components/PipelineFlashCards";
+import { ComplianceFlashCards } from "@/components/ComplianceFlashCards";
 
 type Step = {
   href: string;
@@ -355,21 +357,53 @@ export default function AdminOperatorGuide() {
             className="text-xs mt-3"
             style={{ color: "var(--ow-text-lo)" }}
           >
-            <a
-              href="#crm-flash-cards"
-              data-testid="op-guide-toc-flashcards"
-              style={{ color: "var(--ow-amber)", textDecoration: "none", fontWeight: 600 }}
-            >
-              ★ NEW · CRM flash-card deck →
-            </a>{" "}
-            <span style={{ fontStyle: "italic" }}>
-              20 idiot-proof cards covering view · call · text · pipeline.
+            <span style={{ display: "block", marginBottom: "0.35rem" }}>
+              <a
+                href="#crm-flash-cards"
+                data-testid="op-guide-toc-flashcards"
+                style={{ color: "var(--ow-amber)", textDecoration: "none", fontWeight: 600 }}
+              >
+                ★ CRM flash-card deck →
+              </a>{" "}
+              <span style={{ fontStyle: "italic" }}>
+                20 cards · view · call · text · pipeline.
+              </span>
+            </span>
+            <span style={{ display: "block", marginBottom: "0.35rem" }}>
+              <a
+                href="#pipeline-flash-cards"
+                data-testid="op-guide-toc-pipeline-flashcards"
+                style={{ color: "var(--ow-amber)", textDecoration: "none", fontWeight: 600 }}
+              >
+                ★ Pipeline board flash-card deck →
+              </a>{" "}
+              <span style={{ fontStyle: "italic" }}>
+                14 cards · 5 columns · KPIs · morning ritual.
+              </span>
+            </span>
+            <span style={{ display: "block" }}>
+              <a
+                href="#compliance-flash-cards"
+                data-testid="op-guide-toc-compliance-flashcards"
+                style={{ color: "var(--ow-amber)", textDecoration: "none", fontWeight: 600 }}
+              >
+                ★ Compliance flash-card deck →
+              </a>{" "}
+              <span style={{ fontStyle: "italic" }}>
+                16 cards · Ask · Audit · LIP · APCO · escalate.
+              </span>
             </span>
           </p>
         </div>
 
         {/* CRM Flash Cards — the idiot's guide to viewing, calling, texting */}
         <CrmFlashCards />
+
+        {/* Pipeline board flash-card deck */}
+        <PipelineFlashCards />
+
+        {/* Compliance flash-card deck */}
+        <ComplianceFlashCards />
 
         {/* Sections */}
         {SECTIONS.map((section) => (
