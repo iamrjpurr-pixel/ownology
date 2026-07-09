@@ -4,6 +4,23 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### `/learn` · Owen Deck — 50-card SRS flashcards (Feb 2026, Rich)
+- **Context**: Rich starting his oenology education. Needs both technical fluency (to talk with winemakers) AND consultant-level knowledge (for customer conversations). This is Deck 1 of a planned multi-deck curriculum.
+- **New route**: `/learn` → `client/src/pages/Learn.tsx`. Unlinked from nav, gated behind existing site password. Localstorage-persisted progress.
+- **Content**: `client/src/content/oenologyFlashcards.ts` — 50 cards across 9 categories (Sugar/Ferment ×10, Acid/pH ×7, SO₂ ×6, MLF ×4, Oak ×5, Faults ×6, Sensory ×4, Regions ×5, Pairing ×3).
+- **Dual-language format on every card**:
+  - `sop`: SOP / technical language as it would appear in a cellar procedure or AWRI reference — Rich uses this to sound fluent with winemakers.
+  - `plain`: plain-English translation — how Rich actually learns it.
+  - Plus `why` / `when` / `ruleOfThumb` / `cited` fields.
+- **SRS**: Leitner box scheduler (`client/src/lib/leitnerScheduler.ts`) — 5 boxes with 1/2/4/7/14 day intervals. Grade: Again / Good / Easy. Two study modes: `Due today` (SRS-scheduled) and `All cards` (shuffle). Category filter.
+- **Testids**: `learn-page`, `learn-card`, `learn-card-term`, `learn-card-sop`, `learn-card-plain`, `learn-reveal-btn`, `learn-grade-{again,good,easy}`, `learn-mode-{due,all}`, `learn-category-filter`, `progress-{due,reviewing,mastered,total}`, `learn-reset`, `learn-skip`.
+- **Phase 2 decks noted for backlog** (Rich's stated learning goals):
+  - **Deck 2 — Vineyard & Viticulture** (~20 cards): canopy management, phenology, water stress, disease pressure, rootstocks, spray programs, clones, pruning styles.
+  - **Deck 3 — Consultant's Toolkit** (~15 cards): client objections, decision frameworks, when-to-blend / when-to-hold / when-to-release, sensory evaluation for consulting.
+  - **Deck 4 — Business of Wine** (~10 cards): pricing/margins, distribution, DTC vs trade, cellar door economics, insurance, compliance overview.
+- Verified via screenshot: reveal, grade, next-card advance, filter, and localStorage all working.
+
+
 ### Why-window rotating technical Q&As (Feb 2026, Rich)
 - **Change**: the "window" in `WhyOwnologyBoxes.tsx` now cycles through 3 realistic cellar-diagnostic Q&As on an 8s cadence (pauses on hover, clickable dot nav).
 - **Scenes**:
