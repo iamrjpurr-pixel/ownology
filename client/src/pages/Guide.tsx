@@ -473,6 +473,77 @@ function RoleCard({ path }: { path: RolePath }) {
 }
 
 // ─── Main page ────────────────────────────────────────────────────────────────
+// ── RevealCard — module-scope helper for progressive reveal on /guide ─
+// Renders a compact "click to reveal" card in place of a collapsed
+// section. Kept out of the Guide component to satisfy the
+// react/no-unstable-nested-components rule.
+function RevealCard({
+  id,
+  kicker,
+  title,
+  teaser,
+  onReveal,
+}: {
+  id: string;
+  kicker: string;
+  title: string;
+  teaser: string;
+  onReveal: () => void;
+}) {
+  return (
+    <section className="mb-6" data-testid={`guide-reveal-${id}`}>
+      <button
+        type="button"
+        onClick={onReveal}
+        data-testid={`guide-reveal-btn-${id}`}
+        style={{
+          width: "100%",
+          textAlign: "left",
+          background: BG_CARD,
+          border: `1px solid ${BORDER}`,
+          borderRadius: 6,
+          padding: "1.1rem 1.25rem",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "1rem",
+          transition: "border-color 180ms ease, background 180ms ease",
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.borderColor = AMBER; }}
+        onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; }}
+      >
+        <div style={{ minWidth: 0 }}>
+          <p style={{ fontFamily: MONO, fontSize: "0.65rem", letterSpacing: "0.14em", color: AMBER, textTransform: "uppercase", marginBottom: "0.3rem" }}>
+            {kicker}
+          </p>
+          <p style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1.05rem", color: TEXT_HI, lineHeight: 1.25, marginBottom: "0.3rem" }}>
+            {title}
+          </p>
+          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.82rem", color: TEXT_MID, lineHeight: 1.55 }}>
+            {teaser}
+          </p>
+        </div>
+        <span style={{
+          flexShrink: 0,
+          padding: "0.45rem 0.9rem",
+          background: "color-mix(in oklch, var(--ow-amber) 18%, transparent)",
+          border: `1px solid ${AMBER}`,
+          borderRadius: 999,
+          color: AMBER,
+          fontFamily: SANS,
+          fontSize: "0.75rem",
+          fontWeight: 700,
+          letterSpacing: "0.04em",
+        }}>
+          Reveal →
+        </span>
+      </button>
+    </section>
+  );
+}
+
+// ─── Guide page ──────────────────────────────────────────────────────────────
 export default function Guide() {
   // Mark guide as seen on mount — used by App.tsx redirect logic
   useEffect(() => {
@@ -494,6 +565,29 @@ export default function Guide() {
       if (next.has(id)) next.delete(id);
       else next.add(id);
       try { localStorage.setItem("ownology_checklist", JSON.stringify(Array.from(next))); } catch { /* ignore */ }
+      return next;
+    });
+  };
+
+  // ── Progressive-reveal state (Feb 2026 · Rich) ────────────────────
+  // Doctrine: reveal /guide's dense sub-sections slowly. Only the Four
+  // Pillars overview shows above the fold on a first landing — everything
+  // else (Workflow Map · Getting Started Checklist · Role Paths · Tier
+  // Access · First Fermentation · Further Reading) sits behind a
+  // click-to-reveal card. Persisted so returning visitors don't re-tap.
+  const [expanded, setExpanded] = useState<Set<string>>(() => {
+    try {
+      const raw = localStorage.getItem("ownology_guide_expanded");
+      if (!raw) return new Set();
+      return new Set(JSON.parse(raw) as string[]);
+    } catch { return new Set(); }
+  });
+  const toggleExpanded = (id: string) => {
+    setExpanded(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      try { localStorage.setItem("ownology_guide_expanded", JSON.stringify(Array.from(next))); } catch { /* ignore */ }
       return next;
     });
   };
@@ -647,6 +741,7 @@ export default function Guide() {
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* Section 2 — Interactive Workflow Map                               */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
+        {expanded.has("workflow") ? (
         <section className="mb-16">
           <div style={{ background: BG_RAISED, borderRadius: "4px", border: `1px solid ${BORDER}`, padding: "2rem" }}>
             <div className="flex items-center gap-3 mb-2">
@@ -713,10 +808,19 @@ export default function Guide() {
             </div>
           </div>
         </section>
+        ) : (
+          <RevealCard
+            id="workflow"
+            kicker="Vintage Workflow"
+            title="The vintage cycle, mapped to Ownology"
+            teaser="See how crush · ferment · pressing · aging · bottling map to the four pillars — with clickable nodes."
+          />
+        )}
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* Section 3 — Getting Started Checklist                              */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
+        {expanded.has("checklist") ? (
         <section className="mb-16">
           <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
             <div>
@@ -777,10 +881,20 @@ export default function Guide() {
             ))}
           </div>
         </section>
+        ) : (
+          <RevealCard
+            id="checklist"
+            kicker="Getting Started"
+            title="Your first week on Ownology"
+            teaser={`Seven tasks to touch every pillar · progress saved locally · ${completed.size}/${CHECKLIST.length} done`}
+            onReveal={() => toggleExpanded("checklist")}
+          />
+        )}
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* Section 4 — Role-Based Paths                                       */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
+        {expanded.has("roles") ? (
         <section className="mb-16">
           <div className="flex items-center gap-3 mb-6">
             <div style={{ width: "1px", height: "1.5rem", background: AMBER }} />
@@ -800,10 +914,20 @@ export default function Guide() {
             ))}
           </div>
         </section>
+        ) : (
+          <RevealCard
+            id="roles"
+            kicker="Role-Based Paths"
+            title="Where to start, based on your role"
+            teaser="Three navigational shortcuts — Cellar Hand · Press · Vigneron — jump straight to what your role needs."
+            onReveal={() => toggleExpanded("roles")}
+          />
+        )}
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* Section 5 — Pillar Access by Tier                                    */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
+        {expanded.has("tiers") ? (
         <section className="mb-16">
           <div className="flex items-center gap-3 mb-6">
             <div style={{ width: "1px", height: "1.5rem", background: AMBER }} />
@@ -922,8 +1046,18 @@ export default function Guide() {
             <Link href="/pricing" style={{ color: AMBER, textDecoration: "none" }}>See full pricing →</Link>
           </p>
         </section>
+        ) : (
+          <RevealCard
+            id="tiers"
+            kicker="Pillar Access by Tier"
+            title="Which pillars each subscription unlocks"
+            teaser="Free Run · Cellar Hand · The Press · The Vigneron — see what each tier includes."
+            onReveal={() => toggleExpanded("tiers")}
+          />
+        )}
 
         {/* ── Section 6 — Your First Fermentation ── */}
+        {expanded.has("firstferment") ? (
         <section>
           <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "1.5rem", color: TEXT_HI, marginBottom: "0.5rem" }}>
             Your First Fermentation
@@ -975,8 +1109,18 @@ export default function Guide() {
             ))}
           </div>
         </section>
+        ) : (
+          <RevealCard
+            id="firstferment"
+            kicker="Your First Fermentation"
+            title="Seven steps from empty tank to bottled wine"
+            teaser="A walkthrough with pillar tags and SOP links. Best after you've explored the pillars."
+            onReveal={() => toggleExpanded("firstferment")}
+          />
+        )}
 
         {/* ── Further Reading — external authoritative sources ── */}
+        {expanded.has("reading") ? (
         <section style={{ marginBottom: "3rem" }} data-testid="further-reading-section">
           <h2 style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "1.75rem", color: TEXT_HI, marginBottom: "0.5rem" }}>
             Further reading
@@ -1086,6 +1230,15 @@ export default function Guide() {
             ))}
           </div>
         </section>
+        ) : (
+          <RevealCard
+            id="reading"
+            kicker="Further Reading"
+            title="External authoritative sources we cross-reference"
+            teaser="Wine Australia · AWRI · trade + tasting + marketing links for when you're ready to sell."
+            onReveal={() => toggleExpanded("reading")}
+          />
+        )}
 
         {/* ── Footer note ── */}
         <div style={{
@@ -1114,3 +1267,4 @@ export default function Guide() {
     </div>
   );
 }
+
