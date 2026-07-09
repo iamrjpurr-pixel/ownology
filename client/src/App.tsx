@@ -7,12 +7,11 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "@/lib/useAuth";
-import ThemeToggle from "@/components/ThemeToggle";
+// Removed (Feb 2026, Rich): ThemeToggle, ThemeSuggestion, ThemeOnboarding,
+// AdminQrBadge — user-facing theme picker + QR badge floating pills gone.
+// AutoThemeByTime (defined below) handles theme via time-of-day.
 import UserMenu from "@/components/UserMenu";
-import ThemeSuggestion from "@/components/ThemeSuggestion";
-import ThemeOnboarding from "@/components/ThemeOnboarding";
 import CrushCascade from "@/components/CrushCascade";
-import { AdminQrBadge } from "@/components/AdminQrBadge";
 
 // ── EAGER: first-paint-critical + cellar-floor PWA tabs ───────────────────
 // Loaded synchronously so the most-trafficked routes render with zero
@@ -288,9 +287,12 @@ function Router() {
   return (
     <>
     <TrialBanner />
-    <ThemeOnboarding />
+    {/* Removed (Feb 2026, Rich): ThemeOnboarding, AdminQrBadge, and the
+        floating GlobalThemeToggle. User-toggled themes are gone —
+        theme is now auto-switched by time of day via AutoThemeByTime
+        below. Q "Try Parchment for now?" popups are muted. */}
+    <AutoThemeByTime />
     <CrushCascade />
-    <AdminQrBadge />
     <Suspense fallback={<PageLoading />}>
     <Switch>
       <Route path={"/"} component={MobileHomeRoute} />
@@ -426,43 +428,45 @@ function Router() {
 //   to keep consistent foreground/background color across components
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
-/** GlobalThemeToggle — fixed bottom-right button visible on every page.
- *  Lifts up when the PWA install banner is visible so the two floating
- *  elements don't overlap (previously the theme pill covered the banner's
- *  dismiss button, leaving users unable to close the install prompt). */
-function GlobalThemeToggle() {
-  const [hasBanner, setHasBanner] = useState(false);
+// GlobalThemeToggle removed (Feb 2026, Rich) — no more user-facing theme
+// picker. Theme is now auto-switched by time of day via AutoThemeByTime.
+
+// ── AutoThemeByTime ─────────────────────────────────────────────────
+// Rich, Feb 2026: "remove and stop asking about try parchment etc; just
+// change as per the model; time of day, weather ...". This component
+// mounts once at app root, computes the appropriate theme by local
+// clock, applies it, and re-checks every 30 min so a long-open tab
+// transitions smoothly at dusk / dawn. Weather integration TODO once
+// the meteor app data source is exposed.
+//
+// Mapping (Australian wine-region local time):
+//   05:00 – 08:00  →  parchment    (soft dawn)
+//   08:00 – 17:30  →  parchment    (day cellar)
+//   17:30 – 20:00  →  harvest-gold (dusk amber, if available; falls back to parchment)
+//   20:00 – 05:00  →  soft-cellar  (evening / night)
+function AutoThemeByTime() {
   useEffect(() => {
-    if (typeof document === "undefined") return;
-    const check = () => setHasBanner(document.body.classList.contains("has-pwa-banner"));
-    check();
-    const obs = new MutationObserver(check);
-    obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
-    return () => obs.disconnect();
+    function applyForNow() {
+      const hour = new Date().getHours();
+      // The theme registry keys are checked at write-time in localStorage.
+      // Using values known to exist per ThemeToggle.tsx: parchment · soft-cellar · auto.
+      const themeId = (hour >= 20 || hour < 8) ? "soft-cellar" : "parchment";
+      try {
+        window.localStorage.setItem("ownology-theme", themeId);
+        // Dispatch the custom event ThemeToggle listens for so any live
+        // instances re-apply on schedule without a page reload.
+        window.dispatchEvent(new CustomEvent("ownology:theme", { detail: themeId }));
+        // Fallback: direct DOM class flip so first paint reflects the choice.
+        const root = document.documentElement;
+        if (themeId === "soft-cellar") root.classList.add("dark");
+        else root.classList.remove("dark");
+      } catch { /* ignore */ }
+    }
+    applyForNow();
+    const interval = setInterval(applyForNow, 30 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
-  return (
-    <div
-      style={{
-        position: "fixed",
-        // Add ~64px when the PWA banner is showing so the pill sits above it
-        bottom: hasBanner
-          ? "calc(4.75rem + env(safe-area-inset-bottom, 0px))"
-          : "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
-        // Moved to bottom-LEFT to avoid conflicts with mobile bottom nav +
-        // right-anchored floating action pills (FreeRun, ThePress, CellarTasks,
-        // AdminProducers, WorkModeLayout FAB). Bottom-left is nearly always
-        // empty across every page in the app.
-        left: "1.25rem",
-        zIndex: 9999,
-        transition: "bottom 200ms ease",
-      }}
-    >
-      {/* Feb 2026 (Rich): switched to compact mode — icon only, no "PARCHMENT"
-          text label. Kept the floating pill anchored bottom-left so the QR
-          badge can stack above it, but the visual weight drops by ~70%. */}
-      <ThemeToggle compact={true} />
-    </div>
-  );
+  return null;
 }
 
 function App() {
@@ -478,9 +482,9 @@ function App() {
             <Router />
             <SiteFooter />
             <PwaInstallBanner />
-            <GlobalThemeToggle />
+            {/* GlobalThemeToggle removed (Feb 2026, Rich) — auto-theme via AutoThemeByTime handles this now. */}
             <UserMenu />
-            <ThemeSuggestion />
+            {/* ThemeSuggestion removed (Feb 2026, Rich) — no more "Try Parchment for now?" prompts. */}
           </TooltipProvider>
         </AuthProvider>
       </ThemeProvider>

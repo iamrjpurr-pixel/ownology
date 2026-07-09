@@ -5,6 +5,18 @@ problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
 ## Feb 2026
+### HeroCarousel Scene 2 refactored to Angle D (recognition-anchor) — data-picked  (Feb 2026, Rich)
+- **Problem**: original Scene 2 was abstract stats ("40 hrs / 3:47am / $50k+ / 0") — Rich flagged as "tech heavy" and reminded me the original doctrine positioned Ownology vs InnoVint/Vintrace.
+- **Solution**: applied 6-principle psychology matrix (choice overload · loss aversion · anchoring · cognitive load · craft-identity respect · F-pattern scan time) against 4 candidate framings. Angle D — "You already know InnoVint & Vintrace. You've probably priced them." — won on 5/6 axes.
+- **Copy landed**:
+  - Eyebrow: "The gap · where you sit"
+  - H2: "You already know InnoVint & Vintrace. You've probably priced them."
+  - Chip row: three category peers — InnoVint · Vintrace · **Ownology** (amber-lit)
+  - Paragraph: "Ownology is the same category — cellar intelligence — priced and paced for boutique winemakers. Every answer cited, every SOP editable, APCO built in."
+  - Loss-aversion italic footer: "Before you spend another year on the wrong tool."
+- **Design choices**: recognition memory as anchor (not attack), respects Australian winemaker collegiality (industry <2k producers), mirrors how winemakers themselves sell (story + recognition > spec sheets).
+
+
 ### Cycling landing hero + /guide progressive reveal — cognitive-overload fix  (Feb 2026, Rich, post-deploy iteration)
 - **HeroCarousel** replaces the dense pillars hero on `/home` — three auto-cycling scenes: (1) 3:47am ferment panic cold open (3s), (2) market-gap analysis with 4 stat cards — 40hrs/yr · 3:47am · $50k+ · 0 (6s), (3) Meet Owen apprentice reveal + dual CTA (6s). Auto-cycles 15s loop · pauses on hover · dots for manual jump · skip-intro button.
 - **FounderStory temporarily hidden** on `/home` — Rich flagged the Rich+Gel winery photos as visually broken. Section commented out until reshoot/restyle.

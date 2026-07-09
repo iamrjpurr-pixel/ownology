@@ -74,69 +74,84 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
         </h1>
       </SceneWrap>
 
-      {/* Scene 2 — the market gap (competitor comparison) */}
+      {/* Scene 2 — recognition-anchor framing (Angle D, data-picked).
+             Lower cognitive load than a 4-card comparison matrix; uses
+             competitor names as CATEGORY anchors, not attack targets;
+             mirrors how winemakers themselves sell — story + recognition
+             rather than spec sheets. See CHANGELOG for the psychology
+             memo that landed on this. */}
       <SceneWrap active={active === "gap"} testId="hero-scene-gap">
         <p style={eyebrow}>The gap · where you sit</p>
-        <h2 style={{ ...h1, fontSize: "clamp(1.5rem, 3.6vw, 2.5rem)", marginBottom: "1.75rem" }}>
-          InnoVint &amp; Vintrace built for the big producers.
+        <h2 style={{ ...h1, fontSize: "clamp(1.6rem, 3.8vw, 2.75rem)", marginBottom: "2rem" }}>
+          You already know InnoVint &amp; Vintrace.
           <br />
-          <span style={{ color: "var(--ow-amber)" }}>Ownology is built for you.</span>
+          <span style={{ color: "var(--ow-amber)" }}>You&rsquo;ve probably priced them.</span>
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0.85rem", maxWidth: 960, margin: "0 auto" }}>
+
+        {/* Category chip row — three peers, Ownology amber-lit */}
+        <div
+          data-testid="hero-scene-gap-chips"
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: "0.6rem",
+            marginBottom: "1.75rem",
+          }}
+        >
           {[
-            {
-              name: "InnoVint",
-              price: "$500+/mo",
-              tags: ["Enterprise", "No AI", "No APCO"],
-              muted: true,
-            },
-            {
-              name: "Vintrace",
-              price: "$4k+ setup",
-              tags: ["Complex UI", "No AI", "Big-winery scale"],
-              muted: true,
-            },
-            {
-              name: "Spreadsheet + phone",
-              price: "Free · but",
-              tags: ["No memory", "No compliance", "No 3am answers"],
-              muted: true,
-            },
-            {
-              name: "Ownology",
-              price: "$44/mo founding",
-              tags: ["Boutique-first", "Cited AI · Owen", "APCO built in"],
-              muted: false,
-            },
+            { name: "InnoVint", muted: true },
+            { name: "Vintrace", muted: true },
+            { name: "Ownology", muted: false },
           ].map((c) => (
-            <div
+            <span
               key={c.name}
               style={{
-                ...gapCard,
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.85rem",
+                fontWeight: c.muted ? 400 : 700,
+                letterSpacing: "0.04em",
+                padding: "0.4rem 1rem",
+                borderRadius: 999,
+                border: `1px solid color-mix(in oklch, var(--ow-amber) ${c.muted ? 25 : 55}%, transparent)`,
                 background: c.muted
-                  ? "color-mix(in oklch, var(--ow-amber) 3%, transparent)"
-                  : "color-mix(in oklch, var(--ow-amber) 14%, transparent)",
-                border: `1px solid color-mix(in oklch, var(--ow-amber) ${c.muted ? 20 : 55}%, transparent)`,
-                opacity: c.muted ? 0.75 : 1,
+                  ? "transparent"
+                  : "color-mix(in oklch, var(--ow-amber) 18%, transparent)",
+                color: c.muted ? "oklch(0.68 0.015 75)" : "var(--ow-amber)",
               }}
             >
-              <p style={{ ...gapStat, fontSize: "1.05rem", marginBottom: "0.2rem", color: c.muted ? "oklch(0.80 0.010 75)" : "var(--ow-amber)" }}>
-                {c.name}
-              </p>
-              <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.72rem", letterSpacing: "0.06em", color: c.muted ? "oklch(0.60 0.015 75)" : "var(--ow-amber)", marginBottom: "0.55rem", textTransform: "uppercase" }}>
-                {c.price}
-              </p>
-              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                {c.tags.map((t) => (
-                  <li key={t} style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: c.muted ? "oklch(0.72 0.015 75)" : "oklch(0.88 0.010 75)", lineHeight: 1.55, display: "flex", gap: "0.35rem", alignItems: "flex-start" }}>
-                    <span style={{ color: c.muted ? "oklch(0.50 0.010 60)" : "var(--ow-amber)" }}>{c.muted ? "·" : "✓"}</span>
-                    {t}
-                  </li>
-                ))}
-              </ul>
-            </div>
+              {c.name}
+            </span>
           ))}
         </div>
+
+        <p
+          style={{
+            fontFamily: "'Lato',sans-serif",
+            fontWeight: 300,
+            fontSize: "clamp(0.95rem, 1.4vw, 1.1rem)",
+            lineHeight: 1.65,
+            color: "oklch(0.82 0.010 75)",
+            maxWidth: 640,
+            margin: "0 auto",
+            textWrap: "balance" as "balance",
+          }}
+        >
+          Ownology is the same category &mdash; <span style={{ color: "var(--ow-amber)", fontWeight: 500 }}>cellar intelligence</span> &mdash;
+          priced and paced for boutique winemakers. Every answer cited, every SOP editable, APCO built in.
+        </p>
+
+        <p
+          style={{
+            fontFamily: "'Fraunces',serif",
+            fontStyle: "italic",
+            fontSize: "0.9rem",
+            color: "oklch(0.62 0.015 75)",
+            marginTop: "1.5rem",
+          }}
+        >
+          Before you spend another year on the wrong tool.
+        </p>
       </SceneWrap>
 
       {/* Scene 3 — Owen + CTA */}

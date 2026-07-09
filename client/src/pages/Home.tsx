@@ -235,7 +235,7 @@ function Nav() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <ThemeToggle compact />
+            {/* ThemeToggle removed (Feb 2026, Rich) — auto-theme now, no user picker. */}
             {/* ── "Work Mode" utility button ─────────────────────────────
                Sub-nav shortcut to Ownology's mobile-first cellar shell
                (Ask/Press/Log/Tasks/More). Deliberately quiet — small
@@ -284,9 +284,8 @@ function Nav() {
             </a>
           </div>
 
-          {/* Mobile: theme toggle + hamburger */}
+          {/* Mobile: hamburger only — theme toggle removed (Feb 2026, Rich). */}
           <div className="md:hidden flex items-center gap-1">
-            <ThemeToggle compact />
             <button
               className="touch-target rounded-sm transition-colors"
               style={{background: menuOpen ? "var(--ow-bg-card)" : "transparent"}}
