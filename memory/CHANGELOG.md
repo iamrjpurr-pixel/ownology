@@ -4,6 +4,22 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### `/our-story` standalone page — quiet rebuild for iteration (Feb 2026, Rich)
+- **Context**: Rich uploaded `ownology-our-story.zip` — component + copy but no image binaries. Zip's 3 `/manus-storage/*` image paths (founders-couple, vineyard, lab) are dead in the Emergent build; only the 2 Cloudfront portraits (Rich, Geraldine — the "AI photos" from Manus) still resolve. Rich's ask: rebuild as a **dedicated page**, kept unlinked, structured for a future founder video, no home-page changes.
+- **New route**: `/our-story` → `client/src/pages/OurStory.tsx`. Added to `App.tsx` route table but **not linked from Nav, Footer, or any content page** — direct-URL access only.
+- **Page structure** (top → bottom):
+  1. Video hero slot — 16:9 placeholder card with amber play icon + drop-in instructions (`/media/our-story.mp4`).
+  2. Pull quote — Rich's 2005 boutique-shed anchor line, cellar-key SVG mark above.
+  3. Founder portraits — Rich + Geraldine, 3:4 side-by-side, both Cloudfront (`d2xsxph8kpxj0f.cloudfront.net`, 200 OK verified).
+  4. 4-paragraph body copy verbatim from Rich's upload with amber-left highlighted insight card.
+  5. Education credential card (Advanced Cert Viticulture & Winemaking — Oenology).
+  6. Back-to-home footer link.
+- **What's NOT included** (deliberate — Rich to fill later): founders-couple hero photo, vineyard + lab small gallery. Structure supports adding them back once assets are shot.
+- **Testids**: `our-story-page|video-slot|pullquote|founder-rich|founder-geraldine|body|highlight|credential|back-home|return-home`.
+- **Header**: sticky "Ownology ← / PREVIEW · UNLINKED" banner so Rich knows it's not live.
+- **Verified via screenshot**: all sections render, both portraits load from Cloudfront, video placeholder shows drop-in hint.
+
+
 ### HeroCarousel v4 · "The Apprentice Arc" — reordered 4-scene carousel + `WhyOwnologyBoxes` below-fold (Feb 2026, Rich)
 - **Problem**: v3 opened on 3:47am panic → gap → Owen. Rich wanted to reverse the emotional arc: lead with warmth (Owen), then category (Gap), then pain (3:47am), then invite (Get Started). Also wanted rational-proof boxes below-fold.
 - **v4 carousel scenes** (`client/src/components/HeroCarousel.tsx`, full rewrite):
