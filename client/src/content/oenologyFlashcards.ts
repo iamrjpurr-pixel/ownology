@@ -28,7 +28,8 @@ export type FlashcardCategory =
   | "faults"
   | "sensory"
   | "regions"
-  | "pairing";
+  | "pairing"
+  | "consulting";
 
 export interface Flashcard {
   id: string;
@@ -55,6 +56,7 @@ export const CATEGORY_META: Record<
   sensory:         { label: "Sensory & Flavour",    short: "Sensory" },
   regions:         { label: "Regions & Climate",    short: "Regions" },
   pairing:         { label: "Pairing Principles",   short: "Pairing" },
+  consulting:      { label: "Consultant's Toolkit", short: "Consult" },
 };
 
 export const FLASHCARDS: Flashcard[] = [
@@ -579,5 +581,161 @@ export const FLASHCARDS: Flashcard[] = [
     why: "Most-broken pairing rule in restaurants.",
     when: "Any dessert course.",
     ruleOfThumb: "Chocolate = fortified sweet (PX, Rutherglen Muscat). Tart = late-harvest Riesling.",
+  },
+
+  // ── CONSULTANT'S TOOLKIT — Deck 3 · sales & client conversations (15) ─
+  // For Rich's sales calls. SOP = what to actually SAY on the call.
+  // Plain = the underlying idea in his head. Written to be scanned mid-call.
+  {
+    id: "cons-elevator",
+    term: "Elevator pitch — what Ownology does",
+    category: "consulting",
+    sop: "Cellar intelligence for boutique winemakers. Conversational AI grounded in the oenology reference corpus (Zoecklein, Boulton, Ribéreau-Gayon, AWRI). Every answer cited. SOPs editable. APCO drafting built in. Priced from $22/mo — no per-user fees, no implementation consultant.",
+    plain: "It's software that lets you ask cellar questions and get answers with citations. Keeps your SOPs current, handles compliance drafting. Under a hundred bucks a month. Winemaker AI, priced for actual winemakers.",
+    why: "First 15 seconds of any call. If they don't get it here, nothing else lands.",
+    when: "Cold outreach reply. First inbound demo request. Trade show conversations.",
+    ruleOfThumb: "Say what it IS before what it DOES. Category first, feature list never.",
+  },
+  {
+    id: "cons-hallucination",
+    term: "\"Is the AI going to lie to me?\"",
+    category: "consulting",
+    sop: "Retrieval-augmented generation on a curated oenology corpus. Owen returns citations per answer. On out-of-corpus questions, Owen refuses rather than fabricates. Not a general-purpose chatbot fine-tuned on winemaking — a purpose-built retrieval layer over reference material we own.",
+    plain: "Every answer shows where it came from. If Owen doesn't know, he says so. That's the con·science bit — not internet CON, backed IN SCIENCE. You get the receipts, not just the answer.",
+    why: "This is THE objection. Winemakers have been burned by ChatGPT confidently making things up.",
+    when: "Any prospect who's tried general-purpose AI and got bad advice.",
+    ruleOfThumb: "Show, don't tell — pull up /learn or ask Owen a live question mid-call.",
+  },
+  {
+    id: "cons-vs-innovint",
+    term: "\"How is this different from InnoVint / Vintrace?\"",
+    category: "consulting",
+    sop: "Same category (cellar intelligence software). Different DNA. Boutique-priced (~10% of enterprise incumbents on loaded cost). No per-user fees. No implementation consultant required. Conversational AI is native, not bolted on. Built by working winemakers, not by a software company that acquired a wine domain.",
+    plain: "Same job, one-tenth the price. Full receipts on our /pricing-comparison page. They're built for wineries with a CFO. We're built for wineries with a founder still on the crush pad.",
+    why: "The prospect has almost certainly priced or been quoted by one of them. This must be a confident answer.",
+    when: "Any commercial-scale prospect. Any prospect who mentions competitor names.",
+    ruleOfThumb: "Send them /pricing-comparison after the call. It's your receipt.",
+    cited: "See /pricing-comparison for the full math.",
+  },
+  {
+    id: "cons-data-privacy",
+    term: "\"Where does my data go? Is it safe?\"",
+    category: "consulting",
+    sop: "SOPs and vintage records stored in customer-scoped account with encryption in transit and at rest. Not used to train foundation models. Full data portability on cancellation — CSV export of all user-generated content. Right to delete honoured immediately.",
+    plain: "Your data stays in your account. We don't feed it to AI training. You can export it or delete it any time. Yours forever. That's the third pillar on our homepage — 'your data stays yours' — and we mean it.",
+    why: "Every winery has a competitor they don't want reading their notebook. Legitimate concern.",
+    when: "Any winery with proprietary style or long history to protect.",
+    ruleOfThumb: "Point them at the third Why Ownology box on the homepage.",
+  },
+  {
+    id: "cons-replaces-consultant",
+    term: "\"Are you replacing my consultant?\"",
+    category: "consulting",
+    sop: "Complementary positioning, not replacement. Owen handles reference lookups, 3am chemistry questions, and SOP retrieval. Human consultants handle judgment calls: blend architecture, style trajectory, complex fault diagnosis, business strategy. Different jobs.",
+    plain: "No. Consultants make judgment calls. Owen answers the questions you'd otherwise Google or dig through a textbook for. Two different jobs. Best-case scenario, your consultant loves us because you stop asking them what SO₂ target to hit.",
+    why: "Prospects who work with consultants are cautious about anything that might undercut a trusted relationship.",
+    when: "Prospects with an existing consultant relationship. Sommeliers moonlighting as consultants.",
+    ruleOfThumb: "Never position AI as replacing humans. Position it as freeing humans for the hard problems.",
+  },
+  {
+    id: "cons-import-story",
+    term: "\"How do I get my history into it?\"",
+    category: "consulting",
+    sop: "/import surface handles five modalities: voice memo transcription (Whisper), camera OCR for notebook photos (Claude Sonnet vision), clipboard paste with image OCR + spell-check, structured CSV upload with column mapping, and bulk folder drop with per-file confidence grading (image / text / PDF / XLSX / WhatsApp export / audio).",
+    plain: "Take a photo of your notebook. Drop a folder of PDFs. Paste a screenshot. It reads them all, structures the data, you review and save. Not a week-long onboarding — a single afternoon.",
+    why: "Migration friction is the #1 reason winemakers stay on paper. Kill the friction, kill the resistance.",
+    when: "Any prospect currently on Excel / paper / whiteboards / WhatsApp threads.",
+    ruleOfThumb: "Offer to sit with them for one hour of import — they'll close on the call.",
+  },
+  {
+    id: "cons-pricing-talk",
+    term: "Pricing conversation",
+    category: "consulting",
+    sop: "Four tiers, monthly on annual: Free Run $0 (unlimited AI questions, no SOPs) · Cellar Hand $22/mo (starter commercial + serious DIY) · The Press $44/mo (typical boutique, full commercial toolkit) · The Vigneron $88/mo (owner-operator, 3 seats, vineyard scope, APCO). No per-user surcharges. No implementation cost.",
+    plain: "Free tier for curious folks. $22 for starter. $44 for a typical winery. $88 for serious owner-operators. What's on the page is what you pay — no hidden fees.",
+    why: "Sales confidence comes from clarity. Fumble this and you undermine the whole 10x-cheaper narrative.",
+    when: "After they've indicated interest. Before they've asked (they always ask).",
+    ruleOfThumb: "Say the numbers plainly. Don't apologise, don't over-explain, don't offer discounts on the first call.",
+  },
+  {
+    id: "cons-who-is-owen",
+    term: "\"Who is Owen? Is that a real person?\"",
+    category: "consulting",
+    sop: "Owen is the AI persona of Ownology — the oenology you can talk to. Not a mascot, not a stand-in for a real person. The face of the con·science layer: retrieval, citation, and honest refusal on out-of-corpus questions. Named to be conversational, not authoritative.",
+    plain: "Owen is what we call the AI. Not a real person, not pretending to be one. Just a name for the thing you talk to — because 'ask the AI' sounds cold and 'ask Owen' feels like a colleague.",
+    why: "Some prospects find AI personification off-putting. Have a straight answer ready.",
+    when: "Any prospect who asks or looks confused. Small talk moments.",
+    ruleOfThumb: "If they seem cold on the persona, drop the name and say 'the AI' — Owen is a wrapper, not a hill to die on.",
+  },
+  {
+    id: "cons-ai-wrong",
+    term: "\"What if the AI gives me bad advice on my ferment?\"",
+    category: "consulting",
+    sop: "Owen surfaces citations per answer. Recommended workflow: on any critical decision (SO₂ addition, ferment restart, blend commitment), verify the answer against the cited source before acting. Owen is decision-support, not decision-owner. Same posture as consulting a textbook.",
+    plain: "Owen shows you the source. On critical calls, check the source, then YOU make the decision. Owen helps you think — he doesn't replace your judgement. Same way you'd cross-check a textbook before acting on it.",
+    why: "Serious winemakers ask this. The answer must position Owen correctly — assistant, not oracle.",
+    when: "Any winemaker who's been burned by a bad recommendation from any source.",
+    ruleOfThumb: "Reassure by acknowledging Owen isn't infallible — that's why the citations exist.",
+  },
+  {
+    id: "cons-sop-onboarding",
+    term: "\"How does it learn my winery?\"",
+    category: "consulting",
+    sop: "Customer SOPs uploaded via /import are vector-embedded to the customer's scoped account. Retrieval combines the private customer corpus with the public oenology reference corpus. Where customer SOP overlaps with public reference, customer SOP takes precedence.",
+    plain: "You upload your SOPs and Owen reads them. From that point, your SOPs override the default oenology textbook. If your winery says 'we do it this way', Owen defaults to your way.",
+    why: "Winemakers care about their SOPs being respected, not overwritten.",
+    when: "Any prospect with mature SOPs — likely mid-size commercial or a consulting-heavy small winery.",
+    ruleOfThumb: "'Your SOPs win' is a good tagline in these conversations.",
+  },
+  {
+    id: "cons-team-access",
+    term: "\"Can my whole team use it?\"",
+    category: "consulting",
+    sop: "Cellar Hand and The Press are single-account tiers. Vigneron includes 3 team seats. Enterprise custom quote for larger teams — no per-user surcharge, tier-based only.",
+    plain: "Cellar Hand and The Press are for one winemaker. Vigneron includes 3 team logins. Bigger teams — talk to us, we'll quote flat rate. No per-user hidden fees like the other guys.",
+    why: "Multi-user is where competitor pricing balloons — this is a differentiator worth naming.",
+    when: "Any prospect with more than one person on the cellar floor.",
+    ruleOfThumb: "Explicitly contrast: 'No per-user fees. Ever.'",
+  },
+  // ── Decision frameworks — the calls a consultant is asked to make ────
+  {
+    id: "cons-when-to-press",
+    term: "When to press (reds)",
+    category: "consulting",
+    sop: "Press timing decision governed by extraction curve vs seed-tannin exposure. Standard window: 0 to +5°Bx for balanced structure. Earlier (+3 to +7°Bx) for lighter styles. Later (dry through -1°Bx) only when heavy structure desired; expect grippy tannins.",
+    plain: "Press when the ferment's nearly dry — around zero Brix — for most reds. Earlier if you want a lighter style. Wait past dry only if you want heavier structure, and know you'll get grippy tannins.",
+    why: "Press timing is a decision a consultant is asked to weigh in on constantly.",
+    when: "Late in red ferment. Any prospect on a red-heavy program.",
+    ruleOfThumb: "Taste + Brix + tannin bench trial. Never press on the calendar alone.",
+  },
+  {
+    id: "cons-when-to-blend",
+    term: "When to blend",
+    category: "consulting",
+    sop: "Structural blend decisions (variety ratio, Petit Verdot lift, Cab Franc perfume) — commit BEFORE oak. Stylistic blends (softening tannin, oak marker correction, integration) — commit AFTER oak. Triplicate 100 mL bench trial mandatory before any tank commit.",
+    plain: "Big decisions about which grapes and what ratio — do them BEFORE the barrel. Small tuning blends — do them AFTER the barrel. Always test three small beakers before committing the tank.",
+    why: "Blend timing decisions come up in every consultation. Frame is critical.",
+    when: "Post-ferment onwards. Any prospect thinking about their first blended wine.",
+    ruleOfThumb: "Triplicate bench trial or don't do it.",
+  },
+  {
+    id: "cons-when-to-release",
+    term: "When to hold vs release",
+    category: "consulting",
+    sop: "Release criterion: primary fruit + secondary (oak, MLF-derived) + tertiary (bottle age, integration) sit in balance without one dominating. Hold if primary fruit still masking structure. Hold if tannin still puckering. Release if primary fruit is fading faster than integration is arriving.",
+    plain: "Sell it when it stops changing week-to-week. If you're still tasting sharp oak or grippy tannin at 6 months, give it more time. If the fruit's fading fast, ship it faster.",
+    why: "Cellar economics question — every month of delay is capital tied up.",
+    when: "Any winery with capital constraints and finished stock in bulk.",
+    ruleOfThumb: "Blind-taste against a reference — your palate normalises to a single wine over time.",
+  },
+  {
+    id: "cons-when-to-escalate",
+    term: "When to escalate to a consultant (know the limit)",
+    category: "consulting",
+    sop: "Escalate to human consultant on: (1) fault chemistry unclear after basic diagnostics, (2) blend calls impacting >30% of program value, (3) regulatory / compliance questions with export implications, (4) VA trajectory adverse and unresponsive to standard interventions, (5) style pivot decisions on flagship wines.",
+    plain: "Call a proper consultant when: you can't identify what's wrong, big blends touching a lot of your production, export/legal questions, VA that's getting worse not better, or when you're thinking of changing your flagship style.",
+    why: "Knowing your limit is a consultant skill in itself. Rich needs to know when NOT to be the answer.",
+    when: "Rich's own decision-making — when to stop giving advice and refer.",
+    ruleOfThumb: "If you'd need to Google it twice to be confident — refer.",
   },
 ];

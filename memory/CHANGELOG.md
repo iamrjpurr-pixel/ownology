@@ -4,6 +4,17 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Deck 3 · Consultant's Toolkit — 15 cards for sales calls (Feb 2026, Rich · URGENT for tomorrow's calls)
+- **Context**: Rich has sales calls tomorrow. Needed a cheat-sheet of what to actually SAY when a prospect asks common questions.
+- **Change**: added `consulting` category to `FlashcardCategory` + `CATEGORY_META` in `client/src/content/oenologyFlashcards.ts`.
+- **15 new cards, split**:
+  - **10 objection-handlers** — Elevator pitch · Hallucination worry · vs InnoVint/Vintrace · Data privacy · Replaces consultant? · Import story · Pricing · Who is Owen · AI wrong risk · SOP onboarding · Team access.
+  - **5 decision-frameworks** — When to press · When to blend · When to hold vs release · When to escalate (know Rich's own limit) · (Bench trial discipline folded into When-to-blend).
+- **SOP field** on consulting cards = the actual phrases Rich can say aloud on a call. Written to be scanned mid-conversation.
+- **Deck totals now**: 65 cards across 10 categories.
+- Verified via screenshot on `/apprentice` — filter shows Consultant's Toolkit, first card renders correctly, dual-language format preserved.
+
+
 ### `/learn` · Owen Deck — 50-card SRS flashcards (Feb 2026, Rich)
 - **Context**: Rich starting his oenology education. Needs both technical fluency (to talk with winemakers) AND consultant-level knowledge (for customer conversations). This is Deck 1 of a planned multi-deck curriculum.
 - **New route**: `/learn` → `client/src/pages/Learn.tsx`. Unlinked from nav, gated behind existing site password. Localstorage-persisted progress.
