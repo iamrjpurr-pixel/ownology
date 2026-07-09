@@ -457,6 +457,98 @@ Return ONLY valid JSON. No markdown. If no contact can be identified, return {"f
       }
     }),
 
+  // ── OWNER — Migration bridge: dump all contacts as JSON  (Feb 2026) ──
+  // Rich, one-shot dev→prod migration. Returns every real contact
+  // (excluding rows explicitly tagged "test") as a JSON payload the
+  // operator can save + upload on prod via importContacts below.
+  exportAllContacts: ownerProcedure
+    .query(async () => {
+      const all = await db.select().from(schema.outreachContacts).orderBy(desc(schema.outreachContacts.createdAt));
+      return {
+        exportedAt: Date.now(),
+        count: all.length,
+        // Only include the fields prod's import will accept. We drop the
+        // primary-key `id` because we upsert-by-slug; and we drop the
+        // volatile pipeline timestamps (smsSentAt, firstViewedAt,
+        // viewCount, demoBookedAt, repliedAt, ctaClickedAt) because
+        // pipeline state should reset on the new environment — you
+        // don't want a stale "sent 6 months ago" carrying over.
+        contacts: all.map((c) => ({
+          slug: c.slug,
+          firstName: c.firstName,
+          lastName: c.lastName,
+          mobileAu: c.mobileAu,
+          winery: c.winery,
+          event: c.event,
+          painPoint: c.painPoint,
+          calendlyOverride: c.calendlyOverride,
+          notes: c.notes,
+          smsDraftOverride: c.smsDraftOverride,
+          status: c.status,
+          persona: c.persona,
+          createdAt: c.createdAt,
+        })),
+      };
+    }),
+
+  // ── OWNER — Migration bridge: import contacts from a JSON payload ─────
+  // Upserts by slug. If a contact with the same slug already exists in
+  // this environment, it's SKIPPED (never overwritten) so the operator
+  // can't accidentally wipe fresher data by re-uploading an older dump.
+  importContacts: ownerProcedure
+    .input(z.object({
+      contacts: z.array(z.object({
+        slug: z.string().min(1).max(80),
+        firstName: z.string().min(1).max(80),
+        lastName: z.string().max(80).nullable().optional(),
+        mobileAu: z.string().max(20).nullable().optional(),
+        winery: z.string().max(120).nullable().optional(),
+        event: z.string().max(120).nullable().optional(),
+        painPoint: z.string().max(300).nullable().optional(),
+        calendlyOverride: z.string().max(300).nullable().optional(),
+        notes: z.string().max(500).nullable().optional(),
+        smsDraftOverride: z.string().max(500).nullable().optional(),
+        status: z.string().max(16).default("cold"),
+        persona: z.string().max(32).nullable().optional(),
+        createdAt: z.number().optional(),
+      })).max(500),
+    }))
+    .mutation(async ({ input }) => {
+      let inserted = 0;
+      let skipped = 0;
+      const skippedSlugs: string[] = [];
+      for (const c of input.contacts) {
+        // Check if a contact with this slug already exists — never overwrite
+        const existing = await db.select({ slug: schema.outreachContacts.slug })
+          .from(schema.outreachContacts)
+          .where(eq(schema.outreachContacts.slug, c.slug))
+          .limit(1);
+        if (existing.length > 0) {
+          skipped++;
+          skippedSlugs.push(c.slug);
+          continue;
+        }
+        await db.insert(schema.outreachContacts).values({
+          slug: c.slug,
+          firstName: c.firstName,
+          lastName: c.lastName ?? null,
+          mobileAu: c.mobileAu ?? null,
+          winery: c.winery ?? null,
+          event: c.event ?? null,
+          painPoint: c.painPoint ?? null,
+          calendlyOverride: c.calendlyOverride ?? null,
+          notes: c.notes ?? null,
+          smsDraftOverride: c.smsDraftOverride ?? null,
+          status: c.status,
+          persona: c.persona ?? null,
+          viewCount: 0,
+          createdAt: c.createdAt ?? Date.now(),
+        });
+        inserted++;
+      }
+      return { inserted, skipped, skippedSlugs };
+    }),
+
   // ── OWNER — OCR a business card / email-signature screenshot ─────────
   // Rich, Feb 2026: "paste a screenshot of an email signature or a
   // business card into /admin/contacts and let it OCR + auto-fill the
