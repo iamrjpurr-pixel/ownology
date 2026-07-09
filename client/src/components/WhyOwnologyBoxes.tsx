@@ -11,6 +11,7 @@
  * anchor without turning the box into an ad.
  */
 
+import { useEffect, useMemo, useState } from "react";
 import { Notebook, Smartphone, Lock } from "lucide-react";
 
 interface Box {
@@ -19,6 +20,63 @@ interface Box {
   title: string;
   body: string;
 }
+
+// ── Rotating cellar-diagnostic Q&As for the product "window" ──────────────
+// Each entry is a realistic mid-vintage question a boutique winemaker would
+// actually ask — MLF, SO2 dosing, stuck ferment restart — plus a technically
+// correct answer with two citations from mainstream oenology references.
+// Kept intentionally short (readable in 8s) and spans the harvest timeline
+// so a returning visitor sees fresh proof every time.
+interface WindowScene {
+  id: string;
+  question: string;
+  answerJsx: React.ReactNode;
+  citations: string[];
+}
+
+const WINDOW_SCENES: WindowScene[] = [
+  {
+    id: "mlf",
+    question: "MLF stuck at pH 3.42, temp dropped to 14°C. Restart or wait?",
+    answerJsx: (
+      <>
+        Wait &mdash; and warm first. At <strong style={{ color: "var(--ow-amber)" }}>14°C</strong>, most{" "}
+        <em>Oenococcus oeni</em> strains sit near the lower activity threshold. Warm the tank to{" "}
+        <strong style={{ color: "var(--ow-amber)" }}>18&ndash;20°C</strong> and re-check nutrient status
+        before considering a re-inoculation. pH 3.42 is on the workable side; the temp drop is the more
+        likely stall driver.
+      </>
+    ),
+    citations: ["Zoecklein · Wine Analysis & Production, ch. 8", "AWRI · MLF technical bulletin"],
+  },
+  {
+    id: "so2",
+    question: "Chardonnay finished MLF, pH 3.40. Molecular SO₂ target before bottling?",
+    answerJsx: (
+      <>
+        Aim for <strong style={{ color: "var(--ow-amber)" }}>0.8 mg/L molecular SO₂</strong> for white
+        wines destined for medium-term ageing. At pH 3.40 that lands you at roughly{" "}
+        <strong style={{ color: "var(--ow-amber)" }}>26&ndash;28 mg/L free SO₂</strong>. Re-measure 48h
+        after addition &mdash; MLF-completed wines often show higher binding capacity, so a follow-up
+        adjustment is normal.
+      </>
+    ),
+    citations: ["Boulton et al · Principles & Practices of Winemaking, ch. 12", "AWRI · SO₂ calculator"],
+  },
+  {
+    id: "stuck-ferment",
+    question: "Shiraz stuck at 8.4 Brix, day 12, temp 22°C. Restart approach?",
+    answerJsx: (
+      <>
+        First: <strong style={{ color: "var(--ow-amber)" }}>test residual YAN</strong>. Below 140 mg/L is
+        the most common driver at your stage. If nutrient-limited, rehydrate a restart yeast (Uvaferm 43
+        or equivalent) with GoFerm and step-feed into a 1:10 acclimation. Warm the ferment gently to{" "}
+        <strong style={{ color: "var(--ow-amber)" }}>24°C</strong> before pitching to reduce osmotic shock.
+      </>
+    ),
+    citations: ["Fugelsang & Edwards · Wine Microbiology, ch. 5", "Lallemand · Stuck ferment restart protocol"],
+  },
+];
 
 const BOXES: Box[] = [
   {
@@ -45,6 +103,17 @@ const BOXES: Box[] = [
 ];
 
 export default function WhyOwnologyBoxes() {
+  // Rotate window scenes on an 8s cadence. Pause on hover so a visitor
+  // reading the answer isn't yanked to the next one mid-sentence.
+  const [sceneIdx, setSceneIdx] = useState(0);
+  const [paused, setPaused] = useState(false);
+  useEffect(() => {
+    if (paused) return;
+    const t = setInterval(() => setSceneIdx((i) => (i + 1) % WINDOW_SCENES.length), 8000);
+    return () => clearInterval(t);
+  }, [paused]);
+  const scene = useMemo(() => WINDOW_SCENES[sceneIdx], [sceneIdx]);
+
   return (
     <section
       data-testid="why-ownology-boxes"
@@ -97,6 +166,8 @@ export default function WhyOwnologyBoxes() {
              recognises it as a real cellar problem, not marketing filler. */}
         <div
           data-testid="why-ownology-window"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
           style={{
             maxWidth: 720,
             margin: "0 auto 3rem",
@@ -140,8 +211,8 @@ export default function WhyOwnologyBoxes() {
             </div>
           </div>
 
-          {/* Chat body */}
-          <div style={{ padding: "1.5rem 1.5rem 1.25rem" }}>
+          {/* Chat body — keyed by scene id so the fade replays each swap */}
+          <div key={scene.id} data-testid={`why-ownology-window-scene-${scene.id}`} style={{ padding: "1.5rem 1.5rem 1.25rem", animation: "why-fade 500ms ease" }}>
             {/* User question */}
             <div
               data-testid="why-ownology-window-question"
@@ -169,7 +240,7 @@ export default function WhyOwnologyBoxes() {
                     margin: 0,
                   }}
                 >
-                  MLF stuck at pH 3.42, temp dropped to 14°C. Restart or wait?
+                  {scene.question}
                 </p>
               </div>
             </div>
@@ -213,60 +284,66 @@ export default function WhyOwnologyBoxes() {
                     margin: 0,
                   }}
                 >
-                  Wait &mdash; and warm first. At <strong style={{ color: "var(--ow-amber)" }}>14°C</strong>, most{" "}
-                  <em>Oenococcus oeni</em> strains sit near the lower activity threshold. Warm the tank to{" "}
-                  <strong style={{ color: "var(--ow-amber)" }}>18–20°C</strong> and re-check nutrient status
-                  before considering a re-inoculation. pH 3.42 is on the workable side; the temp drop is the
-                  more likely stall driver.
+                  {scene.answerJsx}
                 </p>
-                {/* Cited source pill — the "backed IN SCIENCE" proof point,
-                     tied visually to the con·science wordplay from the hero. */}
-                <div
-                  style={{
-                    marginTop: "0.85rem",
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "0.4rem",
-                  }}
-                >
-                  <span
-                    data-testid="why-ownology-window-citation"
-                    style={{
-                      fontFamily: "'Fira Code',monospace",
-                      fontSize: "0.66rem",
-                      letterSpacing: "0.06em",
-                      padding: "0.2rem 0.55rem",
-                      borderRadius: 999,
-                      background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
-                      border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
-                      color: "var(--ow-amber)",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.3rem",
-                    }}
-                  >
-                    <span style={{ opacity: 0.7 }}>cited:</span> Zoecklein · Wine Analysis & Production, ch. 8
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "'Fira Code',monospace",
-                      fontSize: "0.66rem",
-                      letterSpacing: "0.06em",
-                      padding: "0.2rem 0.55rem",
-                      borderRadius: 999,
-                      background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
-                      border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
-                      color: "var(--ow-amber)",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.3rem",
-                    }}
-                  >
-                    <span style={{ opacity: 0.7 }}>cited:</span> AWRI · MLF technical bulletin
-                  </span>
+                {/* Citation pills — one per source */}
+                <div style={{ marginTop: "0.85rem", display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                  {scene.citations.map((cite, i) => (
+                    <span
+                      key={cite}
+                      data-testid={i === 0 ? "why-ownology-window-citation" : `why-ownology-window-citation-${i}`}
+                      style={{
+                        fontFamily: "'Fira Code',monospace",
+                        fontSize: "0.66rem",
+                        letterSpacing: "0.06em",
+                        padding: "0.2rem 0.55rem",
+                        borderRadius: 999,
+                        background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+                        border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+                        color: "var(--ow-amber)",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.3rem",
+                      }}
+                    >
+                      <span style={{ opacity: 0.7 }}>cited:</span> {cite}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Dot nav for rotating questions — small, quiet */}
+          <div
+            data-testid="why-ownology-window-dots"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "0.5rem",
+              padding: "0.25rem 0 0.7rem",
+              background: "var(--ow-bg-raised)",
+            }}
+          >
+            {WINDOW_SCENES.map((s, i) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => { setSceneIdx(i); setPaused(true); setTimeout(() => setPaused(false), 5000); }}
+                data-testid={`why-ownology-window-dot-${s.id}`}
+                aria-label={`Show question ${i + 1}`}
+                style={{
+                  width: sceneIdx === i ? 22 : 7,
+                  height: 7,
+                  borderRadius: 999,
+                  border: "none",
+                  cursor: "pointer",
+                  background: sceneIdx === i ? "var(--ow-amber)" : "color-mix(in oklch, var(--ow-amber) 22%, transparent)",
+                  transition: "width 200ms ease, background 200ms ease",
+                  padding: 0,
+                }}
+              />
+            ))}
           </div>
 
           {/* Footer explainer — ties the mock to the con·science wordplay */}
@@ -375,6 +452,12 @@ export default function WhyOwnologyBoxes() {
           ))}
         </div>
       </div>
+      <style>{`
+        @keyframes why-fade {
+          from { opacity: 0.15; transform: translateY(4px); }
+          to   { opacity: 1;    transform: translateY(0); }
+        }
+      `}</style>
     </section>
   );
 }

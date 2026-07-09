@@ -4,6 +4,17 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Why-window rotating technical Q&As (Feb 2026, Rich)
+- **Change**: the "window" in `WhyOwnologyBoxes.tsx` now cycles through 3 realistic cellar-diagnostic Q&As on an 8s cadence (pauses on hover, clickable dot nav).
+- **Scenes**:
+  1. **MLF stall** (mid-vintage) — pH 3.42, 14°C. Cited: Zoecklein ch.8 + AWRI MLF bulletin.
+  2. **SO₂ dosing** (pre-bottling) — Chardonnay, molecular target 0.8 mg/L → 26-28 mg/L free at pH 3.40. Cited: Boulton et al ch.12 + AWRI SO₂ calculator.
+  3. **Stuck ferment restart** — Shiraz at 8.4 Brix, YAN test + Uvaferm 43 restart. Cited: Fugelsang & Edwards ch.5 + Lallemand restart protocol.
+- Each question spans a different vintage-timeline moment so a returning visitor sees varied proof.
+- Testids: `why-ownology-window-scene-{id}`, `why-ownology-window-dot-{id}`, `why-ownology-window-dots`, `why-ownology-window-citation` + `-1` for second citation pill.
+- Answered Rich's separate question about pricing in the hero slides: **Scene 2 placement is correct** (answers the cost objection primed by naming InnoVint/Vintrace); don't spread pricing to other scenes; use `/pricing-comparison` for the deep dive.
+
+
 ### Owen positioning shift · "con·science" motif + Why-section product window (Feb 2026, Rich)
 - **Positioning change**: Rich pulled Owen away from "apprentice / never leaves the cellar" (junior/loyalty framing) toward experience + competence + science.
 - **New Hero Scene 1 copy** (`HeroCarousel.tsx`):
