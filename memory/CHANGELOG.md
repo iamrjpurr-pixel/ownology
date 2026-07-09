@@ -4,6 +4,36 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### `/admin/audio-hook` tool — Whisper + Claude turn any IG reel into a tier-2 SMS opener (Feb 2026, Rich)
+
+**The problem this solves:**
+Perplexity Sonar is text-only and IG is login-walled — social video content is dark to any generic outreach AI. Rich can screen-record or export the audio manually; this tool closes the loop.
+
+**Pipeline:**
+1. Drop audio file (m4a/mp3/mp4/wav/webm, ≤25MB) at `/admin/audio-hook`.
+2. Optionally paste source URL (IG post, YouTube episode) → becomes `hookSourceUrl` for later verify-source link.
+3. Optionally add context ("Matteo from Primo Estate, pitching cellar AI") → sharpens Claude's angle.
+4. Backend `outreach.audioHookPropose` runs Whisper → Claude → returns transcript + 3 hook candidates (technique / quoted_voice / question angles).
+5. Operator picks/edits, filters contacts by name/winery, hits "Save hook to contact".
+6. `outreach.audioHookSave` writes `hookTier=quoted_voice` + `hookText` + `hookSourceUrl` to the chosen row. SMS template + `/hi/:slug` amber hero automatically use it.
+
+**Voice rules baked into the Claude system prompt:**
+- Lower-case start, no exclamation marks, no emoji.
+- Max 140 chars, Australian idiom OK, never fabricate — only echo transcript details.
+- Three angles must attack DIFFERENT hooks (technique · quoted_voice · question).
+
+**Backend procedures added to `outreach` router:**
+- `audioHookPropose` (ownerProcedure): base64 audio + optional context → `{ transcription, candidates: [{angle, text}] }`. 60s Whisper timeout, 25MB payload cap.
+- `audioHookSave` (ownerProcedure): writes hook fields against an existing contact by slug.
+
+**Frontend:**
+- New page `AdminAudioHook.tsx` with 3-step wizard (drop → review → save), inline editable final hook textarea, contact-filter list.
+- New "+ Audio hook →" pill button on `/admin/contacts` header (next to Event ingest / Pipeline).
+- Route registered in `App.tsx`: `/admin/audio-hook`.
+
+**Verified E2E:** Real Primo Estate 2024 Pecorino tasting reel (795KB m4a) → Whisper transcribed cleanly ("I mean seriously that is awesome…") → Claude returned three usable hooks in Rich's voice. Matteo Grilli's contact row (`matteo-primo-estate-wines`) manually seeded with a hookText derived from cross-referencing both his IG reels + the primoestate.com.au product page.
+
+
 ### Hook Waterfall — Perplexity outreach opener v2 + operator-guide auto-links (Feb 2026, Rich)
 
 **Hook Waterfall (kills generic "family-owned winery" AI slop):**

@@ -586,6 +586,24 @@ export default function AdminContacts() {
             + Event ingest →
           </Link>
           <Link
+            href="/admin/audio-hook"
+            data-testid="link-to-audio-hook"
+            style={{
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              padding: "8px 14px",
+              border: "1px solid var(--ow-amber)",
+              borderRadius: 6,
+              color: "var(--ow-amber)",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            + Audio hook →
+          </Link>
+          <Link
             href="/admin/contacts/pipeline"
             data-testid="link-to-pipeline"
             style={{

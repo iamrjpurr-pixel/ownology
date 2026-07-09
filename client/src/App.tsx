@@ -94,6 +94,7 @@ const AdminContacts = lazy(() => import("./pages/AdminContacts"));
 const AdminContactsMigrate = lazy(() => import("./pages/AdminContactsMigrate"));
 const AdminContactsPipeline = lazy(() => import("./pages/AdminContactsPipeline"));
 const AdminEventIngest = lazy(() => import("./pages/AdminEventIngest"));
+const AdminAudioHook = lazy(() => import("./pages/AdminAudioHook"));
 const AdminMarketingKit = lazy(() => import("./pages/AdminMarketingKit"));
 const AdminOperatorGuide = lazy(() => import("./pages/AdminOperatorGuide"));
 const AdminThemesStats = lazy(() => import("./pages/AdminThemesStats"));
@@ -370,6 +371,7 @@ function Router() {
       <Route path={"/admin/contacts"} component={AdminContacts} />
       <Route path={"/admin/contacts-migrate"} component={AdminContactsMigrate} />
       <Route path={"/admin/event-ingest"} component={AdminEventIngest} />
+      <Route path={"/admin/audio-hook"} component={AdminAudioHook} />
       <Route path={"/admin/marketing-kit"} component={AdminMarketingKit} />
       <Route path={"/admin/operator-guide"} component={AdminOperatorGuide} />
       <Route path={"/admin/themes-stats"} component={AdminThemesStats} />

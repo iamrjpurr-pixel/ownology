@@ -1129,6 +1129,178 @@ Return ONLY the requested JSON — no prose, no explanation. Use null for any fi
       };
     }),
 
+  // ── OWNER — Audio-hook: IG reel / TikTok / podcast → SMS opener ────────
+  // Rich, Feb 2026: Perplexity can't hear audio (Sonar is text-only) and
+  // IG is login-walled — so social video is dark to the AI. This closes
+  // the loop: paste an audio file the operator captured manually →
+  // Whisper transcribes → Claude proposes 3 Tier-2 "quoted_voice" hooks
+  // in Rich's SMS voice → operator picks + saves to a contact.
+  //
+  // The result is a hookText grounded in something the prospect ACTUALLY
+  // said (with the IG/YouTube URL as hookSourceUrl for verify). Impossible
+  // for a generic outreach tool to fake — that's the whole edge.
+  audioHookPropose: ownerProcedure
+    .input(z.object({
+      audioBase64: z.string().min(1).max(35_000_000),
+      mimeType: z.string().default("audio/webm"),
+      // Optional context Rich types in — winemaker name, winery, and a
+      // one-line note about who they're pitching. Sharpens Claude's hook.
+      context: z.string().max(500).optional(),
+      language: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const emergentKey = process.env.EMERGENT_LLM_KEY;
+      if (!emergentKey) throw new Error("EMERGENT_LLM_KEY not configured");
+
+      const audioBuffer = Buffer.from(input.audioBase64, "base64");
+      if (audioBuffer.length === 0) throw new Error("Empty audio payload");
+      if (audioBuffer.length > 25 * 1024 * 1024) {
+        throw new Error("Audio exceeds 25MB Whisper limit — trim the clip");
+      }
+
+      const ext =
+        input.mimeType.includes("webm") ? "webm" :
+        input.mimeType.includes("ogg") ? "webm" :
+        input.mimeType.includes("mp4") || input.mimeType.includes("m4a") ? "m4a" :
+        input.mimeType.includes("mpeg") || input.mimeType.includes("mp3") ? "mp3" :
+        input.mimeType.includes("wav") ? "wav" :
+        "webm";
+
+      // Whisper transcription — same endpoint as parseFromVoice.
+      const audioBlob = new Blob([new Uint8Array(audioBuffer)], { type: input.mimeType });
+      const fd = new FormData();
+      fd.append("file", audioBlob, `hook-audio.${ext}`);
+      fd.append("model", "whisper-1");
+      fd.append("response_format", "json");
+      if (input.language) fd.append("language", input.language);
+      fd.append(
+        "prompt",
+        "Australian wine industry tasting reel. Vocabulary: Pecorino, Fiano, Vermentino, Nebbiolo, Sangiovese, Semillon, Shiraz, Chardonnay, Riesling, Grenache, McLaren Vale, Barossa, Adelaide Hills, Clare Valley, Coonawarra, Hunter Valley, Margaret River, Yarra Valley, Le Marche, Offida, Corroboree, MLF, malolactic, stainless steel, hand-picked, wild ferment, skin contact, lees, oak, texture, phenolics, acid."
+      );
+
+      const whisperResp = await fetch(
+        "https://integrations.emergentagent.com/llm/openai/v1/audio/transcriptions",
+        { method: "POST", headers: { Authorization: `Bearer ${emergentKey}` }, body: fd as unknown as BodyInit }
+      );
+      if (!whisperResp.ok) {
+        const errText = await whisperResp.text().catch(() => "");
+        throw new Error(`Transcription failed: ${whisperResp.status} ${errText.slice(0, 200)}`);
+      }
+      const whisperData = (await whisperResp.json()) as { text?: string };
+      const transcription = (whisperData.text ?? "").trim();
+      if (!transcription) return { transcription: "", candidates: [] as string[] };
+
+      // Hand transcript to Claude → 3 hook candidates in Rich's voice.
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      const systemPrompt = `You are helping Rich craft a warm, human SMS opener to a fellow Australian winemaker. Rich has just listened to an audio clip (an IG reel, a podcast, a tasting note video) featuring the prospect or their winery. Your job: propose THREE candidate opening lines Rich could paste into an SMS.
+
+Voice rules — non-negotiable:
+- Lower-case start (yes, no capital first letter). No exclamation marks. No emoji.
+- Max 140 characters per candidate. Aim for 70–120.
+- Australian idiom OK ("g'day", "reckon", "proper", "punt"). Avoid American phrasing ("stoked", "amazing", "check out").
+- Never fabricate. Only echo details that appear in the transcript. If a fact isn't in the transcript, don't invent it.
+- The hook should sound like a peer winemaker who genuinely listened — not a fan, not a marketer.
+
+The three candidates should attack DIFFERENT angles:
+1. A specific technique or decision the winemaker mentioned (varietal choice, ferment style, timing, region-picking).
+2. A direct quote or turn-of-phrase echoed back verbatim (in quotes).
+3. A question that invites reply — grounded in something specific from the audio.
+
+Return ONLY valid JSON with this exact shape:
+{
+  "candidates": [
+    { "angle": "technique", "text": "..." },
+    { "angle": "quoted_voice", "text": "..." },
+    { "angle": "question", "text": "..." }
+  ]
+}
+
+No markdown fences. No prose outside the JSON.`;
+
+      const userContent = `Transcript of the audio:
+"""
+${transcription}
+"""
+
+Extra context Rich provided (optional):
+"""
+${input.context ?? "(none)"}
+"""
+
+Propose the three hook candidates.`;
+
+      const chatResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${forgeKey}`,
+          "x-ow-source": "outreach.audioHookPropose",
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userContent },
+          ],
+          stream: false,
+        }),
+      });
+      if (!chatResp.ok) {
+        // Whisper succeeded — return transcript so Rich can still craft manually
+        return { transcription, candidates: [] as { angle: string; text: string }[] };
+      }
+      const chatData = await chatResp.json();
+      const raw = chatData.choices?.[0]?.message?.content ?? "{}";
+      try {
+        const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+        const parsed = JSON.parse(cleaned);
+        const candidates = Array.isArray(parsed.candidates)
+          ? parsed.candidates
+              .filter((c: unknown) => c && typeof c === "object" && typeof (c as { text?: unknown }).text === "string")
+              .map((c: { angle?: string; text: string }) => ({
+                angle: typeof c.angle === "string" ? c.angle : "quoted_voice",
+                text: c.text.trim().slice(0, 400),
+              }))
+              .slice(0, 3)
+          : [];
+        return { transcription, candidates };
+      } catch {
+        return { transcription, candidates: [] as { angle: string; text: string }[] };
+      }
+    }),
+
+  /** OWNER — save an audio-derived hook against an existing contact.
+   *  Overwrites hookTier/hookText/hookSourceUrl for the given slug. */
+  audioHookSave: ownerProcedure
+    .input(z.object({
+      slug: z.string().min(1).max(80),
+      hookText: z.string().min(1).max(400),
+      hookSourceUrl: z.string().max(500).nullable().optional(),
+      // Tier is fixed to quoted_voice for audio-derived hooks — that's
+      // the whole point of the tool.
+    }))
+    .mutation(async ({ input }) => {
+      const [existing] = await db
+        .select({ slug: schema.outreachContacts.slug })
+        .from(schema.outreachContacts)
+        .where(eq(schema.outreachContacts.slug, input.slug))
+        .limit(1);
+      if (!existing) throw new Error(`Contact "${input.slug}" not found`);
+      await db
+        .update(schema.outreachContacts)
+        .set({
+          hookText: input.hookText.trim(),
+          hookTier: "quoted_voice",
+          hookSourceUrl: input.hookSourceUrl?.trim() || null,
+        })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true };
+    }),
+
+
+
   /** OWNER — update triage status (warm/lukewarm/cold/sales/skip). */
   setStatus: ownerProcedure
     .input(
