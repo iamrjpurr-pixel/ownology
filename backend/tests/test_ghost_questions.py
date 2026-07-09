@@ -8,7 +8,6 @@ Adds tests on top of the iter16 Cellar Brief baseline:
   - ghost_questions DB has ≥200 active rows with the expected wine_type mix
 """
 import os
-import json
 import requests
 import pytest
 

@@ -6,7 +6,6 @@ Run: API_URL=https://ownership-dev.preview.emergentagent.com \
      python -m pytest backend/tests/test_demo_e2e.py -v
 """
 import os
-import re
 import json
 import pytest
 import requests

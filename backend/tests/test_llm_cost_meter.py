@@ -3,7 +3,6 @@ LLM Cost Meter coverage tests — verifies the universal fetch-shim metering
 (server/_core/forgeShim.ts) catches both adapter calls AND direct fetch
 calls (tutor.ts, queryRouter.ts, etc.) without double-counting.
 """
-import os
 import json
 import math
 import time

@@ -6,7 +6,6 @@ tRPC HTTP convention used:
 The dev environment auto-injects an admin user so ownerProcedure is callable.
 """
 import json
-import os
 import time
 from urllib.parse import quote
 
@@ -84,8 +83,8 @@ class TestSetStatus:
 
         # verify via list
         time.sleep(0.5)
-        l = _get("outreach.list")
-        ldata, _ = _data(l)
+        listing = _get("outreach.list")
+        ldata, _ = _data(listing)
         row = next(c for c in ldata["contacts"] if c["slug"] == slug)
         assert row["status"] == "warm"
 
@@ -185,8 +184,8 @@ class TestCreateWithStatus:
         assert err is None
         assert d["ok"] is True
         # verify persisted status
-        l = _get("outreach.list")
-        ld, _ = _data(l)
+        listing = _get("outreach.list")
+        ld, _ = _data(listing)
         row = next(c for c in ld["contacts"] if c["slug"] == slug)
         assert row["status"] == "warm"
         # cleanup
@@ -199,8 +198,8 @@ class TestCreateWithStatus:
         assert r.status_code == 200, r.text
         d, _ = _data(r)
         assert d["ok"] is True
-        l = _get("outreach.list")
-        ld, _ = _data(l)
+        listing = _get("outreach.list")
+        ld, _ = _data(listing)
         row = next(c for c in ld["contacts"] if c["slug"] == slug)
         assert row["status"] == "cold"
         _post("outreach.remove", {"slug": slug})
@@ -225,8 +224,8 @@ class TestRegressionMutations:
         assert d["ok"] is True
 
         # verify both timestamps set
-        l = _get("outreach.list")
-        ld, _ = _data(l)
+        listing = _get("outreach.list")
+        ld, _ = _data(listing)
         row = next(c for c in ld["contacts"] if c["slug"] == slug)
         assert row["smsSentAt"] is not None
         assert row["demoBookedAt"] is not None

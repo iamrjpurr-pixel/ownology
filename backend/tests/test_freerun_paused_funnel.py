@@ -12,7 +12,6 @@ backend via supervisorctl. Restores defaults at teardown_class.
 """
 
 import json
-import os
 import re
 import subprocess
 import time

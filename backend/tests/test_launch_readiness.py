@@ -7,7 +7,6 @@ Preview URL from /app/.env: REACT_APP_BACKEND_URL. Dev bypass is ON, so
 tRPC calls run as seed admin (cellar@redstoneridge.com.au).
 """
 import os
-import time
 import json
 import pytest
 import requests

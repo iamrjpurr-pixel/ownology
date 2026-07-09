@@ -233,7 +233,7 @@ class TestAppRouterComposition:
         if not _is_mounted(resp):
             # Try a fallback that virtually every router has — call <router>.
             # with no procedure to see if router path resolves
-            fallback_resp = _get(client, f"{router}.__probe__", {})
+            _ = _get(client, f"{router}.__probe__", {})
             # If even fallback says router resolves with PROCEDURE_NOT_FOUND
             # vs the entire path failing, accept the FIRST probe's 404 only if
             # we can't find any working procedure.

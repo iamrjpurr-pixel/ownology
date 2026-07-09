@@ -3,9 +3,7 @@ sitemap+RSS, cellar brief ghost-question deep-links wire back to journal."""
 import json
 import os
 import re
-import urllib.parse
 
-import pytest
 import requests
 
 BASE = os.environ.get("REACT_APP_BACKEND_URL", os.environ.get("API_URL", "http://localhost:8001")).rstrip("/")

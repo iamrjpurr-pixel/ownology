@@ -12,7 +12,6 @@ Tests:
 """
 
 import os
-import urllib.parse
 from urllib.parse import urlparse
 import pytest
 import pymysql

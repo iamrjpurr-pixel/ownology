@@ -12,8 +12,6 @@ Env:
   GATE_PASSWORD     - defaults to OWNOLOGY_GATE_PASSWORD from /app/.env
 """
 import os
-import subprocess
-import pytest
 import requests
 
 API_URL = os.environ.get("API_URL", "http://localhost:8001")

@@ -5,7 +5,6 @@ Batch 2 backend regression tests:
   #9 Public Stats (admin.llmStats tRPC)
 Auth is bypassed in this environment (seed-owner-001 auto-injected).
 """
-import os
 import json
 import urllib.parse
 import pytest

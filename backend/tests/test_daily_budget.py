@@ -9,12 +9,10 @@ Spec under test:
 - forgeShim returns synthetic OpenAI-shaped 'paused' response when over budget
 """
 
-import os
 import re
 import json
 import time
 import subprocess
-import pytest
 import requests
 
 BASE_URL = "https://ownership-dev.preview.emergentagent.com"
