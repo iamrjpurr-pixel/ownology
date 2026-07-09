@@ -11,6 +11,7 @@ import FAQ from "@/components/FAQ";
 import HeroTheatricalPattern from "@/components/HeroTheatricalPattern";
 import { HeroPillarsSection } from "@/components/HeroPillarsSection";
 import HeroCarousel from "@/components/HeroCarousel";
+import WhyOwnologyBoxes from "@/components/WhyOwnologyBoxes";
 import { useUiPillarsV1 } from "@/config/ui";
 import { useAutoCascade, pickCrushByDay } from "@/hooks/useAutoCascade";
 import { Link } from "wouter";
@@ -1931,6 +1932,7 @@ export default function Home() {
           the site will fall back to the pillars flag branch. */}
       <HeroCarousel onSkip={() => { const el = document.getElementById("home-below-fold"); if (el) el.scrollIntoView({ behavior: "smooth" }); }} />
       <div id="home-below-fold" />
+      <WhyOwnologyBoxes />
       <TrustChips />
       {!pillarsV1 && <PainPoints />}
       <Features />

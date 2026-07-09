@@ -4,6 +4,22 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### HeroCarousel v4 · "The Apprentice Arc" — reordered 4-scene carousel + `WhyOwnologyBoxes` below-fold (Feb 2026, Rich)
+- **Problem**: v3 opened on 3:47am panic → gap → Owen. Rich wanted to reverse the emotional arc: lead with warmth (Owen), then category (Gap), then pain (3:47am), then invite (Get Started). Also wanted rational-proof boxes below-fold.
+- **v4 carousel scenes** (`client/src/components/HeroCarousel.tsx`, full rewrite):
+  1. **Meet Owen** (5s) — persona/identity anchor. Amber apprentice mark + "The apprentice who never leaves the cellar."
+  2. **The Gap** (6s) — unchanged from v3 Angle D (InnoVint/Vintrace category chips + "Before you spend another year on the wrong tool.").
+  3. **3:47am** (5s) — pain peak, same copy as v3 opener.
+  4. **Get Started** (6s) — invite close. Body pulled from old Owen-CTA scene; primary CTA testids preserved so bookmarked analytics survive.
+- **Below-fold `WhyOwnologyBoxes.tsx`** (new component) — 3 rational-proof cards with Rich's own copy verbatim:
+  - "The problem we're solving" (Notebook icon) — institutional knowledge loss / SOPs in binders.
+  - "Built for mobile, during harvest" (Smartphone icon) — one-handed, wet-gloves, grounded in own docs.
+  - "Your data stays yours" (Lock icon) — never used to train AI models, searchable only by team.
+- **Wire-up**: `Home.tsx` now renders `HeroCarousel → WhyOwnologyBoxes → TrustChips → …`. FAQ section (`<FAQ />`) untouched — deferred per Rich ("skip FAQs entirely for now").
+- **Data-testids**: `hero-scene-owen|gap|panic|start`, `hero-carousel-dot-*`, `hero-carousel-cta-pro|curious`, `why-ownology-boxes`, `why-ownology-box-{problem,mobile,data}`.
+- **Verified via screenshot**: all 4 scenes cycle + dot-jump correctly on load; Why boxes render below fold with amber accent bars.
+
+
 ### `Import.tsx` split into per-tab modules — code-hygiene refactor  (Feb 2026, Rich)
 - **Problem**: `client/src/pages/Import.tsx` had grown to 2,236 lines — five tab implementations (Voice/Camera/Paste/CSV/Bulk) + shared helpers + main composer, all in one file. Painful to navigate, review, or hand off.
 - **Solution**: moved to `client/src/pages/Import/` directory with one file per concern:
