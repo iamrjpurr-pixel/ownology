@@ -4,6 +4,26 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### `/pricing-comparison` — sales-defense receipt page (Feb 2026, Rich)
+- **Context**: Scene 2 of the hero carousel now claims "~95% less" vs InnoVint/Vintrace. Rich wanted a defensible receipt he can share with skeptical prospects mid-sales-call.
+- **New route**: `/pricing-comparison` → `client/src/pages/PricingComparison.tsx`. Unlinked from all nav, direct-URL only, "RATE SHEET · SHAREABLE" banner at top.
+- **Content**:
+  1. Header: "The pricing math · on the record — What a boutique winery actually pays."
+  2. Claim box: "For a typical mid-tier boutique winery, Ownology comes in at roughly one-tenth the loaded cost of a Vintrace or InnoVint quote."
+  3. **6-row side-by-side comparison table**: Home DIY → Serious home → Boutique starter → Boutique typical → Owner-operator vigneron → Enterprise. Each row shows InnoVint / Vintrace / Ownology price + tier + note + savings percentage.
+  4. Two disclosed footnotes (loaded-cost caveat, enterprise-quote caveat).
+  5. 4-box "Why we can price this low" rational-proof (no per-user fees, no implementation consultant, AI where it earns keep, built by a winemaker not a boardroom).
+  6. **Sources cited inline**: SoftwareAdvice, Capterra, GetApp + link back to own `/pricing`.
+  7. Quiet exit CTAs (Ask Owen free / See pricing page).
+- **Pricing intel** (verified via web search Feb 2026):
+  - InnoVint: $99 / $169 / $299 monthly tiers (public list).
+  - Vintrace: from ~$95/mo, mid-tier $200–500 loaded, enterprise $500–2000+ (quote-only, from customer reports).
+  - Ownology (from `/pricing`): Cellar Hand $22 / The Press $44 / Vigneron $88 monthly (annual billing).
+- **Marketer's rewrite** of Rich's literal instruction: replaced "95% cheaper" with "roughly one-tenth the loaded cost" for the claim block, but the table still displays the true math per row (`~54%`, `~74–91%`, `~70–85%`, `90%+`). Honest math beats a slogan.
+- **Testids**: `pricing-comparison-page`, `pc-header`, `pc-claim-box`, `pc-comparison-table`, `pc-row-0..5`, `pc-sources`, `pc-cta-ask`, `pc-cta-pricing`.
+- Verified via screenshot: all sections render, table shows all 6 rows correctly, zero nav links point at the page.
+
+
 ### HeroCarousel Scene 2 · pricing "noise" injection (Feb 2026, Rich)
 - **Problem** (Rich's insight): Scene 2 names InnoVint & Vintrace, which primes visitors to think "$$$". Without an immediate cost counter, the visitor's expectation collapses to "same category = same price" → bounce. Rich's ask: make a noise that we're **~95% cheaper for commercial teams** and **on par (or better) for home winemakers**.
 - **Change** (`HeroCarousel.tsx` scene "gap"): replaced the "Ownology is the same category / cellar intelligence" paragraph with a two-column **price-differential card** (amber-bordered, scannable within one visual beat).

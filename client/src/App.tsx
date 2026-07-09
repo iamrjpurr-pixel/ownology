@@ -80,6 +80,7 @@ const CellarJournalEntry = lazy(() =>
 const Guide = lazy(() => import("./pages/Guide"));
 const Import = lazy(() => import("./pages/Import"));
 const OurStory = lazy(() => import("./pages/OurStory"));
+const PricingComparison = lazy(() => import("./pages/PricingComparison"));
 const Demo = lazy(() => import("./pages/Demo"));
 const Waitlist = lazy(() => import("./pages/Waitlist"));
 const VineReference = lazy(() => import("./pages/VineReference"));
@@ -300,6 +301,7 @@ function Router() {
       <Route path={"/home"} component={Home} />
       <Route path={"/why-ownology"} component={WhyOwnology} />
       <Route path={"/our-story"} component={OurStory} />
+      <Route path={"/pricing-comparison"} component={PricingComparison} />
       <Route path={"/for-innovint-users"} component={ForInnoVintUsers} />
       <Route path={"/for-vintrace-users"} component={ForVintraceUsers} />
       <Route path={"/for-home-winemakers"} component={ForHomeWinemakers} />
