@@ -4,6 +4,24 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Owen positioning shift · "con·science" motif + Why-section product window (Feb 2026, Rich)
+- **Positioning change**: Rich pulled Owen away from "apprentice / never leaves the cellar" (junior/loyalty framing) toward experience + competence + science.
+- **New Hero Scene 1 copy** (`HeroCarousel.tsx`):
+  - H1: **"The oenology you can talk to."** (amber emphasis on "talk to")
+  - Sub: *"Your con·science, cellar-side."* (amber-bold "con·science", middle-dot)
+  - Micro monospace: `not internet CON · backed IN SCIENCE` — CON dimmed + strikethrough, SCIENCE amber-bold, unpacks the wordplay in one glance.
+  - Wordplay logic: **CON + SCIENCE = CONSCIENCE** (Owen is not internet snake-oil; he's science, made conversational).
+- **New "window" in Why Ownology section** (`WhyOwnologyBoxes.tsx` addition, placed above the 3 boxes):
+  - Rendered mock (no image asset) — browser chrome (3 dots + `ownology.com/ask` URL bar) + user question in amber bubble + Owen answer with amber "O" avatar.
+  - Question: *"MLF stuck at pH 3.42, temp dropped to 14°C. Restart or wait?"* (cellar-realistic technical diagnostic).
+  - Answer references *Oenococcus oeni* activity threshold, 18–20°C rewarm, nutrient re-check.
+  - **Two amber citation pills** — `Zoecklein · Wine Analysis & Production, ch. 8` + `AWRI · MLF technical bulletin`.
+  - Footer strip echoes the hero wordplay: `EVERY ANSWER CITED · NOT INTERNET CON · BACKED IN SCIENCE`.
+  - This is the "window" Rich sensed the section was missing — visual proof of the science-backed positioning, not marketing prose.
+- **Testids added**: `hero-scene-owen-subline`, `hero-scene-owen-wordplay`, `why-ownology-window`, `why-ownology-window-question|answer|citation`.
+- Verified via screenshot.
+
+
 ### `/pricing-comparison` — sales-defense receipt page (Feb 2026, Rich)
 - **Context**: Scene 2 of the hero carousel now claims "~95% less" vs InnoVint/Vintrace. Rich wanted a defensible receipt he can share with skeptical prospects mid-sales-call.
 - **New route**: `/pricing-comparison` → `client/src/pages/PricingComparison.tsx`. Unlinked from all nav, direct-URL only, "RATE SHEET · SHAREABLE" banner at top.

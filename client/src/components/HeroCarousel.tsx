@@ -106,10 +106,54 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
         </div>
         <p style={eyebrow}>Meet Owen</p>
         <h1 style={h1}>
-          The apprentice who
+          The oenology you can
           <br />
-          <span style={{ color: "var(--ow-amber)" }}>never leaves the cellar.</span>
+          <span style={{ color: "var(--ow-amber)" }}>talk to.</span>
         </h1>
+
+        {/* Sub-line + wordplay unpack. "Con·science" reads two ways at once —
+             (1) Owen has a conscience (won't hallucinate, cites sources)
+             (2) Owen is CON-SCIENCE: literally science built into the app,
+             not internet snake-oil. The dimmed CON + amber SCIENCE below
+             makes the reading unmistakable on the first pass. */}
+        <p
+          data-testid="hero-scene-owen-subline"
+          style={{
+            fontFamily: "'Fraunces',serif",
+            fontStyle: "italic",
+            fontWeight: 400,
+            fontSize: "clamp(1.1rem, 2vw, 1.5rem)",
+            lineHeight: 1.4,
+            color: "oklch(0.82 0.010 75)",
+            marginTop: "1.75rem",
+            marginBottom: "1.25rem",
+          }}
+        >
+          Your{" "}
+          <span
+            style={{
+              color: "var(--ow-amber)",
+              fontStyle: "normal",
+              fontWeight: 600,
+              letterSpacing: "0.01em",
+            }}
+          >
+            con·science
+          </span>
+          , cellar-side.
+        </p>
+        <p
+          data-testid="hero-scene-owen-wordplay"
+          style={{
+            fontFamily: "'Fira Code',monospace",
+            fontSize: "0.72rem",
+            letterSpacing: "0.14em",
+            color: "oklch(0.68 0.015 75)",
+          }}
+        >
+          not internet <span style={{ opacity: 0.45, textDecoration: "line-through" }}>CON</span> · backed IN{" "}
+          <span style={{ color: "var(--ow-amber)", fontWeight: 700 }}>SCIENCE</span>
+        </p>
       </SceneWrap>
 
       {/* Scene 2 — recognition-anchor framing (Angle D, data-picked in v3).
