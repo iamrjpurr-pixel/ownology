@@ -451,6 +451,14 @@ function Router() {
 // NSW (-32.78, 151.29) as a sensible default for a wine-industry app.
 function AutoThemeByTime() {
   useEffect(() => {
+    // Dev-only override: if window.__ownologyThemeOverride is set to a
+    // non-empty string, use it as themeId and skip both time-of-day and
+    // weather auto-mapping. Set by DevThemePicker below. Feb 2026, Rich —
+    // added because the auto-theme was flipping erratically on his dev
+    // server while iterating on component colours.
+    const override = typeof window !== "undefined"
+      ? ((window as unknown as { __ownologyThemeOverride?: string }).__ownologyThemeOverride ?? "")
+      : "";
     // Map Open-Meteo weathercode → coarse weather bucket
     // https://open-meteo.com/en/docs — WMO weather interpretation codes
     function codeToBucket(code: number | undefined): "clear" | "cloudy" | "rain" | "storm" {
@@ -495,7 +503,8 @@ function AutoThemeByTime() {
 
     async function apply() {
       const hour = new Date().getHours();
-      const themeId = (hour >= 20 || hour < 8) ? "soft-cellar" : "parchment";
+      const timeThemeId = (hour >= 20 || hour < 8) ? "soft-cellar" : "parchment";
+      const themeId = override || timeThemeId;
       try {
         window.localStorage.setItem("ownology-theme", themeId);
         window.dispatchEvent(new CustomEvent("ownology:theme", { detail: themeId }));
@@ -510,9 +519,120 @@ function AutoThemeByTime() {
     }
     apply();
     const interval = setInterval(apply, 30 * 60 * 1000);
-    return () => clearInterval(interval);
+    // Listen for dev override changes so the picker's clicks apply instantly
+    const handler = () => apply();
+    if (typeof window !== "undefined") window.addEventListener("ownology:dev-theme-override", handler);
+    return () => {
+      clearInterval(interval);
+      if (typeof window !== "undefined") window.removeEventListener("ownology:dev-theme-override", handler);
+    };
   }, []);
   return null;
+}
+
+/** Dev-only floating theme picker — appears ONLY when Vite dev mode is
+ *  active (import.meta.env.DEV === true) or the URL contains ?dev=1.
+ *  Production builds never render it. Rich uses this to freeze the theme
+ *  while iterating on component colours, without waiting on Open-Meteo. */
+function DevThemePicker() {
+  const isDev = (() => {
+    try {
+      // import.meta.env.DEV is Vite's dev flag — true only for dev server
+      const env = (import.meta as unknown as { env?: { DEV?: boolean } }).env;
+      if (env?.DEV) return true;
+    } catch { /* ignore */ }
+    if (typeof window !== "undefined" && window.location.search.includes("dev=1")) return true;
+    return false;
+  })();
+  const [current, setCurrent] = useState<string>(() => {
+    if (typeof window === "undefined") return "auto";
+    return ((window as unknown as { __ownologyThemeOverride?: string }).__ownologyThemeOverride ?? "auto");
+  });
+  const [open, setOpen] = useState(false);
+  if (!isDev) return null;
+
+  function set(v: string) {
+    const val = v === "auto" ? "" : v;
+    (window as unknown as { __ownologyThemeOverride?: string }).__ownologyThemeOverride = val;
+    setCurrent(v);
+    window.dispatchEvent(new CustomEvent("ownology:dev-theme-override"));
+  }
+
+  const themes = [
+    { id: "auto", label: "Auto (time + weather)" },
+    { id: "parchment", label: "Parchment (day)" },
+    { id: "soft-cellar", label: "Soft Cellar (night)" },
+  ];
+
+  return (
+    <div
+      data-testid="dev-theme-picker"
+      style={{
+        position: "fixed",
+        bottom: 20,
+        left: 20,
+        zIndex: 9999,
+        fontFamily: "'Fira Code',monospace",
+      }}
+    >
+      {open ? (
+        <div style={{ background: "oklch(0.14 0.008 60)", border: "1px solid var(--ow-amber)", borderRadius: 6, padding: "0.6rem", boxShadow: "0 8px 24px oklch(0 0 0 / 0.4)", minWidth: 180 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+            <span style={{ fontSize: "0.62rem", letterSpacing: "0.14em", color: "var(--ow-amber)", textTransform: "uppercase", fontWeight: 700 }}>Dev · theme</span>
+            <button type="button" onClick={() => setOpen(false)} style={{ background: "transparent", border: "none", color: "var(--ow-text-lo)", cursor: "pointer", fontSize: "0.75rem" }} aria-label="Close">×</button>
+          </div>
+          {themes.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              data-testid={`dev-theme-${t.id}`}
+              onClick={() => set(t.id)}
+              style={{
+                display: "block",
+                width: "100%",
+                padding: "0.4rem 0.6rem",
+                marginBottom: 4,
+                background: current === t.id ? "var(--ow-amber)" : "transparent",
+                color: current === t.id ? "oklch(0.10 0.008 60)" : "var(--ow-text-mid)",
+                border: current === t.id ? "1px solid var(--ow-amber)" : "1px solid var(--ow-bg-inset)",
+                borderRadius: 4,
+                fontFamily: "'Fira Code',monospace",
+                fontSize: "0.72rem",
+                textAlign: "left",
+                cursor: "pointer",
+              }}
+            >
+              {t.label}
+            </button>
+          ))}
+          <p style={{ fontSize: "0.6rem", color: "var(--ow-text-lo)", margin: "0.4rem 0 0", lineHeight: 1.4 }}>
+            Dev-only. Never rendered in production builds.
+          </p>
+        </div>
+      ) : (
+        <button
+          type="button"
+          data-testid="dev-theme-picker-toggle"
+          onClick={() => setOpen(true)}
+          style={{
+            background: "oklch(0.14 0.008 60)",
+            color: "var(--ow-amber)",
+            border: "1px solid var(--ow-amber)",
+            borderRadius: 999,
+            padding: "0.4rem 0.75rem",
+            cursor: "pointer",
+            fontFamily: "'Fira Code',monospace",
+            fontSize: "0.66rem",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            boxShadow: "0 4px 12px oklch(0 0 0 / 0.3)",
+          }}
+        >
+          🎨 theme
+        </button>
+      )}
+    </div>
+  );
 }
 
 function App() {

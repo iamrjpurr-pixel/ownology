@@ -4,6 +4,23 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Deck 2 · Vineyard & Viticulture (20 cards) + Dev-only theme picker (Feb 2026, Rich)
+
+**Deck 2 · Vineyard & Viticulture — 20 cards:**
+- New `viticulture` category in `client/src/content/oenologyFlashcards.ts`.
+- Deck total now **95 cards** across 12 categories.
+- Cards cover Site & Soil (4), Vine Genetics (4), Canopy & Vine Management (5), Phenology & Ripening (3), and Vineyard Health (4):
+  - Aspect · Soil types · Water availability · Elevation & mesoclimate · Rootstock selection · Clonal selection · Own-rooted vs grafted · Variety-site matching · Canopy management (VSP/sprawl/Scott Henry) · Pruning styles (spur/cane/cordon) · Vine balance (Ravaz index) · Yield restriction · Bud fruitfulness · Phenology stages · GDD · Water stress / regulated deficit irrigation · Powdery mildew · Downy mildew · Botrytis (noble vs bunch rot) · Spray programs.
+- Same dual-language SOP + plain format as prior decks. Completes Rich's stated learning-goal spectrum (chemistry ✓ · consulting ✓ · business ✓ · viticulture ✓).
+
+**Dev-only theme picker** (`DevThemePicker` component in `App.tsx`):
+- Floating pill in bottom-left corner: `🎨 theme`. Expands to 3 options — Auto (time + weather) · Parchment (day) · Soft Cellar (night).
+- Renders **ONLY** when Vite dev mode is active (`import.meta.env.DEV === true`) OR URL contains `?dev=1`. Never renders in production builds — respects Rich's "no theme toggles in prod" rule.
+- Writes to `window.__ownologyThemeOverride`; `AutoThemeByTime` reads that variable and uses it as-is when set, ignoring time-of-day mapping. Dispatches `ownology:dev-theme-override` event so the theme applies instantly on click without a page reload.
+- Rationale: Rich was iterating on component colours and the auto-theme was flipping erratically. Now he can freeze the theme in dev without waiting on Open-Meteo.
+- Testids: `dev-theme-picker`, `dev-theme-picker-toggle`, `dev-theme-{auto,parchment,soft-cellar}`.
+
+
 ### WhatsApp channel on `/hi/:slug` + Deck 4 · Business of Wine (Feb 2026, Rich)
 
 **WhatsApp option on outreach landing:**
