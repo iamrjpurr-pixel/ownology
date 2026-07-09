@@ -441,8 +441,8 @@ function Router() {
 // contrast on storms. Refreshes every 30 min.
 //
 // Location strategy: browser geolocation if the visitor has already
-// granted permission (never prompts), fallback to Barossa Valley SA
-// (-34.53, 138.95) as a sensible default for a wine-industry app.
+// granted permission (never prompts), fallback to Hunter Valley (Pokolbin)
+// NSW (-32.78, 151.29) as a sensible default for a wine-industry app.
 function AutoThemeByTime() {
   useEffect(() => {
     // Map Open-Meteo weathercode → coarse weather bucket
@@ -468,8 +468,8 @@ function AutoThemeByTime() {
     }
 
     function getPosition(): Promise<{ lat: number; lon: number }> {
-      // Fallback: Barossa Valley (South Australia wine region)
-      const fallback = { lat: -34.53, lon: 138.95 };
+      // Fallback: Hunter Valley, Pokolbin (NSW wine region)
+      const fallback = { lat: -32.78, lon: 151.29 };
       // Never PROMPT for permission — only use it if already granted.
       // This keeps landing UX friction-free per Rich's "stop asking" ask.
       if (typeof navigator === "undefined" || !navigator.permissions || !navigator.geolocation) {

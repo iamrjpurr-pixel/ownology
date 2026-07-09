@@ -4,6 +4,24 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### `Import.tsx` split into per-tab modules — code-hygiene refactor  (Feb 2026, Rich)
+- **Problem**: `client/src/pages/Import.tsx` had grown to 2,236 lines — five tab implementations (Voice/Camera/Paste/CSV/Bulk) + shared helpers + main composer, all in one file. Painful to navigate, review, or hand off.
+- **Solution**: moved to `client/src/pages/Import/` directory with one file per concern:
+  - `shared.tsx` — types (`EventType`, `ParsedEntry`, `Tab`, `ImportSource`), helpers (`eventLabel`, `eventColor`, `detailSummary`, `assignIds`, `parseCSVText`), and the shared `PreviewTable` component.
+  - `VoiceTab.tsx` — MediaRecorder + Whisper flow.
+  - `CameraTab.tsx` — phone camera + Claude Sonnet vision.
+  - `PasteTab.tsx` — text + clipboard-image OCR + side-by-side reference view.
+  - `CsvTab.tsx` — column-mapped CSV import.
+  - `BulkTab.tsx` — folder drop + parallel multi-file router (image/text/pdf/xlsx/whatsapp/audio) with RAG confidence badges.
+  - `index.tsx` — thin composer (tab selector + preview + save).
+- **Public surface unchanged**: `import("./pages/Import")` in `App.tsx` still resolves via Node module resolution to `pages/Import/index.tsx`. All `data-testid` selectors preserved so existing tests don't break.
+- **Zero new TypeScript errors** (pre-existing `App.tsx` Promise widening + `Guide.tsx` RevealCard prop issue remain untouched).
+- **Result**: largest file dropped from 2,236 → 220 lines (index.tsx); each tab now edits/reviews independently.
+
+### Auto-theme fallback moved from Barossa Valley → Hunter Valley (Pokolbin)  (Feb 2026, Rich)
+- Open-Meteo fallback coords in `AutoThemeByTime` updated from Barossa (−34.53, 138.95) to Pokolbin (−32.78, 151.29). Localises the default weather-driven accent to Rich's home region for visitors who haven't granted geolocation.
+
+
 ## Feb 2026
 ### HeroCarousel Scene 2 refactored to Angle D (recognition-anchor) — data-picked  (Feb 2026, Rich)
 - **Problem**: original Scene 2 was abstract stats ("40 hrs / 3:47am / $50k+ / 0") — Rich flagged as "tech heavy" and reminded me the original doctrine positioned Ownology vs InnoVint/Vintrace.
