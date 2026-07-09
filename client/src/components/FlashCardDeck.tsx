@@ -297,7 +297,7 @@ function FlashCardTile({
           margin: "0 0 0.85rem",
         }}
       >
-        → {card.outcome}
+        → {linkifyPaths(card.outcome)}
       </p>
 
       <ol
@@ -370,7 +370,7 @@ function FlashCardTile({
             >
               Gotcha ·{" "}
             </strong>
-            {card.gotcha}
+            {linkifyPaths(card.gotcha)}
           </p>
         </div>
       )}
