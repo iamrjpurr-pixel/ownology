@@ -642,3 +642,35 @@ html.ow-has-trial-banner .sticky.top-0,
 html.ow-has-trial-banner [class*="sticky"][class*="top-0"] {
   top: var(--ow-trial-banner-h, 0px) !important;
 }
+
+/* ── Weather-driven accent overrides (Feb 2026, Rich) ──────────────────
+   Open-Meteo sets `data-weather` on <html> to one of: clear · cloudy ·
+   rain · storm. These rules subtly shift the amber accent + card
+   surfaces to feel appropriate for the current sky. No new themes —
+   just a warm/cool nudge on top of the time-of-day base theme. */
+
+/* Clear skies → warmer, sunnier amber (baseline, no change needed) */
+
+/* Cloudy → cooler amber, slightly desaturated */
+html[data-weather="cloudy"] {
+  --ow-accent-live: oklch(0.68 0.09 68);
+  --ow-accent-live-soft: color-mix(in oklch, var(--ow-accent-live) 14%, transparent);
+}
+
+/* Rain → cool slate accent, muted card surfaces */
+html[data-weather="rain"] {
+  --ow-accent-live: oklch(0.65 0.06 220);
+  --ow-accent-live-soft: color-mix(in oklch, var(--ow-accent-live) 15%, transparent);
+}
+html[data-weather="rain"].dark {
+  --ow-bg-card: oklch(0.22 0.010 220);
+}
+
+/* Storm → high-contrast, dramatic — inky background, bright amber punch */
+html[data-weather="storm"] {
+  --ow-accent-live: oklch(0.78 0.16 65);
+  --ow-accent-live-soft: color-mix(in oklch, var(--ow-accent-live) 22%, transparent);
+}
+html[data-weather="storm"].dark {
+  --ow-bg-base: oklch(0.06 0.008 250);
+}

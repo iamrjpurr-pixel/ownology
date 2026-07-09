@@ -431,39 +431,79 @@ function Router() {
 // GlobalThemeToggle removed (Feb 2026, Rich) — no more user-facing theme
 // picker. Theme is now auto-switched by time of day via AutoThemeByTime.
 
-// ── AutoThemeByTime ─────────────────────────────────────────────────
+// ── AutoThemeByTime + Weather ────────────────────────────────────────
 // Rich, Feb 2026: "remove and stop asking about try parchment etc; just
-// change as per the model; time of day, weather ...". This component
-// mounts once at app root, computes the appropriate theme by local
-// clock, applies it, and re-checks every 30 min so a long-open tab
-// transitions smoothly at dusk / dawn. Weather integration TODO once
-// the meteor app data source is exposed.
+// change as per the model; time of day, weather in meteor app etc". This
+// mounts once at app root, computes theme by local clock, fetches weather
+// via Open-Meteo (free, no API key, worldwide) and applies both as
+// data-attributes on <html>. CSS in index.css responds with subtle
+// accent shifts — warmer amber on clear days, cooler greys on rain, more
+// contrast on storms. Refreshes every 30 min.
 //
-// Mapping (Australian wine-region local time):
-//   05:00 – 08:00  →  parchment    (soft dawn)
-//   08:00 – 17:30  →  parchment    (day cellar)
-//   17:30 – 20:00  →  harvest-gold (dusk amber, if available; falls back to parchment)
-//   20:00 – 05:00  →  soft-cellar  (evening / night)
+// Location strategy: browser geolocation if the visitor has already
+// granted permission (never prompts), fallback to Barossa Valley SA
+// (-34.53, 138.95) as a sensible default for a wine-industry app.
 function AutoThemeByTime() {
   useEffect(() => {
-    function applyForNow() {
+    // Map Open-Meteo weathercode → coarse weather bucket
+    // https://open-meteo.com/en/docs — WMO weather interpretation codes
+    function codeToBucket(code: number | undefined): "clear" | "cloudy" | "rain" | "storm" {
+      if (code === undefined) return "clear";
+      if (code === 0 || code === 1) return "clear";
+      if (code === 2 || code === 3 || code === 45 || code === 48) return "cloudy";
+      if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return "rain";
+      if (code >= 95 && code <= 99) return "storm";
+      if (code >= 71 && code <= 77) return "cloudy"; // snow → treat as heavy overcast
+      return "clear";
+    }
+
+    async function fetchWeather(lat: number, lon: number): Promise<"clear" | "cloudy" | "rain" | "storm"> {
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=weather_code&timezone=auto`;
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) return "clear";
+        const data = await res.json();
+        return codeToBucket(data?.current?.weather_code);
+      } catch { return "clear"; }
+    }
+
+    function getPosition(): Promise<{ lat: number; lon: number }> {
+      // Fallback: Barossa Valley (South Australia wine region)
+      const fallback = { lat: -34.53, lon: 138.95 };
+      // Never PROMPT for permission — only use it if already granted.
+      // This keeps landing UX friction-free per Rich's "stop asking" ask.
+      if (typeof navigator === "undefined" || !navigator.permissions || !navigator.geolocation) {
+        return Promise.resolve(fallback);
+      }
+      return navigator.permissions.query({ name: "geolocation" as PermissionName }).then((result) => {
+        if (result.state !== "granted") return fallback;
+        return new Promise((resolve) => {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+            () => resolve(fallback),
+            { timeout: 3000 },
+          );
+        });
+      }).catch(() => fallback);
+    }
+
+    async function apply() {
       const hour = new Date().getHours();
-      // The theme registry keys are checked at write-time in localStorage.
-      // Using values known to exist per ThemeToggle.tsx: parchment · soft-cellar · auto.
       const themeId = (hour >= 20 || hour < 8) ? "soft-cellar" : "parchment";
       try {
         window.localStorage.setItem("ownology-theme", themeId);
-        // Dispatch the custom event ThemeToggle listens for so any live
-        // instances re-apply on schedule without a page reload.
         window.dispatchEvent(new CustomEvent("ownology:theme", { detail: themeId }));
-        // Fallback: direct DOM class flip so first paint reflects the choice.
         const root = document.documentElement;
         if (themeId === "soft-cellar") root.classList.add("dark");
         else root.classList.remove("dark");
+
+        const { lat, lon } = await getPosition();
+        const weather = await fetchWeather(lat, lon);
+        root.dataset.weather = weather;
       } catch { /* ignore */ }
     }
-    applyForNow();
-    const interval = setInterval(applyForNow, 30 * 60 * 1000);
+    apply();
+    const interval = setInterval(apply, 30 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
   return null;
