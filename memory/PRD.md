@@ -4,6 +4,12 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Feb 2026 session — SHIPPED (Rich):**
+- `AutoThemeByTime` weather fallback moved from Barossa (−34.53, 138.95) → **Hunter Valley, Pokolbin** (−32.78, 151.29) in `client/src/App.tsx`.
+- `client/src/pages/Import.tsx` (2,236 lines) split into **7 files** under `client/src/pages/Import/` — `shared.tsx`, `VoiceTab.tsx`, `CameraTab.tsx`, `PasteTab.tsx`, `CsvTab.tsx`, `BulkTab.tsx`, `index.tsx`. Lazy-import path unchanged; all `data-testid`s preserved.
+- **Cult & Classic** (`https://events.humanitix.com/cult-and-classic`) logged in `event_ingests` (id=2, Sydney trade_tasting) — attribution for Rich's first 32 outreach contacts. Seed at `scripts/seedCultClassicIngest.ts`. To hydrate the full producer roster, open `/admin/event-ingest` and re-parse the URL.
+
+
 
 **Credit-pack pricing revision — SHIPPED (Feb 2026, this session)**
 
