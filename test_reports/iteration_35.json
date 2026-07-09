@@ -1,0 +1,31 @@
+{
+  "summary": "Tested TWO new OCR features (CRM business-card OCR panel on /admin/contacts + Import Paste side-by-side layout). Blocked initially by a backend syntax error in /app/server/routers/outreach.ts (orphaned .input(...) block after ocrContactCard mutation — missing procedure name/declaration causing esbuild TransformError at line 588, entire tRPC server crashing, gate-unlock returning 502 'Network error. Try again'). Restored the missing `parseFromUrl: ownerProcedure` declaration (inferred from x-ow-source header 'outreach.parseFromUrl' inside the block). After fix, backend booted cleanly and all feature tests PASSED. FEATURE 1a: card-ocr-panel + card-ocr-upload-label + card-ocr-file-input all present above the Add contact form (panel y=1072 < form-firstName y=1182). FEATURE 1b: Uploaded placehold.co business-card image → card-ocr-running visible during ~40s LLM round-trip → card-ocr-result rendered with score '9 / 9 words recognised', confidence '100%', preview thumbnail, raw OCR text. Auto-fill: form-firstName='Nathan', form-lastName='Bailey', form-mobile='0400 123 456', form-winery='Brokenwood Wines', form-notes contained the OCR blob incl. truncated email. Note: form's mobile testid is `form-mobile` (not `form-mobileAu` as review-request stated); there is NO form-email field in this form (email is intentionally captured in notes). FEATURE 1c: card-ocr-reset click hid card-ocr-result but preserved form fields (form-firstName still 'Nathan') — matches intended behaviour. FEATURE 2: paste-ocr-split rendered as grid with paste-ocr-preview (x=593.6, w=94.5) on LEFT and paste-ocr-text (x=705.1) on RIGHT — side-by-side confirmed via bounding rects; paste-ocr-preview-link count=1 (clickable to enlarge). Preview height 47px because the test image had a small natural size — CSS max-height 340px cap works fine. REGRESSION: text paste ('Tank 7 Shiraz Brix 14.2') into paste-textarea + paste-extract-btn click completed without error toasts.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Review the parseFromUrl declaration I restored in /app/server/routers/outreach.ts line 585-591. I inferred the name from the internal x-ow-source header ('outreach.parseFromUrl') and gave it ownerProcedure. Confirm that matches the intended procedure name and that the frontend (deep-research or URL-extraction UI) calls trpc.outreach.parseFromUrl — otherwise rename accordingly."
+  ],
+  "critical_code_review_comments": [
+    "outreach.ts is 1572 lines and continues to grow — consider splitting the extraction procedures (ocrContactCard / parseFromUrl / deepResearch) into their own files under server/routers/outreach/",
+    "The card-ocr flow dumps the raw email address into the notes textarea because the Add contact form has no email field. If Rich actually wants email captured as a first-class field for CRM contacts, add a form-email <Field> and update the auto-fill in handleBusinessCardImage.",
+    "form-mobile testid is inconsistent with review-request expectation (form-mobileAu). Standardise field testids across the codebase (either always suffix with camelCase field name or drop the AU qualifier)."
+  ],
+  "updated_files": [
+    "/app/server/routers/outreach.ts (restored missing `parseFromUrl: ownerProcedure` declaration to unblock backend boot)"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "Gate password: middx99 (accepted). Dev-bypass grants owner role.",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "The backend was rescued by adding `parseFromUrl: ownerProcedure` at line 585 of outreach.ts. If main agent replaces the routers with a different structure, ensure that procedure name still exists (frontend likely calls trpc.outreach.parseFromUrl.useMutation). Card OCR + Import Paste both fully working — no need to re-test unless code changes.",
+  "rca of the issue": "Backend boot crash: An earlier refactor left an orphaned `.input(z.object({ url: ... }))` chain at line 588 of outreach.ts without the preceding `procedureName: ownerProcedure` line, causing esbuild to fail with 'Expected identifier but found .'. This crashed the tRPC HTTP server, so all API mutations including gate-unlock returned 502 → user saw 'Network error. Try again' on the /admin/contacts gate. Fix: added `parseFromUrl: ownerProcedure` on the line before the orphaned .input(...) block. Backend restarted cleanly. Repro: `sudo supervisorctl restart backend` then `tail /var/log/supervisor/backend.err.log`."
+}

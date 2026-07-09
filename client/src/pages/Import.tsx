@@ -939,18 +939,6 @@ function PasteTab({
               </div>
             </div>
 
-            {/* Image preview */}
-            {imagePreview && (
-              <div className="p-3" style={{ background: "var(--ow-bg-base)", borderBottom: "1px solid var(--ow-border-md)" }}>
-                <img
-                  src={imagePreview}
-                  alt="Pasted"
-                  data-testid="paste-ocr-preview"
-                  style={{ maxHeight: 180, maxWidth: "100%", display: "block", borderRadius: 4, margin: "0 auto" }}
-                />
-              </div>
-            )}
-
             {/* Corrections list */}
             {ocrResult.corrections.length > 0 && (
               <div className="p-3" style={{ background: "var(--ow-bg-base)", borderBottom: "1px solid var(--ow-border-md)" }}>
@@ -978,25 +966,75 @@ function PasteTab({
               </div>
             )}
 
-            {/* Raw vs cleaned text preview */}
-            <div className="p-3" style={{ background: "var(--ow-bg-base)" }}>
-              <p className="text-xs mb-1.5" style={{ color: "var(--ow-text-lo)" }}>
-                {showRaw ? "Raw OCR (verbatim):" : "Cleaned text (used for extraction):"}
-              </p>
-              <pre
-                data-testid="paste-ocr-text"
-                style={{
-                  whiteSpace: "pre-wrap",
-                  fontFamily: "'Fira Code',monospace",
-                  fontSize: "0.78rem",
-                  color: "var(--ow-text-hi)",
-                  margin: 0,
-                  maxHeight: 180,
-                  overflowY: "auto",
-                }}
-              >
-                {showRaw ? ocrResult.rawOcrText : ocrResult.cleanedText}
-              </pre>
+            {/* Image + text — side-by-side reference layout (Feb 2026 · Rich).
+                 The original stays visible while the operator hand-edits the
+                 OCR text below, so any words the AI missed can be caught by
+                 eyeballing the source. On mobile these stack vertically. */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: imagePreview ? "minmax(0, 1fr) minmax(0, 1.4fr)" : "1fr",
+                gap: "0.75rem",
+                padding: "0.85rem 0.85rem",
+                background: "var(--ow-bg-base)",
+              }}
+              className="paste-ocr-split"
+              data-testid="paste-ocr-split"
+            >
+              {imagePreview && (
+                <div>
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.66rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ow-text-lo)", fontWeight: 600, marginBottom: 4 }}>
+                    Original — for reference
+                  </p>
+                  <a
+                    href={imagePreview}
+                    target="_blank"
+                    rel="noreferrer"
+                    data-testid="paste-ocr-preview-link"
+                    style={{ display: "block", background: "oklch(0.14 0.010 60)", borderRadius: 4, padding: 4, border: "1px solid var(--ow-border-md)" }}
+                    title="Open original in a new tab (zoom for detail)"
+                  >
+                    <img
+                      src={imagePreview}
+                      alt="Pasted source"
+                      data-testid="paste-ocr-preview"
+                      style={{ width: "100%", maxHeight: 340, objectFit: "contain", display: "block", borderRadius: 3 }}
+                    />
+                  </a>
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.66rem", fontStyle: "italic", color: "var(--ow-text-lo)", marginTop: 4, textAlign: "center" }}>
+                    Click to enlarge · use this to spot what the OCR missed
+                  </p>
+                </div>
+              )}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.66rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ow-text-lo)", fontWeight: 600, margin: 0 }}>
+                    {showRaw ? "Raw OCR (verbatim)" : "Cleaned text — used for extraction"}
+                  </p>
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.66rem", color: "var(--ow-amber)", fontStyle: "italic", margin: 0 }}>
+                    Editable ↓ in the textarea below
+                  </p>
+                </div>
+                <pre
+                  data-testid="paste-ocr-text"
+                  style={{
+                    whiteSpace: "pre-wrap",
+                    fontFamily: "'Fira Code',monospace",
+                    fontSize: "0.78rem",
+                    color: "var(--ow-text-hi)",
+                    margin: 0,
+                    padding: "0.55rem 0.7rem",
+                    background: "oklch(0.14 0.010 60)",
+                    borderRadius: 4,
+                    border: "1px solid var(--ow-border-md)",
+                    maxHeight: 340,
+                    overflowY: "auto",
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {showRaw ? ocrResult.rawOcrText : ocrResult.cleanedText}
+                </pre>
+              </div>
             </div>
           </div>
         )}

@@ -222,6 +222,20 @@ export default function AdminContacts() {
   const [wineryBuffer, setWineryBuffer] = useState("");
   const [editingMobile, setEditingMobile] = useState<string | null>(null);
   const [mobileBuffer, setMobileBuffer] = useState("");
+  // Business-card / email-signature OCR (Feb 2026 · Rich).
+  // Paste an image (business card or email signature screenshot) into
+  // the drop-target above the Add form → vision-LLM OCR extracts contact
+  // fields → auto-populates the form → operator reviews + hits Add.
+  const [ocrCardRunning, setOcrCardRunning] = useState(false);
+  const [ocrCardResult, setOcrCardResult] = useState<{
+    rawOcrText: string;
+    totalWords: number;
+    recognisedWords: number;
+    confidencePct: number;
+    previewDataUrl: string;
+  } | null>(null);
+  const [ocrCardError, setOcrCardError] = useState<string | null>(null);
+  const ocrContactCardMut = trpc.outreach.ocrContactCard.useMutation();
 
   const allContacts = useMemo(() => data?.contacts ?? [], [data]);
   const contacts = useMemo(() => {
@@ -315,6 +329,10 @@ export default function AdminContacts() {
     try {
       await createMutation.mutateAsync(form);
       setForm({ firstName: "", lastName: "", mobileAu: "", winery: "", event: form.event, painPoint: "", calendlyOverride: form.calendlyOverride, notes: "", persona: "winemaker" });
+      // Clear the OCR card after a successful Add so the operator has a
+      // clean surface for the next business card.
+      setOcrCardResult(null);
+      setOcrCardError(null);
       // Await the invalidation AND kick an explicit refetch so the KPI
       // counter + "All (n)" chip update in the same tick as the new row
       // appears in the list. Previously the KPI could look stuck when a
@@ -324,6 +342,79 @@ export default function AdminContacts() {
     } catch (e2) {
       setErr(e2 instanceof Error ? e2.message : String(e2));
     }
+  }
+
+  // ── Business-card OCR handler (Feb 2026, Rich) ───────────────────
+  // Reads a pasted image blob, runs the vision-LLM contact-extraction
+  // pipeline, and populates the Add form with the recognised fields.
+  // The operator reviews everything before hitting Add.
+  async function handleBusinessCardImage(blob: Blob) {
+    setOcrCardError(null);
+    setOcrCardResult(null);
+    setOcrCardRunning(true);
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+      });
+      const base64 = dataUrl.split(",", 2)[1] ?? "";
+      const mimeType = blob.type || "image/png";
+      const result = await ocrContactCardMut.mutateAsync({ imageBase64: base64, mimeType });
+      setOcrCardResult({
+        rawOcrText: result.rawOcrText,
+        totalWords: result.totalWords,
+        recognisedWords: result.recognisedWords,
+        confidencePct: result.confidencePct,
+        previewDataUrl: dataUrl,
+      });
+      // Auto-populate any fields the AI recognised. We MERGE (not overwrite)
+      // so anything the operator already typed is preserved.
+      if (result.fields) {
+        setForm((prev) => ({
+          ...prev,
+          firstName: prev.firstName || result.fields!.firstName || "",
+          lastName: prev.lastName || result.fields!.lastName || "",
+          mobileAu: prev.mobileAu || result.fields!.mobileAu || "",
+          winery: prev.winery || result.fields!.winery || "",
+          notes: prev.notes || [result.fields!.email, result.fields!.notes].filter(Boolean).join(" · "),
+          persona: prev.persona === "winemaker" && result.fields!.persona !== "winemaker"
+            ? result.fields!.persona
+            : prev.persona,
+        }));
+      } else {
+        setOcrCardError("OCR ran but no contact fields could be extracted. You'll need to fill the form manually — the original image and OCR text are shown below for reference.");
+      }
+    } catch {
+      setOcrCardError("Business-card OCR failed. Try a clearer image or fill the form manually.");
+    } finally {
+      setOcrCardRunning(false);
+    }
+  }
+
+  function onCardPaste(e: React.ClipboardEvent<HTMLDivElement>) {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of Array.from(items)) {
+      if (item.kind === "file" && item.type.startsWith("image/")) {
+        const blob = item.getAsFile();
+        if (blob) {
+          e.preventDefault();
+          void handleBusinessCardImage(blob);
+          return;
+        }
+      }
+    }
+  }
+
+  async function onCardFileInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      await handleBusinessCardImage(file);
+    }
+    // Reset so the same file can be picked again if needed
+    e.target.value = "";
   }
 
   // ── Deep research from just a name ─────────────────────────────────────
@@ -803,6 +894,140 @@ export default function AdminContacts() {
       {/* Add form */}
       <form onSubmit={handleCreate} className="mb-8 rounded p-5" style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}>
         <p className="text-xs uppercase tracking-widest mb-3" style={{ color: "var(--ow-amber)" }}>Add contact</p>
+
+        {/* ── Business-card OCR (Feb 2026, Rich) ────────────────────
+             Paste a screenshot of a business card OR email signature,
+             OR click to upload — vision-LLM extracts contact fields,
+             auto-fills the form below, and shows a confidence score
+             card so the operator knows what to double-check. */}
+        <div
+          data-testid="card-ocr-panel"
+          onPaste={onCardPaste}
+          tabIndex={0}
+          style={{
+            marginBottom: "1rem",
+            padding: "0.85rem 1rem",
+            borderRadius: 6,
+            background: "color-mix(in oklch, var(--ow-amber) 5%, transparent)",
+            border: `1px dashed color-mix(in oklch, var(--ow-amber) ${ocrCardResult ? 55 : 35}%, transparent)`,
+            cursor: "text",
+          }}
+        >
+          {!ocrCardResult && !ocrCardRunning && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap" }}>
+              <div>
+                <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.8rem", fontWeight: 600, color: "var(--ow-amber)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 4 }}>
+                  📇 Paste a business card or email signature
+                </p>
+                <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-mid)", margin: 0 }}>
+                  Click here first, then paste a screenshot (⌘V) — OCR auto-fills the form below. Or{" "}
+                  <label
+                    htmlFor="card-ocr-file"
+                    data-testid="card-ocr-upload-label"
+                    style={{ color: "var(--ow-amber)", cursor: "pointer", textDecoration: "underline" }}
+                  >
+                    upload an image
+                  </label>
+                  .
+                </p>
+                <input
+                  id="card-ocr-file"
+                  data-testid="card-ocr-file-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={onCardFileInput}
+                  style={{ display: "none" }}
+                />
+              </div>
+            </div>
+          )}
+
+          {ocrCardRunning && (
+            <div data-testid="card-ocr-running" style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.35rem 0" }}>
+              <div className="animate-spin" style={{ width: 16, height: 16, border: "2px solid var(--ow-amber)", borderTopColor: "transparent", borderRadius: "50%" }} />
+              <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.85rem", color: "var(--ow-text-hi)", margin: 0 }}>
+                Reading the card · extracting name, winery, mobile, email…
+              </p>
+            </div>
+          )}
+
+          {ocrCardResult && !ocrCardRunning && (
+            <div data-testid="card-ocr-result">
+              {/* Score row */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap", marginBottom: "0.65rem" }}>
+                <div>
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", fontWeight: 700, color: "var(--ow-amber)", letterSpacing: "0.1em", textTransform: "uppercase", margin: 0 }}>
+                    OCR quality
+                  </p>
+                  <p data-testid="card-ocr-score" style={{ fontFamily: "'Fraunces',serif", fontSize: "1.05rem", fontWeight: 700, color: "var(--ow-text-hi)", margin: 0 }}>
+                    {ocrCardResult.recognisedWords} / {ocrCardResult.totalWords} words recognised
+                    <span
+                      style={{
+                        marginLeft: 10,
+                        fontSize: "0.82rem",
+                        fontFamily: "'Fira Code',monospace",
+                        color: ocrCardResult.confidencePct >= 85
+                          ? "oklch(0.65 0.15 145)"
+                          : ocrCardResult.confidencePct >= 60
+                            ? "var(--ow-amber)"
+                            : "oklch(0.65 0.18 25)",
+                      }}
+                      data-testid="card-ocr-confidence"
+                    >
+                      {ocrCardResult.confidencePct}%
+                    </span>
+                  </p>
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", fontStyle: "italic", color: "var(--ow-text-lo)", margin: "0.15rem 0 0" }}>
+                    Fields auto-filled below — review them, hand-type anything the AI missed.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  data-testid="card-ocr-reset"
+                  onClick={() => { setOcrCardResult(null); setOcrCardError(null); }}
+                  style={{ padding: "0.35rem 0.8rem", background: "transparent", border: "1px solid var(--ow-border-md)", color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", fontSize: "0.75rem", borderRadius: 4, cursor: "pointer" }}
+                >
+                  Discard
+                </button>
+              </div>
+              {/* Preview + raw OCR — side-by-side reference so the operator can spot missed fields */}
+              <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 140px) 1fr", gap: "0.75rem", alignItems: "flex-start" }}>
+                <img
+                  src={ocrCardResult.previewDataUrl}
+                  alt="Pasted business card"
+                  data-testid="card-ocr-preview"
+                  style={{ width: "100%", maxHeight: 120, objectFit: "contain", borderRadius: 4, background: "var(--ow-bg-base)", border: "1px solid var(--ow-border-md)" }}
+                />
+                <pre
+                  data-testid="card-ocr-raw"
+                  style={{
+                    margin: 0,
+                    fontFamily: "'Fira Code',monospace",
+                    fontSize: "0.72rem",
+                    color: "var(--ow-text-mid)",
+                    background: "var(--ow-bg-base)",
+                    padding: "0.55rem 0.7rem",
+                    borderRadius: 4,
+                    border: "1px solid var(--ow-border-md)",
+                    maxHeight: 120,
+                    overflowY: "auto",
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {ocrCardResult.rawOcrText}
+                </pre>
+              </div>
+            </div>
+          )}
+
+          {ocrCardError && (
+            <p data-testid="card-ocr-error" style={{ marginTop: "0.5rem", padding: "0.5rem 0.7rem", background: "color-mix(in oklch, oklch(0.65 0.18 25) 10%, transparent)", border: "1px solid color-mix(in oklch, oklch(0.65 0.18 25) 40%, transparent)", borderRadius: 4, fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "oklch(0.65 0.18 25)" }}>
+              {ocrCardError}
+            </p>
+          )}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Field label="First name *" testid="form-firstName" value={form.firstName} onChange={(v) => setForm({ ...form, firstName: v })} />
           <Field label="Last name" testid="form-lastName" value={form.lastName} onChange={(v) => setForm({ ...form, lastName: v })} />

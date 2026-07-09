@@ -457,12 +457,134 @@ Return ONLY valid JSON. No markdown. If no contact can be identified, return {"f
       }
     }),
 
-  // ── OWNER — URL-quick-add a contact ────────────────────────────────────
-  // Paste a URL (winery website, Google Business listing, LinkedIn page,
-  // Instagram profile, wine-show exhibitor page). We fetch, extract every
-  // signal we can — JSON-LD schema.org, tel:/mailto: links, social handles,
-  // main page text — and feed it to an LLM to structure into contact
-  // fields. Returns a DRAFT the UI shows for review + confirm.
+  // ── OWNER — OCR a business card / email-signature screenshot ─────────
+  // Rich, Feb 2026: "paste a screenshot of an email signature or a
+  // business card into /admin/contacts and let it OCR + auto-fill the
+  // Add contact form". This turns every business card he snaps into a
+  // ~20-second fully-drafted lead. Same 2-stage pipeline as the /import
+  // Paste tab: vision-LLM OCR (verbatim, marks uncertainty) → text-LLM
+  // structured-contact extraction. Returns both the raw OCR and the
+  // extracted fields so the UI can show a confidence card + auto-fill
+  // the form + let the operator manually fix anything the AI missed.
+  ocrContactCard: ownerProcedure
+    .input(z.object({
+      imageBase64: z.string().min(1),
+      mimeType: z.string().default("image/png"),
+    }))
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      // ── Stage 1: verbatim OCR — reads exactly what's visible ─────
+      const ocrSystemPrompt = `You are a verbatim OCR engine for business cards and email signatures. Transcribe every visible line, exactly as printed. Preserve line breaks. Do NOT correct. Do NOT paraphrase. If a word is unclear, wrap it in brackets with a question mark: [Broke?nwood]. If nothing is readable, return the word EMPTY.`;
+
+      const ocrResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${forgeKey}`,
+          "x-ow-source": "outreach.ocrContactCard.ocr",
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: ocrSystemPrompt },
+            {
+              role: "user",
+              content: [
+                { type: "image_url", image_url: { url: `data:${input.mimeType};base64,${input.imageBase64}`, detail: "high" } },
+                { type: "text", text: "Transcribe every visible line. Mark uncertainty with brackets." },
+              ],
+            },
+          ],
+          stream: false,
+        }),
+      });
+      if (!ocrResp.ok) throw new Error("OCR request failed");
+      const ocrData = await ocrResp.json();
+      const rawOcrText = (ocrData.choices?.[0]?.message?.content ?? "").trim();
+      if (!rawOcrText || rawOcrText === "EMPTY") {
+        return {
+          rawOcrText: "",
+          fields: null,
+          totalWords: 0,
+          recognisedWords: 0,
+          confidencePct: 0,
+        };
+      }
+
+      // Word-quality score from bracketed uncertainty markers
+      const totalWords = (rawOcrText.match(/\b[\w'.-]+\b/g) ?? []).length;
+      const uncertainCount = (rawOcrText.match(/\[[^\]]*\?\]/g) ?? []).length;
+      const recognisedWords = Math.max(0, totalWords - uncertainCount);
+      const confidencePct = totalWords === 0 ? 0 : Math.round((recognisedWords / totalWords) * 100);
+
+      // ── Stage 2: extract structured contact fields ──────────────
+      const extractSystemPrompt = `You are extracting a wine-industry contact from the raw OCR of a business card OR email signature.
+
+Return ONE JSON object with these fields (use null if the field isn't visible):
+- firstName: string | null
+- lastName: string | null
+- mobileAu: string | null — normalise Australian mobiles to "04XX XXX XXX" format. If the number starts with +61 4, drop the +61 and prefix with 0. Landlines / international mobiles stay in their original format.
+- winery: string | null — business / winery / company name. Prefer the main brand name, not tagline.
+- email: string | null — first valid email address
+- notes: string | null — assemble a one-line note with: job title (if any), address / state / country (if any), website, instagram, linkedin. Skip null pieces. Example: "Head Winemaker · Barossa Valley, SA · @brokenwood_wines"
+- status: "warm" | "lukewarm" | "cold" — default to "lukewarm" since a business card exchange implies mild interest.
+- persona: "md" | "winemaker" | "owner" | "sales-rep" — infer from job title. "MD"/"CEO"/"GM"/"Managing Director" → md. "Winemaker"/"Assistant Winemaker"/"Cellar Manager" → winemaker. "Owner"/"Proprietor"/"Founder" → owner. "Sales"/"BDM"/"Rep"/"Ambassador" → sales-rep. Default to "winemaker" if unclear.
+
+Return ONLY valid JSON. No markdown fences. If the OCR text has no recognisable contact info, return {"firstName": null}.`;
+
+      const extractResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${forgeKey}`,
+          "x-ow-source": "outreach.ocrContactCard.extract",
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: extractSystemPrompt },
+            { role: "user", content: `Raw OCR:\n\n${rawOcrText}` },
+          ],
+          stream: false,
+        }),
+      });
+      if (!extractResp.ok) {
+        return { rawOcrText, fields: null, totalWords, recognisedWords, confidencePct };
+      }
+      const extractData = await extractResp.json();
+      const raw = (extractData.choices?.[0]?.message?.content ?? "{}").trim();
+      const stripped = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+      let fields: {
+        firstName: string | null;
+        lastName: string | null;
+        mobileAu: string | null;
+        winery: string | null;
+        email: string | null;
+        notes: string | null;
+        status: "warm" | "lukewarm" | "cold";
+        persona: "md" | "winemaker" | "owner" | "sales-rep";
+      } | null = null;
+      try {
+        const parsed = JSON.parse(stripped);
+        if (parsed && typeof parsed === "object" && (parsed.firstName || parsed.lastName || parsed.email || parsed.mobileAu)) {
+          fields = {
+            firstName: parsed.firstName ?? null,
+            lastName: parsed.lastName ?? null,
+            mobileAu: parsed.mobileAu ?? null,
+            winery: parsed.winery ?? null,
+            email: parsed.email ?? null,
+            notes: parsed.notes ?? null,
+            status: (["warm","lukewarm","cold"].includes(parsed.status) ? parsed.status : "lukewarm") as "warm" | "lukewarm" | "cold",
+            persona: (["md","winemaker","owner","sales-rep"].includes(parsed.persona) ? parsed.persona : "winemaker") as "md" | "winemaker" | "owner" | "sales-rep",
+          };
+        }
+      } catch { /* fields stays null */ }
+
+      return { rawOcrText, fields, totalWords, recognisedWords, confidencePct };
+    }),
+
+  // ── OWNER — Extract contact draft from a URL (winery site, LinkedIn, etc.) ─
   parseFromUrl: ownerProcedure
     .input(z.object({
       url: z.string().url("Please paste a full URL starting with https:// or http://"),
