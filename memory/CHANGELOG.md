@@ -4,6 +4,22 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### WhatsApp channel on `/hi/:slug` + Deck 4 · Business of Wine (Feb 2026, Rich)
+
+**WhatsApp option on outreach landing:**
+- New helper `buildWaHref()` in `server/routers/outreach.ts` — returns `wa.me/[digits]?text=...` link with same pre-filled body as SMS reply. Falls back to `SMS_INBOUND_NUMBER` if `WHATSAPP_INBOUND_NUMBER` not set (same SIM covers both).
+- `outreach.bySlug` now returns `waHref` alongside `smsReplyHref`. Shown regardless of A/B `ctaVariant` — always offered when a number is configured.
+- `HiContact.tsx` renders a quieter green-tinted button under the primary CTA: *"Have WhatsApp? Easier for photos & docs →"* with `data-testid="hi-cta-whatsapp"` and `data-cta-channel="whatsapp"` for analytics splits.
+- Doctrine: SMS = universal door, WhatsApp = richer couch. Zero API cost, no approval needed — pure URL scheme.
+
+**Deck 4 · Business of Wine (10 cards)** added to `/apprentice`:
+- New `business` category. Deck total now **75 cards** across 11 categories.
+- Cards: COGS · 3-tier margin stack · DTC vs Trade · Cellar door economics · Wine club economics · APCO · WET · Winery liability & liquor licensing · Vintage yield economics · Vintage cash cycle.
+- Same dual-language SOP + plain format. Emphasis on the money side of a winery — what a consultant must be conversant on to be trusted.
+
+Verified both via lint (zero errors).
+
+
 ### Deck 3 · Consultant's Toolkit — 15 cards for sales calls (Feb 2026, Rich · URGENT for tomorrow's calls)
 - **Context**: Rich has sales calls tomorrow. Needed a cheat-sheet of what to actually SAY when a prospect asks common questions.
 - **Change**: added `consulting` category to `FlashcardCategory` + `CATEGORY_META` in `client/src/content/oenologyFlashcards.ts`.

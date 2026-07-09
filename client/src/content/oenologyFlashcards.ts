@@ -29,7 +29,8 @@ export type FlashcardCategory =
   | "sensory"
   | "regions"
   | "pairing"
-  | "consulting";
+  | "consulting"
+  | "business";
 
 export interface Flashcard {
   id: string;
@@ -57,6 +58,7 @@ export const CATEGORY_META: Record<
   regions:         { label: "Regions & Climate",    short: "Regions" },
   pairing:         { label: "Pairing Principles",   short: "Pairing" },
   consulting:      { label: "Consultant's Toolkit", short: "Consult" },
+  business:        { label: "Business of Wine",     short: "Business" },
 };
 
 export const FLASHCARDS: Flashcard[] = [
@@ -737,5 +739,109 @@ export const FLASHCARDS: Flashcard[] = [
     why: "Knowing your limit is a consultant skill in itself. Rich needs to know when NOT to be the answer.",
     when: "Rich's own decision-making — when to stop giving advice and refer.",
     ruleOfThumb: "If you'd need to Google it twice to be confident — refer.",
+  },
+
+  // ── BUSINESS OF WINE — Deck 4 · commercial fluency (10) ──────────────
+  // For Rich to be conversant on the money side of a winery. Not deep
+  // accounting — the concepts a consultant should be able to speak to.
+  {
+    id: "biz-cogs",
+    term: "COGS — Cost of Goods Sold",
+    category: "business",
+    sop: "Direct cost per bottle: grape cost (fruit purchase or vineyard amortisation), production labour, packaging (bottle, closure, capsule, label), oak amortisation per litre, freight to distributor. Excludes overhead, marketing, and cellar door.",
+    plain: "What it actually costs to make one bottle before you've paid the rent or the marketing bill. Grapes, labour, glass, cork, oak, and getting it to the warehouse.",
+    why: "Sets your minimum sustainable price. If your wholesale price is below 3× COGS, you're subsidising the drinker.",
+    when: "Every new SKU decision. Every vintage cost review.",
+    ruleOfThumb: "Boutique red bottle COGS: $8–15. Boutique premium: $18–30. Ultra: $40+. Wholesale = 3× COGS floor.",
+  },
+  {
+    id: "biz-margin-stack",
+    term: "The three-tier margin stack",
+    category: "business",
+    sop: "Producer → Distributor → Retailer margin stack. Producer wholesale price (ex-GST). Distributor takes 25–35%. Retailer takes 30–40%. RRP typically 2.4–3.2× wholesale price ex-GST.",
+    plain: "A wine that leaves your cellar at $20 sits on a shelf at $50–60. That's not gouging — that's the middle-tier reality. You have to price for THAT shelf number, not for what you'd like to charge.",
+    why: "Underpricing at wholesale wrecks your shelf position. Overpricing kills volume.",
+    when: "Every price decision. Every distribution conversation.",
+    ruleOfThumb: "Aim shelf-price backwards: RRP ÷ 2.8 = wholesale. Wholesale ÷ 3 = COGS ceiling.",
+  },
+  {
+    id: "biz-dtc-vs-trade",
+    term: "DTC vs Trade — the strategic split",
+    category: "business",
+    sop: "Direct-to-Consumer (DTC): cellar door, wine club, e-commerce. Higher margin (retail-equivalent to producer), owned customer relationship, capped scale. Trade: distributor + retail, higher volume, lower margin per bottle, ceded relationship. Most sustainable boutiques run 40–60% DTC.",
+    plain: "DTC is where you make money per bottle but can only sell so many. Trade is where you move volume but the margin bleeds. Most healthy boutiques are 40–60% DTC — enough scale from trade, enough margin from DTC.",
+    why: "The mix determines whether you're a hobbyist or a viable business.",
+    when: "Every strategic review. Every conversation about growth mode.",
+    ruleOfThumb: "Under 30% DTC → cash squeeze. Over 70% DTC → growth capped by cellar door foot-traffic.",
+  },
+  {
+    id: "biz-cellar-door",
+    term: "Cellar door economics",
+    category: "business",
+    sop: "Revenue drivers: tasting fees (redeemable / retained), bottle sales conversion (typical 60–75% of walk-ins buy), club conversion (10–20% of tastings), average dollar transaction (varies from $30 casual to $200+ for premium regions). Cost drivers: hosting staff, tasting inventory (2–4% of tasting flight cost), facility.",
+    plain: "The cellar door is your most profitable channel per bottle. Real numbers: two-thirds of visitors buy something, one in seven joins a club, average spend $80–150. But every visitor costs you staff hours and open bottles — track it.",
+    why: "Cellar door is where DTC lives or dies. Also where the con·science of your brand is felt directly.",
+    when: "Any conversation about growth, staffing, or DTC strategy.",
+    ruleOfThumb: "Break-even at ~40 visitors/day for a $10 tasting fee model with 1 host. Better with a $25 elevated fee.",
+  },
+  {
+    id: "biz-wine-club",
+    term: "Wine club economics",
+    category: "business",
+    sop: "Subscription-based DTC. Typical structure: quarterly release, 2–6 bottles per shipment. Member LTV drives economics — churn rate targeting <20% annually. Acquisition cost paid back over 3–5 shipments. Members typically buy 2–3× their subscription volume over a year.",
+    plain: "Wine clubs = recurring revenue. Get someone signed up, they stay 4-5 years on average, and buy way more than their subscription. Losing them = losing three years of margin. Fight churn like your life depends on it.",
+    why: "Predictable revenue, high LTV, insulates against retail volatility.",
+    when: "Any DTC growth conversation. Any cellar door optimisation.",
+    ruleOfThumb: "Target: club acquisition cost < 3× shipment value. Aim <15% annual churn.",
+  },
+  {
+    id: "biz-apco",
+    term: "APCO — Australian Packaging Covenant",
+    category: "business",
+    sop: "The Australian Packaging Covenant Organisation. Mandatory scheme for businesses using packaging in Australia with turnover >$5M or importing brand-owner status. Annual reporting on packaging materials, recyclability, and Sustainable Packaging Guidelines (SPG) targets by 2025/2030.",
+    plain: "Australian rule that says if you put wine in a bottle and sell it, you have to report on your packaging every year and prove you're heading toward recyclable/reusable materials by 2025 and 2030 deadlines. Fines are real.",
+    why: "Ownology has an APCO Assistant on the roadmap because this is a real winemaker headache. Consultants who understand APCO save wineries days of paperwork.",
+    when: "Any winery >$5M turnover. Any conversation about compliance.",
+    ruleOfThumb: "Report is due by 31 March each year for the previous calendar year. Late = penalty.",
+  },
+  {
+    id: "biz-wet",
+    term: "WET — Wine Equalisation Tax",
+    category: "business",
+    sop: "Australian federal tax of 29% on wholesale wine value. Producer rebate available for eligible producers up to $350k/year (proposed changes ongoing). Applies at the wholesale point in the three-tier chain.",
+    plain: "Australian government takes 29% of wholesale wine sales as tax. There's a rebate up to $350k a year that keeps small producers alive. If you're helping a client price wine, WET is non-negotiable in the calculation.",
+    why: "One of two big Australian wine taxes. Miss it in a costing conversation and you look amateur.",
+    when: "Every pricing conversation with Australian producers.",
+    ruleOfThumb: "Wholesale ex-GST × 1.29 = WET-inclusive wholesale. Rebate cap $350k/year per group.",
+  },
+  {
+    id: "biz-liability",
+    term: "Winery liability & liquor licensing",
+    category: "business",
+    sop: "Product liability insurance (contamination, injury) sits alongside RSA (Responsible Service of Alcohol) obligations. Australian state-specific liquor licensing (producer's, cellar door, retail) required at each channel. Public liability for cellar door visitor risk. Consult a specialist wine industry broker.",
+    plain: "Winemaking is a regulated activity. You need product liability insurance in case someone gets sick, public liability for cellar door visitors, and state liquor licences for anywhere you sell. Get a wine-specialist broker — general business insurance will miss things.",
+    why: "One breach can end a small winery. Consultants who know the surface area are trusted more.",
+    when: "New winery setup. Any conversation about expanding to a new channel.",
+    ruleOfThumb: "Wine-specialist brokers: WFI Wine Insurance, Cavill Wine Insurance. Not your mate's business broker.",
+  },
+  {
+    id: "biz-vintage-yield",
+    term: "Vintage yield economics",
+    category: "business",
+    sop: "Yield per hectare (t/ha) drives grape supply cost. Boutique premium sites: 4–7 t/ha (yield restricted for concentration). Volume regions: 12–20 t/ha. Grape cost varies from $2,000–3,500/t (bulk warm-climate) to $12,000+/t (premium single-site cool-climate Pinot).",
+    plain: "How many tonnes of grapes come off a hectare of vineyard. Boutique wineries yield less (4–7 tonnes) because they keep quality up. Bulk regions get triple that. Grape cost per tonne swings 5× between bulk and premium — determines your COGS.",
+    why: "Understanding yield economics helps you talk credibly to a grower or a boutique client.",
+    when: "Any conversation about vineyard purchase, contracting, or grape sourcing.",
+    ruleOfThumb: "6 t/ha × 750L per tonne × 1000 bottles per hL ≈ 4,500 bottles per hectare at premium sites.",
+  },
+  {
+    id: "biz-cashflow",
+    term: "Vintage cash cycle",
+    category: "business",
+    sop: "18–36 month cash conversion cycle: fruit paid at harvest (Feb–Apr), packaging paid at bottling (12–18 months post-harvest for reds), retail invoiced at delivery (typically 30–60 days terms), DTC realised over 6–24 months of release cycle. Working capital equivalent to 1–2 full vintages typical.",
+    plain: "You pay for grapes in autumn, pay for bottles 18 months later, get paid by shops a month or two after delivery. If you're not sitting on cash equal to a year or two of production, one bad vintage kills you. It's why most boutique wineries eventually raise capital or partner up.",
+    why: "The single biggest reason boutique wineries fold. Not bad wine — bad cash cycle understanding.",
+    when: "Any founder considering scaling. Any consulting engagement on growth.",
+    ruleOfThumb: "Working capital = 1.5× annual COGS is a defensible minimum for a growing boutique.",
   },
 ];

@@ -71,6 +71,7 @@ export default function HiContact() {
   // assignment per slug. Falls back to "book" if SMS_INBOUND_NUMBER unset.
   const ctaVariant: "book" | "reply" = contact.ctaVariant ?? "book";
   const smsReplyHref: string | null = contact.smsReplyHref ?? null;
+  const waHref: string | null = (contact as { waHref?: string | null }).waHref ?? null;
 
   function logCtaClick() {
     if (contact?.slug) markCtaClicked.mutate({ slug: contact.slug });
@@ -241,6 +242,26 @@ export default function HiContact() {
           </a>
         )}
 
+        {/* WhatsApp offer — appears whenever a WA number is configured,
+             regardless of the primary CTA variant. SMS is universal (door),
+             WhatsApp is the couch: better for photos, PDFs, and threaded
+             follow-up. Deliberately quieter styling than the primary CTA so
+             it reads as an option, not a demand. Feb 2026 · Rich. */}
+        {waHref && (
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="hi-cta-whatsapp"
+            data-cta-channel="whatsapp"
+            onClick={logCtaClick}
+            style={btnWhatsApp}
+          >
+            <span style={{ marginRight: "0.4rem" }}>📱</span>
+            Have WhatsApp? Easier for photos &amp; docs →
+          </a>
+        )}
+
         {/* Secondary CTA — opens the polished 128-tank sample dashboard so the
             prospect can visualise their own operation in Ownology. Plain <a>
             because the target is a static .html outside the React router. */}
@@ -393,6 +414,23 @@ const btnSecondary: React.CSSProperties = {
   textDecoration: "none",
   marginTop: "0.75rem",
   border: "1px solid #b45309",
+  borderRadius: 6,
+};
+// WhatsApp button — green-tinted so the channel identity reads instantly.
+// Sized between primary and tertiary: it's a real option, not a decoration.
+const btnWhatsApp: React.CSSProperties = {
+  display: "block",
+  width: "100%",
+  padding: "0.85rem 1.25rem",
+  background: "rgba(37, 211, 102, 0.10)",
+  color: "#128C7E",
+  fontFamily: "'Lato',sans-serif",
+  fontWeight: 600,
+  fontSize: "0.9rem",
+  textAlign: "center",
+  textDecoration: "none",
+  marginTop: "0.5rem",
+  border: "1px solid rgba(37, 211, 102, 0.45)",
   borderRadius: 6,
 };
 const btnTertiary: React.CSSProperties = {

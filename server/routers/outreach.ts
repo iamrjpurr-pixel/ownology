@@ -132,6 +132,28 @@ function buildSmsReplyHref(input: {
   return `sms:${num}?&body=${encodeURIComponent(body)}`;
 }
 
+/** Build a `wa.me/` href that opens WhatsApp with the same pre-filled reply.
+ *  Falls back to SMS_INBOUND_NUMBER if WHATSAPP_INBOUND_NUMBER isn't set
+ *  (most operators use the same SIM for both). E.164 without the leading +,
+ *  per wa.me's URL requirements. Returns null if no number configured.
+ *
+ *  Rationale (Feb 2026, Rich): SMS is universal but limited for photos and
+ *  docs. WhatsApp deepens the thread once a prospect has engaged. Offering
+ *  both = universal door, richer couch. */
+function buildWaHref(input: {
+  firstName: string;
+  winery: string | null;
+}): string | null {
+  const raw = (process.env.WHATSAPP_INBOUND_NUMBER || process.env.SMS_INBOUND_NUMBER || "").trim();
+  if (!raw) return null;
+  // wa.me expects E.164 digits only, no leading + or spaces
+  const digits = raw.replace(/[^\d]/g, "");
+  if (!digits) return null;
+  const keyword = process.env.SMS_REPLY_KEYWORD?.trim() || "RED";
+  const body = `${keyword} — Hi, it's ${input.firstName}${input.winery ? ` from ${input.winery}` : ""}. Please lock me in for Ownology onboarding.`;
+  return `https://wa.me/${digits}?text=${encodeURIComponent(body)}`;
+}
+
 export const outreachRouter = router({
   /** PUBLIC — fetch a single contact by slug for the /hi/:slug page.
    *  Resolves on the server:
@@ -167,6 +189,10 @@ export const outreachRouter = router({
       const smsReplyHref = ctaVariant === "reply"
         ? buildSmsReplyHref({ firstName: row.firstName, winery: row.winery })
         : null;
+      // WhatsApp is offered whenever we have a number configured — regardless
+      // of ctaVariant. Even the "book" variant benefits from a richer channel
+      // for prospects who want to attach photos of their notebook mid-chat.
+      const waHref = buildWaHref({ firstName: row.firstName, winery: row.winery });
       return {
         ...row,
         calendlyUrl,
@@ -175,6 +201,7 @@ export const outreachRouter = router({
         crushVariant,
         ctaVariant,
         smsReplyHref,
+        waHref,
       };
     }),
 
