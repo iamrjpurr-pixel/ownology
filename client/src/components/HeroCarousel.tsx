@@ -1,0 +1,312 @@
+/**
+ * HeroCarousel — auto-cycling 3-scene landing hero (Feb 2026, Rich).
+ *
+ * The doctrine: "can't rely on user to read and scroll — pitch in 15
+ * seconds, cinematic, cycles". Three scenes rotate on a 3–6s cadence,
+ * pause on hover, dots for manual advance. Below-the-fold static
+ * content still exists (V1 sections) but is hidden until the visitor
+ * scrolls or clicks "Skip intro".
+ *
+ * Scenes:
+ *   1. V3 cold-open — 3:47am ferment panic          (3s)
+ *   2. The market gap — flash-card analysis         (6s)
+ *   3. Owen the apprentice — reveal + primary CTA   (6s)
+ *
+ * Loops. Total loop = 15s. Autoplay resumes 4s after any pause.
+ */
+import { useEffect, useRef, useState } from "react";
+import { Link } from "wouter";
+
+type Scene = "panic" | "gap" | "owen";
+const ORDER: Scene[] = ["panic", "gap", "owen"];
+const DURATIONS: Record<Scene, number> = { panic: 3000, gap: 6000, owen: 6000 };
+
+export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
+  const [active, setActive] = useState<Scene>("panic");
+  const [paused, setPaused] = useState(false);
+  const [progressKey, setProgressKey] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (paused) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      return;
+    }
+    const idx = ORDER.indexOf(active);
+    const next = ORDER[(idx + 1) % ORDER.length];
+    timerRef.current = setTimeout(() => {
+      setActive(next);
+      setProgressKey((k) => k + 1);
+    }, DURATIONS[active]);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [active, paused]);
+
+  function jumpTo(s: Scene) {
+    setActive(s);
+    setProgressKey((k) => k + 1);
+    setPaused(true);
+    setTimeout(() => setPaused(false), 4000);
+  }
+
+  return (
+    <section
+      data-testid="hero-carousel"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      style={{
+        position: "relative",
+        minHeight: "88vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+        background: "oklch(0.10 0.008 60)",
+        color: "oklch(0.95 0.010 75)",
+      }}
+    >
+      {/* Scene 1 — the panic */}
+      <SceneWrap active={active === "panic"} testId="hero-scene-panic">
+        <p style={eyebrow}>3:47am · vintage 2026</p>
+        <h1 style={h1}>
+          Your Shiraz is stuck at 8.4 Brix.
+          <br />
+          <span style={{ color: "var(--ow-amber)" }}>What do you do?</span>
+        </h1>
+      </SceneWrap>
+
+      {/* Scene 2 — the market gap */}
+      <SceneWrap active={active === "gap"} testId="hero-scene-gap">
+        <p style={eyebrow}>The gap · why now</p>
+        <h2 style={{ ...h1, fontSize: "clamp(1.5rem, 3.6vw, 2.5rem)", marginBottom: "1.75rem" }}>
+          Boutique winemakers are stranded
+          <br />
+          <span style={{ color: "var(--ow-amber)" }}>between the giants and the guesswork.</span>
+        </h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem", maxWidth: 900, margin: "0 auto" }}>
+          {[
+            { stat: "40 hrs / yr", label: "lost to manual APCO reporting" },
+            { stat: "3:47am", label: "when Google doesn't answer ferment questions" },
+            { stat: "$50k+", label: "for enterprise winery software" },
+            { stat: "0", label: "AI tools grounded in industry-standard oenology references" },
+          ].map((c) => (
+            <div key={c.label} style={gapCard}>
+              <p style={gapStat}>{c.stat}</p>
+              <p style={gapLabel}>{c.label}</p>
+            </div>
+          ))}
+        </div>
+      </SceneWrap>
+
+      {/* Scene 3 — Owen + CTA */}
+      <SceneWrap active={active === "owen"} testId="hero-scene-owen">
+        <p style={eyebrow}>Meet Owen</p>
+        <h2 style={h1}>
+          The apprentice who
+          <br />
+          <span style={{ color: "var(--ow-amber)" }}>never leaves the cellar.</span>
+        </h2>
+        <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "1rem", lineHeight: 1.7, color: "oklch(0.75 0.015 75)", maxWidth: 520, margin: "1.5rem auto 2rem" }}>
+          Cellar-grade AI grounded in industry-standard oenology references.
+          Cited answers, compliance drafting, and a 250+ Q&amp;A library.
+          Free to ask.
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0.75rem" }}>
+          <Link
+            href="/ask?from=hero-carousel-curious"
+            data-testid="hero-carousel-cta-curious"
+            style={ctaSecondary}
+          >
+            🍷 Ask Owen — free →
+          </Link>
+          <Link
+            href="/pricing?from=hero-carousel-pro"
+            data-testid="hero-carousel-cta-pro"
+            style={ctaPrimary}
+          >
+            🍇 Start 14-day trial →
+          </Link>
+        </div>
+      </SceneWrap>
+
+      {/* Progress bar */}
+      <div
+        key={progressKey}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 2,
+          background: "color-mix(in oklch, var(--ow-amber) 15%, transparent)",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            background: "var(--ow-amber)",
+            width: paused ? "100%" : "0%",
+            animation: paused ? "none" : `progress-fill ${DURATIONS[active]}ms linear forwards`,
+          }}
+        />
+      </div>
+
+      {/* Dot nav */}
+      <div
+        data-testid="hero-carousel-dots"
+        style={{
+          position: "absolute",
+          bottom: "2rem",
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          gap: "0.75rem",
+          zIndex: 3,
+        }}
+      >
+        {ORDER.map((s, i) => (
+          <button
+            key={s}
+            type="button"
+            data-testid={`hero-carousel-dot-${s}`}
+            onClick={() => jumpTo(s)}
+            aria-label={`Go to scene ${i + 1}`}
+            style={{
+              width: active === s ? 28 : 10,
+              height: 10,
+              borderRadius: 999,
+              background: active === s ? "var(--ow-amber)" : "color-mix(in oklch, var(--ow-amber) 25%, transparent)",
+              border: "none",
+              cursor: "pointer",
+              transition: "width 200ms ease, background 200ms ease",
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Skip intro */}
+      {onSkip && (
+        <button
+          type="button"
+          data-testid="hero-carousel-skip"
+          onClick={onSkip}
+          style={{
+            position: "absolute",
+            top: "1.5rem",
+            right: "1.5rem",
+            padding: "0.4rem 0.85rem",
+            background: "transparent",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)",
+            borderRadius: 999,
+            color: "oklch(0.75 0.015 75)",
+            fontFamily: "'Lato',sans-serif",
+            fontSize: "0.72rem",
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            cursor: "pointer",
+            zIndex: 3,
+          }}
+        >
+          Skip intro ↓
+        </button>
+      )}
+
+      <style>{`
+        @keyframes progress-fill { from { width: 0%; } to { width: 100%; } }
+      `}</style>
+    </section>
+  );
+}
+
+// ── Sub-scene wrapper with fade-in / fade-out ────────────────────────────────
+function SceneWrap({ active, testId, children }: { active: boolean; testId: string; children: React.ReactNode }) {
+  return (
+    <div
+      data-testid={testId}
+      aria-hidden={!active}
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "3rem 1.5rem",
+        textAlign: "center",
+        opacity: active ? 1 : 0,
+        transition: "opacity 700ms ease",
+        pointerEvents: active ? "auto" : "none",
+      }}
+    >
+      <div style={{ maxWidth: 900, width: "100%" }}>{children}</div>
+    </div>
+  );
+}
+
+// ── Shared styles ────────────────────────────────────────────────────────────
+const eyebrow: React.CSSProperties = {
+  fontFamily: "'Fira Code',monospace",
+  fontSize: "0.7rem",
+  letterSpacing: "0.24em",
+  color: "var(--ow-amber)",
+  textTransform: "uppercase",
+  marginBottom: "1.75rem",
+};
+
+const h1: React.CSSProperties = {
+  fontFamily: "'Fraunces',serif",
+  fontWeight: 700,
+  fontSize: "clamp(2rem, 5vw, 3.75rem)",
+  lineHeight: 1.1,
+  letterSpacing: "-0.02em",
+  margin: 0,
+  textWrap: "balance" as "balance",
+};
+
+const gapCard: React.CSSProperties = {
+  background: "color-mix(in oklch, var(--ow-amber) 6%, transparent)",
+  border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+  borderRadius: 6,
+  padding: "1rem 1.15rem",
+  textAlign: "left",
+};
+
+const gapStat: React.CSSProperties = {
+  fontFamily: "'Fraunces',serif",
+  fontWeight: 700,
+  fontSize: "1.5rem",
+  color: "var(--ow-amber)",
+  lineHeight: 1,
+  marginBottom: "0.35rem",
+};
+
+const gapLabel: React.CSSProperties = {
+  fontFamily: "'Lato',sans-serif",
+  fontSize: "0.82rem",
+  color: "oklch(0.80 0.010 75)",
+  lineHeight: 1.5,
+  margin: 0,
+};
+
+const ctaPrimary: React.CSSProperties = {
+  padding: "1rem 1.75rem",
+  background: "var(--ow-amber)",
+  color: "oklch(0.10 0.008 60)",
+  borderRadius: 6,
+  fontFamily: "'Lato',sans-serif",
+  fontWeight: 700,
+  fontSize: "1rem",
+  textDecoration: "none",
+  letterSpacing: "0.01em",
+};
+
+const ctaSecondary: React.CSSProperties = {
+  padding: "1rem 1.75rem",
+  background: "transparent",
+  color: "oklch(0.95 0.010 75)",
+  border: "1.5px solid oklch(0.35 0.010 60)",
+  borderRadius: 6,
+  fontFamily: "'Lato',sans-serif",
+  fontWeight: 500,
+  fontSize: "1rem",
+  textDecoration: "none",
+};

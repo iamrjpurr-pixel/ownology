@@ -5,6 +5,19 @@ problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
 ## Feb 2026
+### Cycling landing hero + /guide progressive reveal — cognitive-overload fix  (Feb 2026, Rich, post-deploy iteration)
+- **HeroCarousel** replaces the dense pillars hero on `/home` — three auto-cycling scenes: (1) 3:47am ferment panic cold open (3s), (2) market-gap analysis with 4 stat cards — 40hrs/yr · 3:47am · $50k+ · 0 (6s), (3) Meet Owen apprentice reveal + dual CTA (6s). Auto-cycles 15s loop · pauses on hover · dots for manual jump · skip-intro button.
+- **FounderStory temporarily hidden** on `/home` — Rich flagged the Rich+Gel winery photos as visually broken. Section commented out until reshoot/restyle.
+- **`/guide` progressive reveal** — only Four Pillars visible above the fold; Workflow Map · Getting Started Checklist · Role Paths · Tier Access · First Fermentation · Further Reading all sit behind amber "Reveal →" cards. Persisted via localStorage.
+- **Reusable `RevealCard`** at module scope in Guide.tsx (satisfies `react/no-unstable-nested-components`).
+- **Doctrine restored**: fewer things visible on first landing, respect the visitor's attention, reveal complexity only on explicit user intent.
+
+### Contact migration bridge + Namecheap → Emergent domain switch  (Feb 2026, Rich)
+- **`/admin/contacts-migrate`** — two-button flow: download all contacts as JSON on dev, upload JSON on prod. Volatile pipeline state (sms/reply/booking timestamps · view counts) stripped so prod starts with fresh state. Upsert-by-slug (skips duplicates).
+- **Backend**: `outreach.exportAllContacts` (query, ownerProcedure) + `outreach.importContacts` (mutation, ownerProcedure, upserts by slug, max 500 per batch).
+- **Domain unlinked** from `ownership-dev` (preview) and linked to production Emergent app pointing at `ownology.ai`. Stale bundle bug (React hook order) resolved. Namecheap DNS auto-updated via Emergent's Entri integration. All 5 TXT records (Google verification + email DKIM/SPF/DMARC) preserved.
+
+
 ### CRM business-card / email-signature OCR + Import side-by-side layout  (Feb 2026, Rich)
 - **CRM OCR panel** on `/admin/contacts` — new dashed-amber container ABOVE the Add contact form. Paste a screenshot (or click to upload) → 2-stage vision-LLM pipeline (verbatim OCR → structured extraction) auto-fills firstName, lastName, mobileAu, winery, notes (email + address if present), persona.
 - **Backend**: new `outreach.ocrContactCard` ownerProcedure. Returns `{ rawOcrText, fields, totalWords, recognisedWords, confidencePct }` with the same colour-coded quality score model as `vintageLog.ocrImageToCleanText`.

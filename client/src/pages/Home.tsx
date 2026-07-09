@@ -10,6 +10,7 @@ import FounderStory from "@/components/FounderStory";
 import FAQ from "@/components/FAQ";
 import HeroTheatricalPattern from "@/components/HeroTheatricalPattern";
 import { HeroPillarsSection } from "@/components/HeroPillarsSection";
+import HeroCarousel from "@/components/HeroCarousel";
 import { useUiPillarsV1 } from "@/config/ui";
 import { useAutoCascade, pickCrushByDay } from "@/hooks/useAutoCascade";
 import { Link } from "wouter";
@@ -1924,14 +1925,22 @@ export default function Home() {
     <div className="min-h-screen" style={{background:"var(--ow-bg-base)"}}>
       <Nav />
       <WhatsNewRibbon />
-      <Hero />
+      {/* Cycling 3-scene hero — panic → market gap → Owen (Feb 2026, Rich).
+          Replaces the dense V1 Hero on the primary landing surface.
+          The old <Hero /> component still exists but is no longer
+          rendered here. If you want to preview it, append ?ui=v0 and
+          the site will fall back to the pillars flag branch. */}
+      <HeroCarousel onSkip={() => { const el = document.getElementById("home-below-fold"); if (el) el.scrollIntoView({ behavior: "smooth" }); }} />
+      <div id="home-below-fold" />
       <TrustChips />
       {!pillarsV1 && <PainPoints />}
       <Features />
       {!pillarsV1 && <HowItWorks />}
       <DemoVideo />
       <Testimonials />
-      <FounderStory />
+      {/* FounderStory temporarily hidden (Feb 2026, Rich) — photos flagged
+          as "broken/rich+gel in winery". Restore after reshoot or restyle. */}
+      {/* <FounderStory /> */}
       <ApcoStrip />
       <Pricing />
       {!pillarsV1 && <WeightOfHarvest />}
