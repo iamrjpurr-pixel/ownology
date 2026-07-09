@@ -74,24 +74,66 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
         </h1>
       </SceneWrap>
 
-      {/* Scene 2 — the market gap */}
+      {/* Scene 2 — the market gap (competitor comparison) */}
       <SceneWrap active={active === "gap"} testId="hero-scene-gap">
-        <p style={eyebrow}>The gap · why now</p>
+        <p style={eyebrow}>The gap · where you sit</p>
         <h2 style={{ ...h1, fontSize: "clamp(1.5rem, 3.6vw, 2.5rem)", marginBottom: "1.75rem" }}>
-          Boutique winemakers are stranded
+          InnoVint &amp; Vintrace built for the big producers.
           <br />
-          <span style={{ color: "var(--ow-amber)" }}>between the giants and the guesswork.</span>
+          <span style={{ color: "var(--ow-amber)" }}>Ownology is built for you.</span>
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem", maxWidth: 900, margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0.85rem", maxWidth: 960, margin: "0 auto" }}>
           {[
-            { stat: "40 hrs / yr", label: "lost to manual APCO reporting" },
-            { stat: "3:47am", label: "when Google doesn't answer ferment questions" },
-            { stat: "$50k+", label: "for enterprise winery software" },
-            { stat: "0", label: "AI tools grounded in industry-standard oenology references" },
+            {
+              name: "InnoVint",
+              price: "$500+/mo",
+              tags: ["Enterprise", "No AI", "No APCO"],
+              muted: true,
+            },
+            {
+              name: "Vintrace",
+              price: "$4k+ setup",
+              tags: ["Complex UI", "No AI", "Big-winery scale"],
+              muted: true,
+            },
+            {
+              name: "Spreadsheet + phone",
+              price: "Free · but",
+              tags: ["No memory", "No compliance", "No 3am answers"],
+              muted: true,
+            },
+            {
+              name: "Ownology",
+              price: "$44/mo founding",
+              tags: ["Boutique-first", "Cited AI · Owen", "APCO built in"],
+              muted: false,
+            },
           ].map((c) => (
-            <div key={c.label} style={gapCard}>
-              <p style={gapStat}>{c.stat}</p>
-              <p style={gapLabel}>{c.label}</p>
+            <div
+              key={c.name}
+              style={{
+                ...gapCard,
+                background: c.muted
+                  ? "color-mix(in oklch, var(--ow-amber) 3%, transparent)"
+                  : "color-mix(in oklch, var(--ow-amber) 14%, transparent)",
+                border: `1px solid color-mix(in oklch, var(--ow-amber) ${c.muted ? 20 : 55}%, transparent)`,
+                opacity: c.muted ? 0.75 : 1,
+              }}
+            >
+              <p style={{ ...gapStat, fontSize: "1.05rem", marginBottom: "0.2rem", color: c.muted ? "oklch(0.80 0.010 75)" : "var(--ow-amber)" }}>
+                {c.name}
+              </p>
+              <p style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.72rem", letterSpacing: "0.06em", color: c.muted ? "oklch(0.60 0.015 75)" : "var(--ow-amber)", marginBottom: "0.55rem", textTransform: "uppercase" }}>
+                {c.price}
+              </p>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                {c.tags.map((t) => (
+                  <li key={t} style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: c.muted ? "oklch(0.72 0.015 75)" : "oklch(0.88 0.010 75)", lineHeight: 1.55, display: "flex", gap: "0.35rem", alignItems: "flex-start" }}>
+                    <span style={{ color: c.muted ? "oklch(0.50 0.010 60)" : "var(--ow-amber)" }}>{c.muted ? "·" : "✓"}</span>
+                    {t}
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
