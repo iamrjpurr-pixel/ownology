@@ -4,6 +4,36 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Hook Waterfall — Perplexity outreach opener v2 + operator-guide auto-links (Feb 2026, Rich)
+
+**Hook Waterfall (kills generic "family-owned winery" AI slop):**
+- Perplexity `deepResearch` prompt rewritten to hunt FOUR tiers in strict priority, returning whichever tier can be sourced with a real citation:
+  1. `recent_signal` — a dated event in the last ~90 days (award, review, release, IG post)
+  2. `quoted_voice` — a direct quote from the winemaker (podcast, newsletter, blog)
+  3. `peer_signal` — a specific thing a neighbouring producer just did
+  4. `vintage_pain` — current regional vintage conditions (smoke, drought, rainfall)
+- Fabrication guardrail: if none of the four tiers can be cited, all hook fields return `null`. No made-up quotes, scores, or dates.
+- Voice rules baked into the prompt: lower-case start, no exclamation marks, max 140 chars, Australian idiom OK.
+- Response schema extended: `hookTier`, `hookText`, `hookSourceUrl` (all-or-nothing linked).
+
+**DB + persistence wiring:**
+- Migration `scripts/add-outreach-hook-columns.mjs` adds `hook_tier` (VARCHAR 32), `hook_text` (VARCHAR 400), `hook_source_url` (VARCHAR 500) to `outreach_contacts`.
+- Drizzle schema updated with matching column types.
+- `outreach.create` / `outreach.importContacts` / `outreach.exportAllContacts` all accept + persist + emit the new fields.
+- `outreach.bySlug` returns them so `/hi/:slug` can render the same opener the SMS used.
+- `AdminEventIngest.tsx` passes hook fields through when saving deep-researched leads.
+
+**SMS template + admin UX:**
+- `smsDraft()` in `AdminContacts.tsx` now prefers `hookText` over `painPoint`. Fallback chain: hookText → painPoint → generic honest cold-open.
+- Admin row shows the polished hook line in italics with an amber tier badge (`recent signal` / `quoted voice` / etc.) and a "verify source ↗" link to the citation URL. Operator can sanity-check before sending.
+- `HiContact.tsx` renders the hook in the amber hero card (takes precedence over painPoint) so the landing-page opener matches the SMS opener — reinforces the "someone who did their homework" impression.
+
+**Operator-guide flashcards auto-linkify internal paths:**
+- New `linkifyPaths()` helper in `components/FlashCardDeck.tsx` turns any occurrence of `/admin/...`, `/hi/...`, `/apprentice`, `/import`, etc. inside step text, outcome lines, or gotcha boxes into a clickable amber-underlined wouter `<Link>`.
+- Root-relative paths resolve against the current origin — works identically in dev preview and production, zero env-var plumbing.
+- Placeholder paths containing `<` (e.g. `/hi/<slug>`) are intentionally NOT linkified — they're templates, not URLs.
+
+
 ### Deck 2 · Vineyard & Viticulture (20 cards) + Dev-only theme picker (Feb 2026, Rich)
 
 **Deck 2 · Vineyard & Viticulture — 20 cards:**

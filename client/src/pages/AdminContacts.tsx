@@ -50,14 +50,21 @@ function extractChannels(notes: string | null | undefined): {
   };
 }
 
-function smsDraft(c: { firstName: string; winery?: string | null; event?: string | null; painPoint?: string | null; slug: string }): string {
+function smsDraft(c: { firstName: string; winery?: string | null; event?: string | null; painPoint?: string | null; hookText?: string | null; slug: string }): string {
   const where = c.event ? `at ${c.event}` : "the other day";
   const url = `${PREVIEW_BASE}/hi/${c.slug}`;
+  // Tier-1 preferred: use the Perplexity-sourced hook (specific, cited,
+  // dated). This is the "human who did their homework" opener.
+  if (c.hookText) {
+    const wineryBit = c.winery ? ` (${c.winery})` : "";
+    return `g'day ${c.firstName}${wineryBit} — ${c.hookText}. i've been building a cellar AI grounded in your own vintage logs — 90 sec look: ${url} — Jamie`;
+  }
+  // Tier-2 fallback: painPoint (business summary) as before.
   if (c.painPoint) {
     const wineryBit = c.winery ? ` (${c.winery})` : "";
     return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. You mentioned ${c.painPoint}; I've since built a cellar AI that answers exactly that, grounded in your own vintage logs. 90 sec look: ${url} — Jamie`;
   }
-  // Honest cold-contact version — no faux familiarity
+  // Tier-3 honest fallback — no faux familiarity
   const wineryBit = c.winery ? `, sending this to ${c.winery} too` : "";
   return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. I've since built a cellar AI grounded in your own vintage logs — figured you might find it useful. 90 sec look: ${url} — Jamie`;
 }
@@ -1111,7 +1118,7 @@ export default function AdminContacts() {
       <div className="flex flex-col gap-3">
         {contacts.map((c) => {
           const url = `${PREVIEW_BASE}/hi/${c.slug}`;
-          const templateSms = smsDraft({ firstName: c.firstName, winery: c.winery, event: c.event, painPoint: c.painPoint, slug: c.slug });
+          const templateSms = smsDraft({ firstName: c.firstName, winery: c.winery, event: c.event, painPoint: c.painPoint, hookText: (c as { hookText?: string | null }).hookText ?? null, slug: c.slug });
           const effectiveSms = c.smsDraftOverride ?? templateSms;
           const copied = copyState[c.slug];
           const status = ((c.status ?? "cold") as ContactStatus);
@@ -1751,7 +1758,52 @@ export default function AdminContacts() {
                   </div>
                 </div>
               )}
-              {c.painPoint && <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.85rem", color: "var(--ow-text-mid)", fontStyle: "italic", marginBottom: 8 }}>“{c.painPoint}”</p>}
+              {/* Hook-waterfall display — shows the Perplexity-sourced opener
+                  (if any) with the tier badge + verify link. Falls back to
+                  painPoint if no hook is set. */}
+              {((c as { hookText?: string | null }).hookText ?? null) ? (
+                <div style={{ marginBottom: 8 }}>
+                  <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.85rem", color: "var(--ow-text-hi)", fontStyle: "italic", margin: 0 }}>
+                    “{(c as { hookText?: string | null }).hookText}”
+                  </p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+                    <span
+                      data-testid={`hook-tier-${c.slug}`}
+                      style={{
+                        fontFamily: "'Fira Code',monospace",
+                        fontSize: "0.62rem",
+                        letterSpacing: "0.06em",
+                        textTransform: "uppercase",
+                        color: "var(--ow-amber)",
+                        background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
+                        border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+                        padding: "1px 6px",
+                        borderRadius: 3,
+                      }}
+                    >
+                      {((c as { hookTier?: string | null }).hookTier ?? "hook").replace(/_/g, " ")}
+                    </span>
+                    {((c as { hookSourceUrl?: string | null }).hookSourceUrl ?? null) && (
+                      <a
+                        data-testid={`hook-source-${c.slug}`}
+                        href={(c as { hookSourceUrl?: string | null }).hookSourceUrl ?? "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          fontFamily: "'Lato',sans-serif",
+                          fontSize: "0.7rem",
+                          color: "var(--ow-text-mid)",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        verify source ↗
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ) : c.painPoint && (
+                <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.85rem", color: "var(--ow-text-mid)", fontStyle: "italic", marginBottom: 8 }}>“{c.painPoint}”</p>
+              )}
               {isSilent ? (
                 <p
                   data-testid={`silent-note-${c.slug}`}

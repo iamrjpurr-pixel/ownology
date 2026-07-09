@@ -132,8 +132,30 @@ export default function HiContact() {
           </p>
         )}
 
-        {/* Pain hook (only if explicitly captured) */}
-        {contact.painPoint && (
+        {/* Hook (Perplexity-sourced opener) — takes precedence over painPoint.
+            This is the same line that opened the SMS, so the landing-page
+            reinforces the "someone who did their homework" impression. */}
+        {(contact as { hookText?: string | null }).hookText && (
+          <div
+            data-testid="hi-hook"
+            style={{
+              marginTop: "1.75rem",
+              padding: "1rem 1.25rem",
+              background: "#FEF3C7",
+              borderLeft: "3px solid #b45309",
+              borderRadius: 4,
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.95rem",
+              lineHeight: 1.55,
+              color: "#1f2937",
+            }}
+          >
+            <em>{(contact as { hookText?: string | null }).hookText}</em> — that&apos;s what got me thinking Ownology could actually be useful here. Cellar AI grounded in your own vintage logs, not a guess from a forum.
+          </div>
+        )}
+
+        {/* Pain hook (only if explicitly captured AND no hookText available) */}
+        {!(contact as { hookText?: string | null }).hookText && contact.painPoint && (
           <div
             data-testid="hi-pain"
             style={{
@@ -153,7 +175,7 @@ export default function HiContact() {
         )}
 
         {/* Honest framing for cold/brief contacts */}
-        {!contact.painPoint && (
+        {!(contact as { hookText?: string | null }).hookText && !contact.painPoint && (
           <p
             data-testid="hi-intro"
             style={{

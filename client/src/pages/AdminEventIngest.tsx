@@ -290,6 +290,11 @@ export default function AdminEventIngest() {
         winery: winery || undefined,
         event: event.eventName ?? undefined,
         painPoint: draft.painPoint ? String(draft.painPoint) : undefined,
+        hookTier: typeof draft.hookTier === "string" && ["recent_signal", "quoted_voice", "peer_signal", "vintage_pain"].includes(draft.hookTier)
+          ? (draft.hookTier as "recent_signal" | "quoted_voice" | "peer_signal" | "vintage_pain")
+          : null,
+        hookText: draft.hookText ? String(draft.hookText).slice(0, 400) : null,
+        hookSourceUrl: draft.hookSourceUrl ? String(draft.hookSourceUrl).slice(0, 500) : null,
         notes: notesParts.join(" · ").slice(0, 500) || undefined,
         slug: slugify(firstName, winery),
         persona,
