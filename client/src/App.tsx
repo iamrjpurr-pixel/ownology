@@ -303,7 +303,7 @@ function Router() {
       <Route path={"/why-ownology"} component={WhyOwnology} />
       <Route path={"/our-story"} component={OurStory} />
       <Route path={"/pricing-comparison"} component={PricingComparison} />
-      <Route path={"/learn"} component={Learn} />
+      <Route path={"/apprentice"} component={Learn} />
       <Route path={"/for-innovint-users"} component={ForInnoVintUsers} />
       <Route path={"/for-vintrace-users"} component={ForVintraceUsers} />
       <Route path={"/for-home-winemakers"} component={ForHomeWinemakers} />

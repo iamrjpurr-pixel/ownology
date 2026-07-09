@@ -116,7 +116,7 @@ export default function Learn() {
             <ArrowLeft size={14} /> Ownology
           </Link>
           <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.65rem", letterSpacing: "0.14em", color: "var(--ow-text-lo)", textTransform: "uppercase" }}>
-            /learn · preview · unlinked
+            /apprentice · preview · unlinked
           </span>
         </div>
       </div>
