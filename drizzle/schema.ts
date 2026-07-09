@@ -1212,6 +1212,15 @@ export const outreachContacts = mysqlTable(
     winery: varchar("winery", { length: 120 }),
     event: varchar("event", { length: 120 }), // e.g. "McLaren Vale 2025"
     painPoint: varchar("pain_point", { length: 300 }), // what they complained about
+    // Hook-waterfall fields (Feb 2026). Populated by outreach.deepResearch
+    // when Perplexity finds a dated, specific opening angle. hookTier tells
+    // us which layer landed (recent_signal | quoted_voice | peer_signal |
+    // vintage_pain). hookText is the polished one-liner in Rich's voice —
+    // this is what the SMS template prefers over painPoint. hookSourceUrl
+    // is the citation so prospects can verify we're not making it up.
+    hookTier: varchar("hook_tier", { length: 32 }),
+    hookText: varchar("hook_text", { length: 400 }),
+    hookSourceUrl: varchar("hook_source_url", { length: 500 }),
     calendlyOverride: varchar("calendly_override", { length: 300 }),
     smsSentAt: bigint("sms_sent_at", { mode: "number" }),
     firstViewedAt: bigint("first_viewed_at", { mode: "number" }),

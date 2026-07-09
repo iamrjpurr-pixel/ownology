@@ -17,6 +17,52 @@
 import { useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 
+/**
+ * Auto-linkify internal paths inside step text. Turns any occurrence of
+ *   /admin/…  /hi/…  /apprentice  /import  /sample-vintage-log  etc.
+ * into a clickable <Link> that resolves against the CURRENT origin (so
+ * it works in dev preview AND in prod without any env-var plumbing).
+ *
+ * Excludes placeholder paths that contain "<" (e.g. "/hi/<slug>") — those
+ * are meant to be read as templates, not clicked.
+ */
+function linkifyPaths(text: string): React.ReactNode {
+  // Match a root-relative path: "/" + lowercase-word + optional /segments
+  // Stops at whitespace, punctuation (except - _ /), or angle brackets.
+  const pathRe = /\/[a-z][a-z0-9-]*(?:\/[a-z0-9-]+)*/g;
+  const parts: React.ReactNode[] = [];
+  let lastIdx = 0;
+  let match: RegExpExecArray | null;
+  while ((match = pathRe.exec(text)) !== null) {
+    const path = match[0];
+    const start = match.index;
+    // Skip if the character immediately after is "<" (placeholder like /hi/<slug>)
+    const nextChar = text[start + path.length];
+    if (nextChar === "<") continue;
+    // Push preceding plain text
+    if (start > lastIdx) parts.push(text.slice(lastIdx, start));
+    parts.push(
+      <Link
+        key={`${start}-${path}`}
+        href={path}
+        style={{
+          color: "var(--ow-amber)",
+          textDecoration: "underline",
+          textDecorationThickness: "1px",
+          textUnderlineOffset: "2px",
+          fontFamily: "'Fira Code',monospace",
+          fontSize: "0.78rem",
+        }}
+      >
+        {path}
+      </Link>
+    );
+    lastIdx = start + path.length;
+  }
+  if (lastIdx < text.length) parts.push(text.slice(lastIdx));
+  return parts.length > 0 ? parts : text;
+}
+
 export interface FlashCard {
   n: string;           // sticky card number ("01" … "20")
   deck: string;        // deck id (free-form)
@@ -290,7 +336,7 @@ function FlashCardTile({
             >
               {i + 1}
             </span>
-            <span>{s}</span>
+            <span>{linkifyPaths(s)}</span>
           </li>
         ))}
       </ol>

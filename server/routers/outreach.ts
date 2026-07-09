@@ -910,6 +910,18 @@ Speech-recognition normalisations do NOT apply here — this is scraped HTML. Bu
           region: { type: ["string", "null"] },
           address: { type: ["string", "null"] },
           painPoint: { type: ["string", "null"] },
+          // Hook-waterfall fields (Feb 2026). Perplexity searches four
+          // tiers in order — recent_signal → quoted_voice → peer_signal
+          // → vintage_pain — and returns whichever tier it can source
+          // with a real citation. hookTier is null only when all four
+          // tiers fail; hookText and hookSourceUrl must both be present
+          // when hookTier is not null.
+          hookTier: {
+            type: ["string", "null"],
+            enum: ["recent_signal", "quoted_voice", "peer_signal", "vintage_pain", null],
+          },
+          hookText: { type: ["string", "null"] },
+          hookSourceUrl: { type: ["string", "null"] },
           notes: { type: ["string", "null"] },
           confidence: { type: "string", enum: ["high", "medium", "low"] },
         },
@@ -934,7 +946,7 @@ Speech-recognition normalisations do NOT apply here — this is scraped HTML. Bu
             messages: [
               {
                 role: "system",
-                content: `You are a wine-industry sales-research assistant. Given a business or person name, deep-search the public web for CURRENT contact details. Prioritise official winery websites, verified LinkedIn profiles, Instagram bios, and reputable trade publications (Halliday, WBM, Real Review, Winetitles). Ignore stale info — if two sources disagree, prefer the more recent one.
+                content: `You are a wine-industry sales-research assistant. Given a business or person name, deep-search the public web for CURRENT contact details AND a specific, human, dated opening hook. Prioritise official winery websites, verified LinkedIn profiles, Instagram bios, and reputable trade publications (Halliday, WBM, Real Review, Winetitles, Young Gun of Wine, Vinous, Wine Australia, The Real Review, Drinks Trade). Also check winery newsletter archives, podcast transcripts, and public blog comments where accessible. Ignore stale info — if two sources disagree, prefer the more recent one.
 
 For "role", identify the primary point-of-contact — winemaker, founder, GM, or cellar-door manager — in that priority order. Skip marketing / admin staff.
 
@@ -944,14 +956,58 @@ For "instagram" — return the primary handle WITHOUT the @ (e.g. "lesfruitswine
 
 For "instagramPersonal" — if the winemaker / founder has a SEPARATE personal Instagram AND it's publicly cross-linked with the winery account (either the winery bio mentions the person's handle, or the person's bio mentions the winery, or trade press links the two), return that personal handle without the @. If they've deliberately kept them separate, return null — that separation is a signal to respect.
 
-For "painPoint" — write ONE sentence describing what a cellar-intelligence AI tool could help this producer with, inferred from their scale / focus / recent public commentary. Examples: "Small natural-wine producer, minimal digital record-keeping"; "Established mid-sized producer scaling into cellar-door tourism"; "Cool-climate boutique estate with vintage variability challenges".
+For "painPoint" — write ONE sentence describing what a cellar-intelligence AI tool could help this producer with, inferred from their scale / focus / recent public commentary. This is a fallback business summary; the sharper opener lives in hookText below. Examples: "Small natural-wine producer, minimal digital record-keeping"; "Established mid-sized producer scaling into cellar-door tourism"; "Cool-climate boutique estate with vintage variability challenges".
+
+═══════════════════════════════════════════════════════════════
+HOOK WATERFALL — this is the most important part of the response.
+═══════════════════════════════════════════════════════════════
+
+The operator uses hookText as the OPENING LINE of a personal SMS. Generic "family-owned winery balancing hospitality with production"-style summaries FAIL. The hook must sound like a friend who read something specific about them yesterday — not like an AI that skimmed an About page.
+
+Search these FOUR tiers IN ORDER. Return the FIRST tier that yields a concrete, verifiable, dated hook with a real source URL. Skip any tier that would force you to fabricate.
+
+Tier 1 — "recent_signal" (best): ONE dated event from the last ~90 days.
+  • A new vintage release, a wine-show medal, a Halliday / WBM / Real Review score, a cellar-door renovation, a new winemaker joining, a distribution deal, a mention in trade press, or a distinctive Instagram post about harvest / bottling / pruning.
+  • Must have a specific date, score, or dated URL (e.g. an IG post from Feb 2026, a review published this month, an event they exhibited at last week).
+  • Example hookText: "just saw the 2023 Semillon picked up 96 from Halliday — well done"
+  • Example hookText: "noticed you just opened the new tasting room in Broke — how's the traffic tracking"
+
+Tier 2 — "quoted_voice": a direct quote from the winemaker in a podcast transcript, blog post, newsletter, or long-form interview.
+  • The hook echoes their OWN LANGUAGE back to them. Not paraphrased — quoted.
+  • Podcasts to check: Young Gun of Wine, The Wine Show podcast, Grape Minds, Vinous Table, WineBusiness.com.au. Also winery-run newsletters (Mailchimp archives), Substack, and personal blogs.
+  • Example hookText: "you mentioned on the Young Gun pod that MLF timing is your annual headache — that's actually why i built this"
+  • Example hookText: "in your Feb newsletter you wrote about the acid retention pressure this year — same story i'm hearing across the Hunter"
+
+Tier 3 — "peer_signal": a specific, dated thing a NEIGHBOURING or PEER winery in the same region is doing (award, tech adoption, distribution change, exit, new hire).
+  • The hook opens a lateral conversation about a regional shift.
+  • Example hookText: "saw Tyrrell's just released their oldest-ever library Semillon — feels like the Hunter's finally getting the credit it deserves"
+  • Example hookText: "noticed Audrey Wilkinson switched to a lighter bottle last month — are you seeing the same freight pressure"
+
+Tier 4 — "vintage_pain": the current vintage conditions in their specific region (smoke, drought, heatwave, botrytis pressure, frost, rainfall anomalies).
+  • Reference the CURRENT vintage window — check Wine Australia vintage reports, Bureau of Meteorology summaries, regional-body updates (Hunter Valley Wine & Tourism Association, WBGA, etc.).
+  • Example hookText: "brutal January rain in the Hunter this year — how are the Semillons holding acid"
+  • Example hookText: "the smoke reports out of the Adelaide Hills are grim — hope your fruit escaped it"
+
+═══════════════════════════════════════════════════════════════
+HOOK OUTPUT FORMAT — three linked fields, all-or-nothing:
+═══════════════════════════════════════════════════════════════
+- hookTier: "recent_signal" | "quoted_voice" | "peer_signal" | "vintage_pain" | null
+- hookText: the polished one-liner. Rules:
+    * Lower-case start (yes, no capital)
+    * No exclamation marks. No emoji.
+    * Max 140 chars. Aim for 60–110.
+    * Australian idiom OK ("g'day" not "hi", "reckon" not "believe")
+    * Never invent numbers, dates, scores, or quotes — if you can't cite it, drop that tier and try the next one
+- hookSourceUrl: direct URL to the article / IG post / podcast episode / newsletter that grounds the hook. MUST be a URL that appears in your citations list. If you can't cite it, return null for all three hook fields.
+
+If NONE of the four tiers can be sourced with a real citation, set hookTier, hookText, and hookSourceUrl all to null. Do not fill hookText with a generic "family-owned winery" summary — that's what painPoint is for. Null is always correct over fabrication.
 
 For "confidence":
 - "high" = named person + at least 2 direct channels (phone/email/verified IG) found
 - "medium" = winery + 1 channel found, no named person OR named person + only 1 channel
 - "low" = only the winery name confirmed, no direct contact channels
 
-Return ONLY the requested JSON — no prose, no explanation. Use null for any field you cannot verify. Do NOT invent URLs, phone numbers, or emails — null is always correct over hallucination.`,
+Return ONLY the requested JSON — no prose, no explanation. Use null for any field you cannot verify. Do NOT invent URLs, phone numbers, emails, quotes, dates, or scores — null is always correct over hallucination.`,
               },
               {
                 role: "user",
