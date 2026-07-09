@@ -4,6 +4,17 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### HeroCarousel Scene 2 · pricing "noise" injection (Feb 2026, Rich)
+- **Problem** (Rich's insight): Scene 2 names InnoVint & Vintrace, which primes visitors to think "$$$". Without an immediate cost counter, the visitor's expectation collapses to "same category = same price" → bounce. Rich's ask: make a noise that we're **~95% cheaper for commercial teams** and **on par (or better) for home winemakers**.
+- **Change** (`HeroCarousel.tsx` scene "gap"): replaced the "Ownology is the same category / cellar intelligence" paragraph with a two-column **price-differential card** (amber-bordered, scannable within one visual beat).
+  - Column 1 — `COMMERCIAL TEAMS` · **~95% less** · "than InnoVint or Vintrace"
+  - Column 2 — `HOME WINEMAKERS` · **On par (or better)** · "than any DIY tool"
+- Closing italic tightened: "Same category. Different math. Before you spend another year on the wrong tool."
+- **No specific competitor $ amounts named** (comparative-advertising safety). Percentage claim is qualitative ("~95%") not a formal comparison.
+- Testids: `hero-scene-gap-pricing`, `hero-scene-gap-price-commercial`, `hero-scene-gap-price-diy`.
+- Verified via screenshot on preview.
+
+
 ### `/our-story` standalone page — quiet rebuild for iteration (Feb 2026, Rich)
 - **Context**: Rich uploaded `ownology-our-story.zip` — component + copy but no image binaries. Zip's 3 `/manus-storage/*` image paths (founders-couple, vineyard, lab) are dead in the Emergent build; only the 2 Cloudfront portraits (Rich, Geraldine — the "AI photos" from Manus) still resolve. Rich's ask: rebuild as a **dedicated page**, kept unlinked, structured for a future founder video, no home-page changes.
 - **New route**: `/our-story` → `client/src/pages/OurStory.tsx`. Added to `App.tsx` route table but **not linked from Nav, Footer, or any content page** — direct-URL access only.

@@ -162,21 +162,87 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
           ))}
         </div>
 
-        <p
+        {/* Price-differential block — the "noise" (Feb 2026, Rich). Naming
+             InnoVint/Vintrace primes the visitor to think about $$$, so we
+             answer the cost question in the same breath, before the beat
+             advances. Two-column card is scannable at 6s: eyes land on the
+             amber number first, then the qualifier underneath. */}
+        <div
+          data-testid="hero-scene-gap-pricing"
           style={{
-            fontFamily: "'Lato',sans-serif",
-            fontWeight: 300,
-            fontSize: "clamp(0.95rem, 1.4vw, 1.1rem)",
-            lineHeight: 1.65,
-            color: "oklch(0.82 0.010 75)",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: 0,
             maxWidth: 640,
             margin: "0 auto",
-            textWrap: "balance" as "balance",
+            background: "color-mix(in oklch, var(--ow-amber) 6%, transparent)",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+            borderRadius: 6,
+            overflow: "hidden",
           }}
         >
-          Ownology is the same category &mdash; <span style={{ color: "var(--ow-amber)", fontWeight: 500 }}>cellar intelligence</span> &mdash;
-          priced and paced for boutique winemakers. Every answer cited, every SOP editable, APCO built in.
-        </p>
+          {[
+            {
+              label: "Commercial teams",
+              stat: "~95% less",
+              qual: "than InnoVint or Vintrace",
+              testId: "hero-scene-gap-price-commercial",
+            },
+            {
+              label: "Home winemakers",
+              stat: "On par (or better)",
+              qual: "than any DIY tool",
+              testId: "hero-scene-gap-price-diy",
+            },
+          ].map((col, i) => (
+            <div
+              key={col.testId}
+              data-testid={col.testId}
+              style={{
+                padding: "1.1rem 1rem",
+                textAlign: "center",
+                borderLeft: i === 0 ? "none" : "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: "'Fira Code',monospace",
+                  fontSize: "0.62rem",
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: "oklch(0.70 0.015 75)",
+                  margin: 0,
+                }}
+              >
+                {col.label}
+              </p>
+              <p
+                style={{
+                  fontFamily: "'Fraunces',serif",
+                  fontWeight: 700,
+                  fontSize: "clamp(1.15rem, 2.2vw, 1.55rem)",
+                  color: "var(--ow-amber)",
+                  lineHeight: 1.15,
+                  letterSpacing: "-0.01em",
+                  margin: "0.45rem 0 0.3rem",
+                }}
+              >
+                {col.stat}
+              </p>
+              <p
+                style={{
+                  fontFamily: "'Lato',sans-serif",
+                  fontWeight: 300,
+                  fontSize: "0.78rem",
+                  color: "oklch(0.72 0.012 75)",
+                  margin: 0,
+                }}
+              >
+                {col.qual}
+              </p>
+            </div>
+          ))}
+        </div>
 
         <p
           style={{
@@ -185,9 +251,10 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
             fontSize: "0.9rem",
             color: "oklch(0.62 0.015 75)",
             marginTop: "1.5rem",
+            textWrap: "balance" as "balance",
           }}
         >
-          Before you spend another year on the wrong tool.
+          Same category. Different math. Before you spend another year on the wrong tool.
         </p>
       </SceneWrap>
 
