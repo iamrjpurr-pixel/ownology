@@ -5,6 +5,16 @@ problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
 ## Feb 2026
+### CRM business-card / email-signature OCR + Import side-by-side layout  (Feb 2026, Rich)
+- **CRM OCR panel** on `/admin/contacts` — new dashed-amber container ABOVE the Add contact form. Paste a screenshot (or click to upload) → 2-stage vision-LLM pipeline (verbatim OCR → structured extraction) auto-fills firstName, lastName, mobileAu, winery, notes (email + address if present), persona.
+- **Backend**: new `outreach.ocrContactCard` ownerProcedure. Returns `{ rawOcrText, fields, totalWords, recognisedWords, confidencePct }` with the same colour-coded quality score model as `vintageLog.ocrImageToCleanText`.
+- **Quality score card**: green ≥85% · amber 60–84% · red <60%, matching the Import Paste tab so operator UX is consistent.
+- **Auto-fill discipline**: MERGE not overwrite — anything the operator already typed is preserved. Persona only gets overridden if the operator hadn't set a non-default persona. Discard clears the OCR result but keeps the form fields.
+- **Import Paste side-by-side layout**: original image (up to 340px, click-to-enlarge in new tab) on the LEFT, cleaned OCR text on the RIGHT — a proper reference layout so winemakers can visually cross-check and hand-type any words the OCR missed. Rich's stated 80%-recognition + hand-fill-delta workflow.
+- **Testing**: `testing_agent_v3_fork` iteration_35 — 100% pass both features. Business-card image (Nathan Bailey / Brokenwood Wines) → 9/9 words · 100% confidence · all form fields auto-populated correctly. Side-by-side layout verified via bounding-rect x-coords (preview left, text right).
+- **Regression rescue**: my initial `search_replace` accidentally dropped `parseFromUrl: ownerProcedure` when inserting the new endpoint above it → backend crashed on boot → gate unlock returned 502 "Network error". Testing agent identified the orphaned `.input(...)` block, restored the missing procedure declaration. Fix landed at line 588 of `outreach.ts`.
+
+
 ### Import surface: Paste tab accepts clipboard IMAGES + OCR + spell-check + quality score  (Feb 2026)
 - **Backend**: New tRPC mutation `vintageLog.ocrImageToCleanText` — 2-stage pipeline. Stage 1 = verbatim vision OCR (marks uncertain words with `[unclear?]`). Stage 2 = spell/grammar clean-up returning JSON with `cleanedText` + a `corrections[]` array of `{original, corrected, reason}`.
 - **Frontend PasteTab**: `onPaste` handler detects `clipboardData.items` containing `image/*`, prevents default text-paste, converts to base64, calls the new endpoint.
