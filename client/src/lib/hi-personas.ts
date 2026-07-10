@@ -75,7 +75,7 @@ export const HI_VARIANTS_BY_PERSONA: Record<HiPersona, string[][]> = {
     ],
     // 3 — Cashflow-friendly
     [
-      "Founding-partner pricing is $9/month during pilot — costs less than the coffees your winemaker buys on the way to the cellar.",
+      "First 3 months at $9/mo — less than a coffee-run. Then locks at $22/mo founding, forever.",
       "No install, no consultant, no per-seat licence. One number, one payment, one tool.",
       "If it doesn't save your team five hours in the first vintage, cancel. That's the deal.",
     ],
@@ -161,7 +161,7 @@ export const HI_VARIANTS_BY_PERSONA: Record<HiPersona, string[][]> = {
     [
       "The next generation of your winery will inherit clean records, not shoeboxes of paper. Ownology is the archive that writes itself.",
       "Your name on the bottle deserves better than 40 open tabs. This is where the craft lives now.",
-      "Founding-partner pilot: $9/month, shape the tool with us, keep the founder's rate forever.",
+      "Founding-partner intro: first 3 months at $9/mo to shape the tool with us — then locks at your founder's rate, forever.",
     ],
     // 5 — APCO deadline (Feb 2026 wedge)
     [

@@ -748,7 +748,11 @@ function TierCard({
               ${tier.annualPrice}/yr · save ${(tier.monthlyPrice * 12) - tier.annualPrice}
             </p>
           )}
-          {/* Founding → retail ladder chip — desktop layout. */}
+          {/* Founding → retail ladder chip — desktop layout.
+              Feb 2026: Rich caught the chip getting truncated on annual
+              mode (e.g. "25% off foundin" clipped mid-word). Two fixes:
+              (a) dropped whiteSpace:nowrap, (b) split into two visual lines
+              so it wraps cleanly at the " · " separator rather than mid-word. */}
           {tier.monthlyPrice > 0 && tier.retailMonthlyPrice && (
             <p
               className="mt-1"
@@ -758,14 +762,14 @@ function TierCard({
                 fontSize: "0.65rem",
                 color: tier.highlight ? "oklch(0.75 0.015 75)" : "var(--ow-text-lo)",
                 letterSpacing: "0.03em",
-                whiteSpace: "nowrap",
+                lineHeight: 1.5,
               }}
             >
               Retail from #100:{" "}
               {cycle === "annual"
                 ? `$${tier.retailMonthlyPrice * 10}/yr`
-                : `$${tier.retailMonthlyPrice}/mo`}{" "}
-              ·{" "}
+                : `$${tier.retailMonthlyPrice}/mo`}
+              <br />
               <span style={{ color: "var(--ow-amber)", fontWeight: 700 }}>
                 {Math.round((1 - tier.monthlyPrice / tier.retailMonthlyPrice) * 100)}% off founding
               </span>
