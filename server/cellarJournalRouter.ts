@@ -61,34 +61,84 @@ export function slugifyQuestion(q: string, topic: string): string {
 }
 
 /**
- * Build a teaser containing the diagnosis + first ~40% of the procedure.
- * Strategy:
- *  - Always include first paragraph in full (usually the diagnosis/setup)
- *  - Then include 40% of remaining content, rounded to paragraph boundary
+ * Build a teaser containing the problem framing / diagnosis / "why it matters"
+ * portion — and CUTS BEFORE the operational IP (doses, temps, timing, protocol
+ * steps, citations). This is the "40% truth" rule: enough situational awareness
+ * to prove Ownology understands the problem; not enough to solve it for free.
+ *
+ * Cut priority (first match wins):
+ *   1. Before the first numbered/bulleted procedure step ("1)", "1.", "- ", "• ")
+ *   2. Before the first sentence containing a hard number+unit (SG 1.020,
+ *      3 g/L, 22°C, 48 hours, 25 ppm, pH 3.4, TA 6.5)
+ *   3. Paragraph-boundary at ~40% char length (original multi-para logic)
+ *   4. Sentence-boundary at ~40% char length (single-para fallback)
+ *
+ * Feb 2026 audit finding: 296/312 of the published library was single-para
+ * → old logic returned teaser === full. This cut-priority rewrite closes
+ * the leak. See CHANGELOG entry for the full audit.
  */
 export function buildTeaser(full: string): { teaser: string; diagnosis: string } {
   const paragraphs = full.split(/\n\s*\n/).filter((p) => p.trim());
   if (paragraphs.length === 0) return { teaser: full, diagnosis: "" };
-  // Diagnosis = first sentence of first paragraph (used as meta-description too)
+
+  // Diagnosis = first sentence (used as meta-description too)
   const firstPara = paragraphs[0].trim();
   const firstSentence = firstPara.split(/(?<=[.!?])\s+/)[0] || firstPara;
   const diagnosis = firstSentence.slice(0, 500);
 
-  const targetPercent = 0.4;
-  const totalLen = full.length;
-  const targetLen = Math.floor(totalLen * targetPercent);
-
-  let acc = 0;
-  const kept: string[] = [];
-  for (const p of paragraphs) {
-    kept.push(p);
-    acc += p.length + 2;
-    if (acc >= targetLen) break;
+  // ── PRIORITY 1: cut BEFORE the first numbered/bulleted procedure step ──
+  // Matches "1)", "1.", "- ", "• ", "* " at start of line OR mid-sentence after
+  // a colon/space. This is where the "how to fix it" begins — everything after
+  // is paid IP.
+  const procedureStep = full.search(/(?:^|[\s:])\s*(?:1[.):]|- |• |\* )/m);
+  if (procedureStep > 40) {
+    const cut = full.slice(0, procedureStep).trim();
+    // Only accept if the cut leaves at least a diagnosis sentence
+    if (cut.length >= 60) {
+      return { teaser: cut, diagnosis };
+    }
   }
-  // Ensure at least the first paragraph survives; otherwise teaser feels empty.
-  if (kept.length === 0) kept.push(firstPara);
 
-  return { teaser: kept.join("\n\n"), diagnosis };
+  // ── PRIORITY 2: cut BEFORE the first sentence containing a hard number+unit ──
+  // Numbers-with-units are the operationally useful bits — doses, temps, SG,
+  // pH, TA, hours. Wine-industry-specific unit list.
+  const sentences = full.split(/(?<=[.!?])\s+/);
+  const unitRe = /\b(?:SG\s*\d|pH\s*\d|TA\s*\d|\d+\s*(?:g\/L|g\/l|mg\/L|mg\/l|°C|C\b|ppm|hours?|hrs?|days?|min\b|minutes?|L\b|litres?|ml\b|mL)|\d+\.\d+)/i;
+  let accBefore = "";
+  for (const s of sentences) {
+    if (unitRe.test(s)) {
+      if (accBefore.trim().length >= 60) {
+        return { teaser: accBefore.trim(), diagnosis };
+      }
+      break;
+    }
+    accBefore += (accBefore ? " " : "") + s;
+  }
+
+  // ── PRIORITY 3 (original): paragraph-boundary at ~40% ──
+  if (paragraphs.length > 1) {
+    const targetLen = Math.floor(full.length * 0.4);
+    let acc = 0;
+    const kept: string[] = [];
+    for (const p of paragraphs) {
+      kept.push(p);
+      acc += p.length + 2;
+      if (acc >= targetLen) break;
+    }
+    if (kept.length === 0) kept.push(firstPara);
+    return { teaser: kept.join("\n\n"), diagnosis };
+  }
+
+  // ── PRIORITY 4: sentence-boundary at ~40% (single-para fallback) ──
+  // The critical fix for the 94% of single-para answers that used to leak
+  // 100% of content. Walk sentences until we exceed the 40% target.
+  const target = Math.max(120, Math.floor(full.length * 0.4));
+  let teaser = "";
+  for (const s of sentences) {
+    if (teaser.length + s.length > target && teaser.length >= 80) break;
+    teaser += (teaser ? " " : "") + s;
+  }
+  return { teaser: teaser.trim() || firstSentence, diagnosis };
 }
 
 /* -- core persist function (called from tutor.ask / freeRun) ------------- */
