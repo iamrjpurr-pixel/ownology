@@ -1175,7 +1175,17 @@ Return ONLY the requested JSON — no prose, no explanation. Use null for any fi
       if (input.language) fd.append("language", input.language);
       fd.append(
         "prompt",
-        "Australian wine industry tasting reel. Vocabulary: Pecorino, Fiano, Vermentino, Nebbiolo, Sangiovese, Semillon, Shiraz, Chardonnay, Riesling, Grenache, McLaren Vale, Barossa, Adelaide Hills, Clare Valley, Coonawarra, Hunter Valley, Margaret River, Yarra Valley, Le Marche, Offida, Corroboree, MLF, malolactic, stainless steel, hand-picked, wild ferment, skin contact, lees, oak, texture, phenolics, acid."
+        // Vocabulary-hint biases Whisper toward the correct spellings/terms.
+        // Whisper struggles most with variety-vs-region ambiguity: e.g. hears
+        // "Grenache" as "Coonawarra" (both plausible-sounding words). We list
+        // varieties FIRST so the model prefers them when context is ambiguous.
+        [
+          "Australian wine industry tasting reel or vineyard walk.",
+          "Grape varieties (bias toward these when word could be a region): Grenache, Nebbiolo, Sangiovese, Pecorino, Fiano, Vermentino, Semillon, Shiraz, Syrah, Chardonnay, Riesling, Cabernet Sauvignon, Sauvignon Blanc, Pinot Noir, Pinot Gris, Gamay, Nero d'Avola, Aglianico, Montepulciano, Tempranillo, Mataro, Mourvedre, Grüner Veltliner.",
+          "Regions (only use these if the speaker names a place, not a grape): McLaren Vale, Barossa, Adelaide Hills, Basket Range, Forest Range, Clare Valley, Coonawarra, Hunter Valley, Margaret River, Yarra Valley, Heathcote, Beechworth, Mornington, King Valley, Tasmania, Canberra, Orange, Mudgee, Le Marche, Offida.",
+          "Wineries + vineyards commonly named: Landsdowne, Corroboree, Top Range, Commune of Buttons, Parley Wine, Primo Estate, Tyrrell's, Audrey Wilkinson.",
+          "Winemaking terms: MLF, malolactic, stainless steel, hand-picked, wild ferment, ambient yeast, skin contact, whole bunch, whole cluster, lees, oak, texture, phenolics, acid, brix, pH, TA, botrytis, canopy, veraison.",
+        ].join(" ")
       );
 
       const whisperResp = await fetch(
@@ -1188,7 +1198,7 @@ Return ONLY the requested JSON — no prose, no explanation. Use null for any fi
       }
       const whisperData = (await whisperResp.json()) as { text?: string };
       const transcription = (whisperData.text ?? "").trim();
-      if (!transcription) return { transcription: "", candidates: [] as string[] };
+      if (!transcription) return { transcription: "", candidates: [] as { angle: string; text: string }[], transcriptWarnings: [] as string[] };
 
       // Hand transcript to Claude → 3 hook candidates in Rich's voice.
       const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
@@ -1203,6 +1213,31 @@ Voice rules — non-negotiable:
 - Australian idiom OK ("g'day", "reckon", "proper", "punt"). Avoid American phrasing ("stoked", "amazing", "check out").
 - Never fabricate. Only echo details that appear in the transcript. If a fact isn't in the transcript, don't invent it.
 - The hook should sound like a peer winemaker who genuinely listened — not a fan, not a marketer.
+- If Rich's context provides the prospect's first name, USE IT after "g'day". If not, leave it out — never guess.
+
+════════════════════════════════════════════════════════════
+TRANSCRIPT SANITY CHECK — do this BEFORE drafting hooks:
+════════════════════════════════════════════════════════════
+
+Whisper is not perfect. It will sometimes mishear grape varieties as region names (or vice versa) because they sound alike. Common mishearings we've caught:
+- "Grenache" → transcribed as "Coonawarra"
+- "Nebbiolo" → transcribed as "Napoleon" or "Nebulon"
+- "Semillon" → transcribed as "Salmon" or "Sea-Millan"
+- "Fiano" → transcribed as "Piano" or "Viano"
+- Vineyard names (e.g. "Landsdowne", "Corroboree") sometimes mis-spelled
+
+Before drafting, do a plausibility scan of the transcript. Ask yourself:
+1. Does any word that LOOKS like a region actually make no sense as a region in context? (e.g. "taking Coonawarra from Lansdowne vineyard" — Coonawarra is 400km from Lansdowne; the speaker almost certainly said a GRAPE VARIETY there, not a region.)
+2. Does a grape "region" appear where a variety would fit? Same logic in reverse.
+3. Any wine name that's grammatically wrong given the surrounding sentence?
+
+If you spot a likely mishearing, DO NOT paper over it by using the wrong term in a hook. Instead, either:
+(a) rewrite the hook to reference only the parts of the transcript you're confident are correct, OR
+(b) if the mishearing is central to the audio's content, return an empty candidates array and let Rich sanity-check the transcript manually.
+
+Fabricating a "correction" is worse than admitting uncertainty. It's better to return 1 or 2 hooks with high confidence than 3 with one that contains a Whisper artefact.
+
+════════════════════════════════════════════════════════════
 
 The three candidates should attack DIFFERENT angles:
 1. A specific technique or decision the winemaker mentioned (varietal choice, ferment style, timing, region-picking).
@@ -1215,8 +1250,11 @@ Return ONLY valid JSON with this exact shape:
     { "angle": "technique", "text": "..." },
     { "angle": "quoted_voice", "text": "..." },
     { "angle": "question", "text": "..." }
-  ]
+  ],
+  "transcriptWarnings": ["..."]
 }
+
+transcriptWarnings is a string array — include any word or phrase in the transcript you suspect Whisper mis-transcribed, so Rich can eyeball it. Empty array if none.
 
 No markdown fences. No prose outside the JSON.`;
 
@@ -1265,9 +1303,17 @@ Propose the three hook candidates.`;
               }))
               .slice(0, 3)
           : [];
-        return { transcription, candidates };
+        // Claude flags likely Whisper mishearings so Rich can eyeball the
+        // transcript before saving. Empty array means Claude was confident.
+        const transcriptWarnings = Array.isArray(parsed.transcriptWarnings)
+          ? parsed.transcriptWarnings
+              .filter((w: unknown) => typeof w === "string" && w.trim().length > 0)
+              .map((w: string) => w.trim().slice(0, 200))
+              .slice(0, 5)
+          : [];
+        return { transcription, candidates, transcriptWarnings };
       } catch {
-        return { transcription, candidates: [] as { angle: string; text: string }[] };
+        return { transcription, candidates: [] as { angle: string; text: string }[], transcriptWarnings: [] as string[] };
       }
     }),
 

@@ -33,6 +33,7 @@ export default function AdminAudioHook() {
   const [context, setContext] = useState("");
   const [transcription, setTranscription] = useState("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [warnings, setWarnings] = useState<string[]>([]);
   const [selectedText, setSelectedText] = useState("");
   const [selectedSlug, setSelectedSlug] = useState("");
   const [contactFilter, setContactFilter] = useState("");
@@ -81,6 +82,7 @@ export default function AdminAudioHook() {
       });
       setTranscription(res.transcription);
       setCandidates(res.candidates as Candidate[]);
+      setWarnings((res as { transcriptWarnings?: string[] }).transcriptWarnings ?? []);
       if (res.candidates.length > 0) setSelectedText((res.candidates[0] as Candidate).text);
       setStatus("done");
     } catch (err) {
@@ -112,6 +114,7 @@ export default function AdminAudioHook() {
     setContext("");
     setTranscription("");
     setCandidates([]);
+    setWarnings([]);
     setSelectedText("");
     setSelectedSlug("");
     setContactFilter("");
@@ -279,6 +282,53 @@ export default function AdminAudioHook() {
           <h2 style={{ fontFamily: "'Fraunces',serif", fontSize: "1.05rem", margin: "0 0 0.75rem", color: "var(--ow-text-hi)" }}>
             2 · Review transcript + pick a hook
           </h2>
+
+          {/* Whisper mishear safety net. Two layers:
+              (a) always-on red banner reminding operator to eyeball the transcript
+              (b) yellow warning list when Claude flagged specific words it thinks Whisper botched */}
+          <div
+            data-testid="whisper-safety-banner"
+            style={{
+              padding: "0.75rem 0.9rem",
+              marginBottom: "1rem",
+              background: "color-mix(in oklch, #dc2626 12%, transparent)",
+              border: "1px solid #dc2626",
+              borderRadius: 6,
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.82rem",
+              color: "var(--ow-text-hi)",
+              lineHeight: 1.55,
+            }}
+          >
+            <strong style={{ color: "#dc2626" }}>Read the transcript first.</strong>{" "}
+            Whisper occasionally mishears grape varieties (e.g. Grenache → &quot;Coonawarra&quot;),
+            winery names, and vineyard names. If a term in a hook feels wrong, DON&apos;T save it —
+            edit the hook or process the audio again.
+          </div>
+
+          {warnings.length > 0 && (
+            <div
+              data-testid="claude-warnings"
+              style={{
+                padding: "0.75rem 0.9rem",
+                marginBottom: "1rem",
+                background: "color-mix(in oklch, #f59e0b 14%, transparent)",
+                border: "1px solid #f59e0b",
+                borderRadius: 6,
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.82rem",
+                color: "var(--ow-text-hi)",
+                lineHeight: 1.55,
+              }}
+            >
+              <strong style={{ color: "#f59e0b" }}>⚠ Claude flagged these as possibly mis-transcribed:</strong>
+              <ul style={{ margin: "0.5rem 0 0 1rem", padding: 0 }}>
+                {warnings.map((w, i) => (
+                  <li key={i} style={{ marginBottom: 2 }}><code style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.78rem", background: "var(--ow-bg-inset)", padding: "0 4px", borderRadius: 2 }}>{w}</code></li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {transcription && (
             <details style={{ marginBottom: "1rem" }} open={candidates.length === 0}>
