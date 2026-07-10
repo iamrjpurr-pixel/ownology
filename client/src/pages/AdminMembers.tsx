@@ -375,6 +375,7 @@ function IssueDrawer({ onClose }: { onClose: () => void }) {
   const [label, setLabel] = useState("");
   const [memberName, setMemberName] = useState("");
   const [wineryName, setWineryName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
   const [privateNote, setPrivateNote] = useState("");
   const [expiresInDays, setExpiresInDays] = useState<number | "">("");
   const [issued, setIssued] = useState<{ token: string; tier: string } | null>(null);
@@ -390,11 +391,18 @@ function IssueDrawer({ onClose }: { onClose: () => void }) {
 
   const submit = () => {
     if (!label.trim()) return;
+    // Member tier requires an email — server enforces too, but block early
+    // client-side for a cleaner UX (no round-trip error). Feb 2026 E2E fix.
+    if (tier === "member" && !contactEmail.trim()) {
+      alert("Member tier requires a contact email.");
+      return;
+    }
     issue.mutate({
       tier,
       label: label.trim(),
       memberName: memberName.trim() || undefined,
       wineryName: wineryName.trim() || undefined,
+      contactEmail: contactEmail.trim() || undefined,
       privateNote: privateNote.trim() || undefined,
       expiresInDays: expiresInDays === "" ? null : Number(expiresInDays),
     });
@@ -481,6 +489,24 @@ function IssueDrawer({ onClose }: { onClose: () => void }) {
             data-testid="wineryname-input"
             style={{ padding: "0.6rem", background: CARD, color: HI, border: `1px solid ${BORDER}`, borderRadius: 4, fontSize: "0.85rem" }}
           />
+          {/* Contact email — REQUIRED for Member tier. Shown for all tiers
+              but marked required only when tier=member. Feb 2026 E2E fix. */}
+          <input
+            type="email"
+            placeholder={tier === "member" ? "Contact email (REQUIRED)" : "Contact email (optional)"}
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)}
+            data-testid="contactemail-input"
+            required={tier === "member"}
+            style={{
+              padding: "0.6rem",
+              background: CARD,
+              color: HI,
+              border: `1px solid ${tier === "member" && !contactEmail.trim() ? AMBER : BORDER}`,
+              borderRadius: 4,
+              fontSize: "0.85rem",
+            }}
+          />
           <input
             type="number"
             min={1}
@@ -518,9 +544,27 @@ function IssueDrawer({ onClose }: { onClose: () => void }) {
           </p>
           <div style={{ padding: "0.6rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 4, fontSize: "0.75rem" }}>
             <p style={{ margin: 0, color: LO }}>Share this URL by SMS or email:</p>
-            <code style={{ display: "block", marginTop: "0.4rem", color: AMBER, wordBreak: "break-all" }}>
+            {/* Anchor tag (not code block) so browsers offer full context
+                menu on right-click — "Open in incognito window" / "New tab"
+                / "Copy link". Feb 2026 E2E fix. */}
+            <a
+              href={`${window.location.origin}/i/${issued.token}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="issue-share-link"
+              style={{
+                display: "block",
+                marginTop: "0.4rem",
+                color: AMBER,
+                wordBreak: "break-all",
+                fontFamily: "'Fira Code', monospace",
+                textDecoration: "underline",
+                textDecorationStyle: "dotted",
+              }}
+              title="Right-click to open in incognito, or click to open in a new tab"
+            >
               {window.location.origin}/i/{issued.token}
-            </code>
+            </a>
             <Button
               size="sm"
               onClick={copyLink}
@@ -533,7 +577,7 @@ function IssueDrawer({ onClose }: { onClose: () => void }) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => { setIssued(null); setLabel(""); setMemberName(""); setWineryName(""); setPrivateNote(""); }}
+            onClick={() => { setIssued(null); setLabel(""); setMemberName(""); setWineryName(""); setContactEmail(""); setPrivateNote(""); }}
             style={{ marginTop: "0.75rem" }}
             data-testid="issue-again"
           >

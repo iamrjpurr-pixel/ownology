@@ -92,11 +92,11 @@ async function hydrateMembership(user: User): Promise<User> {
 // in lockstep. When both env AND runtime say off, tRPC returns ctx.user=null
 // and any protectedProcedure throws UNAUTHORIZED.
 function isDevBypassActive(): boolean {
-  if (isRuntimeBypassActive()) return true;
+  // SAFE-BY-DEFAULT (Feb 2026 audit) — see authRouter.ts for full context.
   if (process.env.ENABLE_DEV_BYPASS === "false") return false;
-  if (process.env.NODE_ENV === "production" &&
-      process.env.ENABLE_DEV_BYPASS !== "true") return false;
-  return true;
+  if (isRuntimeBypassActive()) return true;
+  if (process.env.ENABLE_DEV_BYPASS === "true") return true;
+  return false;
 }
 
 const DEV_BYPASS_USER: User = {

@@ -1553,6 +1553,10 @@ export const gateInvites = mysqlTable(
     // to wait for the user to complete onboarding.
     memberName: varchar("member_name", { length: 120 }),
     wineryName: varchar("winery_name", { length: 120 }),
+    // Contact email — REQUIRED for Member tier (paid site invites); optional
+    // for Trial/Gate. Captured at issue time so we know who redeemed which
+    // invite before they enter the app. Feb 2026 E2E-test finding.
+    contactEmail: varchar("contact_email", { length: 200 }),
     // Optional Rich-private note keyed to the invite. Never surfaced to the
     // holder — only visible in /admin/members. Free-form.
     privateNote: text("private_note"),

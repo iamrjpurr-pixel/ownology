@@ -249,10 +249,17 @@ export const membersRouter = router({
       label: z.string().trim().min(1).max(120),
       memberName: z.string().trim().max(120).optional(),
       wineryName: z.string().trim().max(120).optional(),
+      // Member-tier invites REQUIRE a contact email so we can send the link
+      // via Resend + match redemption → identity for follow-up. Trial/Gate
+      // stay optional (throwaway share links). Feb 2026 E2E fix.
+      contactEmail: z.string().trim().email().max(200).optional(),
       expiresInDays: z.number().int().positive().max(365).nullable().optional(),
       privateNote: z.string().max(2000).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      if (input.tier === "member" && !input.contactEmail) {
+        throw new Error("Contact email is required for Member tier invites");
+      }
       const token = generateToken();
       const now = Date.now();
       // Default expiry by tier if not specified: trial=14d, member=null, gate=null.
@@ -265,6 +272,7 @@ export const membersRouter = router({
         tier: input.tier,
         memberName: input.memberName || null,
         wineryName: input.wineryName || null,
+        contactEmail: input.contactEmail || null,
         privateNote: input.privateNote || null,
         createdAt: now,
         expiresAt,

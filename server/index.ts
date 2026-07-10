@@ -106,15 +106,13 @@ function checkBasicAuthFallback(req: express.Request): boolean {
 }
 
 function isDevBypassActive(): boolean {
-  // Runtime override wins first (admin toggled via /admin/dev-mode). Falls
-  // through to env-var evaluation if the runtime flag is off.
-  if (isRuntimeBypassActive()) return true;
-  // Off only when explicitly set to "false" OR running in production. This
-  // mirrors trpc.ts's seed-user injection so dev previews are wide open.
+  // SAFE-BY-DEFAULT (Feb 2026 audit) — see authRouter.ts for full context.
+  // Flipped from default-allow to default-deny after prod exposed /admin
+  // anonymously due to missing NODE_ENV.
   if (process.env.ENABLE_DEV_BYPASS === "false") return false;
-  if (process.env.NODE_ENV === "production" &&
-      process.env.ENABLE_DEV_BYPASS !== "true") return false;
-  return true;
+  if (isRuntimeBypassActive()) return true;
+  if (process.env.ENABLE_DEV_BYPASS === "true") return true;
+  return false;
 }
 
 async function adminGate(

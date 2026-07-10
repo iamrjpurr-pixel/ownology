@@ -242,11 +242,19 @@ router.post("/exchange", express.json(), async (req: Request, res: Response) => 
  * sees a consistent identity in preview and dev.
  */
 function isDevBypassActive(): boolean {
-  if (isRuntimeBypassActive()) return true;
+  // SAFE-BY-DEFAULT (Feb 2026 audit) — flipped from "default allow" to
+  // "default deny". Prod NODE_ENV wasn't guaranteed to be set which meant
+  // the fall-through at the bottom allowed anonymous admin access on
+  // www.ownology.ai. Now: bypass ONLY activates if explicitly opted in
+  // via ENABLE_DEV_BYPASS=true or the runtime flag. Preview + local dev
+  // both set ENABLE_DEV_BYPASS=true in their .env files.
   if (process.env.ENABLE_DEV_BYPASS === "false") return false;
-  if (process.env.NODE_ENV === "production" &&
-      process.env.ENABLE_DEV_BYPASS !== "true") return false;
-  return true;
+  if (isRuntimeBypassActive()) return true;
+  if (process.env.ENABLE_DEV_BYPASS === "true") return true;
+  // Any other combination (missing NODE_ENV, missing ENABLE_DEV_BYPASS,
+  // production, ambiguous) — DENY. Was previously "allow" and that was
+  // the security hole.
+  return false;
 }
 
 router.get("/me", async (req: Request, res: Response) => {
