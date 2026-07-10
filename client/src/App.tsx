@@ -455,7 +455,8 @@ function AutoThemeByTime() {
   useEffect(() => {
     // Dev-only override: if window.__ownologyThemeOverride is set to a
     // non-empty string, use it as themeId and skip both time-of-day and
-    // weather auto-mapping. Set by DevThemePicker below. Feb 2026, Rich —
+    // weather auto-mapping. Set by ThemePicker (bottom-left floating pill).
+    // Feb 2026, Rich —
     // added because the auto-theme was flipping erratically on his dev
     // server while iterating on component colours.
     const override = typeof window !== "undefined"
@@ -532,62 +533,82 @@ function AutoThemeByTime() {
   return null;
 }
 
-/** Dev-only floating theme picker — appears ONLY when Vite dev mode is
- *  active (import.meta.env.DEV === true) or the URL contains ?dev=1.
- *  Production builds never render it. Rich uses this to freeze the theme
- *  while iterating on component colours, without waiting on Open-Meteo. */
-function DevThemePicker() {
-  const isDev = (() => {
-    try {
-      // import.meta.env.DEV is Vite's dev flag — true only for dev server
-      const env = (import.meta as unknown as { env?: { DEV?: boolean } }).env;
-      if (env?.DEV) return true;
-    } catch { /* ignore */ }
-    if (typeof window !== "undefined" && window.location.search.includes("dev=1")) return true;
-    return false;
-  })();
+/** Floating theme picker — bottom-left, minimal footprint. Rich, Feb 2026:
+ *  productised from the earlier dev-only picker after auto-theme kept flipping
+ *  erratically for real visitors. Choices persist in localStorage so a
+ *  returning visitor keeps their preferred palette. "Auto" means: fall back
+ *  to time-of-day + weather-derived theme via Open-Meteo (the default).
+ *
+ *  Placement: bottom-left. Deliberately away from Skip intro (bottom-right of
+ *  hero), the scroll chevron (bottom-centre of hero), and the nav pills
+ *  (top-right). No collisions.
+ */
+const THEME_STORAGE_KEY = "ownology:theme-override";
+
+function ThemePicker() {
   const [current, setCurrent] = useState<string>(() => {
     if (typeof window === "undefined") return "auto";
+    try {
+      const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+      if (stored) return stored;
+    } catch { /* ignore */ }
     return ((window as unknown as { __ownologyThemeOverride?: string }).__ownologyThemeOverride ?? "auto");
   });
   const [open, setOpen] = useState(false);
-  if (!isDev) return null;
+
+  // On mount, hydrate window override from localStorage so the auto-theme
+  // logic in AutoThemeByTime picks it up immediately (avoids a flash of the
+  // weather-derived theme before user's saved preference is applied).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+      if (stored && stored !== "auto") {
+        (window as unknown as { __ownologyThemeOverride?: string }).__ownologyThemeOverride = stored;
+        window.dispatchEvent(new CustomEvent("ownology:dev-theme-override"));
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   function set(v: string) {
     const val = v === "auto" ? "" : v;
     (window as unknown as { __ownologyThemeOverride?: string }).__ownologyThemeOverride = val;
     setCurrent(v);
+    try {
+      if (v === "auto") window.localStorage.removeItem(THEME_STORAGE_KEY);
+      else window.localStorage.setItem(THEME_STORAGE_KEY, v);
+    } catch { /* localStorage disabled — non-fatal */ }
     window.dispatchEvent(new CustomEvent("ownology:dev-theme-override"));
   }
 
   const themes = [
-    { id: "auto", label: "Auto (time + weather)" },
-    { id: "parchment", label: "Parchment (day)" },
-    { id: "soft-cellar", label: "Soft Cellar (night)" },
+    { id: "auto", label: "Auto · time + weather" },
+    { id: "parchment", label: "Parchment · day" },
+    { id: "soft-cellar", label: "Soft Cellar · night" },
   ];
 
   return (
     <div
-      data-testid="dev-theme-picker"
+      data-testid="theme-picker"
       style={{
         position: "fixed",
         bottom: 20,
         left: 20,
-        zIndex: 9999,
+        zIndex: 40, // below modals (50+) but above hero content
         fontFamily: "'Fira Code',monospace",
       }}
     >
       {open ? (
-        <div style={{ background: "oklch(0.14 0.008 60)", border: "1px solid var(--ow-amber)", borderRadius: 6, padding: "0.6rem", boxShadow: "0 8px 24px oklch(0 0 0 / 0.4)", minWidth: 180 }}>
+        <div style={{ background: "var(--ow-bg-base)", border: "1px solid var(--ow-amber)", borderRadius: 6, padding: "0.6rem", boxShadow: "0 8px 24px oklch(0 0 0 / 0.4)", minWidth: 200, backdropFilter: "blur(8px)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-            <span style={{ fontSize: "0.62rem", letterSpacing: "0.14em", color: "var(--ow-amber)", textTransform: "uppercase", fontWeight: 700 }}>Dev · theme</span>
-            <button type="button" onClick={() => setOpen(false)} style={{ background: "transparent", border: "none", color: "var(--ow-text-lo)", cursor: "pointer", fontSize: "0.75rem" }} aria-label="Close">×</button>
+            <span style={{ fontSize: "0.62rem", letterSpacing: "0.14em", color: "var(--ow-amber)", textTransform: "uppercase", fontWeight: 700 }}>Theme</span>
+            <button type="button" onClick={() => setOpen(false)} style={{ background: "transparent", border: "none", color: "var(--ow-text-lo)", cursor: "pointer", fontSize: "0.85rem", lineHeight: 1 }} aria-label="Close theme picker">×</button>
           </div>
           {themes.map((t) => (
             <button
               key={t.id}
               type="button"
-              data-testid={`dev-theme-${t.id}`}
+              data-testid={`theme-${t.id}`}
               onClick={() => set(t.id)}
               style={{
                 display: "block",
@@ -607,30 +628,39 @@ function DevThemePicker() {
               {t.label}
             </button>
           ))}
-          <p style={{ fontSize: "0.6rem", color: "var(--ow-text-lo)", margin: "0.4rem 0 0", lineHeight: 1.4 }}>
-            Dev-only. Never rendered in production builds.
-          </p>
         </div>
       ) : (
         <button
           type="button"
-          data-testid="dev-theme-picker-toggle"
+          data-testid="theme-picker-toggle"
           onClick={() => setOpen(true)}
+          aria-label="Change theme"
+          title="Change theme"
           style={{
-            background: "oklch(0.14 0.008 60)",
+            background: "color-mix(in oklch, var(--ow-bg-base) 70%, transparent)",
             color: "var(--ow-amber)",
-            border: "1px solid var(--ow-amber)",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 45%, transparent)",
             borderRadius: 999,
             padding: "0.4rem 0.75rem",
             cursor: "pointer",
             fontFamily: "'Fira Code',monospace",
-            fontSize: "0.66rem",
-            letterSpacing: "0.1em",
+            fontSize: "0.62rem",
+            letterSpacing: "0.12em",
             textTransform: "uppercase",
-            boxShadow: "0 4px 12px oklch(0 0 0 / 0.3)",
+            boxShadow: "0 4px 12px oklch(0 0 0 / 0.25)",
+            backdropFilter: "blur(6px)",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
           }}
         >
-          🎨 theme
+          {/* Palette icon — 3 dots in a triangle, no emoji per house style */}
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+            <circle cx="5.5" cy="2.5" r="1.4" fill="currentColor" />
+            <circle cx="2.5" cy="7.5" r="1.4" fill="currentColor" />
+            <circle cx="8.5" cy="7.5" r="1.4" fill="currentColor" />
+          </svg>
+          Theme
         </button>
       )}
     </div>
@@ -653,6 +683,9 @@ function App() {
             {/* GlobalThemeToggle removed (Feb 2026, Rich) — auto-theme via AutoThemeByTime handles this now. */}
             <UserMenu />
             {/* ThemeSuggestion removed (Feb 2026, Rich) — no more "Try Parchment for now?" prompts. */}
+            {/* Floating theme picker — bottom-left, persistent, localStorage-backed.
+                Productised from the earlier dev-only picker (Feb 2026, Rich). */}
+            <ThemePicker />
           </TooltipProvider>
         </AuthProvider>
       </ThemeProvider>
@@ -661,4 +694,3 @@ function App() {
 }
 
 export default App;
-;
