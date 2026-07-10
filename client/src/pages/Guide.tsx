@@ -67,12 +67,16 @@ interface RolePath {
 
 // ─── Checklist data ───────────────────────────────────────────────────────────
 const CHECKLIST: ChecklistItem[] = [
+  // Reordered Feb 2026 (Rich E2E finding) — prerequisite-first ordering.
+  // Old order put "Open Cellar Brief" as #1, but the Brief is empty for a
+  // fresh account → wasted first click. New sequence builds data before
+  // showing summaries: vineyard/tank/entry → task → brief now has content.
   {
-    id: "open-cellar-brief",
-    label: "Open your first Cellar Brief",
-    description: "Your daily 5:30am briefing — see what needs your attention today across every tank and barrel, with the LIP compliance badge live for the current vintage.",
-    href: "/cellar-brief",
-    linkLabel: "Open Cellar Brief",
+    id: "vineyard-blocks",
+    label: "Register your vineyard blocks",
+    description: "Add your blocks so you can log observations and link them to your batches. This is the foundation — every fermentation traces back here.",
+    href: "/vineyard",
+    linkLabel: "Open Vineyard",
   },
   {
     id: "register-tank",
@@ -84,9 +88,23 @@ const CHECKLIST: ChecklistItem[] = [
   {
     id: "log-inoculation",
     label: "Log your first vintage entry",
-    description: "Record an Inoculation event — the starting point of every fermentation in Ownology.",
+    description: "Record an Inoculation event — the starting point of every fermentation in Ownology. This lights up your Cellar Brief the next morning.",
     href: "/the-press",
     linkLabel: "Open The Press",
+  },
+  {
+    id: "cellar-task",
+    label: "Set up your first Cellar Task",
+    description: "Register a piece of equipment and generate an AI cleaning or maintenance task. Habit-forming from day one.",
+    href: "/cellar-tasks",
+    linkLabel: "Open Cellar Tasks",
+  },
+  {
+    id: "open-cellar-brief",
+    label: "Open your first Cellar Brief",
+    description: "Now that you have vineyard blocks, a tank, and a fermentation logged — the Brief has content to summarise. Your daily 5:30am briefing with LIP compliance live for the current vintage.",
+    href: "/cellar-brief",
+    linkLabel: "Open Cellar Brief",
   },
   {
     id: "browse-sops",
@@ -96,25 +114,18 @@ const CHECKLIST: ChecklistItem[] = [
     linkLabel: "Open Knowledge Platform",
   },
   {
-    id: "cellar-task",
-    label: "Set up your first Cellar Task",
-    description: "Register a piece of equipment and generate an AI cleaning or maintenance task.",
-    href: "/cellar-tasks",
-    linkLabel: "Open Cellar Tasks",
-  },
-  {
-    id: "vineyard-blocks",
-    label: "Register your vineyard blocks",
-    description: "Add your blocks so you can log observations and link them to your batches.",
-    href: "/vineyard",
-    linkLabel: "Open Vineyard",
-  },
-  {
     id: "free-run",
     label: "Ask Free Run a question",
-    description: "Try the AI assistant with a question relevant to your current vintage stage.",
+    description: "Try the AI assistant with a question relevant to your current vintage stage — grounded in your own vintage logs.",
     href: "/free-run",
     linkLabel: "Open Free Run",
+  },
+  {
+    id: "tribal-knowledge",
+    label: "Add your first Tribal Knowledge entry",
+    description: "Open any SOP in the Knowledge Platform and record a site-specific note in the Tribal Knowledge field. Start capturing your own IP.",
+    href: "/knowledge",
+    linkLabel: "Open Knowledge Platform",
   },
   {
     id: "cellar-journal",
@@ -129,13 +140,6 @@ const CHECKLIST: ChecklistItem[] = [
     description: "Wine Australia s.39F Label Integrity Programme record — batch inventory, 85% rule check, grower one-step-back, branded with your logo.",
     href: "/compliance",
     linkLabel: "Open Compliance",
-  },
-  {
-    id: "tribal-knowledge",
-    label: "Add your first Tribal Knowledge entry",
-    description: "Open any SOP in the Knowledge Platform and record a site-specific note in the Tribal Knowledge field.",
-    href: "/knowledge",
-    linkLabel: "Open Knowledge Platform",
   },
 ];
 
@@ -685,12 +689,41 @@ export default function Guide() {
               <p style={{ fontFamily: MONO, fontSize: "0.62rem", letterSpacing: "0.14em", color: AMBER, textTransform: "uppercase", margin: 0 }}>
                 Your progress
               </p>
-              <p
-                data-testid="guide-progress-pct"
-                style={{ fontFamily: MONO, fontSize: "0.75rem", color: TEXT_HI, margin: 0, fontWeight: 700 }}
-              >
-                {guideProgressPct}%
-              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                {/* Collapse-all chip — reduces cognitive load once several
+                    reveal cards are expanded. Feb 2026, Rich E2E finding. */}
+                {expanded.size > 0 && (
+                  <button
+                    type="button"
+                    data-testid="guide-collapse-all"
+                    onClick={() => {
+                      setExpanded(new Set());
+                      try { localStorage.setItem("ownology_guide_expanded", "[]"); } catch { /* ignore */ }
+                    }}
+                    style={{
+                      padding: "0.28rem 0.65rem",
+                      background: "transparent",
+                      color: TEXT_MID,
+                      border: `1px solid ${BORDER}`,
+                      borderRadius: 999,
+                      fontFamily: MONO,
+                      fontSize: "0.62rem",
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      cursor: "pointer",
+                    }}
+                    title="Collapse every expanded section on this page"
+                  >
+                    ↑ Collapse all ({expanded.size})
+                  </button>
+                )}
+                <p
+                  data-testid="guide-progress-pct"
+                  style={{ fontFamily: MONO, fontSize: "0.75rem", color: TEXT_HI, margin: 0, fontWeight: 700 }}
+                >
+                  {guideProgressPct}%
+                </p>
+              </div>
             </div>
             <div
               style={{
@@ -907,6 +940,7 @@ export default function Guide() {
             kicker="Vintage Workflow"
             title="The vintage cycle, mapped to Ownology"
             teaser="See how crush · ferment · pressing · aging · bottling map to the four pillars — with clickable nodes."
+            onReveal={() => toggleExpanded("workflow")}
           />
         )}
 
@@ -961,7 +995,7 @@ export default function Guide() {
             </div>
           </div>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9375rem", color: TEXT_MID, lineHeight: 1.7, marginBottom: "0.5rem", maxWidth: "520px" }}>
-            These 7 tasks will have you using every major feature of Ownology. Check them off as you go — your progress is saved in this browser.
+            These 10 tasks will have you using every major feature of Ownology in prerequisite order — the tank, blocks and first entry come BEFORE the Cellar Brief so it actually has data to summarise when you open it. Check them off as you go — your progress is saved in this browser AND on the server for the admin view.
           </p>
           <div>
             {CHECKLIST.map(item => (
