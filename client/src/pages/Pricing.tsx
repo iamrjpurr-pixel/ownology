@@ -141,6 +141,22 @@ const PILLAR_TAGS: Record<string, PillarTag[]> = {
   cellar_master:[{ label: "DO", color: "var(--ow-amber)" }, { label: "KNOW", color: "oklch(0.62 0.10 45)" }, { label: "LEARN", color: "oklch(0.65 0.10 220)" }, { label: "GUIDE", color: "oklch(0.65 0.10 160)" }],
 };
 
+/**
+ * EOFY 2026 promotion — Rich, Feb 2026.
+ * Annual founding subscriptions get 3 months free (annual = monthly × 9)
+ * instead of the standard 2 months (monthly × 10). Auto-reverts to the
+ * standard rate after 31 July 2026 (23:59:59 Australia/Sydney) — no
+ * manual patch needed. The badge text also toggles.
+ *
+ * Retail-annual math (retailMonthlyPrice × 10) is unchanged — retail
+ * customers arrive post-#100 and pay the normal 2-month bonus, which
+ * makes the founding annual comparison even sweeter without needing
+ * additional copy.
+ */
+const EOFY_END_MS = new Date('2026-08-01T00:00:00+10:00').getTime();
+const EOFY_ACTIVE = Date.now() < EOFY_END_MS;
+const ANNUAL_MULTIPLIER = EOFY_ACTIVE ? 9 : 10; // 9 → save 3 months, 10 → save 2
+
 const TIERS = [
   {
     id: "free_run",
@@ -169,7 +185,7 @@ const TIERS = [
     tagline: "Learn the science. Stay compliant.",
     audience: "Home winemakers and wine students who want to learn.",
     monthlyPrice: 22,
-    annualPrice: 220,
+    annualPrice: 22 * ANNUAL_MULTIPLIER,
     retailMonthlyPrice: 28,
     highlight: false,
     badge: "FOUNDING MEMBER",
@@ -192,7 +208,7 @@ const TIERS = [
     tagline: "Full cellar operations + institutional knowledge.",
     audience: "Boutique winery teams who need operations and protocol management.",
     monthlyPrice: 44,
-    annualPrice: 440,
+    annualPrice: 44 * ANNUAL_MULTIPLIER,
     retailMonthlyPrice: 59,
     highlight: true,
     badge: "MOST POPULAR",
@@ -216,7 +232,7 @@ const TIERS = [
     tagline: "Your whole operation. Your whole team. Your institutional knowledge.",
     audience: "Owner-operator boutique vignerons — you grow the grapes and make the wine.",
     monthlyPrice: 88,
-    annualPrice: 880,
+    annualPrice: 88 * ANNUAL_MULTIPLIER,
     retailMonthlyPrice: 124,
     highlight: false,
     badge: "TEAM",
@@ -382,7 +398,7 @@ function BillingToggle({
             fontFamily: "'Fira Code', monospace",
           }}
         >
-          SAVE 2 MONTHS
+          {EOFY_ACTIVE ? "SAVE 3 MONTHS · EOFY" : "SAVE 2 MONTHS"}
         </span>
       </button>
     </div>
