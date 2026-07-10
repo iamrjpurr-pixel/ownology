@@ -3,6 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Cache-busting for the HTML shell only. Vite already hashes every JS/CSS
+         chunk filename (e.g. index-abc123.js) so those are cached forever safely.
+         The problem was stale index.html referencing dead chunk names after a
+         deploy — hence Rich's "cascade animation missing on prod" bug.
+         Meta-http-equiv is unreliable in modern browsers (kept as belt), the real
+         teeth are the HTTP headers set in server/index.ts. Feb 2026. -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="app-build" content="__BUILD_ID__" />
+
     <title>Ownology — Cellar Intelligence for Boutique Winemakers</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.json" />

@@ -741,42 +741,65 @@ export default function FreeRun() {
 
             {isLoading && (
               <div
+                data-testid="free-run-thinking"
+                ref={(el) => {
+                  // Auto-scroll into view the moment the thinking indicator
+                  // mounts. Without this, if the user has scrolled up in the
+                  // conversation (or came in with a pre-filled question from
+                  // Cellar Journal), the indicator renders below the fold and
+                  // they don't realise the AI is working — temptation to close
+                  // the tab. Feb 2026, Rich flagged this on his own testing.
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+                }}
                 style={{
                   display: "flex",
-                  gap: "0.5rem",
-                  padding: "1rem",
+                  alignItems: "center",
+                  gap: "0.75rem",
+                  padding: "1rem 1.15rem",
                   background: "#FFFFFF",
                   borderRadius: "12px",
                   border: "1px solid #E8EAED",
                 }}
               >
-                <div
+                <div style={{ display: "flex", gap: "0.4rem" }}>
+                  <div
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      background: ACCENT,
+                      animation: "pulse 1.5s ease-in-out infinite",
+                    }}
+                  />
+                  <div
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      background: ACCENT,
+                      animation: "pulse 1.5s ease-in-out infinite 0.2s",
+                    }}
+                  />
+                  <div
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      background: ACCENT,
+                      animation: "pulse 1.5s ease-in-out infinite 0.4s",
+                    }}
+                  />
+                </div>
+                <span
                   style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    background: ACCENT,
-                    animation: "pulse 1.5s ease-in-out infinite",
+                    fontFamily: "'Lato',sans-serif",
+                    fontSize: "0.85rem",
+                    color: "#6B6B6B",
+                    fontStyle: "italic",
                   }}
-                />
-                <div
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    background: ACCENT,
-                    animation: "pulse 1.5s ease-in-out infinite 0.2s",
-                  }}
-                />
-                <div
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    background: ACCENT,
-                    animation: "pulse 1.5s ease-in-out infinite 0.4s",
-                  }}
-                />
+                >
+                  Owen is thinking — usually 5–15 seconds…
+                </span>
               </div>
             )}
           </div>

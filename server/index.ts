@@ -623,6 +623,12 @@ async function startServer() {
   //
   // Kept as a static map keyed by pathname so adding new share cards is a
   // one-line change. `image` must be an absolute-from-root URL under
+
+  // Build-ID stamped into the HTML shell so Rich can eyeball which deploy is
+  // live via <meta name="app-build" content="..."> in the DOM. Preferred
+  // source: BUILD_ID env var set by CI. Fallback: server-start timestamp,
+  // which changes on every deploy anyway (process restarts on ship). Feb 2026.
+  const BUILD_ID = process.env.BUILD_ID || String(Date.now());
   // /client/public/.
   //
   // In dev this middleware never fires (Vite serves /try on :3000 directly).
@@ -672,6 +678,7 @@ async function startServer() {
       // if that file changes shape, the swaps become no-ops and the page
       // still serves — just with the default OG card.
       const html = raw
+        .replace('__BUILD_ID__', BUILD_ID)
         .replace(
           /<title>[^<]*<\/title>/,
           `<title>${escapeHtmlAttr(meta.title)}</title>`
@@ -717,7 +724,11 @@ async function startServer() {
           `<link rel="canonical" href="${canonical}" />`
         );
       res.setHeader("Content-Type", "text/html; charset=utf-8");
-      res.setHeader("Cache-Control", "public, max-age=300");
+      // HTML shell must NEVER be cached — its chunk references change on
+      // every deploy. Vite's hashed asset filenames (index-<hash>.js) mean
+      // the actual JS/CSS chunks are already immutable-safe. Feb 2026: this
+      // fixes the "cascade animation missing on prod" cache bug.
+      res.setHeader("Cache-Control", "no-store, must-revalidate");
       res.send(html);
     } catch (err) {
       // If disk read fails, fall through to the SPA fallback below.
@@ -769,6 +780,7 @@ async function startServer() {
       const image = "https://ownology.ai/og-try.png";
 
       const html = raw
+        .replace('__BUILD_ID__', BUILD_ID)
         .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtmlAttr(title)}</title>`)
         .replace(
           /<meta name="description" content="[^"]*"\s*\/?>/,
@@ -815,7 +827,9 @@ async function startServer() {
           `<link rel="canonical" href="${canonical}" />`
         );
       res.setHeader("Content-Type", "text/html; charset=utf-8");
-      res.setHeader("Cache-Control", "public, max-age=300");
+      // Same no-cache rule as the primary meta-injector — HTML shell must
+      // never be cached (Feb 2026 cascade-bug fix).
+      res.setHeader("Cache-Control", "no-store, must-revalidate");
       return res.send(html);
     } catch (err) {
       return next(err);
@@ -830,9 +844,23 @@ async function startServer() {
     res.status(404).json({ error: "not_found", message: "API endpoint not found" });
   });
 
-  // Client-side routing fallback
-  app.get("*", (_req, res) => {
-    res.sendFile(path.join(staticPath, "index.html"));
+  // Client-side routing fallback — for any non-API, non-static-asset URL, ship
+  // the SPA HTML shell. Must apply the same no-cache header as the meta-injector
+  // paths above; otherwise browsers happily reuse an old shell that references
+  // chunk names that no longer exist post-deploy (Feb 2026 cache-bust fix).
+  // Also stamps the BUILD_ID so /admin surfaces and other non-meta-injected
+  // routes still show which deploy they're on.
+  app.get("*", async (_req, res) => {
+    res.setHeader("Cache-Control", "no-store, must-revalidate");
+    try {
+      const fs = await import("fs/promises");
+      const raw = await fs.readFile(path.join(staticPath, "index.html"), "utf8");
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      res.send(raw.replace('__BUILD_ID__', BUILD_ID));
+    } catch {
+      // Fallback if disk read fails — sendFile still delivers the shell
+      res.sendFile(path.join(staticPath, "index.html"));
+    }
   });
 
   const port = Number(process.env.PORT) || 8001;
