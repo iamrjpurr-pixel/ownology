@@ -358,6 +358,7 @@ const QUICKLINK_COLUMNS: Array<{
     label: "Guide",
     links: [
       { label: "Getting Started",     href: "/guide" },
+      { label: "Roadmap",             href: "/roadmap" },
       { label: "Regulations Library", href: "/regulations" },
       { label: "FAQ",                 href: "/#faq" },
       { label: "Our Story",           href: "/#our-story" },

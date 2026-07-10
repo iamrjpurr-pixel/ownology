@@ -12,6 +12,7 @@ import { AuthProvider } from "@/lib/useAuth";
 // AutoThemeByTime (defined below) handles theme via time-of-day.
 import UserMenu from "@/components/UserMenu";
 import CrushCascade from "@/components/CrushCascade";
+import { BackToAdminBadge } from "@/components/BackToAdminBadge";
 import { THEMES, applyThemeToDom, type ThemeId } from "@/lib/themes";
 
 // ── EAGER: first-paint-critical + cellar-floor PWA tabs ───────────────────
@@ -137,6 +138,7 @@ const FoundingPartners = lazy(() => import("./pages/FoundingPartners"));
 const Referral = lazy(() => import("./pages/Join"));
 const CallPlaybook = lazy(() => import("./pages/CallPlaybook"));
 const Todo = lazy(() => import("./pages/Todo"));
+const Roadmap = lazy(() => import("./pages/Roadmap"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
  *  Sized so it doesn't cause layout shift on first paint. */
@@ -298,6 +300,7 @@ function Router() {
         below. Q "Try Parchment for now?" popups are muted. */}
     <AutoThemeByTime />
     <CrushCascade />
+    <BackToAdminBadge />
     <Suspense fallback={<PageLoading />}>
     <Switch>
       <Route path={"/"} component={MobileHomeRoute} />
@@ -420,7 +423,7 @@ function Router() {
       <Route path={"/referral"} component={Referral} />
       <Route path={"/call-playbook"} component={CallPlaybook} />
       <Route path={"/todo"} component={Todo} />
-      <Route path={"/roadmap"} component={Todo} />
+      <Route path={"/roadmap"} component={Roadmap} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />

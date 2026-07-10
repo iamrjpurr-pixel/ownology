@@ -15,9 +15,19 @@
  * schema change. Kept short + slugged, capped at 80 chars.
  */
 import { z } from "zod";
-import { router, publicProcedure } from "../trpc.js";
+import { router, publicProcedure, protectedProcedure } from "../trpc.js";
 import { logMemberActivity } from "../memberActivity.js";
+import { getUserByOpenId, listVintageLogEntries, listWineBatches, getUsedTankNames } from "../db.js";
 
+/**
+ * Onboarding router — thin surface for /guide progressive-reveal telemetry
+ * AND the /roadmap conditional-flow gates.
+ *
+ * `roadmapStatus` returns booleans + counts for each prerequisite gate so
+ * the client can reveal downstream detail (e.g. The Press deep view) only
+ * once the operator has entered enough real data for that detail to be
+ * meaningful. See /roadmap for the visualisation and per-gate CTAs.
+ */
 export const onboardingRouter = router({
   /**
    * logStep — record one progression event on the current gate invite.
@@ -41,4 +51,69 @@ export const onboardingRouter = router({
       });
       return { ok: true };
     }),
+
+  /**
+   * roadmapStatus — computes prerequisite gate booleans from the user's
+   * live vintage_log data. Used by /roadmap to reveal downstream detail
+   * only when the operator has entered qualifying data.
+   *
+   * Gates (spine):
+   *   1. registered       — user account exists (always true if authed)
+   *   2. hasTanks         — at least one tank name observed in the log
+   *   3. hasBatch         — at least one wine_batch row (variety + tank)
+   *   4. hasMeasurement   — at least one measurement event (Brix/temp/pH)
+   *   5. hasFermentation  — at least one inoculation OR post-inoculation
+   *                          measurement showing Brix drop (proxy: >=3 measurements)
+   *   6. hasRacking       — at least one racking event (ferment finished)
+   *   7. hasBottling      — at least one bottling_run event
+   *
+   * Later gates gate The Press detail reveal: architecture card visible
+   * always; per-batch debrief detail hidden until hasRacking OR hasBottling.
+   */
+  roadmapStatus: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) {
+      return {
+        registered: false,
+        hasTanks: false,
+        hasBatch: false,
+        hasMeasurement: false,
+        hasFermentation: false,
+        hasRacking: false,
+        hasBottling: false,
+        counts: { tanks: 0, batches: 0, entries: 0, measurements: 0, rackings: 0, bottlings: 0 },
+      };
+    }
+    const wineryId = dbUser.wineryId ?? null;
+    const [tanks, batches, entries] = await Promise.all([
+      getUsedTankNames(dbUser.id, wineryId),
+      listWineBatches(dbUser.id, wineryId),
+      listVintageLogEntries(dbUser.id, 800, wineryId),
+    ]);
+
+    const measurements = entries.filter((e) => e.eventType === "measurement");
+    const inoculations = entries.filter((e) => e.eventType === "inoculation");
+    const rackings = entries.filter((e) => e.eventType === "racking");
+    const bottlings = entries.filter((e) => e.eventType === "bottling_run");
+
+    return {
+      registered: true,
+      hasTanks: tanks.length > 0,
+      hasBatch: batches.length > 0,
+      hasMeasurement: measurements.length > 0,
+      // Fermentation proxy: any inoculation event OR >=3 measurements
+      // (a live ferment usually accumulates Brix readings quickly).
+      hasFermentation: inoculations.length > 0 || measurements.length >= 3,
+      hasRacking: rackings.length > 0,
+      hasBottling: bottlings.length > 0,
+      counts: {
+        tanks: tanks.length,
+        batches: batches.length,
+        entries: entries.length,
+        measurements: measurements.length,
+        rackings: rackings.length,
+        bottlings: bottlings.length,
+      },
+    };
+  }),
 });

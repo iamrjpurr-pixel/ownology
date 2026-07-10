@@ -670,6 +670,36 @@ export default function Guide() {
             Ownology is a four-pillar platform for boutique winery teams. This page explains what each pillar does, how they connect, and where to start.
           </p>
 
+          {/* Roadmap CTA — links to /roadmap where locked/unlocked gates are
+              computed from live vintage_log data. Feb 2026, Rich: progressive
+              disclosure — the deep post-vintage detail is hidden until users
+              have racked a batch. */}
+          <div style={{ marginTop: "1rem" }}>
+            <Link
+              href="/roadmap"
+              data-testid="guide-roadmap-link"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                padding: "0.5rem 0.95rem",
+                background: "transparent",
+                color: AMBER,
+                border: `1px solid ${AMBER}`,
+                borderRadius: 999,
+                fontFamily: MONO,
+                fontSize: "0.68rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                textDecoration: "none",
+                fontWeight: 600,
+              }}
+              title="See your Ownology roadmap — 7 gates from first tank to first bottling"
+            >
+              → See your roadmap
+            </Link>
+          </div>
+
           {/* ── Guide progress meter — visible at the top so the visitor
               knows where they are in the tour. Progress = 50% of sections
               opened + 50% of checklist items ticked. Both signals also

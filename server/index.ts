@@ -575,11 +575,13 @@ async function startServer() {
     if (isPublicPath(req.path)) return next();
 
     // ─── Dev-only routes ────────────────────────────────────────────────
-    // /todo and /roadmap are the internal working roadmap — deliberately
-    // NOT for production. Return 404 on any live ownology.ai hostname so
+    // /todo is the internal working roadmap — deliberately NOT for
+    // production. Return 404 on any live ownology.ai hostname so
     // curious visitors can't discover our security backlog. Still works
     // on preview/dev hosts (they'll flow through to the gate check).
-    const DEV_ONLY_PATHS = new Set(["/todo", "/roadmap"]);
+    // /roadmap is user-facing (progressive-disclosure gate graph) and
+    // stays gated behind the normal wall on all hosts.
+    const DEV_ONLY_PATHS = new Set(["/todo"]);
     const PROD_HOSTS = new Set(["ownology.ai", "www.ownology.ai"]);
     if (DEV_ONLY_PATHS.has(req.path) && PROD_HOSTS.has(req.hostname)) {
       return res.status(404).send("Not Found");

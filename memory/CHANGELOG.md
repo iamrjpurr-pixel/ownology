@@ -4,6 +4,27 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### `/roadmap` conditional-flow gate graph + floating "Back to Admin" pill — SHIPPED (Feb 2026, Rich)
+
+**Why:** Rich flagged progressive-disclosure UX — *"we must be careful not to go too deep into The Press too soon; can reveal press architecture but don't reveal detail until detail has been entered or calculated by app."* Also completed the deferred P2 UX fix: admins testing invite `/i/<token>` links had no obvious way to return to the admin hub.
+
+**Files:**
+- `server/routers/onboarding.ts` — new `roadmapStatus` procedure (`protectedProcedure`). Returns booleans + row counts for 7 gates (registered / hasTanks / hasBatch / hasMeasurement / hasFermentation / hasRacking / hasBottling) computed from live `vintage_log_entries` + `wine_batches`. Fermentation proxy = any inoculation OR ≥3 measurements. Zero new schema.
+- `client/src/pages/Roadmap.tsx` — new user-facing page. 7-node progressive gate spine, per-gate CTA to the prerequisite action (`/quick-entry`), theme-aware text via CSS vars, unlocked gates show their live count (e.g. "Unlocked · 25 tanks"). Bottom "The Press" reveal card unlocks only when `hasRacking || hasBottling` is true — architecture visible from Gate 3, full debrief only from Gate 6.
+- `client/src/components/BackToAdminBadge.tsx` — floating pill mounted once in `App.tsx`. Uses existing `trpc.admin.summary` probe (already cached) to detect admin. Auto-hides on `/admin/*`, `/free-run`, `/work`, `/login`, `/auth/callback`, `/join/qr`, `/try`. Mirrors the removed `AdminQrBadge` styling — bottom-left, low chroma, expands on hover.
+- `client/src/App.tsx` — mounted `<BackToAdminBadge />`; repointed `/roadmap` route from `Todo` → new `Roadmap` component.
+- `client/src/pages/Admin.tsx` — added Roadmap link to the "Guide" submenu.
+- `client/src/pages/Guide.tsx` — amber pill "→ SEE YOUR ROADMAP" under the intro paragraph.
+- `server/index.ts` — removed `/roadmap` from `DEV_ONLY_PATHS` (was 404'd on prod hostname). Now flows through the normal gate wall on all hosts; `/todo` stays dev-only.
+
+**Verified live on preview** (`/api/gate/verify` unlock → GET `/api/trpc/onboarding.roadmapStatus` returns 7 booleans + `counts:{tanks:25,batches:12,entries:180,measurements:120,rackings:4,bottlings:2}`; `/roadmap` page renders progress bar `7/7 · 100%`, all 7 gate cards with unlock badges + counts, The Press reveal card in the unlocked variant with "Open The Press" CTA). Back-to-Admin badge count on `/guide`: 1 (visible + expanded on hover with "Back to Admin" label); count on `/admin`: 0 (auto-hidden). Lint + tsc: no new issues (7 pre-existing errors remain in `App.tsx` weather-fallback + `AdminAudioHook.tsx`).
+
+**Deliberately deferred** (future session):
+- Modify `/the-press` to gate detail sections in-page based on `roadmapStatus` — current version still uses the demo/mock batch. Best addressed alongside a real batch-lifecycle refactor.
+- Empty-state screenshot smoke-test (seed user has too much data to see the locked variant); acceptance test via testing agent would use a fresh cookie/invite.
+
+---
+
 ### `/admin/audio-hook` tool — Whisper + Claude turn any IG reel into a tier-2 SMS opener (Feb 2026, Rich)
 
 **The problem this solves:**
