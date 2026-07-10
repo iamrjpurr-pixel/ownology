@@ -1281,7 +1281,7 @@ export default function Pricing() {
                 Founding Member Offer — for the first 99 paid subscribers
               </p>
               <p className="text-xs mt-0.5" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)" }}>
-                Pricing locked for life · 21% off Cellar Hand · 25% off The Press · 29% off The Vigneron · Permanent founding badge · Direct product input · Name in Our Story (optional).
+                Pricing locked for life · 21% off retail Cellar Hand · 25% off retail The Press · 29% off retail The Vigneron · Permanent founding badge · Direct product input · Name in Our Story (optional).
               </p>
             </div>
           </div>
