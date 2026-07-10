@@ -1256,7 +1256,7 @@ export default function Pricing() {
               lineHeight: 1.75,
             }}
           >
-            Start with free run juice — unforced, natural, no commitment. When you are ready to deep dive, step into The Press. Every tier is designed around the winemaker's working rhythm, not a generic SaaS model.
+            Start with free run juice — unforced, natural, no commitment. When you&apos;re ready to deep dive, step into The Press. Every tier is designed around the winemaker&apos;s rhythm.
           </p>
           <BillingToggle cycle={cycle} onChange={setCycle} />
         </div>

@@ -235,53 +235,65 @@ function Nav() {
                 compact 3-item More section (MORE_NAV) for touch users. */}
           </div>
 
-          <div className="hidden md:flex items-center gap-3">
-            {/* ThemeToggle removed (Feb 2026, Rich) — auto-theme now, no user picker. */}
-            {/* ── "Work Mode" utility button ─────────────────────────────
-               Sub-nav shortcut to Ownology's mobile-first cellar shell
-               (Ask/Press/Log/Tasks/More). Deliberately quiet — small
-               square icon + small caption + native tooltip. It's for
-               members who already know what Work Mode is, not for cold
-               prospects (they'll discover it through the pillar cards).
-               Rich, Feb 2026: "the big amber plus felt ugly + unclear". */}
+          <div className="hidden md:flex items-center gap-2">
+            {/* Symmetric CTA pair — Feb 2026 (Rich).
+                Both pills share shape, padding, typography, and border-radius.
+                Left pill (Enthusiasts) = soft/transparent amber → the curiosity
+                surface (Free Run: Ask Owen anything).
+                Right pill (Professionals) = full amber fill → the commercial
+                surface (Cellar Brief / Founding-partner join flow).
+                Both fully theme-aware via var(--ow-amber). */}
             <Link
               href="/free-run"
-              data-testid="nav-work-mode"
-              title="Work Mode — Ownology's mobile-first shell for the cellar floor. Daily brief, one-tap logs, task list, tank readings. Optimised for a phone in a shed."
-              aria-label="Open Work Mode — mobile cellar shell"
-              className="inline-flex items-center gap-1.5 rounded-md transition-colors"
+              data-testid="nav-enthusiasts"
+              title="For Wine Enthusiasts — Ask Owen anything about wine science, style, and story. Free-tier curiosity flow."
+              aria-label="For Wine Enthusiasts — open Free Run"
+              className="inline-flex items-center rounded-full transition-colors"
               style={{
-                padding: "0.35rem 0.65rem",
-                border: "1px solid var(--ow-border)",
-                background: "transparent",
-                color: "var(--ow-text-mid)",
+                padding: "0.5rem 1rem",
+                border: "1px solid color-mix(in oklch, var(--ow-amber) 55%, transparent)",
+                background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
+                color: "var(--ow-amber)",
                 fontFamily: "'Lato', sans-serif",
                 fontSize: "0.72rem",
-                letterSpacing: "0.05em",
+                letterSpacing: "0.06em",
                 textTransform: "uppercase",
-                fontWeight: 500,
+                fontWeight: 700,
                 textDecoration: "none",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = "var(--ow-amber)";
+                e.currentTarget.style.background = "color-mix(in oklch, var(--ow-amber) 22%, transparent)";
                 e.currentTarget.style.borderColor = "var(--ow-amber)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = "var(--ow-text-mid)";
-                e.currentTarget.style.borderColor = "var(--ow-border)";
+                e.currentTarget.style.background = "color-mix(in oklch, var(--ow-amber) 12%, transparent)";
+                e.currentTarget.style.borderColor = "color-mix(in oklch, var(--ow-amber) 55%, transparent)";
               }}
             >
-              {/* 4-cell grid icon = the 4-pillar Work Mode bottom nav */}
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
-                <rect x="0.5" y="0.5" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />
-                <rect x="6.5" y="0.5" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />
-                <rect x="0.5" y="6.5" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />
-                <rect x="6.5" y="6.5" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />
-              </svg>
-              Work Mode
+              For Wine Enthusiasts
             </Link>
-            <a href="/join?from=homepage-nav" className="btn-amber text-xs inline-flex items-center" data-testid="nav-cta-winemakers">
-              For winemakers
+            <a
+              href="/join?from=homepage-nav"
+              data-testid="nav-professionals"
+              title="For Wine Professionals — Cellar Brief, vintage logs, APCO, and the founding-partner tier."
+              aria-label="For Wine Professionals — open founding-partner join flow"
+              className="inline-flex items-center rounded-full transition-opacity"
+              style={{
+                padding: "0.5rem 1rem",
+                border: "1px solid var(--ow-amber)",
+                background: "var(--ow-amber)",
+                color: "oklch(0.14 0.008 60)",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.72rem",
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                fontWeight: 700,
+                textDecoration: "none",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.9"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
+            >
+              For Wine Professionals
             </a>
           </div>
 
