@@ -150,7 +150,7 @@ type NavItem = { label: string; href: string; external?: boolean };
 // ownology.ai lands on ONE clear next step, not five parallel doors.
 const PRIMARY_NAV: NavItem[] = [
   { label: "Ask Owen",         href: "/ask" },
-  { label: "For winemakers",   href: "/join" },
+  { label: "Founding",   href: "/join" },
   { label: "Pricing",          href: "/pricing" },
 ];
 
@@ -1064,7 +1064,7 @@ function TrustChips() {
     { icon: "🇦🇺", label: "Australian-built" },
     { icon: "🍇", label: "Wine Australia LIP-audit ready" },
     { icon: "📋", label: "APCO Assistant · Compliance-first" },
-    { icon: "✦",  label: "Founding cohort · first 99 winemakers" },
+    { icon: "✦",  label: "Founding cohort · first 99 partners" },
   ];
   return (
     <section

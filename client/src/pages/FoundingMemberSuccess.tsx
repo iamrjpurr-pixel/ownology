@@ -69,7 +69,7 @@ export default function FoundingMemberSuccess() {
           maxWidth: "480px",
         }}
       >
-        Your founding member subscription is confirmed. You're among the first 99 winemakers
+        Your founding member subscription is confirmed. You&apos;re among the first 99 founding partners
         to join Ownology — your pricing is locked for life.
       </p>
 

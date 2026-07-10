@@ -139,7 +139,7 @@ export default function HomeV2() {
           <span>🇦🇺 Australian-built</span>
           <span>Wine Australia LIP-audit ready</span>
           <span>APCO Assistant · 31 March deadline</span>
-          <span>Founding cohort · 99 winemakers</span>
+          <span>Founding cohort · 99 partners</span>
         </div>
       </section>
 
