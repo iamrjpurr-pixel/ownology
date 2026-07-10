@@ -132,28 +132,8 @@ export function SiteFooter() {
               margin: 0,
             }}
           >
-            © 2026 Ownology. Made in Adelaide Hills.
+            © 2026 Ownology.
           </p>
-          <div className="flex gap-4">
-            <a
-              href="/api/cellar-journal/rss.xml"
-              style={{ ...footerLinkStyle, padding: 0 }}
-              onMouseEnter={hover}
-              onMouseLeave={unhover}
-              data-testid="footer-rss"
-            >
-              RSS
-            </a>
-            <a
-              href="/api/sitemap.xml"
-              style={{ ...footerLinkStyle, padding: 0 }}
-              onMouseEnter={hover}
-              onMouseLeave={unhover}
-              data-testid="footer-sitemap-xml"
-            >
-              Sitemap.xml
-            </a>
-          </div>
         </div>
       </div>
     </footer>
