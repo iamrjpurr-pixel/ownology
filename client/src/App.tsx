@@ -12,6 +12,7 @@ import { AuthProvider } from "@/lib/useAuth";
 // AutoThemeByTime (defined below) handles theme via time-of-day.
 import UserMenu from "@/components/UserMenu";
 import CrushCascade from "@/components/CrushCascade";
+import { THEMES, applyThemeToDom, type ThemeId } from "@/lib/themes";
 
 // ── EAGER: first-paint-critical + cellar-floor PWA tabs ───────────────────
 // Loaded synchronously so the most-trafficked routes render with zero
@@ -578,13 +579,39 @@ function ThemePicker() {
       if (v === "auto") window.localStorage.removeItem(THEME_STORAGE_KEY);
       else window.localStorage.setItem(THEME_STORAGE_KEY, v);
     } catch { /* localStorage disabled — non-fatal */ }
+    // Fire the auto-theme re-eval + apply directly for immediate visual feedback
+    // (the auto-theme effect also runs but this makes the swap instant).
+    if (v !== "auto") {
+      try { applyThemeToDom(v as ThemeId); } catch { /* ignore invalid */ }
+    }
     window.dispatchEvent(new CustomEvent("ownology:dev-theme-override"));
+    // For crush themes, ALSO fire the theatrical cascade overlay — same event
+    // /cascade-demo uses. Otherwise the picker silently swaps colours but the
+    // grape-splash animation only plays via the demo page. Feb 2026, Rich.
+    if (v === "red-crush" || v === "white-crush") {
+      window.dispatchEvent(new CustomEvent("ownology:crush", { detail: { themeId: v } }));
+    }
   }
 
-  const themes = [
-    { id: "auto", label: "Auto · time + weather" },
-    { id: "parchment", label: "Parchment · day" },
-    { id: "soft-cellar", label: "Soft Cellar · night" },
+  // Pull the canonical theme catalogue from lib/themes so the picker always
+  // matches whatever's actually shipped. Auto goes first (default), then the
+  // ordered THEMES list. Feb 2026 fix — picker was missing parchment / red-crush
+  // / white-crush / cellar-night because it hardcoded a subset.
+  const themes: Array<{ id: string; label: string; tint: string }> = [
+    { id: "auto", label: "Auto · time + weather", tint: "var(--ow-amber)" },
+    ...THEMES.filter((t) => t.id !== "auto").map((t) => ({
+      id: t.id,
+      label: t.label + (t.id === "red-crush" ? " · harvest" : t.id === "white-crush" ? " · harvest" : t.kind === "dark" ? " · night" : t.kind === "light" ? " · day" : ""),
+      // Small colour dot next to each theme so the visual identity is
+      // instant — no need to click to preview.
+      tint:
+        t.id === "red-crush" ? "oklch(0.62 0.20 20)"
+        : t.id === "white-crush" ? "oklch(0.75 0.14 130)"
+        : t.id === "parchment" ? "oklch(0.85 0.05 75)"
+        : t.id === "soft-cellar" ? "oklch(0.32 0.02 60)"
+        : t.id === "cellar" ? "oklch(0.15 0.005 60)"
+        : "var(--ow-amber)",
+    })),
   ];
 
   return (
@@ -611,9 +638,11 @@ function ThemePicker() {
               data-testid={`theme-${t.id}`}
               onClick={() => set(t.id)}
               style={{
-                display: "block",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
                 width: "100%",
-                padding: "0.4rem 0.6rem",
+                padding: "0.42rem 0.6rem",
                 marginBottom: 4,
                 background: current === t.id ? "var(--ow-amber)" : "transparent",
                 color: current === t.id ? "oklch(0.10 0.008 60)" : "var(--ow-text-mid)",
@@ -625,7 +654,21 @@ function ThemePicker() {
                 cursor: "pointer",
               }}
             >
-              {t.label}
+              {/* Colour dot previews the theme's dominant hue without
+                  needing to click. Auto uses the amber brand accent. */}
+              <span
+                aria-hidden="true"
+                style={{
+                  display: "inline-block",
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  background: t.tint,
+                  border: "1px solid color-mix(in oklch, var(--ow-text-lo) 40%, transparent)",
+                  flexShrink: 0,
+                }}
+              />
+              <span>{t.label}</span>
             </button>
           ))}
         </div>
