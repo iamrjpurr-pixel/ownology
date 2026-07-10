@@ -31,7 +31,13 @@ export type ActivityKind =
   | "magic_link_redeem"
   | "magic_link_reissue"
   | "admin_impersonate_start"
-  | "admin_impersonate_end";
+  | "admin_impersonate_end"
+  // Press-bypass request flow (Feb 2026, Rich):
+  //   press_bypass_request → wine pro / evaluator asks for preview access
+  //   press_bypass_granted → owner (Rich) approves it; unlocks Press card
+  //                          regardless of Gate 6/7 state
+  | "press_bypass_request"
+  | "press_bypass_granted";
 
 interface LogActivityParams {
   req?: express.Request;

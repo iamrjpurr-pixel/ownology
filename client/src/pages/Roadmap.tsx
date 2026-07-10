@@ -22,9 +22,10 @@
  * can see the SHAPE of what Ownology does end-to-end without being
  * shown fake data or empty screens.
  */
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Helmet } from "react-helmet";
-import { CheckCircle2, Lock, Circle, ArrowRight } from "lucide-react";
+import { CheckCircle2, Lock, Circle, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 type GateKey =
@@ -123,10 +124,12 @@ function Node({
   gate,
   unlocked,
   count,
+  skim,
 }: {
   gate: Gate;
   unlocked: boolean;
   count?: number;
+  skim: boolean;
 }) {
   const testId = `roadmap-gate-${gate.key}`;
   return (
@@ -230,8 +233,22 @@ function Node({
             fontFamily: "'Lato', sans-serif",
           }}
         >
-          {unlocked ? gate.detail : `Unlocks → ${gate.unlocks}`}
+          {unlocked ? gate.detail : skim ? gate.detail : `Unlocks → ${gate.unlocks}`}
         </p>
+        {!unlocked && skim && (
+          <p
+            style={{
+              margin: "0.35rem 0",
+              fontSize: "0.72rem",
+              color: "rgba(0,0,0,0.5)",
+              fontFamily: "'Lato', sans-serif",
+              fontStyle: "italic",
+            }}
+            data-testid={`${testId}-skim-unlock-hint`}
+          >
+            Unlocks → {gate.unlocks}
+          </p>
+        )}
         {!unlocked && (
           <Link
             href={gate.cta.href}
@@ -266,6 +283,19 @@ export default function Roadmap() {
     refetchOnWindowFocus: false,
   });
 
+  // Skim mode — client-side preference for wine-pro evaluators who want
+  // the full read of every gate description without earning it. Persists
+  // per-browser via localStorage; does NOT grant access to gated features
+  // (see requestPressBypass for that). Rich, Feb 2026.
+  const [skim, setSkim] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("ow_skim_mode") === "1";
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("ow_skim_mode", skim ? "1" : "0");
+  }, [skim]);
+
   const status = data ?? {
     registered: false,
     hasTanks: false,
@@ -274,6 +304,8 @@ export default function Roadmap() {
     hasFermentation: false,
     hasRacking: false,
     hasBottling: false,
+    pressBypassRequested: false,
+    pressBypassGranted: false,
     counts: { tanks: 0, batches: 0, entries: 0, measurements: 0, rackings: 0, bottlings: 0 },
   };
 
@@ -347,6 +379,60 @@ export default function Roadmap() {
           layer of depth — we won&apos;t show you The Press debrief until you&apos;ve earned
           it by racking a batch you actually made. Honest, progressive disclosure.
         </p>
+      </div>
+
+      {/* Skim-mode toggle — for wine-pro evaluators who want to read every
+          gate's description without earning it. Does NOT grant access to
+          gated features (see the Press-bypass card at the bottom). */}
+      <div
+        data-testid="roadmap-skim-toggle-row"
+        style={{
+          marginBottom: "1.25rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "1rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontSize: "0.78rem",
+            color: "var(--ow-text-mid, rgba(0,0,0,0.6))",
+            fontFamily: "'Lato', sans-serif",
+            maxWidth: "42ch",
+          }}
+        >
+          {skim
+            ? "Skim mode is on. Every gate's full description is visible — but the actual features stay gated until you enter data."
+            : "Evaluating for a team or writing about us? Turn on skim mode to read every gate's full description without unlocking."}
+        </p>
+        <button
+          type="button"
+          onClick={() => setSkim((s) => !s)}
+          data-testid="roadmap-skim-toggle"
+          aria-pressed={skim}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.4rem",
+            padding: "0.4rem 0.85rem",
+            borderRadius: 999,
+            border: `1px solid ${skim ? "#B0741A" : "rgba(0,0,0,0.25)"}`,
+            background: skim ? "#B0741A" : "transparent",
+            color: skim ? "#2A1E0A" : "var(--ow-text-hi, #1a1210)",
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.72rem",
+            fontWeight: 600,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            cursor: "pointer",
+          }}
+        >
+          {skim ? <Eye size={13} strokeWidth={2.2} /> : <EyeOff size={13} strokeWidth={2.2} />}
+          {skim ? "Skim mode · on" : "Skim mode"}
+        </button>
       </div>
 
       {/* Progress bar */}
@@ -439,106 +525,319 @@ export default function Roadmap() {
           gate={gate}
           unlocked={status[gate.key]}
           count={countFor(gate.key)}
+          skim={skim}
         />
       ))}
 
-      {/* The Press reveal — only when at least one racking OR bottling exists */}
-      <div
-        data-testid="roadmap-press-reveal"
-        style={{
-          marginTop: "2rem",
-          padding: "1.5rem 1.5rem",
-          borderRadius: "0.9rem",
-          background: status.hasRacking || status.hasBottling
-            ? "linear-gradient(180deg, #FBF3E4, #F3ECE4)"
-            : "rgba(0,0,0,0.03)",
-          border: status.hasRacking || status.hasBottling
-            ? "1px solid rgba(176,116,26,0.35)"
-            : "1px dashed rgba(0,0,0,0.15)",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-          {status.hasRacking || status.hasBottling ? (
-            <CheckCircle2 size={18} strokeWidth={2.2} color="#B0741A" />
-          ) : (
-            <Circle size={18} strokeWidth={2.2} color="rgba(0,0,0,0.35)" />
-          )}
-          <h3
+      {/* The Press reveal — four states: naturally unlocked (hasRacking||hasBottling),
+          bypass granted (wine-pro preview), bypass requested (pending), locked */}
+      <PressReveal
+        naturallyUnlocked={status.hasRacking || status.hasBottling}
+        bypassGranted={status.pressBypassGranted}
+        bypassRequested={status.pressBypassRequested}
+      />
+    </div>
+  );
+}
+
+// ── PressReveal ──────────────────────────────────────────────────────
+// The gated "detail vs architecture" bit. Four states, in priority order:
+//   1. naturallyUnlocked → full amber card + "Open The Press" CTA
+//   2. bypassGranted     → same as (1) but with a "Preview access" ribbon
+//   3. bypassRequested   → locked look + "Requested — we'll be in touch"
+//   4. default (locked)  → locked look + wine-pro bypass request form
+//
+// The request form intentionally captures only three fields — role,
+// publication/winery, and an optional note. No email required (the gate
+// invite already carries an identity for us) — one less friction step.
+
+function PressReveal({
+  naturallyUnlocked,
+  bypassGranted,
+  bypassRequested,
+}: {
+  naturallyUnlocked: boolean;
+  bypassGranted: boolean;
+  bypassRequested: boolean;
+}) {
+  const unlocked = naturallyUnlocked || bypassGranted;
+  const [formOpen, setFormOpen] = useState(false);
+  const [role, setRole] = useState("");
+  const [publication, setPublication] = useState("");
+  const [note, setNote] = useState("");
+  const [submittedLocal, setSubmittedLocal] = useState(false);
+  const requestMut = trpc.onboarding.requestPressBypass.useMutation({
+    onSuccess: () => setSubmittedLocal(true),
+  });
+  const alreadyRequested = bypassRequested || submittedLocal;
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!role.trim()) return;
+    requestMut.mutate({
+      role: role.trim(),
+      publication: publication.trim() || undefined,
+      note: note.trim() || undefined,
+    });
+  };
+
+  return (
+    <div
+      data-testid="roadmap-press-reveal"
+      style={{
+        marginTop: "2rem",
+        padding: "1.5rem 1.5rem",
+        borderRadius: "0.9rem",
+        background: unlocked
+          ? "linear-gradient(180deg, #FBF3E4, #F3ECE4)"
+          : "rgba(0,0,0,0.03)",
+        border: unlocked
+          ? "1px solid rgba(176,116,26,0.35)"
+          : "1px dashed rgba(0,0,0,0.15)",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+        {unlocked ? (
+          <CheckCircle2 size={18} strokeWidth={2.2} color="#B0741A" />
+        ) : (
+          <Circle size={18} strokeWidth={2.2} color="rgba(0,0,0,0.35)" />
+        )}
+        <h3
+          style={{
+            margin: 0,
+            fontFamily: "'Fraunces', Georgia, serif",
+            fontSize: "1.15rem",
+            fontWeight: 600,
+          }}
+        >
+          The Press — vintage debrief
+        </h3>
+        {bypassGranted && !naturallyUnlocked && (
+          <span
+            data-testid="roadmap-press-bypass-ribbon"
             style={{
-              margin: 0,
-              fontFamily: "'Fraunces', Georgia, serif",
-              fontSize: "1.15rem",
-              fontWeight: 600,
+              marginLeft: "0.5rem",
+              fontSize: "0.6rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              color: "#B0741A",
+              border: "1px solid #B0741A",
+              padding: "0.15rem 0.5rem",
+              borderRadius: 999,
+              fontWeight: 700,
+              fontFamily: "'Lato', sans-serif",
             }}
           >
-            The Press — vintage debrief
-          </h3>
-        </div>
-        {status.hasRacking || status.hasBottling ? (
-          <>
-            <p
+            Preview access
+          </span>
+        )}
+      </div>
+
+      {unlocked ? (
+        <>
+          <p
+            style={{
+              margin: "0.3rem 0 0.7rem 0",
+              fontSize: "0.88rem",
+              color: "#3a2f28",
+              fontFamily: "'Lato', sans-serif",
+            }}
+          >
+            {naturallyUnlocked
+              ? "You've completed a ferment or bottled a batch. The Press can now write your real post-vintage story — peak Brix, ferment duration, temp swings, additions timeline, tasting notes — with your own data cited back to you."
+              : "Preview access granted. The Press below is populated with a curated sample vintage so you can evaluate what your own debrief will look like. Your live debrief unlocks once you rack your first batch."}
+          </p>
+          <Link
+            href="/the-press"
+            data-testid="roadmap-press-cta-unlocked"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.35rem",
+              fontSize: "0.85rem",
+              fontFamily: "'Lato', sans-serif",
+              fontWeight: 600,
+              color: "#2A1E0A",
+              textDecoration: "none",
+              padding: "0.5rem 1rem",
+              borderRadius: 999,
+              background: "#B0741A",
+            }}
+          >
+            Open The Press <ArrowRight size={13} strokeWidth={2.2} />
+          </Link>
+        </>
+      ) : (
+        <>
+          <p
+            style={{
+              margin: "0.3rem 0 0.7rem 0",
+              fontSize: "0.88rem",
+              color: "rgba(0,0,0,0.55)",
+              fontFamily: "'Lato', sans-serif",
+            }}
+          >
+            The Press is where Ownology writes your post-vintage debrief. We
+            deliberately keep the detail locked until you&apos;ve racked a batch —
+            a debrief without your own data would be a stock photo. Complete
+            gates 2 through 6 above and this section opens up in full.
+          </p>
+          <p
+            style={{
+              margin: "0 0 1rem 0",
+              fontSize: "0.78rem",
+              color: "rgba(0,0,0,0.5)",
+              fontFamily: "'Lato', sans-serif",
+              fontStyle: "italic",
+            }}
+            data-testid="roadmap-press-locked-hint"
+          >
+            Architecture visible from Gate 3 · full debrief from Gate 6.
+          </p>
+
+          {/* Wine-pro bypass request path */}
+          {alreadyRequested ? (
+            <div
+              data-testid="roadmap-press-bypass-pending"
               style={{
-                margin: "0.3rem 0 0.7rem 0",
-                fontSize: "0.88rem",
-                color: "#3a2f28",
+                padding: "0.75rem 1rem",
+                borderRadius: "0.5rem",
+                background: "rgba(176,116,26,0.08)",
+                border: "1px solid rgba(176,116,26,0.25)",
                 fontFamily: "'Lato', sans-serif",
+                fontSize: "0.82rem",
+                color: "#3a2f28",
               }}
             >
-              You&apos;ve completed a ferment or bottled a batch. The Press can now
-              write your real post-vintage story — peak Brix, ferment duration,
-              temp swings, additions timeline, tasting notes — with your own
-              data cited back to you.
-            </p>
-            <Link
-              href="/the-press"
-              data-testid="roadmap-press-cta-unlocked"
+              Preview access requested. We&apos;ll be in touch — usually within a
+              working day.
+            </div>
+          ) : !formOpen ? (
+            <button
+              type="button"
+              onClick={() => setFormOpen(true)}
+              data-testid="roadmap-press-bypass-open"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "0.35rem",
-                fontSize: "0.85rem",
+                fontSize: "0.78rem",
                 fontFamily: "'Lato', sans-serif",
                 fontWeight: 600,
-                color: "#2A1E0A",
-                textDecoration: "none",
-                padding: "0.5rem 1rem",
+                color: "#B0741A",
+                background: "transparent",
+                border: "1px dashed rgba(176,116,26,0.5)",
+                padding: "0.45rem 0.9rem",
                 borderRadius: 999,
-                background: "#B0741A",
+                cursor: "pointer",
               }}
             >
-              Open The Press <ArrowRight size={13} strokeWidth={2.2} />
-            </Link>
-          </>
-        ) : (
-          <>
-            <p
+              I&apos;m a wine professional — request preview access
+            </button>
+          ) : (
+            <form
+              onSubmit={submit}
+              data-testid="roadmap-press-bypass-form"
               style={{
-                margin: "0.3rem 0 0.7rem 0",
-                fontSize: "0.88rem",
-                color: "rgba(0,0,0,0.55)",
+                marginTop: "0.5rem",
+                padding: "1rem",
+                borderRadius: "0.6rem",
+                background: "rgba(255,255,255,0.6)",
+                border: "1px solid rgba(0,0,0,0.08)",
+                display: "grid",
+                gap: "0.6rem",
                 fontFamily: "'Lato', sans-serif",
               }}
             >
-              The Press is where Ownology writes your post-vintage debrief. We
-              deliberately keep the detail locked until you&apos;ve racked a batch —
-              a debrief without your own data would be a stock photo. Complete
-              gates 2 through 6 above and this section opens up in full.
-            </p>
-            <p
-              style={{
-                margin: 0,
-                fontSize: "0.78rem",
-                color: "rgba(0,0,0,0.5)",
-                fontFamily: "'Lato', sans-serif",
-                fontStyle: "italic",
-              }}
-              data-testid="roadmap-press-locked-hint"
-            >
-              Architecture visible from Gate 3 · full debrief from Gate 6.
-            </p>
-          </>
-        )}
-      </div>
+              <label style={{ display: "grid", gap: "0.2rem", fontSize: "0.72rem", color: "rgba(0,0,0,0.6)" }}>
+                Your role *
+                <input
+                  type="text"
+                  required
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  placeholder="e.g. winemaker, wine writer, judge, buyer"
+                  data-testid="roadmap-press-bypass-role"
+                  style={inputStyle}
+                />
+              </label>
+              <label style={{ display: "grid", gap: "0.2rem", fontSize: "0.72rem", color: "rgba(0,0,0,0.6)" }}>
+                Publication or winery
+                <input
+                  type="text"
+                  value={publication}
+                  onChange={(e) => setPublication(e.target.value)}
+                  placeholder="e.g. Halliday Wine Companion, Chalk Hill"
+                  data-testid="roadmap-press-bypass-pub"
+                  style={inputStyle}
+                />
+              </label>
+              <label style={{ display: "grid", gap: "0.2rem", fontSize: "0.72rem", color: "rgba(0,0,0,0.6)" }}>
+                Note (optional)
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="What you'd like to look at, review deadline, etc."
+                  rows={3}
+                  data-testid="roadmap-press-bypass-note"
+                  style={{ ...inputStyle, fontFamily: "inherit", resize: "vertical" }}
+                />
+              </label>
+              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                <button
+                  type="submit"
+                  disabled={requestMut.isPending || !role.trim()}
+                  data-testid="roadmap-press-bypass-submit"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.35rem",
+                    fontSize: "0.78rem",
+                    fontWeight: 600,
+                    color: "#2A1E0A",
+                    background: "#B0741A",
+                    border: "none",
+                    padding: "0.5rem 1rem",
+                    borderRadius: 999,
+                    cursor: requestMut.isPending ? "wait" : "pointer",
+                    opacity: !role.trim() ? 0.5 : 1,
+                  }}
+                >
+                  {requestMut.isPending ? "Sending…" : "Send request"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormOpen(false)}
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "rgba(0,0,0,0.5)",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+              {requestMut.error && (
+                <p style={{ fontSize: "0.72rem", color: "#a33", margin: 0 }}>
+                  {requestMut.error.message || "Couldn't send — try again."}
+                </p>
+              )}
+            </form>
+          )}
+        </>
+      )}
     </div>
   );
 }
+
+const inputStyle: React.CSSProperties = {
+  padding: "0.5rem 0.7rem",
+  borderRadius: "0.4rem",
+  border: "1px solid rgba(0,0,0,0.15)",
+  fontSize: "0.85rem",
+  background: "#fff",
+  color: "#1a1210",
+  fontFamily: "inherit",
+};

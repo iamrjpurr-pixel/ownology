@@ -4,24 +4,33 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
-### `/roadmap` conditional-flow gate graph + floating "Back to Admin" pill — SHIPPED (Feb 2026, Rich)
+### `/roadmap` conditional-flow gate graph + floating "Back to Admin" pill + Skim Mode + Press Bypass — SHIPPED (Feb 2026, Rich)
 
-**Why:** Rich flagged progressive-disclosure UX — *"we must be careful not to go too deep into The Press too soon; can reveal press architecture but don't reveal detail until detail has been entered or calculated by app."* Also completed the deferred P2 UX fix: admins testing invite `/i/<token>` links had no obvious way to return to the admin hub.
+**Why:** Rich flagged progressive-disclosure UX — *"we must be careful not to go too deep into The Press too soon"* — but also flagged the dual need: *"we must allow for wine professionals to ingest info and want to bypass all the detail"*. So the induction system has to serve novices (earn depth) AND experts (skim + request bypass) without picking one.
+
+**Two-lens design:**
+- **Novice lens (default)** — 7-gate progressive spine. Locked cards show one-line "Unlocks →" summaries. Full description hidden until earned.
+- **Expert lens (opt-in "Skim mode")** — client-side toggle on `/roadmap`. Every gate's full description paragraph becomes visible even when locked. Features stay gated — only the *reading* is unlocked, not the *doing*. LocalStorage `ow_skim_mode`.
+- **Wine-professional / press bypass** — locked Press card shows an inline "I'm a wine professional — request preview access" form (role · publication/winery · optional note). Writes `press_bypass_request` to `member_activity`. Rich grants by writing a matching `press_bypass_granted` event. Once granted, the Press card unlocks regardless of Gate 6/7 with a "Preview access" ribbon and preview-sample copy.
 
 **Files:**
-- `server/routers/onboarding.ts` — new `roadmapStatus` procedure (`protectedProcedure`). Returns booleans + row counts for 7 gates (registered / hasTanks / hasBatch / hasMeasurement / hasFermentation / hasRacking / hasBottling) computed from live `vintage_log_entries` + `wine_batches`. Fermentation proxy = any inoculation OR ≥3 measurements. Zero new schema.
-- `client/src/pages/Roadmap.tsx` — new user-facing page. 7-node progressive gate spine, per-gate CTA to the prerequisite action (`/quick-entry`), theme-aware text via CSS vars, unlocked gates show their live count (e.g. "Unlocked · 25 tanks"). Bottom "The Press" reveal card unlocks only when `hasRacking || hasBottling` is true — architecture visible from Gate 3, full debrief only from Gate 6.
-- `client/src/components/BackToAdminBadge.tsx` — floating pill mounted once in `App.tsx`. Uses existing `trpc.admin.summary` probe (already cached) to detect admin. Auto-hides on `/admin/*`, `/free-run`, `/work`, `/login`, `/auth/callback`, `/join/qr`, `/try`. Mirrors the removed `AdminQrBadge` styling — bottom-left, low chroma, expands on hover.
-- `client/src/App.tsx` — mounted `<BackToAdminBadge />`; repointed `/roadmap` route from `Todo` → new `Roadmap` component.
-- `client/src/pages/Admin.tsx` — added Roadmap link to the "Guide" submenu.
+- `server/routers/onboarding.ts` — `roadmapStatus` (protectedProcedure) now returns `pressBypassRequested` + `pressBypassGranted` derived from `member_activity` events. New `requestPressBypass` (publicProcedure) mutation. Fermentation proxy = any inoculation OR ≥3 measurements.
+- `server/memberActivity.ts` — added `press_bypass_request` and `press_bypass_granted` to `ActivityKind`.
+- `client/src/pages/Roadmap.tsx` — new page. 7-node spine, Skim toggle (Eye/EyeOff icons), extracted `<PressReveal>` sub-component with 4 states (naturallyUnlocked · bypassGranted · bypassRequested · locked). Bypass request form: role required, pub/note optional, no email (gate cookie identifies).
+- `client/src/components/BackToAdminBadge.tsx` — floating pill, mounted once in `App.tsx`. Uses cached `admin.summary` probe. Auto-hides on `/admin/*`, Work Mode, `/free-run`, `/login`, `/join/qr`, `/try`.
+- `client/src/pages/StyleGuideInduction.tsx` — publication-format print page at `/admin/style-guide/induction`. Cover / TOC / 9 sections / colophon. `@media print` rules produce clean A4 PDF via browser Print → Save as PDF.
+- `client/src/App.tsx` — mounted `<BackToAdminBadge />`; repointed `/roadmap` → Roadmap component; added `/admin/style-guide/induction` route.
+- `client/src/pages/Admin.tsx` — added Roadmap + Induction Style Guide links to the Guide submenu.
 - `client/src/pages/Guide.tsx` — amber pill "→ SEE YOUR ROADMAP" under the intro paragraph.
-- `server/index.ts` — removed `/roadmap` from `DEV_ONLY_PATHS` (was 404'd on prod hostname). Now flows through the normal gate wall on all hosts; `/todo` stays dev-only.
+- `server/index.ts` — removed `/roadmap` from `DEV_ONLY_PATHS`. `/todo` stays dev-only.
+- `memory/INDUCTION_STYLE_GUIDE.md` — publication-format source doc (Markdown).
 
-**Verified live on preview** (`/api/gate/verify` unlock → GET `/api/trpc/onboarding.roadmapStatus` returns 7 booleans + `counts:{tanks:25,batches:12,entries:180,measurements:120,rackings:4,bottlings:2}`; `/roadmap` page renders progress bar `7/7 · 100%`, all 7 gate cards with unlock badges + counts, The Press reveal card in the unlocked variant with "Open The Press" CTA). Back-to-Admin badge count on `/guide`: 1 (visible + expanded on hover with "Back to Admin" label); count on `/admin`: 0 (auto-hidden). Lint + tsc: no new issues (7 pre-existing errors remain in `App.tsx` weather-fallback + `AdminAudioHook.tsx`).
+**Verified live on preview**: `/api/trpc/onboarding.requestPressBypass` returns `{ok:true}`; a subsequent `roadmapStatus` returns `pressBypassRequested:true`. Roadmap page renders correctly, Skim toggle persists to localStorage, TypeScript + lint clean.
 
-**Deliberately deferred** (future session):
-- Modify `/the-press` to gate detail sections in-page based on `roadmapStatus` — current version still uses the demo/mock batch. Best addressed alongside a real batch-lifecycle refactor.
-- Empty-state screenshot smoke-test (seed user has too much data to see the locked variant); acceptance test via testing agent would use a fresh cookie/invite.
+**Deferred**:
+- **`ThePress.tsx` in-page gating** — page still uses demo/mock batch. Best addressed alongside a real batch-lifecycle refactor.
+- **Owner UI to grant bypass** — currently a SQL insert. Small admin panel needed at `/admin/members` (list pending `press_bypass_request` events, one-click grant).
+- **First-invite redirect to `/roadmap`** — first-time invite still lands on `/admin` or `/guide`.
 
 ---
 

@@ -359,6 +359,7 @@ const QUICKLINK_COLUMNS: Array<{
     links: [
       { label: "Getting Started",     href: "/guide" },
       { label: "Roadmap",             href: "/roadmap" },
+      { label: "Induction Style Guide (PDF)", href: "/admin/style-guide/induction" },
       { label: "Regulations Library", href: "/regulations" },
       { label: "FAQ",                 href: "/#faq" },
       { label: "Our Story",           href: "/#our-story" },
