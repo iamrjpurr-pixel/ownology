@@ -15,6 +15,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
+import { trpc } from "@/lib/trpc";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import {
   ClipboardList,
@@ -562,9 +563,14 @@ export default function Guide() {
   const toggleItem = (id: string) => {
     setCompleted(prev => {
       const next = new Set(prev);
+      const wasNew = !next.has(id);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       try { localStorage.setItem("ownology_checklist", JSON.stringify(Array.from(next))); } catch { /* ignore */ }
+      // Only log on tick-ON, not un-tick, so admin sees intent.
+      if (wasNew) {
+        logStepMutation.mutate({ stepId: `checklist:${id}`, kind: "checklist" }, { onError: () => { /* non-critical */ } });
+      }
       return next;
     });
   };
@@ -585,15 +591,47 @@ export default function Guide() {
   const toggleExpanded = (id: string) => {
     setExpanded(prev => {
       const next = new Set(prev);
+      const wasNew = !next.has(id);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       try { localStorage.setItem("ownology_guide_expanded", JSON.stringify(Array.from(next))); } catch { /* ignore */ }
+      // Server-side telemetry — fire only on first expansion so admin sees
+      // the moment a user opened each section (not every toggle).
+      if (wasNew) {
+        logStepMutation.mutate({ stepId: id, kind: "reveal" }, { onError: () => { /* non-critical */ } });
+      }
       return next;
     });
   };
 
+  // ── Progress telemetry — writes onboarding_step to member_activity so
+  // /admin/members can compute a per-user progress score. Fire-and-forget:
+  // fails silently so UI never blocks on network. Feb 2026, Rich.
+  const logStepMutation = trpc.onboarding.logStep.useMutation();
+
   const completedCount = completed.size;
   const totalCount = CHECKLIST.length;
+  // Total reveal cards — keep in sync with the six sections at the bottom
+  // of this component (workflow-map, checklist, role-paths, tier-access,
+  // first-fermentation, further-reading).
+  const REVEAL_TOTAL = 6;
+  const revealedCount = expanded.size;
+  const guideProgressPct = Math.round(
+    ((revealedCount / REVEAL_TOTAL) * 0.5 + (completedCount / totalCount) * 0.5) * 100
+  );
+
+  // When the user completes 100% of the checklist AND opens every section,
+  // log an "onboarding_complete" event once. Guarded by a localStorage flag
+  // so we only ever fire the completion event a single time per user.
+  useEffect(() => {
+    if (revealedCount === REVEAL_TOTAL && completedCount === totalCount && totalCount > 0) {
+      try {
+        if (localStorage.getItem("ownology_guide_completed") === "1") return;
+        localStorage.setItem("ownology_guide_completed", "1");
+        logStepMutation.mutate({ stepId: "guide_complete", kind: "complete" }, { onError: () => { /* non-critical */ } });
+      } catch { /* ignore */ }
+    }
+  }, [revealedCount, completedCount, totalCount, logStepMutation]);
 
   return (
     <div style={{ background: BG, minHeight: "100vh" }}>
@@ -626,6 +664,61 @@ export default function Guide() {
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", color: TEXT_MID, lineHeight: 1.7, maxWidth: "560px" }}>
             Ownology is a four-pillar platform for boutique winery teams. This page explains what each pillar does, how they connect, and where to start.
           </p>
+
+          {/* ── Guide progress meter — visible at the top so the visitor
+              knows where they are in the tour. Progress = 50% of sections
+              opened + 50% of checklist items ticked. Both signals also
+              flow server-side (see logStepMutation) so /admin/members can
+              see per-user progress without another table. Feb 2026, Rich. */}
+          <div
+            data-testid="guide-progress-meter"
+            style={{
+              marginTop: "1.75rem",
+              padding: "1rem 1.15rem",
+              background: BG_CARD,
+              border: `1px solid ${BORDER}`,
+              borderRadius: 6,
+              maxWidth: "640px",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.55rem", gap: "1rem", flexWrap: "wrap" }}>
+              <p style={{ fontFamily: MONO, fontSize: "0.62rem", letterSpacing: "0.14em", color: AMBER, textTransform: "uppercase", margin: 0 }}>
+                Your progress
+              </p>
+              <p
+                data-testid="guide-progress-pct"
+                style={{ fontFamily: MONO, fontSize: "0.75rem", color: TEXT_HI, margin: 0, fontWeight: 700 }}
+              >
+                {guideProgressPct}%
+              </p>
+            </div>
+            <div
+              style={{
+                height: 6,
+                borderRadius: 999,
+                background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
+                overflow: "hidden",
+                marginBottom: "0.75rem",
+              }}
+            >
+              <div
+                style={{
+                  height: "100%",
+                  width: `${guideProgressPct}%`,
+                  background: AMBER,
+                  transition: "width 400ms ease",
+                }}
+              />
+            </div>
+            <div style={{ display: "flex", gap: "1.25rem", flexWrap: "wrap", fontFamily: SANS, fontSize: "0.78rem", color: TEXT_MID }}>
+              <span data-testid="guide-progress-sections">
+                <strong style={{ color: TEXT_HI }}>{revealedCount}</strong> / {REVEAL_TOTAL} sections opened
+              </span>
+              <span data-testid="guide-progress-checklist">
+                <strong style={{ color: TEXT_HI }}>{completedCount}</strong> / {totalCount} checklist done
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
