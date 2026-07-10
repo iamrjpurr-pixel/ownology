@@ -583,7 +583,7 @@ export default function Guide() {
   // Doctrine: reveal /guide's dense sub-sections slowly. Only the Four
   // Pillars overview shows above the fold on a first landing — everything
   // else (Workflow Map · Getting Started Checklist · Role Paths · Tier
-  // Access · First Fermentation · Further Reading) sits behind a
+  // Access · Further Reading) sits behind a
   // click-to-reveal card. Persisted so returning visitors don't re-tap.
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     try {
@@ -615,10 +615,11 @@ export default function Guide() {
 
   const completedCount = completed.size;
   const totalCount = CHECKLIST.length;
-  // Total reveal cards — keep in sync with the six sections at the bottom
+  // Total reveal cards — keep in sync with the five sections at the bottom
   // of this component (workflow-map, checklist, role-paths, tier-access,
-  // first-fermentation, further-reading).
-  const REVEAL_TOTAL = 6;
+  // further-reading). "Your First Fermentation" removed Feb 2026 — it was
+  // teaching winemaking, not app usage (off-strategy for /guide).
+  const REVEAL_TOTAL = 5;
   const revealedCount = expanded.size;
   const guideProgressPct = Math.round(
     ((revealedCount / REVEAL_TOTAL) * 0.5 + (completedCount / totalCount) * 0.5) * 100
@@ -1183,68 +1184,6 @@ export default function Guide() {
           />
         )}
 
-        {/* ── Section 6 — Your First Fermentation ── */}
-        {expanded.has("firstferment") ? (
-        <section>
-          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "1.5rem", color: TEXT_HI, marginBottom: "0.5rem" }}>
-            Your First Fermentation
-          </h2>
-          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9375rem", color: TEXT_MID, marginBottom: "1.5rem", maxWidth: "600px" }}>
-            Follow these seven steps from empty tank to bottled wine. Each step links to the right tool and its SOP.
-          </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
-            {([
-              { step: 1, title: "Clean Your Tank", pillarLabel: "DO", pillarColor: "oklch(0.65 0.10 220)", tool: "Cellar Tasks", toolHref: "/cellar-tasks", sopTitle: "Tank Cleaning & Sanitisation", sopHref: "/knowledge/category/Tank%20Cleaning%20%26%20Sanitation", desc: "Verify cleaning record, inspect valves and seals, confirm tank ID." },
-              { step: 2, title: "Receive Your Grapes", pillarLabel: "DO", pillarColor: "oklch(0.65 0.10 220)", tool: "The Press", toolHref: "/the-press", sopTitle: "Red Wine Fermentation", sopHref: "/knowledge/category/Fermentation%20Management", desc: "Record vineyard block, variety, date, Brix, pH, and TA at intake." },
-              { step: 3, title: "Add Your Yeast", pillarLabel: "KNOW", pillarColor: "var(--ow-amber)", tool: "Knowledge Platform", toolHref: "/knowledge", sopTitle: "Yeast Rehydration & Inoculation", sopHref: "/knowledge/category/Fermentation%20Management", desc: "Rehydrate yeast correctly. Record batch number and inoculation time." },
-              { step: 4, title: "Monitor Daily", pillarLabel: "DO", pillarColor: "oklch(0.65 0.10 220)", tool: "Quick Entry", toolHref: "/quick-entry", sopTitle: "Pump-Over Protocol", sopHref: "/knowledge/category/Fermentation%20Management", desc: "Measure temperature, Brix, and sensory observations every day." },
-              { step: 5, title: "Manage the Cap", pillarLabel: "DO", pillarColor: "oklch(0.65 0.10 220)", tool: "The Press", toolHref: "/the-press", sopTitle: "Pump-Over Protocol", sopHref: "/knowledge/category/Fermentation%20Management", desc: "Conduct pump-overs per your fermentation schedule. Record duration." },
-              { step: 6, title: "Press the Wine", pillarLabel: "DO", pillarColor: "oklch(0.65 0.10 220)", tool: "The Press", toolHref: "/the-press", sopTitle: "Wine Press Operation & Pressing", sopHref: "/knowledge/category/Fermentation%20Management", desc: "Confirm residual sugar target. Separate free-run from press fractions." },
-              { step: 7, title: "Bottle Your Wine", pillarLabel: "DO", pillarColor: "oklch(0.65 0.10 220)", tool: "The Press", toolHref: "/the-press", sopTitle: "Bottling & Packaging", sopHref: "/knowledge/category/Bottling%20Procedures", desc: "Check clarity and SO₂. Fill, seal, label, and record your batch." },
-            ] as Array<{ step: number; title: string; pillarLabel: string; pillarColor: string; tool: string; toolHref: string; sopTitle: string; sopHref: string; desc: string }>).map(item => (
-              <div key={item.step} style={{
-                background: BG_CARD, border: `1px solid ${BORDER}`, borderRadius: "4px",
-                padding: "0.875rem 1.125rem",
-                display: "grid", gridTemplateColumns: "2.25rem 1fr", gap: "0.875rem", alignItems: "start",
-              }}>
-                <div style={{
-                  width: "2.25rem", height: "2.25rem", borderRadius: "50%",
-                  background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontFamily: SERIF, fontWeight: 700, fontSize: "0.875rem", color: AMBER, flexShrink: 0,
-                }}>
-                  {item.step}
-                </div>
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem", flexWrap: "wrap" }}>
-                    <span style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.9375rem", color: TEXT_HI }}>{item.title}</span>
-                    <span style={{
-                      fontFamily: MONO, fontSize: "0.6rem", fontWeight: 600, letterSpacing: "0.1em",
-                      textTransform: "uppercase" as const, color: item.pillarColor,
-                      background: `color-mix(in oklch, ${item.pillarColor} 12%, transparent)`,
-                      border: `1px solid color-mix(in oklch, ${item.pillarColor} 28%, transparent)`,
-                      borderRadius: "3px", padding: "1px 5px",
-                    }}>{item.pillarLabel}</span>
-                  </div>
-                  <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.8125rem", color: TEXT_MID, marginBottom: "0.4rem" }}>{item.desc}</p>
-                  <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-                    <Link href={item.toolHref} style={{ fontFamily: SANS, fontSize: "0.75rem", color: AMBER, textDecoration: "none" }}>→ {item.tool}</Link>
-                    <Link href={item.sopHref} style={{ fontFamily: SANS, fontSize: "0.75rem", color: "oklch(0.65 0.10 220)", textDecoration: "none" }}>📖 {item.sopTitle}</Link>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-        ) : (
-          <RevealCard
-            id="firstferment"
-            kicker="Your First Fermentation"
-            title="Seven steps from empty tank to bottled wine"
-            teaser="A walkthrough with pillar tags and SOP links. Best after you've explored the pillars."
-            onReveal={() => toggleExpanded("firstferment")}
-          />
-        )}
 
         {/* ── Further Reading — external authoritative sources ── */}
         {expanded.has("reading") ? (
