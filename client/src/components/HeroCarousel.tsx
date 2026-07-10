@@ -403,7 +403,11 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
         ))}
       </div>
 
-      {/* Skip intro */}
+      {/* Skip intro — positioned bottom-right so it doesn't collide with the
+          sticky nav's "Work Mode" + "For winemakers" pills in the top-right
+          (Feb 2026, Rich caught the overlap on ownology.ai). Bottom-right
+          also makes more UX sense: the ↓ arrow signals "scroll past this",
+          which reads naturally when the CTA is anchored to the bottom edge. */}
       {onSkip && (
         <button
           type="button"
@@ -411,10 +415,11 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
           onClick={onSkip}
           style={{
             position: "absolute",
-            top: "1.5rem",
+            bottom: "1.5rem",
             right: "1.5rem",
             padding: "0.4rem 0.85rem",
-            background: "transparent",
+            background: "color-mix(in oklch, var(--ow-bg-base) 60%, transparent)",
+            backdropFilter: "blur(6px)",
             border: "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)",
             borderRadius: 999,
             color: "oklch(0.75 0.015 75)",
