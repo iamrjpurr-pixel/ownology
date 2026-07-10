@@ -30,7 +30,17 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
   const [active, setActive] = useState<Scene>("owen");
   const [paused, setPaused] = useState(false);
   const [progressKey, setProgressKey] = useState(0);
+  // Bottom-centre "↓" scroll indicator — fades out once the user has scrolled
+  // past 100px so it doesn't clutter the hero on return visits (Feb 2026, Rich).
+  // Standard cinematic-site vocabulary: silent bouncing chevron, no copy needed.
+  const [scrolled, setScrolled] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 100);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     if (paused) {
@@ -435,8 +445,58 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
         </button>
       )}
 
+      {/* Scroll indicator — bottom-centre bouncing chevron. Silent (no copy),
+          fades once user has scrolled past 100px. Reuses onSkip so click also
+          scrolls to below-fold content. Standard cinematic-site vocabulary
+          (Apple / Tesla / most 2020+ marketing sites). Feb 2026, Rich. */}
+      {onSkip && (
+        <button
+          type="button"
+          data-testid="hero-scroll-indicator"
+          onClick={onSkip}
+          aria-label="Scroll for more"
+          style={{
+            position: "absolute",
+            bottom: "1.4rem",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: 36,
+            height: 36,
+            padding: 0,
+            background: "transparent",
+            border: "none",
+            borderRadius: "50%",
+            color: "color-mix(in oklch, var(--ow-amber) 85%, transparent)",
+            cursor: "pointer",
+            opacity: scrolled ? 0 : 1,
+            pointerEvents: scrolled ? "none" : "auto",
+            transition: "opacity 400ms ease",
+            animation: "hero-scroll-bounce 2.2s ease-in-out infinite",
+            zIndex: 3,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+            <path
+              d="M4 8l7 7 7-7"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      )}
+
       <style>{`
         @keyframes progress-fill { from { width: 0%; } to { width: 100%; } }
+        @keyframes hero-scroll-bounce {
+          0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); }
+          40% { transform: translate(-50%, -6px); }
+          60% { transform: translate(-50%, -3px); }
+        }
       `}</style>
     </section>
   );
