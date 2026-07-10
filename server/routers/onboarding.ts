@@ -15,11 +15,11 @@
  * schema change. Kept short + slugged, capped at 80 chars.
  */
 import { z } from "zod";
-import { router, publicProcedure, protectedProcedure } from "../trpc.js";
+import { router, publicProcedure, protectedProcedure, ownerProcedure } from "../trpc.js";
 import { logMemberActivity } from "../memberActivity.js";
 import { getUserByOpenId, listVintageLogEntries, listWineBatches, getUsedTankNames, db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
-import { and, eq, desc } from "drizzle-orm";
+import { and, eq, desc, inArray } from "drizzle-orm";
 // `and` is imported but not currently used — reserved for future compound
 // filter (e.g. userId + kind IN) if we outgrow the JS-side filter below.
 void and;
@@ -184,4 +184,89 @@ export const onboardingRouter = router({
       },
     };
   }),
+
+  /**
+   * listPressBypassRequests — owner-only. Returns the most recent
+   * `press_bypass_request` events with a computed status per user
+   * (granted if a later `press_bypass_granted` exists for the same
+   * userId, else pending). Powers the /admin/press-bypass grant UI.
+   */
+  listPressBypassRequests: ownerProcedure.query(async () => {
+    const rows = await db
+      .select({
+        id: schema.memberActivity.id,
+        userId: schema.memberActivity.userId,
+        kind: schema.memberActivity.kind,
+        details: schema.memberActivity.details,
+        occurredAt: schema.memberActivity.occurredAt,
+        gateInviteId: schema.memberActivity.gateInviteId,
+      })
+      .from(schema.memberActivity)
+      .where(inArray(schema.memberActivity.kind, ["press_bypass_request", "press_bypass_granted"]))
+      .orderBy(desc(schema.memberActivity.occurredAt))
+      .limit(200);
+
+    // Latest event per userId wins for status. Group by userId (nullable —
+    // pre-auth requests can be identified by gateInviteId instead).
+    const byKey = new Map<string, {
+      key: string;
+      userId: number | null;
+      gateInviteId: number | null;
+      requestedAt: number | null;
+      grantedAt: number | null;
+      role: string | null;
+      publication: string | null;
+      note: string | null;
+    }>();
+    for (const row of rows) {
+      const key = row.userId != null ? `u:${row.userId}` : row.gateInviteId != null ? `i:${row.gateInviteId}` : `id:${row.id}`;
+      const existing = byKey.get(key) ?? {
+        key,
+        userId: row.userId ?? null,
+        gateInviteId: row.gateInviteId ?? null,
+        requestedAt: null as number | null,
+        grantedAt: null as number | null,
+        role: null as string | null,
+        publication: null as string | null,
+        note: null as string | null,
+      };
+      if (row.kind === "press_bypass_request") {
+        // Keep the LATEST request timestamp + details.
+        if (existing.requestedAt == null || row.occurredAt > existing.requestedAt) {
+          existing.requestedAt = row.occurredAt;
+          try {
+            const d = row.details ? JSON.parse(row.details) : {};
+            existing.role = typeof d.role === "string" ? d.role : null;
+            existing.publication = typeof d.publication === "string" ? d.publication : null;
+            existing.note = typeof d.note === "string" ? d.note : null;
+          } catch { /* ignore malformed */ }
+        }
+      } else if (row.kind === "press_bypass_granted") {
+        if (existing.grantedAt == null || row.occurredAt > existing.grantedAt) {
+          existing.grantedAt = row.occurredAt;
+        }
+      }
+      byKey.set(key, existing);
+    }
+
+    return Array.from(byKey.values()).sort((a, b) => (b.requestedAt ?? 0) - (a.requestedAt ?? 0));
+  }),
+
+  /**
+   * grantPressBypass — owner-only. Writes a `press_bypass_granted`
+   * event against the target user, which unlocks The Press card for
+   * that user regardless of gate 6/7 state. Idempotent — safe to call
+   * repeatedly, latest timestamp wins.
+   */
+  grantPressBypass: ownerProcedure
+    .input(z.object({ userId: z.number().int().positive() }))
+    .mutation(async ({ ctx, input }) => {
+      await logMemberActivity({
+        req: ctx.req,
+        kind: "press_bypass_granted",
+        userId: input.userId,
+        details: { grantedAt: Date.now() },
+      });
+      return { ok: true };
+    }),
 });

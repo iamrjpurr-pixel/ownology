@@ -354,6 +354,7 @@ async function startServer() {
     setGateCookie(res, cookieToken);
     // Update usage counters (fire-and-forget)
     const now = Date.now();
+    const isFirstUse = !invite.firstUsedAt;
     db.update(gateInvites)
       .set({
         firstUsedAt: invite.firstUsedAt ?? now,
@@ -363,7 +364,13 @@ async function startServer() {
       .where(eq(gateInvites.id, invite.id))
       .catch(() => {});
     await db.execute(sql`INSERT INTO gate_events (kind, ip, user_agent, path, occurred_at) VALUES ('success', ${ip}, ${ua}, ${'/i/invite/' + String(invite.id)}, ${Date.now()})`).catch(() => {});
-    // Land on the admin hub — most invites are for team/beta testers.
+    // Feb 2026, Rich: first-use invites land on /roadmap so the
+    // induction spine is the user's FIRST Ownology surface, not their
+    // third. Repeat uses (returning team members, testers) land on
+    // /admin as before.
+    if (isFirstUse) {
+      return res.redirect(302, "/roadmap?welcome=1");
+    }
     return res.redirect(302, "/admin");
   });
 

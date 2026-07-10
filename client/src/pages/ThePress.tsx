@@ -9,7 +9,10 @@
  */
 
 import { useState } from "react";
+import { Link } from "wouter";
 import { SopBridgeChip } from "@/components/SopSidePanel";
+import { trpc } from "@/lib/trpc";
+import { Lock, ArrowRight } from "lucide-react";
 
 // ── Work Mode brand accent (amber) ───────────────────────────────────────────
 // The Work Mode app is a light surface; we use a deep amber for text/strokes so
@@ -85,6 +88,190 @@ const MOCK_ENTRIES: LogEntry[] = [
 ];
 
 export default function ThePress() {
+  // Feb 2026, Rich: The Press must honour the reveal law. Gate this page
+  // at render top — a user who deep-links here must either have earned
+  // the debrief (hasRacking || hasBottling) or been granted preview
+  // access (pressBypassGranted). Anything else → locked placeholder.
+  //
+  // Value-engineered wrapper: the existing 780-line mock body renders
+  // unchanged when unlocked. When bypass-granted (not naturally
+  // unlocked), we show a "Preview access — sample data" ribbon so the
+  // evaluator understands the numbers below are curated, not theirs.
+  const roadmap = trpc.onboarding.roadmapStatus.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 60_000,
+  });
+  const status = roadmap.data;
+  const naturallyUnlocked = !!(status?.hasRacking || status?.hasBottling);
+  const bypassGranted = !!status?.pressBypassGranted;
+  const bypassRequested = !!status?.pressBypassRequested;
+  const isPreview = bypassGranted && !naturallyUnlocked;
+  const isLocked = !naturallyUnlocked && !bypassGranted;
+
+  // While the status query is loading, don't flash the mock content —
+  // render a lightweight skeleton so the reveal law can't be defeated by
+  // a slow tRPC round-trip.
+  if (roadmap.isLoading) {
+    return (
+      <div style={{ padding: "3rem 1.25rem", textAlign: "center", color: ACCENT, fontFamily: "'Lato', sans-serif", fontSize: "0.85rem", opacity: 0.6 }}>
+        Loading The Press…
+      </div>
+    );
+  }
+
+  if (isLocked) {
+    return <ThePressLockedPlaceholder bypassRequested={bypassRequested} />;
+  }
+
+  return <ThePressContent isPreview={isPreview} />;
+}
+
+// ── Locked placeholder — shown when the reveal law says "not yet." ──
+function ThePressLockedPlaceholder({ bypassRequested }: { bypassRequested: boolean }) {
+  return (
+    <div
+      data-testid="the-press-locked"
+      style={{
+        maxWidth: 640,
+        margin: "0 auto",
+        padding: "3rem 1.5rem 4rem",
+        color: ACCENT_INK,
+        fontFamily: "'Lato', sans-serif",
+      }}
+    >
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          padding: "0.4rem 0.8rem",
+          borderRadius: 999,
+          background: ACCENT_SOFT,
+          border: `1px solid ${ACCENT_BORDER}`,
+          color: ACCENT,
+          fontSize: "0.68rem",
+          fontWeight: 700,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          marginBottom: "1.5rem",
+        }}
+      >
+        <Lock size={12} strokeWidth={2.4} /> Locked · reveal on earn
+      </div>
+      <h1
+        style={{
+          margin: 0,
+          fontFamily: "'Fraunces', Georgia, serif",
+          fontSize: "clamp(1.8rem, 5vw, 2.5rem)",
+          lineHeight: 1.1,
+          fontWeight: 600,
+          letterSpacing: "-0.02em",
+          color: ACCENT_INK,
+        }}
+      >
+        The Press waits for your first racking.
+      </h1>
+      <p
+        style={{
+          margin: "1rem 0 0 0",
+          fontSize: "1rem",
+          color: "#5c4a3d",
+          lineHeight: 1.65,
+          maxWidth: "58ch",
+        }}
+      >
+        The Press is Ownology&apos;s post-vintage debrief — peak Brix,
+        ferment duration, temp swings, additions timeline, tasting notes,
+        cited back to your own timeline. We deliberately don&apos;t open
+        it until you&apos;ve racked a batch you actually made. A debrief
+        populated with fake numbers would be a stock photo, and a stock
+        photo is not what you signed up for.
+      </p>
+
+      <div
+        style={{
+          marginTop: "2rem",
+          padding: "1.25rem 1.5rem",
+          borderRadius: "0.75rem",
+          background: ACCENT_SOFT,
+          border: `1px solid ${ACCENT_BORDER}`,
+        }}
+      >
+        <p style={{ margin: 0, fontSize: "0.85rem", color: ACCENT_INK, fontWeight: 600 }}>
+          Two ways to open this page:
+        </p>
+        <ol style={{ margin: "0.5rem 0 0 0", paddingLeft: "1.25rem", fontSize: "0.88rem", color: "#5c4a3d", lineHeight: 1.7 }}>
+          <li>
+            <strong>Earn it.</strong> Log a racking event on any batch in
+            the Vessel Journal. This is the honest path.
+          </li>
+          <li>
+            <strong>Request preview access.</strong> If you&apos;re
+            evaluating Ownology as a wine writer, judge, buyer, or
+            consulting winemaker, we&apos;ll grant temporary preview
+            access with a curated sample vintage.
+          </li>
+        </ol>
+        <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", marginTop: "1rem" }}>
+          <Link
+            href="/quick-entry"
+            data-testid="the-press-locked-earn-cta"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.35rem",
+              fontSize: "0.82rem",
+              fontWeight: 600,
+              color: ACCENT_INK,
+              textDecoration: "none",
+              padding: "0.55rem 1.1rem",
+              borderRadius: 999,
+              background: ACCENT,
+            }}
+          >
+            Log a racking <ArrowRight size={13} strokeWidth={2.2} />
+          </Link>
+          <Link
+            href="/roadmap"
+            data-testid="the-press-locked-bypass-cta"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.35rem",
+              fontSize: "0.82rem",
+              fontWeight: 600,
+              color: ACCENT,
+              textDecoration: "none",
+              padding: "0.55rem 1.1rem",
+              borderRadius: 999,
+              background: "transparent",
+              border: `1px solid ${ACCENT}`,
+            }}
+          >
+            {bypassRequested ? "See request status →" : "Request preview access →"}
+          </Link>
+        </div>
+      </div>
+
+      <p
+        style={{
+          margin: "1.5rem 0 0 0",
+          fontSize: "0.75rem",
+          color: "#8a7565",
+          fontFamily: "'Fraunces', Georgia, serif",
+          fontStyle: "italic",
+        }}
+      >
+        The map is not the territory. The roadmap is not the vintage.
+      </p>
+    </div>
+  );
+}
+
+// ── The full Press body — original mock content, extracted so the ──
+// ── locked/preview wrapper stays lean. isPreview adds a ribbon.    ──
+function ThePressContent({ isPreview }: { isPreview: boolean }) {
   const [entries, setEntries] = useState<LogEntry[]>(MOCK_ENTRIES);
   const [batch] = useState<Batch>(MOCK_BATCH);
   const [showAddEntry, setShowAddEntry] = useState(false);
@@ -204,6 +391,30 @@ export default function ThePress() {
 
   return (
     <div style={{ padding: "1.5rem 1.25rem", maxWidth: "640px", margin: "0 auto", width: "100%" }}>
+      {/* Preview-access ribbon — shown to bypass-granted evaluators so
+          they know the numbers below are a curated sample, not their
+          own vintage. Reveal-law compliance. */}
+      {isPreview && (
+        <div
+          data-testid="the-press-preview-ribbon"
+          style={{
+            marginBottom: "1rem",
+            padding: "0.6rem 0.9rem",
+            borderRadius: "0.5rem",
+            background: ACCENT_SOFT,
+            border: `1px solid ${ACCENT_BORDER}`,
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.78rem",
+            color: ACCENT_INK,
+            lineHeight: 1.5,
+          }}
+        >
+          <strong style={{ color: ACCENT, letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.66rem" }}>Preview access ·</strong>{" "}
+          The batch below is a curated sample so you can evaluate what The
+          Press does. Your own debrief unlocks the moment you log a racking event.
+        </div>
+      )}
+
       {/* Compare vintages CTA */}
       <div style={{ marginBottom: "1rem", textAlign: "right" }}>
         <a

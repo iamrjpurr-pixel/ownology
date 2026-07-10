@@ -698,6 +698,7 @@ export default function Guide() {
             >
               → See your roadmap
             </Link>
+            <GuideSkimIndicator />
           </div>
 
           {/* ── Guide progress meter — visible at the top so the visitor
@@ -1361,6 +1362,46 @@ export default function Guide() {
 
       </div>
     </div>
+  );
+}
+
+// Small "Skim mode is on" indicator — surfaced on /guide (and elsewhere in
+// future) so the wine-pro user knows a lens is applied to their roadmap.
+// Fixes the hidden-state UX risk (Nielsen H1) flagged in the human-factors
+// review — a user who turned skim on while evaluating and came back
+// weeks later as a paying member wouldn't have known the toggle exists.
+// Feb 2026, Rich.
+function GuideSkimIndicator() {
+  const isSkim =
+    typeof window !== "undefined" &&
+    window.localStorage.getItem("ow_skim_mode") === "1";
+  if (!isSkim) return null;
+  return (
+    <Link
+      href="/roadmap"
+      data-testid="guide-skim-indicator"
+      title="You have Skim mode on — every roadmap gate description is visible. Tap to open the roadmap and toggle it off."
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "0.35rem",
+        marginTop: "1rem",
+        marginLeft: "0.6rem",
+        padding: "0.35rem 0.75rem",
+        borderRadius: 999,
+        background: "rgba(176,116,26,0.12)",
+        border: "1px dashed rgba(176,116,26,0.55)",
+        color: "#B0741A",
+        fontFamily: "'JetBrains Mono', monospace",
+        fontSize: "0.62rem",
+        letterSpacing: "0.1em",
+        textTransform: "uppercase",
+        textDecoration: "none",
+        fontWeight: 700,
+      }}
+    >
+      Skim mode · on
+    </Link>
   );
 }
 

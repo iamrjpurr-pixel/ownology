@@ -44,6 +44,10 @@ type Gate = {
   promise: string;
   unlocks: string;
   cta: { label: string; href: string };
+  // Optional "why does this matter?" secondary CTA — softens locked-gate
+  // reactance risk by giving skimmers a route to context instead of
+  // always funnelling them to `/quick-entry`.
+  learnCta?: { label: string; href: string };
   detail: string;
 };
 
@@ -65,6 +69,7 @@ const GATES: Gate[] = [
     promise: "Log at least one tank name in the Vessel Journal.",
     unlocks: "Tank-tag autofill · vessel-scoped brief cards.",
     cta: { label: "Add a tank via Quick Entry", href: "/quick-entry" },
+    learnCta: { label: "Why vessels first?", href: "/guide#pillar-journal" },
     detail:
       "Even a single tank unlocks vessel-scoped intelligence. You'll see it in the Brief, in Ask Owen citations, and on the Roadmap dashboard. No block/vineyard data required at this stage.",
   },
@@ -75,6 +80,7 @@ const GATES: Gate[] = [
     promise: "Log a variety + vintage against a tank.",
     unlocks: "The Press architecture · Cellar Brief per-batch cards · SOP suggestions.",
     cta: { label: "Add a batch via Quick Entry", href: "/quick-entry" },
+    learnCta: { label: "See a sample batch write-up", href: "/cellar-journal" },
     detail:
       "A batch = a variety + a tank + a vintage year. This is when The Press becomes visible in the shell (architecture only — the deep post-vintage debrief still needs measurements + a completed ferment).",
   },
@@ -85,6 +91,7 @@ const GATES: Gate[] = [
     promise: "Log a Brix, pH, or temperature reading.",
     unlocks: "Alerts engine · trend lines · sensory inference.",
     cta: { label: "Log a measurement", href: "/quick-entry" },
+    learnCta: { label: "How the alerts engine works", href: "/guide#pillar-copilot" },
     detail:
       "One reading turns Ownology on. Two readings starts the trend. The alerts engine (stuck ferment / temp excursion / SO₂ decay) needs at least one measurement per vessel to have a baseline.",
   },
@@ -95,6 +102,7 @@ const GATES: Gate[] = [
     promise: "Inoculation logged OR 3+ measurements on one vessel.",
     unlocks: "Live ferment card on the brief · MLF prompts · tasting flywheel.",
     cta: { label: "Log an inoculation", href: "/quick-entry" },
+    learnCta: { label: "Ask Owen about ferment chemistry", href: "/ask" },
     detail:
       "A ferment moves the vessel from 'setup' to 'active'. Ownology starts nudging you on DAP, temp, SO₂ addition points. You can also start logging tastings at this point (they feed the Sensory Snapshot on the Brief).",
   },
@@ -105,6 +113,7 @@ const GATES: Gate[] = [
     promise: "Log a racking event — ferment considered finished.",
     unlocks: "The Press · per-batch debrief detail · vintage comparison.",
     cta: { label: "Log a racking event", href: "/quick-entry" },
+    learnCta: { label: "Preview The Press", href: "/the-press" },
     detail:
       "Once you've racked, Ownology can honestly write the post-ferment story for that batch: peak Brix, ferment duration, temp swing, additions timeline. This is when The Press earns its keep.",
   },
@@ -115,6 +124,7 @@ const GATES: Gate[] = [
     promise: "Log a bottling run against the batch.",
     unlocks: "Vintage-year archive · compliance PDF export · Insta Copilot.",
     cta: { label: "Log a bottling run", href: "/quick-entry" },
+    learnCta: { label: "See compliance export", href: "/regulations" },
     detail:
       "The batch is finished. Ownology archives the full lineage: harvest → inoculation → ferment → racking → maturation → bottling. Compliance audit-pack PDF becomes exportable. The Insta Copilot has enough raw material to write a real vintage caption.",
   },
@@ -250,27 +260,50 @@ function Node({
           </p>
         )}
         {!unlocked && (
-          <Link
-            href={gate.cta.href}
-            data-testid={`${testId}-cta`}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.35rem",
-              fontSize: "0.8rem",
-              fontFamily: "'Lato', sans-serif",
-              fontWeight: 600,
-              color: "#B0741A",
-              textDecoration: "none",
-              padding: "0.4rem 0.8rem",
-              borderRadius: 999,
-              border: "1px solid rgba(176,116,26,0.4)",
-              background: "rgba(251,243,228,0.5)",
-              marginTop: "0.3rem",
-            }}
-          >
-            {gate.cta.label} <ArrowRight size={12} strokeWidth={2.2} />
-          </Link>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", alignItems: "center" }}>
+            <Link
+              href={gate.cta.href}
+              data-testid={`${testId}-cta`}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
+                fontSize: "0.8rem",
+                fontFamily: "'Lato', sans-serif",
+                fontWeight: 600,
+                color: "#B0741A",
+                textDecoration: "none",
+                padding: "0.4rem 0.8rem",
+                borderRadius: 999,
+                border: "1px solid rgba(176,116,26,0.4)",
+                background: "rgba(251,243,228,0.5)",
+                marginTop: "0.3rem",
+              }}
+            >
+              {gate.cta.label} <ArrowRight size={12} strokeWidth={2.2} />
+            </Link>
+            {gate.learnCta && (
+              <Link
+                href={gate.learnCta.href}
+                data-testid={`${testId}-learn-cta`}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.3rem",
+                  fontSize: "0.72rem",
+                  fontFamily: "'Lato', sans-serif",
+                  fontWeight: 500,
+                  color: "rgba(0,0,0,0.55)",
+                  textDecoration: "none",
+                  padding: "0.3rem 0.6rem",
+                  borderRadius: 999,
+                  marginTop: "0.3rem",
+                }}
+              >
+                {gate.learnCta.label} →
+              </Link>
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -295,6 +328,10 @@ export default function Roadmap() {
     if (typeof window === "undefined") return;
     window.localStorage.setItem("ow_skim_mode", skim ? "1" : "0");
   }, [skim]);
+
+  // First-invite welcome banner — server redirects new invite tokens to
+  // /roadmap?welcome=1 so the induction spine is the user's FIRST surface.
+  const isWelcome = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("welcome") === "1";
 
   const status = data ?? {
     registered: false,
@@ -380,6 +417,32 @@ export default function Roadmap() {
           it by racking a batch you actually made. Honest, progressive disclosure.
         </p>
       </div>
+
+      {/* First-invite welcome banner (from ?welcome=1 on /i/<token> redirect) */}
+      {isWelcome && (
+        <div
+          data-testid="roadmap-welcome-banner"
+          style={{
+            marginBottom: "1.5rem",
+            padding: "1rem 1.25rem",
+            borderRadius: "0.75rem",
+            background: "linear-gradient(180deg, #FBF3E4, #F3ECE4)",
+            border: "1px solid rgba(176,116,26,0.35)",
+            fontFamily: "'Lato', sans-serif",
+            color: "#2A1E0A",
+          }}
+        >
+          <p style={{ margin: 0, fontSize: "0.7rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "#B0741A", fontWeight: 700 }}>
+            Welcome to Ownology
+          </p>
+          <p style={{ margin: "0.3rem 0 0 0", fontSize: "0.9rem", lineHeight: 1.55, maxWidth: "62ch" }}>
+            You&apos;re inside. This is your roadmap — seven gates from first
+            tank to first bottling. If you&apos;re here to evaluate rather
+            than to make wine, toggle <strong>Skim mode</strong> below to
+            read every gate&apos;s full description without earning it.
+          </p>
+        </div>
+      )}
 
       {/* Skim-mode toggle — for wine-pro evaluators who want to read every
           gate's description without earning it. Does NOT grant access to
