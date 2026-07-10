@@ -402,41 +402,43 @@ export function CellarJournalEntry({ slug }: { slug: string }) {
             </div>
 
             <p className="font-mono text-[11px] uppercase tracking-[0.22em]" style={{ color: "var(--ow-amber)" }}>
-              ↓ The exact protocol, sealed
+              ↓ The advisory, sealed
             </p>
             <h3 className="font-serif italic text-2xl md:text-3xl mt-3 leading-snug">
-              The numbers live below — members see the full answer.
+              The numbers above are the industry reference. What Owen does with them is the paid layer.
             </h3>
-            <p className="mt-4 text-base md:text-lg leading-relaxed opacity-90 max-w-xl">
-              The protocol above is the general approach. The exact doses,
-              the temperature ranges, the timing windows, and the bible
-              citations — scaled to your batch size — are reserved for Ownology members.
+            <p className="mt-4 text-base md:text-lg leading-relaxed opacity-90 max-w-2xl">
+              Scale each dose to your batch size · rank interventions by likelihood if the first doesn&apos;t work · surface Bible-grade citations (author, page, edition) · answer follow-ups grounded in your wine&apos;s history · alert you within 48 hours if the fix isn&apos;t holding.
             </p>
 
-            <div className="mt-7 grid sm:grid-cols-2 gap-3">
+            <div className="mt-7 flex flex-col sm:flex-row gap-3">
+              {/* Primary CTA — the money button. Tied to THIS answer, not
+                  generic signup. Pre-fills Free Run with the current question
+                  so the visitor lands mid-flow, not on a cold form. */}
               <button
-                onClick={() => setLoc("/free-run")}
-                data-testid="cj-cta-free"
+                onClick={() => setLoc(`/free-run?q=${encodeURIComponent(entry.question)}&from=cj-${entry.slug}`)}
+                data-testid="cj-cta-scale"
+                className="px-5 py-3 rounded-full font-mono text-[11px] uppercase tracking-[0.22em] text-left flex items-center justify-between flex-1 transition hover:opacity-90"
+                style={{ background: "var(--ow-amber)", color: "#1a1410" }}
+              >
+                <span>
+                  <span className="block text-[10px] opacity-70">Free · 5 answers/month</span>
+                  Scale this to my batch →
+                </span>
+                <Sparkles className="w-4 h-4" />
+              </button>
+              {/* Secondary CTA — full pricing. De-emphasised to outline pill. */}
+              <button
+                onClick={() => setLoc("/pricing?from=cellar-journal")}
+                data-testid="cj-cta-paid"
                 className="px-5 py-3 rounded-full font-mono text-[11px] uppercase tracking-[0.22em] text-left flex items-center justify-between border transition hover:bg-white/5"
                 style={{ borderColor: "var(--ow-border, rgba(255,255,255,0.2))" }}
               >
                 <span>
-                  <span className="block text-[10px] opacity-60">Free</span>
-                  Ask your own — 5 / month
+                  <span className="block text-[10px] opacity-60">From $22/mo</span>
+                  See all cellar tools
                 </span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setLoc("/pricing?from=cellar-journal")}
-                data-testid="cj-cta-paid"
-                className="px-5 py-3 rounded-full font-mono text-[11px] uppercase tracking-[0.22em] text-left flex items-center justify-between"
-                style={{ background: "var(--ow-amber)", color: "#1a1410" }}
-              >
-                <span>
-                  <span className="block text-[10px] opacity-70">From $22/mo</span>
-                  Unlock the full cellar
-                </span>
-                <Sparkles className="w-4 h-4" />
               </button>
             </div>
 
