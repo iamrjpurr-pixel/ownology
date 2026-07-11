@@ -12,6 +12,7 @@ import HeroTheatricalPattern from "@/components/HeroTheatricalPattern";
 import { HeroPillarsSection } from "@/components/HeroPillarsSection";
 import HeroCarousel from "@/components/HeroCarousel";
 import WhyOwnologyBoxes from "@/components/WhyOwnologyBoxes";
+import { CellarBriefTeaser } from "@/components/CellarBriefTeaser";
 import { useUiPillarsV1 } from "@/config/ui";
 import { useAutoCascade, pickCrushByDay } from "@/hooks/useAutoCascade";
 import { Link } from "wouter";
@@ -556,6 +557,23 @@ function Hero() {
               style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,4rem)", lineHeight:1.1, color:"var(--ow-text-hi)", letterSpacing:"-0.02em", textWrap: "balance" as "balance" }}>
               <EditableText contentKey="home.hero.headline" defaultValue="The winemaker's second brain." contentMap={contentMap} />
             </h1>
+            {/* Enemy line — Feb 2026 positioning audit. Concrete, universal,
+                aligned with product-truth (Ownology = memory that doesn't lie). */}
+            <p
+              data-testid="hero-enemy-line"
+              className="fade-up fade-up-delay-1"
+              style={{
+                fontFamily: "'Fraunces', serif",
+                fontStyle: "italic",
+                fontSize: "clamp(0.95rem, 1.35vw, 1.15rem)",
+                color: "var(--ow-text-mid)",
+                margin: "1rem 0 0",
+                letterSpacing: "0.005em",
+                maxWidth: "480px",
+              }}
+            >
+              The spreadsheet in your winery is lying to you.
+            </p>
             <EditableText contentKey="home.hero.subheading" defaultValue="Log cellar readings. Access 38 industry SOPs across 12 categories. Ask our AI apprentice anything. Stay compliant. Built by boutique winemakers, for boutique wineries between 5 and 50 tonnes." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-10 fade-up fade-up-delay-3">
               <a href="/pricing?from=homepage-hero" className="btn-amber text-center">Start 14-Day Free Trial</a>
@@ -968,39 +986,16 @@ function DemoVideo() {
           60 seconds. A real cellar question. A real answer.
         </h2>
         <div className="amber-rule mt-8 mb-12" />
-        {/* Video placeholder — replace src with actual video URL when ready */}
-        <div
-          className={`relative mx-auto max-w-3xl rounded-sm overflow-hidden ${inView ? "fade-up" : "opacity-0"}`}
-          style={{border:"1px solid var(--ow-border-md)", aspectRatio:"16/9", background:"var(--ow-bg-card)"}}
-        >
-          {/* Placeholder overlay — remove this div and uncomment the iframe below when the video is ready */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center"
-              style={{background:"color-mix(in oklch, var(--ow-amber) 12%, transparent)", border:"2px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)"}}
-            >
-              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                <path d="M10 8l12 6-12 6V8z" fill="var(--ow-amber)" />
-              </svg>
-            </div>
-            <p style={{fontFamily:"'Fraunces',serif", fontWeight:500, fontSize:"1.125rem", color:"var(--ow-text-hi)"}}>Demo video coming soon</p>
-            <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9rem", color:"var(--ow-text-lo)", maxWidth:"360px", textAlign:"center", lineHeight:1.6}}>
-              A 60-second walkthrough showing Ownology answering a real cellar question from an uploaded SOP — on mobile, during harvest.
-            </p>
-          </div>
-          {/* Uncomment and replace VIDEO_URL when ready:
-          <iframe
-            src="VIDEO_URL"
-            title="Ownology demo — 60 seconds, real cellar question"
-            className="absolute inset-0 w-full h-full"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-          */}
+        {/* Live Cellar Brief teaser — replaces the "Demo video coming
+            soon" placeholder from Manus. Feb 2026 audit: prospects should
+            see the wow immediately, not a placeholder. Loads real data
+            from our own cellar via trpc.cellarBrief.latest; falls back to
+            a truthful curated sample if unauthenticated. */}
+        <div className={`${inView ? "fade-up" : "opacity-0"}`}>
+          <CellarBriefTeaser />
         </div>
         <p className="text-center mt-6" style={{fontFamily:"'Lato',sans-serif", fontSize:"0.875rem", color:"var(--ow-text-lo)"}}>
-          Want an early preview? <a href="mailto:support@ownology.ai" style={{color:"var(--ow-amber)"}}>Email us</a> and we'll walk you through it live.
+          Want to see it on your own tanks? <a href="mailto:support@ownology.ai" style={{color:"var(--ow-amber)"}}>Email us</a> or start a 14-day free trial.
         </p>
       </div>
     </section>
