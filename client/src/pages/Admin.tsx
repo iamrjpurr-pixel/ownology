@@ -403,6 +403,12 @@ const TOOLS: AdminTool[] = [
     icon: <IconMembers />,
   },
   {
+    label: "Press Bypass Requests",
+    description: "Wine writers, judges, and evaluators can request preview access to The Press without racking a batch. Grant here — one-click.",
+    href: "/admin/press-bypass",
+    icon: <IconMembers />,
+  },
+  {
     label: "Compliance Agent",
     description: "The owner-facing view of the AI regulatory Q&A tool. Test questions across all seven jurisdictions and review knowledge base coverage.",
     href: "/compliance",

@@ -4,6 +4,46 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Induction system — P0→P2 fixes shipped (Feb 2026, Rich · human-factors round-2)
+
+Round-2 of the induction system after Rich's human-factors challenge. Value-engineered the deferred list into a single shipped batch.
+
+**P0 — reveal-law compliance on `/the-press`.** Page now consults `roadmapStatus` at render top. Three states:
+- **Locked** (no racking, no bottling, no bypass) → new `ThePressLockedPlaceholder` renders instead of the mock batch. Copy explains the reveal law honestly, offers two paths out ("earn it" → `/quick-entry` · "request preview access" → `/roadmap`).
+- **Preview access** (bypass granted, no racking) → mock batch renders WITH an amber `preview-ribbon` at the top explaining "curated sample, not your own vintage."
+- **Naturally unlocked** (racking or bottling logged) → mock batch renders unchanged (still mock — the real-data refactor is a separate future task).
+
+Files: `client/src/pages/ThePress.tsx` (renamed inner body to `ThePressContent`, wrapped default export with gate check + skeleton loader).
+
+**P0 — first-invite redirect.** `/i/<token>` route in `server/index.ts` now checks `invite.firstUsedAt`. First use → `302 /roadmap?welcome=1`. Repeat uses → `/admin` as before. New `Roadmap` renders a welcome banner when the query flag is present.
+
+**P1 — owner UI to grant press bypass.** New `/admin/press-bypass` page + two new tRPC procedures (both `ownerProcedure`):
+- `listPressBypassRequests` → groups `press_bypass_request` + `press_bypass_granted` events by userId, returns pending-first / granted-second.
+- `grantPressBypass({userId})` → writes idempotent `press_bypass_granted` event.
+
+One-click grant, no modal, no confirmation dance. Also listed in `/admin` hub. Files: `client/src/pages/AdminPressBypass.tsx`, `server/routers/onboarding.ts`, `client/src/App.tsx`, `client/src/pages/Admin.tsx`.
+
+**P1 — Skim mode visibility indicator.** Fixes the hidden-state UX risk (Nielsen H1). New `GuideSkimIndicator` small dashed-amber pill on `/guide` renders only when localStorage `ow_skim_mode === "1"`. Links back to `/roadmap` where the toggle lives.
+
+**P1 — bypass request confirmation loop.** Already partially shipped in round 1 (persistent "Requested — we'll be in touch" state). Round 2 added the visible admin queue AND the closable loop (grant → `roadmapStatus.pressBypassGranted:true` → Press card flips to "Preview access" ribbon variant).
+
+**P2 — varied locked-gate CTAs.** Softens reactance risk (Brehm). Each gate now has an optional secondary `learnCta` linking to the "why" — `/guide#pillar-journal`, `/cellar-journal`, `/guide#pillar-copilot`, `/ask`, `/the-press`, `/regulations` — so skimmers have a route to context, not always `/quick-entry`.
+
+**Bonus — `/try` copy jargon audit.** Rich spotted "🔒 In real Ownology this hits the sitemap, RSS, and OG image queue" as engineer-speak leaking to prospects on the public sandbox. Fixed three chips + one blurb:
+- Step 1: "Same schema" → "Same layout"
+- Step 4 lock chip: "In real Ownology this saves. Here it's the demo" → "…saves to your vintage log — searchable, cited, and yours."
+- Step 6 blurb: "meta tags, pings the sitemap, adds it to your RSS" → "handles the SEO plumbing — the write-up, the preview card, the sitemap — quietly, in the background."
+- Step 6 lock chip: "hits the sitemap, RSS, and OG image queue" → "goes live on your public cellar journal — where Google and wine drinkers find you."
+
+**Verified live**: seed admin request/grant flow → `listPressBypassRequests` returns 1 pending → click "Grant preview access" → row flips to "Granted" with timestamp → `roadmapStatus.pressBypassGranted:true`. `/the-press` correctly renders three states. Lint + tsc clean.
+
+**Still deferred** (small, non-blocking):
+- Auto-confirmation email/SMS on bypass request submit (in-app pending banner covers this for now).
+- `/roadmap-preview` public sample variant for pitches/SEO.
+- `/admin/deck-editor` — DB-backed flashcards.
+
+---
+
 ### `/roadmap` conditional-flow gate graph + floating "Back to Admin" pill + Skim Mode + Press Bypass — SHIPPED (Feb 2026, Rich)
 
 **Why:** Rich flagged progressive-disclosure UX — *"we must be careful not to go too deep into The Press too soon"* — but also flagged the dual need: *"we must allow for wine professionals to ingest info and want to bypass all the detail"*. So the induction system has to serve novices (earn depth) AND experts (skim + request bypass) without picking one.

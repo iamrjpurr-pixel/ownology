@@ -231,8 +231,8 @@ function Row({ r, onGrant, isGranting }: { r: Row; onGrant: () => void; isGranti
               color: "#B0741A",
               padding: "0.4rem 0.7rem",
               borderRadius: 999,
-              border: "1px solid rgba(176,116,26,0.4)",
-              background: "rgba(251,243,228,0.5)",
+              border: "1px solid rgba(176,116,26,0.55)",
+              background: "rgba(176,116,26,0.15)",
             }}
           >
             <CheckCircle2 size={12} strokeWidth={2.2} /> Granted

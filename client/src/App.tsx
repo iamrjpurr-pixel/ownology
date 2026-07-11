@@ -140,6 +140,7 @@ const CallPlaybook = lazy(() => import("./pages/CallPlaybook"));
 const Todo = lazy(() => import("./pages/Todo"));
 const Roadmap = lazy(() => import("./pages/Roadmap"));
 const StyleGuideInduction = lazy(() => import("./pages/StyleGuideInduction"));
+const AdminPressBypass = lazy(() => import("./pages/AdminPressBypass"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
  *  Sized so it doesn't cause layout shift on first paint. */
@@ -426,6 +427,7 @@ function Router() {
       <Route path={"/todo"} component={Todo} />
       <Route path={"/roadmap"} component={Roadmap} />
       <Route path={"/admin/style-guide/induction"} component={StyleGuideInduction} />
+      <Route path={"/admin/press-bypass"} component={AdminPressBypass} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
       <Route path={"/404"} component={NotFound} />

@@ -368,8 +368,8 @@ function Step1Landing({ onNext }: { onNext: () => void }) {
         you've been reaching for.
       </p>
       <GelSays testid="try-step-1-gel">
-        Everything you see is real data from our actual cellar. Same schema you'd get for your winery. Same alerts we
-        read every morning. Same brief I write. What you can't do is break anything.
+        Everything you see is real data from our actual cellar. Same layout you&apos;d get for your winery. Same alerts we
+        read every morning. Same brief I write. What you can&apos;t do is break anything.
       </GelSays>
       <div
         data-testid="try-step-1-excel"
@@ -791,7 +791,7 @@ function Step4Log({ onNext }: { onNext: () => void }) {
           >
             {saved ? "✓ Logged" : "Save entry"}
           </button>
-          <Chip testid="try-step-4-lock">In real Ownology this saves. Here it's the demo.</Chip>
+          <Chip testid="try-step-4-lock">In real Ownology this saves to your vintage log — searchable, cited, and yours.</Chip>
         </div>
       </div>
 
@@ -974,7 +974,7 @@ function Step6Journal({ onNext }: { onNext: () => void }) {
     >
       <p>
         Every stuck ferment you solve is a Cellar Journal entry someone else is Googling right now. Publish once,
-        Ownology writes the meta tags, pings the sitemap, adds it to your RSS. In six months, wine students in New
+        Ownology handles the SEO plumbing — the write-up, the preview card, the sitemap — quietly, in the background. In six months, wine students in New
         Zealand find it and remember your name.
       </p>
 
@@ -1031,7 +1031,7 @@ function Step6Journal({ onNext }: { onNext: () => void }) {
         >
           {published ? "✓ Published" : "Publish entry"}
         </button>
-        <Chip>In real Ownology this hits the sitemap, RSS, and OG image queue.</Chip>
+        <Chip>In real Ownology this goes live on your public cellar journal — where Google and wine drinkers find you.</Chip>
       </div>
 
       {published && (
