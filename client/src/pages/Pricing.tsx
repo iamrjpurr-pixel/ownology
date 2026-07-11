@@ -5,6 +5,207 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { trpc } from "@/lib/trpc";
 import { FoundingReservationModal } from "@/components/FoundingReservationModal";
 
+// ─── TierChooser ──────────────────────────────────────────────────────────────
+// 3-question wizard that recommends a tier. Removes the "which one fits me?"
+// friction identified in the Feb 2026 positioning audit. Client-side, no
+// backend, no state persistence — deliberately ephemeral so users can retry.
+function TierChooser() {
+  const [step, setStep] = useState<0 | 1 | 2 | 3 | 4>(0);
+  const [scale, setScale] = useState<"garage" | "boutique" | "consult" | null>(null);
+  const [ai, setAi] = useState<"daily" | "weekly" | "rarely" | null>(null);
+  const [compliance, setCompliance] = useState<"critical" | "someday" | "no" | null>(null);
+
+  // Recommendation logic — deliberately transparent.
+  //   Cellar Hand → garage / rarely / no-compliance
+  //   The Press   → boutique / weekly-daily / compliance-someday-or-critical
+  //   Vigneron    → consult OR (boutique + daily + critical)
+  function recommend(): { tier: string; href: string; why: string } {
+    if (scale === "consult") {
+      return { tier: "The Vigneron", href: "#tier-vigneron", why: "You need 3 team seats + Annual knowledge base review + Onboarding call — Vigneron is built for you." };
+    }
+    if (scale === "boutique" && ai === "daily" && compliance === "critical") {
+      return { tier: "The Vigneron", href: "#tier-vigneron", why: "Daily AI + compliance-critical + team scale — Vigneron gives you unlimited Divine Trinity reveals and priority compliance." };
+    }
+    if (scale === "garage" && (ai === "rarely" || ai === null) && (compliance === "no" || compliance === null)) {
+      return { tier: "The Cellar Hand", href: "#tier-cellar", why: "You're logging vintages, occasional AI, no audit pressure — Cellar Hand is the honest fit at $22/mo founding." };
+    }
+    return { tier: "The Press", href: "#tier-press", why: "Full cellar operations + 38 SOPs + priority compliance AI — the sweet spot for boutique wineries." };
+  }
+
+  if (step === 0) {
+    return (
+      <div className="container max-w-7xl mx-auto mb-8 px-4 sm:px-6">
+        <div
+          className="rounded-sm px-6 py-5"
+          style={{ background: "color-mix(in oklch, var(--ow-amber) 5%, transparent)", border: "1px dashed color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}
+          data-testid="tier-chooser-cta"
+        >
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium" style={{ fontFamily: "'Lato', sans-serif", color: "var(--ow-text-hi)" }}>
+                Not sure which tier fits your winery?
+              </p>
+              <p className="text-xs mt-0.5" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)" }}>
+                3 questions · 30 seconds · we&apos;ll point you at the right one.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              data-testid="tier-chooser-start"
+              style={{
+                padding: "0.55rem 1.1rem",
+                borderRadius: "2px",
+                background: "var(--ow-amber)",
+                color: "#2A1E0A",
+                border: "none",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Help me choose →
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === 4 || (step === 3 && compliance)) {
+    const rec = recommend();
+    return (
+      <div className="container max-w-7xl mx-auto mb-8 px-4 sm:px-6">
+        <div
+          className="rounded-sm px-6 py-5"
+          style={{ background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)" }}
+          data-testid="tier-chooser-result"
+        >
+          <p className="text-xs mb-1" style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ow-amber)" }}>
+            Our recommendation
+          </p>
+          <p className="text-xl mb-2" style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, color: "var(--ow-text-hi)" }} data-testid="tier-chooser-result-tier">
+            {rec.tier}
+          </p>
+          <p className="text-sm mb-4" style={{ fontFamily: "'Lato', sans-serif", color: "var(--ow-text-mid)", lineHeight: 1.6 }}>
+            {rec.why}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href={rec.href}
+              data-testid="tier-chooser-result-cta"
+              style={{
+                padding: "0.5rem 1rem",
+                borderRadius: "2px",
+                background: "var(--ow-amber)",
+                color: "#2A1E0A",
+                textDecoration: "none",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.82rem",
+                fontWeight: 600,
+              }}
+            >
+              See {rec.tier} details ↓
+            </a>
+            <button
+              type="button"
+              onClick={() => { setStep(0); setScale(null); setAi(null); setCompliance(null); }}
+              data-testid="tier-chooser-reset"
+              style={{
+                padding: "0.5rem 1rem",
+                borderRadius: "2px",
+                background: "transparent",
+                color: "var(--ow-text-mid)",
+                border: "1px solid var(--ow-border)",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.82rem",
+                cursor: "pointer",
+              }}
+            >
+              Start over
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const questions = [
+    {
+      n: 1,
+      label: "Your winery scale",
+      options: [
+        { key: "garage", label: "Garage / grower — under 1000L, mostly me" },
+        { key: "boutique", label: "Boutique commercial — 5-50 tonnes, family or small team" },
+        { key: "consult", label: "Consultant / multi-site — I advise more than one winery" },
+      ],
+      onPick: (v: string) => { setScale(v as "garage" | "boutique" | "consult"); setStep(2); },
+    },
+    {
+      n: 2,
+      label: "How often would you use the AI?",
+      options: [
+        { key: "daily", label: "Daily — during vintage I'll live in it" },
+        { key: "weekly", label: "Weekly — check in on live ferments" },
+        { key: "rarely", label: "Rarely — mostly for the log + compliance" },
+      ],
+      onPick: (v: string) => { setAi(v as "daily" | "weekly" | "rarely"); setStep(3); },
+    },
+    {
+      n: 3,
+      label: "Compliance / audit pressure",
+      options: [
+        { key: "critical", label: "Critical — annual audit, or export licence" },
+        { key: "someday", label: "Someday — I'd like it tidier" },
+        { key: "no", label: "Not right now — I sell direct" },
+      ],
+      onPick: (v: string) => { setCompliance(v as "critical" | "someday" | "no"); setStep(4); },
+    },
+  ];
+  const q = questions[step - 1];
+
+  return (
+    <div className="container max-w-7xl mx-auto mb-8 px-4 sm:px-6">
+      <div
+        className="rounded-sm px-6 py-5"
+        style={{ background: "color-mix(in oklch, var(--ow-amber) 6%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}
+        data-testid={`tier-chooser-q${q.n}`}
+      >
+        <p className="text-xs mb-2" style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ow-amber)" }}>
+          Question {q.n} of 3 · {q.label}
+        </p>
+        <div className="flex flex-col gap-2 mt-3">
+          {q.options.map((opt) => (
+            <button
+              key={opt.key}
+              type="button"
+              onClick={() => q.onPick(opt.key)}
+              data-testid={`tier-chooser-q${q.n}-${opt.key}`}
+              style={{
+                padding: "0.7rem 1rem",
+                borderRadius: "2px",
+                background: "var(--ow-bg-raised)",
+                color: "var(--ow-text-hi)",
+                border: "1px solid var(--ow-border)",
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.88rem",
+                textAlign: "left",
+                cursor: "pointer",
+                transition: "background 120ms ease, border-color 120ms ease",
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--ow-amber)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--ow-border)"; }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Waitlist CTA ─────────────────────────────────────────────────────────────
 function WaitlistCapture() {
   const [email, setEmail] = useState("");
@@ -36,10 +237,10 @@ function WaitlistCapture() {
     return (
       <div className="py-6 px-8 rounded-sm inline-block" style={{ background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)", border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)" }}>
         <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, fontSize: "1.125rem", color: "var(--ow-text-hi)" }}>
-          You're on the list. We'll be in touch.
+          You&apos;re on the list. We&apos;ll be in touch.
         </p>
         <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.875rem", color: "var(--ow-text-lo)", marginTop: "0.5rem" }}>
-          Founding member pricing locked for the first 99 subscribers.
+          Founding Cohort · 2026 — the first 99 wineries lock in founding pricing for life.
         </p>
       </div>
     );
@@ -196,7 +397,7 @@ const TIERS = [
       "Unlimited Compliance AI",
       "Vintage log \u2014 unlimited entries",
       "Email support",
-      "Founding member badge",
+      "Founding Cohort · 2026 badge",
     ],
     cta: "Join The Cellar Hand",
     ctaHref: "#waitlist",
@@ -300,11 +501,11 @@ const FAQS = [
   },
   {
     q: "What is the Founding Member offer?",
-    a: "The first 99 paid subscribers (member numbers 11–99) receive founding member status: pricing locked for life, a permanent founding member badge, direct input into the product roadmap, and their name in the Our Story section (optional). Numbers 1–9 are reserved.",
+    a: "The first 99 paid subscribers (member numbers 11–99) join the Founding Cohort · 2026: founding pricing locked for life, a permanent Founding Cohort badge, direct input into the product roadmap, and their name in the Meet the Cellar section (optional). Numbers 1–9 are reserved.",
   },
   {
     q: "Can I change tiers?",
-    a: "Yes. You can upgrade or downgrade at any time. Upgrades take effect immediately; downgrades take effect at the next billing cycle. Founding member pricing is locked regardless of tier changes.",
+    a: "Yes. You can upgrade or downgrade at any time. Upgrades take effect immediately; downgrades take effect at the next billing cycle. Founding Cohort pricing is locked regardless of tier changes.",
   },
   {
     q: "What is the difference between Free Run and The Press?",
@@ -1361,6 +1562,12 @@ export default function Pricing() {
         </div>
       )}
 
+      {/* Tier Chooser — 3-question wizard from the Feb 2026 positioning
+          audit. Removes decision friction ("which tier fits me?") without
+          replacing the full tier grid below. Client-side only, no backend.
+          Deliberately compact — lives above the Founding banner. */}
+      <TierChooser />
+
       {/* Founding member banner — de-risked: no live claim counter until we
           have real paid subscribers to count. Keep the offer, drop the
           fabricated "N of 99 claimed" bar (Stripe was in test mode). */}
@@ -1377,10 +1584,10 @@ export default function Pricing() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium" style={{ fontFamily: "'Lato', sans-serif", color: "var(--ow-text-mid)" }}>
-                Founding Member Offer — for the first 99 paid subscribers
+                Founding Cohort · 2026 — first 99 wineries lock in founding pricing for life
               </p>
               <p className="text-xs mt-0.5" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)" }}>
-                Pricing locked for life · 21% off retail Cellar Hand · 25% off retail The Press · 29% off retail The Vigneron · Permanent founding badge · Direct product input · Name in Our Story (optional).
+                Currently open · 21% off retail Cellar Hand · 25% off retail The Press · 29% off retail The Vigneron · Permanent Founding Cohort badge · Direct product input · Name in Meet the Cellar (optional).
               </p>
             </div>
           </div>
@@ -1574,7 +1781,7 @@ export default function Pricing() {
             className="mt-4 mb-8"
             style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "var(--ow-text-lo)", lineHeight: 1.7 }}
           >
-            Join the waitlist for early access and founding member pricing. First 99 paid subscribers receive lifetime locked rates and a permanent founding badge.
+            Join the waitlist for early access and Founding Cohort · 2026 pricing. First 99 paid subscribers get lifetime locked rates and a permanent Founding Cohort badge.
           </p>
           <WaitlistCapture />
         </div>
@@ -1583,7 +1790,7 @@ export default function Pricing() {
       {/* Footer note */}
       <div className="py-6 text-center" style={{ borderTop: "1px solid var(--ow-border)" }}>
         <p className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "oklch(0.40 0.010 75)" }}>
-          All prices in AUD. USD pricing available for international customers. Founding member pricing locked for life. No credit card required for Free Run.
+          All prices in AUD. USD pricing available for international customers. Founding Cohort · 2026 pricing locked for life. No credit card required for Free Run.
         </p>
       </div>
 

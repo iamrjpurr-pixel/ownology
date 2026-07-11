@@ -425,6 +425,10 @@ function Router() {
       <Route path={"/referral"} component={Referral} />
       <Route path={"/call-playbook"} component={CallPlaybook} />
       <Route path={"/todo"} component={Todo} />
+      <Route path={"/your-vintage"} component={Roadmap} />
+      {/* Legacy alias — /roadmap kept for bookmark/link compatibility.
+          Feb 2026, Rich: renamed to /your-vintage — "roadmap" reads as
+          startup-speak; "your vintage" is winemaker-native. */}
       <Route path={"/roadmap"} component={Roadmap} />
       <Route path={"/admin/style-guide/induction"} component={StyleGuideInduction} />
       <Route path={"/admin/press-bypass"} component={AdminPressBypass} />

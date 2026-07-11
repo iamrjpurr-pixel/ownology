@@ -370,7 +370,7 @@ export default function Roadmap() {
       }}
     >
       <Helmet>
-        <title>Roadmap · Ownology</title>
+        <title>Your Vintage · Ownology</title>
         <meta
           name="description"
           content="Your progression through Ownology — from registering your first tank to a full vintage debrief in The Press."
@@ -389,7 +389,7 @@ export default function Roadmap() {
             fontWeight: 700,
           }}
         >
-          Your Ownology Roadmap
+          Your Ownology Vintage
         </p>
         <h1
           style={{

@@ -233,7 +233,7 @@ function ThePressLockedPlaceholder({ bypassRequested }: { bypassRequested: boole
             Log a racking <ArrowRight size={13} strokeWidth={2.2} />
           </Link>
           <Link
-            href="/roadmap"
+            href="/your-vintage"
             data-testid="the-press-locked-bypass-cta"
             style={{
               display: "inline-flex",

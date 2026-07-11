@@ -670,13 +670,13 @@ export default function Guide() {
             Ownology is a four-pillar platform for boutique winery teams. This page explains what each pillar does, how they connect, and where to start.
           </p>
 
-          {/* Roadmap CTA — links to /roadmap where locked/unlocked gates are
+          {/* Your-Vintage CTA — links to /your-vintage where locked/unlocked gates are
               computed from live vintage_log data. Feb 2026, Rich: progressive
               disclosure — the deep post-vintage detail is hidden until users
               have racked a batch. */}
           <div style={{ marginTop: "1rem" }}>
             <Link
-              href="/roadmap"
+              href="/your-vintage"
               data-testid="guide-roadmap-link"
               style={{
                 display: "inline-flex",
@@ -694,9 +694,9 @@ export default function Guide() {
                 textDecoration: "none",
                 fontWeight: 600,
               }}
-              title="See your Ownology roadmap — 7 gates from first tank to first bottling"
+              title="Open your Vintage — 7 gates from first tank to first bottling"
             >
-              → See your roadmap
+              → See your vintage
             </Link>
             <GuideSkimIndicator />
           </div>
@@ -1378,9 +1378,9 @@ function GuideSkimIndicator() {
   if (!isSkim) return null;
   return (
     <Link
-      href="/roadmap"
+      href="/your-vintage"
       data-testid="guide-skim-indicator"
-      title="You have Skim mode on — every roadmap gate description is visible. Tap to open the roadmap and toggle it off."
+      title="You have Skim mode on — every gate description is visible. Tap to open Your Vintage and toggle it off."
       style={{
         display: "inline-flex",
         alignItems: "center",

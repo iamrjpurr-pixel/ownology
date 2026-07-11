@@ -344,7 +344,7 @@ export default function StyleGuideInduction() {
             user comes to understand <em>what the product does</em>.
           </p>
 
-          <SubHead>3.3 <code style={code}>/roadmap</code> &mdash; <em>the journey</em></SubHead>
+          <SubHead>3.3 <code style={code}>/your-vintage</code> &mdash; <em>the journey</em></SubHead>
           <p style={p}>
             The new page. Seven gates from first tank to first bottling.
             Each gate is either unlocked (with your live count against it)
@@ -382,7 +382,7 @@ export default function StyleGuideInduction() {
             </li>
             <li>
               <strong>Expert lens &mdash; Skim mode.</strong> A single
-              toggle at the top of <code style={code}>/roadmap</code>{" "}
+              toggle at the top of <code style={code}>/your-vintage</code>{" "}
               reveals every gate&apos;s full description paragraph
               regardless of whether it is unlocked. The <em>reading</em>{" "}
               is expanded. The <em>doing</em> is not. The feature stays
@@ -431,7 +431,7 @@ export default function StyleGuideInduction() {
         <Section n="4" title="The seven gates">
           <p style={p}>
             The full progression, in order. Each row of this table maps to
-            a card on <code style={code}>/roadmap</code>.
+            a card on <code style={code}>/your-vintage</code>.
           </p>
           <div style={{ overflowX: "auto", marginTop: "1.25rem" }}>
             <table
@@ -492,7 +492,7 @@ export default function StyleGuideInduction() {
             The Press is not mentioned. No card. No tile. No hint.
           </RevealRow>
           <RevealRow when="At Gate 3 (batch registered)">
-            The Press appears on <code style={code}>/roadmap</code> as an{" "}
+            The Press appears on <code style={code}>/your-vintage</code> as an{" "}
             <strong>architecture card</strong>: what it is, what it will do,
             what it will contain. No sample data. No mock numbers. The card
             explicitly says <em>&ldquo;we deliberately keep the detail
@@ -532,7 +532,7 @@ export default function StyleGuideInduction() {
           </p>
           <p style={p}>
             <strong>Direct.</strong> Anyone with the gate cookie can visit{" "}
-            <code style={code}>/roadmap</code>. Bookmarkable. Sharable to a
+            <code style={code}>/your-vintage</code>. Bookmarkable. Sharable to a
             co-founder or advisor.
           </p>
           <p style={p}>
@@ -626,12 +626,12 @@ export default function StyleGuideInduction() {
               No middle ground.
             </li>
             <li>
-              <strong>First-invite redirect to <code style={code}>/roadmap</code>.</strong>{" "}
+              <strong>First-invite redirect to <code style={code}>/your-vintage</code>.</strong>{" "}
               Today, a first-time gate-verify lands on{" "}
               <code style={code}>/admin</code> or{" "}
               <code style={code}>/guide</code>. Next release will route
               first-use invite tokens straight to{" "}
-              <code style={code}>/roadmap</code> so the induction spine is
+              <code style={code}>/your-vintage</code> so the induction spine is
               the operator&apos;s <em>first</em> Ownology surface, not
               their third.
             </li>
@@ -665,7 +665,7 @@ export default function StyleGuideInduction() {
             This guide is version 1.0, published February 2026 by Rich
             Middlebrook for Ownology. It documents the induction system as
             shipped in the Roadmap release
-            (<code style={code}>/roadmap</code> ·{" "}
+            (<code style={code}>/your-vintage</code> ·{" "}
             <code style={code}>roadmapStatus</code> procedure ·
             Back-to-Admin pill · Guide Roadmap CTA).
           </p>

@@ -554,9 +554,9 @@ function Hero() {
             </p>
             <h1 className="fade-up fade-up-delay-1"
               style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,4rem)", lineHeight:1.1, color:"var(--ow-text-hi)", letterSpacing:"-0.02em", textWrap: "balance" as "balance" }}>
-              <EditableText contentKey="home.hero.headline" defaultValue="Your cellar's most knowledgeable apprentice." contentMap={contentMap} />
+              <EditableText contentKey="home.hero.headline" defaultValue="The winemaker's second brain." contentMap={contentMap} />
             </h1>
-            <EditableText contentKey="home.hero.subheading" defaultValue="Log cellar readings. Access 38 industry SOPs across 12 categories. Ask the AI anything. Stay compliant. Ownology is the complete intelligence platform for boutique winery teams — on a mobile phone, during harvest." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
+            <EditableText contentKey="home.hero.subheading" defaultValue="Log cellar readings. Access 38 industry SOPs across 12 categories. Ask our AI apprentice anything. Stay compliant. Built by boutique winemakers, for boutique wineries between 5 and 50 tonnes." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-10 fade-up fade-up-delay-3">
               <a href="/pricing?from=homepage-hero" className="btn-amber text-center">Start 14-Day Free Trial</a>
               <Link
@@ -1250,6 +1250,78 @@ function Pricing() {
     },
   ];
   return (
+    <>
+    {/* ─── Meet the Team — the team-of-three story ────────────────────
+        Rich (winemaker) + Gel (partner, real human) + Owen (AI apprentice).
+        Positioned before pricing so a prospect meets the humans behind
+        Ownology before being asked to pay. Anchor: #our-story. */}
+    <section id="our-story" className="py-28" style={{background:"var(--ow-bg-base)"}}>
+      <div className="container">
+        <p className="section-label mb-4">Meet the cellar</p>
+        <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"620px", lineHeight:1.2, letterSpacing:"-0.01em", textWrap: 'balance' as 'balance'}}>
+          A winemaker, a partner, and an AI apprentice.
+        </h2>
+        <p className="mt-4" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, color:"var(--ow-text-mid)", fontSize:"1rem", maxWidth:"58ch", lineHeight:1.7}}>
+          Ownology isn&apos;t a Silicon Valley product. It&apos;s a boutique-winery product built by boutique winemakers who got tired of running their cellar from a spreadsheet. Three of us. Meet the team.
+        </p>
+        <div className="mt-12 grid gap-8 md:grid-cols-3" style={{maxWidth:"960px"}}>
+          {[
+            {
+              role: "The winemaker",
+              name: "Rich",
+              tag: "Founder · builds Ownology in between vintages",
+              body: "Rich makes the wine at Chalk Hill. Every rule in Ownology comes from a decision Rich has actually had to make in his own cellar — which is why the product reads like it was written by someone who&rsquo;s racked a tank at 4am, because it was.",
+              testid: "team-rich",
+              accent: "var(--ow-amber)",
+            },
+            {
+              role: "The partner",
+              name: "Gel",
+              tag: "Voice, story, human on the other end",
+              body: "Gel is Rich&rsquo;s partner. Not a winemaker, not a coder. She&rsquo;s the reason Ownology feels like a family business instead of a SaaS pitch. If you email us, Gel probably answers. If a Cellar Journal post has warmth in it, that&rsquo;s her.",
+              testid: "team-gel",
+              accent: "var(--ow-amber)",
+            },
+            {
+              role: "The AI apprentice",
+              name: "Owen",
+              tag: "Reads the manuals so you don't have to",
+              body: "Owen is our AI teammate. He&rsquo;s read every winemaking manual we own — Red &amp; White Wine Bibles, MoreWine, AWRI notes — and cites his sources. He&rsquo;ll point, remember, and structure. He&rsquo;ll never tell you what to make. That&rsquo;s your call, and Rich&rsquo;s, and Gel&rsquo;s.",
+              testid: "team-owen",
+              accent: "var(--ow-amber)",
+            },
+          ].map((m) => (
+            <div
+              key={m.testid}
+              data-testid={m.testid}
+              style={{
+                padding: "1.75rem 1.75rem 2rem",
+                borderRadius: "0.75rem",
+                background: "var(--ow-bg-raised)",
+                border: "1px solid color-mix(in oklch, var(--ow-amber) 20%, transparent)",
+              }}
+            >
+              <p style={{fontFamily:"'JetBrains Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.14em", textTransform:"uppercase", color:m.accent, fontWeight:700, margin:0}}>
+                {m.role}
+              </p>
+              <h3 style={{margin:"0.5rem 0 0.25rem", fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.5rem", color:"var(--ow-text-hi)"}}>
+                {m.name}
+              </h3>
+              <p style={{margin:"0 0 1rem", fontFamily:"'Lato',sans-serif", fontSize:"0.78rem", fontStyle:"italic", color:"var(--ow-text-mid)"}}>
+                {m.tag}
+              </p>
+              <p
+                style={{margin:0, fontFamily:"'Lato',sans-serif", fontSize:"0.9rem", lineHeight:1.65, color:"var(--ow-text-mid)"}}
+                dangerouslySetInnerHTML={{__html: m.body}}
+              />
+            </div>
+          ))}
+        </div>
+        <p className="mt-10" style={{fontFamily:"'Fraunces',serif", fontStyle:"italic", color:"var(--ow-amber)", fontSize:"1rem", maxWidth:"48ch"}}>
+          Rich makes the wine. Gel tells the story. Owen remembers everything so you don&apos;t have to.
+        </p>
+      </div>
+    </section>
     <section id="pricing" className="py-28" style={{background:"var(--ow-bg-raised)"}}>
       <div className="container" ref={ref}>
         <p className="section-label mb-4">Pricing</p>
@@ -1257,7 +1329,7 @@ function Pricing() {
           From Free Run to The Vigneron.
         </h2>
         <p className="mt-4" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, color:"var(--ow-text-mid)", fontSize:"1rem"}}>
-          Start free. No credit card required. Founding member pricing locked for life for the first 99 subscribers.
+          Start free. No credit card required. <strong>Founding Cohort · 2026</strong> — the first 99 wineries get founding pricing for life.
         </p>
         <div className="amber-rule mt-8 mb-12" />
 
@@ -1324,6 +1396,7 @@ function Pricing() {
         </div>
       </div>
     </section>
+    </>
   );
 }
 
@@ -1582,7 +1655,7 @@ function WhatOwnologyKnows() {
               maxWidth: "600px",
             }}
           >
-            Ownology is trained on the same body of knowledge as a formally qualified winemaker — the equivalent of a Bachelor of Oenology — and is available at 2am during vintage, on a mobile phone, in the middle of a stuck fermentation.
+            Owen — our AI apprentice — has read the same books a formally qualified winemaker would (Red &amp; White Wine Bibles, MoreWine, AWRI notes). He cites his sources. He&apos;s available at 2am during vintage, on a mobile phone, in the middle of a stuck fermentation. He won&apos;t tell you what to make — but he&apos;ll remember every log entry, every reading, every SOP, and hand it back the moment you need it.
           </p>
         </div>
 

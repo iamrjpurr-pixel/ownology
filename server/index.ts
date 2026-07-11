@@ -369,7 +369,7 @@ async function startServer() {
     // third. Repeat uses (returning team members, testers) land on
     // /admin as before.
     if (isFirstUse) {
-      return res.redirect(302, "/roadmap?welcome=1");
+      return res.redirect(302, "/your-vintage?welcome=1");
     }
     return res.redirect(302, "/admin");
   });

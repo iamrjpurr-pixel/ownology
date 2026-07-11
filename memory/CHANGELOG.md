@@ -4,6 +4,40 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Positioning audit execution · Batches 1-3 (Feb 2026, Rich)
+
+Delivered the positioning audit's "this-week" P0 items in full plus 3 of 4 "next-30-days" P1 items. Ship batch, one smoke walkthrough at the end.
+
+**Batch 1 — Homepage + team-story rebrand:**
+- Hero H1: *"Your cellar's most knowledgeable apprentice"* → **"The winemaker's second brain."** Category noun on the homepage.
+- Hero subheading: added *"Built by boutique winemakers, for boutique wineries between 5 and 50 tonnes"* — target audience explicit.
+- New `#our-story` section between demo and pricing: **Meet the Cellar** — Rich (winemaker) / Gel (partner) / Owen (AI apprentice) — three-card grid + pull-quote *"Rich makes the wine. Gel tells the story. Owen remembers everything so you don't have to."*
+- Repositioned Owen from "AI winemaker equivalent to Bachelor of Oenology" → "AI apprentice who has read the manuals, cites sources, never tells you what to make." Trust-research aligned.
+- Founding banner rename: `Founding member` → `Founding Cohort · 2026` (permanent-cohort ambiguity resolved into time-bounded scarcity).
+
+**Batch 2 — Route rename `/roadmap` → `/your-vintage`:**
+- Primary route: `/your-vintage` (Roadmap component). Legacy `/roadmap` kept as alias so bookmarks + external links still work.
+- Server: `/i/<token>` first-invite redirect now → `/your-vintage?welcome=1`.
+- Client links updated: Guide "See your vintage" pill, Admin nav, ThePress locked placeholder bypass CTA, Skim-indicator link.
+- Page overline + document title + `<h1>` copy: *"Your Ownology Vintage"* replaces *"Your Ownology Roadmap"*.
+- StyleGuideInduction: all `/roadmap` code refs → `/your-vintage` (single global search-replace).
+- Trial/theme suppress prefixes extended to include both paths.
+
+**Batch 3 — Pricing tier chooser + Founding banner:**
+- New `TierChooser` component at top of `/pricing`: 3-question wizard (winery scale · AI-use cadence · compliance pressure) → recommendation card + jump-to-tier anchor. Client-side, no backend, ephemeral state (users can retry). Removes the "which tier fits me?" friction.
+- Founding banner copy rewritten in three surfaces (`Pricing.tsx` line 42, feature-lists, FAQ, footer): everywhere now says "Founding Cohort · 2026 — first 99 wineries lock in founding pricing for life."
+- Annual pricing toggle: **already shipped** — the `/pricing` page had a monthly/annual toggle + EOFY 3-months-free banner from a prior session. No new work needed.
+
+**Verified live**: full walkthrough — Homepage renders 3-card team section, `/your-vintage` renders progressive gates with correct overline + title, `/pricing` chooser works end-to-end (boutique/daily/critical → *"The Vigneron"* recommendation). Zero tsc errors on all changed files.
+
+**Deferred to Batch 4/5 (afternoon)**:
+- Cellar Brief live-demo hero card on homepage (biggest visual hook; still shows a static screenshot)
+- `/compliance-score` tool (lead-gen + SEO)
+- Jargon audit sweep across `/guide` + email templates (matched the `/try` audit pattern)
+- Enemy framing line on homepage (awaiting Rich's pick on `#2` from the exec plan)
+
+---
+
 ### Induction system — P0→P2 fixes shipped (Feb 2026, Rich · human-factors round-2)
 
 Round-2 of the induction system after Rich's human-factors challenge. Value-engineered the deferred list into a single shipped batch.
