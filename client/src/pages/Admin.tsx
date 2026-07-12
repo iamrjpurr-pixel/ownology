@@ -410,6 +410,18 @@ const TOOLS: AdminTool[] = [
     icon: <IconMembers />,
   },
   {
+    label: "Health Digest — run now",
+    description: "Runs all system health probes (env vars, DB, Resend, LLM key, auth). Add ?send=1 to also email ADMIN_EMAILS. Fires automatically daily 07:00 AEST once Railway cron is added.",
+    href: "/api/scheduled/health-digest",
+    icon: <IconMembers />,
+  },
+  {
+    label: "Resend Deliverability Check",
+    description: "One-URL verdict on email deliverability — API key valid, domains verified, sandbox detection. Add ?to=you@example.com to trigger a real test send.",
+    href: "/api/scheduled/resend-health",
+    icon: <IconMembers />,
+  },
+  {
     label: "Weekly Cellar Digest — send now",
     description: "Fire the Monday-morning weekly Cellar Brief email to every winery user (dry-run first — redirects to your test address). Uses your existing Resend integration.",
     href: "/api/scheduled/weekly-cellar-digest?dryRun=1",
