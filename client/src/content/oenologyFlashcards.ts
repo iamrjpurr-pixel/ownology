@@ -257,7 +257,7 @@ export const FLASHCARDS: Flashcard[] = [
     id: "bound-so2",
     term: "Bound SO₂",
     category: "so2",
-    sop: "Sulfite that has undergone irreversible adduct formation with acetaldehyde, anthocyanins, sugars, and other electrophilic wine constituents. Not recoverable via standard vinification.",
+    sop: "Sulfite that has undergone irreversible adduct formation with acetaldehyde, anthocyanins, sugars, and other electrophilic wine constituents. Not recoverable through normal cellar work.",
     plain: "SO₂ that already reacted with something in the wine and is used up. You can't get it back. Wines with lots of bound SO₂ demand more free SO₂ to compensate.",
     why: "Wines with high bound require higher additions to maintain molecular target.",
     when: "Assessed via Free vs Total SO₂ delta (Total − Free = Bound).",

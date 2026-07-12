@@ -158,6 +158,7 @@ The absence of these patterns is as much the style guide as the presence of the 
 - **No progress badges, no gamified rewards, no streaks.** This is a professional tool. The reward for logging a racking is a better ferment analysis, not confetti.
 - **No forced first-run wizard.** The Roadmap is a reference, not a rail.
 - **No dark patterns to inflate gate completion.** The seven gates measure *winemaking activity*, not *app engagement*. We would rather have a Gate-2 member for six months than trick them into faking Gate-4.
+- **No textbook-oenology copy.** Words and phrases from the table of contents of a university wine textbook do not appear in user-facing copy. Banned examples: *vinification*, *preparation of high-quality wines*, *the winemaking process* (as a noun phrase), *oenological practices*. We say *making wine*, *what happens in the cellar*, *cellar work*, *the vintage*. Winemaker verbs, not consultant nouns. Rich's rule — Feb 2026.
 
 ---
 
