@@ -173,7 +173,29 @@ All should return 200 with the correct content.
 - [ ] Wire Stripe (real test keys → live keys when ready)
 - [ ] Pick storage (Cloudinary or skip)
 - [ ] Set `CELLAR_JOURNAL_WEBHOOK_URL` to your Zapier hook for auto-social-posting
-- [ ] Set up a cron (Railway has built-in Cron) to fire the weekly newsletter / Trinity cluster jobs
+- [ ] **Add the Railway Cron jobs (see Section 8.1 below).**
+
+---
+
+## 8.1 Railway Cron Jobs — schedule for all scheduled endpoints
+
+Railway's built-in Cron feature lives at **Railway dashboard → your service → Settings → Cron Schedule**. Add one cron entry per scheduled endpoint below. Times are UTC; the AEST equivalents shown are non-DST (add 1h during Sydney summer).
+
+For each entry: **HTTP method: GET**, **URL: `https://www.ownology.ai/api/scheduled/<endpoint>`**, and (if you set `CRON_SECRET`) add header `x-cron-secret: <your-secret>`.
+
+| Endpoint | Cron (UTC) | AEST equivalent | Purpose |
+|---|---|---|---|
+| `/api/scheduled/daily-alert-email` | `30 18 * * *` | 05:30 daily | Daily alerts (stuck ferment · temp excursion · SO₂ decay) |
+| `/api/scheduled/weekly-cellar-digest` | `30 18 * * 0` | 05:30 Monday | Weekly Cellar Digest email to all winery users |
+| `/api/scheduled/nurture-email` | `0 22 * * 2` | 09:00 Wednesday | Nurture drip to prospects who haven't signed up |
+| `/api/scheduled/marketing-coach-email` | `0 21 * * 1` | 08:00 Tuesday | Marketing coach cadence (Rich-only owner email) |
+| `/api/scheduled/trinity-newsletter` | `0 22 * * 4` | 09:00 Friday | Trinity Newsletter weekly cluster |
+
+**Env vars this depends on** (all already set — verify on Railway before enabling crons):
+- `RESEND_API_KEY` · `ALERT_FROM_EMAIL` · `ALERT_REPLY_TO` · `CRON_SECRET` (optional but recommended)
+- `ALERT_TEST_TO` — **unset this on production** so emails go to real user inboxes, not your test inbox. Currently `iamrjpurr@gmail.com` in dev.
+
+**Verification pattern:** trigger any cron manually first as a dry-run: visit `https://www.ownology.ai/api/scheduled/weekly-cellar-digest?dryRun=1` in your browser. You'll see a JSON summary of who would have received it, with zero emails actually sent. Once that looks right, enable the Railway cron.
 
 ---
 
