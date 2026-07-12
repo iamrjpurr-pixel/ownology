@@ -17,6 +17,7 @@ import { trinityNewsletterHandler } from "./scheduled/trinityNewsletter.js";
 import { cellarJournalSitemapHandler, mainSitemapHandler, robotsTxtHandler, cellarJournalRssHandler } from "./sitemap.js";
 import { generateAuditTrailPdf } from "./auditTrailPdf.js";
 import { dailyAlertEmailHandler } from "./scheduled/dailyAlertEmail.js";
+import { weeklyCellarDigestHandler } from "./scheduled/weeklyCellarDigest.js";
 import { marketingCoachEmailHandler } from "./scheduled/marketingCoachEmail.js";
 import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
 import { generateLipAuditPackPdf } from "./lipAuditPackPdf.js";
@@ -389,6 +390,8 @@ async function startServer() {
   app.post("/api/scheduled/trinity-newsletter", express.json(), trinityNewsletterHandler);
   app.post("/api/scheduled/daily-alert-email", express.json(), dailyAlertEmailHandler);
   app.get("/api/scheduled/daily-alert-email", dailyAlertEmailHandler); // GET allowed for manual triggering / dry-run
+  app.post("/api/scheduled/weekly-cellar-digest", express.json(), weeklyCellarDigestHandler);
+  app.get("/api/scheduled/weekly-cellar-digest", weeklyCellarDigestHandler); // GET allowed for manual triggering / dry-run
   app.post("/api/scheduled/marketing-coach-email", express.json(), marketingCoachEmailHandler);
   app.get("/api/scheduled/marketing-coach-email", marketingCoachEmailHandler); // GET allowed for manual triggering / dry-run
   app.post("/api/scheduled/nurture-email", express.json(), nurtureEmailHandler);

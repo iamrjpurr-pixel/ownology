@@ -410,6 +410,12 @@ const TOOLS: AdminTool[] = [
     icon: <IconMembers />,
   },
   {
+    label: "Weekly Cellar Digest — send now",
+    description: "Fire the Monday-morning weekly Cellar Brief email to every winery user (dry-run first — redirects to your test address). Uses your existing Resend integration.",
+    href: "/api/scheduled/weekly-cellar-digest?dryRun=1",
+    icon: <IconMembers />,
+  },
+  {
     label: "Compliance Agent",
     description: "The owner-facing view of the AI regulatory Q&A tool. Test questions across all seven jurisdictions and review knowledge base coverage.",
     href: "/compliance",

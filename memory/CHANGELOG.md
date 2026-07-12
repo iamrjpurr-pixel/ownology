@@ -4,6 +4,21 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Weekly Cellar Digest email + User Journey Deck (Feb 2026, Rich)
+
+**Weekly Cellar Digest — SHIPPED end-to-end**
+- New `server/scheduled/weeklyCellarDigest.ts` — Monday 05:30 AEST digest email built from `generateCellarBrief(wineryId, "weekly")`. Same data shape as the homepage teaser + `/cellar-brief` page.
+- Reused existing Resend integration (`RESEND_API_KEY` already in env), existing `ALERT_FROM_EMAIL=owen@ownology.ai`, existing test-to override, existing CRON_SECRET pattern.
+- HTML template + text fallback + winery-name sender personalisation ("Owen · Chalk Hill" style) + STOP-to-pause opt-out language.
+- Registered at `/api/scheduled/weekly-cellar-digest` (GET+POST). Owner-triggerable via new `/admin` tile "Weekly Cellar Digest — send now" (opens dry-run in a new tab).
+- Dry-run tested live: 6 users scanned, 2 dry-run sends queued for iamrjpurr@gmail.com (testTo override working), 31 cards computed, zero errors.
+- Value-engineering: zero new schema, zero new env vars, zero new dependencies. Copy-adapted from `dailyAlertEmail.ts`.
+
+**User Journey Deck — SHIPPED**
+- New `client/src/pages/UserJourneyDeck.tsx` — publication-format 9-slide deck at `/admin/deck/user-journey`. Cover + at-a-glance strip + 9 stage slides + colophon. A4 landscape print CSS. Each slide: eyebrow, title, primary CTA card (dashed amber), page reference, "what's on the page" bullets, "human factors" pull-block. Linked from Admin Guide submenu.
+
+---
+
 ### Positioning audit execution · Batches 1-4 (Feb 2026, Rich)
 
 Delivered the positioning audit's "this-week" P0 items in full plus all "next-30-days" P1 items including the biggest visual upgrade — live Cellar Brief teaser on homepage.
