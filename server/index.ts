@@ -516,6 +516,7 @@ async function startServer() {
     "/blog",
     "/pricing",
     "/quiz",
+    "/compliance-score",
     "/try",
     "/ask",
     "/founding-partners",

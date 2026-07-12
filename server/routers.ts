@@ -908,6 +908,40 @@ const leadsRouter = router({
       if (input.message) await updateLeadNotes(id, input.message);
       return { ok: true, id };
     }),
+  // Public: capture a compliance-score submission (email + score + answers)
+  complianceScore: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        name: z.string().max(256).optional(),
+        wineryName: z.string().max(256).optional(),
+        score: z.number().min(0).max(100),
+        answers: z.record(z.string(), z.enum(["yes","partial","no"])),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const band = input.score >= 80 ? "green" : input.score >= 50 ? "amber" : "red";
+      const tags = ["compliance-score", `score:${input.score}`, `band:${band}`];
+      await addLead({
+        email: input.email,
+        source: "compliance-score",
+        name: input.name,
+        wineryName: input.wineryName,
+        tags,
+      });
+      // addLead's drizzle-mysql insert doesn't consistently return insertId
+      // in this driver version, so re-query by (email, source) to get the
+      // real id for the notes update. Small extra query, but keeps the
+      // waitlist flow untouched.
+      const row = await db.query.leads.findFirst({
+        where: and(eq(schema.leads.email, input.email.toLowerCase().trim()), eq(schema.leads.source, "compliance-score")),
+      });
+      const summary = Object.entries(input.answers)
+        .map(([q, a]) => `${q}=${a}`)
+        .join(" · ");
+      if (row) await updateLeadNotes(row.id, `Score: ${input.score}/100 (${band}). Answers: ${summary}`);
+      return { ok: true, id: row?.id ?? null, band };
+    }),
 });
 // ─── Site Content Router (Owner Inline Editing) ─────────────────────────────
 
