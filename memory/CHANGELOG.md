@@ -4,6 +4,29 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Jargon audit sweep · `/guide` + email templates (Feb 2026, Rich)
+
+Applied same lens as the `/try` audit. Six changes across four surfaces.
+
+**`/guide` (Guide.tsx):**
+- "Dashboard — KPIs & tank status" → **"Dashboard — your cellar at a glance"** (removed enterprise "KPIs" language)
+- Cellar Manager tagline "Production visibility, cost intelligence, and compliance readiness" → **"See the whole cellar. Know what it cost. Know it's audit-ready."** (winemaker verbs, not consultant nouns)
+- Head Winemaker tagline "Fermentation control, protocol management, and decision capture" → **"Ferment control, protocols at hand, decisions captured for next vintage."** (grounded in daily reality)
+- "Free Run — AI assistant" → **"Free Run — Owen, your AI apprentice"** (Owen brand consistency)
+- Pillar card description rewritten around **"Ask Owen anything… He reads your SOPs, cross-references the Red & White Wine Bibles and MoreWine, and cites every source back to you."** (personalised, source-cited framing)
+- LIP-audit blurb "exports directly to this schema" → **"exports match this format field-for-field"** (killed "schema")
+- WineMaker Magazine blurb "pre-Ownology stage debugging" → **"pre-Ownology reading if you're just starting out"** (killed "debugging")
+
+**Email templates:**
+- `foundingReservationEmail.ts` — 5 rewrites: "Founding-Member" → **"Founding Cohort · 2026"** across subject line, HTML header, HTML paragraph, text body, and owner-side notification. Bonus: "the 60-second onboarding" → **"your first login — about 60 seconds"** (removed "onboarding" jargon).
+- `nurtureEmail.ts` — HTML + text sync: "at 7am" → **"at 5:30am"** (aligned with Cellar Brief cadence everywhere else), "Ask Ownology" → **"Ask Owen"** (brand consistency).
+- `marketingCoachEmail.ts` — audited but not touched. Owner-only internal email (Rich is the audience), winemaker-facing language doesn't apply.
+- `dailyAlertEmail.ts` — audited, clean. Already in Owen voice with cellar-native language.
+
+**Verified**: `/guide` renders correctly with new copy ("SEE YOUR VINTAGE" pill, "Ask Owen" pillar). Zero TS regressions. Lint clean.
+
+---
+
 ### Weekly Cellar Digest email + User Journey Deck (Feb 2026, Rich)
 
 **Weekly Cellar Digest — SHIPPED end-to-end**

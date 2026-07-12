@@ -147,11 +147,11 @@ const CHECKLIST: ChecklistItem[] = [
 const ROLE_PATHS: RolePath[] = [
   {
     role: "Winery Owner",
-    tagline: "Production visibility, cost intelligence, and compliance readiness.",
+    tagline: "See the whole cellar. Know what it cost. Know it's audit-ready.",
     icon: <Layers className="w-6 h-6" />,
     steps: [
       { label: "Cellar Brief — daily 5:30am briefing", href: "/cellar-brief" },
-      { label: "Dashboard — KPIs & tank status", href: "/dashboard" },
+      { label: "Dashboard — your cellar at a glance", href: "/dashboard" },
       { label: "The Press — Cellar Value tab", href: "/the-press" },
       { label: "Compliance — LIP Audit Pack export", href: "/compliance" },
     ],
@@ -160,13 +160,13 @@ const ROLE_PATHS: RolePath[] = [
   },
   {
     role: "Head Winemaker",
-    tagline: "Fermentation control, protocol management, and decision capture.",
+    tagline: "Ferment control, protocols at hand, decisions captured for next vintage.",
     icon: <FlaskConical className="w-6 h-6" />,
     steps: [
       { label: "Cellar Brief — daily 5:30am briefing", href: "/cellar-brief" },
       { label: "The Press — Vintage Log", href: "/the-press" },
       { label: "Knowledge Platform — SOPs & Decision Logic", href: "/knowledge" },
-      { label: "Free Run — AI assistant", href: "/free-run" },
+      { label: "Free Run — Owen, your AI apprentice", href: "/free-run" },
     ],
     startHref: "/cellar-brief",
     startLabel: "Start with your Cellar Brief",
@@ -821,8 +821,8 @@ export default function Guide() {
             />
             <PillarCard
               pillar="Learn"
-              label="Free Run — AI Assistant"
-              description="Ask anything about winemaking science, regulatory requirements, or your own protocols. The AI draws on your SOPs and world-class wine science, then cites its sources."
+              label="Free Run — Ask Owen"
+              description="Ask Owen anything about winemaking science, regs, or your own protocols. He reads your SOPs, cross-references the Red & White Wine Bibles and MoreWine, and cites every source back to you."
               href="/free-run"
               icon={<FlaskConical className="w-5 h-5" />}
               color="oklch(0.65 0.10 220)"
@@ -1250,13 +1250,13 @@ export default function Guide() {
               {
                 label: "Wine Australia — LIP & Record-Keeping (s.39F)",
                 href: "https://www.wineaustralia.com/labelling/label-integrity-program",
-                blurb: "The AU Label Integrity Program you need to know cold. Ownology's LIP Audit Pack exports directly to this schema.",
+                blurb: "The AU Label Integrity Program you need to know cold. Ownology's LIP Audit Pack exports match this format field-for-field.",
                 tag: "COMPLIANCE",
               },
               {
                 label: "WineMaker Magazine — Troubleshooting Guide",
                 href: "https://winemakermag.com/technique",
-                blurb: "The friendliest home-winemaker troubleshooting archive. Great for pre-Ownology stage debugging.",
+                blurb: "The friendliest home-winemaker troubleshooting archive. Great for pre-Ownology reading if you're just starting out.",
                 tag: "COMMUNITY",
               },
               {

@@ -53,8 +53,8 @@ function renderHtml(opts: { contactName: string | null; wineryName: string; code
   <p>You clicked ${attribution}'s Ownology invite a few days back but didn't sign up. Totally fine — most winemakers we talk to are heads-down through harvest.</p>
   <p>Here's the short version of what ${opts.contactName ? escapeHtml(opts.contactName) : escapeHtml(opts.wineryName)} finds useful:</p>
   <ul style="padding-left: 20px;">
-    <li>A daily <strong>Cellar Brief</strong> at 7am — every tank's vintage-log summary + what needs action today, written by Owen.</li>
-    <li><strong>Ask Ownology</strong> — 236 winemaker Q&amp;As grounded in industry-standard oenology references.</li>
+    <li>A daily <strong>Cellar Brief</strong> at 5:30am — every tank's vintage-log summary + what needs action today, written by Owen.</li>
+    <li><strong>Ask Owen</strong> — 236 winemaker Q&amp;As grounded in industry-standard oenology references.</li>
     <li>One-tap <strong>compliance exports</strong> for Wine Australia LIP audits (or your local regulator).</li>
   </ul>
   <p style="margin: 24px 0;">
@@ -79,8 +79,8 @@ function renderText(opts: { contactName: string | null; wineryName: string; code
     `You clicked ${attribution}'s Ownology invite a few days back but didn't sign up. Totally fine.`,
     ``,
     `What ${opts.contactName ?? opts.wineryName} finds useful:`,
-    ` • A daily Cellar Brief at 7am — every tank's summary + what needs action today, written by Owen.`,
-    ` • Ask Ownology — 236 Q&As grounded in industry-standard oenology references.`,
+    ` • A daily Cellar Brief at 5:30am — every tank's summary + what needs action today, written by Owen.`,
+    ` • Ask Owen — 236 Q&As grounded in industry-standard oenology references.`,
     ` • One-tap compliance exports for LIP audits.`,
     ``,
     `Claim your 44-day trial: ${joinUrl}`,
