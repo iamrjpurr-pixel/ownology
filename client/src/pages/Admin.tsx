@@ -410,9 +410,9 @@ const TOOLS: AdminTool[] = [
     icon: <IconMembers />,
   },
   {
-    label: "Health Digest — run now",
-    description: "Runs all system health probes (env vars, DB, Resend, LLM key, auth). Add ?send=1 to also email ADMIN_EMAILS. Fires automatically daily 07:00 AEST once Railway cron is added.",
-    href: "/api/scheduled/health-digest",
+    label: "App Health Dashboard",
+    description: "Live probe status (env vars · DB · Resend · LLM · auth) with last-transition timestamps. Run the daily digest or the failure-only watcher from here.",
+    href: "/admin/health",
     icon: <IconMembers />,
   },
   {

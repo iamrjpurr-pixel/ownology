@@ -21,6 +21,7 @@ import { weeklyCellarDigestHandler } from "./scheduled/weeklyCellarDigest.js";
 import { resendHealthHandler } from "./scheduled/resendHealth.js";
 import { healthDigestHandler } from "./scheduled/healthDigest.js";
 import { healthWatchHandler } from "./scheduled/healthWatch.js";
+import { adminHealthStatusHandler } from "./adminHealth.js";
 import { marketingCoachEmailHandler } from "./scheduled/marketingCoachEmail.js";
 import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
 import { generateLipAuditPackPdf } from "./lipAuditPackPdf.js";
@@ -398,6 +399,7 @@ async function startServer() {
   app.get("/api/scheduled/resend-health", resendHealthHandler); // Owner probe: verifies env + domain + optional live send
   app.get("/api/scheduled/health-digest", healthDigestHandler); // Daily aggregator: env + DB + Resend + LLM + auth → optional email to ADMIN_EMAILS
   app.get("/api/scheduled/health-watch", healthWatchHandler); // Near-real-time: fires immediate email on OK→FAIL / FAIL→OK transitions
+  app.get("/api/admin/health-status", adminHealthStatusHandler); // Admin dashboard: live probes + stored state
   app.post("/api/scheduled/marketing-coach-email", express.json(), marketingCoachEmailHandler);
   app.get("/api/scheduled/marketing-coach-email", marketingCoachEmailHandler); // GET allowed for manual triggering / dry-run
   app.post("/api/scheduled/nurture-email", express.json(), nurtureEmailHandler);
