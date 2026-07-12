@@ -391,29 +391,35 @@ function ThePressContent({ isPreview }: { isPreview: boolean }) {
 
   return (
     <div style={{ padding: "1.5rem 1.25rem", maxWidth: "640px", margin: "0 auto", width: "100%" }}>
-      {/* Preview-access ribbon — shown to bypass-granted evaluators so
-          they know the numbers below are a curated sample, not their
-          own vintage. Reveal-law compliance. */}
-      {isPreview && (
-        <div
-          data-testid="the-press-preview-ribbon"
-          style={{
-            marginBottom: "1rem",
-            padding: "0.6rem 0.9rem",
-            borderRadius: "0.5rem",
-            background: ACCENT_SOFT,
-            border: `1px solid ${ACCENT_BORDER}`,
-            fontFamily: "'Lato', sans-serif",
-            fontSize: "0.78rem",
-            color: ACCENT_INK,
-            lineHeight: 1.5,
-          }}
-        >
-          <strong style={{ color: ACCENT, letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.66rem" }}>Preview access ·</strong>{" "}
-          The batch below is a curated sample so you can evaluate what The
-          Press does. Your own debrief unlocks the moment you log a racking event.
-        </div>
-      )}
+      {/* Sample-vintage ribbon — always shown while the batch pipeline is
+          still seeded with MOCK_BATCH. Two copy variants: bypass-granted
+          evaluators get "Preview access" language; naturally-unlocked
+          users get "Sample vintage" language so nobody mistakes the demo
+          numbers for their own vintage. Reveal-law + "no fake data"
+          compliance. Once we wire real wine_batches → The Press, drop the
+          `!hasRealBatch` branch here and let the ribbon disappear on its
+          own when the user has data of their own. */}
+      <div
+        data-testid={isPreview ? "the-press-preview-ribbon" : "the-press-sample-ribbon"}
+        style={{
+          marginBottom: "1rem",
+          padding: "0.6rem 0.9rem",
+          borderRadius: "0.5rem",
+          background: ACCENT_SOFT,
+          border: `1px solid ${ACCENT_BORDER}`,
+          fontFamily: "'Lato', sans-serif",
+          fontSize: "0.78rem",
+          color: ACCENT_INK,
+          lineHeight: 1.5,
+        }}
+      >
+        <strong style={{ color: ACCENT, letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.66rem" }}>
+          {isPreview ? "Preview access ·" : "Sample vintage ·"}
+        </strong>{" "}
+        {isPreview
+          ? "The batch below is a curated sample so you can evaluate what The Press does. Your own debrief unlocks the moment you log a racking event."
+          : "Ownology Cellars 2024 Shiraz — a demo batch used to show what The Press does. Your own vintage will replace this here once real-batch pipelining ships."}
+      </div>
 
       {/* Compare vintages CTA */}
       <div style={{ marginBottom: "1rem", textAlign: "right" }}>
