@@ -4,6 +4,41 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Prod cutover · Ownology.ai now served by new Railway build (Feb 2026, Rich)
+
+Full end-to-end wire-through completed. Prod was previously serving a stale build via Cloudflare-fronted DNS; now `ownology.ai` and `www.ownology.ai` route directly to the fresh Railway service.
+
+**DNS surgery (at Namecheap):**
+- Deleted 3 stale records: `A @ → 162.159.142.117`, `A @ → 172.66.2.113`, `CNAME www → ownology.ai.` (all leftover Cloudflare edge IPs).
+- Added 4 new records:
+  - `ALIAS @ → aye79ubv.up.railway.app`
+  - `TXT _railway-verify → railway-verify=4e0da…` (apex verification)
+  - `CNAME www → uj8udgk7.up.railway.app`
+  - `TXT _railway-verify.www → railway-verify=c3b70…` (www verification)
+- Preserved: Google Search Console TXT, `_dmarc`, `default._domainkey`, `resend._domainkey`, SPF for Amazon SES.
+
+**Env var cleanup (on Railway):**
+- Deleted `ALERT_TEST_TO` — email redirect to test inbox removed. All transactional emails now go to real recipients.
+- Regenerated `JWT_SECRET` (was flagged for leading/trailing whitespace by health probe).
+- Confirmed `ALERT_FROM_EMAIL=owen@ownology.ai`.
+- Rotated `RESEND_API_KEY` from a Bondi Roam-scoped key to a new `railway-prod` key scoped to Rich's Ownology Resend workspace (where `ownology.ai` is verified).
+- Deferred (per Rich): `STRIPE_SECRET_KEY` (waiting on live keys), `OAUTH_SERVER_URL` (waiting on public-signup readiness).
+
+**Verification:**
+- `/api/health` uptime dropped from 128,927s (stale process) to 127s post-redeploy.
+- `/api/scheduled/health-digest?send=1` returned Resend message-id `7f28118c-3ef7-4c47-9996-8d7d8bb684d6`.
+- Real email from `owen@ownology.ai` landed in Rich's inbox — first production email under proper `ALERT_FROM_EMAIL` config.
+- Final probe status: 3 OK · 2 WARN (STRIPE + OAUTH stubs, both intentional deferrals) · 0 FAIL.
+
+**Also shipped in this session:**
+- `/admin/health` React dashboard (live probe status + last-transition timestamps + "Run watch" actions)
+- Failure-only push detector (`/api/scheduled/health-watch` + `health_probe_state` table)
+- Textbook-jargon sweep — Bucket B (10 rewrites) + C3 audience split (winemaker-facing surfaces migrated to "the standard cellar references your team already trusts", enthusiast surfaces kept for SEO). Hero renamed: **"The cellar you can talk to"** (was "The oenology you can talk to").
+- Style rule captured in `INDUCTION_STYLE_GUIDE.md` §7 to prevent regressions.
+
+---
+
+
 ### Failure-only push alert for App Health · `/api/scheduled/health-watch` (Feb 2026, Rich)
 
 Companion to the daily health digest. Rich no longer has to wait until 07:00 AEST to hear that Resend/MySQL/LLM died at midnight — a 15-min Railway cron now fires an **immediate** Resend email the moment any probe transitions.
