@@ -116,7 +116,7 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
         </div>
         <p style={eyebrow}>Meet Owen</p>
         <h1 style={h1}>
-          The oenology you can
+          The cellar you can
           <br />
           <span style={{ color: "var(--ow-amber)" }}>talk to.</span>
         </h1>
@@ -336,7 +336,7 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
           <span style={{ color: "var(--ow-amber)" }}>knowledgeable apprentice</span> is ready.
         </h2>
         <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "1rem", lineHeight: 1.7, color: "oklch(0.75 0.015 75)", maxWidth: 520, margin: "1.5rem auto 2rem" }}>
-          Cellar-grade AI grounded in industry-standard oenology references.
+          Cellar-grade AI grounded in the standard cellar references your team already trusts.
           Cited answers, compliance drafting, and a 250+ Q&amp;A library.
           Free to ask.
         </p>

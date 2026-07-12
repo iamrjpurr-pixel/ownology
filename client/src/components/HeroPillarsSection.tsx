@@ -55,7 +55,7 @@ const PILLARS: Pillar[] = [
     n: "03",
     name: "Learn",
     promise: "Ask any winemaking question. Get an answer.",
-    bullets: ["Grounded in industry-standard oenology references", "Curated by winemakers, not marketers", "Free forever, cited & shareable"],
+    bullets: ["Grounded in the standard cellar references your team already trusts", "Curated by winemakers, not marketers", "Free forever, cited & shareable"],
     cta: "Ask Owen →",
     href: "/ask?from=hero-pillars",
     testid: "hero-pillar-learn",

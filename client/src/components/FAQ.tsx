@@ -33,7 +33,7 @@ function useInView(threshold = 0.1) {
 const FAQS = [
   {
     q: "Is Ownology like WineryCopilot or other AI wine tools I've seen?",
-    a: "Those tools are built for marketing teams, not winemakers. WineryCopilot and similar platforms generate tasting room copy, social media posts, and event flyers — they are content generators powered by general-purpose AI with wine-flavoured prompts. Ownology is a cellar intelligence tool. It answers technical production questions (SO₂ additions, YAN targets, fermentation anomalies, protocol lookups) grounded in your own documents and verified wine science. If you are asking \"what DAP addition does Tank 7 need right now?\", Ownology answers it. A marketing AI cannot.",
+    a: "Those tools are built for marketing teams, not winemakers. WineryCopilot and similar platforms generate tasting room copy, social media posts, and event flyers — they are content generators powered by general-purpose AI with wine-flavoured prompts. Ownology is a cellar intelligence tool. It answers technical production questions (SO₂ additions, YAN targets, fermentation anomalies, protocol lookups) grounded in your own documents and verified cellar references. If you are asking \"what DAP addition does Tank 7 need right now?\", Ownology answers it. A marketing AI cannot.",
   },
   {
     q: "How is Ownology different from just using ChatGPT?",
@@ -61,7 +61,7 @@ const FAQS = [
   },
   {
     q: "What happens if the AI gives a wrong answer?",
-    a: "Every answer Free Run provides is grounded in your winery's own SOPs and verified wine science literature — it cannot invent a protocol that does not exist in your Knowledge Platform. Every response includes a source citation so you can verify it instantly. The system is also designed to say 'I don't know' rather than guess. And critically, Ownology never makes a decision — it informs yours. The winemaker always has the final call.",
+    a: "Every answer Free Run provides is grounded in your winery's own SOPs and verified cellar references literature — it cannot invent a protocol that does not exist in your Knowledge Platform. Every response includes a source citation so you can verify it instantly. The system is also designed to say 'I don't know' rather than guess. And critically, Ownology never makes a decision — it informs yours. The winemaker always has the final call.",
   },
   {
     q: "Will Ownology replace me as the winemaker?",

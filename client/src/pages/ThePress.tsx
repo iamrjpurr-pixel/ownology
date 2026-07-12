@@ -676,7 +676,7 @@ function ThePressContent({ isPreview }: { isPreview: boolean }) {
             lineHeight: 1.55,
           }}
         >
-          Explore wine science, fermentation techniques, and pressing decisions to make better cellar choices.
+          Look at what happened at ferment, at pressing, and why — so next vintage runs better.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
           <button
@@ -702,7 +702,7 @@ function ThePressContent({ isPreview }: { isPreview: boolean }) {
               e.currentTarget.style.color = ACCENT;
             }}
           >
-            Fermentation Science
+            Ferment Guide
           </button>
           <button
             onClick={() => handleTryItNow()}

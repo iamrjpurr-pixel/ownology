@@ -58,8 +58,8 @@ const FLASH_CARDS: FlashCard[] = [
     title: "Ask Owen.",
     body: (
       <>
-        Grounded in the standard oenology references boutique winemakers
-        actually use. Cited every time. Every answer becomes a permanent
+        Grounded in the standard cellar references your team already trusts,
+        specific to boutique wineries. Cited every time. Every answer becomes a permanent
         Cellar Journal entry the whole industry can search.
       </>
     ),

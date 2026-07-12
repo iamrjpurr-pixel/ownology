@@ -141,7 +141,7 @@ const SECTIONS: Section[] = [
       {
         href: "/free-run",
         label: "Free Run (ask anything)",
-        what: "Type any winemaking question. You get an oenology-grounded answer citing AWRI / the bibles / your own cellar history. Every question auto-saves to a Cellar Journal page — that's your content flywheel.",
+        what: "Type any winemaking question. You get a cited answer from AWRI / the bibles / your own cellar history. Every question auto-saves to a Cellar Journal page — that's your content flywheel.",
       },
       {
         href: "/cellar-journal",

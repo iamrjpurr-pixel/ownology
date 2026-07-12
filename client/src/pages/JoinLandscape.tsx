@@ -102,7 +102,7 @@ export default function JoinLandscape() {
           </h2>
           <div style={{ padding: "1.25rem", background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)", border: `1px solid ${AMBER}`, borderRadius: 8 }}>
             <p style={{ margin: 0, color: HI, fontSize: "1rem", fontWeight: 600, fontStyle: "italic", lineHeight: 1.5 }}>
-              &quot;AI wine answer engine, grounded in real oenology, with cellar-side infrastructure underneath.&quot;
+              &quot;AI wine answer engine, grounded in the cellar references your team already trusts, with cellar-side infrastructure underneath.&quot;
             </p>
           </div>
           <p style={{ margin: "1.25rem 0 0.75rem", color: MID, fontSize: "0.95rem", lineHeight: 1.55 }}>
@@ -131,14 +131,14 @@ export default function JoinLandscape() {
           <div style={{ padding: "1.25rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 8 }}>
             <p style={{ margin: 0, color: HI, fontSize: "1.05rem", fontFamily: SERIF, lineHeight: 1.45 }}>
               Ownology is the wine answer engine.<br />
-              Grounded in real oenology.<br />
+              Grounded in the cellar references your team already trusts.<br />
               Delivered by Owen, the cellar hand who remembers.
             </p>
           </div>
           <div style={{ marginTop: "1rem", display: "grid", gap: "0.6rem" }}>
             <div style={{ padding: "0.75rem 1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 6, fontSize: "0.88rem" }}>
               <strong style={{ color: HI }}>Grounded, not vibes.</strong>{" "}
-              <span style={{ color: MID }}>Rooted in industry-standard oenology — not community opinion, not internet consensus, not LLM hallucination.</span>
+              <span style={{ color: MID }}>Rooted in the standard cellar references your team already trusts — not community opinion, not internet consensus, not LLM hallucination.</span>
             </div>
             <div style={{ padding: "0.75rem 1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 6, fontSize: "0.88rem" }}>
               <strong style={{ color: HI }}>Direct, not deferential.</strong>{" "}
@@ -162,7 +162,7 @@ export default function JoinLandscape() {
               &quot;What makes you different from the other wine apps and AI tools?&quot;
             </p>
             <p style={{ margin: "0.6rem 0 0", color: MID, fontStyle: "italic", fontSize: "0.9rem", lineHeight: 1.55 }}>
-              &quot;Big wine apps tell you what the crowd thinks about a bottle. Wine-education sites teach evergreen concepts. Generic AI will guess at wine questions with confidence but no depth. Ownology sits somewhere else — it&apos;s the answer engine grounded in real oenology, and on the professional side, a cellar hand that remembers your last three vintages. Different job. Different tool.&quot;
+              &quot;Big wine apps tell you what the crowd thinks about a bottle. Wine-education sites teach evergreen concepts. Generic AI will guess at wine questions with confidence but no depth. Ownology sits somewhere else — it&apos;s the answer engine grounded in the cellar references your team already trusts, and on the professional side, a cellar hand that remembers your last three vintages. Different job. Different tool.&quot;
             </p>
           </div>
 

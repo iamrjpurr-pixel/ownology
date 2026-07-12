@@ -130,7 +130,7 @@ const CHECKLIST: ChecklistItem[] = [
   {
     id: "cellar-journal",
     label: "Explore the Cellar Journal",
-    description: "236 winemaker Q&As grounded in industry-standard oenology references — public, SEO-indexed, and shareable.",
+    description: "236 winemaker Q&As grounded in the standard cellar references your team already trusts — public, SEO-indexed, and shareable.",
     href: "/cellar-journal",
     linkLabel: "Open Cellar Journal",
   },
@@ -814,7 +814,7 @@ export default function Guide() {
             <PillarCard
               pillar="Know"
               label="Knowledge — SOPs + Cellar Journal"
-              description="38 industry-standard SOPs across 12 categories, plus 236 winemaker Q&As in the public Cellar Journal — grounded in the standard oenology references, searchable, shareable."
+              description="38 industry-standard SOPs across 12 categories, plus 236 winemaker Q&As in the public Cellar Journal — grounded in the standard cellar references your team already trusts, searchable, shareable."
               href="/knowledge"
               icon={<BookOpen className="w-5 h-5" />}
               color="oklch(0.62 0.10 45)"
@@ -1224,7 +1224,7 @@ export default function Guide() {
           </h2>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9rem", color: TEXT_MID, marginBottom: "1.5rem", maxWidth: "48rem" }}>
             The public authorities we cross-reference (but don't clone). These sources are curated — not comprehensive.
-            Ownology grounds its AI in the technical/production side (industry-standard oenology references, AWRI research, AU compliance frameworks).
+            Ownology grounds its AI in the technical/production side (the standard cellar references your team already trusts, AWRI research, AU compliance frameworks).
             The links below are the trade, tasting, and marketing side you'll need eventually.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "0.75rem" }}>

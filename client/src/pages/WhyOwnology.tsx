@@ -114,7 +114,7 @@ function TwoSystems() {
             <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: AMBER, marginBottom: "0.75rem" }}>Ownology</p>
             <h3 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "1.375rem", color: TEXT_HI, marginBottom: "0.75rem" }}>The knowledge layer on top</h3>
             <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "0.9375rem", color: TEXT_MID, lineHeight: 1.75, marginBottom: "1.5rem" }}>
-              Ownology is your <strong style={{ color: TEXT_HI, fontWeight: 400 }}>decision-support layer</strong>. It answers questions, surfaces protocols, and helps every person in your cellar make better decisions — grounded in your own documents and verified wine science.
+              Ownology is your <strong style={{ color: TEXT_HI, fontWeight: 400 }}>second brain</strong>. It answers questions, surfaces protocols, and helps every person in your cellar make better decisions — grounded in your own documents and verified cellar references.
             </p>
             <ul className="flex flex-col gap-3">
               {ownItems.map(item => (

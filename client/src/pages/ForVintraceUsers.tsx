@@ -205,7 +205,7 @@ function HowItFits() {
                 "Document vault — upload protocols & reports",
                 "Cellar-floor answers in seconds on mobile",
                 "Cited responses grounded in your documents",
-                "Wine science knowledge base built-in",
+                "Cellar reference library built-in",
                 "Onboards seasonal staff without interrupting you",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2.5">

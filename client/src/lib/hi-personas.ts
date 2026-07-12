@@ -118,7 +118,7 @@ export const HI_VARIANTS_BY_PERSONA: Record<HiPersona, string[][]> = {
     // 3 — Like a second winemaker on the floor
     [
       "Like a quiet-competent second pair of hands you always wished you could hire — on the phone, always on.",
-      "Grounded in the standard oenology references your team already trusts, with your specific tank pulled up alongside.",
+      "Grounded in the standard cellar references your team already trusts, with your specific tank pulled up alongside.",
       "Captures the <em>why</em> behind decisions — because \"we did this because\" is the story a good winery tells.",
     ],
     // 4 — Muddy hands, calm mind

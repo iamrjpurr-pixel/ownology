@@ -44,7 +44,7 @@ const CARDS: FlashCard[] = [
       "Ignore or double-check sources from: blogs, forums, wine-marketing sites.",
       "If ALL sources look weak, re-ask the question with more specificity (add state, product type, exact regulation number).",
     ],
-    gotcha: "Compliance AI is grounded in oenology + regulatory refs, but it can still generalise. Two citations from authoritative sources = safe. Zero citations = re-ask.",
+    gotcha: "Compliance AI is grounded in cellar + regulatory refs, but it can still generalise. Two citations from authoritative sources = safe. Zero citations = re-ask.",
   },
   {
     n: "03", deck: "ask",

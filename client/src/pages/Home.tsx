@@ -810,7 +810,7 @@ function Features() {
                 </svg>
               </div>
               <EditableText contentKey="home.features.ask.title" defaultValue="AI Knowledge Assistant" as="h3" style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.375rem", color:"var(--ow-text-hi)", marginBottom:"0.75rem"}} contentMap={contentMap} />
-              <EditableText contentKey="home.features.ask.body" defaultValue="Ask anything — from complex SO2 calculations to your own harvest protocols. The assistant searches your uploaded documents and world-class wine science literature, then delivers a precise, cited answer in seconds." as="p" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7, maxWidth:"420px"}} multiline contentMap={contentMap} />
+              <EditableText contentKey="home.features.ask.body" defaultValue="Ask anything — from complex SO2 calculations to your own harvest protocols. The assistant searches your uploaded documents and the standard cellar references your team already trusts, then delivers a precise, cited answer in seconds." as="p" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7, maxWidth:"420px"}} multiline contentMap={contentMap} />
               <div className="mt-6 p-4 rounded-sm" style={{background:"var(--ow-bg-base)", border:"1px solid var(--ow-border)"}}>
                 <p className="data-readout text-xs mb-2" style={{color:"color-mix(in oklch, var(--ow-amber) 60%, transparent)"}}>EXAMPLE QUERY</p>
                 <p style={{fontFamily:"'Fira Code',monospace", fontSize:"0.8125rem", color:"var(--ow-amber)", lineHeight:1.6}}>

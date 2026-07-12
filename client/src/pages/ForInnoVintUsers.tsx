@@ -77,7 +77,7 @@ function Hero() {
           <em style={{ color: AMBER, fontStyle: "italic" }}>Ownology answers your questions.</em>
         </h1>
         <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.125rem", color: TEXT_MID, lineHeight: 1.75, maxWidth: "600px", marginBottom: "2.5rem" }}>
-          You already have a world-class production management system. Ownology adds the one thing InnoVint doesn't have: an AI assistant that reads your own protocols, SOPs, and vintage notes — and answers your team's questions in plain language, on the cellar floor, in seconds.
+          You already have a serious production management system. Ownology adds the one thing InnoVint doesn't have: an AI assistant that reads your own protocols, SOPs, and vintage notes — and answers your team's questions in plain language, on the cellar floor, in seconds.
         </p>
         <div className="flex flex-wrap gap-4">
           <a href="/#pricing" className="btn-amber">Start Free Trial — No Credit Card</a>
@@ -207,7 +207,7 @@ function HowItFits() {
                 "Document vault — upload protocols & reports",
                 "Cellar-floor answers in seconds on mobile",
                 "Cited responses grounded in your documents",
-                "Wine science knowledge base built-in",
+                "Cellar reference library built-in",
                 "Onboards seasonal staff without interrupting you",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2.5">

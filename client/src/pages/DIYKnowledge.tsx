@@ -159,7 +159,7 @@ function DIYKnowledgeHome() {
               <div className="absolute bottom-full left-0 mb-2 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150" style={{ width: "230px" }}>
                 <div style={{ background: "oklch(0.14 0.008 60)", border: "1px solid oklch(0.72 0.12 75 / 30%)", borderRadius: "4px", padding: "0.625rem 0.75rem", boxShadow: "0 4px 20px oklch(0 0 0 / 0.35)" }}>
                   <p style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 600, color: "var(--ow-amber)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.375rem" }}>What are guides?</p>
-                  <p style={{ fontFamily: SANS, fontSize: "0.75rem", color: "oklch(0.82 0.015 75)", lineHeight: 1.55, margin: 0 }}>Each guide is a step-by-step SOP (Standard Operating Procedure) drawn from the standard oenology references — written for home scale, not commercial production.</p>
+                  <p style={{ fontFamily: SANS, fontSize: "0.75rem", color: "oklch(0.82 0.015 75)", lineHeight: 1.55, margin: 0 }}>Each guide is a step-by-step SOP (Standard Operating Procedure) drawn from the standard cellar references — written for home scale, not commercial production.</p>
                 </div>
               </div>
             </div>
