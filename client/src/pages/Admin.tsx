@@ -360,6 +360,7 @@ const QUICKLINK_COLUMNS: Array<{
       { label: "Getting Started",     href: "/guide" },
       { label: "Your Vintage",       href: "/your-vintage" },
       { label: "Induction Style Guide (PDF)", href: "/admin/style-guide/induction" },
+      { label: "User Journey Deck (PDF)", href: "/admin/deck/user-journey" },
       { label: "Regulations Library", href: "/regulations" },
       { label: "FAQ",                 href: "/#faq" },
       { label: "Our Story",           href: "/#our-story" },

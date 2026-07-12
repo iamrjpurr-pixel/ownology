@@ -140,6 +140,7 @@ const CallPlaybook = lazy(() => import("./pages/CallPlaybook"));
 const Todo = lazy(() => import("./pages/Todo"));
 const Roadmap = lazy(() => import("./pages/Roadmap"));
 const StyleGuideInduction = lazy(() => import("./pages/StyleGuideInduction"));
+const UserJourneyDeck = lazy(() => import("./pages/UserJourneyDeck"));
 const AdminPressBypass = lazy(() => import("./pages/AdminPressBypass"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
@@ -431,6 +432,7 @@ function Router() {
           startup-speak; "your vintage" is winemaker-native. */}
       <Route path={"/roadmap"} component={Roadmap} />
       <Route path={"/admin/style-guide/induction"} component={StyleGuideInduction} />
+      <Route path={"/admin/deck/user-journey"} component={UserJourneyDeck} />
       <Route path={"/admin/press-bypass"} component={AdminPressBypass} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />
