@@ -186,6 +186,7 @@ For each entry: **HTTP method: GET**, **URL: `https://www.ownology.ai/api/schedu
 | Endpoint | Cron (UTC) | AEST equivalent | Purpose |
 |---|---|---|---|
 | `/api/scheduled/health-digest?send=1` | `0 20 * * *` | 07:00 daily | System health digest emailed to `ADMIN_EMAILS` (env vars · DB · Resend · LLM · auth) |
+| `/api/scheduled/health-watch?send=1` | `*/15 * * * *` | every 15 min | **Failure-only push.** Fires an immediate email the moment any probe transitions OK→FAIL (or FAIL→OK for recovery). Cheap — no email sent when nothing changed. |
 | `/api/scheduled/daily-alert-email` | `30 18 * * *` | 05:30 daily | Daily alerts (stuck ferment · temp excursion · SO₂ decay) |
 | `/api/scheduled/weekly-cellar-digest` | `30 18 * * 0` | 05:30 Monday | Weekly Cellar Digest email to all winery users |
 | `/api/scheduled/nurture-email` | `0 22 * * 2` | 09:00 Wednesday | Nurture drip to prospects who haven't signed up |

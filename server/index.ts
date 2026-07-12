@@ -20,6 +20,7 @@ import { dailyAlertEmailHandler } from "./scheduled/dailyAlertEmail.js";
 import { weeklyCellarDigestHandler } from "./scheduled/weeklyCellarDigest.js";
 import { resendHealthHandler } from "./scheduled/resendHealth.js";
 import { healthDigestHandler } from "./scheduled/healthDigest.js";
+import { healthWatchHandler } from "./scheduled/healthWatch.js";
 import { marketingCoachEmailHandler } from "./scheduled/marketingCoachEmail.js";
 import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
 import { generateLipAuditPackPdf } from "./lipAuditPackPdf.js";
@@ -396,6 +397,7 @@ async function startServer() {
   app.get("/api/scheduled/weekly-cellar-digest", weeklyCellarDigestHandler); // GET allowed for manual triggering / dry-run
   app.get("/api/scheduled/resend-health", resendHealthHandler); // Owner probe: verifies env + domain + optional live send
   app.get("/api/scheduled/health-digest", healthDigestHandler); // Daily aggregator: env + DB + Resend + LLM + auth → optional email to ADMIN_EMAILS
+  app.get("/api/scheduled/health-watch", healthWatchHandler); // Near-real-time: fires immediate email on OK→FAIL / FAIL→OK transitions
   app.post("/api/scheduled/marketing-coach-email", express.json(), marketingCoachEmailHandler);
   app.get("/api/scheduled/marketing-coach-email", marketingCoachEmailHandler); // GET allowed for manual triggering / dry-run
   app.post("/api/scheduled/nurture-email", express.json(), nurtureEmailHandler);
@@ -1081,6 +1083,24 @@ async function startServer() {
         resolved_note VARCHAR(500),
         INDEX vqf_winery_vessel_idx (winery_id, vessel_id),
         INDEX vqf_active_idx (winery_id, resolved_at)
+      )
+    `);
+    // health_probe_state — Feb 2026: last-known status of each health
+    // digest probe so /api/scheduled/health-watch can fire an immediate
+    // Resend email on OK→FAIL / FAIL→OK transitions instead of waiting
+    // for the daily digest. Persisted (not in-memory) so redeploys don't
+    // cause spurious "just failed" alerts.
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS health_probe_state (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        probe_name VARCHAR(64) NOT NULL UNIQUE,
+        last_status ENUM('ok','warn','fail','skip') NOT NULL,
+        last_detail TEXT,
+        last_checked_at BIGINT NOT NULL,
+        last_transitioned_at BIGINT NOT NULL,
+        last_alerted_at BIGINT,
+        INDEX hps_status_idx (last_status),
+        INDEX hps_transitioned_idx (last_transitioned_at)
       )
     `);
     await db.execute(sql`

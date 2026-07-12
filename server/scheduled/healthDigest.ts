@@ -24,16 +24,16 @@ import { Resend } from "resend";
 import { sql } from "drizzle-orm";
 import { db } from "../db.js";
 
-type ProbeStatus = "ok" | "warn" | "fail" | "skip";
-type Probe = { name: string; status: ProbeStatus; detail: string; hint?: string };
+export type ProbeStatus = "ok" | "warn" | "fail" | "skip";
+export type Probe = { name: string; status: ProbeStatus; detail: string; hint?: string };
 
-const STATUS_COLOR: Record<ProbeStatus, string> = {
+export const STATUS_COLOR: Record<ProbeStatus, string> = {
   ok: "#4a7c47",
   warn: "#b57e14",
   fail: "#b91c1c",
   skip: "#6b7280",
 };
-const STATUS_LABEL: Record<ProbeStatus, string> = { ok: "OK", warn: "WARN", fail: "FAIL", skip: "SKIP" };
+export const STATUS_LABEL: Record<ProbeStatus, string> = { ok: "OK", warn: "WARN", fail: "FAIL", skip: "SKIP" };
 
 async function probeEnv(): Promise<Probe> {
   const missing: string[] = [];
@@ -141,7 +141,11 @@ async function probeAuth(): Promise<Probe> {
   return { name: "Auth", status: "ok", detail: `dev-bypass=${bypass} · oauth=${oauthStubbed ? "stub" : "configured"}` };
 }
 
-function renderHtml(probes: Probe[], generatedAt: Date): string {
+export async function runAllProbes(): Promise<Probe[]> {
+  return Promise.all([probeEnv(), probeDb(), probeResend(), probeLlm(), probeAuth()]);
+}
+
+export function renderHtml(probes: Probe[], generatedAt: Date): string {
   const rows = probes
     .map(
       (p) => `
@@ -191,7 +195,7 @@ export async function healthDigestHandler(req: Request, res: Response): Promise<
     null;
   const secretOk = cronSecret === null || providedSecret === cronSecret;
 
-  const probes = await Promise.all([probeEnv(), probeDb(), probeResend(), probeLlm(), probeAuth()]);
+  const probes = await runAllProbes();
   const now = new Date();
   const summary = {
     generatedAt: now.toISOString(),

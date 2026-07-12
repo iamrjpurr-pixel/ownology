@@ -4,6 +4,22 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Failure-only push alert for App Health · `/api/scheduled/health-watch` (Feb 2026, Rich)
+
+Companion to the daily health digest. Rich no longer has to wait until 07:00 AEST to hear that Resend/MySQL/LLM died at midnight — a 15-min Railway cron now fires an **immediate** Resend email the moment any probe transitions.
+
+- **New table** `health_probe_state` — one row per probe (Env vars · MySQL · Resend · Emergent LLM key · Auth), persisted so redeploys don't cause spurious "just failed" alerts. Bootstrapped via `CREATE TABLE IF NOT EXISTS` on server boot; also exists in Drizzle schema.
+- **New endpoint** `GET /api/scheduled/health-watch` — reuses the same probe set as `healthDigest.ts` (extracted `runAllProbes()` + shared types). Compares each observation against the last-known row, emits **failure** alerts on OK/WARN/SKIP → FAIL and **recovery** alerts on FAIL → OK/WARN. Same `CRON_SECRET` + `ADMIN_EMAILS` config as the daily digest.
+- **Suppression window**: 30 min per probe (via `lastAlertedAt`) to prevent duplicate emails inside a settling event. `?force=1` overrides. Dry-run by default; `?send=1` actually mails.
+- **Email format**: distinct "JUST FAILED" / "RECOVERED" badges, previous→current status arrow, detail line, hint. Subject line lists the failing probe(s) directly (`[Ownology ALERT] MySQL just failed`) so a phone lock-screen preview is enough context.
+- **Railway cron entry** added to `DEPLOY_TO_RAILWAY.md`: `*/15 * * * *` UTC.
+
+**Verified**: initial state seeded, recovery transition detected via forced DB flip, repeat runs correctly silent, dry-run default respected, no lint issues.
+
+---
+
+
+
 ### Jargon audit sweep · `/guide` + email templates (Feb 2026, Rich)
 
 Applied same lens as the `/try` audit. Six changes across four surfaces.

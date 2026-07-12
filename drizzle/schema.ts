@@ -1787,3 +1787,30 @@ export const adminActions = mysqlTable(
   ]
 );
 
+
+// ─── Health Probe State (Feb 2026 — failure-only push alerts) ─────────────
+// One row per probe name. Tracks the last observed status so the /api/scheduled/
+// health-watch endpoint can detect OK→FAIL / FAIL→OK transitions and fire
+// immediate Resend alerts. Persisted (rather than in-memory) so restarts and
+// deploys don't cause spurious "just failed" alerts. See
+// server/scheduled/healthWatch.ts.
+export const healthProbeState = mysqlTable(
+  "health_probe_state",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    probeName: varchar("probe_name", { length: 64 }).notNull().unique(),
+    lastStatus: mysqlEnum("last_status", ["ok", "warn", "fail", "skip"]).notNull(),
+    lastDetail: text("last_detail"),
+    // UTC ms — updated on every observation
+    lastCheckedAt: bigint("last_checked_at", { mode: "number" }).notNull(),
+    // UTC ms — updated only when status changes vs previous row
+    lastTransitionedAt: bigint("last_transitioned_at", { mode: "number" }).notNull(),
+    // UTC ms — set when an alert email is dispatched for a transition, to
+    // prevent repeated re-alerts if the watcher runs before state settles.
+    lastAlertedAt: bigint("last_alerted_at", { mode: "number" }),
+  },
+  (t) => [
+    index("hps_status_idx").on(t.lastStatus),
+    index("hps_transitioned_idx").on(t.lastTransitionedAt),
+  ]
+);
