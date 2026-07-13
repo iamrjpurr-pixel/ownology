@@ -66,8 +66,13 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
   return (
     <section
       data-testid="hero-carousel"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      // Only pause on real mouse hover — mobile touch events can fire
+      // mouseenter (via touch emulation) but never mouseleave, leaving the
+      // carousel stuck on scene 1 forever. Use pointer events with a
+      // mouse-only guard so the auto-advance keeps running on touch devices.
+      // Feb 2026, Rich reported "stuck on one theme" on prod mobile.
+      onPointerEnter={(e) => { if (e.pointerType === "mouse") setPaused(true); }}
+      onPointerLeave={(e) => { if (e.pointerType === "mouse") setPaused(false); }}
       style={{
         position: "relative",
         minHeight: "88vh",
