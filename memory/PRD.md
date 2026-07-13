@@ -4,6 +4,11 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Feb 2026 session — Auto-Rewrite on Ingest — SHIPPED (this session):**
+- `outreach.create` now runs Claude rewrite + region inference inline after insert (silent-fail, ~2s latency, ~$0.005 cost). New contacts hit the list with a warm SMS draft + backfilled region — zero manual "Rewrite with AI" clicks needed.
+- Green success toast ("✨ SMS draft warm from birth — {name} · {winery}") or orange retry-hint on Claude failure.
+- Verified: AutoTest at Wirra Wirra with grenache-crush hook → region auto-set to `mclaren-vale`, SMS mentions McLaren Vale + grenache crush without parroting.
+
 **Feb 2026 session — Region-aware cohort bulk + TSV copy — SHIPPED (this session):**
 - `bulkRewriteSmsAI` now accepts optional `region` param — scoping via `WHERE region = <kebab>`.
 - Region filter chips on Outbound Queue now bound to the real DB `region` column with per-cohort counts (Hunter 14 · Barossa 16 · Yarra 12 etc). Empty cohorts auto-hide.

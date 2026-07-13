@@ -323,6 +323,7 @@ export default function AdminContacts() {
     hookSourceUrl: null as string | null,
   });
   const [err, setErr] = useState<string | null>(null);
+  const [autoRewriteToast, setAutoRewriteToast] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<Record<string, "url" | "sms" | null>>({});
   const [statusFilter, setStatusFilter] = useState<ContactStatus | "all">("all");
   // Sort order for the pipeline list. Persisted in localStorage so operator
@@ -496,12 +497,21 @@ export default function AdminContacts() {
       return;
     }
     try {
-      await createMutation.mutateAsync(form);
+      const result = await createMutation.mutateAsync(form);
       setForm({ firstName: "", lastName: "", mobileAu: "", winery: "", event: form.event, painPoint: "", calendlyOverride: form.calendlyOverride, notes: "", persona: "winemaker", hookTier: null, hookText: null, hookSourceUrl: null });
       // Clear the OCR card after a successful Add so the operator has a
       // clean surface for the next business card.
       setOcrCardResult(null);
       setOcrCardError(null);
+      // Surface the auto-rewrite outcome so operator knows if the draft
+      // was warmed by Claude (silent-fail on Claude means fallback to
+      // template — still useable, but flagged so they can retry).
+      if (result?.autoRewrote) {
+        setAutoRewriteToast(`✨ SMS draft warm from birth — ${form.firstName} · ${form.winery || "no winery"}`);
+      } else if (result?.autoRewriteError) {
+        setAutoRewriteToast(`Auto-rewrite skipped: ${result.autoRewriteError}. Hit "Rewrite with AI" on the card to try again.`);
+      }
+      setTimeout(() => setAutoRewriteToast(null), 4000);
       // Await the invalidation AND kick an explicit refetch so the KPI
       // counter + "All (n)" chip update in the same tick as the new row
       // appears in the list. Previously the KPI could look stuck when a
@@ -1568,6 +1578,29 @@ export default function AdminContacts() {
           {createMutation.isPending ? "Saving…" : "Save contact"}
         </button>
       </form>
+
+      {/* Auto-rewrite outcome toast — surfaces whether the AI draft was
+          warmed after a successful save. Auto-dismisses after 4s. */}
+      {autoRewriteToast && (
+        <div
+          data-testid="auto-rewrite-toast"
+          role="status"
+          style={{
+            margin: "0 0 16px",
+            padding: "8px 14px",
+            background: autoRewriteToast.startsWith("✨")
+              ? "color-mix(in oklch, oklch(0.70 0.16 140) 12%, transparent)"
+              : "color-mix(in oklch, oklch(0.65 0.18 60) 12%, transparent)",
+            border: `1px solid ${autoRewriteToast.startsWith("✨") ? "#16a34a" : "#ea580c"}`,
+            borderRadius: 4,
+            color: "var(--ow-text-hi)",
+            fontFamily: "'Lato',sans-serif",
+            fontSize: "0.82rem",
+          }}
+        >
+          {autoRewriteToast}
+        </div>
+      )}
 
       {/* Table */}
       {isLoading && <p style={{ color: "var(--ow-text-mid)" }}>Loading…</p>}

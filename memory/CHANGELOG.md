@@ -4,6 +4,42 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Auto-Rewrite on Ingest — SMS draft warm from birth (Feb 2026)
+
+Rich's ask: when a new contact gets added (via Perplexity, URL Quick-Add, or manual form), auto-fire the AI rewrite so the SMS draft is already warm — no separate "✨ Rewrite with AI" button click needed. Everything a new contact needs is generated in one atomic save.
+
+**Backend** (`server/routers/outreach.ts::create`):
+- Added optional `autoRewrite: z.boolean().default(true)` input flag.
+- After the DB insert, if `autoRewrite=true` AND research signals exist (winery + at least one of painPoint / hookText / notes) AND the LLM service is configured, the mutation runs two extra steps inline:
+  1. **Region inference** — calls `regionForWinery(winery)` against the static wineryRegions table; if hit, UPDATEs the row's `region` column. This gives the AI rewrite regional context to work with.
+  2. **Claude rewrite** — calls the shared `claudeRewriteOne()` helper (same one used by single + bulk) with the just-inferred region. Saves result to `smsDraftOverride`.
+- Silent-fail on Claude errors: the contact is already committed, so we don't roll back — the operator can hit "Rewrite with AI" manually if needed. Error surfaced in the response as `autoRewriteError`.
+- Response now returns `{ ok, slug, autoRewrote, autoRewriteError }` so the UI knows what happened.
+- Added `import { regionForWinery } from "../wineryRegions.js"`.
+
+**Frontend** (`client/src/pages/AdminContacts.tsx`):
+- `createMutation.mutateAsync` now captures the `result` and inspects `autoRewrote` / `autoRewriteError`.
+- New "auto-rewrite toast" component below the Add form:
+  - Green tint + "✨ SMS draft warm from birth — {FirstName} · {Winery}" on success.
+  - Orange tint + "Auto-rewrite skipped: {reason}. Hit 'Rewrite with AI' on the card to try again." on Claude failure.
+  - Auto-dismisses after 4s.
+- Zero UX friction: the operator just clicks Save, waits ~2s extra, and the new contact appears in the list with a natural SMS already loaded in the draft box.
+
+**Verified end-to-end via curl**:
+```
+POST outreach.create {firstName: "AutoTest", winery: "Wirra Wirra", painPoint: "Balancing bottle-shop distribution with cellar-door growth in McLaren Vale", hookText: "just crushed the last block of grenache", hookTier: "recent_signal"}
+→ { ok: true, slug: "autotest-wirra-wirra", autoRewrote: true, autoRewriteError: null }
+```
+DB post-insert:
+- region: `mclaren-vale` ✓ (auto-inferred from winery lookup)
+- sms_draft_override: *"gday — saw you just wrapped grenache crush. built a cellar-intelligence tool that helps winemakers in mclaren vale (and elsewhere) track stock + plan bottling runs without spreadsheet hell. worth 90 sec if useful: … — Jamie"* ✓ (regional context + hook acknowledged, no parroting)
+
+Cost: ~$0.005 extra per ingest for Claude call. Adds ~2s to the save latency (barely noticeable after the 15-30s Perplexity deep research the operator just watched).
+
+[shipped: auto-rewrite-on-ingest, auto-region-inference-on-ingest]
+
+
+
 ### Region-aware cohort bulk — AI rewrite + TSV copy (Feb 2026)
 
 Rich asked to scope bulk rewrite to a single region cohort (McLaren Vale / Hunter / Barossa) so a whole batch shares a story arc, AND clarified how "bulk send" actually works today — the existing `Copy N SMS drafts` button dumps a TSV to clipboard for Messages/iOS paste. No SMS gateway. Both flows now region-scoped.

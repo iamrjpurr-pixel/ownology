@@ -8,6 +8,7 @@ import { eq, sql, desc, isNull, and } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure } from "../trpc.js";
 import { db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
+import { regionForWinery } from "../wineryRegions.js";
 
 function slugify(...parts: string[]): string {
   return parts
@@ -760,6 +761,10 @@ export const outreachRouter = router({
         slug: z.string().max(80).optional(),
         status: z.enum(["warm", "lukewarm", "cold", "sales", "skip"]).optional(),
         persona: z.enum(["md", "winemaker", "owner", "sales-rep"]).optional(),
+        // When true (default), the server also runs claudeRewriteOne right
+        // after the insert to warm the SMS draft. Only skip in tests or
+        // for contacts without enough research to yield a natural draft.
+        autoRewrite: z.boolean().default(true),
       })
     )
     .mutation(async ({ input }) => {
@@ -791,7 +796,67 @@ export const outreachRouter = router({
         }
         throw err;
       }
-      return { ok: true, slug };
+
+      // 🔥 AUTO-REWRITE — draft is warm from birth (Feb 2026, Rich).
+      // Only fires if research signals exist to work with (winery + at
+      // least one of painPoint / hookText / notes). Silent-fail: if
+      // Claude is down, we don't block the create — the operator can
+      // click "Rewrite with AI" manually on the card later.
+      //
+      // Region backfill runs FIRST — try to guess the region from the
+      // winery name so the AI rewrite has regional context to work with.
+      let autoRewrote = false;
+      let autoRewriteError: string | null = null;
+      if (input.autoRewrite) {
+        const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+        const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+        const hasResearch = !!(input.winery && (input.painPoint || input.hookText || input.notes));
+
+        if (forgeUrl && forgeKey && hasResearch) {
+          // Cheap region inference: winery-name lookup via wineryRegions.
+          const inferredRegion = regionForWinery(input.winery);
+          if (inferredRegion) {
+            await db
+              .update(schema.outreachContacts)
+              .set({ region: inferredRegion })
+              .where(eq(schema.outreachContacts.slug, slug));
+          }
+
+          try {
+            const previewBase = process.env.PREVIEW_BASE_URL || process.env.PUBLIC_BASE_URL || "https://ownology.ai";
+            const { sms } = await claudeRewriteOne({
+              forgeUrl,
+              forgeKey,
+              previewBase,
+              tone: "warm",
+              contact: {
+                slug,
+                firstName: input.firstName.trim(),
+                lastName: input.lastName?.trim() || null,
+                winery: input.winery?.trim() || null,
+                region: inferredRegion,
+                event: input.event?.trim() || null,
+                painPoint: input.painPoint?.trim() || null,
+                hookText: input.hookText?.trim() || null,
+                hookTier: input.hookTier ?? null,
+                notes: input.notes?.trim() || null,
+                persona: input.persona ?? null,
+              },
+            });
+            await db
+              .update(schema.outreachContacts)
+              .set({ smsDraftOverride: sms })
+              .where(eq(schema.outreachContacts.slug, slug));
+            autoRewrote = true;
+          } catch (err) {
+            autoRewriteError = err instanceof Error ? err.message.slice(0, 120) : String(err);
+            // Do NOT throw — the contact is already created. Operator
+            // can hit "Rewrite with AI" manually if this failed.
+          }
+        }
+      }
+
+      return { ok: true, slug, autoRewrote, autoRewriteError };
     }),
 
   // ── OWNER — Voice-quick-add a contact ──────────────────────────────────
