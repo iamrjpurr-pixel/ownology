@@ -1,5 +1,27 @@
 # Agent Operating Rules — Ownology
 
+
+## Rule 0 · Do not delegate work to Rich that the agent can do in code (Jul 2026)
+
+If the task is doable via a bash script, SQL update, LLM call, or an API mutation
+you can invoke yourself — DO IT. Do not ask Rich to click buttons, paste text
+into UI fields, follow multi-step manual workflows, or manually run curl
+commands. He explicitly stated this rule on 2026-07-13 after receiving a
+brief that ended with "you need to click the Enrich button on Stephen's
+card and paste the transcript" — that was the exact wrong move.
+
+Concrete examples this rule covers:
+- Populating a contact card with a hook / painPoint / notes → direct DB update, don't ask Rich to click through UI
+- Creating a new contact (e.g. Chester Osborn) → INSERT the row directly with all enrichment fields
+- Bulk-ingesting a directory of 180 winemakers → fetch + parse + INSERT loop, don't build a UI and ask him to click "Ingest N"
+- Running an LLM enrichment on an existing card → call the endpoint yourself with curl or a Node script, don't ask him to open the panel
+- Verifying a fix on prod → curl the prod URL yourself, don't tell him to "check on prod and let me know"
+
+The UI wire-up for humans is still worth building — but only as an ONGOING capability, not as a requirement Rich must trigger to see the current session's work land. The current session's work MUST land on the database by the agent, using code, before the session ends.
+
+Ship-then-tell, don't ask-then-ship. He's the CEO, not the QA intern.
+
+
 These are PERMANENT rules for any AI agent working on this codebase. Future
 forks must read this first.
 
