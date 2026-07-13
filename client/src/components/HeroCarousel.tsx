@@ -161,7 +161,7 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
             color: "oklch(0.68 0.015 75)",
           }}
         >
-          not internet <span style={{ opacity: 0.45, textDecoration: "line-through" }}>CON</span> · backed IN{" "}
+          not internet <span style={{ opacity: 0.45, textDecoration: "line-through" }}>CON</span> · backed BY{" "}
           <span style={{ color: "var(--ow-amber)", fontWeight: 700 }}>SCIENCE</span>
         </p>
       </SceneWrap>
@@ -385,7 +385,7 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
         data-testid="hero-carousel-dots"
         style={{
           position: "absolute",
-          bottom: "2rem",
+          bottom: "3.25rem",
           left: "50%",
           transform: "translateX(-50%)",
           display: "flex",
@@ -457,7 +457,7 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
           aria-label="Scroll for more"
           style={{
             position: "absolute",
-            bottom: "1.4rem",
+            bottom: "0.6rem",
             left: "50%",
             transform: "translateX(-50%)",
             width: 36,

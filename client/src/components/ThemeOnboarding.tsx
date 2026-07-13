@@ -8,10 +8,10 @@
  *   2. After dismissal: stays closed unless something dispatches
  *      `ownology:open-theme-picker` (e.g. the ThemeToggle dropdown's
  *      "Compare themes" link).
- *   3. While open: clicking a theme applies it as a live preview (theme
- *      changes on the page in real time) but DOES NOT close the card.
- *      Users can click through several themes to compare. They confirm
- *      via "Done — keep this", or close via × (last preview is kept).
+ *   3. While open: clicking a theme applies it AND immediately closes the
+ *      card (Feb 2026 per Rich — the original preview-then-Done flow
+ *      tested as annoying; users who want to compare re-open via the
+ *      ThemeToggle dropdown's "Compare themes" link).
  *
  * Auto-open is still suppressed on /admin/* and /hi/:slug routes. Manual
  * re-open (via event) works everywhere — operators sometimes want to flip
@@ -178,7 +178,10 @@ export default function ThemeOnboarding() {
                   key={t.id}
                   type="button"
                   data-testid={`onboarding-theme-${t.id}`}
-                  onClick={() => preview(t.id)}
+                  onClick={() => {
+                    preview(t.id);
+                    dismiss();
+                  }}
                   style={{
                     padding: "8px 12px",
                     borderRadius: 4,
