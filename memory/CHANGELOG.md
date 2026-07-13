@@ -4,6 +4,36 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Contact engagement analytics view — `/admin/contacts/engagement` (Feb 2026)
+
+Rich asked for a "contact-me-back" landing analytics view to close the loop after the Outbound Queue tells you *who to touch next*. This new page tells you *who to touch again* based on real engagement signals (viewCount / firstViewedAt / ctaClickedAt / repliedAt / demoBookedAt).
+
+**New backend procedure** (`server/routers/outreach.ts`):
+- `outreach.engagementAnalytics` (`ownerProcedure`) — returns aggregate funnel totals (sent / viewed / re-opened / clicked / replied / booked) computed on SENT contacts only (honest denominator, doesn't inflate rates with test-page visits), plus per-contact rows bucketed by follow-up priority. Also returns `generatedAt` for cache-freshness display.
+- `outreach.markFollowedUp` (`ownerProcedure`) — bumps `smsSentAt` to now so the "Ghosts" bucket clears out after operator sends a second SMS/email.
+
+**Six follow-up buckets** (top = strike now, bottom = celebrate):
+- **🔥 Hot** — viewed 2+ times, no reply, no book → obsessive re-read = ready to talk
+- **✳ Clicked, no book** — tapped the CTA but didn't book → nudge with direct SMS
+- **👀 Viewed, no click** — opened but bounced off CTA → try a second angle
+- **💬 Replied** — reply in hand, no booking → keep it warm
+- **✓ Booked** — demo on the calendar (surface for confirmation cadence)
+- **👻 Ghosted** — sent 3+ days ago, never opened → SMS may not have landed
+
+**Frontend** (`client/src/pages/AdminEngagement.tsx`, ~320 LOC):
+- KPI strip: Sent / Viewed (with open rate %) / Re-opened / Clicked CTA / Replied / Booked with rates between each stage
+- Collapsible buckets, "Hot" auto-expanded on load
+- Every row: bucket-specific pre-written follow-up SMS + email templates (context-aware — the Hot template says "noticed you had another look", Ghosted says "first SMS may not have landed", etc.), Copy SMS button, Draft email mailto:, Mark followed up, Preview ↗ to /hi/<slug>
+- Row footer shows engagement timeline: "📤 sent 14d ago · 👀 opened 14d ago · 69× total · ✳ CTA 2d ago"
+
+**Route wiring**: `/admin/contacts/engagement` added to App.tsx (gated by default-deny wall). Nav pills added to `AdminContacts` header (Pipeline / Outbound queue / Engagement) and back-link in `AdminOutboundQueue`.
+
+**Verified live**: engagement endpoint returns clean data with honest funnel math (Sent=2 → Viewed=2 = 100% open rate — no inflation from test visits). Sally Rainbows (69 views) + Jane Tyrrells (3 views) both land in the Hot bucket as expected. Copy SMS + Mark followed up + email drafts all wire through.
+
+[shipped: engagement-analytics-view, follow-up-templates]
+
+
+
 ### Audit fix — Owen positioning + outbound queue + region column (Jul 2026)
 
 Rich called out three unshipped promises from earlier this session. All three shipped in one batch:

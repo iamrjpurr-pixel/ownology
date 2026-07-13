@@ -860,6 +860,42 @@ export default function AdminContacts() {
           >
             Pipeline board →
           </Link>
+          <Link
+            href="/admin/contacts/outbound-queue"
+            data-testid="link-to-outbound-queue"
+            style={{
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              padding: "8px 14px",
+              border: "1px solid var(--ow-amber)",
+              borderRadius: 6,
+              color: "var(--ow-amber)",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Outbound queue →
+          </Link>
+          <Link
+            href="/admin/contacts/engagement"
+            data-testid="link-to-engagement"
+            style={{
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              padding: "8px 14px",
+              border: "1px solid var(--ow-amber)",
+              borderRadius: 6,
+              color: "var(--ow-amber)",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Engagement →
+          </Link>
         </div>
       </div>
 

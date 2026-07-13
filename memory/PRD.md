@@ -4,6 +4,12 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Feb 2026 session — Contact engagement analytics view — SHIPPED (this session):**
+- New `/admin/contacts/engagement` page + `outreach.engagementAnalytics` + `outreach.markFollowedUp` procedures. Six follow-up buckets (Hot / Clicked-no-book / Viewed-no-click / Replied / Booked / Ghosted) with bucket-specific pre-written SMS + email templates. KPI strip with honest funnel math (only counts sent contacts as denominator).
+- Nav pills wired: `/admin/contacts` header now shows Pipeline / Outbound queue / Engagement side-by-side.
+- Verified: 2 sent → 2 viewed = 100% open rate; both fall into Hot bucket (Sally Rainbows 69 views + Jane Tyrrells 3 views).
+
+
 **Feb 2026 session — SHIPPED (Rich):**
 - `AutoThemeByTime` weather fallback moved from Barossa (−34.53, 138.95) → **Hunter Valley, Pokolbin** (−32.78, 151.29) in `client/src/App.tsx`.
 - `client/src/pages/Import.tsx` (2,236 lines) split into **7 files** under `client/src/pages/Import/` — `shared.tsx`, `VoiceTab.tsx`, `CameraTab.tsx`, `PasteTab.tsx`, `CsvTab.tsx`, `BulkTab.tsx`, `index.tsx`. Lazy-import path unchanged; all `data-testid`s preserved.

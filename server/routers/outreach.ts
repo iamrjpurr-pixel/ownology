@@ -2558,6 +2558,142 @@ Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine
       return { ok: true };
     }),
 
+  /** OWNER — post-send engagement analytics.
+   *
+   *  Reads every contact that has been touched (smsSentAt IS NOT NULL) and
+   *  buckets them by follow-up priority. Powers /admin/contacts/engagement.
+   *
+   *  Buckets (order = descending follow-up urgency):
+   *    - hot            : viewed 2+ times, no reply, no booking → strike now
+   *    - clickedNoBook  : tapped CTA but never booked/replied → nudge personally
+   *    - viewedNoClick  : opened but bounced from CTA → second SMS worth trying
+   *    - replied        : sent a reply, no booking yet → keep the conversation live
+   *    - booked         : demo booked (win — surface for reminder cadence)
+   *    - ghosted        : sent 3+ days ago, never viewed → SMS may not have landed
+   *
+   *  Also returns funnel totals (sent / viewed / clicked / replied / booked)
+   *  computed off the full contact table so the KPI strip shows the true
+   *  denominator.
+   */
+  engagementAnalytics: ownerProcedure.query(async () => {
+    const rows = await db
+      .select({
+        slug: schema.outreachContacts.slug,
+        firstName: schema.outreachContacts.firstName,
+        lastName: schema.outreachContacts.lastName,
+        winery: schema.outreachContacts.winery,
+        region: schema.outreachContacts.region,
+        mobileAu: schema.outreachContacts.mobileAu,
+        notes: schema.outreachContacts.notes,
+        hookText: schema.outreachContacts.hookText,
+        painPoint: schema.outreachContacts.painPoint,
+        smsSentAt: schema.outreachContacts.smsSentAt,
+        firstViewedAt: schema.outreachContacts.firstViewedAt,
+        viewCount: schema.outreachContacts.viewCount,
+        ctaClickedAt: schema.outreachContacts.ctaClickedAt,
+        repliedAt: schema.outreachContacts.repliedAt,
+        demoBookedAt: schema.outreachContacts.demoBookedAt,
+        status: schema.outreachContacts.status,
+      })
+      .from(schema.outreachContacts);
+
+    const now = Date.now();
+    const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+
+    // Totals — funnel is computed on SENT contacts only so the denominator
+    // is honest (page visits from non-sent test URLs don't inflate rates).
+    // "total" still shows the whole DB size for context.
+    const totals = {
+      total: rows.length,
+      sent: 0,
+      viewed: 0,
+      multiViewed: 0,
+      clicked: 0,
+      replied: 0,
+      booked: 0,
+    };
+    for (const r of rows) {
+      if (r.status === "sales" || r.status === "skip") continue;
+      if (!r.smsSentAt) continue; // not sent → doesn't belong in funnel
+      totals.sent++;
+      if (r.firstViewedAt) totals.viewed++;
+      if ((r.viewCount ?? 0) >= 2) totals.multiViewed++;
+      if (r.ctaClickedAt) totals.clicked++;
+      if (r.repliedAt) totals.replied++;
+      if (r.demoBookedAt) totals.booked++;
+    }
+
+    // Sent contacts only — everyone in the follow-up buckets must have
+    // been messaged at least once.
+    const sentContacts = rows.filter((r) => r.smsSentAt && r.status !== "sales" && r.status !== "skip");
+
+    const buckets = {
+      hot: [] as typeof sentContacts,
+      clickedNoBook: [] as typeof sentContacts,
+      viewedNoClick: [] as typeof sentContacts,
+      replied: [] as typeof sentContacts,
+      booked: [] as typeof sentContacts,
+      ghosted: [] as typeof sentContacts,
+    };
+
+    for (const r of sentContacts) {
+      const viewed = !!r.firstViewedAt;
+      const multiViewed = (r.viewCount ?? 0) >= 2;
+      const clicked = !!r.ctaClickedAt;
+      const replied = !!r.repliedAt;
+      const booked = !!r.demoBookedAt;
+      const daysSinceSent = r.smsSentAt ? (now - r.smsSentAt) / (24 * 60 * 60 * 1000) : 0;
+
+      if (booked) {
+        buckets.booked.push(r);
+      } else if (replied) {
+        buckets.replied.push(r);
+      } else if (multiViewed && !clicked) {
+        // Multi-view + no click = obsessive re-read = ready to talk
+        buckets.hot.push(r);
+      } else if (clicked) {
+        buckets.clickedNoBook.push(r);
+      } else if (viewed) {
+        buckets.viewedNoClick.push(r);
+      } else if (!viewed && r.smsSentAt && (now - r.smsSentAt) >= THREE_DAYS_MS) {
+        buckets.ghosted.push(r);
+      } else {
+        // Sent <3 days ago, never viewed — too soon to chase, skip
+        void daysSinceSent;
+      }
+    }
+
+    // Sort each bucket newest-first (most recent activity on top).
+    const sortByRecency = (a: typeof sentContacts[number], b: typeof sentContacts[number]) => {
+      const aT = a.firstViewedAt ?? a.smsSentAt ?? 0;
+      const bT = b.firstViewedAt ?? b.smsSentAt ?? 0;
+      return bT - aT;
+    };
+    buckets.hot.sort(sortByRecency);
+    buckets.clickedNoBook.sort(sortByRecency);
+    buckets.viewedNoClick.sort(sortByRecency);
+    buckets.replied.sort(sortByRecency);
+    buckets.booked.sort(sortByRecency);
+    buckets.ghosted.sort(sortByRecency);
+
+    return { totals, buckets, generatedAt: now };
+  }),
+
+  /** OWNER — record a manual follow-up touch on an existing contact.
+   *  Bumps smsSentAt to now so the "Ghosts" bucket clears out after the
+   *  operator sends a second SMS/email. Does NOT clear engagement fields —
+   *  we still want to know they've been viewed / clicked historically. */
+  markFollowedUp: ownerProcedure
+    .input(z.object({ slug: z.string().min(1).max(80) }))
+    .mutation(async ({ input }) => {
+      const now = Date.now();
+      await db
+        .update(schema.outreachContacts)
+        .set({ smsSentAt: now })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true };
+    }),
+
   /** OWNER — mark a whole batch of contacts as smsSentAt=now in one call.
    *  Client owns the actual SMS sending (via the "Copy" clipboard flow or
    *  a bulk-Messages export). This endpoint just records the timestamp so

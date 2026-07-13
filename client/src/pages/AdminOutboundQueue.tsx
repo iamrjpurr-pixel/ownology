@@ -94,6 +94,7 @@ export default function AdminOutboundQueue() {
             Ranked by hook quality × channel availability. Highest-yield first-touch at the top.
           </p>
         </div>
+        <Link href="/admin/contacts/engagement" data-testid="link-to-engagement-from-queue" style={{ color: "var(--ow-text-mid)", fontSize: "0.8rem", textDecoration: "none", marginRight: 12 }}>Engagement →</Link>
         <Link href="/admin/contacts" style={{ color: "var(--ow-amber)", fontSize: "0.85rem", textDecoration: "none" }}>← back to contacts</Link>
       </header>
 
