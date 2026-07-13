@@ -102,6 +102,11 @@ const SECTIONS: Section[] = [
         label: "Sample vintage log (Hunter)",
         what: "The visual mockup cold prospects see. Try the ?variant=hunter, ?variant=boutique and ?variant=large query params — the system serves the right one per contact automatically.",
       },
+      {
+        href: "/compliance-score",
+        label: "Compliance score (SEO lead-gen)",
+        what: "Public 8-question audit-readiness checklist. Winemakers searching \"winery compliance checklist\" land here, get a live score (green ≥80 / amber ≥50 / red <50), and can email themselves the write-up. Every completion writes to /admin/contacts as source=compliance-score with tags carrying their score and band.",
+      },
     ],
   },
   {
@@ -123,7 +128,7 @@ const SECTIONS: Section[] = [
       {
         href: "/the-press",
         label: "The Press",
-        what: "The live log. Every voice / camera / paste / CSV import shows up here tagged by source. Rack, edit, or delete inline.",
+        what: "The live log. Every voice / camera / paste / CSV import shows up here tagged by source. Rack, edit, or delete inline. Note: while there's no real batch data yet, The Press shows a Sample vintage ribbon at the top (Ownology Cellars 2024 Shiraz demo). Once real batches populate, the ribbon disappears automatically.",
       },
       {
         href: "/quick-entry",
@@ -200,12 +205,27 @@ const SECTIONS: Section[] = [
         what: "AI answers stopped working? Check Today's Budget + per-tier guard. If exceeded, use admin.resetDailyBudget from /admin or wait until UTC midnight.",
       },
       {
-        href: "/api/scheduled/daily-alert-email?dryRun=1",
-        label: "Email dry-run",
-        what: "Emails not sending? Hit this URL to see exactly what would be sent, without sending. Check RESEND_API_KEY in .env if it errors.",
+        href: "/admin/health",
+        label: "App Health dashboard",
+        what: "Live status of the 5 system probes (env vars, MySQL, Resend, Emergent LLM key, Auth) with last-transition timestamps. Three actions: Refresh (re-run probes), Run watch (dry-run — test failure detection without email), Run watch + send (fires a real email if any probe just flipped). Bookmark this — your first stop when anything feels off.",
       },
       {
-        href: "/admin/dev-mode",
+        href: "/api/scheduled/health-digest",
+        label: "Daily health digest (JSON preview)",
+        what: "Same 5 probes, JSON form. Add ?send=1 to also email ADMIN_EMAILS. Railway cron fires this at 07:00 AEST daily.",
+      },
+      {
+        href: "/api/scheduled/health-watch",
+        label: "Failure-only push (JSON preview)",
+        what: "Companion to the daily digest — Railway cron fires this every 15 min. Only emails when a probe transitions OK→FAIL or FAIL→OK. Add ?send=1 to actually send. State persisted in health_probe_state so redeploys don't cause spurious \"just failed\" alerts.",
+      },
+      {
+        href: "/api/scheduled/daily-alert-email?dryRun=1",
+        label: "Email dry-run (marketing digest)",
+        what: "Different from health emails — this is the daily contact-pipeline nudge digest. Hit this URL to see exactly what would be sent, without sending. Check RESEND_API_KEY in .env if it errors.",
+      },
+      {
+        href: "/admin/dev",
         label: "Dev bypass toggle",
         what: "Toggle the auth dev-bypass on/off at runtime. Useful for testing what an anonymous visitor sees without opening an incognito window.",
       },
@@ -215,7 +235,7 @@ const SECTIONS: Section[] = [
         what: "Regulator asking? Download the chronological compliance audit trail PDF from the button on this page.",
       },
     ],
-    note: "Preview vs production: /todo and /roadmap only work on the preview host — they return 404 on ownology.ai. That's intentional; it keeps your working backlog private.",
+    note: "Preview vs production: /todo and /roadmap only work on the preview host — they return 404 on ownology.ai. That's intentional; it keeps your working backlog private. Production env vars live on Railway (not .env) — cleanup steps saved at /app/memory/RAILWAY_ENV_CLEANUP.md. DNS lives at Namecheap (Advanced DNS) with ALIAS @ → aye79ubv.up.railway.app and CNAME www → uj8udgk7.up.railway.app.",
   },
 ];
 
