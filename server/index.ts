@@ -38,6 +38,7 @@ import {
   clearGateCookie,
   checkGateRateLimit,
   recordGateAttempt,
+  resetGateAttempts,
   clientIpOf,
   isIpAllowlisted,
   rateLimitCheck,
@@ -262,10 +263,37 @@ async function startServer() {
   app.post("/api/gate/verify", express.json(), async (req, res) => {
     const ip = clientIpOf(req);
     const ua = String(req.headers["user-agent"] || "").slice(0, 300);
+
+    const expected = process.env.OWNOLOGY_GATE_PASSWORD;
+    if (!expected) {
+      return res.status(503).json({ ok: false, error: "Gate not configured. Ask the operator to set OWNOLOGY_GATE_PASSWORD." });
+    }
+    const body = req.body as { password?: unknown } | undefined;
+    const candidate = typeof body?.password === "string" ? body.password : "";
+
+    // ── Correct password path — bypasses rate-limit entirely ──────────
+    // A legitimate user who typos 5 times then finally gets it right
+    // MUST be allowed through. The rate-limit exists to slow brute-
+    // forcers, not to lock out humans who eventually remember their
+    // shared secret. On success we wipe their failure counter too, so
+    // subsequent visits from the same IP start clean.
+    if (candidate && candidate === expected) {
+      const token = await mintGateToken();
+      if (!token) {
+        return res.status(503).json({ ok: false, error: "Gate not configured (JWT_SECRET missing)." });
+      }
+      setGateCookie(res, token);
+      resetGateAttempts(ip);
+      import("./db.js").then(async ({ db }) => {
+        const { sql } = await import("drizzle-orm");
+        await db.execute(sql`INSERT INTO gate_events (kind, ip, user_agent, path, occurred_at) VALUES ('success', ${ip}, ${ua}, '/api/gate/verify', ${Date.now()})`);
+      }).catch(() => {});
+      return res.json({ ok: true });
+    }
+
+    // ── Wrong / missing password path — now the rate-limit bites ──────
     const rate = checkGateRateLimit(ip);
     if (!rate.allowed) {
-      // Log the rate-limit event (S3) — best-effort; never let logging
-      // failures affect the client response.
       import("./db.js").then(async ({ db }) => {
         const { sql } = await import("drizzle-orm");
         await db.execute(sql`INSERT INTO gate_events (kind, ip, user_agent, path, occurred_at) VALUES ('rate_limited', ${ip}, ${ua}, '/api/gate/verify', ${Date.now()})`);
@@ -274,30 +302,11 @@ async function startServer() {
       return res.status(429).json({ ok: false, error: "Too many attempts. Try again in 15 minutes." });
     }
     recordGateAttempt(ip);
-
-    const expected = process.env.OWNOLOGY_GATE_PASSWORD;
-    if (!expected) {
-      return res.status(503).json({ ok: false, error: "Gate not configured. Ask the operator to set OWNOLOGY_GATE_PASSWORD." });
-    }
-    const body = req.body as { password?: unknown } | undefined;
-    const candidate = typeof body?.password === "string" ? body.password : "";
-    if (!candidate || candidate !== expected) {
-      import("./db.js").then(async ({ db }) => {
-        const { sql } = await import("drizzle-orm");
-        await db.execute(sql`INSERT INTO gate_events (kind, ip, user_agent, path, occurred_at) VALUES ('fail', ${ip}, ${ua}, '/api/gate/verify', ${Date.now()})`);
-      }).catch(() => {});
-      return res.status(401).json({ ok: false, error: "Wrong password." });
-    }
-    const token = await mintGateToken();
-    if (!token) {
-      return res.status(503).json({ ok: false, error: "Gate not configured (JWT_SECRET missing)." });
-    }
-    setGateCookie(res, token);
     import("./db.js").then(async ({ db }) => {
       const { sql } = await import("drizzle-orm");
-      await db.execute(sql`INSERT INTO gate_events (kind, ip, user_agent, path, occurred_at) VALUES ('success', ${ip}, ${ua}, '/api/gate/verify', ${Date.now()})`);
+      await db.execute(sql`INSERT INTO gate_events (kind, ip, user_agent, path, occurred_at) VALUES ('fail', ${ip}, ${ua}, '/api/gate/verify', ${Date.now()})`);
     }).catch(() => {});
-    return res.json({ ok: true });
+    return res.status(401).json({ ok: false, error: "Wrong password." });
   });
   app.get("/api/gate/status", async (req, res) => {
     const unlocked = await verifyGateCookie(req);
@@ -357,6 +366,10 @@ async function startServer() {
     const cookieToken = await mintInviteToken(invite.id);
     if (!cookieToken) return res.status(503).send("Gate not configured. Ask the operator.");
     setGateCookie(res, cookieToken);
+    // Valid invite hit — wipe the failure counter for this IP so a
+    // legitimate tester who fat-fingered the password 5 times can still
+    // get through via their magic-link.
+    resetGateAttempts(ip);
     // Update usage counters (fire-and-forget)
     const now = Date.now();
     const isFirstUse = !invite.firstUsedAt;

@@ -194,8 +194,11 @@ const attemptsByIp = new Map<string, { count: number; windowStart: number }>();
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 const RATE_LIMIT_MAX_ATTEMPTS = 5;
 
-/** Returns true if this IP is allowed to attempt password verification. */
+/** Returns true if this IP is allowed to attempt password verification.
+ *  IPs on OWNOLOGY_GATE_IP_ALLOWLIST are ALWAYS allowed — the owner
+ *  should never be able to lock themselves out from a known network. */
 export function checkGateRateLimit(ip: string): { allowed: boolean; retryAfterMs?: number } {
+  if (isIpAllowlisted(ip)) return { allowed: true };
   const now = Date.now();
   const cur = attemptsByIp.get(ip);
   if (!cur || now - cur.windowStart > RATE_LIMIT_WINDOW_MS) {
@@ -218,6 +221,15 @@ export function recordGateAttempt(ip: string): void {
   }
   cur.count += 1;
   attemptsByIp.set(ip, cur);
+}
+
+/** Clear the failure counter for an IP. Called on a successful gate
+ *  password / invite verification — a correct secret is proof the caller
+ *  isn't the brute-forcer we were guarding against, so we wipe their
+ *  slate. This is what stops a legitimate user from being locked out
+ *  after 5 typos followed by the correct password on the 6th try. */
+export function resetGateAttempts(ip: string): void {
+  attemptsByIp.delete(ip);
 }
 
 /** Best-effort client IP extraction — respects X-Forwarded-For when behind

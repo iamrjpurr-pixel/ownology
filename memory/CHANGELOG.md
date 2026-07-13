@@ -4,6 +4,18 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Gate wall lockout fixed · correct password now always wins (Feb 2026)
+
+Rich was locked out of `/site-map` on prod despite typing `middx99` correctly. Root cause: the rate limiter ran BEFORE the password check, so once 5 typos tripped the 15-min bucket, even a correct password got blocked. Fixed by inverting the flow:
+
+- `POST /api/gate/verify` now checks the password FIRST. A correct password always issues the cookie and calls the new `resetGateAttempts(ip)` to wipe the counter — humans who fat-finger 5x then remember it on the 6th try get through immediately.
+- The rate limiter now only counts failed attempts, still 5/15min/IP.
+- `checkGateRateLimit()` short-circuits for IPs listed in `OWNOLOGY_GATE_IP_ALLOWLIST` (env), so the owner can permanently immunise a home/office IP.
+- Same treatment for `/i/:token` — a valid invite wipes the caller's IP counter.
+
+Files touched: `server/gate.ts`, `server/index.ts`, `memory/test_credentials.md`. Verified locally via curl: 6th attempt with correct pw returns 200 even after being 429'd.
+
+
 ### Prod cutover · Ownology.ai now served by new Railway build (Feb 2026, Rich)
 
 Full end-to-end wire-through completed. Prod was previously serving a stale build via Cloudflare-fronted DNS; now `ownology.ai` and `www.ownology.ai` route directly to the fresh Railway service.
