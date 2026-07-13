@@ -4,6 +4,28 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### transcriptEnrich — turn a podcast/YouTube transcript into 4 CRM+blog artefacts (Jul 2026)
+
+Rich pasted the Stephen Pannell (SC Pannell Wines, McLaren Vale) YouTube interview transcript and asked what we can do with it beyond an SMS hook. Answer shipped: a new `outreach.transcriptEnrich` procedure that takes `{ transcriptText, sourceUrl, contactFirstName, contactWinery }` and returns FIVE structured artefacts in one Claude call via forge:
+
+1. **`summary`** — 120-160 word third-person CRM notes paragraph capturing story, philosophy, and distinctive lines.
+2. **`hookCandidates[]`** — 3-5 Tier-2 "quoted_voice" SMS/email opener lines, Australian idiom, lower-case, cite-able against the transcript.
+3. **`painPointRefined`** — one sentence, evidence-backed, replaces the generic CRM string.
+4. **`blogQuotes[]`** — 3-5 verbatim pull-quotes suitable for a long-form Cellar Journal post.
+5. **`philosophyTags[]`** — kebab-case CRM search facets ("sense-of-place", "grenache-focus", "forest-vineyard", "no-acid-addition", etc.).
+
+Discipline: fabrication forbidden. Every quote must appear near-verbatim in the transcript. Candidates only — never auto-merges. Rich reviews and hand-picks what to save.
+
+Demonstrated on Stephen Pannell's transcript. Sample output:
+- Refined pain: "Juggling a grenache-led, 85% self-sufficient operation across McLaren Vale and the Adelaide Hills while shifting Chameleia from vineyard management to forest management…"
+- Sample hook: "read what you said about wine tasting like it comes from somewhere — that sense of place line really lands"
+- Sample blog quote: "I've moved away from managing a vineyard to managing a forest."
+
+Backend only for now — Rich can call it via the tRPC panel or a follow-up UI wire-up (small collapsible textarea on each contact card) is the natural next step.
+
+[shipped: transcript-enrichment]
+
+
 ### Contact-add — multi-person cascade, Draft email, Preview post link (Jul 2026)
 
 Three connected upgrades to the /admin/contacts flow, all triggered by Rich pasting the Ministry of Clouds URL:

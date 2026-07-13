@@ -1292,6 +1292,116 @@ Speech-recognition normalisations do NOT apply here — this is scraped HTML. Bu
 
 
   // ── OWNER — Deep research from just a business name ────────────────────
+
+  /** OWNER — Turn a podcast / YouTube / video transcript into structured
+   *  enrichment for an existing contact card.
+   *
+   *  Rich, Jul 2026 — added after the Stephen Pannell SC Pannell interview
+   *  transcript (McLaren Vale ganache manifesto) proved that first-hand
+   *  long-form voice content is the strongest sales asset we have: it's
+   *  cite-able, un-fake-able, and yields 4 uses at once — hook lines for
+   *  SMS/email, refined painPoint for the CRM, pull-quotes for the Cellar
+   *  Journal blog, and a summary paragraph in the operator's voice.
+   *
+   *  Returns candidates only — never auto-merges. Rich reviews then picks
+   *  what to save. That review discipline is what stops fabrication /
+   *  paraphrase drift creeping into outreach copy over time. */
+  transcriptEnrich: ownerProcedure
+    .input(z.object({
+      transcriptText: z.string().min(200).max(60_000),
+      sourceUrl: z.string().url().max(500).optional(),
+      contactFirstName: z.string().max(80).optional(),
+      contactWinery: z.string().max(120).optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      const systemPrompt = `You transform a first-person interview or podcast transcript into four structured artefacts for a wine-industry CRM + blog pipeline. The subject is an Australian winemaker; the transcript is their own words, lightly cleaned up from an auto-caption.
+
+Return a single JSON object with these fields:
+
+1. "summary" — one 120-160 word paragraph, third-person, that captures WHO this person is, WHERE they work, their signature philosophy, and the 2-3 most distinctive things they said. Written to slot into a CRM notes field — informative not laudatory. No "revolutionary" / "visionary" / "renowned" fluff.
+
+2. "hookCandidates" — array of 3-5 SMS/email opener lines in Rich's voice. Each is a Tier-2 "quoted_voice" hook: reflects THEIR own language back at them so an SMS reads like a friend who watched the video. Rules per line:
+   - Lower-case start, no exclamation, no emoji.
+   - 60-140 chars.
+   - Australian idiom OK ("g'day", "reckon").
+   - Must quote or paraphrase something SPECIFIC they said (grape variety, place, technique, philosophy) — no generic "loved your interview" openers.
+   - Example: "read what you said about wine having to taste like it comes from somewhere — that's the exact question owen answers"
+
+3. "painPointRefined" — one sentence, sharper than the generic CRM default. What in their own words is the STRUCTURAL tension in their operation? (e.g. "manually orchestrating 6 varieties + 3 vineyards + 85% self-sufficiency across McLaren Vale and Adelaide Hills — no digital SOP layer evident from the interview"). Grounded in the transcript, not inferred fluff.
+
+4. "blogQuotes" — array of 3-5 pull-quotes suitable for a long-form Cellar Journal blog post. Each 15-50 words. Verbatim (or minimally cleaned) from the transcript. Choose quotes that stand alone as a philosophical or technical point.
+
+5. "philosophyTags" — short kebab-case tags (max 8) that describe their approach: e.g. "sense-of-place", "medium-body-tannic", "no-acid-addition", "vineyard-as-forest", "grenache-focus", "ocean-influenced". These become search facets on the CRM.
+
+Rules:
+- NEVER fabricate. If the transcript doesn't say something, don't include it. Null the field over inventing.
+- Quotes MUST appear in the transcript (near-verbatim OK to fix ASR errors). Don't paraphrase into invented phrasing.
+- Return ONLY the requested JSON. No markdown fences. No prose commentary.`;
+
+      const userPayload: string[] = [];
+      if (input.contactFirstName || input.contactWinery) {
+        const parts = [input.contactFirstName, input.contactWinery ? `(${input.contactWinery})` : null].filter(Boolean);
+        userPayload.push(`Subject: ${parts.join(" ")}`);
+      }
+      if (input.sourceUrl) userPayload.push(`Source: ${input.sourceUrl}`);
+      userPayload.push("");
+      userPayload.push("--- TRANSCRIPT ---");
+      userPayload.push(input.transcriptText);
+      userPayload.push("--- END TRANSCRIPT ---");
+
+      const chatResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${forgeKey}`,
+          "x-ow-source": "outreach.transcriptEnrich",
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPayload.join("\n") },
+          ],
+          stream: false,
+        }),
+      });
+      if (!chatResp.ok) {
+        const errText = await chatResp.text().catch(() => "");
+        throw new Error(`LLM enrichment failed: ${chatResp.status} ${errText.slice(0, 200)}`);
+      }
+      const chatData = await chatResp.json();
+      const raw = chatData.choices?.[0]?.message?.content ?? "{}";
+      try {
+        const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+        const parsed = JSON.parse(cleaned) as {
+          summary?: string;
+          hookCandidates?: string[];
+          painPointRefined?: string;
+          blogQuotes?: string[];
+          philosophyTags?: string[];
+        };
+        return {
+          summary: typeof parsed.summary === "string" ? parsed.summary.slice(0, 2000) : null,
+          hookCandidates: Array.isArray(parsed.hookCandidates)
+            ? parsed.hookCandidates.filter((h) => typeof h === "string").slice(0, 5).map((h) => h.slice(0, 400))
+            : [],
+          painPointRefined: typeof parsed.painPointRefined === "string" ? parsed.painPointRefined.slice(0, 400) : null,
+          blogQuotes: Array.isArray(parsed.blogQuotes)
+            ? parsed.blogQuotes.filter((q) => typeof q === "string").slice(0, 5).map((q) => q.slice(0, 800))
+            : [],
+          philosophyTags: Array.isArray(parsed.philosophyTags)
+            ? parsed.philosophyTags.filter((t) => typeof t === "string").slice(0, 8)
+            : [],
+          sourceUrl: input.sourceUrl ?? null,
+        };
+      } catch (err) {
+        throw new Error(`Enrichment returned malformed JSON: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }),
+
   // Paste a winery name → Perplexity Sonar-Pro multi-hop web-searches for
   // the winemaker, phone, email, IG, website, address → returns structured
   // JSON with citations. Same review-then-Save UX as parseFromUrl.
