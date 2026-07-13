@@ -493,9 +493,69 @@ export default function AdminOperatorGuide() {
           </section>
         ))}
 
+        {/* Sharing + print + audit metadata */}
+        <div
+          className="mt-10 mb-6 p-5 rounded-lg"
+          style={{
+            background: "var(--ow-bg-base)",
+            border: "1px solid var(--ow-bg-inset)",
+          }}
+          data-testid="op-guide-share-block"
+        >
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="flex-1 min-w-0">
+              <div
+                className="text-xs uppercase tracking-widest mb-1"
+                style={{ color: "var(--ow-amber)", fontFamily: "'Fraunces', serif" }}
+              >
+                Handing this off
+              </div>
+              <p className="text-sm mb-3" style={{ color: "var(--ow-text-mid)", lineHeight: 1.55 }}>
+                This page is admin-gated — new hires and advisors won&apos;t see it by default.
+                To share:{" "}
+                <strong style={{ color: "var(--ow-text-hi)" }}>Print / Save as PDF</strong>{" "}
+                (button below) for anyone offline, or screen-share it live during onboarding.
+                For temporary in-app access, create a magic link at{" "}
+                <Link
+                  href="/admin/gate-invites"
+                  className="underline"
+                  style={{ color: "var(--ow-amber)" }}
+                >
+                  /admin/gate-invites
+                </Link>{" "}
+                — but note that only lets them past the wall, not into admin surfaces.
+              </p>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                data-testid="op-guide-print-btn"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
+                style={{
+                  background: "var(--ow-amber)",
+                  color: "var(--ow-bg-base)",
+                  fontFamily: "'Lato', sans-serif",
+                }}
+              >
+                <ExternalLink size={14} strokeWidth={2.4} /> Print / Save as PDF
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Audit trail */}
+        <div
+          className="text-center text-xs pb-4"
+          data-testid="op-guide-audit-line"
+          style={{ color: "var(--ow-text-lo)" }}
+        >
+          Last audited{" "}
+          <strong style={{ color: "var(--ow-text-mid)" }}>Feb 12, 2026</strong>{" "}
+          · Rich · every link verified against App.tsx + Express routes. Re-audit monthly or after any major shipping session.
+        </div>
+
         {/* Footer */}
         <div
-          className="text-center text-xs pt-8 pb-4"
+          className="text-center text-xs pt-4 pb-4"
           style={{ color: "var(--ow-text-lo)" }}
         >
           Missing something? This page lives at{" "}
