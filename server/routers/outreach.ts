@@ -154,6 +154,201 @@ function buildWaHref(input: {
   return `https://wa.me/${digits}?text=${encodeURIComponent(body)}`;
 }
 
+/**
+ * mineInstagramHooks
+ * ──────────────────
+ * Given up to 3 Instagram handles + the contact's name/winery, ask
+ * Perplexity Sonar to read their PUBLIC IG posts from the last ~90 days
+ * and extract a specific, dated, pain-point-or-celebration signal we
+ * can drop into a first-touch SMS.
+ *
+ * Why Perplexity instead of a direct IG fetch?
+ * ───────────────────────────────────────────
+ * Instagram's public-profile pages are login-walled for unauthenticated
+ * Node fetches — you get a "please log in" HTML shell. Sonar's crawler
+ * has broader access via aggregators, cached indexes and embed-friendly
+ * mirrors. It also handles the entity resolution (which of the 3 handles
+ * is winery vs. personal) without us having to think.
+ *
+ * Returned hook obeys the same 4-tier waterfall as deepResearch — Tier 1
+ * (recent_signal) preferred, Tier 4 (vintage_pain) as the last resort.
+ * When the model can't find anything cite-able across all 3 handles,
+ * everything is null. Null is always correct over fabrication (the
+ * downstream smsDraft() then falls back to the honest Tier-3 template).
+ */
+async function mineInstagramHooks(input: {
+  firstName: string | null;
+  lastName: string | null;
+  winery: string | null;
+  region: string | null;
+  handles: string[]; // 1-3 IG handles, no @ sign
+}): Promise<{
+  hookTier: "recent_signal" | "quoted_voice" | "peer_signal" | "vintage_pain" | null;
+  hookText: string | null;
+  hookSourceUrl: string | null;
+  painPoint: string | null; // Sharper pain-point derived from IG posts
+  citations: string[];
+}> {
+  const key = process.env.PERPLEXITY_API_KEY;
+  const empty = { hookTier: null, hookText: null, hookSourceUrl: null, painPoint: null, citations: [] };
+  if (!key) return empty;
+  const cleanHandles = input.handles.map((h) => h.replace(/^@/, "").trim()).filter(Boolean).slice(0, 3);
+  if (cleanHandles.length === 0) return empty;
+
+  const contactSchema = {
+    type: "object",
+    properties: {
+      hookTier: {
+        type: ["string", "null"],
+        enum: ["recent_signal", "quoted_voice", "peer_signal", "vintage_pain", null],
+      },
+      hookText: { type: ["string", "null"] },
+      hookSourceUrl: { type: ["string", "null"] },
+      painPoint: { type: ["string", "null"] },
+    },
+    required: ["hookTier", "hookText", "hookSourceUrl", "painPoint"],
+    additionalProperties: false,
+  } as const;
+
+  const systemPrompt = `You are a wine-industry research assistant. You will be given 1-3 Instagram handles for a small Australian winery and its founders, plus the founder's name(s). Your job is to READ THEIR RECENT PUBLIC INSTAGRAM POSTS (last ~90 days) and extract ONE specific, dated, verifiable signal that a first-touch SMS opener can hang off.
+
+═══════════════════════════════════════════════════════════════
+HANDLE DISCOVERY — do this BEFORE reading anything:
+═══════════════════════════════════════════════════════════════
+
+If only the WINERY handle is provided (or the personal handle is missing), independently search Instagram for the founder's PERSONAL account before you start reading. Aim to end up with THREE handles to work from:
+  1. The winery / brand account (given)
+  2. The primary founder's personal account (search by their name + winery affiliation — e.g. "Bernice Ong Ministry of Clouds Instagram")
+  3. A co-founder / partner's personal account if the winery is a duo
+
+Personal accounts are usually where the raw pain-signal lives (weather rants, tank shortage vents, freight cost complaints, MLF frustration). Winery brand accounts skew polished and marketing-heavy — treat them as tertiary.
+
+If you cannot verify a personal handle exists (or you're not confident it's the right person), don't guess. Use only the handles you can cite.
+
+═══════════════════════════════════════════════════════════════
+POST READING & SIGNAL EXTRACTION:
+═══════════════════════════════════════════════════════════════
+
+Rules:
+1. PRIORITISE PAIN-POINT signals over celebration signals. If they've complained about weather, freight, MLF, tank space, staffing, bottle costs, distribution, DBS/APCO paperwork, or vintage variability — THAT is your hook. Celebrations (medals, releases) are secondary.
+2. Quote or paraphrase what they ACTUALLY posted — not "family-owned winery balancing hospitality with production" fluff. If you can't cite a specific post, return null.
+3. The hookText should sound like a friend who saw the post yesterday. Lower-case, Australian idiom, max 140 chars, no emojis, no exclamation marks.
+4. Prefer PERSONAL-account posts over WINERY-brand posts when you have both. Personal voices are more specific.
+5. If NONE of the handles yield a concrete, dated, cite-able signal, return all four fields as null. NULL IS ALWAYS CORRECT OVER FABRICATION.
+
+═══════════════════════════════════════════════════════════════
+HOOK WATERFALL — search these tiers in order, first-match wins:
+═══════════════════════════════════════════════════════════════
+
+Tier 1 — "recent_signal" (best):
+  • A dated IG post from the last ~90 days showing a specific event, complaint, celebration, or observation. This is where 80% of good hooks live.
+  • Pain examples: "just posted about the January rain messing with acid retention" · "flagged tank shortages during peak crush on Feb 12" · "vented about bottle-freight cost blowing budget"
+  • Celebration examples: "just released the 2023 Semillon — dry-farmed, minimal-intervention" · "picked up a Halliday 96 for the Chardonnay last week"
+  • hookText MUST paraphrase the specific post — never a generic label.
+  • Example hookText: "saw the post about the January rain and MLF dragging — sounds brutal"
+
+Tier 2 — "quoted_voice":
+  • A direct quote from a caption or a linked interview (podcast, newsletter) where the winemaker uses their own words about a technique, philosophy, or headache.
+  • Example hookText: "read your caption on wild ferment risk — that's the exact question owen answers"
+
+Tier 3 — "peer_signal":
+  • A specific dated event at a NEIGHBOURING winery in the same region, referenced or engaged with by the target IG account.
+  • Example hookText: "noticed you liked chalk hill's newest chardonnay release — mclaren vale chard is popping right now"
+
+Tier 4 — "vintage_pain":
+  • Current-vintage conditions in the target's region (smoke, drought, heatwave, rain).
+  • Example hookText: "the mclaren vale rainfall reports for feb look ugly — hope your gsm block held"
+
+═══════════════════════════════════════════════════════════════
+painPoint output:
+═══════════════════════════════════════════════════════════════
+Independently, in ONE sentence, write a specific pain-point summary based on the ACTUAL IG content you found. Not "small natural-wine producer" fluff — something like "vents publicly about tank rotation stress during peak crush" or "small volume, hand-picked, sensitive to weather variability, no digital SOP system evident". This becomes the CRM's structured pain-point tag.
+
+Return ONLY the requested JSON. No prose. No markdown fences.`;
+
+  const contextParts: string[] = [];
+  const fullName = [input.firstName, input.lastName].filter(Boolean).join(" ").trim();
+  if (fullName) contextParts.push(`Founder name: ${fullName}${input.winery ? ` (${input.winery})` : ""}`);
+  else if (input.winery) contextParts.push(`Winery: ${input.winery}`);
+  if (input.region) contextParts.push(`Region: ${input.region}`);
+  contextParts.push(`Known Instagram handle(s) — start with these: ${cleanHandles.map((h) => "@" + h).join(", ")}`);
+  if (fullName) {
+    contextParts.push(`Search Instagram for the founder's personal account by name if the given handles are all brand/winery accounts.`);
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 45_000);
+  let resp: Response;
+  try {
+    resp = await fetch("https://api.perplexity.ai/chat/completions", {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "sonar-pro",
+        max_tokens: 1200,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: contextParts.join("\n") + "\n\nRead their recent Instagram posts and return the structured JSON." },
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: { schema: contactSchema },
+        },
+      }),
+    });
+    clearTimeout(timeoutId);
+  } catch (err) {
+    clearTimeout(timeoutId);
+    // Never fail the outer parseFromUrl flow because of an IG-enrichment
+    // hiccup. Best-effort: return empty and let the operator save without
+    // an auto-generated hook.
+    console.error("[mineInstagramHooks] fetch error:", err instanceof Error ? err.message : String(err));
+    return empty;
+  }
+
+  if (!resp.ok) {
+    const errText = await resp.text().catch(() => "");
+    console.error(`[mineInstagramHooks] Perplexity ${resp.status}: ${errText.slice(0, 200)}`);
+    return empty;
+  }
+
+  const data = await resp.json() as {
+    choices?: Array<{ message?: { content?: string } }>;
+    citations?: string[];
+  };
+  const content = data.choices?.[0]?.message?.content ?? "";
+  const citations = Array.isArray(data.citations) ? data.citations.slice(0, 10) : [];
+
+  try {
+    const cleaned = content.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+    const parsed = JSON.parse(cleaned) as {
+      hookTier?: string | null;
+      hookText?: string | null;
+      hookSourceUrl?: string | null;
+      painPoint?: string | null;
+    };
+    const validTiers = ["recent_signal", "quoted_voice", "peer_signal", "vintage_pain"] as const;
+    type ValidTier = (typeof validTiers)[number];
+    const hookTier = validTiers.includes(parsed.hookTier as ValidTier) ? (parsed.hookTier as ValidTier) : null;
+    return {
+      hookTier,
+      hookText: typeof parsed.hookText === "string" && parsed.hookText.trim() ? parsed.hookText.trim().slice(0, 400) : null,
+      hookSourceUrl: typeof parsed.hookSourceUrl === "string" && parsed.hookSourceUrl.trim() ? parsed.hookSourceUrl.trim().slice(0, 500) : null,
+      painPoint: typeof parsed.painPoint === "string" && parsed.painPoint.trim() ? parsed.painPoint.trim().slice(0, 400) : null,
+      citations,
+    };
+  } catch (err) {
+    console.error("[mineInstagramHooks] JSON parse failed:", err instanceof Error ? err.message : String(err));
+    return { ...empty, citations };
+  }
+}
+
+
+
 export const outreachRouter = router({
   /** PUBLIC — fetch a single contact by slug for the /hi/:slug page.
    *  Resolves on the server:
@@ -877,16 +1072,62 @@ Speech-recognition normalisations do NOT apply here — this is scraped HTML. Bu
       }
       const chatData = await chatResp.json();
       const raw = chatData.choices?.[0]?.message?.content ?? "{}";
+      let draft: Record<string, unknown> | null = null;
       try {
         const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
-        const draft = JSON.parse(cleaned);
-        if (!draft || typeof draft !== "object" || !draft.firstName) {
-          return { draft: null, signals };
+        const parsed = JSON.parse(cleaned);
+        if (parsed && typeof parsed === "object" && parsed.firstName) {
+          draft = parsed;
         }
-        return { draft, signals };
       } catch {
-        return { draft: null, signals };
+        /* draft stays null */
       }
+      if (!draft) return { draft: null, signals };
+
+      // ── Instagram enrichment ──────────────────────────────────────────
+      // Rich, Jul 2026: the source URL scrape gives us 1-3 IG handles as
+      // *pointers* but doesn't actually read the accounts. That leaves
+      // the Tier-1 SMS hook empty, and smsDraft() falls back to the
+      // generic Tier-3 template — which Rich correctly called "not
+      // impressive" against a rich-signal source like ministryofclouds.
+      //
+      // Fix: after the primary parse succeeds, if we have IG handles,
+      // fire a Perplexity Sonar call that specifically reads those
+      // accounts' recent posts and extracts a dated pain-point signal.
+      // Result gets merged into the draft as hookTier / hookText /
+      // hookSourceUrl (feeds smsDraft's Tier-1 template) plus a sharper
+      // painPoint. Best-effort — failures never break the outer flow.
+      const igHandles = signals.instagram ?? [];
+      if (igHandles.length > 0) {
+        const firstName = typeof draft.firstName === "string" ? draft.firstName : null;
+        const lastName = typeof draft.lastName === "string" ? draft.lastName : null;
+        const winery = typeof draft.winery === "string" ? draft.winery : null;
+        const region =
+          typeof (draft as { region?: unknown }).region === "string"
+            ? ((draft as { region?: string }).region ?? null)
+            : null;
+        const enrich = await mineInstagramHooks({
+          firstName,
+          lastName,
+          winery,
+          region,
+          handles: igHandles,
+        });
+        if (enrich.hookTier && enrich.hookText && enrich.hookSourceUrl) {
+          draft.hookTier = enrich.hookTier;
+          draft.hookText = enrich.hookText;
+          draft.hookSourceUrl = enrich.hookSourceUrl;
+        }
+        // Prefer IG-derived painPoint over the generic one from the URL
+        // scrape — IG signal is always sharper. Only overwrite if we got
+        // a real string back; never clobber good data with null.
+        if (enrich.painPoint) {
+          draft.painPoint = enrich.painPoint;
+        }
+        return { draft, signals, igCitations: enrich.citations };
+      }
+
+      return { draft, signals };
     }),
 
   // ── OWNER — Deep research from just a business name ────────────────────

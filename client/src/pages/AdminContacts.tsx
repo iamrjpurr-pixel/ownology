@@ -194,6 +194,15 @@ export default function AdminContacts() {
     calendlyOverride: "",
     notes: "",
     persona: "winemaker" as "md" | "winemaker" | "owner" | "sales-rep",
+    // Hook fields — auto-populated by parseFromUrl's Instagram enrichment
+    // step (or by deep-research). Hidden pass-through: no visible input,
+    // but they carry through to the `create` mutation so the resulting
+    // contact gets a Tier-1 SMS draft instead of the generic Tier-3
+    // fallback. Frontend UX for editing the hook lives on the contact
+    // card itself post-save (see AdminContacts "hookText" pill).
+    hookTier: null as "recent_signal" | "quoted_voice" | "peer_signal" | "vintage_pain" | null,
+    hookText: null as string | null,
+    hookSourceUrl: null as string | null,
   });
   const [err, setErr] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<Record<string, "url" | "sms" | null>>({});
@@ -335,7 +344,7 @@ export default function AdminContacts() {
     }
     try {
       await createMutation.mutateAsync(form);
-      setForm({ firstName: "", lastName: "", mobileAu: "", winery: "", event: form.event, painPoint: "", calendlyOverride: form.calendlyOverride, notes: "", persona: "winemaker" });
+      setForm({ firstName: "", lastName: "", mobileAu: "", winery: "", event: form.event, painPoint: "", calendlyOverride: form.calendlyOverride, notes: "", persona: "winemaker", hookTier: null, hookText: null, hookSourceUrl: null });
       // Clear the OCR card after a successful Add so the operator has a
       // clean surface for the next business card.
       setOcrCardResult(null);
@@ -469,6 +478,13 @@ export default function AdminContacts() {
         calendlyOverride: form.calendlyOverride,
         notes: combinedNotes,
         persona: (result.suggestedPersona as typeof form.persona) ?? "winemaker",
+        hookTier:
+          d.hookTier === "recent_signal" || d.hookTier === "quoted_voice" ||
+          d.hookTier === "peer_signal" || d.hookTier === "vintage_pain"
+            ? d.hookTier
+            : null,
+        hookText: typeof d.hookText === "string" ? d.hookText : null,
+        hookSourceUrl: typeof d.hookSourceUrl === "string" ? d.hookSourceUrl : null,
       });
       setDeepSearchCitations(result.citations || []);
       setDeepSearchConfidence(typeof d.confidence === "string" ? d.confidence : null);
@@ -531,6 +547,15 @@ export default function AdminContacts() {
         calendlyOverride: form.calendlyOverride,
         notes: combinedNotes,
         persona: form.persona,
+        // IG enrichment output (only present when the source URL yielded
+        // IG handles AND Sonar found a cite-able signal on those posts).
+        hookTier:
+          d.hookTier === "recent_signal" || d.hookTier === "quoted_voice" ||
+          d.hookTier === "peer_signal" || d.hookTier === "vintage_pain"
+            ? d.hookTier
+            : null,
+        hookText: typeof d.hookText === "string" ? d.hookText : null,
+        hookSourceUrl: typeof d.hookSourceUrl === "string" ? d.hookSourceUrl : null,
       });
       setUrlLastFetched(url);
       setUrlQuickAdd("");
@@ -1102,6 +1127,76 @@ export default function AdminContacts() {
           </span>
         </div>
         <Field label="Pain point they mentioned" testid="form-pain" value={form.painPoint} placeholder="VA issues on Tank 9 last year" onChange={(v) => setForm({ ...form, painPoint: v })} />
+        {/* Auto-generated hook preview — populated by parseFromUrl's IG
+            enrichment step. Rich sees it BEFORE saving so he can edit,
+            regenerate, or clear if the Sonar-mined signal is weak.
+            Editing here overrides the hook that feeds smsDraft() Tier-1. */}
+        {form.hookText && (
+          <div
+            data-testid="form-hook-preview"
+            style={{
+              marginTop: 12,
+              padding: "10px 12px",
+              borderRadius: 6,
+              background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)",
+              border: "1px solid color-mix(in oklch, var(--ow-amber) 40%, var(--ow-border))",
+              fontFamily: "'Lato',sans-serif",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, fontSize: "0.72rem", color: "var(--ow-amber)", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+              Auto-drafted SMS hook · {form.hookTier?.replace(/_/g, " ") ?? "unknown"}
+              {form.hookSourceUrl && (
+                <a
+                  href={form.hookSourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "var(--ow-amber)", textDecoration: "underline" }}
+                  data-testid="form-hook-source"
+                >
+                  source ↗
+                </a>
+              )}
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, hookTier: null, hookText: null, hookSourceUrl: null })}
+                data-testid="form-hook-clear"
+                style={{
+                  marginLeft: "auto",
+                  background: "transparent",
+                  border: "1px solid var(--ow-border)",
+                  color: "var(--ow-text-lo)",
+                  padding: "2px 8px",
+                  borderRadius: 4,
+                  fontSize: "0.68rem",
+                  cursor: "pointer",
+                }}
+              >
+                clear
+              </button>
+            </div>
+            <textarea
+              data-testid="form-hook-text"
+              value={form.hookText}
+              onChange={(e) => setForm({ ...form, hookText: e.target.value })}
+              rows={2}
+              maxLength={400}
+              style={{
+                width: "100%",
+                background: "var(--ow-bg-base)",
+                border: "1px solid var(--ow-border)",
+                color: "var(--ow-text-hi)",
+                borderRadius: 4,
+                padding: "6px 8px",
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.85rem",
+                resize: "vertical",
+              }}
+            />
+            <p style={{ margin: "6px 0 0", fontSize: "0.7rem", color: "var(--ow-text-lo)", fontStyle: "italic" }}>
+              Grounds the SMS in something specific they posted. Edit if it's off — or clear it to fall back to a generic opener.
+            </p>
+          </div>
+        )}
         <Field label="Private notes" testid="form-notes" value={form.notes} onChange={(v) => setForm({ ...form, notes: v })} />
         {err && <p data-testid="form-error" style={{ color: "#b91c1c", fontFamily: "'Lato',sans-serif", fontSize: "0.85rem", marginTop: 8 }}>{err}</p>}
         <button

@@ -4,6 +4,37 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Contact-add SMS auto-draft · IG mining wired into parseFromUrl (Jul 2026)
+
+Rich smoke-tested the /admin/contacts URL-add flow against the Ministry of Clouds winery profile at `https://www.ministryofclouds.com.au/bernice-ong-and-julian-forwood-are-the-duo-behind-ministry-of-clouds/` — called the URL "gold" but the auto-drafted SMS was unimpressive because parseFromUrl was falling back to the generic Tier-3 template ("we crossed paths the other day…").
+
+Root cause: parseFromUrl scraped the URL, extracted up to 3 IG handles as data points but never READ those accounts. So the resulting draft had no hookText → smsDraft's Tier-1 branch was starved → Tier-3 generic fired.
+
+Fix — new backend helper + prompt design:
+
+- New `mineInstagramHooks()` in `server/routers/outreach.ts` (top-level, before the router). Given firstName/lastName/winery/region/handles, calls Perplexity Sonar with a prompt that:
+  1. First DISCOVERS missing personal-founder handles by searching IG (e.g. "@berniceong___" for Bernice Ong). Winery brand accounts are treated as tertiary.
+  2. Reads the last ~90 days of posts across the discovered handles.
+  3. Prioritises PAIN-POINT signals over celebration signals (weather rants, freight cost, tank shortage, MLF headaches, DBS/APCO paperwork).
+  4. Returns hookTier + hookText + hookSourceUrl + a sharper painPoint. Null-over-fabrication remains the discipline.
+- parseFromUrl now runs `mineInstagramHooks` as a follow-up when the URL scrape yielded ≥1 IG handle. Best-effort — enrichment failure never breaks the outer flow.
+- Frontend: `AdminContacts` form state now carries hookTier/hookText/hookSourceUrl. Adds an amber-tinted preview panel inside the add form so Rich can SEE, EDIT, or CLEAR the auto-drafted hook before saving.
+
+Verified end-to-end against the Ministry of Clouds URL:
+
+BEFORE (Tier-3 generic):
+> G'day Bernice — we crossed paths the other day, sending this to Ministry of Clouds Wines too. I've since built a cellar AI grounded in your own vintage logs — figured you might find it useful.
+
+AFTER (Tier-1 recent_signal, sourced from real IG post DYDj_x9SLes):
+> g'day Bernice (Ministry of Clouds Wines) — saw your post about juggling vintage, the kids and the dog while chasing that perfect 2025 balance. i've been building a cellar AI grounded in your own vintage logs — 90 sec look: …
+
+Sharpened painPoint also lands in the CRM: "Publicly shares how exhausting it is to juggle 2025 vintage work with family life and limited time while still chasing precise stylistic balance in the wines." Compared to the previous "small McLaren Vale winery with an established dual-founder team" fluff — night and day.
+
+Cost: one extra ~15-30s Perplexity Sonar call per URL that yields IG handles. Skipped when the scrape yields zero handles.
+
+[shipped: contact-add-ig-mining]
+
+
 ### Pricing drift between /waitlist and /pricing · single source of truth extracted (Jul 2026)
 
 Rich spotted the /waitlist page quoting stale annual prices while /pricing had the EOFY promo running. Digging in:
