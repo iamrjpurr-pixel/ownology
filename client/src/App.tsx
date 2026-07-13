@@ -3,7 +3,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect, useLocation } from "wouter";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "@/lib/useAuth";
@@ -582,6 +582,26 @@ function ThemePicker() {
     return ((window as unknown as { __ownologyThemeOverride?: string }).__ownologyThemeOverride ?? "auto");
   });
   const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Close on outside click + Escape. Standard picker behaviour — Rich
+  // (Feb 2026) called this out multiple times: selection-then-manual-close
+  // was breaking his BD flow. Selection + click-away + Esc all now close.
+  useEffect(() => {
+    if (!open) return;
+    function onDown(e: MouseEvent) {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   // On mount, hydrate window override from localStorage so the auto-theme
   // logic in AutoThemeByTime picks it up immediately (avoids a flash of the
@@ -648,6 +668,7 @@ function ThemePicker() {
 
   return (
     <div
+      ref={rootRef}
       data-testid="theme-picker"
       style={{
         position: "fixed",
@@ -668,7 +689,14 @@ function ThemePicker() {
               key={t.id}
               type="button"
               data-testid={`theme-${t.id}`}
-              onClick={() => set(t.id)}
+              onClick={() => {
+                set(t.id);
+                // Auto-close after selection (Rich, Feb 2026 — repeated ask:
+                // the picker was leaving itself open after a theme was
+                // chosen, forcing a manual click on ×. Selection is a
+                // commit → close is the right default).
+                setOpen(false);
+              }}
               style={{
                 display: "flex",
                 alignItems: "center",

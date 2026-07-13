@@ -66,8 +66,10 @@ function TierBadge({ tier }: { tier: string | null | undefined }) {
 export default function AdminOutboundQueue() {
   const { data, isLoading, refetch } = trpc.outreach.outboundQueue.useQuery();
   const markSent = trpc.outreach.markSent.useMutation();
+  const bulkRewrite = trpc.outreach.bulkRewriteSmsAI.useMutation();
   const [copied, setCopied] = useState<Record<string, "sms" | "email" | "done" | undefined>>({});
   const [regionFilter, setRegionFilter] = useState<string>("all");
+  const [bulkResult, setBulkResult] = useState<{ rewritten: number; skippedExisting: number; failed: number } | null>(null);
 
   async function copySms(slug: string, text: string) {
     try { await navigator.clipboard.writeText(text); setCopied((s) => ({ ...s, [slug]: "sms" })); } catch { /* no-op */ }
@@ -76,6 +78,18 @@ export default function AdminOutboundQueue() {
     await markSent.mutateAsync({ slug, channel });
     setCopied((s) => ({ ...s, [slug]: "done" }));
     setTimeout(() => refetch(), 400);
+  }
+
+  async function runBulkRewrite(tone: "warm" | "brief" | "regional") {
+    if (!confirm(`Rewrite SMS drafts for the outbound queue via Claude (${tone} tone)?\n\nThis will take ~1.5-2s per contact and cost ~$0.005 each.\nExisting hand-crafted drafts are skipped.`)) return;
+    setBulkResult(null);
+    try {
+      const result = await bulkRewrite.mutateAsync({ tone, force: false, limit: 500 });
+      setBulkResult(result);
+      refetch();
+    } catch (err) {
+      alert(`Bulk rewrite failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 
   const queue = data?.queue ?? [];
@@ -118,6 +132,58 @@ export default function AdminOutboundQueue() {
         <span style={{ marginLeft: "auto", fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
           {filtered.length} of {queue.length} in queue
         </span>
+      </div>
+
+      {/* Bulk AI Rewrite strip — pre-warms every unsent draft in the queue */}
+      <div
+        data-testid="bulk-ai-rewrite-strip"
+        style={{
+          margin: "0 24px 8px",
+          padding: "10px 14px",
+          background: "color-mix(in oklch, var(--ow-amber) 5%, transparent)",
+          border: "1px solid var(--ow-border)",
+          borderRadius: 4,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          flexWrap: "wrap",
+        }}
+      >
+        <span style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "0.95rem", color: "var(--ow-text-hi)" }}>
+          ✨ Bulk AI rewrite
+        </span>
+        <span style={{ fontSize: "0.78rem", color: "var(--ow-text-mid)", flex: 1, minWidth: 240 }}>
+          Pre-warm every unsent SMS in the queue via Claude. Skips hand-crafted overrides. ~$0.005 per contact.
+        </span>
+        <button
+          data-testid="bulk-rewrite-warm"
+          onClick={() => runBulkRewrite("warm")}
+          disabled={bulkRewrite.isPending}
+          style={{ padding: "5px 12px", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.75rem", fontWeight: 700, cursor: bulkRewrite.isPending ? "wait" : "pointer" }}
+        >
+          {bulkRewrite.isPending ? "Rewriting…" : "Warm tone"}
+        </button>
+        <button
+          data-testid="bulk-rewrite-brief"
+          onClick={() => runBulkRewrite("brief")}
+          disabled={bulkRewrite.isPending}
+          style={{ padding: "5px 12px", background: "transparent", color: "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.75rem", cursor: bulkRewrite.isPending ? "wait" : "pointer" }}
+        >
+          Brief
+        </button>
+        <button
+          data-testid="bulk-rewrite-regional"
+          onClick={() => runBulkRewrite("regional")}
+          disabled={bulkRewrite.isPending}
+          style={{ padding: "5px 12px", background: "transparent", color: "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.75rem", cursor: bulkRewrite.isPending ? "wait" : "pointer" }}
+        >
+          Regional
+        </button>
+        {bulkResult && (
+          <span data-testid="bulk-rewrite-result" style={{ fontSize: "0.78rem", color: "#16a34a", fontWeight: 600 }}>
+            ✓ {bulkResult.rewritten} rewritten · {bulkResult.skippedExisting} skipped · {bulkResult.failed} failed
+          </span>
+        )}
       </div>
 
       {isLoading && <p style={{ padding: 24 }}>Loading queue…</p>}

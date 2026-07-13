@@ -4,6 +4,12 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Feb 2026 session — Theme picker auto-close + Bulk AI Rewrite + Region backfill — SHIPPED (this session):**
+- Theme picker (bottom-left floating pill) now auto-closes on selection + Esc + outside-click. Fix in `App.tsx::ThemePicker`. Re-shipped after Rich flagged the miss.
+- New `outreach.bulkRewriteSmsAI` procedure — Claude-rewrites all cold/lukewarm/unsent contacts in the outbound queue in one batch. Skips hand-crafted overrides. 3-tone selector (Warm/Brief/Regional). Cost ~$1.10 for the full 220-contact queue. UI strip added on `/admin/contacts/outbound-queue`.
+- Region backfill: 3-round Node script pipeline (regex painPoint → winery-name lookup → paren-stripped fallback). 84 new contacts tagged, distribution: McLaren Vale 20 / Hunter 18 / Barossa 16 / Yarra 12 etc. Only 64 remain null (mostly boutique/spirits).
+- Refactored: `claudeRewriteOne()` helper extracted so single + bulk share one system prompt / model / anti-parrot rules.
+
 **Feb 2026 session — SMS "acknowledge, don't quote" AI rewrite — SHIPPED (this session):**
 - New `outreach.rewriteSmsAI` mutation using Claude Sonnet 4.5 via Emergent LLM Key. Reads all research (winery, region, painPoint, hookText, notes, persona) and generates a NEW SMS that acknowledges A: winery / B: winemaker / C: region — without directly quoting Perplexity's hookText.
 - Three tones: `warm` (default), `brief` (<220 chars), `regional` (leads with regional context).

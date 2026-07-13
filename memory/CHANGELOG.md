@@ -4,6 +4,56 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Theme picker auto-close + Esc + outside-click (Feb 2026)
+
+Rich reported this again — the floating bottom-left theme picker was NOT closing after a theme was selected. Root cause: `onClick={() => set(t.id)}` in `App.tsx::ThemePicker` was persisting `set(...)` without ever calling `setOpen(false)`. Every selection required a manual click on the ×.
+
+**Fix** (`client/src/App.tsx::ThemePicker`):
+- Selection now closes the panel (`onClick` calls `set(t.id)` then `setOpen(false)`).
+- Added `useEffect` with `mousedown` + `keydown` listeners for outside-click and Escape-to-close (standard picker UX pattern, matches `components/ThemeToggle.tsx` which already had this).
+- Attached `rootRef` to the picker root `<div>` so outside-click detection works.
+- Added `useRef` to the App.tsx import.
+
+**Verified live**: click theme option → panel closes AND theme applies in one gesture. Escape closes. Outside click closes. All three flows green in Playwright test.
+
+[shipped: theme-picker-auto-close, theme-picker-esc, theme-picker-outside-click]
+
+
+### Bulk AI Rewrite + Region Auto-Fill (Feb 2026)
+
+Two BD-velocity unblockers shipped in one batch.
+
+**A) Region auto-fill** (backfill scripts `/app/scripts/backfill-region-*.mts`, 3 rounds):
+- Round 1 — regex against painPoint + notes text → 43 matched (Barossa/Tasmania/Adelaide Hills/Grampians/Hunter/Clare/Coonawarra…).
+- Round 2 — winery-name lookup via existing `wineryRegions.ts` → 25 more matched.
+- Round 3 — paren-stripped winery lookup + Hunter/Orange/Canberra fallback markers → 16 more matched.
+- **Total: 84 contacts backfilled** (68 previously tagged + 84 new = 152 with region; 64 still null, mostly boutique/spirits labels).
+- Overall distribution now: McLaren Vale 20 · Hunter 18 · Barossa 16 · Yarra Valley 12 · Adelaide Hills 11 · Coonawarra 11 · Orange 10 · Tasmania 10 · Margaret River 9 · Mornington Peninsula 9 · Clare 8, etc.
+- Unlocks: region filter chips on Outbound Queue now cover 2× as many contacts; "regional" AI rewrites have accurate context to work with.
+
+**B) Bulk AI Rewrite** (`outreach.bulkRewriteSmsAI` + Outbound Queue strip):
+- New `ownerProcedure` iterates the outbound-queue set (cold/lukewarm, smsSentAt null), calls Claude via the same `claudeRewriteOne` helper that powers the single-contact rewrite, saves each result to `smsDraftOverride`.
+- Refactor: extracted `claudeRewriteOne()` helper at the top of `outreach.ts` so single + bulk share one system prompt / model config / anti-parrot rules. Zero duplication.
+- Respects hand-crafted overrides: skips any contact with existing `smsDraftOverride` unless `force=true`. Failures on individual rows don't abort the batch — collected in `failures[]` for retry.
+- 3-tone chooser in UI (Warm / Brief / Regional) matches the single-contact rewrite.
+- Serial (not parallel) — 1.5-2s per contact, ~6-7 min for a full 220-contact queue. Gentle on the LLM proxy.
+- Cost: ~$0.005 per contact = ~$1.10 for a full queue rewrite.
+- Verified: 3-contact test batch returned `{ rewritten: 2, skippedExisting: 1, failed: 0 }` — the 2 fresh rewrites are Andrew Pike + one other; Bernice/Matteo (with existing overrides) correctly skipped.
+
+**Frontend strip on `/admin/contacts/outbound-queue`**:
+- New "✨ Bulk AI rewrite" panel below the region filter row.
+- Copy explains the deal ("Pre-warm every unsent SMS via Claude. Skips hand-crafted overrides. ~$0.005 per contact").
+- Warm / Brief / Regional buttons + confirmation prompt.
+- Result summary badge after run: "✓ N rewritten · M skipped · X failed".
+
+**Deferred (from Rich's 4-item value-check)**:
+- Save AI Draft History (3-version rollback) — LOW ROI, re-spinning on Claude is $0.01, not revenue-critical.
+- View-Event Timeline (per-view timestamps) — requires new `outreach_view_events` table + backfill; no immediate BD ROI when viewCount + hotAlert already cover the "who's circling" question.
+
+[shipped: bulk-rewrite-sms-ai, region-backfill-3-rounds, claude-helper-refactor]
+
+
+
 ### SMS draft "acknowledge, don't quote" — AI rewrite + Research Context box (Feb 2026)
 
 Rich flagged the SMS drafts as unusable: Perplexity's `hookText` was getting spliced verbatim into every SMS ("g'day Andrew (Pikes Wines) — juggling growing demand with keeping it all feeling family-run is the real trick") which parrots research back and reads like an AI wrote it. Every send needed a manual rewrite → killing BD velocity.
