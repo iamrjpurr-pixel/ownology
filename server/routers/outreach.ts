@@ -800,6 +800,167 @@ Return ONLY valid JSON. No markdown. If no contact can be identified, return {"f
       }
     }),
 
+  /** OWNER — Rewrite the SMS draft using Claude via Emergent LLM Key.
+   *
+   *  The problem this solves: Perplexity's hookText tends to get spliced
+   *  verbatim into the SMS ("g'day andrew (pikes wines) — juggling growing
+   *  demand with keeping it all feeling family-run is the real trick").
+   *  That parrots research back and reads like an AI wrote it.
+   *
+   *  This endpoint instead asks Claude to ACKNOWLEDGE three signals warmly
+   *  without directly quoting: (a) the winery/business context, (b) the
+   *  winemaker as a person, (c) their region and its current challenges.
+   *
+   *  Reads all research fields, writes a fresh SMS, saves to
+   *  `smsDraftOverride` so downstream flows (Copy SMS, mailto:, etc.)
+   *  pick it up automatically.
+   */
+  rewriteSmsAI: ownerProcedure
+    .input(z.object({
+      slug: z.string().min(1).max(80),
+      tone: z.enum(["warm", "brief", "regional"]).default("warm"),
+    }))
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      const rows = await db
+        .select({
+          slug: schema.outreachContacts.slug,
+          firstName: schema.outreachContacts.firstName,
+          lastName: schema.outreachContacts.lastName,
+          winery: schema.outreachContacts.winery,
+          region: schema.outreachContacts.region,
+          event: schema.outreachContacts.event,
+          painPoint: schema.outreachContacts.painPoint,
+          hookText: schema.outreachContacts.hookText,
+          hookTier: schema.outreachContacts.hookTier,
+          notes: schema.outreachContacts.notes,
+          persona: schema.outreachContacts.persona,
+        })
+        .from(schema.outreachContacts)
+        .where(eq(schema.outreachContacts.slug, input.slug))
+        .limit(1);
+      const c = rows[0];
+      if (!c) throw new Error(`No contact found with slug ${input.slug}`);
+
+      const previewBase = process.env.PREVIEW_BASE_URL || process.env.PUBLIC_BASE_URL || "https://ownology.ai";
+      const link = `${previewBase}/hi/${c.slug}`;
+
+      // Compact research summary — pass raw evidence to Claude, not a
+      // pre-written line. We want Claude to synthesise, not template-fill.
+      const researchBits: string[] = [];
+      if (c.winery) researchBits.push(`Winery: ${c.winery}`);
+      if (c.region) researchBits.push(`Region: ${c.region}`);
+      if (c.event) researchBits.push(`Where we met / context: ${c.event}`);
+      if (c.painPoint) researchBits.push(`Business summary (from Perplexity): ${c.painPoint}`);
+      if (c.hookText) researchBits.push(`Recent signal / quote (from Perplexity — DO NOT QUOTE VERBATIM, but you may reference the topic): ${c.hookText}`);
+      if (c.notes) researchBits.push(`Additional notes: ${c.notes.slice(0, 500)}`);
+      if (c.persona) researchBits.push(`Their role at the winery: ${c.persona}`);
+
+      const toneGuidance = {
+        warm:     "Warm, mate-to-mate, Australian idiom. Feels like a text from a friend who happens to make winemaking software.",
+        brief:    "Short and sharp. Under 220 chars. One acknowledgment, one offer, one link.",
+        regional: "Lead with regional context. Show you understand what's happening in their patch this vintage.",
+      }[input.tone];
+
+      const systemPrompt = `You are Jamie, the founder of Ownology (a cellar-intelligence AI for boutique winemakers). You write personal SMS messages to fellow winemakers — the kind of message a mate who did their homework would send. Never sales-y, never templated.
+
+The operator (Rich, running BD) will paste your output straight into their phone. Your job is to spin the research below into an SMS that ACKNOWLEDGES three signals warmly without quoting them verbatim:
+
+  (A) You've read about the winery — its scale, focus, style of business
+  (B) You've read about the winemaker as a person — their role, journey, philosophy
+  (C) You understand their region and its current challenges — vintage conditions, market pressure, or a peer signal
+
+You do NOT need to hit all three every time — but the SMS must feel like the sender genuinely knows who they're texting, not like they scraped a bio and templated a line.
+
+RULES — absolute:
+1. Never directly quote the research. If the research says "juggling growing demand with keeping it all feeling family-run", DO NOT write "juggling growing demand" back to them. Instead: acknowledge the tension around scale in a family business ("scaling a family label without losing the feel is a real trick").
+2. Never say "family-owned winery balancing hospitality with production" or any variation of scraped-About-page prose.
+3. Lower-case start. Australian idiom OK ("g'day", "reckon", "gday" ok). No exclamation marks. No emojis.
+4. 200–320 chars total (SMS-length friendly). Include their personal URL at the end: ${link}
+5. Sign off with " — Jamie" (space, em-dash, space, "Jamie").
+6. If a signal is absent from the research, DO NOT invent one. Silence is better than fabrication.
+7. Tone: ${toneGuidance}
+8. Structure the message as: acknowledgment (1 short sentence about them / their patch) → what you built (1 sentence, plainspoken, no jargon) → soft offer (link + "have a squiz" / "worth 90 sec" / "if useful").
+
+Return JSON with two fields:
+  - "sms": the final SMS string (200-320 chars, includes the URL, includes " — Jamie" sign-off)
+  - "signalsAcknowledged": array of strings from ["winery", "winemaker", "region"] indicating which of the three signals you actually managed to weave in (be honest — don't claim "region" if you didn't mention their region at all)
+
+Return ONLY the JSON. No prose. No markdown fences.`;
+
+      const userPayload = `Contact: ${c.firstName}${c.lastName ? ` ${c.lastName}` : ""}
+Their personal URL: ${link}
+
+Research on file:
+${researchBits.length > 0 ? researchBits.join("\n") : "(no research on file — write a warm cold-outreach opener without inventing details)"}
+`;
+
+      const chatResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${forgeKey}`,
+          "x-ow-source": "outreach.rewriteSmsAI",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-5",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPayload },
+          ],
+          stream: false,
+        }),
+      });
+      if (!chatResp.ok) {
+        const errText = await chatResp.text().catch(() => "");
+        throw new Error(`Claude rewrite failed: ${chatResp.status} ${errText.slice(0, 200)}`);
+      }
+      const chatData = await chatResp.json();
+      const raw = chatData.choices?.[0]?.message?.content ?? "{}";
+      let sms: string | null = null;
+      let signalsAcknowledged: string[] = [];
+      try {
+        const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+        const parsed = JSON.parse(cleaned) as { sms?: string; signalsAcknowledged?: string[] };
+        if (typeof parsed.sms === "string") sms = parsed.sms.trim().slice(0, 500);
+        if (Array.isArray(parsed.signalsAcknowledged)) {
+          signalsAcknowledged = parsed.signalsAcknowledged
+            .filter((s) => typeof s === "string" && ["winery", "winemaker", "region"].includes(s))
+            .slice(0, 3);
+        }
+      } catch {
+        // Fall through — sms stays null, UI will surface the error
+      }
+      if (!sms) throw new Error("Claude returned malformed output; try again.");
+
+      // Persist as the smsDraftOverride so Copy SMS / mailto: flows use it.
+      await db
+        .update(schema.outreachContacts)
+        .set({ smsDraftOverride: sms })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+
+      return {
+        sms,
+        signalsAcknowledged,
+        tone: input.tone,
+        // Echo the raw research for the UI so the operator can see what
+        // Claude was working with (audit trail — no more black box).
+        research: {
+          winery: c.winery,
+          region: c.region,
+          event: c.event,
+          painPoint: c.painPoint,
+          hookText: c.hookText,
+          hookTier: c.hookTier,
+          notes: c.notes,
+          persona: c.persona,
+        },
+      };
+    }),
+
   // ── OWNER — Migration bridge: dump all contacts as JSON  (Feb 2026) ──
   // Rich, one-shot dev→prod migration. Returns every real contact
   // (excluding rows explicitly tagged "test") as a JSON payload the

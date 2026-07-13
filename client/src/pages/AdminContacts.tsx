@@ -2596,6 +2596,16 @@ export default function AdminContacts() {
                   slug={c.slug}
                   templateSms={templateSms}
                   override={c.smsDraftOverride ?? null}
+                  research={{
+                    winery: c.winery,
+                    region: (c as { region?: string | null }).region ?? null,
+                    event: c.event,
+                    painPoint: c.painPoint,
+                    hookText: (c as { hookText?: string | null }).hookText ?? null,
+                    hookTier: (c as { hookTier?: string | null }).hookTier ?? null,
+                    notes: c.notes,
+                    persona: (c as { persona?: string | null }).persona ?? null,
+                  }}
                   onSave={(draft) =>
                     setSmsDraftMutation.mutate(
                       { slug: c.slug, draft },
@@ -2650,22 +2660,43 @@ function SmsDraftEditor({
   templateSms,
   override,
   onSave,
+  research,
 }: {
   slug: string;
   templateSms: string;
   override: string | null;
   onSave: (draft: string | null) => void;
+  research: {
+    winery?: string | null;
+    region?: string | null;
+    event?: string | null;
+    painPoint?: string | null;
+    hookText?: string | null;
+    hookTier?: string | null;
+    notes?: string | null;
+    persona?: string | null;
+  };
 }) {
   const [value, setValue] = useState<string>(override ?? templateSms);
-  const [savedHint, setSavedHint] = useState<"saved" | "reset" | null>(null);
+  const [savedHint, setSavedHint] = useState<"saved" | "reset" | "ai" | null>(null);
+  const [showResearch, setShowResearch] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiSignals, setAiSignals] = useState<string[] | null>(null);
   const isOverride = override !== null && override.length > 0;
   const dirty = value !== (override ?? templateSms);
+
+  const rewriteMutation = trpc.outreach.rewriteSmsAI.useMutation();
+
+  // Signal availability — used to render the "acknowledgment chip row"
+  // that tells the operator at a glance what the AI has to work with.
+  const hasWinery = !!research.winery;
+  const hasWinemaker = !!research.persona || !!research.notes || !!research.hookText;
+  const hasRegion = !!research.region;
+  const hasHook = !!research.hookText;
 
   function handleBlur() {
     if (!dirty) return;
     const trimmed = value.trim();
-    // Treat "same as template" as a reset (clears override so future
-    // template changes auto-apply to this contact).
     if (trimmed === templateSms.trim()) {
       onSave(null);
       setSavedHint("reset");
@@ -2683,9 +2714,103 @@ function SmsDraftEditor({
     setTimeout(() => setSavedHint(null), 2200);
   }
 
+  async function handleAiRewrite(tone: "warm" | "brief" | "regional") {
+    setAiError(null);
+    setAiSignals(null);
+    try {
+      const result = await rewriteMutation.mutateAsync({ slug, tone });
+      setValue(result.sms);
+      onSave(result.sms); // save immediately — Claude already committed to the DB
+      setAiSignals(result.signalsAcknowledged);
+      setSavedHint("ai");
+      setTimeout(() => setSavedHint(null), 3200);
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : String(err));
+      setTimeout(() => setAiError(null), 5000);
+    }
+  }
+
   return (
     <div data-testid={`sms-editor-${slug}`} style={{ marginTop: 10 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+      {/* Research context box — collapsible, shows the raw Perplexity
+          signals so the operator can see what the AI is working with. */}
+      <div
+        data-testid={`research-context-${slug}`}
+        style={{
+          marginBottom: 8,
+          border: "1px solid var(--ow-border)",
+          borderRadius: 4,
+          background: "color-mix(in oklch, var(--ow-amber) 2%, transparent)",
+        }}
+      >
+        <button
+          type="button"
+          data-testid={`research-toggle-${slug}`}
+          onClick={() => setShowResearch((v) => !v)}
+          style={{
+            width: "100%",
+            padding: "6px 10px",
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            textAlign: "left",
+            fontFamily: "'Lato',sans-serif",
+            fontSize: "0.7rem",
+            color: "var(--ow-text-mid)",
+            letterSpacing: "0.03em",
+            textTransform: "uppercase",
+          }}
+        >
+          <span>Research context</span>
+          <span style={{ display: "flex", gap: 4 }}>
+            <SignalChip label="winery" active={hasWinery} />
+            <SignalChip label="winemaker" active={hasWinemaker} />
+            <SignalChip label="region" active={hasRegion} />
+            {hasHook && <SignalChip label="hook" active={true} />}
+          </span>
+          <span style={{ flexGrow: 1 }} />
+          <span style={{ fontSize: "0.85rem", color: "var(--ow-text-lo)" }}>{showResearch ? "▾" : "▸"}</span>
+        </button>
+        {showResearch && (
+          <div
+            data-testid={`research-body-${slug}`}
+            style={{
+              padding: "0 12px 10px",
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.78rem",
+              color: "var(--ow-text-mid)",
+              lineHeight: 1.55,
+              display: "grid",
+              gridTemplateColumns: "auto 1fr",
+              gap: "4px 12px",
+              alignItems: "baseline",
+            }}
+          >
+            {research.winery && (<><span style={researchLabel}>Winery</span><span>{research.winery}</span></>)}
+            {research.region && (<><span style={researchLabel}>Region</span><span>{research.region}</span></>)}
+            {research.persona && (<><span style={researchLabel}>Role</span><span>{research.persona}</span></>)}
+            {research.event && (<><span style={researchLabel}>Event / where</span><span>{research.event}</span></>)}
+            {research.hookText && (
+              <>
+                <span style={researchLabel}>Hook{research.hookTier ? ` (${research.hookTier})` : ""}</span>
+                <span style={{ fontStyle: "italic" }}>&ldquo;{research.hookText}&rdquo;</span>
+              </>
+            )}
+            {research.painPoint && (<><span style={researchLabel}>Business summary</span><span>{research.painPoint}</span></>)}
+            {research.notes && (<><span style={researchLabel}>Notes</span><span style={{ whiteSpace: "pre-wrap", opacity: 0.85 }}>{research.notes}</span></>)}
+            {!research.winery && !research.region && !research.persona && !research.hookText && !research.painPoint && !research.notes && (
+              <span style={{ gridColumn: "1 / span 2", color: "var(--ow-text-lo)", fontStyle: "italic" }}>
+                No research on file yet. Run Perplexity deepResearch on this contact to populate.
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
         <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "var(--ow-text-lo)", letterSpacing: "0.05em", textTransform: "uppercase" }}>
           SMS Draft
         </span>
@@ -2708,6 +2833,65 @@ function SmsDraftEditor({
           </span>
         )}
         <span style={{ flexGrow: 1 }} />
+        <button
+          type="button"
+          data-testid={`sms-rewrite-ai-${slug}`}
+          onClick={() => handleAiRewrite("warm")}
+          disabled={rewriteMutation.isPending}
+          title="Rewrite with Claude — acknowledges research warmly without quoting"
+          style={{
+            fontFamily: "'Lato',sans-serif",
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            padding: "3px 10px",
+            background: "var(--ow-amber)",
+            color: "oklch(0.10 0.008 60)",
+            border: "none",
+            borderRadius: 3,
+            cursor: rewriteMutation.isPending ? "wait" : "pointer",
+            opacity: rewriteMutation.isPending ? 0.6 : 1,
+          }}
+        >
+          {rewriteMutation.isPending ? "✨ Rewriting…" : "✨ Rewrite with AI"}
+        </button>
+        <button
+          type="button"
+          data-testid={`sms-rewrite-ai-brief-${slug}`}
+          onClick={() => handleAiRewrite("brief")}
+          disabled={rewriteMutation.isPending}
+          title="Short punchy variant"
+          style={{
+            fontFamily: "'Lato',sans-serif",
+            fontSize: "0.7rem",
+            padding: "3px 8px",
+            background: "transparent",
+            color: "var(--ow-text-mid)",
+            border: "1px solid var(--ow-border)",
+            borderRadius: 3,
+            cursor: rewriteMutation.isPending ? "wait" : "pointer",
+          }}
+        >
+          Brief
+        </button>
+        <button
+          type="button"
+          data-testid={`sms-rewrite-ai-regional-${slug}`}
+          onClick={() => handleAiRewrite("regional")}
+          disabled={rewriteMutation.isPending}
+          title="Lead with regional context"
+          style={{
+            fontFamily: "'Lato',sans-serif",
+            fontSize: "0.7rem",
+            padding: "3px 8px",
+            background: "transparent",
+            color: "var(--ow-text-mid)",
+            border: "1px solid var(--ow-border)",
+            borderRadius: 3,
+            cursor: rewriteMutation.isPending ? "wait" : "pointer",
+          }}
+        >
+          Regional
+        </button>
         <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.68rem", color: value.length > 160 ? "#dc2626" : "var(--ow-text-lo)" }}>
           {value.length} chars · {value.length <= 160 ? "1 SMS" : value.length <= 306 ? "2 SMS" : `${Math.ceil(value.length / 153)} SMS`}
         </span>
@@ -2733,7 +2917,7 @@ function SmsDraftEditor({
           transition: "border-color 120ms ease",
         }}
       />
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4, flexWrap: "wrap" }}>
         {isOverride && (
           <button
             type="button"
@@ -2753,10 +2937,25 @@ function SmsDraftEditor({
             Reset to template
           </button>
         )}
+        {aiSignals && aiSignals.length > 0 && (
+          <span data-testid={`sms-ai-signals-${slug}`} style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", color: "var(--ow-text-mid)" }}>
+            Acknowledged: {aiSignals.map((s) => `✓ ${s}`).join("  ")}
+          </span>
+        )}
         <span style={{ flexGrow: 1 }} />
+        {aiError && (
+          <span data-testid={`sms-ai-error-${slug}`} style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "#dc2626" }}>
+            AI failed: {aiError.slice(0, 90)}
+          </span>
+        )}
         {savedHint === "saved" && (
           <span data-testid={`sms-editor-saved-${slug}`} style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "#10b981" }}>
             ✓ Saved
+          </span>
+        )}
+        {savedHint === "ai" && (
+          <span data-testid={`sms-editor-ai-saved-${slug}`} style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "#10b981" }}>
+            ✨ Rewritten &amp; saved
           </span>
         )}
         {savedHint === "reset" && (
@@ -2771,6 +2970,38 @@ function SmsDraftEditor({
         )}
       </div>
     </div>
+  );
+}
+
+const researchLabel: React.CSSProperties = {
+  fontFamily: "'Lato',sans-serif",
+  fontSize: "0.65rem",
+  color: "var(--ow-text-lo)",
+  textTransform: "uppercase",
+  letterSpacing: "0.05em",
+  fontWeight: 600,
+  paddingTop: 2,
+  whiteSpace: "nowrap",
+};
+
+function SignalChip({ label, active }: { label: string; active: boolean }) {
+  return (
+    <span
+      data-testid={`signal-chip-${label}`}
+      style={{
+        fontSize: "0.6rem",
+        padding: "1px 6px",
+        borderRadius: 8,
+        background: active ? "var(--ow-amber)" : "transparent",
+        color: active ? "oklch(0.10 0.008 60)" : "var(--ow-text-lo)",
+        border: active ? "none" : "1px dashed var(--ow-border)",
+        fontWeight: 700,
+        letterSpacing: "0.03em",
+        textTransform: "uppercase",
+      }}
+    >
+      {active ? "✓" : "○"} {label}
+    </span>
   );
 }
 

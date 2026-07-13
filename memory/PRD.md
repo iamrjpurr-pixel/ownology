@@ -4,6 +4,13 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Feb 2026 session — SMS "acknowledge, don't quote" AI rewrite — SHIPPED (this session):**
+- New `outreach.rewriteSmsAI` mutation using Claude Sonnet 4.5 via Emergent LLM Key. Reads all research (winery, region, painPoint, hookText, notes, persona) and generates a NEW SMS that acknowledges A: winery / B: winemaker / C: region — without directly quoting Perplexity's hookText.
+- Three tones: `warm` (default), `brief` (<220 chars), `regional` (leads with regional context).
+- New Research Context collapsible on every AdminContacts card showing raw Perplexity output (audit-transparent — no more black box). Signal chips in header: ✓ WINERY / ✓ WINEMAKER / ○ REGION / ✓ HOOK.
+- ✨ Rewrite with AI · Brief · Regional buttons on SMS DRAFT toolbar. Draft persists to `smsDraftOverride`, "Acknowledged: ✓ winery ✓ region" chip confirms which signals landed.
+- Kills the "must-manually-rewrite-every-SMS" bottleneck that was blocking BD velocity.
+
 **Feb 2026 session — 🔥 Auto Hot Alert on view #3 — SHIPPED (this session):**
 - Extended `outreach.markViewed` to fire a second Resend "🔥 they're circling" email on the 3rd view. Idempotent via new `hot_alert_sent_at BIGINT` column (ALTER TABLE applied live). Distinct urgency framing + ready-to-copy follow-up SMS in email body.
 - Backfilled 7 pre-existing 3+ view contacts to prevent retro-fire (Sally, Jane, Nathan, Lou, Bryan, Simon, Matteo).

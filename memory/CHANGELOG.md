@@ -4,6 +4,39 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### SMS draft "acknowledge, don't quote" — AI rewrite + Research Context box (Feb 2026)
+
+Rich flagged the SMS drafts as unusable: Perplexity's `hookText` was getting spliced verbatim into every SMS ("g'day Andrew (Pikes Wines) — juggling growing demand with keeping it all feeling family-run is the real trick") which parrots research back and reads like an AI wrote it. Every send needed a manual rewrite → killing BD velocity.
+
+**Fix — new `outreach.rewriteSmsAI` mutation** (`server/routers/outreach.ts`):
+- Uses Claude Sonnet 4.5 via Emergent LLM Key (Built-in Forge shim).
+- Feeds Claude the RAW research (winery, region, event, painPoint, hookText, notes, persona) with a strict prompt: acknowledge three signals (A: winery business, B: winemaker as a person, C: their region + current challenges) WITHOUT directly quoting.
+- Explicit anti-parroting rule: "If the research says 'juggling growing demand with keeping it all feeling family-run', DO NOT write 'juggling growing demand' back to them. Instead acknowledge the underlying tension."
+- Three tones: `warm` (default, mate-to-mate), `brief` (< 220 chars), `regional` (leads with regional context).
+- Returns `{ sms, signalsAcknowledged: ["winery" | "winemaker" | "region"], research }` — audit-transparent (operator sees exactly what Claude worked with).
+- Persists to `smsDraftOverride` so downstream Copy SMS / mailto: / /hi/:slug flows pick it up automatically.
+
+**Frontend — Research Context box** (`SmsDraftEditor` in `AdminContacts.tsx`):
+- New collapsible "Research context" panel above every SMS draft box.
+- **Signal chips** in the header at all times: `✓ WINERY  ✓ WINEMAKER  ○ REGION  ✓ HOOK` — operator sees at a glance which signals the AI has to work with, no need to open the panel.
+- Expanded panel shows every research field (Winery, Region, Role, Event/Where, Hook + tier, Business summary, Notes) as a labelled 2-col grid.
+- **✨ Rewrite with AI** primary button + Brief / Regional side buttons on the SMS DRAFT toolbar.
+- Post-rewrite the SMS box updates in-place with the new draft, "✨ Rewritten & saved" confirmation appears, plus "Acknowledged: ✓ winery ✓ region" chip so operator knows what Claude actually pulled off.
+- Char counter + 1/2/3-SMS estimator preserved from existing editor.
+
+**Before/After on Andrew Pike (Pikes Wines)**:
+- OLD: "g'day Andrew (Pikes Wines) — juggling growing demand with keeping it all feeling family-run is the real trick. i've been building a cellar AI grounded in your own vintage logs — 90 sec look: … — Jamie"
+- NEW (warm): "gday Andrew — scaling a Clare Valley family label without losing that hands-on feel is a real trick. built a cellar-intelligence tool that takes the admin load off winemakers so you can stay in the vineyards. worth 90 sec if useful … — Jamie"
+- NEW (regional): "gday Andrew — clare's had a cracker run but scaling a family label without losing the feel is a real trick. built something for winemakers who want cellar intelligence without the faff. worth 90 sec if useful: … — Jamie"
+
+Note: even though `region` was null in the DB for Andrew, Claude correctly inferred "Clare Valley" from the painPoint text — the model synthesises, doesn't just template-fill.
+
+**Verified live end-to-end**: TS compiles clean, lint clean, endpoint returns valid JSON for all 3 tones on real contact, UI screenshot shows signal chips + audit panel + rewrite buttons all rendered. Draft persisted to DB via `smsDraftOverride`.
+
+[shipped: sms-rewrite-ai, research-context-box, signal-chips]
+
+
+
 ### 🔥 Auto Hot Alert — Resend email fires on view #3 (Feb 2026)
 
 Extended `outreach.markViewed` to fire a second, higher-urgency Resend alert email the moment a prospect crosses 3+ total views on their /hi/&lt;slug&gt; page. Idempotent — the "hot" email fires exactly once per contact, no matter how many times they re-visit after that.
