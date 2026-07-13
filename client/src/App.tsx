@@ -564,6 +564,11 @@ function AutoThemeByTime() {
 const THEME_STORAGE_KEY = "ownology:theme-override";
 
 function ThemePicker() {
+  // Hide on the gate wall (/try) — the password box sits bottom-center and
+  // the picker's bottom-left pill visually clashes with it on mobile.
+  // Also hide on other pre-auth surfaces where theme choice is premature.
+  // Feb 2026, Rich reported the collision on prod /try.
+  const [pathname] = useLocation();
   const [current, setCurrent] = useState<string>(() => {
     if (typeof window === "undefined") return "auto";
     try {
@@ -630,6 +635,12 @@ function ThemePicker() {
         : "var(--ow-amber)",
     })),
   ];
+
+  // Suppress the picker on pre-auth surfaces — the bottom-left pill clashes
+  // with the /try password box on mobile. All hooks above have already run,
+  // so this early return is safe under rules-of-hooks.
+  const HIDDEN_ON = new Set(["/try", "/auth/callback"]);
+  if (HIDDEN_ON.has(pathname) || pathname.startsWith("/i/")) return null;
 
   return (
     <div
