@@ -69,7 +69,7 @@ export function CellarJournalIndex() {
         </p>
         <p className="mt-6 text-lg md:text-xl max-w-2xl leading-relaxed opacity-80">
           Every question a winemaker asks Ownology becomes a page here — grounded in
-          real references, written for the cellar at 2&nbsp;am.
+          real references, written for the cellar at 2&nbsp;am. <strong className="opacity-100" style={{ color: "var(--ow-amber)" }}>Home-scale by default</strong> — this is the public library of everything Free Run has been asked. Commercial-scale answers live in The Press.
         </p>
 
         {/* search + counts */}
@@ -363,10 +363,22 @@ export function CellarJournalEntry({ slug }: { slug: string }) {
           ← Cellar Journal
         </Link>
 
-        <div className="mt-8 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em]" style={{ color: "var(--ow-amber, #b8924a)" }}>
+        <div className="mt-8 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em] flex-wrap" style={{ color: "var(--ow-amber, #b8924a)" }}>
           <span>{entry.topicTag}</span>
           <span className="opacity-50">·</span>
           <span className="opacity-60">Asked {entry.askedCount}× · Viewed {entry.viewCount + 1}</span>
+          {/* Tier chip — Cellar Journal answers come from the Free Run
+              (home-scale) tutor. Signal that clearly so professional readers
+              know what to expect + linked to the product page. */}
+          <span className="opacity-50">·</span>
+          <Link
+            href="/free-run"
+            data-testid="cj-tier-chip"
+            className="inline-flex items-center gap-1 px-2 py-1 rounded border"
+            style={{ borderColor: "var(--ow-amber)", color: "var(--ow-amber)", textDecoration: "none" }}
+          >
+            Free Run · home-scale
+          </Link>
         </div>
 
         <h1 className="font-serif italic text-4xl md:text-6xl mt-4 leading-[1.05] tracking-tight" data-testid="cj-entry-question">
@@ -405,10 +417,10 @@ export function CellarJournalEntry({ slug }: { slug: string }) {
               ↓ The advisory, sealed
             </p>
             <h3 className="font-serif italic text-2xl md:text-3xl mt-3 leading-snug">
-              The numbers above are the industry reference. What Owen does with them is the paid layer.
+              Above is a Free Run answer — home-scale, grounded in the standard home-winemaker references.
             </h3>
             <p className="mt-4 text-base md:text-lg leading-relaxed opacity-90 max-w-2xl">
-              Scale each dose to your batch size · rank interventions by likelihood if the first doesn&apos;t work · surface Bible-grade citations (author, page, edition) · answer follow-ups grounded in your wine&apos;s history · alert you within 48 hours if the fix isn&apos;t holding.
+              What Owen does at commercial scale — Bibles cited page-and-edition, batches sized to your actual cellar, answers that remember your last three vintages, and a 48-hour follow-up if a fix isn&apos;t holding — is The Press. Not the same tool. Deeper corpus, professional-grade.
             </p>
 
             <div className="mt-7 flex flex-col sm:flex-row gap-3">
@@ -443,7 +455,7 @@ export function CellarJournalEntry({ slug }: { slug: string }) {
             </div>
 
             <p className="mt-5 text-xs opacity-60 font-mono tracking-wide">
-              Bible-grade citations · 38 SOPs · AI tutor scaled to your tanks
+              Free Run · home-scale · 23 L default → The Press covers commercial scale
             </p>
           </div>
         </div>
