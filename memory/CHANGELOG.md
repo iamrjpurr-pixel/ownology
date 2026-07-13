@@ -4,6 +4,28 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Pricing drift between /waitlist and /pricing · single source of truth extracted (Jul 2026)
+
+Rich spotted the /waitlist page quoting stale annual prices while /pricing had the EOFY promo running. Digging in:
+
+- `/pricing` used `ANNUAL_MULTIPLIER = 9` (EOFY promo — 3 months free) with all four tiers Free Run · Cellar Hand · Press · Vigneron.
+- `/waitlist` hard-coded `$440/yr` and `$880/yr` (× 10) and was missing The Cellar Hand entirely — a prospect recommended Cellar Hand via the TierChooser had no way to sign up for it from the waitlist.
+- Additional pre-existing bug: the `/waitlist` tier card template rendered `{tier.annual}/yr` on top of an already-formatted `"$440/yr"` string, so annual line was `$44/mo · $440/yr/yr` (double suffix).
+
+Fix — extracted all tier + credit-pack data to a single source of truth:
+
+- New file `client/src/data/pricing.ts` — exports `TIERS`, `PAID_TIERS`, `CREDIT_PACKS`, `EOFY_ACTIVE`, `ANNUAL_MULTIPLIER`, `monthlyLabel()`, `annualLabel()`, `type TierId`.
+- `Pricing.tsx` — removed 131 lines of duplicate `TIERS` + `CREDIT_PACKS` constants; now imports from `data/pricing`. Behaviour identical.
+- `Waitlist.tsx` — replaced the 2-tier hardcoded array with a `PAID_TIERS.map(...)` projection. Now renders 3 cards (Cellar Hand · Press · Vigneron), with The Press pre-selected (matches the "MOST POPULAR" badge on `/pricing`). Fixed the `/yr/yr` template bug. Backend already accepts all 3 tier IDs — no server change needed.
+- Verified visually on preview: /waitlist now shows `$22/mo · $198/yr`, `$44/mo · $396/yr`, `$88/mo · $792/yr` — perfectly matching `/pricing`. Old strings `$440/yr` and `$880/yr` no longer exist anywhere on the page.
+
+Rule from now on: any page that quotes a subscription price MUST import from `client/src/data/pricing.ts`. Never redeclare a monthly/annual number locally.
+
+Follow-up (not blocking): `PricingComparison.tsx` still hard-codes `$22 / mo`, `$44 / mo`, `$88 / mo` — currently correct but a drift risk. Refactor to import when next touched.
+
+[shipped: pricing-single-source-of-truth]
+
+
 ### Session-expired auto-logout · admin pages no longer ghost-render (Jul 2026)
 
 Rich reported `/admin/contacts` was showing empty on prod — his "34 contacts" appeared missing. Data was actually intact (38 rows verified in Railway DB). Root cause: the earlier `JWT_SECRET` rotation invalidated his `app_session_id` cookie signature, so `ownerProcedure` returned 401, and 21 of 22 admin pages destructure `{ data, isLoading }` without reading `isError` — silently rendering as empty.

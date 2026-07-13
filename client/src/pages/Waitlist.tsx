@@ -2,6 +2,10 @@
  * /waitlist — Professional tier waitlist for boutique winery operators
  * Audience: winery owners, head winemakers, cellar masters
  * Design: dark warm-black, amber gold accents, Fraunces serif, Lato body
+ *
+ * Tier data + EOFY annual math come from `client/src/data/pricing.ts`
+ * (Rich, Jul 2026 — single source of truth after `/waitlist` and
+ * `/pricing` drifted). Never redeclare a monthly/annual number here.
  */
 
 import { useState } from "react";
@@ -9,42 +13,40 @@ import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import OwnologyLogo from "@/components/OwnologyLogo";
+import { PAID_TIERS, monthlyLabel, annualLabel, type TierId } from "@/data/pricing";
 
 // ─── Tier options ─────────────────────────────────────────────────────────────
+// Projection of the shared TIERS data into the shape this page renders.
+// `tagline` becomes the card description, `audience` becomes "for who",
+// and the `badge` (e.g. "MOST POPULAR") comes straight from the source.
+// If Rich changes a price in `data/pricing.ts`, this page reflects it on
+// next dev-server tick — no drift possible.
+// Waitlist backend accepts "cellar" | "press" | "cellar_master" (see
+// server/routers.ts leads.join input schema).
+type WaitlistTierId = Exclude<TierId, "free_run">;
 
-const TIERS = [
-  {
-    id: "press" as const,
-    name: "The Press",
-    price: "$44/mo",
-    annual: "$440/yr",
-    description: "Full winemaking AI — SOPs, technique, vintage log, cellar tracking.",
-    forWho: "Home winemakers and serious hobbyists",
-    badge: null,
-  },
-  {
-    id: "cellar_master" as const,
-    name: "The Vigneron",
-    price: "$88/mo",
-    annual: "$880/yr",
-    description: "Everything in The Press + team seats, annual knowledge review, Vigneron badge.",
-    forWho: "Owner-operator boutique vignerons",
-    badge: "Most popular",
-  },
-];
+const TIERS = PAID_TIERS.map((t) => ({
+  id: t.id as WaitlistTierId, // PAID_TIERS is filtered to monthlyPrice > 0, so free_run is never present
+  name: t.name,
+  price: monthlyLabel(t),
+  annual: annualLabel(t),
+  description: t.tagline,
+  forWho: t.audience,
+  badge: t.badge,
+}));
 
 const PRODUCTION_OPTIONS = [
   "Under 1 tonne",
-  "1–5 tonnes",
-  "5–20 tonnes",
-  "20–100 tonnes",
+  "1\u20135 tonnes",
+  "5\u201320 tonnes",
+  "20\u2013100 tonnes",
   "100+ tonnes",
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Waitlist() {
-  const [selectedTier, setSelectedTier] = useState<"press" | "cellar_master">("cellar_master");
+  const [selectedTier, setSelectedTier] = useState<WaitlistTierId>("press");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -281,7 +283,7 @@ export default function Waitlist() {
                     className="text-xs mb-2"
                     style={{ color: "oklch(0.55 0.012 75)" }}
                   >
-                    {tier.price} · {tier.annual}/yr
+                    {tier.price} · {tier.annual}
                   </div>
                   <p
                     className="text-xs leading-relaxed"

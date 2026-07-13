@@ -4,6 +4,10 @@ import OwnologyLogo from "@/components/OwnologyLogo";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
 import { FoundingReservationModal } from "@/components/FoundingReservationModal";
+// Pricing data lives in a single source of truth so `/pricing`,
+// `/waitlist`, `/founding-partners` etc. can never drift. Any dollar
+// figure quoted on the site must come from this module.
+import { TIERS, CREDIT_PACKS, EOFY_ACTIVE, ANNUAL_MULTIPLIER } from "../data/pricing";
 
 // ─── TierChooser ──────────────────────────────────────────────────────────────
 // 3-question wizard that recommends a tier. Removes the "which one fits me?"
@@ -343,152 +347,14 @@ const PILLAR_TAGS: Record<string, PillarTag[]> = {
 };
 
 /**
- * EOFY 2026 promotion — Rich, Feb 2026.
- * Annual founding subscriptions get 3 months free (annual = monthly × 9)
- * instead of the standard 2 months (monthly × 10). Auto-reverts to the
- * standard rate after 31 July 2026 (23:59:59 Australia/Sydney) — no
- * manual patch needed. The badge text also toggles.
- *
- * Retail-annual math (retailMonthlyPrice × 10) is unchanged — retail
- * customers arrive post-#100 and pay the normal 2-month bonus, which
- * makes the founding annual comparison even sweeter without needing
- * additional copy.
+ * All tier + credit-pack data lives in `client/src/data/pricing.ts` as
+ * the single source of truth (Rich, Jul 2026). `/waitlist`, `/pricing`,
+ * `/founding-partners` and any future page that quotes a subscription
+ * price must import from there — never redeclare a monthly/annual
+ * number locally. `EOFY_ACTIVE` and `ANNUAL_MULTIPLIER` also come from
+ * that module so the promo auto-reverts on 31 Jul 2026 without a code
+ * push.
  */
-const EOFY_END_MS = new Date('2026-08-01T00:00:00+10:00').getTime();
-const EOFY_ACTIVE = Date.now() < EOFY_END_MS;
-const ANNUAL_MULTIPLIER = EOFY_ACTIVE ? 9 : 10; // 9 → save 3 months, 10 → save 2
-
-const TIERS = [
-  {
-    id: "free_run",
-    name: "Free Run",
-    tagline: "Home-scale winemaking, from the inside out.",
-    audience: "Wine lovers, curious drinkers, food & wine enthusiasts.",
-    monthlyPrice: 0,
-    annualPrice: 0,
-    highlight: false,
-    badge: null,
-    color: "var(--ow-text-lo)",
-    features: [
-      "3 curiosity questions / day",
-      "Flavour science, varietals & regions",
-      "Divine Trinity — Science, Vineyard, Craft",
-      "First Divine Trinity reveal free",
-      "Free account — no card needed",
-    ],
-    cta: "Start Exploring",
-    ctaHref: "/free-run",
-    note: null,
-  },
-  {
-    id: "cellar",
-    name: "The Cellar Hand",
-    tagline: "Learn the craft. Stay compliant.",
-    audience: "Home winemakers and wine students who want to learn.",
-    monthlyPrice: 22,
-    annualPrice: 22 * ANNUAL_MULTIPLIER,
-    retailMonthlyPrice: 28,
-    highlight: false,
-    badge: "FOUNDING MEMBER",
-    color: "oklch(0.65 0.08 75)",
-    features: [
-      "Full curiosity AI \u2014 40+ subjects",
-      "100 Divine Trinity reveals / mo",
-      "Unlimited Compliance AI",
-      "Vintage log \u2014 unlimited entries",
-      "Email support",
-      "Founding Cohort · 2026 badge",
-    ],
-    cta: "Join The Cellar Hand",
-    ctaHref: "#waitlist",
-    note: "Less than a bottle of decent Shiraz per month.",
-  },
-  {
-    id: "press",
-    name: "The Press",
-    tagline: "Full cellar operations · commercial scale.",
-    audience: "Boutique winery teams who need operations and protocol management.",
-    monthlyPrice: 44,
-    annualPrice: 44 * ANNUAL_MULTIPLIER,
-    retailMonthlyPrice: 59,
-    highlight: true,
-    badge: "MOST POPULAR",
-    color: "var(--ow-amber)",
-    features: [
-      "Full cellar operations suite",
-      "38 SOPs across 12 categories",
-      "Decision Logic + Tribal Knowledge",
-      "Priority Compliance AI",
-      "Unlimited Divine Trinity reveals",
-      "Vintage log PDF export",
-      "Email support",
-    ],
-    cta: "Enter The Press",
-    ctaHref: "#waitlist",
-    note: null,
-  },
-  {
-    id: "cellar_master",
-    name: "The Vigneron",
-    tagline: "Your whole operation. Your whole team. The cellar's memory, cited.",
-    audience: "Owner-operator boutique vignerons — you grow the grapes and make the wine.",
-    monthlyPrice: 88,
-    annualPrice: 88 * ANNUAL_MULTIPLIER,
-    retailMonthlyPrice: 124,
-    highlight: false,
-    badge: "TEAM",
-    color: "oklch(0.80 0.14 75)",
-    features: [
-      "Everything in The Press",
-      "Unlimited Divine Trinity reveals",
-      "Team seats (roll-out with multi-tenant)",
-      "Annual knowledge base review",
-      "Vigneron badge + number",
-    ],
-    cta: "Claim The Vigneron",
-    ctaHref: "#waitlist",
-    note: null,
-  },
-];
-
-const CREDIT_PACKS = [
-  {
-    id: "pour",
-    name: "Pour",
-    credits: 5,
-    price: 2,
-    perCredit: "$0.40",
-    tagline: "Five reveals — cheaper than a coffee, a week of curiosity.",
-    badge: null,
-  },
-  {
-    id: "glass",
-    name: "Glass",
-    credits: 15,
-    price: 5,
-    perCredit: "$0.33",
-    tagline: "Fifteen reveals — a weekend research pack.",
-    badge: null,
-  },
-  {
-    id: "flight",
-    name: "Flight",
-    credits: 35,
-    price: 10,
-    perCredit: "$0.29",
-    tagline: "Thirty-five reveals — a month+ of daily learning at 42% off.",
-    badge: "MOST POPULAR",
-  },
-  {
-    id: "cellar",
-    name: "Cellar",
-    credits: 80,
-    price: 20,
-    perCredit: "$0.25",
-    tagline: "Eighty reveals. A vintage's worth of curiosity, at the best rate.",
-    badge: "BEST VALUE",
-  },
-];
 
 const FAQS = [
   {
