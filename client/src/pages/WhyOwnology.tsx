@@ -75,7 +75,7 @@ function Hero() {
           The AI knowledge layer your production software was never designed to be.
         </h1>
         <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.125rem", lineHeight: 1.75, color: TEXT_MID, maxWidth: "580px" }}>
-          Your production system records what happened. Ownology tells you what to do about it — drawing on your own SOPs, vintage notes, and the institutional knowledge that lives in your team’s heads. And for everything that was never in any system at all? Photograph it. Paste it. We’ll read it.
+          Your production system records what happened. Ownology tells you what to do about it — drawing on your own SOPs, vintage notes, and the tribal know-how that lives in your team’s heads. And for everything that was never in any system at all? Photograph it. Paste it. We’ll read it.
         </p>
       </div>
     </section>

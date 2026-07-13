@@ -362,7 +362,7 @@ const TIERS = [
   {
     id: "free_run",
     name: "Free Run",
-    tagline: "Understand wine from the inside out.",
+    tagline: "Home-scale winemaking, from the inside out.",
     audience: "Wine lovers, curious drinkers, food & wine enthusiasts.",
     monthlyPrice: 0,
     annualPrice: 0,
@@ -383,7 +383,7 @@ const TIERS = [
   {
     id: "cellar",
     name: "The Cellar Hand",
-    tagline: "Learn the science. Stay compliant.",
+    tagline: "Learn the craft. Stay compliant.",
     audience: "Home winemakers and wine students who want to learn.",
     monthlyPrice: 22,
     annualPrice: 22 * ANNUAL_MULTIPLIER,
@@ -406,7 +406,7 @@ const TIERS = [
   {
     id: "press",
     name: "The Press",
-    tagline: "Full cellar operations + institutional knowledge.",
+    tagline: "Full cellar operations · commercial scale.",
     audience: "Boutique winery teams who need operations and protocol management.",
     monthlyPrice: 44,
     annualPrice: 44 * ANNUAL_MULTIPLIER,
@@ -430,7 +430,7 @@ const TIERS = [
   {
     id: "cellar_master",
     name: "The Vigneron",
-    tagline: "Your whole operation. Your whole team. Your institutional knowledge.",
+    tagline: "Your whole operation. Your whole team. The cellar's memory, cited.",
     audience: "Owner-operator boutique vignerons — you grow the grapes and make the wine.",
     monthlyPrice: 88,
     annualPrice: 88 * ANNUAL_MULTIPLIER,
@@ -1649,7 +1649,22 @@ export default function Pricing() {
       </div>
 
       {/* Tier cards */}
-      <section className="container max-w-7xl mx-auto mb-16 sm:mb-20 px-4 sm:px-6">
+      <section id="tier-cards" className="container max-w-7xl mx-auto mb-16 sm:mb-20 px-4 sm:px-6">
+        {/* Pillar legend — decodes the DO / KNOW / LEARN / GUIDE pill tags
+            on each tier card. Small, single line, above the grid. Removes
+            the "what do these tags mean?" cognitive load flagged in the
+            Feb 2026 UX audit. */}
+        <div
+          className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs"
+          style={{ fontFamily: "'Lato', sans-serif", color: "var(--ow-text-lo)" }}
+          data-testid="pricing-pillar-legend"
+        >
+          <span className="uppercase tracking-widest opacity-60">The four pillars:</span>
+          <span><strong style={{ color: "var(--ow-amber)" }}>DO</strong> — cellar operations</span>
+          <span><strong style={{ color: "var(--ow-amber)" }}>KNOW</strong> — your data & records</span>
+          <span><strong style={{ color: "var(--ow-amber)" }}>LEARN</strong> — AI-tutored answers</span>
+          <span><strong style={{ color: "var(--ow-amber)" }}>GUIDE</strong> — SOPs & compliance</span>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 pb-24 sm:pb-0">
           {TIERS.map(tier => (
             <TierCard
@@ -1669,13 +1684,13 @@ export default function Pricing() {
         <div className="flex items-center gap-4" style={{ borderTop: "1px solid var(--ow-border)" }}>
           <div className="pt-8 flex-1">
             <p className="section-label mb-2" style={{ fontFamily: "'Lato', sans-serif" }}>
-              Credit Packs
+              Credit Packs · Free Run add-on
             </p>
             <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: "1.75rem", color: "var(--ow-text-hi)" }}>
               Top up when you need it.
             </h2>
             <p className="mt-2 max-w-xl" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.9375rem", color: "var(--ow-text-lo)", lineHeight: 1.7 }}>
-              One credit unlocks the Divine Trinity for one question — The Science, The Vineyard, and The Craft — three acts that take your curiosity one level deeper.
+              Not ready for a subscription? Buy credits for individual Divine Trinity reveals. One credit unlocks three acts — The Science, The Vineyard, and The Craft — that take your curiosity one level deeper.
               <br />
               <strong style={{ color: "var(--ow-text-mid)", fontWeight: 500 }}>
                 Every reveal is yours forever — saved to your private Journal, searchable, re-readable. Packs never expire; neither do the answers they unlock.
