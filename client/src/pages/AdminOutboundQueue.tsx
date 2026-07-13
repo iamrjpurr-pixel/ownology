@@ -70,6 +70,7 @@ export default function AdminOutboundQueue() {
   const [copied, setCopied] = useState<Record<string, "sms" | "email" | "done" | undefined>>({});
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [bulkResult, setBulkResult] = useState<{ rewritten: number; skippedExisting: number; failed: number } | null>(null);
+  const [cohortCopied, setCohortCopied] = useState(false);
 
   async function copySms(slug: string, text: string) {
     try { await navigator.clipboard.writeText(text); setCopied((s) => ({ ...s, [slug]: "sms" })); } catch { /* no-op */ }
@@ -81,10 +82,16 @@ export default function AdminOutboundQueue() {
   }
 
   async function runBulkRewrite(tone: "warm" | "brief" | "regional") {
-    if (!confirm(`Rewrite SMS drafts for the outbound queue via Claude (${tone} tone)?\n\nThis will take ~1.5-2s per contact and cost ~$0.005 each.\nExisting hand-crafted drafts are skipped.`)) return;
+    const regionLabel = regionFilter === "all" ? "the whole queue" : `the ${regionFilter.replace(/-/g, " ")} cohort (${filtered.length} contacts)`;
+    if (!confirm(`Rewrite SMS drafts for ${regionLabel} via Claude (${tone} tone)?\n\nThis will take ~1.5-2s per contact and cost ~$0.005 each.\nExisting hand-crafted drafts are skipped.`)) return;
     setBulkResult(null);
     try {
-      const result = await bulkRewrite.mutateAsync({ tone, force: false, limit: 500 });
+      const result = await bulkRewrite.mutateAsync({
+        tone,
+        force: false,
+        limit: 500,
+        region: regionFilter === "all" ? undefined : regionFilter,
+      });
       setBulkResult(result);
       refetch();
     } catch (err) {
@@ -92,11 +99,35 @@ export default function AdminOutboundQueue() {
     }
   }
 
+  async function copyCohortTsv() {
+    const rows = filtered
+      .filter((c) => c.mobileAu && c.mobileAu.trim().length > 0)
+      .map((c) => {
+        const draft = (c as { smsDraftOverride?: string | null }).smsDraftOverride
+          ?? smsDraft({ firstName: c.firstName, winery: c.winery, painPoint: c.painPoint, hookText: c.hookText, slug: c.slug });
+        const name = `${c.firstName}${c.lastName ? ` ${c.lastName}` : ""}`;
+        return `${name}\t${c.mobileAu}\t${draft}`;
+      });
+    if (rows.length === 0) {
+      alert(`No SMS-ready contacts in this cohort (need a mobile number).`);
+      return;
+    }
+    const blob = `Name\tMobile\tSMS draft\n${rows.join("\n")}`;
+    try {
+      await navigator.clipboard.writeText(blob);
+      setCohortCopied(true);
+      setTimeout(() => setCohortCopied(false), 2400);
+    } catch {
+      alert("Clipboard write failed. Try again or use per-row copy buttons.");
+    }
+  }
+
   const queue = data?.queue ?? [];
-  // Client-side region filter — cheap, works off winery name substring
+  // Region filter now uses the DB region column (kebab-case) so cohorts
+  // are precise. Chip values match wineryRegions.ts AuRegion enum.
   const filtered = regionFilter === "all"
     ? queue
-    : queue.filter((c) => (c.winery ?? "").toLowerCase().includes(regionFilter.toLowerCase()));
+    : queue.filter((c) => ((c as { region?: string | null }).region ?? "").toLowerCase() === regionFilter.toLowerCase());
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--ow-bg-base)", color: "var(--ow-text-hi)", fontFamily: "'Lato',sans-serif" }}>
@@ -114,27 +145,32 @@ export default function AdminOutboundQueue() {
 
       <div style={{ padding: "16px 24px 8px", display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
         <span style={{ fontSize: "0.75rem", color: "var(--ow-text-lo)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Filter region:</span>
-        {["all", "mclaren", "barossa", "adelaide hills", "yarra", "margaret river", "tasmania", "hunter"].map((r) => (
-          <button
-            key={r}
-            data-testid={`filter-${r.replace(/\s+/g, "-")}`}
-            onClick={() => setRegionFilter(r)}
-            style={{
-              padding: "3px 10px", borderRadius: 3, border: "1px solid var(--ow-border)",
-              background: regionFilter === r ? "var(--ow-amber)" : "transparent",
-              color: regionFilter === r ? "oklch(0.10 0.008 60)" : "var(--ow-text-mid)",
-              fontSize: "0.72rem", cursor: "pointer", textTransform: "capitalize",
-            }}
-          >
-            {r}
-          </button>
-        ))}
+        {["all", "mclaren-vale", "hunter", "barossa", "yarra-valley", "adelaide-hills", "coonawarra", "orange", "tasmania", "margaret-river", "mornington-peninsula", "clare", "beechworth", "grampians"].map((r) => {
+          const label = r === "all" ? "All" : r.replace(/-/g, " ");
+          const cohortCount = r === "all" ? queue.length : queue.filter((c) => ((c as { region?: string | null }).region ?? "") === r).length;
+          if (r !== "all" && cohortCount === 0) return null;
+          return (
+            <button
+              key={r}
+              data-testid={`filter-${r}`}
+              onClick={() => setRegionFilter(r)}
+              style={{
+                padding: "3px 10px", borderRadius: 3, border: "1px solid var(--ow-border)",
+                background: regionFilter === r ? "var(--ow-amber)" : "transparent",
+                color: regionFilter === r ? "oklch(0.10 0.008 60)" : "var(--ow-text-mid)",
+                fontSize: "0.72rem", cursor: "pointer", textTransform: "capitalize",
+              }}
+            >
+              {label} <span style={{ opacity: 0.6, fontSize: "0.65rem" }}>({cohortCount})</span>
+            </button>
+          );
+        })}
         <span style={{ marginLeft: "auto", fontSize: "0.75rem", color: "var(--ow-text-lo)" }}>
           {filtered.length} of {queue.length} in queue
         </span>
       </div>
 
-      {/* Bulk AI Rewrite strip — pre-warms every unsent draft in the queue */}
+      {/* Bulk AI Rewrite strip — scoped to current region filter */}
       <div
         data-testid="bulk-ai-rewrite-strip"
         style={{
@@ -150,32 +186,34 @@ export default function AdminOutboundQueue() {
         }}
       >
         <span style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "0.95rem", color: "var(--ow-text-hi)" }}>
-          ✨ Bulk AI rewrite
+          ✨ Bulk AI rewrite {regionFilter !== "all" && <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "var(--ow-amber)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", marginLeft: 6 }}>{regionFilter.replace(/-/g, " ")} cohort</span>}
         </span>
         <span style={{ fontSize: "0.78rem", color: "var(--ow-text-mid)", flex: 1, minWidth: 240 }}>
-          Pre-warm every unsent SMS in the queue via Claude. Skips hand-crafted overrides. ~$0.005 per contact.
+          {regionFilter === "all"
+            ? `Pre-warm every unsent SMS in the queue via Claude. Skips hand-crafted overrides. ~$0.005 per contact.`
+            : `Rewrite the ${filtered.length}-contact ${regionFilter.replace(/-/g, " ")} cohort with a shared story arc. Regional tone gives them a common voice.`}
         </span>
         <button
           data-testid="bulk-rewrite-warm"
           onClick={() => runBulkRewrite("warm")}
-          disabled={bulkRewrite.isPending}
-          style={{ padding: "5px 12px", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.75rem", fontWeight: 700, cursor: bulkRewrite.isPending ? "wait" : "pointer" }}
+          disabled={bulkRewrite.isPending || filtered.length === 0}
+          style={{ padding: "5px 12px", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.75rem", fontWeight: 700, cursor: bulkRewrite.isPending ? "wait" : "pointer", opacity: bulkRewrite.isPending || filtered.length === 0 ? 0.6 : 1 }}
         >
           {bulkRewrite.isPending ? "Rewriting…" : "Warm tone"}
         </button>
         <button
           data-testid="bulk-rewrite-brief"
           onClick={() => runBulkRewrite("brief")}
-          disabled={bulkRewrite.isPending}
-          style={{ padding: "5px 12px", background: "transparent", color: "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.75rem", cursor: bulkRewrite.isPending ? "wait" : "pointer" }}
+          disabled={bulkRewrite.isPending || filtered.length === 0}
+          style={{ padding: "5px 12px", background: "transparent", color: "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.75rem", cursor: bulkRewrite.isPending ? "wait" : "pointer", opacity: filtered.length === 0 ? 0.5 : 1 }}
         >
           Brief
         </button>
         <button
           data-testid="bulk-rewrite-regional"
           onClick={() => runBulkRewrite("regional")}
-          disabled={bulkRewrite.isPending}
-          style={{ padding: "5px 12px", background: "transparent", color: "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.75rem", cursor: bulkRewrite.isPending ? "wait" : "pointer" }}
+          disabled={bulkRewrite.isPending || filtered.length === 0}
+          style={{ padding: "5px 12px", background: "transparent", color: "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.75rem", cursor: bulkRewrite.isPending ? "wait" : "pointer", opacity: filtered.length === 0 ? 0.5 : 1 }}
         >
           Regional
         </button>
@@ -184,6 +222,47 @@ export default function AdminOutboundQueue() {
             ✓ {bulkResult.rewritten} rewritten · {bulkResult.skippedExisting} skipped · {bulkResult.failed} failed
           </span>
         )}
+      </div>
+
+      {/* Cohort Copy strip — TSV clipboard for the current filter */}
+      <div
+        data-testid="cohort-copy-strip"
+        style={{
+          margin: "0 24px 12px",
+          padding: "10px 14px",
+          background: "color-mix(in oklch, oklch(0.65 0.14 200) 4%, transparent)",
+          border: "1px solid var(--ow-border)",
+          borderRadius: 4,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          flexWrap: "wrap",
+        }}
+      >
+        <span style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "0.95rem", color: "var(--ow-text-hi)" }}>
+          📋 Copy cohort to Messages
+        </span>
+        <span style={{ fontSize: "0.78rem", color: "var(--ow-text-mid)", flex: 1, minWidth: 240 }}>
+          Grab a TSV blob of Name / Mobile / SMS for all {filtered.filter((c) => c.mobileAu).length} SMS-ready contacts in this filter. Paste into Messages (Mac/iOS) or a spreadsheet.
+        </span>
+        <button
+          data-testid="cohort-copy-btn"
+          onClick={copyCohortTsv}
+          disabled={filtered.length === 0}
+          style={{
+            padding: "5px 14px",
+            background: cohortCopied ? "#16a34a" : "oklch(0.65 0.14 200)",
+            color: "oklch(0.10 0.008 60)",
+            border: "none",
+            borderRadius: 3,
+            fontSize: "0.78rem",
+            fontWeight: 700,
+            cursor: filtered.length === 0 ? "not-allowed" : "pointer",
+            opacity: filtered.length === 0 ? 0.5 : 1,
+          }}
+        >
+          {cohortCopied ? "✓ Copied — paste into Messages" : `Copy ${filtered.filter((c) => c.mobileAu).length} SMSes as TSV`}
+        </button>
       </div>
 
       {isLoading && <p style={{ padding: 24 }}>Loading queue…</p>}

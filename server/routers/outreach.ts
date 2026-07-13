@@ -1021,15 +1021,22 @@ Return ONLY valid JSON. No markdown. If no contact can be identified, return {"f
       tone: z.enum(["warm", "brief", "regional"]).default("warm"),
       force: z.boolean().default(false),
       limit: z.number().int().min(1).max(500).default(500),
+      // Optional region filter — kebab-case value from AuRegion enum
+      // (e.g. "mclaren-vale", "barossa", "hunter"). When set, only
+      // contacts with that exact region are rewritten. Enables cohort-
+      // scoped batches with a shared story arc.
+      region: z.string().max(40).optional(),
     }))
     .mutation(async ({ input }) => {
       const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
       const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
       if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
 
-      // Fetch the outbound-queue set: cold/lukewarm + no smsSentAt.
-      // Same filter as `outboundQueue` above so this only warms drafts
-      // for contacts the operator is actually about to send to.
+      // Same base filter as `outboundQueue`, optionally narrowed by region.
+      const whereClause = input.region
+        ? sql`(status IN ('cold','lukewarm')) AND sms_sent_at IS NULL AND region = ${input.region}`
+        : sql`(status IN ('cold','lukewarm')) AND sms_sent_at IS NULL`;
+
       const contacts = await db
         .select({
           slug: schema.outreachContacts.slug,
@@ -1046,7 +1053,7 @@ Return ONLY valid JSON. No markdown. If no contact can be identified, return {"f
           smsDraftOverride: schema.outreachContacts.smsDraftOverride,
         })
         .from(schema.outreachContacts)
-        .where(sql`(status IN ('cold','lukewarm')) AND sms_sent_at IS NULL`)
+        .where(whereClause)
         .limit(input.limit);
 
       const previewBase = process.env.PREVIEW_BASE_URL || process.env.PUBLIC_BASE_URL || "https://ownology.ai";

@@ -4,6 +4,37 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Region-aware cohort bulk — AI rewrite + TSV copy (Feb 2026)
+
+Rich asked to scope bulk rewrite to a single region cohort (McLaren Vale / Hunter / Barossa) so a whole batch shares a story arc, AND clarified how "bulk send" actually works today — the existing `Copy N SMS drafts` button dumps a TSV to clipboard for Messages/iOS paste. No SMS gateway. Both flows now region-scoped.
+
+**Backend** (`server/routers/outreach.ts`):
+- Added optional `region: string` input to `bulkRewriteSmsAI` (Zod max 40 chars).
+- SQL where-clause narrows to `region = <kebab>` when set: `(status IN ('cold','lukewarm')) AND sms_sent_at IS NULL AND region = ?`.
+- Same Claude prompt + skip-existing behaviour; the only change is the query filter.
+- Verified: `region: "hunter", tone: "regional", limit: 2` returned `{ rewritten: 1, skippedExisting: 1, failed: 0 }`. Allanna De Iuliis rewrite: *"gday allanna — hunter's had a wild run with the wet. built a cellar-intel tool that helps small makers track stock and plan releases without spreadsheet hell..."* — regional context captured cleanly.
+
+**Frontend — `/admin/contacts/outbound-queue`** (`AdminOutboundQueue.tsx`):
+- Region filter chips REWORKED to use the real DB `region` column (kebab-case) instead of winery-name substring. Chip values now match `AuRegion` enum (`mclaren-vale`, `hunter`, `barossa`, `yarra-valley`, `adelaide-hills`, `coonawarra`, `orange`, `tasmania`, `margaret-river`, `mornington-peninsula`, `clare`, `beechworth`, `grampians`).
+- Each chip shows a count badge (e.g. `Hunter (14) · Barossa (16)`). Empty-cohort chips auto-hide.
+- **Bulk AI rewrite strip is now context-aware**: when a region cohort is selected, the amber "HUNTER COHORT" (etc.) badge appears next to the title, and the copy switches to: *"Rewrite the 14-contact hunter cohort with a shared story arc. Regional tone gives them a common voice."* The `region` param is passed through to the backend automatically.
+- Confirm dialog also names the scope: *"Rewrite SMS drafts for the hunter cohort (14 contacts) via Claude (regional tone)?"* — no surprise-billing.
+- **NEW: "Copy cohort to Messages" strip** (teal accent) below the bulk-rewrite strip. Button label is dynamic: `Copy 8 SMSes as TSV` for the current region filter (only counts SMS-ready contacts with mobile numbers). TSV format is `Name\tMobile\tSMS draft` — paste straight into Messages on Mac/iOS to spawn a thread per row. Uses each contact's `smsDraftOverride` (the AI-rewritten version if present) or falls back to the auto-generated template.
+- Buttons disable + dim when cohort is empty.
+
+**End-to-end flow for a region-scoped BD session**:
+1. Open `/admin/contacts/outbound-queue`
+2. Tap `Hunter (14)` filter chip
+3. Tap "Warm tone" (or Regional) on the Bulk AI rewrite strip → confirm → 14 drafts spun in ~30s
+4. Tap `Copy 8 SMSes as TSV` → paste into Messages → one thread per Hunter maker
+5. Tap `Mark all N as sent` back on `/admin/contacts` (or per-row on the queue) once sent
+
+**Verified live via screenshot**: Hunter chip shows count 14, region badge visible in bulk-rewrite header, cohort copy button reads `Copy 8 SMSes as TSV`, all disable states correct when filter reduces to zero.
+
+[shipped: region-cohort-bulk-rewrite, cohort-tsv-copy, region-chip-counts]
+
+
+
 ### Theme picker auto-close + Esc + outside-click (Feb 2026)
 
 Rich reported this again — the floating bottom-left theme picker was NOT closing after a theme was selected. Root cause: `onClick={() => set(t.id)}` in `App.tsx::ThemePicker` was persisting `set(...)` without ever calling `setOpen(false)`. Every selection required a manual click on the ×.

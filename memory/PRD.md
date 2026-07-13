@@ -4,6 +4,13 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Feb 2026 session — Region-aware cohort bulk + TSV copy — SHIPPED (this session):**
+- `bulkRewriteSmsAI` now accepts optional `region` param — scoping via `WHERE region = <kebab>`.
+- Region filter chips on Outbound Queue now bound to the real DB `region` column with per-cohort counts (Hunter 14 · Barossa 16 · Yarra 12 etc). Empty cohorts auto-hide.
+- Bulk AI rewrite strip is context-aware — shows "HUNTER COHORT" badge + tailored copy when cohort selected.
+- NEW teal "📋 Copy cohort to Messages" strip → TSV clipboard button labelled dynamically (`Copy 8 SMSes as TSV`). Uses per-contact `smsDraftOverride` (AI version) with template fallback.
+- Verified: Hunter cohort rewrite generated Allanna De Iuliis regional SMS acknowledging Hunter's wet vintage — "wild run with the wet" — no parrot quoting.
+
 **Feb 2026 session — Theme picker auto-close + Bulk AI Rewrite + Region backfill — SHIPPED (this session):**
 - Theme picker (bottom-left floating pill) now auto-closes on selection + Esc + outside-click. Fix in `App.tsx::ThemePicker`. Re-shipped after Rich flagged the miss.
 - New `outreach.bulkRewriteSmsAI` procedure — Claude-rewrites all cold/lukewarm/unsent contacts in the outbound queue in one batch. Skips hand-crafted overrides. 3-tone selector (Warm/Brief/Regional). Cost ~$1.10 for the full 220-contact queue. UI strip added on `/admin/contacts/outbound-queue`.
