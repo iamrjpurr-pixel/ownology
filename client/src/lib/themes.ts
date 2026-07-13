@@ -96,9 +96,25 @@ export function getTheme(id: ThemeId | string | null | undefined): Theme {
 
 /** Resolve "auto" → the concrete dark or light theme right now. Used by
  *  the toggle button for display purposes (so users see Night/Daylight
- *  reflected rather than a generic Auto icon at all times). */
+ *  reflected rather than a generic Auto icon at all times).
+ *
+ *  Device-aware policy (Feb 2026, Rich):
+ *  - Desktop/mouse (fine pointer) → parchment (light). Rich's PC has
+ *    system=dark but he prefers the light theme when working at a desk.
+ *  - Touch device (coarse pointer, phones/tablets) → respect system
+ *    dark/light preference so late-night SMS-follow-ups don't blast
+ *    the operator's eyes.
+ *  A user's explicit pick (via the picker) always overrides — this
+ *  function only fires when the picker is set to "auto". */
 export function resolveAutoTheme(): Theme {
-  if (typeof window === "undefined") return getTheme("soft-cellar");
+  if (typeof window === "undefined") return getTheme("parchment");
+  // "coarse" pointer = touch primary → phone/tablet.
+  const isTouch = window.matchMedia("(pointer: coarse)").matches;
+  if (!isTouch) {
+    // Desktop → light default regardless of OS dark-mode setting.
+    return getTheme("parchment");
+  }
+  // Mobile → honour system preference.
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   return getTheme(prefersDark ? "soft-cellar" : "parchment");
 }

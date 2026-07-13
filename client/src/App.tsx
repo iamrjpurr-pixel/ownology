@@ -527,19 +527,35 @@ function AutoThemeByTime() {
     }
 
     async function apply() {
-      const hour = new Date().getHours();
-      const timeThemeId = (hour >= 20 || hour < 8) ? "soft-cellar" : "parchment";
-      const themeId = override || timeThemeId;
+      // Device-aware default (Rich, Feb 2026 — desktop kept flipping to dark
+      // after 8pm even though he's at a desk not a phone at that hour).
+      //   - Desktop / fine pointer → parchment (light). Time-of-day is
+      //     irrelevant on a big screen at a desk. Rich picked "light default"
+      //     as his working preference explicitly.
+      //   - Touch device (coarse pointer, phones/tablets) → keep the
+      //     time-of-day auto-flip (bright day, softer at night).
+      const isTouch = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+      let timeThemeId: "soft-cellar" | "parchment";
+      if (isTouch) {
+        const hour = new Date().getHours();
+        timeThemeId = (hour >= 20 || hour < 8) ? "soft-cellar" : "parchment";
+      } else {
+        timeThemeId = "parchment";
+      }
+      const themeId = (override as ThemeId) || timeThemeId;
       try {
         window.localStorage.setItem("ownology-theme", themeId);
         window.dispatchEvent(new CustomEvent("ownology:theme", { detail: themeId }));
-        const root = document.documentElement;
-        if (themeId === "soft-cellar") root.classList.add("dark");
-        else root.classList.remove("dark");
+        // Use the canonical writer so both the `dark` class AND the
+        // theme-specific class (theme-parchment / theme-soft-cellar) land.
+        // Previously we only toggled `dark` which left parchment's CSS
+        // variables unset (:root falls back to dark defaults) → the page
+        // stayed dark even when we thought we'd switched to light.
+        applyThemeToDom(themeId);
 
         const { lat, lon } = await getPosition();
         const weather = await fetchWeather(lat, lon);
-        root.dataset.weather = weather;
+        document.documentElement.dataset.weather = weather;
       } catch { /* ignore */ }
     }
     apply();
