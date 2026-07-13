@@ -69,6 +69,86 @@ function smsDraft(c: { firstName: string; winery?: string | null; event?: string
   return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. I've since built a cellar AI grounded in your own vintage logs — figured you might find it useful. 90 sec look: ${url} — Jamie`;
 }
 
+/**
+ * emailDraft — companion to smsDraft. Same hookText, longer format.
+ * Delivered via mailto: so Rich's existing mail client handles auth /
+ * signature / send. Subject line grounds in the hook when possible so
+ * the inbox preview is still specific-not-generic. When no hookText is
+ * available, falls back to a neutral subject and a plainer body — same
+ * tier discipline as smsDraft(). Body has explicit line breaks so it
+ * renders sanely once the mail client wraps it.
+ */
+function emailDraft(c: {
+  firstName: string;
+  winery?: string | null;
+  event?: string | null;
+  painPoint?: string | null;
+  hookText?: string | null;
+  slug: string;
+}): { subject: string; body: string } {
+  const url = `${PREVIEW_BASE}/hi/${c.slug}`;
+  const wineryPhrase = c.winery ? ` at ${c.winery}` : "";
+  if (c.hookText) {
+    const subject = `${c.firstName} — ${c.hookText.slice(0, 60)}${c.hookText.length > 60 ? "…" : ""}`;
+    const body =
+`G'day ${c.firstName},
+
+${c.hookText.charAt(0).toUpperCase() + c.hookText.slice(1)} — reading that hit home.
+
+I've been quietly building Ownology: a cellar AI grounded in a winery's own vintage logs, not a textbook. Ask it "why did tank 9 stick this year" and it walks you through the actual data before it reaches for theory. Owen the apprentice sits inside it — retrieves, cites, defers to the winemaker.
+
+There's a 90-second landing page I've built specifically for you${wineryPhrase}, with the pitch tuned to your scale and the recent post I saw:
+
+${url}
+
+If it's not a fit, absolutely no pressure — happy to be told to bugger off. But if it is, I'd rather hear it directly than through a form.
+
+Cheers,
+Jamie
+Ownology (Ministry of Clouds tier: The Vigneron)`;
+    return { subject, body };
+  }
+  if (c.painPoint) {
+    const subject = `${c.firstName}${wineryPhrase} — a small tool for ${c.painPoint.slice(0, 50)}${c.painPoint.length > 50 ? "…" : ""}`;
+    const body =
+`G'day ${c.firstName},
+
+You mentioned ${c.painPoint} — that's the exact kind of question I've been building a cellar AI to answer, grounded in a winery's own vintage logs rather than textbooks.
+
+Here's a 90-second page tuned to your operation${wineryPhrase}:
+
+${url}
+
+No pressure either way — thought it was worth a look given what we talked about.
+
+Cheers,
+Jamie
+Ownology`;
+    return { subject, body };
+  }
+  const subject = `${c.firstName}${wineryPhrase} — a cellar apprentice grounded in your own logs`;
+  const body =
+`G'day ${c.firstName},
+
+I've been building Ownology — a small AI cellar apprentice grounded in a winery's own vintage logs rather than a textbook. Figured you might find it useful.
+
+90-second look, tuned to your operation${wineryPhrase}:
+
+${url}
+
+Cheers,
+Jamie
+Ownology`;
+  return { subject, body };
+}
+
+/** Build a mailto: link that opens the operator's default mail client
+ *  with subject + body pre-filled. Encoded per RFC 6068. */
+function buildMailto(email: string, subject: string, body: string): string {
+  const enc = encodeURIComponent;
+  return `mailto:${email}?subject=${enc(subject)}&body=${enc(body)}`;
+}
+
 type ContactStatus = "warm" | "lukewarm" | "cold" | "sales" | "skip";
 
 type SortMode =
@@ -218,6 +298,23 @@ export default function AdminContacts() {
   const [urlQuickAdd, setUrlQuickAdd] = useState("");
   const [urlErr, setUrlErr] = useState<string | null>(null);
   const [urlLastFetched, setUrlLastFetched] = useState<string | null>(null);
+  // Rich, Jul 2026: multi-person cross-match. When a scraped page lists
+  // several people from the same winery (co-founders, husband/wife,
+  // winemaker + GM), the backend returns them here alongside the primary
+  // `draft`. Each entry may carry a `matchedSlug` if we already have a
+  // contact card for that person — one click merges the new email/mobile
+  // into their existing card instead of silently discarding it.
+  const [otherPeople, setOtherPeople] = useState<Array<{
+    firstName: string;
+    lastName: string | null;
+    email: string | null;
+    mobileAu: string | null;
+    role: string | null;
+    matchedSlug: string | null;
+  }>>([]);
+  const [otherPeopleSourceUrl, setOtherPeopleSourceUrl] = useState<string | null>(null);
+  const [mergeStatus, setMergeStatus] = useState<Record<string, "pending" | "done" | "error">>({});
+  const mergeFieldsMutation = trpc.outreach.mergeFields.useMutation();
   const [deepSearchName, setDeepSearchName] = useState("");
   const [deepSearchErr, setDeepSearchErr] = useState<string | null>(null);
   const [deepSearchCitations, setDeepSearchCitations] = useState<string[]>([]);
@@ -559,8 +656,69 @@ export default function AdminContacts() {
       });
       setUrlLastFetched(url);
       setUrlQuickAdd("");
+      // Surface additional people found on the same page — the backend
+      // already cross-matched them against existing contacts by winery
+      // + name, so `matchedSlug` will be set for people already in the
+      // CRM. The panel below renders one-click "Update <name>'s card"
+      // or "Add new contact" per person.
+      const others = (result as { otherPeople?: unknown }).otherPeople;
+      setOtherPeople(Array.isArray(others) ? (others as typeof otherPeople) : []);
+      setOtherPeopleSourceUrl(url);
+      setMergeStatus({});
     } catch (e2) {
       setUrlErr(e2 instanceof Error ? e2.message : String(e2));
+    }
+  }
+
+  async function mergePersonIntoExisting(idx: number) {
+    const p = otherPeople[idx];
+    if (!p?.matchedSlug) return;
+    const key = `${idx}`;
+    setMergeStatus((s) => ({ ...s, [key]: "pending" }));
+    try {
+      await mergeFieldsMutation.mutateAsync({
+        slug: p.matchedSlug,
+        email: p.email,
+        mobileAu: p.mobileAu,
+        role: p.role,
+        sourceUrl: otherPeopleSourceUrl,
+      });
+      setMergeStatus((s) => ({ ...s, [key]: "done" }));
+      await utils.outreach.list.invalidate();
+    } catch {
+      setMergeStatus((s) => ({ ...s, [key]: "error" }));
+    }
+  }
+
+  function addPersonAsNewContact(idx: number) {
+    const p = otherPeople[idx];
+    if (!p) return;
+    // Populate the Add form with this person's data. The operator can
+    // then tweak and hit Save. Winery + event come from what's already
+    // in the form (from the primary parse), so the second card lands
+    // in the same event/winery bucket.
+    setForm({
+      firstName: p.firstName,
+      lastName: p.lastName ?? "",
+      mobileAu: p.mobileAu ?? "",
+      winery: form.winery,
+      event: form.event,
+      painPoint: "",
+      calendlyOverride: form.calendlyOverride,
+      notes: [
+        p.email ? `Email: ${p.email}` : null,
+        p.role ? `Role: ${p.role}` : null,
+        otherPeopleSourceUrl ? `Source: ${otherPeopleSourceUrl}` : null,
+      ].filter(Boolean).join(" · "),
+      persona: form.persona,
+      hookTier: null,
+      hookText: null,
+      hookSourceUrl: null,
+    });
+    // Scroll the operator to the form and mark this person as consumed.
+    setMergeStatus((s) => ({ ...s, [`${idx}`]: "done" }));
+    if (typeof window !== "undefined") {
+      document.querySelector<HTMLElement>('[data-testid="form-firstName"]')?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }
 
@@ -939,6 +1097,104 @@ export default function AdminContacts() {
             ✓ Prefilled the form below from <code style={{ fontSize: "0.75rem" }}>{urlLastFetched.slice(0, 80)}</code>{urlLastFetched.length > 80 ? "…" : ""} — review, edit if needed, then Save.
           </p>
         )}
+        {/* Multi-person cascade. Only shown when the scrape surfaced
+            people OTHER than the primary — e.g. Julian on a page whose
+            primary was Bernice. Each row is one of:
+              (a) matched to an existing contact → "Update <name>'s card"
+              (b) unmatched → "Add as new contact" (loads into Add form) */}
+        {otherPeople.length > 0 && (
+          <div
+            data-testid="url-quickadd-other-people"
+            style={{
+              marginTop: 12,
+              padding: "12px 14px",
+              borderRadius: 6,
+              background: "color-mix(in oklch, var(--ow-amber) 6%, transparent)",
+              border: "1px solid color-mix(in oklch, var(--ow-amber) 25%, var(--ow-border))",
+            }}
+          >
+            <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "var(--ow-amber)", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>
+              Also on this page ({otherPeople.length})
+            </p>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+              {otherPeople.map((p, idx) => {
+                const status = mergeStatus[`${idx}`];
+                const fullName = [p.firstName, p.lastName].filter(Boolean).join(" ");
+                const detailBits = [p.role, p.email, p.mobileAu].filter(Boolean);
+                return (
+                  <li
+                    key={`${p.firstName}-${idx}`}
+                    data-testid={`other-person-${idx}`}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      flexWrap: "wrap",
+                      padding: "6px 8px",
+                      background: "var(--ow-bg-card)",
+                      borderRadius: 4,
+                      border: "1px solid var(--ow-border)",
+                    }}
+                  >
+                    <span style={{ fontFamily: "'Fraunces',serif", fontSize: "0.9rem", color: "var(--ow-text-hi)", fontWeight: 600 }}>
+                      {fullName}
+                    </span>
+                    {detailBits.length > 0 && (
+                      <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-mid)" }}>
+                        {detailBits.join(" · ")}
+                      </span>
+                    )}
+                    <span style={{ flex: 1 }} />
+                    {status === "done" ? (
+                      <span data-testid={`other-person-done-${idx}`} style={{ color: "#16a34a", fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", fontWeight: 600 }}>✓ done</span>
+                    ) : status === "error" ? (
+                      <span style={{ color: "#b91c1c", fontFamily: "'Lato',sans-serif", fontSize: "0.78rem" }}>merge failed</span>
+                    ) : p.matchedSlug ? (
+                      <button
+                        type="button"
+                        data-testid={`other-person-merge-${idx}`}
+                        onClick={() => mergePersonIntoExisting(idx)}
+                        disabled={status === "pending"}
+                        style={{
+                          padding: "4px 12px",
+                          borderRadius: 3,
+                          background: "var(--ow-amber)",
+                          color: "oklch(0.10 0.008 60)",
+                          border: "none",
+                          fontFamily: "'Lato',sans-serif",
+                          fontSize: "0.78rem",
+                          fontWeight: 700,
+                          cursor: status === "pending" ? "wait" : "pointer",
+                          opacity: status === "pending" ? 0.6 : 1,
+                        }}
+                      >
+                        {status === "pending" ? "Merging…" : `Update ${p.firstName}'s card`}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        data-testid={`other-person-add-${idx}`}
+                        onClick={() => addPersonAsNewContact(idx)}
+                        style={{
+                          padding: "4px 12px",
+                          borderRadius: 3,
+                          background: "transparent",
+                          color: "var(--ow-text-hi)",
+                          border: "1px solid var(--ow-border)",
+                          fontFamily: "'Lato',sans-serif",
+                          fontSize: "0.78rem",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Add as new contact
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
       </form>
 
       {/* Add form */}
@@ -1193,7 +1449,7 @@ export default function AdminContacts() {
               }}
             />
             <p style={{ margin: "6px 0 0", fontSize: "0.7rem", color: "var(--ow-text-lo)", fontStyle: "italic" }}>
-              Grounds the SMS in something specific they posted. Edit if it's off — or clear it to fall back to a generic opener.
+              Grounds the SMS in something specific they posted. Edit if it&apos;s off — or clear it to fall back to a generic opener.
             </p>
           </div>
         )}
@@ -1909,7 +2165,7 @@ export default function AdminContacts() {
                           textDecoration: "underline",
                         }}
                       >
-                        verify source ↗
+                        Preview post ↗
                       </a>
                     )}
                   </div>
@@ -1977,6 +2233,36 @@ export default function AdminContacts() {
                   >
                     {copied === "sms" ? "✓ SMS copied" : "Copy SMS draft"}
                   </button>
+                  {/* Draft email button — mirrors the SMS action but opens
+                      the operator's default mail client via mailto: with
+                      subject + body pre-filled from the same hookText.
+                      Only rendered when we have an email on file (parsed
+                      out of notes by extractChannels). Deliberately does
+                      NOT auto-send (Rich reviews and hits Send inside
+                      Gmail/Apple Mail/Outlook — signature, tracking,
+                      threading all stay client-side). */}
+                  {(() => {
+                    const ch = extractChannels(c.notes);
+                    if (!ch.email) return null;
+                    const { subject, body } = emailDraft({
+                      firstName: c.firstName,
+                      winery: c.winery,
+                      event: c.event,
+                      painPoint: c.painPoint,
+                      hookText: (c as { hookText?: string | null }).hookText ?? null,
+                      slug: c.slug,
+                    });
+                    return (
+                      <a
+                        data-testid={`draft-email-${c.slug}`}
+                        href={buildMailto(ch.email, subject, body)}
+                        style={{ ...btn, textDecoration: "none" }}
+                        title={`Opens your mail client with a draft to ${ch.email}`}
+                      >
+                        Draft email
+                      </a>
+                    );
+                  })()}
                   <a href={url} target="_blank" rel="noopener noreferrer" style={{ ...btn, textDecoration: "none" }}>
                     Preview /hi/{c.slug}
                   </a>

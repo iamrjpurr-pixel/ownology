@@ -4,6 +4,29 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Contact-add — multi-person cascade, Draft email, Preview post link (Jul 2026)
+
+Three connected upgrades to the /admin/contacts flow, all triggered by Rich pasting the Ministry of Clouds URL:
+
+1. **Multi-person static extraction** — Rich pointed out that Julian@ministryofclouds.com.au was on the same page as Bernice, but the old extractor picked ONE person (winemaker/founder) and dropped the rest. `parseFromUrl` now returns an `otherPeople[]` array (up to 4 extras), each with `firstName / lastName / email / mobileAu / role`. Backend cross-matches every extra against `outreach_contacts` by (winery LOWER equality + firstName / lastName / first-3-chars similarity) and sets `matchedSlug` when an existing card is found.
+
+2. **`mergeFields` mutation** — new ownerProcedure that patches an existing contact with additional channels (email, mobile, personal IG, role, sourceUrl). Discipline: never overwrites hand-typed fields (`mobileAu` only fills when the current cell is empty); channel data (email, IG-personal, role, source URL) is APPENDED to `notes` using the recognised `Email:` / `Role:` / `Source:` labels that `extractChannels()` already parses — so the existing UI chips light up automatically.
+
+3. **Frontend "Also found on this page" panel** — appears under the URL quick-add form whenever `otherPeople.length > 0`. Each row shows name + role + email + mobile, plus a one-click button:
+   - "Update <name>'s card" (amber) when `matchedSlug` is set — fires `mergeFields` immediately.
+   - "Add as new contact" when unmatched — pre-populates the Add form with the person's data and scrolls to it.
+
+4. **Draft email button** (companion to Copy SMS) — new `emailDraft()` helper mirrors `smsDraft()` with a longer body suited to email. `buildMailto()` opens the operator's default mail client via `mailto:` with subject + body pre-filled. Same 3-tier discipline (hookText → painPoint → honest fallback). Only rendered when we have an email on the contact (parsed from notes by `extractChannels()`). Deliberately does NOT auto-send — Rich keeps signature/tracking/threading in Gmail or Apple Mail.
+
+5. **"Preview post ↗"** — relabelled the `hookSourceUrl` link on the contact card from the diagnostic "verify source" to the action-y "Preview post". Already had `target="_blank"` — opens the cited IG post in a new tab so Rich can double-check the post is still up before sending.
+
+Verified end-to-end on Rich's Ministry of Clouds URL:
+- Primary contact: Bernice Ong / bernice@ministryofclouds.com.au / 0417 087 023 / hook = "saw you wrap up vintage saying 2025 was a grind and the toughest year yet in 13 years"
+- otherPeople[0]: Julian Forwood / Co-founder / julian@ministryofclouds.com.au / +61417864615 / matched to his existing card. Merge fires successfully — email + role + source URL appended to notes, existing mobile preserved.
+
+[shipped: contact-add-multi-person-cascade]
+
+
 ### Contact-add SMS auto-draft · IG mining wired into parseFromUrl (Jul 2026)
 
 Rich smoke-tested the /admin/contacts URL-add flow against the Ministry of Clouds winery profile at `https://www.ministryofclouds.com.au/bernice-ong-and-julian-forwood-are-the-duo-behind-ministry-of-clouds/` — called the URL "gold" but the auto-drafted SMS was unimpressive because parseFromUrl was falling back to the generic Tier-3 template ("we crossed paths the other day…").

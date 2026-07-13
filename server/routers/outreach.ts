@@ -1032,7 +1032,23 @@ Return ONLY valid JSON. No markdown fences. If the OCR text has no recognisable 
 
 Prefer JSON-LD structured data when present (that's the source of truth). Fall back to regex-matched tel:/mailto: links, then to free-form phone/email in the page text. Use pageTitle/siteName for the winery/business name. Use pageDescription and mainText to infer the person's role or the winery's specialty (which becomes the painPoint hint).
 
-Return a single JSON object with these fields:
+═══════════════════════════════════════════════════════════════
+MULTI-PERSON EXTRACTION — CRITICAL:
+═══════════════════════════════════════════════════════════════
+Many winery pages list TWO OR THREE people (co-founders, husband/wife, winemaker + GM, etc.) with SEPARATE emails or phones. The old rule "pick the winemaker/founder" caused us to drop Julian@ministryofclouds when Bernice was the primary — losing structured data we already had. That's now a bug, not a feature.
+
+Return the PRIMARY person as the top-level fields (firstName / lastName / mobileAu / email / etc.) — pick the winemaker/founder over marketing/admin as before.
+
+Then, if the page clearly lists ADDITIONAL people from the same business who have their OWN email or phone attributed to THEM specifically, return them in the "otherPeople" array (max 4 extras). Only include a person if:
+  - They have a specific email OR phone attributed to them (name-adjacent in the text, or in a "Contact team" list, or in JSON-LD Person entries with the same organization).
+  - They are a founder / winemaker / GM / owner / co-founder — NOT admin/marketing/PR/media/comms/events staff.
+  - They are clearly linked to this business (same winery, same page). Don't include generic contacts (info@, hello@, cellar-door@) as "people".
+
+For "otherPeople[i]" each entry has: firstName, lastName, email, mobileAu, role (short, e.g. "Co-founder & winemaker"). All except firstName are nullable. If no additional people qualify, return "otherPeople": [].
+
+═══════════════════════════════════════════════════════════════
+FIELDS:
+═══════════════════════════════════════════════════════════════
 - firstName: string — the primary contact person, if identifiable. If the page is a company (no named person), use the winery/business name here (we'll flip it in the UI).
 - lastName: string | null
 - mobileAu: string | null — first Australian mobile you find, normalised to "04XX XXX XXX". If only a landline is available, use that raw.
@@ -1041,16 +1057,16 @@ Return a single JSON object with these fields:
 - website: string | null — the URL passed in (echo it back so it lands in notes)
 - instagram: string | null — Instagram handle WITHOUT the @ (just the username)
 - event: string | null — if the URL is a wine-show/exhibitor page, name the event
-- painPoint: string | null — a one-sentence summary of what the business focuses on that a wine-tech tool could help with (e.g. "Boutique Hunter Semillon producer, no digital cellar records", "Emerging cool-climate Chardonnay estate; 3-person team")
+- painPoint: string | null — a one-sentence summary of what the business focuses on that a wine-tech tool could help with
 - notes: string | null — anything else worth remembering (address, hours, size of operation, distinctive detail). Include the source URL as a suffix.
-- status: "warm" | "lukewarm" | "cold" — default to "cold" (this is a prospecting-from-URL flow, not a warm-intro)
-- confidence: "high" | "medium" | "low" — high if you found a named person + phone/email; medium if you found the business + one contact channel; low if you only got the business name
+- status: "warm" | "lukewarm" | "cold" — default to "cold"
+- confidence: "high" | "medium" | "low"
+- otherPeople: array (see above)
 
 Speech-recognition normalisations do NOT apply here — this is scraped HTML. But:
 - Strip any trailing punctuation from phone numbers ("0400 123 456." → "0400 123 456")
 - Instagram handles: strip @ sign if present, remove trailing "/"
-- If multiple people are listed, pick the winemaker/founder/GM over marketing/admin
-- Return ONLY valid JSON. No markdown fences. If no useful data can be extracted, return {"firstName": null, "confidence": "low"}.`;
+- Return ONLY valid JSON. No markdown fences. If no useful data can be extracted, return {"firstName": null, "confidence": "low", "otherPeople": []}.`;
 
       const chatResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
         method: "POST",
@@ -1082,7 +1098,80 @@ Speech-recognition normalisations do NOT apply here — this is scraped HTML. Bu
       } catch {
         /* draft stays null */
       }
-      if (!draft) return { draft: null, signals };
+      if (!draft) return { draft: null, signals, otherPeople: [] };
+
+      // ── Multi-person cross-match ─────────────────────────────────────
+      // Rich, Jul 2026: winery About pages routinely list two co-founders
+      // (Bernice + Julian, Sarah + Sam, husband/wife duos). The old
+      // extractor picked ONE and dropped the other's email — a hard loss
+      // when the second person often already exists in the CRM.
+      //
+      // Now we surface the extras as `otherPeople`, cross-matched against
+      // outreach_contacts by (winery match + firstName ILIKE) so the UI
+      // can offer a one-click "→ Update Julian's card" merge instead of
+      // silently discarding structured data we already had.
+      type ExtraPerson = {
+        firstName: string;
+        lastName: string | null;
+        email: string | null;
+        mobileAu: string | null;
+        role: string | null;
+        matchedSlug: string | null; // set when an existing contact matches
+      };
+      const rawOthers = Array.isArray((draft as { otherPeople?: unknown }).otherPeople)
+        ? ((draft as { otherPeople: unknown[] }).otherPeople as Array<Record<string, unknown>>)
+        : [];
+      const primaryFirst = typeof draft.firstName === "string" ? draft.firstName.toLowerCase().trim() : "";
+      const wineryName = typeof draft.winery === "string" ? draft.winery.trim() : null;
+
+      // Fetch candidate existing contacts by winery match (case-insensitive
+      // ILIKE approximation via LOWER()) so we only do ONE DB query.
+      let existingByWinery: Array<{ slug: string; firstName: string; lastName: string | null }> = [];
+      if (wineryName) {
+        try {
+          const rows = await db
+            .select({
+              slug: schema.outreachContacts.slug,
+              firstName: schema.outreachContacts.firstName,
+              lastName: schema.outreachContacts.lastName,
+            })
+            .from(schema.outreachContacts)
+            .where(sql`LOWER(${schema.outreachContacts.winery}) = LOWER(${wineryName})`)
+            .limit(20);
+          existingByWinery = rows;
+        } catch {
+          /* best-effort — a match miss is not a failure */
+        }
+      }
+
+      const otherPeople: ExtraPerson[] = rawOthers
+        .filter((p) => typeof p.firstName === "string" && p.firstName.trim().length > 0)
+        .filter((p) => (p.firstName as string).toLowerCase().trim() !== primaryFirst) // dedupe against primary
+        .slice(0, 4)
+        .map((p) => {
+          const first = (p.firstName as string).trim();
+          const firstLower = first.toLowerCase();
+          const lastLower = typeof p.lastName === "string" ? p.lastName.trim().toLowerCase() : "";
+          // Match rule: same winery + firstName prefix match (handles
+          // "Julian Forwood" ↔ "Julian" and "J. Forwood" ↔ "Julian Forwood")
+          const match = existingByWinery.find((row) => {
+            const rowFirst = row.firstName.toLowerCase().trim();
+            const rowLast = (row.lastName ?? "").toLowerCase().trim();
+            return (
+              rowFirst === firstLower ||
+              rowFirst.startsWith(firstLower.slice(0, 3)) && rowFirst.length >= 3 ||
+              (lastLower && rowLast === lastLower)
+            );
+          });
+          return {
+            firstName: first,
+            lastName: typeof p.lastName === "string" ? p.lastName.trim() : null,
+            email: typeof p.email === "string" ? p.email.trim() : null,
+            mobileAu: typeof p.mobileAu === "string" ? normaliseMobile(p.mobileAu) : null,
+            role: typeof p.role === "string" ? p.role.trim() : null,
+            matchedSlug: match?.slug ?? null,
+          };
+        });
 
       // ── Instagram enrichment ──────────────────────────────────────────
       // Rich, Jul 2026: the source URL scrape gives us 1-3 IG handles as
@@ -1124,11 +1213,83 @@ Speech-recognition normalisations do NOT apply here — this is scraped HTML. Bu
         if (enrich.painPoint) {
           draft.painPoint = enrich.painPoint;
         }
-        return { draft, signals, igCitations: enrich.citations };
+        return { draft, signals, otherPeople, igCitations: enrich.citations };
       }
 
-      return { draft, signals };
+      return { draft, signals, otherPeople };
     }),
+
+  /** OWNER — Merge additional channels (email, mobile, IG) into an
+   *  existing contact card. Powers the "Also found on this page → Update
+   *  Julian's card" one-click action in AdminContacts.
+   *
+   *  Only OVERWRITES a field when the current value is null/empty. Never
+   *  clobbers hand-entered data. Additional channels not covered by a
+   *  first-class column (personal-IG, LinkedIn, website, role) are
+   *  appended to the notes field using the recognised label prefixes so
+   *  the existing extractChannels() UI can surface them. */
+  mergeFields: ownerProcedure
+    .input(
+      z.object({
+        slug: z.string().min(1).max(80),
+        email: z.string().max(200).nullable().optional(),
+        mobileAu: z.string().max(20).nullable().optional(),
+        instagramPersonal: z.string().max(80).nullable().optional(),
+        role: z.string().max(120).nullable().optional(),
+        sourceUrl: z.string().max(500).nullable().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const rows = await db
+        .select()
+        .from(schema.outreachContacts)
+        .where(eq(schema.outreachContacts.slug, input.slug))
+        .limit(1);
+      const existing = rows[0];
+      if (!existing) throw new Error(`Contact not found: ${input.slug}`);
+
+      // Only merge non-null incoming values, and only overwrite empty
+      // slots on the existing row (don't clobber hand-typed data).
+      const update: Record<string, unknown> = {};
+      const mobileNorm = input.mobileAu ? normaliseMobile(input.mobileAu) : null;
+      if (mobileNorm && !existing.mobileAu) update.mobileAu = mobileNorm;
+
+      // Channel data that lives in the free-form notes field. We APPEND
+      // rather than replace so the operator's own notes stay intact. We
+      // also dedupe against what's already in the notes (crude substring
+      // check — good enough for this workflow).
+      const existingNotes = (existing.notes ?? "").trim();
+      const appendages: string[] = [];
+      const notesLower = existingNotes.toLowerCase();
+      if (input.email && !notesLower.includes(input.email.toLowerCase())) {
+        appendages.push(`Email: ${input.email}`);
+      }
+      if (input.instagramPersonal) {
+        const igClean = input.instagramPersonal.replace(/^@/, "");
+        if (!notesLower.includes(igClean.toLowerCase())) {
+          appendages.push(`IG-personal: @${igClean}`);
+        }
+      }
+      if (input.role && !notesLower.includes(input.role.toLowerCase())) {
+        appendages.push(`Role: ${input.role}`);
+      }
+      if (input.sourceUrl && !notesLower.includes(input.sourceUrl.toLowerCase())) {
+        appendages.push(`Source: ${input.sourceUrl}`);
+      }
+      if (appendages.length > 0) {
+        update.notes = existingNotes ? `${existingNotes} · ${appendages.join(" · ")}` : appendages.join(" · ");
+      }
+
+      if (Object.keys(update).length === 0) {
+        return { ok: true, slug: input.slug, patched: [] as string[], skipped: "no new data to merge" };
+      }
+      await db
+        .update(schema.outreachContacts)
+        .set(update)
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true, slug: input.slug, patched: Object.keys(update) };
+    }),
+
 
   // ── OWNER — Deep research from just a business name ────────────────────
   // Paste a winery name → Perplexity Sonar-Pro multi-hop web-searches for
