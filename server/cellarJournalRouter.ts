@@ -278,7 +278,7 @@ export function composeSocialDraft(
   const twitter = `${tHook}\n\n${tBody}\n\n→ ${url}`.slice(0, 280);
 
   // LinkedIn — longer form, 1-2 paragraphs, conversational
-  const linkedin = `Cellar floor question of the week:\n\n"${question}"\n\n${lead}\n\nFull answer (cited from the Red & White Wine Bibles): ${url}\n\n#winemaking #${topic.replace(/[^a-z0-9]/gi, "")} #ownology #cellarjournal`;
+  const linkedin = `Cellar floor question of the week:\n\n"${question}"\n\n${lead}\n\nFull answer (cited to canonical wine-science sources): ${url}\n\n#winemaking #${topic.replace(/[^a-z0-9]/gi, "")} #ownology #cellarjournal`;
 
   // Markdown for newsletters / Discord / Slack / Reddit
   const markdown = `**${question}**\n\n${lead}\n\n[Read the full answer →](${url})`;

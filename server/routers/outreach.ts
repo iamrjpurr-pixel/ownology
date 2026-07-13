@@ -516,6 +516,73 @@ export const outreachRouter = router({
     return { contacts: rows };
   }),
 
+  /** OWNER — Outbound queue. Sequences unsent contacts by (a) hook
+   *  quality × (b) channel availability. Powers /admin/contacts/outbound-queue.
+   *
+   *  Scoring rubric:
+   *    - Hook tier 1 (recent_signal)  → 4 pts
+   *    - Hook tier 2 (quoted_voice)   → 3 pts
+   *    - Hook tier 3 (peer_signal)    → 2 pts
+   *    - Hook tier 4 (vintage_pain)   → 1 pt
+   *    - No hook, has painPoint       → 0 pts (still queueable, just Tier-3 SMS)
+   *    - Has mobileAu                 → +2 pts (SMS-ready)
+   *    - Has email in notes           → +1 pt (email-ready)
+   *    - Both channels                → +3 pts (SMS + email = highest-yield first-touch)
+   *
+   *  Filters:
+   *    - status in ('cold','lukewarm') — skip already-warm and already-engaged
+   *    - smsSentAt IS NULL — hasn't been contacted yet
+   *
+   *  Returns rows sorted by score DESC, then by createdAt ASC (older first
+   *  to work through the backlog). Includes derived fields the UI needs
+   *  without a second query: hasEmail (parsed from notes), hasMobile,
+   *  score. */
+  outboundQueue: ownerProcedure.query(async () => {
+    const rows = await db
+      .select()
+      .from(schema.outreachContacts)
+      .where(sql`(status IN ('cold','lukewarm')) AND sms_sent_at IS NULL`)
+      .orderBy(desc(schema.outreachContacts.createdAt));
+
+    const scored = rows.map((c) => {
+      const tierScore =
+        c.hookTier === "recent_signal" ? 4 :
+        c.hookTier === "quoted_voice"  ? 3 :
+        c.hookTier === "peer_signal"   ? 2 :
+        c.hookTier === "vintage_pain"  ? 1 : 0;
+      const hasMobile = !!(c.mobileAu && c.mobileAu.trim().length > 0);
+      const notesLower = (c.notes ?? "").toLowerCase();
+      const hasEmail = /email:\s*\S+@\S+/i.test(c.notes ?? "");
+      const channelScore = (hasMobile ? 2 : 0) + (hasEmail ? 1 : 0) + (hasMobile && hasEmail ? 3 : 0);
+      // Personal IG is a soft signal — bumps score for the sales-nurture
+      // channel even without a direct comms route.
+      const igBonus = /ig-personal:\s*@/i.test(notesLower) ? 1 : 0;
+      const score = tierScore * 10 + channelScore + igBonus;
+      return { ...c, hasEmail, hasMobile, score };
+    });
+    scored.sort((a, b) => (b.score - a.score) || (a.createdAt ?? 0) - (b.createdAt ?? 0));
+    return { queue: scored };
+  }),
+
+  /** OWNER — Stamp a contact as sent (SMS or email) and advance the
+   *  outbound queue. Sets smsSentAt to now — the pipeline board uses
+   *  this to auto-progress the card from "cold" bucket to "sent" bucket. */
+  markSent: ownerProcedure
+    .input(z.object({
+      slug: z.string().min(1).max(80),
+      channel: z.enum(["sms", "email", "both"]),
+    }))
+    .mutation(async ({ input }) => {
+      const now = Date.now();
+      await db
+        .update(schema.outreachContacts)
+        .set({ smsSentAt: now })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true, slug: input.slug, at: now, channel: input.channel };
+    }),
+
+
+
   /** OWNER — create a new contact. Slug auto-generated unless overridden. */
   create: ownerProcedure
     .input(

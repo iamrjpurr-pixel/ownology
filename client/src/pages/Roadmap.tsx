@@ -60,7 +60,7 @@ const GATES: Gate[] = [
     unlocks: "Cellar Brief · Ask Owen · Roadmap visibility.",
     cta: { label: "Guide", href: "/guide" },
     detail:
-      "The starting point. From here you can already ask Owen anything about winemaking — grounded in the Red & White Wine Bibles and MoreWine manuals — and read the daily Cellar Brief in demo mode.",
+      "The starting point. From here you can already ask Owen anything about winemaking — grounded in the finest wine-science texts and AWRI&rsquo;s technical library — and read the daily Cellar Brief in demo mode.",
   },
   {
     key: "hasTanks",

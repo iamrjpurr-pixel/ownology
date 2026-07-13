@@ -1281,7 +1281,7 @@ function Pricing() {
               role: "The AI apprentice",
               name: "Owen",
               tag: "Reads the manuals so you don't have to",
-              body: "Owen is our AI teammate. He&rsquo;s read every winemaking manual we own — Red &amp; White Wine Bibles, MoreWine, AWRI notes — and cites his sources. He&rsquo;ll point, remember, and structure. He&rsquo;ll never tell you what to make. That&rsquo;s your call, and Rich&rsquo;s, and Gel&rsquo;s.",
+              body: "Owen is our AI teammate. He&rsquo;s read the finest wine-science books ever published, cross-referenced with AWRI&rsquo;s technical library — and cites his sources on every answer. Coached by an advanced-certificate oenologist. He&rsquo;ll point, remember, and structure. He&rsquo;ll never tell you what to make. That&rsquo;s your call, and Rich&rsquo;s, and Gel&rsquo;s.",
               testid: "team-owen",
               accent: "var(--ow-amber)",
             },
@@ -1650,7 +1650,7 @@ function WhatOwnologyKnows() {
               maxWidth: "600px",
             }}
           >
-            Owen — our AI apprentice — has read the same books a formally qualified winemaker would (Red &amp; White Wine Bibles, MoreWine, AWRI notes). He cites his sources. He&apos;s available at 2am during vintage, on a mobile phone, in the middle of a stuck fermentation. He won&apos;t tell you what to make — but he&apos;ll remember every log entry, every reading, every SOP, and hand it back the moment you need it.
+            Owen — our AI apprentice — has read the same books a formally qualified winemaker would: the finest wine-science texts ever written, AWRI&rsquo;s technical library, decades of peer-reviewed research. He cites his sources. Coached by an advanced-certificate oenologist. He&apos;s available at 2am during vintage, on a mobile phone, in the middle of a stuck fermentation. He won&apos;t tell you what to make — but he&apos;ll remember every log entry, every reading, every SOP, and hand it back the moment you need it.
           </p>
         </div>
 

@@ -95,6 +95,7 @@ const HiContact = lazy(() => import("./pages/HiContact"));
 const AdminContacts = lazy(() => import("./pages/AdminContacts"));
 const AdminContactsMigrate = lazy(() => import("./pages/AdminContactsMigrate"));
 const AdminContactsPipeline = lazy(() => import("./pages/AdminContactsPipeline"));
+const AdminOutboundQueue = lazy(() => import("./pages/AdminOutboundQueue"));
 const AdminEventIngest = lazy(() => import("./pages/AdminEventIngest"));
 const AdminAudioHook = lazy(() => import("./pages/AdminAudioHook"));
 const AdminMarketingKit = lazy(() => import("./pages/AdminMarketingKit"));
@@ -377,6 +378,7 @@ function Router() {
       <Route path={"/hi/producers/:id"} component={HiProducerPreview} />
       <Route path={"/hi/:slug"} component={HiContact} />
       <Route path={"/admin/contacts/pipeline"} component={AdminContactsPipeline} />
+      <Route path={"/admin/contacts/outbound-queue"} component={AdminOutboundQueue} />
       <Route path={"/admin/contacts"} component={AdminContacts} />
       <Route path={"/admin/contacts-migrate"} component={AdminContactsMigrate} />
       <Route path={"/admin/event-ingest"} component={AdminEventIngest} />

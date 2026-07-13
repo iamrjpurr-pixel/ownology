@@ -822,7 +822,7 @@ export default function Guide() {
             <PillarCard
               pillar="Learn"
               label="Free Run — Ask Owen"
-              description="Ask Owen anything about winemaking science, regs, or your own protocols. He reads your SOPs, cross-references the Red & White Wine Bibles and MoreWine, and cites every source back to you."
+              description="Ask Owen anything about winemaking science, regs, or your own protocols. He reads your SOPs, cross-references the finest wine-science texts and AWRI&rsquo;s technical library, and cites every source back to you."
               href="/free-run"
               icon={<FlaskConical className="w-5 h-5" />}
               color="oklch(0.65 0.10 220)"

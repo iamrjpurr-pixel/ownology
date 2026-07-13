@@ -4,6 +4,19 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Audit fix — Owen positioning + outbound queue + region column (Jul 2026)
+
+Rich called out three unshipped promises from earlier this session. All three shipped in one batch:
+
+1. **Owen blurb — MoreWine/Wine Bibles purged from public copy** (5 files). New voice: "read the finest wine-science books ever published, cross-referenced with AWRI's technical library — cited on every answer. Coached by an advanced-certificate oenologist." Files updated: Home.tsx (×2), Guide.tsx, Roadmap.tsx, cellarJournalRouter.ts (LinkedIn social template). Backend RAG source identifiers deliberately unchanged (those are internal chunk labels, not marketing copy). Public-copy grep count now zero.
+
+2. **Outbound queue view** — `/admin/contacts/outbound-queue` page + `outreach.outboundQueue` + `outreach.markSent` procedures. Sequences contacts by score = (hook tier × 10) + channel availability + IG bonus. Row shows: score badge, name, tier, channel chips, Copy SMS + Draft email side-by-side + Mark sent. Top 5 in the queue currently all score 36-37 (Tier-2 hook + both channels + personal IG). Region filter chips top of page.
+
+3. **Region column** — `outreach_contacts.region` VARCHAR(40) added via ALTER TABLE. 79 contacts tagged via static wineryRegions lookup: 18 mclaren-vale, 8 yarra-valley, 8 coonawarra, 7 mornington-peninsula, 6 barossa/beechworth each, plus tail regions. 148 wineries still unknown (not in lookup table) — future LLM classification pass will finish this.
+
+[shipped: owen-positioning-fix, outbound-queue-view, region-column-backfill]
+
+
 ### transcriptEnrich UI wired + Wine Australia directory identified (Jul 2026)
 
 Following the transcriptEnrich backend from the previous entry, wired the full frontend:
