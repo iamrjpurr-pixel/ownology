@@ -1221,6 +1221,13 @@ export const outreachContacts = mysqlTable(
     hookTier: varchar("hook_tier", { length: 32 }),
     hookText: varchar("hook_text", { length: 400 }),
     hookSourceUrl: varchar("hook_source_url", { length: 500 }),
+    // Region — populated from a static winery→region lookup at ingest
+    // time (see server/wineryRegions.ts). Powers /admin/contacts?region=
+    // cohort slicing. Null when the winery is unknown or ambiguous.
+    // Values are kebab-case: "mclaren-vale", "barossa", "adelaide-hills",
+    // "margaret-river", "yarra-valley", "hunter", "coonawarra", "clare",
+    // "tasmania", etc. (Rich, Jul 2026)
+    region: varchar("region", { length: 40 }),
     calendlyOverride: varchar("calendly_override", { length: 300 }),
     smsSentAt: bigint("sms_sent_at", { mode: "number" }),
     firstViewedAt: bigint("first_viewed_at", { mode: "number" }),
