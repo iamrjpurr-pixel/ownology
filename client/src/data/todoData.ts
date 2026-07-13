@@ -39,7 +39,7 @@ export interface TodoItem {
 
 /** ISO timestamp of the last edit to this file. Bump when you edit anything.
  *  Displayed at the top of /todo so visitors can see the roadmap is alive. */
-export const LAST_UPDATED = "2026-02-06";
+export const LAST_UPDATED = "2026-07-13";
 
 export const TODO: TodoItem[] = [
   // ═══ 🔴 P0 · Must-fix before first paying customer ═══
@@ -102,25 +102,25 @@ export const TODO: TodoItem[] = [
     id: "rotate-jwt-secret",
     title: "Rotate JWT_SECRET and gate password before first paying member",
     description:
-      "JWT_SECRET is still the seeded default in /app/.env. Gate password was `changeme-set-real-password` up to Feb 06 (now rotated to a real value). Both need one more rotation on the Railway prod deploy so preview and prod use different secrets. Zero code change — env update only.",
+      "SHIPPED Jul 13 — JWT_SECRET rotated on Railway prod, gate password rotated to `middx99`, preview + prod now use different secrets. Follow-up hardening also shipped: correct gate password always bypasses the rate limiter (server/gate.ts::resetGateAttempts), and a global 401 interceptor in main.tsx auto-logs-out stale sessions after any future secret rotation (previously admin pages ghost-rendered as empty).",
     priority: "p0",
     effort: "~10 min",
-    status: "in-progress",
+    status: "done",
     category: "Safety",
-    updatedAt: "2026-02-06",
+    updatedAt: "2026-07-13",
   },
 
   // ═══ 🟠 P1 · Launch protection & growth ═══
   {
     id: "gate-rate-limiter-hardening",
-    title: "Redis-backed gate rate limiter + IP allowlist",
+    title: "Redis-backed gate rate limiter (multi-pod safe)",
     description:
-      "Current limiter is in-memory (5 attempts / 15 min per IP) and per-pod, so multi-replica Railway prod deploys let an attacker dodge by rotating pods. Also trips too easily under legitimate QA — self-tripped 3× during pre-demo validation. Swap for Redis-backed limiter, widen to ~30/hour, add OWNOLOGY_GATE_RATE_LIMIT_ALLOWLIST env for preview/office IPs. Found during Feb 2026 pre-demo E2E.",
-    priority: "p1",
+      "PARTIAL FIX SHIPPED Jul 13 — correct password now always wins (never rate-limited), and IPs in OWNOLOGY_GATE_IP_ALLOWLIST env skip the limiter entirely (server/gate.ts). This kills the 'self-tripped during QA' pain. STILL OPEN: swap in-memory store for Redis so multi-replica Railway prod deploys can't be dodged by pod-rotation. Widen to ~30/hour failed attempts once Redis is in.",
+    priority: "p2",
     effort: "~90 min",
     status: "not-started",
     category: "Safety",
-    updatedAt: "2026-02-06",
+    updatedAt: "2026-07-13",
   },
   {
     id: "daily-cellar-brief-email-cron",
@@ -181,12 +181,12 @@ export const TODO: TodoItem[] = [
     id: "custom-domain-dns",
     title: "Point ownology.ai DNS to Railway",
     description:
-      "In Railway → ownology service → Settings → Networking → Custom Domain. Add ownology.ai (and www.ownology.ai), get a CNAME/A record value, add to DNS host. Blocked on deployment-sync issue that Emergent Support is fixing (see Blocked section).",
+      "SHIPPED Feb 2026 — Namecheap DNS surgery complete. `ownology.ai` and `www.ownology.ai` now resolve directly to Railway via ALIAS + CNAME records (Cloudflare proxy disabled). See CHANGELOG.md 'Prod cutover · Ownology.ai now served by new Railway build'.",
     priority: "p1",
     effort: "~10 min once Emergent Support unblocks deploy",
-    status: "not-started",
+    status: "done",
     category: "Ops",
-    updatedAt: "2026-02-06",
+    updatedAt: "2026-07-13",
   },
 
   // ═══ 🟡 P2 · Conversion polish (do after data) ═══

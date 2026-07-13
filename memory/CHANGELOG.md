@@ -4,6 +4,22 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Session-expired auto-logout · admin pages no longer ghost-render (Jul 2026)
+
+Rich reported `/admin/contacts` was showing empty on prod — his "34 contacts" appeared missing. Data was actually intact (38 rows verified in Railway DB). Root cause: the earlier `JWT_SECRET` rotation invalidated his `app_session_id` cookie signature, so `ownerProcedure` returned 401, and 21 of 22 admin pages destructure `{ data, isLoading }` without reading `isError` — silently rendering as empty.
+
+- Added a global 401 interceptor in `client/src/main.tsx` (`authAwareFetch`) that catches UNAUTHORIZED responses, best-effort `POST /api/auth/logout`, and hard-redirects to `/login?next=<path>&reason=session_expired`.
+- Only fires on paths that need auth (`/admin`, `/dashboard`, `/cellar-brief`, etc.) so public-page background tRPC calls aren't affected.
+- `Login.tsx` now shows a "Session expired" banner when `reason=session_expired` is present, so the bounce is explained instead of feeling like a bug.
+- Guarded by a module-level `redirectedOnce` flag — an outage doesn't trigger a redirect storm.
+
+[shipped: rotate-jwt-secret]
+
+Also added `viteTodoSync` plugin (`/app/viteTodoSync.ts`, wired in `vite.config.ts`) — on dev server start and on every `memory/CHANGELOG.md` change, the plugin scans for `[shipped: <id-list>]` markers and auto-marks matching TODO items as `status: "done"` in `client/src/data/todoData.ts`. Idempotent, fails soft, no dirty writes. `/todo` now stays in sync without manual editing.
+
+[shipped: custom-domain-dns]
+
+
 ### Gate wall lockout fixed · correct password now always wins (Feb 2026)
 
 Rich was locked out of `/site-map` on prod despite typing `middx99` correctly. Root cause: the rate limiter ran BEFORE the password check, so once 5 typos tripped the 15-min bucket, even a correct password got blocked. Fixed by inverting the flow:
@@ -596,3 +612,4 @@ Verified both via lint (zero errors).
 
 Older shipped work lives inline in PRD.md (pre-Feb-2026); future entries
 should land here so PRD.md can stay a spec, not a diary.
+

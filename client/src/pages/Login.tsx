@@ -13,6 +13,16 @@ import { useAuth } from "@/lib/useAuth";
 export default function Login() {
   const { user, status, login } = useAuth();
 
+  // Read query params once. `?reason=session_expired` is set by the
+  // global 401 interceptor in main.tsx when a stale JWT (e.g. after
+  // JWT_SECRET rotation) causes tRPC to reject the cookie. Surfacing
+  // this explicitly means the user sees "sign in again" instead of
+  // being silently bounced.
+  const reason = typeof window !== "undefined"
+    ? new URLSearchParams(window.location.search).get("reason")
+    : null;
+  const sessionExpired = reason === "session_expired";
+
   useEffect(() => {
     // If already signed in, jump straight to ?next= or /admin.
     if (status === "authed" && user) {
@@ -64,6 +74,25 @@ export default function Login() {
         >
           Sign in to Ownology
         </h1>
+        {sessionExpired && (
+          <div
+            data-testid="login-session-expired-banner"
+            style={{
+              background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
+              border: "1px solid var(--ow-amber)",
+              borderRadius: 6,
+              padding: "0.6rem 0.85rem",
+              fontSize: "0.82rem",
+              color: "var(--ow-text-hi)",
+              lineHeight: 1.5,
+              marginBottom: "1rem",
+            }}
+          >
+            <strong>Session expired.</strong> Your login was invalidated (usually
+            because a secret was rotated on the server). Sign in again to
+            restore access — your data is untouched.
+          </div>
+        )}
         <p
           style={{
             fontSize: "0.92rem",
