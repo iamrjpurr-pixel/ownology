@@ -408,43 +408,70 @@ export const outreachRouter = router({
    *  the operator via Resend so they can reply while the prospect is
    *  still on the page. Best-effort — email failures never break the
    *  view-tracking. Operator email = OPERATOR_ALERT_EMAIL env var,
-   *  falls back to OWNER_EMAIL, silently no-ops if neither set. */
+   *  falls back to OWNER_EMAIL, silently no-ops if neither set.
+   *
+   *  🔥 HOT ALERT (Feb 2026): once the prospect crosses 3+ total views
+   *  AND we haven't already fired the hot alert (hotAlertSentAt is null),
+   *  fire a second, higher-urgency email. This is the "they're circling,
+   *  strike now" signal — a prospect who opened the same link 3 times
+   *  in a row is almost always mid-decision. Idempotent: only fires once
+   *  per contact, even on view 10 or 20. */
   markViewed: publicProcedure
     .input(z.object({ slug: z.string().min(1).max(80) }))
     .mutation(async ({ input }) => {
       const now = Date.now();
-      // Read current state so we know if this is the FIRST view.
+      // Read current state so we know if this is the FIRST view AND
+      // whether the hot-alert has already been fired.
       const existing = await db
         .select({
           slug: schema.outreachContacts.slug,
           firstName: schema.outreachContacts.firstName,
+          lastName: schema.outreachContacts.lastName,
           winery: schema.outreachContacts.winery,
           mobileAu: schema.outreachContacts.mobileAu,
           firstViewedAt: schema.outreachContacts.firstViewedAt,
+          viewCount: schema.outreachContacts.viewCount,
+          hotAlertSentAt: schema.outreachContacts.hotAlertSentAt,
+          notes: schema.outreachContacts.notes,
+          hookText: schema.outreachContacts.hookText,
         })
         .from(schema.outreachContacts)
         .where(eq(schema.outreachContacts.slug, input.slug))
         .limit(1);
       const isFirstView = existing.length > 0 && !existing[0].firstViewedAt;
+      const prevViewCount = existing.length > 0 ? (existing[0].viewCount ?? 0) : 0;
+      const newViewCount = prevViewCount + 1;
+      // Hot-alert fires exactly ONCE when the counter crosses 3 (i.e.
+      // the incoming view is the 3rd or later AND we haven't alerted yet).
+      const shouldFireHotAlert =
+        existing.length > 0 &&
+        newViewCount >= 3 &&
+        !existing[0].hotAlertSentAt;
+
       await db
         .update(schema.outreachContacts)
         .set({
           viewCount: sql`view_count + 1`,
           firstViewedAt: sql`COALESCE(first_viewed_at, ${now})`,
+          ...(shouldFireHotAlert ? { hotAlertSentAt: now } : {}),
         })
         .where(eq(schema.outreachContacts.slug, input.slug));
-      // A4 — real-time alert. Fire-and-forget; NEVER await inside the
+
+      // A4 — real-time alerts. Fire-and-forget; NEVER await inside the
       // mutation response path so slow SMTP doesn't slow the page load.
-      if (isFirstView && existing.length > 0) {
-        const alertTo = process.env.OPERATOR_ALERT_EMAIL || process.env.OWNER_EMAIL;
-        const resendKey = process.env.RESEND_API_KEY;
-        if (alertTo && resendKey) {
-          const c = existing[0];
-          const previewBase = process.env.PREVIEW_BASE_URL || process.env.PUBLIC_BASE_URL || "https://ownology.ai";
-          const link = `${previewBase}/hi/${c.slug}`;
-          // Best-effort fetch to Resend HTTPS API. Wrapped so any error
-          // (network, auth, quota) is silently swallowed — this is
-          // instrumentation, not a user-facing feature.
+      const alertTo = process.env.OPERATOR_ALERT_EMAIL || process.env.OWNER_EMAIL;
+      const resendKey = process.env.RESEND_API_KEY;
+      const previewBase = process.env.PREVIEW_BASE_URL || process.env.PUBLIC_BASE_URL || "https://ownology.ai";
+
+      if (alertTo && resendKey && existing.length > 0) {
+        const c = existing[0];
+        const link = `${previewBase}/hi/${c.slug}`;
+        const fullName = `${c.firstName || "Prospect"}${c.lastName ? ` ${c.lastName}` : ""}`;
+        const wineryLabel = c.winery ? ` — ${c.winery}` : "";
+        const mobileLabel = c.mobileAu || "(no mobile)";
+
+        // FIRST-VIEW alert (existing behaviour, gentler tone).
+        if (isFirstView) {
           fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {
@@ -454,13 +481,31 @@ export const outreachRouter = router({
             body: JSON.stringify({
               from: process.env.RESEND_FROM || "Ownology Alerts <alerts@ownology.ai>",
               to: [alertTo],
-              subject: `📡 ${c.firstName || "Prospect"} just opened their link${c.winery ? ` — ${c.winery}` : ""}`,
-              text: `${c.firstName || "A prospect"} from ${c.winery || "an unknown winery"} just opened ${link}.\n\nThey're on the page right now. Reply to their SMS while it's warm.\n\nMobile: ${c.mobileAu || "(no mobile)"}\n\nAdmin: ${previewBase}/admin/contacts`,
+              subject: `📡 ${c.firstName || "Prospect"} just opened their link${wineryLabel}`,
+              text: `${c.firstName || "A prospect"} from ${c.winery || "an unknown winery"} just opened ${link}.\n\nThey're on the page right now. Reply to their SMS while it's warm.\n\nMobile: ${mobileLabel}\n\nAdmin: ${previewBase}/admin/contacts`,
+            }),
+          }).catch(() => { /* silent */ });
+        }
+
+        // 🔥 HOT ALERT — 3+ views, first time crossing this threshold.
+        if (shouldFireHotAlert) {
+          const hookLine = c.hookText ? `\n\nTheir personal hook (why they're a fit):\n"${c.hookText}"` : "";
+          fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${resendKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              from: process.env.RESEND_FROM || "Ownology Alerts <alerts@ownology.ai>",
+              to: [alertTo],
+              subject: `🔥 ${fullName} is circling — view #${newViewCount}${wineryLabel}`,
+              text: `${fullName}${c.winery ? ` from ${c.winery}` : ""} has now opened ${link} ${newViewCount} times.\n\nThey're circling. This is the moment — call them, SMS them, or reply to their SMS if they've already texted back. A prospect on view 3+ is almost always mid-decision.\n\nMobile: ${mobileLabel}\n\nDirect follow-up SMS (copy/paste):\n"hey ${c.firstName || "there"} — noticed you had another look at that link i sent. happy to answer any Qs directly, or i can walk you through it live in 15 min. what works? — Jamie"${hookLine}\n\nEngagement dashboard: ${previewBase}/admin/contacts/engagement\nAdmin card: ${previewBase}/admin/contacts?slug=${encodeURIComponent(c.slug)}`,
             }),
           }).catch(() => { /* silent */ });
         }
       }
-      return { ok: true };
+      return { ok: true, viewCount: newViewCount, hotAlertFired: shouldFireHotAlert };
     }),
 
   /** PUBLIC — record that the prospect tapped the primary CTA on /hi/:slug.
@@ -2594,6 +2639,7 @@ Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine
         repliedAt: schema.outreachContacts.repliedAt,
         demoBookedAt: schema.outreachContacts.demoBookedAt,
         status: schema.outreachContacts.status,
+        hotAlertSentAt: schema.outreachContacts.hotAlertSentAt,
       })
       .from(schema.outreachContacts);
 
@@ -2611,6 +2657,7 @@ Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine
       clicked: 0,
       replied: 0,
       booked: 0,
+      hotAlerted: 0,
     };
     for (const r of rows) {
       if (r.status === "sales" || r.status === "skip") continue;
@@ -2621,6 +2668,7 @@ Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine
       if (r.ctaClickedAt) totals.clicked++;
       if (r.repliedAt) totals.replied++;
       if (r.demoBookedAt) totals.booked++;
+      if (r.hotAlertSentAt) totals.hotAlerted++;
     }
 
     // Sent contacts only — everyone in the follow-up buckets must have

@@ -4,6 +4,42 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### 🔥 Auto Hot Alert — Resend email fires on view #3 (Feb 2026)
+
+Extended `outreach.markViewed` to fire a second, higher-urgency Resend alert email the moment a prospect crosses 3+ total views on their /hi/&lt;slug&gt; page. Idempotent — the "hot" email fires exactly once per contact, no matter how many times they re-visit after that.
+
+**New schema column** (`drizzle/schema.ts` + live ALTER on Railway MySQL): `outreach_contacts.hot_alert_sent_at BIGINT NULL`.
+
+**`markViewed` mutation** (`server/routers/outreach.ts`):
+- Reads current `viewCount` + `hotAlertSentAt` before the update.
+- Computes `newViewCount = prev + 1`.
+- Fires the hot alert iff `newViewCount >= 3 AND hotAlertSentAt IS NULL`. Same `UPDATE` also stamps `hot_alert_sent_at = now` so the check returns false on future views.
+- Response payload now returns `{ ok, viewCount, hotAlertFired }` (useful for debugging + potential frontend confetti later).
+
+**Hot-alert email body** — distinct from the first-view alert:
+- Subject: `🔥 {FirstName} {LastName} is circling — view #{N} — {Winery}`
+- Body: urgency framing ("A prospect on view 3+ is almost always mid-decision"), mobile number, ready-to-copy follow-up SMS, hook text (if present), links to `/admin/contacts/engagement` + the specific admin card.
+
+**Backfill** (`scripts/backfill-hot-alert-sent-at.mjs`): stamped `hot_alert_sent_at = first_viewed_at` on 7 pre-existing contacts already at viewCount ≥ 3 (Sally, Jane, Nathan, Lou, Bryan, Simon, Matteo) so the feature doesn't retro-fire noisy alerts on their next visit.
+
+**Engagement page**:
+- New `🔥 Alerted` KPI showing count of hot-alert-fired contacts (currently 2 sent + alerted = 2).
+- Every row in the Hot bucket now shows a red "🔥 alerted Nd ago" chip in the engagement timeline.
+
+**Verified end-to-end** via `scripts/test_hot_alert.mjs`:
+```
+view 1: {"viewCount":1, "hotAlertFired":false}
+view 2: {"viewCount":2, "hotAlertFired":false}
+view 3: {"viewCount":3, "hotAlertFired":true}  ← 🔥 email sent
+view 4: {"viewCount":4, "hotAlertFired":false} ← idempotent (already alerted)
+```
+
+Resend email delivery is best-effort (silent on quota/network errors — same pattern as the first-view alert). Requires `OPERATOR_ALERT_EMAIL` + `RESEND_API_KEY` env vars; auto-no-ops in dev when either is missing.
+
+[shipped: auto-hot-alert, hot-alert-sent-at-column, hot-alert-backfill]
+
+
+
 ### Contact engagement analytics view — `/admin/contacts/engagement` (Feb 2026)
 
 Rich asked for a "contact-me-back" landing analytics view to close the loop after the Outbound Queue tells you *who to touch next*. This new page tells you *who to touch again* based on real engagement signals (viewCount / firstViewedAt / ctaClickedAt / repliedAt / demoBookedAt).

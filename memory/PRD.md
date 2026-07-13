@@ -4,6 +4,12 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Feb 2026 session — 🔥 Auto Hot Alert on view #3 — SHIPPED (this session):**
+- Extended `outreach.markViewed` to fire a second Resend "🔥 they're circling" email on the 3rd view. Idempotent via new `hot_alert_sent_at BIGINT` column (ALTER TABLE applied live). Distinct urgency framing + ready-to-copy follow-up SMS in email body.
+- Backfilled 7 pre-existing 3+ view contacts to prevent retro-fire (Sally, Jane, Nathan, Lou, Bryan, Simon, Matteo).
+- Engagement page shows new `🔥 Alerted` KPI + red "🔥 alerted Nd ago" chip per row.
+- Verified via test script: views 1→2 no fire, view 3 fires exactly once, view 4+ idempotent no-op.
+
 **Feb 2026 session — Contact engagement analytics view — SHIPPED (this session):**
 - New `/admin/contacts/engagement` page + `outreach.engagementAnalytics` + `outreach.markFollowedUp` procedures. Six follow-up buckets (Hot / Clicked-no-book / Viewed-no-click / Replied / Booked / Ghosted) with bucket-specific pre-written SMS + email templates. KPI strip with honest funnel math (only counts sent contacts as denominator).
 - Nav pills wired: `/admin/contacts` header now shows Pipeline / Outbound queue / Engagement side-by-side.

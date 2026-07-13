@@ -1256,6 +1256,12 @@ export const outreachContacts = mysqlTable(
     // Auto-suggested by outreach.deepResearch from Perplexity's `role`
     // + `notes` fields; operator can override on save.
     persona: varchar("persona", { length: 32 }),
+    // 🔥 Hot-alert idempotency — timestamp when the operator got their
+    // Resend "prospect is circling" email after the contact crossed 3+
+    // views. Null = not yet alerted. Once set, we NEVER fire the hot
+    // alert again for this slug (even on view 10 or 20) so the operator
+    // doesn't get spammed by a curious re-visitor.
+    hotAlertSentAt: bigint("hot_alert_sent_at", { mode: "number" }),
   },
   (t) => [
     index("oc_slug_idx").on(t.slug),

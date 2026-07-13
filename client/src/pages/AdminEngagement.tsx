@@ -37,6 +37,7 @@ type Contact = {
   ctaClickedAt: number | null;
   repliedAt: number | null;
   demoBookedAt: number | null;
+  hotAlertSentAt: number | null;
 };
 
 const PREVIEW_BASE = typeof window !== "undefined" ? window.location.origin : "";
@@ -148,7 +149,7 @@ export default function AdminEngagement() {
     setTimeout(() => refetch(), 400);
   }
 
-  const totals = data?.totals ?? { total: 0, sent: 0, viewed: 0, multiViewed: 0, clicked: 0, replied: 0, booked: 0 };
+  const totals = data?.totals ?? { total: 0, sent: 0, viewed: 0, multiViewed: 0, clicked: 0, replied: 0, booked: 0, hotAlerted: 0 };
   const buckets = data?.buckets ?? { hot: [], clickedNoBook: [], viewedNoClick: [], replied: [], booked: [], ghosted: [] };
 
   return (
@@ -174,6 +175,7 @@ export default function AdminEngagement() {
           <KpiCell testid="kpi-sent" label="Sent" value={totals.sent} sub={`of ${totals.total} total`} />
           <KpiCell testid="kpi-viewed" label="Viewed" value={totals.viewed} sub={`${pct(totals.viewed, totals.sent)}% open rate`} />
           <KpiCell testid="kpi-multi-viewed" label="Re-opened" value={totals.multiViewed} sub={`${pct(totals.multiViewed, totals.viewed)}% of viewers`} />
+          <KpiCell testid="kpi-hot-alerted" label="🔥 Alerted" value={totals.hotAlerted} sub="3+ views · fired" />
           <KpiCell testid="kpi-clicked" label="Clicked CTA" value={totals.clicked} sub={`${pct(totals.clicked, totals.viewed)}% of viewers`} />
           <KpiCell testid="kpi-replied" label="Replied" value={totals.replied} sub={`${pct(totals.replied, totals.sent)}% reply rate`} />
           <KpiCell testid="kpi-booked" label="Booked" value={totals.booked} sub={`${pct(totals.booked, totals.sent)}% conversion`} />
@@ -251,6 +253,7 @@ export default function AdminEngagement() {
                               {c.ctaClickedAt && <span data-testid={`row-clicked-${c.slug}`}>✳ CTA {fmtAgo(c.ctaClickedAt)}</span>}
                               {c.repliedAt && <span data-testid={`row-replied-${c.slug}`}>💬 replied {fmtAgo(c.repliedAt)}</span>}
                               {c.demoBookedAt && <span style={{ color: "#16a34a", fontWeight: 600 }}>✓ booked {fmtAgo(c.demoBookedAt)}</span>}
+                              {c.hotAlertSentAt && <span data-testid={`row-hot-alerted-${c.slug}`} style={{ color: "#dc2626", fontWeight: 600 }}>🔥 alerted {fmtAgo(c.hotAlertSentAt)}</span>}
                             </div>
                             {c.hookText && (
                               <p style={{ margin: "6px 0 0", fontSize: "0.78rem", color: "var(--ow-text-mid)", fontStyle: "italic", lineHeight: 1.5 }}>
