@@ -4,6 +4,25 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### transcriptEnrich UI wired + Wine Australia directory identified (Jul 2026)
+
+Following the transcriptEnrich backend from the previous entry, wired the full frontend:
+
+- Extended `outreach.mergeFields` to accept `painPoint`, `hookTier`/`hookText`/`hookSourceUrl` (updated as a unit), and `appendNotes`. Discipline preserved: hand-typed fields never clobbered.
+- New `TranscriptEnrichPanel` inside `AdminContacts` — collapsible textarea + source-URL field per contact card, wired to `outreach.transcriptEnrich`. Returns get rendered as:
+  - Summary (one-click "Append to notes")
+  - Refined pain-point (one-click "Overwrite pain-point")
+  - 5 hook candidates (per-line "Use as hook" — sets hookText/hookTier="quoted_voice"/hookSourceUrl in one merge call)
+  - 5 blog pull-quotes (per-line "Copy" to clipboard)
+  - Philosophy tags (visual chips — search-facet groundwork)
+- New `EnrichRow` helper component (top of AdminContacts.tsx).
+- Verified end-to-end on Chester Osborn's transcript: 5 hooks, 5 pull-quotes, 8 philosophy tags including `sense-of-place` — a tag that also appears on Stephen Pannell, proving the CRM search-facet cohort concept works.
+
+Also identified a strategic prospect source: `https://www.australianwine.com/experience/our-makers` — the Wine Australia trade body's directory of ~180 named Australian winemakers with individual profile URLs. This is the shortlist for a future bulk-ingest flow (see ROADMAP: `bulkIngestDirectory` proposal).
+
+[shipped: transcript-enrichment-ui]
+
+
 ### transcriptEnrich — turn a podcast/YouTube transcript into 4 CRM+blog artefacts (Jul 2026)
 
 Rich pasted the Stephen Pannell (SC Pannell Wines, McLaren Vale) YouTube interview transcript and asked what we can do with it beyond an SMS hook. Answer shipped: a new `outreach.transcriptEnrich` procedure that takes `{ transcriptText, sourceUrl, contactFirstName, contactWinery }` and returns FIVE structured artefacts in one Claude call via forge:

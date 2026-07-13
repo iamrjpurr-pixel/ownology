@@ -1237,6 +1237,16 @@ Speech-recognition normalisations do NOT apply here — this is scraped HTML. Bu
         instagramPersonal: z.string().max(80).nullable().optional(),
         role: z.string().max(120).nullable().optional(),
         sourceUrl: z.string().max(500).nullable().optional(),
+        // Transcript-enrichment fields (Jul 2026). painPoint OVERWRITES
+        // when a new value is supplied (transcript signals beat generic
+        // scrape defaults). Hook fields overwrite together — never
+        // partial (all three set or all null).
+        painPoint: z.string().max(400).nullable().optional(),
+        hookTier: z.enum(["recent_signal","quoted_voice","peer_signal","vintage_pain"]).nullable().optional(),
+        hookText: z.string().max(400).nullable().optional(),
+        hookSourceUrl: z.string().max(500).nullable().optional(),
+        // Free-form notes append — used by transcript summary save.
+        appendNotes: z.string().max(3000).nullable().optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -1253,6 +1263,17 @@ Speech-recognition normalisations do NOT apply here — this is scraped HTML. Bu
       const update: Record<string, unknown> = {};
       const mobileNorm = input.mobileAu ? normaliseMobile(input.mobileAu) : null;
       if (mobileNorm && !existing.mobileAu) update.mobileAu = mobileNorm;
+
+      // painPoint overwrites — transcript-refined pain always beats the
+      // generic scrape default. Rich reviews before firing this call.
+      if (input.painPoint) update.painPoint = input.painPoint;
+
+      // Hook fields update as a unit — all three or none.
+      if (input.hookTier && input.hookText) {
+        update.hookTier = input.hookTier;
+        update.hookText = input.hookText;
+        update.hookSourceUrl = input.hookSourceUrl ?? null;
+      }
 
       // Channel data that lives in the free-form notes field. We APPEND
       // rather than replace so the operator's own notes stay intact. We
@@ -1275,6 +1296,9 @@ Speech-recognition normalisations do NOT apply here — this is scraped HTML. Bu
       }
       if (input.sourceUrl && !notesLower.includes(input.sourceUrl.toLowerCase())) {
         appendages.push(`Source: ${input.sourceUrl}`);
+      }
+      if (input.appendNotes && input.appendNotes.trim()) {
+        appendages.push(input.appendNotes.trim());
       }
       if (appendages.length > 0) {
         update.notes = existingNotes ? `${existingNotes} · ${appendages.join(" · ")}` : appendages.join(" · ");

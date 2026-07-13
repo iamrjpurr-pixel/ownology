@@ -26,6 +26,44 @@ function fmtAgo(ms: number | null | undefined): string {
  * separated list. Parse them back out so we can render each as a
  * distinct chip on the contact row.
  */
+
+/** EnrichRow — small labelled "text + save button" row used by the
+ *  transcript-enrichment panel to display a single artefact (summary or
+ *  refined pain-point) with a one-click save action. Kept small and
+ *  local because it's only used inside that panel. */
+function EnrichRow({ label, text, onSave, saved, saveLabel }: {
+  label: string;
+  text: string;
+  onSave: () => Promise<void> | void;
+  saved: boolean;
+  saveLabel: string;
+}) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <div>
+      <p style={{ margin: 0, fontSize: "0.7rem", color: "var(--ow-amber)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+        {label}
+      </p>
+      <div style={{ display: "flex", gap: 8, alignItems: "flex-start", marginTop: 4, padding: "6px 8px", background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)", borderRadius: 3 }}>
+        <p style={{ flex: 1, margin: 0, color: "var(--ow-text-mid)", lineHeight: 1.5 }}>{text}</p>
+        {saved ? (
+          <span style={{ color: "#16a34a", fontSize: "0.72rem", fontWeight: 600, whiteSpace: "nowrap" }}>✓ saved</span>
+        ) : (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={async () => { setBusy(true); try { await onSave(); } finally { setBusy(false); } }}
+            style={{ padding: "3px 10px", background: "transparent", border: "1px solid var(--ow-border)", color: "var(--ow-text-hi)", borderRadius: 3, fontSize: "0.72rem", cursor: busy ? "wait" : "pointer", whiteSpace: "nowrap" }}
+          >
+            {busy ? "…" : saveLabel}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
 function extractChannels(notes: string | null | undefined): {
   instagram: string | null;
   instagramPersonal: string | null;
@@ -321,6 +359,24 @@ export default function AdminContacts() {
   const [deepSearchConfidence, setDeepSearchConfidence] = useState<string | null>(null);
   const [deepSearchEmailGuesses, setDeepSearchEmailGuesses] = useState<string[]>([]);
   const [editingNotes, setEditingNotes] = useState<string | null>(null); // slug being edited
+  // Transcript-enrichment panel: which slug (if any) is being enriched
+  // right now, plus the current textarea + URL buffer + last returned
+  // artefacts. Shared state so only one panel is open at a time — trades
+  // a tiny amount of context-switch friction for a MUCH simpler render
+  // path across 100+ contact cards.
+  const [enrichingSlug, setEnrichingSlug] = useState<string | null>(null);
+  const [enrichTranscript, setEnrichTranscript] = useState("");
+  const [enrichSourceUrl, setEnrichSourceUrl] = useState("");
+  const [enrichResult, setEnrichResult] = useState<{
+    summary: string | null;
+    hookCandidates: string[];
+    painPointRefined: string | null;
+    blogQuotes: string[];
+    philosophyTags: string[];
+    sourceUrl: string | null;
+  } | null>(null);
+  const [enrichSaveStatus, setEnrichSaveStatus] = useState<Record<string, "done">>({});
+  const transcriptEnrichMutation = trpc.outreach.transcriptEnrich.useMutation();
   const [notesBuffer, setNotesBuffer] = useState("");
   // Inline name edit — click on the name to quickly fix a spelling or add
   // a surname captured after the initial event conversation (e.g. "Sally"
@@ -1974,6 +2030,31 @@ export default function AdminContacts() {
                           >
                             ✏️ Edit
                           </button>
+                          <button
+                            type="button"
+                            data-testid={`enrich-transcript-btn-${c.slug}`}
+                            onClick={() => {
+                              if (enrichingSlug === c.slug) {
+                                setEnrichingSlug(null);
+                                setEnrichResult(null);
+                              } else {
+                                setEnrichingSlug(c.slug);
+                                setEnrichTranscript("");
+                                setEnrichSourceUrl("");
+                                setEnrichResult(null);
+                              }
+                            }}
+                            style={{
+                              ...chipStyle,
+                              background: enrichingSlug === c.slug ? "var(--ow-amber)" : "transparent",
+                              border: "1px dashed var(--ow-border)",
+                              color: enrichingSlug === c.slug ? "oklch(0.10 0.008 60)" : "var(--ow-text-lo)",
+                              fontSize: "0.72rem",
+                            }}
+                            title="Paste a transcript (podcast, YouTube, interview) — extract hook candidates, refined pain-point, blog quotes"
+                          >
+                            📝 Enrich
+                          </button>
                         </>
                       );
                     })()}
@@ -2125,6 +2206,183 @@ export default function AdminContacts() {
                       Cancel
                     </button>
                   </div>
+                </div>
+              )}
+              {/* Transcript-enrichment panel. Rich pastes a podcast /
+                  YouTube / interview transcript, optionally a source URL,
+                  and one Claude call produces: summary, 5 hook candidates,
+                  refined pain-point, 5 blog pull-quotes, philosophy tags.
+                  Each artefact has a one-click "save to this card" action
+                  wired through outreach.mergeFields (which now supports
+                  painPoint, hook{Tier,Text,SourceUrl}, and appendNotes). */}
+              {enrichingSlug === c.slug && (
+                <div
+                  data-testid={`transcript-enrich-panel-${c.slug}`}
+                  style={{
+                    margin: "8px 0 12px",
+                    padding: "12px",
+                    background: "color-mix(in oklch, var(--ow-amber) 5%, transparent)",
+                    border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, var(--ow-border))",
+                    borderRadius: 6,
+                  }}
+                >
+                  <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+                    <input
+                      data-testid={`enrich-source-url-${c.slug}`}
+                      type="url"
+                      value={enrichSourceUrl}
+                      onChange={(e) => setEnrichSourceUrl(e.target.value)}
+                      placeholder="Source URL (YouTube, podcast page) — optional"
+                      style={{
+                        flex: 1, background: "var(--ow-bg-base)", border: "1px solid var(--ow-border)",
+                        color: "var(--ow-text-hi)", padding: "6px 8px", borderRadius: 4,
+                        fontFamily: "'Lato',sans-serif", fontSize: "0.8rem",
+                      }}
+                    />
+                  </div>
+                  <textarea
+                    data-testid={`enrich-transcript-${c.slug}`}
+                    value={enrichTranscript}
+                    onChange={(e) => setEnrichTranscript(e.target.value)}
+                    rows={6}
+                    placeholder="Paste the transcript here (min ~200 chars). Auto-caption from YouTube is fine — the model cleans up ASR errors."
+                    style={{
+                      width: "100%", background: "var(--ow-bg-base)", border: "1px solid var(--ow-border)",
+                      color: "var(--ow-text-hi)", padding: "8px", borderRadius: 4,
+                      fontFamily: "'Lato',sans-serif", fontSize: "0.82rem", resize: "vertical",
+                    }}
+                  />
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>
+                    <button
+                      type="button"
+                      data-testid={`enrich-run-${c.slug}`}
+                      disabled={transcriptEnrichMutation.isPending || enrichTranscript.trim().length < 200}
+                      onClick={async () => {
+                        try {
+                          const r = await transcriptEnrichMutation.mutateAsync({
+                            transcriptText: enrichTranscript,
+                            sourceUrl: enrichSourceUrl.trim() || undefined,
+                            contactFirstName: c.firstName,
+                            contactWinery: c.winery ?? undefined,
+                          });
+                          setEnrichResult(r);
+                        } catch (err) {
+                          alert(err instanceof Error ? err.message : String(err));
+                        }
+                      }}
+                      style={{
+                        padding: "5px 14px", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)",
+                        border: "none", borderRadius: 3, fontFamily: "'Lato',sans-serif", fontSize: "0.78rem",
+                        fontWeight: 700, cursor: transcriptEnrichMutation.isPending ? "wait" : "pointer",
+                        opacity: transcriptEnrichMutation.isPending || enrichTranscript.trim().length < 200 ? 0.6 : 1,
+                      }}
+                    >
+                      {transcriptEnrichMutation.isPending ? "Enriching (20-40s)…" : "Enrich"}
+                    </button>
+                    <span style={{ fontSize: "0.72rem", color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif" }}>
+                      {enrichTranscript.length.toLocaleString()} chars · min 200
+                    </span>
+                  </div>
+                  {enrichResult && (
+                    <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 10, fontFamily: "'Lato',sans-serif", fontSize: "0.82rem" }}>
+                      {enrichResult.summary && (
+                        <EnrichRow
+                          label="Summary"
+                          text={enrichResult.summary}
+                          onSave={async () => {
+                            await mergeFieldsMutation.mutateAsync({ slug: c.slug, appendNotes: enrichResult.summary!, sourceUrl: enrichResult.sourceUrl });
+                            setEnrichSaveStatus((s) => ({ ...s, [`${c.slug}-summary`]: "done" }));
+                            await utils.outreach.list.invalidate();
+                          }}
+                          saved={enrichSaveStatus[`${c.slug}-summary`] === "done"}
+                          saveLabel="Append to notes"
+                        />
+                      )}
+                      {enrichResult.painPointRefined && (
+                        <EnrichRow
+                          label="Refined pain-point"
+                          text={enrichResult.painPointRefined}
+                          onSave={async () => {
+                            await mergeFieldsMutation.mutateAsync({ slug: c.slug, painPoint: enrichResult.painPointRefined });
+                            setEnrichSaveStatus((s) => ({ ...s, [`${c.slug}-pain`]: "done" }));
+                            await utils.outreach.list.invalidate();
+                          }}
+                          saved={enrichSaveStatus[`${c.slug}-pain`] === "done"}
+                          saveLabel="Overwrite pain-point"
+                        />
+                      )}
+                      {enrichResult.hookCandidates.length > 0 && (
+                        <div>
+                          <p style={{ margin: 0, fontSize: "0.7rem", color: "var(--ow-amber)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                            Hook candidates
+                          </p>
+                          <ul style={{ listStyle: "none", padding: 0, margin: "4px 0 0", display: "flex", flexDirection: "column", gap: 4 }}>
+                            {enrichResult.hookCandidates.map((h, i) => (
+                              <li key={i} style={{ display: "flex", gap: 6, alignItems: "flex-start", padding: "4px 6px", borderRadius: 3, background: "var(--ow-bg-card)" }}>
+                                <span style={{ flex: 1, fontStyle: "italic", color: "var(--ow-text-mid)" }}>“{h}”</span>
+                                {enrichSaveStatus[`${c.slug}-hook-${i}`] === "done" ? (
+                                  <span style={{ color: "#16a34a", fontSize: "0.72rem", fontWeight: 600 }}>✓ hook set</span>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    data-testid={`enrich-use-hook-${c.slug}-${i}`}
+                                    onClick={async () => {
+                                      await mergeFieldsMutation.mutateAsync({
+                                        slug: c.slug,
+                                        hookTier: "quoted_voice",
+                                        hookText: h,
+                                        hookSourceUrl: enrichResult.sourceUrl,
+                                      });
+                                      setEnrichSaveStatus((s) => ({ ...s, [`${c.slug}-hook-${i}`]: "done" }));
+                                      await utils.outreach.list.invalidate();
+                                    }}
+                                    style={{ padding: "2px 8px", background: "transparent", border: "1px solid var(--ow-border)", color: "var(--ow-text-hi)", borderRadius: 3, fontSize: "0.7rem", cursor: "pointer" }}
+                                  >
+                                    Use as hook
+                                  </button>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {enrichResult.blogQuotes.length > 0 && (
+                        <div>
+                          <p style={{ margin: 0, fontSize: "0.7rem", color: "var(--ow-amber)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                            Blog pull-quotes
+                          </p>
+                          <ul style={{ listStyle: "none", padding: 0, margin: "4px 0 0", display: "flex", flexDirection: "column", gap: 4 }}>
+                            {enrichResult.blogQuotes.map((q, i) => (
+                              <li key={i} style={{ display: "flex", gap: 6, alignItems: "flex-start", padding: "4px 6px", borderRadius: 3, background: "var(--ow-bg-card)" }}>
+                                <span style={{ flex: 1, color: "var(--ow-text-mid)" }}>“{q}”</span>
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    try { await navigator.clipboard.writeText(q); setEnrichSaveStatus((s) => ({ ...s, [`${c.slug}-quote-${i}`]: "done" })); } catch { /* clipboard perms */ }
+                                  }}
+                                  style={{ padding: "2px 8px", background: "transparent", border: "1px solid var(--ow-border)", color: "var(--ow-text-hi)", borderRadius: 3, fontSize: "0.7rem", cursor: "pointer" }}
+                                >
+                                  {enrichSaveStatus[`${c.slug}-quote-${i}`] === "done" ? "✓ copied" : "Copy"}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {enrichResult.philosophyTags.length > 0 && (
+                        <div>
+                          <p style={{ margin: 0, fontSize: "0.7rem", color: "var(--ow-amber)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                            Philosophy tags
+                          </p>
+                          <div style={{ marginTop: 4, display: "flex", flexWrap: "wrap", gap: 4 }}>
+                            {enrichResult.philosophyTags.map((t) => (
+                              <span key={t} style={{ padding: "2px 8px", background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)", borderRadius: 10, fontSize: "0.7rem", color: "var(--ow-text-mid)" }}>{t}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
               {/* Hook-waterfall display — shows the Perplexity-sourced opener
