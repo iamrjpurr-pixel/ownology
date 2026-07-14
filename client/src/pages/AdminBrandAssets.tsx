@@ -53,6 +53,18 @@ const CATEGORIES: Category[] = [
     ],
   },
   {
+    key: "auto-crops",
+    title: "Auto-cropped platform variants",
+    intro: "Derivatives cropped from the 4200×700 master for LinkedIn / Instagram / Facebook / Google Business. Re-run scripts/crop-brand-sizes.mts if the master ever changes.",
+    assets: [
+      { label: "IG square",              file: "/ownology-ig-square-1080x1080.png",       dims: "1080 × 1080", purpose: "Instagram square post + profile display; centre-cropped from master", target: "IG feed post · IG profile grid tile", bg: "dark" },
+      { label: "IG portrait (letterboxed)", file: "/ownology-ig-portrait-1080x1350.png",    dims: "1080 × 1350", purpose: "Instagram portrait post — full master preserved with brand-dark letterbox top/bottom", target: "IG portrait post", bg: "dark" },
+      { label: "Facebook cover",         file: "/ownology-fb-cover-820x312.png",           dims: "820 × 312",   purpose: "FB page cover; entropy-based crop favours brand mark region", target: "Facebook page → Cover image", bg: "dark" },
+      { label: "Google Business cover",  file: "/ownology-google-business-1080x608.png",   dims: "1080 × 608",  purpose: "Google Business Profile cover; 16:9-ish safe crop", target: "Google Business Profile → Cover photo", bg: "dark" },
+      { label: "Universal square avatar", file: "/ownology-profile-square-1024x1024.png",  dims: "1024 × 1024", purpose: "Square avatar cropped from the master (alternative to the profile-icon logos). Use when you want a photographic feel rather than logo-mark.", target: "Any avatar upload", bg: "dark" },
+    ],
+  },
+  {
     key: "banners",
     title: "Social banners",
     intro: "Cover art tuned per platform. Never crop these — each is already at native platform dimensions.",

@@ -1253,6 +1253,13 @@ export const outreachContacts = mysqlTable(
     // colour-code the contact card + drive the "Reply-first follow-up"
     // generator on /admin/contacts/engagement (Rich, Feb 2026).
     replySentiment: varchar("reply_sentiment", { length: 20 }),
+    // Claude-generated follow-up SMS drafted from the pasted reply text.
+    // Separate from smsDraftOverride so the bulk follow-up job doesn't
+    // stomp the first-touch draft. Populated by bulkReplyFollowupAI +
+    // (in future) an on-demand single-contact "save" from the Engagement
+    // page. Cleared when the operator manually sends the follow-up
+    // (via smsSentAt bump).
+    replyFollowupDraft: varchar("reply_followup_draft", { length: 500 }),
     notes: varchar("notes", { length: 500 }),
     // Per-contact SMS draft override. When null, AdminContacts.tsx falls
     // back to the auto-generated template (smsDraft() helper). Set when

@@ -974,6 +974,134 @@ Return JSON: { "sms": "the follow-up SMS text" }. Return ONLY the JSON. No prose
       return { sms: parsed.sms.trim().slice(0, 500), sentiment: c.replySentiment };
     }),
 
+  /** OWNER — Bulk-draft follow-ups for every contact with a captured
+   *  reply that hasn't been actioned yet. "Actioned" = the operator has
+   *  either flipped status to sales/skip OR bumped smsSentAt AFTER the
+   *  reply landed (meaning they already sent the follow-up manually).
+   *
+   *  Skips contacts that already have `reply_followup_draft` set unless
+   *  force=true. Writes to that dedicated column so smsDraftOverride
+   *  (the first-touch draft) stays clean.
+   *
+   *  Cost: ~$0.005 per contact via Claude. Called overnight to pre-warm
+   *  follow-ups so the morning triage is Copy → Send. */
+  bulkReplyFollowupAI: ownerProcedure
+    .input(z.object({
+      force: z.boolean().default(false),
+      limit: z.number().int().min(1).max(200).default(200),
+    }))
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+      const previewBase = process.env.PREVIEW_BASE_URL || process.env.PUBLIC_BASE_URL || "https://ownology.ai";
+
+      const rows = await db
+        .select({
+          slug: schema.outreachContacts.slug,
+          firstName: schema.outreachContacts.firstName,
+          lastName: schema.outreachContacts.lastName,
+          winery: schema.outreachContacts.winery,
+          region: schema.outreachContacts.region,
+          hookText: schema.outreachContacts.hookText,
+          painPoint: schema.outreachContacts.painPoint,
+          replyText: schema.outreachContacts.replyText,
+          replySentiment: schema.outreachContacts.replySentiment,
+          replyFollowupDraft: schema.outreachContacts.replyFollowupDraft,
+          smsSentAt: schema.outreachContacts.smsSentAt,
+          repliedAt: schema.outreachContacts.repliedAt,
+          status: schema.outreachContacts.status,
+        })
+        .from(schema.outreachContacts)
+        .where(sql`reply_text IS NOT NULL AND status NOT IN ('sales','skip')`)
+        .limit(input.limit);
+
+      const results = {
+        total: rows.length,
+        drafted: 0,
+        skippedAlreadyActioned: 0,
+        skippedExistingDraft: 0,
+        failed: 0,
+        failures: [] as Array<{ slug: string; reason: string }>,
+      };
+
+      for (const c of rows) {
+        // Already actioned = smsSentAt is AFTER repliedAt.
+        if (c.smsSentAt && c.repliedAt && c.smsSentAt > c.repliedAt) {
+          results.skippedAlreadyActioned++;
+          continue;
+        }
+        // Respect existing follow-up drafts unless force=true.
+        if (!input.force && c.replyFollowupDraft && c.replyFollowupDraft.trim().length > 0) {
+          results.skippedExistingDraft++;
+          continue;
+        }
+        if (!c.replyText) continue;
+
+        try {
+          const link = `${previewBase}/hi/${c.slug}`;
+          const systemPrompt = `You are Rich, the founder of Ownology. A winemaker just replied to your outbound SMS. Draft the next SMS you'd send them — grounded in their actual reply.
+
+Their reply (verbatim):
+"""
+${c.replyText}
+"""
+
+Reply intent (Claude's classification): ${c.replySentiment ?? "unknown"}
+Their winery: ${c.winery ?? "(unknown)"}
+Region: ${c.region ?? "(unknown)"}
+Original hook: ${c.hookText ?? "(no hook on file)"}
+
+RULES:
+1. Address the specific thing they said. If concern, respond to concern. If question, answer. If yes, propose next step.
+2. Never sales-y. Mate who happens to build cellar software.
+3. Lower-case start OK. Australian idiom OK. No exclamation marks. No emojis.
+4. 180-320 chars.
+5. "interested" — propose a specific 15-min call this week ("how's Tuesday 2pm or Wednesday morning?").
+6. "objection" — acknowledge first ("fair call"), reframe without pushing.
+7. "not-now" — accept gracefully, offer to circle back in 3 months.
+8. "cold" — thank them, close warmly.
+9. Sign off " — Rich".
+10. Include link ${link} only if genuinely useful.
+
+Return JSON: { "sms": "..." }. ONLY JSON. No prose. No fences.`;
+
+          const chatResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${forgeKey}`,
+              "x-ow-source": "outreach.bulkReplyFollowupAI",
+            },
+            body: JSON.stringify({
+              model: "claude-sonnet-4-5",
+              messages: [{ role: "system", content: systemPrompt }],
+              stream: false,
+            }),
+          });
+          if (!chatResp.ok) throw new Error(`Claude ${chatResp.status}`);
+          const chatData = await chatResp.json();
+          const raw = chatData.choices?.[0]?.message?.content ?? "{}";
+          const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+          const parsed = JSON.parse(cleaned) as { sms?: string };
+          if (typeof parsed.sms !== "string" || !parsed.sms.trim()) throw new Error("malformed");
+          await db
+            .update(schema.outreachContacts)
+            .set({ replyFollowupDraft: parsed.sms.trim().slice(0, 500) })
+            .where(eq(schema.outreachContacts.slug, c.slug));
+          results.drafted++;
+        } catch (err) {
+          results.failed++;
+          results.failures.push({
+            slug: c.slug,
+            reason: err instanceof Error ? err.message.slice(0, 150) : String(err),
+          });
+        }
+      }
+
+      return results;
+    }),
+
 
 
   /** OWNER — create a new contact. Slug auto-generated unless overridden. */
