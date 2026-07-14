@@ -354,6 +354,10 @@ function Router() {
       <Route path={"/merch/success"} component={MerchSuccess} />
       <Route path={"/merch/cancel"} component={MerchCancel} />
       <Route path={"/merch"} component={Merch} />
+      {/* Owner-only surfaces — moved to /admin/* per Feb 2026 smoke test.
+          Old URLs kept as aliases so existing bookmarks don't 404. */}
+      <Route path={"/admin/campaign-metrics"} component={CampaignMetrics} />
+      <Route path={"/admin/orders"} component={Orders} />
       <Route path={"/campaign-metrics"} component={CampaignMetrics} />
       <Route path={"/orders"} component={Orders} />
       <Route path={"/admin"} component={Admin} />
@@ -370,6 +374,8 @@ function Router() {
       <Route path={"/founding-member/success"} component={FoundingMemberSuccess} />
       <Route path={"/dashboard"} component={DashboardPage} />
       <Route path={"/vineyard"} component={Vineyard} />
+      {/* /build-index moved to /admin/* — dev-only surface, was leaking on prod. */}
+      <Route path={"/admin/build-index"} component={BuildIndex} />
       <Route path={"/build-index"} component={BuildIndex} />
       <Route path={"/knowledge/using-ownology"} component={KnowledgeUsingOwnology} />
       <Route path={"/knowledge"} component={KnowledgePage} />

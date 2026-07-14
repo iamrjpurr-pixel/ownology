@@ -31,7 +31,11 @@ const PRESETS: { label: string; path: string }[] = [
 ];
 
 const VIEWPORTS: { label: string; w: number; h: number; icon: string }[] = [
+  // Feb 2026: added Pixel 8 (Android portrait) so Android/Chrome coverage
+  // isn't just inferred from the iPhone 390-wide breakpoint. Pixel 8 is
+  // 412×915 CSS pixels — meaningful gap from iPhone's 390.
   { label: "iPhone 13/14",  w: 390,  h: 844,  icon: "📱" },
+  { label: "Pixel 8",       w: 412,  h: 915,  icon: "📱" },
   { label: "iPad portrait", w: 768,  h: 1024, icon: "📱" },
   { label: "Desktop 1440",  w: 1440, h: 900,  icon: "🖥️" },
 ];
@@ -71,7 +75,7 @@ export default function AdminResponsive() {
             Responsive UI check
           </h1>
           <span style={{ fontSize: "0.72rem", color: "var(--ow-text-lo)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-            iPhone · iPad · Desktop · all live
+            iPhone · Pixel 8 · iPad · Desktop · all live
           </span>
         </div>
 

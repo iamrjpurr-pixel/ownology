@@ -332,6 +332,19 @@ export const cellarJournalRouter = router({
           )!
         );
       }
+      // Feb 2026 cleanup — hide dev pollution from the paginated listing.
+      // Same suppression rules as the `topics` procedure above; kept as
+      // SQL predicates so the total count matches what's actually visible.
+      if (!input.topic) {
+        // Only apply topic-based noise filter when the user isn't asking for
+        // a specific topic. If they've deep-linked into "test" we let it
+        // through so the URL isn't silently empty.
+        conds.push(sql`LOWER(TRIM(${cj.topicTag})) NOT IN ('test','general','')`);
+        conds.push(sql`LOWER(${cj.topicTag}) NOT LIKE 'morewine%'`);
+        conds.push(sql`LOWER(${cj.topicTag}) NOT LIKE 'morew\\_%' ESCAPE '\\'`);
+        conds.push(sql`${cj.topicTag} NOT LIKE '% — Section %'`);
+        conds.push(sql`${cj.topicTag} NOT LIKE '% — Chapter %'`);
+      }
 
       const rows = await db
         .select({

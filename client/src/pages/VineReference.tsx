@@ -4,7 +4,7 @@
  * Design: dark warm-black, amber gold accents, Fraunces serif, Lato body
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
 
@@ -301,6 +301,19 @@ export default function VineReference() {
     const first = CHAPTERS.find((ch) => chapterMatchesQuery(ch, val));
     if (first) setActiveChapter(first.number);
   };
+
+  // Force the site theme to dark while this reference page is mounted so
+  // the navbar + page-body render as a single dark editorial surface.
+  // The page's typographic styles are all tuned for dark bg — inheriting
+  // a parchment site theme leaked pale text onto cream and broke legibility.
+  useEffect(() => {
+    const root = document.documentElement;
+    const wasDark = root.classList.contains("dark");
+    root.classList.add("dark");
+    return () => {
+      if (!wasDark) root.classList.remove("dark");
+    };
+  }, []);
 
   return (
     <div

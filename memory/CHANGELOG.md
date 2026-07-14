@@ -4,6 +4,56 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Feb 2026 — Smoke-test value-engineering pass
+
+Rich walked through several prod pages and reported issues; consolidated Q&A into a shortlist of fixes and shipped the highest-value ones.
+
+**Access-control cleanup** — three surfaces moved out of the public/member zone into `/admin/*` where they belong:
+- `/orders` → `/admin/orders` (owner-only merch order history from Stripe — was leaking to any logged-in user)
+- `/campaign-metrics` → `/admin/campaign-metrics` (owner-only weekly campaign KPIs)
+- `/build-index` → `/admin/build-index` (dev-only feature index — file header literally said "remove before going live", was live on prod)
+- Old URLs kept as aliases so existing bookmarks don't 404. Real gating still relies on the tRPC procedures each page hits — those already have owner scoping.
+
+**Cellar Journal category cleanup** (`server/cellarJournalRouter.ts`)
+- Rich reported the category chips were leaking dev pollution: `MOREWINE! RED WINEMAKING OUTLINE — SECTION A.2 SO2 ADDITION · 1`, `TEST · 1`, `AROMA · 1` (duplicate of `Flavor & Aroma`), plus singleton grape varieties (`RIESLING · 1`, `PINOT NOIR · 1`, `CHARDONNAY · 1`), `GENERAL · 1`, `SANITATION · 1`.
+- New suppression rules in both `topics` procedure AND the `listPublic` SQL predicate:
+  - Hard-drop: `test`, `general`, empty topic tags
+  - Prefix-drop: source-doc labels (`morewine%`, `morew\_%`)
+  - Shape-drop: any topic containing ` — Section ` or ` — Chapter ` (section-header shaped labels leaking from ingest)
+  - Singleton-drop: topics with count < 2 removed from category chip list (natural threshold — real categories cross it as content accrues)
+- `listPublic` predicate only applies the noise filter when `topic` param is NOT set — a deep-link to `?topic=test` still returns those entries so no silent 404s.
+- Verified via `cellarJournal.topics`: 14 real topics returned, zero noise, zero singletons. Sample now clean: SO₂ & Sulphites, Stuck Fermentation, Acid & pH, Flavour & Aroma, etc.
+
+**VineReference theme fix** (`client/src/pages/VineReference.tsx`)
+- Rich reported the page had a mixed parchment navbar + dark body — visual mismatch.
+- First attempt made the outer bg parchment via `var(--ow-bg-base)`, which broke the page's dark-tuned typography (pale text on cream = invisible).
+- Correct fix: forced `documentElement.classList.add("dark")` for the lifetime of the page mount, restored on unmount. This makes the ThemePicker infrastructure treat the whole page (nav + body + cards) as one dark editorial surface. Verified via screenshot — every element now rendered in warm-black + cream, no theme leak.
+
+**Pixel 8 breakpoint on `/admin/responsive`** (`client/src/pages/AdminResponsive.tsx`)
+- Rich asked if Android/Google phones were covered — they weren't; only iPhone 13/14 (390×844), iPad (768×1024), Desktop (1440×900).
+- Added Pixel 8 (412×915) between iPhone and iPad so Android portrait is explicitly tested. Meaningful 22px gap from iPhone 390 catches Android-only layout bugs.
+
+**Flashcard swipe affordance** (`client/src/components/FlashCardDeck.tsx`)
+- Rich reported "can't read the edges" on `/admin/operator-guide#crm-flash-cards`.
+- Added a right-edge fade mask (linear-gradient) on the scroll strip so the peek-at-next-card reads as an affordance, not a bug. Plus a floating `swipe →` chip that only appears when the strip actually has more off-screen content (measured via scrollLeft + clientWidth vs scrollWidth on scroll + resize).
+- Also noted: production is running a stale build without earlier edge-fixes — Rich needs to redeploy for the fix to appear on ownology.ai.
+
+**SW `CACHE_VERSION`** bumped `ow-v19 → ow-v20`.
+
+**Q&A logged (deferred; ready for next session)**:
+- `/quick-entry` — add Clean + Sanitise event tiles to close the Cellar Board RAG loop
+- `/vineyard` — tight rebuild scope (block register + basics, no viticulture creep)
+- `/resources/home-winery-kit` — metric/imperial toggle
+- `/merch` — hi-res artwork downloader for VistaPrint uploads (Option A: `/admin/merch-artwork` page)
+- `/stats` — rename to `/how-we-price`, keep public
+- `/roadmap` — rename to `/your-journey`, dim locked nodes per tier
+- `/todo` — auto-refresh script that reads CHANGELOG.md
+- Auth expansion — email/password magic-link fallback via Resend, optional Microsoft OAuth
+- Cross-page consistency audit (Terms / Privacy / Refund / Pricing)
+- Mockup pages (copilot / onboarding / branding) — pending Rich's greenlight per-mockup
+
+
+
 ### Feb 2026 — Batch Book Print CSS + Knowledge base + contextual learn links
 
 **Batch Book Print CSS** (`client/src/pages/BatchBook.tsx`)
