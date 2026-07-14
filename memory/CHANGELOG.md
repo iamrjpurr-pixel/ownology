@@ -1085,3 +1085,35 @@ should land here so PRD.md can stay a spec, not a diary.
   Wineries", and the answer prose no longer names any suppressed
   source.
 
+### "See it on your own kit" personalised /how-we-trace  (Feb 2026)
+- `/how-we-trace` was previously a static demo. Now every visitor can
+  click **"See it on your own kit"**, run a 5-minute equipment intake
+  (phase-grouped checkboxes with quantity steppers + batch label + wine
+  style), and instantly see their kit rendered on the same cellar board
+  — with Red/Amber/Green/Grey states, phase groupings, drawer detail,
+  and a personalised traceability timeline.
+- Zero-DB. Intake persists in `localStorage` under `ow_prospect_cellar_v1`
+  so refresh preserves state, and Rich never has to garbage-collect
+  abandoned prospect rows. Anonymous users, no signup, no auth touch.
+- Deterministic scenario: seeded PRNG from the intake means the same
+  kit + batch label → same board on every render (no reshuffling on
+  refresh). Rules: one fermenter holds the batch (Red), ~30% of the
+  rest are Green (sanitised inside 72h), ~35% chance a press is Grey
+  (gasket fault) to demo the out-of-service UX, remainder Amber with
+  varied "needs clean" reasons. Flow-path vessels (hopper → sorting
+  table → destemmer → pump/hose → fermenter) get their recent-use
+  drawer prepopulated so the story lands even without operator input.
+- Hero, board header, timeline eyebrow, and CTA all switch copy when a
+  personalised intake is active. "Edit your kit" + "Back to sample
+  board" controls let prospects toggle without losing state.
+- Backing files: `client/src/lib/prospectCellar.ts` (types, catalog,
+  storage, scenario generator, timeline builder — ~230 LOC),
+  `client/src/pages/HowWeTrace.tsx` (extended with `IntakeModal`
+  component + swapped data sources).
+- SW cache bumped to `ow-v7`.
+- Smoke tested via Playwright: click "See it on your own kit" →
+  modal opens with sensible defaults (9 types · 26 vessels) → submit →
+  board renders with R=1 A=18 G=7 X=0, hero flips to "Your cellar, on
+  our board", "McLaren Vale Shiraz · Live sample" eyebrow, Fermenter
+  #1 correctly shows "Holding batch 26SHZ-001 — day 1 of fermentation".
+

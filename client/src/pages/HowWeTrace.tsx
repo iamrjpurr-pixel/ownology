@@ -26,7 +26,18 @@
  */
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
-import { ArrowRight, CheckCircle2, AlertTriangle, XCircle, Circle, ChevronDown, ChevronRight, Shield, Scan, ClipboardList } from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertTriangle, XCircle, Circle, ChevronDown, ChevronRight, Shield, Scan, ClipboardList, Sparkles, X } from "lucide-react";
+import {
+  EQUIPMENT_CATALOG,
+  loadProspectIntake,
+  saveProspectIntake,
+  clearProspectIntake,
+  generateProspectCellar,
+  generateProspectTimeline,
+  type ProspectIntake,
+  type IntakeEntry,
+  type ProspectVessel,
+} from "@/lib/prospectCellar";
 
 type WbsPhase =
   | "receival"
@@ -223,31 +234,69 @@ const DEMO_TIMELINE: TimelineStep[] = [
 
 export default function HowWeTrace() {
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
+  const [intake, setIntake] = useState<ProspectIntake | null>(() => loadProspectIntake());
+  const [showIntakeModal, setShowIntakeModal] = useState(false);
+
+  // Personalised board when the prospect has submitted their kit, else the
+  // hand-tuned sample. `personalised` is the flag downstream sections read.
+  const personalised = intake != null;
+  const vessels: Vessel[] = useMemo(
+    () => (personalised ? (generateProspectCellar(intake!) as Vessel[]) : DEMO_VESSELS),
+    [personalised, intake]
+  );
+  const timeline: TimelineStep[] = useMemo(
+    () => (personalised ? (generateProspectTimeline(intake!) as TimelineStep[]) : DEMO_TIMELINE),
+    [personalised, intake]
+  );
+
   const grouped = useMemo(() => {
     const m = new Map<WbsPhase, Vessel[]>();
-    for (const v of DEMO_VESSELS) {
+    for (const v of vessels) {
       const bucket = m.get(v.wbsPhase) ?? [];
       bucket.push(v);
       m.set(v.wbsPhase, bucket);
     }
     return m;
-  }, []);
+  }, [vessels]);
   const counts = useMemo(() => {
     const c = { green: 0, amber: 0, red: 0, grey: 0 };
-    for (const v of DEMO_VESSELS) c[v.state]++;
+    for (const v of vessels) c[v.state]++;
     return c;
-  }, []);
+  }, [vessels]);
+
+  const handleSaveIntake = (next: ProspectIntake) => {
+    saveProspectIntake(next);
+    setIntake(next);
+    setShowIntakeModal(false);
+    setExpanded({});
+    // Scroll to board so the payoff is immediate.
+    if (typeof window !== "undefined") {
+      setTimeout(() => document.getElementById("cellar-board-live")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+    }
+  };
+  const handleResetIntake = () => {
+    clearProspectIntake();
+    setIntake(null);
+    setExpanded({});
+  };
 
   return (
     <div style={{ background: "#faf5ec", minHeight: "100vh" }}>
       <SeoMeta />
-      <Hero />
+      <Hero personalised={personalised} intake={intake} onPersonalise={() => setShowIntakeModal(true)} onReset={handleResetIntake} />
       <RecallStory />
-      <BoardSection grouped={grouped} counts={counts} expanded={expanded} setExpanded={setExpanded} />
+      <BoardSection grouped={grouped} counts={counts} expanded={expanded} setExpanded={setExpanded} personalised={personalised} intake={intake} />
       <ComplianceCallout />
-      <Timeline />
-      <ProspectCta />
+      <Timeline timeline={timeline} intake={intake} personalised={personalised} />
+      <ProspectCta personalised={personalised} onPersonalise={() => setShowIntakeModal(true)} />
       <Footer />
+      {showIntakeModal && (
+        <IntakeModal
+          initial={intake}
+          onClose={() => setShowIntakeModal(false)}
+          onSave={handleSaveIntake}
+        />
+      )}
     </div>
   );
 }
@@ -274,33 +323,63 @@ function SeoMeta() {
   return null;
 }
 
-function Hero() {
+function Hero({ personalised, intake, onPersonalise, onReset }: { personalised: boolean; intake: ProspectIntake | null; onPersonalise: () => void; onReset: () => void }) {
+  const headline = personalised && intake
+    ? `If Batch ${intake.batchLabel} faulted tomorrow, you'd know exactly which pump, hose, and tank touched it — with sanitation timestamps.`
+    : "If Batch 26SHZ-001 faulted tomorrow, you'd know exactly which pump, hose, and tank touched it — with sanitation timestamps.";
+  const subtitle = personalised && intake
+    ? `Your kit. Your batch label. Your cellar board — computed live below from what you told us. This is exactly what Ownology looks like for ${intake.wineStyle}.`
+    : "This is the live Ownology cellar board. Green vessels are sanitised, empty, ready to fill. Amber need cleaning. Red are holding wine. Grey are out of service. Every state is computed from your event log — never edited by hand. That's the audit-defensible bit.";
+
   return (
     <section style={{ padding: "72px 24px 40px", maxWidth: 1080, margin: "0 auto" }}>
       <div style={{ fontFamily: "Georgia,serif", fontSize: 12, letterSpacing: "0.16em", textTransform: "uppercase", color: "#B0741A", fontWeight: 700, marginBottom: 12 }} data-testid="how-we-trace-eyebrow">
-        Cellar traceability, in one screen
+        {personalised ? "Your cellar, on our board" : "Cellar traceability, in one screen"}
       </div>
       <h1 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(28px, 5vw, 48px)", fontWeight: 600, color: "#1a1210", lineHeight: 1.15, margin: "0 0 20px", maxWidth: 820 }}>
-        If Batch 26SHZ-001 faulted tomorrow, you'd know exactly which pump, hose, and tank touched it — with sanitation timestamps.
+        {headline}
       </h1>
       <p style={{ fontFamily: "Georgia,serif", fontSize: 18, lineHeight: 1.55, color: "#4a3d35", maxWidth: 720, margin: "0 0 28px" }}>
-        This is the live Ownology cellar board. Green vessels are sanitised, empty, ready to fill. Amber need cleaning. Red are holding wine. Grey are out of service. Every state is computed from your event log — never edited by hand. That's the audit-defensible bit.
+        {subtitle}
       </p>
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+        {!personalised && (
+          <button
+            type="button"
+            data-testid="how-we-trace-personalise-cta"
+            onClick={onPersonalise}
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 22px", background: "#B0741A", color: "#2A1E0A", border: "none", cursor: "pointer", fontFamily: "Arial,sans-serif", fontSize: 15, fontWeight: 600, borderRadius: 999 }}
+          >
+            <Sparkles size={16} /> See it on your own kit
+          </button>
+        )}
+        {personalised && (
+          <>
+            <button
+              type="button"
+              data-testid="how-we-trace-edit-kit"
+              onClick={onPersonalise}
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 22px", background: "#B0741A", color: "#2A1E0A", border: "none", cursor: "pointer", fontFamily: "Arial,sans-serif", fontSize: 15, fontWeight: 600, borderRadius: 999 }}
+            >
+              <Sparkles size={16} /> Edit your kit
+            </button>
+            <button
+              type="button"
+              data-testid="how-we-trace-reset-sample"
+              onClick={onReset}
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 22px", background: "transparent", color: "#4a3d35", textDecoration: "none", fontFamily: "Arial,sans-serif", fontSize: 15, fontWeight: 500, border: "1px solid #d4c9b6", borderRadius: 999, cursor: "pointer" }}
+            >
+              Back to sample board
+            </button>
+          </>
+        )}
         <Link
           href="/try"
           data-testid="how-we-trace-try-cta"
-          style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 22px", background: "#B0741A", color: "#2A1E0A", textDecoration: "none", fontFamily: "Arial,sans-serif", fontSize: 15, fontWeight: 600, borderRadius: 999 }}
+          style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 22px", background: personalised ? "transparent" : "transparent", color: "#4a3d35", textDecoration: "none", fontFamily: "Arial,sans-serif", fontSize: 15, fontWeight: 500, border: "1px solid #d4c9b6", borderRadius: 999 }}
         >
           Try Ownology for your cellar <ArrowRight size={16} />
         </Link>
-        <a
-          href="#recall-story"
-          data-testid="how-we-trace-story-cta"
-          style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 22px", background: "transparent", color: "#4a3d35", textDecoration: "none", fontFamily: "Arial,sans-serif", fontSize: 15, fontWeight: 500, border: "1px solid #d4c9b6", borderRadius: 999 }}
-        >
-          See the recall-readiness story
-        </a>
       </div>
     </section>
   );
@@ -341,23 +420,29 @@ function BoardSection({
   counts,
   expanded,
   setExpanded,
+  personalised,
+  intake,
 }: {
   grouped: Map<WbsPhase, Vessel[]>;
   counts: Record<RagState, number>;
   expanded: Record<number, boolean>;
   setExpanded: React.Dispatch<React.SetStateAction<Record<number, boolean>>>;
+  personalised: boolean;
+  intake: ProspectIntake | null;
 }) {
   return (
-    <section style={{ padding: "48px 24px", maxWidth: 1200, margin: "0 auto", borderTop: "1px solid #e5dcc7" }}>
+    <section id="cellar-board-live" style={{ padding: "48px 24px", maxWidth: 1200, margin: "0 auto", borderTop: "1px solid #e5dcc7" }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontFamily: "Georgia,serif", fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", color: "#B0741A", fontWeight: 700, marginBottom: 8 }}>
-          Ownology Cellars — 2026 Vintage · Live sample
+          {personalised && intake ? `${intake.wineStyle} · Live sample` : "Ownology Cellars — 2026 Vintage · Live sample"}
         </div>
         <h2 style={{ fontFamily: "Georgia,serif", fontSize: 30, fontWeight: 600, color: "#1a1210", margin: "0 0 8px" }}>
-          The cellar board, right now
+          {personalised ? "Your cellar, right now" : "The cellar board, right now"}
         </h2>
         <p style={{ fontFamily: "Georgia,serif", fontSize: 15, color: "#4a3d35", margin: 0, maxWidth: 720 }}>
-          This is the exact UI your winemakers use. Tap any vessel to see its recent uses and sanitation history.
+          {personalised
+            ? "This is your kit, on the exact UI your winemakers would use. Tap any vessel to see its recent uses and sanitation history."
+            : "This is the exact UI your winemakers use. Tap any vessel to see its recent uses and sanitation history."}
         </p>
       </div>
 
@@ -473,11 +558,13 @@ function VesselCard({ v, expanded, onToggle }: { v: Vessel; expanded: boolean; o
   );
 }
 
-function Timeline() {
+function Timeline({ timeline, intake, personalised }: { timeline: TimelineStep[]; intake: ProspectIntake | null; personalised: boolean }) {
+  const batchLabel = personalised && intake ? intake.batchLabel : "26SHZ-001";
+  const wineStyle = personalised && intake ? intake.wineStyle : "McLaren Vale Shiraz";
   return (
     <section style={{ padding: "48px 24px", maxWidth: 900, margin: "0 auto", borderTop: "1px solid #e5dcc7" }}>
       <div style={{ fontFamily: "Georgia,serif", fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", color: "#B0741A", fontWeight: 700, marginBottom: 8 }}>
-        Batch 26SHZ-001 · McLaren Vale Shiraz
+        Batch {batchLabel} · {wineStyle}
       </div>
       <h2 style={{ fontFamily: "Georgia,serif", fontSize: 26, fontWeight: 600, color: "#1a1210", margin: "0 0 6px" }}>
         The traceability sheet, unwrapped
@@ -486,7 +573,7 @@ function Timeline() {
         Every touch point in the last 24 hours, with sanitation verified at the moment of use.
       </p>
       <div style={{ borderLeft: "2px solid #B0741A", paddingLeft: 20 }}>
-        {DEMO_TIMELINE.map((s, i) => (
+        {timeline.map((s, i) => (
           <div
             key={i}
             data-testid={`how-we-trace-timeline-step-${i}`}
@@ -523,7 +610,7 @@ function ComplianceCallout() {
   );
 }
 
-function ProspectCta() {
+function ProspectCta({ personalised, onPersonalise }: { personalised: boolean; onPersonalise: () => void }) {
   return (
     <section style={{ padding: "56px 24px", maxWidth: 900, margin: "0 auto", textAlign: "center", borderTop: "1px solid #e5dcc7" }}>
       <h2 style={{ fontFamily: "Georgia,serif", fontSize: 28, fontWeight: 600, color: "#1a1210", margin: "0 0 12px" }}>
@@ -532,13 +619,25 @@ function ProspectCta() {
       <p style={{ fontFamily: "Georgia,serif", fontSize: 16, color: "#4a3d35", margin: "0 0 24px", maxWidth: 620, marginInline: "auto" }}>
         Ownology is a winemaker's second brain — the cellar intelligence layer between your logbook and your compliance file. Try it for your 2026 vintage.
       </p>
-      <Link
-        href="/try"
-        data-testid="how-we-trace-final-cta"
-        style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 28px", background: "#B0741A", color: "#2A1E0A", textDecoration: "none", fontFamily: "Arial,sans-serif", fontSize: 15, fontWeight: 600, borderRadius: 999 }}
-      >
-        Start your cellar <ArrowRight size={16} />
-      </Link>
+      <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+        {!personalised && (
+          <button
+            type="button"
+            data-testid="how-we-trace-cta-personalise"
+            onClick={onPersonalise}
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 28px", background: "transparent", color: "#4a3d35", border: "1px solid #d4c9b6", cursor: "pointer", fontFamily: "Arial,sans-serif", fontSize: 15, fontWeight: 500, borderRadius: 999 }}
+          >
+            <Sparkles size={16} /> See it on your own kit first
+          </button>
+        )}
+        <Link
+          href="/try"
+          data-testid="how-we-trace-final-cta"
+          style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 28px", background: "#B0741A", color: "#2A1E0A", textDecoration: "none", fontFamily: "Arial,sans-serif", fontSize: 15, fontWeight: 600, borderRadius: 999 }}
+        >
+          Start your cellar <ArrowRight size={16} />
+        </Link>
+      </div>
     </section>
   );
 }
@@ -552,3 +651,174 @@ function Footer() {
     </footer>
   );
 }
+
+// ───────────────────────────────────────────────────────────────────────
+// Intake modal — 5-minute equipment intake driving the personalised board
+// ───────────────────────────────────────────────────────────────────────
+
+type PhaseGroupedCatalog = Array<{ phase: WbsPhase; label: string; items: typeof EQUIPMENT_CATALOG }>;
+
+const PHASE_CATALOG: PhaseGroupedCatalog = (["receival", "crushing", "fermentation", "pressing_transfer", "storage_ageing", "bottling"] as WbsPhase[]).map(
+  (p) => ({
+    phase: p,
+    label: PHASE_LABEL[p],
+    items: EQUIPMENT_CATALOG.filter((c) => c.phase === p),
+  })
+);
+
+const COMMON_WINE_STYLES = [
+  "McLaren Vale Shiraz",
+  "Barossa Shiraz",
+  "Coonawarra Cabernet",
+  "Adelaide Hills Chardonnay",
+  "Yarra Valley Pinot Noir",
+  "Margaret River Cabernet",
+  "Hunter Valley Semillon",
+  "Tasmanian Pinot Noir",
+  "Clare Valley Riesling",
+  "Grenache blend",
+];
+
+function IntakeModal({
+  initial,
+  onClose,
+  onSave,
+}: {
+  initial: ProspectIntake | null;
+  onClose: () => void;
+  onSave: (i: ProspectIntake) => void;
+}) {
+  const [batchLabel, setBatchLabel] = useState(initial?.batchLabel ?? "26SHZ-001");
+  const [wineStyle, setWineStyle] = useState(initial?.wineStyle ?? "McLaren Vale Shiraz");
+  const [quantities, setQuantities] = useState<Record<string, number>>(() => {
+    const q: Record<string, number> = {};
+    if (initial) {
+      for (const e of initial.entries) q[e.key] = e.quantity;
+    } else {
+      q.hopper = 1;
+      q.sorting_table = 1;
+      q.destemmer = 1;
+      q.fermentation_tank = 4;
+      q.press = 1;
+      q.pump = 2;
+      q.hose = 3;
+      q.barrel = 12;
+      q.bottling_filler = 1;
+    }
+    return q;
+  });
+
+  const totalSelected = useMemo(() => Object.values(quantities).reduce((s, n) => s + (n > 0 ? 1 : 0), 0), [quantities]);
+  const totalItems = useMemo(() => Object.values(quantities).reduce((s, n) => s + n, 0), [quantities]);
+
+  const setQty = (key: string, next: number) => {
+    setQuantities((q) => ({ ...q, [key]: Math.max(0, Math.min(99, next)) }));
+  };
+
+  const handleSubmit = () => {
+    const entries: IntakeEntry[] = EQUIPMENT_CATALOG
+      .filter((c) => (quantities[c.key] ?? 0) > 0)
+      .map((c) => ({
+        key: c.key,
+        label: c.label,
+        phase: c.phase,
+        quantity: quantities[c.key],
+        capacityL: c.typicalCapacityL,
+      }));
+    if (entries.length === 0) return;
+
+    onSave({
+      version: 1,
+      batchLabel: batchLabel.trim() || "26SHZ-001",
+      wineStyle: wineStyle.trim() || "McLaren Vale Shiraz",
+      entries,
+      savedAt: Date.now(),
+    });
+  };
+
+  return (
+    <div
+      data-testid="how-we-trace-intake-modal"
+      style={{ position: "fixed", inset: 0, background: "rgba(26,18,16,0.55)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "40px 16px", zIndex: 200, overflowY: "auto" }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div style={{ background: "#faf5ec", maxWidth: 720, width: "100%", borderRadius: 12, padding: "28px 28px 22px", boxShadow: "0 20px 60px rgba(0,0,0,0.35)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+          <div>
+            <div style={{ fontFamily: "Georgia,serif", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "#B0741A", fontWeight: 700, marginBottom: 6 }}>
+              5-minute equipment intake
+            </div>
+            <h2 style={{ fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 600, color: "#1a1210", margin: 0 }}>
+              Tell us what you own. See your cellar board.
+            </h2>
+          </div>
+          <button type="button" data-testid="how-we-trace-intake-close" onClick={onClose} aria-label="Close" style={{ background: "transparent", border: "none", cursor: "pointer", color: "#6b5c50", padding: 4 }}>
+            <X size={20} />
+          </button>
+        </div>
+
+        <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#6b5c50", margin: "6px 0 18px", lineHeight: 1.55 }}>
+          Nothing gets saved anywhere but this browser. Take 5 minutes, then Ownology renders your cellar with a live batch — Red vessels holding wine, Green ready to fill, Amber needing clean, Grey out of service.
+        </p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 18 }}>
+          <label style={{ fontFamily: "Arial,sans-serif", fontSize: 12, color: "#6b5c50" }}>
+            Your batch label
+            <input type="text" data-testid="how-we-trace-intake-batch-label" value={batchLabel} onChange={(e) => setBatchLabel(e.target.value)} placeholder="e.g. 26SHZ-001" maxLength={32}
+              style={{ width: "100%", marginTop: 4, padding: "9px 10px", fontFamily: "Georgia,serif", fontSize: 15, border: "1px solid #d4c9b6", borderRadius: 6, background: "#fff", color: "#1a1210" }} />
+          </label>
+          <label style={{ fontFamily: "Arial,sans-serif", fontSize: 12, color: "#6b5c50" }}>
+            Wine style
+            <input type="text" data-testid="how-we-trace-intake-wine-style" value={wineStyle} onChange={(e) => setWineStyle(e.target.value)} list="how-we-trace-styles" placeholder="e.g. McLaren Vale Shiraz" maxLength={64}
+              style={{ width: "100%", marginTop: 4, padding: "9px 10px", fontFamily: "Georgia,serif", fontSize: 15, border: "1px solid #d4c9b6", borderRadius: 6, background: "#fff", color: "#1a1210" }} />
+            <datalist id="how-we-trace-styles">
+              {COMMON_WINE_STYLES.map((s) => (<option key={s} value={s} />))}
+            </datalist>
+          </label>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 20 }}>
+          {PHASE_CATALOG.map(({ phase, label, items }) => (
+            <div key={phase}>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 13, fontWeight: 600, color: "#4a3d35", marginBottom: 6 }}>{label}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 6 }}>
+                {items.map((it) => {
+                  const qty = quantities[it.key] ?? 0;
+                  const selected = qty > 0;
+                  return (
+                    <div key={it.key} data-testid={`how-we-trace-intake-item-${it.key}`}
+                      style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", border: `1px solid ${selected ? "#B0741A" : "#e5dcc7"}`, background: selected ? "rgba(176,116,26,0.06)" : "#fff", borderRadius: 6 }}>
+                      <input type="checkbox" data-testid={`how-we-trace-intake-check-${it.key}`} checked={selected} onChange={(e) => setQty(it.key, e.target.checked ? 1 : 0)} style={{ accentColor: "#B0741A", cursor: "pointer" }} />
+                      <span style={{ flex: 1, fontFamily: "Arial,sans-serif", fontSize: 13, color: "#1a1210" }}>{it.label}</span>
+                      {selected && (
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                          <button type="button" aria-label={`Decrease ${it.label}`} onClick={() => setQty(it.key, qty - 1)} style={{ width: 22, height: 22, border: "1px solid #d4c9b6", background: "#fff", borderRadius: 4, cursor: "pointer", fontFamily: "Arial", fontSize: 14, lineHeight: 1, color: "#4a3d35" }}>−</button>
+                          <span data-testid={`how-we-trace-intake-qty-${it.key}`} style={{ minWidth: 20, textAlign: "center", fontFamily: "Georgia,serif", fontSize: 14, fontWeight: 600, color: "#1a1210" }}>{qty}</span>
+                          <button type="button" aria-label={`Increase ${it.label}`} onClick={() => setQty(it.key, qty + 1)} style={{ width: 22, height: 22, border: "1px solid #d4c9b6", background: "#fff", borderRadius: 4, cursor: "pointer", fontFamily: "Arial", fontSize: 14, lineHeight: 1, color: "#4a3d35" }}>+</button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #e5dcc7", paddingTop: 14, gap: 12, flexWrap: "wrap" }}>
+          <div style={{ fontFamily: "Arial,sans-serif", fontSize: 12, color: "#6b5c50" }}>
+            <span data-testid="how-we-trace-intake-summary">{totalSelected} types · {totalItems} vessels</span>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button type="button" onClick={onClose} style={{ padding: "9px 16px", background: "transparent", border: "1px solid #d4c9b6", borderRadius: 999, cursor: "pointer", fontFamily: "Arial,sans-serif", fontSize: 14, color: "#4a3d35" }}>Cancel</button>
+            <button type="button" data-testid="how-we-trace-intake-submit" onClick={handleSubmit} disabled={totalSelected === 0}
+              style={{ padding: "9px 22px", background: totalSelected === 0 ? "#c9b48e" : "#B0741A", color: "#2A1E0A", border: "none", borderRadius: 999, cursor: totalSelected === 0 ? "not-allowed" : "pointer", fontFamily: "Arial,sans-serif", fontSize: 14, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <Sparkles size={14} /> Show my cellar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
