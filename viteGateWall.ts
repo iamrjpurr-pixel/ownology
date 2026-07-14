@@ -68,6 +68,7 @@ const PUBLIC_EXACT = new Set<string>([
   "/merch/success",
   "/merch/cancel",
   "/cellar-journal",
+  "/how-we-trace",
   "/apco",
   "/reference/vine",
   "/guide",

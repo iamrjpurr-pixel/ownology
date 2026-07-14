@@ -76,6 +76,7 @@ const Knowledge = lazy(() => import("./pages/Knowledge"));
 const CellarJournalIndex = lazy(() =>
   import("./pages/CellarJournal").then((m) => ({ default: m.CellarJournalIndex }))
 );
+const HowWeTrace = lazy(() => import("./pages/HowWeTrace"));
 const CellarJournalEntry = lazy(() =>
   import("./pages/CellarJournal").then((m) => ({ default: m.CellarJournalEntry }))
 );
@@ -329,6 +330,7 @@ function Router() {
       <Route path={"/blog"} component={Blog} />
       <Route path={"/blog/:slug"} component={BlogArticle} />
       <Route path={"/cellar-journal"} component={CellarJournalIndex} />
+      <Route path={"/how-we-trace"} component={HowWeTrace} />
       <Route path={"/cellar-journal/:slug"}>
         {(params) => <CellarJournalEntry slug={params.slug} />}
       </Route>

@@ -49,6 +49,7 @@ const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }
   { path: "/risk-management",      priority: "0.8", changefreq: "monthly" },
   { path: "/why-ownology",         priority: "0.7", changefreq: "monthly" },
   { path: "/apco",                 priority: "0.9", changefreq: "weekly" },
+  { path: "/how-we-trace",         priority: "0.9", changefreq: "monthly" },
   { path: "/free-run",             priority: "0.7", changefreq: "monthly" },
   { path: "/blog",                 priority: "0.7", changefreq: "weekly" },
   { path: "/for-home-winemakers",  priority: "0.6", changefreq: "monthly" },

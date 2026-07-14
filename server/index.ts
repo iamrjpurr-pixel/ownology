@@ -18,6 +18,7 @@ import { cellarJournalSitemapHandler, mainSitemapHandler, robotsTxtHandler, cell
 import { generateAuditTrailPdf } from "./auditTrailPdf.js";
 import { dailyAlertEmailHandler } from "./scheduled/dailyAlertEmail.js";
 import { weeklyCellarDigestHandler } from "./scheduled/weeklyCellarDigest.js";
+import { weeklyBdDigestHandler } from "./scheduled/weeklyBdDigest.js";
 import { resendHealthHandler } from "./scheduled/resendHealth.js";
 import { healthDigestHandler } from "./scheduled/healthDigest.js";
 import { healthWatchHandler } from "./scheduled/healthWatch.js";
@@ -424,6 +425,8 @@ async function startServer() {
   app.get("/api/scheduled/daily-alert-email", dailyAlertEmailHandler); // GET allowed for manual triggering / dry-run
   app.post("/api/scheduled/weekly-cellar-digest", express.json(), weeklyCellarDigestHandler);
   app.get("/api/scheduled/weekly-cellar-digest", weeklyCellarDigestHandler); // GET allowed for manual triggering / dry-run
+  app.post("/api/scheduled/weekly-bd-digest", express.json(), weeklyBdDigestHandler);
+  app.get("/api/scheduled/weekly-bd-digest", weeklyBdDigestHandler); // GET allowed for manual triggering / dry-run
   app.get("/api/scheduled/resend-health", resendHealthHandler); // Owner probe: verifies env + domain + optional live send
   app.get("/api/scheduled/health-digest", healthDigestHandler); // Daily aggregator: env + DB + Resend + LLM + auth → optional email to ADMIN_EMAILS
   app.get("/api/scheduled/health-watch", healthWatchHandler); // Near-real-time: fires immediate email on OK→FAIL / FAIL→OK transitions
@@ -570,6 +573,7 @@ async function startServer() {
     "/merch/success",
     "/merch/cancel",
     "/cellar-journal",
+    "/how-we-trace",
     "/reference/vine",
     "/guide",
     "/resume",
