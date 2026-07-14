@@ -146,6 +146,8 @@ const StyleGuideInduction = lazy(() => import("./pages/StyleGuideInduction"));
 const UserJourneyDeck = lazy(() => import("./pages/UserJourneyDeck"));
 const AdminPressBypass = lazy(() => import("./pages/AdminPressBypass"));
 const AdminHealth = lazy(() => import("./pages/AdminHealth"));
+const AdminBuildCheck = lazy(() => import("./pages/AdminBuildCheck"));
+const AdminCellarBoard = lazy(() => import("./pages/AdminCellarBoard"));
 const ComplianceScore = lazy(() => import("./pages/ComplianceScore"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
@@ -443,6 +445,8 @@ function Router() {
       <Route path={"/admin/deck/user-journey"} component={UserJourneyDeck} />
       <Route path={"/admin/press-bypass"} component={AdminPressBypass} />
       <Route path={"/admin/health"} component={AdminHealth} />
+      <Route path={"/admin/build-check"} component={AdminBuildCheck} />
+      <Route path={"/admin/cellar-board"} component={AdminCellarBoard} />
       <Route path={"/compliance-score"} component={ComplianceScore} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />

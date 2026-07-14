@@ -58,6 +58,20 @@ const GROUPS: ToolGroup[] = [
         internal: true,
         cta: "Run animation",
       },
+      {
+        title: "Build check",
+        blurb: "Is prod current? Diffs local vs prod manifest (commit, SW version, table + procedure counts). Auto-refreshes every 30s during a deploy.",
+        href: "/admin/build-check",
+        internal: true,
+        cta: "Open check",
+      },
+      {
+        title: "Cellar board (RAG)",
+        blurb: "Every vessel's Red/Amber/Green/Grey state. Green = sanitised + within 72h freshness window + empty. Auto-refreshes every 30s. FSANZ 3.2.2 audit-defensible.",
+        href: "/admin/cellar-board",
+        internal: true,
+        cta: "Open board",
+      },
     ],
   },
   {

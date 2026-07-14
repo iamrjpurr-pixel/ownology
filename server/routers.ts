@@ -73,6 +73,11 @@ import {
   completeCellarTask,
   uncompleteCellarTask,
   deleteCellarTask,
+  listCellarBoard,
+  logEquipmentUse,
+  listBatchEquipmentUses,
+  listEquipmentHistory,
+  getVesselStatus,
   type EquipmentType,
   type EquipmentMaterial,
   type TaskType,
@@ -1159,14 +1164,24 @@ ${scopedKB}`;
 // ─── Cellar Equipment Router ──────────────────────────────────────────────────────────────────────────────────────────────
 
 const EQUIPMENT_TYPES = [
+  "hopper",
+  "sorting_table",
+  "scale",
+  "destemmer",
   "fermentation_tank",
-  "barrel",
+  "cold_room",
+  "punch_down_rig",
   "press",
   "pump",
-  "sorting_table",
-  "destemmer",
-  "cold_room",
   "hose",
+  "racking_cane",
+  "storage_tank",
+  "barrel",
+  "carboy",
+  "filter",
+  "bottling_filler",
+  "corker",
+  "labeller",
   "other",
 ] as const;
 
@@ -1424,6 +1439,87 @@ const cellarTasksRouter = router({
       }
 
       return { success: true, count: insertedIds.length, ids: insertedIds };
+    }),
+});
+
+// ─── Cellar Board Router (RAG traceability) ──────────────────────────────
+// Feb 2026. Backs /admin/cellar-board and the per-batch phase logger.
+// Every vessel's Red/Amber/Green/Grey state is computed from the event
+// log — never stored — so it can never drift from the source of truth.
+
+const WBS_PHASE_ENUM = [
+  "receival",
+  "crushing",
+  "fermentation",
+  "pressing_transfer",
+  "storage_ageing",
+  "bottling",
+  "other",
+] as const;
+
+const USE_DIRECTION_ENUM = ["in", "out", "pass", "note"] as const;
+
+const cellarBoardRouter = router({
+  /** RAG wall — every equipment row grouped by WBS phase with computed status. */
+  board: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return { equipment: [], counts: { green: 0, amber: 0, red: 0, grey: 0 } };
+    const rows = await listCellarBoard(dbUser.id, dbUser.wineryId ?? null);
+    const counts = { green: 0, amber: 0, red: 0, grey: 0 };
+    for (const r of rows) counts[r.status.state]++;
+    return { equipment: rows, counts };
+  }),
+
+  /** Compute status for a single vessel (used by drawer / batch phase logger). */
+  vesselStatus: protectedProcedure
+    .input(z.object({ equipmentId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      return getVesselStatus(input.equipmentId, dbUser.id);
+    }),
+
+  /** Log a batch-equipment-use event (turns Red on 'in', Amber on 'out'). */
+  logUse: protectedProcedure
+    .input(
+      z.object({
+        batchId: z.number().int().positive(),
+        batchLabel: z.string().min(1).max(32),
+        equipmentId: z.number().int().positive(),
+        equipmentName: z.string().min(1).max(128),
+        phase: z.enum(WBS_PHASE_ENUM),
+        direction: z.enum(USE_DIRECTION_ENUM),
+        usedAt: z.number().optional(),
+        notes: z.string().max(1000).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const result = await logEquipmentUse({
+        userId: dbUser.id,
+        wineryId: dbUser.wineryId ?? null,
+        ...input,
+      });
+      return { ok: true, ...result };
+    }),
+
+  /** All equipment uses for a batch (traceability sheet input). */
+  batchEquipment: protectedProcedure
+    .input(z.object({ batchId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) return [];
+      return listBatchEquipmentUses(input.batchId, dbUser.id);
+    }),
+
+  /** Every batch a piece of equipment touched (reverse lookup). */
+  equipmentHistory: protectedProcedure
+    .input(z.object({ equipmentId: z.number(), limit: z.number().min(1).max(500).default(200) }))
+    .query(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) return [];
+      return listEquipmentHistory(input.equipmentId, dbUser.id, input.limit);
     }),
 });
 
@@ -1853,6 +1949,7 @@ export const appRouter = router({
   compliance: complianceRouter,
   cellarEquipment: cellarEquipmentRouter,
   cellarTasks: cellarTasksRouter,
+  cellarBoard: cellarBoardRouter,
   dashboard: dashboardRouter,
   barrel: barrelRouter,
   packaging: packagingRouter,

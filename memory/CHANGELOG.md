@@ -954,6 +954,63 @@ Verified both via lint (zero errors).
   above the theme pill (and lifts an extra 3.5rem when the PWA install
   banner is visible), so the two never overlap.
 
+### Build manifest + `/admin/build-check`  (Feb 2026)
+- New public endpoint `GET /api/build-info` returning commit hash, SW
+  cache version, tRPC procedure count, DB table count, page count, top
+  CHANGELOG entry, package.json version, and NODE_ENV. Cached 60s
+  in-process.
+- New `/admin/build-check` page fetches the manifest from both this
+  build and the prod URL (default `https://ownology.app`, persisted per
+  operator to localStorage) and diffs them field-by-field, refreshing
+  every 30s. Any mismatch turns red with a plain-English hint. Answers
+  "is prod current?" without waiting on a human.
+- Backing files: `server/buildInfo.ts` (compute), `server/index.ts`
+  (endpoint registered before `adminGate` so it's publicly readable —
+  no secrets exposed), `client/src/pages/AdminBuildCheck.tsx` (UI).
+- Root doc: `/app/BUILD_MANIFEST.md` — human-readable snapshot of the
+  scope currently in this build + how the diff loop works.
+
+### Cellar Board (RAG traceability)  (Feb 2026)
+- Schema v23. `cellar_equipment.equipment_type` enum expanded from 9 →
+  19 values to match the AWRI Practices Survey 2019 + Iland & Boulton
+  WBS: adds hopper, scale, punch_down_rig, racking_cane, storage_tank,
+  carboy, filter, bottling_filler, corker, labeller.
+- New `cellar_equipment.wbs_phase` column (nullable enum:
+  receival, crushing, fermentation, pressing_transfer, storage_ageing,
+  bottling, other) auto-inferred from equipment type via
+  `server/wbsPhase.ts` on insert.
+- New table `batch_equipment_uses` — the traceability thread. One row
+  per equipment-use event on a batch with direction (in/out/pass/note),
+  phase, sanitation snapshot (task id + ok-flag + age-hours) captured
+  at the moment of use so later cellar_task edits can't rewrite the
+  audit trail. Ties to FSANZ 3.2.2 Clause 20 evidence requirements.
+- Computed vessel RAG state (never stored — no drift):
+  - 🟢 **Green** — sanitised, empty, within 72h freshness window
+    (default from AWRI post-clean guidance; per-winery override to
+    come via `winery_settings`).
+  - 🟡 **Amber** — empty but sanitation expired or never done.
+  - 🔴 **Red** — currently holding wine/must (last event = `in` with
+    no matching `out`).
+  - ⚫ **Grey** — open `fault_log` task on the vessel.
+- New tRPC router `cellarBoard` with procedures:
+  `board` (RAG wall + counts), `vesselStatus` (single-vessel drawer),
+  `logUse` (fill/empty/pass event), `batchEquipment` (per-batch
+  traceability sheet input), `equipmentHistory` (reverse lookup —
+  every batch a piece of equipment touched).
+- New page `/admin/cellar-board` — vessels grouped by WBS phase,
+  filterable by state, per-vessel drawer shows recent uses with
+  sanitation verification badges. Auto-refreshes every 30s. Discoverable
+  from `/admin/dev` card.
+- Backing files: `drizzle/schema.ts`, `server/db.ts`, `server/wbsPhase.ts`,
+  `server/routers.ts` (new `cellarBoardRouter`), `server/index.ts`
+  (idempotent ALTER + CREATE migration), `client/src/pages/AdminCellarBoard.tsx`.
+- Smoke tested: board endpoint returns 10 correctly WBS-phased vessels
+  in initial amber state (never sanitised → clean + sanitise before
+  next use), with phase auto-inference working across all 5 equipment
+  categories present in seed data (fermentation_tank → fermentation,
+  press/pump → pressing_transfer, barrel → storage_ageing, destemmer
+  → crushing, cold_room → fermentation).
+
 ---
 
 Older shipped work lives inline in PRD.md (pre-Feb-2026); future entries

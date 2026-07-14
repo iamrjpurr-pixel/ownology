@@ -731,14 +731,24 @@ export async function deleteWineBatch(id: number, userId: number) {
 // ─── Cellar Equipment Register ────────────────────────────────────────────────
 
 export type EquipmentType =
+  | "hopper"
+  | "sorting_table"
+  | "scale"
+  | "destemmer"
   | "fermentation_tank"
-  | "barrel"
+  | "cold_room"
+  | "punch_down_rig"
   | "press"
   | "pump"
-  | "sorting_table"
-  | "destemmer"
-  | "cold_room"
   | "hose"
+  | "racking_cane"
+  | "storage_tank"
+  | "barrel"
+  | "carboy"
+  | "filter"
+  | "bottling_filler"
+  | "corker"
+  | "labeller"
   | "other";
 
 export type EquipmentMaterial =
@@ -766,6 +776,7 @@ export async function addCellarEquipment(data: {
   quantity?: number;
   notes?: string;
 }) {
+  const { inferPhase } = await import("./wbsPhase.js");
   const now = Date.now();
   const result = await db.insert(schema.cellarEquipment).values({
     userId: data.userId,
@@ -773,6 +784,7 @@ export async function addCellarEquipment(data: {
     name: data.name,
     equipmentType: data.equipmentType,
     material: data.material,
+    wbsPhase: inferPhase(data.equipmentType),
     capacityL: data.capacityL ?? null,
     quantity: data.quantity ?? 1,
     notes: data.notes ?? null,
@@ -1584,4 +1596,243 @@ export async function setNewsletterStatus(
     .update(schema.trinityNewsletterDrafts)
     .set(patch)
     .where(eq(schema.trinityNewsletterDrafts.id, id));
+}
+
+
+// ─── RAG Status + Batch Equipment Uses ───────────────────────────────────
+// Feb 2026. Traceability thread linking wine_batches → cellar_equipment
+// with a computed Red/Amber/Green/Grey vessel state derived from the
+// event log. See server/wbsPhase.ts for the phase mapping and the
+// default 72h sanitation freshness window.
+
+import type { WbsPhase, VesselRagState } from "./wbsPhase.js";
+import { DEFAULT_SANITATION_FRESHNESS_HOURS, inferPhase } from "./wbsPhase.js";
+
+export type UseDirection = "in" | "out" | "pass" | "note";
+
+export type VesselStatus = {
+  equipmentId: number;
+  state: VesselRagState;
+  reason: string;
+  since: number | null;
+  sanitisedAt: number | null;
+  sanitisedExpiresAt: number | null;
+  currentBatchId: number | null;
+  currentBatchLabel: string | null;
+};
+
+/**
+ * Compute the RAG state for a single vessel from the event log.
+ * Rules, in order of priority:
+ *   1. Open fault_log task → grey (out of service).
+ *   2. Last direction=in on an active batch (no matching out since) → red.
+ *   3. Latest sanitise task completed within freshness window → green.
+ *   4. Otherwise → amber (needs clean or sanitation expired).
+ */
+export async function getVesselStatus(
+  equipmentId: number,
+  userId: number,
+  freshnessHours = DEFAULT_SANITATION_FRESHNESS_HOURS
+): Promise<VesselStatus> {
+  const now = Date.now();
+
+  // Latest open fault_log task
+  const openFault = await db.query.cellarTasks.findFirst({
+    where: and(
+      eq(schema.cellarTasks.userId, userId),
+      eq(schema.cellarTasks.equipmentId, equipmentId),
+      eq(schema.cellarTasks.taskType, "fault_log"),
+      sql`${schema.cellarTasks.completedAt} IS NULL`
+    ),
+    orderBy: [desc(schema.cellarTasks.createdAt)],
+  });
+
+  if (openFault) {
+    return {
+      equipmentId,
+      state: "grey",
+      reason: openFault.title || "Fault logged",
+      since: openFault.createdAt,
+      sanitisedAt: null,
+      sanitisedExpiresAt: null,
+      currentBatchId: null,
+      currentBatchLabel: null,
+    };
+  }
+
+  // Latest use event to determine occupancy
+  const latestUse = await db.query.batchEquipmentUses.findFirst({
+    where: and(
+      eq(schema.batchEquipmentUses.userId, userId),
+      eq(schema.batchEquipmentUses.equipmentId, equipmentId)
+    ),
+    orderBy: [desc(schema.batchEquipmentUses.usedAt)],
+  });
+
+  // Latest completed sanitise task
+  const latestSanitise = await db.query.cellarTasks.findFirst({
+    where: and(
+      eq(schema.cellarTasks.userId, userId),
+      eq(schema.cellarTasks.equipmentId, equipmentId),
+      eq(schema.cellarTasks.taskType, "sanitise"),
+      sql`${schema.cellarTasks.completedAt} IS NOT NULL`
+    ),
+    orderBy: [desc(schema.cellarTasks.completedAt)],
+  });
+
+  const sanitisedAt = latestSanitise?.completedAt ?? null;
+  const sanitisedExpiresAt = sanitisedAt != null ? sanitisedAt + freshnessHours * 3600 * 1000 : null;
+
+  // Red: currently in-use (last event = 'in' and no subsequent 'out'/'note' emptying)
+  if (latestUse && latestUse.direction === "in") {
+    return {
+      equipmentId,
+      state: "red",
+      reason: `Holding batch ${latestUse.batchLabel}`,
+      since: latestUse.usedAt,
+      sanitisedAt,
+      sanitisedExpiresAt,
+      currentBatchId: latestUse.batchId,
+      currentBatchLabel: latestUse.batchLabel,
+    };
+  }
+
+  // Green: sanitation is current AND vessel is empty (last was out/pass/note or never used)
+  if (sanitisedAt != null && sanitisedExpiresAt != null && sanitisedExpiresAt > now) {
+    // Only count as green if the sanitise happened AFTER the last use event
+    const lastUsedAt = latestUse?.usedAt ?? 0;
+    if (sanitisedAt >= lastUsedAt) {
+      return {
+        equipmentId,
+        state: "green",
+        reason: `Sanitised — ${Math.round((sanitisedExpiresAt - now) / 3600000)}h freshness remaining`,
+        since: sanitisedAt,
+        sanitisedAt,
+        sanitisedExpiresAt,
+        currentBatchId: null,
+        currentBatchLabel: null,
+      };
+    }
+  }
+
+  // Amber: empty but not sanitation-current
+  return {
+    equipmentId,
+    state: "amber",
+    reason: sanitisedAt == null
+      ? "Never sanitised — clean + sanitise before next use"
+      : sanitisedExpiresAt != null && sanitisedExpiresAt <= now
+        ? "Sanitation window expired — re-sanitise before next use"
+        : "Used since last sanitation — clean + sanitise before next use",
+    since: latestUse?.usedAt ?? null,
+    sanitisedAt,
+    sanitisedExpiresAt,
+    currentBatchId: null,
+    currentBatchLabel: null,
+  };
+}
+
+/** Cellar board — every equipment row with its computed RAG status. */
+export async function listCellarBoard(
+  userId: number,
+  wineryId?: number | null,
+  freshnessHours = DEFAULT_SANITATION_FRESHNESS_HOURS
+) {
+  const equipment = await listCellarEquipment(userId, wineryId);
+  const statuses = await Promise.all(
+    equipment.map((e) => getVesselStatus(e.id, userId, freshnessHours))
+  );
+  return equipment.map((e, i) => ({
+    ...e,
+    wbsPhase: (e.wbsPhase as WbsPhase | null) ?? inferPhase(e.equipmentType),
+    status: statuses[i],
+  }));
+}
+
+/** Log a batch-equipment-use event with sanitation snapshot. */
+export async function logEquipmentUse(data: {
+  userId: number;
+  wineryId?: number | null;
+  batchId: number;
+  batchLabel: string;
+  equipmentId: number;
+  equipmentName: string;
+  phase: WbsPhase;
+  direction: UseDirection;
+  usedAt?: number;
+  notes?: string;
+  freshnessHours?: number;
+}) {
+  const now = Date.now();
+  const usedAt = data.usedAt ?? now;
+  const freshnessHours = data.freshnessHours ?? DEFAULT_SANITATION_FRESHNESS_HOURS;
+
+  // Snapshot the sanitation status at the moment of use.
+  const latestSanitise = await db.query.cellarTasks.findFirst({
+    where: and(
+      eq(schema.cellarTasks.userId, data.userId),
+      eq(schema.cellarTasks.equipmentId, data.equipmentId),
+      eq(schema.cellarTasks.taskType, "sanitise"),
+      sql`${schema.cellarTasks.completedAt} IS NOT NULL`
+    ),
+    orderBy: [desc(schema.cellarTasks.completedAt)],
+  });
+
+  let sanitiseOkAtUse = 0;
+  let sanitiseAgeHours: number | null = null;
+  let sanitiseTaskId: number | null = null;
+  if (latestSanitise?.completedAt != null) {
+    const ageMs = usedAt - latestSanitise.completedAt;
+    sanitiseAgeHours = Math.max(0, Math.round(ageMs / 3600000));
+    sanitiseTaskId = latestSanitise.id;
+    if (ageMs >= 0 && ageMs <= freshnessHours * 3600 * 1000) sanitiseOkAtUse = 1;
+  }
+
+  const result = await db.insert(schema.batchEquipmentUses).values({
+    userId: data.userId,
+    wineryId: data.wineryId ?? null,
+    batchId: data.batchId,
+    batchLabel: data.batchLabel,
+    equipmentId: data.equipmentId,
+    equipmentName: data.equipmentName,
+    phase: data.phase,
+    direction: data.direction,
+    usedAt,
+    sanitiseTaskId,
+    sanitiseOkAtUse,
+    sanitiseAgeHours,
+    notes: data.notes ?? null,
+    createdAt: now,
+  });
+
+  return {
+    id: (result as unknown as { insertId: number }).insertId,
+    sanitiseOkAtUse: sanitiseOkAtUse === 1,
+    sanitiseAgeHours,
+  };
+}
+
+/** All equipment uses for a batch, phase-ordered then chronological. */
+export async function listBatchEquipmentUses(batchId: number, userId: number) {
+  return db.query.batchEquipmentUses.findMany({
+    where: and(
+      eq(schema.batchEquipmentUses.batchId, batchId),
+      eq(schema.batchEquipmentUses.userId, userId)
+    ),
+    orderBy: [
+      desc(schema.batchEquipmentUses.usedAt),
+    ],
+  });
+}
+
+/** Every batch a given piece of equipment touched, most recent first. */
+export async function listEquipmentHistory(equipmentId: number, userId: number, limit = 200) {
+  return db.query.batchEquipmentUses.findMany({
+    where: and(
+      eq(schema.batchEquipmentUses.equipmentId, equipmentId),
+      eq(schema.batchEquipmentUses.userId, userId)
+    ),
+    orderBy: [desc(schema.batchEquipmentUses.usedAt)],
+    limit,
+  });
 }

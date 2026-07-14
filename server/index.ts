@@ -181,6 +181,21 @@ async function startServer() {
     res.status(200).json({ status: "ok", uptime: process.uptime() });
   });
 
+  // ── Build manifest (checkpoint diff) ──────────────────────────────────────
+  // Public, cached 60s in-process. Lets /admin/build-check fetch the same
+  // shape from local + prod and diff them so Rich always knows whether the
+  // most recent "Save to Github" push is live on Railway yet.
+  // Exposes only surface counters + commit hash + SW cache version.
+  // No secrets, no schema shape, no procedure names.
+  app.get("/api/build-info", async (_req, res) => {
+    try {
+      const { computeBuildInfo } = await import("./buildInfo.js");
+      res.status(200).json(computeBuildInfo());
+    } catch (e) {
+      res.status(500).json({ error: e instanceof Error ? e.message : "build-info-failed" });
+    }
+  });
+
   // ── Deep health probe (O2) — checks downstream dependencies. Runs a
   // quick timeout-bounded ping on each integration and returns per-
   // service status. Use for post-deploy smoke tests and alerting.
@@ -1262,6 +1277,69 @@ async function startServer() {
       `);
     } catch (e) {
       console.warn("[bootstrap] founding_reservations table create skipped:", (e as Error).message);
+    }
+
+    // ── Cellar equipment WBS expansion + batch traceability (Feb 2026) ──
+    // Expand equipment_type enum from 9 → 19 values, add wbs_phase column,
+    // and create the batch_equipment_uses junction table. Idempotent DDL.
+    try {
+      // MODIFY COLUMN is always required for enum expansion (can't be done
+      // via ADD COLUMN IF NOT EXISTS). Safe to re-run: MySQL just no-ops
+      // when the enum already contains the target set.
+      try {
+        await db.execute(sql`
+          ALTER TABLE cellar_equipment MODIFY COLUMN equipment_type
+          ENUM('hopper','sorting_table','scale','destemmer','fermentation_tank','cold_room','punch_down_rig','press','pump','hose','racking_cane','storage_tank','barrel','carboy','filter','bottling_filler','corker','labeller','other') NOT NULL
+        `);
+      } catch (e) {
+        console.warn("[bootstrap] cellar_equipment enum expand skipped:", (e as Error).message);
+      }
+      // Add wbs_phase column (nullable — existing rows back-fill via
+      // inferPhase() in listCellarBoard).
+      try {
+        await db.execute(sql`
+          ALTER TABLE cellar_equipment ADD COLUMN IF NOT EXISTS wbs_phase
+          ENUM('receival','crushing','fermentation','pressing_transfer','storage_ageing','bottling','other') NULL
+        `);
+      } catch {
+        try {
+          await db.execute(sql`
+            ALTER TABLE cellar_equipment ADD COLUMN wbs_phase
+            ENUM('receival','crushing','fermentation','pressing_transfer','storage_ageing','bottling','other') NULL
+          `);
+        } catch { /* column already exists */ }
+      }
+      try { await db.execute(sql`ALTER TABLE cellar_equipment ADD INDEX ce_phase_idx (wbs_phase)`); } catch { /* index already exists */ }
+
+      // Junction table — one row per equipment-use event on a batch.
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS batch_equipment_uses (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          user_id INT NOT NULL,
+          winery_id INT,
+          batch_id INT NOT NULL,
+          batch_label VARCHAR(32) NOT NULL,
+          equipment_id INT NOT NULL,
+          equipment_name VARCHAR(128) NOT NULL,
+          phase ENUM('receival','crushing','fermentation','pressing_transfer','storage_ageing','bottling','other') NOT NULL,
+          direction ENUM('in','out','pass','note') NOT NULL,
+          used_at BIGINT NOT NULL,
+          sanitise_task_id INT,
+          sanitise_ok_at_use INT NOT NULL DEFAULT 0,
+          sanitise_age_hours INT,
+          notes TEXT,
+          created_at BIGINT NOT NULL,
+          INDEX beu_user_idx (user_id),
+          INDEX beu_winery_idx (winery_id),
+          INDEX beu_batch_idx (batch_id),
+          INDEX beu_equipment_idx (equipment_id),
+          INDEX beu_used_at_idx (used_at),
+          INDEX beu_phase_idx (phase),
+          INDEX beu_equipment_used_at_idx (equipment_id, used_at)
+        )
+      `);
+    } catch (e) {
+      console.warn("[bootstrap] batch_equipment_uses / cellar_equipment migration skipped:", (e as Error).message);
     }
 
     // ── Progressive-exposure + command-center tables (Feb 2026) ─────────

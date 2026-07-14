@@ -1866,3 +1866,71 @@ PWA + iOS install tutorial + share cards covers 90% of both iOS and Android at ~
 
 ### Future / Backlog (unchanged)
 Impersonate mode (M4) · Diagnostic panels (M6) · Morning brief email (M7) · Analytics tiles (M8) · Staged reveal (Phase D) · Regional multi-currency SKUs · Home Winemaker bridge tier · Capacitor wrap for App Store (only if PWA retention data justifies) · Sensory Assessment on `/cellar-brief` (Sometimes Always steal) · Owen voice guide (100-word North Star)
+
+---
+
+## 2026-02-08 (evening) — Cellar traceability + Build check shipped
+
+### Shipped this session
+- **Build manifest + `/admin/build-check`**: public `GET /api/build-info`
+  endpoint (commit, SW cache version, procedure count, table count,
+  page count, latest CHANGELOG entry, app version, NODE_ENV) + UI page
+  that auto-diffs local vs prod every 30s. Answers "is prod current?"
+  hourly without me being in the loop. Files: `server/buildInfo.ts`,
+  `server/index.ts`, `client/src/pages/AdminBuildCheck.tsx`,
+  `/app/BUILD_MANIFEST.md`.
+- **Cellar equipment WBS expansion** (schema v23): enum from 9 → 19
+  types sourced from AWRI Practices Survey 2019, Iland & Boulton, and
+  SafeWork NSW. Added `wbs_phase` column auto-inferred from equipment
+  type on insert.
+- **`batch_equipment_uses` junction table** — the traceability thread.
+  One row per fill/empty/pass event with sanitation snapshot at moment
+  of use. FSANZ 3.2.2 Clause 20 evidence trail.
+- **Computed vessel RAG state** (Green/Amber/Red/Grey) — never stored,
+  derived from event log so no drift is possible. 72h freshness window
+  (AWRI post-clean protective-atmosphere default; configurable later).
+- **`/admin/cellar-board`** — RAG wall grouped by WBS phase, filterable
+  by state, per-vessel drawer with recent uses + sanitation verification
+  badges. 30s auto-refresh. Discoverable from `/admin/dev` card.
+- **tRPC router `cellarBoard`**: `board`, `vesselStatus`, `logUse`,
+  `batchEquipment`, `equipmentHistory` (reverse lookup).
+
+### Smoke tests passed
+- `/api/build-info` returns commit 834f420, 216 tRPC procs, 52 DB tables.
+- `/api/trpc/cellarBoard.board` returns 10 correctly WBS-phased vessels
+  in initial amber state ("Never sanitised — clean + sanitise before
+  next use"). Auto-phase inference verified across fermentation_tank,
+  press, pump, barrel, destemmer, cold_room.
+- TypeScript compiles clean on all new files.
+
+### Regulatory anchor for the traceability work
+Not EPA. EPA covers effluent, not batch-level equipment traceability.
+The real drivers:
+- **FSANZ Standard 3.2.2 Clauses 20 & 24** — food-contact surfaces
+  must be cleaned + sanitised before use; equipment maintained fit
+  for effective cleaning.
+- **FSANZ 3.2.2A** (Cat 1 businesses) — 3-month record retention,
+  cleaning linked to production batches.
+- **HACCP / SQF / BRCGS / FSSC 22000** — cleaning schedule +
+  completion sign-off + verification logs mandated by the certifier.
+  Required for any winery exporting or supplying major retailers.
+- **Recall readiness** — non-regulatory but the actual business pain.
+
+### Next Action Items (in order)
+1. 🟡 **Weekly BD Digest email** — Monday Resend cron summarising last
+   week's opens/clicks/hot alerts/captured replies + sentiment
+   breakdown. Backend-only. Files: `server/trinityRouter.ts`,
+   `server/routers/outreach.ts`.
+2. 🟡 **Batch phase logger UI** on Your Vintage — surfaces
+   `cellarBoard.logUse` inline with per-phase batch notes so operators
+   don't need to leave the batch page. Schema + backend already live.
+3. 🟡 **24h sanitation warning banner** in the logUse form when the
+   selected vessel is amber/red.
+4. 🟡 **Printable per-batch traceability sheet** (PDF) driven by
+   `cellarBoard.batchEquipment` — the audit deliverable.
+5. 🟢 **Per-winery sanitation freshness override** (`winery_settings`
+   table) — only when the first winery asks for a non-72h window.
+
+### Future / Backlog (unchanged from previous session)
+Impersonate mode (M4) · Diagnostic panels (M6) · Morning brief email (M7) · Analytics tiles (M8) · Staged reveal (Phase D) · Regional multi-currency SKUs · Home Winemaker bridge tier · Capacitor wrap for App Store · Sensory Assessment on `/cellar-brief` · Owen voice guide · Refactor `server/routers/outreach.ts` (>3300 lines) · SW `CACHE_VERSION` auto-bump from commit hash · Multi-tenant winery model (Vigneron tier)
+

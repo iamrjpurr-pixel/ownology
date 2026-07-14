@@ -419,16 +419,36 @@ export const cellarEquipment = mysqlTable(
     wineryId: int("winery_id"),
     // Equipment name (e.g. "Tank 7", "Bladder Press", "Basket Press")
     name: varchar("name", { length: 128 }).notNull(),
-    // Equipment type — drives default task templates
+    // Equipment type — drives default task templates. Ordered by
+    // WBS phase (receival → crushing → fermentation → pressing/transfer
+    // → storage/ageing → bottling) so /admin/cellar-board can group by
+    // phase without a separate join. Feb 2026: expanded from 9 to 19
+    // types to match AWRI Practices Survey 2019 + Iland & Boulton WBS.
     equipmentType: mysqlEnum("equipment_type", [
+      // 1.0 Receival
+      "hopper",
+      "sorting_table",
+      "scale",
+      // 2.0 Crushing
+      "destemmer",
+      // 3.0 Fermentation
       "fermentation_tank",
-      "barrel",
+      "cold_room",
+      "punch_down_rig",
+      // 4.0 Pressing & Transfer
       "press",
       "pump",
-      "sorting_table",
-      "destemmer",
-      "cold_room",
       "hose",
+      "racking_cane",
+      // 5.0 Storage & Ageing
+      "storage_tank",
+      "barrel",
+      "carboy",
+      "filter",
+      // 6.0 Bottling
+      "bottling_filler",
+      "corker",
+      "labeller",
       "other",
     ]).notNull(),
     // Material of construction
@@ -439,6 +459,19 @@ export const cellarEquipment = mysqlTable(
       "fibreglass",
       "other",
     ]).notNull().default("stainless"),
+    // WBS phase — auto-inferred from equipmentType when missing, but
+    // stored here so operators can override (e.g. a hose repurposed
+    // solely for bottling). Nullable during migration; new rows fill
+    // it via the mapping in server/wbsPhase.ts.
+    wbsPhase: mysqlEnum("wbs_phase", [
+      "receival",
+      "crushing",
+      "fermentation",
+      "pressing_transfer",
+      "storage_ageing",
+      "bottling",
+      "other",
+    ]),
     // Capacity in litres (optional)
     capacityL: int("capacity_l"),
     // Quantity of this item (e.g. 24 barrels)
@@ -452,6 +485,67 @@ export const cellarEquipment = mysqlTable(
     index("ce_user_idx").on(t.userId),
     index("ce_winery_idx").on(t.wineryId),
     index("ce_type_idx").on(t.equipmentType),
+    index("ce_phase_idx").on(t.wbsPhase),
+  ]
+);
+
+// ─── Batch ↔ Equipment Uses (Traceability Thread) ─────────────────────────
+// Feb 2026. Answers "which pump/hose/tank touched batch 26SHZ-001 in
+// each phase, and was it sanitised in the 24h before?"
+//
+// One row per equipment-use event on a batch. Direction disambiguates
+// fill vs empty vs passing-transfer so the RAG status can be computed
+// deterministically:
+//   in     — batch entered/filled this vessel (turns vessel Red)
+//   out    — batch left this vessel (turns vessel Amber)
+//   pass   — batch flowed through (hose/pump/press) — no state change
+//   note   — free-text observation, no state effect
+//
+// sanitiseTaskId + sanitiseOkAtUse snapshot the sanitation check at the
+// moment of use. Preserving the snapshot means later cellar_task edits
+// can never rewrite the audit trail. Ties to FSANZ 3.2.2 Clause 20
+// evidence requirements.
+export const batchEquipmentUses = mysqlTable(
+  "batch_equipment_uses",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull(),
+    wineryId: int("winery_id"),
+    // FK-in-spirit to wine_batches.id (loose ref, indexed for lookup).
+    batchId: int("batch_id").notNull(),
+    // Denormalised batch label — survives batch renames for audit.
+    batchLabel: varchar("batch_label", { length: 32 }).notNull(),
+    // FK-in-spirit to cellar_equipment.id.
+    equipmentId: int("equipment_id").notNull(),
+    // Denormalised equipment name — survives renames for audit.
+    equipmentName: varchar("equipment_name", { length: 128 }).notNull(),
+    // WBS phase this use belongs to.
+    phase: mysqlEnum("phase", [
+      "receival",
+      "crushing",
+      "fermentation",
+      "pressing_transfer",
+      "storage_ageing",
+      "bottling",
+      "other",
+    ]).notNull(),
+    direction: mysqlEnum("direction", ["in", "out", "pass", "note"]).notNull(),
+    usedAt: bigint("used_at", { mode: "number" }).notNull(),
+    // Sanitation snapshot at time of use — the audit-defensible bit.
+    sanitiseTaskId: int("sanitise_task_id"),
+    sanitiseOkAtUse: int("sanitise_ok_at_use").notNull().default(0),
+    sanitiseAgeHours: int("sanitise_age_hours"),
+    notes: text("notes"),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("beu_user_idx").on(t.userId),
+    index("beu_winery_idx").on(t.wineryId),
+    index("beu_batch_idx").on(t.batchId),
+    index("beu_equipment_idx").on(t.equipmentId),
+    index("beu_used_at_idx").on(t.usedAt),
+    index("beu_phase_idx").on(t.phase),
+    index("beu_equipment_used_at_idx").on(t.equipmentId, t.usedAt),
   ]
 );
 
