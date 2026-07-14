@@ -1117,6 +1117,28 @@ should land here so PRD.md can stay a spec, not a diary.
   our board", "McLaren Vale Shiraz · Live sample" eyebrow, Fermenter
   #1 correctly shows "Holding batch 26SHZ-001 — day 1 of fermentation".
 
+### `/site-map` crash fix — unknown `audience` values no longer blank the page  (Feb 2026)
+- **Bug reported by Rich in prod**: `TypeError: Cannot read properties of
+  undefined (reading 'bg')` blanks the whole SiteMap route with the
+  generic error boundary. Stack pointed at `Array.map` inside `badgeStyle`.
+- **Root cause**: `client/src/pages/SiteMap.tsx` had a `Route.audience`
+  union of `"public" | "member" | "admin"` — but the actual data literals
+  included `audience: "gated"` on several rows. `map[audience]` returned
+  `undefined`, then `.bg` on undefined threw, killing the whole component
+  via the error boundary.
+- **Fix**:
+  - Added `"gated"` to the `Route["audience"]` union.
+  - Added a `gated` entry (grey, `#8a7565`) to both the `badgeStyle` map
+    and the `audienceLabel` map so those rows render with a proper chip.
+  - Added a `?? map.public` fallback on both lookups so any FUTURE
+    unknown audience value can never crash the whole SiteMap page again.
+    (Belt-and-braces: this bug pattern was silent because
+    the string union didn't match the data literal.)
+- SW cache bumped to `ow-v11`.
+- Verified with a client-side crash sweep across 20 routes: `/site-map`
+  and every other public/gated/admin surface renders without a TypeError.
+  Zero regressions elsewhere.
+
 ### `/pricing` — HF density pass · killed duplicate EOFY banner  (Feb 2026)
 - Bug reported by Rich: the big amber EOFY banner duplicated the "SAVE 3
   MONTHS · EOFY" chip already on the billing toggle, and its "See annual
@@ -1135,6 +1157,8 @@ should land here so PRD.md can stay a spec, not a diary.
   - Auto-hides when `EOFY_ACTIVE` is false, same as the old banner.
 - SW cache bumped to `ow-v10`. Zero TS errors. Playwright verified:
   banner removed, deadline caption present, hero visible above the fold.
+
+### `/cellar-brief` — SOP evidence links + HF density pass  (Feb 2026)
 
 **Two changes shipped together:**
 

@@ -565,7 +565,7 @@ export default function FoundingPartners() {
         <title>Ownology — For our founding partners.</title>
         <meta
           name="description"
-          content="Vintage 2026 is fermenting across Australia and New Zealand right now. YAN calls, MLF timing, stuck tanks — every decision in the next 90 days shapes this vintage. We're onboarding a small circle of founding partners to shape the platform through their live 2026 ferment — and every vintage after."
+          content="Vintage 2026 is on the crush pad across Australia and New Zealand. Nitrogen additions, MLF co-inoculation windows, sluggish ferments at 8°Bé — every log entry between now and press-off becomes evidence you'll cite when a barrel goes sideways in year two, or a QC lab asks how you tracked free SO₂ through maturation. We're onboarding a small number of founding partners to shape the platform through their 2026 vintage — and every vintage after."
         />
         <link rel="canonical" href="https://ownology.ai/join" />
         <meta property="og:title" content="Ownology — For our founding partners." />
@@ -659,12 +659,14 @@ export default function FoundingPartners() {
             maxWidth: "720px",
           }}
         >
-          Vintage 2026 is fermenting across Australia and New Zealand right now.
-          YAN calls. MLF timing. Stuck tanks. Every decision in the next 90 days
-          shapes whether this year is your best vintage or the one you'd rather
-          forget. We're onboarding{" "}
-          <strong style={{ color: "var(--ow-text-hi)" }}>a small circle of founding partners</strong>{" "}
-          to shape the platform through their live 2026 ferment — and every
+          Vintage 2026 is on the crush pad across Australia and New Zealand.
+          Nitrogen additions. MLF co-inoculation windows. Sluggish ferments
+          at 8°Bé. Every log entry between now and press-off becomes evidence
+          you&apos;ll cite when a barrel goes sideways in year two — or a QC
+          lab asks how you tracked free SO₂ through maturation. We&apos;re
+          onboarding{" "}
+          <strong style={{ color: "var(--ow-text-hi)" }}>a small number of founding partners</strong>{" "}
+          to shape the platform through their 2026 vintage — and every
           vintage after.
         </p>
 

@@ -20,7 +20,7 @@ interface Route {
   path: string;
   label: string;
   desc: string;
-  audience?: "public" | "member" | "admin";
+  audience?: "public" | "member" | "admin" | "gated";
 }
 
 interface Section {
@@ -212,12 +212,17 @@ const TEXT_MID  = "var(--ow-text-mid)";
 const TEXT_LO   = "var(--ow-text-lo)";
 
 function badgeStyle(audience?: Route["audience"]): React.CSSProperties {
-  const map = {
-    public: { bg: "oklch(from var(--ow-amber) l c h / 0.10)", color: AMBER, label: "PUBLIC" },
+  const map: Record<string, { bg: string; color: string; label: string }> = {
+    public: { bg: "oklch(from var(--ow-amber) l c h / 0.10)", color: AMBER,     label: "PUBLIC" },
     member: { bg: "oklch(from #4a9d8a l c h / 0.10)",           color: "#4a9d8a", label: "MEMBER" },
     admin:  { bg: "oklch(from #b0413e l c h / 0.10)",           color: "#b0413e", label: "ADMIN"  },
+    gated:  { bg: "oklch(from #8a7565 l c h / 0.10)",           color: "#8a7565", label: "GATED"  },
   };
-  const m = map[audience ?? "public"];
+  // Fallback to "public" for any unknown audience value so a new bucket
+  // introduced in the data literals can never crash the whole SiteMap
+  // page again (see SiteMap TypeError, Feb 2026 — 'gated' was in the
+  // data but not in the badge map, blanking the entire route for prod).
+  const m = map[audience ?? "public"] ?? map.public;
   return {
     display: "inline-block",
     background: m.bg,
@@ -234,7 +239,8 @@ function badgeStyle(audience?: Route["audience"]): React.CSSProperties {
   };
 }
 function audienceLabel(a: Route["audience"]): string {
-  return { public: "PUBLIC", member: "MEMBER", admin: "ADMIN" }[a ?? "public"];
+  const map: Record<string, string> = { public: "PUBLIC", member: "MEMBER", admin: "ADMIN", gated: "GATED" };
+  return map[a ?? "public"] ?? "PUBLIC";
 }
 
 export default function SiteMap() {
