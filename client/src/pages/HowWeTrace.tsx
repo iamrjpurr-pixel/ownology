@@ -38,6 +38,8 @@ import {
   type IntakeEntry,
   type ProspectVessel,
 } from "@/lib/prospectCellar";
+import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/lib/useAuth";
 
 type WbsPhase =
   | "receival"
@@ -288,7 +290,7 @@ export default function HowWeTrace() {
       <BoardSection grouped={grouped} counts={counts} expanded={expanded} setExpanded={setExpanded} personalised={personalised} intake={intake} />
       <ComplianceCallout />
       <Timeline timeline={timeline} intake={intake} personalised={personalised} />
-      <ProspectCta personalised={personalised} onPersonalise={() => setShowIntakeModal(true)} />
+      <ProspectCta personalised={personalised} onPersonalise={() => setShowIntakeModal(true)} intake={intake} />
       <Footer />
       {showIntakeModal && (
         <IntakeModal
@@ -610,7 +612,35 @@ function ComplianceCallout() {
   );
 }
 
-function ProspectCta({ personalised, onPersonalise }: { personalised: boolean; onPersonalise: () => void }) {
+function ProspectCta({ personalised, onPersonalise, intake }: { personalised: boolean; onPersonalise: () => void; intake: ProspectIntake | null }) {
+  const auth = useAuth();
+  const [saveMsg, setSaveMsg] = useState<string | null>(null);
+  const saveMut = trpc.cellarBoard.saveProspectIntake.useMutation({
+    onSuccess: (data) => setSaveMsg(`Saved — ${data.inserted} vessels added to your cellar. Open the board to view.`),
+    onError: (e) => setSaveMsg(`Couldn't save: ${e.message}`),
+  });
+
+  const handleSave = () => {
+    if (!intake) return;
+    if (auth.status === "anon") {
+      // Preserve intake in localStorage (already there) and redirect
+      // through the OAuth flow, returning to /how-we-trace so the user
+      // can hit Save again once authed.
+      auth.login("/how-we-trace");
+      return;
+    }
+    saveMut.mutate({
+      batchLabel: intake.batchLabel,
+      wineStyle: intake.wineStyle,
+      entries: intake.entries.map((e) => ({
+        key: e.key as "hopper" | "sorting_table" | "scale" | "destemmer" | "fermentation_tank" | "cold_room" | "punch_down_rig" | "press" | "pump" | "hose" | "racking_cane" | "storage_tank" | "barrel" | "carboy" | "filter" | "bottling_filler" | "corker" | "labeller" | "other",
+        label: e.label,
+        quantity: e.quantity,
+        capacityL: e.capacityL,
+      })),
+    });
+  };
+
   return (
     <section style={{ padding: "56px 24px", maxWidth: 900, margin: "0 auto", textAlign: "center", borderTop: "1px solid #e5dcc7" }}>
       <h2 style={{ fontFamily: "Georgia,serif", fontSize: 28, fontWeight: 600, color: "#1a1210", margin: "0 0 12px" }}>
@@ -620,6 +650,18 @@ function ProspectCta({ personalised, onPersonalise }: { personalised: boolean; o
         Ownology is a winemaker's second brain — the cellar intelligence layer between your logbook and your compliance file. Try it for your 2026 vintage.
       </p>
       <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+        {personalised && intake && (
+          <button
+            type="button"
+            data-testid="how-we-trace-save-cellar"
+            onClick={handleSave}
+            disabled={saveMut.isPending}
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 28px", background: "#B0741A", color: "#2A1E0A", border: "none", cursor: saveMut.isPending ? "wait" : "pointer", fontFamily: "Arial,sans-serif", fontSize: 15, fontWeight: 600, borderRadius: 999 }}
+          >
+            <Sparkles size={16} />
+            {auth.status === "anon" ? "Sign in to save this cellar" : (saveMut.isPending ? "Saving…" : "Save this cellar to my Ownology account")}
+          </button>
+        )}
         {!personalised && (
           <button
             type="button"
@@ -633,11 +675,19 @@ function ProspectCta({ personalised, onPersonalise }: { personalised: boolean; o
         <Link
           href="/try"
           data-testid="how-we-trace-final-cta"
-          style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 28px", background: "#B0741A", color: "#2A1E0A", textDecoration: "none", fontFamily: "Arial,sans-serif", fontSize: 15, fontWeight: 600, borderRadius: 999 }}
+          style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 28px", background: personalised ? "transparent" : "#B0741A", color: personalised ? "#4a3d35" : "#2A1E0A", textDecoration: "none", fontFamily: "Arial,sans-serif", fontSize: 15, fontWeight: personalised ? 500 : 600, borderRadius: 999, border: personalised ? "1px solid #d4c9b6" : "none" }}
         >
-          Start your cellar <ArrowRight size={16} />
+          {personalised ? "Try Ownology" : "Start your cellar"} <ArrowRight size={16} />
         </Link>
       </div>
+      {saveMsg && (
+        <div
+          data-testid="how-we-trace-save-msg"
+          style={{ marginTop: 18, fontFamily: "Arial,sans-serif", fontSize: 13, color: saveMsg.startsWith("Saved") ? "#2f5230" : "#7f1d1d" }}
+        >
+          {saveMsg}
+        </div>
+      )}
     </section>
   );
 }

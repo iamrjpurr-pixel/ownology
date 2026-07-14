@@ -328,6 +328,7 @@ function VesselCard({ row, expanded, onToggle }: { row: BoardRow; expanded: bool
 }
 
 function VesselDetail({ row }: { row: BoardRow }) {
+  const [logOpen, setLogOpen] = useState(false);
   const historyQ = trpc.cellarBoard.equipmentHistory.useQuery(
     { equipmentId: row.id, limit: 20 },
     { staleTime: 30_000 }
@@ -341,7 +342,26 @@ function VesselDetail({ row }: { row: BoardRow }) {
         <span style={{ color: "#6b7280" }}>Sanitised</span><span>{humanAgo(row.status.sanitisedAt)}</span>
         {row.status.currentBatchLabel ? (<><span style={{ color: "#6b7280" }}>Current batch</span><span>{row.status.currentBatchLabel}</span></>) : null}
       </div>
-      <div style={{ fontWeight: 600, marginBottom: 4, color: "#374151" }}>Recent uses</div>
+      <div style={{ fontWeight: 600, marginBottom: 4, color: "#374151", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span>Recent uses</span>
+        <button
+          type="button"
+          data-testid={`cellar-board-log-use-${row.id}`}
+          onClick={() => setLogOpen(true)}
+          style={{
+            padding: "4px 10px",
+            fontSize: 11,
+            fontWeight: 600,
+            border: `1px solid ${STATE_META[row.status.state as RagState].color}`,
+            background: STATE_META[row.status.state as RagState].bg,
+            color: STATE_META[row.status.state as RagState].color,
+            borderRadius: 999,
+            cursor: "pointer",
+          }}
+        >
+          + Log equipment use
+        </button>
+      </div>
       {historyQ.isLoading && <div style={{ color: "#9ca3af" }}>Loading…</div>}
       {historyQ.data && historyQ.data.length === 0 && (
         <div data-testid={`cellar-board-history-empty-${row.id}`} style={{ color: "#9ca3af" }}>No batch uses logged yet.</div>
@@ -367,6 +387,193 @@ function VesselDetail({ row }: { row: BoardRow }) {
           ))}
         </ul>
       )}
+      {logOpen && <LogUseModal row={row} onClose={() => setLogOpen(false)} />}
     </div>
   );
 }
+
+// ─── LogUseModal ─────────────────────────────────────────────────────────
+// Modal fired from a vessel's "Log equipment use" button. Captures a single
+// fill/empty/pass event against a chosen batch and phase, then commits it
+// via `cellarBoard.logUse`. Renders a red sanitation warning banner when
+// the target vessel is amber/red so operators can't inadvertently pump
+// juice into a dirty tank without acknowledgement.
+function LogUseModal({ row, onClose }: { row: BoardRow; onClose: () => void }) {
+  const utils = trpc.useUtils();
+  const batchesQ = trpc.cellarBoard.listBatches.useQuery();
+  const [batchId, setBatchId] = useState<number | null>(null);
+  const [direction, setDirection] = useState<"in" | "out" | "pass" | "note">("in");
+  const [phase, setPhase] = useState<WbsPhase>((row.wbsPhase as WbsPhase) ?? "other");
+  const [notes, setNotes] = useState("");
+  const [acknowledgedWarning, setAcknowledgedWarning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const logUse = trpc.cellarBoard.logUse.useMutation({
+    onSuccess: () => {
+      utils.cellarBoard.board.invalidate();
+      utils.cellarBoard.equipmentHistory.invalidate({ equipmentId: row.id, limit: 20 });
+      onClose();
+    },
+    onError: (e) => setError(e.message),
+  });
+
+  const isDirty = row.status.state === "amber" || row.status.state === "red";
+  const meta = STATE_META[row.status.state as RagState];
+
+  const selectedBatch = batchesQ.data?.find((b) => b.id === batchId);
+
+  const canSubmit = batchId != null && (!isDirty || acknowledgedWarning) && !logUse.isPending;
+
+  const handleSubmit = () => {
+    if (!selectedBatch) return;
+    setError(null);
+    logUse.mutate({
+      batchId: selectedBatch.id,
+      batchLabel: selectedBatch.batchId,
+      equipmentId: row.id,
+      equipmentName: row.name,
+      phase,
+      direction,
+      notes: notes.trim() || undefined,
+    });
+  };
+
+  return (
+    <div
+      data-testid={`cellar-board-log-modal-${row.id}`}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      style={{ position: "fixed", inset: 0, background: "rgba(26,18,16,0.55)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "40px 16px", zIndex: 300, overflowY: "auto" }}
+    >
+      <div style={{ background: "#fff", maxWidth: 520, width: "100%", borderRadius: 10, padding: "22px 22px 18px", boxShadow: "0 20px 60px rgba(0,0,0,0.35)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
+          <div>
+            <div style={{ fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8a7565", fontWeight: 700, marginBottom: 4 }}>
+              Log equipment use
+            </div>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: "#111" }}>{row.name}</h3>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Close" data-testid={`cellar-board-log-close-${row.id}`}
+            style={{ background: "transparent", border: "none", cursor: "pointer", color: "#6b7280", fontSize: 20, lineHeight: 1, padding: 4 }}>×</button>
+        </div>
+
+        {/* Sanitation warning — visible whenever vessel is amber/red. Requires
+            explicit acknowledgement before submit is enabled. Ties to FSANZ
+            3.2.2 Clause 20 evidence requirements — the operator must
+            positively confirm they've seen the risk before contact. */}
+        {isDirty && (
+          <div
+            data-testid={`cellar-board-log-warn-${row.id}`}
+            style={{ marginTop: 14, padding: "12px 14px", background: "rgba(185,28,28,0.06)", border: "1px solid #b91c1c", borderRadius: 6, color: "#7f1d1d" }}
+          >
+            <div style={{ fontWeight: 700, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
+              <meta.Icon size={14} color="#b91c1c" /> Sanitation check required
+            </div>
+            <div style={{ fontSize: 12, marginTop: 4, lineHeight: 1.5 }}>
+              {row.status.reason}. Logging use now creates an audit event where
+              sanitation was not verified within the 72h freshness window.
+            </div>
+            <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, fontSize: 12, cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                data-testid={`cellar-board-log-ack-${row.id}`}
+                checked={acknowledgedWarning}
+                onChange={(e) => setAcknowledgedWarning(e.target.checked)}
+                style={{ accentColor: "#b91c1c" }}
+              />
+              <span>I&apos;ve reviewed the risk — proceed anyway (auditable).</span>
+            </label>
+          </div>
+        )}
+
+        <div style={{ marginTop: 14, display: "grid", gap: 12 }}>
+          <label style={{ fontSize: 12, color: "#6b7280", display: "block" }}>
+            Batch
+            <select
+              data-testid={`cellar-board-log-batch-${row.id}`}
+              value={batchId ?? ""}
+              onChange={(e) => setBatchId(e.target.value ? Number(e.target.value) : null)}
+              style={{ width: "100%", marginTop: 4, padding: "8px 10px", fontSize: 14, border: "1px solid #d4d4d8", borderRadius: 6, background: "#fff", color: "#111" }}
+            >
+              <option value="">— Select a batch —</option>
+              {(batchesQ.data ?? []).map((b) => (
+                <option key={b.id} value={b.id}>{b.batchId} · {b.variety} ({b.vintage})</option>
+              ))}
+            </select>
+            {batchesQ.data && batchesQ.data.length === 0 && (
+              <span style={{ fontSize: 11, color: "#8a7565", marginTop: 4, display: "block" }}>
+                No batches yet — register one in Your Vintage first.
+              </span>
+            )}
+          </label>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <label style={{ fontSize: 12, color: "#6b7280", display: "block" }}>
+              Direction
+              <select
+                data-testid={`cellar-board-log-direction-${row.id}`}
+                value={direction}
+                onChange={(e) => setDirection(e.target.value as "in" | "out" | "pass" | "note")}
+                style={{ width: "100%", marginTop: 4, padding: "8px 10px", fontSize: 14, border: "1px solid #d4d4d8", borderRadius: 6, background: "#fff", color: "#111" }}
+              >
+                <option value="in">In (batch fills this vessel)</option>
+                <option value="out">Out (batch leaves this vessel)</option>
+                <option value="pass">Pass (transfer through)</option>
+                <option value="note">Note only (no state change)</option>
+              </select>
+            </label>
+            <label style={{ fontSize: 12, color: "#6b7280", display: "block" }}>
+              Phase
+              <select
+                data-testid={`cellar-board-log-phase-${row.id}`}
+                value={phase}
+                onChange={(e) => setPhase(e.target.value as WbsPhase)}
+                style={{ width: "100%", marginTop: 4, padding: "8px 10px", fontSize: 14, border: "1px solid #d4d4d8", borderRadius: 6, background: "#fff", color: "#111" }}
+              >
+                <option value="receival">1. Receival</option>
+                <option value="crushing">2. Crushing</option>
+                <option value="fermentation">3. Fermentation</option>
+                <option value="pressing_transfer">4. Pressing & Transfer</option>
+                <option value="storage_ageing">5. Storage & Ageing</option>
+                <option value="bottling">6. Bottling</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+          </div>
+
+          <label style={{ fontSize: 12, color: "#6b7280", display: "block" }}>
+            Notes (optional)
+            <textarea
+              data-testid={`cellar-board-log-notes-${row.id}`}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="e.g. 900L transferred, 8°Bé, no anomalies"
+              rows={2}
+              maxLength={500}
+              style={{ width: "100%", marginTop: 4, padding: "8px 10px", fontSize: 14, border: "1px solid #d4d4d8", borderRadius: 6, background: "#fff", color: "#111", resize: "vertical", fontFamily: "system-ui, sans-serif" }}
+            />
+          </label>
+
+          {error && (
+            <div data-testid={`cellar-board-log-error-${row.id}`} style={{ padding: "8px 12px", background: "rgba(185,28,28,0.06)", border: "1px solid #b91c1c", borderRadius: 6, color: "#7f1d1d", fontSize: 12 }}>
+              {error}
+            </div>
+          )}
+        </div>
+
+        <div style={{ marginTop: 18, display: "flex", justifyContent: "flex-end", gap: 8 }}>
+          <button type="button" onClick={onClose} style={{ padding: "8px 16px", background: "transparent", border: "1px solid #d4d4d8", borderRadius: 999, cursor: "pointer", fontSize: 13, color: "#4a3d35" }}>Cancel</button>
+          <button
+            type="button"
+            data-testid={`cellar-board-log-submit-${row.id}`}
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+            style={{ padding: "8px 20px", background: canSubmit ? "#B0741A" : "#c9b48e", color: "#2A1E0A", border: "none", borderRadius: 999, cursor: canSubmit ? "pointer" : "not-allowed", fontSize: 13, fontWeight: 600 }}
+          >
+            {logUse.isPending ? "Logging…" : "Log use"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+

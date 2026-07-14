@@ -1521,6 +1521,63 @@ const cellarBoardRouter = router({
       if (!dbUser) return [];
       return listEquipmentHistory(input.equipmentId, dbUser.id, input.limit);
     }),
+
+  /** Batches for the Log-Use modal dropdown. Compact projection — id + label
+   *  + vintage + variety. Ordered by most recent vintage first. */
+  listBatches: protectedProcedure.query(async ({ ctx }) => {
+    const dbUser = await getUserByOpenId(ctx.user.openId);
+    if (!dbUser) return [];
+    const rows = await listWineBatches(dbUser.id, dbUser.wineryId ?? null);
+    return rows.map((r) => ({
+      id: r.id,
+      batchId: r.batchId,
+      vintage: r.vintage,
+      variety: r.variety,
+    }));
+  }),
+
+  /** Save a prospect's /how-we-trace intake to their real cellar.
+   *  Converts each intake entry into `cellar_equipment` rows via the
+   *  existing addCellarEquipment helper — same code path as manual
+   *  cellar-equipment insertion. WBS phase is auto-inferred inside
+   *  addCellarEquipment so the entries land pre-tagged.
+   *  Requires auth. Returns count inserted. */
+  saveProspectIntake: protectedProcedure
+    .input(z.object({
+      batchLabel: z.string().min(1).max(32).optional(),
+      wineStyle: z.string().min(1).max(64).optional(),
+      entries: z.array(z.object({
+        key: z.enum(EQUIPMENT_TYPES),
+        label: z.string().min(1).max(128),
+        quantity: z.number().int().min(1).max(99),
+        capacityL: z.number().int().min(1).max(200000).optional(),
+      })).min(1).max(50),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      let inserted = 0;
+      for (const e of input.entries) {
+        // Each intake entry with quantity N spawns N vessel rows so pump #1
+        // and pump #2 are individually loggable — matching how the intake
+        // scenario generator on /how-we-trace assigns states.
+        for (let n = 1; n <= e.quantity; n++) {
+          const name = e.quantity > 1 ? `${e.label} #${n}` : e.label;
+          await addCellarEquipment({
+            userId: dbUser.id,
+            wineryId: dbUser.wineryId ?? null,
+            name,
+            equipmentType: e.key as EquipmentType,
+            material: "stainless", // sensible default; operator can edit later
+            capacityL: e.capacityL,
+            quantity: 1,
+            notes: input.wineStyle ? `Seeded from /how-we-trace intake (${input.wineStyle})` : undefined,
+          });
+          inserted++;
+        }
+      }
+      return { ok: true, inserted };
+    }),
 });
 
 // ─── Production Dashboard Router ──────────────────────────────────────────────

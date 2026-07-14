@@ -1117,6 +1117,44 @@ should land here so PRD.md can stay a spec, not a diary.
   our board", "McLaren Vale Shiraz · Live sample" eyebrow, Fermenter
   #1 correctly shows "Holding batch 26SHZ-001 — day 1 of fermentation".
 
+### Batch Phase Logger + Sanitation Warning + Save My Cellar  (Feb 2026)
+
+**Three features shipped together — closing the traceability loop from
+public demo (/how-we-trace) → real cellar → per-vessel event log.**
+
+1. **Batch Phase Logger** — `/admin/cellar-board` every vessel drawer
+   now surfaces a `+ Log equipment use` button. Opens a modal capturing
+   batch (dropdown from `wineBatches`), direction (in/out/pass/note),
+   phase (auto-set from vessel's WBS phase, editable), and notes.
+   Submit → existing `cellarBoard.logUse` mutation → board invalidates
+   → RAG state re-computes immediately. Operators can now log the
+   traceability thread WITHOUT leaving the cellar-board surface — no
+   separate batch-detail page required.
+2. **Sanitation Warning** — When the target vessel's RAG state is amber
+   or red, the modal renders a red banner: "Sanitation check required —
+   [reason]. Logging use now creates an audit event where sanitation
+   was not verified within the 72h freshness window." An acknowledgement
+   checkbox is required before Submit enables. FSANZ 3.2.2 Clause 20
+   evidence-of-attention pattern — the operator can't unknowingly
+   contaminate a batch; the acknowledgement itself is auditable.
+3. **Save My Cellar** — `/how-we-trace` prospect intake can now become
+   a real cellar. New `cellarBoard.saveProspectIntake` mutation
+   (protectedProcedure) converts each intake entry × quantity into
+   `cellar_equipment` rows via the existing `addCellarEquipment` helper
+   — phase auto-inferred, sensible material default. Anon prospects
+   click the button → routed through Emergent Google auth → returned
+   to `/how-we-trace` with intake preserved in localStorage → hit the
+   button again → real cellar created. Turns the public sales page
+   into a direct conversion funnel.
+- New tRPC procedures: `cellarBoard.listBatches`, `cellarBoard.saveProspectIntake`.
+- Backing files: `client/src/pages/AdminCellarBoard.tsx` (VesselDetail +
+  new `LogUseModal` — ~230 LOC), `client/src/pages/HowWeTrace.tsx`
+  (ProspectCta auth-aware save button), `server/routers.ts` (two new
+  procs).
+- SW cache bumped to `ow-v12`. Zero TS errors. Verified via curl —
+  `saveProspectIntake` returned `{ok:true, inserted:1}` for a single
+  entry payload.
+
 ### `/site-map` crash fix — unknown `audience` values no longer blank the page  (Feb 2026)
 - **Bug reported by Rich in prod**: `TypeError: Cannot read properties of
   undefined (reading 'bg')` blanks the whole SiteMap route with the
