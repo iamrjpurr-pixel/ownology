@@ -726,7 +726,9 @@ export const outreachRouter = router({
 
   /** OWNER — Stamp a contact as sent (SMS or email) and advance the
    *  outbound queue. Sets smsSentAt to now — the pipeline board uses
-   *  this to auto-progress the card from "cold" bucket to "sent" bucket. */
+   *  this to auto-progress the card from "cold" bucket to "sent" bucket.
+   *  When channel is "email" or "both", ALSO sets emailSentAt so the
+   *  Gmail-log stat updates in parallel. */
   markSent: ownerProcedure
     .input(z.object({
       slug: z.string().min(1).max(80),
@@ -734,11 +736,55 @@ export const outreachRouter = router({
     }))
     .mutation(async ({ input }) => {
       const now = Date.now();
+      const patch: { smsSentAt?: number; emailSentAt?: number } = {};
+      if (input.channel === "sms" || input.channel === "both") patch.smsSentAt = now;
+      if (input.channel === "email" || input.channel === "both") patch.emailSentAt = now;
       await db
         .update(schema.outreachContacts)
-        .set({ smsSentAt: now })
+        .set(patch)
         .where(eq(schema.outreachContacts.slug, input.slug));
       return { ok: true, slug: input.slug, at: now, channel: input.channel };
+    }),
+
+  /** OWNER — Stamp a contact as emailed (Gmail-log button).
+   *  One-click: after operator hits Send in Gmail, tap this button to
+   *  record the send. Sets emailSentAt to now. */
+  markEmailSent: ownerProcedure
+    .input(z.object({ slug: z.string().min(1).max(80) }))
+    .mutation(async ({ input }) => {
+      const now = Date.now();
+      await db
+        .update(schema.outreachContacts)
+        .set({ emailSentAt: now })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true, at: now };
+    }),
+
+  /** OWNER — Save (or clear) a captured reply from the prospect.
+   *  Sets replyText to the pasted content and repliedAt to now. When
+   *  the operator clears the box (empty text), both fields go null so
+   *  the pipeline board reverts the card to its pre-reply bucket. */
+  saveReply: ownerProcedure
+    .input(z.object({
+      slug: z.string().min(1).max(80),
+      reply: z.string().max(2000),
+    }))
+    .mutation(async ({ input }) => {
+      const trimmed = input.reply.trim();
+      const now = Date.now();
+      if (trimmed.length === 0) {
+        // Clear
+        await db
+          .update(schema.outreachContacts)
+          .set({ replyText: null, repliedAt: null })
+          .where(eq(schema.outreachContacts.slug, input.slug));
+        return { ok: true, cleared: true };
+      }
+      await db
+        .update(schema.outreachContacts)
+        .set({ replyText: trimmed, repliedAt: now })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true, at: now };
     }),
 
 
@@ -3003,6 +3049,8 @@ Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine
         demoBookedAt: schema.outreachContacts.demoBookedAt,
         status: schema.outreachContacts.status,
         hotAlertSentAt: schema.outreachContacts.hotAlertSentAt,
+        emailSentAt: schema.outreachContacts.emailSentAt,
+        replyText: schema.outreachContacts.replyText,
       })
       .from(schema.outreachContacts);
 
@@ -3011,10 +3059,12 @@ Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine
 
     // Totals — funnel is computed on SENT contacts only so the denominator
     // is honest (page visits from non-sent test URLs don't inflate rates).
-    // "total" still shows the whole DB size for context.
+    // "sent" = touched via ANY channel (SMS OR email), so email-only
+    // outreach still counts toward the funnel (Rich, Feb 2026).
     const totals = {
       total: rows.length,
       sent: 0,
+      emailSent: 0,
       viewed: 0,
       multiViewed: 0,
       clicked: 0,
@@ -3024,8 +3074,10 @@ Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine
     };
     for (const r of rows) {
       if (r.status === "sales" || r.status === "skip") continue;
-      if (!r.smsSentAt) continue; // not sent → doesn't belong in funnel
+      const touched = !!r.smsSentAt || !!r.emailSentAt;
+      if (!touched) continue; // not sent → doesn't belong in funnel
       totals.sent++;
+      if (r.emailSentAt) totals.emailSent++;
       if (r.firstViewedAt) totals.viewed++;
       if ((r.viewCount ?? 0) >= 2) totals.multiViewed++;
       if (r.ctaClickedAt) totals.clicked++;
@@ -3035,8 +3087,8 @@ Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine
     }
 
     // Sent contacts only — everyone in the follow-up buckets must have
-    // been messaged at least once.
-    const sentContacts = rows.filter((r) => r.smsSentAt && r.status !== "sales" && r.status !== "skip");
+    // been messaged at least once (SMS OR email).
+    const sentContacts = rows.filter((r) => (r.smsSentAt || r.emailSentAt) && r.status !== "sales" && r.status !== "skip");
 
     const buckets = {
       hot: [] as typeof sentContacts,

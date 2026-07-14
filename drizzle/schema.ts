@@ -1237,6 +1237,17 @@ export const outreachContacts = mysqlTable(
     // replied to the SMS but hasn't booked yet. Used by the pipeline-board
     // view to derive the "Replied" column.
     repliedAt: bigint("replied_at", { mode: "number" }),
+    // Verbatim reply captured by the operator when a prospect texts / emails
+    // back. Lives here rather than scattered across Messages / Gmail threads
+    // so the whole outbound → response arc is in one place (Rich, Feb 2026).
+    // 2000 chars is enough for a genuine reply — anything longer belongs in
+    // The Press as a proper interview record.
+    replyText: varchar("reply_text", { length: 2000 }),
+    // Timestamp of when the operator hit "✓ Sent via Gmail" after firing an
+    // outbound email through the Gmail compose URL. Separate from smsSentAt
+    // because a contact might be emailed but not SMS'd (e.g. no mobile), and
+    // we want both channels tracked independently for funnel accuracy.
+    emailSentAt: bigint("email_sent_at", { mode: "number" }),
     notes: varchar("notes", { length: 500 }),
     // Per-contact SMS draft override. When null, AdminContacts.tsx falls
     // back to the auto-generated template (smsDraft() helper). Set when

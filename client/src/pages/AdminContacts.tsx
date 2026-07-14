@@ -304,6 +304,8 @@ export default function AdminContacts() {
   const setWineryMutation = trpc.outreach.setWinery.useMutation();
   const setMobileMutation = trpc.outreach.setMobile.useMutation();
   const removeMutation = trpc.outreach.remove.useMutation();
+  const markEmailSentMutation = trpc.outreach.markEmailSent.useMutation();
+  const saveReplyMutation = trpc.outreach.saveReply.useMutation();
 
   const [form, setForm] = useState({
     firstName: "",
@@ -2583,16 +2585,46 @@ export default function AdminContacts() {
                       slug: c.slug,
                     });
                     return (
-                      <a
-                        data-testid={`draft-email-${c.slug}`}
-                        href={buildMailto(ch.email, subject, body)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ ...btn, textDecoration: "none" }}
-                        title={`Opens Gmail with a draft to ${ch.email}`}
-                      >
-                        Draft in Gmail
-                      </a>
+                      <>
+                        <a
+                          data-testid={`draft-email-${c.slug}`}
+                          href={buildMailto(ch.email, subject, body)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ ...btn, textDecoration: "none" }}
+                          title={`Opens Gmail with a draft to ${ch.email}`}
+                        >
+                          Draft in Gmail
+                        </a>
+                        {!c.emailSentAt && (
+                          <button
+                            data-testid={`mark-email-sent-${c.slug}`}
+                            onClick={() => markEmailSentMutation.mutate({ slug: c.slug }, { onSuccess: () => utils.outreach.list.invalidate() })}
+                            style={{ ...btn, background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)" }}
+                            title="After you hit Send in the Gmail tab, click this to log it"
+                          >
+                            ✓ Sent via Gmail
+                          </button>
+                        )}
+                        {c.emailSentAt && (
+                          <span
+                            data-testid={`email-sent-badge-${c.slug}`}
+                            style={{
+                              fontFamily: "'Lato',sans-serif",
+                              fontSize: "0.7rem",
+                              padding: "3px 8px",
+                              background: "color-mix(in oklch, oklch(0.70 0.16 140) 15%, transparent)",
+                              color: "#16a34a",
+                              border: "1px solid #16a34a",
+                              borderRadius: 3,
+                              fontWeight: 600,
+                            }}
+                            title={`Emailed ${new Date(c.emailSentAt).toLocaleString()}`}
+                          >
+                            ✓ Emailed
+                          </span>
+                        )}
+                      </>
                     );
                   })()}
                   <a href={url} target="_blank" rel="noopener noreferrer" style={{ ...btn, textDecoration: "none" }}>
@@ -2647,6 +2679,19 @@ export default function AdminContacts() {
                   onSave={(draft) =>
                     setSmsDraftMutation.mutate(
                       { slug: c.slug, draft },
+                      { onSuccess: () => utils.outreach.list.invalidate() }
+                    )
+                  }
+                />
+              )}
+              {!isSilent && (
+                <ReplyCaptureBox
+                  slug={c.slug}
+                  initial={(c as { replyText?: string | null }).replyText ?? null}
+                  repliedAt={(c as { repliedAt?: number | null }).repliedAt ?? null}
+                  onSave={(reply) =>
+                    saveReplyMutation.mutate(
+                      { slug: c.slug, reply },
                       { onSuccess: () => utils.outreach.list.invalidate() }
                     )
                   }
@@ -3040,6 +3085,140 @@ function SignalChip({ label, active }: { label: string; active: boolean }) {
     >
       {active ? "✓" : "○"} {label}
     </span>
+  );
+}
+
+/** Paste-a-reply box — operator captures a prospect's SMS/email response
+ *  verbatim so the whole outbound → response arc lives on the contact card
+ *  instead of scattered across Messages/Gmail threads (Rich, Feb 2026).
+ *
+ *  UX rules:
+ *  - Collapsed by default until the operator has something to paste OR a
+ *    reply is already on file. Keeps the contact card compact when the
+ *    prospect hasn't replied yet.
+ *  - Auto-save on blur (same pattern as SmsDraftEditor).
+ *  - Clearing the box (empty) removes both replyText AND repliedAt so the
+ *    engagement funnel reverts — supports "oh I pasted the wrong reply".
+ *  - Shows "Replied Nd ago" once saved.
+ */
+function ReplyCaptureBox({
+  slug,
+  initial,
+  repliedAt,
+  onSave,
+}: {
+  slug: string;
+  initial: string | null;
+  repliedAt: number | null;
+  onSave: (reply: string) => void;
+}) {
+  const [value, setValue] = useState<string>(initial ?? "");
+  const [expanded, setExpanded] = useState<boolean>(!!initial);
+  const [savedHint, setSavedHint] = useState<"saved" | "cleared" | null>(null);
+  const dirty = value !== (initial ?? "");
+  const hasReply = !!initial && initial.length > 0;
+
+  function fmtAgo(ms: number | null): string {
+    if (!ms) return "";
+    const diff = Date.now() - ms;
+    if (diff < 60_000) return "just now";
+    if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
+    if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
+    return `${Math.floor(diff / 86_400_000)}d ago`;
+  }
+
+  function handleBlur() {
+    if (!dirty) return;
+    const trimmed = value.trim();
+    onSave(trimmed);
+    setSavedHint(trimmed.length === 0 ? "cleared" : "saved");
+    setTimeout(() => setSavedHint(null), 2200);
+  }
+
+  return (
+    <div data-testid={`reply-capture-${slug}`} style={{ marginTop: 10 }}>
+      <button
+        type="button"
+        data-testid={`reply-toggle-${slug}`}
+        onClick={() => setExpanded((v) => !v)}
+        style={{
+          width: "100%",
+          padding: "6px 10px",
+          background: hasReply
+            ? "color-mix(in oklch, oklch(0.70 0.16 140) 6%, transparent)"
+            : "transparent",
+          border: `1px ${hasReply ? "solid #16a34a" : "dashed var(--ow-border)"}`,
+          borderRadius: 4,
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          textAlign: "left",
+          fontFamily: "'Lato',sans-serif",
+          fontSize: "0.72rem",
+          color: hasReply ? "#16a34a" : "var(--ow-text-mid)",
+          letterSpacing: "0.03em",
+          textTransform: "uppercase",
+          fontWeight: 700,
+        }}
+      >
+        <span>{hasReply ? "💬 Reply on file" : "💬 Paste a reply"}</span>
+        {hasReply && repliedAt && (
+          <span style={{ color: "var(--ow-text-lo)", fontWeight: 400, textTransform: "none" }}>
+            · {fmtAgo(repliedAt)}
+          </span>
+        )}
+        <span style={{ flexGrow: 1 }} />
+        <span style={{ fontSize: "0.85rem", color: "var(--ow-text-lo)" }}>{expanded ? "▾" : "▸"}</span>
+      </button>
+      {expanded && (
+        <div style={{ marginTop: 6 }}>
+          <textarea
+            data-testid={`reply-input-${slug}`}
+            value={value}
+            onChange={(e) => setValue(e.target.value.slice(0, 2000))}
+            onBlur={handleBlur}
+            placeholder={`Paste their reply here — SMS, Gmail, or a message you'd rather not lose in a thread.\n\nCleared? Empty box → removes reply + repliedAt.`}
+            rows={4}
+            style={{
+              width: "100%",
+              padding: 10,
+              background: "color-mix(in oklch, oklch(0.70 0.16 140) 3%, transparent)",
+              border: `1px solid ${dirty ? "#16a34a" : "var(--ow-border)"}`,
+              borderRadius: 4,
+              fontFamily: "'Fira Code',monospace",
+              fontSize: "0.78rem",
+              color: "var(--ow-text-hi)",
+              lineHeight: 1.5,
+              resize: "vertical",
+              outline: "none",
+              transition: "border-color 120ms ease",
+            }}
+          />
+          <div style={{ display: "flex", gap: 12, marginTop: 4, alignItems: "center" }}>
+            <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.68rem", color: value.length > 1800 ? "#dc2626" : "var(--ow-text-lo)" }}>
+              {value.length} / 2000 chars
+            </span>
+            <span style={{ flexGrow: 1 }} />
+            {savedHint === "saved" && (
+              <span data-testid={`reply-saved-${slug}`} style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "#16a34a" }}>
+                ✓ Reply saved · funnel updated
+              </span>
+            )}
+            {savedHint === "cleared" && (
+              <span data-testid={`reply-cleared-${slug}`} style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "var(--ow-text-lo)" }}>
+                ↺ Reply cleared
+              </span>
+            )}
+            {dirty && !savedHint && (
+              <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "var(--ow-amber)" }}>
+                Click outside to save
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
