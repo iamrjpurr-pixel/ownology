@@ -1,0 +1,23 @@
+{
+  "summary": "Retest of Feb 2026 batch after main-agent fixes for (a) AWRI stuck fact-sheet surfacing in tutor.ask sopTitles + Part N/M stripping, (b) AdminCellarBoard Download PDF button semantically disabled via <button> when no batch selected, (c) cellarBoard.createShareLink returning row id. All 15 pytest cases now pass (was 14/15) and Playwright UI check confirms Download PDF button state transitions BUTTON(disabled) -> A(href) as expected. No regressions on the 14 previously-passing cases.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_feb2026_batch.py",
+    "/app/test_reports/pytest/feb2026_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "tutor.ts fixes look clean: content+tag*2+sourceBoost scoring and merging LLM citations with retrieved-chunk titles is the right shape; Part N/M strip applied consistently.",
+    "AdminCellarBoard: conditional <a>/<button> render is a good pattern for semantic disabled; both branches carry the same data-testid so tests remain stable.",
+    "cellarBoard.createShareLink now returns {ok,id,token,url,expiresAt} — clients no longer need round-trip via listShareLinks to correlate id for revoke."
+  ],
+  "updated_files": ["/app/backend/tests/test_feb2026_batch.py"],
+  "success_rate": {"backend": "100% (15/15)", "frontend": "100%"},
+  "test_credentials": "Gate password middx99 -> POST /api/gate/verify sets ow_gate cookie.",
+  "seed_data_creation": "Created 1 new share-link row per run (this run received id from response directly). Prior rows still accumulate in cellar_book_share_tokens.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "test_feb2026_batch.py now (a) asserts createShareLink returns positive int id in response payload, (b) asserts no sopTitle for stuck-ferment ends with 'Part N/M'. UI verified with fresh Playwright context: initial button element is <button disabled>, switches to <a href='/api/compliance/cellar-book.pdf?batchId=N'> after batch selection. Test batch ids observed in this env now start at 5 (26SEM-001) — id=1 seed no longer present in list dropdown but PDF endpoint still resolves batchId=1.",
+  "rca of the issue": "n/a — all previously-flagged issues are fixed."
+}

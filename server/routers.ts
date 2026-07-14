@@ -1603,7 +1603,7 @@ const cellarBoardRouter = router({
       const token = randomBytes(32).toString("base64url");
       const now = Date.now();
       const expiresAt = now + input.ttlDays * 86400 * 1000;
-      await db.insert(schema.cellarBookShareTokens).values({
+      const [insertResult] = await db.insert(schema.cellarBookShareTokens).values({
         token,
         batchId: input.batchId,
         userId: dbUser.id,
@@ -1621,7 +1621,8 @@ const cellarBoardRouter = router({
         || (ctx.req.headers.host as string | undefined)
         || "ownology.ai";
       const url = `${proto}://${host}/api/compliance/cellar-book.pdf?token=${token}`;
-      return { ok: true, token, url, expiresAt };
+      const id = (insertResult as unknown as { insertId?: number })?.insertId ?? null;
+      return { ok: true, id, token, url, expiresAt };
     }),
 
   /** List every active + recently-revoked share link for the caller's batches. */

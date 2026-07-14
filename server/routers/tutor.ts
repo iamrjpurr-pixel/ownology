@@ -234,7 +234,7 @@ const tutorRouter = router({
           "demijohn": ["fermenter", "vessel", "storage", "headspace"],
           "bucket": ["fermenter", "vessel", "primary fermentation"],
           "airlock": ["CO2", "oxygen", "fermentation", "headspace"],
-          "stuck": ["stuck fermentation", "stalled", "YAN", "nutrient"],
+          "stuck": ["stuck fermentation", "stalled", "sluggish", "YAN", "nutrient", "nitrogen", "restart", "rehydration", "temperature"],
           "mlf": ["malolactic fermentation", "lactic acid", "malic acid", "bacteria"],
           "malo": ["malolactic fermentation", "lactic acid", "malic acid"],
           "lees": ["gross lees", "fine lees", "sediment", "racking"],
@@ -306,6 +306,7 @@ const tutorRouter = router({
           "mousy": ["mousiness", "fault", "MLF", "bacteria", "contamination"],
           "geranium": ["geranium taint", "sorbate", "MLF", "fault"],
           "sorbate": ["potassium sorbate", "geranium taint", "MLF", "stabilisation"],
+          "sluggish": ["sluggish", "stuck fermentation", "YAN", "nitrogen", "temperature", "restart", "rehydration"],
           "chardonnay": ["Chardonnay", "white wine", "oak", "MLF", "sur-lie"],
           "sauvignon blanc": ["Sauvignon Blanc", "white wine", "reductive", "acidity", "thiols"],
           "riesling": ["Riesling", "white wine", "acidity", "residual sugar", "low pH"],
@@ -398,12 +399,19 @@ const tutorRouter = router({
 
         // Score each chunk by expanded keyword overlap
         const scored = scopedChunks.map((chunk) => {
-          const haystack = [
-            (chunk.topicTags ?? "").toLowerCase(),
+          const contentBlob = [
             (chunk.chapterTitle ?? "").toLowerCase(),
             chunk.content.toLowerCase().slice(0, 800),
           ].join(" ");
-          const score = questionWords.reduce((acc, word) => acc + (haystack.includes(word) ? 1 : 0), 0);
+          const tagsBlob = (chunk.topicTags ?? "").toLowerCase();
+          // Content/title keyword hits — 1 per match (existing behaviour).
+          const contentScore = questionWords.reduce((acc, word) => acc + (contentBlob.includes(word) ? 1 : 0), 0);
+          // Topic-tag hits — 2 per match. Topic tags are hand-curated per-chunk
+          // metadata, so a hit there is a much stronger relevance signal than
+          // a generic word appearing somewhere in the body. Fixes the case
+          // where a generic "Boutique Winery equipment" SOP outscored the
+          // AWRI Stuck Fermentation fact sheet on a stuck-ferment question.
+          const tagScore = questionWords.reduce((acc, word) => acc + (tagsBlob.includes(word) ? 2 : 0), 0);
           // Boost home-scale outlines + the MoreWine specialist manuals — they
           // are the highest-density practical content in the corpus.
           const src = chunk.sourceDoc ?? "";
@@ -414,7 +422,7 @@ const tutorRouter = router({
             SPECIALIST_MANUALS_SET.has(src) ? 0.4 :
             SPARKLING_SOURCES.has(src) ? 0.6 :  // supplier-grade sparkling data
             0;
-          return { ...chunk, score: score + sourceBoost };
+          return { ...chunk, score: contentScore + tagScore + sourceBoost };
         });
 
         // Take top 6 most relevant chunks (mix of sources)
@@ -474,7 +482,16 @@ const tutorRouter = router({
           })
           .join("\n\n---\n\n");
 
-        const sourceRefs = Array.from(new Set<string>(relevantChunks.map((c) => c.chapterTitle ?? `Chapter ${c.chapterRef}`))).slice(0, 4);
+        // Retrieved-chunk baseline titles. Strip any "— Part N/M" suffix
+        // that our chunker adds for multi-part sources (AWRI, long PDFs) so
+        // Owen's citation surface stays clean.
+        const sourceRefs = Array.from(
+          new Set<string>(
+            relevantChunks
+              .map((c) => (c.chapterTitle ?? `Chapter ${c.chapterRef}`) as string)
+              .map((t) => t.replace(/\s*—\s*Part\s+\d+\s*\/\s*\d+\s*$/i, "").trim())
+          )
+        ).slice(0, 4);
 
         // Step 3: Batch size extraction — use explicit input if provided, else parse from question text
         let batchSizeContext: string;
@@ -571,7 +588,28 @@ ${docContext}`;
         try {
           const parsed = JSON.parse(diyRawContent);
           if (parsed.answer) diyAnswer = parsed.answer;
-          if (Array.isArray(parsed.sourceChapters)) diySourceChapters = parsed.sourceChapters;
+          if (Array.isArray(parsed.sourceChapters) && parsed.sourceChapters.length > 0) {
+            // Union the LLM's citations with the retrieved chunk titles.
+            // Rationale: if the LLM returns fewer citations than the top-K
+            // chunks we actually retrieved, we don't want to lose AWRI /
+            // Boulton / Iland titles that the retrieval scorer already
+            // ranked as highest-signal. LLM citations go first (they name
+            // the most-relevant sections); then baseline retrieval titles
+            // fill out the rest, de-duplicated. Any "— Part N/M" chunker
+            // suffix is stripped so the surface reads as one canonical
+            // source per fact sheet.
+            const stripPart = (s: string) => s.replace(/\s*—\s*Part\s+\d+\s*\/\s*\d+\s*$/iu, "").trim();
+            const seen = new Set<string>();
+            const merged: string[] = [];
+            for (const s of [...parsed.sourceChapters, ...sourceRefs]) {
+              if (typeof s !== "string") continue;
+              const clean = stripPart(s.trim());
+              if (!clean || seen.has(clean)) continue;
+              seen.add(clean);
+              merged.push(clean);
+            }
+            diySourceChapters = merged;
+          }
           if (parsed.disclaimer) diyDisclaimer = parsed.disclaimer;
           if (parsed.riskLevel) diyRiskLevel = parsed.riskLevel;
         } catch {

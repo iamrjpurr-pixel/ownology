@@ -198,32 +198,56 @@ export default function AdminCellarBoard() {
             </option>
           ))}
         </select>
-        <a
-          data-testid="cellar-book-download-btn"
-          href={cellarBookBatchId ? `/api/compliance/cellar-book.pdf?batchId=${cellarBookBatchId}` : undefined}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-disabled={!cellarBookBatchId}
-          onClick={(e) => { if (!cellarBookBatchId) e.preventDefault(); }}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "7px 14px",
-            borderRadius: 6,
-            background: cellarBookBatchId ? "#78350f" : "#c8beb0",
-            color: "#fff",
-            fontSize: 13,
-            fontWeight: 600,
-            textDecoration: "none",
-            cursor: cellarBookBatchId ? "pointer" : "not-allowed",
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M7 1v8m0 0L4 6m3 3 3-3M2 12h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          Download PDF
-        </a>
+        {cellarBookBatchId ? (
+          <a
+            data-testid="cellar-book-download-btn"
+            href={`/api/compliance/cellar-book.pdf?batchId=${cellarBookBatchId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "7px 14px",
+              borderRadius: 6,
+              background: "#78350f",
+              color: "#fff",
+              fontSize: 13,
+              fontWeight: 600,
+              textDecoration: "none",
+              cursor: "pointer",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M7 1v8m0 0L4 6m3 3 3-3M2 12h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Download PDF
+          </a>
+        ) : (
+          <button
+            type="button"
+            data-testid="cellar-book-download-btn"
+            disabled
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "7px 14px",
+              borderRadius: 6,
+              background: "#c8beb0",
+              color: "#fff",
+              border: "none",
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: "not-allowed",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M7 1v8m0 0L4 6m3 3 3-3M2 12h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Download PDF
+          </button>
+        )}
         <button
           type="button"
           data-testid="cellar-book-share-btn"

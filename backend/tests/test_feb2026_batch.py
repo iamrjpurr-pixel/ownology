@@ -89,9 +89,12 @@ class TestAuditorPreviewLink:
         assert url and "token=" in url, f"no token in url: {payload}"
         expires = payload.get("expiresAt")
         assert expires, f"no expiresAt: {payload}"
+        # NEW: id must now be returned as a positive int
+        row_id = payload.get("id")
+        assert isinstance(row_id, int) and row_id > 0, f"expected positive int id in response, got: {payload}"
         _share_state["url"] = url
         _share_state["token"] = re.search(r"token=([^&]+)", url).group(1)
-        _share_state["id"] = payload.get("id")  # may be None; resolved via list below
+        _share_state["id"] = row_id
 
     def test_02_fetch_url_no_cookies(self, no_auth_session):
         url = _share_state.get("url")
@@ -192,8 +195,11 @@ class TestAskOwenCitations:
         r = _ask_owen(gate_session, "My fermentation is stuck at 8 Brix, what should I check?", 50)
         titles, _ = self._extract_sop_titles(r)
         joined = " || ".join(titles)
-        assert re.search(r"awri fact sheet.*stuck", joined, re.I), f"no AWRI stuck fact-sheet: {titles}"
+        assert re.search(r"AWRI Fact Sheet.*Stuck", joined), f"no AWRI stuck fact-sheet: {titles}"
         assert re.search(r"boulton|zoecklein|jackson", joined, re.I), f"no named-bible citation: {titles}"
+        # NEW: no title should end with "Part N/M"
+        for t in titles:
+            assert not re.search(r"Part\s+\d+/\d+\s*$", t), f"title ends with Part N/M: {t!r} full: {titles}"
 
 
 # ---------- Legal pages raw HTTP ----------
