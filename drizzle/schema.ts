@@ -1248,6 +1248,11 @@ export const outreachContacts = mysqlTable(
     // because a contact might be emailed but not SMS'd (e.g. no mobile), and
     // we want both channels tracked independently for funnel accuracy.
     emailSentAt: bigint("email_sent_at", { mode: "number" }),
+    // Claude's classification of the pasted reply text — one of
+    // "interested" | "objection" | "not-now" | "cold" | null. Used to
+    // colour-code the contact card + drive the "Reply-first follow-up"
+    // generator on /admin/contacts/engagement (Rich, Feb 2026).
+    replySentiment: varchar("reply_sentiment", { length: 20 }),
     notes: varchar("notes", { length: 500 }),
     // Per-contact SMS draft override. When null, AdminContacts.tsx falls
     // back to the auto-generated template (smsDraft() helper). Set when

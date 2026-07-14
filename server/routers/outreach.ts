@@ -464,6 +464,52 @@ ${researchBits.length > 0 ? researchBits.join("\n") : "(no research on file — 
   return { sms: parsed.sms.trim().slice(0, 500), signalsAcknowledged };
 }
 
+/**
+ * Classify a pasted reply into one of: interested | objection | not-now | cold.
+ * Uses Claude via the Emergent Forge shim. Kept lean — one call, one word.
+ * Called inline from `saveReply` so the frontend gets sentiment in the
+ * same round-trip. Throws on any failure (caller decides to swallow).
+ */
+async function classifyReplySentiment(
+  forgeUrl: string,
+  forgeKey: string,
+  replyText: string
+): Promise<"interested" | "objection" | "not-now" | "cold"> {
+  const systemPrompt = `Classify this winemaker's reply to a cold-outreach SMS into exactly one category:
+
+- "interested" — they've engaged positively, asked a question, said yes, want to know more, or are open to a call
+- "objection" — they raised a concern, disagreed, or pushed back on the pitch (but didn't close the door)
+- "not-now" — they said interested but not right now, "circle back later", "busy with vintage", etc.
+- "cold" — polite brush-off, "no thanks", "not for us", "please remove me"
+
+Return JSON: { "sentiment": "<one of the four>" }. No prose. No fences.`;
+
+  const chatResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${forgeKey}`,
+      "x-ow-source": "outreach.classifyReply",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-5",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: replyText },
+      ],
+      stream: false,
+    }),
+  });
+  if (!chatResp.ok) throw new Error(`Claude classify failed: ${chatResp.status}`);
+  const chatData = await chatResp.json();
+  const raw = chatData.choices?.[0]?.message?.content ?? "{}";
+  const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+  const parsed = JSON.parse(cleaned) as { sentiment?: string };
+  const s = parsed.sentiment;
+  if (s === "interested" || s === "objection" || s === "not-now" || s === "cold") return s;
+  throw new Error(`Claude returned unrecognised sentiment: ${s}`);
+}
+
 export const outreachRouter = router({
   /** PUBLIC — fetch a single contact by slug for the /hi/:slug page.
    *  Resolves on the server:
@@ -761,9 +807,20 @@ export const outreachRouter = router({
     }),
 
   /** OWNER — Save (or clear) a captured reply from the prospect.
-   *  Sets replyText to the pasted content and repliedAt to now. When
-   *  the operator clears the box (empty text), both fields go null so
-   *  the pipeline board reverts the card to its pre-reply bucket. */
+   *
+   *  On save with non-empty text, runs three actions inline:
+   *  (1) Classify the reply via Claude (interested / objection / not-now
+   *      / cold) so the card can colour-code and the follow-up generator
+   *      has intent context.
+   *  (2) Auto-advance status:
+   *      - "interested" → warm
+   *      - "objection" or "not-now" → lukewarm (still worth nurturing)
+   *      - "cold" → status untouched (operator can flip manually)
+   *  (3) Stamps replied_at + reply_text.
+   *
+   *  On empty save, clears reply + sentiment + repliedAt but does NOT
+   *  revert the status — the operator can adjust that manually if they
+   *  made a mistake pasting. */
   saveReply: ownerProcedure
     .input(z.object({
       slug: z.string().min(1).max(80),
@@ -771,20 +828,150 @@ export const outreachRouter = router({
     }))
     .mutation(async ({ input }) => {
       const trimmed = input.reply.trim();
-      const now = Date.now();
       if (trimmed.length === 0) {
-        // Clear
         await db
           .update(schema.outreachContacts)
-          .set({ replyText: null, repliedAt: null })
+          .set({ replyText: null, repliedAt: null, replySentiment: null })
           .where(eq(schema.outreachContacts.slug, input.slug));
-        return { ok: true, cleared: true };
+        return { ok: true, cleared: true, sentiment: null as string | null };
       }
+      const now = Date.now();
+
+      // Fire the classify + status advance inline so the frontend gets the
+      // sentiment back in the same round-trip. Best-effort — if Claude
+      // errors out, we still save the reply (sentiment stays null and the
+      // operator can retry later). Never blocks the reply save.
+      let sentiment: string | null = null;
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (forgeUrl && forgeKey) {
+        try {
+          sentiment = await classifyReplySentiment(forgeUrl, forgeKey, trimmed);
+        } catch {
+          // silent — sentiment stays null
+        }
+      }
+
+      // Auto-advance status based on sentiment.
+      let newStatus: "warm" | "lukewarm" | "cold" | "sales" | "skip" | null = null;
+      if (sentiment === "interested") newStatus = "warm";
+      else if (sentiment === "objection" || sentiment === "not-now") newStatus = "lukewarm";
+
+      // Only bump the status FORWARD — never demote a contact who was
+      // manually marked warm/sales/etc by the operator.
+      const advanceIfHigher = async () => {
+        if (!newStatus) return;
+        const [row] = await db
+          .select({ status: schema.outreachContacts.status })
+          .from(schema.outreachContacts)
+          .where(eq(schema.outreachContacts.slug, input.slug))
+          .limit(1);
+        if (!row) return;
+        const rank: Record<string, number> = { cold: 0, lukewarm: 1, warm: 2, sales: 3, skip: -1 };
+        const cur = rank[row.status ?? "cold"] ?? 0;
+        const next = rank[newStatus!] ?? 0;
+        if (next > cur) {
+          await db
+            .update(schema.outreachContacts)
+            .set({ status: newStatus })
+            .where(eq(schema.outreachContacts.slug, input.slug));
+        }
+      };
+
       await db
         .update(schema.outreachContacts)
-        .set({ replyText: trimmed, repliedAt: now })
+        .set({ replyText: trimmed, repliedAt: now, replySentiment: sentiment })
         .where(eq(schema.outreachContacts.slug, input.slug));
-      return { ok: true, at: now };
+      await advanceIfHigher();
+
+      return { ok: true, at: now, sentiment };
+    }),
+
+  /** OWNER — Generate a personalised follow-up SMS grounded in the pasted
+   *  reply text. Different from rewriteSmsAI which acknowledges research
+   *  before any reply — this generator READS the reply and responds to it
+   *  as a mate would over text. Used on the /admin/contacts/engagement
+   *  "Replied" bucket to draft the next message. */
+  replyFollowupAI: ownerProcedure
+    .input(z.object({ slug: z.string().min(1).max(80) }))
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
+
+      const rows = await db
+        .select({
+          slug: schema.outreachContacts.slug,
+          firstName: schema.outreachContacts.firstName,
+          lastName: schema.outreachContacts.lastName,
+          winery: schema.outreachContacts.winery,
+          region: schema.outreachContacts.region,
+          hookText: schema.outreachContacts.hookText,
+          painPoint: schema.outreachContacts.painPoint,
+          replyText: schema.outreachContacts.replyText,
+          replySentiment: schema.outreachContacts.replySentiment,
+        })
+        .from(schema.outreachContacts)
+        .where(eq(schema.outreachContacts.slug, input.slug))
+        .limit(1);
+      const c = rows[0];
+      if (!c) throw new Error(`No contact found with slug ${input.slug}`);
+      if (!c.replyText) throw new Error("No reply on file — paste their reply first.");
+
+      const previewBase = process.env.PREVIEW_BASE_URL || process.env.PUBLIC_BASE_URL || "https://ownology.ai";
+      const link = `${previewBase}/hi/${c.slug}`;
+
+      const systemPrompt = `You are Jamie, the founder of Ownology. A winemaker just replied to your outbound SMS. Draft the next SMS you'd send them — grounded in their actual reply.
+
+Their reply (verbatim):
+"""
+${c.replyText}
+"""
+
+Reply intent (Claude's classification): ${c.replySentiment ?? "unknown"}
+Their winery: ${c.winery ?? "(unknown)"}
+Region: ${c.region ?? "(unknown)"}
+Original hook you sent them was about: ${c.hookText ?? "(no hook on file)"}
+
+RULES:
+1. Address the specific thing they said. If they raised a concern, respond to that concern. If they asked a question, answer it. If they said "yes", propose a specific next step.
+2. Never sales-y. Sound like a mate who happens to build cellar software.
+3. Lower-case start OK. Australian idiom OK ("gday", "reckon", "cool"). No exclamation marks. No emojis.
+4. 180-320 chars total (SMS-length).
+5. If sentiment is "interested" — propose a specific 15-minute call time this week (say "how's Tuesday 2pm or Wednesday morning?").
+6. If sentiment is "objection" — acknowledge the objection first ("fair call"), then reframe without pushing. Don't argue.
+7. If sentiment is "not-now" — accept it graciously, offer to circle back in 3 months, no pressure.
+8. If sentiment is "cold" or the reply is a polite brush-off — thank them for their honesty and close warmly.
+9. Sign off with " — Jamie".
+10. Only include the link ${link} if it's genuinely useful (e.g. they asked for more info). Otherwise skip the link.
+
+Return JSON: { "sms": "the follow-up SMS text" }. Return ONLY the JSON. No prose. No markdown fences.`;
+
+      const chatResp = await fetch(`${forgeUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${forgeKey}`,
+          "x-ow-source": "outreach.replyFollowupAI",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-5",
+          messages: [{ role: "system", content: systemPrompt }],
+          stream: false,
+        }),
+      });
+      if (!chatResp.ok) {
+        const errText = await chatResp.text().catch(() => "");
+        throw new Error(`Claude follow-up failed: ${chatResp.status} ${errText.slice(0, 200)}`);
+      }
+      const chatData = await chatResp.json();
+      const raw = chatData.choices?.[0]?.message?.content ?? "{}";
+      const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+      const parsed = JSON.parse(cleaned) as { sms?: string };
+      if (typeof parsed.sms !== "string" || !parsed.sms.trim()) {
+        throw new Error("Claude returned malformed output");
+      }
+      return { sms: parsed.sms.trim().slice(0, 500), sentiment: c.replySentiment };
     }),
 
 

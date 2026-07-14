@@ -2689,6 +2689,7 @@ export default function AdminContacts() {
                   slug={c.slug}
                   initial={(c as { replyText?: string | null }).replyText ?? null}
                   repliedAt={(c as { repliedAt?: number | null }).repliedAt ?? null}
+                  sentiment={(c as { replySentiment?: string | null }).replySentiment ?? null}
                   onSave={(reply) =>
                     saveReplyMutation.mutate(
                       { slug: c.slug, reply },
@@ -3105,11 +3106,13 @@ function ReplyCaptureBox({
   slug,
   initial,
   repliedAt,
+  sentiment,
   onSave,
 }: {
   slug: string;
   initial: string | null;
   repliedAt: number | null;
+  sentiment: string | null;
   onSave: (reply: string) => void;
 }) {
   const [value, setValue] = useState<string>(initial ?? "");
@@ -3117,6 +3120,24 @@ function ReplyCaptureBox({
   const [savedHint, setSavedHint] = useState<"saved" | "cleared" | null>(null);
   const dirty = value !== (initial ?? "");
   const hasReply = !!initial && initial.length > 0;
+
+  // Sentiment-driven palette. Tuned so each state is unambiguous at a
+  // glance without shouting on light-mode parchment.
+  const sentimentMeta = (() => {
+    if (!hasReply) return { border: "var(--ow-border)", bg: "transparent", color: "var(--ow-text-mid)", label: "PASTE A REPLY", accent: "" };
+    switch (sentiment) {
+      case "interested":
+        return { border: "#16a34a", bg: "color-mix(in oklch, oklch(0.70 0.16 140) 8%, transparent)", color: "#16a34a", label: "REPLIED · INTERESTED", accent: "🔥" };
+      case "objection":
+        return { border: "#ea580c", bg: "color-mix(in oklch, oklch(0.65 0.18 60) 8%, transparent)", color: "#ea580c", label: "REPLIED · OBJECTION", accent: "⚠" };
+      case "not-now":
+        return { border: "#0ea5e9", bg: "color-mix(in oklch, oklch(0.65 0.14 220) 8%, transparent)", color: "#0284c7", label: "REPLIED · NOT NOW", accent: "⏳" };
+      case "cold":
+        return { border: "var(--ow-text-lo)", bg: "color-mix(in oklch, var(--ow-text-lo) 6%, transparent)", color: "var(--ow-text-lo)", label: "REPLIED · COLD", accent: "🧊" };
+      default:
+        return { border: "#16a34a", bg: "color-mix(in oklch, oklch(0.70 0.16 140) 6%, transparent)", color: "#16a34a", label: "REPLY ON FILE", accent: "💬" };
+    }
+  })();
 
   function fmtAgo(ms: number | null): string {
     if (!ms) return "";
@@ -3144,10 +3165,8 @@ function ReplyCaptureBox({
         style={{
           width: "100%",
           padding: "6px 10px",
-          background: hasReply
-            ? "color-mix(in oklch, oklch(0.70 0.16 140) 6%, transparent)"
-            : "transparent",
-          border: `1px ${hasReply ? "solid #16a34a" : "dashed var(--ow-border)"}`,
+          background: sentimentMeta.bg,
+          border: `1px ${hasReply ? "solid" : "dashed"} ${sentimentMeta.border}`,
           borderRadius: 4,
           cursor: "pointer",
           display: "flex",
@@ -3156,13 +3175,13 @@ function ReplyCaptureBox({
           textAlign: "left",
           fontFamily: "'Lato',sans-serif",
           fontSize: "0.72rem",
-          color: hasReply ? "#16a34a" : "var(--ow-text-mid)",
+          color: sentimentMeta.color,
           letterSpacing: "0.03em",
           textTransform: "uppercase",
           fontWeight: 700,
         }}
       >
-        <span>{hasReply ? "💬 Reply on file" : "💬 Paste a reply"}</span>
+        <span>{hasReply ? `${sentimentMeta.accent} ${sentimentMeta.label}` : `💬 ${sentimentMeta.label}`}</span>
         {hasReply && repliedAt && (
           <span style={{ color: "var(--ow-text-lo)", fontWeight: 400, textTransform: "none" }}>
             · {fmtAgo(repliedAt)}
@@ -3178,7 +3197,7 @@ function ReplyCaptureBox({
             value={value}
             onChange={(e) => setValue(e.target.value.slice(0, 2000))}
             onBlur={handleBlur}
-            placeholder={`Paste their reply here — SMS, Gmail, or a message you'd rather not lose in a thread.\n\nCleared? Empty box → removes reply + repliedAt.`}
+            placeholder={`Paste their reply here — SMS, Gmail, or a message you'd rather not lose in a thread.\n\nCleared? Empty box → removes reply + repliedAt.\n\nOn save, Claude classifies the reply (interested/objection/not-now/cold) and auto-advances the contact status.`}
             rows={4}
             style={{
               width: "100%",
@@ -3195,14 +3214,19 @@ function ReplyCaptureBox({
               transition: "border-color 120ms ease",
             }}
           />
-          <div style={{ display: "flex", gap: 12, marginTop: 4, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 12, marginTop: 4, alignItems: "center", flexWrap: "wrap" }}>
             <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.68rem", color: value.length > 1800 ? "#dc2626" : "var(--ow-text-lo)" }}>
               {value.length} / 2000 chars
             </span>
+            {hasReply && sentiment && (
+              <span data-testid={`reply-sentiment-${slug}`} style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.68rem", color: sentimentMeta.color, fontWeight: 700 }}>
+                → status auto-advanced ({sentiment})
+              </span>
+            )}
             <span style={{ flexGrow: 1 }} />
             {savedHint === "saved" && (
               <span data-testid={`reply-saved-${slug}`} style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "#16a34a" }}>
-                ✓ Reply saved · funnel updated
+                ✓ Reply saved · Claude classifying…
               </span>
             )}
             {savedHint === "cleared" && (
