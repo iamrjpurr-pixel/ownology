@@ -1,0 +1,52 @@
+{
+  "summary": "Regression sweep for Feb 2026 batch (Cellar Book PDF, Auditor Preview Link, Terms/Refund/Privacy rewrites, Ask Owen citations). 14/15 pytest cases pass + all Playwright UI checks pass. Single functional bug: Ask Owen 'stuck fermentation' query does not surface the AWRI Fact Sheet on Stuck & Sluggish Fermentation in sopTitles.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "/api/trpc/tutor.ask (stuck-ferment question)",
+        "issue": "sopTitles returns named-bible citations (Boulton, Jackson, Zoecklein) correctly but does NOT include 'AWRI Fact Sheet — Stuck & Sluggish Fermentation'. Regex /AWRI Fact Sheet — Stuck/ produces no match. AWRI awri_stuck_fermentation label exists in /app/server/routers/tutor.ts (line ~462) so the retrieval / labelmap wiring is not surfacing AWRI chunks for this question. Other AWRI chunks did surface for the protein-stability question so the wiring is partially working — likely an ingest/relevance-ranking issue specific to stuck-fermentation AWRI chunk."
+      },
+      {
+        "endpoint": "/api/trpc/cellarBoard.createShareLink",
+        "issue": "Response payload {ok, token, url, expiresAt} omits the newly-created row id. UI has to round-trip via listShareLinks to correlate. Not a bug per se but returning id would simplify revoke UX."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "AdminCellarBoard — Cellar Book PDF card",
+        "issue": "Download PDF button is NOT disabled when no batch is selected (initial state). Only Share with auditor is disabled. Spec: both should be disabled until a batch is selected. Clicking Download with no batch currently likely 400s or no-ops.",
+        "selector": "[data-testid=cellar-book-download-btn]",
+        "priority": "LOW"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_feb2026_batch.py",
+    "/app/test_reports/pytest/feb2026_results.xml"
+  ],
+  "action_items": [
+    "Investigate why AWRI Fact Sheet — Stuck & Sluggish Fermentation is not surfaced in sopTitles for 'stuck fermentation' Ask Owen questions. Check ingest chunks for awri_stuck_fermentation sourceDoc + retrieval ranking + tutor.ts filter thresholds.",
+    "(Optional) Disable Download PDF button until a batch is selected on AdminCellarBoard.",
+    "(Optional) Return the newly-inserted share-link row id from cellarBoard.createShareLink."
+  ],
+  "critical_code_review_comments": [
+    "cellarBoard.createShareLink returns url+token+expiresAt but not the DB row id — clients must re-query listShareLinks to get id for revoke; consider returning full row.",
+    "AWRI awri_stuck_fermentation labelmap present but not represented in sopTitles for stuck-ferment queries — suggests either the ingested chunks are not tagged with sourceDoc='awri_stuck_fermentation' or the retrieval boost/threshold in tutor.ts is not selecting them.",
+    "AdminCellarBoard: Download PDF button lacks disabled-state gating on empty batch selection."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_feb2026_batch.py"
+  ],
+  "success_rate": {"backend": "93% (14/15)", "frontend": "100% (all UI acceptance criteria met apart from minor download-btn gating)"},
+  "test_credentials": "Gate cookie via POST /api/gate/verify {password: 'middx99'} — sets ow_gate cookie. Dev bypass gives admin role.",
+  "seed_data_creation": "Created 1 new share-link row (id=3, token=OrlEMbi3...) for batch 1 during test_01_create_share_link. Revoked in test_04. Prior rows id=1 (revoked, main-agent test), id=2 (viewCount=1, not revoked) still exist.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Backend test file /app/backend/tests/test_feb2026_batch.py can be re-run standalone (`pytest backend/tests/test_feb2026_batch.py`). It creates a fresh share-token every run — no cleanup needed but rows accumulate in cellar_book_share_tokens. Legal-pages served under SPA + service-worker (CACHE_VERSION=ow-v15); Playwright ran with fresh context and content asserted via body.innerText.",
+  "rca of the issue": "AWRI Fact Sheet — Stuck & Sluggish Fermentation not appearing in sopTitles: the awri_stuck_fermentation entry is defined in /app/server/routers/tutor.ts SOURCE_LABEL map (~line 462) and the retrieval boost gives awri_ prefix a 0.9 score (line 412), but for the question 'My fermentation is stuck at 8 Brix, what should I check?' with mode=home_winemaker/batchSize=50, sopTitles returned only Boulton (Ch.3), Jackson (Ch.6), Zoecklein (Ch.8) — all fermentation named-bible chapters. The AWRI stuck-ferment chunk is either (a) not ingested into diy_knowledge_chunks with sourceDoc='awri_stuck_fermentation', (b) ranking below top-K threshold, or (c) filtered out by the DIY branch (line ~560). Reproduction: `curl -b cookies -X POST $BASE/api/trpc/tutor.ask -H 'Content-Type: application/json' -d '{\"json\":{\"question\":\"My fermentation is stuck at 8 Brix, what should I check?\",\"mode\":\"home_winemaker\",\"batchSizeLitres\":50}}'` and inspect result.data.json.sopTitles."
+}

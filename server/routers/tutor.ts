@@ -391,6 +391,7 @@ const tutorRouter = router({
               c.wineType === detectedWineType ||
               (c.sourceDoc && SPECIALIST_MANUALS_SET.has(c.sourceDoc)) ||
               (c.sourceDoc && c.sourceDoc.startsWith("awri_")) || // AWRI fact sheets — always in scope
+              (c.sourceDoc === "boulton_ppw" || c.sourceDoc === "iland_cagw") || // Named-bible summaries — always in scope
               (c.sourceDoc && SPARKLING_SOURCES.has(c.sourceDoc) && detectedWineType !== "red") ||
               (c.sourceDoc === "morew_red_outline" && detectedWineType === "red")
             );
@@ -407,6 +408,7 @@ const tutorRouter = router({
           // are the highest-density practical content in the corpus.
           const src = chunk.sourceDoc ?? "";
           const sourceBoost =
+            src === "boulton_ppw" || src === "iland_cagw" ? 1.0 : // Named-bible summaries — highest tier
             src.startsWith("awri_") ? 0.9 :   // AWRI fact sheets — top-tier grounding
             src === "morew_red_outline" ? 0.5 :
             SPECIALIST_MANUALS_SET.has(src) ? 0.4 :
@@ -458,6 +460,11 @@ const tutorRouter = router({
           awri_protein_stability:        "AWRI Fact Sheet — Protein Stability in White Wines",
           awri_reducing_ethanol:         "AWRI Fact Sheet — Reducing Ethanol in Wine",
           awri_stuck_fermentation:       "AWRI Fact Sheet — Stuck & Sluggish Fermentation",
+          // Boulton & Iland attributed summaries — Feb 2026 Reference Ingest
+          // Phase C. Each chunk carries its full source attribution in the
+          // content body (never verbatim book text).
+          boulton_ppw:                   "Boulton, Singleton, Bisson & Kunkee — Principles and Practices of Winemaking",
+          iland_cagw:                    "Iland, Bruer, Edwards, Weeks & Wilkes — Chemical Analysis of Grapes and Wine",
         };
         const docContext = relevantChunks
           .map((chunk) => {

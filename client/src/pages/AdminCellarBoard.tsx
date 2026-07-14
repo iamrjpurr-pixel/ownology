@@ -20,7 +20,7 @@
  */
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, AlertTriangle, CheckCircle2, Circle, XCircle, ChevronDown, ChevronRight } from "lucide-react";
+import { ArrowLeft, AlertTriangle, CheckCircle2, Circle, XCircle, ChevronDown, ChevronRight, Share2, Copy, X, Ban } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 type WbsPhase =
@@ -106,6 +106,7 @@ export default function AdminCellarBoard() {
   const [phaseFilter, setPhaseFilter] = useState<WbsPhase | "all">("all");
   const [stateFilter, setStateFilter] = useState<RagState | "all">("all");
   const [cellarBookBatchId, setCellarBookBatchId] = useState<string>("");
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   const filtered = useMemo(() => {
     const list = boardQ.data?.equipment ?? [];
@@ -223,6 +224,28 @@ export default function AdminCellarBoard() {
           </svg>
           Download PDF
         </a>
+        <button
+          type="button"
+          data-testid="cellar-book-share-btn"
+          disabled={!cellarBookBatchId}
+          onClick={() => setShareModalOpen(true)}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "7px 14px",
+            borderRadius: 6,
+            background: cellarBookBatchId ? "transparent" : "#f3efe6",
+            border: `1px solid ${cellarBookBatchId ? "#78350f" : "#d4d4d8"}`,
+            color: cellarBookBatchId ? "#78350f" : "#a09883",
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: cellarBookBatchId ? "pointer" : "not-allowed",
+          }}
+        >
+          <Share2 size={14} />
+          Share with auditor
+        </button>
       </div>
 
       {/* Phase filter */}
@@ -283,6 +306,197 @@ export default function AdminCellarBoard() {
           </section>
         );
       })}
+
+      {shareModalOpen && (
+        <ShareAuditorModal
+          batchId={Number(cellarBookBatchId)}
+          batchLabel={(batchesQ.data ?? []).find((b) => String(b.id) === cellarBookBatchId)?.batchId ?? "batch"}
+          onClose={() => setShareModalOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ─── Share-with-auditor modal ─────────────────────────────────────────────
+// Generate + copy + revoke — everything a winemaker needs to email a link to
+// a FSANZ auditor before the visit. Kept as a same-file component so all the
+// Cellar Board state lives in one place.
+function ShareAuditorModal({
+  batchId,
+  batchLabel,
+  onClose,
+}: {
+  batchId: number;
+  batchLabel: string;
+  onClose: () => void;
+}) {
+  const linksQ = trpc.cellarBoard.listShareLinks.useQuery({ batchId });
+  const utils = trpc.useUtils();
+  const create = trpc.cellarBoard.createShareLink.useMutation({
+    onSuccess: () => utils.cellarBoard.listShareLinks.invalidate(),
+  });
+  const revoke = trpc.cellarBoard.revokeShareLink.useMutation({
+    onSuccess: () => utils.cellarBoard.listShareLinks.invalidate(),
+  });
+  const [label, setLabel] = useState("");
+  const [ttlDays, setTtlDays] = useState(14);
+  const [copied, setCopied] = useState<string | null>(null);
+  const activeLinks = (linksQ.data ?? []).filter((l) => !l.revoked && l.expiresAt > Date.now());
+  const inactiveLinks = (linksQ.data ?? []).filter((l) => l.revoked || l.expiresAt <= Date.now());
+
+  const handleCopy = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(url);
+      setTimeout(() => setCopied(null), 2000);
+    } catch { /* clipboard denied — silently no-op */ }
+  };
+
+  return (
+    <div
+      data-testid="cellar-book-share-modal"
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000,
+        display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          maxWidth: 640, width: "100%", maxHeight: "90vh", overflow: "auto",
+          background: "#fff", borderRadius: 10, padding: 22,
+          fontFamily: "system-ui, sans-serif", boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+          <div>
+            <h3 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 600, color: "#78350f" }}>
+              Share Cellar Book with auditor
+            </h3>
+            <p style={{ margin: 0, fontSize: 13, color: "#6b7280" }}>
+              Read-only PDF link for batch <strong>{batchLabel}</strong>. No login required for the recipient.
+            </p>
+          </div>
+          <button
+            type="button"
+            data-testid="share-modal-close"
+            onClick={onClose}
+            style={{ background: "transparent", border: "none", cursor: "pointer", color: "#6b7280" }}
+            aria-label="Close"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div style={{ display: "flex", gap: 10, alignItems: "flex-end", flexWrap: "wrap", marginBottom: 20, padding: "12px 14px", border: "1px solid #e5e5e5", borderRadius: 8, background: "#fafaf7" }}>
+          <div style={{ flex: "1 1 220px", minWidth: 200 }}>
+            <label style={{ display: "block", fontSize: 12, color: "#6b7280", marginBottom: 4 }}>Label (optional)</label>
+            <input
+              type="text"
+              data-testid="share-modal-label-input"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="e.g. Sarah's audit — 14 Aug"
+              style={{ width: "100%", padding: "6px 8px", border: "1px solid #d4d4d8", borderRadius: 6, fontSize: 13 }}
+            />
+          </div>
+          <div style={{ width: 120 }}>
+            <label style={{ display: "block", fontSize: 12, color: "#6b7280", marginBottom: 4 }}>Expires in</label>
+            <select
+              data-testid="share-modal-ttl-select"
+              value={ttlDays}
+              onChange={(e) => setTtlDays(Number(e.target.value))}
+              style={{ width: "100%", padding: "6px 8px", border: "1px solid #d4d4d8", borderRadius: 6, fontSize: 13, background: "#fff" }}
+            >
+              {[7, 14, 30, 60, 90].map((d) => <option key={d} value={d}>{d} days</option>)}
+            </select>
+          </div>
+          <button
+            type="button"
+            data-testid="share-modal-generate-btn"
+            disabled={create.isPending}
+            onClick={() => create.mutate({ batchId, label: label.trim() || undefined, ttlDays })}
+            style={{
+              padding: "7px 14px", borderRadius: 6, background: "#78350f",
+              color: "#fff", border: "none", fontSize: 13, fontWeight: 600,
+              cursor: create.isPending ? "wait" : "pointer",
+            }}
+          >
+            {create.isPending ? "Generating…" : "Generate link"}
+          </button>
+        </div>
+
+        {create.error && (
+          <div data-testid="share-modal-error" style={{ padding: "8px 12px", background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 6, color: "#7f1d1d", fontSize: 13, marginBottom: 14 }}>
+            {create.error.message}
+          </div>
+        )}
+
+        <h4 style={{ fontSize: 13, fontWeight: 600, color: "#374151", margin: "16px 0 8px" }}>
+          Active links <span style={{ color: "#9ca3af", fontWeight: 400 }}>· {activeLinks.length}</span>
+        </h4>
+        {linksQ.isLoading && <div style={{ fontSize: 13, color: "#6b7280" }}>Loading…</div>}
+        {!linksQ.isLoading && activeLinks.length === 0 && (
+          <div data-testid="share-modal-empty" style={{ padding: 14, textAlign: "center", color: "#6b7280", border: "1px dashed #d4d4d8", borderRadius: 6, fontSize: 13 }}>
+            No active links yet. Generate one above.
+          </div>
+        )}
+        {activeLinks.map((link) => {
+          const url = `${window.location.origin}/api/compliance/cellar-book.pdf?token=${link.token}`;
+          const expiresIn = Math.max(0, Math.floor((link.expiresAt - Date.now()) / 86400000));
+          return (
+            <div
+              key={link.id}
+              data-testid={`share-modal-active-${link.id}`}
+              style={{ padding: "10px 12px", border: "1px solid #e5e5e5", borderRadius: 8, marginBottom: 8, background: "#fff" }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 500 }}>{link.label || "Untitled link"}</div>
+                <div style={{ fontSize: 11, color: "#6b7280" }}>expires in {expiresIn}d · {link.viewCount} view{link.viewCount === 1 ? "" : "s"}</div>
+              </div>
+              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                <code style={{ flex: 1, padding: "6px 8px", background: "#f3f4f6", borderRadius: 4, fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{url}</code>
+                <button
+                  type="button"
+                  data-testid={`share-modal-copy-${link.id}`}
+                  onClick={() => handleCopy(url)}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "6px 10px", borderRadius: 6, background: copied === url ? "#2f5230" : "#78350f", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                >
+                  <Copy size={12} /> {copied === url ? "Copied" : "Copy"}
+                </button>
+                <button
+                  type="button"
+                  data-testid={`share-modal-revoke-${link.id}`}
+                  disabled={revoke.isPending}
+                  onClick={() => revoke.mutate({ id: link.id })}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "6px 10px", borderRadius: 6, background: "transparent", color: "#7f1d1d", border: "1px solid #fca5a5", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                >
+                  <Ban size={12} /> Revoke
+                </button>
+              </div>
+            </div>
+          );
+        })}
+
+        {inactiveLinks.length > 0 && (
+          <>
+            <h4 style={{ fontSize: 13, fontWeight: 600, color: "#6b7280", margin: "16px 0 8px" }}>
+              Revoked / expired <span style={{ fontWeight: 400 }}>· {inactiveLinks.length}</span>
+            </h4>
+            {inactiveLinks.slice(0, 5).map((link) => (
+              <div
+                key={link.id}
+                data-testid={`share-modal-inactive-${link.id}`}
+                style={{ padding: "6px 10px", fontSize: 12, color: "#6b7280", background: "#f9f9f6", borderRadius: 6, marginBottom: 4 }}
+              >
+                {link.label || "Untitled"} · {link.revoked ? "revoked" : "expired"} · {link.viewCount} view{link.viewCount === 1 ? "" : "s"}
+              </div>
+            ))}
+          </>
+        )}
+      </div>
     </div>
   );
 }

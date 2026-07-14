@@ -457,10 +457,42 @@ async function startServer() {
     return res.status(401).json({ error: "auth required — unlock via /try or login" });
   });
 
-  // Cellar Book PDF — per-batch equipment traceability sheet. Same gating as
-  // the LIP audit pack: cookie/gate/allowlisted callers get through, everyone
-  // else is bounced to /try. Requires ?batchId=<int>.
+  // Cellar Book PDF — per-batch equipment traceability sheet. Two auth paths:
+  //   1. Signed-in / gate-cookie / IP-allowlisted operator with ?batchId=<int>
+  //   2. Auditor with a token: ?token=<url-safe-token> — token is scoped to
+  //      one batch, has an expiry, and is revocable by the owner.
   app.get("/api/compliance/cellar-book.pdf", async (req, res, next) => {
+    const token = typeof req.query.token === "string" ? req.query.token.trim() : "";
+    // ── Token path ──
+    if (token.length > 0) {
+      try {
+        const { db: mdb } = await import("./db.js");
+        const s = await import("../drizzle/schema.js");
+        const { eq: mEq, sql: mSql } = await import("drizzle-orm");
+        const [row] = await mdb
+          .select()
+          .from(s.cellarBookShareTokens)
+          .where(mEq(s.cellarBookShareTokens.token, token))
+          .limit(1);
+        if (!row) return res.status(404).send("Share link not found");
+        if (row.revoked === 1) return res.status(410).send("This share link has been revoked");
+        if (row.expiresAt < Date.now()) return res.status(410).send("This share link has expired");
+        // Fire-and-forget viewCount bump — don't gate PDF delivery on it.
+        (async () => {
+          try {
+            await mdb
+              .update(s.cellarBookShareTokens)
+              .set({ viewCount: mSql`${s.cellarBookShareTokens.viewCount} + 1`, lastViewedAt: Date.now() })
+              .where(mEq(s.cellarBookShareTokens.id, row.id));
+          } catch { /* silent */ }
+        })();
+        return generateCellarBookPdf(req, res, { forceOwnerUserId: row.userId, forceBatchId: row.batchId });
+      } catch (e) {
+        console.error("[cellar-book] token check failed:", e);
+        return res.status(500).send("Share link check failed");
+      }
+    }
+    // ── Cookie / gate path ──
     const cookieHeader = req.headers.cookie || "";
     const cookies = parseCookies(cookieHeader);
     if (cookies[COOKIE_NAME]) return generateCellarBookPdf(req, res);
@@ -1180,10 +1212,8 @@ async function startServer() {
         INDEX wp_outreach_idx (outreach_status)
       )
     `);
-    // Reference Ingest Phase B (Feb 2026) — citation index for named bibles
-    // (Boulton, Iland, Ribéreau-Gayon, Rankine, etc.). Zero verbatim text;
-    // topic-tag matched at retrieval time in server/routers/tutor.ts to
-    // surface named-bible citations alongside chunk sources.
+    // Reference Ingest Phase B (Feb 2026) — citation index for named bibles.
+    // Zero verbatim text; topic-tag matched at retrieval time by tutor.ask.
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS professional_citations (
         id INT PRIMARY KEY AUTO_INCREMENT,
@@ -1204,6 +1234,27 @@ async function startServer() {
         INDEX pc_source_key_idx (source_key),
         INDEX pc_wbs_code_idx (wbs_code),
         INDEX pc_priority_idx (priority)
+      )
+    `);
+    // Cellar Book Share Tokens (Feb 2026) — revocable pre-auditor previews.
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS cellar_book_share_tokens (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        token VARCHAR(64) NOT NULL UNIQUE,
+        batch_id INT NOT NULL,
+        user_id INT NOT NULL,
+        winery_id INT,
+        label VARCHAR(128),
+        expires_at BIGINT NOT NULL,
+        revoked INT NOT NULL DEFAULT 0,
+        revoked_at BIGINT,
+        view_count INT NOT NULL DEFAULT 0,
+        last_viewed_at BIGINT,
+        created_at BIGINT NOT NULL,
+        INDEX cbst_token_idx (token),
+        INDEX cbst_batch_idx (batch_id),
+        INDEX cbst_user_idx (user_id),
+        INDEX cbst_expires_idx (expires_at)
       )
     `);
     // ── Phase 1 multi-tenant bootstrap ───────────────────────────────────

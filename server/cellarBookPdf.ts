@@ -50,26 +50,43 @@ const DIRECTION_LABEL: Record<string, string> = {
   note: "Note",
 };
 
-export async function generateCellarBookPdf(req: Request, res: Response): Promise<void> {
+export async function generateCellarBookPdf(
+  req: Request,
+  res: Response,
+  opts?: { forceOwnerUserId?: number; forceBatchId?: number }
+): Promise<void> {
   try {
     const batchIdRaw = req.query.batchId as string | undefined;
-    const batchIdNum = batchIdRaw ? parseInt(batchIdRaw, 10) : NaN;
+    const batchIdNum = opts?.forceBatchId ?? (batchIdRaw ? parseInt(batchIdRaw, 10) : NaN);
     if (!Number.isFinite(batchIdNum) || batchIdNum <= 0) {
       res.status(400).send("Missing or invalid ?batchId= parameter");
       return;
     }
 
-    // Auth-bypass world: pull the seed owner (matches audit-trail & lip-audit-pack).
-    // When real per-user auth lands, swap to req.user.id.
-    const [owner] = await db
-      .select()
-      .from(schema.users)
-      .where(eq(schema.users.openId, "seed-owner-001"))
-      .limit(1);
-    if (!owner) {
+    // Token flow: opts.forceOwnerUserId is set by the token-checking wrapper.
+    // Cookie/gate flow: fall back to seed-owner-001 (matches audit-trail + LIP
+    // audit pack). When per-user auth lands, swap to req.user.id.
+    let ownerRow: { id: number; wineryId: number | null; name: string | null } | null = null;
+    if (opts?.forceOwnerUserId) {
+      const [u] = await db
+        .select({ id: schema.users.id, wineryId: schema.users.wineryId, name: schema.users.name })
+        .from(schema.users)
+        .where(eq(schema.users.id, opts.forceOwnerUserId))
+        .limit(1);
+      ownerRow = u ?? null;
+    } else {
+      const [u] = await db
+        .select({ id: schema.users.id, wineryId: schema.users.wineryId, name: schema.users.name })
+        .from(schema.users)
+        .where(eq(schema.users.openId, "seed-owner-001"))
+        .limit(1);
+      ownerRow = u ?? null;
+    }
+    if (!ownerRow) {
       res.status(500).send("No owner user found");
       return;
     }
+    const owner = ownerRow;
 
     const winery = owner.wineryId
       ? await db.query.wineries.findFirst({ where: eq(schema.wineries.id, owner.wineryId) })

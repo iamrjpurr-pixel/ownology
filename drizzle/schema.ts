@@ -549,6 +549,47 @@ export const batchEquipmentUses = mysqlTable(
   ]
 );
 
+// ─── Cellar Book Share Tokens (Feb 2026, Auditor Preview Link) ──────────────
+// Time-boxed, revocable, read-only tokens that let an owner share a batch's
+// Cellar Book PDF with a FSANZ auditor before the on-site visit. Access is
+// scoped to a single batch and a fixed TTL. Every hit increments viewCount so
+// the winemaker can see whether the auditor has actually opened it.
+export const cellarBookShareTokens = mysqlTable(
+  "cellar_book_share_tokens",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // URL-safe token (32 bytes base64url — 43 chars). Rendered into the share
+    // link as ?token=<token>. Indexed for O(log n) lookup on the public route.
+    token: varchar("token", { length: 64 }).notNull().unique(),
+    // FK-in-spirit to wine_batches.id — the batch this token can view.
+    batchId: int("batch_id").notNull(),
+    // Owner of the token — the winemaker who generated it. The PDF is
+    // rendered as this user so tenancy/data-scoping is preserved.
+    userId: int("user_id").notNull(),
+    wineryId: int("winery_id"),
+    // Optional human label ("Sarah's audit visit — 14 Aug") to help the
+    // winemaker distinguish multiple active links.
+    label: varchar("label", { length: 128 }),
+    // Ownology-signed expiry (UTC ms). Default = 14 days from creation.
+    expiresAt: bigint("expires_at", { mode: "number" }).notNull(),
+    // Set to 1 when the owner clicks Revoke. Revoked tokens return 410 Gone.
+    revoked: int("revoked").notNull().default(0),
+    revokedAt: bigint("revoked_at", { mode: "number" }),
+    // Hit counter — incremented on every successful PDF serve. Lets the
+    // owner see whether the auditor has actually opened the file.
+    viewCount: int("view_count").notNull().default(0),
+    lastViewedAt: bigint("last_viewed_at", { mode: "number" }),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("cbst_token_idx").on(t.token),
+    index("cbst_batch_idx").on(t.batchId),
+    index("cbst_user_idx").on(t.userId),
+    index("cbst_expires_idx").on(t.expiresAt),
+  ]
+);
+
+
 // ─── Cellar Tasks ─────────────────────────────────────────────────────────────
 // One row per cleaning/maintenance task. Tasks are either AI-generated from the
 // equipment register or manually added by the user.

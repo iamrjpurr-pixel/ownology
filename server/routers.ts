@@ -1578,6 +1578,101 @@ const cellarBoardRouter = router({
       }
       return { ok: true, inserted };
     }),
+
+  /** Create a shareable, revocable, time-boxed link to a batch's Cellar Book
+   *  PDF. Auditor Preview Link (Feb 2026): winemakers send the URL to a
+   *  FSANZ auditor pre-visit; the auditor loads the PDF without any Ownology
+   *  login. Token is 32 random bytes → 43 URL-safe chars. Default TTL 14 days.
+   *  The returned URL is fully-qualified so it can be copied straight into
+   *  an email — no client-side rewriting needed. */
+  createShareLink: protectedProcedure
+    .input(z.object({
+      batchId: z.number().int().positive(),
+      label: z.string().max(128).optional(),
+      ttlDays: z.number().int().min(1).max(90).default(14),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      // Confirm the batch is actually the caller's — cross-tenant hardening.
+      const batch = await db.query.wineBatches.findFirst({
+        where: and(eq(schema.wineBatches.id, input.batchId), eq(schema.wineBatches.userId, dbUser.id)),
+      });
+      if (!batch) throw new Error("Batch not found");
+      const { randomBytes } = await import("crypto");
+      const token = randomBytes(32).toString("base64url");
+      const now = Date.now();
+      const expiresAt = now + input.ttlDays * 86400 * 1000;
+      await db.insert(schema.cellarBookShareTokens).values({
+        token,
+        batchId: input.batchId,
+        userId: dbUser.id,
+        wineryId: dbUser.wineryId ?? null,
+        label: input.label ?? null,
+        expiresAt,
+        revoked: 0,
+        viewCount: 0,
+        createdAt: now,
+      });
+      // Compose the fully-qualified URL from the current request's origin so
+      // it works in dev + prod without client-side munging.
+      const proto = (ctx.req.headers["x-forwarded-proto"] as string | undefined) || "https";
+      const host = (ctx.req.headers["x-forwarded-host"] as string | undefined)
+        || (ctx.req.headers.host as string | undefined)
+        || "ownology.ai";
+      const url = `${proto}://${host}/api/compliance/cellar-book.pdf?token=${token}`;
+      return { ok: true, token, url, expiresAt };
+    }),
+
+  /** List every active + recently-revoked share link for the caller's batches. */
+  listShareLinks: protectedProcedure
+    .input(z.object({ batchId: z.number().int().positive().optional() }).optional())
+    .query(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) return [];
+      const whereClause = input?.batchId
+        ? and(
+            eq(schema.cellarBookShareTokens.userId, dbUser.id),
+            eq(schema.cellarBookShareTokens.batchId, input.batchId)
+          )
+        : eq(schema.cellarBookShareTokens.userId, dbUser.id);
+      const rows = await db
+        .select()
+        .from(schema.cellarBookShareTokens)
+        .where(whereClause)
+        .orderBy(desc(schema.cellarBookShareTokens.createdAt))
+        .limit(50);
+      return rows.map((r) => ({
+        id: r.id,
+        token: r.token,
+        batchId: r.batchId,
+        label: r.label,
+        expiresAt: r.expiresAt,
+        revoked: r.revoked === 1,
+        revokedAt: r.revokedAt,
+        viewCount: r.viewCount,
+        lastViewedAt: r.lastViewedAt,
+        createdAt: r.createdAt,
+      }));
+    }),
+
+  /** Revoke a share link. Idempotent — revoking an already-revoked link is a no-op. */
+  revokeShareLink: protectedProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      await db
+        .update(schema.cellarBookShareTokens)
+        .set({ revoked: 1, revokedAt: Date.now() })
+        .where(
+          and(
+            eq(schema.cellarBookShareTokens.id, input.id),
+            eq(schema.cellarBookShareTokens.userId, dbUser.id)
+          )
+        );
+      return { ok: true };
+    }),
 });
 
 // ─── Production Dashboard Router ──────────────────────────────────────────────
