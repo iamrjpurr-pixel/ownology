@@ -16,6 +16,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import OwnologyLogo from "@/components/OwnologyLogo";
+import { buildEmailUrl } from "@/lib/emailCompose";
 
 const PREVIEW_BASE = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -52,7 +53,7 @@ function buildMailto(email: string, firstName: string, winery: string | null, pa
   const body = hookText
     ? `G'day ${firstName},\n\n${hookText.charAt(0).toUpperCase() + hookText.slice(1)} — reading that hit home.\n\nI've been quietly building Ownology: a cellar AI grounded in a winery's own vintage logs, not a textbook. Ask it "why did tank 9 stick this year" and it walks you through the actual data before it reaches for theory.\n\n90-second landing page tuned to you${wineryPhrase}:\n\n${url}\n\nNo pressure — happy to be told to bugger off. But if it lands, I'd rather hear it directly than through a form.\n\nCheers,\nJamie\nOwnology`
     : `G'day ${firstName},\n\nI've been building Ownology — a small AI cellar apprentice grounded in a winery's own vintage logs rather than a textbook. Figured you might find it useful.\n\n90-second look, tuned to your operation${wineryPhrase}:\n\n${url}\n\nCheers,\nJamie\nOwnology`;
-  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  return buildEmailUrl({ to: email, subject, body });
 }
 
 function TierBadge({ tier }: { tier: string | null | undefined }) {
@@ -337,9 +338,11 @@ export default function AdminOutboundQueue() {
                         <a
                           data-testid={`queue-email-${c.slug}`}
                           href={buildMailto(email, c.firstName, c.winery, c.painPoint, c.hookText, c.slug)}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           style={{ padding: "4px 12px", background: "transparent", color: "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.75rem", textDecoration: "none" }}
                         >
-                          Draft email
+                          Draft in Gmail
                         </a>
                       )}
                     </div>

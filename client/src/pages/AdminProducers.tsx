@@ -15,6 +15,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { buildEmailUrl } from "@/lib/emailCompose";
 
 const SERIF = "'Fraunces',serif";
 const SANS = "'Lato',sans-serif";
@@ -761,7 +762,7 @@ function ComposeModal({ producer, onClose }: { producer: ComposeProducer; onClos
     setCopied("none");
   };
 
-  const mailtoHref = `mailto:${encodeURIComponent(producer.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const mailtoHref = buildEmailUrl({ to: producer.email, subject, body });
 
   const copyBody = async () => {
     await navigator.clipboard.writeText(body);
@@ -886,10 +887,12 @@ function ComposeModal({ producer, onClose }: { producer: ComposeProducer; onClos
           <a
             data-testid="compose-open-mail"
             href={mailtoHref}
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={onClose}
             style={{ padding: "8px 18px", background: AMBER, color: "oklch(0.10 0.008 60)", fontFamily: SANS, fontSize: "0.82rem", fontWeight: 700, borderRadius: 4, textDecoration: "none", letterSpacing: "0.02em" }}
           >
-            ▶ Open in mail app
+            ▶ Open in Gmail
           </a>
           <button
             type="button"

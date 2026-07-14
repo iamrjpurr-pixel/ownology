@@ -18,6 +18,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import OwnologyLogo from "@/components/OwnologyLogo";
+import { buildEmailUrl } from "@/lib/emailCompose";
 
 type BucketKey = "hot" | "clickedNoBook" | "viewedNoClick" | "replied" | "booked" | "ghosted";
 
@@ -116,7 +117,7 @@ function buildFollowupEmail(email: string, c: Contact, bucket: BucketKey): strin
     subject = `${first} — looking forward to our chat`;
     body = `G'day ${first},\n\nJust confirming we're set for the demo. I'll send a calendar reminder + Zoom link the day before. If anything shifts on your end just ping.\n\nCheers,\nJamie`;
   }
-  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  return buildEmailUrl({ to: email, subject, body });
 }
 
 function pct(num: number, denom: number): number {
@@ -280,9 +281,11 @@ export default function AdminEngagement() {
                                     <a
                                       data-testid={`engagement-email-${c.slug}`}
                                       href={buildFollowupEmail(email, c, key)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
                                       style={{ padding: "4px 12px", background: "transparent", color: "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.72rem", textDecoration: "none" }}
                                     >
-                                      Draft email
+                                      Draft in Gmail
                                     </a>
                                   )}
                                 </div>

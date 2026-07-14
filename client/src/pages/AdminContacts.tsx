@@ -8,6 +8,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { buildEmailUrl } from "@/lib/emailCompose";
 
 const PREVIEW_BASE = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -180,11 +181,13 @@ Ownology`;
   return { subject, body };
 }
 
-/** Build a mailto: link that opens the operator's default mail client
- *  with subject + body pre-filled. Encoded per RFC 6068. */
+/** Build a Gmail compose URL that opens in a new tab. Chrome opens
+ *  https://mail.google.com/... reliably regardless of whether the OS has
+ *  Gmail registered as its mailto: handler (Rich, Feb 2026 — mailto:
+ *  was silently failing on his PC because Gmail wasn't the default).
+ *  Falls through to plain mailto: for callers that need Apple Mail etc. */
 function buildMailto(email: string, subject: string, body: string): string {
-  const enc = encodeURIComponent;
-  return `mailto:${email}?subject=${enc(subject)}&body=${enc(body)}`;
+  return buildEmailUrl({ to: email, subject, body });
 }
 
 type ContactStatus = "warm" | "lukewarm" | "cold" | "sales" | "skip";
@@ -2583,10 +2586,12 @@ export default function AdminContacts() {
                       <a
                         data-testid={`draft-email-${c.slug}`}
                         href={buildMailto(ch.email, subject, body)}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         style={{ ...btn, textDecoration: "none" }}
-                        title={`Opens your mail client with a draft to ${ch.email}`}
+                        title={`Opens Gmail with a draft to ${ch.email}`}
                       >
-                        Draft email
+                        Draft in Gmail
                       </a>
                     );
                   })()}
