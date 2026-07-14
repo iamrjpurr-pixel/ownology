@@ -39,6 +39,8 @@ type Contact = {
   repliedAt: number | null;
   demoBookedAt: number | null;
   hotAlertSentAt: number | null;
+  replyText: string | null;
+  replySentiment: string | null;
 };
 
 const PREVIEW_BASE = typeof window !== "undefined" ? window.location.origin : "";
@@ -74,22 +76,22 @@ function buildFollowupSms(c: Contact, bucket: BucketKey): string {
   const first = c.firstName;
   const winery = c.winery ? ` (${c.winery})` : "";
   if (bucket === "hot") {
-    return `hey ${first}${winery} — noticed you had another look at that link i sent. happy to answer any Qs directly, or i can walk you through it live in 15 min. what works? — Jamie`;
+    return `hey ${first}${winery} — noticed you had another look at that link i sent. happy to answer any Qs directly, or i can walk you through it live in 15 min. what works? — Rich`;
   }
   if (bucket === "clickedNoBook") {
-    return `hey ${first} — you tapped through to Ownology the other day. any reservations i can address? happy to grab 15 min live if it's easier than reading — ${url} — Jamie`;
+    return `hey ${first} — you tapped through to Ownology the other day. any reservations i can address? happy to grab 15 min live if it's easier than reading — ${url} — Rich`;
   }
   if (bucket === "viewedNoClick") {
-    return `hey ${first} — sent that ownology link the other day, wanted to double-check it landed. if the pitch missed the mark, tell me straight — i'd rather know than guess: ${url} — Jamie`;
+    return `hey ${first} — sent that ownology link the other day, wanted to double-check it landed. if the pitch missed the mark, tell me straight — i'd rather know than guess: ${url} — Rich`;
   }
   if (bucket === "ghosted") {
-    return `hey ${first}${winery} — first SMS may not have landed. quick recap: cellar AI grounded in a winery's own vintage logs, not a textbook. 90-sec look ${url} — Jamie`;
+    return `hey ${first}${winery} — first SMS may not have landed. quick recap: cellar AI grounded in a winery's own vintage logs, not a textbook. 90-sec look ${url} — Rich`;
   }
   if (bucket === "replied") {
-    return `hey ${first} — following up from your earlier reply. still keen to grab 15 min to walk you through Ownology? happy to do it whenever suits — Jamie`;
+    return `hey ${first} — following up from your earlier reply. still keen to grab 15 min to walk you through Ownology? happy to do it whenever suits — Rich`;
   }
   // booked
-  return `hey ${first} — looking forward to our chat. i'll send a calendar reminder + zoom link the day before. if anything shifts on your end just ping. — Jamie`;
+  return `hey ${first} — looking forward to our chat. i'll send a calendar reminder + zoom link the day before. if anything shifts on your end just ping. — Rich`;
 }
 
 function buildFollowupEmail(email: string, c: Contact, bucket: BucketKey): string {
@@ -138,8 +140,24 @@ function KpiCell({ label, value, sub, testid }: { label: string; value: string |
 export default function AdminEngagement() {
   const { data, isLoading, refetch } = trpc.outreach.engagementAnalytics.useQuery();
   const markFollowedUp = trpc.outreach.markFollowedUp.useMutation();
-  const [copied, setCopied] = useState<Record<string, "sms" | "done" | undefined>>({});
+  const replyFollowup = trpc.outreach.replyFollowupAI.useMutation();
+  const [copied, setCopied] = useState<Record<string, "sms" | "done" | "reply-sms" | undefined>>({});
   const [openBucket, setOpenBucket] = useState<BucketKey | null>("hot");
+  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
+
+  async function generateReplyFollowup(slug: string) {
+    try {
+      const result = await replyFollowup.mutateAsync({ slug });
+      setReplyDrafts((s) => ({ ...s, [slug]: result.sms }));
+    } catch (err) {
+      alert(`Follow-up generation failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  async function copyReplyDraft(slug: string) {
+    const text = replyDrafts[slug];
+    if (!text) return;
+    try { await navigator.clipboard.writeText(text); setCopied((s) => ({ ...s, [slug]: "reply-sms" })); } catch { /* no-op */ }
+  }
 
   async function copySms(slug: string, text: string) {
     try { await navigator.clipboard.writeText(text); setCopied((s) => ({ ...s, [slug]: "sms" })); } catch { /* no-op */ }
@@ -260,6 +278,45 @@ export default function AdminEngagement() {
                               <p style={{ margin: "6px 0 0", fontSize: "0.78rem", color: "var(--ow-text-mid)", fontStyle: "italic", lineHeight: 1.5 }}>
                                 &ldquo;{c.hookText}&rdquo;
                               </p>
+                            )}
+                            {key === "replied" && c.replyText && (
+                              <div data-testid={`reply-block-${c.slug}`} style={{ marginTop: 8, padding: "8px 10px", background: c.replySentiment === "interested" ? "color-mix(in oklch, oklch(0.70 0.16 140) 6%, transparent)" : c.replySentiment === "objection" ? "color-mix(in oklch, oklch(0.65 0.18 60) 6%, transparent)" : c.replySentiment === "not-now" ? "color-mix(in oklch, oklch(0.65 0.14 220) 6%, transparent)" : "color-mix(in oklch, var(--ow-text-lo) 4%, transparent)", border: `1px solid ${c.replySentiment === "interested" ? "#16a34a" : c.replySentiment === "objection" ? "#ea580c" : c.replySentiment === "not-now" ? "#0ea5e9" : "var(--ow-border)"}`, borderRadius: 4 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
+                                  <span style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: c.replySentiment === "interested" ? "#16a34a" : c.replySentiment === "objection" ? "#ea580c" : c.replySentiment === "not-now" ? "#0284c7" : "var(--ow-text-lo)" }}>
+                                    {c.replySentiment ? `Their reply · ${c.replySentiment}` : "Their reply"}
+                                  </span>
+                                  <button
+                                    data-testid={`reply-followup-generate-${c.slug}`}
+                                    onClick={() => generateReplyFollowup(c.slug)}
+                                    disabled={replyFollowup.isPending}
+                                    style={{ padding: "2px 8px", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.65rem", fontWeight: 700, cursor: replyFollowup.isPending ? "wait" : "pointer" }}
+                                  >
+                                    {replyFollowup.isPending ? "✨ Drafting…" : "✨ Draft follow-up"}
+                                  </button>
+                                </div>
+                                <p style={{ margin: 0, fontSize: "0.78rem", fontStyle: "italic", color: "var(--ow-text-hi)", lineHeight: 1.5 }}>
+                                  &ldquo;{c.replyText}&rdquo;
+                                </p>
+                                {replyDrafts[c.slug] && (
+                                  <div data-testid={`reply-draft-${c.slug}`} style={{ marginTop: 8, padding: "8px 10px", background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)", border: "1px solid var(--ow-amber)", borderRadius: 3 }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 4, alignItems: "center" }}>
+                                      <span style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--ow-amber)" }}>
+                                        ✨ Your follow-up (grounded in reply)
+                                      </span>
+                                      <button
+                                        data-testid={`reply-followup-copy-${c.slug}`}
+                                        onClick={() => copyReplyDraft(c.slug)}
+                                        style={{ padding: "2px 8px", background: "transparent", color: "var(--ow-amber)", border: "1px solid var(--ow-amber)", borderRadius: 3, fontSize: "0.65rem", fontWeight: 700, cursor: "pointer" }}
+                                      >
+                                        {copied[c.slug] === "reply-sms" ? "✓ Copied" : "Copy SMS"}
+                                      </button>
+                                    </div>
+                                    <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--ow-text-hi)", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+                                      {replyDrafts[c.slug]}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
                             )}
                           </div>
                           <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end", minWidth: 210 }}>

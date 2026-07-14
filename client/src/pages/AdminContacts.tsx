@@ -96,16 +96,16 @@ function smsDraft(c: { firstName: string; winery?: string | null; event?: string
   // dated). This is the "human who did their homework" opener.
   if (c.hookText) {
     const wineryBit = c.winery ? ` (${c.winery})` : "";
-    return `g'day ${c.firstName}${wineryBit} — ${c.hookText}. i've been building a cellar AI grounded in your own vintage logs — 90 sec look: ${url} — Jamie`;
+    return `g'day ${c.firstName}${wineryBit} — ${c.hookText}. i've been building a cellar AI grounded in your own vintage logs — 90 sec look: ${url} — Rich`;
   }
   // Tier-2 fallback: painPoint (business summary) as before.
   if (c.painPoint) {
     const wineryBit = c.winery ? ` (${c.winery})` : "";
-    return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. You mentioned ${c.painPoint}; I've since built a cellar AI that answers exactly that, grounded in your own vintage logs. 90 sec look: ${url} — Jamie`;
+    return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. You mentioned ${c.painPoint}; I've since built a cellar AI that answers exactly that, grounded in your own vintage logs. 90 sec look: ${url} — Rich`;
   }
   // Tier-3 honest fallback — no faux familiarity
   const wineryBit = c.winery ? `, sending this to ${c.winery} too` : "";
-  return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. I've since built a cellar AI grounded in your own vintage logs — figured you might find it useful. 90 sec look: ${url} — Jamie`;
+  return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. I've since built a cellar AI grounded in your own vintage logs — figured you might find it useful. 90 sec look: ${url} — Rich`;
 }
 
 /**
@@ -143,7 +143,7 @@ ${url}
 If it's not a fit, absolutely no pressure — happy to be told to bugger off. But if it is, I'd rather hear it directly than through a form.
 
 Cheers,
-Jamie
+Rich
 Ownology (Ministry of Clouds tier: The Vigneron)`;
     return { subject, body };
   }
@@ -161,7 +161,7 @@ ${url}
 No pressure either way — thought it was worth a look given what we talked about.
 
 Cheers,
-Jamie
+Rich
 Ownology`;
     return { subject, body };
   }
@@ -176,7 +176,7 @@ I've been building Ownology — a small AI cellar apprentice grounded in a winer
 ${url}
 
 Cheers,
-Jamie
+Rich
 Ownology`;
   return { subject, body };
 }

@@ -97,6 +97,7 @@ const AdminContactsMigrate = lazy(() => import("./pages/AdminContactsMigrate"));
 const AdminContactsPipeline = lazy(() => import("./pages/AdminContactsPipeline"));
 const AdminOutboundQueue = lazy(() => import("./pages/AdminOutboundQueue"));
 const AdminEngagement = lazy(() => import("./pages/AdminEngagement"));
+const AdminBrandAssets = lazy(() => import("./pages/AdminBrandAssets"));
 const AdminEventIngest = lazy(() => import("./pages/AdminEventIngest"));
 const AdminAudioHook = lazy(() => import("./pages/AdminAudioHook"));
 const AdminMarketingKit = lazy(() => import("./pages/AdminMarketingKit"));
@@ -381,6 +382,7 @@ function Router() {
       <Route path={"/admin/contacts/pipeline"} component={AdminContactsPipeline} />
       <Route path={"/admin/contacts/outbound-queue"} component={AdminOutboundQueue} />
       <Route path={"/admin/contacts/engagement"} component={AdminEngagement} />
+      <Route path={"/admin/brand-assets"} component={AdminBrandAssets} />
       <Route path={"/admin/contacts"} component={AdminContacts} />
       <Route path={"/admin/contacts-migrate"} component={AdminContactsMigrate} />
       <Route path={"/admin/event-ingest"} component={AdminEventIngest} />

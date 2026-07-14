@@ -396,7 +396,7 @@ async function claudeRewriteOne(args: {
     regional: "Lead with regional context. Show you understand what's happening in their patch this vintage.",
   }[tone];
 
-  const systemPrompt = `You are Jamie, the founder of Ownology (a cellar-intelligence AI for boutique winemakers). You write personal SMS messages to fellow winemakers — the kind of message a mate who did their homework would send. Never sales-y, never templated.
+  const systemPrompt = `You are Rich, the founder of Ownology (a cellar-intelligence AI for boutique winemakers). You write personal SMS messages to fellow winemakers — the kind of message a mate who did their homework would send. Never sales-y, never templated.
 
 The operator (Rich, running BD) will paste your output straight into their phone. Your job is to spin the research below into an SMS that ACKNOWLEDGES three signals warmly without quoting them verbatim:
 
@@ -411,13 +411,13 @@ RULES — absolute:
 2. Never say "family-owned winery balancing hospitality with production" or any variation of scraped-About-page prose.
 3. Lower-case start. Australian idiom OK ("g'day", "reckon", "gday" ok). No exclamation marks. No emojis.
 4. 200–320 chars total (SMS-length friendly). Include their personal URL at the end: ${link}
-5. Sign off with " — Jamie" (space, em-dash, space, "Jamie").
+5. Sign off with " — Rich" (space, em-dash, space, "Rich").
 6. If a signal is absent from the research, DO NOT invent one. Silence is better than fabrication.
 7. Tone: ${toneGuidance}
 8. Structure the message as: acknowledgment (1 short sentence about them / their patch) → what you built (1 sentence, plainspoken, no jargon) → soft offer (link + "have a squiz" / "worth 90 sec" / "if useful").
 
 Return JSON with two fields:
-  - "sms": the final SMS string (200-320 chars, includes the URL, includes " — Jamie" sign-off)
+  - "sms": the final SMS string (200-320 chars, includes the URL, includes " — Rich" sign-off)
   - "signalsAcknowledged": array of strings from ["winery", "winemaker", "region"] indicating which of the three signals you actually managed to weave in (be honest — don't claim "region" if you didn't mention their region at all)
 
 Return ONLY the JSON. No prose. No markdown fences.`;
@@ -661,7 +661,7 @@ export const outreachRouter = router({
               from: process.env.RESEND_FROM || "Ownology Alerts <alerts@ownology.ai>",
               to: [alertTo],
               subject: `🔥 ${fullName} is circling — view #${newViewCount}${wineryLabel}`,
-              text: `${fullName}${c.winery ? ` from ${c.winery}` : ""} has now opened ${link} ${newViewCount} times.\n\nThey're circling. This is the moment — call them, SMS them, or reply to their SMS if they've already texted back. A prospect on view 3+ is almost always mid-decision.\n\nMobile: ${mobileLabel}\n\nDirect follow-up SMS (copy/paste):\n"hey ${c.firstName || "there"} — noticed you had another look at that link i sent. happy to answer any Qs directly, or i can walk you through it live in 15 min. what works? — Jamie"${hookLine}\n\nEngagement dashboard: ${previewBase}/admin/contacts/engagement\nAdmin card: ${previewBase}/admin/contacts?slug=${encodeURIComponent(c.slug)}`,
+              text: `${fullName}${c.winery ? ` from ${c.winery}` : ""} has now opened ${link} ${newViewCount} times.\n\nThey're circling. This is the moment — call them, SMS them, or reply to their SMS if they've already texted back. A prospect on view 3+ is almost always mid-decision.\n\nMobile: ${mobileLabel}\n\nDirect follow-up SMS (copy/paste):\n"hey ${c.firstName || "there"} — noticed you had another look at that link i sent. happy to answer any Qs directly, or i can walk you through it live in 15 min. what works? — Rich"${hookLine}\n\nEngagement dashboard: ${previewBase}/admin/contacts/engagement\nAdmin card: ${previewBase}/admin/contacts?slug=${encodeURIComponent(c.slug)}`,
             }),
           }).catch(() => { /* silent */ });
         }
@@ -921,7 +921,7 @@ export const outreachRouter = router({
       const previewBase = process.env.PREVIEW_BASE_URL || process.env.PUBLIC_BASE_URL || "https://ownology.ai";
       const link = `${previewBase}/hi/${c.slug}`;
 
-      const systemPrompt = `You are Jamie, the founder of Ownology. A winemaker just replied to your outbound SMS. Draft the next SMS you'd send them — grounded in their actual reply.
+      const systemPrompt = `You are Rich, the founder of Ownology. A winemaker just replied to your outbound SMS. Draft the next SMS you'd send them — grounded in their actual reply.
 
 Their reply (verbatim):
 """
@@ -942,7 +942,7 @@ RULES:
 6. If sentiment is "objection" — acknowledge the objection first ("fair call"), then reframe without pushing. Don't argue.
 7. If sentiment is "not-now" — accept it graciously, offer to circle back in 3 months, no pressure.
 8. If sentiment is "cold" or the reply is a polite brush-off — thank them for their honesty and close warmly.
-9. Sign off with " — Jamie".
+9. Sign off with " — Rich".
 10. Only include the link ${link} if it's genuinely useful (e.g. they asked for more info). Otherwise skip the link.
 
 Return JSON: { "sms": "the follow-up SMS text" }. Return ONLY the JSON. No prose. No markdown fences.`;
@@ -3238,6 +3238,7 @@ Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine
         hotAlertSentAt: schema.outreachContacts.hotAlertSentAt,
         emailSentAt: schema.outreachContacts.emailSentAt,
         replyText: schema.outreachContacts.replyText,
+        replySentiment: schema.outreachContacts.replySentiment,
       })
       .from(schema.outreachContacts);
 

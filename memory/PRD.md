@@ -4,7 +4,15 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
-**Feb 2026 session — Auto-Rewrite on Ingest — SHIPPED (this session):**
+**Feb 2026 session — Sender sweep + Reply follow-up generator + Brand assets — SHIPPED (this session):**
+- Sender sweep: `Jamie` → `Rich` across 5 code files + 51 DB SMS drafts. Zero residues remain.
+- Reply follow-up generator: new `outreach.replyFollowupAI` uses Claude to draft the next SMS grounded in the pasted reply text + sentiment. UI adds an expandable colour-coded reply block on `/admin/contacts/engagement` Replied bucket with `✨ Draft follow-up` + Copy SMS.
+- Brand assets page: new `/admin/brand-assets` catalogs 16 existing brand images across 5 categories (logos / profile icons / social banners / OG images / favicons) with per-asset Copy URL + Open ↗ + Download. Bonus platform-size cheat-sheet table.
+
+**Feb 2026 session — Reply Sentiment + Auto-Advance — SHIPPED (this session):**
+- `saveReply` runs Claude classification inline (interested / objection / not-now / cold), stamps `reply_sentiment` column, auto-advances `status` forward-only (cold→lukewarm→warm). ReplyCaptureBox colour-codes based on sentiment.
+
+**Feb 2026 session — Auto-Rewrite on Ingest — SHIPPED:**
 - `outreach.create` now runs Claude rewrite + region inference inline after insert (silent-fail, ~2s latency, ~$0.005 cost). New contacts hit the list with a warm SMS draft + backfilled region — zero manual "Rewrite with AI" clicks needed.
 - Green success toast ("✨ SMS draft warm from birth — {name} · {winery}") or orange retry-hint on Claude failure.
 - Verified: AutoTest at Wirra Wirra with grenache-crush hook → region auto-set to `mclaren-vale`, SMS mentions McLaren Vale + grenache crush without parroting.

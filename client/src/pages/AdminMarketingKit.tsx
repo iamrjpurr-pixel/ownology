@@ -30,7 +30,7 @@ ${origin}/sample-vintage-log?variant=hunter
 
 No signup, no sales pitch. Just curious if it'd be useful to you. Happy to chat anytime.
 
-— Jamie`;
+— Rich`;
 
 const LINKEDIN_DM_B_BOUTIQUE = (origin: string) => `G'day [First name] — love what you're doing with [Winery].
 
@@ -41,7 +41,7 @@ ${origin}/sample-vintage-log?variant=boutique
 
 No signup. Keen to hear what you'd want it to do differently.
 
-— Jamie`;
+— Rich`;
 
 const LINKEDIN_DM_C_LARGE = (origin: string) => `G'day [First name] — building a cellar AI for production-scale wineries.
 
@@ -53,13 +53,13 @@ ${origin}/sample-vintage-log
 20-min demo if you've got 5 min curious:
 calendly.com/ownology/new-meeting
 
-— Jamie`;
+— Rich`;
 
-const EMAIL_SIG_PREVIEW = (origin: string) => `— Jamie · Ownology
+const EMAIL_SIG_PREVIEW = (origin: string) => `— Rich · Ownology
 Cellar AI grounded in your own vintage logs — built for working winemakers
 ↳ ${origin.replace(/^https?:\/\//, "")}/sample-vintage-log`;
 
-const EMAIL_SIG_PROD = `— Jamie · Ownology
+const EMAIL_SIG_PROD = `— Rich · Ownology
 Cellar AI grounded in your own vintage logs — built for working winemakers
 ↳ ownology.ai/sample-vintage-log`;
 
