@@ -14,7 +14,7 @@
  *   - The container is deep-linkable via `anchorId` prop, so a lost
  *     operator can be sent to a specific deck with a single URL.
  */
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 
 /**
@@ -103,6 +103,25 @@ export function FlashCardDeck({
 }: Props) {
   const [activeDeck, setActiveDeck] = useState<string>("all");
   const scrollRef = useRef<HTMLDivElement>(null);
+  // hasMoreRight = there's still off-screen content to the right of the
+  // strip. Drives the visible "swipe →" chip so users understand the deck
+  // scrolls horizontally rather than being clipped.
+  const [hasMoreRight, setHasMoreRight] = useState(true);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const check = () => {
+      // 4px slack so the chip disappears cleanly at the very end.
+      setHasMoreRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+    };
+    check();
+    el.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+    return () => {
+      el.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+    };
+  }, [activeDeck]); // re-check when filter changes deck-content width
 
   const filtered = useMemo(
     () => (activeDeck === "all" ? cards : cards.filter((c) => c.deck === activeDeck)),
@@ -182,24 +201,33 @@ export function FlashCardDeck({
         ))}
       </div>
 
-      {/* Card strip. Outer horizontal padding gives snap-scrolled cards
-          breathing room so their borders/text don't clip against the
-          viewport edge (previously users could "not see the edges"). */}
-      <div
-        ref={scrollRef}
-        data-testid={`${testIdPrefix}-strip`}
-        style={{
-          display: "grid",
-          gridAutoFlow: "column",
-          gridAutoColumns: "min(90vw, 340px)",
-          gap: "0.85rem",
-          overflowX: "auto",
-          scrollSnapType: "x mandatory",
-          padding: "0.5rem 1rem 1.25rem",
-          margin: "0 -1rem",
-          WebkitOverflowScrolling: "touch",
-        }}
-      >
+      {/* Card strip wrapper — adds edge fade masks so the horizontal-scroll
+          affordance reads as "there's more to see", not "the card is clipped".
+          Left mask only appears once you've scrolled off the start. */}
+      <div style={{ position: "relative" }}>
+        <div
+          ref={scrollRef}
+          data-testid={`${testIdPrefix}-strip`}
+          style={{
+            display: "grid",
+            gridAutoFlow: "column",
+            gridAutoColumns: "min(90vw, 340px)",
+            gap: "0.85rem",
+            overflowX: "auto",
+            scrollSnapType: "x mandatory",
+            padding: "0.5rem 1rem 1.25rem",
+            margin: "0 -1rem",
+            WebkitOverflowScrolling: "touch",
+            // Fade mask on the trailing edge so the peek-at-next-card reads
+            // as an affordance ("swipe → for more") rather than a bug.
+            // Uses the same base bg color as the surrounding page so the
+            // fade blends invisibly into the site chrome.
+            maskImage:
+              "linear-gradient(to right, black 0, black calc(100% - 44px), transparent 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to right, black 0, black calc(100% - 44px), transparent 100%)",
+          }}
+        >
         {filtered.map((card) => (
           <FlashCardTile
             key={card.n}
@@ -208,6 +236,35 @@ export function FlashCardDeck({
             testIdPrefix={testIdPrefix}
           />
         ))}
+        </div>
+        {/* Right-edge scroll affordance chip — only shows when the strip has
+            more content off-screen. Positioned over the fade so users see
+            a clear "swipe → for more" cue instead of guessing at the crop. */}
+        {hasMoreRight && (
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              right: 4,
+              top: "50%",
+              transform: "translateY(-50%)",
+              padding: "4px 8px",
+              borderRadius: 999,
+              fontSize: "0.65rem",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              fontWeight: 600,
+              color: "var(--ow-text-hi)",
+              background: "color-mix(in oklch, var(--ow-bg-base) 92%, transparent)",
+              border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+              pointerEvents: "none",
+              whiteSpace: "nowrap",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+            }}
+          >
+            swipe →
+          </div>
+        )}
       </div>
 
       {/* Footer */}
