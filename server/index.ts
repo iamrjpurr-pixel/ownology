@@ -192,9 +192,61 @@ async function startServer() {
   app.get("/api/build-info", async (_req, res) => {
     try {
       const { computeBuildInfo } = await import("./buildInfo.js");
+      // Public, safe to expose cross-origin — used by /admin/build-check on
+      // any host (preview ↔ prod) to diff manifests. No secrets in payload.
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Cache-Control", "no-store");
       res.status(200).json(computeBuildInfo());
     } catch (e) {
       res.status(500).json({ error: e instanceof Error ? e.message : "build-info-failed" });
+    }
+  });
+
+  // Server-side proxy for build-info fetches — bypasses CORS so the
+  // /admin/build-check page can compare against any prod host, even one
+  // that hasn't yet redeployed the CORS-enabled response above.
+  // Only used from our own UI; strict URL allowlist keeps this from being
+  // a general-purpose SSRF surface.
+  app.get("/api/build-info-remote", async (req, res) => {
+    const raw = String(req.query.url || "").trim();
+    if (!raw) {
+      res.status(400).json({ error: "missing url" });
+      return;
+    }
+    let target: URL;
+    try {
+      target = new URL(raw);
+    } catch {
+      res.status(400).json({ error: "invalid url" });
+      return;
+    }
+    // Allow only https and hostnames ending in an approved suffix.
+    const ALLOWED_SUFFIXES = [
+      "ownology.ai",
+      "ownology.app",
+      ".preview.emergentagent.com",
+      "localhost",
+      "127.0.0.1",
+    ];
+    const host = target.hostname.toLowerCase();
+    const okHost = ALLOWED_SUFFIXES.some((s) =>
+      s.startsWith(".") ? host.endsWith(s) : host === s
+    );
+    if ((target.protocol !== "https:" && target.protocol !== "http:") || !okHost) {
+      res.status(400).json({ error: "host not allowed" });
+      return;
+    }
+    const infoUrl = `${target.origin}/api/build-info`;
+    try {
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), 8000);
+      const r = await fetch(infoUrl, { signal: ctrl.signal, cache: "no-store" });
+      clearTimeout(to);
+      const text = await r.text();
+      res.setHeader("Cache-Control", "no-store");
+      res.status(r.status).type("application/json").send(text);
+    } catch (e) {
+      res.status(502).json({ error: e instanceof Error ? e.message : "fetch-failed" });
     }
   });
 

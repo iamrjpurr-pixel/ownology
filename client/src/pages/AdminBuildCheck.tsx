@@ -33,7 +33,7 @@ type FetchResult =
   | { ok: true; data: BuildInfo; ms: number }
   | { ok: false; error: string; ms: number };
 
-const DEFAULT_PROD_URL = "https://ownology.app";
+const DEFAULT_PROD_URL = "https://ownology.ai";
 const LS_KEY = "ow_build_check_prod_url";
 const REFRESH_MS = 30_000;
 
@@ -65,7 +65,13 @@ const FIELDS: Array<{ key: keyof BuildInfo; label: string; hint: string }> = [
 export default function AdminBuildCheck() {
   const [prodUrl, setProdUrl] = useState<string>(() => {
     if (typeof window === "undefined") return DEFAULT_PROD_URL;
-    return window.localStorage.getItem(LS_KEY) || DEFAULT_PROD_URL;
+    const stored = window.localStorage.getItem(LS_KEY);
+    // Self-heal any user still holding the old (unresolvable) ownology.app default.
+    if (!stored || /ownology\.app$/i.test(stored.replace(/\/+$/, ""))) {
+      window.localStorage.setItem(LS_KEY, DEFAULT_PROD_URL);
+      return DEFAULT_PROD_URL;
+    }
+    return stored;
   });
   const [localResult, setLocalResult] = useState<FetchResult | null>(null);
   const [prodResult, setProdResult] = useState<FetchResult | null>(null);
