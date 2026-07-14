@@ -101,9 +101,11 @@ function humanAgo(ms: number | null | undefined): string {
 
 export default function AdminCellarBoard() {
   const boardQ = trpc.cellarBoard.board.useQuery(undefined, { refetchInterval: 30_000 });
+  const batchesQ = trpc.cellarBoard.listBatches.useQuery();
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
   const [phaseFilter, setPhaseFilter] = useState<WbsPhase | "all">("all");
   const [stateFilter, setStateFilter] = useState<RagState | "all">("all");
+  const [cellarBookBatchId, setCellarBookBatchId] = useState<string>("");
 
   const filtered = useMemo(() => {
     const list = boardQ.data?.equipment ?? [];
@@ -148,6 +150,79 @@ export default function AdminCellarBoard() {
         <SummaryChip label="Needs clean" count={counts.amber} state="amber" active={stateFilter === "amber"} onClick={() => setStateFilter(stateFilter === "amber" ? "all" : "amber")} />
         <SummaryChip label="In use" count={counts.red} state="red" active={stateFilter === "red"} onClick={() => setStateFilter(stateFilter === "red" ? "all" : "red")} />
         <SummaryChip label="Out of service" count={counts.grey} state="grey" active={stateFilter === "grey"} onClick={() => setStateFilter(stateFilter === "grey" ? "all" : "grey")} />
+      </div>
+
+      {/* Cellar Book PDF — the FSANZ audit deliverable. Per-batch, one click. */}
+      <div
+        data-testid="cellar-book-pdf-panel"
+        style={{
+          display: "flex",
+          gap: 10,
+          alignItems: "center",
+          flexWrap: "wrap",
+          padding: "10px 12px",
+          marginBottom: 20,
+          border: "1px solid #d4d4d8",
+          borderLeft: "4px solid #78350f",
+          borderRadius: 6,
+          background: "#fdfaf3",
+        }}
+      >
+        <div style={{ flex: "1 1 240px", minWidth: 220 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "#78350f" }}>Cellar Book PDF</div>
+          <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>
+            Every vessel this batch touched with sanitation timestamps — the sheet a FSANZ auditor asks for.
+          </div>
+        </div>
+        <select
+          data-testid="cellar-book-batch-select"
+          value={cellarBookBatchId}
+          onChange={(e) => setCellarBookBatchId(e.target.value)}
+          disabled={batchesQ.isLoading || !batchesQ.data || batchesQ.data.length === 0}
+          style={{
+            padding: "6px 8px",
+            borderRadius: 6,
+            border: "1px solid #d4d4d8",
+            background: "#fff",
+            fontSize: 13,
+            minWidth: 220,
+          }}
+        >
+          <option value="">
+            {batchesQ.data && batchesQ.data.length === 0 ? "No batches — create one first" : "Select a batch…"}
+          </option>
+          {(batchesQ.data ?? []).map((b) => (
+            <option key={b.id} value={String(b.id)}>
+              {b.batchId} · {b.vintage} {b.variety}
+            </option>
+          ))}
+        </select>
+        <a
+          data-testid="cellar-book-download-btn"
+          href={cellarBookBatchId ? `/api/compliance/cellar-book.pdf?batchId=${cellarBookBatchId}` : undefined}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-disabled={!cellarBookBatchId}
+          onClick={(e) => { if (!cellarBookBatchId) e.preventDefault(); }}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "7px 14px",
+            borderRadius: 6,
+            background: cellarBookBatchId ? "#78350f" : "#c8beb0",
+            color: "#fff",
+            fontSize: 13,
+            fontWeight: 600,
+            textDecoration: "none",
+            cursor: cellarBookBatchId ? "pointer" : "not-allowed",
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M7 1v8m0 0L4 6m3 3 3-3M2 12h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Download PDF
+        </a>
       </div>
 
       {/* Phase filter */}

@@ -17,7 +17,7 @@
  * Public files (never cached): /manifest.json, /favicon.*, /robots.txt,
  * /sitemap.xml — small, always fresh from origin.
  */
-const CACHE_VERSION = "ow-v13";
+const CACHE_VERSION = "ow-v14";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 

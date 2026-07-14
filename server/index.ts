@@ -26,6 +26,7 @@ import { adminHealthStatusHandler } from "./adminHealth.js";
 import { marketingCoachEmailHandler } from "./scheduled/marketingCoachEmail.js";
 import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
 import { generateLipAuditPackPdf } from "./lipAuditPackPdf.js";
+import { generateCellarBookPdf } from "./cellarBookPdf.js";
 import { isRuntimeBypassActive } from "./devBypassRuntime.js";
 import { publicAuditHandler } from "./publicAudit.js";
 import authRouter from "./authRouter.js";
@@ -453,6 +454,18 @@ async function startServer() {
     if (cookies[COOKIE_NAME]) return generateLipAuditPackPdf(req, res);
     if (isIpAllowlisted(clientIpOf(req))) return generateLipAuditPackPdf(req, res);
     if (await verifyGateCookie(req)) return generateLipAuditPackPdf(req, res);
+    return res.status(401).json({ error: "auth required — unlock via /try or login" });
+  });
+
+  // Cellar Book PDF — per-batch equipment traceability sheet. Same gating as
+  // the LIP audit pack: cookie/gate/allowlisted callers get through, everyone
+  // else is bounced to /try. Requires ?batchId=<int>.
+  app.get("/api/compliance/cellar-book.pdf", async (req, res, next) => {
+    const cookieHeader = req.headers.cookie || "";
+    const cookies = parseCookies(cookieHeader);
+    if (cookies[COOKIE_NAME]) return generateCellarBookPdf(req, res);
+    if (isIpAllowlisted(clientIpOf(req))) return generateCellarBookPdf(req, res);
+    if (await verifyGateCookie(req)) return generateCellarBookPdf(req, res);
     return res.status(401).json({ error: "auth required — unlock via /try or login" });
   });
 

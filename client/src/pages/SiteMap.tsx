@@ -167,6 +167,7 @@ const SECTIONS: Section[] = [
       { path: "/api/robots.txt",                 label: "robots.txt",             desc: "Crawler policy + sitemap declarations", audience: "public" },
       { path: "/api/compliance/audit-trail.pdf", label: "Audit trail PDF",        desc: "Regulator-ready chronological export (owner-only)", audience: "admin" },
       { path: "/api/compliance/lip-audit-pack.pdf", label: "LIP audit pack PDF",  desc: "Wine Australia LIP compliance pack", audience: "admin" },
+      { path: "/api/compliance/cellar-book.pdf?batchId=1", label: "Cellar Book PDF", desc: "Per-batch equipment traceability sheet — FSANZ audit deliverable", audience: "admin" },
       { path: "/api/scheduled/daily-alert-email?dryRun=1", label: "Daily alert email — dry run", desc: "Preview the Cellar Brief email without sending", audience: "admin" },
       { path: "/api/scheduled/nurture-email?dryRun=1", label: "Nurture email — dry run", desc: "Preview the founding-member nurture sequence without sending", audience: "admin" },
       { path: "/sample-vintage-log?variant=large",    label: "Sample vintage log — Large",    desc: "Static HTML demo mockup — 128-tank producer", audience: "public" },
