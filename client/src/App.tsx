@@ -153,6 +153,7 @@ const AdminCellarBoard = lazy(() => import("./pages/AdminCellarBoard"));
 // Two entry points: /b/:token (public, token-scoped) and /admin/batch-book/:batchId (auth).
 const BatchBookByToken = lazy(() => import("./pages/BatchBook").then((m) => ({ default: m.BatchBookByToken })));
 const BatchBookByBatchId = lazy(() => import("./pages/BatchBook").then((m) => ({ default: m.BatchBookByBatchId })));
+const KnowledgeUsingOwnology = lazy(() => import("./pages/KnowledgeUsingOwnology"));
 const ComplianceScore = lazy(() => import("./pages/ComplianceScore"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
@@ -370,6 +371,7 @@ function Router() {
       <Route path={"/dashboard"} component={DashboardPage} />
       <Route path={"/vineyard"} component={Vineyard} />
       <Route path={"/build-index"} component={BuildIndex} />
+      <Route path={"/knowledge/using-ownology"} component={KnowledgeUsingOwnology} />
       <Route path={"/knowledge"} component={KnowledgePage} />
       <Route path={"/knowledge/*"} component={KnowledgePage} />
       <Route path={"/guide"} component={Guide} />

@@ -231,7 +231,10 @@ const CARDS: FlashCard[] = [
   },
 ];
 
-export function ComplianceFlashCards() {
+export function ComplianceFlashCards({ excludeDecks }: { excludeDecks?: string[] } = {}) {
+  const skip = new Set(excludeDecks ?? []);
+  const filteredDecks = DECKS.filter((d) => !skip.has(d.id));
+  const filteredCards = CARDS.filter((c) => !skip.has(c.deck));
   return (
     <FlashCardDeck
       anchorId="compliance-flash-cards"
@@ -239,8 +242,8 @@ export function ComplianceFlashCards() {
       eyebrow="Idiot's guide · Compliance workflow"
       title="Ask, cite, download, defend."
       intro="16 flash cards for the compliance surfaces — asking the AI, downloading the audit trail, producing the LIP Audit Pack, feeding the APCO Assistant, and knowing when to escalate to a real lawyer. Written for the moment a regulator emails and you have 24 hours."
-      decks={DECKS}
-      cards={CARDS}
+      decks={filteredDecks}
+      cards={filteredCards}
       footerNote={
         <>
           Deep-link:{" "}

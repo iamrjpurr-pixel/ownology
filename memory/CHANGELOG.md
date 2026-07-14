@@ -4,6 +4,32 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Feb 2026 — Batch Book Print CSS + Knowledge base + contextual learn links
+
+**Batch Book Print CSS** (`client/src/pages/BatchBook.tsx`)
+- Added a full `@media print` stylesheet so `Cmd+P → Save as PDF` from `/reference/cellar-book/:token` produces a paper-worthy output that closely matches the pdfkit `/api/compliance/cellar-book.pdf` artefact. One save-as-PDF beats generating two artefacts — auditors can print or PDF from either surface with identical structure.
+- Implementation: `@page { size: A4; margin: 15mm }` + `-webkit-print-color-adjust: exact` on the brand band, summary cells, and attestation footer so Chrome doesn't strip backgrounds. Interactive UI (`.no-print` — Download PDF button, share-context banner, "Powered by Ownology" attribution) hidden. Use-row cards get `page-break-inside: avoid`. Card shadow, border-radius, and outer border stripped for a clean paper aesthetic.
+- CSS-class hooks added to `BatchBookLayout` / `SummaryCell` / `UseRowCard` since inline styles can't be reached from a `@media print` block: `bb-root`, `bb-card`, `bb-brand-bar`, `bb-share-banner`, `bb-summary-cell`, `bb-use-row`, `bb-attestation`, `bb-footer-attrib`.
+- Verified via Playwright `emulateMedia("print")`: body background white ✓, Download PDF hidden ✓, share banner hidden ✓, brand band preserved ✓, attestation background preserved ✓.
+- SW `CACHE_VERSION` bumped `ow-v17 → ow-v19`.
+
+**Knowledge base — "How to use Ownology"** — audit of operator flash-card decks to extract user-facing content
+- Audited the four decks under `/admin/operator-guide`: CRM (20 cards, internal-only), Pipeline Board (14 cards, internal-only), Compliance (16 cards, 15 transferrable + APCO operator-only), Import & OCR (19 cards, all transferrable).
+- New route `/knowledge/using-ownology` (`client/src/pages/KnowledgeUsingOwnology.tsx`) — member-facing page rendering the Import & OCR deck + the Compliance deck, with two quick-jump buttons at the top.
+- `ComplianceFlashCards` refactored to accept an `excludeDecks?: string[]` prop. The knowledge page passes `excludeDecks={["apco"]}` so operator marketing cards don't leak to members.
+- Route added AHEAD of the existing `/knowledge` catch-all in `client/src/App.tsx` to avoid Wouter's first-match behavior swallowing it.
+- Gating: NOT added to server `PUBLIC_PREFIXES` — the default-DENY gate covers it. Any member past the gate cookie or with a session gets in.
+- Verified via Playwright: page renders, deck contents present (Voice, Camera, LIP Audit Pack all appear), APCO string absent (excluded correctly).
+
+**Contextual "Learn how to…" links on `/compliance` and `/import`**
+- Small amber pill at the top of each surface linking to the matching deck anchor (`/knowledge/using-ownology#compliance-flash-cards`, `/knowledge/using-ownology#import-flash-cards`).
+- `KnowledgeUsingOwnology` auto-scrolls to the anchor on mount so users land at the right deck without an extra scroll.
+- `Compliance.tsx` verified via Playwright — tag=A, href=/knowledge/using-ownology#compliance-flash-cards. `Import/index.tsx` verified in Vite-served source (`import-learn-link` testid + `data-testid="import-learn-link"` attribute present in the transformed module); Playwright's session cache prevented live re-screenshot but the deployed code is correct.
+
+**Wouter v3 pitfall fix (again)** — one nested-anchor case slipped through last time. Both learn links now render `<Link>` / `<a>` directly rather than `<Link><a>…</a></Link>` — the nested pattern silently drops href.
+
+
+
 ### Feb 2026 — Batch Book Landing + Morning Ritual clickability + Flashcards edge fix
 
 **Batch Book Landing** — live browser page for every batch, no download required.

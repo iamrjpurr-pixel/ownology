@@ -117,7 +117,23 @@ export default function Import() {
         </div>
       </div>
 
-      <div className="container max-w-2xl py-6 space-y-6">
+      <div className="container max-w-2xl py-6 space-y-6" data-testid="import-content">
+        {/* Learn-how-to strip — plain <a> so hash-anchor jump works reliably. */}
+        <a
+          href="/knowledge/using-ownology#import-flash-cards"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs no-underline"
+          data-testid="import-learn-link"
+          style={{
+            color: "var(--ow-amber)",
+            background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+            fontWeight: 500,
+            width: "fit-content",
+          }}
+        >
+          New here? Learn how Voice / Camera / Paste / CSV / Bulk work →
+        </a>
+
         {/* Success state */}
         {saved && (
           <div
@@ -211,3 +227,4 @@ export default function Import() {
     </div>
   );
 }
+

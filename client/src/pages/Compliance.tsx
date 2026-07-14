@@ -474,6 +474,21 @@ export default function Compliance() {
       </nav>
 
       <div className="container pt-24 pb-8" style={{ maxWidth: "860px", margin: "0 auto", animation: "owFadeIn 0.3s ease forwards" }}>
+        {/* Learn-how-to strip — links to the Compliance flash-card deck. */}
+        <Link
+          href="/knowledge/using-ownology#compliance-flash-cards"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs no-underline mb-6"
+          data-testid="compliance-learn-link"
+          style={{
+            color: "var(--ow-amber)",
+            background: "color-mix(in oklch, var(--ow-amber) 10%, transparent)",
+            border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+            fontWeight: 500,
+          }}
+        >
+          New here? Learn Ask → cite → download → LIP audit pack →
+        </Link>
+
         {/* Header */}
         <div className="mb-8">
           <p
