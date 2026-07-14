@@ -141,11 +141,71 @@ function BatchBookLayout({
   const { winery, batch, uses, summary, generatedAt } = payload;
 
   return (
-    <div data-testid="batch-book-page" style={{ minHeight: "100dvh", background: "#f8f6f0", padding: "24px 16px 48px", fontFamily: "'Lato', system-ui, sans-serif" }}>
+    <div data-testid="batch-book-page" className="bb-root" style={{ minHeight: "100dvh", background: "#f8f6f0", padding: "24px 16px 48px", fontFamily: "'Lato', system-ui, sans-serif" }}>
       <style>{`
+        /* ── Print stylesheet ──────────────────────────────────────────
+           Goal: Cmd+P → Save-as-PDF from the browser produces a layout
+           that matches the pdfkit-generated /api/compliance/cellar-book.pdf
+           closely enough that a winemaker can pick either path and get an
+           audit-defensible artefact. Highlights:
+             * Hide interactive UI (no-print class covers Download / attrib)
+             * Force brand colours to print (Chrome strips backgrounds by
+               default — print-color-adjust: exact overrides that)
+             * A4 page size with a comfortable 15mm margin
+             * No shadows, no rounded corners — clean paper aesthetic
+             * Force text sizes to points so line-height renders reliably
+             * Keep individual event rows together (page-break-inside)
+             * Repeat the Attestation on the last page only (natural flow) */
         @media print {
+          @page {
+            size: A4;
+            margin: 15mm;
+          }
+          html, body {
+            background: #fff !important;
+            color: #000;
+            font-size: 10pt;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
           .no-print { display: none !important; }
-          body { background: #fff; }
+          .bb-root { padding: 0 !important; background: #fff !important; }
+          .bb-card {
+            max-width: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            border: none !important;
+          }
+          .bb-brand-bar {
+            /* Chrome by default strips the top-band brand colour — force it. */
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .bb-share-banner { display: none !important; } /* internal-only context */
+          .bb-summary-cell {
+            background: #f5f5f2 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .bb-use-row {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+          .bb-attestation {
+            page-break-before: auto;
+            background: #f9f9f6 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .bb-footer-attrib { display: none !important; }
+          h1, h2, h3, h4 {
+            page-break-after: avoid;
+            break-after: avoid;
+          }
+          a[href], a[href]:visited {
+            color: inherit !important;
+            text-decoration: none !important;
+          }
         }
       `}</style>
 
@@ -153,16 +213,16 @@ function BatchBookLayout({
         {shareContext && (
           <div
             data-testid="batch-book-share-banner"
-            className="no-print"
+            className="no-print bb-share-banner"
             style={{ padding: "8px 14px", background: "#fef7e0", border: "1px solid #f0d780", borderRadius: 6, fontSize: 13, color: "#78350f", marginBottom: 18 }}
           >
             You are viewing a shared Cellar Book{shareContext.label ? ` — ${shareContext.label}` : ""}. Link expires {fmtDate(shareContext.expiresAt)}.
           </div>
         )}
 
-        <div style={{ background: "#fff", borderRadius: 10, boxShadow: "0 4px 20px rgba(0,0,0,0.06)", overflow: "hidden" }}>
+        <div className="bb-card" style={{ background: "#fff", borderRadius: 10, boxShadow: "0 4px 20px rgba(0,0,0,0.06)", overflow: "hidden" }}>
           {/* ── Header ── */}
-          <div style={{ borderTop: `6px solid ${winery.brandColor}`, padding: "24px 28px 20px", display: "flex", alignItems: "center", gap: 16 }}>
+          <div className="bb-brand-bar" style={{ borderTop: `6px solid ${winery.brandColor}`, padding: "24px 28px 20px", display: "flex", alignItems: "center", gap: 16 }}>
             {winery.logoUrl && (
               <img
                 src={winery.logoUrl}
@@ -262,7 +322,7 @@ function BatchBookLayout({
           </div>
 
           {/* ── Attestation footer ── */}
-          <div style={{ padding: "20px 28px", background: "#fafaf7", borderTop: "1px solid #f0eee7", fontSize: 12, color: "#6b7280", lineHeight: 1.55 }}>
+          <div className="bb-attestation" style={{ padding: "20px 28px", background: "#fafaf7", borderTop: "1px solid #f0eee7", fontSize: 12, color: "#6b7280", lineHeight: 1.55 }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Attestation</div>
             <p style={{ margin: 0 }}>
               The equipment uses recorded above are a true and complete record of every vessel this batch touched,
@@ -275,7 +335,7 @@ function BatchBookLayout({
           </div>
         </div>
 
-        <div className="no-print" style={{ marginTop: 14, textAlign: "center", fontSize: 12, color: "#9ca3af" }}>
+        <div className="no-print bb-footer-attrib" style={{ marginTop: 14, textAlign: "center", fontSize: 12, color: "#9ca3af" }}>
           Powered by <a href="/" style={{ color: winery.brandColor, textDecoration: "none", fontWeight: 600 }}>Ownology</a>
         </div>
       </div>
@@ -286,7 +346,7 @@ function BatchBookLayout({
 function SummaryCell({ label, value, tone }: { label: string; value: string | number; tone?: "red" | "green" | "neutral" }) {
   const color = tone === "red" ? "#7f1d1d" : tone === "green" ? "#2f5230" : "#1f2937";
   return (
-    <div style={{ padding: "8px 12px", background: "#f9f9f6", borderRadius: 6 }}>
+    <div className="bb-summary-cell" style={{ padding: "8px 12px", background: "#f9f9f6", borderRadius: 6 }}>
       <div style={{ fontSize: 11, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</div>
       <div style={{ fontSize: 18, fontWeight: 700, color, marginTop: 2 }}>{value}</div>
     </div>
@@ -312,6 +372,7 @@ function UseRowCard({ u }: { u: UseRow }) {
   return (
     <div
       data-testid={`batch-book-use-${u.id}`}
+      className="bb-use-row"
       style={{ padding: "10px 12px", borderTop: "1px solid #f0eee7", display: "grid", gridTemplateColumns: "160px 130px 1fr auto auto", gap: 12, alignItems: "baseline", fontSize: 13 }}
     >
       <div style={{ color: "#4b5563", fontFamily: "'JetBrains Mono', monospace", fontSize: 11 }}>{fmtDateTime(u.usedAt)}</div>
