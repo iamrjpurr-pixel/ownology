@@ -2,11 +2,11 @@
  * Refund — a plain-language refund policy.
  *
  * Written to be generous — because a boutique winemaker is not going to
- * refund-abuse a $997 SaaS. The 30-day guarantee is stronger than what
- * most competitors offer, which reduces the "is this real?" objection
- * during the Founding-Member checkout. Founding-Member locked pricing is
- * NOT refundable after 30 days because that&apos;s the whole point of the
- * lifetime lock-in — no take-backsies once we hit the 99 cap.
+ * refund-abuse a subscription SaaS. The 30-day guarantee is stronger
+ * than what most competitors offer, which reduces the "is this real?"
+ * objection during checkout. Founding-Member locked pricing stays
+ * locked for the life of the subscription; the 30-day money-back window
+ * still applies to every paid tier.
  */
 import { Link } from "wouter";
 
@@ -48,7 +48,7 @@ export default function Refund() {
 
         <h2 style={styles.h2}>What&apos;s not refundable</h2>
         <ul style={styles.ul}>
-          <li><strong>Founding Member after day 30</strong> — the whole point of the Founding-Member tier is locked-in lifetime pricing. Once the 30-day window closes, the $997 becomes a permanent commitment (and gets you the permanently-locked rate). We&apos;ll never re-open this offer, so we can&apos;t undo it either.</li>
+          <li><strong>Founding Member after day 30</strong> — the whole point of the Founding-Member tier is locked-in pricing for the life of your subscription. Once the 30-day window closes, your rate becomes a permanent commitment (and gets you the permanently-locked price). We&apos;ll never re-open this offer to new sign-ups after the 99 cap, so we can&apos;t undo it either.</li>
           <li><strong>Merch orders</strong> — apparel and printed materials follow the printer&apos;s standard return policy (usually not returnable once shipped). Contact us if there&apos;s a defect and we&apos;ll sort it.</li>
           <li><strong>Free plan usage</strong> — nothing to refund.</li>
         </ul>

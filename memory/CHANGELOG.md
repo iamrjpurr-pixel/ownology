@@ -4,6 +4,32 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Cellar Book PDF + Terms rewrite (Feb 2026)
+
+Rich's ask: one-click FSANZ-ready audit sheet listing every vessel a batch touched with sanitation timestamps; and a fact-checked Terms of Service refresh.
+
+**Cellar Book PDF (server + UI)**
+- New `server/cellarBookPdf.ts` — `generateCellarBookPdf(req,res)`. Pulls `wine_batches` header + all `batch_equipment_uses` (asc by `usedAt`) + joins to `cellar_equipment` for type/material. Renders branded header (winery logo, brand colour, region), batch identity block, sanitation summary (total events, unique vessels, sanit-ok count, breach count on wine contact), chronological equipment log with BREACH flagging for sanit-fail on `in`/`pass` events, notes lines, and an attestation footer with winemaker + auditor signature blocks.
+- Route: `GET /api/compliance/cellar-book.pdf?batchId=<int>` — registered in `server/index.ts`, gated identically to the LIP Audit Pack (cookie / gate / IP allowlist → PDF, otherwise 401).
+- Empty-state PDF still generates ("No equipment uses have been logged for this batch yet…").
+- Verified end-to-end via curl: 401 without cookie, 400 missing batchId, 404 unknown batch, 200 + valid `%PDF-1.3` payload with cookie. Content OCR-verified: header, batch info, sanitation summary numbers, chronological table, attestation block all render correctly.
+- UI: added Cellar Book PDF panel to `/admin/cellar-board` above the phase filter — batch selector (uses existing `cellarBoard.listBatches`) + Download button opens the PDF in a new tab. `data-testid`s: `cellar-book-pdf-panel`, `cellar-book-batch-select`, `cellar-book-download-btn`.
+- SiteMap entry added (`/admin/site-map`).
+- Service Worker `CACHE_VERSION` bumped `ow-v13` → `ow-v14`.
+
+**Terms of Service rewrite (`client/src/pages/Terms.tsx`)**
+- Fixed factual bug: removed `$997 one-off` (never existed in code). Payment section now lists the three real Stripe tiers — Cellar Hand $19/mo · $190/yr, Press $49/mo · $490/yr, Vigneron $99/mo · $990/yr.
+- Refreshed "What Ownology is" list — includes Cellar Board, Cellar Book PDF, LIP Audit Pack, Vintage Log & Batch Book, Owen AI Tutor, Weekly Cellar Digest, Cellar Journal.
+- New sections: **Compliance record-keeping** (FSANZ / Wine Australia stance — Ownology is a record-keeping tool, user attests to accuracy), **AI and LLM use** (no training on user data, source citations, advisory only), **Your content & our IP** (limited licence for us to run the service), **Sub-processors** (Stripe, Resend, Buttondown, Emergent LLM Gateway, Perplexity, Railway), **Data retention** (12 months post-cancellation), **Beta status** (pre-1.0 acknowledgement).
+- Softened uptime commitment to "target 99.5%, credits granted on request for material outages" (removed automatic pro-rata credit maths).
+- Termination clause updated to reflect current cancellation UX (`/admin/settings`).
+- Contact block split: `legal@ownology.ai` for terms, `privacy@ownology.ai` for exports/deletions.
+
+**Refund policy factual sync (`client/src/pages/Refund.tsx`)**
+- Removed the two `$997` references so it no longer contradicts the corrected Terms. Founding-Member language now says "locked-in pricing for the life of your subscription".
+
+
+
 ### Auto-Rewrite on Ingest — SMS draft warm from birth (Feb 2026)
 
 Rich's ask: when a new contact gets added (via Perplexity, URL Quick-Add, or manual form), auto-fire the AI rewrite so the SMS draft is already warm — no separate "✨ Rewrite with AI" button click needed. Everything a new contact needs is generated in one atomic save.
