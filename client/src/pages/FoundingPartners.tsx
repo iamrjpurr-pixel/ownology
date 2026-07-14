@@ -129,9 +129,16 @@ const FLASH_CARDS: FlashCard[] = [
 ];
 
 // ─── Flash-card cycler ───────────────────────────────────────────────────
-// Presentation mode (Rich, Feb 2026): NO auto-cycle. Prospect drives the
-// deck at their own pace. Auto-cycle used to skip past slide 1 while the
-// visitor read the hero — landing them on slide 2 with no context.
+// Auto-cycle policy (Feb 2026, revised): 6s dwell on slide 1 so visitors
+// finish reading the hero, 5s per slide 2–5, then STOP on slide 6 (the
+// BookCallForm — auto-advancing off that would break the funnel).
+// Auto-cycle pauses on hover/focus so a slow reader isn't yanked mid-line.
+// Progress dots signal "this is cycling" so arrows aren't the only hint.
+// If a visitor clicks any arrow, auto-cycle stops for the session — they
+// took manual control, respect it.
+const AUTO_CYCLE_FIRST_DELAY_MS = 6000;
+const AUTO_CYCLE_STEP_MS = 5000;
+
 function FlashCards({ refTag }: { refTag: string | null }) {
   // Deep-link support (#book) — the /trial-locked upgrade CTA + any email
   // link that pastes /join#book should jump straight to the final card
@@ -140,15 +147,46 @@ function FlashCards({ refTag }: { refTag: string | null }) {
     ? FLASH_CARDS.length - 1
     : 0;
   const [idx, setIdx] = React.useState(initialIdx);
+  const [autoCycleOn, setAutoCycleOn] = React.useState(initialIdx === 0);
+  const [paused, setPaused] = React.useState(false);
   const total = FLASH_CARDS.length;
 
   const card = FLASH_CARDS[idx];
   const isLast = idx === total - 1;
   const isFirst = idx === 0;
 
+  // Auto-cycle effect. First dwell is longer so the hero has time to breathe;
+  // subsequent slides tick at a steady 5s. Any manual arrow click flips
+  // autoCycleOn=false and cancels the timer for the rest of the session.
+  React.useEffect(() => {
+    if (!autoCycleOn) return;
+    if (paused) return;
+    if (isLast) return; // never advance off the Book form
+    const delay = idx === 0 ? AUTO_CYCLE_FIRST_DELAY_MS : AUTO_CYCLE_STEP_MS;
+    const timer = window.setTimeout(() => setIdx((i) => Math.min(i + 1, total - 1)), delay);
+    return () => window.clearTimeout(timer);
+  }, [idx, autoCycleOn, paused, isLast, total]);
+
+  const goPrev = () => {
+    setAutoCycleOn(false);
+    if (!isFirst) setIdx((i) => i - 1);
+  };
+  const goNext = () => {
+    setAutoCycleOn(false);
+    if (!isLast) setIdx((i) => i + 1);
+  };
+  const jumpTo = (i: number) => {
+    setAutoCycleOn(false);
+    setIdx(i);
+  };
+
   return (
     <section
       data-testid="fp-flashcards"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
       style={{
         marginTop: "3.5rem",
         padding: "2rem 2rem 1.75rem",
@@ -159,7 +197,7 @@ function FlashCards({ refTag }: { refTag: string | null }) {
         minHeight: "360px",
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", gap: "1rem" }}>
         <p
           data-testid="fp-flashcard-eyebrow"
           style={{
@@ -174,26 +212,58 @@ function FlashCards({ refTag }: { refTag: string | null }) {
         >
           {card.eyebrow}
         </p>
-        <div style={{ display: "flex", gap: "0.4rem" }}>
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
           <button
             type="button"
             aria-label="Previous card"
             data-testid="fp-flashcard-prev"
-            onClick={() => !isFirst && setIdx((i) => i - 1)}
+            onClick={goPrev}
             disabled={isFirst}
-            style={{ background: "transparent", border: "1px solid var(--ow-border)", borderRadius: "4px", padding: "0.15rem 0.35rem", cursor: isFirst ? "not-allowed" : "pointer", color: "var(--ow-text-mid)", opacity: isFirst ? 0.35 : 1 }}
+            style={{
+              background: "var(--ow-bg-card, transparent)",
+              border: "1.5px solid var(--ow-amber, #B0741A)",
+              borderRadius: "999px",
+              padding: "0.45rem",
+              cursor: isFirst ? "not-allowed" : "pointer",
+              color: "var(--ow-amber, #B0741A)",
+              opacity: isFirst ? 0.35 : 1,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "2.25rem",
+              height: "2.25rem",
+              transition: "background 120ms",
+            }}
+            onMouseOver={(e) => { if (!isFirst) (e.currentTarget as HTMLButtonElement).style.background = "rgba(176,116,26,0.10)"; }}
+            onMouseOut={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--ow-bg-card, transparent)"; }}
           >
-            <ChevronLeft className="w-3.5 h-3.5" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             type="button"
             aria-label="Next card"
             data-testid="fp-flashcard-next"
-            onClick={() => !isLast && setIdx((i) => i + 1)}
+            onClick={goNext}
             disabled={isLast}
-            style={{ background: "transparent", border: "1px solid var(--ow-border)", borderRadius: "4px", padding: "0.15rem 0.35rem", cursor: isLast ? "not-allowed" : "pointer", color: "var(--ow-text-mid)", opacity: isLast ? 0.35 : 1 }}
+            style={{
+              background: "var(--ow-bg-card, transparent)",
+              border: "1.5px solid var(--ow-amber, #B0741A)",
+              borderRadius: "999px",
+              padding: "0.45rem",
+              cursor: isLast ? "not-allowed" : "pointer",
+              color: "var(--ow-amber, #B0741A)",
+              opacity: isLast ? 0.35 : 1,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "2.25rem",
+              height: "2.25rem",
+              transition: "background 120ms",
+            }}
+            onMouseOver={(e) => { if (!isLast) (e.currentTarget as HTMLButtonElement).style.background = "rgba(176,116,26,0.10)"; }}
+            onMouseOut={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--ow-bg-card, transparent)"; }}
           >
-            <ChevronRight className="w-3.5 h-3.5" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -252,14 +322,14 @@ function FlashCards({ refTag }: { refTag: string | null }) {
       )}
 
       {/* Dot pager — shows deck progress + jump-to */}
-      <div style={{ marginTop: "1.5rem", display: "flex", gap: "0.4rem", justifyContent: "center" }} data-testid="fp-flashcard-dots">
+      <div style={{ marginTop: "1.5rem", display: "flex", gap: "0.4rem", justifyContent: "center", alignItems: "center" }} data-testid="fp-flashcard-dots">
         {FLASH_CARDS.map((_, i) => (
           <button
             key={i}
             type="button"
             aria-label={`Go to card ${i + 1}`}
             data-testid={`fp-flashcard-dot-${i}`}
-            onClick={() => setIdx(i)}
+            onClick={() => jumpTo(i)}
             style={{
               width: i === idx ? "22px" : "8px",
               height: "8px",
@@ -273,6 +343,25 @@ function FlashCards({ refTag }: { refTag: string | null }) {
           />
         ))}
       </div>
+      {/* Cycling hint — only while auto-cycle is still active and we're not
+          on the last card. Fades to signal it's a status line, not a CTA. */}
+      {autoCycleOn && !isLast && (
+        <div
+          data-testid="fp-flashcard-cycle-hint"
+          style={{
+            marginTop: "0.5rem",
+            textAlign: "center",
+            fontFamily: "'Lato', sans-serif",
+            fontSize: "0.7rem",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "var(--ow-text-mid)",
+            opacity: 0.55,
+          }}
+        >
+          {paused ? "Paused — move mouse away to resume" : `Auto-cycling · slide ${idx + 1} of ${total} · hover to pause`}
+        </div>
+      )}
     </section>
   );
 }

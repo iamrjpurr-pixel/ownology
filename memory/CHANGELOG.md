@@ -1117,3 +1117,29 @@ should land here so PRD.md can stay a spec, not a diary.
   our board", "McLaren Vale Shiraz · Live sample" eyebrow, Fermenter
   #1 correctly shows "Holding batch 26SHZ-001 — day 1 of fermentation".
 
+### `/join` flash-card deck — auto-cycle restored + bigger arrows  (Feb 2026)
+- Bug: 6-slide deck required manual arrow clicks and the arrows were
+  so small visitors never spotted them.
+- Fix in `client/src/pages/FoundingPartners.tsx`:
+  - **Auto-cycle restored** with smarter dwell: 6s on slide 1 so the
+    hero has room to breathe, 5s per slide 2–5. Stops on slide 6 (the
+    BookCallForm) — never advances off the funnel.
+  - **Pause on hover / focus** so slow readers aren't yanked mid-line.
+  - **Any arrow / dot click cancels auto-cycle** for the session —
+    manual control wins.
+  - **Arrows enlarged** from `w-3.5 h-3.5` grey squares to 2.25rem
+    amber pill-shaped circles with hover fill. Impossible to miss.
+  - **Cycle-status caption** below the dots: "Auto-cycling · slide N
+    of 6 · hover to pause" (flips to "Paused — move mouse away to
+    resume" on hover). Signals the deck is alive so arrows aren't the
+    only affordance.
+- Preserved the deep-link behaviour: `/join#book` still jumps straight
+  to slide 6 with auto-cycle disabled from the outset.
+- Preserved the prior session's guardrail (documented in-code) that
+  auto-cycle used to skip the hero — the 6s initial dwell prevents
+  that recurrence.
+- SW cache bumped to `ow-v8`.
+- Playwright smoke test verified: initial dot 1 elongated, hint reads
+  "Auto-cycling · slide 1 of 6 · hover to pause", deck auto-advances,
+  hover flips caption to "Paused", TS compiles clean.
+
