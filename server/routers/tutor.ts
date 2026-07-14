@@ -11,6 +11,7 @@ import * as schema from "../../drizzle/schema.js";
 import { routeQuery } from "../queryRouter.js";
 import { backfillSopEmbeddings } from "../sopEmbeddings.js";
 import { filterPremiumCitations, PREMIUM_BIBLES_LIST, scrubHomebrewMentions } from "../premiumCitations.js";
+import { findProfessionalCitations, renderCitation } from "../professionalCitations.js";
 import { persistJournalEntry } from "../cellarJournalRouter.js";
 import { chatCompletion, MODELS } from "../_core/llm.js";
 import { logMemberActivity } from "../memberActivity.js";
@@ -389,6 +390,7 @@ const tutorRouter = router({
           : allPublishedChunks.filter(c =>
               c.wineType === detectedWineType ||
               (c.sourceDoc && SPECIALIST_MANUALS_SET.has(c.sourceDoc)) ||
+              (c.sourceDoc && c.sourceDoc.startsWith("awri_")) || // AWRI fact sheets — always in scope
               (c.sourceDoc && SPARKLING_SOURCES.has(c.sourceDoc) && detectedWineType !== "red") ||
               (c.sourceDoc === "morew_red_outline" && detectedWineType === "red")
             );
@@ -405,6 +407,7 @@ const tutorRouter = router({
           // are the highest-density practical content in the corpus.
           const src = chunk.sourceDoc ?? "";
           const sourceBoost =
+            src.startsWith("awri_") ? 0.9 :   // AWRI fact sheets — top-tier grounding
             src === "morew_red_outline" ? 0.5 :
             SPECIALIST_MANUALS_SET.has(src) ? 0.4 :
             SPARKLING_SOURCES.has(src) ? 0.6 :  // supplier-grade sparkling data
@@ -444,6 +447,17 @@ const tutorRouter = router({
           morew_ph_meter:          "MoreWine! Use & Care of a pH Meter",
           morew_bench_trials:      "MoreWine! How to Perform Bench Trials",
           morew_fining_agents:     "MoreWine! Benchmarking of Fining Agents",
+          // AWRI fact sheets — Feb 2026 Reference Ingest Phase A. Named
+          // labels so citations render as "AWRI Fact Sheet — <topic>" and
+          // never leak the source_key.
+          awri_avoiding_lab_spoilage:    "AWRI Fact Sheet — Avoiding Wine Spoilage in the Laboratory",
+          awri_controlling_brett:        "AWRI Fact Sheet — Controlling Brettanomyces",
+          awri_managing_botrytis:        "AWRI Fact Sheet — Managing Botrytis",
+          awri_mlf_achieving_successful: "AWRI Fact Sheet — Achieving Successful Malolactic Fermentation",
+          awri_mlf_red_wine:             "AWRI Fact Sheet — Malolactic Fermentation in Red Wine",
+          awri_protein_stability:        "AWRI Fact Sheet — Protein Stability in White Wines",
+          awri_reducing_ethanol:         "AWRI Fact Sheet — Reducing Ethanol in Wine",
+          awri_stuck_fermentation:       "AWRI Fact Sheet — Stuck & Sluggish Fermentation",
         };
         const docContext = relevantChunks
           .map((chunk) => {
@@ -555,6 +569,28 @@ ${docContext}`;
           if (parsed.riskLevel) diyRiskLevel = parsed.riskLevel;
         } catch {
           diyAnswer = diyRawContent;
+        }
+
+        // ── Named-bible citations (Feb 2026 Reference Ingest Phase B) ─────
+        // Match the question against the professional_citations index and
+        // prepend up to 3 named-bible pointers (Boulton, Iland, etc.) to
+        // sourceChapters so the /ask surface always shows real bibles when
+        // a topic match exists. Runs in parallel with LLM parsing — pure DB
+        // lookup, ~5ms budget.
+        try {
+          const topWbs = relevantChunks[0]?.wbsCode ?? null;
+          const namedHits = await findProfessionalCitations({
+            question: input.question,
+            wbsCode: topWbs,
+            limit: 3,
+          });
+          if (namedHits.length > 0) {
+            const rendered = namedHits.map(renderCitation);
+            // Named bibles go first — highest-signal citation surface.
+            diySourceChapters = [...rendered, ...(diySourceChapters ?? [])];
+          }
+        } catch (e) {
+          console.warn("[Tutor.DIY] named-bible citation lookup failed:", (e as Error)?.message);
         }
 
         // ── Persist to Cellar Journal (awaited so we can return the slug) ──
@@ -855,6 +891,22 @@ ${sopContext}${vintageContext ? `\n\n---\n\n## Regional Vintage Context\n${vinta
       } catch {
         answer = rawContent;
       }
+
+            // ── Named-bible citations (Feb 2026 Reference Ingest Phase B) ─
+            // Same pass as the DIY path — surface Boulton / Iland / etc. by
+            // name in sopTitles when a topic-tag match exists. Belt-and-braces
+            // with the LLM's own citations from the prompt.
+            try {
+              const namedHits = await findProfessionalCitations({
+                question: input.question,
+                limit: 3,
+              });
+              if (namedHits.length > 0) {
+                sopTitles = [...namedHits.map(renderCitation), ...sopTitles];
+              }
+            } catch (e) {
+              console.warn("[Tutor.Commercial] named-bible citation lookup failed:", (e as Error)?.message);
+            }
 
             // Instrumentation for /admin/members — feeds first_question
             // pillar and Ask Owen activity timeline.

@@ -1180,6 +1180,32 @@ async function startServer() {
         INDEX wp_outreach_idx (outreach_status)
       )
     `);
+    // Reference Ingest Phase B (Feb 2026) — citation index for named bibles
+    // (Boulton, Iland, Ribéreau-Gayon, Rankine, etc.). Zero verbatim text;
+    // topic-tag matched at retrieval time in server/routers/tutor.ts to
+    // surface named-bible citations alongside chunk sources.
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS professional_citations (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        source_key VARCHAR(64) NOT NULL,
+        authors VARCHAR(256) NOT NULL,
+        title VARCHAR(256) NOT NULL,
+        edition VARCHAR(64),
+        chapter_ref VARCHAR(32),
+        section_ref VARCHAR(64),
+        page_range VARCHAR(32),
+        section_title VARCHAR(256) NOT NULL,
+        subject_summary TEXT NOT NULL,
+        topic_tags VARCHAR(512) NOT NULL,
+        wbs_domain VARCHAR(10),
+        wbs_code VARCHAR(10),
+        priority INT NOT NULL DEFAULT 50,
+        created_at BIGINT NOT NULL,
+        INDEX pc_source_key_idx (source_key),
+        INDEX pc_wbs_code_idx (wbs_code),
+        INDEX pc_priority_idx (priority)
+      )
+    `);
     // ── Phase 1 multi-tenant bootstrap ───────────────────────────────────
     // Idempotent: creates `wineries` table, adds `winery_id` column to
     // users if missing, seeds a Default Winery, backfills NULL user

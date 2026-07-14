@@ -997,6 +997,55 @@ export const diyKnowledgeChunks = mysqlTable(
   ]
 );
 
+// ─── Professional Citations Index (Feb 2026, Reference Ingest Phase B) ──────
+// One row per named-bible section pointer. NO verbatim text — this is a
+// citation index only. Owen surfaces these in `sourceChapters` when a
+// question's topic-tags match, so users see "Boulton et al., Principles &
+// Practices of Winemaking — §5.3 Cold Stabilisation, pp 322–338" instead of
+// (or in addition to) MoreWine!-branded chunk names.
+//
+// Matching: topicTags intersection with question keywords. Score-boosted
+// over homebrew sources in server/routers/tutor.ts.
+export const professionalCitations = mysqlTable(
+  "professional_citations",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // Stable machine key (e.g. "boulton_ppw", "iland_cagw", "ribereau_handbook_enology_v2")
+    sourceKey: varchar("source_key", { length: 64 }).notNull(),
+    // Full author list (e.g. "Boulton, Singleton, Bisson & Kunkee")
+    authors: varchar("authors", { length: 256 }).notNull(),
+    // Book title as it should appear in citations
+    title: varchar("title", { length: 256 }).notNull(),
+    // Edition/year (e.g. "2nd edn, 1999")
+    edition: varchar("edition", { length: 64 }),
+    // Chapter reference (e.g. "5", "Ch. 12")
+    chapterRef: varchar("chapter_ref", { length: 32 }),
+    // Section reference within the chapter (e.g. "§5.3", "C.4.2")
+    sectionRef: varchar("section_ref", { length: 64 }),
+    // Page range for the citation (e.g. "322–338")
+    pageRange: varchar("page_range", { length: 32 }),
+    // Short section title (e.g. "Cold Stabilisation")
+    sectionTitle: varchar("section_title", { length: 256 }).notNull(),
+    // 1–3 line topic summary. Original attributed prose, NOT verbatim.
+    subjectSummary: text("subject_summary").notNull(),
+    // Comma-separated topic tags for keyword-based matching
+    topicTags: varchar("topic_tags", { length: 512 }).notNull(),
+    // WBS domain code (e.g. "D4")
+    wbsDomain: varchar("wbs_domain", { length: 10 }),
+    // Full WBS code (e.g. "D4.3")
+    wbsCode: varchar("wbs_code", { length: 10 }),
+    // Rank within a topic — higher wins when we cap the citation surface
+    priority: int("priority").notNull().default(50),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("pc_source_key_idx").on(t.sourceKey),
+    index("pc_wbs_code_idx").on(t.wbsCode),
+    index("pc_priority_idx").on(t.priority),
+  ]
+);
+
+
 // ─── Ghost Questions ───────────────────────────────────────────────────────────
 // AI-generated questions mapped to WBS nodes for the home winemaker knowledge hub.
 // These "ghost questions" surface naturally through the AI journey rather than

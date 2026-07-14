@@ -4,6 +4,44 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Reference Ingest — AWRI + named-bible citations (Feb 2026)
+
+Rich's ask: feed AWRI, Boulton, and Iland corpora into the SOP library so Owen's citations pull from named professional bibles instead of MoreWine!/homebrew titles.
+
+**Phase A — AWRI verbatim ingest** (`scripts/ingest-awri-fact-sheets.mjs`, new)
+- Uses `pdfjs-dist` (already installed) to extract text from 8 AWRI fact-sheet PDFs in `/app/references/awri-fact-sheets/` (small-lot-fermentation.pdf is a 0-byte placeholder — skipped gracefully). Chunked at 700-word target, section-boundary aware.
+- 21 chunks loaded into `diy_knowledge_chunks` with `source_doc="awri_<slug>"`, `published=true`, correct WBS codes, topic tags per-sheet.
+- Fact sheets covered: Avoiding Lab Spoilage, Controlling Brettanomyces, Managing Botrytis, Achieving Successful MLF, MLF in Red Wine, Protein Stability in White Wines, Reducing Ethanol, Stuck & Sluggish Fermentation.
+- Idempotent — re-running the script wipes existing `awri_*` rows and reloads.
+
+**Phase B — Named-bible citations index** (`scripts/seed-professional-citations.mjs`, new; `professional_citations` table)
+- New `professional_citations` table (schema.ts + `CREATE TABLE IF NOT EXISTS` in `server/index.ts` bootstrap) — a citation index only, zero verbatim book text. Columns: `source_key`, `authors`, `title`, `edition`, `chapter_ref`, `section_ref`, `page_range`, `section_title`, `subject_summary`, `topic_tags`, `wbs_code`, `priority`.
+- 27 citation rows across 8 named bibles: **Boulton, Singleton, Bisson & Kunkee** (7 sections — yeast, MLF, cold stab, phenolics, SO2, fining, redox), **Iland, Bruer, Edwards, Weeks & Wilkes** (8 sections — pH/TA, Brix, SO2 methods, VA, YAN, MLF assay, Somers phenolics, protein heat test), **Ribéreau-Gayon et al. Handbook of Enology** (2), **Rankine — Making Good Wine** (2), **Zoecklein et al. Wine Analysis and Production** (2), **Jackson — Wine Science** (2), **Margalit — Concepts in Wine Chemistry** (2), **OIV** (2 international references).
+- Each row carries an original attributed summary paragraph — legal analogue of a lecturer's course-notes bibliography, no copyrighted text reproduced.
+
+**Phase B (wire-in) — Tutor retrieval** (`server/professionalCitations.ts`, new; `server/routers/tutor.ts`)
+- New `findProfessionalCitations({question, wbsCode, limit})` — scores rows by topic-tag ∩ question-token count + WBS match bonus + priority weight; requires overlap ≥1.5 to qualify.
+- New `renderCitation(hit)` — formats each hit as e.g. `"Boulton et al., Principles and Practices of Winemaking (1996) — §5.3 Cold Stabilisation, pp 322–338"`.
+- Wired into both tutor.ask paths (DIY + Commercial) — named-bible citations are prepended to `sourceChapters` / `sopTitles` before the response returns. Pure DB lookup, ~5ms budget, no LLM cost.
+- Runs in parallel with the existing LLM-generated citations; homebrew suppression filter still runs on the tail.
+
+**Phase A (retrieval boost) — DIY tutor scorer** (`server/routers/tutor.ts`)
+- AWRI chunks get a `sourceBoost = 0.9` — the highest tier, above all MoreWine sources (0.4–0.6).
+- AWRI chunks bypass the wine-type scoping filter (`c.sourceDoc.startsWith("awri_")`) so a red-only or white-only question can still surface AWRI fact sheets that are broadly applicable.
+- New `DOC_LABELS` entries render AWRI chunks in the LLM context as e.g. "AWRI Fact Sheet — Managing Botrytis" — the source_key never leaks.
+
+**Verified end-to-end** via curl on `/api/trpc/tutor.ask`:
+- Q: "My fermentation is stuck at 8 Brix" → citations returned: Boulton Ch.3 (Ethanol Fermentation), Jackson Ch.6, Zoecklein Ch.8 (Nitrogen), AWRI Stuck & Sluggish Fermentation (2 parts). MoreWine sources absent.
+- Q: "How do I test protein stability before bottling? Heat test + bentonite?" → citations returned: Iland Ch.G (Protein Heat Stability Testing), Boulton Ch.8 (Fining), Ribéreau-Gayon Vol 2 Ch.9 (Ageing on Lees), AWRI Protein Stability in White Wines (2 parts).
+
+Frontend `/ask` page consumes `sopTitles` through `filterPremiumCitations` — no UI change needed, citations flow through automatically.
+
+**Phase C (deferred)** — hand-crafted attributed summary chunks for Boulton/Iland (~12 chunks × 200 words) covering the highest-frequency Owen topics. Scoped as a follow-up for careful accuracy review; not blocking today's ship.
+
+**Not ingested** — user confirmed no licensed PDFs for Boulton or Iland; citations index + topic-matched surfacing is the legal path taken.
+
+
+
 ### Cellar Book PDF + Terms rewrite (Feb 2026)
 
 Rich's ask: one-click FSANZ-ready audit sheet listing every vessel a batch touched with sanitation timestamps; and a fact-checked Terms of Service refresh.
