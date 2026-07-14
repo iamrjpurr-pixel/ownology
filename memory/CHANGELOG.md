@@ -1117,6 +1117,59 @@ should land here so PRD.md can stay a spec, not a diary.
   our board", "McLaren Vale Shiraz · Live sample" eyebrow, Fermenter
   #1 correctly shows "Holding batch 26SHZ-001 — day 1 of fermentation".
 
+### `/pricing` — HF density pass · killed duplicate EOFY banner  (Feb 2026)
+- Bug reported by Rich: the big amber EOFY banner duplicated the "SAVE 3
+  MONTHS · EOFY" chip already on the billing toggle, and its "See annual
+  prices →" CTA just scrolled to prices the visitor could reach by
+  flipping the toggle directly above.
+- HF audit: banner carried only ONE unique datum (the "Ends 31 July 2026"
+  deadline). Everything else was a repeat.
+- Fix in `client/src/pages/Pricing.tsx`:
+  - **Removed the standalone EOFY banner block** (~80 LOC, incl. hourglass
+    SVG, promo copy, and the redundant CTA button).
+  - **Added a single-line urgency caption directly under the billing
+    toggle**: "Founding annual subscribers get **3 months free** instead
+    of 2. · Ends 31 July 2026." — preserves the loss-aversion hook without
+    fighting the toggle for attention. Uses `--ow-text-lo` so it reads as
+    context, not command.
+  - Auto-hides when `EOFY_ACTIVE` is false, same as the old banner.
+- SW cache bumped to `ow-v10`. Zero TS errors. Playwright verified:
+  banner removed, deadline caption present, hero visible above the fold.
+
+**Two changes shipped together:**
+
+1. **SOP URL surface** — the "Grounded in" chips that previously read as
+   plain text (e.g. "SOP 11 SO₂ at the Crush") are now clickable links
+   for pros. Any chip matching `/^SOP\s+(\d+)\s+.+/` wraps in a
+   `<Link>` pointing to `/knowledge/sop/:id` (the full SOP viewer —
+   procedure, evidence, calc, story, video) with an `↗` glyph
+   signalling the outbound jump. Bible / manual chunks (Red Wine
+   Bible Ch.5, MoreWine specialist manuals) stay as static text —
+   no per-chapter viewer exists yet, and building one crosses into
+   third-party copyright territory. Backing file:
+   `client/src/pages/CellarBrief.tsx` — parse regex + branch on
+   `sopMatch`. Amber pill border + amber text distinguishes clickable
+   evidence from static context.
+
+2. **Human-factors density pass** — the cards were auto-expanding on
+   status ≠ ok, stacking 15+ signals per card × N cards on a busy day.
+   Fix:
+   - **All cards default to collapsed.** Auto-expand ONLY when there is
+     exactly one attention card — a solo critical item is worth surfacing
+     eagerly; a wall of attention cards isn't (visitor picks their own
+     order).
+   - **Amplified attention emphasis in the collapsed row** — 5px status
+     coloured left border on attention cards, 3px on watch, inset shadow
+     on attention. Eye still catches the critical items without expanding
+     them by default.
+   - **Culled the "day N" chip** — `day 5` moved into a hover tooltip on
+     the stage chip. Removes one persistent signal from every card header.
+- Backing file: `client/src/pages/CellarBrief.tsx` — `BriefCard` now
+  takes a `defaultExpanded` prop, parent computes `soloAttentionIdx`
+  from the cards array.
+- SW cache bumped to `ow-v9`. Zero TS errors. Regex parser verified
+  against 5 sample strings — SOP-prefixed → link, bible/manual → text.
+
 ### `/join` flash-card deck — auto-cycle restored + bigger arrows  (Feb 2026)
 - Bug: 6-slide deck required manual arrow clicks and the arrows were
   so small visitors never spotted them.

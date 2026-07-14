@@ -217,11 +217,23 @@ export default function CellarBrief() {
         <LipComplianceBadge snapshot={summary.lipCompliance} />
       )}
 
-      {/* Cards */}
+      {/* Cards.
+          HF cleanup (Feb 2026): default all cards to COLLAPSED. Auto-expand
+          ONE card only when it is the single "attention" item — a solo
+          critical item is worth surfacing eagerly; a wall of attention cards
+          isn't (visitor should pick their own order). Attention cards keep a
+          thick coloured left border in the collapsed row so the eye still
+          catches them. */}
       <div className="flex flex-col gap-3">
-        {cards.map((c: Card, idx: number) => (
-          <BriefCard key={`${c.vesselId}-${idx}`} card={c} />
-        ))}
+        {(() => {
+          const attentionIndexes = cards
+            .map((c: Card, idx: number) => ({ c, idx }))
+            .filter(({ c }: { c: Card }) => c.status === "attention");
+          const soloAttentionIdx = attentionIndexes.length === 1 ? attentionIndexes[0].idx : -1;
+          return cards.map((c: Card, idx: number) => (
+            <BriefCard key={`${c.vesselId}-${idx}`} card={c} defaultExpanded={idx === soloAttentionIdx} />
+          ));
+        })()}
       </div>
 
       {/* History accordion */}
@@ -294,14 +306,22 @@ type Card = {
   sensoryAssessedAt?: number | null;
 };
 
-function BriefCard({ card }: { card: Card }) {
-  const [expanded, setExpanded] = useState(card.status !== "ok");
+function BriefCard({ card, defaultExpanded = false }: { card: Card; defaultExpanded?: boolean }) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const c = statusColor(card.status);
   const emoji = STAGE_EMOJI[card.stage] ?? "·";
   const slug = `${card.vesselId}-${card.variety}`
     .replace(/[^a-zA-Z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
     .toLowerCase();
+
+  // HF: emphasise attention cards in the collapsed row so the eye still
+  // catches them after we removed the auto-expand default. Attention gets
+  // a 5px status-coloured left border; watch gets 3px; ok gets none.
+  const leftBorderWidth = card.status === "attention" ? 5 : card.status === "watch" ? 3 : 0;
+  const attentionInsetShadow = card.status === "attention"
+    ? `inset 3px 0 0 color-mix(in oklch, ${c} 25%, transparent)`
+    : undefined;
 
   return (
     <div
@@ -311,6 +331,8 @@ function BriefCard({ card }: { card: Card }) {
       style={{
         background: "var(--ow-bg-raised)",
         border: `1px solid color-mix(in oklch, ${c} 35%, var(--ow-border))`,
+        borderLeft: leftBorderWidth > 0 ? `${leftBorderWidth}px solid ${c}` : `1px solid color-mix(in oklch, ${c} 35%, var(--ow-border))`,
+        boxShadow: attentionInsetShadow,
       }}
     >
       {/* Card header — always visible, tappable to expand */}
@@ -335,8 +357,14 @@ function BriefCard({ card }: { card: Card }) {
             <span className="text-sm" style={{ color: "var(--ow-text-mid)" }}>{card.variety}</span>
           </div>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <span className="text-xs px-2 py-0.5 rounded" style={{ background: "var(--ow-bg-inset)", color: "var(--ow-text-mid)" }}>
-              {emoji} {card.stageLabel} · day {card.daysInStage}
+            {/* HF cleanup: "day N in stage" moved into the title so the chip
+                stays legible without dropping the data pros actually want. */}
+            <span
+              className="text-xs px-2 py-0.5 rounded"
+              style={{ background: "var(--ow-bg-inset)", color: "var(--ow-text-mid)" }}
+              title={`Day ${card.daysInStage} in ${card.stageLabel}`}
+            >
+              {emoji} {card.stageLabel}
             </span>
             <span className="text-xs px-2 py-0.5 rounded font-semibold" style={{ background: `color-mix(in oklch, ${c} 18%, transparent)`, color: c }}>
               {statusLabel(card.status)}
@@ -425,17 +453,53 @@ function BriefCard({ card }: { card: Card }) {
                 Grounded in
               </p>
               <ul className="mt-2 flex flex-wrap gap-1.5" style={{ listStyle: "none", padding: 0 }}>
-                {card.grounding.map((g, i) => (
-                  <li key={i}>
-                    <span
-                      className="text-xs px-2 py-1 rounded"
-                      style={{ background: "var(--ow-bg-inset)", color: "var(--ow-text-mid)", border: "1px solid var(--ow-border)" }}
-                      data-testid={`brief-grounding-${slug}-${i}`}
-                    >
-                      {g}
-                    </span>
-                  </li>
-                ))}
+                {card.grounding.map((g, i) => {
+                  // Parse the "SOP {id} {title}" prefix so pros can click through
+                  // to the full SOP viewer at /knowledge/sop/:id. Cellar Brief is
+                  // the pro view; DIY visitors have their own mirror route. Bible /
+                  // manual chunks (Red Wine Bible Ch.5, MoreWine SO₂ Management,
+                  // etc.) stay as text — no per-chapter viewer exists yet and
+                  // building one crosses into copyright territory.
+                  const sopMatch = /^SOP\s+(\d+)\s+(.+)$/i.exec(g);
+                  const sharedPillStyle: React.CSSProperties = {
+                    background: "var(--ow-bg-inset)",
+                    color: "var(--ow-text-mid)",
+                    border: "1px solid var(--ow-border)",
+                  };
+                  if (sopMatch) {
+                    const sopId = sopMatch[1];
+                    return (
+                      <li key={i}>
+                        <Link
+                          href={`/knowledge/sop/${sopId}`}
+                          className="text-xs px-2 py-1 rounded inline-flex items-center gap-1 transition-colors hover:brightness-110"
+                          style={{
+                            ...sharedPillStyle,
+                            color: "var(--ow-amber)",
+                            textDecoration: "none",
+                            borderColor: "color-mix(in oklch, var(--ow-amber) 40%, var(--ow-border))",
+                          }}
+                          data-testid={`brief-grounding-${slug}-${i}`}
+                          title="Open the full SOP — procedure, evidence, calc, video"
+                        >
+                          <span>{g}</span>
+                          <span aria-hidden="true" style={{ fontSize: "0.7em", opacity: 0.8 }}>↗</span>
+                        </Link>
+                      </li>
+                    );
+                  }
+                  return (
+                    <li key={i}>
+                      <span
+                        className="text-xs px-2 py-1 rounded"
+                        style={sharedPillStyle}
+                        data-testid={`brief-grounding-${slug}-${i}`}
+                      >
+                        {g}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}

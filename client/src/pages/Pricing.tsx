@@ -1342,91 +1342,28 @@ export default function Pricing() {
             Start with free run juice — unforced, natural, no commitment. When you&apos;re ready to deep dive, step into The Press. Every tier is designed around the winemaker&apos;s rhythm.
           </p>
           <BillingToggle cycle={cycle} onChange={setCycle} />
+          {/* EOFY urgency caption — replaces the standalone EOFY banner
+              (Feb 2026 HF pass). The old banner duplicated the toggle chip
+              and its CTA just scrolled to prices already in view. Kept the
+              one unique signal — the deadline — as a single-line loss-aversion
+              hook directly under the toggle. */}
+          {EOFY_ACTIVE && (
+            <p
+              data-testid="eofy-deadline-caption"
+              className="text-center mt-3"
+              style={{
+                fontFamily: "'Lato', sans-serif",
+                fontSize: "0.78rem",
+                color: "var(--ow-text-lo)",
+                letterSpacing: "0.02em",
+              }}
+            >
+              Founding annual subscribers get <strong style={{ color: "var(--ow-text-mid)" }}>3 months free</strong> instead of 2.
+              <span style={{ opacity: 0.75 }}> · Ends 31 July 2026.</span>
+            </p>
+          )}
         </div>
       </section>
-
-      {/* EOFY promo banner — Rich, Feb 2026. Shows only while EOFY_ACTIVE
-          (until 31 July 2026 23:59 Sydney). Auto-disappears after that.
-          Placed ABOVE the Founding Member banner so the time-limited hook
-          is the first thing a visitor lands on when they scroll down. */}
-      {EOFY_ACTIVE && (
-        <div
-          className="container max-w-7xl mx-auto mb-4 px-4 sm:px-6"
-          data-testid="eofy-banner"
-        >
-          <div
-            className="rounded-sm px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3"
-            style={{
-              background: "var(--ow-amber)",
-              color: "oklch(0.14 0.008 60)",
-              boxShadow: "0 0 0 1px var(--ow-amber), 0 8px 24px color-mix(in oklch, var(--ow-amber) 25%, transparent)",
-            }}
-          >
-            <div
-              className="flex items-center justify-center rounded-full flex-shrink-0"
-              style={{
-                width: 34,
-                height: 34,
-                background: "oklch(0.14 0.008 60)",
-                color: "var(--ow-amber)",
-              }}
-              aria-hidden="true"
-            >
-              {/* Hourglass icon — signals time-limited without emoji */}
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M4 2h8M4 14h8M4 2v2c0 1.5 1 2.5 2 3.5s2 1.5 2 2.5-1 1.5-2 2.5-2 2-2 3.5M12 2v2c0 1.5-1 2.5-2 3.5s-2 1.5-2 2.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <p
-                className="font-medium"
-                style={{
-                  fontFamily: "'Fraunces', serif",
-                  fontSize: "1.05rem",
-                  lineHeight: 1.3,
-                  letterSpacing: "-0.005em",
-                }}
-              >
-                EOFY Bonus · Ends 31 July 2026
-              </p>
-              <p
-                className="mt-1"
-                style={{
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: "0.82rem",
-                  lineHeight: 1.5,
-                  opacity: 0.85,
-                }}
-              >
-                Annual founding subscribers get <strong>3 months free</strong> instead of 2. Snap up any tier before end of July and lock in the deeper savings for the whole 12-month term.
-              </p>
-            </div>
-            <button
-              type="button"
-              data-testid="eofy-banner-cta"
-              onClick={() => {
-                const el = document.getElementById("tier-cards") || document.querySelector('[data-tier-grid]');
-                el?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-              className="flex-shrink-0 rounded-full transition-opacity hover:opacity-90"
-              style={{
-                padding: "0.55rem 1.1rem",
-                background: "oklch(0.14 0.008 60)",
-                color: "var(--ow-amber)",
-                fontFamily: "'Lato', sans-serif",
-                fontSize: "0.72rem",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                fontWeight: 700,
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              See annual prices →
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Tier Chooser — 3-question wizard from the Feb 2026 positioning
           audit. Removes decision friction ("which tier fits me?") without
