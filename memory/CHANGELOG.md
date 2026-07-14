@@ -4,6 +4,48 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Feb 2026 — Privacy refresh + Auditor Preview Link + Boulton/Iland Phase C + Full regression
+
+**Privacy Page Refresh** (`client/src/pages/Privacy.tsx`)
+- Sub-processor list now matches the Terms rewrite: Railway, Resend, Buttondown, Emergent LLM Gateway (Claude / GPT / Gemini), Perplexity (opt-in only), Stripe.
+- Retention window aligned to 12 months post-cancellation (was 30 days — contradicted the new Terms).
+- New "Compliance records" bullet — Cellar Book PDF and LIP Audit Pack are generated on demand and don't persist on our disks.
+- Explicit "we don't train foundation models on your cellar data" statement matches Terms §"AI and LLM use".
+- Cookies section rewritten — session cookie + gate cookie only, no advertising/third-party cookies.
+
+**Auditor Preview Link** — shareable read-only Cellar Book PDF for FSANZ auditors
+- New `cellar_book_share_tokens` table (schema.ts + CREATE TABLE bootstrap in server/index.ts). Columns: `token`, `batchId`, `userId`, `wineryId`, `label`, `expiresAt`, `revoked`, `revokedAt`, `viewCount`, `lastViewedAt`, `createdAt`.
+- `server/cellarBookPdf.ts` — `generateCellarBookPdf` now accepts `{forceOwnerUserId, forceBatchId}` so the token wrapper renders as the token owner (tenancy preserved).
+- `server/index.ts` — `/api/compliance/cellar-book.pdf` route dual-mode: `?token=<32-byte url-safe>` bypasses cookie/gate; token path checks `revoked`, `expiresAt`; returns 404 (not found), 410 (revoked/expired), 500 (lookup fail). Fire-and-forget viewCount + lastViewedAt bump on every successful serve.
+- Three new tRPC procedures on `cellarBoardRouter`:
+  - `createShareLink({batchId, label?, ttlDays=14})` — auth-scoped to caller's batch. Returns `{ok, id, token, url, expiresAt}`. URL is fully-qualified from request origin so it copies straight into an email.
+  - `listShareLinks({batchId?})` — returns active + revoked links with viewCount + timestamps.
+  - `revokeShareLink({id})` — idempotent revoke; scoped to caller.
+- `client/src/pages/AdminCellarBoard.tsx` — new `ShareAuditorModal` component (same file). "Share with auditor" button opens modal with label input, TTL select (7/14/30/60/90 days), Generate button. Active links list shows the URL, days-until-expiry, viewCount, Copy button (uses clipboard API), and Revoke button. Revoked/expired links shown separately at the bottom. All keyed with `data-testid`s.
+- `data-testid`s: `cellar-book-share-btn`, `cellar-book-share-modal`, `share-modal-close`, `share-modal-label-input`, `share-modal-ttl-select`, `share-modal-generate-btn`, `share-modal-empty`, `share-modal-active-<id>`, `share-modal-copy-<id>`, `share-modal-revoke-<id>`, `share-modal-inactive-<id>`, `share-modal-error`.
+- Download PDF button converted from `<a href>` to a semantic disabled `<button>` when no batch is selected (was aria-disabled only — testing agent flagged the semantic gap).
+- Service worker `CACHE_VERSION` bumped `ow-v14 → ow-v15`.
+
+**Reference Ingest Phase C — Boulton & Iland attributed summary chunks** (`scripts/seed-boulton-iland-summaries.mjs`, new)
+- 12 hand-crafted 200-word summary paragraphs seeded into `diy_knowledge_chunks` with `source_doc="boulton_ppw"` (6 chunks) and `source_doc="iland_cagw"` (6 chunks). All published, WBS-coded, topic-tagged.
+- Every chunk opens with `"Summary — <authors>, <title>, <chapter>, pp <range>."` and paraphrases the section content in original prose — zero verbatim book text, legal course-notes bibliography analogue.
+- Topics covered — Boulton: SO2 chemistry (Ch.7), yeast biochemistry & stuck ferment (Ch.3), MLF microbiology (Ch.4), cold stabilisation (§5.3), phenolic extraction (Ch.6), fining and filtration (Ch.8). Iland: pH & TA (Ch.A), free/total SO2 methods (Ch.C.1), YAN measurement (Ch.D), volatile acidity (Ch.C.4), MLF monitoring (Ch.E), protein heat stability (Ch.G).
+- Retrieval wired: source-boost = 1.0 (highest tier, above AWRI 0.9), always-in-scope bypass for wine-type filtering, DOC_LABELS entries so citations render as "Boulton, Singleton, Bisson & Kunkee — Principles and Practices of Winemaking".
+
+**Tutor retrieval improvements** (`server/routers/tutor.ts`)
+- Scored map split into `contentScore + tagScore*2 + sourceBoost`. Topic-tag hits now count double — a chunk that has "stuck fermentation" as a tag beats a generic SOP that just mentions "fermentation" in body text. Fixes the AWRI Stuck Fermentation fact sheet not surfacing on stuck-ferment queries.
+- LLM's `parsed.sourceChapters` is now merged with the retrieved-chunk `sourceRefs` (was: wholesale overwrite). Preserves AWRI/Boulton/Iland titles when the LLM only cites a subset. De-duplicated + Part N/M chunker suffix stripped.
+- `sourceRefs` now strips `— Part N/M` from chunker output so multi-part fact sheets read as one canonical citation.
+- `"stuck"` colloquial-map entry expanded: `stuck fermentation, stalled, sluggish, YAN, nutrient, nitrogen, restart, rehydration, temperature`. New `"sluggish"` synonym entry.
+
+**Regression Test Sweep** — testing agent (`test_reports/iteration_36.json` then `iteration_37.json`)
+- Iteration 36: 14/15 backend, all UI. Single miss: AWRI Stuck Fermentation not in sopTitles for shortened "stuck at 8 Brix" question.
+- Iteration 37 (after fixes): **15/15 backend, 100% UI. No regressions. No retest needed.**
+- Tests cover: PDF gate/no-cookie/404/400 paths, token generate/copy/revoke lifecycle (410 on revoked, 404 on invalid), Terms/Refund/Privacy content assertions (no $997, new sub-processor list present), tutor.ask citations flow across 3 question topics (SO2, protein stability, stuck ferment).
+- Test file preserved at `/app/backend/tests/test_feb2026_batch.py` for future runs.
+
+
+
 ### Reference Ingest — AWRI + named-bible citations (Feb 2026)
 
 Rich's ask: feed AWRI, Boulton, and Iland corpora into the SOP library so Owen's citations pull from named professional bibles instead of MoreWine!/homebrew titles.
