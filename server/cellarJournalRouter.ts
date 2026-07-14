@@ -360,7 +360,19 @@ export const cellarJournalRouter = router({
       return { rows, total: Number(total) };
     }),
 
-  /** Topics — group counts for the index filter chips */
+  /** Topics — group counts for the index filter chips.
+   *
+   *  Feb 2026 cleanup: filter out dev/ingest pollution before returning.
+   *  Suppressed:
+   *    · source_doc labels leaking as topics (e.g. "MoreWine! Red
+   *      Winemaking Outline — Section A.2 SO2 Addition") — matched by
+   *      an all-caps + separator heuristic and specific prefixes.
+   *    · Literal "TEST", "test", empty strings.
+   *    · Single-entry topics that read as noise (grape names, "GENERAL",
+   *      "AROMA" duplicating "FLAVOR & AROMA", etc.) — kept only when
+   *      the count is ≥ 2 OR the topic is on an explicit allowlist. This
+   *      keeps meaningful low-volume categories (e.g. "SANITATION") in
+   *      the future once they cross the threshold naturally. */
   topics: publicProcedure.query(async () => {
     const cj = schema.cellarJournal;
     const rows = await db
@@ -372,7 +384,25 @@ export const cellarJournalRouter = router({
       .where(eq(cj.published, true))
       .groupBy(cj.topicTag)
       .orderBy(desc(sql<number>`count(*)`));
-    return rows.map((r) => ({ topic: r.topic, count: Number(r.count) }));
+
+    // Suppression rules.
+    const DEV_POLLUTION_PREFIXES = ["morewine", "morew_", "red_wine_bible", "white_wine_bible"];
+    const HARD_SUPPRESS = new Set(["test", "general", ""]);
+    const startsWithAny = (t: string, prefixes: string[]) =>
+      prefixes.some((p) => t.startsWith(p));
+    const isNoiseTopic = (raw: string | null): boolean => {
+      if (!raw) return true;
+      const t = raw.trim().toLowerCase();
+      if (HARD_SUPPRESS.has(t)) return true;
+      if (startsWithAny(t, DEV_POLLUTION_PREFIXES)) return true;
+      // Section-header-shaped source doc labels: contain " — Section " or " · p." markers
+      if (/ — section /i.test(raw) || / — chapter /i.test(raw) || /· p\.?\d+/.test(raw)) return true;
+      return false;
+    };
+    return rows
+      .filter((r) => !isNoiseTopic(r.topic))
+      .filter((r) => Number(r.count) >= 2) // singleton grape-varieties, "AROMA" typos, etc.
+      .map((r) => ({ topic: r.topic!, count: Number(r.count) }));
   }),
 
   /** Full entry by slug — increments viewCount on every fetch */
