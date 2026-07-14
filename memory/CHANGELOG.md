@@ -1117,6 +1117,43 @@ should land here so PRD.md can stay a spec, not a diary.
   our board", "McLaren Vale Shiraz · Live sample" eyebrow, Fermenter
   #1 correctly shows "Holding batch 26SHZ-001 — day 1 of fermentation".
 
+### Admin tidy-up — playbook refresh + `/admin/dev` regrouping + allowlist audit  (Feb 2026)
+
+**Three cleanups shipped after the RAG/BD-digest/Save-my-cellar burst.**
+
+1. **`AdminPlaybook.tsx` refresh** — added two new SOPs that match the
+   new operator surfaces:
+   - **SOP 6 — Log equipment use during vintage** — walk-through of the
+     Cellar Board + Log Use modal + sanitation warning ack pattern.
+     "Ticking the checkbox is auditable — it's evidence you saw the risk."
+   - **SOP 7 — Weekly BD Digest triage (Monday)** — Monday 05:30 AEST
+     workflow: scan chips, reply-first to Interested, bump Not-now,
+     touch Top-3 Hottest, dry-run fallback if it doesn't fire.
+   - Daily 10 gained a Cellar Board glance (1 min) between the Brief and
+     the dashboard.
+
+2. **`/admin/dev` regrouped** — collapsed 17 cards under one "After a UI
+   change" group into three purpose-driven groups:
+   - **After a UI change**: Responsive viewer, Compare themes, Crush
+     cascade test.
+   - **Cellar ops**: Cellar board (RAG), Cellar Brief, Sample vintage log.
+   - **Deployment ops**: Build check, Nuke cache, Health probes.
+   Sales/traction, Content/SOPs, and Reference docs groups unchanged.
+   Operator can now scan by task-context instead of insertion order.
+
+3. **Public allowlist audit** — swept the server `PUBLIC_EXACT` list vs
+   the Vite gate wall + robots.txt. **Zero real leaks:**
+   - Dev-only mockups (`/branding-mockup`, `/cascade-demo`, `/copilot-mockup`,
+     `/home-v2`, `/home-v3`, `/onboarding-mockup`, `/preview`) are
+     correctly gated (documented in the Feb 2026 Rich audit comment).
+   - Competitor-migration pages (`/for-innovint-users`, `/for-vintrace-users`)
+     are correctly INTENTIONALLY gated + robots.txt Disallow'd — only
+     reachable via team-shared gate password.
+   - `/how-we-trace` correctly PUBLIC on both server + vite wall + sitemap.
+   No changes made — the existing gating is on-strategy.
+
+- SW cache bumped to `ow-v13`. Zero TS errors.
+
 ### Batch Phase Logger + Sanitation Warning + Save My Cellar  (Feb 2026)
 
 **Three features shipped together — closing the traceability loop from

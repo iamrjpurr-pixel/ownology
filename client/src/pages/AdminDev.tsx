@@ -58,6 +58,39 @@ const GROUPS: ToolGroup[] = [
         internal: true,
         cta: "Run animation",
       },
+    ],
+  },
+  {
+    groupTitle: "Cellar ops",
+    groupBlurb: "Live vessel state + traceability plumbing. Green = safe to fill. Red = holding wine. Grey = fault.",
+    tools: [
+      {
+        title: "Cellar board (RAG)",
+        blurb: "Every vessel's Red/Amber/Green/Grey state, grouped by WBS phase. Log equipment use from the vessel drawer. FSANZ 3.2.2 audit-defensible.",
+        href: "/admin/cellar-board",
+        internal: true,
+        cta: "Open board",
+      },
+      {
+        title: "Cellar Brief",
+        blurb: "AI's morning summary — alerts, trajectory, decisions due. Grounded-in chips link to full SOPs.",
+        href: "/cellar-brief",
+        internal: true,
+        cta: "Open brief",
+      },
+      {
+        title: "Sample vintage log",
+        blurb: "The seeded sample data shown to /hi/:slug prospects. Verify recommendation grounding.",
+        href: "/sample-vintage-log",
+        internal: true,
+        cta: "View log",
+      },
+    ],
+  },
+  {
+    groupTitle: "Deployment ops",
+    groupBlurb: "Push-and-verify tools. Catches stale prod and env-var drift before customers see it.",
+    tools: [
       {
         title: "Build check",
         blurb: "Is prod current? Diffs local vs prod manifest (commit, SW version, table + procedure counts). Auto-refreshes every 30s during a deploy.",
@@ -66,11 +99,18 @@ const GROUPS: ToolGroup[] = [
         cta: "Open check",
       },
       {
-        title: "Cellar board (RAG)",
-        blurb: "Every vessel's Red/Amber/Green/Grey state. Green = sanitised + within 72h freshness window + empty. Auto-refreshes every 30s. FSANZ 3.2.2 audit-defensible.",
-        href: "/admin/cellar-board",
+        title: "Nuke cache",
+        blurb: "Unregisters the Service Worker + clears localStorage. Fixes stuck theme / stale JS bugs after a deploy.",
+        href: "/admin/dev#nuke",
         internal: true,
-        cta: "Open board",
+        cta: "Nuke",
+      },
+      {
+        title: "Health probes",
+        blurb: "Backend uptime, MySQL, Resend key, Perplexity key, Emergent LLM budget — one-glance status.",
+        href: "/admin/health",
+        internal: true,
+        cta: "Open health",
       },
     ],
   },
