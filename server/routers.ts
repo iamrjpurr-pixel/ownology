@@ -1614,13 +1614,15 @@ const cellarBoardRouter = router({
         viewCount: 0,
         createdAt: now,
       });
-      // Compose the fully-qualified URL from the current request's origin so
-      // it works in dev + prod without client-side munging.
+      // Compose the fully-qualified Cellar Book URL from the current
+      // request's origin so it works in dev + prod without client-side
+      // munging. We emit the WEB view URL (public HTML page); the PDF
+      // URL is derived client-side by swapping the prefix.
       const proto = (ctx.req.headers["x-forwarded-proto"] as string | undefined) || "https";
       const host = (ctx.req.headers["x-forwarded-host"] as string | undefined)
         || (ctx.req.headers.host as string | undefined)
         || "ownology.ai";
-      const url = `${proto}://${host}/api/compliance/cellar-book.pdf?token=${token}`;
+      const url = `${proto}://${host}/reference/cellar-book/${token}`;
       const id = (insertResult as unknown as { insertId?: number })?.insertId ?? null;
       return { ok: true, id, token, url, expiresAt };
     }),
@@ -1673,6 +1675,45 @@ const cellarBoardRouter = router({
           )
         );
       return { ok: true };
+    }),
+
+  /** Batch Book Landing (Feb 2026) — live browser page equivalent of the
+   *  Cellar Book PDF. Same data, no download required. Winemakers use this
+   *  from /admin/batch-book/:batchId; auditors + buyers get a token URL.
+   *  Auth-scoped: caller sees only their own batches. */
+  getBatchBook: protectedProcedure
+    .input(z.object({ batchId: z.number().int().positive() }))
+    .query(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const { loadCellarBookPayload } = await import("./cellarBookPayload.js");
+      const payload = await loadCellarBookPayload(input.batchId, dbUser.id);
+      if (!payload) throw new Error("Batch not found");
+      return payload;
+    }),
+
+  /** Public token-scoped Batch Book — no login required. Same payload as
+   *  getBatchBook. Fire-and-forget view-count bump so the winemaker can
+   *  see whether the auditor has opened the link. */
+  getBatchBookByToken: publicProcedure
+    .input(z.object({ token: z.string().min(10).max(64) }))
+    .query(async ({ input }) => {
+      const { loadCellarBookByToken } = await import("./cellarBookPayload.js");
+      const result = await loadCellarBookByToken(input.token);
+      if (result.status !== "ok") return { ok: false as const, status: result.status };
+      // Fire-and-forget view-count bump — mirrors the PDF token handler.
+      (async () => {
+        try {
+          await db
+            .update(schema.cellarBookShareTokens)
+            .set({
+              viewCount: sql`${schema.cellarBookShareTokens.viewCount} + 1`,
+              lastViewedAt: Date.now(),
+            })
+            .where(eq(schema.cellarBookShareTokens.id, result.token.id));
+        } catch { /* silent */ }
+      })();
+      return { ok: true as const, payload: result.payload, token: result.token };
     }),
 });
 

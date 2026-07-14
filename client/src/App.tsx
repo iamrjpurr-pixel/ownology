@@ -149,6 +149,10 @@ const AdminPressBypass = lazy(() => import("./pages/AdminPressBypass"));
 const AdminHealth = lazy(() => import("./pages/AdminHealth"));
 const AdminBuildCheck = lazy(() => import("./pages/AdminBuildCheck"));
 const AdminCellarBoard = lazy(() => import("./pages/AdminCellarBoard"));
+// Feb 2026 — Batch Book Landing: live browser page mirroring the Cellar Book PDF.
+// Two entry points: /b/:token (public, token-scoped) and /admin/batch-book/:batchId (auth).
+const BatchBookByToken = lazy(() => import("./pages/BatchBook").then((m) => ({ default: m.BatchBookByToken })));
+const BatchBookByBatchId = lazy(() => import("./pages/BatchBook").then((m) => ({ default: m.BatchBookByBatchId })));
 const ComplianceScore = lazy(() => import("./pages/ComplianceScore"));
 
 /** Lightweight skeleton shown while a lazy page chunk downloads.
@@ -449,6 +453,8 @@ function Router() {
       <Route path={"/admin/health"} component={AdminHealth} />
       <Route path={"/admin/build-check"} component={AdminBuildCheck} />
       <Route path={"/admin/cellar-board"} component={AdminCellarBoard} />
+      <Route path={"/admin/batch-book/:batchId"} component={BatchBookByBatchId} />
+      <Route path={"/reference/cellar-book/:token"} component={BatchBookByToken} />
       <Route path={"/compliance-score"} component={ComplianceScore} />
       <Route path={"/app"}><Redirect to="/free-run" /></Route>
       <Route path={"/api/oauth/callback"} component={OAuthCallback} />

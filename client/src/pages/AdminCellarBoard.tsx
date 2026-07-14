@@ -270,6 +270,27 @@ export default function AdminCellarBoard() {
           <Share2 size={14} />
           Share with auditor
         </button>
+        {cellarBookBatchId && (
+          <Link
+            href={`/admin/batch-book/${cellarBookBatchId}`}
+            data-testid="cellar-book-webview-link"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "7px 14px",
+              borderRadius: 6,
+              background: "transparent",
+              border: "1px solid #d4d4d8",
+              color: "#4b5563",
+              fontSize: 13,
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            Open web view
+          </Link>
+        )}
       </div>
 
       {/* Phase filter */}
@@ -468,7 +489,8 @@ function ShareAuditorModal({
           </div>
         )}
         {activeLinks.map((link) => {
-          const url = `${window.location.origin}/api/compliance/cellar-book.pdf?token=${link.token}`;
+          const webUrl = `${window.location.origin}/reference/cellar-book/${link.token}`;
+          const pdfUrl = `${window.location.origin}/api/compliance/cellar-book.pdf?token=${link.token}`;
           const expiresIn = Math.max(0, Math.floor((link.expiresAt - Date.now()) / 86400000));
           return (
             <div
@@ -476,28 +498,41 @@ function ShareAuditorModal({
               data-testid={`share-modal-active-${link.id}`}
               style={{ padding: "10px 12px", border: "1px solid #e5e5e5", borderRadius: 8, marginBottom: 8, background: "#fff" }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
                 <div style={{ fontSize: 13, fontWeight: 500 }}>{link.label || "Untitled link"}</div>
                 <div style={{ fontSize: 11, color: "#6b7280" }}>expires in {expiresIn}d · {link.viewCount} view{link.viewCount === 1 ? "" : "s"}</div>
               </div>
-              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                <code style={{ flex: 1, padding: "6px 8px", background: "#f3f4f6", borderRadius: 4, fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{url}</code>
+              <div style={{ display: "grid", gridTemplateColumns: "80px 1fr auto", gap: 6, alignItems: "center", marginBottom: 4 }}>
+                <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", color: "#6b7280", fontWeight: 600 }}>Web view</div>
+                <code style={{ padding: "5px 8px", background: "#f3f4f6", borderRadius: 4, fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{webUrl}</code>
+                <button
+                  type="button"
+                  data-testid={`share-modal-copy-web-${link.id}`}
+                  onClick={() => handleCopy(webUrl)}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "5px 10px", borderRadius: 6, background: copied === webUrl ? "#2f5230" : "#78350f", color: "#fff", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer" }}
+                >
+                  <Copy size={11} /> {copied === webUrl ? "Copied" : "Copy"}
+                </button>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "80px 1fr auto auto", gap: 6, alignItems: "center" }}>
+                <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", color: "#6b7280", fontWeight: 600 }}>PDF</div>
+                <code style={{ padding: "5px 8px", background: "#f3f4f6", borderRadius: 4, fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pdfUrl}</code>
                 <button
                   type="button"
                   data-testid={`share-modal-copy-${link.id}`}
-                  onClick={() => handleCopy(url)}
-                  style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "6px 10px", borderRadius: 6, background: copied === url ? "#2f5230" : "#78350f", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                  onClick={() => handleCopy(pdfUrl)}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "5px 10px", borderRadius: 6, background: copied === pdfUrl ? "#2f5230" : "#78350f", color: "#fff", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer" }}
                 >
-                  <Copy size={12} /> {copied === url ? "Copied" : "Copy"}
+                  <Copy size={11} /> {copied === pdfUrl ? "Copied" : "Copy"}
                 </button>
                 <button
                   type="button"
                   data-testid={`share-modal-revoke-${link.id}`}
                   disabled={revoke.isPending}
                   onClick={() => revoke.mutate({ id: link.id })}
-                  style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "6px 10px", borderRadius: 6, background: "transparent", color: "#7f1d1d", border: "1px solid #fca5a5", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "5px 10px", borderRadius: 6, background: "transparent", color: "#7f1d1d", border: "1px solid #fca5a5", fontSize: 11, fontWeight: 600, cursor: "pointer" }}
                 >
-                  <Ban size={12} /> Revoke
+                  <Ban size={11} /> Revoke
                 </button>
               </div>
             </div>

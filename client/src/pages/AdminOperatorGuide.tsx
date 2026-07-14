@@ -243,57 +243,77 @@ const SECTIONS: Section[] = [
 
 function StepRow({ step }: { step: Step }) {
   const external = step.href.startsWith("http") || step.href.startsWith("/api/");
-  return (
-    <div
-      className="flex gap-4 p-4 rounded-lg"
-      style={{
-        background: "var(--ow-bg-base)",
-        border: "1px solid var(--ow-bg-inset)",
-      }}
-      data-testid={`op-guide-step-${step.href.replace(/[^a-z0-9]/gi, "-")}`}
-    >
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          {external ? (
-            <a
-              href={step.href}
-              target="_blank"
-              rel="noreferrer"
-              className="font-semibold text-sm inline-flex items-center gap-1.5 hover:underline"
-              style={{ color: "var(--ow-amber)" }}
-            >
-              {step.label}
-              <ExternalLink size={12} />
-            </a>
-          ) : (
-            <Link href={step.href}>
-              <span
-                className="font-semibold text-sm cursor-pointer hover:underline"
-                style={{ color: "var(--ow-amber)" }}
-              >
-                {step.label} →
-              </span>
-            </Link>
-          )}
-          <code
-            className="text-xs px-2 py-0.5 rounded"
-            style={{
-              color: "var(--ow-text-lo)",
-              background: "color-mix(in oklch, var(--ow-text-lo) 12%, transparent)",
-              fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-            }}
-          >
-            {step.href}
-          </code>
-        </div>
-        <p
-          className="text-sm mt-2 leading-relaxed"
-          style={{ color: "var(--ow-text-mid)" }}
+  const testid = `op-guide-step-${step.href.replace(/[^a-z0-9]/gi, "-")}`;
+
+  // The whole card is the tap target — user reported that only the label
+  // being clickable was easy to miss on desktop and impossible on mobile.
+  // Wrap in an <a> for external and /api paths, <Link> for SPA routes so
+  // wouter handles client-side navigation without a full page load.
+  const cardInner = (
+    <div className="flex-1 min-w-0">
+      <div className="flex items-center gap-2 flex-wrap">
+        <span
+          className="font-semibold text-sm inline-flex items-center gap-1.5"
+          style={{ color: "var(--ow-amber)" }}
         >
-          {step.what}
-        </p>
+          {step.label}
+          {external ? <ExternalLink size={12} /> : <span aria-hidden="true">→</span>}
+        </span>
+        <code
+          className="text-xs px-2 py-0.5 rounded"
+          style={{
+            color: "var(--ow-text-lo)",
+            background: "color-mix(in oklch, var(--ow-text-lo) 12%, transparent)",
+            fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+          }}
+        >
+          {step.href}
+        </code>
       </div>
+      <p
+        className="text-sm mt-2 leading-relaxed"
+        style={{ color: "var(--ow-text-mid)" }}
+      >
+        {step.what}
+      </p>
     </div>
+  );
+
+  const cardStyle: React.CSSProperties = {
+    background: "var(--ow-bg-base)",
+    border: "1px solid var(--ow-bg-inset)",
+    color: "inherit",
+    textDecoration: "none",
+    transition: "border-color 120ms ease, background 120ms ease",
+    cursor: "pointer",
+  };
+  const cardClass = "flex gap-4 p-4 rounded-lg hover:opacity-95";
+
+  if (external) {
+    return (
+      <a
+        href={step.href}
+        target="_blank"
+        rel="noreferrer"
+        className={cardClass}
+        style={cardStyle}
+        data-testid={testid}
+      >
+        {cardInner}
+      </a>
+    );
+  }
+  // Wouter v3 <Link> renders its own <a>. Pass className / style / testid
+  // straight through — don't nest another anchor.
+  return (
+    <Link
+      href={step.href}
+      className={cardClass}
+      style={cardStyle}
+      data-testid={testid}
+    >
+      {cardInner}
+    </Link>
   );
 }
 

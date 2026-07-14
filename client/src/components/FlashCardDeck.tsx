@@ -182,7 +182,9 @@ export function FlashCardDeck({
         ))}
       </div>
 
-      {/* Card strip */}
+      {/* Card strip. Outer horizontal padding gives snap-scrolled cards
+          breathing room so their borders/text don't clip against the
+          viewport edge (previously users could "not see the edges"). */}
       <div
         ref={scrollRef}
         data-testid={`${testIdPrefix}-strip`}
@@ -190,11 +192,11 @@ export function FlashCardDeck({
           display: "grid",
           gridAutoFlow: "column",
           gridAutoColumns: "min(90vw, 340px)",
-          gap: "0.75rem",
+          gap: "0.85rem",
           overflowX: "auto",
           scrollSnapType: "x mandatory",
-          padding: "0.25rem 0.25rem 1rem",
-          margin: "0 -0.25rem",
+          padding: "0.5rem 1rem 1.25rem",
+          margin: "0 -1rem",
           WebkitOverflowScrolling: "touch",
         }}
       >
@@ -246,6 +248,12 @@ function FlashCardTile({
         display: "flex",
         flexDirection: "column",
         minHeight: 380,
+        // Grid children default to min-width: auto — that lets long
+        // unbreakable text (paths, urls) overflow the tile. Reset to 0
+        // and add word-break so linkified paths wrap cleanly.
+        minWidth: 0,
+        overflowWrap: "anywhere",
+        wordBreak: "break-word",
       }}
     >
       <div className="flex items-baseline justify-between mb-2">
@@ -316,7 +324,7 @@ function FlashCardTile({
         }}
       >
         {card.steps.map((s, i) => (
-          <li key={i} style={{ display: "flex", gap: "0.55rem", alignItems: "flex-start" }}>
+          <li key={i} style={{ display: "flex", gap: "0.55rem", alignItems: "flex-start", minWidth: 0 }}>
             <span
               style={{
                 flexShrink: 0,
@@ -336,7 +344,7 @@ function FlashCardTile({
             >
               {i + 1}
             </span>
-            <span>{linkifyPaths(s)}</span>
+            <span style={{ minWidth: 0, flex: 1, overflowWrap: "anywhere" }}>{linkifyPaths(s)}</span>
           </li>
         ))}
       </ol>

@@ -660,7 +660,7 @@ async function startServer() {
     "/i/", // /i/:token — magic-link invites (see server/routers/gate.ts)
     "/cellar-journal/", // /cellar-journal/:slug
     "/for-home-winemakers/knowledge/", // /for-home-winemakers/knowledge/:section
-    "/reference/", // future /reference/* pages
+    "/reference/", // /reference/cellar-book/:token — Auditor Preview Link
   ];
   const isPublicPath = (pathname: string): boolean => {
     if (PUBLIC_EXACT.has(pathname)) return true;

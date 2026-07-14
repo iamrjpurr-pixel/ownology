@@ -4,6 +4,30 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Feb 2026 — Batch Book Landing + Morning Ritual clickability + Flashcards edge fix
+
+**Batch Book Landing** — live browser page for every batch, no download required.
+- New `server/cellarBookPayload.ts` — single source of truth for the Cellar Book data shape. Both the PDF renderer and the browser page pull from `loadCellarBookPayload(batchId, ownerUserId)` / `loadCellarBookByToken(token)` so they never drift.
+- Two tRPC procedures on `cellarBoardRouter`: `getBatchBook` (auth-scoped, for winemaker self-serve) and `getBatchBookByToken` (public, no auth — same token that unlocks the PDF). Public procedure fires-and-forgets the view-count bump.
+- New `client/src/pages/BatchBook.tsx` — mobile-friendly page with winery brand-colour header, batch identity block, sanitation summary cards, chronological equipment log, attestation footer, and a `Download PDF` button that goes to the existing token-scoped PDF endpoint.
+- Two routes: `/admin/batch-book/:batchId` (auth-scoped, winemaker's dashboard use) and `/reference/cellar-book/:token` (public token-scoped, for auditors + buyers).
+- **Infrastructure fix**: initial `/b/:token` URL was 302'd by Cloudflare / K8s ingress → `/try` before ever reaching Express. Moved to `/reference/cellar-book/:token` which sits under the already-whitelisted `/reference/` prefix.
+- `ShareAuditorModal` now exposes BOTH URLs (Web view + PDF) with independent Copy buttons keyed on separate testids (`share-modal-copy-web-<id>` and `share-modal-copy-<id>`). Same revoke = kills both.
+- Added `Open web view` button to the Cellar Book PDF panel on `/admin/cellar-board` for one-click access to `/admin/batch-book/:batchId`.
+- SW `CACHE_VERSION` bumped `ow-v16 → ow-v17`.
+- End-to-end verified via preview URL screenshot: page renders with correct brand colour, batch header, share-context banner ("expires 28 July 2026"), empty-state message, PDF download button links back to `/api/compliance/cellar-book.pdf?token=<x>`.
+
+**Morning Ritual clickability fix** (`client/src/pages/AdminOperatorGuide.tsx`)
+- Rich reported the Pipeline/Contacts/Funnel URL paths in the Morning Ritual section were decorative-only, not clickable. Root cause: only the label span was wrapped in `<Link>`; the code path and description weren't clickable.
+- Rewrote `StepRow` so the ENTIRE card is a single `<a>` (external / `/api/`) or `<Link>` (internal) — tap anywhere on the card navigates. Also fixed a nested-anchor bug (previously `<Link><a>…</a></Link>` — Wouter v3's Link is already an anchor, nesting caused href to drop).
+- Verified via headless click: card tag=A, href=/admin/contacts/pipeline, cursor=pointer, click flowed through to the pipeline page.
+
+**Flashcards edge-wrap fix** (`client/src/components/FlashCardDeck.tsx`)
+- Rich reported he couldn't see the edges of flashcards — text was overflowing horizontally, long paths from `linkifyPaths` were shooting past the card border, and cards jammed against the viewport edge.
+- Fixed three overflow chains: (1) `<article>` tile added `minWidth: 0, overflowWrap: "anywhere", wordBreak: "break-word"` so grid children stop defaulting to `min-width: auto`; (2) step `<li>` and its text `<span>` added `minWidth: 0, flex: 1, overflowWrap: "anywhere"` so long paths wrap cleanly rather than punching out the right edge; (3) strip container padding increased from `0.25rem 0.25rem 1rem` (negative-margin `-0.25rem`) to `0.5rem 1rem 1.25rem` (negative-margin `-1rem`) so snap-scrolled cards have breathing room against the viewport edge.
+
+
+
 ### Feb 2026 — Privacy refresh + Auditor Preview Link + Boulton/Iland Phase C + Full regression
 
 **Privacy Page Refresh** (`client/src/pages/Privacy.tsx`)
