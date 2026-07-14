@@ -538,8 +538,6 @@ async function startServer() {
     "/free-run",
     "/free-run/journal",
     "/apco",
-    "/home-v2",
-    "/home-v3",
     "/waitlist",
     "/demo",
     "/join",
@@ -557,9 +555,6 @@ async function startServer() {
     "/merch/success",
     "/merch/cancel",
     "/cellar-journal",
-    "/branding-mockup",
-    "/onboarding-mockup",
-    "/cascade-demo",
     "/reference/vine",
     "/guide",
     "/resume",
@@ -572,7 +567,6 @@ async function startServer() {
     "/install-ios",
     "/pwa/install",
     "/pwa/ios",
-    "/preview",
     "/404",
     "/risk-management",
     "/app", // redirects to /free-run
@@ -580,6 +574,20 @@ async function startServer() {
     "/sitemap.xml",
     "/favicon.ico",
     "/manifest.json",
+    // ── Below: internal mockups + old home variants + dev previews.
+    // REMOVED from public allowlist (Feb 2026, Rich audit) — a cold visitor
+    // landing here gets cog overload from unfinished / unwired UX. Anyone
+    // on the team can still reach them by unlocking the gate wall with
+    // the shared password (ow_gate cookie), so preview flows still work.
+    // If you re-add anything here, ask: "is this ready for a stranger to
+    // land on and understand?" If no, keep it gated.
+    //   "/branding-mockup" — not-wired mockup for Roy
+    //   "/onboarding-mockup" — not-wired mockup
+    //   "/copilot-mockup" — not-wired mockup
+    //   "/cascade-demo" — theme-cascade QA page
+    //   "/home-v2" — home reorder mockup
+    //   "/home-v3" — home storytelling mockup
+    //   "/preview" — dev preview surface
   ]);
   const PUBLIC_PREFIXES = [
     "/api/", // tRPC + REST endpoints enforce own auth at the procedure layer

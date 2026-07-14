@@ -38,6 +38,13 @@ const MEMBER_ONLY_PREFIXES = [
   "/regulations",
   "/tank-qr",
   "/today",
+  // Internal mockups + previews — gated so anonymous visitors see /try
+  // honeypot, not an unfinished UX (Rich audit, Feb 2026). Team access
+  // via gate-password unlock (ow_gate cookie) still works.
+  "/branding-mockup",
+  "/onboarding-mockup",
+  "/cascade-demo",
+  "/preview",
 ];
 
 function pathIsMemberOnly(pathname: string): boolean {

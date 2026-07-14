@@ -68,9 +68,7 @@ const PUBLIC_EXACT = new Set<string>([
   "/merch/success",
   "/merch/cancel",
   "/cellar-journal",
-  "/branding-mockup",
-  "/onboarding-mockup",
-  "/cascade-demo",
+  "/apco",
   "/reference/vine",
   "/guide",
   "/resume",
@@ -83,7 +81,6 @@ const PUBLIC_EXACT = new Set<string>([
   "/install-ios",
   "/pwa/install",
   "/pwa/ios",
-  "/preview",
   "/404",
   "/risk-management",
   "/app", // redirects to /free-run
@@ -91,6 +88,10 @@ const PUBLIC_EXACT = new Set<string>([
   "/sitemap.xml",
   "/favicon.ico",
   "/manifest.json",
+  // Feb 2026 Rich audit — internal mockups/previews moved OUT of the
+  // public allowlist. Anonymous visitors get redirected to /try. Team
+  // access via gate-password unlock (ow_gate cookie) still works.
+  //   REMOVED: /branding-mockup /onboarding-mockup /cascade-demo /preview
 ]);
 const PUBLIC_PREFIXES = [
   "/api/", // tRPC + REST endpoints enforce own auth
