@@ -24,6 +24,31 @@ import { trpc } from "@/lib/trpc";
 import { Sparkles, BookOpen, ArrowRight, AlertTriangle } from "lucide-react";
 import { OwenDisclaimer } from "@/components/OwenDisclaimer";
 
+// Belt-and-braces citation filter. Mirrors the denylist in
+// server/premiumCitations.ts so if a homebrew-supplier title ever leaks
+// through the server filter (e.g. seed data / cache / manual override),
+// the UI still catches it. Server is the source of truth — update both
+// lists together when new patterns need suppressing.
+const HOMEBREW_SUPPRESS_PATTERNS: RegExp[] = [
+  /morewine/i,
+  /more\s*wine\!/i,
+  /northern\s*brewer/i,
+  /midwest\s+(home|brew|supply)/i,
+  /e[\.\s]*c[\.\s]*kraus/i,
+  /home\s*brew(ing|ers?)?/i,
+  /wine\s*maker\s+mag(azine)?/i,
+  /winexpert/i,
+  /beersmith/i,
+  /brewersfriend/i,
+  /brulosophy/i,
+  /amateur\s+winemaker/i,
+];
+
+function filterPremiumCitations(titles: readonly string[] | null | undefined): string[] {
+  if (!titles || !Array.isArray(titles)) return [];
+  return titles.filter((t) => t && !HOMEBREW_SUPPRESS_PATTERNS.some((p) => p.test(t)));
+}
+
 // Sample prompts to seed curiosity + kickstart the flywheel with high-value
 // topics for both the LLM (they hit rich chapters) and SEO (long-tail keywords).
 const SAMPLE_QUESTIONS: Array<{ q: string; topic: string }> = [
@@ -322,14 +347,14 @@ export default function Ask() {
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{result.answer}</ReactMarkdown>
             </div>
 
-            {result.sopTitles && result.sopTitles.length > 0 && (
+            {result.sopTitles && filterPremiumCitations(result.sopTitles).length > 0 && (
               <div className="mt-8" data-testid="ask-sources">
                 <p className="font-mono text-[11px] uppercase tracking-[0.22em] opacity-60 mb-2">
                   Cited from
                 </p>
                 <ul className="space-y-1 text-sm opacity-80">
-                  {result.sopTitles.map((t, i) => (
-                    <li key={i}>· {t}</li>
+                  {filterPremiumCitations(result.sopTitles).map((t, i) => (
+                    <li key={i} data-testid={`ask-source-${i}`}>· {t}</li>
                   ))}
                 </ul>
               </div>

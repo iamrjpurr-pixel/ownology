@@ -10,6 +10,7 @@ import {
 import * as schema from "../../drizzle/schema.js";
 import { routeQuery } from "../queryRouter.js";
 import { backfillSopEmbeddings } from "../sopEmbeddings.js";
+import { filterPremiumCitations, PREMIUM_BIBLES_LIST, scrubHomebrewMentions } from "../premiumCitations.js";
 import { persistJournalEntry } from "../cellarJournalRouter.js";
 import { chatCompletion, MODELS } from "../_core/llm.js";
 import { logMemberActivity } from "../memberActivity.js";
@@ -500,8 +501,9 @@ WINE TYPE CONTEXT: The user appears to be asking about ${detectedWineType === 'b
 
 DOCUMENT-GROUNDED RULES:
 1. Answer from the reference documents provided. If the exact answer is not there, reason from the principles in the documents and say so.
-2. Cite the source document and section (e.g. "According to the MoreWine! Outline, Section C...").
-3. If the question is outside the scope of all provided documents, say so honestly and suggest what topics are covered.
+2. Cite the source document and section (e.g. "According to the Iland Chemical Analysis of Grapes and Wine, Section C...").
+3. CITATION LANE — When you name sources anywhere (in \`sourceChapters\` OR inline in \`answer\` prose), ONLY name winemaker's technical bibles and regulator anchors. NEVER name homebrew suppliers, kit manufacturers, or hobby magazines — not even in prose, not even as "the outline says". Explicitly forbidden names: MoreWine!, More Wine, Red/White Winemaking Outline, Northern Brewer, MidWest, E.C. Kraus, Winemaker Magazine, Homebrewers Association, Winexpert, Amateur Winemaker. If you draw guidance from those sources, attribute it generically ("home-scale winemaking practice suggests…") or to an applicable bible. Prefer: ${PREMIUM_BIBLES_LIST}.
+4. If the question is outside the scope of all provided documents, say so honestly and suggest what topics are covered.
 
 RISK GUIDANCE:
 ${isHighRisk ? '- This question involves chemical additions or dosages. Provide the document guidance, scale the quantities to the user\'s batch size, and add: "Always do a bench trial on a small sample before treating the whole batch. Verify products with your homebrew supplier."' : '- This is a process or technique question. Answer confidently and practically.'}
@@ -580,8 +582,8 @@ ${docContext}`;
         }
 
         return {
-          answer: diyAnswer,
-          sopTitles: diySourceChapters,
+          answer: scrubHomebrewMentions(diyAnswer),
+          sopTitles: filterPremiumCitations(diySourceChapters),
           disclaimer: diyDisclaimer,
           riskLevel: diyRiskLevel,
           journalSlug,
@@ -865,7 +867,7 @@ ${sopContext}${vintageContext ? `\n\n---\n\n## Regional Vintage Context\n${vinta
                 sopCount: sopTitles.length,
               },
             });
-            return { answer, sopTitles, disclaimer };
+            return { answer: scrubHomebrewMentions(answer), sopTitles: filterPremiumCitations(sopTitles), disclaimer };
     }),
 
   // Owner-only: backfill embedding vectors for all SOPs that don't have them

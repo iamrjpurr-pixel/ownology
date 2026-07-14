@@ -1016,3 +1016,72 @@ Verified both via lint (zero errors).
 Older shipped work lives inline in PRD.md (pre-Feb-2026); future entries
 should land here so PRD.md can stay a spec, not a diary.
 
+### Weekly BD Digest email  (Feb 2026)
+- New scheduled handler `/api/scheduled/weekly-bd-digest` — Monday
+  05:30 AEST Resend cron. Reads directly from `outreach_contacts` (no
+  new tables, no LLM calls at digest time) and sends ONE HTML+text
+  summary to `OPERATOR_ALERT_EMAIL` / `OWNER_EMAIL` covering the last
+  7 days: sends (SMS/email breakdown), opens + view events, CTA
+  clicks, hot alerts fired, demos booked, replies grouped by
+  Claude-classified sentiment, up to 5 reply samples, and top 3
+  hottest un-booked prospects (highest view count).
+- Same env-var + secret + dry-run contract as `daily-alert-email` and
+  `weekly-cellar-digest` (RESEND_API_KEY, ALERT_FROM_EMAIL, CRON_SECRET,
+  ALERT_TEST_TO override). GET with `?dryRun=1` allowed for safe manual
+  trigger; live send requires `x-cron-secret` header match if the env
+  var is set.
+- Backing file: `server/scheduled/weeklyBdDigest.ts`. Verified via curl
+  — dry-run returns valid digest with 7-day window and correctly
+  scoped counts.
+
+### Public "How we trace" sales page  (Feb 2026)
+- New public route `/how-we-trace`. Renders the exact same cellar-board
+  UI (grouped by WBS phase, colour-coded RAG state, per-vessel drawer
+  with sanitation badges) as the operator view at `/admin/cellar-board`
+  — but points at a hand-tuned in-memory demo scenario ("Ownology
+  Cellars — 2026 Vintage") so prospects can *see* the traceability
+  machinery without signing up.
+- Sells the recall-readiness story: one live batch (26SHZ-001) flows
+  through Hopper → Sorting Table → Destemmer → Pump #1 → Hose #A →
+  Tank 3, each step with sanitation timestamps. If the batch faulted
+  tomorrow, every touch point is auditable in ten seconds.
+- FSANZ 3.2.2 Clause 20 pull-quote positions Ownology as the recall
+  answer that pours itself. SEO angle: "winery traceability software",
+  "batch recall traceability", "FSANZ 3.2.2 winery evidence" — long-tail
+  terms no AU vineyard-management ERP is ranking for yet.
+- Added to `PUBLIC_EXACT` allowlists in both `server/index.ts` and
+  `viteGateWall.ts`, and to the main `sitemap.xml` (priority 0.9).
+- SW cache bumped to `ow-v6` so the new bundle lands with next deploy.
+- Backing file: `client/src/pages/HowWeTrace.tsx`. Smoke-tested — page
+  renders publicly (no gate redirect), correct `<title>` for SEO, all
+  four RAG states visible in the sample data.
+
+### Owen citations — homebrew-supplier scrub  (Feb 2026)
+- Bug: `/ask` page's "Cited from" block was showing homebrew-supplier
+  titles ("MoreWine! Red Winemaking Outline", "White Winemaking
+  Outline") which undermined the "cited from the bibles" positioning.
+- Fix (server + client + prompt, three-layer belt-and-braces):
+  1. New `server/premiumCitations.ts` with `HOMEBREW_SUPPRESS_PATTERNS`
+     denylist covering MoreWine, Northern Brewer, MidWest, E.C. Kraus,
+     Winexpert, Winemaker Magazine, Amateur Winemaker, BeerSmith,
+     Brulosophy, BrewersFriend, and the specific document titles "Red
+     Winemaking Outline" / "White Winemaking Outline".
+  2. `filterPremiumCitations()` applied at BOTH return points in
+     `server/routers/tutor.ts` (commercial + DIY paths) — the block
+     never shows suppressed titles.
+  3. `scrubHomebrewMentions()` post-processor on the answer prose —
+     replaces LLM name-drops like "the red winemaking outline" with
+     generic phrasing ("the home-scale winemaking guide") so the body
+     text is on-positioning too.
+  4. DIY system prompt at `tutor.ts:502` tightened with an explicit
+     "CITATION LANE" rule listing forbidden names and preferring the
+     PREMIUM_BIBLES_LIST (AWRI, Boulton, Iland, Zoecklein, Ribéreau-
+     Gayon, Australian Wine Regulations, FSANZ, OIV).
+  5. Client-side mirror filter in `Ask.tsx` — belt-and-braces if a bad
+     title ever slips through the server.
+- Verified via curl: identical DIY question that previously returned
+  "MoreWine! Red Winemaking Outline" now returns only "Australian Wine
+  Regulations — Federal Regulatory Requirements For Australian
+  Wineries", and the answer prose no longer names any suppressed
+  source.
+
