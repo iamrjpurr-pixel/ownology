@@ -193,6 +193,9 @@ export const WINES: Wine[] = [
     // grip texture, not mid-palate tightness), so nudged grip to "soft"
     // to disambiguate scoring without misrepresenting the variety.
     palate: { fruit: "red", body: "medium", sweetness: "bone_dry", grip: "soft", age: "developed" },
+  },
+  {
+    slug: "nebbiolo-barolo",
     variety: "Nebbiolo (Barolo)",
     wineType: "red",
     region: "Piedmont",
@@ -453,6 +456,9 @@ export const WINES: Wine[] = [
     gelsNote: "Semi-carbonic maceration preserves fresh primary fruit; low alcohol, low extract, high drinkability.",
     producers: ["Georges Duboeuf", "Louis Jadot", "Domaine Dupeuble"],
     alsoTry: ["Cru Beaujolais (Fleurie)", "Loire Pinot Noir"],
+    // Feb 2026 Wave E — was colliding with Yarra entry Pinot on light/soft/young.
+    // Nouveau-adjacent Villages carries brighter primary fruit than the more
+    // textural Cru Beaujolais tier, so "bright" better represents the style.
     palate: { fruit: "red", body: "light", sweetness: "bone_dry", grip: "bright", age: "young" },
   },
   {
@@ -468,10 +474,10 @@ export const WINES: Wine[] = [
     producers: ["De Bortoli Villages", "Delatite", "Josef Chromy"],
     alsoTry: ["Mornington entry Pinot", "Central Otago Pinot second labels"],
     // Feb 2026 Wave E — was colliding with Beaujolais-Villages on
-    // red/light/bone_dry/soft/young. Young cool-climate Pinot's acid line
-    // is genuinely brighter than Gamay's semi-carbonic soft chew, so
-    // grip "bright" is more accurate anyway.
-    palate: { fruit: "red", body: "light", sweetness: "bone_dry", grip: "bright", age: "young" },
+    // red/light/bone_dry/soft/young. Villages is now bumped to "bright"
+    // (more accurate for primary-fruit Nouveau-adjacent style); Yarra
+    // entry Pinot stays "soft" as the more textural cool-climate red.
+    palate: { fruit: "red", body: "light", sweetness: "bone_dry", grip: "soft", age: "young" },
   },
   {
     slug: "burgundy-old-white",
@@ -568,6 +574,131 @@ export const WINES: Wine[] = [
     alsoTry: ["Rutherglen Muscat (sweeter)", "Rare Tawny (aged)"],
     palate: { fruit: "dark", body: "full", sweetness: "sweet", grip: "grippy", age: "old" },
   },
+
+  // ── Feb 2026 Wave B · Remaining AU/NZ same-variety twins ────────────────
+  // Round two of the Wave A pattern — closes the last 8 Old-World entries
+  // that would swap to unrelated varieties under home-market bias.
+
+  {
+    slug: "chenin-blanc-au",
+    variety: "Chenin Blanc",
+    wineType: "white",
+    region: "Margaret River / Canberra District",
+    country: "Australia",
+    ageWindow: "2–8 years",
+    price: "25_50",
+    richsPick: "Aus Chenin is one of the great sleeper categories — nobody sees it coming. Nick O'Leary in Canberra makes a bone-dry, textural, Vouvray-adjacent bottling under $30. McHenry Hohnen's Rocky Road down in Margaret River goes off-dry with real weight. L.A.S. Vino does a natural-wine-adjacent skin-contact version if you want to nerd out.",
+    gelsNote: "Chenin's high natural TA (7-9 g/L) transposes to warm-Aus climates when picked cool — retain acidity by early morning fruit intake and short skin contact.",
+    producers: ["Nick O'Leary (Canberra)", "McHenry Hohnen (Margaret River)", "L.A.S. Vino (Margaret River)", "Coriole (McLaren Vale)"],
+    alsoTry: ["Vouvray (Loire off-dry)", "South African Chenin (Ken Forrester)"],
+    palate: { fruit: "citrus", body: "medium", sweetness: "off_dry", grip: "bright", age: "developed" },
+  },
+
+  {
+    slug: "gamay-au-beechworth",
+    variety: "Gamay",
+    wineType: "red",
+    region: "Beechworth / Yarra Valley / Tasmania",
+    country: "Australia",
+    ageWindow: "2–5 years",
+    price: "25_50",
+    richsPick: "Sorrenberg in Beechworth has quietly made Australia's best Gamay for 30 years — semi-carbonic, bright cherry, feather tannin, a genuine Beaujolais-Villages replica at $45 with none of the freight surcharge. Bass Phillip and Sailor Seeks Horse (Tas) are the newer cool-climate expressions. Serve slightly chilled and prepare for compliments.",
+    gelsNote: "Semi-carbonic maceration preserves primary fruit + drops harsh tannin; Aus cool-climate Gamay tracks the Beaujolais phenolic curve almost exactly.",
+    producers: ["Sorrenberg (Beechworth)", "Bass Phillip (Gippsland)", "Sailor Seeks Horse (Tas)", "Chapel Hill (McLaren Vale)"],
+    alsoTry: ["Cru Beaujolais (Fleurie)", "Yarra entry Pinot Noir"],
+    palate: { fruit: "red", body: "light", sweetness: "bone_dry", grip: "soft", age: "young" },
+  },
+
+  {
+    slug: "prosecco-king-valley",
+    variety: "Prosecco (Glera)",
+    wineType: "curveball",
+    region: "King Valley",
+    country: "Australia",
+    ageWindow: "1–2 years",
+    price: "under_25",
+    richsPick: "The King Valley Italian-Australian community started planting Glera in the '90s and now makes some of the best Prosecco outside Italy. Dal Zotto and Chrismont's bottlings sit at $22-28 — pear, green apple, chalk, fine mousse. Better than most Valdobbiadene bottlings that land in Aus after freight and duty.",
+    gelsNote: "Charmat/Martinotti method — pressure-tank secondary fermentation preserves primary fruit. Aus Glera clone is directly descended from Veneto vines.",
+    producers: ["Dal Zotto (King Valley)", "Chrismont", "Pizzini", "Brown Brothers"],
+    alsoTry: ["Valdobbiadene DOCG Prosecco", "Tasmanian Vintage Sparkling"],
+    palate: { fruit: "citrus", body: "light", sweetness: "hint", grip: "bright", age: "young" },
+  },
+
+  {
+    slug: "noble-one-au",
+    variety: "Sémillon (Botrytis)",
+    wineType: "curveball",
+    region: "Riverina",
+    country: "Australia",
+    ageWindow: "8–20 years",
+    price: "50_100",
+    richsPick: "De Bortoli Noble One is Australia's answer to Sauternes and it's not close — this is one of the world's great botrytised wines full stop. Honey, apricot, saffron, marmalade, all the noble-rot magic at half the price of Château d'Yquem. Brown Brothers Patricia is the entry-level version. Buy a half-bottle, save it for a serious dessert.",
+    gelsNote: "Botrytis cinerea concentration in Riverina's morning fog / afternoon sun cycle mimics the Sauternes botrytis pattern. RS 150-200 g/L, 10-11% ABV.",
+    producers: ["De Bortoli Noble One", "Brown Brothers Patricia", "Yalumba FSE Botrytis", "Peter Lehmann Botrytis"],
+    alsoTry: ["Sauternes (Bordeaux)", "Tokaji Aszú (Hungary)"],
+    palate: { fruit: "citrus", body: "full", sweetness: "sweet", grip: "soft", age: "old" },
+  },
+
+  {
+    slug: "rose-au-dry",
+    variety: "Grenache Rosé (dry)",
+    wineType: "curveball",
+    region: "Barossa / McLaren Vale / Adelaide Hills",
+    country: "Australia",
+    ageWindow: "Current vintage only",
+    price: "25_50",
+    richsPick: "Charles Melton 'Rose of Virginia' has been Aus's benchmark dry Rosé since the 90s — pale, savoury, dry, watermelon and rose petal. Turkey Flat Rosé and Bekkers are the natural progression. Provence-style dry Rosé grown here for half the freight — drink very cold, drink young, no need to import.",
+    gelsNote: "Direct-press or short 4-8 hour maceration; minimal skin phenolic extraction gives the pale colour + dry finish.",
+    producers: ["Charles Melton Rose of Virginia (Barossa)", "Turkey Flat", "Bekkers (McLaren Vale)", "The Pawn Wine Co (Adelaide Hills)"],
+    alsoTry: ["Provence Rosé", "Tavel (heavier French style)"],
+    palate: { fruit: "red", body: "light", sweetness: "bone_dry", grip: "bright", age: "young" },
+  },
+
+  {
+    slug: "assyrtiko-au-clare",
+    variety: "Assyrtiko",
+    wineType: "white",
+    region: "Clare Valley",
+    country: "Australia",
+    ageWindow: "2–5 years",
+    price: "25_50",
+    richsPick: "Jim Barry planted Assyrtiko in the Clare Valley in 2006 — the first commercial planting outside Greece. The 'Clare Valley Assyrtiko' at ~$35 is the closest thing you'll get to a Santorini bottle without booking a flight. Lemon, chalk, sea-salt minerality, laser acid. Nobody at your dinner will have tried it. Bring it to a Clare tasting and watch people re-think what the region can do.",
+    gelsNote: "Aus Assyrtiko retains the varietal's TA 8+ g/L profile in warm-continental Clare — early morning picking + reductive winemaking preserves the marine mineral character.",
+    producers: ["Jim Barry Assyrtiko (Clare Valley)"],
+    alsoTry: ["Santorini Assyrtiko (Greek)", "Albariño (Rías Baixas)"],
+    palate: { fruit: "citrus", body: "medium", sweetness: "bone_dry", grip: "bright", age: "developed" },
+  },
+
+  {
+    slug: "montepulciano-au",
+    variety: "Montepulciano",
+    wineType: "red",
+    region: "Heathcote / McLaren Vale",
+    country: "Australia",
+    ageWindow: "2–5 years",
+    price: "under_25",
+    richsPick: "Chalmers in Heathcote is doing more for Italian varieties in Australia than any other family — their Montepulciano at $22 outperforms most $20 Chianti landing here. Coriole runs a McLaren Vale version. Dark cherry, gentle grip, honest table red. Drink with pasta, don't overthink.",
+    gelsNote: "Aus Montepulciano tracks the Abruzzo phenolic curve — medium extraction, ambient MLF softens the palate quickly.",
+    producers: ["Chalmers (Heathcote)", "Coriole (McLaren Vale)", "Vinea Marson", "S.C. Pannell"],
+    alsoTry: ["Montepulciano d'Abruzzo (Italy)", "Nero d'Avola"],
+    palate: { fruit: "red", body: "medium", sweetness: "bone_dry", grip: "soft", age: "young" },
+  },
+
+  {
+    slug: "vermouth-au",
+    variety: "Vermouth (Australian)",
+    wineType: "curveball",
+    region: "Adelaide Hills / Yarra Valley",
+    country: "Australia",
+    ageWindow: "Non-vintage, drink fresh",
+    price: "25_50",
+    richsPick: "Regal Rogue (Adelaide Hills) and Maidenii (Yarra Valley) are making Aus native-botanical vermouths that beat Italian imports on both quality and price. Wormwood + native lemon myrtle / strawberry gum / wattle seed instead of alpine botanicals — a genuinely different + genuinely Australian aromatic profile. Serve over ice with a twist. Buy Aussie.",
+    gelsNote: "Aromatised fortified wine — Aus versions typically use Verdelho or Riesling base + native botanical maceration instead of Piedmont wormwood alone.",
+    producers: ["Regal Rogue (Adelaide Hills)", "Maidenii (Yarra Valley)", "Poor Toms", "Adelaide Hills Distillery Native"],
+    alsoTry: ["Vermouth di Torino", "Punt e Mes"],
+    palate: { fruit: "savoury", body: "medium", sweetness: "off_dry", grip: "soft", age: "young" },
+    specialty: true,
+  },
 ];
 
 // ─── Scoring — deterministic, zero LLM ────────────────────────────────────
@@ -620,8 +751,12 @@ const HOME_MARKET_BONUS = 6;
 
 /** Extract a normalised variety root for cross-region matching. Handles
  *  parenthesised region qualifiers (e.g. "Gamay (Cru Beaujolais)" → "gamay")
- *  and Aus's Shiraz vs Old World's Syrah synonym. Used by the same-variety
- *  home-market preference in pickWineWithHonesty (Wave C, Feb 2026). */
+ *  and Aus's Shiraz vs Old World's Syrah synonym. Also aliases stylistic
+ *  category names (Champagne/Vintage Sparkling, Port/Vintage Fortified,
+ *  Sauternes/Botrytis, Glera/Prosecco) so the twin-search picks up
+ *  fortified/sparkling/dessert-style AU alternatives to Old-World bottlings.
+ *  Used by the same-variety home-market preference in pickWineWithHonesty
+ *  (Wave C, Feb 2026). */
 function varietyRoot(variety: string): string {
   const head = variety
     .toLowerCase()
@@ -634,6 +769,16 @@ function varietyRoot(variety: string): string {
   // catalogue, another in the Rhône. Fold both to a single key so the
   // twin-search can cross-match.
   if (head === "syrah" || head === "shiraz") return "syrah";
+  // Stylistic aliases — bottled as different variety strings but the
+  // same drinking category, so a home-market twin lookup should cross
+  // them. AU makes credible parallels for each.
+  if (head === "champagne" || head === "vintage") return "champagne-family";
+  if (head === "port") return "vintage-fortified-family";
+  if (head === "sémillon-sauvignon" || head === "sémillon") return "botrytis-family";
+  if (head === "glera" || head === "prosecco") return "prosecco-family";
+  // Grenache-based dry rosé — Provence's "Grenache-Cinsault Rosé" and AU's
+  // "Grenache Rosé (dry)" are the same drinking category. Both surface here.
+  if (variety.toLowerCase().includes("rosé") || variety.toLowerCase().includes("rose")) return "dry-rosé-family";
   return head;
 }
 const AUSTRALASIAN_COUNTRIES: ReadonlySet<string> = new Set(["Australia", "New Zealand"]);
@@ -845,7 +990,7 @@ const REGIONAL_NOTES: Record<string, Partial<Record<Region, RegionalNote>>> = {
     US: { availability: "easy", priceRange: "US$40-140", advice: "Total Wine, K&L, wine.com. Portugal isn't affected by EU-wide tariff drama the same way France/Italy are — Port has been stable. 20-year Tawny is the reliable go-to at $50-70." },
     UK: { availability: "easy", priceRange: "£25-100", advice: "Berry Bros, Fortnum & Mason, Waitrose. UK has a 300-year love affair with Port — best-priced market outside Portugal itself. Post-2023 duty on fortified wine hit sub-£20 bracket the hardest; premium Port still fair value." },
   },
-  "vermouth-torino": {
+  "vermouth-di-torino": {
     AU: { availability: "moderate", priceRange: "$45-90", advice: "Specialty wine and spirits merchants — Vintage Cellars, Prince Wine Store, cocktail-focused liquor stores (Cellarmaster). Carpano Antica, Cocchi Storico, Punt e Mes are the essentials. Not a supermarket item in AU yet." },
     NZ: { availability: "hard", priceRange: "NZ$55-110", advice: "Cocktail bars and specialist merchants (Regional Wines). Vermouth is under-represented in NZ retail; you may need to order online. Cocchi Americano is worth the hunt for cocktails." },
     US: { availability: "easy", priceRange: "US$25-60", advice: "Booming cocktail culture means Total Wine, BevMo, Whole Foods all carry premium vermouth. Carpano Antica, Cocchi, Dolin, Punt e Mes — spoiled for choice. Under $30 for excellent quality." },
@@ -874,6 +1019,144 @@ const REGIONAL_NOTES: Record<string, Partial<Record<Region, RegionalNote>>> = {
     NZ: { availability: "moderate", priceRange: "NZ$38-80", advice: "Glengarry, Caro's for the top houses. NZ also grows Chenin (small quantities — Millton Vineyards is worth seeking) as a local alternative." },
     US: { availability: "moderate", priceRange: "US$25-55", advice: "K&L, Chambers Street, Astor Wines have deep Loire selections. South African Chenin (Ken Forrester, Mullineux) is the underrated alternative — half the price, comparable quality." },
     UK: { availability: "easy", priceRange: "£18-40", advice: "Wine Society, Waitrose, Berry Bros — Loire is well-served in UK retail. Post-Brexit tariff on EU wine is nil; Chenin at 12-13% ABV benefits from the 2023 duty structure." },
+  },
+
+  // ── Feb 2026 Wave D · Regional notes for previously-fallback wines ────
+  // Fills the gaps so no wine falls back to generic "check specialist
+  // merchants" prose. Written honestly with 2026 tariff/duty context.
+
+  "chardonnay-adelaide-hills": {
+    AU: { availability: "easy", priceRange: "$28-60", advice: "Shaw + Smith M3, Ashton Hills, Tapanappa all at Dan Murphy's Premium, Prince Wine Store. This IS your local — no import surcharge, freshest bottles. Vintage Cellars runs regular Adelaide Hills specials." },
+    NZ: { availability: "easy", priceRange: "NZ$32-70", advice: "Glengarry, Fine Wine Delivery carry the top Adelaide Hills producers. Trans-Tasman trade is friction-free. NZ Chardonnay (Kumeu River, Neudorf) is the closest local alternative." },
+    US: { availability: "moderate", priceRange: "US$25-55", advice: "Old Bridge Cellars imports Shaw + Smith. Available at K&L, quality wine shops. Sonoma Coast Chardonnay is the domestic parallel at similar price." },
+    UK: { availability: "moderate", priceRange: "£22-45", advice: "Wine Society, Berry Bros carry Australian Chardonnay. Post-2023 duty at 12-13% ABV is reasonable. Chablis at £25-40 is the geographical alternative." },
+  },
+  "sauvignon-blanc-marlborough": {
+    AU: { availability: "easy", priceRange: "$18-32", advice: "Cloudy Bay, Greywacke, Dog Point everywhere from Dan Murphy's to Aldi. NZ imports flow freely — ANZCERTA means no tariff. Buy young, drink cold. Adelaide Hills Sauv Blanc (Shaw + Smith, Grosset Alea) is the domestic parallel." },
+    NZ: { availability: "easy", priceRange: "NZ$18-32", advice: "This is your backyard. Every supermarket, every wine shop. Cloudy Bay from Auckland to Invercargill. Directly from cellar door if you're passing through Marlborough — same price, fresher stock." },
+    US: { availability: "easy", priceRange: "US$14-24", advice: "Total Wine, Costco, every wine shop. Kim Crawford is the volume brand; step up to Cloudy Bay or Greywacke for actual craft. Post-tariff situation stable — NZ has never been a target." },
+    UK: { availability: "easy", priceRange: "£10-18", advice: "Marlborough Sauv is on every supermarket shelf. Waitrose, Tesco, M&S all stock the majors. Post-2023 duty at 12.5% ABV is a mid-tier hit but volumes keep pricing sharp." },
+  },
+  "shiraz-barossa": {
+    AU: { availability: "easy", priceRange: "$45-120", advice: "Torbreck, Rockford Basket Press, Standish at Prince Wine Store and Dan Murphy's Premium. Under $45 the Barossa turns into supermarket blends — jump up to $60+ for real character. Cellar door tastings are the best value if you can get there." },
+    NZ: { availability: "easy", priceRange: "NZ$50-140", advice: "Aus Shiraz crosses freely — Glengarry, Fine Wine Delivery stock the top names. Trans-Tasman trade is friction-free. Central Otago Syrah (Trinity Hill, Bilancia) is the boutique NZ alternative." },
+    US: { availability: "moderate", priceRange: "US$40-110", advice: "Old Bridge Cellars imports the majors. Available at K&L, quality wine shops. Washington State Syrah (Cayuse, Betz) is the domestic parallel — often better value." },
+    UK: { availability: "moderate", priceRange: "£30-90", advice: "Wine Society, Berry Bros, Majestic stock rotating Aus Shiraz. Post-2023 duty on 14-14.5% ABV is punishing — highest tax bracket. Northern Rhône or Priorat at similar price may drink better after tax." },
+  },
+  "grenache-mclaren-vale": {
+    AU: { availability: "easy", priceRange: "$28-55", advice: "Yangarra Old Vine, SC Pannell, Aphelion at Dan Murphy's Premium, Prince Wine Store. Under $30 the quality has jumped dramatically — this is the current Aus sweet spot for craft red. Buy on cellar door specials if you can." },
+    NZ: { availability: "moderate", priceRange: "NZ$32-65", advice: "Glengarry carries the McLaren Vale Grenache range. Growing category as NZ palates open up beyond Pinot. Trans-Tasman friction-free." },
+    US: { availability: "moderate", priceRange: "US$25-55", advice: "Old Bridge Cellars imports Yangarra. Available at K&L, Chambers Street. Southern Rhône (Châteauneuf, Gigondas) at similar price is the classical parallel." },
+    UK: { availability: "moderate", priceRange: "£22-50", advice: "Wine Society, Berry Bros. Southern Rhône Grenache at £20-40 is the closer-to-home alternative. Aus Grenache is having a UK moment but stock is patchy." },
+  },
+  "beaujolais-cru": {
+    AU: { availability: "moderate", priceRange: "$32-55", advice: "Cru Beaujolais (Morgon, Fleurie, Moulin-à-Vent) is a step up from the Villages tier — Prince Wine Store, Blackhearts & Sparrows, City Wine Shop. Marcel Lapierre, Jean Foillard, Château Thivin — natural-wine icons. Serve slightly chilled." },
+    NZ: { availability: "moderate", priceRange: "NZ$38-65", advice: "Glengarry, Regional Wines stock the top Cru Beaujolais producers. Growing category. Post-2023 EU tariffs on NZ are nil (FTA in force)." },
+    US: { availability: "moderate", priceRange: "US$25-50", advice: "K&L, Chambers Street, Astor have deep Beaujolais lists. Post-2025 EU tariff instability applies — buy on dips. Kermit Lynch import portfolio is the gold standard." },
+    UK: { availability: "easy", priceRange: "£18-38", advice: "Wine Society, Berry Bros, Majestic — Cru Beaujolais is well-served in UK retail. Post-2023 duty hit mid-tier hardest; £22-32 is the value sweet spot for the top Crus." },
+  },
+  "chianti-classico": {
+    AU: { availability: "easy", priceRange: "$28-60", advice: "Fontodi, Castello di Ama, Isole e Olena at Prince Wine Store, Vintage Cellars. Under $40 you're at Classico DOCG tier; over $60 Riserva territory. Excellent value category — some of the best mid-priced reds landing in Aus." },
+    NZ: { availability: "moderate", priceRange: "NZ$32-70", advice: "Glengarry, Caro's, Regional Wines stock the majors. Trans-Tasman + EU FTA means minimal friction on Italian wines to NZ." },
+    US: { availability: "easy", priceRange: "US$22-55", advice: "Total Wine, K&L, wine.com. Chianti Classico is a US staple — dozens of producers on shelves. Post-2021 EU tariffs lifted; pricing has normalised." },
+    UK: { availability: "easy", priceRange: "£18-45", advice: "Waitrose, M&S, Berry Bros — Chianti is a UK household name. Post-2023 duty on 13-13.5% ABV is manageable. Riserva at £30-45 is the sweet spot for structure and complexity." },
+  },
+  "champagne-vintage": {
+    AU: { availability: "moderate", priceRange: "$120-350", advice: "Roederer, Bollinger, Pol Roger vintage bottlings at Prince Wine Store, Dan Murphy's Premium. Non-vintage from $60. Aus Vintage Sparkling (House of Arras, Jansz) delivers 85% of the drinking at half the price — worth considering as your regular sparkling." },
+    NZ: { availability: "moderate", priceRange: "NZ$140-400", advice: "Glengarry, Fine Wine Delivery carry the top houses. NZ makes stellar traditional-method sparkling (Quartz Reef, No. 1 Family Estate) as an accessible alternative." },
+    US: { availability: "easy", priceRange: "US$90-280", advice: "K&L, Total Wine, wine.com — vintage Champagne is a US staple. Post-2025 EU tariff instability applies. Domestic vintage sparkling (Schramsberg, Roederer Estate CA) is the value alternative." },
+    UK: { availability: "easy", priceRange: "£75-260", advice: "Berry Bros, Wine Society, Waitrose. UK is a major Champagne market — best-priced outside France. English sparkling (Nyetimber, Gusbourne) at £45-90 is the domestic alternative at genuine competitive quality." },
+  },
+  "rose-provence": {
+    AU: { availability: "easy", priceRange: "$28-60", advice: "Whispering Angel is at every wine shop from Dan Murphy's to Aldi. Domaines Ott, Château Miraval at Prince Wine Store, Vintage Cellars. Charles Melton 'Rose of Virginia' is the equivalent-quality AU dry Rosé at half the price." },
+    NZ: { availability: "moderate", priceRange: "NZ$32-70", advice: "Glengarry, Fine Wine Delivery carry the essentials. NZ dry Rosé (Man O' War, Te Whare Ra) is growing as a local alternative." },
+    US: { availability: "easy", priceRange: "US$18-45", advice: "Whispering Angel is a US phenomenon — every retailer stocks it. Post-2021 EU tariffs lifted; pricing stable. Domestic dry Rosé (Wölffer Estate, Bonny Doon) at $18-28 is the accessible alternative." },
+    UK: { availability: "easy", priceRange: "£15-40", advice: "Waitrose, M&S, Berry Bros — Provence Rosé is a UK summer staple. Post-2023 duty on 12-13% ABV is manageable. English dry Rosé (Nyetimber, Ridgeview) is the domestic alternative worth trying." },
+  },
+  "pinot-noir-yarra-entry": {
+    AU: { availability: "easy", priceRange: "$18-25", advice: "De Bortoli Villages, Delatite, Josef Chromy all at Dan Murphy's, First Choice around $20-25. This is honest under-$25 Pinot — no gambling required anymore. Cellar door specials at Yarra Valley can drop below $18." },
+    NZ: { availability: "easy", priceRange: "NZ$22-32", advice: "AU Pinot flows freely to NZ. Glengarry stocks the range. NZ also does entry-tier Pinot brilliantly — Framingham, Ata Rangi second labels around NZ$25-35." },
+    US: { availability: "hard", priceRange: "US$18-30", advice: "Rare in US retail — entry-tier Aus wines don't ship well economically. Domestic entry Pinot from Oregon (King Estate, A to Z, Willamette Valley Vineyards) is your accessible alternative under $25." },
+    UK: { availability: "hard", priceRange: "£18-28", advice: "Wine Society occasional, otherwise rare. Post-2023 duty and freight make entry-tier Aus a hard sell in UK. Loire Pinot or Beaujolais at similar price is the closer-to-home alternative." },
+  },
+  "burgundy-old-white": {
+    AU: { availability: "hard", priceRange: "$150-450", advice: "Aged Meursault / Puligny is Prince Wine Store, Randall's, Dan Murphy's Fine Wine territory. Coche-Dury, Roulot are allocation-only — book years in advance. Aged Adelaide Hills Chardonnay from Tapanappa Tiers at $80-140 is the smart local alternative." },
+    NZ: { availability: "hard", priceRange: "NZ$180-500", advice: "Specialist merchants only — Fine Wine Delivery, Caro's. Small NZ market limits allocations. NZ premium Chardonnay (Kumeu River, Neudorf) is the accessible alternative at half the price." },
+    US: { availability: "moderate", priceRange: "US$120-380", advice: "K&L, Zachys, Chambers Street. Post-2025 EU tariff volatility hits Burgundy hardest — 2019-2021 saw 25% duties. Buy on dips. Sonoma Coast top-tier Chardonnay is the domestic parallel." },
+    UK: { availability: "moderate", priceRange: "£95-320", advice: "Berry Bros, Wine Society, Justerini & Brooks — Burgundy is a UK institution. Post-2023 duty at 13-13.5% ABV is manageable. English top-tier Chardonnay (Wiston, Gusbourne) at £45-70 is the interesting domestic alternative." },
+  },
+  "gewurztraminer-alsace": {
+    AU: { availability: "moderate", priceRange: "$45-95", advice: "Trimbach, Zind-Humbrecht, Domaine Weinbach at Prince Wine Store, Randall's. Grand Cru bottlings command $70+. AU Alpine Gewürz (Delatite, Pizzini) is the value alternative at half the price — same variety, no import surcharge." },
+    NZ: { availability: "moderate", priceRange: "NZ$50-110", advice: "Glengarry, Fine Wine Delivery stock the top houses. Central Otago and Marlborough are experimenting with Gewürz — worth checking Waipara Springs for a local alternative." },
+    US: { availability: "moderate", priceRange: "US$28-75", advice: "K&L, wine.com — Alsace Gewürz has a small but loyal US following. Post-2025 EU tariff instability applies. Domestic Gewürz from Oregon or Anderson Valley (Navarro, Handley) is the local alternative." },
+    UK: { availability: "moderate", priceRange: "£20-55", advice: "Wine Society, Berry Bros — Alsace is a UK favourite. Post-2023 duty at 13-14% ABV pushes Gewürz into the higher tax bracket. Off-dry to sweet expressions carry a bit more duty than bone-dry equivalents." },
+  },
+  "gewurztraminer-au-alpine": {
+    AU: { availability: "easy", priceRange: "$22-35", advice: "Delatite is a Dan Murphy's / First Choice staple at ~$24. Pizzini range at $28-35 across all mainstream bottle shops. Bream Creek (Tas) and Frogmore Creek are cellar-door + specialty stores. Better cellar temp on this journey than any Alsace bottle." },
+    NZ: { availability: "moderate", priceRange: "NZ$28-45", advice: "Glengarry, Fine Wine Delivery carry the top Aus Gewürz names. Trans-Tasman ANZCERTA means no tariff — pricing is competitive. NZ Waipara Springs Gewürz is the domestic alternative." },
+    US: { availability: "hard", priceRange: "US$22-40", advice: "Rare in US — Aus Gewürz is a specialty import (Old Bridge Cellars occasional). Domestic Oregon Gewürz (Navarro, Handley) is your accessible alternative at similar price and quality." },
+    UK: { availability: "hard", priceRange: "£22-40", advice: "Aus Gewürz is niche in UK retail — Wine Society occasional. Alsace at £20-35 is the standard UK option." },
+  },
+  "prosecco-superiore": {
+    AU: { availability: "moderate", priceRange: "$28-55", advice: "Actual DOCG Valdobbiadene (Nino Franco, Bisol, Ruggeri) at Prince Wine Store, Vintage Cellars — much better than the $15 servo Prosecco. AU King Valley Prosecco (Dal Zotto, Chrismont) at $22-28 is the local alternative at similar quality." },
+    NZ: { availability: "moderate", priceRange: "NZ$32-65", advice: "Glengarry, Fine Wine Delivery stock the top Valdobbiadene producers. Aus King Valley Prosecco crosses the Tasman freely as a local alternative." },
+    US: { availability: "easy", priceRange: "US$18-40", advice: "Total Wine, K&L, wine.com. Prosecco Superiore DOCG (the good stuff) is well-labelled in US retail. Post-2021 EU tariff situation stable — Italian wines re-priced normally." },
+    UK: { availability: "easy", priceRange: "£12-30", advice: "Waitrose, M&S — DOCG Prosecco is a UK favourite. Post-2023 duty on 11-12% ABV is one of the most favourable brackets — Prosecco is priced very competitively vs Champagne." },
+  },
+  "assyrtiko-santorini": {
+    AU: { availability: "moderate", priceRange: "$32-55", advice: "Sigalas, Gaia, Argyros at Prince Wine Store, Blackhearts & Sparrows. Greek wines are a growing niche in AU. AU Clare Valley Assyrtiko (Jim Barry) at ~$35 is the local alternative — the first commercial planting outside Greece." },
+    NZ: { availability: "hard", priceRange: "NZ$40-70", advice: "Regional Wines, Caro's stock rotating Greek producers. Small category. Greek imports pricier in NZ due to volumes." },
+    US: { availability: "moderate", priceRange: "US$22-45", advice: "K&L, Astor Wines, Whole Foods better locations. Greek wines have grown in US shelf space over the last 5 years. Sigalas is the accessible entry point." },
+    UK: { availability: "moderate", priceRange: "£18-40", advice: "Wine Society, Berry Bros — Greek wine has a loyal UK following. Post-2023 duty at 12-13% ABV is manageable. Sicilian white or Albariño at similar price is the closer-to-home alternative." },
+  },
+  // Wave B twin regional notes
+  "chenin-blanc-au": {
+    AU: { availability: "moderate", priceRange: "$25-45", advice: "Nick O'Leary Canberra Chenin at ~$28 through cellar door + specialty (Prince Wine Store). McHenry Hohnen Margaret River at Vintage Cellars. L.A.S. Vino allocation-based — Blackhearts & Sparrows worth checking. Better than most Loire Chenin landing here after freight." },
+    NZ: { availability: "hard", priceRange: "NZ$32-55", advice: "Aus Chenin is a small allocation category in NZ — Glengarry occasional. NZ Millton Vineyards makes a local Chenin worth seeking." },
+    US: { availability: "hard", priceRange: "US$22-42", advice: "Rare — Old Bridge Cellars imports L.A.S. Vino sporadically. South African Chenin (Ken Forrester, Mullineux) at similar price is the far more accessible parallel." },
+    UK: { availability: "hard", priceRange: "£22-45", advice: "Aus Chenin is niche in UK retail. Loire Chenin (Vouvray, Chinon Blanc) at £18-35 or SA Chenin at £12-25 are the accessible alternatives." },
+  },
+  "gamay-au-beechworth": {
+    AU: { availability: "moderate", priceRange: "$32-55", advice: "Sorrenberg is cellar-door + Prince Wine Store + City Wine Shop — allocation-based, book ahead. Bass Phillip at $40-50 through Blackhearts. Sailor Seeks Horse (Tas) is the newer expression. Genuine Beaujolais replica — no freight surcharge." },
+    NZ: { availability: "hard", priceRange: "NZ$38-70", advice: "Aus Gamay is very niche in NZ — Glengarry very occasional. NZ Pinot Noir at NZ$30-50 is the closer-to-hand cool-climate light red." },
+    US: { availability: "hard", priceRange: "US$30-55", advice: "Rare in US — specialist Australian importers only. Domestic Gamay from Willamette Valley (Brick House, Division) is your accessible parallel." },
+    UK: { availability: "hard", priceRange: "£28-55", advice: "Aus Gamay is niche in UK. Cru Beaujolais at £22-40 is the obvious closer-to-home alternative." },
+  },
+  "prosecco-king-valley": {
+    AU: { availability: "easy", priceRange: "$18-28", advice: "Dal Zotto and Chrismont are Dan Murphy's / First Choice regulars at $20-25. Brown Brothers volume brand at supermarkets under $18. Pizzini boutique at $25-30. Better than most Italian Prosecco landing after freight — and the King Valley Italian-Australian culture is worth supporting." },
+    NZ: { availability: "moderate", priceRange: "NZ$22-32", advice: "Trans-Tasman friction-free. Glengarry, Fine Wine Delivery stock the King Valley range. Solid local alternative to Italian Prosecco." },
+    US: { availability: "hard", priceRange: "US$18-32", advice: "Rare in US retail — Aus Prosecco is a specialty item. Italian Prosecco Superiore DOCG at similar price is the widely-available parallel." },
+    UK: { availability: "hard", priceRange: "£18-32", advice: "Aus Prosecco is very niche in UK — Italian Prosecco dominates. Wine Society occasional." },
+  },
+  "noble-one-au": {
+    AU: { availability: "easy", priceRange: "$45-90 (375ml)", advice: "De Bortoli Noble One at Dan Murphy's, Vintage Cellars, First Choice — around $50 for a 375ml. Brown Brothers Patricia at ~$45. This is one of the world's great botrytised wines and Australians can buy it at half the price of equivalent Sauternes." },
+    NZ: { availability: "moderate", priceRange: "NZ$55-110 (375ml)", advice: "Glengarry, Fine Wine Delivery stock De Bortoli Noble One. Trans-Tasman friction-free. NZ Framingham F-Series late-harvest Riesling is the local alternative." },
+    US: { availability: "moderate", priceRange: "US$40-85 (375ml)", advice: "Old Bridge Cellars imports Noble One — K&L, Chambers Street, quality wine shops. Domestic ice wine (Inniskillin Canada, Kiona WA) is the local alternative." },
+    UK: { availability: "moderate", priceRange: "£35-80 (375ml)", advice: "Wine Society, Berry Bros stock Noble One. Post-2023 duty on 10-11% ABV is favourable — one of the more sensibly-taxed sweet wine brackets." },
+  },
+  "rose-au-dry": {
+    AU: { availability: "easy", priceRange: "$28-45", advice: "Charles Melton Rose of Virginia at Dan Murphy's Premium, Prince Wine Store — the Aus benchmark since the '90s. Turkey Flat and Bekkers at specialty wine shops. AU dry Rosé is having its moment — great alternative to expensive Provence imports." },
+    NZ: { availability: "moderate", priceRange: "NZ$32-55", advice: "Glengarry, Fine Wine Delivery stock the top Aus Rosé names. Trans-Tasman friction-free. NZ Man O' War dry Rosé is the domestic alternative." },
+    US: { availability: "hard", priceRange: "US$25-45", advice: "Rare in US retail — Aus Rosé is a specialty import. Provence Rosé (Whispering Angel, etc.) at similar price dominates. Domestic dry Rosé (Wölffer Estate, Bonny Doon) is the accessible alternative." },
+    UK: { availability: "hard", priceRange: "£22-45", advice: "Aus dry Rosé is niche in UK — Provence dominates. Wine Society occasional. English dry Rosé from Nyetimber or Ridgeview is the domestic alternative." },
+  },
+  "assyrtiko-au-clare": {
+    AU: { availability: "moderate", priceRange: "$32-45", advice: "Jim Barry Clare Valley Assyrtiko at Prince Wine Store, Vintage Cellars, cellar door — this is Australia's ONLY commercial Assyrtiko planting outside Greece. Around $35. Novelty + quality combined." },
+    NZ: { availability: "hard", priceRange: "NZ$38-55", advice: "Very rare in NZ — Glengarry very occasional allocations. Greek Assyrtiko from Sigalas etc. at similar NZ price is the alternative." },
+    US: { availability: "hard", priceRange: "US$30-50", advice: "Rare in US — Old Bridge Cellars imports Jim Barry sporadically. Domestic Assyrtiko is basically non-existent; Greek imports (Sigalas, Gaia) at similar price are the parallel." },
+    UK: { availability: "hard", priceRange: "£25-50", advice: "Very niche in UK. Wine Society occasional. Greek Assyrtiko at £18-32 is the far more accessible option." },
+  },
+  "montepulciano-au": {
+    AU: { availability: "moderate", priceRange: "$20-32", advice: "Chalmers Heathcote at Prince Wine Store, Blackhearts around $22. Coriole McLaren Vale at Dan Murphy's around $25. S.C. Pannell at Vintage Cellars. Better than most $20 Italian Montepulciano landing here after freight." },
+    NZ: { availability: "hard", priceRange: "NZ$25-38", advice: "Aus Italian varietals cross the Tasman but volume is limited. Glengarry, Regional Wines occasional. Italian Montepulciano at NZ$22-32 is the more common alternative." },
+    US: { availability: "hard", priceRange: "US$18-35", advice: "Rare in US — Old Bridge Cellars imports Coriole occasionally. Italian Montepulciano at $14-22 is the mass-market parallel." },
+    UK: { availability: "hard", priceRange: "£20-35", advice: "Aus Montepulciano is niche in UK retail. Italian Montepulciano d'Abruzzo at £10-18 is far more accessible and comparably priced/quality." },
+  },
+  "vermouth-au": {
+    AU: { availability: "moderate", priceRange: "$45-75", advice: "Regal Rogue and Maidenii at Dan Murphy's Premium, Vintage Cellars, cocktail-focused specialists. Poor Toms and other native-botanical labels growing quickly. Better than most Italian vermouth for the same price — and you're supporting Aus native-botanical distilling." },
+    NZ: { availability: "hard", priceRange: "NZ$55-90", advice: "Regal Rogue crosses the Tasman — Regional Wines, cocktail-focused merchants. Small category in NZ but growing." },
+    US: { availability: "hard", priceRange: "US$35-70", advice: "Rare in US — Aus vermouth is a specialty import. Domestic vermouth (Ransom, Vya) from Oregon/California at similar price is the accessible parallel." },
+    UK: { availability: "hard", priceRange: "£30-60", advice: "Very niche in UK — Italian vermouth (Carpano, Cocchi) dominates. Whisky Exchange occasional stock." },
   },
   // ── Feb 2026 Wave A regional notes — AU twins ────────────────────────
   "nebbiolo-au-alpine": {

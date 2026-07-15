@@ -4,6 +4,53 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Feb 2026 — Quiz full quality pass (Waves A + B + C + D + E)
+
+Rich flagged the Gewürztraminer recommendation as broken ("we don't grow that here" false + "Riesling isn't the swap"). Root-cause audit surfaced a class of bugs: home-market swap picked highest-scoring AU/NZ wine regardless of grape identity, so Alsatian Gewürz → Clare Riesling instead of Aus Gewürz. Same failure mode latent for 17 other Old-World entries.
+
+**Fixes shipped in a single session:**
+
+- **Wave C · Algorithm root cause** — `pickWineWithHonesty` now runs a same-variety twin search first: if the true palate winner is Old-World AND an AU/NZ same-grape twin exists in budget, prefer the twin within a 5-point score tolerance. `varietyRoot()` helper folds stylistic aliases (Champagne↔Vintage Sparkling, Port↔Vintage Fortified, Sauternes↔Noble One, Glera↔Prosecco, Provence Rosé↔dry Rosé) so fortified/sparkling/dessert categories cross-match too.
+
+- **Wave A + B · 13 new AU/NZ twin wines** — full producer research verified Feb 2026: Alpine Gewürz (Delatite, Pizzini, Bream Creek); King Valley Nebbiolo (Pizzini, Luke Lambert, Vinea Marson); AU Sangiovese (Coriole, Chalmers); Rutherglen Malbec (Campbells, All Saints); Tasmanian Vintage Sparkling (House of Arras, Jansz, Deviation Road); AU Vintage Fortified (Seppeltsfield, All Saints); AU Chenin (Nick O'Leary, McHenry Hohnen, L.A.S. Vino); Beechworth Gamay (Sorrenberg, Bass Phillip); King Valley Prosecco (Dal Zotto, Chrismont); De Bortoli Noble One + Brown Brothers Patricia; AU dry Rosé (Charles Melton, Turkey Flat, Bekkers); Jim Barry Clare Assyrtiko (only commercial planting outside Greece); AU Montepulciano (Chalmers, Coriole); AU Vermouth (Regal Rogue, Maidenii).
+
+- **Wave D · 57 new regional-note entries** — AU/NZ/US/UK curated buying advice for every wine that previously fell back to generic "check specialist merchants" prose. Catalogue fallback rate: 15/28 (54%) → 0/41 (0%). `vermouth-torino` slug-key mismatch fixed (was `vermouth-torino`, WINE slug is `vermouth-di-torino`).
+
+- **Wave E · Palate collision fixes** — Grenache McLaren Vale nudged to `grip: soft` (whole-bunch tannin structure); Beaujolais Villages nudged to `grip: bright` (primary-fruit Nouveau-adjacent).
+
+- **Framing rewrite** — same-variety swaps get *"Same grape grows brilliantly here too"* narration instead of *"we're picking X instead — hits the same notes"*.
+
+**Verification:** 7 smoke-test palates each route to their correct AU same-variety twin. Two acknowledged gaps remaining (Grillo, Amarone) — no commercial Aus equivalent exists.
+
+### Feb 2026 — Design pass on `/hi/*` and `/admin/contacts`
+
+Rich called the `/hi/*` and admin/contacts pages "ugly, confused typeface" — full brand pass shipped.
+
+- `/hi/*` full rebuild — CSS design tokens throughout (theme picker adaptive), Fraunces serif for H1 + one italic accent size, Lato sans for everything else, one shared `panelStyle` (neutral card + 2px amber top-accent) replacing 3 different panel treatments, amber budget capped at 4 surfaces
+- `<AcronymTooltip>` component + canonical `acronym-glossary.ts` (12 acronyms) — Radix Popover-backed, works hover on desktop + tap on mobile + keyboard focus; dotted-underline affordance; wired on `/hi/*` compliance + AI tiles + authority strip
+- `/admin/contacts` — `sectionPanel` + `sectionEyebrow` shared consts, unified "A/B EXPERIMENTS · /HI/" section wrapping both CTA + QMS Tile stats side-by-side, verbose captions collapsed to italic one-liners; ~85% amber-surface reduction
+
+### Feb 2026 — Outreach workflow additions
+
+- `<AdminOutboundQueue>` **vCard export button** — downloads `.vcf` for AirDrop/email to phone; iOS + Android Contacts absorb it; Google Messages + WhatsApp autocomplete winemaker names (prefixed "OW ·" for easy find/purge later)
+- `<AdminOutboundQueue>` **Force toggle** on Bulk AI rewrite — red-bordered checkbox lets operator overwrite existing `sms_draft_override` values; confirmation dialog shows `⚠ FORCE mode is ON` warning
+- `refresh-cold-call.mjs` — generic CLI (`node scripts/refresh-cold-call.mjs [--event "..."] [--tone warm|brief|regional] [--force-perplexity] <slug> [<slug>...]`)
+- Server Claude system prompt tightened: banned DTC/B2B/SaaS jargon vocabulary, mandated "second brain" + "cellar door" AU-native vocabulary
+- `client/src/lib/ownology-descriptor.ts` — single source of truth for the 3-layer canonical pitch (Category descriptor · Metaphor · Category noun)
+- QMS/quality-system A/B on `/hi/*` tile summary — deterministic-per-slug variant, `qmsStats` tRPC proc, admin card mirrors CtaAbCard shape
+
+### Feb 2026 — Test infrastructure hardening
+
+- `test_feb2026_batch.py` hardcoded gate password → `os.environ["OWNOLOGY_GATE_PASSWORD"]` with module-level skip if unset
+- `is`→`==` sweep: 51 mechanical fixes across 11 test files (correctly preserving `is None` idioms)
+- 5 high-complexity tests refactored with named helpers — cyclomatic complexity 15-21 → under 10 each
+
+### Feb 2026 — Build Check fixes
+- Default prod URL corrected (was `ownology.app` — didn't resolve → now `ownology.ai`); localStorage self-heals old stored values
+- CORS header added to `/api/build-info` for cross-origin build-diffing
+- `/api/build-info-remote` server-side proxy so `/admin/build-check` works even before prod redeploys the CORS-enabled response
+
+
 ### Feb 2026 — Smoke-test value-engineering pass
 
 Rich walked through several prod pages and reported issues; consolidated Q&A into a shortlist of fixes and shipped the highest-value ones.
