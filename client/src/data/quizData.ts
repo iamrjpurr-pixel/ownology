@@ -187,10 +187,12 @@ export const WINES: Wine[] = [
     gelsNote: "Whole-bunch, ambient yeast, moderate extraction — 13.5–14% ABV is now the norm.",
     producers: ["Yangarra Old Vine", "SC Pannell", "Aphelion"],
     alsoTry: ["Southern Rhône Grenache", "Priorat"],
-    palate: { fruit: "red", body: "medium", sweetness: "bone_dry", grip: "bright", age: "developed" },
-  },
-  {
-    slug: "nebbiolo-barolo",
+    // Feb 2026 Wave E — palate signature was colliding with Pinot Noir
+    // Mornington on red/medium/bone_dry/bright/developed. Grenache's
+    // tannin is genuinely softer than Pinot's (whole-bunch stems give
+    // grip texture, not mid-palate tightness), so nudged grip to "soft"
+    // to disambiguate scoring without misrepresenting the variety.
+    palate: { fruit: "red", body: "medium", sweetness: "bone_dry", grip: "soft", age: "developed" },
     variety: "Nebbiolo (Barolo)",
     wineType: "red",
     region: "Piedmont",
@@ -465,7 +467,11 @@ export const WINES: Wine[] = [
     gelsNote: "Entry-tier fruit off cool-climate vineyards; minimal oak, short maceration, drink young.",
     producers: ["De Bortoli Villages", "Delatite", "Josef Chromy"],
     alsoTry: ["Mornington entry Pinot", "Central Otago Pinot second labels"],
-    palate: { fruit: "red", body: "light", sweetness: "bone_dry", grip: "soft", age: "young" },
+    // Feb 2026 Wave E — was colliding with Beaujolais-Villages on
+    // red/light/bone_dry/soft/young. Young cool-climate Pinot's acid line
+    // is genuinely brighter than Gamay's semi-carbonic soft chew, so
+    // grip "bright" is more accurate anyway.
+    palate: { fruit: "red", body: "light", sweetness: "bone_dry", grip: "bright", age: "young" },
   },
   {
     slug: "burgundy-old-white",
@@ -480,6 +486,87 @@ export const WINES: Wine[] = [
     producers: ["Domaine Roulot", "Coche-Dury", "François Carillon"],
     alsoTry: ["Aged Adelaide Hills Chardonnay", "Chablis Grand Cru"],
     palate: { fruit: "citrus", body: "full", sweetness: "bone_dry", grip: "bright", age: "old" },
+  },
+
+  // ── Feb 2026 Wave A · Australian same-variety twins ─────────────────────
+  // Added so the AU/NZ home-market swap can prefer a same-grape local wine
+  // over drifting to an unrelated variety. Each entry mirrors the Old-World
+  // palate signature of its twin so twin-search + score-tolerance in
+  // pickWineWithHonesty picks it cleanly. Producers verified Feb 2026.
+
+  {
+    slug: "nebbiolo-au-alpine",
+    variety: "Nebbiolo",
+    wineType: "red",
+    region: "King Valley / Alpine Victoria",
+    country: "Australia",
+    ageWindow: "5–12 years",
+    price: "25_50",
+    richsPick: "Pizzini in the King Valley started planting Nebbiolo in the '80s and now makes the definitive Aus expression. Rose petal, tar, dried cherry — the same aromatic playbook as Barolo, at half the price and 5 years earlier drinkability. Luke Lambert (Yarra) and Vinea Marson do more Piedmont-faithful versions. This is the sleeper wine of Aus varietals.",
+    gelsNote: "Aus Nebbiolo carries high natural tannin like Piedmont — extended maceration + old oak, drink cellared 5+ years for tannin polymerisation.",
+    producers: ["Pizzini (King Valley)", "Luke Lambert (Yarra)", "Vinea Marson (Heathcote)", "Sam Miranda (King Valley)"],
+    alsoTry: ["Langhe Nebbiolo (Piedmont entry)", "Aged Sangiovese"],
+    palate: { fruit: "savoury", body: "full", sweetness: "bone_dry", grip: "grippy", age: "developed" },
+  },
+
+  {
+    slug: "sangiovese-au",
+    variety: "Sangiovese",
+    wineType: "red",
+    region: "McLaren Vale / Heathcote / King Valley",
+    country: "Australia",
+    ageWindow: "3–8 years",
+    price: "25_50",
+    richsPick: "Sangio has quietly become one of Australia's most exciting Italian varieties. Coriole in McLaren Vale, Chalmers in Heathcote, Pizzini in the King Valley — all making bright, dusty, sour-cherry Aus interpretations that drink like Chianti at Chianti Classico prices. Better with tomato-based food than a lot of the Aus reds you're used to.",
+    gelsNote: "Sangio's high natural acidity survives the warmer Aus climate when picked early — 13-13.5% ABV target keeps the sour-cherry line intact.",
+    producers: ["Coriole (McLaren Vale)", "Chalmers (Heathcote)", "Pizzini (King Valley)", "Vinea Marson"],
+    alsoTry: ["Aged Chianti Classico", "Montepulciano d'Abruzzo"],
+    palate: { fruit: "red", body: "medium", sweetness: "bone_dry", grip: "grippy", age: "developed" },
+  },
+
+  {
+    slug: "malbec-au-rutherglen",
+    variety: "Malbec",
+    wineType: "red",
+    region: "Rutherglen / Wrattonbully",
+    country: "Australia",
+    ageWindow: "3–8 years",
+    price: "under_25",
+    richsPick: "Rutherglen's warm continental climate is essentially Mendoza with different soils. Campbells and Buller have made Malbec since the '60s — plush black plum, violet, forgiving tannin, but with more savoury complexity than most Argentine bottlings. All Saints does a serious single-vineyard version worth the splurge. Value's better than Mendoza once you factor in freight.",
+    gelsNote: "Rutherglen's diurnal range preserves acidity in a warm-climate Malbec — no need for altitude when the nights drop enough.",
+    producers: ["Campbells (Rutherglen)", "All Saints Estate", "Buller Wines", "Anthony Munro (Wrattonbully)"],
+    alsoTry: ["Cahors (French Malbec)", "Petit Verdot from Langhorne Creek"],
+    palate: { fruit: "dark", body: "full", sweetness: "bone_dry", grip: "soft", age: "young" },
+  },
+
+  {
+    slug: "sparkling-tasmanian-vintage",
+    variety: "Vintage Sparkling (Chardonnay-Pinot Noir)",
+    wineType: "curveball",
+    region: "Tasmania",
+    country: "Australia",
+    ageWindow: "6–15 years",
+    price: "50_100",
+    richsPick: "Tasmania is now producing the closest thing to vintage Champagne outside Champagne itself — House of Arras EJ Carr sits alongside Bollinger and Krug in blind tastings and holds its own. Cool-climate Chardonnay-Pinot base, extended lees ageing (5-10+ years), the whole traditional method playbook. At $80-140, better value than any equivalent French bottling landing here after freight.",
+    gelsNote: "Traditional method, tirage 5-10+ years, autolytic mannoprotein release drives the brioche/toast character — same chemistry as Champagne.",
+    producers: ["House of Arras (Bay of Fires)", "Jansz Tasmania", "Deviation Road (Adelaide Hills)", "Clover Hill (Tas)"],
+    alsoTry: ["Vintage Champagne", "Franciacorta Riserva"],
+    palate: { fruit: "citrus", body: "medium", sweetness: "hint", grip: "bright", age: "old" },
+  },
+
+  {
+    slug: "vintage-fortified-au",
+    variety: "Vintage Fortified (Shiraz / Grenache)",
+    wineType: "curveball",
+    region: "Barossa / Rutherglen",
+    country: "Australia",
+    ageWindow: "15–40 years",
+    price: "50_100",
+    richsPick: "Australia used to legally call these 'Vintage Port' before the EU GI rules changed that in 2010. What we now call 'Vintage Fortified' from Seppeltsfield or All Saints is chemically and stylistically indistinguishable from Douro Vintage Port — blackberry, chocolate, cedar, 20% ABV. Half the price of Portuguese, and Seppeltsfield's 100-year Para tawny library is a national treasure.",
+    gelsNote: "Grape brandy arrest at ~8-10°Brix, RS 100+ g/L, 20% ABV — same fortification chemistry as Douro Port. Aged in seasoned oak for 15+ years for premium bottlings.",
+    producers: ["Seppeltsfield Vintage Fortified", "All Saints Estate", "Chambers Rosewood", "Yalumba Museum Reserve"],
+    alsoTry: ["Rutherglen Muscat (sweeter)", "Rare Tawny (aged)"],
+    palate: { fruit: "dark", body: "full", sweetness: "sweet", grip: "grippy", age: "old" },
   },
 ];
 
@@ -530,6 +617,25 @@ const SPECIALTY_PENALTY = 5;
 // Chablis — but here's an Adelaide Hills Chard you can actually get for
 // half the freight." That honest framing is the whole point of the layer.
 const HOME_MARKET_BONUS = 6;
+
+/** Extract a normalised variety root for cross-region matching. Handles
+ *  parenthesised region qualifiers (e.g. "Gamay (Cru Beaujolais)" → "gamay")
+ *  and Aus's Shiraz vs Old World's Syrah synonym. Used by the same-variety
+ *  home-market preference in pickWineWithHonesty (Wave C, Feb 2026). */
+function varietyRoot(variety: string): string {
+  const head = variety
+    .toLowerCase()
+    .replace(/\s*\([^)]*\)/g, "")
+    .replace(/\s*-\s*/g, "-")
+    .trim()
+    .split(/[\s/,]/)
+    .filter(Boolean)[0] || variety.toLowerCase();
+  // Shiraz and Syrah are the same grape — one variety string in the AU
+  // catalogue, another in the Rhône. Fold both to a single key so the
+  // twin-search can cross-match.
+  if (head === "syrah" || head === "shiraz") return "syrah";
+  return head;
+}
 const AUSTRALASIAN_COUNTRIES: ReadonlySet<string> = new Set(["Australia", "New Zealand"]);
 function homeMarketBonus(w: Wine, region?: Region): number {
   if (!region) return 0;
@@ -769,6 +875,37 @@ const REGIONAL_NOTES: Record<string, Partial<Record<Region, RegionalNote>>> = {
     US: { availability: "moderate", priceRange: "US$25-55", advice: "K&L, Chambers Street, Astor Wines have deep Loire selections. South African Chenin (Ken Forrester, Mullineux) is the underrated alternative — half the price, comparable quality." },
     UK: { availability: "easy", priceRange: "£18-40", advice: "Wine Society, Waitrose, Berry Bros — Loire is well-served in UK retail. Post-Brexit tariff on EU wine is nil; Chenin at 12-13% ABV benefits from the 2023 duty structure." },
   },
+  // ── Feb 2026 Wave A regional notes — AU twins ────────────────────────
+  "nebbiolo-au-alpine": {
+    AU: { availability: "moderate", priceRange: "$32-55", advice: "Pizzini's flagship King Valley Nebbiolo is around $50 at Prince Wine Store, Vintage Cellars. Luke Lambert (Yarra) is allocation-based — try Blackhearts & Sparrows or the winery direct. Better value than any Langhe Nebbiolo landing in AU." },
+    NZ: { availability: "hard", priceRange: "NZ$40-70", advice: "Aus Nebbiolo trickles across the Tasman — Glengarry has occasional Pizzini allocations. Very niche category in NZ." },
+    US: { availability: "hard", priceRange: "US$28-55", advice: "Rare in US retail — Old Bridge Cellars imports Pizzini sporadically. Try direct-ship states via WineBid or Vinous. Domestic Nebbiolo (Palmina in CA, Idlewild) is the accessible alternative." },
+    UK: { availability: "hard", priceRange: "£28-55", advice: "Aus Nebbiolo is a specialist find — Wine Society, Roberson Wine occasional. Langhe Nebbiolo at £25-40 is easier and closer to source." },
+  },
+  "sangiovese-au": {
+    AU: { availability: "easy", priceRange: "$22-42", advice: "Coriole Sangiovese is a Dan Murphy's / First Choice staple around $25. Chalmers Heathcote at Prince Wine Store, Blackhearts. Pizzini range at $30-45. Better with pasta than most Aus reds you're used to." },
+    NZ: { availability: "moderate", priceRange: "NZ$28-48", advice: "Aus Italian varietals cross freely — Glengarry, Regional Wines stock Coriole and Pizzini. Growing category as NZ palates diversify." },
+    US: { availability: "hard", priceRange: "US$22-45", advice: "Rare — specialist Australian importers only (Old Bridge Cellars occasional). Californian Sangiovese (Seghesio, Ferrari-Carano) is your domestic alternative." },
+    UK: { availability: "hard", priceRange: "£22-45", advice: "Australian Italian varietals are niche in UK retail. Wine Society occasionally lists Coriole. Aged Chianti Classico at similar price point is easier to find." },
+  },
+  "malbec-au-rutherglen": {
+    AU: { availability: "moderate", priceRange: "$22-45", advice: "Campbells Malbec is around $28 at Dan Murphy's, First Choice. All Saints and Buller through winery direct or Vintage Cellars. Rutherglen wineries are also great cellar-door destinations for tastings." },
+    NZ: { availability: "moderate", priceRange: "NZ$28-50", advice: "Glengarry, Regional Wines carry the Rutherglen essentials. NZ market prefers Mendoza — Aus Malbec is a small niche but growing." },
+    US: { availability: "hard", priceRange: "US$22-42", advice: "Rare in US — Mendoza Malbec dominates. Old Bridge Cellars imports Campbells occasionally. If Argentine Malbec is your reference, this is a savoury cousin worth seeking through specialists." },
+    UK: { availability: "hard", priceRange: "£22-45", advice: "Australian Malbec is not widely stocked — Wine Society, Berry Bros occasional. Cahors (French Malbec) or Mendoza (Argentine) is the standard UK option." },
+  },
+  "sparkling-tasmanian-vintage": {
+    AU: { availability: "easy", priceRange: "$65-140", advice: "House of Arras EJ Carr around $130 at Dan Murphy's Premium, Prince Wine Store. Jansz Vintage $50-80, everywhere. Deviation Road Beltana at cellar door or specialist retailers. Half the price of equivalent Champagne after freight lands here." },
+    NZ: { availability: "moderate", priceRange: "NZ$70-160", advice: "Fine Wine Delivery, Glengarry carry the top Tas sparklings. NZ also makes excellent traditional-method (Quartz Reef, No. 1 Family Estate) as a local alternative." },
+    US: { availability: "hard", priceRange: "US$55-140", advice: "Rare in US retail — Old Bridge Cellars imports Arras and Jansz sporadically. Domestic vintage sparkling (Schramsberg, Roederer Estate) at similar price is the accessible parallel." },
+    UK: { availability: "moderate", priceRange: "£50-120", advice: "Wine Society, Berry Bros — Aus sparkling has a small but loyal UK following. English sparkling (Nyetimber, Gusbourne) is the domestic alternative at comparable quality." },
+  },
+  "vintage-fortified-au": {
+    AU: { availability: "easy", priceRange: "$50-160", advice: "Seppeltsfield Vintage Fortified is on Dan Murphy's / First Choice shelves at $60-90. The Para 100-year library and Rare Tawny are direct-from-cellar-door institutions. Half the price of vintage Douro Port for near-identical drinking." },
+    NZ: { availability: "moderate", priceRange: "NZ$60-180", advice: "Aus fortified crosses the Tasman freely. Glengarry stocks Seppeltsfield. Small NZ market for fortified means limited range — but the Aus imports are excellent value." },
+    US: { availability: "hard", priceRange: "US$45-150", advice: "Very rare in US — Old Bridge Cellars imports Seppeltsfield range for specialty retailers (K&L, Chambers Street). If you love vintage Port and can find these, buy on sight — half the equivalent Douro price." },
+    UK: { availability: "hard", priceRange: "£40-140", advice: "Berry Bros, Fortnum & Mason occasionally list. UK fortified drinking overwhelmingly favours Portuguese Port — Aus fortified is niche despite excellent quality." },
+  },
 };
 
 /** Return the regional note for a wine + region, using fallback if needed. */
@@ -801,7 +938,7 @@ export function pickWineWithHonesty(a: QuizAnswers, region?: Region): QuizResult
   const r = region ?? detectRegion();
   // Winner uses the home-market bias so the recommendation is something the
   // user can actually walk into a local bottle-o and buy.
-  const winner = pickWine(a, r);
+  let winner = pickWine(a, r);
 
   // Find the palate-only best (ignore budget AND home-market bias) — but
   // STAY inside the user's wineType so we don't narrate "your true match
@@ -813,6 +950,39 @@ export function pickWineWithHonesty(a: QuizAnswers, region?: Region): QuizResult
   const allScores = inType.map((w) => ({ w, s: scoreWine(w, a) }));
   allScores.sort((x, y) => y.s - x.s);
   const trueMatch = allScores.length > 0 ? allScores[0].w : winner;
+
+  // ── Wave C · Same-variety home-market preference ────────────────────────
+  // Feb 2026, added after we caught the quiz swapping Alsatian Gewürz to
+  // Clare Riesling instead of Aus Gewürz. If the true palate match is an
+  // Old-World wine AND we have the SAME variety grown in Aus/NZ within
+  // budget, prefer the home-market twin over any different-variety pick —
+  // even if the twin scores slightly lower on the raw palate. Users
+  // fundamentally trust "same grape, closer to home" more than "different
+  // grape, adjacent-ish flavour profile."
+  //
+  // Threshold: twin's palate score must be within TWIN_SCORE_TOLERANCE of
+  // the current winner's. Set loose (5 points) so any legitimately
+  // decent same-variety twin gets picked. If the twin is a dud, the
+  // original algorithm wins.
+  const TWIN_SCORE_TOLERANCE = 5;
+  if ((r === "AU" || r === "NZ") && !AUSTRALASIAN_COUNTRIES.has(trueMatch.country)) {
+    const trueVarietyRoot = varietyRoot(trueMatch.variety);
+    const allowedBudget = acceptableTiers(a.budget);
+    const twinCandidates = WINES
+      .filter((w) => w.wineType === a.wineType)
+      .filter((w) => AUSTRALASIAN_COUNTRIES.has(w.country))
+      .filter((w) => varietyRoot(w.variety) === trueVarietyRoot)
+      .filter((w) => allowedBudget.has(w.price));
+    if (twinCandidates.length > 0) {
+      const twinScores = twinCandidates.map((w) => ({ w, s: scoreWine(w, a, r) }));
+      twinScores.sort((x, y) => y.s - x.s);
+      const bestTwin = twinScores[0];
+      const currentWinnerScore = scoreWine(winner, a, r);
+      if (bestTwin.s + TWIN_SCORE_TOLERANCE >= currentWinnerScore) {
+        winner = bestTwin.w;
+      }
+    }
+  }
 
   const budgetConstrained =
     BUDGET_RANK[trueMatch.price] > BUDGET_RANK[a.budget] && trueMatch.slug !== winner.slug;
