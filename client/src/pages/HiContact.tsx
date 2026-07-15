@@ -191,6 +191,82 @@ export default function HiContact() {
           </p>
         )}
 
+        {/* 3-tile "What Ownology does" — sales-psych Interest block. Sits
+            after the personalised hook (rapport) and before the persona
+            bullets (personalised desire). Generic + static — same on every
+            /hi/:slug page — so a cold visitor gets a clean "here's what
+            this thing is" moment before we ask them to book. Soft-launch
+            of QMS framing per Feb 2026 positioning decision — kept
+            confined to /hi/* until we A/B against the current Home hero. */}
+        <div data-testid="hi-what-ownology-does" style={{ marginTop: "2.25rem" }}>
+          <p
+            style={{
+              fontFamily: "'Lato',sans-serif",
+              fontSize: 10,
+              letterSpacing: "0.28em",
+              color: "#b45309",
+              textTransform: "uppercase",
+              fontWeight: 700,
+              margin: "0 0 0.9rem 0",
+            }}
+          >
+            ✦ What Ownology does
+          </p>
+          <div style={{ display: "grid", gap: "0.6rem" }}>
+            <WhatTile
+              testid="hi-tile-records"
+              kicker="Records"
+              body="Every batch, every vessel — one source of truth across the vintage."
+            />
+            <WhatTile
+              testid="hi-tile-compliance"
+              kicker="Compliance"
+              body="WBS, LIP and HACCP records auto-log as you work. Audit-ready PDF in 60 seconds."
+            />
+            <WhatTile
+              testid="hi-tile-ai"
+              kicker="AI apprentice"
+              body="Owen answers with citations — grounded in AWRI, Boulton, Iland, and your own logs."
+            />
+          </div>
+          <p
+            data-testid="hi-what-summary"
+            style={{
+              marginTop: "1rem",
+              fontFamily: "'Fraunces',serif",
+              fontStyle: "italic",
+              fontSize: "0.98rem",
+              lineHeight: 1.4,
+              color: "#4b5563",
+              textAlign: "center",
+            }}
+          >
+            A winemaking QMS with an AI apprentice.
+          </p>
+        </div>
+
+        {/* Authority strip — moved up from the footer per sales-psych audit
+            (Feb 2026). Lands the "working winemaker" credential BEFORE
+            the ask, not after. Tight, muted, no logo/photo — the words
+            do the work. */}
+        <p
+          data-testid="hi-authority"
+          style={{
+            marginTop: "1.75rem",
+            padding: "0.7rem 0.9rem",
+            background: "rgba(180, 83, 9, 0.05)",
+            borderTop: "1px solid rgba(180, 83, 9, 0.25)",
+            borderBottom: "1px solid rgba(180, 83, 9, 0.25)",
+            fontFamily: "'Lato',sans-serif",
+            fontSize: "0.82rem",
+            lineHeight: 1.5,
+            color: "#374151",
+            textAlign: "center",
+          }}
+        >
+          Built by a working winemaker · Cited from 12+ industry bibles including AWRI, Boulton and Iland.
+        </p>
+
         {/* Value bullets — persona-tuned. Each persona has 5 variants (see
             /app/client/src/lib/hi-personas.ts). Starting variant is
             deterministic per contact slug (so first-time visitors see a
@@ -472,3 +548,53 @@ const btnTertiary: React.CSSProperties = {
   borderRadius: 6,
   letterSpacing: "0.01em",
 };
+
+/**
+ * WhatTile — one row of the /hi/:slug "What Ownology does" 3-tile block.
+ * Small, dense, mobile-first. Amber kicker (category noun) + serif body
+ * (concrete deliverable). No icons — the words do the work.
+ */
+function WhatTile({ kicker, body, testid }: { kicker: string; body: string; testid: string }) {
+  return (
+    <div
+      data-testid={testid}
+      style={{
+        padding: "0.75rem 0.9rem",
+        background: "#fff",
+        border: "1px solid rgba(180, 83, 9, 0.18)",
+        borderRadius: 6,
+        display: "grid",
+        gridTemplateColumns: "auto 1fr",
+        alignItems: "start",
+        gap: "0.85rem",
+      }}
+    >
+      <span
+        style={{
+          fontFamily: "'Lato',sans-serif",
+          fontSize: 10,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          color: "#b45309",
+          fontWeight: 800,
+          whiteSpace: "nowrap",
+          paddingTop: 3,
+          minWidth: 74,
+        }}
+      >
+        {kicker}
+      </span>
+      <span
+        style={{
+          fontFamily: "'Lato',sans-serif",
+          fontSize: "0.88rem",
+          lineHeight: 1.45,
+          color: "#1f2937",
+        }}
+      >
+        {body}
+      </span>
+    </div>
+  );
+}
+
