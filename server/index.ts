@@ -1243,6 +1243,35 @@ async function startServer() {
         INDEX hps_transitioned_idx (last_transitioned_at)
       )
     `);
+    // Weekly Reco Digest — Feb 2026. Subscriber list + send history for the
+    // "one Aus wine pick per week" opt-in digest. See /admin/digests/weekly-reco.
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS weekly_reco_subscribers (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        source VARCHAR(64) NOT NULL,
+        unsubscribe_token VARCHAR(64) NOT NULL UNIQUE,
+        subscribed_at BIGINT NOT NULL,
+        unsubscribed_at BIGINT,
+        region_pref VARCHAR(40),
+        last_sent_at BIGINT,
+        INDEX wrs_active_idx (unsubscribed_at),
+        INDEX wrs_source_idx (source)
+      )
+    `);
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS weekly_reco_digest_history (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        week_of VARCHAR(12) NOT NULL UNIQUE,
+        pick_slug VARCHAR(80) NOT NULL,
+        html_snapshot TEXT NOT NULL,
+        sent_at BIGINT NOT NULL,
+        recipient_count INT NOT NULL,
+        resend_batch_id VARCHAR(128),
+        INDEX wrdh_sentat_idx (sent_at),
+        INDEX wrdh_pick_idx (pick_slug)
+      )
+    `);
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS wine_producers (
         id INT PRIMARY KEY AUTO_INCREMENT,

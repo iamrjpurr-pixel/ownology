@@ -97,6 +97,8 @@ const AdminContacts = lazy(() => import("./pages/AdminContacts"));
 const AdminContactsMigrate = lazy(() => import("./pages/AdminContactsMigrate"));
 const AdminContactsPipeline = lazy(() => import("./pages/AdminContactsPipeline"));
 const AdminOutboundQueue = lazy(() => import("./pages/AdminOutboundQueue"));
+const AdminWeeklyRecoDigest = lazy(() => import("./pages/AdminWeeklyRecoDigest"));
+const UnsubscribeWeeklyReco = lazy(() => import("./pages/UnsubscribeWeeklyReco"));
 const AdminEngagement = lazy(() => import("./pages/AdminEngagement"));
 const AdminBrandAssets = lazy(() => import("./pages/AdminBrandAssets"));
 const AdminEventIngest = lazy(() => import("./pages/AdminEventIngest"));
@@ -397,6 +399,8 @@ function Router() {
       <Route path={"/hi/:slug"} component={HiContact} />
       <Route path={"/admin/contacts/pipeline"} component={AdminContactsPipeline} />
       <Route path={"/admin/contacts/outbound-queue"} component={AdminOutboundQueue} />
+      <Route path={"/admin/digests/weekly-reco"} component={AdminWeeklyRecoDigest} />
+      <Route path={"/unsubscribe/weekly-reco"} component={UnsubscribeWeeklyReco} />
       <Route path={"/admin/contacts/engagement"} component={AdminEngagement} />
       <Route path={"/admin/brand-assets"} component={AdminBrandAssets} />
       <Route path={"/admin/contacts"} component={AdminContacts} />

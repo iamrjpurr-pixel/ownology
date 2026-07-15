@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { pickWine, pickWineWithHonesty, getCurveballs, detectRegion, type QuizAnswers, type Budget, type QuizResult, type Region } from "@/data/quizData";
 import { trpc } from "@/lib/trpc";
+import { WeeklyRecoOptIn } from "@/components/WeeklyRecoOptIn";
 
 const AMBER = "var(--ow-amber)";
 const BG = "var(--ow-bg-base)";
@@ -611,6 +612,10 @@ export default function Quiz() {
                 Read the journal
               </Link>
             </div>
+
+            {/* Weekly Reco opt-in — Feb 2026. One-liner subscribe strip.
+                Fires with source="quiz_footer" for engagement attribution. */}
+            <WeeklyRecoOptIn source="quiz_footer" />
 
             {/* ── Lead capture (A5) ────────────────────────────────────────
                 Anonymous quiz completion → known lead. Deliberately soft:

@@ -2034,3 +2034,63 @@ export const healthProbeState = mysqlTable(
     index("hps_transitioned_idx").on(t.lastTransitionedAt),
   ]
 );
+
+
+// ─── Weekly Reco Digest (Feb 2026) ────────────────────────────────────────
+// Subscriber list for the "one Aus wine pick per week" digest. Sourced
+// from the quiz results footer opt-in + any admin-added invites. Unsubscribe
+// via signed token URL so no login required — an unauth-safe unsubscribe
+// endpoint hits weeklyRecoDigest.unsubscribe with the token.
+//
+// Owner previews + approves each week's draft in /admin/digests/weekly-reco
+// before sending. Send record lives in weekly_reco_digest_history so we
+// don't accidentally re-send the same pick two weeks in a row and so we
+// can rotate through the quiz catalogue over time.
+export const weeklyRecoSubscribers = mysqlTable(
+  "weekly_reco_subscribers",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    email: varchar("email", { length: 255 }).notNull().unique(),
+    // Where they signed up — "quiz_footer", "admin_added", "site_footer",
+    // etc. Useful for source-attributed engagement analytics later.
+    source: varchar("source", { length: 64 }).notNull(),
+    // Signed random token used in unsubscribe URLs (?t=<token>). Regenerated
+    // if the subscriber re-subscribes after unsubscribing.
+    unsubscribeToken: varchar("unsubscribe_token", { length: 64 }).notNull().unique(),
+    // UTC ms — when they added themselves
+    subscribedAt: bigint("subscribed_at", { mode: "number" }).notNull(),
+    // UTC ms — set on unsubscribe; NULL means still active
+    unsubscribedAt: bigint("unsubscribed_at", { mode: "number" }),
+    // Optional AU region preference — future use for regional-focus months
+    regionPref: varchar("region_pref", { length: 40 }),
+    // UTC ms — updated on every successful digest delivery to this address
+    lastSentAt: bigint("last_sent_at", { mode: "number" }),
+  },
+  (t) => [
+    index("wrs_active_idx").on(t.unsubscribedAt),
+    index("wrs_source_idx").on(t.source),
+  ]
+);
+
+export const weeklyRecoDigestHistory = mysqlTable(
+  "weekly_reco_digest_history",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    // ISO week key like "2026-W07" — one send per week guaranteed by unique idx
+    weekOf: varchar("week_of", { length: 12 }).notNull().unique(),
+    // WINES slug of the wine we featured
+    pickSlug: varchar("pick_slug", { length: 80 }).notNull(),
+    // Snapshot the HTML we actually sent, for audit
+    htmlSnapshot: text("html_snapshot").notNull(),
+    // UTC ms — when Rich hit "Send"
+    sentAt: bigint("sent_at", { mode: "number" }).notNull(),
+    // How many active subscribers received it
+    recipientCount: int("recipient_count").notNull(),
+    // Resend batch id for delivery-status traceback
+    resendBatchId: varchar("resend_batch_id", { length: 128 }),
+  },
+  (t) => [
+    index("wrdh_sentat_idx").on(t.sentAt),
+    index("wrdh_pick_idx").on(t.pickSlug),
+  ]
+);
