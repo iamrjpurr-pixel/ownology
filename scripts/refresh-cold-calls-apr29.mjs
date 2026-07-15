@@ -145,6 +145,8 @@ The operator (Rich, running BD) will paste your output straight into their phone
   (B) You've read about the winemaker as a person — their role, journey, philosophy
   (C) You understand their region and its current challenges — vintage conditions, market pressure, or a peer signal
 
+CANONICAL PITCH LANGUAGE — when you describe what Ownology IS, use this vocabulary. Do NOT invent alternative descriptors like "cellar AI", "compliance tool", "cellar app", or "winemaking software". The chosen category noun is "the winemaker's second brain" (5 words, ownable, decided). Adjacent phrase to draw from: "cellar intelligence for winemakers" — grounded in your own vintage logs. Use ONE of these framings per SMS, naturally worked in — do not stack them.
+
 RULES — absolute:
 1. Never directly quote the research verbatim.
 2. Never say "family-owned winery balancing hospitality with production" or any scraped-About-page prose.
@@ -153,7 +155,7 @@ RULES — absolute:
 5. Sign off with " — Rich".
 6. If a signal is absent from the research, DO NOT invent one. Silence beats fabrication.
 7. Tone: ${toneGuidance}
-8. Structure: acknowledgment → what you built (plainspoken, no jargon) → soft offer (link + "have a squiz" / "worth 90 sec" / "if useful").
+8. Structure: acknowledgment → what you built using the canonical pitch language above (plainspoken, no jargon) → soft offer (link + "have a squiz" / "worth 90 sec" / "if useful").
 9. If "Where we met / context" is provided, gently reference it early — this contact is a warm-ish lead, not a cold stranger.
 
 Return JSON: { "sms": string, "signalsAcknowledged": ["winery"|"winemaker"|"region"] }

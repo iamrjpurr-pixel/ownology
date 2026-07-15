@@ -16,6 +16,7 @@ import { useRoute, Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAutoCascade } from "@/hooks/useAutoCascade";
 import { HI_VARIANTS_BY_PERSONA, type HiPersona } from "@/lib/hi-personas";
+import { OWNOLOGY_SELL_STACK } from "@/lib/ownology-descriptor";
 
 const CALENDLY_FALLBACK_LABEL = "Book a 20-min demo";
 
@@ -150,7 +151,7 @@ export default function HiContact() {
               color: "#1f2937",
             }}
           >
-            <em>{(contact as { hookText?: string | null }).hookText}</em> — that&apos;s what got me thinking Ownology could actually be useful here. Cellar AI grounded in your own vintage logs, not a guess from a forum.
+            <em>{(contact as { hookText?: string | null }).hookText}</em> — that&apos;s what got me thinking Ownology could actually be useful here. {OWNOLOGY_SELL_STACK}
           </div>
         )}
 
@@ -170,7 +171,7 @@ export default function HiContact() {
               color: "#1f2937",
             }}
           >
-            Thought this might be relevant: <em>{contact.painPoint}</em>. Ownology is built to answer that kind of question grounded in your actual vintage logs, not a guess from a forum.
+            Thought this might be relevant: <em>{contact.painPoint}</em>. {OWNOLOGY_SELL_STACK}
           </div>
         )}
 
@@ -186,7 +187,7 @@ export default function HiContact() {
               color: "#374151",
             }}
           >
-            We didn&apos;t get long to chat — I&apos;ve since shipped something I reckon could save your wine making heroes real time through the vintage. 90-second look below; no signup needed.
+            We didn&apos;t get long to chat — I&apos;ve since shipped something I reckon could save your wine making heroes real time through the vintage. {OWNOLOGY_SELL_STACK} 90-second look below; no signup needed.
           </p>
         )}
 

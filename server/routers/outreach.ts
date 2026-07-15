@@ -406,6 +406,8 @@ The operator (Rich, running BD) will paste your output straight into their phone
 
 You do NOT need to hit all three every time — but the SMS must feel like the sender genuinely knows who they're texting, not like they scraped a bio and templated a line.
 
+CANONICAL PITCH LANGUAGE — when you describe what Ownology IS, use this vocabulary. Do NOT invent alternative descriptors like "cellar AI", "compliance tool", "cellar app", or "winemaking software". The chosen category noun is "the winemaker's second brain" (5 words, ownable, decided). Adjacent phrase to draw from: "cellar intelligence for winemakers" — grounded in your own vintage logs. Use ONE of these framings per SMS, naturally worked in — do not stack them.
+
 RULES — absolute:
 1. Never directly quote the research. If the research says "juggling growing demand with keeping it all feeling family-run", DO NOT write "juggling growing demand" back to them. Instead: acknowledge the tension around scale in a family business ("scaling a family label without losing the feel is a real trick").
 2. Never say "family-owned winery balancing hospitality with production" or any variation of scraped-About-page prose.
@@ -414,7 +416,7 @@ RULES — absolute:
 5. Sign off with " — Rich" (space, em-dash, space, "Rich").
 6. If a signal is absent from the research, DO NOT invent one. Silence is better than fabrication.
 7. Tone: ${toneGuidance}
-8. Structure the message as: acknowledgment (1 short sentence about them / their patch) → what you built (1 sentence, plainspoken, no jargon) → soft offer (link + "have a squiz" / "worth 90 sec" / "if useful").
+8. Structure the message as: acknowledgment (1 short sentence about them / their patch) → what you built using the canonical pitch language above (1 sentence, plainspoken, no jargon) → soft offer (link + "have a squiz" / "worth 90 sec" / "if useful").
 
 Return JSON with two fields:
   - "sms": the final SMS string (200-320 chars, includes the URL, includes " — Rich" sign-off)
