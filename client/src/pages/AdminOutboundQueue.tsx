@@ -17,6 +17,7 @@ import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import { buildEmailUrl } from "@/lib/emailCompose";
+import { exportContactsAsVcard } from "@/lib/vcardExport";
 
 const PREVIEW_BASE = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -72,6 +73,7 @@ export default function AdminOutboundQueue() {
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [bulkResult, setBulkResult] = useState<{ rewritten: number; skippedExisting: number; failed: number } | null>(null);
   const [cohortCopied, setCohortCopied] = useState(false);
+  const [vcardCount, setVcardCount] = useState<number | null>(null);
 
   async function copySms(slug: string, text: string) {
     try { await navigator.clipboard.writeText(text); setCopied((s) => ({ ...s, [slug]: "sms" })); } catch { /* no-op */ }
@@ -121,6 +123,41 @@ export default function AdminOutboundQueue() {
     } catch {
       alert("Clipboard write failed. Try again or use per-row copy buttons.");
     }
+  }
+
+  /** vCard export — downloads a .vcf for the current filtered cohort.
+   *  Includes anyone with a mobile OR an email (unlike the TSV copy which
+   *  is SMS-only). AirDrop / Gmail the file to your phone → tap → iOS /
+   *  Android Contacts absorb it → Google Messages + WhatsApp autocomplete
+   *  the winemaker names when you start typing. */
+  function exportCohortVcard() {
+    const routable = filtered.filter((c) =>
+      (c.mobileAu && c.mobileAu.trim().length > 0) ||
+      Boolean((c as { email?: string | null }).email),
+    );
+    if (routable.length === 0) {
+      alert("No routable contacts in this cohort (need mobile or email).");
+      return;
+    }
+    const count = exportContactsAsVcard(
+      routable.map((c) => ({
+        firstName: c.firstName,
+        lastName: c.lastName,
+        winery: c.winery,
+        mobileAu: c.mobileAu,
+        email: (c as { email?: string | null }).email ?? null,
+        slug: c.slug,
+        region: (c as { region?: string | null }).region ?? null,
+        event: (c as { event?: string | null }).event ?? null,
+        hookText: c.hookText,
+        painPoint: c.painPoint,
+      })),
+      {
+        filenameHint: regionFilter === "all" ? "queue" : regionFilter,
+      },
+    );
+    setVcardCount(count);
+    setTimeout(() => setVcardCount(null), 3500);
   }
 
   const queue = data?.queue ?? [];
@@ -241,10 +278,10 @@ export default function AdminOutboundQueue() {
         }}
       >
         <span style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "0.95rem", color: "var(--ow-text-hi)" }}>
-          📋 Copy cohort to Messages
+          📋 Send to your phone
         </span>
         <span style={{ fontSize: "0.78rem", color: "var(--ow-text-mid)", flex: 1, minWidth: 240 }}>
-          Grab a TSV blob of Name / Mobile / SMS for all {filtered.filter((c) => c.mobileAu).length} SMS-ready contacts in this filter. Paste into Messages (Mac/iOS) or a spreadsheet.
+          <strong>Copy TSV</strong> for iMessage / spreadsheet paste. <strong>Export vCard</strong> to import all contacts into your phone (Android + iOS) so Google Messages + WhatsApp autocomplete the names.
         </span>
         <button
           data-testid="cohort-copy-btn"
@@ -263,6 +300,27 @@ export default function AdminOutboundQueue() {
           }}
         >
           {cohortCopied ? "✓ Copied — paste into Messages" : `Copy ${filtered.filter((c) => c.mobileAu).length} SMSes as TSV`}
+        </button>
+        <button
+          data-testid="cohort-vcard-btn"
+          onClick={exportCohortVcard}
+          disabled={filtered.length === 0}
+          title="Download a .vcf you can AirDrop / email to your phone. iOS + Android Contacts absorb it; Google Messages + WhatsApp autocomplete winemaker names when you start typing."
+          style={{
+            padding: "5px 14px",
+            background: vcardCount !== null ? "#16a34a" : "transparent",
+            color: vcardCount !== null ? "oklch(0.10 0.008 60)" : "var(--ow-text-hi)",
+            border: "1px solid var(--ow-border)",
+            borderRadius: 3,
+            fontSize: "0.78rem",
+            fontWeight: 600,
+            cursor: filtered.length === 0 ? "not-allowed" : "pointer",
+            opacity: filtered.length === 0 ? 0.5 : 1,
+          }}
+        >
+          {vcardCount !== null
+            ? `✓ ${vcardCount} contacts exported`
+            : `Export ${filtered.filter((c) => c.mobileAu || (c as { email?: string | null }).email).length} as vCard`}
         </button>
       </div>
 
