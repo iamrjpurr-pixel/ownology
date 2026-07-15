@@ -345,6 +345,31 @@ export const WINES: Wine[] = [
     palate: { fruit: "citrus", body: "full", sweetness: "off_dry", grip: "soft", age: "developed" },
   },
   {
+    // Feb 2026 — Australian Gewürz added so the home-market swap picks a
+    // like-for-like variety instead of jumping to Riesling. Riesling shares
+    // "aromatic white" tag with Gewürz but LACKS the cis-rose-oxide marker
+    // (the lychee/rose signature). Palate tags mirror the Alsace entry
+    // exactly so scoring is identical — the AU/NZ home-market bonus in
+    // pickWine() then breaks the tie in this variety's favour.
+    //
+    // Producers verified (Feb 2026): Delatite in Mansfield VIC has been
+    // making the Aus benchmark since the '70s; Pizzini in King Valley
+    // does an aromatic style; Bream Creek + Frogmore in Tas run cool-
+    // climate versions with elevated rose-oxide expression.
+    slug: "gewurztraminer-au-alpine",
+    variety: "Gewürztraminer",
+    wineType: "white",
+    region: "Alpine Valleys / King Valley / Tasmania",
+    country: "Australia",
+    ageWindow: "1–5 years",
+    price: "under_25",
+    richsPick: "The Aus Gewürz nobody talks about. Delatite has made the definitive bottling since the '70s — Mansfield alpine site, cool nights preserving the rose oxide. Pizzini does a King Valley style, Bream Creek runs the Tassie cool-climate version. Half the price of Alsace, better cellar temp between here and your bottle-o, no freight-and-tariff surcharge.",
+    gelsNote: "Same cis-rose-oxide + terpene profile as Alsace when cool-fermented (14-16°C). Naturally low acid — many producers block MLF to keep the aromatic lift; AWRI aromatic-white protocols apply directly.",
+    producers: ["Delatite (VIC alpine)", "Pizzini (King Valley)", "Bream Creek (Tas)", "Ashton Hills (Adelaide Hills)", "Frogmore Creek (Tas)"],
+    alsoTry: ["Pinot Gris (Mornington / Tas)", "Viognier (Adelaide Hills / Yarra)"],
+    palate: { fruit: "citrus", body: "full", sweetness: "off_dry", grip: "soft", age: "developed" },
+  },
+  {
     slug: "port-vintage",
     variety: "Port (Vintage)",
     wineType: "curveball",
@@ -822,8 +847,19 @@ export function pickWineWithHonesty(a: QuizAnswers, region?: Region): QuizResult
     }
     if (homeMarketSwap && !budgetConstrained && !regionallyRare) {
       const homeName = r === "AU" ? "Australia" : "New Zealand";
-      parts.push(`It's Old World though — freight, tariffs, and cellar temp between there and here all add up.`);
-      parts.push(`So we're picking **${winner.variety}** from ${winner.region} for you instead — a ${homeName}-grown wine that hits the same notes and you can actually get your hands on this week.`);
+      const homeArticle = r === "AU" ? "an Australia" : "a New Zealand";
+      const sameVariety = trueMatch.variety === winner.variety;
+      if (sameVariety) {
+        // Same-variety home-market swap — Feb 2026, added when we
+        // learned the quiz was jumping from Alsatian Gewürz to Clare
+        // Riesling instead of Aus Gewürz. Now the copy honours the
+        // "same variety, grown here" story properly.
+        parts.push(`Same grape grows brilliantly here too — freight, tariffs, and cellar temp between there and ${homeName} all add up on the Old World bottle.`);
+        parts.push(`So we're picking a ${winner.variety} from **${winner.region}** for you instead — ${homeArticle}-grown version of exactly the same variety, no import surcharge.`);
+      } else {
+        parts.push(`It's Old World though — freight, tariffs, and cellar temp between there and here all add up.`);
+        parts.push(`So we're picking **${winner.variety}** from ${winner.region} for you instead — ${homeArticle}-grown wine that hits the same notes and you can actually get your hands on this week.`);
+      }
     } else {
       parts.push(`So we're picking **${winner.variety}** for you instead — hits most of your marks at your budget.`);
     }
