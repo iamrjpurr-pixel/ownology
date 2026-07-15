@@ -117,6 +117,20 @@ function pickCtaVariant(slug: string): "book" | "reply" {
   return h % 2 === 0 ? "book" : "reply";
 }
 
+/** QMS-framing A/B test on /hi/:slug 3-tile block. Deterministic per slug,
+ *  and INDEPENDENT of pickCtaVariant (uses only odd-indexed characters +
+ *  a shift) so the two experiments don't confound each other.
+ *    - "qms"            → "A winemaking QMS with an AI apprentice."
+ *    - "quality-system" → "A winemaking quality system with an AI apprentice."
+ *  Feb 2026 soft launch — QMS is the sharper category noun but risks reading
+ *  as corporate jargon on a Halliday-Young-Gun audience. Spelt-out version
+ *  is the plain-English hedge. Kill the loser after ~1 week. */
+function pickQmsVariant(slug: string): "qms" | "quality-system" {
+  let h = 0;
+  for (let i = 1; i < slug.length; i += 2) h = (h * 17 + slug.charCodeAt(i)) | 0;
+  return Math.abs(h) % 2 === 0 ? "qms" : "quality-system";
+}
+
 /** Build the `sms:` href that pre-fills the operator's number with the
  *  prospect's identity. iOS and Android both support `sms:+number?body=...`.
  *  Returns null if no inbound number configured. */
@@ -552,6 +566,7 @@ export const outreachRouter = router({
       const sampleVintageLogUrl = `/sample-vintage-log?variant=${variant}&from=sms-${encodeURIComponent(row.slug)}`;
       const crushVariant = pickCrushVariant({ winery: row.winery, event: row.event });
       const ctaVariant = pickCtaVariant(row.slug);
+      const qmsVariant = pickQmsVariant(row.slug);
       const smsReplyHref = ctaVariant === "reply"
         ? buildSmsReplyHref({ firstName: row.firstName, winery: row.winery })
         : null;
@@ -566,6 +581,7 @@ export const outreachRouter = router({
         sampleVintageLogVariant: variant,
         crushVariant,
         ctaVariant,
+        qmsVariant,
         smsReplyHref,
         waHref,
       };
@@ -718,6 +734,43 @@ export const outreachRouter = router({
     }
     const enabled = !!process.env.SMS_INBOUND_NUMBER?.trim();
     return { enabled, buckets: Object.values(buckets) };
+  }),
+
+  /** OWNER — A/B conversion stats by QMS-tile variant (Feb 2026). Same
+   *  attribution model as ctaStats: variant is a deterministic function
+   *  of the slug so historical clicks bucket cleanly without needing
+   *  per-row storage. Kill the loser after ~1 week (or when confidence
+   *  hits an acceptable threshold given the sample size). */
+  qmsStats: ownerProcedure.query(async () => {
+    const rows = await db
+      .select({
+        slug: schema.outreachContacts.slug,
+        status: schema.outreachContacts.status,
+        firstViewedAt: schema.outreachContacts.firstViewedAt,
+        ctaClickedAt: schema.outreachContacts.ctaClickedAt,
+        demoBookedAt: schema.outreachContacts.demoBookedAt,
+      })
+      .from(schema.outreachContacts);
+    type QmsBucket = {
+      variant: "qms" | "quality-system";
+      total: number;
+      viewed: number;
+      clicked: number;
+      booked: number;
+    };
+    const buckets: Record<"qms" | "quality-system", QmsBucket> = {
+      "qms":            { variant: "qms",            total: 0, viewed: 0, clicked: 0, booked: 0 },
+      "quality-system": { variant: "quality-system", total: 0, viewed: 0, clicked: 0, booked: 0 },
+    };
+    for (const r of rows) {
+      if (r.status === "sales" || r.status === "skip") continue; // exclude noise
+      const v = pickQmsVariant(r.slug);
+      buckets[v].total++;
+      if (r.firstViewedAt) buckets[v].viewed++;
+      if (r.ctaClickedAt) buckets[v].clicked++;
+      if (r.demoBookedAt) buckets[v].booked++;
+    }
+    return { buckets: Object.values(buckets) };
   }),
 
   /** OWNER — list all contacts with their engagement state. */

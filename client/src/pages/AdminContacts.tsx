@@ -932,6 +932,10 @@ export default function AdminContacts() {
       {/* A/B CTA stats — book demo vs reply RED */}
       <CtaAbCard />
 
+      {/* A/B tile-summary stats — "QMS" vs "quality system" spelt out. Soft
+          launch on /hi/:slug (Feb 2026). Kill the loser in ~1 week. */}
+      <QmsAbCard />
+
       {/* Triage filter chips + sort selector */}
       <div className="flex flex-wrap items-center gap-2 mb-6" data-testid="status-filter-bar">
         <FilterChip
@@ -3367,6 +3371,83 @@ function CtaAbCard() {
                 </span>
               </div>
               <div style={{ display: "flex", gap: 16, marginTop: 8, fontFamily: "'Lato',sans-serif", fontSize: "0.78rem" }}>
+                <span style={{ color: "var(--ow-text-mid)" }}>
+                  Viewed <strong style={{ color: "var(--ow-text-hi)" }}>{b.viewed}</strong> · {pct(b.viewed, b.total)}
+                </span>
+                <span style={{ color: "var(--ow-text-mid)" }}>
+                  Clicked <strong style={{ color: "var(--ow-amber)" }}>{b.clicked}</strong> · {pct(b.clicked, b.viewed)}
+                </span>
+                <span style={{ color: "var(--ow-text-mid)" }}>
+                  Booked <strong style={{ color: "#059669" }}>{b.booked}</strong> · {pct(b.booked, b.total)}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+
+/**
+ * QmsAbCard — /hi/:slug tile-summary A/B card. Mirrors CtaAbCard's shape
+ * so both experiments live side by side. Deterministic-per-slug variant
+ * assignment; conversion attribution flows through the same firstViewedAt
+ * / ctaClickedAt / demoBookedAt fields.
+ */
+function QmsAbCard() {
+  const { data, isLoading } = trpc.outreach.qmsStats.useQuery();
+  if (isLoading || !data) return null;
+  const [qmsB, qsB] = [
+    data.buckets.find((b) => b.variant === "qms"),
+    data.buckets.find((b) => b.variant === "quality-system"),
+  ];
+  const pct = (n: number, d: number) => (d > 0 ? `${Math.round((n / d) * 100)}%` : "—");
+
+  return (
+    <div
+      className="mb-6 rounded-md p-4"
+      data-testid="qms-ab-card"
+      style={{
+        background: "var(--ow-bg-card)",
+        border: "1px solid var(--ow-border)",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
+        <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ow-amber)", fontWeight: 700, margin: 0 }}>
+          A/B test · &quot;What Ownology does&quot; tile on /hi/
+        </p>
+        <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "var(--ow-text-lo)", margin: 0 }}>
+          Independent of CTA variant
+        </p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {[qmsB, qsB].map((b) => {
+          if (!b) return null;
+          const label = b.variant === "qms"
+            ? "A winemaking QMS with an AI apprentice."
+            : "A winemaking quality system with an AI apprentice.";
+          return (
+            <div
+              key={b.variant}
+              data-testid={`qms-variant-${b.variant}`}
+              style={{
+                background: "var(--ow-bg-base)",
+                border: `1px solid ${b.variant === "qms" ? "color-mix(in oklch, var(--ow-amber) 40%, transparent)" : "var(--ow-border)"}`,
+                padding: "0.9rem 1rem",
+                borderRadius: 6,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                <span style={{ fontFamily: "'Fraunces',serif", fontStyle: "italic", color: "var(--ow-text-hi)", fontSize: "0.88rem", lineHeight: 1.3 }}>
+                  &ldquo;{label}&rdquo;
+                </span>
+                <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.72rem", color: "var(--ow-text-lo)", flexShrink: 0 }}>
+                  {b.total} prospects
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: 16, marginTop: 8, fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", flexWrap: "wrap" }}>
                 <span style={{ color: "var(--ow-text-mid)" }}>
                   Viewed <strong style={{ color: "var(--ow-text-hi)" }}>{b.viewed}</strong> · {pct(b.viewed, b.total)}
                 </span>

@@ -73,6 +73,16 @@ export default function HiContact() {
   const ctaVariant: "book" | "reply" = contact.ctaVariant ?? "book";
   const smsReplyHref: string | null = contact.smsReplyHref ?? null;
   const waHref: string | null = (contact as { waHref?: string | null }).waHref ?? null;
+  // A/B variant for the "What Ownology does" summary line — soft-launch
+  // of QMS framing (Feb 2026). "qms" is the punchy 3-letter category;
+  // "quality-system" is the plain-English hedge for non-corporate readers.
+  // Deterministic per slug, independent of ctaVariant (different hash).
+  const qmsVariant: "qms" | "quality-system" =
+    (contact as { qmsVariant?: "qms" | "quality-system" | null }).qmsVariant ?? "qms";
+  const qmsSummary =
+    qmsVariant === "qms"
+      ? "A winemaking QMS with an AI apprentice."
+      : "A winemaking quality system with an AI apprentice.";
 
   function logCtaClick() {
     if (contact?.slug) markCtaClicked.mutate({ slug: contact.slug });
@@ -198,7 +208,11 @@ export default function HiContact() {
             this thing is" moment before we ask them to book. Soft-launch
             of QMS framing per Feb 2026 positioning decision — kept
             confined to /hi/* until we A/B against the current Home hero. */}
-        <div data-testid="hi-what-ownology-does" style={{ marginTop: "2.25rem" }}>
+        <div
+          data-testid="hi-what-ownology-does"
+          data-qms-variant={qmsVariant}
+          style={{ marginTop: "2.25rem" }}
+        >
           <p
             style={{
               fontFamily: "'Lato',sans-serif",
@@ -241,7 +255,7 @@ export default function HiContact() {
               textAlign: "center",
             }}
           >
-            A winemaking QMS with an AI apprentice.
+            {qmsSummary}
           </p>
         </div>
 
