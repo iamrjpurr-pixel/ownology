@@ -56,7 +56,7 @@ class TestLogView:
         resp = trpc_mutation("pricing.logView", {"source": "free-paused"})
         assert resp["status"] == 200, resp
         d = data_of(resp)
-        assert d["ok"] is True
+        assert d["ok"] == True
         assert d["source"] == "free-paused"
 
     def test_log_view_normalisation_trim_and_lowercase(self):

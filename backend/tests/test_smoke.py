@@ -53,7 +53,7 @@ def test_gate_wrong_password_returns_401():
         timeout=5,
     )
     assert r.status_code == 401
-    assert r.json()["ok"] is False
+    assert r.json()["ok"] == False
 
 
 def test_gate_correct_password_sets_cookie():
@@ -63,7 +63,7 @@ def test_gate_correct_password_sets_cookie():
         timeout=5,
     )
     assert r.status_code == 200
-    assert r.json()["ok"] is True
+    assert r.json()["ok"] == True
     assert "ow_gate" in r.cookies, "ow_gate cookie must be set"
 
 
@@ -71,7 +71,7 @@ def test_gate_status_reflects_cookie():
     s = requests.Session()
     s.post(f"{API_URL}/api/gate/verify", json={"password": _env_password()}, timeout=5)
     r = s.get(f"{API_URL}/api/gate/status", timeout=5)
-    assert r.json()["unlocked"] is True
+    assert r.json()["unlocked"] == True
 
 
 def test_trpc_quiz_stats_is_reachable():
@@ -131,7 +131,7 @@ def test_quiz_capture_lead_accepts_valid_payload():
         timeout=5,
     )
     assert r.status_code == 200
-    assert r.json()["result"]["data"]["json"]["ok"] is True
+    assert r.json()["result"]["data"]["json"]["ok"] == True
 
 
 def test_lip_audit_pdf_requires_auth():
@@ -172,5 +172,5 @@ def test_tutor_sandbox_ask_returns_grounded_answer():
     )
     assert r.status_code == 200
     body = r.json()["result"]["data"]["json"]
-    assert body["ok"] is True
+    assert body["ok"] == True
     assert len(body["answer"]) > 30

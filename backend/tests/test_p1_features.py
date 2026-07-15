@@ -44,7 +44,7 @@ class TestDailyAlertEmailCron:
         r = session.get(f"{BASE_URL}/api/scheduled/daily-alert-email?dryRun=1", timeout=30)
         assert r.status_code == 200, r.text
         body = r.json()
-        assert body["dryRun"] is True
+        assert body["dryRun"] == True
         assert body["totals"]["dryRun"] >= 1
         assert body["totals"]["sent"] == 0  # dry-run must not send
         assert body["totals"]["errors"] == 0
@@ -65,7 +65,7 @@ class TestDailyAlertEmailCron:
         r = session.get(f"{BASE_URL}/api/scheduled/daily-alert-email", timeout=60)
         assert r.status_code == 200, r.text
         body = r.json()
-        assert body["dryRun"] is False
+        assert body["dryRun"] == False
         sent_rows = [x for x in body["results"] if x["status"] == "sent"]
         err_rows = [x for x in body["results"] if x["status"] == "error"]
         if not sent_rows and err_rows:
@@ -87,7 +87,7 @@ class TestAdminResetFreeRunQuota:
         r = _trpc_mut(session, "admin.resetFreeRunQuota", {"json": {}})
         assert r.status_code == 200, r.text
         data = r.json()["result"]["data"]["json"]
-        assert data["ok"] is True
+        assert data["ok"] == True
         assert data["scope"] == "all"
         assert re.match(r"^\d{4}-\d{2}-\d{2}$", data["dateKey"])
 
@@ -95,7 +95,7 @@ class TestAdminResetFreeRunQuota:
         r = _trpc_mut(session, "admin.resetFreeRunQuota", {"json": {"userId": 1}})
         assert r.status_code == 200, r.text
         data = r.json()["result"]["data"]["json"]
-        assert data["ok"] is True
+        assert data["ok"] == True
         assert data["scope"] == "user"
         assert data["userId"] == 1
         assert re.match(r"^\d{4}-\d{2}-\d{2}$", data["dateKey"])

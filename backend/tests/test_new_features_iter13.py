@@ -55,7 +55,7 @@ class TestLogConversion:
         resp = trpc_mutation("pricing.logConversion", {"source": "free-paused"})
         assert resp["status"] == 200, resp
         d = data_of(resp)
-        assert d["ok"] is True, d
+        assert d["ok"] == True, d
         assert d["source"] == "free-paused:converted", d
 
     def test_normalisation_lowercase_and_punctuation(self):
@@ -162,7 +162,7 @@ class TestLogViewRegression:
         r = trpc_mutation("pricing.logView", {"source": tag})
         assert r["status"] == 200, r
         d = data_of(r)
-        assert d["ok"] is True
+        assert d["ok"] == True
         # source field NOT suffixed with :converted
         assert ":converted" not in d["source"], d
         time.sleep(0.3)

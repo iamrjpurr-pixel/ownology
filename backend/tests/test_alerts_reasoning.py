@@ -52,6 +52,32 @@ def _extract_data(resp_json):
 
 SEVERITY_RANK = {"high": 0, "medium": 1, "low": 2}
 VALID_KINDS = {"dap_due", "high_temp", "stuck_ferment", "ready_to_rack", "tank_quiet"}
+_ALERT_REQUIRED_FIELDS = ("kind", "severity", "tankName", "variety", "title", "detail", "action")
+
+
+def _extract_new_id_from_add_response(data):
+    """Pull the created row's id out of vintageLog.add's response. Backend
+    sometimes returns {id}, sometimes {success:true} nested one level — fall
+    back to scanning nested dicts before giving up. Shared by both the
+    round-trip and tutor-surfacing tests."""
+    if not isinstance(data, dict):
+        return None
+    if "id" in data:
+        return data["id"]
+    for v in data.values():
+        if isinstance(v, dict) and "id" in v:
+            return v["id"]
+    return None
+
+
+def _assert_alert_shape(alert, index):
+    """Validate one alert dict has all required fields and known enum values.
+    Extracted so the parent test stays under complexity 10 and reads
+    top-to-bottom: fetch → shape-check → severity-check → variety-check."""
+    for field in _ALERT_REQUIRED_FIELDS:
+        assert field in alert, f"alert[{index}] missing '{field}': {alert}"
+    assert alert["kind"] in VALID_KINDS, f"alert[{index}] invalid kind: {alert['kind']}"
+    assert alert["severity"] in SEVERITY_RANK, f"alert[{index}] invalid severity: {alert['severity']}"
 
 
 # ---------------------------------------------------------------------------
@@ -68,12 +94,8 @@ class TestAlertsEngine:
         assert isinstance(alerts, list), f"alerts is not a list: {type(alerts)}"
         assert len(alerts) >= 4, f"Expected >=4 alerts, got {len(alerts)}: {alerts}"
 
-        required_fields = ("kind", "severity", "tankName", "variety", "title", "detail", "action")
         for i, a in enumerate(alerts):
-            for f in required_fields:
-                assert f in a, f"alert[{i}] missing '{f}': {a}"
-            assert a["kind"] in VALID_KINDS, f"alert[{i}] invalid kind: {a['kind']}"
-            assert a["severity"] in SEVERITY_RANK, f"alert[{i}] invalid severity: {a['severity']}"
+            _assert_alert_shape(a, i)
 
         # Must have at least one HIGH severity alert
         high = [a for a in alerts if a["severity"] == "high"]
@@ -107,6 +129,34 @@ class TestReasoningRoundTrip:
     created_id = None
     unique_note = None
 
+    @staticmethod
+    def _extract_new_id(add_response_data):
+        return _extract_new_id_from_add_response(add_response_data)
+
+    @staticmethod
+    def _find_entry_in_list(entries, new_id, unique_note):
+        """Locate the just-added row in vintageLog.list — by id if we have
+        one, otherwise by unique noteText (which is always stable)."""
+        if new_id:
+            match = next((e for e in entries if e.get("id") == new_id), None)
+            if match is not None:
+                return match
+        return next((e for e in entries if e.get("noteText") == unique_note), None)
+
+    @staticmethod
+    def _parse_details_json(match):
+        """detailsJson can serialise as either str or dict depending on the
+        client. Normalise both to (parsed_dict, searchable_string)."""
+        dj = match.get("detailsJson") or match.get("details")
+        if isinstance(dj, str):
+            try:
+                dj_obj = json.loads(dj)
+            except json.JSONDecodeError:
+                dj_obj = {}
+            return dj_obj, dj
+        dj_obj = dj or {}
+        return dj_obj, json.dumps(dj_obj)
+
     def test_add_entry_with_reasoning_and_verify_via_list(self, api_client):
         # Use a unique noteText so we can identify the entry even when add()
         # only returns {success:true} (no id) — a minor backend deviation.
@@ -130,45 +180,26 @@ class TestReasoningRoundTrip:
         assert resp.status_code == 200, f"add failed: HTTP {resp.status_code} {resp.text[:400]}"
 
         data = _extract_data(resp.json())
-        # Response shape may vary; pull id if present, otherwise look up by noteText
-        new_id = data.get("id") if isinstance(data, dict) else None
-        if not new_id and isinstance(data, dict):
-            for v in data.values():
-                if isinstance(v, dict) and "id" in v:
-                    new_id = v["id"]
-                    break
+        new_id = self._extract_new_id(data)
 
         # Now GET list and confirm entry exists (lookup by id OR unique noteText)
         list_resp = _trpc_get(api_client, "vintageLog.list", {})
         assert list_resp.status_code == 200
         entries = _extract_data(list_resp.json())
-        match = None
-        if new_id:
-            match = next((e for e in entries if e.get("id") == new_id), None)
-        if match is None:
-            match = next((e for e in entries if e.get("noteText") == unique), None)
+        match = self._find_entry_in_list(entries, new_id, unique)
         assert match is not None, (
             f"New entry not found in vintageLog.list. add response={data}, noteText={unique}"
         )
         TestReasoningRoundTrip.created_id = match.get("id")
 
         # detailsJson can be a string or dict depending on serialization
-        dj = match.get("detailsJson") or match.get("details")
-        if isinstance(dj, str):
-            try:
-                dj_obj = json.loads(dj)
-            except json.JSONDecodeError:
-                dj_obj = {}
-            haystack_str = dj
-        else:
-            dj_obj = dj or {}
-            haystack_str = json.dumps(dj_obj)
+        dj_obj, haystack_str = self._parse_details_json(match)
 
         assert "reasoning" in haystack_str or "reasoning" in dj_obj, (
-            f"reasoning key missing in detailsJson: {dj}"
+            f"reasoning key missing in detailsJson: {match.get('detailsJson') or match.get('details')}"
         )
         assert self.REASONING_TEXT in haystack_str, (
-            f"Reasoning text not preserved. Got: {dj}"
+            f"Reasoning text not preserved. Got: {haystack_str}"
         )
 
     def test_cleanup_delete_test_entry(self, api_client):
@@ -209,16 +240,19 @@ class TestTutorSurfaceReasoning:
         }
         add = _trpc_post(api_client, "vintageLog.add", seed_payload, timeout=30)
         assert add.status_code == 200, add.text[:300]
-        d = _extract_data(add.json())
-        new_id = d.get("id") if isinstance(d, dict) else None
-        if not new_id and isinstance(d, dict):
-            for v in d.values():
-                if isinstance(v, dict) and "id" in v:
-                    new_id = v["id"]
-                    break
-        TestTutorSurfaceReasoning.seeded_id = new_id
+        TestTutorSurfaceReasoning.seeded_id = _extract_new_id_from_add_response(
+            _extract_data(add.json())
+        )
 
         # Ask tutor
+        answer = self._ask_tutor_about_tank(api_client)
+        self._assert_tutor_surfaced_reasoning(answer)
+
+        print("\n=== TUTOR REASONING ANSWER (truncated) ===")
+        print(answer[:1000])
+        print("=== /ANSWER ===\n")
+
+    def _ask_tutor_about_tank(self, api_client):
         ask = _trpc_post(
             api_client,
             "tutor.ask",
@@ -230,19 +264,17 @@ class TestTutorSurfaceReasoning:
         assert ask.status_code == 200, ask.text[:400]
         answer = _extract_data(ask.json())["answer"]
         assert isinstance(answer, str) and len(answer) > 30
+        return answer
 
+    def _assert_tutor_surfaced_reasoning(self, answer):
+        """Pass if the tutor's answer cites either the reasoning phrase or the
+        tank identity. Kept flexible because LLM phrasing varies vintage-to-
+        vintage; we only want to catch total silence."""
         lower = answer.lower()
-        # Reasoning OR at least Tank Test 1 must be cited
-        assert (
-            "diurnal" in lower
-            or "swing" in lower
-            or "tank test 1" in lower
-            or self.SEED_REASONING.lower() in lower
-        ), f"tutor did not surface reasoning or cite Tank Test 1. Answer:\n{answer[:800]}"
-
-        print("\n=== TUTOR REASONING ANSWER (truncated) ===")
-        print(answer[:1000])
-        print("=== /ANSWER ===\n")
+        keywords = ("diurnal", "swing", "tank test 1", self.SEED_REASONING.lower())
+        assert any(k in lower for k in keywords), (
+            f"tutor did not surface reasoning or cite Tank Test 1. Answer:\n{answer[:800]}"
+        )
 
     def test_cleanup_seeded_entry(self, api_client):
         if not TestTutorSurfaceReasoning.seeded_id:

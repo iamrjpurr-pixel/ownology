@@ -30,7 +30,7 @@ def _trpc_get(proc: str):
 def reset_stats():
     r = _trpc_post("admin.resetLlmStats", None)
     assert r.status_code == 200, r.text
-    assert r.json()["result"]["data"]["json"]["ok"] is True
+    assert r.json()["result"]["data"]["json"]["ok"] == True
 
 def get_stats():
     r = _trpc_get("admin.llmStats")
@@ -53,7 +53,7 @@ def extract_answer(resp_json):
 
 def curiosity_quota_exhausted(resp_json) -> bool:
     data = resp_json.get("result", {}).get("data", {}).get("json", {})
-    return isinstance(data, dict) and data.get("limitReached") is True
+    return isinstance(data, dict) and data.get("limitReached") == True
 
 
 # ---------- fixtures ----------

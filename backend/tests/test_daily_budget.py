@@ -35,6 +35,17 @@ def _trpc_get(proc: str):
     return requests.get(f"{BASE_URL}/api/trpc/{proc}", timeout=TIMEOUT)
 
 
+def _extract_answer(trpc_response):
+    """Pull the human-readable answer string out of a tutor.ask response.
+    Backend has three shapes over time (answer / content / raw JSON) —
+    normalising here keeps the tests scannable."""
+    assert trpc_response.status_code == 200, trpc_response.text
+    body = trpc_response.json()["result"]["data"]["json"]
+    ans = body.get("answer") or body.get("content") or json.dumps(body)
+    assert isinstance(ans, str)
+    return ans
+
+
 def reset_stats():
     r = _trpc_post("admin.resetLlmStats", None)
     assert r.status_code == 200, r.text
@@ -105,7 +116,7 @@ class TestResetLlmStatsAlsoResetsDaily:
         reset_stats()
         stats = get_stats()
         assert stats["daily"]["spendUsd"] == 0
-        assert stats["daily"]["exceeded"] is False
+        assert stats["daily"]["exceeded"] == False
 
 
 class TestResetDailyBudgetMutation:
@@ -113,14 +124,14 @@ class TestResetDailyBudgetMutation:
         r = _trpc_post("admin.resetDailyBudget", None)
         assert r.status_code == 200, r.text
         data = r.json()["result"]["data"]["json"]
-        assert data["ok"] is True
+        assert data["ok"] == True
         assert re.match(r"^\d{4}-\d{2}-\d{2}$", data["dateKey"])
 
     def test_reset_daily_budget_clears_spend(self):
         reset_daily()
         stats = get_stats()
         assert stats["daily"]["spendUsd"] == 0
-        assert stats["daily"]["exceeded"] is False
+        assert stats["daily"]["exceeded"] == False
 
 
 class TestNormalLlmCallAccumulatesUnderBudget:
@@ -143,7 +154,7 @@ class TestNormalLlmCallAccumulatesUnderBudget:
         after = get_stats()
         assert after["daily"]["spendUsd"] > 0, "Daily spend did not accumulate"
         assert after["daily"]["spendUsd"] < 10, "Daily spend should be well under $10"
-        assert after["daily"]["exceeded"] is False
+        assert after["daily"]["exceeded"] == False
 
 
 class TestBudgetEnforcement:
@@ -169,28 +180,14 @@ class TestBudgetEnforcement:
         assert stats0["daily"]["spendUsd"] == 0
 
         # Call 1 — should succeed with real LLM answer (and arm the guard).
-        r1 = ask_tutor("In one short sentence, what is yeast?")
-        assert r1.status_code == 200, r1.text
-        body1 = r1.json()["result"]["data"]["json"]
-        ans1 = body1.get("answer") or body1.get("content") or json.dumps(body1)
-        assert isinstance(ans1, str)
-        # Real answer is >50 chars and shouldn't contain the paused phrase.
+        ans1 = _extract_answer(ask_tutor("In one short sentence, what is yeast?"))
         assert "temporarily paused" not in ans1.lower(), f"Call 1 unexpectedly paused: {ans1!r}"
         assert len(ans1) > 30, f"Call 1 too short: {ans1!r}"
 
-        time.sleep(2)
-        mid = get_stats()
-        calls_after_real = mid["totals"]["calls"]
-        assert calls_after_real >= 1, f"Real call didn't register: {mid['totals']}"
-        assert mid["daily"]["spendUsd"] > 0
-        # Budget should be exceeded now (spend ≥ $0.0005)
-        assert mid["daily"]["exceeded"] is True, f"Guard not armed: {mid['daily']}"
+        calls_after_real = self._await_guard_armed()
 
         # Call 2 — should return the synthetic paused response.
-        r2 = ask_tutor("In one short sentence, what is fermentation?")
-        assert r2.status_code == 200, r2.text
-        body2 = r2.json()["result"]["data"]["json"]
-        ans2 = body2.get("answer") or body2.get("content") or json.dumps(body2)
+        ans2 = _extract_answer(ask_tutor("In one short sentence, what is fermentation?"))
         assert "temporarily paused" in ans2.lower(), f"Expected paused message, got: {ans2!r}"
 
         # Synthetic response must NOT increment totals.calls (usage:0/0/0).
@@ -201,18 +198,28 @@ class TestBudgetEnforcement:
             f"({calls_after_real} → {after['totals']['calls']})"
         )
 
+    @staticmethod
+    def _await_guard_armed():
+        """Give the LLM meter a moment to record Call 1, then confirm the
+        guard flipped to exceeded. Returns the current totals.calls count so
+        the parent test can compare against the post-synthetic value."""
+        time.sleep(2)
+        mid = get_stats()
+        calls_after_real = mid["totals"]["calls"]
+        assert calls_after_real >= 1, f"Real call didn't register: {mid['totals']}"
+        assert mid["daily"]["spendUsd"] > 0
+        assert mid["daily"]["exceeded"] == True, f"Guard not armed: {mid['daily']}"
+        return calls_after_real
+
     def test_reset_daily_budget_unpauses(self):
         # We're still in budget=0.0005 state (guard armed from previous test in class).
         # Reset daily and verify next call succeeds again.
         reset_daily()
         stats = get_stats()
         assert stats["daily"]["spendUsd"] == 0
-        assert stats["daily"]["exceeded"] is False
+        assert stats["daily"]["exceeded"] == False
 
-        r = ask_tutor("In one short sentence, what is a vintage?")
-        assert r.status_code == 200, r.text
-        body = r.json()["result"]["data"]["json"]
-        ans = body.get("answer") or body.get("content") or json.dumps(body)
+        ans = _extract_answer(ask_tutor("In one short sentence, what is a vintage?"))
         # After reset, next call should be a real answer (before it arms guard again).
         assert "temporarily paused" not in ans.lower(), f"Still paused after reset: {ans!r}"
 

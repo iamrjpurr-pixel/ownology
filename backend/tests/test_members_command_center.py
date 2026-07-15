@@ -201,12 +201,12 @@ class TestSignalBeacons:
         })
         assert r.status_code == 200, r.text[:300]
         data = _unwrap(r.json())
-        assert data.get("ok") is True
+        assert data.get("ok") == True
 
     def test_signal_cellar_brief_open(self):
         r = _trpc_post("members.signalCellarBriefOpen", {"briefDate": "2026-02-01"})
         assert r.status_code == 200, r.text[:300]
-        assert _unwrap(r.json()).get("ok") is True
+        assert _unwrap(r.json()).get("ok") == True
 
 
 # ─── Feature: instrumentation on bulkSave + tutor.ask ────────────────────
@@ -252,7 +252,7 @@ class TestEmailHoneypot:
         })
         assert r.status_code == 200, r.text[:300]
         data = _unwrap(r.json())
-        assert data.get("ok") is True
+        assert data.get("ok") == True
 
     def test_honeypot_empty_string_passes_through(self):
         # Empty companyWebsite should NOT trigger honeypot; legitimate signup.
@@ -263,7 +263,7 @@ class TestEmailHoneypot:
         })
         assert r.status_code == 200, r.text[:300]
         data = _unwrap(r.json())
-        assert data.get("ok") is True or "success" in str(data).lower()
+        assert data.get("ok") == True or "success" in str(data).lower()
 
 
 # ─── Feature: gate cookie tier enforcement (trial → /import ok, /admin blocked) ──

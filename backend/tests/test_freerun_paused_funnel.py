@@ -151,8 +151,8 @@ class TestNormalFlow:
         # Shape check (non-paused path)
         assert "answer" in data and "limitReached" in data
         assert "paused" in data, f"missing paused key: {data}"
-        assert data["paused"] is False, f"unexpectedly paused: {data}"
-        assert data["limitReached"] is False
+        assert data["paused"] == False, f"unexpectedly paused: {data}"
+        assert data["limitReached"] == False
         assert isinstance(data["answer"], str) and len(data["answer"]) > 50, \
             f"answer too short: {data['answer']!r}"
         assert data["questionsUsed"] == used_before + 1, \
@@ -181,10 +181,34 @@ class TestPausedFlow:
         reset_stats()
         reset_free_quota()
 
+    # Shape of a well-formed paused-payload from ask_curiosity — asserted
+    # in one helper so the parent test reads intent-first.
+    PAUSED_PAYLOAD_KEYS = (
+        "answer", "topicTag", "limitReached", "paused",
+        "pausedTier", "pausedMessage", "retryAt",
+        "questionsUsed", "questionsTotal",
+    )
+
+    def _assert_paused_payload_shape(self, response):
+        """Verify a paused response has every required field and reasonable
+        values. Kept here so the round-trip test stays under complexity 10."""
+        for key in self.PAUSED_PAYLOAD_KEYS:
+            assert key in response, f"paused payload missing {key}: {response}"
+        assert response["paused"] == True, f"expected paused, got: {response}"
+        assert response["pausedTier"] in ("free", "overall"), \
+            f"bad pausedTier: {response['pausedTier']}"
+        assert isinstance(response["pausedMessage"], str) and response["pausedMessage"]
+        assert response["answer"] == "", f"paused answer should be empty: {response['answer']!r}"
+        assert response["topicTag"] is None
+        assert response["limitReached"] == False
+        retry = response["retryAt"]
+        assert isinstance(retry, str)
+        assert retry.endswith("T00:00:00.000Z"), f"retryAt not UTC midnight: {retry!r}"
+
     def test_first_call_real_then_subsequent_paused(self):
         # ── Call 1: should be a real answer, arms the guard
         first = ask_curiosity("In one sentence, what is tannin?")
-        assert first["paused"] is False, f"call 1 unexpectedly paused: {first}"
+        assert first["paused"] == False, f"call 1 unexpectedly paused: {first}"
         assert len(first["answer"]) > 30
         assert first["questionsUsed"] == 1
 
@@ -192,25 +216,7 @@ class TestPausedFlow:
 
         # ── Call 2: budget exhausted → paused payload
         second = ask_curiosity("In one sentence, what is acidity?")
-
-        # Structured paused shape
-        for key in ("answer", "topicTag", "limitReached", "paused",
-                    "pausedTier", "pausedMessage", "retryAt",
-                    "questionsUsed", "questionsTotal"):
-            assert key in second, f"paused payload missing {key}: {second}"
-
-        assert second["paused"] is True, f"call 2 not paused: {second}"
-        assert second["pausedTier"] in ("free", "overall"), \
-            f"bad pausedTier: {second['pausedTier']}"
-        assert isinstance(second["pausedMessage"], str) and second["pausedMessage"]
-        assert second["answer"] == "", f"paused answer should be empty: {second['answer']!r}"
-        assert second["topicTag"] is None
-        assert second["limitReached"] is False
-
-        # retryAt is a valid ISO with UTC midnight
-        retry = second["retryAt"]
-        assert isinstance(retry, str)
-        assert retry.endswith("T00:00:00.000Z"), f"retryAt not UTC midnight: {retry!r}"
+        self._assert_paused_payload_shape(second)
 
         # ── Critical: quota NOT bumped from paused call
         assert second["questionsUsed"] == 1, \
@@ -221,7 +227,7 @@ class TestPausedFlow:
         # Make 3 more paused calls in a row
         for i in range(3):
             r = ask_curiosity(f"In one sentence, what is fermentation {i}?")
-            assert r["paused"] is True, f"call {i} should be paused: {r}"
+            assert r["paused"] == True, f"call {i} should be paused: {r}"
             assert r["questionsUsed"] == 1, \
                 f"call {i} bumped quota to {r['questionsUsed']}"
 
@@ -239,7 +245,7 @@ class TestPausedFlow:
         # Fire 3 paused calls
         for i in range(3):
             r = ask_curiosity(f"In one sentence, what is sulfite {i}?")
-            assert r["paused"] is True
+            assert r["paused"] == True
 
         time.sleep(2)  # give any (incorrect) fire-and-forget writes time to land
 
@@ -263,6 +269,6 @@ class TestCleanupRestoresNormalFlow:
 
     def test_restored_budget_returns_real_answer(self):
         data = ask_curiosity("What is malic acid? Answer in one short paragraph.")
-        assert data["paused"] is False, f"still paused after restore: {data}"
+        assert data["paused"] == False, f"still paused after restore: {data}"
         assert len(data["answer"]) > 50
         assert data["questionsUsed"] == 1

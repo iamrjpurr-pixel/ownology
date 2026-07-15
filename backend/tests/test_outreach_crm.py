@@ -79,7 +79,7 @@ class TestSetStatus:
         assert r.status_code == 200, r.text
         data, err = _data(r)
         assert err is None, err
-        assert data.get("ok") is True
+        assert data.get("ok") == True
 
         # verify via list
         time.sleep(0.5)
@@ -105,7 +105,7 @@ class TestSetStatus:
             r = _post("outreach.setStatus", {"slug": slug, "status": s})
             assert r.status_code == 200, f"{s}: {r.text}"
             data, err = _data(r)
-            assert err is None and data.get("ok") is True
+            assert err is None and data.get("ok") == True
 
 
 # ---------- bySlug ----------
@@ -143,13 +143,13 @@ class TestMarkViewed:
         assert cr.status_code == 200, cr.text
         cdata, cerr = _data(cr)
         assert cerr is None, cerr
-        assert cdata["ok"] is True
+        assert cdata["ok"] == True
 
         # first mark
         mv1 = _post("outreach.markViewed", {"slug": slug})
         assert mv1.status_code == 200, mv1.text
         d1, _ = _data(mv1)
-        assert d1["ok"] is True
+        assert d1["ok"] == True
 
         # query list to get first_viewed_at + view_count
         l1 = _get("outreach.list")
@@ -182,7 +182,7 @@ class TestCreateWithStatus:
         assert r.status_code == 200, r.text
         d, err = _data(r)
         assert err is None
-        assert d["ok"] is True
+        assert d["ok"] == True
         # verify persisted status
         listing = _get("outreach.list")
         ld, _ = _data(listing)
@@ -197,7 +197,7 @@ class TestCreateWithStatus:
         r = _post("outreach.create", {"firstName": "DefaultTest", "winery": f"DD{ts}", "slug": slug})
         assert r.status_code == 200, r.text
         d, _ = _data(r)
-        assert d["ok"] is True
+        assert d["ok"] == True
         listing = _get("outreach.list")
         ld, _ = _data(listing)
         row = next(c for c in ld["contacts"] if c["slug"] == slug)
@@ -216,12 +216,12 @@ class TestRegressionMutations:
         ms = _post("outreach.markSmsSent", {"slug": slug})
         assert ms.status_code == 200, ms.text
         d, _ = _data(ms)
-        assert d["ok"] is True
+        assert d["ok"] == True
 
         mb = _post("outreach.markBooked", {"slug": slug})
         assert mb.status_code == 200, mb.text
         d, _ = _data(mb)
-        assert d["ok"] is True
+        assert d["ok"] == True
 
         # verify both timestamps set
         listing = _get("outreach.list")
@@ -233,7 +233,7 @@ class TestRegressionMutations:
         rm = _post("outreach.remove", {"slug": slug})
         assert rm.status_code == 200, rm.text
         d, _ = _data(rm)
-        assert d["ok"] is True
+        assert d["ok"] == True
 
         # verify gone
         l2 = _get("outreach.list")

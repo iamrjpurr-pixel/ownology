@@ -67,7 +67,7 @@ class TestFoundingReservation:
         r = trpc_post("foundingMembers.reserve", payload)
         assert r.status_code == 200, r.text
         data = r.json()["result"]["data"]["json"]
-        assert data["ok"] is True
+        assert data["ok"] == True
         assert data["cap"] == 99
         assert isinstance(data["slotNumber"], int) and data["slotNumber"] >= 1
         assert "emails" in data
@@ -112,7 +112,7 @@ class TestFoundingReservation:
                 })
                 assert r.status_code == 200, f"{tier}/{cycle}: {r.text}"
                 d = r.json()["result"]["data"]["json"]
-                assert d["ok"] is True and d["slotNumber"] >= 1
+                assert d["ok"] == True and d["slotNumber"] >= 1
 
     def test_list_reservations_owner_only(self):
         # Dev bypass ON → we ARE the admin owner
@@ -140,20 +140,20 @@ class TestDevBypassToggle:
         r = trpc_post("admin.setDevBypass", {"active": True, "minutes": 15})
         assert r.status_code == 200, r.text
         d = r.json()["result"]["data"]["json"]
-        assert d["ok"] is True
-        assert d["runtime"]["active"] is True
+        assert d["ok"] == True
+        assert d["runtime"]["active"] == True
         assert d["runtime"]["expiresAt"] is not None
 
         # Verify state reflects it
         st = trpc_get("admin.getDevBypassState").json()["result"]["data"]["json"]
-        assert st["runtime"]["active"] is True
+        assert st["runtime"]["active"] == True
 
     def test_disable_runtime_bypass(self):
         r = trpc_post("admin.setDevBypass", {"active": False, "minutes": 15})
         assert r.status_code == 200
         d = r.json()["result"]["data"]["json"]
-        assert d["ok"] is True
-        assert d["runtime"]["active"] is False
+        assert d["ok"] == True
+        assert d["runtime"]["active"] == False
 
     def test_setDevBypass_minutes_cap(self):
         # 24h max

@@ -17,7 +17,16 @@ import pytest
 import requests
 
 BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://ownership-dev.preview.emergentagent.com").rstrip("/")
-GATE_PASSWORD = "middx99"
+# Read from env, never commit. Prefer OWNOLOGY_GATE_PASSWORD (the canonical
+# server-side var); fall back to GATE_PASSWORD for CI convenience. Skip the
+# whole gated-flow module if unset so CI without the secret still exits
+# cleanly rather than 401-ing every test.
+GATE_PASSWORD = os.environ.get("OWNOLOGY_GATE_PASSWORD") or os.environ.get("GATE_PASSWORD")
+if not GATE_PASSWORD:
+    pytest.skip(
+        "OWNOLOGY_GATE_PASSWORD not set — export in .env or CI to run gated tests.",
+        allow_module_level=True,
+    )
 
 
 # ---------- fixtures ----------

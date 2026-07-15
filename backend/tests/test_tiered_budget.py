@@ -144,7 +144,7 @@ class TestResetClearsTierBuckets:
         stats = get_stats()
         for t in ("free", "premium", "system"):
             assert stats["daily"]["tiers"][t]["spendUsd"] == 0
-            assert stats["daily"]["tiers"][t]["exceeded"] is False
+            assert stats["daily"]["tiers"][t]["exceeded"] == False
 
     def test_reset_daily_budget_zeros_all_tiers_and_overall(self):
         reset_daily()
@@ -240,7 +240,7 @@ class TestTierPauseSemantics:
         free_tier = midstats["daily"]["tiers"]["free"]
         assert free_tier["spendUsd"] > 0, "free spend didn't accumulate"
         # After call 1, free guard should be armed (spend > 0.0005)
-        assert free_tier["exceeded"] is True, f"free not exceeded: {free_tier}"
+        assert free_tier["exceeded"] == True, f"free not exceeded: {free_tier}"
 
         # 2) Fire freeRun.curiosityAsk #2 — should be tier-paused
         r2 = ask_curiosity("In one short sentence, what is chardonnay?")
@@ -289,7 +289,7 @@ class TestOverallPauseAffectsSystem:
 
         time.sleep(2)
         mid = get_stats()
-        assert mid["daily"]["exceeded"] is True, \
+        assert mid["daily"]["exceeded"] == True, \
             f"overall not armed: {mid['daily']}"
 
         # Now ANY call (including system-bound queryRouter) should be paused
