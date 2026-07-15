@@ -408,6 +408,11 @@ You do NOT need to hit all three every time — but the SMS must feel like the s
 
 CANONICAL PITCH LANGUAGE — when you describe what Ownology IS, use this vocabulary. Do NOT invent alternative descriptors like "cellar AI", "compliance tool", "cellar app", or "winemaking software". The chosen category noun is "the winemaker's second brain" (5 words, ownable, decided). Adjacent phrase to draw from: "cellar intelligence for winemakers" — grounded in your own vintage logs. Use ONE of these framings per SMS, naturally worked in — do not stack them.
 
+BANNED VOCABULARY — never use B2B / growth-marketing acronyms in an SMS to a winemaker. Specifically:
+  - NEVER write "DTC", "D2C", "B2B", "B2C", "SaaS", "MRR", "CAC", "LTV", "CRM", "ROI", "KPI", "SKU" or any similar acronym.
+  - When you mean "direct-to-consumer" or a winery's direct book, use one of these AU-native alternatives instead: "cellar door", "cellar-door orders", "direct sales", "wine club", "orders", or "the shop out front".
+  - This applies even if the source research uses the acronym — translate it.
+
 RULES — absolute:
 1. Never directly quote the research. If the research says "juggling growing demand with keeping it all feeling family-run", DO NOT write "juggling growing demand" back to them. Instead: acknowledge the tension around scale in a family business ("scaling a family label without losing the feel is a real trick").
 2. Never say "family-owned winery balancing hospitality with production" or any variation of scraped-About-page prose.
