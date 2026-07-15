@@ -74,6 +74,7 @@ export default function AdminOutboundQueue() {
   const [bulkResult, setBulkResult] = useState<{ rewritten: number; skippedExisting: number; failed: number } | null>(null);
   const [cohortCopied, setCohortCopied] = useState(false);
   const [vcardCount, setVcardCount] = useState<number | null>(null);
+  const [forceRewrite, setForceRewrite] = useState(false);
 
   async function copySms(slug: string, text: string) {
     try { await navigator.clipboard.writeText(text); setCopied((s) => ({ ...s, [slug]: "sms" })); } catch { /* no-op */ }
@@ -86,12 +87,15 @@ export default function AdminOutboundQueue() {
 
   async function runBulkRewrite(tone: "warm" | "brief" | "regional") {
     const regionLabel = regionFilter === "all" ? "the whole queue" : `the ${regionFilter.replace(/-/g, " ")} cohort (${filtered.length} contacts)`;
-    if (!confirm(`Rewrite SMS drafts for ${regionLabel} via Claude (${tone} tone)?\n\nThis will take ~1.5-2s per contact and cost ~$0.005 each.\nExisting hand-crafted drafts are skipped.`)) return;
+    const forceMsg = forceRewrite
+      ? "\n\n⚠ FORCE mode is ON — this WILL overwrite existing hand-crafted drafts."
+      : "\n\nExisting hand-crafted drafts are skipped.";
+    if (!confirm(`Rewrite SMS drafts for ${regionLabel} via Claude (${tone} tone)?\n\nThis will take ~1.5-2s per contact and cost ~$0.005 each.${forceMsg}`)) return;
     setBulkResult(null);
     try {
       const result = await bulkRewrite.mutateAsync({
         tone,
-        force: false,
+        force: forceRewrite,
         limit: 500,
         region: regionFilter === "all" ? undefined : regionFilter,
       });
@@ -228,8 +232,8 @@ export default function AdminOutboundQueue() {
         </span>
         <span style={{ fontSize: "0.78rem", color: "var(--ow-text-mid)", flex: 1, minWidth: 240 }}>
           {regionFilter === "all"
-            ? `Pre-warm every unsent SMS in the queue via Claude. Skips hand-crafted overrides. ~$0.005 per contact.`
-            : `Rewrite the ${filtered.length}-contact ${regionFilter.replace(/-/g, " ")} cohort with a shared story arc. Regional tone gives them a common voice.`}
+            ? `Pre-warm every unsent SMS in the queue via Claude. ${forceRewrite ? "Force mode ON — will overwrite existing drafts." : "Skips hand-crafted overrides."} ~$0.005 per contact.`
+            : `Rewrite the ${filtered.length}-contact ${regionFilter.replace(/-/g, " ")} cohort with a shared story arc. ${forceRewrite ? "Force mode ON — will overwrite existing drafts." : "Skips existing drafts."}`}
         </span>
         <button
           data-testid="bulk-rewrite-warm"
@@ -255,6 +259,32 @@ export default function AdminOutboundQueue() {
         >
           Regional
         </button>
+        <label
+          data-testid="bulk-rewrite-force-toggle"
+          title="Off (default): keeps existing hand-crafted drafts untouched. On: overwrites them with a fresh Claude rewrite. Use when you want to refresh the whole cohort."
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "4px 10px",
+            background: forceRewrite ? "color-mix(in oklch, #dc2626 12%, transparent)" : "transparent",
+            border: `1px solid ${forceRewrite ? "#dc2626" : "var(--ow-border)"}`,
+            borderRadius: 3,
+            fontSize: "0.72rem",
+            color: forceRewrite ? "#dc2626" : "var(--ow-text-mid)",
+            cursor: "pointer",
+            fontWeight: forceRewrite ? 700 : 500,
+            userSelect: "none",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={forceRewrite}
+            onChange={(e) => setForceRewrite(e.target.checked)}
+            style={{ margin: 0, accentColor: "#dc2626" }}
+          />
+          Force · overwrite existing
+        </label>
         {bulkResult && (
           <span data-testid="bulk-rewrite-result" style={{ fontSize: "0.78rem", color: "#16a34a", fontWeight: 600 }}>
             ✓ {bulkResult.rewritten} rewritten · {bulkResult.skippedExisting} skipped · {bulkResult.failed} failed
