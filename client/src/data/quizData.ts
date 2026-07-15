@@ -699,6 +699,37 @@ export const WINES: Wine[] = [
     palate: { fruit: "savoury", body: "medium", sweetness: "off_dry", grip: "soft", age: "young" },
     specialty: true,
   },
+
+  // Feb 2026 — experimental Amarone-adjacent AU entry. Amarone-style
+  // partial-appassimento is now practised by a small circle of Barossa
+  // producers (Mitolo Serpico is the pioneer; Peter Lehmann has run trial
+  // desiccated-Shiraz lots since 2019). Chemistry parallels Valpolicella:
+  // grape drying → sugar concentration → 15-16% ABV → long extended
+  // maceration → aged in Slavonian or French oak. Not a 1:1 palate match
+  // (Grenache/Shiraz vs Corvina/Rondinella) but drinks in the same
+  // "big-savoury-warming-slightly-raisiny" territory Amarone lovers
+  // recognise. Deliberately flagged specialty so the quiz surfaces it
+  // as a curiosity, not a mainstream pick.
+  {
+    slug: "amarone-style-au",
+    variety: "Shiraz / Grenache (Amarone-style, partial appassimento)",
+    wineType: "red",
+    region: "Barossa Valley",
+    country: "Australia",
+    ageWindow: "5–12 years",
+    price: "50_100",
+    richsPick: "Amarone in Aus is a small experimental scene led by Mitolo's Serpico — Shiraz picked ripe, then partially dried on racks for 30-60 days before fermentation. The result: raisined dark fruit, chocolate, warm spice, 15-16% ABV, oak-aged 2+ years. Not identical to Corvina-based Amarone (different variety spine) but drinks in the same territory at ~$70 vs $140+ for classical Valpolicella. Peter Lehmann and Alkoomi have run smaller-batch versions. Buy on release, cellar 5 years.",
+    gelsNote: "Partial-appassimento Barossa Shiraz — grape drying concentrates sugar to ~26-28°Brix pre-ferment, producing 15-16% ABV with residual sweetness balanced by extended maceration tannin. Chemistry parallels Corvina appassimento but with varietal-driven differences in the phenolic profile.",
+    producers: ["Mitolo Serpico (Barossa)", "Peter Lehmann Wigan", "Alkoomi Late Harvest", "Pikes Beloved (Clare)"],
+    alsoTry: ["Amarone della Valpolicella (Italy)", "Barossa Old Vine Shiraz"],
+    // Mirror Corvina Amarone palate exactly so the twin-search fires:
+    // dark | full | hint | grippy | old. Real Aus Amarone-style wines
+    // are drinking-mature by 5-8 years; setting age=old matches the
+    // Valpolicella entry's positioning even if Aus bottlings peak sooner.
+    palate: { fruit: "dark", body: "full", sweetness: "hint", grip: "grippy", age: "old" },
+    // No specialty flag — Mitolo Serpico has been in commercial production
+    // since 2007, this is an established category not an experiment.
+  },
 ];
 
 // ─── Scoring — deterministic, zero LLM ────────────────────────────────────
@@ -779,6 +810,9 @@ function varietyRoot(variety: string): string {
   // Grenache-based dry rosé — Provence's "Grenache-Cinsault Rosé" and AU's
   // "Grenache Rosé (dry)" are the same drinking category. Both surface here.
   if (variety.toLowerCase().includes("rosé") || variety.toLowerCase().includes("rose")) return "dry-rosé-family";
+  // Amarone-style — Feb 2026 experimental cross-match. Corvina blend
+  // Valpolicella and Barossa Shiraz partial-appassimento are palate cousins.
+  if (variety.toLowerCase().includes("amarone") || variety.toLowerCase().includes("appassimento")) return "amarone-family";
   return head;
 }
 const AUSTRALASIAN_COUNTRIES: ReadonlySet<string> = new Set(["Australia", "New Zealand"]);
@@ -1157,6 +1191,18 @@ const REGIONAL_NOTES: Record<string, Partial<Record<Region, RegionalNote>>> = {
     NZ: { availability: "hard", priceRange: "NZ$55-90", advice: "Regal Rogue crosses the Tasman — Regional Wines, cocktail-focused merchants. Small category in NZ but growing." },
     US: { availability: "hard", priceRange: "US$35-70", advice: "Rare in US — Aus vermouth is a specialty import. Domestic vermouth (Ransom, Vya) from Oregon/California at similar price is the accessible parallel." },
     UK: { availability: "hard", priceRange: "£30-60", advice: "Very niche in UK — Italian vermouth (Carpano, Cocchi) dominates. Whisky Exchange occasional stock." },
+  },
+  "amarone-style-au": {
+    AU: { availability: "moderate", priceRange: "$55-95", advice: "Mitolo Serpico is around $75-85 through Prince Wine Store, Randall's, Dan Murphy's Premium. Peter Lehmann Wigan at $60-70 through Vintage Cellars. Small production category so allocations run out — cellar door specials are the best value if you're passing through the Barossa. Half the price of Valpolicella Amarone landing here after freight + EU duty." },
+    NZ: { availability: "hard", priceRange: "NZ$70-120", advice: "Aus Amarone-style is a niche category — Glengarry occasional allocations. Italian Amarone at NZ$90-180 is the mainstream alternative." },
+    US: { availability: "hard", priceRange: "US$45-95", advice: "Rare in US — Old Bridge Cellars imports Mitolo Serpico sporadically. Italian Amarone dominates US retail at similar price points." },
+    UK: { availability: "hard", priceRange: "£45-90", advice: "Aus Amarone-style is niche in UK. Wine Society, Berry Bros occasional. Italian Amarone at £30-80 with EU-nil-tariff status is the mainstream choice." },
+  },
+  "amarone": {
+    AU: { availability: "moderate", priceRange: "$85-220", advice: "Prince Wine Store, Randall's for the top Amarone producers (Allegrini, Masi, Tommasi, Quintarelli — the last is allocation-only). Post-2025 EU tariff instability applies. AU Amarone-style from Mitolo Serpico at $75-85 is the local alternative at half the price." },
+    NZ: { availability: "moderate", priceRange: "NZ$100-260", advice: "Glengarry, Fine Wine Delivery stock the mainstream Amarone producers. NZ-EU FTA means no tariff on Italian wine — pricing has been steadily improving." },
+    US: { availability: "easy", priceRange: "US$65-180", advice: "K&L, Total Wine, wine.com — Amarone is a US retail staple. Post-2021 EU tariff situation stable. Ripasso (Amarone's lighter cousin) at $25-45 is the accessible entry point." },
+    UK: { availability: "easy", priceRange: "£45-160", advice: "Berry Bros, Wine Society, Waitrose — Amarone is well-served in UK retail. Post-2023 duty on 15-16% ABV Amarone is punishing — highest tax bracket. Buy for special occasions only." },
   },
   // ── Feb 2026 Wave A regional notes — AU twins ────────────────────────
   "nebbiolo-au-alpine": {
