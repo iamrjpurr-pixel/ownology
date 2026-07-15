@@ -929,12 +929,28 @@ export default function AdminContacts() {
           personalised SMS batch and stamps smsSentAt on the whole set. */}
       <BulkActivateStrip onDone={() => utils.outreach.list.invalidate()} />
 
-      {/* A/B CTA stats — book demo vs reply RED */}
-      <CtaAbCard />
-
-      {/* A/B tile-summary stats — "QMS" vs "quality system" spelt out. Soft
-          launch on /hi/:slug (Feb 2026). Kill the loser in ~1 week. */}
-      <QmsAbCard />
+      {/* A/B experiments running on /hi/:slug — CTA variant + tile-summary
+          variant. Both share the same conversion attribution (firstViewedAt
+          / ctaClickedAt / demoBookedAt) and neither stores per-row state,
+          so historical clicks bucket automatically. Feb 2026 design pass:
+          one wrapped section, no amber-tinted panels, neutral card bg,
+          amber reserved for eyebrow + winning-variant border. */}
+      <section
+        data-testid="ab-experiments-section"
+        className="mb-6 rounded p-4"
+        style={sectionPanel}
+      >
+        <div className="mb-3">
+          <p style={sectionEyebrow}>A/B experiments · /hi/</p>
+          <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.82rem", color: "var(--ow-text-mid)", margin: "4px 0 0", fontStyle: "italic" }}>
+            Two independent tests. Same visitor sees a stable variant across visits.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CtaAbCard />
+          <QmsAbCard />
+        </div>
+      </section>
 
       {/* Triage filter chips + sort selector */}
       <div className="flex flex-wrap items-center gap-2 mb-6" data-testid="status-filter-bar">
@@ -998,15 +1014,10 @@ export default function AdminContacts() {
         onSubmit={handleDeepSearch}
         className="mb-3 rounded p-4"
         data-testid="deep-research-panel"
-        style={{
-          background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
-          border: "1.5px solid color-mix(in oklch, var(--ow-amber) 55%, transparent)",
-        }}
+        style={sectionPanel}
       >
         <div className="flex items-baseline justify-between mb-2">
-          <p className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-amber)" }}>
-            Deep research — just a name
-          </p>
+          <p style={sectionEyebrow}>Deep research — just a name</p>
           <p className="text-xs" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif" }}>
             Perplexity Sonar · ~15–30s · &lt; 1¢ per lookup
           </p>
@@ -1016,13 +1027,13 @@ export default function AdminContacts() {
             type="text"
             value={deepSearchName}
             onChange={(e) => setDeepSearchName(e.target.value)}
-            placeholder="e.g. Les Fruits Adelaide Hills"
+            placeholder="Winery or winemaker name — e.g. Les Fruits Adelaide Hills"
             disabled={deepResearchMutation.isPending}
             data-testid="deep-research-input"
             style={{
               flex: 1,
               padding: "0.6rem 0.8rem",
-              background: "var(--ow-bg-card)",
+              background: "var(--ow-bg-base)",
               border: "1px solid var(--ow-border)",
               borderRadius: 4,
               color: "var(--ow-text-hi)",
@@ -1051,9 +1062,8 @@ export default function AdminContacts() {
             {deepResearchMutation.isPending ? "Researching…" : "Research →"}
           </button>
         </div>
-        <p className="text-xs mt-2" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", lineHeight: 1.5 }}>
-          Type any winery / winemaker name and we&apos;ll deep-search the web for their contact details, painpoint, and role.
-          Adding the region (Adelaide Hills, McLaren Vale) improves accuracy.
+        <p className="text-xs mt-2" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", fontStyle: "italic" }}>
+          Include the region for a sharper hit — &ldquo;Les Fruits Adelaide Hills&rdquo; beats &ldquo;Les Fruits&rdquo;.
         </p>
         {deepSearchErr && (
           <p data-testid="deep-research-error" style={{ marginTop: 8, color: "#b91c1c", fontFamily: "'Lato',sans-serif", fontSize: "0.82rem" }}>
@@ -1142,15 +1152,10 @@ export default function AdminContacts() {
         onSubmit={handleUrlQuickAdd}
         className="mb-4 rounded p-4"
         data-testid="url-quickadd-panel"
-        style={{
-          background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)",
-          border: "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)",
-        }}
+        style={sectionPanel}
       >
         <div className="flex items-baseline justify-between mb-2">
-          <p className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-amber)" }}>
-            Quick-add from a URL
-          </p>
+          <p style={sectionEyebrow}>Quick-add from a URL</p>
           <p className="text-xs" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif" }}>
             Winery site · LinkedIn · Instagram · Google Business
           </p>
@@ -1160,13 +1165,13 @@ export default function AdminContacts() {
             type="url"
             value={urlQuickAdd}
             onChange={(e) => setUrlQuickAdd(e.target.value)}
-            placeholder="https://www.brokenwood.com.au/contact"
+            placeholder="Paste any URL — https://www.brokenwood.com.au/contact"
             disabled={parseFromUrlMutation.isPending}
             data-testid="url-quickadd-input"
             style={{
               flex: 1,
               padding: "0.6rem 0.8rem",
-              background: "var(--ow-bg-card)",
+              background: "var(--ow-bg-base)",
               border: "1px solid var(--ow-border)",
               borderRadius: 4,
               color: "var(--ow-text-hi)",
@@ -1195,8 +1200,8 @@ export default function AdminContacts() {
             {parseFromUrlMutation.isPending ? "Fetching…" : "Fetch details →"}
           </button>
         </div>
-        <p className="text-xs mt-2" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", lineHeight: 1.5 }}>
-          We scrape phone, email, Instagram, address, and any named contact — then pre-fill the form below. You review and hit Save.
+        <p className="text-xs mt-2" style={{ color: "var(--ow-text-lo)", fontFamily: "'Lato',sans-serif", fontStyle: "italic" }}>
+          Scrapes phone, email, IG, address, and any named contact — you review before saving.
         </p>
         {urlErr && (
           <p data-testid="url-quickadd-error" style={{ marginTop: 8, color: "#b91c1c", fontFamily: "'Lato',sans-serif", fontSize: "0.82rem" }}>
@@ -3319,6 +3324,34 @@ const btn: React.CSSProperties = {
   cursor: "pointer",
 };
 
+/**
+ * Shared "section panel" style — the design-system contract for every
+ * major admin section on /admin/contacts. Follows the Feb 2026 design
+ * pass ("--ow-amber as precious accent, not background block"):
+ *   - Neutral card background (works in dark AND light theme)
+ *   - Subtle border
+ *   - Single 2px amber accent along the top edge — the ONLY amber this
+ *     panel gets. Interior amber (buttons, badges, active-state rings)
+ *     stays fully saturated, but the panel itself no longer competes.
+ */
+const sectionPanel: React.CSSProperties = {
+  background: "var(--ow-bg-card)",
+  border: "1px solid var(--ow-border)",
+  borderTop: "2px solid color-mix(in oklch, var(--ow-amber) 55%, transparent)",
+  borderRadius: 6,
+};
+
+/** Small-caps section eyebrow, unified. Amber, tight tracking, tiny. */
+const sectionEyebrow: React.CSSProperties = {
+  fontFamily: "'Lato',sans-serif",
+  fontSize: "0.68rem",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  color: "var(--ow-amber)",
+  fontWeight: 700,
+  margin: 0,
+};
+
 function CtaAbCard() {
   const { data, isLoading } = trpc.outreach.ctaStats.useQuery();
   if (isLoading || !data) return null;
@@ -3330,47 +3363,49 @@ function CtaAbCard() {
 
   return (
     <div
-      className="mb-6 rounded-md p-4"
+      className="rounded"
       data-testid="cta-ab-card"
       style={{
-        background: "var(--ow-bg-card)",
+        background: "var(--ow-bg-raised)",
         border: "1px solid var(--ow-border)",
+        borderRadius: 6,
+        padding: "0.9rem 1rem",
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
-        <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ow-amber)", fontWeight: 700, margin: 0 }}>
-          A/B test · CTA on /hi/
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10, gap: 8 }}>
+        <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.62rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ow-text-lo)", fontWeight: 700, margin: 0 }}>
+          CTA variant
         </p>
         {!data.enabled && (
-          <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "#dc2626", fontWeight: 600, margin: 0 }}>
-            ⚠ SMS_INBOUND_NUMBER not set — all prospects see &quot;book&quot; variant
+          <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.68rem", color: "#dc2626", fontWeight: 600, margin: 0 }}>
+            ⚠ SMS_INBOUND_NUMBER not set
           </p>
         )}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {[bookB, replyB].map((b, i) => {
+      <div className="grid grid-cols-1 gap-2">
+        {[bookB, replyB].map((b) => {
           if (!b) return null;
-          const label = b.variant === "book" ? "📅 Book demo" : "💬 Reply RED";
+          const label = b.variant === "book" ? "Book demo" : "Reply RED";
           return (
             <div
               key={b.variant}
               data-testid={`cta-variant-${b.variant}`}
               style={{
-                background: "var(--ow-bg-base)",
-                border: `1px solid ${b.variant === "reply" ? "color-mix(in oklch, var(--ow-amber) 40%, transparent)" : "var(--ow-border)"}`,
-                padding: "0.9rem 1rem",
-                borderRadius: 6,
+                background: "var(--ow-bg-card)",
+                border: "1px solid var(--ow-border)",
+                padding: "0.7rem 0.85rem",
+                borderRadius: 4,
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontFamily: "'Lato',sans-serif", fontWeight: 700, color: "var(--ow-text-hi)", fontSize: "0.92rem" }}>
+                <span style={{ fontFamily: "'Lato',sans-serif", fontWeight: 700, color: "var(--ow-text-hi)", fontSize: "0.9rem" }}>
                   {label}
                 </span>
-                <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.72rem", color: "var(--ow-text-lo)" }}>
-                  {b.total} prospects
+                <span style={{ fontFamily: "'JetBrains Mono',ui-monospace,monospace", fontSize: "0.7rem", color: "var(--ow-text-lo)" }}>
+                  {b.total}
                 </span>
               </div>
-              <div style={{ display: "flex", gap: 16, marginTop: 8, fontFamily: "'Lato',sans-serif", fontSize: "0.78rem" }}>
+              <div style={{ display: "flex", gap: 14, marginTop: 6, fontFamily: "'Lato',sans-serif", fontSize: "0.76rem", flexWrap: "wrap" }}>
                 <span style={{ color: "var(--ow-text-mid)" }}>
                   Viewed <strong style={{ color: "var(--ow-text-hi)" }}>{b.viewed}</strong> · {pct(b.viewed, b.total)}
                 </span>
@@ -3407,47 +3442,44 @@ function QmsAbCard() {
 
   return (
     <div
-      className="mb-6 rounded-md p-4"
+      className="rounded"
       data-testid="qms-ab-card"
       style={{
-        background: "var(--ow-bg-card)",
+        background: "var(--ow-bg-raised)",
         border: "1px solid var(--ow-border)",
+        borderRadius: 6,
+        padding: "0.9rem 1rem",
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
-        <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ow-amber)", fontWeight: 700, margin: 0 }}>
-          A/B test · &quot;What Ownology does&quot; tile on /hi/
-        </p>
-        <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", color: "var(--ow-text-lo)", margin: 0 }}>
-          Independent of CTA variant
-        </p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.62rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ow-text-lo)", fontWeight: 700, margin: "0 0 10px" }}>
+        Tile summary variant
+      </p>
+      <div className="grid grid-cols-1 gap-2">
         {[qmsB, qsB].map((b) => {
           if (!b) return null;
           const label = b.variant === "qms"
-            ? "A winemaking QMS with an AI apprentice."
-            : "A winemaking quality system with an AI apprentice.";
+            ? "\u201cA winemaking QMS with an AI apprentice.\u201d"
+            : "\u201cA winemaking quality system with an AI apprentice.\u201d";
           return (
             <div
               key={b.variant}
               data-testid={`qms-variant-${b.variant}`}
               style={{
-                background: "var(--ow-bg-base)",
-                border: `1px solid ${b.variant === "qms" ? "color-mix(in oklch, var(--ow-amber) 40%, transparent)" : "var(--ow-border)"}`,
-                padding: "0.9rem 1rem",
-                borderRadius: 6,
+                background: "var(--ow-bg-card)",
+                border: "1px solid var(--ow-border)",
+                padding: "0.7rem 0.85rem",
+                borderRadius: 4,
               }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                <span style={{ fontFamily: "'Fraunces',serif", fontStyle: "italic", color: "var(--ow-text-hi)", fontSize: "0.88rem", lineHeight: 1.3 }}>
-                  &ldquo;{label}&rdquo;
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                <span style={{ fontFamily: "'Fraunces',serif", fontStyle: "italic", color: "var(--ow-text-hi)", fontSize: "0.86rem", lineHeight: 1.3 }}>
+                  {label}
                 </span>
-                <span style={{ fontFamily: "'Fira Code',monospace", fontSize: "0.72rem", color: "var(--ow-text-lo)", flexShrink: 0 }}>
-                  {b.total} prospects
+                <span style={{ fontFamily: "'JetBrains Mono',ui-monospace,monospace", fontSize: "0.7rem", color: "var(--ow-text-lo)", flexShrink: 0, whiteSpace: "nowrap" }}>
+                  {b.total}
                 </span>
               </div>
-              <div style={{ display: "flex", gap: 16, marginTop: 8, fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: 14, marginTop: 6, fontFamily: "'Lato',sans-serif", fontSize: "0.76rem", flexWrap: "wrap" }}>
                 <span style={{ color: "var(--ow-text-mid)" }}>
                   Viewed <strong style={{ color: "var(--ow-text-hi)" }}>{b.viewed}</strong> · {pct(b.viewed, b.total)}
                 </span>
@@ -3524,14 +3556,11 @@ function BulkActivateStrip({ onDone }: { onDone: () => void }) {
     <div
       data-testid="bulk-activate-strip"
       className="rounded p-4 mb-6"
-      style={{
-        background: "color-mix(in oklch, var(--ow-amber) 12%, transparent)",
-        border: "1.5px solid color-mix(in oklch, var(--ow-amber) 40%, transparent)",
-      }}
+      style={sectionPanel}
     >
       <div className="flex items-baseline justify-between flex-wrap gap-3 mb-2">
         <div>
-          <p className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-amber)", fontFamily: "'Lato',sans-serif", fontWeight: 700 }}>
+          <p style={sectionEyebrow}>
             Bulk activation · {pool.length} cold contacts un-SMS&apos;d
           </p>
           <h3 style={{ fontFamily: "'Fraunces',serif", fontSize: "1.15rem", color: "var(--ow-text-hi)", margin: "4px 0 0" }}>
@@ -3579,8 +3608,8 @@ function BulkActivateStrip({ onDone }: { onDone: () => void }) {
           </button>
         </div>
       </div>
-      <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.82rem", color: "var(--ow-text-mid)", margin: "6px 0 0", lineHeight: 1.5 }}>
-        Click <strong>Copy</strong> to grab Name / Mobile / personalised SMS for all {pool.length} contacts (TSV format — paste straight into Messages or a spreadsheet). After you&apos;ve sent them, click <strong>Mark as sent</strong> to advance the pipeline.
+      <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.82rem", color: "var(--ow-text-mid)", margin: "6px 0 0", fontStyle: "italic" }}>
+        Copy grabs Name / Mobile / SMS as TSV — paste into Messages or a spreadsheet, then Mark as sent.
       </p>
     </div>
   );
