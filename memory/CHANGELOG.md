@@ -4,6 +4,16 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Jul 2026 — Outreach router split (helpers extracted)
+
+**`server/routers/outreach.ts` down from 3,698 → 3,167 lines.** The 3.7k-line file had grown unwieldy — TypeScript's Language Server was re-analysing the whole thing on every keystroke, making hover-info + go-to-definition sluggish, and every agent (me included) could only see slices at a time. Split by concern:
+
+  * `outreach-helpers.ts` (194 lines) — pure sync helpers: `slugify`, `normaliseMobile`, `isPlaceholderPhone`, `pickCtaVariant`, `pickQmsVariant`, `pickSampleVintageVariant`, `pickCrushVariant`, `buildSmsReplyHref`, `buildWaHref`, plus the four marker constants (HUNTER / LARGE / BOUTIQUE / WHITE_FOCUS). Zero DB, zero fetch, zero side-effects except reading `process.env`. Safe to unit-test in isolation.
+  * `outreach-ai-helpers.ts` (370 lines) — async LLM helpers: `mineInstagramHooks` (Perplexity Sonar), `claudeRewriteOne` (Emergent Forge → Claude for SMS rewriting), `classifyReplySentiment` (Claude sentiment classifier). Heaviest part of the old file because of long system prompts — extracting them alone reclaims ~340 lines from the router's mental model.
+  * `outreach.ts` retains all 50 tRPC procedures and now imports the helpers. Zero external call sites had to change — the only external consumer (`server/routers.ts`) still just imports `outreachRouter`.
+
+**Verified.** `tsc --noEmit` produces the same 21 pre-existing errors and zero new ones. Live smoke tests: `outreach.bySlug` (public), `outreach.outboundQueue` (owner), `outreach.engagementAnalytics` (owner) all return normally. Backend supervisor uptime unbroken.
+
 ### Jul 2026 — PWA session-aware launch + version banner + cache reset + desktop-safe SMS + region editor
 
 **PWA launch no longer dumps users on marketing.** Rich reported: "I have the PWA installed in my taskbar on Windows PC. But as I open it, I get the landing page with three or four other options, and no direct link to the fact that I should be logged in as a user and administrator." Fix landed across three files:
