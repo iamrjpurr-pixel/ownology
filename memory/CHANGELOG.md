@@ -4,6 +4,12 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Feb 2026 — Outbound queue ↔ contact card deep-linking
+
+**Problem.** After the "Today's Top 5" hero landed, there was no way to click from a queue row into the underlying contact card to work the contact (edit hook, mark status, paste reply, delete etc.). The only path — "Enrich this contact →" — only appeared when a contact had zero channels.
+
+**Two-way link.** Every top-5 row now has (a) a dotted-underline name link and (b) an "Open card ↗" link on the far right of the channel-icon row. Every full-queue row already had "Open card ↗". All of them target `/admin/contacts?slug=<slug>`. The AdminContacts page reads the `slug` query param, waits two rAFs + 250ms for the ~200-row list to finish laying out, then `scrollIntoView({ block: "center", behavior: "smooth" })` on the target card. The target card gets a 2px amber border + 4px amber outer ring that fades away after 2.4s so the operator can see exactly where the page landed. Verified end-to-end on Adam Richardson: URL `/admin/contacts?slug=adam-richardson-atr-wines` scrolls straight to his card in centre of viewport with amber highlight, all his contact details, SMS drafts, and hook fields immediately actionable.
+
 ### Feb 2026 — Nightly Instagram-backfill cron
 
 **Shared core, two triggers.** Extracted the Perplexity-Sonar-driven IG handle backfill into a single `runInstagramBackfill(limit)` function in `/app/server/instagramBackfillCore.ts` so the manual admin button (`outreach.backfillInstagramHandles` tRPC) and the new nightly cron (`/api/scheduled/instagram-backfill`) call literally the same code path. No behaviour drift possible.

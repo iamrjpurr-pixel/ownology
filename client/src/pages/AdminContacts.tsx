@@ -289,6 +289,44 @@ export default function AdminContacts() {
     refetchOnMount: "always",
     staleTime: 0,
   });
+
+  // Deep-link support — `/admin/contacts?slug=<slug>` scrolls to and briefly
+  // highlights the target card once contacts have loaded. Wired from the
+  // "Open card ↗" links on /admin/contacts/outbound-queue so the operator
+  // can go queue → card → work → back without hunting.
+  const deepLinkSlug = typeof window !== "undefined"
+    ? new URLSearchParams(window.location.search).get("slug")
+    : null;
+  const [highlightSlug, setHighlightSlug] = useState<string | null>(null);
+  useEffect(() => {
+    if (!deepLinkSlug || isLoading || !data) return;
+    // The card list is huge (~200 rows on a full queue) so we wait for the
+    // browser to lay it out before trying to scroll. Two rAFs = one full
+    // paint cycle after data lands, plus a small settle delay for React
+    // reconciliation.
+    let cancelled = false;
+    const run = () => {
+      if (cancelled) return;
+      const el = document.querySelector(`[data-testid="contact-row-${deepLinkSlug}"]`) as HTMLElement | null;
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        setHighlightSlug(deepLinkSlug);
+        setTimeout(() => setHighlightSlug(null), 2400);
+      }
+    };
+    const raf1 = requestAnimationFrame(() => {
+      const raf2 = requestAnimationFrame(() => {
+        setTimeout(run, 250);
+      });
+      // best-effort cleanup — cancelling the inner rAF handle from the outer
+      // scope isn't strictly needed but keeps the intent explicit
+      void raf2;
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf1);
+    };
+  }, [deepLinkSlug, isLoading, data]);
   const createMutation = trpc.outreach.create.useMutation();
   const parseFromVoiceMutation = trpc.outreach.parseFromVoice.useMutation();
   const parseFromUrlMutation = trpc.outreach.parseFromUrl.useMutation();
@@ -1639,7 +1677,9 @@ export default function AdminContacts() {
               className="rounded p-4"
               style={{
                 background: "var(--ow-bg-card)",
-                border: "1px solid var(--ow-border)",
+                border: highlightSlug === c.slug ? "2px solid var(--ow-amber)" : "1px solid var(--ow-border)",
+                boxShadow: highlightSlug === c.slug ? "0 0 0 4px color-mix(in oklch, var(--ow-amber) 20%, transparent)" : undefined,
+                transition: "border-color 200ms ease, box-shadow 400ms ease",
                 opacity: isSilent ? 0.55 : 1,
               }}
             >

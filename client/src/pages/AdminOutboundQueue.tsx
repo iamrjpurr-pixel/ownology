@@ -311,7 +311,13 @@ export default function AdminOutboundQueue() {
                   </div>
                   <div>
                     <div style={{ fontFamily: "'Fraunces',serif", fontSize: "1.05rem", fontWeight: 600, marginBottom: 3 }}>
-                      {c.firstName} {c.lastName ?? ""}
+                      <Link
+                        href={`/admin/contacts?slug=${c.slug}`}
+                        data-testid={`top5-name-link-${c.slug}`}
+                        style={{ color: "var(--ow-text-hi)", textDecoration: "none", borderBottom: "1px dotted var(--ow-border-md)" }}
+                      >
+                        {c.firstName} {c.lastName ?? ""}
+                      </Link>
                       {c.winery && <span style={{ fontSize: "0.85rem", color: "var(--ow-text-mid)", fontWeight: 400 }}> · {c.winery}</span>}
                     </div>
                     {c.hookText && (
@@ -319,12 +325,19 @@ export default function AdminOutboundQueue() {
                         &ldquo;{c.hookText}&rdquo;
                       </p>
                     )}
-                    <div style={{ display: "flex", gap: 8, fontSize: "0.7rem", color: "var(--ow-text-lo)", flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", gap: 8, fontSize: "0.7rem", color: "var(--ow-text-lo)", flexWrap: "wrap", alignItems: "center" }}>
                       {c.hasMobile && <span data-testid={`chan-sms-${c.slug}`}>📱 SMS</span>}
                       {email && <span data-testid={`chan-email-${c.slug}`}>✉ email</span>}
                       {igHandle && <span data-testid={`chan-insta-${c.slug}`}>📸 @{igHandle}</span>}
                       {linkedin && <span data-testid={`chan-linkedin-${c.slug}`}>🔗 LinkedIn</span>}
                       {!c.hasMobile && !email && !igHandle && !linkedin && <span style={{ color: "#dc2626" }}>no channel — enrich first</span>}
+                      <Link
+                        href={`/admin/contacts?slug=${c.slug}`}
+                        data-testid={`top5-open-card-${c.slug}`}
+                        style={{ marginLeft: "auto", color: "var(--ow-text-mid)", textDecoration: "none", fontWeight: 600 }}
+                      >
+                        Open card ↗
+                      </Link>
                     </div>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end", minWidth: 220 }}>
