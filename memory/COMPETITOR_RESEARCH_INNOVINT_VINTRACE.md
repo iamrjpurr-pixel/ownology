@@ -62,21 +62,42 @@
 ### What it actually is
 - **Cloud-based wine production platform** originating in Australia, now global (670+ wineries)
 - **Production / blending / lab depth** is its strong suit
-- Marketed as trusted-by-670-wineries
+- Marketed as **"the most trusted winery software platform"**
+- **Mobile-first field ethos** — the entire 2-min pitch video (2020, still current per 2025 support docs) is: don't run back to the desk. Everything happens from the app in the shed.
 
-### Core modules
+### Core modules (confirmed from vendor video, support docs, and 2025 support portal)
 | Module | Detail |
 |---|---|
 | **Vineyard + blocks** | Blocks, fruit bookings, harvest management |
-| **Work orders** | Tasks, assignments (like InnoVint) |
-| **Tank map** | **2D** (InnoVint's is 3D) |
-| **Inventory + cost** | Dry-goods + case-goods; lot traceability; **cost tracking called out as weaker than InnoVint's COGS** in independent reviews |
-| **Lab Module** | Standalone lab records (Essentials tier +) |
-| **Trial Blends** | Blend simulation (Professional tier +) |
-| **Sparkling Module** | Sparkling-specific workflows (Professional +) |
+| **Harvest Calendar + Fruit Intake** | Booking visibility, auto-calc dry-goods amounts from desired addition rates |
+| **Job Management Console** | Centralised work-order hub. Create manually, via templates, or from Jobs/Vessels/Calendar pages. Assign crew, set priority, track draft → completed |
+| **Work orders** | Mobile scan + submit (transfers, topping, additions) in real time |
+| **Tank Map (2D facility view)** | Real-time vessel status, brand, volume, batch details. Enables **visual blending + transfers** (one tank into many) — this is Vintrace's most-praised feature in reviews |
+| **Product Page** | Per-product page with latest lab results + graphable metrics over time |
+| **Lab Console** | Request analysis, **graph fermentation curves** (zoom-in trends), export to CSV, **auto-ingest lab results from Baker Lab / ETS** (Vintrace-native integration) |
+| **Trial Blends ("sandbox")** | Mock blends before committing. Calculates **price/gal**, current lab analysis, impact on cost + labelling limits. Retains considered trials as records |
+| **Sparkling Module** | Sparkling-specific workflows (Professional tier +) |
+| **QR code system** | Barrel + tank + row-post QR labels — scan-to-log in the field (vendor's own core pitch) |
+| **Dashboard** | Real-time business health with **vintage-on-vintage comparison** (this year vs previous vintage/period) |
 | **Compliance** | TTB reporting; **WET reporting** (Australian Wine Equalisation Tax — Vintrace-native, InnoVint lacks) |
-| **Integrations** | Xero (accounting), TankNET (tank telemetry), WineDirect |
-| **Mobile** | iOS + Android, offline mode, barcode scanning |
+| **Tank Controller integration** | TankNET (tank telemetry) — physical hardware bridge |
+| **Integrations** | Xero (accounting), TankNET, WineDirect |
+| **Mobile** | iOS + Android, offline mode, barcode + QR scanning |
+
+### From the 2-minute demo video (verbatim value props):
+- "Harvest is hard work with no time to spare"
+- "View vineyard data, intake fruit weight, process fruit quickly and easily"
+- "Calculate addition rates, track ferment activity, record lab results — all from your smartphone"
+- "Get all your barrels labelled and tracked so they're easy to find and less likely to go in the wrong blend"
+- "Manage tanks and barrels with our simple QR code system — just scan the code"
+- "QR code labels on row posts to simplify picking schedules"
+- "No more spreadsheets and paper all over the place"
+- "Never fall behind on record-keeping again"
+- "Real-time cloud dashboard, business health insights"
+- "See how your business is tracking compared to previous vintage or period"
+- "Stay ahead of compliance requirements — quick and easy reports in a few clicks"
+- Customer testimonial: *"Without Vintrace I wouldn't have as much time to be out on the floor actually making wine"* — Brasswood
+- Positioning tagline: *"Ready to take control of your business and get hours back every week?"*
 
 ### Pricing
 - **G2/Capterra listed starting price**: US $95 / month ("Basic" tier)
