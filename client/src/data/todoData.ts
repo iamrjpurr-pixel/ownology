@@ -39,7 +39,7 @@ export interface TodoItem {
 
 /** ISO timestamp of the last edit to this file. Bump when you edit anything.
  *  Displayed at the top of /todo so visitors can see the roadmap is alive. */
-export const LAST_UPDATED = "2026-07-13";
+export const LAST_UPDATED = "2026-02-15";
 
 export const TODO: TodoItem[] = [
   // ═══ 🔴 P0 · Must-fix before first paying customer ═══
@@ -91,12 +91,12 @@ export const TODO: TodoItem[] = [
     id: "auth-scope-endpoints",
     title: "Hide member data from anonymous API calls",
     description:
-      "The default-deny gate wall (Feb 2026) blocks browser access to /dashboard, /cellar-brief, /admin etc. But the tRPC endpoints themselves still default to seed-owner-001 when there's no session — a determined attacker could pull live Ownology Cellars data via /api/trpc directly. We need every member endpoint to require a real logged-in user and scope by winery_id. Same fix applies to the LIP Audit Pack PDF.",
+      "PARTIAL AUDIT COMPLETE Feb 2026 — verified `orders.list` and `campaignMetrics.getHistory + upsert` are correctly locked to ownerProcedure (only `campaignMetrics.getLatest` is publicProcedure and that's safe, it drives the /pricing founding-member counter). STILL OPEN: sweep every remaining tRPC procedure across all routers to confirm no member data falls back to seed-owner-001 on missing session. Same fix applies to the LIP Audit Pack PDF and any /api/admin/* raw handlers (they currently sit outside the gate wall because /api/ requests skip the HTML gate).",
     priority: "p0",
     effort: "~4-6 hours",
-    status: "not-started",
+    status: "in-progress",
     category: "Safety",
-    updatedAt: "2026-02-06",
+    updatedAt: "2026-02-15",
   },
   {
     id: "rotate-jwt-secret",
@@ -299,6 +299,72 @@ export const TODO: TodoItem[] = [
     status: "not-started",
     category: "Ops",
     updatedAt: "2026-02-06",
+  },
+  {
+    id: "merch-more-skus",
+    title: "Add mug + sticker + business-card SKUs to /admin/merch-artwork",
+    description:
+      "Bar Runner + Square Coaster shipped Feb 2026 with QR + UTM tracking via /api/qr-scan/:sku. Extending the SKUS array to more products is a one-line addition per SKU. Waiting on Rich to paste VistaPrint bleed/trim/safety values for: (a) 11oz ceramic mug, (b) square 60mm sticker, (c) 85×55mm business card. Once specs land, ~5 minutes per SKU.",
+    priority: "p2",
+    effort: "~5 min per SKU",
+    status: "blocked",
+    category: "Product",
+    updatedAt: "2026-02-15",
+  },
+  {
+    id: "merch-test-print-batch",
+    title: "Order test print — 1 bar runner + 1 coaster",
+    description:
+      "The merch artwork downloader is shipped and the QR encodes /api/qr-scan/:sku with per-SKU UTM tagging + attribution logging in /admin/qr-scans. Only real-world validation left: order one of each through VistaPrint, scan the QR on the bench, watch the arrival land live in the dashboard, confirm amber colour + felt texture match the brand. Cheap to catch a colour miss on one unit vs a bulk order.",
+    priority: "p2",
+    effort: "~15 min (Rich to order) + wait for delivery",
+    status: "not-started",
+    category: "Growth",
+    updatedAt: "2026-02-15",
+  },
+  {
+    id: "weekly-bd-digest-cron",
+    title: "Wire Monday cron for the BD Digest email",
+    description:
+      "Handler + dry-run at /api/scheduled/weekly-bd-digest verified Feb 2026 — env vars set (RESEND_API_KEY, ALERT_TEST_TO, CRON_SECRET), computes real digest (contacts, view events, hot alerts, replies). Live-send path: hit endpoint with x-cron-secret header, no ?dryRun=1. Only remaining step is a Railway cron entry for Monday 9am AEDT so the digest actually lands in Rich's inbox weekly. Same shape as the daily-cellar-brief-email-cron item.",
+    priority: "p1",
+    effort: "~5 min config",
+    status: "not-started",
+    category: "Growth",
+    updatedAt: "2026-02-15",
+  },
+  {
+    id: "outreach-router-split",
+    title: "Refactor server/routers/outreach.ts (3,500+ lines)",
+    description:
+      "The single biggest file in the codebase and a merge-conflict magnet. Split into modular services: cold-call pipeline (Perplexity hooks, Claude SMS drafts, bulk rewrites), contact CRUD, campaign tracking + A/B rendering, /hi/:slug renderer, vCard export. Same disciplined approach as the Phase 2 router refactor: BEFORE deleting a sub-router from outreach.ts, grep for every symbol reference and audit which the remaining routers still need. High-risk change — do in a dedicated session, not batched with feature work.",
+    priority: "p2",
+    effort: "~4-6 hours",
+    status: "not-started",
+    category: "Hygiene",
+    updatedAt: "2026-02-15",
+  },
+  {
+    id: "quick-entry-clean-sanitise",
+    title: "Add Clean + Sanitise tiles to /quick-entry",
+    description:
+      "Wire two new blind-calculator tiles that log to `logEquipmentUse`. Every equipment use ticks the vessel's cleanliness lifecycle so the Cellar Board RAG status transitions from Green (recently sanitised) → Amber (needs recheck) → Red (unsafe until re-sanitised). Requires: understanding the existing quick-entry data model + logEquipmentUse mutation shape + Cellar Board RAG state machine. Not a batch-with-features change — do focused.",
+    priority: "p2",
+    effort: "~2-3 hours",
+    status: "not-started",
+    category: "Product",
+    updatedAt: "2026-02-15",
+  },
+  {
+    id: "cross-page-copy-audit",
+    title: "Cross-page copy consistency (Terms · Privacy · Refund · Pricing)",
+    description:
+      "Unify voice, tense, and product-name usage across the four legal + pricing pages. Right now some pages say 'the winemaker's second brain', others say 'AI cellar assistant', a few slip into 'CRM'. Needs Rich's editorial pass — the AI shouldn't guess final legal wording without a human review. Ship as a single PR so tone stays consistent across all four.",
+    priority: "p2",
+    effort: "~1 hour (Rich review) + ~30 min wiring",
+    status: "not-started",
+    category: "Product",
+    updatedAt: "2026-02-15",
   },
 
   // ═══ ⚪ Blocked / waiting ═══
