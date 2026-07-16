@@ -57,7 +57,7 @@ function interpolate(template: string, ctx: { firstName: string; winery: string;
  *  language or "second brain" — those are banned from the SMS layer. */
 function fallbackOpener(ctx: { firstName: string; winery: string; url: string }): string {
   const wineryOr = ctx.winery ? ` at ${ctx.winery}` : "";
-  return `Hi ${ctx.firstName}${wineryOr} — I've built a cellar record that pins quality panels, vintage-log reasoning, and asset trail into one thread, so a decade of craft doesn't walk out the door with the next handover. ${ctx.url} · 90 seconds if it resonates. — Rich P · 0408 105 067`;
+  return `Hi ${ctx.firstName}${wineryOr} — quality and risk management shouldn't stop at the cellar door. I've built a system that pins quality panels, vintage-log reasoning, and asset trail across the whole business, so productivity and profit compound year on year instead of restarting each vintage. ${ctx.url} · 90 seconds. — Rich P · 0408 105 067`;
 }
 
 export const smsOpenersRouter = router({
@@ -224,9 +224,13 @@ export const smsOpenersRouter = router({
   clearStaleDrafts: ownerProcedure
     .input(z.object({ dryRun: z.boolean().default(false) }).optional())
     .mutation(async ({ input }) => {
+      // Broadened Jul 2026 audit — includes every AI-first framing shipped
+      // before the Trinity rewrite. Widen this string whenever a new
+      // banned phrase surfaces.
+      const bannedRe = "cellar AI|second brain|winemaker.s second|AI apprentice|building a cellar|building Ownology|cellar-intelligence AI";
       const [countResult] = await db.execute(sql`
         SELECT COUNT(*) as n FROM outreach_contacts
-        WHERE sms_draft_override REGEXP 'second brain|cellar AI|winemaker.s second|AI apprentice'
+        WHERE sms_draft_override REGEXP ${bannedRe}
       `);
       const rows = Array.isArray(countResult) && Array.isArray(countResult[0])
         ? (countResult[0][0] as { n: number } | undefined)
@@ -237,7 +241,7 @@ export const smsOpenersRouter = router({
         await db.execute(sql`
           UPDATE outreach_contacts
           SET sms_draft_override = NULL
-          WHERE sms_draft_override REGEXP 'second brain|cellar AI|winemaker.s second|AI apprentice'
+          WHERE sms_draft_override REGEXP ${bannedRe}
         `);
       }
       return { cleared: matched, matched, dryRun: false as const };

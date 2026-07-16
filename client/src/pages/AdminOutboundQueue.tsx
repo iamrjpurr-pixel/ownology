@@ -38,7 +38,7 @@ function smsDraft(c: { firstName: string; winery?: string | null; painPoint?: st
   const wineryOr = c.winery ? ` at ${c.winery}` : "";
   // Continuity-lens fallback — matches the smsOpeners.render fallback
   // exactly so the two paths never disagree.
-  return `Hi ${c.firstName}${wineryOr} — I've built a cellar record that pins quality panels, vintage-log reasoning, and asset trail into one thread, so a decade of craft doesn't walk out the door with the next handover. ${url} · 90 seconds if it resonates. — Rich P · 0408 105 067`;
+  return `Hi ${c.firstName}${wineryOr} — quality and risk management shouldn't stop at the cellar door. I've built a system that pins quality panels, vintage-log reasoning, and asset trail across the whole business, so productivity and profit compound year on year instead of restarting each vintage. ${url} · 90 seconds. — Rich P · 0408 105 067`;
 }
 
 // ── Instagram / LinkedIn extraction from the notes field ────────────────

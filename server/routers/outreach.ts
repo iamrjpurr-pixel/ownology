@@ -276,7 +276,45 @@ export const outreachRouter = router({
       .select()
       .from(schema.outreachContacts)
       .orderBy(desc(schema.outreachContacts.createdAt));
-    return { contacts: rows };
+
+    // Attach the server-rendered SMS opener per row (same logic as
+    // outboundQueue). AdminContacts' smsDraft() prefers `opener` when
+    // present, so this is the surface that fixes Rich's "why is the
+    // contact card still showing cellar AI" complaint. Jul 2026 audit.
+    const actives = await db
+      .select()
+      .from(schema.smsOpenerVariants)
+      .where(eq(schema.smsOpenerVariants.active, 1))
+      .orderBy(asc(schema.smsOpenerVariants.sortIndex));
+    const previewBase = (process.env.PUBLIC_APP_URL?.trim() || process.env.CANONICAL_HOST?.trim() || "https://ownology.ai").replace(/\/$/, "");
+    const stableHash = (s: string): number => {
+      let h = 5381;
+      for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+      return Math.abs(h);
+    };
+    const withOpener = rows.map((c) => {
+      const url = `${previewBase}/hi/${c.slug}`;
+      const winery = c.winery ?? "";
+      const wineryOr = winery ? ` at ${winery}` : "";
+      const firstName = c.firstName ?? "there";
+      let opener: string | null = null;
+      let openerVariantKey: string | null = null;
+      if (c.smsDraftOverride && c.smsDraftOverride.trim()) {
+        opener = c.smsDraftOverride.trim();
+        openerVariantKey = "override";
+      } else if (actives.length > 0) {
+        const pick = actives[stableHash(c.slug) % actives.length];
+        opener = pick.template
+          .replaceAll("${firstName}", firstName)
+          .replaceAll("${winery}", winery)
+          .replaceAll("${wineryOr}", wineryOr)
+          .replaceAll("${url}", url);
+        openerVariantKey = pick.key;
+      }
+      return { ...c, opener, openerVariantKey };
+    });
+
+    return { contacts: withOpener };
   }),
 
   /** OWNER — Outbound queue. Sequences unsent contacts by (a) hook

@@ -89,23 +89,17 @@ function extractChannels(notes: string | null | undefined): {
   };
 }
 
-function smsDraft(c: { firstName: string; winery?: string | null; event?: string | null; painPoint?: string | null; hookText?: string | null; slug: string }): string {
-  const where = c.event ? `at ${c.event}` : "the other day";
+function smsDraft(c: { firstName: string; winery?: string | null; event?: string | null; painPoint?: string | null; hookText?: string | null; slug: string; opener?: string | null }): string {
+  // ── Trinity-first opener (Jul 2026, Rich) ──────────────────────────
+  // Server-rendered variant from sms_opener_variants wins if present.
+  // That's the /admin/sms-openers picker output. Falls back to the
+  // Continuity template — matches the smsOpeners.render fallback so the
+  // two paths never disagree. NO "AI" / "brain" language anywhere.
+  if (c.opener && c.opener.trim().length > 0) return c.opener;
+
   const url = `${PREVIEW_BASE}/hi/${c.slug}`;
-  // Tier-1 preferred: use the Perplexity-sourced hook (specific, cited,
-  // dated). This is the "human who did their homework" opener.
-  if (c.hookText) {
-    const wineryBit = c.winery ? ` (${c.winery})` : "";
-    return `g'day ${c.firstName}${wineryBit} — ${c.hookText}. i've been building a cellar AI grounded in your own vintage logs — 90 sec look: ${url} — Rich P · 0408 105 067`;
-  }
-  // Tier-2 fallback: painPoint (business summary) as before.
-  if (c.painPoint) {
-    const wineryBit = c.winery ? ` (${c.winery})` : "";
-    return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. You mentioned ${c.painPoint}; I've since built a cellar AI that answers exactly that, grounded in your own vintage logs. 90 sec look: ${url} — Rich P · 0408 105 067`;
-  }
-  // Tier-3 honest fallback — no faux familiarity
-  const wineryBit = c.winery ? `, sending this to ${c.winery} too` : "";
-  return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. I've since built a cellar AI grounded in your own vintage logs — figured you might find it useful. 90 sec look: ${url} — Rich P · 0408 105 067`;
+  const wineryOr = c.winery ? ` at ${c.winery}` : "";
+  return `Hi ${c.firstName}${wineryOr} — quality and risk management shouldn't stop at the cellar door. I've built a system that pins quality panels, vintage-log reasoning, and asset trail across the whole business, so productivity and profit compound year on year instead of restarting each vintage. ${url} · 90 seconds. — Rich P · 0408 105 067`;
 }
 
 /**
@@ -1726,7 +1720,7 @@ export default function AdminContacts() {
         )}
         {contacts.map((c) => {
           const url = `${PREVIEW_BASE}/hi/${c.slug}`;
-          const templateSms = smsDraft({ firstName: c.firstName, winery: c.winery, event: c.event, painPoint: c.painPoint, hookText: (c as { hookText?: string | null }).hookText ?? null, slug: c.slug });
+          const templateSms = smsDraft({ firstName: c.firstName, winery: c.winery, event: c.event, painPoint: c.painPoint, hookText: (c as { hookText?: string | null }).hookText ?? null, slug: c.slug, opener: (c as { opener?: string | null }).opener ?? null });
           const effectiveSms = c.smsDraftOverride ?? templateSms;
           const copied = copyState[c.slug];
           const status = ((c.status ?? "cold") as ContactStatus);

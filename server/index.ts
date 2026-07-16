@@ -1658,7 +1658,7 @@ async function startServer() {
           lens: "continuity",
           sortIndex: 10,
           active: 1,
-          template: `Hi \${firstName} — I've built a cellar record that pins quality panels, vintage-log reasoning, and asset trail into one thread, so a decade of craft doesn't walk out the door with the next handover. \${url} · 90 seconds if it resonates. — Rich P · 0408 105 067`,
+          template: `Hi \${firstName} — quality and risk management shouldn't stop at the cellar door. I've built a system that pins quality panels, vintage-log reasoning, and asset trail across the whole business, so productivity and profit compound year on year instead of restarting each vintage. \${url} · 90 seconds. — Rich P · 0408 105 067`,
         },
         {
           key: "vintage-fog-v1",
@@ -1666,7 +1666,7 @@ async function startServer() {
           lens: "vintage-fog",
           sortIndex: 20,
           active: 0,
-          template: `Hi \${firstName} — day 40 of vintage, 2am, your own notebook reads like a stranger's. I've built a record where quality, vintage-log reasoning, and asset trail sit together, so your yesterday-self still makes sense. \${url} · Worth a look. — Rich P · 0408 105 067`,
+          template: `Hi \${firstName} — day 40 of vintage, 2am, your own notebook reads like a stranger's. Built a business-wide quality and risk record so decisions, panels, and assets sit on one thread — your yesterday-self still makes sense, and the numbers under it compound. \${url} — Rich P · 0408 105 067`,
         },
         {
           key: "craft-compounding-v1",
@@ -1674,7 +1674,7 @@ async function startServer() {
           lens: "craft",
           sortIndex: 30,
           active: 0,
-          template: `Hi \${firstName} — every vintage seems to rediscover what the last one knew. I've built a cellar record that keeps quality panels, vintage-log reasoning, and asset trail woven into one thread, so your best 2023 calls sharpen the 2026 vintage. \${url} — Rich P · 0408 105 067`,
+          template: `Hi \${firstName} — every vintage seems to rediscover what the last one knew. Built a business-wide quality and risk record — quality panels, vintage-log reasoning, and asset trail woven together — so your best 2023 calls sharpen the 2026 numbers instead of restarting. \${url} — Rich P · 0408 105 067`,
         },
         {
           key: "audit-v1",
@@ -1682,7 +1682,7 @@ async function startServer() {
           lens: "audit",
           sortIndex: 40,
           active: 0,
-          template: `Hi \${firstName}\${wineryOr} — audits reward one source of truth. I've built a cellar record where quality panels, vintage-log decisions, and asset trail live in one thread, so there's no scramble when APCO or a regulator asks about a specific batch. \${url} — Rich P · 0408 105 067`,
+          template: `Hi \${firstName}\${wineryOr} — audits reward one source of truth. Built quality and risk management across the whole business — quality panels, vintage-log decisions, asset trail — so productivity and profit ride on the same data compliance does. \${url} — Rich P · 0408 105 067`,
         },
       ];
       for (const s of seeds) {
