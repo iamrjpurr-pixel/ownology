@@ -893,6 +893,42 @@ export const outreachRouter = router({
       return { ok: true, at: now };
     }),
 
+  /** OWNER — Mark a prospect as contacted via a social channel
+   *  (Instagram DM, LinkedIn message, Facebook message). Mirrors the
+   *  markSent / markEmailSent pattern but on the social-channel columns
+   *  added in Jul 2026. Also nudges the status: cold → lukewarm on first
+   *  outbound touch, so social-first contacts don't stay in "cold" forever.
+   *
+   *  Idempotent — safe to click twice; latest timestamp wins. */
+  markSocialContacted: ownerProcedure
+    .input(z.object({
+      slug: z.string().min(1).max(80),
+      channel: z.enum(["instagram", "linkedin", "facebook"]),
+    }))
+    .mutation(async ({ input }) => {
+      const now = Date.now();
+      const column = input.channel === "instagram"
+        ? "instaContactedAt"
+        : input.channel === "linkedin"
+          ? "linkedinContactedAt"
+          : "facebookContactedAt";
+      // Read current status so we can nudge cold → lukewarm without
+      // stomping a manually-set warm/skip/sales.
+      const existing = await db
+        .select({ status: schema.outreachContacts.status })
+        .from(schema.outreachContacts)
+        .where(eq(schema.outreachContacts.slug, input.slug))
+        .limit(1);
+      const currentStatus = existing[0]?.status ?? "cold";
+      const nextStatus = currentStatus === "cold" ? "lukewarm" : currentStatus;
+
+      await db
+        .update(schema.outreachContacts)
+        .set({ [column]: now, status: nextStatus })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true, at: now, channel: input.channel };
+    }),
+
   /** OWNER — Save (or clear) a captured reply from the prospect.
    *
    *  On save with non-empty text, runs three actions inline:

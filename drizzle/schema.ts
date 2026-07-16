@@ -1454,6 +1454,14 @@ export const outreachContacts = mysqlTable(
     // because a contact might be emailed but not SMS'd (e.g. no mobile), and
     // we want both channels tracked independently for funnel accuracy.
     emailSentAt: bigint("email_sent_at", { mode: "number" }),
+    // Social-channel contact timestamps (Jul 2026). Set when operator ticks
+    // "Mark Insta / LinkedIn / FB sent" on the contact card — mirrors the
+    // sms_sent_at / email_sent_at pattern so downstream funnel + pipeline
+    // views can see whether we've reached this person on ANY channel, not
+    // just SMS/email.
+    instaContactedAt: bigint("insta_contacted_at", { mode: "number" }),
+    linkedinContactedAt: bigint("linkedin_contacted_at", { mode: "number" }),
+    facebookContactedAt: bigint("facebook_contacted_at", { mode: "number" }),
     // Claude's classification of the pasted reply text — one of
     // "interested" | "objection" | "not-now" | "cold" | null. Used to
     // colour-code the contact card + drive the "Reply-first follow-up"

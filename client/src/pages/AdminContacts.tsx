@@ -343,6 +343,7 @@ export default function AdminContacts() {
   const setMobileMutation = trpc.outreach.setMobile.useMutation();
   const removeMutation = trpc.outreach.remove.useMutation();
   const markEmailSentMutation = trpc.outreach.markEmailSent.useMutation();
+  const markSocialContactedMutation = trpc.outreach.markSocialContacted.useMutation();
   const saveReplyMutation = trpc.outreach.saveReply.useMutation();
 
   const [form, setForm] = useState({
@@ -2697,6 +2698,50 @@ export default function AdminContacts() {
                       Mark booked
                     </button>
                   )}
+                  {/* ── Social-channel contacted markers (Jul 2026) ─────────
+                       Three parallel toggles for Instagram / LinkedIn /
+                       Facebook. Same visual pattern as Mark SMS sent:
+                       unstamped → grey button, stamped → green ✓ badge with
+                       tooltip showing the timestamp. Server nudges cold →
+                       lukewarm on first tap. */}
+                  {([
+                    { channel: "instagram" as const, label: "Insta", at: c.instaContactedAt, icon: "📸" },
+                    { channel: "linkedin" as const, label: "LinkedIn", at: c.linkedinContactedAt, icon: "🔗" },
+                    { channel: "facebook" as const, label: "FB", at: c.facebookContactedAt, icon: "📘" },
+                  ] as const).map((s) => (
+                    s.at ? (
+                      <span
+                        key={s.channel}
+                        data-testid={`social-badge-${s.channel}-${c.slug}`}
+                        style={{
+                          fontFamily: "'Lato',sans-serif",
+                          fontSize: "0.7rem",
+                          padding: "3px 8px",
+                          background: "color-mix(in oklch, oklch(0.70 0.16 140) 15%, transparent)",
+                          color: "#16a34a",
+                          border: "1px solid #16a34a",
+                          borderRadius: 3,
+                          fontWeight: 600,
+                        }}
+                        title={`${s.label} contacted ${new Date(s.at).toLocaleString()}`}
+                      >
+                        ✓ {s.label}
+                      </span>
+                    ) : (
+                      <button
+                        key={s.channel}
+                        data-testid={`mark-social-${s.channel}-${c.slug}`}
+                        onClick={() => markSocialContactedMutation.mutate(
+                          { slug: c.slug, channel: s.channel },
+                          { onSuccess: () => utils.outreach.list.invalidate() }
+                        )}
+                        style={btn}
+                        title={`Mark this contact as reached via ${s.label}`}
+                      >
+                        {s.icon} {s.label} sent
+                      </button>
+                    )
+                  ))}
                   <button
                     data-testid={`remove-${c.slug}`}
                     onClick={() => {

@@ -4,6 +4,18 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Jul 2026 — Social-channel contacted markers on the contact card
+
+**Problem.** The contact card only surfaced two "sent" markers (Mark SMS sent · ✓ Emailed) and one status flip (Mark booked). Winemakers reached via Instagram DM, LinkedIn message, or Facebook message had no way to be marked contacted — so the queue's SMS-null filter kept them at the top forever even after the operator had sent them a DM.
+
+**Three new sent-markers.** Three parallel toggles on every contact card, sitting next to Mark SMS sent / Mark booked: **📸 Insta sent · 🔗 LinkedIn sent · 📘 FB sent**. Each toggle is a small button that swaps to a green **✓ Insta / ✓ LinkedIn / ✓ FB** badge on click, with a tooltip showing the exact timestamp — same visual pattern as the existing ✓ Emailed badge. Idempotent — safe to double-click; latest timestamp wins.
+
+**Schema.** Three new nullable BIGINT columns on `outreach_contacts`: `insta_contacted_at`, `linkedin_contacted_at`, `facebook_contacted_at`. Added via idempotent `ADD COLUMN IF NOT EXISTS` in the bootstrap block of `server/index.ts` — safe to re-run, safe on fresh production deploys. Mirrored in the drizzle schema so downstream queries (funnel, pipeline board, engagement) can see the fields without manual joins.
+
+**New tRPC procedure `outreach.markSocialContacted({slug, channel})`.** Owner-scoped, `channel: "instagram" | "linkedin" | "facebook"`. Stamps the correct column with `Date.now()` AND nudges `status` from `cold` → `lukewarm` on the first outbound social touch, so social-first contacts don't stay in "cold" forever. Nudge only fires when status is currently `cold` — never stomps a manually-set `warm` / `skip` / `sales`.
+
+**Verified end-to-end on Tim Stock's card** — curl-marked Insta then clicked LinkedIn from the UI: both flipped to green ✓ badges, status auto-nudged to Lukewarm, FB button still shows for the third channel.
+
 ### Jul 2026 — Outbound queue ↔ contact card deep-linking
 
 **Problem.** After the "Today's Top 5" hero landed, there was no way to click from a queue row into the underlying contact card to work the contact (edit hook, mark status, paste reply, delete etc.). The only path — "Enrich this contact →" — only appeared when a contact had zero channels.

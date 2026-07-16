@@ -1529,6 +1529,23 @@ async function startServer() {
       }
     }
 
+    // outreach_contacts — social-channel contacted timestamps (Jul 2026).
+    // Tracks when the operator marked a prospect as contacted via each social
+    // channel. Nullable BIGINT (unix ms). Feeds the /admin/contacts card badges
+    // (✓ Insta / ✓ LinkedIn / ✓ FB) and lets us compute per-channel funnel
+    // analytics later. Guarded ALTERs so re-runs are no-ops.
+    for (const alter of [
+      "ADD COLUMN IF NOT EXISTS insta_contacted_at BIGINT NULL",
+      "ADD COLUMN IF NOT EXISTS linkedin_contacted_at BIGINT NULL",
+      "ADD COLUMN IF NOT EXISTS facebook_contacted_at BIGINT NULL",
+    ]) {
+      try {
+        await db.execute(sql.raw(`ALTER TABLE outreach_contacts ${alter}`));
+      } catch {
+        // Column already exists — best-effort.
+      }
+    }
+
     // Create cellar_briefs table (Feb 2026, Cellar Brief feature).
     // Idempotent CREATE TABLE IF NOT EXISTS. Drizzle ORM only handles schema
     // for queries; the table itself is created here on first boot.
