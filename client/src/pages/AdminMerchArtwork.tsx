@@ -310,6 +310,22 @@ function composeArtwork(canvas: HTMLCanvasElement, opts: ComposeOptions): void {
   }
 }
 
+// ─── Default QR landing per SKU ─────────────────────────────────────────────
+// All merch QRs land on the /vs/innovint-vintrace comparison page — the
+// SEO front-door + honest positioning story that converts cellar-door scans
+// into quiz-takers or founding members. UTMs baked in per SKU for attribution.
+const DEFAULT_QR_URL = "https://ownology.ai/vs/innovint-vintrace";
+function qrTargetFor(skuId: string): string {
+  const params = new URLSearchParams({
+    utm_source: skuId,
+    utm_medium: "merch",
+    utm_campaign: "cellar-door",
+  });
+  return `${DEFAULT_QR_URL}?${params.toString()}`;
+}
+// Human-readable version rendered on the artwork (no UTM noise on the print)
+const QR_DISPLAY_URL = "ownology.ai/vs";
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 export default function AdminMerchArtwork() {
   const [skuId, setSkuId] = useState<string>(SKUS[0].id);
@@ -320,12 +336,40 @@ export default function AdminMerchArtwork() {
   const [markScale, setMarkScale] = useState(1.0);
   const [showBorder, setShowBorder] = useState(true);
   const [showGuides, setShowGuides] = useState(true);
+  const [showQr, setShowQr] = useState(true);
+  const [qrDisplayUrl, setQrDisplayUrl] = useState(QR_DISPLAY_URL);
   const [downloading, setDownloading] = useState(false);
+  const [qrImg, setQrImg] = useState<HTMLImageElement | null>(null);
 
   const sku = useMemo(() => SKUS.find((s) => s.id === skuId) ?? SKUS[0], [skuId]);
   const bg = useMemo(() => BG_PRESETS.find((b) => b.id === bgId) ?? BG_PRESETS[0], [bgId]);
   const mark = useMemo(() => MARK_ASSETS.find((m) => m.id === markId) ?? MARK_ASSETS[0], [markId]);
   const markImg = useImage(mark.url);
+
+  // The URL that gets ENCODED into the QR (UTM-tagged per SKU for attribution)
+  const qrEncodedUrl = useMemo(() => qrTargetFor(skuId), [skuId]);
+
+  // Regenerate QR any time the encoded URL changes. Uses high error-correction
+  // so scans still work through print variance / cork surface texture.
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const dataUrl = await QRCode.toDataURL(qrEncodedUrl, {
+          errorCorrectionLevel: "H",
+          margin: 1,
+          scale: 20,
+          color: { dark: "#000000", light: "#ffffff" },
+        });
+        const img = new Image();
+        img.onload = () => { if (alive) setQrImg(img); };
+        img.src = dataUrl;
+      } catch (err) {
+        console.error("QR generation failed", err);
+      }
+    })();
+    return () => { alive = false; };
+  }, [qrEncodedUrl]);
 
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -338,8 +382,11 @@ export default function AdminMerchArtwork() {
       showGuides,
       markScale,
       showBorder,
+      qrImg,
+      qrUrl: qrDisplayUrl,
+      showQr,
     });
-  }, [sku, bg, mark, markImg, wordmark, tagline, showGuides, markScale, showBorder]);
+  }, [sku, bg, mark, markImg, wordmark, tagline, showGuides, markScale, showBorder, qrImg, qrDisplayUrl, showQr]);
 
   async function handleDownload() {
     setDownloading(true);
@@ -352,6 +399,9 @@ export default function AdminMerchArtwork() {
         showGuides: false,
         markScale,
         showBorder,
+        qrImg,
+        qrUrl: qrDisplayUrl,
+        showQr,
       });
       const blob = await new Promise<Blob | null>((res) => off.toBlob(res, "image/png", 1.0));
       if (!blob) throw new Error("Canvas export failed");
@@ -573,8 +623,37 @@ export default function AdminMerchArtwork() {
             />
           </div>
 
+          {/* QR display URL */}
+          <div>
+            <label htmlFor="qrurl" style={labelStyle}>QR display URL</label>
+            <input
+              id="qrurl"
+              data-testid="qr-url-input"
+              type="text"
+              value={qrDisplayUrl}
+              onChange={(e) => setQrDisplayUrl(e.target.value)}
+              maxLength={60}
+              style={inputStyle}
+              placeholder="ownology.ai/vs"
+            />
+            <p style={{ margin: "6px 0 0", fontSize: "0.68rem", color: "var(--ow-text-lo)", lineHeight: 1.5 }}>
+              <strong style={{ color: "var(--ow-amber)" }}>Scan target:</strong> <span style={{ fontFamily: "'Fira Code', monospace", fontSize: "0.66rem", wordBreak: "break-all" }}>{qrEncodedUrl}</span>
+              <br />
+              <em>The QR encodes the full UTM-tagged URL for attribution. The clean version above is what prints on the artwork.</em>
+            </p>
+          </div>
+
           {/* Toggles */}
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.82rem", cursor: "pointer" }}>
+              <input
+                data-testid="toggle-qr"
+                type="checkbox"
+                checked={showQr}
+                onChange={(e) => setShowQr(e.target.checked)}
+              />
+              Show QR code + URL <span style={{ color: "var(--ow-text-lo)", fontSize: "0.7rem" }}>(recommended)</span>
+            </label>
             <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.82rem", cursor: "pointer" }}>
               <input
                 data-testid="toggle-border"

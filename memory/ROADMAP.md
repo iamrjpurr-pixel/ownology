@@ -9,7 +9,9 @@ Last consolidated: 28 Jun 2026.
 
 ## ✅ Shipped Feb 2026
 
-- **Merch artwork downloader (`/admin/merch-artwork`)** — VistaPrint-ready PNG composer at 300 DPI for Pro Felt Bar Runner (856×225 mm bleed) and Square Coaster (100×100 mm bleed). Reuses existing brand mark PNGs; SKU array is one-line extensible for future products (mug, sticker, t-shirt, etc.).
+- **`/vs/innovint-vintrace` public comparison landing** — SEO-tuned three-way comparison, honest "where we lag" section, sitemap-indexed. QR-scan target for all merch. Deep-links to `/for-innovint-users`, `/for-vintrace-users`, `/pricing-comparison`. Positioning: "Ownology isn't replacing their cellar ledger — it's the second brain that runs alongside it."
+- **Competitor research memo** at `/app/memory/COMPETITOR_RESEARCH_INNOVINT_VINTRACE.md` — sourced facts from vendor sites, Capterra, G2, Rich's InnoVint screenshots, Vintrace demo transcript. Source of truth for any future comparison copy.
+- **Merch artwork downloader (`/admin/merch-artwork`)** — VistaPrint-ready PNG composer at 300 DPI for Pro Felt Bar Runner (856×225 mm bleed) and Square Coaster (100×100 mm bleed) with QR + UTM-tagged landing per SKU. Reuses existing brand mark PNGs; SKU array is one-line extensible.
 
 ---
 

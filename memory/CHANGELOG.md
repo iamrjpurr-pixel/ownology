@@ -4,6 +4,46 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Feb 2026 — `/vs/innovint-vintrace` public comparison landing + QR-wired merch
+
+Rich pushed back on my thin competitor knowledge before I wrote comparison copy. Rebuilt Ownology's competitive positioning from first-principles research.
+
+**Research process:**
+- Web-searched vendor sites + Capterra + G2 + GetApp + Wine Industry Advisor
+- Parsed InnoVint product screenshots Rich sent (lot dashboard, chemistry panel with dated analytes, composition percentages to 4dp, vessel register, work-order queue)
+- Extracted Vintrace 2-min demo transcript + 2025 support-portal docs (Job Management Console, Lab Console with Baker Lab/ETS auto-ingest, sandbox trial-blending)
+- Consolidated to `/app/memory/COMPETITOR_RESEARCH_INNOVINT_VINTRACE.md` — source-of-truth memo with 11 cited references
+
+**Strategic reframe (new positioning):**
+- Old frame: "Ownology is the modern AI-native alternative to InnoVint/Vintrace"
+- **New frame**: "Ownology isn't trying to replace their cellar ledger. It's the second brain that runs alongside it." — different category, not a feature race
+- Target buyer: **owner-operator winemaker who is also the marketer, DTC channel, tasting-room host, and story publisher** — one person doing eight jobs, needs AI leverage across all of them
+
+**New page shipped** at `/app/client/src/pages/VsInnovintVintrace.tsx`:
+- **Public** (added to `PUBLIC_EXACT` in both `/app/server/index.ts` and `/app/viteGateWall.ts`)
+- **SEO-tuned**: canonical `https://ownology.ai/vs/innovint-vintrace`, meta title + description + OG image, sitemap entry with priority 0.85
+- **8 sections**: Hero → Category reframe → 3 vendor cards (You are this winemaker if…) → 17-row feature matrix with `core/yes/partial/no` colour-coded cells + per-cell notes → "Where we honestly lag" (6 tiles publishing our gaps — credibility play) → "The eight things only Ownology does" → 3 migration paths (from InnoVint / from Vintrace / starting fresh) → Closing CTA
+- **UTM-ready CTAs** via `withUtm()` helper
+- **Deep-links** to `/for-innovint-users`, `/for-vintrace-users`, `/pricing-comparison`
+- Verified: 17 matrix rows, 8 unique tiles, 6 lag tiles, 3 migration cards, canonical + title + description all correctly rendered
+
+**Merch artwork QR wired** to the new landing page:
+- `/admin/merch-artwork` now includes QR generation via the `qrcode` npm package (error-correction level "H" for print-through-cork reliability)
+- **Default target**: `https://ownology.ai/vs/innovint-vintrace` — automatically UTM-tagged per SKU:
+  - Bar Runner → `?utm_source=pro-felt-bar-runner&utm_medium=merch&utm_campaign=cellar-door`
+  - Coaster → `?utm_source=square-coaster&utm_medium=merch&utm_campaign=cellar-door`
+- **Bar Runner layout**: mark left · wordmark + tagline + display-URL centre · QR + SCAN badge right
+- **Coaster layout**: mark top · wordmark · tagline · QR + URL bottom (inside safety circle)
+- Display URL shown on artwork: clean `ownology.ai/vs` (no UTM noise); QR encodes the tagged URL for attribution
+- New UI controls: `data-testid="qr-url-input"` for display text, `data-testid="toggle-qr"` for hide/show, sidebar shows the full UTM-tagged scan target so the operator can verify before print
+
+**Audit outcome for the four existing comparison pages** (not touched this session, flagged for later):
+- `/pricing-comparison` — kept as-is (strong "receipt" rate sheet, sourced, defensible)
+- `/for-innovint-users` — kept gated, deep-linked from new page (works as full migration guide)
+- `/for-vintrace-users` — kept gated, deep-linked from new page
+- `/competitive-advantage` — **FLAGGED** for rewrite: claims "0 direct competitors found" which is stale after InnoVint shipped AI Copilot Jan 2026
+
+
 ### Feb 2026 — Merch artwork downloader (`/admin/merch-artwork`)
 
 Rich asked "Did you finish merchnimages?" and provided VistaPrint spec sheets for the Pro Felt Bar Runner (856×225 mm bleed) and Square Coaster (100×100 mm bleed / 90×90 mm safety). Built a client-side print-artwork composer:

@@ -102,6 +102,7 @@ const UnsubscribeWeeklyReco = lazy(() => import("./pages/UnsubscribeWeeklyReco")
 const AdminEngagement = lazy(() => import("./pages/AdminEngagement"));
 const AdminBrandAssets = lazy(() => import("./pages/AdminBrandAssets"));
 const AdminMerchArtwork = lazy(() => import("./pages/AdminMerchArtwork"));
+const VsInnovintVintrace = lazy(() => import("./pages/VsInnovintVintrace"));
 const AdminEventIngest = lazy(() => import("./pages/AdminEventIngest"));
 const AdminAudioHook = lazy(() => import("./pages/AdminAudioHook"));
 const AdminMarketingKit = lazy(() => import("./pages/AdminMarketingKit"));
@@ -330,6 +331,7 @@ function Router() {
       <Route path={"/apprentice"} component={Learn} />
       <Route path={"/for-innovint-users"} component={ForInnoVintUsers} />
       <Route path={"/for-vintrace-users"} component={ForVintraceUsers} />
+      <Route path={"/vs/innovint-vintrace"} component={VsInnovintVintrace} />
       <Route path={"/for-home-winemakers"} component={ForHomeWinemakers} />
       <Route path={"/for-home-winemakers/troubleshooting"} component={HomeWinemakerTroubleshooting} />
       <Route path={"/for-home-winemakers/glossary"} component={HomeWinemakerGlossary} />

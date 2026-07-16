@@ -67,6 +67,8 @@ const PUBLIC_EXACT = new Set<string>([
   "/merch",
   "/merch/success",
   "/merch/cancel",
+  // Public comparison landing — QR-scan target for merch (bar runner + coaster)
+  "/vs/innovint-vintrace",
   "/cellar-journal",
   "/how-we-trace",
   "/apco",

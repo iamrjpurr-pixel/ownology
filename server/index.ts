@@ -669,6 +669,8 @@ async function startServer() {
     "/merch",
     "/merch/success",
     "/merch/cancel",
+    // Public comparison landing — QR-scan target for merch (bar runner + coaster)
+    "/vs/innovint-vintrace",
     "/cellar-journal",
     "/how-we-trace",
     "/reference/vine",
