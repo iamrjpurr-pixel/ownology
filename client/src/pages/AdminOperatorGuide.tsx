@@ -42,26 +42,55 @@ const SECTIONS: Section[] = [
   {
     id: "morning",
     title: "Your morning ritual",
-    subtitle: "5 minutes, every day. Do these three in order.",
+    subtitle: "5 minutes. Do these in order.",
     icon: <Sun size={22} />,
     steps: [
       {
-        href: "/admin/contacts/pipeline",
-        label: "Pipeline board",
-        what: "Trello-style board of every SMS prospect. Focus on the Awaiting reply column — nudge anyone who's opened your link but not replied. Drag cards left/right as things change.",
+        href: "/admin/contacts/outbound-queue",
+        label: "Today's Top 5 (start here)",
+        what: "The queue page opens with a big amber \"Today's top 5\" card at the top. Five rows, one primary button per row (Copy SMS · Open email · DM on Instagram · Message on LinkedIn — whichever channel the contact actually has). Tap the button, paste and send, then tap the dashed \"Mark sent, next →\" and move to the next row. Do just these five. That's the whole day's outbound. Every noisy tool (region filter, bulk AI rewrite, cohort copy, IG backfill, full 200+ queue) is tucked into \"Advanced tools\" at the bottom so it can't distract you.",
       },
       {
-        href: "/admin/contacts",
-        label: "Contacts (list view)",
-        what: "Same prospects, list layout. Tap Copy SMS draft on a warm row, tweak the message in the inline editor, send it from your iPhone, then click Mark sent. Rows tagged sales or skip are dimmed so you skip them without thinking.",
+        href: "/admin/contacts/pipeline",
+        label: "Pipeline board — check for replies",
+        what: "Trello-style board of every SMS prospect. Focus on the Awaiting reply column — nudge anyone who's opened your link but not replied. Drag cards left/right as the state changes.",
       },
       {
         href: "/admin/funnel",
-        label: "Conversion funnel",
+        label: "Conversion funnel — quick weekly peek",
         what: "Which CTAs actually convert? The Conv % column highlights winners in green. If free-paused sits above 5%, lower DAILY_FREE_BUDGET_USD in .env so the upsell surfaces sooner.",
       },
     ],
     note: "That's it for the mandatory daily loop. Everything below is reactive — do it when the situation calls for it.",
+  },
+  {
+    id: "queue-deep",
+    title: "Working a single queue row (the details)",
+    subtitle: "How the top-5 CTAs and channels actually behave.",
+    icon: <MessageCircle size={22} />,
+    steps: [
+      {
+        href: "/admin/contacts/outbound-queue",
+        label: "Channel priority explained",
+        what: "The primary button on each row picks the best channel automatically: mobile → email → Instagram DM → LinkedIn message → \"Enrich this contact\" if there's nothing. The 📱 · ✉ · 📸 · 🔗 icons below the hook show every channel the contact has, so at a glance you know if IG is a shot in the dark or the only path.",
+      },
+      {
+        href: "/admin/contacts/outbound-queue",
+        label: "Instagram + LinkedIn DMs",
+        what: "For contacts with no mobile + no email (Tim Stock, Sarah Feehan, ~30% of the Wine Australia cohort), the primary button says \"DM @handle on Instagram\". Tapping it copies a shorter Insta-appropriate draft to your clipboard (no landing URL — Insta punishes first-message links) AND opens instagram.com/handle in a new tab. Paste into their DM box and send. Same pattern for LinkedIn.",
+      },
+      {
+        href: "/admin/contacts",
+        label: "Open card ↗ — work the contact",
+        what: "Every top-5 row has two ways into the contact card: the name is a dotted-underline link, and the far right of the channel-icon strip has an \"Open card ↗\" link. Both open /admin/contacts?slug=<slug> which scrolls straight to that card and briefly highlights it with an amber ring. From there you can edit the hook, paste a reply, mark status, change persona, etc. Browser back → straight back to your top-5.",
+      },
+      {
+        href: "/admin/contacts/outbound-queue",
+        label: "Advanced tools (fold-out at the bottom)",
+        what: "Tap the \"Advanced tools · region filter · bulk AI rewrite · vCard export · full queue\" summary to reveal: the 13-region filter chips, the Warm/Brief/Regional bulk AI rewrite strip (Claude rewrites SMS drafts in the chosen tone — ~$0.005 per contact), the Copy cohort as TSV button (spreadsheet-friendly export), the Export as vCard button (AirDrop to your phone → Contacts absorbs it → Messages autocompletes winemaker names), the pink 📸 IG handle backfill button (Perplexity looks up up to 50 winery handles at ~$0.20/run), and the full ranked queue with all 200+ contacts.",
+      },
+    ],
+    note: "The IG backfill button is also wired to a nightly Railway cron (2am Adelaide) — the backlog trickles down automatically. The button is there for when you want to force a batch.",
   },
   {
     id: "sales",
@@ -133,7 +162,7 @@ const SECTIONS: Section[] = [
       {
         href: "/quick-entry",
         label: "Quick Entry (manual)",
-        what: "For a single event when voice isn't practical. The Confirm screen has decision-logic Why? preset chips so you capture the reasoning behind every add — this is what powers your AI's personalised advice.",
+        what: "For a single event when voice isn't practical. New (Feb 2026): the top of the page has a \"Cellar hygiene · one tap\" strip with 🧽 Clean and 🧴 Sanitise tiles — tap one, enter the equipment name (Tank 4, Press, Pump…), add optional method notes (\"Star San @ 300ppm · 5 min contact\"), tap Log. Creates a completed cellar_task in one write; feeds the /admin/cellar-board RAG board (a sanitise flips the equipment green). Below the hygiene strip sits the existing 7-event confirm flow (add, transfer, rack, top up, taste, note, measurement) with decision-logic Why? preset chips so you capture the reasoning behind every add — this is what powers your AI's personalised advice.",
       },
     ],
   },
@@ -187,6 +216,11 @@ const SECTIONS: Section[] = [
         what: "Your internal SOP library. Uses localStorage to track which SOPs you've read, so you can see gaps at a glance.",
       },
       {
+        href: "/login",
+        label: "Login (Google + magic-link)",
+        what: "Sign-in surface for winemakers. Google OAuth is the primary path. Below the \"or\" divider, an email input + \"Email me a login link\" button sends a one-tap magic-link via Resend for winemakers without a Google account (Feb 2026 addition). Links expire in 15 min, single-use, 3-per-hour-per-email rate limit. If a customer paid but can't sign in, this is where they land.",
+      },
+      {
         href: "/admin/themes-stats",
         label: "Theme telemetry",
         what: "Which themes operators pick after the first-time onboarding card. Not urgent — helps you decide which themes stay enabled.",
@@ -223,6 +257,11 @@ const SECTIONS: Section[] = [
         href: "/api/scheduled/daily-alert-email?dryRun=1",
         label: "Email dry-run (marketing digest)",
         what: "Different from health emails — this is the daily contact-pipeline nudge digest. Hit this URL to see exactly what would be sent, without sending. Check RESEND_API_KEY in .env if it errors.",
+      },
+      {
+        href: "/api/scheduled/instagram-backfill?dryRun=1",
+        label: "IG backfill dry-run (Perplexity)",
+        what: "Peek at the IG-less-winery backlog without spending a cent. Same endpoint the nightly Railway cron pings (with header x-cron-secret: <CRON_SECRET>) at 2am Adelaide. ?limit=<N> capped at 200. If you want to actually run it manually with UI feedback, use the 📸 IG backfill button in /admin/contacts/outbound-queue → Advanced tools instead.",
       },
       {
         href: "/admin/dev",
