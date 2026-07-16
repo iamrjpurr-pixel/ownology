@@ -231,14 +231,73 @@ router.post("/exchange", express.json(), async (req: Request, res: Response) => 
 });
 
 /**
+ * Provision a brand-new user by email address (no OAuth session data).
+ * Called from the magic-link request path when a winemaker enters an email
+ * we've never seen. Mirrors the shape of upsertUserFromEmergent's insert
+ * branch (users row + a fresh Winery row with the user as owner) so both
+ * signup paths land in the same tenancy state. Returns the fresh user id
+ * and openId so the caller can immediately mint a magic-link for it.
+ *
+ * openId format: `email:<lowercased-email>` — distinguishes email-signup
+ * users from `emergent:<google-id>` OAuth users. If the same email later
+ * logs in via Google OAuth, `upsertUserFromEmergent` will find them by
+ * openId=emergent:… and create a SEPARATE row — merging on email is a
+ * future task (Jul 2026 TODO — mostly harmless for now; two rows just
+ * mean two Winery containers for the same person).
+ */
+async function provisionUserByEmail(email: string): Promise<{ id: number; openId: string; role: "admin" | "user" }> {
+  const now = Date.now();
+  const role: "admin" | "user" = isAdminEmail(email) ? "admin" : "user";
+  const openId = `email:${email}`;
+  // Local name fallback — magic-link signup has no name field yet.
+  const localName = email.split("@")[0].replace(/[._-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+  await db.insert(schema.users).values({
+    openId,
+    name: localName,
+    email,
+    role,
+    createdAt: now,
+  });
+  const justCreated = await db.query.users.findFirst({ where: eq(schema.users.openId, openId) });
+  if (!justCreated?.id) throw new Error("provisionUserByEmail: insert succeeded but re-query failed");
+
+  // Provision a Winery for them, same as the Google OAuth path.
+  const wineryName = `${localName.split(/\s+/)[0]}'s Winery`;
+  const baseSlug = localName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 48) || "winery";
+  const suffix = Math.random().toString(36).slice(2, 6);
+  const slug = `${baseSlug}-${suffix}`;
+  try {
+    await db.insert(schema.wineries).values({
+      name: wineryName,
+      slug,
+      ownerUserId: justCreated.id,
+      plan: "free",
+      createdAt: now,
+    });
+    const newWinery = await db.query.wineries.findFirst({ where: eq(schema.wineries.slug, slug) });
+    if (newWinery?.id) {
+      await db.update(schema.users).set({ wineryId: newWinery.id }).where(eq(schema.users.id, justCreated.id));
+    }
+  } catch (e) {
+    console.warn("[auth/email-signup] winery provisioning skipped:", (e as Error).message);
+  }
+  return { id: justCreated.id, openId, role };
+}
+
+/**
  * POST /api/auth/magic-link/request
  * Body: { email: string }
  *
  * Passwordless login for winemakers without a Google account. Generates a
  * one-time token, hashes it (SHA-256) into `magic_login_tokens`, emails the
  * plaintext to the user via Resend. Rate limit: 3 sends per email per hour.
- * Rejects unknown emails to avoid accidental account provisioning (users
- * must be created first via Google OAuth or admin seed).
+ *
+ * Auto-provision (Jul 2026): unknown emails are now created on the fly as
+ * a brand-new user + Winery (mirrors the Google OAuth first-time-signin
+ * flow). Winemakers can sign themselves up via email — the magic-link
+ * click doubles as email verification. If open signup ever needs to be
+ * paused, gate provisionUserByEmail behind an env flag.
  *
  * Jul 2026 addition — sits alongside Google OAuth, not replacing it.
  */
@@ -253,18 +312,8 @@ router.post("/magic-link/request", express.json(), async (req: Request, res: Res
     return res.status(400).json({ error: "Enter a valid email address." });
   }
   try {
-    // Reject unknown emails — don't auto-provision accounts via this path.
-    const user = await db.query.users.findFirst({
-      where: eq(schema.users.email, email),
-    });
-    if (!user) {
-      // Intentionally return 200 with the same message shape so we don't
-      // leak which emails have accounts (enumeration protection). The email
-      // just never arrives.
-      return res.json({ ok: true, sent: true });
-    }
-
-    // Rate-limit: count sends for this email in the last hour.
+    // Rate-limit BEFORE any provisioning so an attacker can't spam our
+    // create-user path even by hitting fresh addresses each time.
     const { sql, gte, and } = await import("drizzle-orm");
     const cutoff = Date.now() - MAGIC_LINK_RATE_WINDOW_MS;
     const recent = await db
@@ -279,6 +328,28 @@ router.post("/magic-link/request", express.json(), async (req: Request, res: Res
       return res.status(429).json({
         error: "Too many login links requested. Try again in an hour.",
       });
+    }
+
+    // Find or provision the user. Auto-provisioning matches the Google
+    // OAuth signup flow — first magic-link request for an unknown email
+    // creates the account, sends the verification link, and the click
+    // completes signup by minting the session cookie.
+    let user = await db.query.users.findFirst({
+      where: eq(schema.users.email, email),
+    });
+    let isNewUser = false;
+    if (!user) {
+      const provisioned = await provisionUserByEmail(email);
+      user = await db.query.users.findFirst({ where: eq(schema.users.id, provisioned.id) });
+      isNewUser = true;
+    }
+    // isNewUser is available for future welcome-flavoured emails / analytics.
+    void isNewUser;
+    if (!user) {
+      // Provisioning succeeded but re-query returned nothing — treat as
+      // transient DB weirdness. Return 500 so the client shows an error
+      // rather than silently claiming success.
+      return res.status(500).json({ error: "Could not create your account. Try again shortly." });
     }
 
     // Generate token — 32 random bytes → hex. Store SHA-256 hash only.

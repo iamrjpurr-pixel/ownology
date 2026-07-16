@@ -243,12 +243,12 @@ export default function Login() {
               lineHeight: 1.55,
             }}
           >
-            <strong>Check your inbox.</strong> If <em>{magicEmail}</em> is on file, we&rsquo;ve sent you a one-tap login link. It expires in 15 minutes.
+            <strong>Check your inbox.</strong> We&rsquo;ve sent a one-tap login link to <em>{magicEmail}</em>. It expires in 15 minutes.
           </div>
         ) : (
           <form onSubmit={requestMagicLink}>
             <label style={{ display: "block", fontSize: "0.78rem", color: "var(--ow-text-mid)", marginBottom: 6 }}>
-              Email login (no Google account? no worries)
+              Email login or sign up
             </label>
             <input
               type="email"
@@ -269,9 +269,12 @@ export default function Login() {
                 fontFamily: "'Lato',sans-serif",
                 fontSize: "0.95rem",
                 outline: "none",
-                marginBottom: 8,
+                marginBottom: 4,
               }}
             />
+            <p style={{ margin: "0 0 8px", fontSize: "0.72rem", color: "var(--ow-text-lo)", lineHeight: 1.5 }}>
+              New here? Same box — first click emails your login link and creates your account. No password to remember.
+            </p>
             {magicError && (
               <p
                 data-testid="login-magic-error"

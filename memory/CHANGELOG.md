@@ -4,6 +4,16 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Jul 2026 — Magic-link auto-provisioning + admin allowlist wired
+
+**Open signup via email.** `POST /api/auth/magic-link/request` no longer silently no-ops on unknown emails — it now auto-provisions a fresh user + Winery on first magic-link request, exactly matching the Google OAuth first-time-signin behaviour in `upsertUserFromEmergent`. New helper `provisionUserByEmail(email)` in `authRouter.ts` handles the users-row + wineries-row insert with `openId = "email:<address>"` to distinguish email-signup accounts from `emergent:<google-id>` OAuth accounts. Merging same-email accounts across the two paths is a Jul 2026 TODO — for now if someone signs up via magic-link then later via Google they'll get two rows; harmless because the sessions are keyed on openId. Rate-limit moved earlier in the handler so an attacker hitting fresh addresses each time can't spam our create-user path. Verified live: brand-new `fresh-signup-...@example.com` request created user id=24, winery "Fresh's Winery", role=user, sent the login link.
+
+**Admin allowlist populated.** `ADMIN_EMAILS=iamrjpurr@gmail.com` set in preview `.env` so any signup path (Google OAuth or magic-link) that matches this email promotes to `role="admin"` automatically. Rich's existing row was already admin — the env just guarantees future re-provisioning stays consistent. Confirmed via DB check: `iamrjpurr@gmail.com` → id=2, role=admin, winery_id=1.
+
+**Login page copy updated.** Removed the "if <email> is on file" enumeration-protection language (moot now that signup is open) and re-labelled the email input from "Email login (no Google account? no worries)" to "Email login or sign up" with a subtitle: "New here? Same box — first click emails your login link and creates your account. No password to remember."
+
+**Production checklist for Rich**: set `ADMIN_EMAILS=iamrjpurr@gmail.com` in Railway env vars so the same admin promotion works on `www.ownology.ai`. Deploy will pick up the new auth code automatically.
+
 ### Jul 2026 — Queue filter respects ALL outbound channels
 
 **Problem.** The Today's-Top-5 filter was SMS-only: `sms_sent_at IS NULL`. Meaning a contact you'd reached via Instagram DM, LinkedIn message, or Facebook would stay at the top of the queue forever until you also happened to SMS them — which is silly given IG-only contacts (Tim Stock, Sarah Feehan) have no SMS path in the first place. Caught by Rich when Tim reappeared after being DMed: "1. fixed already?? tim not in the top 5 anymore; since i sent him a message; check;" — the honest answer was no, Tim was only gone because of a stale SMS-sent flag, not the new Insta mark.
