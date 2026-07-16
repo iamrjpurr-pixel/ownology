@@ -109,10 +109,12 @@ export default function AdminOutboundQueue() {
   const markSent = trpc.outreach.markSent.useMutation();
   const bulkRewrite = trpc.outreach.bulkRewriteSmsAI.useMutation();
   const backfillIg = trpc.outreach.backfillInstagramHandles.useMutation();
+  const enrichMobiles = trpc.outreach.bulkEnrichMobiles.useMutation();
   const [copied, setCopied] = useState<Record<string, "sms" | "email" | "done" | undefined>>({});
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [bulkResult, setBulkResult] = useState<{ rewritten: number; skippedExisting: number; failed: number } | null>(null);
   const [igResult, setIgResult] = useState<{ checked: number; found: number; notFound: number; errors: number } | null>(null);
+  const [mobileResult, setMobileResult] = useState<{ candidates: number; found: number; saved: number; skipped: number; errors: number } | null>(null);
   const [cohortCopied, setCohortCopied] = useState(false);
   const [vcardCount, setVcardCount] = useState<number | null>(null);
   const [forceRewrite, setForceRewrite] = useState(false);

@@ -25,6 +25,7 @@ import {
   mineInstagramHooks,
   claudeRewriteOne,
   classifyReplySentiment,
+  mineMobileNumber,
 } from "./outreach-ai-helpers.js";
 
 export const outreachRouter = router({
@@ -3215,6 +3216,159 @@ Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine
         errors: result.errors,
         skipped: 0,
         dryRun: false,
+      };
+    }),
+
+  /** OWNER — Enrich a SINGLE contact's mobile via Perplexity Sonar.
+   *
+   *  Fires when the operator explicitly asks "find their number" on a
+   *  contact card. Uses `mineMobileNumber` and ONLY persists on high
+   *  confidence (Sonar cited a source that ties the mobile to THIS
+   *  person at THIS winery). Medium/low confidence hits are returned to
+   *  the UI so the operator can eyeball and decide, but not auto-saved.
+   *
+   *  Cost: ~$0.005 per lookup.
+   */
+  enrichMobile: ownerProcedure
+    .input(z.object({ slug: z.string().min(1).max(80), saveOnlyHighConfidence: z.boolean().default(true) }))
+    .mutation(async ({ input }) => {
+      const [contact] = await db
+        .select()
+        .from(schema.outreachContacts)
+        .where(eq(schema.outreachContacts.slug, input.slug))
+        .limit(1);
+      if (!contact) throw new Error(`Contact ${input.slug} not found`);
+      const emailMatch = (contact.notes ?? "").match(/email:\s*(\S+@\S+)/i);
+      const email = emailMatch?.[1] ?? null;
+
+      const result = await mineMobileNumber({
+        firstName: contact.firstName ?? null,
+        lastName: contact.lastName ?? null,
+        winery: contact.winery ?? null,
+        region: contact.region ?? null,
+        email,
+      });
+
+      let saved = false;
+      if (result.mobileAu && (result.confidence === "high" || !input.saveOnlyHighConfidence)) {
+        await db
+          .update(schema.outreachContacts)
+          .set({ mobileAu: result.mobileAu })
+          .where(eq(schema.outreachContacts.slug, input.slug));
+        saved = true;
+      }
+      return { ...result, saved };
+    }),
+
+  /** OWNER — Bulk-enrich mobiles for the whole email-only band of the queue.
+   *
+   *  Iterates outreach_contacts where:
+   *    - status IN ('cold','lukewarm')
+   *    - mobile_au IS NULL or empty
+   *    - notes contain "email: <address>" (so we know we have SOMETHING
+   *      to search against — bare-name rows return too many false hits)
+   *    - no outbound touch recorded yet
+   *  For each: calls mineMobileNumber, persists ONLY on high confidence.
+   *  Returns aggregate counts + per-hit details so the UI can show a
+   *  "found N, skipped M, none for K" summary.
+   *
+   *  dryRun mode returns the candidate list WITHOUT calling Perplexity
+   *  (cost-safe for validating the filter before spending a real batch).
+   *
+   *  Cost: ~$0.005 per lookup × 116 email-only rows ≈ $0.60. Bounded by
+   *  the `limit` input; default 25 per run so the operator can throttle.
+   */
+  bulkEnrichMobiles: ownerProcedure
+    .input(z.object({
+      limit: z.number().min(1).max(200).default(25),
+      dryRun: z.boolean().default(false),
+    }))
+    .mutation(async ({ input }) => {
+      // Filter: cold/lukewarm, no mobile, has email in notes, no outbound touch yet
+      const rows = await db
+        .select()
+        .from(schema.outreachContacts)
+        .where(sql`
+          status IN ('cold','lukewarm')
+          AND (mobile_au IS NULL OR TRIM(mobile_au) = '')
+          AND notes REGEXP 'email:[[:space:]]*[^[:space:]]+@[^[:space:]]+'
+          AND sms_sent_at IS NULL
+          AND email_sent_at IS NULL
+          AND insta_contacted_at IS NULL
+          AND linkedin_contacted_at IS NULL
+          AND facebook_contacted_at IS NULL
+        `)
+        .orderBy(desc(schema.outreachContacts.createdAt))
+        .limit(input.limit);
+
+      if (input.dryRun) {
+        return {
+          dryRun: true,
+          candidates: rows.length,
+          candidateSlugs: rows.map((r) => r.slug),
+          found: 0,
+          saved: 0,
+          skipped: 0,
+          errors: 0,
+          results: [] as Array<{ slug: string; mobileAu: string | null; confidence: string | null; saved: boolean; sourceUrl: string | null }>,
+        };
+      }
+
+      let found = 0;
+      let saved = 0;
+      let skipped = 0;
+      let errors = 0;
+      const results: Array<{ slug: string; mobileAu: string | null; confidence: string | null; saved: boolean; sourceUrl: string | null }> = [];
+
+      for (const row of rows) {
+        const emailMatch = (row.notes ?? "").match(/email:\s*(\S+@\S+)/i);
+        const email = emailMatch?.[1] ?? null;
+        try {
+          const r = await mineMobileNumber({
+            firstName: row.firstName ?? null,
+            lastName: row.lastName ?? null,
+            winery: row.winery ?? null,
+            region: row.region ?? null,
+            email,
+          });
+          if (r.mobileAu) found++;
+          let didSave = false;
+          if (r.mobileAu && r.confidence === "high") {
+            await db
+              .update(schema.outreachContacts)
+              .set({ mobileAu: r.mobileAu })
+              .where(eq(schema.outreachContacts.slug, row.slug));
+            saved++;
+            didSave = true;
+          } else if (r.mobileAu) {
+            // Found something but not high enough to trust — count skipped.
+            skipped++;
+          }
+          results.push({
+            slug: row.slug,
+            mobileAu: r.mobileAu,
+            confidence: r.confidence,
+            saved: didSave,
+            sourceUrl: r.sourceUrl,
+          });
+        } catch (err) {
+          errors++;
+          console.error(`[bulkEnrichMobiles] ${row.slug} failed:`, err instanceof Error ? err.message : String(err));
+          results.push({ slug: row.slug, mobileAu: null, confidence: null, saved: false, sourceUrl: null });
+        }
+        // Light throttle — Perplexity Sonar can be sensitive to bursts.
+        await new Promise((r) => setTimeout(r, 250));
+      }
+
+      return {
+        dryRun: false,
+        candidates: rows.length,
+        candidateSlugs: rows.map((r) => r.slug),
+        found,
+        saved,
+        skipped,
+        errors,
+        results,
       };
     }),
 });

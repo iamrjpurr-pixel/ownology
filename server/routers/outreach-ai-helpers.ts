@@ -368,3 +368,205 @@ Return JSON: { "sentiment": "<one of the four>" }. No prose. No fences.`;
   if (s === "interested" || s === "objection" || s === "not-now" || s === "cold") return s;
   throw new Error(`Claude returned unrecognised sentiment: ${s}`);
 }
+
+/**
+ * mineMobileNumber
+ * ────────────────
+ * Given a contact's name + winery + email, ask Perplexity Sonar to find
+ * their PUBLIC Australian mobile number from open-web sources (winery
+ * contact page, industry directory listings, event exhibitor lists,
+ * LinkedIn public snippets, association member pages).
+ *
+ * Why this exists
+ * ───────────────
+ * The outbound queue (Jul 2026) now scores +614xxxxxxxx mobile-holders
+ * at 100 pts vs 30 for email-only. But 116 of 208 queue rows are
+ * email-only — that top-priority SMS band is starved. Most of those
+ * winemakers DO publish a mobile somewhere (contact page footers, event
+ * exhibitor CSVs, chamber-of-commerce listings) — it just wasn't captured
+ * at ingest time. This helper closes that gap.
+ *
+ * Confidence gating
+ * ─────────────────
+ * Perplexity returns one of "high" | "medium" | "low" | null. The caller
+ * MUST only persist "high" matches — that means Sonar cited a source that
+ * unambiguously ties the mobile to THIS person at THIS winery. Anything
+ * else is fabrication risk (auto-hallucinating a mobile is worse than no
+ * mobile — an SMS to the wrong person burns the brand).
+ *
+ * Returns { mobileAu, sourceUrl, confidence, citations }; all fields null
+ * when the model can't find a defensible AU mobile.
+ */
+export async function mineMobileNumber(input: {
+  firstName: string | null;
+  lastName: string | null;
+  winery: string | null;
+  region: string | null;
+  email: string | null;
+}): Promise<{
+  mobileAu: string | null;
+  sourceUrl: string | null;
+  confidence: "high" | "medium" | "low" | null;
+  citations: string[];
+}> {
+  const key = process.env.PERPLEXITY_API_KEY;
+  const empty = { mobileAu: null, sourceUrl: null, confidence: null, citations: [] };
+  if (!key) return empty;
+
+  const fullName = [input.firstName, input.lastName].filter(Boolean).join(" ").trim();
+  if (!fullName && !input.winery) return empty;
+
+  const responseSchema = {
+    type: "object",
+    properties: {
+      mobileAu: { type: ["string", "null"], description: "AU mobile in E.164 format like +61412345678, or null if not confidently found" },
+      sourceUrl: { type: ["string", "null"], description: "URL of the page where the mobile was found" },
+      confidence: { type: ["string", "null"], enum: ["high", "medium", "low", null] },
+    },
+    required: ["mobileAu", "sourceUrl", "confidence"],
+    additionalProperties: false,
+  } as const;
+
+  const systemPrompt = `You are a research assistant hunting for a specific person's PUBLIC Australian mobile phone number so they can be reached for a business conversation (winemaking software outreach). You will be given a person's name, their winery, and their email address. Your job is to search the open web for their mobile number and return it in strict E.164 format.
+
+═══════════════════════════════════════════════════════════════
+WHERE TO LOOK — search these in order, first hit wins:
+═══════════════════════════════════════════════════════════════
+
+Tier 1 (BEST — the winery publishes it themselves):
+  • The winery's own "Contact" or "About Us" page — footer, sidebar, staff-bio blocks
+  • A dedicated "Meet the winemaker" or team page on the winery site
+  • The winery's LinkedIn Company Page → About → Contact info
+
+Tier 2 (industry sources):
+  • Australian Grape & Wine, WFA, or state wine association member directories
+  • Regional wine-region body pages (e.g. Hunter Valley Wine, Barossa Grape & Wine Association)
+  • Cellar-door directory sites like Wine Selectors, Halliday, Vinehealth
+  • Trade-event exhibitor lists (Rootstock, Pinot Palooza, Prowein AU) — often list a mobile for booth contact
+
+Tier 3 (LinkedIn):
+  • The person's LinkedIn profile "Contact info" section if publicly cached
+  • A LinkedIn post they've made themselves that includes a mobile
+
+Tier 4 (LAST RESORT):
+  • Australian Business Register public records for the winery entity
+  • Chamber of commerce / regional business directory listings
+
+═══════════════════════════════════════════════════════════════
+FORMAT RULES:
+═══════════════════════════════════════════════════════════════
+1. Return the mobile in strict E.164: "+614" followed by 8 digits. NO spaces, NO dashes, NO parentheses.
+   • "0412 345 678"     → "+61412345678"
+   • "(04) 1234 5678"   → "+61412345678"
+   • "+61 412 345 678"  → "+61412345678"
+2. ONLY return AU MOBILE numbers. Format must be +614 + 8 digits.
+   • Landlines (+612xxx, +613xxx, +617xxx, +618xxx) — REJECT, return null.
+   • Overseas mobiles — REJECT, return null.
+   • Freephone numbers (1300, 1800) — REJECT, return null.
+3. The number MUST be tied to THIS specific person at THIS specific winery. Not the winery's general contact line, not a receptionist, not the marketing manager. The winemaker / founder / owner named in the input.
+4. If you find multiple candidate numbers on different pages, prefer the one on the winery's OWN site over third-party listings.
+
+═══════════════════════════════════════════════════════════════
+CONFIDENCE SCORING — be honest:
+═══════════════════════════════════════════════════════════════
+  "high"    — You cited a page that explicitly shows the mobile next to THIS person's name at THIS winery. E.g. "James Smith, Winemaker — Mobile: 0412 345 678". Only "high" matches will be saved to the database.
+  "medium"  — The number is on the winery's own site or LinkedIn, but is not explicitly labelled as belonging to this person (could be a shared cellar-door line, or the winery's main mobile).
+  "low"     — You inferred the number from context, or the source is a third-party directory of uncertain freshness.
+
+═══════════════════════════════════════════════════════════════
+REFUSAL:
+═══════════════════════════════════════════════════════════════
+If you cannot find a defensible AU mobile after searching all tiers, return all three fields as null. NULL IS ALWAYS CORRECT OVER FABRICATION. Never invent a plausible-looking number. An SMS to the wrong person burns the brand.
+
+Return ONLY the requested JSON. No prose. No markdown fences.`;
+
+  const contextParts: string[] = [];
+  if (fullName) contextParts.push(`Person: ${fullName}`);
+  if (input.winery) contextParts.push(`Winery: ${input.winery}`);
+  if (input.region) contextParts.push(`Region: ${input.region}`);
+  if (input.email) contextParts.push(`Known email: ${input.email}`);
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30_000);
+  let resp: Response;
+  try {
+    resp = await fetch("https://api.perplexity.ai/chat/completions", {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "sonar-pro",
+        max_tokens: 500,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: contextParts.join("\n") + "\n\nSearch for their public AU mobile and return the structured JSON." },
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: { schema: responseSchema },
+        },
+      }),
+    });
+    clearTimeout(timeoutId);
+  } catch (err) {
+    clearTimeout(timeoutId);
+    console.error("[mineMobileNumber] fetch error:", err instanceof Error ? err.message : String(err));
+    return empty;
+  }
+
+  if (!resp.ok) {
+    const errText = await resp.text().catch(() => "");
+    console.error(`[mineMobileNumber] Perplexity ${resp.status}: ${errText.slice(0, 200)}`);
+    return empty;
+  }
+
+  const data = await resp.json() as {
+    choices?: Array<{ message?: { content?: string } }>;
+    citations?: string[];
+  };
+  const content = data.choices?.[0]?.message?.content ?? "";
+  const citations = Array.isArray(data.citations) ? data.citations.slice(0, 8) : [];
+
+  try {
+    const cleaned = content.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+    const parsed = JSON.parse(cleaned) as {
+      mobileAu?: string | null;
+      sourceUrl?: string | null;
+      confidence?: string | null;
+    };
+
+    // Post-validate the mobile format even if Perplexity claims it's valid.
+    // Sonar sometimes returns "0412345678" or "+61 4 1234 5678" — normalise.
+    let mobile: string | null = null;
+    if (typeof parsed.mobileAu === "string" && parsed.mobileAu.trim()) {
+      const digits = parsed.mobileAu.replace(/[^\d+]/g, "");
+      // Accept "+614XXXXXXXX", "614XXXXXXXX", "04XXXXXXXX", "4XXXXXXXX"
+      let normalised: string | null = null;
+      if (/^\+614\d{8}$/.test(digits)) normalised = digits;
+      else if (/^614\d{8}$/.test(digits)) normalised = "+" + digits;
+      else if (/^04\d{8}$/.test(digits)) normalised = "+61" + digits.slice(1);
+      else if (/^4\d{8}$/.test(digits)) normalised = "+61" + digits;
+      mobile = normalised;
+    }
+
+    const validConfidence = ["high", "medium", "low"] as const;
+    type ValidC = (typeof validConfidence)[number];
+    const confidence = validConfidence.includes(parsed.confidence as ValidC)
+      ? (parsed.confidence as ValidC)
+      : null;
+
+    return {
+      mobileAu: mobile,
+      sourceUrl: typeof parsed.sourceUrl === "string" && parsed.sourceUrl.trim() ? parsed.sourceUrl.trim().slice(0, 500) : null,
+      confidence,
+      citations,
+    };
+  } catch (err) {
+    console.error("[mineMobileNumber] JSON parse failed:", err instanceof Error ? err.message : String(err));
+    return { ...empty, citations };
+  }
+}
+
