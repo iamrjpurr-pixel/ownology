@@ -128,7 +128,7 @@ function emailDraft(c: {
 
 ${c.hookText.charAt(0).toUpperCase() + c.hookText.slice(1)} — reading that hit home.
 
-I've been quietly building Ownology: a cellar AI grounded in a winery's own vintage logs, not a textbook. Ask it "why did tank 9 stick this year" and it walks you through the actual data before it reaches for theory. Owen the apprentice sits inside it — retrieves, cites, defers to the winemaker.
+I've been building Ownology: a business-wide quality and risk record for boutique winemakers. Quality panels, vintage-log reasoning and asset trail woven onto one thread, so productivity and profit compound year on year instead of restarting each vintage.
 
 There's a 90-second landing page I've built specifically for you${wineryPhrase}, with the pitch tuned to your scale and the recent post I saw:
 
@@ -146,7 +146,7 @@ Ownology (Ministry of Clouds tier: The Vigneron)`;
     const body =
 `G'day ${c.firstName},
 
-You mentioned ${c.painPoint} — that's the exact kind of question I've been building a cellar AI to answer, grounded in a winery's own vintage logs rather than textbooks.
+You mentioned ${c.painPoint} — that's the exact kind of thread I've been building Ownology to hold: quality and risk management across the whole business, so decisions, panels and asset trail compound each vintage instead of restarting.
 
 Here's a 90-second page tuned to your operation${wineryPhrase}:
 
@@ -159,11 +159,11 @@ Rich
 Ownology`;
     return { subject, body };
   }
-  const subject = `${c.firstName}${wineryPhrase} — a cellar apprentice grounded in your own logs`;
+  const subject = `${c.firstName}${wineryPhrase} — quality & risk management, across the whole business`;
   const body =
 `G'day ${c.firstName},
 
-I've been building Ownology — a small AI cellar apprentice grounded in a winery's own vintage logs rather than a textbook. Figured you might find it useful.
+I've been building Ownology — quality and risk management for winemakers, stretched across the whole business (not just the vintage). Decisions, panels and asset trail on one thread so productivity and profit compound each year.
 
 90-second look, tuned to your operation${wineryPhrase}:
 

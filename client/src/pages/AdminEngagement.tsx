@@ -85,7 +85,7 @@ function buildFollowupSms(c: Contact, bucket: BucketKey): string {
     return `hey ${first} — sent that ownology link the other day, wanted to double-check it landed. if the pitch missed the mark, tell me straight — i'd rather know than guess: ${url} — Rich P · 0408 105 067`;
   }
   if (bucket === "ghosted") {
-    return `hey ${first}${winery} — first SMS may not have landed. quick recap: cellar AI grounded in a winery's own vintage logs, not a textbook. 90-sec look ${url} — Rich P · 0408 105 067`;
+    return `hey ${first}${winery} — first SMS may not have landed. quick recap: quality and risk management across the whole business, so productivity and profit compound each vintage instead of restarting. 90-sec look ${url} — Rich P · 0408 105 067`;
   }
   if (bucket === "replied") {
     return `hey ${first} — following up from your earlier reply. still keen to grab 15 min to walk you through Ownology? happy to do it whenever suits — Rich P · 0408 105 067`;
@@ -111,7 +111,7 @@ function buildFollowupEmail(email: string, c: Contact, bucket: BucketKey): strin
     body = `G'day ${first},\n\nSent an Ownology link the other day, wanted to double-check it landed and that the pitch made sense${wineryPhrase}. If it missed the mark, I'd rather hear it straight than guess.\n\n${url}\n\nCheers,\nRich P\n0408 105 067`;
   } else if (bucket === "ghosted") {
     subject = `${first} — trying again${wineryPhrase}`;
-    body = `G'day ${first},\n\nFirst SMS/email may not have landed. Quick recap: I've been quietly building Ownology — a cellar AI grounded in a winery's own vintage logs rather than a textbook. Ask it "why did tank 9 stick this year" and it walks you through your actual data first.\n\n90-second landing tuned to ${c.winery ?? "your operation"}:\n\n${url}\n\nCheers,\nRich P\n0408 105 067`;
+    body = `G'day ${first},\n\nFirst SMS/email may not have landed. Quick recap: I've been building Ownology — quality and risk management for winemakers, stretched across the whole business. Quality panels, vintage-log reasoning and asset trail on one thread so productivity and profit compound each year instead of restarting.\n\n90-second landing tuned to ${c.winery ?? "your operation"}:\n\n${url}\n\nCheers,\nRich P\n0408 105 067`;
   } else if (bucket === "replied") {
     subject = `${first} — following up on your reply`;
     body = `G'day ${first},\n\nFollowing up from your earlier reply. Still keen to grab 15 min to walk you through Ownology? Happy to do it whenever suits.\n\nLink to your personal page: ${url}\n\nCheers,\nRich P\n0408 105 067`;

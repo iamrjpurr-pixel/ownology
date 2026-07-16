@@ -70,14 +70,17 @@ function extractLinkedinFromNotes(notes: string | null | undefined): string | nu
 // lead with the hook and invite a reply so it lands in Primary, not
 // Requests.
 function igDmDraft(c: { firstName: string; winery?: string | null; hookText?: string | null; painPoint?: string | null }): string {
+  // Continuity-lens IG DM — mirrors the SMS opener framing (quality & risk
+  // management → productivity & profit) instead of the retired "cellar AI"
+  // pitch. No landing URL in the first message (IG buries links).
   if (c.hookText) {
-    return `hey ${c.firstName} — ${c.hookText}. been quietly building a cellar AI grounded in a winery's own vintage logs (not a textbook). happy to send you the 90 sec look if useful? — Rich P · 0408 105 067`;
+    return `hey ${c.firstName} — ${c.hookText}. been building a quality-and-risk record for winemakers that carries decisions, panels and asset trail across the whole business so productivity and profit compound year on year. happy to send you the 90 sec look if useful? — Rich P · 0408 105 067`;
   }
   if (c.painPoint) {
-    return `hey ${c.firstName} — noticed ${c.painPoint}. been building a cellar AI grounded in a winery's own vintage logs. reckon it might scratch that itch — worth a 90 sec look? — Rich P · 0408 105 067`;
+    return `hey ${c.firstName} — noticed ${c.painPoint}. been building a quality-and-risk record for the whole business so decisions, panels and asset trail compound instead of restarting each vintage. worth a 90 sec look? — Rich P · 0408 105 067`;
   }
   const wineryBit = c.winery ? ` — ${c.winery}'s wines have been on my mind` : "";
-  return `hey ${c.firstName}${wineryBit}. been building a cellar AI grounded in a winery's own vintage logs. curious if it'd be useful for you — happy to send a 90 sec look? — Rich P · 0408 105 067`;
+  return `hey ${c.firstName}${wineryBit}. been building a quality-and-risk record for winemakers — decisions, panels and asset trail on one thread, so productivity and profit compound. happy to send a 90 sec look? — Rich P · 0408 105 067`;
 }
 
 function extractEmailFromNotes(notes: string | null | undefined): string | null {
@@ -91,10 +94,10 @@ function buildMailto(email: string, firstName: string, winery: string | null, pa
   const wineryPhrase = winery ? ` at ${winery}` : "";
   const subject = hookText
     ? `${firstName} — ${hookText.slice(0, 60)}${hookText.length > 60 ? "…" : ""}`
-    : `${firstName}${wineryPhrase} — a cellar apprentice grounded in your own logs`;
+    : `${firstName}${wineryPhrase} — quality & risk management, across the whole business`;
   const body = hookText
-    ? `G'day ${firstName},\n\n${hookText.charAt(0).toUpperCase() + hookText.slice(1)} — reading that hit home.\n\nI've been quietly building Ownology: a cellar AI grounded in a winery's own vintage logs, not a textbook. Ask it "why did tank 9 stick this year" and it walks you through the actual data before it reaches for theory.\n\n90-second landing page tuned to you${wineryPhrase}:\n\n${url}\n\nNo pressure — happy to be told to bugger off. But if it lands, I'd rather hear it directly than through a form.\n\nCheers,\nRich P\n0408 105 067\nOwnology`
-    : `G'day ${firstName},\n\nI've been building Ownology — a small AI cellar apprentice grounded in a winery's own vintage logs rather than a textbook. Figured you might find it useful.\n\n90-second look, tuned to your operation${wineryPhrase}:\n\n${url}\n\nCheers,\nRich P\n0408 105 067\nOwnology`;
+    ? `G'day ${firstName},\n\n${hookText.charAt(0).toUpperCase() + hookText.slice(1)} — reading that hit home.\n\nI've been building Ownology: a business-wide quality and risk record for boutique winemakers. Quality panels, vintage-log reasoning and asset trail on one thread, so productivity and profit compound year on year instead of restarting each vintage.\n\n90-second landing page tuned to you${wineryPhrase}:\n\n${url}\n\nNo pressure — happy to be told to bugger off. But if it lands, I'd rather hear it directly than through a form.\n\nCheers,\nRich P\n0408 105 067\nOwnology`
+    : `G'day ${firstName},\n\nI've been building Ownology — quality and risk management for winemakers, stretched across the whole business (not just the vintage). Decisions, panels and asset trail on one thread so productivity and profit compound each year.\n\n90-second look, tuned to your operation${wineryPhrase}:\n\n${url}\n\nCheers,\nRich P\n0408 105 067\nOwnology`;
   return buildEmailUrl({ to: email, subject, body });
 }
 
