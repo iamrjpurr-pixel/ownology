@@ -34,6 +34,10 @@ import { Resend } from "resend";
 import { db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
 import { generateCellarBrief, type CellarBriefCard } from "../cellarBriefEngine.js";
+import {
+  computeWeeklyDigestEnrichments,
+  type WeeklyDigestEnrichments,
+} from "../weeklyDigestEnrichments.js";
 
 type EmailResult = {
   userId: number;
@@ -60,7 +64,7 @@ function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
 }
 
-function renderText(userName: string, wineryName: string | null, cards: CellarBriefCard[], counts: { attention: number; watch: number; ok: number }): string {
+function renderText(userName: string, wineryName: string | null, cards: CellarBriefCard[], counts: { attention: number; watch: number; ok: number }, enrichments: WeeklyDigestEnrichments): string {
   const lines: string[] = [];
   const wineryLabel = wineryName ? ` at ${wineryName}` : "";
   lines.push(`Monday morning, ${userName}${wineryLabel}.`);
@@ -81,6 +85,30 @@ function renderText(userName: string, wineryName: string | null, cards: CellarBr
   if (cards.length > 6) {
     lines.push(`… and ${cards.length - 6} more.`);
   }
+
+  // ── Enrichment sections ───────────────────────────────────────────
+  const t = enrichments.tasks;
+  if (t.completedThisWeek + t.newThisWeek + t.overdue + t.dueNextWeek > 0) {
+    lines.push("");
+    lines.push("CELLAR TASKS THIS WEEK");
+    lines.push(`  ${t.completedThisWeek} completed · ${t.newThisWeek} new · ${t.overdue} overdue · ${t.dueNextWeek} due next 7 days`);
+    for (const c of t.recentCompletions.slice(0, 3)) {
+      lines.push(`  ✓ ${c.title} — ${c.equipmentName}${c.completedBy ? ` (by ${c.completedBy})` : ""}`);
+    }
+  }
+  if (enrichments.tempOutliers.length > 0) {
+    lines.push("");
+    lines.push("TEMPERATURE / HUMIDITY OUTLIERS");
+    for (const o of enrichments.tempOutliers) lines.push(`  • ${o.label}`);
+  }
+  const p = enrichments.pipeline;
+  if (p.newContacts + p.firstViews + p.replies + p.demosBooked > 0) {
+    lines.push("");
+    lines.push("PIPELINE MOVES");
+    lines.push(`  ${p.newContacts} new · ${p.firstViews} first opens · ${p.replies} replies · ${p.demosBooked} demo${p.demosBooked === 1 ? "" : "s"} booked`);
+    for (const e of p.topEngaged) lines.push(`  ⋯ ${e.name}${e.winery ? ` · ${e.winery}` : ""} (${e.viewCount} views)`);
+  }
+
   lines.push("");
   lines.push("Open your full brief: https://ownology.ai/cellar-brief");
   lines.push("");
@@ -89,7 +117,7 @@ function renderText(userName: string, wineryName: string | null, cards: CellarBr
   return lines.join("\n");
 }
 
-function renderHtml(userName: string, wineryName: string | null, cards: CellarBriefCard[], counts: { attention: number; watch: number; ok: number }): string {
+function renderHtml(userName: string, wineryName: string | null, cards: CellarBriefCard[], counts: { attention: number; watch: number; ok: number }, enrichments: WeeklyDigestEnrichments): string {
   const wineryLabel = wineryName ? ` at <em>${escapeHtml(wineryName)}</em>` : "";
   const headline =
     counts.attention > 0
@@ -129,6 +157,68 @@ function renderHtml(userName: string, wineryName: string | null, cards: CellarBr
       ? `<tr><td colspan="3" style="padding:10px 14px;font-family:Arial,sans-serif;font-size:12px;color:#8a7565;text-align:center;border-top:1px solid #eee5d3;font-style:italic;">… and ${cards.length - 6} more in your full brief.</td></tr>`
       : "";
 
+  // ── Enrichment blocks ─────────────────────────────────────────────
+  // Each block is a self-contained <tr> so they can be re-ordered without
+  // reflowing surrounding markup. Emails skip a section entirely when it
+  // has no data — a quiet week shouldn't fake activity.
+
+  const t = enrichments.tasks;
+  const tasksTotal = t.completedThisWeek + t.newThisWeek + t.overdue + t.dueNextWeek;
+  const tasksBlock = tasksTotal === 0 ? "" : `
+    <tr><td style="padding:20px 24px 4px;border-top:1px solid #eee5d3;">
+      <div style="font-family:Georgia,serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#B0741A;font-weight:700;margin-bottom:8px;">Cellar tasks · this week</div>
+      <div style="font-family:Arial,sans-serif;font-size:13px;color:#3a2e26;line-height:1.6;">
+        <strong style="color:#4a7c47;">${t.completedThisWeek}</strong> completed
+        · <strong>${t.newThisWeek}</strong> new
+        ${t.overdue > 0 ? `· <strong style="color:#b91c1c;">${t.overdue}</strong> overdue` : ""}
+        ${t.dueNextWeek > 0 ? `· <strong style="color:#b57e14;">${t.dueNextWeek}</strong> due next 7 days` : ""}
+      </div>
+      ${t.recentCompletions.length > 0 ? `
+      <div style="font-family:Arial,sans-serif;font-size:12px;color:#6b5c50;margin-top:8px;line-height:1.55;">
+        ${t.recentCompletions.slice(0, 3).map((c) =>
+          `<div>✓ <strong>${escapeHtml(c.title)}</strong> — ${escapeHtml(c.equipmentName)}${c.completedBy ? ` <span style="color:#8a7565;">(${escapeHtml(c.completedBy)})</span>` : ""}</div>`
+        ).join("")}
+      </div>` : ""}
+    </td></tr>
+  `;
+
+  const outliersBlock = enrichments.tempOutliers.length === 0 ? "" : `
+    <tr><td style="padding:20px 24px 4px;border-top:1px solid #eee5d3;">
+      <div style="font-family:Georgia,serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#B0741A;font-weight:700;margin-bottom:8px;">Temperature &amp; humidity outliers</div>
+      <div style="font-family:Arial,sans-serif;font-size:13px;color:#3a2e26;line-height:1.7;">
+        ${enrichments.tempOutliers.map((o) => {
+          const isHigh = o.kind === "humidity_high" || o.kind === "temp_high";
+          const color = isHigh ? "#b91c1c" : "#1b6a99";
+          return `<div>• <span style="color:${color};font-weight:600;">${escapeHtml(o.label)}</span></div>`;
+        }).join("")}
+      </div>
+      <div style="font-family:Arial,sans-serif;font-size:11px;color:#8a7565;margin-top:6px;">
+        Thresholds set on <a href="https://ownology.ai/admin/environment" style="color:#B0741A;">/admin/environment</a>.
+      </div>
+    </td></tr>
+  `;
+
+  const p = enrichments.pipeline;
+  const pipelineTotal = p.newContacts + p.firstViews + p.replies + p.demosBooked;
+  const pipelineBlock = pipelineTotal === 0 ? "" : `
+    <tr><td style="padding:20px 24px 4px;border-top:1px solid #eee5d3;">
+      <div style="font-family:Georgia,serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#B0741A;font-weight:700;margin-bottom:8px;">Pipeline moves · outreach</div>
+      <div style="font-family:Arial,sans-serif;font-size:13px;color:#3a2e26;line-height:1.6;">
+        <strong>${p.newContacts}</strong> new
+        · <strong style="color:#4a7c47;">${p.firstViews}</strong> first opens
+        · <strong style="color:#B0741A;">${p.replies}</strong> replies
+        ${p.demosBooked > 0 ? `· <strong style="color:#4a7c47;">${p.demosBooked}</strong> demo${p.demosBooked === 1 ? "" : "s"} booked` : ""}
+      </div>
+      ${p.topEngaged.length > 0 ? `
+      <div style="font-family:Arial,sans-serif;font-size:12px;color:#6b5c50;margin-top:8px;line-height:1.55;">
+        Most engaged this week:
+        ${p.topEngaged.map((e) =>
+          `<div>⋯ <a href="https://ownology.ai/admin/contacts" style="color:#3a2e26;text-decoration:none;font-weight:600;">${escapeHtml(e.name)}</a>${e.winery ? ` · ${escapeHtml(e.winery)}` : ""} <span style="color:#8a7565;">(${e.viewCount} views)</span></div>`
+        ).join("")}
+      </div>` : ""}
+    </td></tr>
+  `;
+
   return `<!DOCTYPE html>
 <html><body style="margin:0;padding:0;background:#f6f1ea;font-family:Arial,Helvetica,sans-serif;color:#1a1210;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f6f1ea;padding:24px 12px;">
@@ -152,6 +242,9 @@ function renderHtml(userName: string, wineryName: string | null, cards: CellarBr
             ${moreLine}
           </table>
         </td></tr>
+        ${tasksBlock}
+        ${outliersBlock}
+        ${pipelineBlock}
 
         <tr><td style="padding:18px 26px 22px;border-top:1px solid #eee5d3;background:#fbf3e4;">
           <a href="https://ownology.ai/cellar-brief?from=weekly-digest"
@@ -168,6 +261,14 @@ function renderHtml(userName: string, wineryName: string | null, cards: CellarBr
   </table>
 </body></html>`;
 }
+
+// Expose the renderers so the /admin/weekly-digest preview UI (via the
+// weeklyDigest tRPC router) can reuse the exact same HTML/text output
+// the cron would email out. Prefixed with `__` to signal "internal, not
+// a public API — could change without notice".
+export const __renderHtmlForPreview = renderHtml;
+export const __renderTextForPreview = renderText;
+
 
 export async function weeklyCellarDigestHandler(req: Request, res: Response): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
@@ -229,14 +330,18 @@ export async function weeklyCellarDigestHandler(req: Request, res: Response): Pr
       continue;
     }
 
+    // Enrichments (tasks / temp outliers / pipeline moves). Compute
+    // failures return empty sections so the digest still ships.
+    const enrichments = await computeWeeklyDigestEnrichments(u.id, u.wineryId);
+
     const userName = u.name ?? "winemaker";
     const wineryName = wineryNameById.get(u.wineryId) ?? null;
     const recipient = testTo ?? u.email;
     const subject = counts.attention > 0
       ? `Cellar brief — ${counts.attention} vessel${counts.attention === 1 ? "" : "s"} need your eye this week`
       : `Cellar brief — Monday, ${cards.length} vessels tracked`;
-    const html = renderHtml(userName, wineryName, cards, counts);
-    const text = renderText(userName, wineryName, cards, counts);
+    const html = renderHtml(userName, wineryName, cards, counts, enrichments);
+    const text = renderText(userName, wineryName, cards, counts, enrichments);
     const senderDisplay = wineryName ? `Owen · ${wineryName}` : fromName;
 
     if (dryRun || !resend) {

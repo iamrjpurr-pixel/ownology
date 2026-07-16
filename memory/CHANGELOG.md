@@ -4,6 +4,25 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Jul 2026 — Weekly Cellar Digest: tasks + temp outliers + pipeline moves + preview UI
+
+**"A Monday-morning heartbeat every seven days."** The existing weekly-cron surface only shipped vessel status cards from `generateCellarBrief`. Rich asked for the three missing sections that make founding members feel the app is *watching the cellar*, not just listing tanks. Landed:
+
+  * **`server/weeklyDigestEnrichments.ts`** — new pure compute engine. Three parallel rollups, each fault-isolated (returns empty on any error so the digest still renders):
+    - **Cellar tasks** — `cellar_tasks` rollup over the last 7 days: completed / new / overdue / due-next-7-days counts, plus the 5 most-recent completions with equipment + completed-by names.
+    - **Temperature outliers** — Open-Meteo `past_days=7` daily max/min for the winery's coords, compared against `weather_thresholds_json`. Emits at most ONE outlier per day (the sharpest breach) so long runs don't drown the email. Six real breaches showed up on Rich's Hunter Valley coords on first run: humidity peaks at 99% (threshold 72%), cellar-ambient dropping to 4.6°C over-night on a cold July snap.
+    - **Pipeline rollup** — `outreach_contacts` movement: contacts created / first-viewed / replied / demo-booked in the last 7 days + top-3 most-engaged by view count. Sarah Feehan (130 views) leads Rich's board this week.
+
+  * **`server/scheduled/weeklyCellarDigest.ts`** — existing Monday cron handler extended to compute enrichments and inject three new self-contained `<tr>` blocks into the HTML (tasks / outliers / pipeline), each hidden when its data is zero (quiet weeks don't fake activity). Plain-text sibling section mirrors.
+
+  * **`server/routers/weeklyDigest.ts`** — new tRPC router:
+    - `preview` (owner query) — returns THIS week's fully computed digest (recipient, subject, cards, counts, enrichments) so the admin UI can render it faithfully.
+    - `sendNow` (owner mutation) — invokes the same renderers and fires a Resend send to the caller's email. Reuses the HTML/text renderers exported from the scheduled handler (`__renderHtmlForPreview` / `__renderTextForPreview`) so cron + preview share a single source of truth.
+
+  * **`/admin/weekly-digest`** (`AdminWeeklyDigest.tsx`) — new admin surface. Renders subject + recipient + 4-stat strip (vessels · tasks · outliers · pipeline) + vessel snapshot list (first 8) + three enrichment sections. **Send now →** button fires `sendNow` and shows a green "Sent to richard@ownology.ai · Resend id …" confirmation. Verified live: first send returned Resend id `d262eeb6-f395-4bd8-b66a-40dae2a11cf3` and delivered to Rich's inbox.
+
+**Cron schedule (Railway).** Monday 07:00 Australia/Sydney via `POST /api/scheduled/weekly-cellar-digest`. Requires `x-cron-secret` header matching `CRON_SECRET` env var for live sends (dry-runs stay open).
+
 ### Jul 2026 — Outreach router split (helpers extracted)
 
 **`server/routers/outreach.ts` down from 3,698 → 3,167 lines.** The 3.7k-line file had grown unwieldy — TypeScript's Language Server was re-analysing the whole thing on every keystroke, making hover-info + go-to-definition sluggish, and every agent (me included) could only see slices at a time. Split by concern:
