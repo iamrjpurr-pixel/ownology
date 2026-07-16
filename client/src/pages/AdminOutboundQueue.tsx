@@ -331,13 +331,15 @@ export default function AdminOutboundQueue() {
                       {igHandle && <span data-testid={`chan-insta-${c.slug}`}>📸 @{igHandle}</span>}
                       {linkedin && <span data-testid={`chan-linkedin-${c.slug}`}>🔗 LinkedIn</span>}
                       {!c.hasMobile && !email && !igHandle && !linkedin && <span style={{ color: "#dc2626" }}>no channel — enrich first</span>}
-                      <Link
+                      <a
                         href={`/admin/contacts?slug=${c.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         data-testid={`top5-open-card-${c.slug}`}
                         style={{ marginLeft: "auto", color: "var(--ow-text-mid)", textDecoration: "none", fontWeight: 600 }}
                       >
                         Open card ↗
-                      </Link>
+                      </a>
                     </div>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end", minWidth: 220 }}>
@@ -713,13 +715,15 @@ export default function AdminOutboundQueue() {
                     >
                       Mark sent, next →
                     </button>
-                    <Link
+                    <a
                       href={`/admin/contacts?slug=${c.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       data-testid={`queue-open-${c.slug}`}
                       style={{ fontSize: "0.7rem", color: "var(--ow-text-lo)", textDecoration: "none" }}
                     >
                       Open card ↗
-                    </Link>
+                    </a>
                   </>
                 )}
               </div>
