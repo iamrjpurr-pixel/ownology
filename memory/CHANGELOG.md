@@ -4,6 +4,16 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Feb 2026 — Outbound Queue "simplify my day" + Instagram/LinkedIn DM channels
+
+**Problem the user hit:** operator opened `/admin/contacts/outbound-queue` and (a) couldn't figure out the daily workflow amidst the region-filter chips, bulk-AI-rewrite strip, cohort-copy strip, and 221-row queue list, and (b) hit a dead-end on IG-only prospects (Tim Stock @ Les Fruits Wine, Sarah Feehan @ Parley Wines, ~30% of the enriched Wine Australia cohort have no mobile + no email — Instagram is the only channel).
+
+**"Today's top 5" hero.** New hero card at the top of `/admin/contacts/outbound-queue` renders exactly the top 5 unsent contacts as fat rows with ONE primary amber CTA each. Header copy: "Do just these. That's the whole day's outbound." Everything below the hero (region filter, bulk AI rewrite, cohort copy strip, vCard export, full 221-row queue) moved into a `<details>` collapsed by default with the summary "Advanced tools · region filter · bulk AI rewrite · vCard export · full queue". Operator's daily flow shrinks to: open page → 5 buttons → done.
+
+**Instagram + LinkedIn as first-class outreach channels.** New client-side extractors `extractInstagramFromNotes` (handles `IG: handle`, `IG: @handle`, `Instagram: @handle`, `instagram.com/handle`) and `extractLinkedinFromNotes` (handles `LinkedIn: url`, `LinkedIn: slug`, bare `linkedin.com/in/slug`). New `igDmDraft()` writes a shorter, Insta-appropriate message: no landing URL in the first message (Insta buries first-message links and marks them spammy), leads with the hook, invites a reply. Per-row primary-CTA priority is now: **mobile → email → Instagram → LinkedIn → "enrich this contact" link**. Instagram button copies the DM draft to the clipboard AND opens `instagram.com/<handle>/` in a new tab so the operator pastes into Insta's DM box. Same pattern for LinkedIn. IG-only contacts (Tim Stock, Sarah Feehan, Sarah Fagan, Timo Mayer, Sarah Crowe, Sarah Morris and ~50 others) now have a live CTA instead of a dead row.
+
+**Full queue rows also get the new channel buttons** — the collapsed queue below the hero renders `📸 DM @handle` and `🔗 LinkedIn` buttons alongside the existing Copy SMS / Draft in Gmail, plus a red "no channel — enrich first" hint when a contact truly has nothing.
+
 ### Feb 2026 — P0 admin auth fix + P1 hygiene tiles + Vineyard tighten + copy audit
 
 **P0 — Raw Express `/api/admin/*` auth gap plugged.** `/api/admin/qr-scans` was previously registered at server/index.ts:233, BEFORE `app.use(adminGate)` at line 391. Express middleware only applies to routes registered after `app.use(...)`, so the endpoint slipped the wall and served scan analytics publicly. Moved the route registration to sit next to `/api/admin/health-status` (which was already correctly gated). Both admin endpoints now sit at lines 530 + 537, both behind `adminGate`. Preview still returns 200 for both because ENABLE_DEV_BYPASS is on; in production (bypass off) both require gate-cookie / basic-auth / JWT-role verification.

@@ -39,6 +39,45 @@ function smsDraft(c: { firstName: string; winery?: string | null; painPoint?: st
   return `G'day ${c.firstName} — we crossed paths the other day${wineryBit}. I've since built a cellar AI grounded in your own vintage logs — figured you might find it useful. 90 sec look: ${url} — Rich`;
 }
 
+// ── Instagram / LinkedIn extraction from the notes field ────────────────
+// The enrichment pipeline writes "IG: handle" and "LinkedIn: url-or-slug"
+// into notes. Pull them out so IG-only prospects (Tim Stock, Sarah Feehan,
+// ~30% of the queue) aren't dead-ends when they have no mobile + no email.
+function extractInstagramFromNotes(notes: string | null | undefined): string | null {
+  if (!notes) return null;
+  // Match "IG: @handle" | "IG: handle" | "Instagram: @handle" | "instagram.com/handle"
+  const m =
+    notes.match(/\b(?:IG|Instagram|Insta)\s*:\s*@?([a-z0-9._]{2,32})\b/i) ||
+    notes.match(/instagram\.com\/([a-z0-9._]{2,32})\b/i);
+  return m ? m[1].replace(/[.,;)]+$/, "").toLowerCase() : null;
+}
+function extractLinkedinFromNotes(notes: string | null | undefined): string | null {
+  if (!notes) return null;
+  // Match "LinkedIn: https://linkedin.com/in/slug" or "LinkedIn: slug" or bare URL
+  const urlMatch = notes.match(/linkedin\.com\/in\/([a-z0-9-]+)/i);
+  if (urlMatch) return `https://www.linkedin.com/in/${urlMatch[1]}`;
+  const slugMatch = notes.match(/\bLinkedIn\s*:\s*([a-z0-9-]{3,60})\b/i);
+  if (slugMatch && !slugMatch[1].toLowerCase().startsWith("http")) {
+    return `https://www.linkedin.com/in/${slugMatch[1]}`;
+  }
+  return null;
+}
+
+// Shorter, Instagram-DM-appropriate hook: no landing URL in the first
+// message (Insta buries first-message links and marks them spammy). We
+// lead with the hook and invite a reply so it lands in Primary, not
+// Requests.
+function igDmDraft(c: { firstName: string; winery?: string | null; hookText?: string | null; painPoint?: string | null }): string {
+  if (c.hookText) {
+    return `hey ${c.firstName} — ${c.hookText}. been quietly building a cellar AI grounded in a winery's own vintage logs (not a textbook). happy to send you the 90 sec look if useful? — Rich`;
+  }
+  if (c.painPoint) {
+    return `hey ${c.firstName} — noticed ${c.painPoint}. been building a cellar AI grounded in a winery's own vintage logs. reckon it might scratch that itch — worth a 90 sec look? — Rich`;
+  }
+  const wineryBit = c.winery ? ` — ${c.winery}'s wines have been on my mind` : "";
+  return `hey ${c.firstName}${wineryBit}. been building a cellar AI grounded in a winery's own vintage logs. curious if it'd be useful for you — happy to send a 90 sec look? — Rich`;
+}
+
 function extractEmailFromNotes(notes: string | null | undefined): string | null {
   if (!notes) return null;
   const m = notes.match(/email:\s*(\S+@\S+?)(?:\s|$|·)/i);
@@ -78,6 +117,13 @@ export default function AdminOutboundQueue() {
 
   async function copySms(slug: string, text: string) {
     try { await navigator.clipboard.writeText(text); setCopied((s) => ({ ...s, [slug]: "sms" })); } catch { /* no-op */ }
+  }
+  async function copyAndOpen(slug: string, text: string, url: string, kind: "insta" | "linkedin") {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied((s) => ({ ...s, [slug]: kind === "insta" ? "sms" : "sms" }));
+    } catch { /* no-op */ }
+    window.open(url, "_blank", "noopener,noreferrer");
   }
   async function stampSent(slug: string, channel: "sms" | "email" | "both") {
     await markSent.mutateAsync({ slug, channel });
@@ -178,14 +224,150 @@ export default function AdminOutboundQueue() {
         <div style={{ flex: 1 }}>
           <h1 style={{ fontFamily: "'Fraunces',serif", fontSize: "1.4rem", margin: 0, fontWeight: 700 }}>Outbound queue</h1>
           <p style={{ margin: "2px 0 0", fontSize: "0.78rem", color: "var(--ow-text-mid)" }}>
-            Ranked by hook quality × channel availability. Highest-yield first-touch at the top.
+            Your daily 5 sit at the top. Tap one primary button per contact. Everything else lives under &ldquo;Advanced tools&rdquo; below.
           </p>
         </div>
         <Link href="/admin/contacts/engagement" data-testid="link-to-engagement-from-queue" style={{ color: "var(--ow-text-mid)", fontSize: "0.8rem", textDecoration: "none", marginRight: 12 }}>Engagement →</Link>
         <Link href="/admin/contacts" style={{ color: "var(--ow-amber)", fontSize: "0.85rem", textDecoration: "none" }}>← back to contacts</Link>
       </header>
 
-      <div style={{ padding: "16px 24px 8px", display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+      {/* ── Today's top 5 hero — simple, one primary CTA per contact ─────── */}
+      <section
+        data-testid="daily-top-five"
+        style={{
+          margin: "20px 24px 8px",
+          padding: "20px 22px 18px",
+          background: "color-mix(in oklch, var(--ow-amber) 8%, var(--ow-bg-card))",
+          border: "1px solid var(--ow-amber)",
+          borderRadius: 8,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
+          <h2 style={{ fontFamily: "'Fraunces',serif", fontSize: "1.25rem", margin: 0, fontWeight: 700, color: "var(--ow-text-hi)" }}>
+            Today&apos;s top 5
+          </h2>
+          <span style={{ fontSize: "0.78rem", color: "var(--ow-text-mid)" }}>
+            Do just these. That&apos;s the whole day&apos;s outbound.
+          </span>
+        </div>
+        {isLoading ? (
+          <p style={{ margin: 0, color: "var(--ow-text-lo)", fontSize: "0.85rem" }}>Loading…</p>
+        ) : filtered.length === 0 ? (
+          <p style={{ margin: 0, color: "var(--ow-text-lo)", fontSize: "0.85rem" }}>Queue is empty — nice work.</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {filtered.slice(0, 5).map((c, idx) => {
+              const email = extractEmailFromNotes(c.notes);
+              const igHandle = extractInstagramFromNotes(c.notes);
+              const linkedin = extractLinkedinFromNotes(c.notes);
+              const sms = smsDraft({ firstName: c.firstName, winery: c.winery, painPoint: c.painPoint, hookText: c.hookText, slug: c.slug });
+              const igMsg = igDmDraft({ firstName: c.firstName, winery: c.winery, hookText: c.hookText, painPoint: c.painPoint });
+              const state = copied[c.slug];
+
+              // Primary channel priority: SMS → email → Insta DM → LinkedIn → open card
+              let primary: { label: string; onClick: () => void; testid: string; markChannel: "sms" | "email" | "both" } | null = null;
+              if (c.hasMobile) {
+                primary = { label: state === "sms" ? "✓ SMS copied — paste in Messages" : "Copy SMS", onClick: () => copySms(c.slug, sms), testid: `top5-sms-${c.slug}`, markChannel: "sms" };
+              } else if (email) {
+                primary = { label: "Open email draft", onClick: () => window.open(buildMailto(email, c.firstName, c.winery, c.painPoint, c.hookText, c.slug), "_blank", "noopener,noreferrer"), testid: `top5-email-${c.slug}`, markChannel: "email" };
+              } else if (igHandle) {
+                primary = { label: state === "sms" ? "✓ DM copied — paste in Insta" : `DM @${igHandle} on Instagram`, onClick: () => copyAndOpen(c.slug, igMsg, `https://www.instagram.com/${igHandle}/`, "insta"), testid: `top5-insta-${c.slug}`, markChannel: "sms" };
+              } else if (linkedin) {
+                primary = { label: state === "sms" ? "✓ Message copied — paste in LinkedIn" : "Message on LinkedIn", onClick: () => copyAndOpen(c.slug, igMsg, linkedin, "linkedin"), testid: `top5-linkedin-${c.slug}`, markChannel: "email" };
+              }
+
+              return (
+                <div
+                  key={c.slug}
+                  data-testid={`top5-row-${c.slug}`}
+                  style={{
+                    background: state === "done" ? "color-mix(in oklch, #16a34a 8%, transparent)" : "var(--ow-bg-base)",
+                    border: "1px solid var(--ow-border)",
+                    borderRadius: 6,
+                    padding: "12px 14px",
+                    display: "grid",
+                    gridTemplateColumns: "auto 1fr auto",
+                    gap: 14,
+                    alignItems: "center",
+                    opacity: state === "done" ? 0.6 : 1,
+                  }}
+                >
+                  <div style={{ minWidth: 30, textAlign: "center" }}>
+                    <div style={{ fontFamily: "'Fraunces',serif", fontSize: "1.6rem", fontWeight: 700, color: "var(--ow-amber)", lineHeight: 1 }}>{idx + 1}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: "'Fraunces',serif", fontSize: "1.05rem", fontWeight: 600, marginBottom: 3 }}>
+                      {c.firstName} {c.lastName ?? ""}
+                      {c.winery && <span style={{ fontSize: "0.85rem", color: "var(--ow-text-mid)", fontWeight: 400 }}> · {c.winery}</span>}
+                    </div>
+                    {c.hookText && (
+                      <p style={{ margin: "2px 0 6px", fontSize: "0.82rem", color: "var(--ow-text-mid)", fontStyle: "italic", lineHeight: 1.45 }}>
+                        &ldquo;{c.hookText}&rdquo;
+                      </p>
+                    )}
+                    <div style={{ display: "flex", gap: 8, fontSize: "0.7rem", color: "var(--ow-text-lo)", flexWrap: "wrap" }}>
+                      {c.hasMobile && <span data-testid={`chan-sms-${c.slug}`}>📱 SMS</span>}
+                      {email && <span data-testid={`chan-email-${c.slug}`}>✉ email</span>}
+                      {igHandle && <span data-testid={`chan-insta-${c.slug}`}>📸 @{igHandle}</span>}
+                      {linkedin && <span data-testid={`chan-linkedin-${c.slug}`}>🔗 LinkedIn</span>}
+                      {!c.hasMobile && !email && !igHandle && !linkedin && <span style={{ color: "#dc2626" }}>no channel — enrich first</span>}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end", minWidth: 220 }}>
+                    {state === "done" ? (
+                      <span data-testid={`top5-done-${c.slug}`} style={{ color: "#16a34a", fontSize: "0.85rem", fontWeight: 600 }}>✓ sent — nice</span>
+                    ) : primary ? (
+                      <>
+                        <button
+                          data-testid={primary.testid}
+                          onClick={primary.onClick}
+                          style={{
+                            padding: "8px 14px",
+                            background: state === "sms" ? "#16a34a" : "var(--ow-amber)",
+                            color: "oklch(0.10 0.008 60)",
+                            border: "none",
+                            borderRadius: 4,
+                            fontSize: "0.85rem",
+                            fontWeight: 700,
+                            cursor: "pointer",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {primary.label}
+                        </button>
+                        <button
+                          data-testid={`top5-mark-sent-${c.slug}`}
+                          onClick={() => stampSent(c.slug, primary!.markChannel)}
+                          disabled={markSent.isPending}
+                          style={{ padding: "3px 10px", background: "transparent", color: "var(--ow-text-lo)", border: "1px dashed var(--ow-border)", borderRadius: 3, fontSize: "0.7rem", cursor: markSent.isPending ? "wait" : "pointer" }}
+                        >
+                          Mark sent, next →
+                        </button>
+                      </>
+                    ) : (
+                      <Link
+                        href={`/admin/contacts?slug=${c.slug}`}
+                        data-testid={`top5-open-${c.slug}`}
+                        style={{ padding: "6px 12px", border: "1px solid var(--ow-border)", borderRadius: 4, fontSize: "0.78rem", color: "var(--ow-text-hi)", textDecoration: "none" }}
+                      >
+                        Enrich this contact →
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      <details data-testid="advanced-tools-details" style={{ margin: "0 24px 8px" }}>
+        <summary style={{ cursor: "pointer", padding: "10px 4px", fontSize: "0.82rem", color: "var(--ow-text-mid)", fontFamily: "'Fraunces',serif" }}>
+          Advanced tools · region filter · bulk AI rewrite · vCard export · full queue
+        </summary>
+        <div style={{ paddingTop: 8 }}>
+
+      <div style={{ padding: "16px 0 8px", display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
         <span style={{ fontSize: "0.75rem", color: "var(--ow-text-lo)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Filter region:</span>
         {["all", "mclaren-vale", "hunter", "barossa", "yarra-valley", "adelaide-hills", "coonawarra", "orange", "tasmania", "margaret-river", "mornington-peninsula", "clare", "beechworth", "grampians"].map((r) => {
           const label = r === "all" ? "All" : r.replace(/-/g, " ");
@@ -216,7 +398,7 @@ export default function AdminOutboundQueue() {
       <div
         data-testid="bulk-ai-rewrite-strip"
         style={{
-          margin: "0 24px 8px",
+          margin: "0 0 8px",
           padding: "10px 14px",
           background: "color-mix(in oklch, var(--ow-amber) 5%, transparent)",
           border: "1px solid var(--ow-border)",
@@ -296,7 +478,7 @@ export default function AdminOutboundQueue() {
       <div
         data-testid="cohort-copy-strip"
         style={{
-          margin: "0 24px 12px",
+          margin: "0 0 12px",
           padding: "10px 14px",
           background: "color-mix(in oklch, oklch(0.65 0.14 200) 4%, transparent)",
           border: "1px solid var(--ow-border)",
@@ -360,7 +542,10 @@ export default function AdminOutboundQueue() {
       <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
         {filtered.map((c, idx) => {
           const email = extractEmailFromNotes(c.notes);
+          const igHandle = extractInstagramFromNotes(c.notes);
+          const linkedin = extractLinkedinFromNotes(c.notes);
           const sms = smsDraft({ firstName: c.firstName, winery: c.winery, painPoint: c.painPoint, hookText: c.hookText, slug: c.slug });
+          const igMsg = igDmDraft({ firstName: c.firstName, winery: c.winery, hookText: c.hookText, painPoint: c.painPoint });
           const state = copied[c.slug];
           return (
             <li
@@ -412,7 +597,7 @@ export default function AdminOutboundQueue() {
                   <span data-testid={`queue-done-${c.slug}`} style={{ color: "#16a34a", fontSize: "0.85rem", fontWeight: 600 }}>✓ sent — advancing</span>
                 ) : (
                   <>
-                    <div style={{ display: "flex", gap: 6 }}>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
                       {c.hasMobile && (
                         <button
                           data-testid={`queue-copy-sms-${c.slug}`}
@@ -432,6 +617,29 @@ export default function AdminOutboundQueue() {
                         >
                           Draft in Gmail
                         </a>
+                      )}
+                      {igHandle && (
+                        <button
+                          data-testid={`queue-insta-${c.slug}`}
+                          onClick={() => copyAndOpen(c.slug, igMsg, `https://www.instagram.com/${igHandle}/`, "insta")}
+                          title={`Copies a short DM to your clipboard, then opens instagram.com/${igHandle} in a new tab. Paste into the DM box.`}
+                          style={{ padding: "4px 12px", background: "transparent", color: "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.75rem", cursor: "pointer" }}
+                        >
+                          📸 DM @{igHandle}
+                        </button>
+                      )}
+                      {linkedin && (
+                        <button
+                          data-testid={`queue-linkedin-${c.slug}`}
+                          onClick={() => copyAndOpen(c.slug, igMsg, linkedin, "linkedin")}
+                          title="Copies a short message to your clipboard, then opens the LinkedIn profile in a new tab."
+                          style={{ padding: "4px 12px", background: "transparent", color: "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.75rem", cursor: "pointer" }}
+                        >
+                          🔗 LinkedIn
+                        </button>
+                      )}
+                      {!c.hasMobile && !email && !igHandle && !linkedin && (
+                        <span style={{ fontSize: "0.72rem", color: "#dc2626", fontStyle: "italic" }}>no channel — enrich first</span>
                       )}
                     </div>
                     <button
@@ -456,6 +664,8 @@ export default function AdminOutboundQueue() {
           );
         })}
       </ul>
+        </div>
+      </details>
     </div>
   );
 }
