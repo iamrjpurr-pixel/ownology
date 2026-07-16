@@ -7,7 +7,7 @@ import { COOKIE_NAME } from "../shared/const.js";
 import { upsertUser, db } from "./db.js";
 import * as schema from "../drizzle/schema.js";
 import { eq } from "drizzle-orm";
-import { isRuntimeBypassActive } from "./devBypassRuntime.js";
+import { isDevBypassActive } from "./devBypass.js";
 
 // --- Context ------------------------------------------------------------------
 export type User = {
@@ -85,19 +85,11 @@ async function hydrateMembership(user: User): Promise<User> {
   return user;
 }
 
-// Dev-bypass — auto-injects the seed owner when either the env-var says so
-// OR an admin has flipped the runtime override on via /admin/dev-mode. This
-// mirrors authRouter::isDevBypassActive and server/index.ts::isDevBypassActive
-// so all three surfaces (auth /me endpoint, tRPC context, admin gate) stay
-// in lockstep. When both env AND runtime say off, tRPC returns ctx.user=null
-// and any protectedProcedure throws UNAUTHORIZED.
-function isDevBypassActive(): boolean {
-  // SAFE-BY-DEFAULT (Feb 2026 audit) — see authRouter.ts for full context.
-  if (process.env.ENABLE_DEV_BYPASS === "false") return false;
-  if (isRuntimeBypassActive()) return true;
-  if (process.env.ENABLE_DEV_BYPASS === "true") return true;
-  return false;
-}
+// Dev-bypass logic lives in `./devBypass.ts` (single source of truth,
+// SEC-001-hardened Jul 2026). authRouter, index.ts and trpc.ts all
+// import from there so the auth /me endpoint, tRPC context, and the
+// admin gate stay in lockstep automatically.
+// (Imported at the top of the file.)
 
 const DEV_BYPASS_USER: User = {
   openId: "seed-owner-001",

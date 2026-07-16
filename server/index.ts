@@ -2,6 +2,7 @@ import "dotenv/config";
 import "./_core/forgeShim.js";
 import express from "express";
 import { createServer } from "http";
+import { timingSafeEqual } from "node:crypto";
 import path from "path";
 import { fileURLToPath } from "url";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
@@ -28,7 +29,7 @@ import { marketingCoachEmailHandler } from "./scheduled/marketingCoachEmail.js";
 import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
 import { generateLipAuditPackPdf } from "./lipAuditPackPdf.js";
 import { generateCellarBookPdf } from "./cellarBookPdf.js";
-import { isRuntimeBypassActive } from "./devBypassRuntime.js";
+import { isDevBypassActive } from "./devBypass.js";
 import { publicAuditHandler } from "./publicAudit.js";
 import authRouter from "./authRouter.js";
 import {
@@ -115,14 +116,21 @@ function checkBasicAuthFallback(req: express.Request): boolean {
   }
 }
 
-function isDevBypassActive(): boolean {
-  // SAFE-BY-DEFAULT (Feb 2026 audit) — see authRouter.ts for full context.
-  // Flipped from default-allow to default-deny after prod exposed /admin
-  // anonymously due to missing NODE_ENV.
-  if (process.env.ENABLE_DEV_BYPASS === "false") return false;
-  if (isRuntimeBypassActive()) return true;
-  if (process.env.ENABLE_DEV_BYPASS === "true") return true;
-  return false;
+// Dev-bypass logic centralised in `./devBypass.ts` (SEC-001 hardened
+// Jul 2026 audit — refuses to activate on internet-reachable hosts even
+// when ENABLE_DEV_BYPASS=true, to prevent anonymous admin over a shared
+// production DB). `isDevBypassActive` imported at the top of the file.
+
+/** Constant-time string equality for shared-secret comparisons (gate
+ *  password, CRON secrets). Uses Node's crypto.timingSafeEqual so an
+ *  attacker can't infer prefix matches from timing differences.
+ *  Returns false on length mismatch — that leak is fine, expected input
+ *  lengths are constant for a given secret. */
+function constantTimeEquals(a: string, b: string): boolean {
+  const aBuf = Buffer.from(a, "utf8");
+  const bBuf = Buffer.from(b, "utf8");
+  if (aBuf.length !== bBuf.length) return false;
+  return timingSafeEqual(aBuf, bBuf);
 }
 
 async function adminGate(
@@ -169,6 +177,22 @@ const __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
   const server = createServer(app);
+
+  // ── Trust proxy configuration (SEC hardening Jul 2026) ─────────────
+  // Express reads client IP from req.ip. When we sit behind a load
+  // balancer (Railway, Emergent preview, k8s ingress), the LB puts the
+  // real client IP in X-Forwarded-For — but without `trust proxy` set,
+  // Express reads the LB's own IP instead. This lets the rate-limiter
+  // and gate be trivially bypassed by anyone with the ability to spoof
+  // that header. Value = TRUST_PROXY env if set (e.g. "1" for single
+  // Railway LB, "loopback,linklocal,uniquelocal" for local dev), else
+  // "1" as a safe default that only trusts one immediate hop.
+  //
+  // NEVER set this to `true` — that trusts arbitrary XFF chains and
+  // reintroduces the spoof.
+  const trustProxy = (process.env.TRUST_PROXY ?? "1").trim();
+  const trustProxyValue: string | number = /^\d+$/.test(trustProxy) ? Number(trustProxy) : trustProxy;
+  app.set("trust proxy", trustProxyValue);
 
   // ── Health probe (MUST be registered before adminGate/routers) ───────────
   // k8s readiness/liveness probes hit /api/health, /healthz, or /health.
@@ -391,7 +415,11 @@ async function startServer() {
     // forcers, not to lock out humans who eventually remember their
     // shared secret. On success we wipe their failure counter too, so
     // subsequent visits from the same IP start clean.
-    if (candidate && candidate === expected) {
+    //
+    // SEC hardening (Jul 2026 audit): use crypto.timingSafeEqual instead
+    // of === to avoid a length-based timing side-channel on the shared
+    // gate password.
+    if (candidate && constantTimeEquals(candidate, expected)) {
       const token = await mintGateToken();
       if (!token) {
         return res.status(503).json({ ok: false, error: "Gate not configured (JWT_SECRET missing)." });

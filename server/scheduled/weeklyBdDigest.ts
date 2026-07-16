@@ -367,20 +367,12 @@ export async function weeklyBdDigestHandler(req: Request, res: Response): Promis
     process.env.OPERATOR_ALERT_EMAIL?.trim() ||
     process.env.OWNER_EMAIL?.trim() ||
     null;
-  const cronSecret = process.env.CRON_SECRET?.trim() || null;
-  const providedSecret =
-    (req.headers["x-cron-secret"] as string | undefined)?.trim() ??
-    (req.query.cronSecret as string | undefined)?.trim() ??
-    null;
-
-  const dryRunRequested = req.query.dryRun === "1" || !apiKey || !recipient;
-  const secretRequired = cronSecret !== null;
-  const secretOk = !secretRequired || providedSecret === cronSecret;
-  const dryRun = dryRunRequested || !secretOk;
-
-  if (!secretOk && !dryRunRequested) {
-    console.warn("[weekly-bd-digest] CRON_SECRET mismatch — downgrading to dry-run.");
-  }
+  // SEC-002 hardening (Jul 2026 audit) — live send requires configured
+  // CRON_SECRET. Empty secret → forced dry-run.
+  const { evaluateCronSecret } = await import("./_cronSecret.js");
+  const guard = evaluateCronSecret(req, "weekly-bd-digest", { hasApiKey: !!apiKey && !!recipient });
+  const secretOk = guard.secretOk;
+  const dryRun = guard.dryRun;
 
   let digest: DigestData;
   try {

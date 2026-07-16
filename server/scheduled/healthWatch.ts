@@ -107,12 +107,10 @@ function renderAlertHtml(transitions: Transition[], generatedAt: Date): string {
 export async function healthWatchHandler(req: Request, res: Response): Promise<void> {
   const shouldSend = req.query.send === "1";
   const force = req.query.force === "1";
-  const cronSecret = process.env.CRON_SECRET?.trim() || null;
-  const providedSecret =
-    (req.headers["x-cron-secret"] as string | undefined)?.trim() ??
-    (req.query.cronSecret as string | undefined)?.trim() ??
-    null;
-  const secretOk = cronSecret === null || providedSecret === cronSecret;
+  // SEC-002 hardening (Jul 2026) — send-side requires configured secret.
+  const { evaluateCronSecret } = await import("./_cronSecret.js");
+  const guard = evaluateCronSecret(req, "health-watch");
+  const secretOk = guard.secretOk;
 
   const now = new Date();
   const nowMs = now.getTime();

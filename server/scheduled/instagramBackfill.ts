@@ -38,23 +38,18 @@ const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 200;
 
 export async function instagramBackfillHandler(req: Request, res: Response): Promise<void> {
-  const cronSecret = process.env.CRON_SECRET?.trim() || null;
-  const providedSecret = (req.headers["x-cron-secret"] as string | undefined)?.trim()
-    ?? (req.query.cronSecret as string | undefined)?.trim()
-    ?? null;
-  const secretRequired = cronSecret !== null;
-  const secretOk = !secretRequired || providedSecret === cronSecret;
-  const dryRunRequested = req.query.dryRun === "1";
+  // SEC-002 hardening (Jul 2026 audit) — live Perplexity spend requires a
+  // configured CRON_SECRET now. Empty secret → forced dry-run.
+  const { evaluateCronSecret } = await import("./_cronSecret.js");
+  const guard = evaluateCronSecret(req, "ig-backfill-cron");
+  const secretOk = guard.secretOk;
 
   const rawLimit = Number(req.query.limit ?? DEFAULT_LIMIT);
   const limit = Number.isFinite(rawLimit) && rawLimit > 0
     ? Math.min(Math.floor(rawLimit), MAX_LIMIT)
     : DEFAULT_LIMIT;
 
-  const dryRun = dryRunRequested || !secretOk;
-  if (!secretOk && !dryRunRequested) {
-    console.warn("[ig-backfill-cron] CRON_SECRET mismatch — downgrading to dry-run.");
-  }
+  const dryRun = guard.dryRun;
 
   if (dryRun) {
     // Same candidate filter as the live path — no Perplexity calls, no

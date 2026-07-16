@@ -276,19 +276,15 @@ export async function weeklyCellarDigestHandler(req: Request, res: Response): Pr
   const fromName = process.env.ALERT_FROM_NAME ?? "Owen · Ownology Cellars";
   const replyTo = process.env.ALERT_REPLY_TO?.trim() || "support@ownology.ai";
   const testTo = process.env.ALERT_TEST_TO?.trim() || null;
-  const cronSecret = process.env.CRON_SECRET?.trim() || null;
-  const providedSecret = (req.headers["x-cron-secret"] as string | undefined)?.trim()
-    ?? (req.query.cronSecret as string | undefined)?.trim()
-    ?? null;
 
-  const dryRunRequested = req.query.dryRun === "1" || !apiKey;
-  const secretRequired = cronSecret !== null;
-  const secretOk = !secretRequired || providedSecret === cronSecret;
-  const dryRun = dryRunRequested || !secretOk;
-
-  if (!secretOk && !dryRunRequested) {
-    console.warn("[weekly-cellar-digest] CRON_SECRET mismatch — downgrading to dry-run.");
-  }
+  // SEC-002 hardening (Jul 2026 audit) — CRON_SECRET is now MANDATORY for
+  // live sends. Previously an empty env silently permitted live sends,
+  // meaning any internet visitor could POST this endpoint and trigger a
+  // real Resend blast to every user. Shared guard lives in ./_cronSecret.
+  const { evaluateCronSecret } = await import("./_cronSecret.js");
+  const guard = evaluateCronSecret(req, "weekly-cellar-digest", { hasApiKey: !!apiKey });
+  const dryRun = guard.dryRun;
+  const secretOk = guard.secretOk;
 
   const resend = apiKey ? new Resend(apiKey) : null;
   const results: EmailResult[] = [];

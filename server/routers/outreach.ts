@@ -9,6 +9,7 @@ import { router, publicProcedure, ownerProcedure } from "../trpc.js";
 import { db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
 import { regionForWinery } from "../wineryRegions.js";
+import { safeFetch, SsrfError } from "../ssrfGuard.js";
 import {
   slugify,
   normaliseMobile,
@@ -1373,13 +1374,15 @@ Return ONLY valid JSON. No markdown fences. If the OCR text has no recognisable 
 
       // Fetch with realistic UA + 12s timeout. Some winery sites 403 the
       // default node UA, so we masquerade as a modern browser.
+      // SEC-003 hardening: safeFetch() rejects hostnames that resolve to
+      // private / loopback / cloud-metadata IPs, disables auto-redirect,
+      // and re-validates every hop against the block list.
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 12_000);
       let html: string;
       try {
-        const resp = await fetch(input.url, {
+        const resp = await safeFetch(input.url, {
           signal: controller.signal,
-          redirect: "follow",
           headers: {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
             Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -1398,6 +1401,7 @@ Return ONLY valid JSON. No markdown fences. If the OCR text has no recognisable 
         html = new TextDecoder("utf-8", { fatal: false }).decode(buf);
       } catch (err) {
         clearTimeout(timeoutId);
+        if (err instanceof SsrfError) throw new Error(`URL is not allowed — ${err.message}`);
         const msg = err instanceof Error ? err.message : String(err);
         if (msg.includes("aborted")) throw new Error("Page took too long to load (>12s). Try a different URL.");
         throw new Error(`Could not load page — ${msg}`);
@@ -2620,13 +2624,14 @@ Propose the three hook candidates.`;
       }
 
       // Fetch with browser-like UA + 15s timeout.
+      // SEC-003 hardening — safeFetch rejects private / metadata IPs and
+      // manually re-validates every redirect hop.
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15_000);
       let html: string;
       try {
-        const resp = await fetch(input.url, {
+        const resp = await safeFetch(input.url, {
           signal: controller.signal,
-          redirect: "follow",
           headers: {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
             Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -2644,6 +2649,7 @@ Propose the three hook candidates.`;
         html = new TextDecoder("utf-8", { fatal: false }).decode(buf);
       } catch (err) {
         clearTimeout(timeoutId);
+        if (err instanceof SsrfError) throw new Error(`URL is not allowed — ${err.message}`);
         const msg = err instanceof Error ? err.message : String(err);
         if (msg.includes("aborted")) throw new Error("Page took too long to load (>15s). Try a different URL.");
         throw new Error(`Could not load page — ${msg}`);

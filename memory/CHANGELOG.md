@@ -4,6 +4,35 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Jul 2026 — Security audit hardening (SEC-001, SEC-002, SEC-003 + P3s)
+
+Read-only audit surfaced one CRITICAL + one HIGH + one MEDIUM finding plus a handful of P3 hardening notes. **All fixes shipped and verified live**:
+
+**SEC-001 CRITICAL — anonymous admin over shared prod DB.** The preview environment had `ENABLE_DEV_BYPASS=true` in `.env` AND shared the same Railway MySQL as production. Any anonymous internet visitor could hit `/api/trpc/outreach.exportAllContacts` (or any owner procedure) and read/write production data. Fix:
+  * New `server/devBypass.ts` — single source of truth for the bypass check, previously duplicated across `server/index.ts`, `server/authRouter.ts`, `server/trpc.ts`.
+  * Three-layer hardening: (1) production `NODE_ENV` always refuses bypass; (2) non-loopback `HOST` binding refuses bypass unless the operator sets `DEV_BYPASS_ALLOW_PUBLIC=i-know-what-im-doing`; (3) explicit `ENABLE_DEV_BYPASS=false` always wins.
+  * All three duplicates deleted, import a single hardened function.
+  * Verified: `/api/auth/me` anonymous returns `{}` (no user); `outreach.list` returns `admin login required`; public `outreach.bySlug` still works normally.
+
+**SEC-002 HIGH — unauthenticated cron endpoints.** `CRON_SECRET` was optional; empty env silently allowed live sends. Any visitor could `POST /api/scheduled/weekly-cellar-digest` and blast every user with a real email + burn Perplexity budget via `/instagram-backfill`. Fix:
+  * New shared guard `server/scheduled/_cronSecret.ts` — `evaluateCronSecret(req, name)` returns `{dryRun, secretConfigured, secretOk, reason}`.
+  * All 6 cron handlers migrated to the shared guard: `weeklyCellarDigest`, `dailyAlertEmail`, `weeklyBdDigest`, `instagramBackfill`, `healthDigest`, `healthWatch`.
+  * New contract: no CRON_SECRET set → automatic dry-run, no side-effects. Verified live: POST returns `dryRun=true` with `status=dry_run`, zero emails sent.
+
+**SEC-003 MEDIUM — SSRF in outreach URL parsers.** `outreach.parseFromUrl` and `outreach.parseEventUrl` fetched attacker-supplied URLs with `redirect: "follow"` and no host allowlist. Combined with SEC-001, an attacker could pivot to cloud-metadata endpoints (`169.254.169.254`), internal RFC1918, or loopback services. Fix:
+  * New `server/ssrfGuard.ts` — `assertSafeUrl()` + `safeFetch()`. Resolves DNS and rejects any IP in a documented private/loopback/link-local/metadata/CGNAT/multicast range. Manual redirect handling with per-hop re-validation (blocks redirect-based pivots).
+  * Both procedures now wrap fetch with `safeFetch`; the old `redirect: "follow"` is gone.
+  * Verified: `169.254.169.254`, `127.0.0.1`, `10.0.0.1` all trigger `SsrfError`. External winery URLs still work.
+
+**P3 hardening bundle (same audit):**
+  * **Constant-time gate password compare.** `/api/gate/verify` now uses `crypto.timingSafeEqual` via a shared `constantTimeEquals()` helper. Closes a low-severity timing-side-channel on the shared password.
+  * **Trust proxy configured.** `app.set("trust proxy", ...)` reads `TRUST_PROXY` env (default `"1"` = one Railway/Emergent hop). Express now derives `req.ip` from the leftmost untrusted XFF entry — spoof-safe.
+  * **`clientIpOf()` prefers `req.ip`.** `server/gate.ts` no longer reads XFF header directly. Rate-limits + IP allowlist are no longer bypassable via a forged `X-Forwarded-For`.
+
+**Positive findings preserved (audit called out):** magic-link tokens (crypto-random 32-byte, SHA-256-hashed, single-use, 15-min TTL); weather raw SQL uses parameterized `sql\`\`` templates; no secrets logged; JWT `alg:none` rejected; `dangerouslySetInnerHTML` renders static copy only.
+
+**Workflow note for Rich**: with SEC-001 in effect, preview URLs no longer auto-admin. To keep local dev frictionless: set `HOST=127.0.0.1` in local `.env`. To restore the old bypass on Emergent preview (accepting the anonymous-admin risk): set `DEV_BYPASS_ALLOW_PUBLIC=i-know-what-im-doing` on the preview environment ONLY — and ideally split the preview DB from prod first.
+
 ### Jul 2026 — Weekly Cellar Digest: tasks + temp outliers + pipeline moves + preview UI
 
 **"A Monday-morning heartbeat every seven days."** The existing weekly-cron surface only shipped vessel status cards from `generateCellarBrief`. Rich asked for the three missing sections that make founding members feel the app is *watching the cellar*, not just listing tanks. Landed:

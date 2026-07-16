@@ -25,7 +25,7 @@ import { db } from "./db.js";
 import * as schema from "../drizzle/schema.js";
 import { eq } from "drizzle-orm";
 import { COOKIE_NAME, ONE_YEAR_MS } from "../shared/const.js";
-import { isRuntimeBypassActive } from "./devBypassRuntime.js";
+import { isDevBypassActive } from "./devBypass.js";
 
 const EMERGENT_SESSION_DATA_URL =
   "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data";
@@ -511,21 +511,8 @@ router.get("/magic-link/verify", async (req: Request, res: Response) => {
  * seed admin user. Mirrors the tRPC bypass so the client AuthProvider
  * sees a consistent identity in preview and dev.
  */
-function isDevBypassActive(): boolean {
-  // SAFE-BY-DEFAULT (Feb 2026 audit) — flipped from "default allow" to
-  // "default deny". Prod NODE_ENV wasn't guaranteed to be set which meant
-  // the fall-through at the bottom allowed anonymous admin access on
-  // www.ownology.ai. Now: bypass ONLY activates if explicitly opted in
-  // via ENABLE_DEV_BYPASS=true or the runtime flag. Preview + local dev
-  // both set ENABLE_DEV_BYPASS=true in their .env files.
-  if (process.env.ENABLE_DEV_BYPASS === "false") return false;
-  if (isRuntimeBypassActive()) return true;
-  if (process.env.ENABLE_DEV_BYPASS === "true") return true;
-  // Any other combination (missing NODE_ENV, missing ENABLE_DEV_BYPASS,
-  // production, ambiguous) — DENY. Was previously "allow" and that was
-  // the security hole.
-  return false;
-}
+// Dev-bypass logic centralised in `./devBypass.ts` (SEC-001 hardened
+// Jul 2026 audit — see that file for full context). Imported at top.
 
 router.get("/me", async (req: Request, res: Response) => {
   const { jwtVerify } = await import("jose");

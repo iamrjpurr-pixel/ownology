@@ -143,22 +143,14 @@ export async function dailyAlertEmailHandler(req: Request, res: Response): Promi
   const fromName = process.env.ALERT_FROM_NAME ?? "Owen · Ownology Cellars";
   const replyTo = process.env.ALERT_REPLY_TO?.trim() || "support@ownology.ai";
   const testTo = process.env.ALERT_TEST_TO?.trim() || null;
-  const cronSecret = process.env.CRON_SECRET?.trim() || null;
-  const providedSecret = (req.headers["x-cron-secret"] as string | undefined)?.trim()
-    ?? (req.query.cronSecret as string | undefined)?.trim()
-    ?? null;
 
-  // Live sends require either no CRON_SECRET configured (dev convenience) or
-  // a matching header/query. Dry-runs stay open so the cellar team can poll
-  // safely without burning Resend quota.
-  const dryRunRequested = req.query.dryRun === "1" || !apiKey;
-  const secretRequired = cronSecret !== null;
-  const secretOk = !secretRequired || providedSecret === cronSecret;
-  const dryRun = dryRunRequested || !secretOk;
-
-  if (!secretOk && !dryRunRequested) {
-    console.warn("[daily-alert-email] CRON_SECRET mismatch — downgrading to dry-run.");
-  }
+  // Live sends require CRON_SECRET to be set AND match the header/query.
+  // (SEC-002 hardening, Jul 2026 audit — empty secret used to silently
+  // permit live sends.) Dry-runs stay open so the cellar team can poll.
+  const { evaluateCronSecret } = await import("./_cronSecret.js");
+  const guard = evaluateCronSecret(req, "daily-alert-email", { hasApiKey: !!apiKey });
+  const dryRun = guard.dryRun;
+  const secretOk = guard.secretOk;
 
   const resend = apiKey ? new Resend(apiKey) : null;
   const results: EmailResult[] = [];

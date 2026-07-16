@@ -232,16 +232,23 @@ export function resetGateAttempts(ip: string): void {
   attemptsByIp.delete(ip);
 }
 
-/** Best-effort client IP extraction — respects X-Forwarded-For when behind
- *  a proxy (Emergent's ingress sets it). Falls back to remote address. */
+/** Best-effort client IP extraction. SEC hardening (Jul 2026):
+ *  now prefers `req.ip` which Express derives via the app's `trust proxy`
+ *  setting (see server/index.ts). This means:
+ *    - When TRUST_PROXY="1" (Railway/Emergent default), Express takes the
+ *      LEFTMOST unTrusted X-Forwarded-For entry — spoof-safe.
+ *    - When TRUST_PROXY is unset, req.ip is the direct socket peer.
+ *  The old raw XFF-first behaviour was bypassable by any client putting
+ *  a fake IP in the header (rate-limit dodge, IP-allowlist forgery).
+ *  Kept as fallback only when req.ip is truly missing (test doubles). */
 export function clientIpOf(req: express.Request): string {
+  if (req.ip) return req.ip;
   const xff = req.headers["x-forwarded-for"];
   if (typeof xff === "string" && xff.length > 0) {
-    // XFF can be "client, proxy1, proxy2" — first entry is the origin.
     const first = xff.split(",")[0]?.trim();
     if (first) return first;
   }
-  return req.ip || req.socket.remoteAddress || "unknown";
+  return req.socket.remoteAddress || "unknown";
 }
 
 // ─── IP allowlist bypass (S4) ─────────────────────────────────────────────
