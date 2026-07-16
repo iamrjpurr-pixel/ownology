@@ -101,6 +101,7 @@ const AdminWeeklyRecoDigest = lazy(() => import("./pages/AdminWeeklyRecoDigest")
 const UnsubscribeWeeklyReco = lazy(() => import("./pages/UnsubscribeWeeklyReco"));
 const AdminEngagement = lazy(() => import("./pages/AdminEngagement"));
 const AdminBrandAssets = lazy(() => import("./pages/AdminBrandAssets"));
+const AdminMerchArtwork = lazy(() => import("./pages/AdminMerchArtwork"));
 const AdminEventIngest = lazy(() => import("./pages/AdminEventIngest"));
 const AdminAudioHook = lazy(() => import("./pages/AdminAudioHook"));
 const AdminMarketingKit = lazy(() => import("./pages/AdminMarketingKit"));
@@ -403,6 +404,7 @@ function Router() {
       <Route path={"/unsubscribe/weekly-reco"} component={UnsubscribeWeeklyReco} />
       <Route path={"/admin/contacts/engagement"} component={AdminEngagement} />
       <Route path={"/admin/brand-assets"} component={AdminBrandAssets} />
+      <Route path={"/admin/merch-artwork"} component={AdminMerchArtwork} />
       <Route path={"/admin/contacts"} component={AdminContacts} />
       <Route path={"/admin/contacts-migrate"} component={AdminContactsMigrate} />
       <Route path={"/admin/event-ingest"} component={AdminEventIngest} />

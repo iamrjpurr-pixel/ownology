@@ -4,6 +4,20 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Feb 2026 — Merch artwork downloader (`/admin/merch-artwork`)
+
+Rich asked "Did you finish merchnimages?" and provided VistaPrint spec sheets for the Pro Felt Bar Runner (856×225 mm bleed) and Square Coaster (100×100 mm bleed / 90×90 mm safety). Built a client-side print-artwork composer:
+
+- **New page**: `/app/client/src/pages/AdminMerchArtwork.tsx` — canvas-based composer that renders artwork at exact VistaPrint bleed dimensions @ 300 DPI (Bar Runner → 10,110×2,657 px; Square Coaster → 1,181×1,181 px).
+- **SKU spec sheet** hard-coded from VistaPrint values (bleed / trim / safety in mm). Adding new products is a one-line addition to the `SKUS` array.
+- **Reuses existing brand assets** from `/client/public/`: trinity mark, dark/light/mono profile icons, full dark/light lockups. No new artwork required — this composes the existing library.
+- **Composable inputs**: SKU picker, background preset (5 options across dark + light kinds), brand mark picker, mark scale slider, wordmark text, tagline text, amber double-rule toggle, guide overlay toggle.
+- **Guides** render BLEED (magenta), TRIM (cyan dashed) and SAFETY (green dashed) with a corner legend — shown in preview only, automatically stripped for the exported PNG.
+- **Download**: renders to an off-DOM canvas, exports full-resolution PNG with filename `ownology-<sku>-<bg>-<mark>-<w>x<h>px.png` for direct VistaPrint upload.
+- **Route wiring**: registered lazy import in `App.tsx` at `/admin/merch-artwork`; added `merch artwork →` link on `/admin/brand-assets` header.
+- **Screenshot smoke test** confirmed: bar runner + coaster layouts render, dark + light background variants both work, guide toggle strips overlays, download button enabled after brand mark loads.
+
+
 ### Feb 2026 — Quiz full quality pass (Waves A + B + C + D + E)
 
 Rich flagged the Gewürztraminer recommendation as broken ("we don't grow that here" false + "Riesling isn't the swap"). Root-cause audit surfaced a class of bugs: home-market swap picked highest-scoring AU/NZ wine regardless of grape identity, so Alsatian Gewürz → Clare Riesling instead of Aus Gewürz. Same failure mode latent for 17 other Old-World entries.

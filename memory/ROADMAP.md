@@ -4,6 +4,13 @@ Living document. Every "Potential improvement 💡" and "Next Action Item" from 
 
 Last consolidated: 28 Jun 2026.
 
+
+---
+
+## ✅ Shipped Feb 2026
+
+- **Merch artwork downloader (`/admin/merch-artwork`)** — VistaPrint-ready PNG composer at 300 DPI for Pro Felt Bar Runner (856×225 mm bleed) and Square Coaster (100×100 mm bleed). Reuses existing brand mark PNGs; SKU array is one-line extensible for future products (mug, sticker, t-shirt, etc.).
+
 ---
 
 ## 🆕 TODO — Copilot Fork B · Vintage-log → regional narrative (Feb 2026)

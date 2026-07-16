@@ -143,6 +143,7 @@ export default function AdminBrandAssets() {
           </p>
         </div>
         <Link href="/admin-hub" style={{ color: "var(--ow-amber)", fontSize: "0.85rem", textDecoration: "none" }}>← admin hub</Link>
+        <Link href="/admin/merch-artwork" style={{ color: "var(--ow-amber)", fontSize: "0.85rem", textDecoration: "none", marginLeft: 12 }} data-testid="link-merch-artwork">merch artwork →</Link>
       </header>
 
       {CATEGORIES.map((cat) => (
