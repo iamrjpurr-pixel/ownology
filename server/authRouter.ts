@@ -240,7 +240,7 @@ router.post("/exchange", express.json(), async (req: Request, res: Response) => 
  * Rejects unknown emails to avoid accidental account provisioning (users
  * must be created first via Google OAuth or admin seed).
  *
- * Feb 2026 addition — sits alongside Google OAuth, not replacing it.
+ * Jul 2026 addition — sits alongside Google OAuth, not replacing it.
  */
 const MAGIC_LINK_TTL_MS = 15 * 60 * 1000; // 15 minutes
 const MAGIC_LINK_RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour

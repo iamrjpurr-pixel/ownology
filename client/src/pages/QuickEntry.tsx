@@ -373,7 +373,7 @@ export default function QuickEntry() {
   const [sessionLog, setSessionLog] = useState<{ tank: string; summary: string; ts: Date }[]>([]);
 
   // ── Cellar hygiene quick-log (Clean / Sanitise) ─────────────────────────────
-  // Feb 2026 P1: one-tap logging of a completed Clean or Sanitise task on the
+  // Jul 2026 P1: one-tap logging of a completed Clean or Sanitise task on the
   // cellar floor. Feeds the /admin/cellar-board RAG status — a completed
   // 'sanitise' task resets the equipment sanitation freshness window.
   const [hygieneOpen, setHygieneOpen] = useState<"clean" | "sanitise" | null>(null);

@@ -539,7 +539,7 @@ async function startServer() {
   // Feeds /admin/qr-scans dashboard: totals per SKU + recent arrivals.
   // Registered AFTER adminGate (line ~391) so /api/admin/* wall enforces
   // gate-cookie auth. Prior placement above adminGate leaked scan analytics
-  // publicly (Feb 2026 audit) — do NOT move this back above adminGate.
+  // publicly (Jul 2026 audit) — do NOT move this back above adminGate.
   app.get("/api/admin/qr-scans", async (_req, res) => {
     try {
       const { db } = await import("./db.js");
@@ -1449,7 +1449,7 @@ async function startServer() {
         INDEX cbst_expires_idx (expires_at)
       )
     `);
-    // Magic-link login tokens (Feb 2026) — passwordless email login fallback
+    // Magic-link login tokens (Jul 2026) — passwordless email login fallback
     // for winemakers without a Google account. Token is stored SHA-256
     // hashed; the plaintext only exists in the outbound email. Single-use,
     // 15-minute expiry. See authRouter.ts magic-link routes.

@@ -4,21 +4,21 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
-### Feb 2026 — Outbound queue ↔ contact card deep-linking
+### Jul 2026 — Outbound queue ↔ contact card deep-linking
 
 **Problem.** After the "Today's Top 5" hero landed, there was no way to click from a queue row into the underlying contact card to work the contact (edit hook, mark status, paste reply, delete etc.). The only path — "Enrich this contact →" — only appeared when a contact had zero channels.
 
 **Two-way link.** Every top-5 row now has (a) a dotted-underline name link and (b) an "Open card ↗" link on the far right of the channel-icon row. Every full-queue row already had "Open card ↗". All of them target `/admin/contacts?slug=<slug>`. The AdminContacts page reads the `slug` query param, waits two rAFs + 250ms for the ~200-row list to finish laying out, then `scrollIntoView({ block: "center", behavior: "smooth" })` on the target card. The target card gets a 2px amber border + 4px amber outer ring that fades away after 2.4s so the operator can see exactly where the page landed. Verified end-to-end on Adam Richardson: URL `/admin/contacts?slug=adam-richardson-atr-wines` scrolls straight to his card in centre of viewport with amber highlight, all his contact details, SMS drafts, and hook fields immediately actionable.
 
-### Feb 2026 — Nightly Instagram-backfill cron
+### Jul 2026 — Nightly Instagram-backfill cron
 
 **Shared core, two triggers.** Extracted the Perplexity-Sonar-driven IG handle backfill into a single `runInstagramBackfill(limit)` function in `/app/server/instagramBackfillCore.ts` so the manual admin button (`outreach.backfillInstagramHandles` tRPC) and the new nightly cron (`/api/scheduled/instagram-backfill`) call literally the same code path. No behaviour drift possible.
 
 **New scheduled route.** `POST /api/scheduled/instagram-backfill` runs the live enrichment (default 20 candidates, ~$0.08/night); `GET` allowed for browser-friendly dry-runs. `?limit=<N>` query param overrides the default (capped at 200). `?dryRun=1` forces a candidate-count-only mode with no Perplexity spend. Guarded by the same `CRON_SECRET` mechanism as `dailyAlertEmailHandler` — missing/wrong secret downgrades to dry-run (never errors, never silently spends). End-to-end tested: dry-run returned 5 candidates, live run of 2 correctly wrote `notFound=2, errors=0` when Perplexity couldn't confidently resolve either winery (which is what we want — no guessing).
 
-**Cron config for Railway (operator action).** Add a Railway cron job that pings the endpoint nightly. Suggested `0 16 * * *` UTC (2am Adelaide) so the backlog is fresh when the operator opens the queue in the morning. Headers: `x-cron-secret: <CRON_SECRET value>`. If Railway cron isn't set up yet, the manual button on `/admin/contacts/outbound-queue` still works — no code change needed.
+**Cron config for Railway (operator action).** Add a Railway cron job that pings the endpoint nightly. Suggested `0 16 * * *` UTC (early morning Sydney — AEST/AEDT lands 02:00–03:00 depending on DST) so the backlog is fresh when the operator opens the queue in the morning. Headers: `x-cron-secret: <CRON_SECRET value>`. If Railway cron isn't set up yet, the manual button on `/admin/contacts/outbound-queue` still works — no code change needed.
 
-### Feb 2026 — Passwordless magic-link login + Instagram handle backfill
+### Jul 2026 — Passwordless magic-link login + Instagram handle backfill
 
 **Passwordless magic-link login (Resend).** New tables + endpoints so a winemaker without a Google account can still sign in via a one-tap email link. `magic_login_tokens` schema (drizzle + raw DDL in server/index.ts) stores only the SHA-256 hash of a 32-byte token; the plaintext lives exclusively in the outbound Resend email. Two new Express routes on the existing auth router: `POST /api/auth/magic-link/request` (validates email shape, enumeration-protection: returns 200 even for unknown emails so an attacker can't probe accounts, rate-limits at 3 sends per email per hour, generates + hashes token, sends via Resend using the existing `ALERT_FROM_EMAIL` sender, dev fallback logs the URL to stdout when RESEND_API_KEY is missing) and `GET /api/auth/magic-link/verify?token=…` (hashes the plaintext, looks up row, rejects if consumed/expired/missing, stamps `consumed_at` BEFORE minting the cookie so a mid-flight failure can't leave a live token, calls the same `signSessionJwt` + `setSessionCookie` the Google OAuth exchange uses so downstream `protectedProcedure`/`ownerProcedure` code is unchanged, 302-redirects to `/dashboard`). `/login` page rewritten to keep Google as the primary but adds an "or · Email login" divider below it with an email input + "Email me a login link" secondary button. Redirect-error banner surfaces `?err=invalid|used|expired|server` from the verify route. Verified end-to-end via curl: request 200 for known + unknown emails, 400 for malformed shape, verify 302 → `/login?err=invalid` for junk tokens.
 
@@ -26,7 +26,7 @@ backlog. This file just records what actually shipped, and when.
 
 **Admin UI: 📸 IG handle backfill strip** on `/admin/contacts/outbound-queue` inside the "Advanced tools" `<details>` block. Single pink "Backfill 50 handles" button opens a confirm() explaining the ~$0.20 spend and behaviour, then shows a "✓ N found · N unresolved · N errors" result line when done. Refetches the queue on success so the newly-enriched rows show their IG buttons immediately.
 
-### Feb 2026 — Outbound Queue "simplify my day" + Instagram/LinkedIn DM channels
+### Jul 2026 — Outbound Queue "simplify my day" + Instagram/LinkedIn DM channels
 
 **Problem the user hit:** operator opened `/admin/contacts/outbound-queue` and (a) couldn't figure out the daily workflow amidst the region-filter chips, bulk-AI-rewrite strip, cohort-copy strip, and 221-row queue list, and (b) hit a dead-end on IG-only prospects (Tim Stock @ Les Fruits Wine, Sarah Feehan @ Parley Wines, ~30% of the enriched Wine Australia cohort have no mobile + no email — Instagram is the only channel).
 
@@ -36,7 +36,7 @@ backlog. This file just records what actually shipped, and when.
 
 **Full queue rows also get the new channel buttons** — the collapsed queue below the hero renders `📸 DM @handle` and `🔗 LinkedIn` buttons alongside the existing Copy SMS / Draft in Gmail, plus a red "no channel — enrich first" hint when a contact truly has nothing.
 
-### Feb 2026 — P0 admin auth fix + P1 hygiene tiles + Vineyard tighten + copy audit
+### Jul 2026 — P0 admin auth fix + P1 hygiene tiles + Vineyard tighten + copy audit
 
 **P0 — Raw Express `/api/admin/*` auth gap plugged.** `/api/admin/qr-scans` was previously registered at server/index.ts:233, BEFORE `app.use(adminGate)` at line 391. Express middleware only applies to routes registered after `app.use(...)`, so the endpoint slipped the wall and served scan analytics publicly. Moved the route registration to sit next to `/api/admin/health-status` (which was already correctly gated). Both admin endpoints now sit at lines 530 + 537, both behind `adminGate`. Preview still returns 200 for both because ENABLE_DEV_BYPASS is on; in production (bypass off) both require gate-cookie / basic-auth / JWT-role verification.
 

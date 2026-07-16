@@ -589,7 +589,7 @@ export const cellarBookShareTokens = mysqlTable(
   ]
 );
 
-// Magic-link login tokens (Feb 2026) — passwordless email login fallback.
+// Magic-link login tokens (Jul 2026) — passwordless email login fallback.
 // Only the SHA-256 hash of the plaintext token is stored; the plaintext
 // lives exclusively in the one outbound Resend email. Single-use — once
 // consumed_at is set the token is dead, even before it expires.

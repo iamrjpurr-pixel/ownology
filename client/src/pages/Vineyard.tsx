@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Plus, Trash2, Leaf, Eye, ChevronDown, ChevronUp, MapPin } from "lucide-react";
 
 const TRAINING_SYSTEMS = ["VSP", "Scott Henry", "Smart-Dyson", "Pergola", "Bush Vine", "Other"] as const;
-// Feb 2026 P1: tight rebuild — Vineyard = block register + phenology + yield only.
+// Jul 2026 P1: tight rebuild — Vineyard = block register + phenology + yield only.
 // Spray/irrigation/canopy/pest/disease intentionally OUT of scope (that's
 // vineyard-management software territory; Ownology is a cellar tool).
 // The DB enum keeps the older values so historical entries render, but the

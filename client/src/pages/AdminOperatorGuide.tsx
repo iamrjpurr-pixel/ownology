@@ -90,7 +90,7 @@ const SECTIONS: Section[] = [
         what: "Tap the \"Advanced tools · region filter · bulk AI rewrite · vCard export · full queue\" summary to reveal: the 13-region filter chips, the Warm/Brief/Regional bulk AI rewrite strip (Claude rewrites SMS drafts in the chosen tone — ~$0.005 per contact), the Copy cohort as TSV button (spreadsheet-friendly export), the Export as vCard button (AirDrop to your phone → Contacts absorbs it → Messages autocompletes winemaker names), the pink 📸 IG handle backfill button (Perplexity looks up up to 50 winery handles at ~$0.20/run), and the full ranked queue with all 200+ contacts.",
       },
     ],
-    note: "The IG backfill button is also wired to a nightly Railway cron (2am Adelaide) — the backlog trickles down automatically. The button is there for when you want to force a batch.",
+    note: "The IG backfill button is also wired to a nightly Railway cron (16:00 UTC — early morning Sydney) — the backlog trickles down automatically. The button is there for when you want to force a batch.",
   },
   {
     id: "sales",
@@ -261,7 +261,7 @@ const SECTIONS: Section[] = [
       {
         href: "/api/scheduled/instagram-backfill?dryRun=1",
         label: "IG backfill dry-run (Perplexity)",
-        what: "Peek at the IG-less-winery backlog without spending a cent. Same endpoint the nightly Railway cron pings (with header x-cron-secret: <CRON_SECRET>) at 2am Adelaide. ?limit=<N> capped at 200. If you want to actually run it manually with UI feedback, use the 📸 IG backfill button in /admin/contacts/outbound-queue → Advanced tools instead.",
+        what: "Peek at the IG-less-winery backlog without spending a cent. Same endpoint the nightly Railway cron pings (with header x-cron-secret: <CRON_SECRET>) at 16:00 UTC (early morning Sydney). ?limit=<N> capped at 200. If you want to actually run it manually with UI feedback, use the 📸 IG backfill button in /admin/contacts/outbound-queue → Advanced tools instead.",
       },
       {
         href: "/admin/dev",

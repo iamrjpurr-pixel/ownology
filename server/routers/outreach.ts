@@ -131,15 +131,41 @@ function pickQmsVariant(slug: string): "qms" | "quality-system" {
   return Math.abs(h) % 2 === 0 ? "qms" : "quality-system";
 }
 
+/** Detect canonical placeholder phone numbers that should never render as a
+ *  live "Reply RED" button. Jul 2026: caught a `+61400000000` slip in prod
+ *  that sent every /hi/<slug> prospect to a fake destination — this guards
+ *  against a repeat. Accepts anything that E.164-cleans to all-zeros or one
+ *  of a handful of well-known dummy numbers. */
+function isPlaceholderPhone(raw: string): boolean {
+  const digits = raw.replace(/[^\d]/g, "");
+  if (!digits) return true;
+  // All-zero suffixes after the country code — the classic mis-copy pattern.
+  // "+61400000000" → digits "61400000000" → all-zero after the +614 prefix.
+  if (/^\d{1,3}0+$/.test(digits)) return true;
+  if (/0{7,}/.test(digits)) return true; // 7+ consecutive zeros → dummy
+  const KNOWN_DUMMIES = new Set([
+    "61400000000", "61400000001", // AU mobile placeholder
+    "15551234567", "15555550100", // US 555 test range
+    "12025550100",
+    "441234567890",               // UK placeholder
+  ]);
+  return KNOWN_DUMMIES.has(digits);
+}
+
 /** Build the `sms:` href that pre-fills the operator's number with the
  *  prospect's identity. iOS and Android both support `sms:+number?body=...`.
- *  Returns null if no inbound number configured. */
+ *  Returns null if no inbound number configured OR the configured number
+ *  looks like a placeholder (see isPlaceholderPhone). */
 function buildSmsReplyHref(input: {
   firstName: string;
   winery: string | null;
 }): string | null {
   const num = process.env.SMS_INBOUND_NUMBER?.trim();
   if (!num) return null;
+  if (isPlaceholderPhone(num)) {
+    console.warn(`[buildSmsReplyHref] SMS_INBOUND_NUMBER "${num}" looks like a placeholder — suppressing Reply RED button. Set a real E.164 mobile in .env / Railway env vars.`);
+    return null;
+  }
   const keyword = process.env.SMS_REPLY_KEYWORD?.trim() || "RED";
   const body = `${keyword} — Hi, it's ${input.firstName}${input.winery ? ` from ${input.winery}` : ""}. Please lock me in for Ownology onboarding.`;
   // RFC-compliant body encoding (URLSearchParams encodes spaces as +, but
@@ -161,6 +187,7 @@ function buildWaHref(input: {
 }): string | null {
   const raw = (process.env.WHATSAPP_INBOUND_NUMBER || process.env.SMS_INBOUND_NUMBER || "").trim();
   if (!raw) return null;
+  if (isPlaceholderPhone(raw)) return null; // Same guard as buildSmsReplyHref — never render a WA link to a fake number.
   // wa.me expects E.164 digits only, no leading + or spaces
   const digits = raw.replace(/[^\d]/g, "");
   if (!digits) return null;

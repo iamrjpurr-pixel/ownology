@@ -1,8 +1,8 @@
 /**
  * Instagram backfill cron — /api/scheduled/instagram-backfill
  *
- * Fires nightly (configure via Railway cron — recommended 2am AEST when
- * Perplexity is idle and the winemaker isn't looking). Runs the same
+ * Fires nightly (configure via Railway cron — recommended 16:00 UTC / early
+ * morning Sydney when Perplexity is idle and the winemaker isn't looking). Runs the same
  * `runInstagramBackfill()` core the manual admin button uses, capped at
  * 20 contacts per run to keep the nightly spend well under $0.10.
  *
