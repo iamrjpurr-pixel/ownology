@@ -18,6 +18,7 @@ import { qualFlagsRouter } from "./routers/qualFlags.js";
 import { weatherRouter } from "./routers/weather.js";
 import { wineryRouter } from "./routers/winery.js";
 import { cellarBriefRouter } from "./routers/cellarBrief.js";
+import { adminUsersRouter } from "./routers/adminUsers.js";
 import { referralsRouter } from "./routers/referrals.js";
 import { onboardingRouter } from "./routers/onboarding.js";
 import { weeklyRecoDigestRouter } from "./routers/weeklyRecoDigest.js";
@@ -2210,6 +2211,7 @@ export const appRouter = router({
   producers: producersRouter,
   winery: wineryRouter,
   cellarBrief: cellarBriefRouter,
+  adminUsers: adminUsersRouter,
   referrals: referralsRouter,
   marketingOps: marketingOpsRouter,
   gate: gateRouter,

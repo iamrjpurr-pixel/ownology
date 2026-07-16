@@ -305,6 +305,81 @@ const MAGIC_LINK_TTL_MS = 15 * 60 * 1000; // 15 minutes
 const MAGIC_LINK_RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 const MAGIC_LINK_RATE_MAX = 3;
 
+/**
+ * Generate a fresh magic-link token for `user`, insert it into the DB, and
+ * dispatch the email via Resend. Returns the plaintext token AND the URL
+ * so callers can log / debug in dev.
+ *
+ * Shared between the public `POST /api/auth/magic-link/request` handler
+ * (where operator = winemaker asking for their own link) and the admin
+ * `adminUsers.sendFreshMagicLink` tRPC procedure (where operator = Rich
+ * resending a link to a stuck customer). The `subject` and `intro` args
+ * let the admin path use welcome / recovery wording without duplicating
+ * the HTML template.
+ */
+export async function issueMagicLink(params: {
+  user: { id: number; email: string; name: string | null };
+  siteUrl: string;
+  requestIp?: string | null;
+  subject?: string;
+  introHtml?: string;
+}): Promise<{ tokenPlaintext: string; magicUrl: string; sent: boolean }> {
+  const { randomBytes, createHash } = await import("node:crypto");
+  const tokenPlaintext = randomBytes(32).toString("hex");
+  const tokenHash = createHash("sha256").update(tokenPlaintext).digest("hex");
+  const now = Date.now();
+  const expiresAt = now + MAGIC_LINK_TTL_MS;
+
+  await db.insert(schema.magicLoginTokens).values({
+    tokenHash,
+    email: params.user.email,
+    userId: params.user.id,
+    expiresAt,
+    consumedAt: null,
+    createdAt: now,
+    requestIp: params.requestIp?.slice(0, 63) ?? null,
+  });
+
+  const magicUrl = `${params.siteUrl}/api/auth/magic-link/verify?token=${tokenPlaintext}`;
+  const subject = params.subject || "Your Ownology login link";
+  const introHtml = params.introHtml
+    || `<p style="margin:0 0 20px;font-size:15px;line-height:1.55;color:#374151">Here&rsquo;s your one-tap login link. It expires in 15 minutes and can only be used once.</p>`;
+
+  const resendKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.ALERT_FROM_EMAIL || "onboarding@resend.dev";
+  let sent = false;
+  if (resendKey) {
+    const { Resend } = await import("resend");
+    const resend = new Resend(resendKey);
+    const displayName = (params.user.name || params.user.email.split("@")[0]).replace(/[<>]/g, "");
+    const html = `<!doctype html><html><body style="margin:0;padding:32px 16px;background:#f6f4ef;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#1f2937">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06)">
+    <tr><td style="padding:32px 32px 8px;border-top:6px solid #b8860b">
+      <h1 style="margin:0;font-family:'Fraunces',Georgia,serif;font-size:22px;color:#b8860b;font-weight:700">Ownology</h1>
+    </td></tr>
+    <tr><td style="padding:8px 32px 24px">
+      <p style="margin:0 0 12px;font-size:16px">G&rsquo;day ${displayName},</p>
+      ${introHtml}
+      <p style="margin:20px 0 24px;text-align:center">
+        <a href="${magicUrl}" style="display:inline-block;padding:12px 28px;background:#b8860b;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:700;font-size:15px">Sign in to Ownology</a>
+      </p>
+      <p style="margin:0 0 8px;font-size:12px;color:#6b7280;line-height:1.5">If the button doesn&rsquo;t work, paste this into your browser:<br><span style="word-break:break-all;color:#374151">${magicUrl}</span></p>
+      <p style="margin:24px 0 0;font-size:12px;color:#9ca3af;line-height:1.5">Didn&rsquo;t request this? Ignore it — the link expires shortly and no account changes were made.</p>
+    </td></tr>
+  </table>
+</body></html>`;
+    try {
+      await resend.emails.send({ from: fromEmail, to: params.user.email, subject, html });
+      sent = true;
+    } catch (sendErr) {
+      console.error("[issueMagicLink] Resend failed:", (sendErr as Error).message);
+    }
+  } else {
+    console.log(`[issueMagicLink] (dev) link for ${params.user.email}: ${magicUrl}`);
+  }
+  return { tokenPlaintext, magicUrl, sent };
+}
+
 router.post("/magic-link/request", express.json(), async (req: Request, res: Response) => {
   const emailRaw = typeof req.body?.email === "string" ? req.body.email : "";
   const email = emailRaw.trim().toLowerCase();
@@ -354,70 +429,20 @@ router.post("/magic-link/request", express.json(), async (req: Request, res: Res
 
     // Generate token — 32 random bytes → hex. Store SHA-256 hash only.
     const { randomBytes, createHash } = await import("node:crypto");
-    const tokenPlaintext = randomBytes(32).toString("hex");
-    const tokenHash = createHash("sha256").update(tokenPlaintext).digest("hex");
-    const now = Date.now();
-    const expiresAt = now + MAGIC_LINK_TTL_MS;
+    // Generate + dispatch token via the shared helper (same code path as
+    // the admin resend button in adminUsers.sendFreshMagicLink).
+    const { randomBytes: _rb, createHash: _ch } = await import("node:crypto");
+    void _rb; void _ch;
+    const siteUrl = process.env.PUBLIC_SITE_URL
+      || `${req.protocol}://${req.get("host")}`;
     const clientIp = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim()
       || req.socket.remoteAddress
       || null;
-
-    await db.insert(schema.magicLoginTokens).values({
-      tokenHash,
-      email,
-      userId: user.id,
-      expiresAt,
-      consumedAt: null,
-      createdAt: now,
-      requestIp: clientIp?.slice(0, 63) ?? null,
+    await issueMagicLink({
+      user: { id: user.id, email: user.email, name: user.name },
+      siteUrl,
+      requestIp: clientIp,
     });
-
-    // Build the callback URL. PUBLIC_SITE_URL wins in prod; falls back to
-    // the request's own origin so preview environments work without config.
-    const siteUrl = process.env.PUBLIC_SITE_URL
-      || `${req.protocol}://${req.get("host")}`;
-    const magicUrl = `${siteUrl}/api/auth/magic-link/verify?token=${tokenPlaintext}`;
-
-    // Send via Resend. Non-blocking on failure — we still return 200 to the
-    // client so a Resend hiccup doesn't leak "this email doesn't exist" via
-    // a differential error message.
-    const resendKey = process.env.RESEND_API_KEY;
-    const fromEmail = process.env.ALERT_FROM_EMAIL || "onboarding@resend.dev";
-    if (resendKey) {
-      const { Resend } = await import("resend");
-      const resend = new Resend(resendKey);
-      const displayName = user.name || email.split("@")[0];
-      const html = `<!doctype html><html><body style="margin:0;padding:32px 16px;background:#f6f4ef;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#1f2937">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06)">
-    <tr><td style="padding:32px 32px 8px;border-top:6px solid #b8860b">
-      <h1 style="margin:0;font-family:'Fraunces',Georgia,serif;font-size:22px;color:#b8860b;font-weight:700">Ownology</h1>
-    </td></tr>
-    <tr><td style="padding:8px 32px 24px">
-      <p style="margin:0 0 12px;font-size:16px">G&rsquo;day ${displayName.replace(/[<>]/g, "")},</p>
-      <p style="margin:0 0 20px;font-size:15px;line-height:1.55;color:#374151">Here&rsquo;s your one-tap login link. It expires in 15 minutes and can only be used once.</p>
-      <p style="margin:20px 0 24px;text-align:center">
-        <a href="${magicUrl}" style="display:inline-block;padding:12px 28px;background:#b8860b;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:700;font-size:15px">Sign in to Ownology</a>
-      </p>
-      <p style="margin:0 0 8px;font-size:12px;color:#6b7280;line-height:1.5">If the button doesn&rsquo;t work, paste this into your browser:<br><span style="word-break:break-all;color:#374151">${magicUrl}</span></p>
-      <p style="margin:24px 0 0;font-size:12px;color:#9ca3af;line-height:1.5">Didn&rsquo;t request this? Ignore it — the link expires shortly and no account changes were made.</p>
-    </td></tr>
-  </table>
-</body></html>`;
-      try {
-        await resend.emails.send({
-          from: fromEmail,
-          to: email,
-          subject: "Your Ownology login link",
-          html,
-        });
-      } catch (sendErr) {
-        console.error("[auth/magic-link] Resend failed:", (sendErr as Error).message);
-      }
-    } else {
-      // Dev / preview without Resend key — log the link so operator can
-      // still complete a test flow.
-      console.log(`[auth/magic-link] (dev) link for ${email}: ${magicUrl}`);
-    }
 
     return res.json({ ok: true, sent: true });
   } catch (err: unknown) {
