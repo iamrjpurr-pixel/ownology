@@ -333,7 +333,7 @@ export default function HiContact() {
             onClick={logCtaClick}
             style={btnPrimary}
           >
-            Reply RED to lock my onboarding →
+            Text me to lock my onboarding →
           </a>
         ) : calendlyUrl ? (
           <a

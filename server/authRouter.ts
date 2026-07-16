@@ -439,7 +439,7 @@ router.post("/magic-link/request", express.json(), async (req: Request, res: Res
       || req.socket.remoteAddress
       || null;
     await issueMagicLink({
-      user: { id: user.id, email: user.email, name: user.name },
+      user: { id: user.id, email: user.email ?? email, name: user.name },
       siteUrl,
       requestIp: clientIp,
     });

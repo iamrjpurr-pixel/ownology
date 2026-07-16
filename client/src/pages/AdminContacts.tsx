@@ -3470,7 +3470,7 @@ function CtaAbCard() {
       <div className="grid grid-cols-1 gap-2">
         {[bookB, replyB].map((b) => {
           if (!b) return null;
-          const label = b.variant === "book" ? "Book demo" : "Reply RED";
+          const label = b.variant === "book" ? "Book demo" : "Text reply";
           return (
             <div
               key={b.variant}

@@ -100,7 +100,7 @@ export const adminUsersRouter = router({
       if (!user) throw new Error("No user with that email — sign them up first.");
       const siteUrl = process.env.PUBLIC_SITE_URL || "https://www.ownology.ai";
       const result = await issueMagicLink({
-        user: { id: user.id, email: user.email, name: user.name },
+        user: { id: user.id, email: user.email ?? email, name: user.name },
         siteUrl,
         requestIp: "admin-resend",
         subject: input.subject,

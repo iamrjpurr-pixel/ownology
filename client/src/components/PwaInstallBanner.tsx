@@ -18,22 +18,43 @@ import { useEffect, useState } from "react";
 import { useLocation, Link } from "wouter";
 import { usePwaInstall } from "@/hooks/usePwaInstall";
 
-const DISMISSED_KEY = "ownology_pwa_banner_dismissed";
+const DISMISSED_KEY = "ownology_pwa_banner_dismissed_until"; // stores UTC ms — snooze not permanent
+const SNOOZE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days — after this, the banner reappears
 
 /** Prospect / conversion surfaces where the install nudge would distract
  *  from the story we're telling. `/try` is the main sandbox — asking a
  *  visitor to install a PWA before they've even subscribed is friction. */
 const SUPPRESSED_PREFIXES = ["/try", "/hi/", "/audit/", "/join", "/founding-member/success"];
 
+/** Routes where we render the FATTER post-login variant of the banner.
+ *  `/dashboard` is the first landing after a magic-link click or Google
+ *  OAuth exchange, so this is the moment to nudge hardest. Everywhere
+ *  else gets the subtle bottom strip. */
+const HERO_PREFIXES = ["/dashboard"];
+
 export default function PwaInstallBanner() {
   const [location] = useLocation();
   const { canInstall, canInstallIos, promptInstall, isInstalled } = usePwaInstall();
   const [dismissed, setDismissed] = useState(false);
   const suppressed = SUPPRESSED_PREFIXES.some((p) => location.startsWith(p));
+  const isHero = HERO_PREFIXES.some((p) => location.startsWith(p));
 
   useEffect(() => {
-    if (localStorage.getItem(DISMISSED_KEY) === "1") {
+    const raw = localStorage.getItem(DISMISSED_KEY);
+    if (!raw) return;
+    // Backwards-compat: legacy value "1" was a permanent dismiss. Treat
+    // as a fresh install invitation — we'd rather over-prompt than never
+    // prompt at all. Also handles the "user snoozed but 7 days elapsed"
+    // case: numeric timestamp in the past → banner comes back.
+    if (raw === "1") {
+      localStorage.removeItem(DISMISSED_KEY);
+      return;
+    }
+    const until = Number(raw);
+    if (Number.isFinite(until) && until > Date.now()) {
       setDismissed(true);
+    } else {
+      localStorage.removeItem(DISMISSED_KEY);
     }
   }, []);
 
@@ -49,7 +70,8 @@ export default function PwaInstallBanner() {
   }, [isVisible]);
 
   function handleDismiss() {
-    localStorage.setItem(DISMISSED_KEY, "1");
+    // Snooze — reappears in 7 days. Was previously permanent ("1" flag).
+    localStorage.setItem(DISMISSED_KEY, String(Date.now() + SNOOZE_MS));
     setDismissed(true);
   }
 
@@ -66,11 +88,13 @@ export default function PwaInstallBanner() {
   return (
     <div
       data-testid="pwa-install-banner"
-      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between gap-4 px-5 py-3"
+      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between gap-4"
       style={{
-        background: "oklch(0.13 0.008 60)",
-        borderTop: "1px solid oklch(0.72 0.12 75 / 25%)",
+        background: isHero ? "oklch(0.15 0.020 75)" : "oklch(0.13 0.008 60)",
+        borderTop: `${isHero ? "3px" : "1px"} solid oklch(0.72 0.12 75 / ${isHero ? "80" : "25"}%)`,
         backdropFilter: "blur(8px)",
+        padding: isHero ? "16px 24px" : "12px 20px",
+        boxShadow: isHero ? "0 -8px 24px rgba(0,0,0,0.35)" : "none",
       }}
     >
       {/* Icon + text */}
@@ -93,13 +117,19 @@ export default function PwaInstallBanner() {
           )}
         </div>
         <div>
-          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 600, fontSize: "0.8125rem", color: "oklch(0.88 0.015 75)", lineHeight: 1.3 }}>
-            {isIos ? "Install Ownology on your iPhone" : "Add Ownology to your home screen"}
+          <p style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: isHero ? "1rem" : "0.8125rem", color: "oklch(0.88 0.015 75)", lineHeight: 1.3 }}>
+            {isHero
+              ? (isIos ? "Add Ownology to your home screen — 10 sec setup" : "Add Ownology to your home screen — one tap")
+              : (isIos ? "Install Ownology on your iPhone" : "Add Ownology to your home screen")}
           </p>
-          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: "0.75rem", color: "oklch(0.55 0.012 75)", lineHeight: 1.3 }}>
-            {isIos
-              ? "Tap the Share button below, then \u201CAdd to Home Screen\u201D"
-              : "Works offline · Faster access · No app store needed"}
+          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: isHero ? "0.82rem" : "0.75rem", color: "oklch(0.55 0.012 75)", lineHeight: 1.4, marginTop: isHero ? 2 : 0 }}>
+            {isHero
+              ? (isIos
+                  ? "Tap Share → Add to Home Screen. Ownology opens like an app, no Chrome tab, and stays signed in."
+                  : "Faster than the browser · Opens like an app · Stays signed in · No app store needed")
+              : (isIos
+                  ? "Tap the Share button below, then \u201CAdd to Home Screen\u201D"
+                  : "Works offline · Faster access · No app store needed")}
           </p>
         </div>
       </div>

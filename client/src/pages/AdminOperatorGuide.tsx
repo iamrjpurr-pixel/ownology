@@ -101,12 +101,12 @@ const SECTIONS: Section[] = [
       {
         href: "/hi/nathan-brokenwood-wines",
         label: "Example: /hi/<slug>",
-        what: "Personalised landing card with their name, winery, event, and a CTA. The system already picked their crush theme (red/white) and CTA variant (Book demo vs Reply RED) deterministically — you don't touch that logic.",
+        what: "Personalised landing card with their name, winery, event, and a CTA. The system already picked their crush theme (red/white) and CTA variant (Book demo vs Text reply) deterministically — you don't touch that logic.",
       },
       {
         href: "/admin/contacts",
         label: "A/B card",
-        what: "Between the KPI strip and filter chips on /admin/contacts, a card shows live Book demo vs Reply RED conversion. Uses live data to tell you which variant is winning.",
+        what: "Between the KPI strip and filter chips on /admin/contacts, a card shows live Book demo vs Text reply conversion. Uses live data to tell you which variant is winning.",
       },
     ],
   },

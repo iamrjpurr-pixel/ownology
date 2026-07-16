@@ -19,7 +19,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
-import { OwnologyLogo } from "@/components/OwnologyLogo";
+import OwnologyLogo from "@/components/OwnologyLogo";
 
 function fmtDateTime(ms: number | null | undefined): string {
   if (!ms) return "—";
@@ -103,15 +103,16 @@ export default function AdminUsers() {
             </thead>
             <tbody>
               {data.rows.map((u) => {
-                const isExpanded = expanded === u.email;
-                const path = u.openId?.startsWith("emergent:") ? "Google" : u.openId?.startsWith("email:") ? "Email" : u.openId;
-                const rs = resendState[u.email] || "idle";
+                const email = u.email ?? "";
+                const isExpanded = expanded === email;
+                const path = u.openId?.startsWith("emergent:") ? "Google" : u.openId?.startsWith("email:") ? "Email" : (u.openId ?? "—");
+                const rs = resendState[email] || "idle";
                 return (
                   <>
                     <tr key={u.id} data-testid={`user-row-${u.id}`} style={{ borderBottom: "1px solid var(--ow-border)" }}>
                       <td style={{ padding: "10px 12px" }}>
                         <div style={{ fontWeight: 600 }}>{u.name || "—"}</div>
-                        <div style={{ fontSize: "0.78rem", color: "var(--ow-text-mid)" }}>{u.email}</div>
+                        <div style={{ fontSize: "0.78rem", color: "var(--ow-text-mid)" }}>{email}</div>
                       </td>
                       <td style={{ padding: "10px 12px", fontSize: "0.82rem" }}>
                         {u.wineryName ? (
@@ -148,16 +149,16 @@ export default function AdminUsers() {
                       <td style={{ padding: "10px 12px", textAlign: "right" }}>
                         <button
                           data-testid={`resend-magic-${u.id}`}
-                          onClick={() => resendLink(u.email)}
+                          onClick={() => resendLink(email)}
                           disabled={rs === "sending"}
-                          title={`Send a fresh magic-link to ${u.email} — bypasses the public 3/hr rate-limit`}
+                          title={`Send a fresh magic-link to ${email} — bypasses the public 3/hr rate-limit`}
                           style={{ padding: "4px 10px", background: rs === "sent" ? "#16a34a" : "transparent", color: rs === "sent" ? "oklch(0.10 0.008 60)" : "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.75rem", cursor: rs === "sending" ? "wait" : "pointer", marginRight: 6 }}
                         >
                           {rs === "sending" ? "Sending…" : rs === "sent" ? "✓ Sent" : "Send fresh link"}
                         </button>
                         <button
                           data-testid={`expand-user-${u.id}`}
-                          onClick={() => setExpanded(isExpanded ? null : u.email)}
+                          onClick={() => setExpanded(isExpanded ? null : email)}
                           style={{ padding: "4px 10px", background: "transparent", color: "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.75rem", cursor: "pointer" }}
                         >
                           {isExpanded ? "Hide" : "Tokens"}
@@ -167,7 +168,7 @@ export default function AdminUsers() {
                     {isExpanded && (
                       <tr key={`${u.id}-tokens`} data-testid={`token-panel-${u.id}`}>
                         <td colSpan={6} style={{ padding: "0 12px 16px", background: "color-mix(in oklch, var(--ow-bg-card) 60%, transparent)" }}>
-                          <TokenPanel email={u.email} />
+                          <TokenPanel email={email} />
                         </td>
                       </tr>
                     )}
@@ -197,7 +198,7 @@ function TokenPanel({ email }: { email: string }) {
     <div style={{ padding: "12px 4px" }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 8 }}>
         <p style={{ margin: 0, fontSize: "0.72rem", color: "var(--ow-text-mid)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Last 10 magic-link tokens</p>
-        <button onClick={() => refetch()} style={{ fontSize: "0.7rem", color: "var(--ow-text-mid)", background: "transparent", border: "none", cursor: "pointer", textDecoration: "underline" }}>refresh</button>
+        <button onClick={() => refetch()} data-testid="token-refetch-btn" style={{ fontSize: "0.7rem", color: "var(--ow-text-mid)", background: "transparent", border: "none", cursor: "pointer", textDecoration: "underline" }}>refresh</button>
       </div>
       {isLoading ? (
         <p style={{ color: "var(--ow-text-lo)", fontSize: "0.8rem", margin: 0 }}>Loading…</p>

@@ -148,7 +148,7 @@ const GROUPS: ToolGroup[] = [
       },
       {
         title: "A/B funnel stats",
-        blurb: "Live wins for Reply RED vs Book Demo CTAs on /hi/:slug landings.",
+        blurb: "Live wins for Text reply vs Book Demo CTAs on /hi/:slug landings.",
         href: "/admin/contacts",
         internal: true,
         cta: "Open funnel",

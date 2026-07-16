@@ -108,6 +108,7 @@ const AdminEventIngest = lazy(() => import("./pages/AdminEventIngest"));
 const AdminAudioHook = lazy(() => import("./pages/AdminAudioHook"));
 const AdminMarketingKit = lazy(() => import("./pages/AdminMarketingKit"));
 const AdminOperatorGuide = lazy(() => import("./pages/AdminOperatorGuide"));
+const AdminUsers = lazy(() => import("./pages/AdminUsers"));
 const AdminThemesStats = lazy(() => import("./pages/AdminThemesStats"));
 const AdminQuizPicks = lazy(() => import("./pages/AdminQuizPicks"));
 const AdminProducers = lazy(() => import("./pages/AdminProducers"));
@@ -415,6 +416,7 @@ function Router() {
       <Route path={"/admin/audio-hook"} component={AdminAudioHook} />
       <Route path={"/admin/marketing-kit"} component={AdminMarketingKit} />
       <Route path={"/admin/operator-guide"} component={AdminOperatorGuide} />
+      <Route path={"/admin/users"} component={AdminUsers} />
       <Route path={"/admin/themes-stats"} component={AdminThemesStats} />
       <Route path={"/admin/quiz-picks"} component={AdminQuizPicks} />
       <Route path={"/admin/producers"} component={AdminProducers} />
