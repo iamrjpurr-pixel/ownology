@@ -14,6 +14,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
+import QRCode from "qrcode";
 import OwnologyLogo from "@/components/OwnologyLogo";
 
 // ─── SKU spec sheet (VistaPrint) ─────────────────────────────────────────────
@@ -104,10 +105,13 @@ type ComposeOptions = {
   showGuides: boolean;       // preview only — never true when exporting
   markScale: number;         // 0.1 – 1.0 relative to short side
   showBorder: boolean;
+  qrImg: HTMLImageElement | null;  // pre-rendered QR (dark modules on transparent)
+  qrUrl: string;                    // human-readable URL to render alongside QR
+  showQr: boolean;
 };
 
 function composeArtwork(canvas: HTMLCanvasElement, opts: ComposeOptions): void {
-  const { sku, bg, markImg, wordmark, tagline, showGuides, markScale, showBorder } = opts;
+  const { sku, bg, markImg, wordmark, tagline, showGuides, markScale, showBorder, qrImg, qrUrl, showQr } = opts;
 
   const wPx = mmToPx(sku.bleedMm.w);
   const hPx = mmToPx(sku.bleedMm.h);
@@ -135,7 +139,7 @@ function composeArtwork(canvas: HTMLCanvasElement, opts: ComposeOptions): void {
   const accentColor = bg.kind === "dark" ? AMBER_LIGHT : AMBER;
 
   if (sku.layout === "landscape") {
-    // Bar runner: [mark on left · double-rule · wordmark centre · tagline · double-rule · mark on right]
+    // Bar runner: [mark on left · double-rule · wordmark centre · tagline · QR right]
     const centreY = hPx / 2;
     const markSize = Math.round(hPx * 0.75 * markScale);
     const padding = Math.round(hPx * 0.15);
@@ -143,8 +147,28 @@ function composeArtwork(canvas: HTMLCanvasElement, opts: ComposeOptions): void {
     // Left mark
     if (markImg) {
       ctx.drawImage(markImg, padding, centreY - markSize / 2, markSize, markSize);
-      // Right mark (mirror position)
-      ctx.drawImage(markImg, wPx - padding - markSize, centreY - markSize / 2, markSize, markSize);
+    }
+
+    // Right side: QR badge if enabled, otherwise mirror mark for symmetry
+    const rightX = wPx - padding - markSize;
+    if (showQr && qrImg) {
+      // QR sits on a light square so it always scans, regardless of background darkness
+      const qrPad = Math.round(markSize * 0.08);
+      const qrPlateSize = markSize;
+      const qrInner = qrPlateSize - qrPad * 2;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(rightX, centreY - qrPlateSize / 2, qrPlateSize, qrPlateSize);
+      ctx.drawImage(qrImg, rightX + qrPad, centreY - qrPlateSize / 2 + qrPad, qrInner, qrInner);
+
+      // URL label under the QR
+      const urlLabelSize = Math.round(hPx * 0.055);
+      ctx.fillStyle = accentColor;
+      ctx.font = `700 ${urlLabelSize}px "Fira Code", monospace`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.fillText("SCAN →", rightX + qrPlateSize / 2, centreY + qrPlateSize / 2 + urlLabelSize * 0.4);
+    } else if (markImg) {
+      ctx.drawImage(markImg, rightX, centreY - markSize / 2, markSize, markSize);
     }
 
     // Centre wordmark
@@ -153,14 +177,22 @@ function composeArtwork(canvas: HTMLCanvasElement, opts: ComposeOptions): void {
     ctx.font = `700 ${wordmarkSize}px "Fraunces", "Times New Roman", serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(wordmark, wPx / 2, centreY - wordmarkSize * 0.35);
+    ctx.fillText(wordmark, wPx / 2, centreY - wordmarkSize * 0.55);
 
     // Tagline
     const taglineSize = Math.round(hPx * 0.10);
     ctx.fillStyle = accentColor;
     ctx.font = `400 ${taglineSize}px "Lato", "Helvetica Neue", sans-serif`;
     const trackedTagline = tagline.split("").join(" ");
-    ctx.fillText(trackedTagline, wPx / 2, centreY + wordmarkSize * 0.55);
+    ctx.fillText(trackedTagline, wPx / 2, centreY + wordmarkSize * 0.25);
+
+    // URL under tagline (small, tracked)
+    if (showQr && qrUrl.trim().length > 0) {
+      const urlSize = Math.round(hPx * 0.06);
+      ctx.fillStyle = textColor;
+      ctx.font = `400 ${urlSize}px "Fira Code", monospace`;
+      ctx.fillText(qrUrl, wPx / 2, centreY + wordmarkSize * 0.75);
+    }
 
     // Double-rule border
     if (showBorder) {
@@ -173,29 +205,49 @@ function composeArtwork(canvas: HTMLCanvasElement, opts: ComposeOptions): void {
       ctx.strokeRect(inner, inner, wPx - inner * 2, hPx - inner * 2);
     }
   } else {
-    // Square coaster: mark centred + wordmark below + tagline arc
+    // Square coaster: mark top · wordmark · tagline · QR + URL bottom
     const shortSide = Math.min(wPx, hPx);
-    const markSize = Math.round(shortSide * 0.50 * markScale);
+    const markSize = Math.round(shortSide * 0.42 * markScale);
     const centreX = wPx / 2;
     const centreY = hPx / 2;
 
+    // Mark sits slightly above centre to leave room for QR under wordmark
     if (markImg) {
-      ctx.drawImage(markImg, centreX - markSize / 2, centreY - markSize / 2 - shortSide * 0.06, markSize, markSize);
+      ctx.drawImage(markImg, centreX - markSize / 2, centreY - markSize / 2 - shortSide * 0.14, markSize, markSize);
     }
 
     // Wordmark
-    const wordmarkSize = Math.round(shortSide * 0.09);
+    const wordmarkSize = Math.round(shortSide * 0.085);
     ctx.fillStyle = textColor;
     ctx.font = `700 ${wordmarkSize}px "Fraunces", "Times New Roman", serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(wordmark, centreX, centreY + shortSide * 0.24);
+    ctx.fillText(wordmark, centreX, centreY + shortSide * 0.16);
 
     // Tagline
-    const taglineSize = Math.round(shortSide * 0.04);
+    const taglineSize = Math.round(shortSide * 0.035);
     ctx.fillStyle = accentColor;
     ctx.font = `400 ${taglineSize}px "Lato", "Helvetica Neue", sans-serif`;
-    ctx.fillText(tagline.toUpperCase().split("").join(" "), centreX, centreY + shortSide * 0.34);
+    ctx.fillText(tagline.toUpperCase().split("").join(" "), centreX, centreY + shortSide * 0.24);
+
+    // QR + URL under tagline
+    if (showQr && qrImg) {
+      const qrSize = Math.round(shortSide * 0.18);
+      const qrPad = Math.round(qrSize * 0.10);
+      const qrPlate = qrSize + qrPad * 2;
+      const qrY = centreY + shortSide * 0.30;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(centreX - qrPlate / 2, qrY, qrPlate, qrPlate);
+      ctx.drawImage(qrImg, centreX - qrSize / 2, qrY + qrPad, qrSize, qrSize);
+
+      if (qrUrl.trim().length > 0) {
+        const urlSize = Math.round(shortSide * 0.028);
+        ctx.fillStyle = accentColor;
+        ctx.font = `700 ${urlSize}px "Fira Code", monospace`;
+        ctx.fillText(qrUrl, centreX, qrY + qrPlate + urlSize * 0.8);
+      }
+    }
 
     // Circular ring border (respects safety area)
     if (showBorder) {
