@@ -3562,57 +3562,42 @@ Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine
   /**
    * OWNER — Instagram handle backfill via Perplexity Sonar.
    *
-   * Scans outreach_contacts for rows where notes contains no IG handle
-   * AND winery name is set. For each candidate (capped by `limit`), asks
-   * Perplexity for the winery's Instagram handle, validates the shape,
-   * and appends `IG: <handle>` (business) and optionally
-   * `IG-personal: @<handle>` (personal) to the notes column.
+   * Manual button on /admin/contacts/outbound-queue. Same code path as
+   * the nightly cron at /api/scheduled/instagram-backfill — both call
+   * runInstagramBackfill() so behaviour stays in sync.
    *
    * Feeds `/admin/contacts/outbound-queue` — IG-only winemakers stop
    * being dead rows once they have a handle in notes (the client-side
    * extractor picks it up and renders a "DM on Instagram" primary CTA).
    *
    * Cost: ~$0.004 per Perplexity Sonar query. Default cap 50 → ~20¢/run.
-   *
-   * Rate limit: 5 concurrent-safe (sequential loop with 200ms pause to
-   * stay under Perplexity's 60 rpm soft ceiling on the free tier).
    */
   backfillInstagramHandles: ownerProcedure
     .input(z.object({ limit: z.number().min(1).max(200).default(50), dryRun: z.boolean().default(false) }))
     .mutation(async ({ input }) => {
-      const key = process.env.PERPLEXITY_API_KEY;
-      if (!key) throw new Error("PERPLEXITY_API_KEY not configured");
-
-      // Candidate query: winery is present + notes has no IG marker yet.
-      // We intentionally include contacts already contacted (sms_sent_at
-      // not null) because a good IG handle helps re-engagement + reply
-      // classification too.
-      const candidates = await db
-        .select({
-          id: schema.outreachContacts.id,
-          slug: schema.outreachContacts.slug,
-          firstName: schema.outreachContacts.firstName,
-          lastName: schema.outreachContacts.lastName,
-          winery: schema.outreachContacts.winery,
-          notes: schema.outreachContacts.notes,
-        })
-        .from(schema.outreachContacts)
-        .where(sql`
-          winery IS NOT NULL
-          AND LENGTH(TRIM(winery)) > 0
-          AND (
-            notes IS NULL OR (
-              notes NOT LIKE '%IG:%'
-              AND notes NOT LIKE '%Instagram:%'
-              AND notes NOT LIKE '%instagram.com/%'
-              AND notes NOT LIKE '%Insta:%'
-            )
-          )
-        `)
-        .orderBy(desc(schema.outreachContacts.createdAt))
-        .limit(input.limit);
-
       if (input.dryRun) {
+        // Dry-run returns just the candidate list — no Perplexity calls,
+        // no cost, no DB writes. Uses the same filter as the live path.
+        const candidates = await db
+          .select({
+            slug: schema.outreachContacts.slug,
+            winery: schema.outreachContacts.winery,
+          })
+          .from(schema.outreachContacts)
+          .where(sql`
+            winery IS NOT NULL
+            AND LENGTH(TRIM(winery)) > 0
+            AND (
+              notes IS NULL OR (
+                notes NOT LIKE '%IG:%'
+                AND notes NOT LIKE '%Instagram:%'
+                AND notes NOT LIKE '%instagram.com/%'
+                AND notes NOT LIKE '%Insta:%'
+              )
+            )
+          `)
+          .orderBy(desc(schema.outreachContacts.createdAt))
+          .limit(input.limit);
         return {
           checked: candidates.length,
           found: 0,
@@ -3620,112 +3605,17 @@ Return ONLY valid JSON. No markdown fences. If the page doesn't look like a wine
           errors: 0,
           skipped: 0,
           dryRun: true,
-          candidates: candidates.map((c) => ({ slug: c.slug, winery: c.winery })),
+          candidates,
         };
       }
 
-      const validHandle = /^[a-z0-9._]{2,30}$/i;
-      let found = 0;
-      let notFound = 0;
-      let errors = 0;
-
-      for (const c of candidates) {
-        try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 30_000);
-          const wineryLabel = (c.winery ?? "").trim();
-          const personLabel = [c.firstName, c.lastName].filter(Boolean).join(" ").trim();
-
-          const prompt = `What is the official Instagram handle for the Australian winery "${wineryLabel}"${personLabel ? ` (winemaker: ${personLabel})` : ""}?
-
-Return a strict JSON object with exactly these fields:
-{"business": "<handle-or-null>", "personal": "<handle-or-null>", "confidence": "high|medium|low"}
-
-Rules:
-- "business" = the winery's official Instagram handle (no @ prefix, no URL, just the handle text). Prefer the actual winery account, not a distributor or retailer.
-- "personal" = the winemaker's personal Instagram handle if clearly distinct from the business one and publicly visible in bios/press. Otherwise null.
-- If you cannot find a verified handle, return null. Do NOT guess. Do NOT invent a plausible-sounding handle.
-- Handles must match Instagram's rules: 2-30 chars, lowercase letters/numbers/underscores/periods only.
-- Return ONLY the JSON object, no prose, no code fences.`;
-
-          let resp: Response;
-          try {
-            resp = await fetch("https://api.perplexity.ai/chat/completions", {
-              method: "POST",
-              signal: controller.signal,
-              headers: {
-                Authorization: `Bearer ${key}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                model: "sonar",
-                max_tokens: 200,
-                messages: [
-                  { role: "system", content: "You are a precise research assistant for wine-industry contact discovery. You only return verified Instagram handles you can find in the public web. When unsure, you return null. You never invent handles." },
-                  { role: "user", content: prompt },
-                ],
-              }),
-            });
-          } finally {
-            clearTimeout(timeoutId);
-          }
-
-          if (!resp.ok) {
-            errors++;
-            console.error(`[backfillIG] Perplexity ${resp.status} for ${c.slug}`);
-            continue;
-          }
-          const payload = await resp.json() as { choices?: { message?: { content?: string } }[] };
-          const raw = payload.choices?.[0]?.message?.content ?? "";
-          // Strip code fences if Perplexity adds them despite the "no fences" instruction.
-          const clean = raw.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "").trim();
-          let parsed: { business?: string | null; personal?: string | null; confidence?: string } | null = null;
-          try { parsed = JSON.parse(clean); } catch { /* fall through */ }
-          if (!parsed) {
-            errors++;
-            continue;
-          }
-
-          const business = typeof parsed.business === "string"
-            ? parsed.business.replace(/^@/, "").trim().toLowerCase()
-            : null;
-          const personal = typeof parsed.personal === "string"
-            ? parsed.personal.replace(/^@/, "").trim().toLowerCase()
-            : null;
-
-          const businessOk = business && validHandle.test(business) ? business : null;
-          const personalOk = personal && validHandle.test(personal) && personal !== businessOk ? personal : null;
-
-          if (!businessOk && !personalOk) {
-            notFound++;
-            continue;
-          }
-
-          const suffix: string[] = [];
-          if (businessOk) suffix.push(`IG: ${businessOk}`);
-          if (personalOk) suffix.push(`IG-personal: @${personalOk}`);
-          const stamp = ` · [auto-IG ${new Date().toISOString().slice(0, 10)}] ${suffix.join(" · ")}`;
-          const newNotes = ((c.notes ?? "").trimEnd() + stamp).slice(0, 4000);
-
-          await db
-            .update(schema.outreachContacts)
-            .set({ notes: newNotes })
-            .where(eq(schema.outreachContacts.id, c.id));
-
-          found++;
-          // Gentle pause so we don't hammer Perplexity's soft rate limit.
-          await new Promise((r) => setTimeout(r, 200));
-        } catch (err) {
-          errors++;
-          console.error(`[backfillIG] failed for ${c.slug}:`, (err as Error).message);
-        }
-      }
-
+      const { runInstagramBackfill } = await import("../instagramBackfillCore.js");
+      const result = await runInstagramBackfill(input.limit);
       return {
-        checked: candidates.length,
-        found,
-        notFound,
-        errors,
+        checked: result.checked,
+        found: result.found,
+        notFound: result.notFound,
+        errors: result.errors,
         skipped: 0,
         dryRun: false,
       };

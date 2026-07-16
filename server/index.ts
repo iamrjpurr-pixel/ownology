@@ -17,6 +17,7 @@ import { trinityNewsletterHandler } from "./scheduled/trinityNewsletter.js";
 import { cellarJournalSitemapHandler, mainSitemapHandler, robotsTxtHandler, cellarJournalRssHandler } from "./sitemap.js";
 import { generateAuditTrailPdf } from "./auditTrailPdf.js";
 import { dailyAlertEmailHandler } from "./scheduled/dailyAlertEmail.js";
+import { instagramBackfillHandler } from "./scheduled/instagramBackfill.js";
 import { weeklyCellarDigestHandler } from "./scheduled/weeklyCellarDigest.js";
 import { weeklyBdDigestHandler } from "./scheduled/weeklyBdDigest.js";
 import { resendHealthHandler } from "./scheduled/resendHealth.js";
@@ -520,6 +521,11 @@ async function startServer() {
   app.post("/api/scheduled/trinity-newsletter", express.json(), trinityNewsletterHandler);
   app.post("/api/scheduled/daily-alert-email", express.json(), dailyAlertEmailHandler);
   app.get("/api/scheduled/daily-alert-email", dailyAlertEmailHandler); // GET allowed for manual triggering / dry-run
+  // Instagram handle backfill — nightly Perplexity Sonar enrichment for
+  // IG-less winery contacts. GET allowed so operator can hit it in the
+  // browser for a dry-run; Railway cron pings the POST with x-cron-secret.
+  app.post("/api/scheduled/instagram-backfill", express.json(), instagramBackfillHandler);
+  app.get("/api/scheduled/instagram-backfill", instagramBackfillHandler);
   app.post("/api/scheduled/weekly-cellar-digest", express.json(), weeklyCellarDigestHandler);
   app.get("/api/scheduled/weekly-cellar-digest", weeklyCellarDigestHandler); // GET allowed for manual triggering / dry-run
   app.post("/api/scheduled/weekly-bd-digest", express.json(), weeklyBdDigestHandler);
