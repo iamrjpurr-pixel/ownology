@@ -274,6 +274,7 @@ export default function AdminOutboundQueue() {
             Your daily 5 sit at the top. Tap one primary button per contact. Everything else lives under &ldquo;Advanced tools&rdquo; below.
           </p>
         </div>
+        <Link href="/admin/sms-openers" data-testid="link-to-openers-from-queue" style={{ color: "var(--ow-amber)", fontSize: "0.8rem", textDecoration: "none", marginRight: 12, fontWeight: 600 }}>📝 SMS openers →</Link>
         <Link href="/admin/contacts/engagement" data-testid="link-to-engagement-from-queue" style={{ color: "var(--ow-text-mid)", fontSize: "0.8rem", textDecoration: "none", marginRight: 12 }}>Engagement →</Link>
         <Link href="/admin/contacts" style={{ color: "var(--ow-amber)", fontSize: "0.85rem", textDecoration: "none" }}>← back to contacts</Link>
       </header>

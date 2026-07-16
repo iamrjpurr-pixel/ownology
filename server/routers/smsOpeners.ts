@@ -22,7 +22,7 @@
  */
 
 import { z } from "zod";
-import { and, eq, asc } from "drizzle-orm";
+import { and, eq, asc, sql } from "drizzle-orm";
 import { router, ownerProcedure, publicProcedure } from "../trpc.js";
 import { db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
@@ -212,5 +212,34 @@ export const smsOpenersRouter = router({
       const idx = stableHash(contact.slug) % actives.length;
       const pick = actives[idx];
       return { sms: interpolate(pick.template, ctx), variantKey: pick.key };
+    }),
+
+  /** OWNER — flush stale sms_draft_override rows that contain banned
+   *  language from the pre-Jul-2026 opener rework ("second brain",
+   *  "cellar AI", "winemaker's second..."). Clearing the override forces
+   *  those contacts to fall back to the active variant on next queue
+   *  reload — which is Trinity-first Continuity by default.
+   *
+   *  Returns the count cleared so the UI can toast a summary. Idempotent. */
+  clearStaleDrafts: ownerProcedure
+    .input(z.object({ dryRun: z.boolean().default(false) }).optional())
+    .mutation(async ({ input }) => {
+      const [countResult] = await db.execute(sql`
+        SELECT COUNT(*) as n FROM outreach_contacts
+        WHERE sms_draft_override REGEXP 'second brain|cellar AI|winemaker.s second|AI apprentice'
+      `);
+      const rows = Array.isArray(countResult) && Array.isArray(countResult[0])
+        ? (countResult[0][0] as { n: number } | undefined)
+        : undefined;
+      const matched = Number(rows?.n ?? 0);
+      if (input?.dryRun) return { cleared: 0, matched, dryRun: true as const };
+      if (matched > 0) {
+        await db.execute(sql`
+          UPDATE outreach_contacts
+          SET sms_draft_override = NULL
+          WHERE sms_draft_override REGEXP 'second brain|cellar AI|winemaker.s second|AI apprentice'
+        `);
+      }
+      return { cleared: matched, matched, dryRun: false as const };
     }),
 });

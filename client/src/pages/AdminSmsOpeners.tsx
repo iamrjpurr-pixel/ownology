@@ -11,7 +11,7 @@
  * template textarea · preview strip · notes textarea · save/delete row.
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { trpc } from "@/lib/trpc";
 
 const CARD = "var(--ow-bg-card)";
@@ -42,6 +42,23 @@ export default function AdminSmsOpeners() {
   const update = trpc.smsOpeners.update.useMutation({ onSuccess: () => list.refetch() });
   const create = trpc.smsOpeners.create.useMutation({ onSuccess: () => { list.refetch(); setCreating(false); setDraft(EMPTY_DRAFT); } });
   const remove = trpc.smsOpeners.remove.useMutation({ onSuccess: () => list.refetch() });
+  const clearStale = trpc.smsOpeners.clearStaleDrafts.useMutation();
+  const stalePreview = trpc.smsOpeners.clearStaleDrafts.useMutation();
+  const [staleCount, setStaleCount] = useState<number | null>(null);
+  const [flushResult, setFlushResult] = useState<{ cleared: number } | null>(null);
+
+  // Fire a dryRun on mount so we can show the banner right away.
+  useEffect(() => {
+    stalePreview.mutateAsync({ dryRun: true }).then((r) => setStaleCount(r.matched)).catch(() => setStaleCount(null));
+  }, []);
+
+  async function runFlush() {
+    if (!confirm(`Clear ${staleCount ?? "?"} stale SMS drafts that contain banned language ("second brain", "cellar AI", "winemaker's second...")?\n\nThe contacts fall back to your active variant (Continuity by default). Their smsDraftOverride is set to NULL — you can rewrite via Claude later if you want.`)) return;
+    setFlushResult(null);
+    const r = await clearStale.mutateAsync({ dryRun: false });
+    setFlushResult(r);
+    setStaleCount(0);
+  }
 
   const [creating, setCreating] = useState(false);
   const [draft, setDraft] = useState<{ key: string; name: string; lens: string; template: string }>(EMPTY_DRAFT);
@@ -73,6 +90,50 @@ export default function AdminSmsOpeners() {
               ? "⚠ No variants active — every fresh contact falls back to the hardcoded Continuity opener."
               : `${activeCount} variant${activeCount === 1 ? "" : "s"} active${activeCount > 1 ? " · rotating deterministically per slug" : ""}.`}
           </p>
+
+          {staleCount !== null && staleCount > 0 && (
+            <div
+              data-testid="stale-drafts-banner"
+              style={{
+                marginTop: "0.9rem",
+                padding: "0.75rem 1rem",
+                border: `1px solid oklch(0.60 0.20 25)`,
+                background: `color-mix(in oklch, oklch(0.60 0.20 25) 8%, transparent)`,
+                borderRadius: 6,
+                display: "flex",
+                gap: "0.85rem",
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ flex: 1, fontFamily: SANS, fontSize: "0.85rem", color: HI, lineHeight: 1.5 }}>
+                <strong style={{ color: "oklch(0.65 0.20 25)" }}>{staleCount} contacts</strong> still carry pre-Jul-2026 SMS drafts using banned language (&ldquo;second brain&rdquo;, &ldquo;cellar AI&rdquo;). These override the active variant. Flush them to fall back to Continuity.
+              </div>
+              <button
+                data-testid="flush-stale-drafts-btn"
+                onClick={runFlush}
+                disabled={clearStale.isPending}
+                style={{
+                  background: "oklch(0.60 0.20 25)",
+                  color: "white",
+                  border: 0,
+                  padding: "0.5rem 1.15rem",
+                  borderRadius: 4,
+                  fontFamily: SANS,
+                  fontWeight: 700,
+                  fontSize: "0.85rem",
+                  cursor: clearStale.isPending ? "wait" : "pointer",
+                }}
+              >
+                {clearStale.isPending ? "Flushing…" : `Flush ${staleCount} drafts`}
+              </button>
+            </div>
+          )}
+          {flushResult && (
+            <p data-testid="flush-result" style={{ fontFamily: SANS, fontSize: "0.82rem", color: "oklch(0.65 0.14 145)", marginTop: "0.5rem", fontWeight: 600 }}>
+              ✓ Flushed {flushResult.cleared} stale drafts. They&apos;ll fall back to the active variant on next queue reload.
+            </p>
+          )}
         </header>
 
         {list.isLoading && <p style={{ fontFamily: SANS, color: MID }}>Loading variants…</p>}
