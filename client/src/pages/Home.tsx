@@ -555,7 +555,7 @@ function Hero() {
             </p>
             <h1 className="fade-up fade-up-delay-1"
               style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,4rem)", lineHeight:1.1, color:"var(--ow-text-hi)", letterSpacing:"-0.02em", textWrap: "balance" as "balance" }}>
-              <EditableText contentKey="home.hero.headline" defaultValue="The winemaker's second brain." contentMap={contentMap} />
+              <EditableText contentKey="home.hero.headline" defaultValue="Quality and risk, across the whole business." contentMap={contentMap} />
             </h1>
             {/* Enemy line — Feb 2026 positioning audit. Concrete, universal,
                 aligned with product-truth (Ownology = memory that doesn't lie). */}
@@ -574,7 +574,7 @@ function Hero() {
             >
               The spreadsheet in your winery is lying to you.
             </p>
-            <EditableText contentKey="home.hero.subheading" defaultValue="Log cellar readings. Access 38 industry SOPs across 12 categories. Ask our AI apprentice anything. Stay compliant. Built by boutique winemakers, for boutique wineries between 5 and 50 tonnes." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
+            <EditableText contentKey="home.hero.subheading" defaultValue="Log cellar readings. Access 38 industry SOPs across 12 categories. Quality panels, vintage-log reasoning and asset trail on one thread — so productivity and profit compound year on year. Built by boutique winemakers, for boutique wineries between 5 and 50 tonnes." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-10 fade-up fade-up-delay-3">
               <a href="/pricing?from=homepage-hero" className="btn-amber text-center">Start 14-Day Free Trial</a>
               <Link
@@ -1247,14 +1247,14 @@ function Pricing() {
   return (
     <>
     {/* ─── Meet the Team — the team-of-three story ────────────────────
-        Rich (winemaker) + Gel (partner, real human) + Owen (AI apprentice).
+        Rich (winemaker) + Gel (partner, real human) + Owen (working memory).
         Positioned before pricing so a prospect meets the humans behind
         Ownology before being asked to pay. Anchor: #our-story. */}
     <section id="our-story" className="py-28" style={{background:"var(--ow-bg-base)"}}>
       <div className="container">
         <p className="section-label mb-4">Meet the cellar</p>
         <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"clamp(1.5rem,2.8vw,2.25rem)", color:"var(--ow-text-hi)", maxWidth:"620px", lineHeight:1.2, letterSpacing:"-0.01em", textWrap: 'balance' as 'balance'}}>
-          A winemaker, a partner, and an AI apprentice.
+          A winemaker, a partner, and a working memory.
         </h2>
         <p className="mt-4" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, color:"var(--ow-text-mid)", fontSize:"1rem", maxWidth:"58ch", lineHeight:1.7}}>
           Ownology isn&apos;t a Silicon Valley product. It&apos;s a boutique-winery product built by boutique winemakers who got tired of running their cellar from a spreadsheet. Three of us. Meet the team.
@@ -1278,10 +1278,10 @@ function Pricing() {
               accent: "var(--ow-amber)",
             },
             {
-              role: "The AI apprentice",
+              role: "The working memory",
               name: "Owen",
               tag: "Reads the manuals so you don't have to",
-              body: "Owen is our AI teammate. He&rsquo;s read the finest wine-science books ever published, cross-referenced with AWRI&rsquo;s technical library — and cites his sources on every answer. Coached by an advanced-certificate oenologist. He&rsquo;ll point, remember, and structure. He&rsquo;ll never tell you what to make. That&rsquo;s your call, and Rich&rsquo;s, and Gel&rsquo;s.",
+              body: "Owen is our working memory. He&rsquo;s read the finest wine-science books ever published, cross-referenced with AWRI&rsquo;s technical library — and cites his sources on every answer. Coached by an advanced-certificate oenologist. He&rsquo;ll point, remember, and structure. He&rsquo;ll never tell you what to make. That&rsquo;s your call, and Rich&rsquo;s, and Gel&rsquo;s.",
               testid: "team-owen",
               accent: "var(--ow-amber)",
             },
@@ -1650,7 +1650,7 @@ function WhatOwnologyKnows() {
               maxWidth: "600px",
             }}
           >
-            Owen — our AI apprentice — has read the same books a formally qualified winemaker would: the finest wine-science texts ever written, AWRI&rsquo;s technical library, decades of peer-reviewed research. He cites his sources. Coached by an advanced-certificate oenologist. He&apos;s available at 2am during vintage, on a mobile phone, in the middle of a stuck fermentation. He won&apos;t tell you what to make — but he&apos;ll remember every log entry, every reading, every SOP, and hand it back the moment you need it.
+            Owen — our working memory — has read the same books a formally qualified winemaker would: the finest wine-science texts ever written, AWRI&rsquo;s technical library, decades of peer-reviewed research. He cites his sources. Coached by an advanced-certificate oenologist. He&apos;s available at 2am during vintage, on a mobile phone, in the middle of a stuck fermentation. He won&apos;t tell you what to make — but he&apos;ll remember every log entry, every reading, every SOP, and hand it back the moment you need it.
           </p>
         </div>
 

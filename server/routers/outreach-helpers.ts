@@ -117,11 +117,11 @@ export function pickCtaVariant(slug: string): "book" | "reply" {
 /** QMS-framing A/B test on /hi/:slug 3-tile block. Deterministic per slug,
  *  and INDEPENDENT of pickCtaVariant (uses only odd-indexed characters +
  *  a shift) so the two experiments don't confound each other.
- *    - "qms"            → "A winemaking QMS with an AI apprentice."
- *    - "quality-system" → "A winemaking quality system with an AI apprentice."
- *  Feb 2026 soft launch — QMS is the sharper category noun but risks reading
- *  as corporate jargon on a Halliday-Young-Gun audience. Spelt-out version
- *  is the plain-English hedge. Kill the loser after ~1 week. */
+ *    - "qms"            → "A winemaking QMS with a working memory."
+ *    - "quality-system" → "A winemaking quality-and-risk system, across the whole business."
+ *  Feb 2026 rewrite — retired the "AI apprentice" framing in favour of
+ *  the sanctioned quality-and-risk-management pitch. Kill the loser after
+ *  ~1 week. */
 export function pickQmsVariant(slug: string): "qms" | "quality-system" {
   let h = 0;
   for (let i = 1; i < slug.length; i += 2) h = (h * 17 + slug.charCodeAt(i)) | 0;

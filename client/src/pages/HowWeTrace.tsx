@@ -647,7 +647,7 @@ function ProspectCta({ personalised, onPersonalise, intake }: { personalised: bo
         Your cellar, audit-ready in one screen.
       </h2>
       <p style={{ fontFamily: "Georgia,serif", fontSize: 16, color: "#4a3d35", margin: "0 0 24px", maxWidth: 620, marginInline: "auto" }}>
-        Ownology is a winemaker's second brain — the cellar intelligence layer between your logbook and your compliance file. Try it for your 2026 vintage.
+        Ownology is quality and risk management for winemakers — the layer between your logbook and your compliance file, stretched across the whole business. Try it for your 2026 vintage.
       </p>
       <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
         {personalised && intake && (

@@ -166,7 +166,7 @@ const ROLE_PATHS: RolePath[] = [
       { label: "Cellar Brief — daily 5:30am briefing", href: "/cellar-brief" },
       { label: "The Press — Vintage Log", href: "/the-press" },
       { label: "Knowledge Platform — SOPs & Decision Logic", href: "/knowledge" },
-      { label: "Free Run — Owen, your AI apprentice", href: "/free-run" },
+      { label: "Free Run — Owen, your working memory", href: "/free-run" },
     ],
     startHref: "/cellar-brief",
     startLabel: "Start with your Cellar Brief",

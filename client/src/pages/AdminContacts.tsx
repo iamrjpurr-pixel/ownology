@@ -3706,8 +3706,8 @@ function QmsAbCard() {
         {[qmsB, qsB].map((b) => {
           if (!b) return null;
           const label = b.variant === "qms"
-            ? "\u201cA winemaking QMS with an AI apprentice.\u201d"
-            : "\u201cA winemaking quality system with an AI apprentice.\u201d";
+            ? "\u201cA winemaking QMS with a working memory.\u201d"
+            : "\u201cA winemaking quality-and-risk system, across the whole business.\u201d";
           return (
             <div
               key={b.variant}

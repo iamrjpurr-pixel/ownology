@@ -117,8 +117,8 @@ export default function HiContact() {
     (contact as { qmsVariant?: "qms" | "quality-system" | null }).qmsVariant ?? "qms";
   const qmsSummary =
     qmsVariant === "qms"
-      ? "A winemaking QMS with an AI apprentice."
-      : "A winemaking quality system with an AI apprentice.";
+      ? "A winemaking QMS with a working memory."
+      : "A winemaking quality-and-risk system, across the whole business.";
 
   function logCtaClick() {
     if (contact?.slug) markCtaClicked.mutate({ slug: contact.slug });
@@ -273,7 +273,7 @@ export default function HiContact() {
             />
             <WhatTile
               testid="hi-tile-ai"
-              kicker="AI apprentice"
+              kicker="Working memory"
               body={
                 <>
                   Owen answers with citations — grounded in <AcronymTooltip term="AWRI" />,
@@ -296,7 +296,7 @@ export default function HiContact() {
           >
             {qmsVariant === "qms" ? (
               <>
-                A winemaking <AcronymTooltip term="QMS" /> with an AI apprentice.
+                A winemaking <AcronymTooltip term="QMS" /> with a working memory.
               </>
             ) : (
               qmsSummary

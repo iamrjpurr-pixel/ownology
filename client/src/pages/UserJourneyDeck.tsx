@@ -58,11 +58,11 @@ const SLIDES: Slide[] = [
     ctaMechanism: "Deep-link to /cellar-brief, plus scroll-past to Meet the Cellar",
     page: "/home",
     bullets: [
-      { label: "Line 1 (H1)", body: "The winemaker's second brain. Category noun in five words. If they don't get it here, they're not our audience." },
+      { label: "Line 1 (H1)", body: "Quality and risk, across the whole business. Category noun in six words. If they don't get it here, they're not our audience." },
       { label: "Line 2 (enemy)", body: "The spreadsheet in your winery is lying to you. Universal pain — every prospect nods." },
       { label: "Line 3 (audience)", body: "Built by boutique winemakers, for boutique wineries between 5 and 50 tonnes. Precision earns 3× conversion clarity." },
       { label: "The wow", body: "Live Cellar Brief teaser mid-page — real vessels, real statuses. The 4-second 'oh, THAT's what it does.'" },
-      { label: "The humans", body: "Meet the Cellar — Rich, Gel, Owen. Team-of-three framing. Not a Silicon Valley product." },
+      { label: "The humans", body: "Meet the Cellar — Rich, Gel, Owen. Team-of-three framing (Owen = working memory). Not a Silicon Valley product." },
     ],
     psych: "Prospects buy people they can picture. The team section humanises before pricing. Trust before price = higher tier selection.",
   },
@@ -170,7 +170,7 @@ const SLIDES: Slide[] = [
     ctaMechanism: null,
     page: "Everywhere. It's the doctrine.",
     bullets: [
-      { label: "The category", body: "The winemaker's second brain. Not an AI winemaker. Not a compliance tool. Not a CRM. One category noun, unambiguous, ownable." },
+      { label: "The category", body: "Quality and risk management for winemakers — across the whole business. Not an AI winemaker. Not a compliance tool. Not a CRM. One category noun, unambiguous, ownable." },
       { label: "The team of three", body: "Rich makes the wine. Gel tells the story. Owen remembers everything so you don't have to. Uncloneable competitive moat." },
       { label: "The enemy", body: "The spreadsheet in your winery is lying to you. Concrete. Universal. Sherif in-group bonding." },
       { label: "The promise", body: "Honest progressive disclosure. We show you the mountain. We only open the summit when you've earned it. No stock photos of your future." },

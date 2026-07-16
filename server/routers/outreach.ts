@@ -2079,7 +2079,7 @@ For "instagram" — return the primary handle WITHOUT the @ (e.g. "lesfruitswine
 
 For "instagramPersonal" — if the winemaker / founder has a SEPARATE personal Instagram AND it's publicly cross-linked with the winery account (either the winery bio mentions the person's handle, or the person's bio mentions the winery, or trade press links the two), return that personal handle without the @. If they've deliberately kept them separate, return null — that separation is a signal to respect.
 
-For "painPoint" — write ONE sentence describing what a cellar-intelligence AI tool could help this producer with, inferred from their scale / focus / recent public commentary. This is a fallback business summary; the sharper opener lives in hookText below. Examples: "Small natural-wine producer, minimal digital record-keeping"; "Established mid-sized producer scaling into cellar-door tourism"; "Cool-climate boutique estate with vintage variability challenges".
+For "painPoint" — write ONE sentence describing what a quality-and-risk-management tool could help this producer with, inferred from their scale / focus / recent public commentary. This is a fallback business summary; the sharper opener lives in hookText below. Examples: "Small natural-wine producer, minimal digital record-keeping"; "Established mid-sized producer scaling into cellar-door tourism"; "Cool-climate boutique estate with vintage variability challenges".
 
 ═══════════════════════════════════════════════════════════════
 HOOK WATERFALL — this is the most important part of the response.

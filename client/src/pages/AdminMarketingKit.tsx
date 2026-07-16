@@ -23,7 +23,7 @@ const DEMO_URL_VARIANTS: Array<{ slug: string; label: string; subtext: string; p
 
 const LINKEDIN_DM_A_HUNTER = (origin: string) => `G'day [First name] — saw you're at [Winery] in the Hunter.
 
-Building a cellar AI grounded in your own vintage logs — so "Brix on T-03 plateaued for 36h, what's typical for this clone here?" actually gets answered against your history, not a forum guess.
+Been building a quality-and-risk record for winemakers — quality panels, vintage-log reasoning and asset trail on one thread — so "Brix on T-03 plateaued for 36h, what's typical for this clone here?" actually resolves against your history, not a forum guess.
 
 90-sec mockup of what it'd look like at Hunter scale (24 tanks, Semillon & Shiraz country):
 ${origin}/sample-vintage-log?variant=hunter
@@ -34,7 +34,7 @@ No signup, no sales pitch. Just curious if it'd be useful to you. Happy to chat 
 
 const LINKEDIN_DM_B_BOUTIQUE = (origin: string) => `G'day [First name] — love what you're doing with [Winery].
 
-Been building a cellar AI for small producers — answers grounded in your own logs, not Vinepair threads. The kind of thing that remembers what you did in T-04 last vintage and references it next time.
+Been building a quality-and-risk record for small producers — decisions, panels and asset trail on one thread, so your best 2023 calls sharpen the 2026 numbers instead of restarting.
 
 12-tank, family-scale mockup of how it surfaces what matters:
 ${origin}/sample-vintage-log?variant=boutique
@@ -43,9 +43,9 @@ No signup. Keen to hear what you'd want it to do differently.
 
 — Rich P · 0408 105 067`;
 
-const LINKEDIN_DM_C_LARGE = (origin: string) => `G'day [First name] — building a cellar AI for production-scale wineries.
+const LINKEDIN_DM_C_LARGE = (origin: string) => `G'day [First name] — building quality-and-risk management for production-scale wineries.
 
-Grounds every recommendation in your own vintage logs — so "what did we do in T-47 last year?" gets answered, not auto-completed.
+Quality panels, vintage-log reasoning and asset trail woven onto one thread — so "what did we do in T-47 last year?" gets answered, not auto-completed. Productivity and profit compound instead of restarting each vintage.
 
 128-tank sample dashboard:
 ${origin}/sample-vintage-log
@@ -57,12 +57,12 @@ calendly.com/ownology/new-meeting
 
 const EMAIL_SIG_PREVIEW = (origin: string) => `— Rich P · Ownology
 0408 105 067
-Cellar AI grounded in your own vintage logs — built for working winemakers
+Quality and risk management for winemakers — across the whole business
 ↳ ${origin.replace(/^https?:\/\//, "")}/sample-vintage-log`;
 
 const EMAIL_SIG_PROD = `— Rich P · Ownology
 0408 105 067
-Cellar AI grounded in your own vintage logs — built for working winemakers
+Quality and risk management for winemakers — across the whole business
 ↳ ownology.ai/sample-vintage-log`;
 
 export default function AdminMarketingKit() {

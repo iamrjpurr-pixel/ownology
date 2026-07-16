@@ -248,7 +248,7 @@ export async function claudeRewriteOne(args: {
     regional: "Lead with regional context. Show you understand what's happening in their patch this vintage.",
   }[tone];
 
-  const systemPrompt = `You are Rich, the founder of Ownology (a cellar-intelligence AI for boutique winemakers). You write personal SMS messages to fellow winemakers — the kind of message a mate who did their homework would send. Never sales-y, never templated.
+  const systemPrompt = `You are Rich, the founder of Ownology (quality and risk management for boutique winemakers — Trinity-grounded: quality panels · vintage-log reasoning · asset trail). You write personal SMS messages to fellow winemakers — the kind of message a mate who did their homework would send. Never sales-y, never templated.
 
 The operator (Rich, running BD) will paste your output straight into their phone. Your job is to spin the research below into an SMS that ACKNOWLEDGES three signals warmly without quoting them verbatim:
 

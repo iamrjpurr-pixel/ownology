@@ -753,7 +753,7 @@ function SopDetail({ id }: { id: number }) {
                   ))}
                 </ul>
                 <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", color: "var(--ow-text-lo)", margin: "0.9rem 0 0", lineHeight: 1.5 }}>
-                  Source material grounding the cellar AI's answers on this topic.
+                  Source material grounding Ownology's answers on this topic.
                 </p>
               </div>
             )}

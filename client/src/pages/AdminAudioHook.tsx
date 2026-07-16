@@ -13,7 +13,7 @@
  *   2. Optionally paste source URL (IG post, YouTube, podcast episode) —
  *      becomes hookSourceUrl for later verification.
  *   3. Optionally add context ("this is Matteo from Primo Estate,
- *      pitching the cellar AI tool") — sharpens Claude's angle.
+ *      pitching quality-and-risk management") — sharpens Claude's angle.
  *   4. Backend runs Whisper → Claude → returns transcript + 3 candidates.
  *   5. Pick one, pick a contact from the list, hit save.
  *   6. Row's hookTier becomes "quoted_voice", hookText + hookSourceUrl
@@ -224,7 +224,7 @@ export default function AdminAudioHook() {
           <textarea
             data-testid="context-input"
             rows={2}
-            placeholder="e.g. Matteo Grilli from Primo Estate — winemaker/owner. Pitching cellar AI grounded in vintage logs."
+            placeholder="e.g. Matteo Grilli from Primo Estate — winemaker/owner. Pitching quality and risk management across the whole business."
             value={context}
             onChange={(e) => setContext(e.target.value)}
             style={{

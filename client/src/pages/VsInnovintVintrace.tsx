@@ -5,9 +5,9 @@
  * against InnoVint and Vintrace. Serves as the QR-scan landing target for
  * merch (bar runner + coaster) via UTM-tagged CTAs.
  *
- * Positioning: NOT a feature race. Ownology is a different category — the
- * owner-operator's second brain that runs alongside a cellar ledger, not a
- * replacement for one. This page lets buyers self-select.
+ * Positioning: NOT a feature race. Ownology is a different category —
+ * quality and risk management that runs alongside a cellar ledger, not
+ * a replacement for one. This page lets buyers self-select.
  *
  * Facts sourced from: /app/memory/COMPETITOR_RESEARCH_INNOVINT_VINTRACE.md
  * (Feb 2026 web research from vendor sites + Capterra + G2 + Rich's
@@ -41,7 +41,7 @@ const MONO      = "'Fira Code', monospace";
 function useDocumentMeta(): void {
   useEffect(() => {
     const title = "Ownology vs InnoVint vs Vintrace — honest comparison for boutique winemakers";
-    const description = "InnoVint tracks lots. Vintrace runs the bench. Ownology is the AI second brain that runs alongside. See the honest three-way comparison — including where we lag.";
+    const description = "InnoVint tracks lots. Vintrace runs the bench. Ownology is the quality and risk management layer that runs alongside. See the honest three-way comparison — including where we lag.";
     document.title = title;
 
     const upsert = (selector: string, attrs: Record<string, string>) => {
@@ -110,7 +110,7 @@ const VENDORS: Vendor[] = [
   },
   {
     name: "Ownology",
-    kicker: "The winemaker's second brain",
+    kicker: "Quality and risk, across the whole business",
     audience: "Owner-operator boutique winemaker who is ALSO the marketer, DTC channel, tasting-room host, and story publisher. One person doing eight jobs. Needs AI leverage across all of it.",
     pricing: "Free Run $0. Cellar Hand $22/mo. The Press $44/mo. The Vigneron $88/mo. No per-user fees. No implementation consultant. Public list price.",
     sourceUrl: "/pricing",
@@ -295,7 +295,7 @@ function Reframe(): JSX.Element {
         </p>
         <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)", lineHeight: 1.15, color: TEXT_HI, letterSpacing: "-0.015em", marginBottom: "1.25rem", maxWidth: 720, textWrap: "balance" as "balance" }}>
           Ownology isn&apos;t trying to replace their cellar ledger.<br />
-          <span style={{ color: AMBER }}>It&apos;s the second brain that runs alongside it.</span>
+          <span style={{ color: AMBER }}>It&apos;s the quality-and-risk layer that runs alongside it.</span>
         </h2>
         <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.05rem", color: TEXT_MID, lineHeight: 1.75, maxWidth: 680 }}>
           InnoVint and Vintrace were built for the <strong style={{ color: TEXT_HI, fontWeight: 500 }}>full-time cellar team</strong> — assign the work order to Jane, run the trial blend, file TTB. That&apos;s a real job. Both do it well after 10–15 years of iteration.
@@ -483,7 +483,7 @@ function WhereWeLag(): JSX.Element {
 function WhatWeUniquelyDo(): JSX.Element {
   const { ref, inView } = useInView<HTMLDivElement>();
   const wins = [
-    { title: "AI second brain grounded in your own docs", body: "Ask &lsquo;what does our SOP say about a stuck ferment at 4.2 Brix?&rsquo; Get an answer. Claude Sonnet, reading your protocols, not a generic chatbot." },
+    { title: "Quality-and-risk answers grounded in your own docs", body: "Ask &lsquo;what does our SOP say about a stuck ferment at 4.2 Brix?&rsquo; Get an answer. Claude Sonnet, reading your protocols, not a generic chatbot." },
     { title: "The quiz — DIY buyer's front door", body: "A wine-style quiz that recommends AU/NZ wines by palate, pipes buyers into your comms, and sells home winery kits at the end. Neither incumbent has one." },
     { title: "Weekly Reco Digest", body: "Auto-curated email to opted-in customers on Sunday night. \"This week in your cellar…\" — driven by the cellar signal itself." },
     { title: "Home / DIY winemakers", body: "Free Run tier + Home Winery Kit. Neither incumbent serves the garagiste who wants to log 3 batches from their garage." },
@@ -522,7 +522,7 @@ function MigrationPaths(): JSX.Element {
     {
       badge: "From InnoVint",
       title: "You&apos;re probably US-based, custom-crush, TTB-filing.",
-      body: "Don&apos;t rip out InnoVint. Their lot ledger + TTB automation is genuinely good. Add Ownology alongside as your AI second brain — quiz-driven DTC, weekly reco digest, cellar journal, home-market intelligence.",
+      body: "Don&apos;t rip out InnoVint. Their lot ledger + TTB automation is genuinely good. Add Ownology alongside as your quality-and-risk layer — quiz-driven DTC, weekly reco digest, cellar journal, home-market intelligence.",
       cta: "See our full InnoVint migration guide",
       href: "/for-innovint-users",
     },
