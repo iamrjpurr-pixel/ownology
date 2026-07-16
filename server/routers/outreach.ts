@@ -318,21 +318,69 @@ export const outreachRouter = router({
       `)
       .orderBy(desc(schema.outreachContacts.createdAt));
 
+    // ── Prioritisation model (Jul 2026, Rich) ──────────────────────────
+    //   "+614******** is the key" — a valid AU mobile number is the
+    //   single highest-value signal, because SMS gets a 5-10× response
+    //   rate over IG/LinkedIn cold DMs. The old model let the Perplexity
+    //   hook (`tierScore × 10`, up to 40) dominate `hasMobile` (2 pts),
+    //   so SMS-ready contacts sank below hypothetical-hook contacts.
+    //
+    //   New model: channel dominates. Hook quality is a tie-breaker
+    //   WITHIN a channel band. In practice:
+    //     SMS-ready (+614) + any hook  →  score ≥ 100
+    //     Email-only     + best hook   →  score ≤ 50
+    //     IG-only        + best hook   →  score ≤ 35
+    //     No channel                   →  score ≤ 20
+    //
+    //   `hasAuMobile` requires strict E.164 `+614` + 8 digits — junk
+    //   entries like blank, "TBD", or a landline can't spoof the top.
+    const AU_MOBILE_RE = /^\+614\d{8}$/;
     const scored = rows.map((c) => {
+      const mobile = (c.mobileAu ?? "").trim();
+      const hasAuMobile = AU_MOBILE_RE.test(mobile);
+      const notes = c.notes ?? "";
+      const notesLower = notes.toLowerCase();
+      const hasEmail = /email:\s*\S+@\S+/i.test(notes);
+      const hasIgPersonal = /ig-personal:\s*@/i.test(notesLower);
+      const hasLinkedin = /linkedin(?:\.com)?:?\s*\S+/i.test(notesLower);
+
+      // Channel score — SMS is king. Everything else is fallback.
+      const channelScore =
+        hasAuMobile ? 100 :
+        hasEmail    ? 30 :
+        hasIgPersonal ? 15 :
+        hasLinkedin ? 10 :
+        0;
+
+      // Hook quality still ranks WITHIN a band. Scaled ×5 so a great
+      // hook can lift a mobile-holder by 20 above a mobile-holder with
+      // no hook, but can never lift an email-only contact past a
+      // mobile-holder.
       const tierScore =
         c.hookTier === "recent_signal" ? 4 :
         c.hookTier === "quoted_voice"  ? 3 :
         c.hookTier === "peer_signal"   ? 2 :
         c.hookTier === "vintage_pain"  ? 1 : 0;
-      const hasMobile = !!(c.mobileAu && c.mobileAu.trim().length > 0);
-      const notesLower = (c.notes ?? "").toLowerCase();
-      const hasEmail = /email:\s*\S+@\S+/i.test(c.notes ?? "");
-      const channelScore = (hasMobile ? 2 : 0) + (hasEmail ? 1 : 0) + (hasMobile && hasEmail ? 3 : 0);
-      // Personal IG is a soft signal — bumps score for the sales-nurture
-      // channel even without a direct comms route.
-      const igBonus = /ig-personal:\s*@/i.test(notesLower) ? 1 : 0;
-      const score = tierScore * 10 + channelScore + igBonus;
-      return { ...c, hasEmail, hasMobile, score };
+      const hookScore = tierScore * 5;
+
+      // Small bonuses so ties break deterministically:
+      //   +2 if mobile AND email (dual-channel resilience)
+      //   +1 if IG-personal is present (nurture-adjacent signal)
+      const dualBonus = hasAuMobile && hasEmail ? 2 : 0;
+      const igBonus = hasIgPersonal ? 1 : 0;
+
+      const score = channelScore + hookScore + dualBonus + igBonus;
+
+      // Also expose a coarse channel label so the UI can badge the row
+      // without re-deriving. "sms" | "email" | "insta" | "linkedin" | "none".
+      const channel: "sms" | "email" | "insta" | "linkedin" | "none" =
+        hasAuMobile ? "sms" :
+        hasEmail    ? "email" :
+        hasIgPersonal ? "insta" :
+        hasLinkedin ? "linkedin" :
+        "none";
+
+      return { ...c, hasEmail, hasMobile: hasAuMobile, channel, score };
     });
     scored.sort((a, b) => (b.score - a.score) || (a.createdAt ?? 0) - (b.createdAt ?? 0));
     return { queue: scored };

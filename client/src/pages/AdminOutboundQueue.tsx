@@ -263,6 +263,18 @@ export default function AdminOutboundQueue() {
           <span style={{ fontSize: "0.78rem", color: "var(--ow-text-mid)" }}>
             Do just these. That&apos;s the whole day&apos;s outbound.
           </span>
+          <span
+            data-testid="top5-priority-hint"
+            style={{
+              fontSize: "0.7rem",
+              color: "var(--ow-text-lo)",
+              display: "block",
+              marginTop: 3,
+              fontStyle: "italic",
+            }}
+          >
+            Ranking: SMS-ready +614 mobile ▲ · then email ▲ · then IG/LinkedIn · hook quality breaks ties within each band.
+          </span>
         </div>
         {isLoading ? (
           <p style={{ margin: 0, color: "var(--ow-text-lo)", fontSize: "0.85rem" }}>Loading…</p>
@@ -326,7 +338,24 @@ export default function AdminOutboundQueue() {
                       </p>
                     )}
                     <div style={{ display: "flex", gap: 8, fontSize: "0.7rem", color: "var(--ow-text-lo)", flexWrap: "wrap", alignItems: "center" }}>
-                      {c.hasMobile && <span data-testid={`chan-sms-${c.slug}`}>📱 SMS</span>}
+                      {c.hasMobile && (
+                        <span
+                          data-testid={`chan-sms-${c.slug}`}
+                          title="AU mobile on file — SMS is the priority channel"
+                          style={{
+                            background: "color-mix(in oklch, var(--ow-amber) 18%, transparent)",
+                            color: "var(--ow-amber)",
+                            padding: "2px 8px",
+                            borderRadius: 3,
+                            fontWeight: 700,
+                            letterSpacing: "0.04em",
+                            textTransform: "uppercase",
+                            fontSize: "0.68rem",
+                          }}
+                        >
+                          📱 SMS ready
+                        </span>
+                      )}
                       {email && <span data-testid={`chan-email-${c.slug}`}>✉ email</span>}
                       {igHandle && <span data-testid={`chan-insta-${c.slug}`}>📸 @{igHandle}</span>}
                       {linkedin && <span data-testid={`chan-linkedin-${c.slug}`}>🔗 LinkedIn</span>}
