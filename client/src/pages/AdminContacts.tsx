@@ -369,6 +369,21 @@ export default function AdminContacts() {
   const [err, setErr] = useState<string | null>(null);
   const [autoRewriteToast, setAutoRewriteToast] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<Record<string, "url" | "sms" | null>>({});
+  // Per-card "More detail" expansion. Default: all cards COMPACT — the
+  // primary action (Copy SMS) + status pills stay above the fold; every
+  // enrichment tool, notes editor, transcript panel, hook display, and
+  // bottom-of-card editor collapse behind one click. See the ternary at
+  // ~line 2250 for the render fork. Rich's Jul 2026 critique: the card
+  // was busy and ugly — this cuts perceived height by ~70% on first paint.
+  const [expandedSlugs, setExpandedSlugs] = useState<Set<string>>(new Set());
+  const toggleExpanded = (slug: string) => {
+    setExpandedSlugs((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) next.delete(slug);
+      else next.add(slug);
+      return next;
+    });
+  };
   const [statusFilter, setStatusFilter] = useState<ContactStatus | "all">("all");
   // Sort order for the pipeline list. Persisted in localStorage so operator
   // preference survives page reloads. Region + State are parsed out of the
@@ -1663,6 +1678,52 @@ export default function AdminContacts() {
         </p>
       )}
       <div className="flex flex-col gap-3">
+        {contacts.length > 0 && (
+          <div
+            data-testid="expand-collapse-all"
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: 6,
+              marginBottom: -4,
+            }}
+          >
+            <button
+              data-testid="expand-all-btn"
+              onClick={() => setExpandedSlugs(new Set(contacts.map((c) => c.slug)))}
+              style={{
+                padding: "3px 10px",
+                borderRadius: 3,
+                border: "1px solid var(--ow-border)",
+                background: "transparent",
+                color: "var(--ow-text-lo)",
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.7rem",
+                cursor: "pointer",
+              }}
+              title="Expand every card"
+            >
+              Expand all
+            </button>
+            <button
+              data-testid="collapse-all-btn"
+              onClick={() => setExpandedSlugs(new Set())}
+              style={{
+                padding: "3px 10px",
+                borderRadius: 3,
+                border: "1px solid var(--ow-border)",
+                background: "transparent",
+                color: "var(--ow-text-lo)",
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.7rem",
+                cursor: "pointer",
+              }}
+              title="Collapse every card"
+            >
+              Collapse all
+            </button>
+          </div>
+        )}
         {contacts.map((c) => {
           const url = `${PREVIEW_BASE}/hi/${c.slug}`;
           const templateSms = smsDraft({ firstName: c.firstName, winery: c.winery, event: c.event, painPoint: c.painPoint, hookText: (c as { hookText?: string | null }).hookText ?? null, slug: c.slug });
@@ -2247,6 +2308,94 @@ export default function AdminContacts() {
                   {c.demoBookedAt && <Pill color="#10b981">Booked {fmtAgo(c.demoBookedAt)}</Pill>}
                 </div>
               </div>
+              {/* ── Compact mode strip (Jul 2026, Rich) ─────────────────
+                  Below-the-fold detail is collapsed by default. This
+                  compact strip gives one-click access to the primary
+                  outbound action (Copy SMS) + a "More detail ▾" toggle.
+                  When expanded, the strip is hidden and the full editor
+                  stack renders instead. */}
+              {!expandedSlugs.has(c.slug) ? (
+                <div
+                  data-testid={`compact-strip-${c.slug}`}
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    marginTop: 10,
+                    padding: "8px 10px",
+                    background: "var(--ow-bg-raised)",
+                    border: "1px solid var(--ow-border)",
+                    borderRadius: 4,
+                  }}
+                >
+                  <div
+                    style={{
+                      flex: 1,
+                      minWidth: 200,
+                      fontFamily: "'Lato',sans-serif",
+                      fontSize: "0.78rem",
+                      color: "var(--ow-text-mid)",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                    title={effectiveSms}
+                  >
+                    {effectiveSms.slice(0, 140)}{effectiveSms.length > 140 ? "…" : ""}
+                  </div>
+                  <button
+                    data-testid={`compact-copy-sms-${c.slug}`}
+                    onClick={() => copy(c.slug, "sms", effectiveSms)}
+                    style={{
+                      padding: "6px 14px",
+                      borderRadius: 4,
+                      border: 0,
+                      background: "var(--ow-amber)",
+                      color: "oklch(0.10 0.008 60)",
+                      fontFamily: "'Lato',sans-serif",
+                      fontSize: "0.8rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {copied === "sms" ? "✓ Copied" : "Copy SMS"}
+                  </button>
+                  <button
+                    data-testid={`compact-copy-url-${c.slug}`}
+                    onClick={() => copy(c.slug, "url", url)}
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: 4,
+                      border: "1px solid var(--ow-border)",
+                      background: "transparent",
+                      color: "var(--ow-text-mid)",
+                      fontFamily: "'Lato',sans-serif",
+                      fontSize: "0.78rem",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {copied === "url" ? "✓ Link" : "Copy link"}
+                  </button>
+                  <button
+                    data-testid={`expand-more-${c.slug}`}
+                    onClick={() => toggleExpanded(c.slug)}
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: 4,
+                      border: "1px solid var(--ow-border)",
+                      background: "transparent",
+                      color: "var(--ow-text-lo)",
+                      fontFamily: "'Lato',sans-serif",
+                      fontSize: "0.75rem",
+                      cursor: "pointer",
+                    }}
+                  >
+                    More detail ▾
+                  </button>
+                </div>
+              ) : (
+                <>
               {/* Inline notes editor. Opens when user clicks ✏️ Edit chip.
                   Free-form textarea — user can add IG-personal:, LinkedIn:,
                   Email:, Web:, Addr: labels or any private prose. Notes
@@ -2791,6 +2940,26 @@ export default function AdminContacts() {
                     )
                   }
                 />
+              )}
+              <div style={{ marginTop: 10, textAlign: "right" }}>
+                <button
+                  data-testid={`collapse-more-${c.slug}`}
+                  onClick={() => toggleExpanded(c.slug)}
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: 4,
+                    border: "1px solid var(--ow-border)",
+                    background: "transparent",
+                    color: "var(--ow-text-lo)",
+                    fontFamily: "'Lato',sans-serif",
+                    fontSize: "0.72rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  Collapse ▴
+                </button>
+              </div>
+                </>
               )}
             </div>
           );

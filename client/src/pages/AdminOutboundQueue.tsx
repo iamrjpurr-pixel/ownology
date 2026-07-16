@@ -170,6 +170,35 @@ export default function AdminOutboundQueue() {
     }
   }
 
+  /** Bulk-enrich mobile numbers for the email-only band via Perplexity Sonar.
+   *  Every high-confidence hit auto-writes to `mobile_au`, promoting that
+   *  contact from the email band (30 pts) into the SMS band (100 pts) on
+   *  the queue score. See outreach.bulkEnrichMobiles + mineMobileNumber
+   *  for the honest-search + confidence-gating rules.
+   *
+   *  ~$0.005/lookup × 25 default limit ≈ $0.13 per run. Ask before firing. */
+  async function runMobileEnrich() {
+    const emailOnlyCount = (data?.queue ?? []).filter(
+      (c: { channel?: string }) => c.channel === "email"
+    ).length;
+    const target = Math.min(25, emailOnlyCount || 25);
+    if (!confirm(`Hunt AU mobile numbers via Perplexity Sonar for up to ${target} email-only contacts?\n\n~$0.005 per lookup (${target} lookups ≈ $${(target * 0.005).toFixed(2)}). Only high-confidence hits (cited source ties mobile to THIS person at THIS winery) are saved. Never fabricates.`)) return;
+    setMobileResult(null);
+    try {
+      const result = await enrichMobiles.mutateAsync({ limit: target, dryRun: false });
+      setMobileResult({
+        candidates: result.candidates,
+        found: result.found,
+        saved: result.saved,
+        skipped: result.skipped,
+        errors: result.errors,
+      });
+      refetch();
+    } catch (err) {
+      alert(`Mobile enrichment failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
   async function copyCohortTsv() {
     const rows = filtered
       .filter((c) => c.mobileAu && c.mobileAu.trim().length > 0)
@@ -630,6 +659,49 @@ export default function AdminOutboundQueue() {
         {igResult && (
           <span data-testid="ig-backfill-result" style={{ fontSize: "0.78rem", color: "#16a34a", fontWeight: 600 }}>
             ✓ {igResult.found} found · {igResult.notFound} unresolved · {igResult.errors} errors (of {igResult.checked} checked)
+          </span>
+        )}
+      </div>
+
+      {/* ── Mobile enrichment strip (Jul 2026, Rich) ────────────────────
+          Companion to the IG backfill above but targeting the email-only
+          band of the queue. Perplexity Sonar hunts a defensible AU mobile
+          for each contact where notes carry an email but mobile_au is
+          blank. Only high-confidence hits (Sonar cited a page that ties
+          the mobile to THIS person at THIS winery) auto-save. Every save
+          promotes the contact from email band (30 pts) to SMS band (100)
+          on the queue score model. */}
+      <div
+        data-testid="mobile-enrich-strip"
+        style={{
+          display: "flex",
+          gap: 10,
+          alignItems: "center",
+          padding: "10px 12px",
+          margin: "10px 12px 0",
+          background: "color-mix(in oklch, var(--ow-amber) 6%, var(--ow-bg-card))",
+          border: "1px dashed var(--ow-amber)",
+          borderRadius: 4,
+          flexWrap: "wrap",
+        }}
+      >
+        <span style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "0.95rem", color: "var(--ow-text-hi)" }}>
+          📱 Mobile enrichment
+        </span>
+        <span style={{ fontSize: "0.78rem", color: "var(--ow-text-mid)", flex: 1, minWidth: 240 }}>
+          Perplexity Sonar hunts a public AU mobile for the email-only band. Only high-confidence hits save. Every hit lifts that contact from the email band (30 pts) into the SMS band (100 pts) on the next queue reload. ~$0.13 per 25-row batch.
+        </span>
+        <button
+          data-testid="mobile-enrich-btn"
+          onClick={runMobileEnrich}
+          disabled={enrichMobiles.isPending}
+          style={{ padding: "5px 14px", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.78rem", fontWeight: 700, cursor: enrichMobiles.isPending ? "wait" : "pointer", opacity: enrichMobiles.isPending ? 0.7 : 1 }}
+        >
+          {enrichMobiles.isPending ? "Hunting…" : "Enrich 25 mobiles"}
+        </button>
+        {mobileResult && (
+          <span data-testid="mobile-enrich-result" style={{ fontSize: "0.78rem", color: mobileResult.saved > 0 ? "#16a34a" : "var(--ow-text-mid)", fontWeight: 600 }}>
+            ✓ {mobileResult.saved} saved · {mobileResult.found - mobileResult.saved} low-conf skipped · {mobileResult.errors} errors (of {mobileResult.candidates} checked)
           </span>
         )}
       </div>
