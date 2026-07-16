@@ -589,6 +589,28 @@ export const cellarBookShareTokens = mysqlTable(
   ]
 );
 
+// Magic-link login tokens (Feb 2026) — passwordless email login fallback.
+// Only the SHA-256 hash of the plaintext token is stored; the plaintext
+// lives exclusively in the one outbound Resend email. Single-use — once
+// consumed_at is set the token is dead, even before it expires.
+export const magicLoginTokens = mysqlTable(
+  "magic_login_tokens",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    tokenHash: varchar("token_hash", { length: 128 }).notNull().unique(),
+    email: varchar("email", { length: 255 }).notNull(),
+    userId: int("user_id").notNull(),
+    expiresAt: bigint("expires_at", { mode: "number" }).notNull(),
+    consumedAt: bigint("consumed_at", { mode: "number" }),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    requestIp: varchar("request_ip", { length: 64 }),
+  },
+  (t) => [
+    index("mlt_email_created_idx").on(t.email, t.createdAt),
+    index("mlt_expires_idx").on(t.expiresAt),
+  ]
+);
+
 
 // ─── Cellar Tasks ─────────────────────────────────────────────────────────────
 // One row per cleaning/maintenance task. Tasks are either AI-generated from the

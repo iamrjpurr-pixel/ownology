@@ -1443,6 +1443,24 @@ async function startServer() {
         INDEX cbst_expires_idx (expires_at)
       )
     `);
+    // Magic-link login tokens (Feb 2026) — passwordless email login fallback
+    // for winemakers without a Google account. Token is stored SHA-256
+    // hashed; the plaintext only exists in the outbound email. Single-use,
+    // 15-minute expiry. See authRouter.ts magic-link routes.
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS magic_login_tokens (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        token_hash VARCHAR(128) NOT NULL UNIQUE,
+        email VARCHAR(255) NOT NULL,
+        user_id INT NOT NULL,
+        expires_at BIGINT NOT NULL,
+        consumed_at BIGINT,
+        created_at BIGINT NOT NULL,
+        request_ip VARCHAR(64),
+        INDEX mlt_email_created_idx (email, created_at),
+        INDEX mlt_expires_idx (expires_at)
+      )
+    `);
     // ── Phase 1 multi-tenant bootstrap ───────────────────────────────────
     // Idempotent: creates `wineries` table, adds `winery_id` column to
     // users if missing, seeds a Default Winery, backfills NULL user

@@ -1,41 +1,83 @@
 /**
- * Login — single-screen "Sign in with Google" via Emergent OAuth.
+ * Login — Sign in with Google (primary) + passwordless magic-link fallback.
  *
  * REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH.
  *
  * Reads `?next=/some/path` query param so e.g. ProtectedRoute can bounce a
  * deep-linker through login and back. Default: /admin (the only currently
  * gated surface — extend the gate list as more app surfaces ship).
+ *
+ * The magic-link path (Feb 2026) exists for winemakers without a Google
+ * account. The `/api/auth/magic-link/*` server routes handle sending +
+ * verifying — this page is just the email input + status feedback.
  */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/useAuth";
 
 export default function Login() {
   const { user, status, login } = useAuth();
+  const [magicEmail, setMagicEmail] = useState("");
+  const [magicState, setMagicState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [magicError, setMagicError] = useState<string | null>(null);
 
   // Read query params once. `?reason=session_expired` is set by the
   // global 401 interceptor in main.tsx when a stale JWT (e.g. after
   // JWT_SECRET rotation) causes tRPC to reject the cookie. Surfacing
   // this explicitly means the user sees "sign in again" instead of
   // being silently bounced.
-  const reason = typeof window !== "undefined"
-    ? new URLSearchParams(window.location.search).get("reason")
-    : null;
+  // `?err=<code>` is set by /api/auth/magic-link/verify when a click-through
+  // fails (invalid, used, expired, server).
+  const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const reason = params?.get("reason");
+  const magicErr = params?.get("err");
   const sessionExpired = reason === "session_expired";
+  const magicErrorFromRedirect = magicErr === "invalid" ? "That login link isn’t valid."
+    : magicErr === "used" ? "That login link has already been used — request a fresh one."
+    : magicErr === "expired" ? "That login link has expired — request a fresh one."
+    : magicErr === "server" ? "Something went wrong verifying that link. Try again."
+    : null;
 
   useEffect(() => {
     // If already signed in, jump straight to ?next= or /admin.
     if (status === "authed" && user) {
-      const params = new URLSearchParams(window.location.search);
-      const next = params.get("next") || "/admin";
+      const next = (params?.get("next")) || "/admin";
       window.location.replace(next.startsWith("/") ? next : "/admin");
     }
-  }, [status, user]);
+  }, [status, user, params]);
 
   function handleLogin() {
-    const params = new URLSearchParams(window.location.search);
-    const next = params.get("next") || "/admin";
+    const next = (params?.get("next")) || "/admin";
     login(next);
+  }
+
+  async function requestMagicLink(e: React.FormEvent) {
+    e.preventDefault();
+    const email = magicEmail.trim();
+    if (!email) return;
+    setMagicState("sending");
+    setMagicError(null);
+    try {
+      const resp = await fetch("/api/auth/magic-link/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (resp.status === 429) {
+        setMagicState("error");
+        setMagicError("Too many login links requested — try again in an hour.");
+        return;
+      }
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        setMagicState("error");
+        setMagicError(data.error || "Could not send login link. Try again shortly.");
+        return;
+      }
+      setMagicState("sent");
+    } catch {
+      setMagicState("error");
+      setMagicError("Network problem — try again in a moment.");
+    }
   }
 
   return (
@@ -151,6 +193,115 @@ export default function Login() {
           </svg>
           Continue with Google
         </button>
+
+        {/* ── Magic-link fallback ─────────────────────────────────────────── */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            margin: "1.6rem 0 1.2rem",
+            fontSize: "0.72rem",
+            color: "var(--ow-text-lo)",
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+          }}
+        >
+          <div style={{ flex: 1, height: 1, background: "var(--ow-border)" }} />
+          or
+          <div style={{ flex: 1, height: 1, background: "var(--ow-border)" }} />
+        </div>
+
+        {magicErrorFromRedirect && !magicError && (
+          <div
+            data-testid="login-magic-redirect-error"
+            style={{
+              background: "color-mix(in oklch, #dc2626 10%, transparent)",
+              border: "1px solid #dc2626",
+              borderRadius: 6,
+              padding: "0.55rem 0.8rem",
+              fontSize: "0.8rem",
+              color: "#fca5a5",
+              lineHeight: 1.5,
+              marginBottom: "0.8rem",
+            }}
+          >
+            {magicErrorFromRedirect}
+          </div>
+        )}
+
+        {magicState === "sent" ? (
+          <div
+            data-testid="login-magic-sent"
+            style={{
+              background: "color-mix(in oklch, #16a34a 10%, transparent)",
+              border: "1px solid #16a34a",
+              borderRadius: 6,
+              padding: "0.75rem 0.9rem",
+              fontSize: "0.88rem",
+              color: "var(--ow-text-hi)",
+              lineHeight: 1.55,
+            }}
+          >
+            <strong>Check your inbox.</strong> If <em>{magicEmail}</em> is on file, we&rsquo;ve sent you a one-tap login link. It expires in 15 minutes.
+          </div>
+        ) : (
+          <form onSubmit={requestMagicLink}>
+            <label style={{ display: "block", fontSize: "0.78rem", color: "var(--ow-text-mid)", marginBottom: 6 }}>
+              Email login (no Google account? no worries)
+            </label>
+            <input
+              type="email"
+              data-testid="magic-link-email-input"
+              placeholder="you@yourwinery.com"
+              value={magicEmail}
+              onChange={(e) => { setMagicEmail(e.target.value); setMagicError(null); }}
+              required
+              maxLength={254}
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                padding: "0.7rem 0.9rem",
+                background: "var(--ow-bg-base)",
+                border: "1px solid var(--ow-border)",
+                borderRadius: 6,
+                color: "var(--ow-text-hi)",
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.95rem",
+                outline: "none",
+                marginBottom: 8,
+              }}
+            />
+            {magicError && (
+              <p
+                data-testid="login-magic-error"
+                style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#fca5a5" }}
+              >
+                {magicError}
+              </p>
+            )}
+            <button
+              type="submit"
+              data-testid="magic-link-submit-btn"
+              disabled={magicState === "sending" || !magicEmail.trim()}
+              style={{
+                width: "100%",
+                background: "transparent",
+                color: "var(--ow-text-hi)",
+                fontFamily: "'Lato',sans-serif",
+                fontSize: "0.9rem",
+                fontWeight: 600,
+                padding: "0.7rem 1rem",
+                border: "1px solid var(--ow-border-md)",
+                borderRadius: 6,
+                cursor: magicState === "sending" ? "wait" : "pointer",
+                opacity: !magicEmail.trim() ? 0.5 : 1,
+              }}
+            >
+              {magicState === "sending" ? "Sending…" : "Email me a login link"}
+            </button>
+          </form>
+        )}
 
         <p
           style={{

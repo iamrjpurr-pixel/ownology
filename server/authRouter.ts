@@ -231,6 +231,180 @@ router.post("/exchange", express.json(), async (req: Request, res: Response) => 
 });
 
 /**
+ * POST /api/auth/magic-link/request
+ * Body: { email: string }
+ *
+ * Passwordless login for winemakers without a Google account. Generates a
+ * one-time token, hashes it (SHA-256) into `magic_login_tokens`, emails the
+ * plaintext to the user via Resend. Rate limit: 3 sends per email per hour.
+ * Rejects unknown emails to avoid accidental account provisioning (users
+ * must be created first via Google OAuth or admin seed).
+ *
+ * Feb 2026 addition — sits alongside Google OAuth, not replacing it.
+ */
+const MAGIC_LINK_TTL_MS = 15 * 60 * 1000; // 15 minutes
+const MAGIC_LINK_RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const MAGIC_LINK_RATE_MAX = 3;
+
+router.post("/magic-link/request", express.json(), async (req: Request, res: Response) => {
+  const emailRaw = typeof req.body?.email === "string" ? req.body.email : "";
+  const email = emailRaw.trim().toLowerCase();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
+    return res.status(400).json({ error: "Enter a valid email address." });
+  }
+  try {
+    // Reject unknown emails — don't auto-provision accounts via this path.
+    const user = await db.query.users.findFirst({
+      where: eq(schema.users.email, email),
+    });
+    if (!user) {
+      // Intentionally return 200 with the same message shape so we don't
+      // leak which emails have accounts (enumeration protection). The email
+      // just never arrives.
+      return res.json({ ok: true, sent: true });
+    }
+
+    // Rate-limit: count sends for this email in the last hour.
+    const { sql, gte, and } = await import("drizzle-orm");
+    const cutoff = Date.now() - MAGIC_LINK_RATE_WINDOW_MS;
+    const recent = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.magicLoginTokens)
+      .where(and(
+        eq(schema.magicLoginTokens.email, email),
+        gte(schema.magicLoginTokens.createdAt, cutoff),
+      ));
+    const recentCount = Number(recent[0]?.count ?? 0);
+    if (recentCount >= MAGIC_LINK_RATE_MAX) {
+      return res.status(429).json({
+        error: "Too many login links requested. Try again in an hour.",
+      });
+    }
+
+    // Generate token — 32 random bytes → hex. Store SHA-256 hash only.
+    const { randomBytes, createHash } = await import("node:crypto");
+    const tokenPlaintext = randomBytes(32).toString("hex");
+    const tokenHash = createHash("sha256").update(tokenPlaintext).digest("hex");
+    const now = Date.now();
+    const expiresAt = now + MAGIC_LINK_TTL_MS;
+    const clientIp = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim()
+      || req.socket.remoteAddress
+      || null;
+
+    await db.insert(schema.magicLoginTokens).values({
+      tokenHash,
+      email,
+      userId: user.id,
+      expiresAt,
+      consumedAt: null,
+      createdAt: now,
+      requestIp: clientIp?.slice(0, 63) ?? null,
+    });
+
+    // Build the callback URL. PUBLIC_SITE_URL wins in prod; falls back to
+    // the request's own origin so preview environments work without config.
+    const siteUrl = process.env.PUBLIC_SITE_URL
+      || `${req.protocol}://${req.get("host")}`;
+    const magicUrl = `${siteUrl}/api/auth/magic-link/verify?token=${tokenPlaintext}`;
+
+    // Send via Resend. Non-blocking on failure — we still return 200 to the
+    // client so a Resend hiccup doesn't leak "this email doesn't exist" via
+    // a differential error message.
+    const resendKey = process.env.RESEND_API_KEY;
+    const fromEmail = process.env.ALERT_FROM_EMAIL || "onboarding@resend.dev";
+    if (resendKey) {
+      const { Resend } = await import("resend");
+      const resend = new Resend(resendKey);
+      const displayName = user.name || email.split("@")[0];
+      const html = `<!doctype html><html><body style="margin:0;padding:32px 16px;background:#f6f4ef;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#1f2937">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06)">
+    <tr><td style="padding:32px 32px 8px;border-top:6px solid #b8860b">
+      <h1 style="margin:0;font-family:'Fraunces',Georgia,serif;font-size:22px;color:#b8860b;font-weight:700">Ownology</h1>
+    </td></tr>
+    <tr><td style="padding:8px 32px 24px">
+      <p style="margin:0 0 12px;font-size:16px">G&rsquo;day ${displayName.replace(/[<>]/g, "")},</p>
+      <p style="margin:0 0 20px;font-size:15px;line-height:1.55;color:#374151">Here&rsquo;s your one-tap login link. It expires in 15 minutes and can only be used once.</p>
+      <p style="margin:20px 0 24px;text-align:center">
+        <a href="${magicUrl}" style="display:inline-block;padding:12px 28px;background:#b8860b;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:700;font-size:15px">Sign in to Ownology</a>
+      </p>
+      <p style="margin:0 0 8px;font-size:12px;color:#6b7280;line-height:1.5">If the button doesn&rsquo;t work, paste this into your browser:<br><span style="word-break:break-all;color:#374151">${magicUrl}</span></p>
+      <p style="margin:24px 0 0;font-size:12px;color:#9ca3af;line-height:1.5">Didn&rsquo;t request this? Ignore it — the link expires shortly and no account changes were made.</p>
+    </td></tr>
+  </table>
+</body></html>`;
+      try {
+        await resend.emails.send({
+          from: fromEmail,
+          to: email,
+          subject: "Your Ownology login link",
+          html,
+        });
+      } catch (sendErr) {
+        console.error("[auth/magic-link] Resend failed:", (sendErr as Error).message);
+      }
+    } else {
+      // Dev / preview without Resend key — log the link so operator can
+      // still complete a test flow.
+      console.log(`[auth/magic-link] (dev) link for ${email}: ${magicUrl}`);
+    }
+
+    return res.json({ ok: true, sent: true });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[auth/magic-link/request] failed:", msg);
+    return res.status(500).json({ error: "Could not send login link. Try again shortly." });
+  }
+});
+
+/**
+ * GET /api/auth/magic-link/verify?token=<hex>
+ * User clicks the link in their email → we verify, mint the same JWT
+ * cookie the Google OAuth exchange sets, then 302 to /dashboard.
+ * Token is single-use — consumed_at is stamped so replay attempts fail.
+ */
+router.get("/magic-link/verify", async (req: Request, res: Response) => {
+  const tokenPlaintext = typeof req.query.token === "string" ? req.query.token : "";
+  const siteUrl = process.env.PUBLIC_SITE_URL || `${req.protocol}://${req.get("host")}`;
+  if (!tokenPlaintext || !/^[a-f0-9]{40,80}$/i.test(tokenPlaintext)) {
+    return res.redirect(302, `${siteUrl}/login?err=invalid`);
+  }
+  try {
+    const { createHash } = await import("node:crypto");
+    const tokenHash = createHash("sha256").update(tokenPlaintext).digest("hex");
+    const row = await db.query.magicLoginTokens.findFirst({
+      where: eq(schema.magicLoginTokens.tokenHash, tokenHash),
+    });
+    if (!row) return res.redirect(302, `${siteUrl}/login?err=invalid`);
+    if (row.consumedAt) return res.redirect(302, `${siteUrl}/login?err=used`);
+    if (row.expiresAt < Date.now()) return res.redirect(302, `${siteUrl}/login?err=expired`);
+
+    // Load user, then stamp the token as consumed BEFORE minting the cookie
+    // so a network error mid-response can't leave an unconsumed token.
+    const user = await db.query.users.findFirst({
+      where: eq(schema.users.id, row.userId),
+    });
+    if (!user) return res.redirect(302, `${siteUrl}/login?err=invalid`);
+    await db
+      .update(schema.magicLoginTokens)
+      .set({ consumedAt: Date.now() })
+      .where(eq(schema.magicLoginTokens.id, row.id));
+
+    const jwt = await signSessionJwt({
+      openId: user.openId,
+      name: user.name,
+      email: user.email,
+      role: (user.role === "admin" ? "admin" : "user"),
+    });
+    setSessionCookie(res, jwt);
+    // Land on /dashboard by default (same as post-Google-callback landing).
+    return res.redirect(302, `${siteUrl}/dashboard`);
+  } catch (err: unknown) {
+    console.error("[auth/magic-link/verify] failed:", (err as Error).message);
+    return res.redirect(302, `${siteUrl}/login?err=server`);
+  }
+});
+
+/**
  * GET /api/auth/me
  * Verifies the existing `app_session_id` cookie and returns the user. The
  * cookie verification reuses the same logic as tRPC's getUserFromCookie so

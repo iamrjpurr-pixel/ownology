@@ -108,9 +108,11 @@ export default function AdminOutboundQueue() {
   const { data, isLoading, refetch } = trpc.outreach.outboundQueue.useQuery();
   const markSent = trpc.outreach.markSent.useMutation();
   const bulkRewrite = trpc.outreach.bulkRewriteSmsAI.useMutation();
+  const backfillIg = trpc.outreach.backfillInstagramHandles.useMutation();
   const [copied, setCopied] = useState<Record<string, "sms" | "email" | "done" | undefined>>({});
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [bulkResult, setBulkResult] = useState<{ rewritten: number; skippedExisting: number; failed: number } | null>(null);
+  const [igResult, setIgResult] = useState<{ checked: number; found: number; notFound: number; errors: number } | null>(null);
   const [cohortCopied, setCohortCopied] = useState(false);
   const [vcardCount, setVcardCount] = useState<number | null>(null);
   const [forceRewrite, setForceRewrite] = useState(false);
@@ -149,6 +151,18 @@ export default function AdminOutboundQueue() {
       refetch();
     } catch (err) {
       alert(`Bulk rewrite failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  async function runIgBackfill() {
+    if (!confirm("Backfill Instagram handles via Perplexity Sonar for up to 50 IG-less winery contacts?\n\n~$0.20 per run. Only contacts with a winery name and no existing IG marker in notes are checked. Handles are appended to notes as \"IG: handle\" — the queue picks them up on next reload.")) return;
+    setIgResult(null);
+    try {
+      const result = await backfillIg.mutateAsync({ limit: 50, dryRun: false });
+      setIgResult(result);
+      refetch();
+    } catch (err) {
+      alert(`IG backfill failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -534,6 +548,42 @@ export default function AdminOutboundQueue() {
             ? `✓ ${vcardCount} contacts exported`
             : `Export ${filtered.filter((c) => c.mobileAu || (c as { email?: string | null }).email).length} as vCard`}
         </button>
+      </div>
+
+      {/* Instagram backfill strip — Perplexity Sonar auto-enrichment */}
+      <div
+        data-testid="ig-backfill-strip"
+        style={{
+          margin: "0 0 12px",
+          padding: "10px 14px",
+          background: "color-mix(in oklch, oklch(0.65 0.14 320) 4%, transparent)",
+          border: "1px solid var(--ow-border)",
+          borderRadius: 4,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          flexWrap: "wrap",
+        }}
+      >
+        <span style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "0.95rem", color: "var(--ow-text-hi)" }}>
+          📸 IG handle backfill
+        </span>
+        <span style={{ fontSize: "0.78rem", color: "var(--ow-text-mid)", flex: 1, minWidth: 240 }}>
+          Perplexity Sonar looks up the Instagram handle for up to 50 winery contacts that don&apos;t have one yet. Handles land in the notes field as <code>IG: handle</code>, so a &ldquo;DM on Instagram&rdquo; button appears on the next queue reload. ~$0.20 per run.
+        </span>
+        <button
+          data-testid="ig-backfill-btn"
+          onClick={runIgBackfill}
+          disabled={backfillIg.isPending}
+          style={{ padding: "5px 14px", background: "oklch(0.65 0.14 320)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.78rem", fontWeight: 700, cursor: backfillIg.isPending ? "wait" : "pointer", opacity: backfillIg.isPending ? 0.7 : 1 }}
+        >
+          {backfillIg.isPending ? "Backfilling…" : "Backfill 50 handles"}
+        </button>
+        {igResult && (
+          <span data-testid="ig-backfill-result" style={{ fontSize: "0.78rem", color: "#16a34a", fontWeight: 600 }}>
+            ✓ {igResult.found} found · {igResult.notFound} unresolved · {igResult.errors} errors (of {igResult.checked} checked)
+          </span>
+        )}
       </div>
 
       {isLoading && <p style={{ padding: 24 }}>Loading queue…</p>}
