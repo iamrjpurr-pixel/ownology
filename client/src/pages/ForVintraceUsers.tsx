@@ -80,7 +80,7 @@ function Hero() {
         </p>
         <div className="flex flex-wrap gap-4">
           <a href="/#pricing" className="btn-amber">Start Free Trial — No Credit Card</a>
-          <Link href="/why-ownology" className="btn-ghost">See Full Comparison</Link>
+          <Link href="/vs/innovint-vintrace" className="btn-ghost">See the honest 3-way comparison</Link>
         </div>
         <p style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO, marginTop: "2rem" }}>
           Works alongside Vintrace, InnoVint, VinoERP, and any production system you already use.
@@ -270,14 +270,15 @@ function Testimonial() {
     <section className="py-20" style={{ background: BG_BASE }}>
       <div className="container max-w-3xl" ref={ref}>
         <div className={`p-10 rounded-sm ${inView ? "fade-up" : "opacity-0"}`} style={{ background: BG_CARD, border: `1px solid ${BORDER_MD}` }}>
-          <div style={{ fontFamily: SERIF, fontSize: "2.5rem", color: AMBER, lineHeight: 1, marginBottom: "1.25rem" }}>"</div>
-          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", color: TEXT_MID, lineHeight: 1.8, fontStyle: "italic", marginBottom: "1.5rem" }}>
-            Vintrace is excellent — we wouldn't run harvest without it. But when a new vintage assistant asks me a protocol question at 11pm, I can't always stop and answer. Ownology means they get the right answer from our own documents, instantly, without waking me up.
+          <p style={{ fontFamily: MONO, fontSize: "0.68rem", letterSpacing: "0.16em", textTransform: "uppercase", color: AMBER, marginBottom: "1rem" }}>
+            Example use-case
           </p>
-          <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: "1.25rem" }}>
-            <p style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "0.9375rem", color: TEXT_HI }}>Head Winemaker</p>
-            <p style={{ fontFamily: MONO, fontSize: "0.75rem", color: TEXT_LO, marginTop: "0.25rem" }}>Boutique Estate · 9,500 cases · Vintrace user since 2019</p>
-          </div>
+          <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", color: TEXT_MID, lineHeight: 1.8, marginBottom: "1.5rem" }}>
+            Vintrace is excellent — you wouldn&apos;t run harvest without it. Your job console, tank map, and Baker Lab auto-ingest all work. But when a new vintage assistant asks you a protocol question at 11pm, you can&apos;t always stop and answer. Ownology means they get the right answer from your own documents, instantly, without waking you up.
+          </p>
+          <p style={{ fontFamily: SANS, fontSize: "0.78rem", color: TEXT_LO, borderTop: `1px solid ${BORDER}`, paddingTop: "1rem", fontStyle: "italic" }}>
+            That&apos;s the situation Ownology is built for. If it sounds like yours, start the free trial.
+          </p>
         </div>
       </div>
     </section>
@@ -391,6 +392,7 @@ function Footer() {
         </p>
         <div className="flex gap-6">
           <a href="mailto:support@ownology.ai" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>Contact</a>
+          <Link href="/vs/innovint-vintrace" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>Compare</Link>
           <Link href="/for-innovint-users" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>For InnoVint Users</Link>
           <Link href="/why-ownology" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>Why Ownology</Link>
           <Link href="/" style={{ fontFamily: SANS, fontSize: "0.8125rem", color: TEXT_LO }}>Home</Link>

@@ -633,10 +633,14 @@ async function startServer() {
     "/",
     "/home",
     "/why-ownology",
-    // Competitor-migration pages (`/for-innovint-users`, `/for-vintrace-users`)
-    // are deliberately NOT in PUBLIC_EXACT. They stay routable for warm-outreach
-    // links (invite-token / /hi/:slug) but a public crawler hits the gate wall
-    // instead — keeps us out of trademark/tortious-interference territory.
+    // Public competitor comparison — SEO front-door + QR landing for merch
+    "/vs/innovint-vintrace",
+    // Competitor-migration pages — public since Feb 2026 alongside the new
+    // /vs/innovint-vintrace page. Both name the incumbents openly and honestly
+    // position Ownology as the layer above/around rather than a replacement,
+    // so the earlier tortious-interference concern no longer applies.
+    "/for-innovint-users",
+    "/for-vintrace-users",
     "/for-home-winemakers",
     "/for-home-winemakers/troubleshooting",
     "/for-home-winemakers/glossary",
@@ -669,8 +673,6 @@ async function startServer() {
     "/merch",
     "/merch/success",
     "/merch/cancel",
-    // Public comparison landing — QR-scan target for merch (bar runner + coaster)
-    "/vs/innovint-vintrace",
     "/cellar-journal",
     "/how-we-trace",
     "/reference/vine",
@@ -728,6 +730,18 @@ async function startServer() {
     // express.static above never carry `text/html` in Accept.
     const accept = req.headers.accept || "";
     if (!accept.includes("text/html")) return next();
+
+    // ─── 301 redirects (SEO consolidation) ─────────────────────────────
+    // /competitive-advantage was a 983-line page claiming "0 direct
+    // competitors found" — factually stale after InnoVint shipped AI in
+    // Jan 2026. Consolidated into /vs/innovint-vintrace which handles the
+    // full three-way honest positioning story.
+    const PERMANENT_REDIRECTS: Record<string, string> = {
+      "/competitive-advantage": "/vs/innovint-vintrace",
+    };
+    if (PERMANENT_REDIRECTS[req.path]) {
+      return res.redirect(301, PERMANENT_REDIRECTS[req.path]);
+    }
 
     // Anything explicitly public → pass through.
     if (isPublicPath(req.path)) return next();

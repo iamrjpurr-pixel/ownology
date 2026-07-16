@@ -188,6 +188,19 @@ export function viteGateWall(): Plugin {
         }
 
         const pathname = url.split("?")[0];
+
+        // ─── 301 redirects (mirror server/index.ts PERMANENT_REDIRECTS) ────
+        // Keep dev + prod behaviour identical for retired routes.
+        const PERMANENT_REDIRECTS: Record<string, string> = {
+          "/competitive-advantage": "/vs/innovint-vintrace",
+        };
+        if (PERMANENT_REDIRECTS[pathname]) {
+          res.statusCode = 301;
+          res.setHeader("Location", PERMANENT_REDIRECTS[pathname]);
+          res.end();
+          return;
+        }
+
         // Anything on the public allowlist → pass through untouched.
         if (isPublicPath(pathname)) return next();
 

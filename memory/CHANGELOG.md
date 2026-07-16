@@ -4,6 +4,32 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Feb 2026 — P0 sweep: comparison plumbing + Home Winery Kit units
+
+**P0.1 — Ungate + refresh the two migration guides**
+- `/for-innovint-users` + `/for-vintrace-users` now in `PUBLIC_EXACT` on both `server/index.ts` and `viteGateWall.ts` (they were gated for pre-existing tortious-interference concerns which no longer apply now that `/vs/innovint-vintrace` publishes the same names openly and honestly)
+- Removed `Disallow` lines from `/api/robots.txt` — Google can now crawl them
+- Added both to `sitemap.xml` at priority 0.75, changefreq monthly
+- **Removed the invented "Head Winemaker · Boutique Estate · 12,000 cases · InnoVint user since 2021" testimonials** — that was fabricated social proof and inconsistent with our honesty-first positioning. Replaced with "Example use-case" framing that names the situation clearly and invites the reader to identify themselves in it
+- Refreshed hero CTAs on both pages: "See Full Comparison" → "See the honest 3-way comparison" linking to `/vs/innovint-vintrace`
+- Added `/vs/innovint-vintrace` link to both page footers
+
+**P0.2 — Retire `/competitive-advantage` → 301 redirect**
+- The original 983-line page claimed "0 direct competitors found" — factually stale after InnoVint shipped its AI Copilot in Jan 2026 and actively harmful to credibility if quoted back
+- Replaced the entire component with a 30-line redirect stub (preserves the route registration in `App.tsx` and any inbound links)
+- Added `PERMANENT_REDIRECTS` map to BOTH `server/index.ts` (production Express) AND `viteGateWall.ts` (dev Vite middleware) — same 301 behaviour in both environments
+- Verified: `curl -I` returns `HTTP/2 301 Location: /vs/innovint-vintrace`
+- SEO signal consolidates on the new canonical `/vs/innovint-vintrace`
+
+**P0.3 — Home Winery Kit units toggle**
+- Added metric/imperial pill toggle at `/resources/home-winery-kit`
+- **Default = metric (23 L)** since Ownology's home market is AU/NZ (matches Cellar Journal's default, glossary, and Ask.tsx sample question)
+- Imperial mode = 6 gal for US visitors
+- Persists to `localStorage.ownology.homeWineryUnits`
+- `convertForUnits()` helper does live regex conversion of item.name + item.note + intro paragraph. Idempotent for text with no matching patterns
+- Screenshots verify: metric shows `24.6-L Big Mouth Bubbler`, `23-L glass carboy`, `1.5 m food-grade tubing`; imperial shows `6.5-gallon Big Mouth Bubbler`, `6-gallon glass carboy`, `5 ft food-grade tubing`
+
+
 ### Feb 2026 — `/vs/innovint-vintrace` public comparison landing + QR-wired merch
 
 Rich pushed back on my thin competitor knowledge before I wrote comparison copy. Rebuilt Ownology's competitive positioning from first-principles research.

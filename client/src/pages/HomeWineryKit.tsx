@@ -3,9 +3,35 @@
  * Printable shopping checklist for a complete home winery setup.
  * SEO-friendly, print-optimised, PDF export via window.print().
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { Printer, ArrowLeft, CheckSquare, Square, ExternalLink } from "lucide-react";
+
+// ─── Units toggle ─────────────────────────────────────────────────────────────
+// Default = metric (23 L) since Ownology's home market is AU/NZ. US buyers
+// hitting the page can flip to imperial (6 gal) with a single tap; choice is
+// persisted to localStorage so they don't have to re-toggle on every visit.
+type Units = "metric" | "imperial";
+const UNITS_STORAGE_KEY = "ownology.homeWineryUnits";
+
+/**
+ * Rewrite equipment copy for the selected unit system. Handles the specific
+ * measurement patterns that appear in this page (batch volumes, tubing length,
+ * dosing dilutions). Idempotent for text that contains no matching patterns.
+ */
+function convertForUnits(text: string, units: Units): string {
+  if (units === "metric") {
+    return text
+      .replace(/6\.5-gallon/gi, "24.6-L")
+      .replace(/6-gallon/gi, "23-L")
+      .replace(/5 ft/gi, "1.5 m")
+      .replace(/1 tbsp per gallon of warm water/gi, "5 mL per litre of warm water")
+      .replace(/(\d+) tsp per 4 L/gi, "$1 tsp per 4 L");
+  }
+  // imperial — leave existing gallon copy, but flip the metric-specific line
+  return text
+    .replace(/1 tsp per 4 L of cool water/gi, "1 tsp per 1 gallon of cool water");
+}
 
 // ─── Equipment data ────────────────────────────────────────────────────────────
 
@@ -100,6 +126,15 @@ const CATEGORIES = [
 
 export default function HomeWineryKit() {
   const [checked, setChecked] = useState<Set<string>>(new Set());
+  const [units, setUnits] = useState<Units>(() => {
+    if (typeof window === "undefined") return "metric";
+    const stored = window.localStorage.getItem(UNITS_STORAGE_KEY);
+    return stored === "imperial" ? "imperial" : "metric";
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem(UNITS_STORAGE_KEY, units);
+  }, [units]);
 
   const toggle = (id: string) => {
     setChecked(prev => {
@@ -188,8 +223,53 @@ export default function HomeWineryKit() {
           Home Winery Kit
         </h1>
         <p style={{ fontSize: "1rem", lineHeight: 1.7, color: "var(--ow-text-mid)", maxWidth: "560px", marginBottom: "1.25rem" }}>
-          Everything you need to make your first 6-gallon (approximately 30 bottles) batch of wine at home — from fermentation to bottling. Tick items off as you gather them.
+          Everything you need to make your first {units === "metric" ? "23-litre (approximately 30 bottles)" : "6-gallon (approximately 30 bottles)"} batch of wine at home — from fermentation to bottling. Tick items off as you gather them.
         </p>
+
+        {/* Units toggle */}
+        <div
+          className="no-print"
+          role="group"
+          aria-label="Measurement units"
+          style={{
+            display: "inline-flex",
+            gap: 0,
+            marginBottom: "1.25rem",
+            background: "var(--ow-bg-raised)",
+            border: "1px solid var(--ow-border)",
+            borderRadius: "999px",
+            padding: "3px",
+          }}
+          data-testid="units-toggle"
+        >
+          {(["metric", "imperial"] as Units[]).map((u) => {
+            const isActive = units === u;
+            return (
+              <button
+                key={u}
+                type="button"
+                data-testid={`units-${u}`}
+                onClick={() => setUnits(u)}
+                aria-pressed={isActive}
+                style={{
+                  padding: "0.4rem 0.9rem",
+                  borderRadius: "999px",
+                  border: "none",
+                  background: isActive ? "var(--ow-amber)" : "transparent",
+                  color: isActive ? "oklch(0.10 0.008 60)" : "var(--ow-text-mid)",
+                  fontFamily: "'Lato', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.04em",
+                  cursor: "pointer",
+                  transition: "background 0.15s, color 0.15s",
+                }}
+              >
+                {u === "metric" ? "Metric (23 L)" : "Imperial (6 gal)"}
+              </button>
+            );
+          })}
+        </div>
 
         {/* Progress bar */}
         <div className="no-print" style={{ marginBottom: "0.5rem" }}>
@@ -289,7 +369,7 @@ export default function HomeWineryKit() {
                           lineHeight: 1.4,
                         }}
                       >
-                        {item.name}
+                        {convertForUnits(item.name, units)}
                       </p>
                       {item.note && (
                         <p
@@ -300,7 +380,7 @@ export default function HomeWineryKit() {
                             lineHeight: 1.4,
                           }}
                         >
-                          {item.note}
+                          {convertForUnits(item.note, units)}
                         </p>
                       )}
                     </div>
@@ -317,8 +397,8 @@ export default function HomeWineryKit() {
                 >
                   <div style={{ width: "16px", height: "16px", border: "1px solid #999", borderRadius: "2px", flexShrink: 0, marginTop: "2px" }} />
                   <div>
-                    <span style={{ fontSize: "0.875rem", fontWeight: 600 }}>{item.name}</span>
-                    {item.note && <span style={{ fontSize: "0.8rem", color: "#666", marginLeft: "0.4rem" }}>— {item.note}</span>}
+                    <span style={{ fontSize: "0.875rem", fontWeight: 600 }}>{convertForUnits(item.name, units)}</span>
+                    {item.note && <span style={{ fontSize: "0.8rem", color: "#666", marginLeft: "0.4rem" }}>— {convertForUnits(item.note, units)}</span>}
                   </div>
                 </div>
               ))}
@@ -347,7 +427,7 @@ export default function HomeWineryKit() {
             Have a question about your kit?
           </p>
           <p style={{ fontSize: "0.8125rem", color: "var(--ow-text-lo)", marginBottom: "1.25rem", lineHeight: 1.6 }}>
-            Ask Ownology's Home Winemaker AI — it knows your equipment, your kit schedule, and common faults.
+            Ask Ownology&apos;s Home Winemaker AI — it knows your equipment, your kit schedule, and common faults.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             {[
