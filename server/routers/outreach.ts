@@ -824,7 +824,12 @@ export const outreachRouter = router({
    *
    *  Filters:
    *    - status in ('cold','lukewarm') — skip already-warm and already-engaged
-   *    - smsSentAt IS NULL — hasn't been contacted yet
+   *    - No outbound touch on ANY channel yet: sms_sent_at, email_sent_at,
+   *      insta_contacted_at, linkedin_contacted_at, facebook_contacted_at all
+   *      NULL. Any one of these being set means the operator has already
+   *      reached out — the contact belongs on the pipeline board, not the
+   *      first-touch queue. (Jul 2026 — was SMS-only until we added the
+   *      social-channel markers.)
    *
    *  Returns rows sorted by score DESC, then by createdAt ASC (older first
    *  to work through the backlog). Includes derived fields the UI needs
@@ -834,7 +839,14 @@ export const outreachRouter = router({
     const rows = await db
       .select()
       .from(schema.outreachContacts)
-      .where(sql`(status IN ('cold','lukewarm')) AND sms_sent_at IS NULL`)
+      .where(sql`
+        (status IN ('cold','lukewarm'))
+        AND sms_sent_at IS NULL
+        AND email_sent_at IS NULL
+        AND insta_contacted_at IS NULL
+        AND linkedin_contacted_at IS NULL
+        AND facebook_contacted_at IS NULL
+      `)
       .orderBy(desc(schema.outreachContacts.createdAt));
 
     const scored = rows.map((c) => {

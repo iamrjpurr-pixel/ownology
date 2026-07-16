@@ -4,6 +4,14 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Jul 2026 — Queue filter respects ALL outbound channels
+
+**Problem.** The Today's-Top-5 filter was SMS-only: `sms_sent_at IS NULL`. Meaning a contact you'd reached via Instagram DM, LinkedIn message, or Facebook would stay at the top of the queue forever until you also happened to SMS them — which is silly given IG-only contacts (Tim Stock, Sarah Feehan) have no SMS path in the first place. Caught by Rich when Tim reappeared after being DMed: "1. fixed already?? tim not in the top 5 anymore; since i sent him a message; check;" — the honest answer was no, Tim was only gone because of a stale SMS-sent flag, not the new Insta mark.
+
+**Fix.** `outreach.outboundQueue` filter now excludes contacts with a timestamp on ANY of the five outbound-channel columns: `sms_sent_at`, `email_sent_at`, `insta_contacted_at`, `linkedin_contacted_at`, `facebook_contacted_at`. Any one tick and the contact drops off the queue. Verified live: Andre Bondar (Bondar Wines, top-5 rank #2) marked LinkedIn-contacted via curl; queue shrank from 214 → 213 rows, Andre gone. Status also auto-nudged cold → lukewarm so he lands in the right pipeline-board column.
+
+**What this means daily.** Tomorrow's top-5 will be five FRESH prospects rather than the same five you already DMed / emailed yesterday. Combined with the nightly IG-backfill cron, the backlog burns down evenly regardless of which channel you actually used to touch each row.
+
 ### Jul 2026 — Social-channel contacted markers on the contact card
 
 **Problem.** The contact card only surfaced two "sent" markers (Mark SMS sent · ✓ Emailed) and one status flip (Mark booked). Winemakers reached via Instagram DM, LinkedIn message, or Facebook message had no way to be marked contacted — so the queue's SMS-null filter kept them at the top forever even after the operator had sent them a DM.
