@@ -6,7 +6,7 @@ import { Route, Switch, Redirect, useLocation } from "wouter";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { AuthProvider } from "@/lib/useAuth";
+import { AuthProvider, useAuth } from "@/lib/useAuth";
 // Removed (Feb 2026, Rich): ThemeToggle, ThemeSuggestion, ThemeOnboarding,
 // AdminQrBadge — user-facing theme picker + QR badge floating pills gone.
 // AutoThemeByTime (defined below) handles theme via time-of-day.
@@ -268,13 +268,45 @@ function KnowledgePage() {
 }
 
 /**
- * MobileRedirect — auto-routes mobile users to Work Mode on first visit to /
- * Desktop users see the marketing homepage as normal.
- * A sessionStorage flag prevents re-redirecting during the same session.
+ * MobileHomeRoute — auto-routes visitors on the root path.
+ *
+ * PWA launches (Windows taskbar, iOS/Android home-screen icon) should NEVER
+ * dump users onto the public marketing page — Rich (Feb 2026): "as I open
+ * it I get the landing page with three or four options, no direct link that
+ * I should be logged in as admin". Fix: manifest start_url is `/?src=pwa` and
+ * we also detect `display-mode: standalone`. Either → session-aware jump:
+ *
+ *   • authed  → /dashboard   (admins keep going to /admin via UserMenu)
+ *   • anon    → /login
+ *
+ * Browser visits keep the marketing homepage, and mobile-first visitors are
+ * still routed to Work Mode on first session (unchanged).
  */
 function MobileHomeRoute() {
   const [, navigate] = useLocation();
+  const { user, status } = useAuth();
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // ── PWA launch: session-aware routing (Feb 2026, Rich) ─────────────
+    const params = new URLSearchParams(window.location.search);
+    const isStandalone =
+      window.matchMedia?.("(display-mode: standalone)").matches ||
+      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+    const pwaFlag = params.get("src") === "pwa";
+    if (isStandalone || pwaFlag) {
+      // Wait for auth to resolve before jumping — otherwise we'd flash /login
+      // for a signed-in user while /me is still in flight.
+      if (status === "loading") return;
+      if (user) {
+        navigate("/dashboard", { replace: true });
+      } else {
+        navigate("/login?next=%2Fdashboard&reason=pwa_launch", { replace: true });
+      }
+      return;
+    }
+
+    // ── Browser visits (existing behaviour) ────────────────────────────
     // S8-I: First-visit orientation redirect.
     // New users (no ownology_guide_seen flag) are sent to /guide once.
     // The Guide page sets ownology_guide_seen on mount, so this fires only once.
@@ -294,7 +326,7 @@ function MobileHomeRoute() {
       sessionStorage.setItem("ow_mobile_redirected", "1");
       navigate("/free-run", { replace: true });
     }
-  }, [navigate]);
+  }, [navigate, status, user]);
   return <Home />;
 }
 

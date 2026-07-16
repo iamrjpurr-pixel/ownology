@@ -2,7 +2,7 @@
   "name": "Ownology — AI for Winemakers",
   "short_name": "Ownology",
   "description": "AI Knowledge Assistant for boutique winemakers. Cellar log, batch book, compliance, and more.",
-  "start_url": "/",
+  "start_url": "/?src=pwa",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#1a1512",

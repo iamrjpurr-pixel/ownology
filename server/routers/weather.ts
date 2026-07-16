@@ -408,12 +408,13 @@ export const weatherRouter = router({
           label: DEFAULT_LABEL,
           isDefault: true,
         },
+        region: null as string | null,
         cellarType: "passive" as const,
         thresholds: DEFAULT_THRESHOLDS,
       };
     }
     const rows = await db.execute(sql`
-      SELECT location_lat, location_lng, location_label, cellar_type, weather_thresholds_json
+      SELECT location_lat, location_lng, location_label, region, cellar_type, weather_thresholds_json
       FROM wineries WHERE id = ${wineryId} LIMIT 1
     `);
     const row = Array.isArray(rows) && Array.isArray(rows[0])
@@ -421,6 +422,7 @@ export const weatherRouter = router({
           location_lat: number | null;
           location_lng: number | null;
           location_label: string | null;
+          region: string | null;
           cellar_type: string | null;
           weather_thresholds_json: string | null;
         } | undefined)
@@ -441,6 +443,7 @@ export const weatherRouter = router({
         label: row?.location_label || DEFAULT_LABEL,
         isDefault: !hasCoords,
       },
+      region: row?.region ?? null,
       cellarType: (row?.cellar_type || "passive") as "passive" | "active" | "mixed",
       thresholds,
     };
@@ -457,6 +460,7 @@ export const weatherRouter = router({
         lat: z.number().min(-90).max(90).optional(),
         lng: z.number().min(-180).max(180).optional(),
         label: z.string().max(255).optional(),
+        region: z.string().max(128).optional(),
         cellarType: z.enum(["passive", "active", "mixed"]).optional(),
         thresholds: z
           .object({
@@ -507,6 +511,7 @@ export const weatherRouter = router({
           location_lat = COALESCE(${input.lat ?? null}, location_lat),
           location_lng = COALESCE(${input.lng ?? null}, location_lng),
           location_label = COALESCE(${input.label ?? null}, location_label),
+          region = COALESCE(${input.region ?? null}, region),
           cellar_type = COALESCE(${input.cellarType ?? null}, cellar_type),
           weather_thresholds_json = ${mergedJson}
         WHERE id = ${ctx.wineryId}

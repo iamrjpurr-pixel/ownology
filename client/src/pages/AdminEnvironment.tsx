@@ -52,6 +52,7 @@ export default function AdminEnvironment() {
   const utils = trpc.useContext();
 
   const [label, setLabel] = useState("");
+  const [region, setRegion] = useState("");
   const [lat, setLat] = useState<string>("");
   const [lng, setLng] = useState<string>("");
   const [cellarType, setCellarType] = useState<"passive" | "active" | "mixed">("passive");
@@ -66,15 +67,28 @@ export default function AdminEnvironment() {
   const [geoQuery, setGeoQuery] = useState("");
   const [geoResults, setGeoResults] = useState<GeoResult[]>([]);
   const [geoBusy, setGeoBusy] = useState(false);
+  const [gpsBusy, setGpsBusy] = useState(false);
+  const [gpsError, setGpsError] = useState<string | null>(null);
+  const [cacheStatus, setCacheStatus] = useState<string | null>(null);
+  const [buildInfo, setBuildInfo] = useState<{ commit?: string; swCacheVersion?: string; latestChange?: string } | null>(null);
 
   useEffect(() => {
     if (!config.data) return;
     setLabel(config.data.location.label);
     setLat(String(config.data.location.lat));
     setLng(String(config.data.location.lng));
+    setRegion(config.data.region ?? "");
     setCellarType(config.data.cellarType);
     setThresholds({ ...thresholds, ...config.data.thresholds });
   }, [config.data]);
+
+  // One-shot fetch of the current build manifest for the version chip.
+  useEffect(() => {
+    fetch("/api/build-info", { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && setBuildInfo(d))
+      .catch(() => { /* offline — non-fatal */ });
+  }, []);
 
   const runGeo = async () => {
     setGeoBusy(true);
@@ -89,8 +103,59 @@ export default function AdminEnvironment() {
     setLat(String(g.latitude));
     setLng(String(g.longitude));
     setLabel([g.name, g.admin1, g.country].filter(Boolean).join(", "));
+    // Auto-fill region from admin1 (state / wine region) if it's currently empty
+    // — keeps the wineries.region column in step with the coords without
+    // requiring the operator to hand-type it. They can always edit after.
+    if (!region.trim() && g.admin1) setRegion(g.admin1);
     setGeoResults([]);
     setGeoQuery("");
+  };
+
+  const useCurrentGps = () => {
+    if (!navigator.geolocation) {
+      setGpsError("Geolocation not supported in this browser.");
+      return;
+    }
+    setGpsBusy(true);
+    setGpsError(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLat(pos.coords.latitude.toFixed(5));
+        setLng(pos.coords.longitude.toFixed(5));
+        setGpsBusy(false);
+      },
+      (err) => {
+        setGpsBusy(false);
+        setGpsError(
+          err.code === err.PERMISSION_DENIED
+            ? "Permission denied. Enable location in your browser."
+            : err.code === err.POSITION_UNAVAILABLE
+            ? "Location unavailable — try again in a moment."
+            : "Could not read location.",
+        );
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60_000 },
+    );
+  };
+
+  const resetAppCache = async () => {
+    setCacheStatus("Clearing…");
+    try {
+      // 1. Wipe every Cache Storage bucket owned by this origin.
+      if ("caches" in window) {
+        const names = await caches.keys();
+        await Promise.all(names.map((n) => caches.delete(n)));
+      }
+      // 2. Unregister every service worker so the next load fetches a fresh one.
+      if (navigator.serviceWorker) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+      }
+      setCacheStatus("Cleared — reloading…");
+      setTimeout(() => window.location.reload(), 400);
+    } catch (e) {
+      setCacheStatus(`Failed: ${e instanceof Error ? e.message : "unknown"}`);
+    }
   };
 
   const submit = () => {
@@ -98,6 +163,7 @@ export default function AdminEnvironment() {
       lat: Number(lat),
       lng: Number(lng),
       label: label.trim() || undefined,
+      region: region.trim() || undefined,
       cellarType,
       thresholds,
     }, {
@@ -151,7 +217,22 @@ export default function AdminEnvironment() {
             >
               {geoBusy ? "Searching…" : "Look up"}
             </button>
+            <button
+              data-testid="admin-env-use-gps"
+              type="button"
+              onClick={useCurrentGps}
+              disabled={gpsBusy}
+              title="Fill lat/lng with your current device location"
+              style={{ background: "transparent", color: AMBER, border: `1px solid ${AMBER}`, padding: "0.55rem 1rem", borderRadius: 4, fontWeight: 700, cursor: gpsBusy ? "wait" : "pointer", fontFamily: SANS, fontSize: "0.85rem" }}
+            >
+              {gpsBusy ? "Reading…" : "Use my GPS"}
+            </button>
           </div>
+          {gpsError && (
+            <p data-testid="admin-env-gps-error" style={{ fontFamily: SANS, fontSize: "0.78rem", color: "oklch(0.65 0.18 25)", margin: "0 0 0.5rem" }}>
+              {gpsError}
+            </p>
+          )}
 
           {geoResults.length > 0 && (
             <div data-testid="admin-env-geo-results" style={{ marginBottom: "0.75rem", background: RAISED, border: `1px solid ${BORDER}`, borderRadius: 4, padding: "0.35rem 0" }}>
@@ -184,6 +265,39 @@ export default function AdminEnvironment() {
             <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
               <span style={{ fontSize: "0.68rem", color: LO, letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 700, fontFamily: SANS }}>Display label</span>
               <input data-testid="admin-env-label" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Ownology Cellars · Pokolbin, Hunter Valley" style={inp} />
+            </label>
+          </div>
+
+          <div style={{ marginTop: "0.65rem" }}>
+            <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+              <span style={{ fontSize: "0.68rem", color: LO, letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 700, fontFamily: SANS }}>
+                Wine region
+              </span>
+              <input
+                data-testid="admin-env-region"
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+                placeholder="Hunter Valley"
+                style={inp}
+                list="admin-env-region-list"
+              />
+              <datalist id="admin-env-region-list">
+                <option value="Hunter Valley" />
+                <option value="Barossa Valley" />
+                <option value="Adelaide Hills" />
+                <option value="McLaren Vale" />
+                <option value="Yarra Valley" />
+                <option value="Margaret River" />
+                <option value="Coonawarra" />
+                <option value="Clare Valley" />
+                <option value="Mornington Peninsula" />
+                <option value="Tasmania" />
+                <option value="Marlborough" />
+                <option value="Central Otago" />
+              </datalist>
+              <span style={{ fontSize: "0.72rem", color: LO, fontFamily: SANS, marginTop: "0.1rem" }}>
+                Free-text — used across contact filters and regional intelligence prompts.
+              </span>
             </label>
           </div>
         </section>
@@ -272,6 +386,75 @@ export default function AdminEnvironment() {
           <strong style={{ color: HI }}>Data source:</strong> Open-Meteo (free tier, CC-BY-4.0, no auth). Refreshes every 5 min on the Dashboard widget.{" "}
           <Link href="/risk-briefing" style={{ color: AMBER }}>Learn more about Tier 3 risk →</Link>
         </div>
+
+        {/* ── App version + cache reset ── */}
+        <section
+          data-testid="admin-env-app-cache"
+          style={{ marginTop: "1.5rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 8, padding: "1.25rem 1.35rem" }}
+        >
+          <h2 style={{ fontFamily: SERIF, fontSize: "1.2rem", color: HI, margin: 0, marginBottom: "0.4rem" }}>
+            App version + cache
+          </h2>
+          <p style={{ fontFamily: SANS, fontSize: "0.82rem", color: MID, marginBottom: "0.85rem", lineHeight: 1.55 }}>
+            Confirm the installed PWA is on the latest build. If a customer says the app looks stale,
+            tap <em>Reset app cache</em> and reload — service worker + Cache Storage are wiped, and the
+            next load pulls fresh bundles from the server.
+          </p>
+          <div
+            data-testid="admin-env-build-chip"
+            style={{
+              display: "inline-block",
+              padding: "0.35rem 0.7rem",
+              background: RAISED,
+              border: `1px solid ${BORDER}`,
+              borderRadius: 4,
+              fontFamily: MONO,
+              fontSize: "0.75rem",
+              color: HI,
+              marginBottom: "0.85rem",
+            }}
+          >
+            <span style={{ color: LO }}>build</span>{" "}
+            <strong style={{ color: AMBER }}>{buildInfo?.commit ?? "…"}</strong>
+            {buildInfo?.swCacheVersion && (
+              <>
+                {" · "}<span style={{ color: LO }}>sw</span>{" "}
+                <span>{buildInfo.swCacheVersion}</span>
+              </>
+            )}
+            {buildInfo?.latestChange && (
+              <>
+                {" · "}<span style={{ color: LO }}>last change</span>{" "}
+                <span style={{ fontFamily: SANS }}>{buildInfo.latestChange}</span>
+              </>
+            )}
+          </div>
+          <div style={{ display: "flex", gap: "0.7rem", alignItems: "center", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              data-testid="admin-env-reset-cache"
+              onClick={resetAppCache}
+              style={{
+                background: "transparent",
+                color: AMBER,
+                border: `1px solid ${AMBER}`,
+                padding: "0.5rem 1.1rem",
+                borderRadius: 4,
+                fontWeight: 700,
+                fontFamily: SANS,
+                fontSize: "0.85rem",
+                cursor: "pointer",
+              }}
+            >
+              Reset app cache
+            </button>
+            {cacheStatus && (
+              <span data-testid="admin-env-cache-status" style={{ fontFamily: SANS, fontSize: "0.85rem", color: MID }}>
+                {cacheStatus}
+              </span>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );

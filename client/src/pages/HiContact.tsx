@@ -28,7 +28,7 @@
  * Fires outreach.markViewed on mount so the owner sees who opened the
  * link in /admin/contacts.
  */
-import { CSSProperties, useEffect, useRef } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useRoute, Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAutoCascade } from "@/hooks/useAutoCascade";
@@ -75,6 +75,7 @@ export default function HiContact() {
   const markViewed = trpc.outreach.markViewed.useMutation();
   const markCtaClicked = trpc.outreach.markCtaClicked.useMutation();
   const fired = useRef(false);
+  const [smsCopyHint, setSmsCopyHint] = useState<string | null>(null);
 
   // Auto-fire the harvest crush cascade ~2.5s after the SMS prospect lands,
   // matched to their winery profile. One-shot per browser tab.
@@ -121,6 +122,37 @@ export default function HiContact() {
 
   function logCtaClick() {
     if (contact?.slug) markCtaClicked.mutate({ slug: contact.slug });
+  }
+
+  /** Desktop OSes (Windows, macOS without Messages continuity) have no
+   *  registered `sms:` handler, so clicking the CTA pops a "Pick an app"
+   *  chooser. On desktop we intercept the click, parse the number + body
+   *  out of the sms: URI, copy the pre-filled text + phone number to
+   *  the clipboard, and show a tiny confirmation strip. Phones keep the
+   *  native `sms:` behaviour. Feb 2026, Rich. */
+  function handleSmsCtaClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    logCtaClick();
+    if (typeof window === "undefined") return;
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    if (isTouch) return; // phones + tablets — native sms: works fine
+    e.preventDefault();
+    const href = smsReplyHref || "";
+    // sms:<number>?[&]body=<encoded>  — split on the query separator
+    const numMatch = href.match(/^sms:([^?&]+)/i);
+    const bodyMatch = href.match(/[?&]body=([^&]+)/i);
+    const number = numMatch ? decodeURIComponent(numMatch[1]) : "";
+    const body = bodyMatch ? decodeURIComponent(bodyMatch[1]) : "";
+    const combined = body ? `${body}\n\n(Text this to ${number})` : number;
+    const okMsg = `Copied. Text this to ${number} from your phone.`;
+    const failMsg = `Text ${number}: "${body}"`;
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(combined).then(
+        () => setSmsCopyHint(okMsg),
+        () => setSmsCopyHint(failMsg),
+      );
+    } else {
+      setSmsCopyHint(failMsg);
+    }
   }
 
   const tryNowHref = contact.sampleVintageLogUrl
@@ -326,15 +358,35 @@ export default function HiContact() {
 
         {/* Primary CTA — A/B variant chosen server-side per slug */}
         {ctaVariant === "reply" && smsReplyHref ? (
-          <a
-            href={smsReplyHref}
-            data-testid="hi-cta-primary"
-            data-cta-variant="reply"
-            onClick={logCtaClick}
-            style={btnPrimary}
-          >
-            Text me to lock my onboarding →
-          </a>
+          <>
+            <a
+              href={smsReplyHref}
+              data-testid="hi-cta-primary"
+              data-cta-variant="reply"
+              onClick={handleSmsCtaClick}
+              style={btnPrimary}
+            >
+              Text me to lock my onboarding →
+            </a>
+            {smsCopyHint && (
+              <p
+                data-testid="hi-cta-sms-hint"
+                style={{
+                  marginTop: "0.6rem",
+                  fontFamily: SANS,
+                  fontSize: "0.82rem",
+                  color: "var(--ow-text-mid)",
+                  lineHeight: 1.45,
+                  padding: "0.55rem 0.75rem",
+                  background: "color-mix(in oklch, var(--ow-amber) 8%, transparent)",
+                  border: "1px solid color-mix(in oklch, var(--ow-amber) 35%, transparent)",
+                  borderRadius: 6,
+                }}
+              >
+                {smsCopyHint}
+              </p>
+            )}
+          </>
         ) : calendlyUrl ? (
           <a
             href={calendlyUrl}

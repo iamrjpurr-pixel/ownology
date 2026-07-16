@@ -4,6 +4,22 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Jul 2026 — PWA session-aware launch + version banner + cache reset + desktop-safe SMS + region editor
+
+**PWA launch no longer dumps users on marketing.** Rich reported: "I have the PWA installed in my taskbar on Windows PC. But as I open it, I get the landing page with three or four other options, and no direct link to the fact that I should be logged in as a user and administrator." Fix landed across three files:
+
+  * `client/public/manifest.json` — `start_url` bumped from `/` to `/?src=pwa` so the SPA can positively identify a PWA launch even where `display-mode: standalone` is unreliable (Windows Edge PWAs sometimes report neither).
+  * `client/src/App.tsx` `MobileHomeRoute` — added an early branch: if `?src=pwa` OR `matchMedia("(display-mode: standalone)")` OR iOS `navigator.standalone`, wait for auth to resolve, then hard-redirect to `/dashboard` (authed) or `/login?next=/dashboard&reason=pwa_launch` (anon). Browser visits keep the marketing homepage + the existing first-visit `/guide` + mobile-→-Free-Run behaviour.
+  * Verified live via Playwright: `/?src=pwa` (dev-bypass authed) → final URL `/dashboard`.
+
+**Fresh-build detection: `New version available` banner + auto-poll.** `registerServiceWorker.ts` now watches for a waiting SW (from `registration.waiting` on load AND `updatefound` events), shows a small amber top-right toast with a "Refresh" button, and sends `SKIP_WAITING` when tapped. SW listens for that message and immediately activates the new bundle → existing `controllerchange` handler auto-reloads. Also polls `registration.update()` every 30 min so long-lived tabs pick up deploys without a manual reload. `sw.js` gets a matching `message` handler.
+
+**`/admin/environment` gains a "App version + cache" section.** Displays the current commit hash, SW cache version, and the top CHANGELOG title (pulled from `/api/build-info`), plus a **Reset app cache** button that wipes every Cache Storage bucket, unregisters every service worker, and reloads. This is the one-tap escape hatch for any "the app looks stale" report — for Rich AND any founding member on a locked-up PWA.
+
+**P0 — Winery region editor.** `/admin/environment` now exposes an editable **Wine region** field (with an AU/NZ region datalist for one-tap autocomplete) that persists to `wineries.region` via a `region` field added to the `weather.saveWineryConfig` tRPC input + the SQL UPDATE. `getWineryConfig` returns `region` too, and picking a geocoder result auto-fills the region from `admin1` (state) if it's currently blank. Replaces the manual SQL script used in the last session to fix Rich's coordinates. Also added a **"Use my GPS"** button next to Look up that fills lat/lng from `navigator.geolocation.getCurrentPosition` (high-accuracy, 8 s timeout, ambient permission errors surfaced inline).
+
+**Desktop `sms:` links no longer open the OS "Pick an application" dialog.** Rich screenshotted Windows popping `Open Pick an application?` when clicking `Text me to lock my onboarding →` on `/hi/<slug>`. On desktop (fine pointer), `HiContact.tsx` now intercepts the click, parses the number + prefilled body out of the `sms:` URI, copies both to the clipboard, and shows an inline amber-tinted confirmation strip ("Copied. Text this to +61408105067 from your phone."). Touch devices (phones + tablets) keep native `sms:` behaviour — one tap opens Messages with the body prefilled, unchanged.
+
 ### Jul 2026 — Winery location fix + RED-keyword removal + PWA install nudge + admin/users page
 
 **Winery id=1 coordinates corrected.** Rich flagged that his phone was reporting Barossa Valley weather. Root cause: `wineries.id=1` had `region="Hunter Valley, NSW"` but `location_lat/lng=-34.535, 138.958` which are Tanunda, Barossa coords, plus a stale `location_label="Ownology Cellars · Tanunda, Barossa Valley"` and `owner_user_id=1` (a phantom user, not Rich's actual id=2). WeatherWidget reads the coords, not the region label — so it was correctly fetching Barossa weather for the wrong-but-real coords. Fixed via one-shot DB update: coords → Pokolbin (-32.7833, 151.3025), label → "Ownology Cellars · Pokolbin, Hunter Valley NSW", owner → user id=2 (Rich).

@@ -4,6 +4,13 @@
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
 
+**Jul 2026 session — PWA session-aware launch + version banner + cache reset + desktop-safe SMS + region editor — SHIPPED (this session):**
+- **PWA launch UX fix:** manifest `start_url` bumped to `/?src=pwa`; `MobileHomeRoute` detects PWA (query flag OR `display-mode: standalone` OR iOS `navigator.standalone`) and jumps authed users straight to `/dashboard` (anons to `/login?next=/dashboard`). No more marketing tiles when opening from the taskbar.
+- **New-version banner:** `registerServiceWorker.ts` shows a top-right amber "New version available — Refresh" toast when a waiting SW is detected on load or via `updatefound`. Also polls `registration.update()` every 30 min so long-lived tabs auto-detect deploys. `sw.js` gains `message` handler for `SKIP_WAITING`.
+- **Cache reset self-serve:** `/admin/environment` gains a build chip (commit + SW version + last change) and a `Reset app cache` button that wipes Cache Storage + unregisters all SWs + reloads.
+- **P0 — Winery region editor:** `/admin/environment` gains an editable `Wine region` field (with AU/NZ datalist) that persists via a `region` field added to `weather.saveWineryConfig`. Geocoder pick auto-fills region from `admin1` when blank. `Use my GPS` button also added (browser geolocation with error surfacing).
+- **Desktop `sms:` fix:** `/hi/:slug` CTA no longer triggers Windows "Pick an application" dialog. On desktop (fine pointer), click copies phone + prefilled body to clipboard and shows an inline confirmation. Touch devices keep native SMS behaviour.
+
 **Feb 2026 session — Sender sweep + Reply follow-up generator + Brand assets — SHIPPED (this session):**
 - Sender sweep: `Jamie` → `Rich` across 5 code files + 51 DB SMS drafts. Zero residues remain.
 - Reply follow-up generator: new `outreach.replyFollowupAI` uses Claude to draft the next SMS grounded in the pasted reply text + sentiment. UI adds an expandable colour-coded reply block on `/admin/contacts/engagement` Replied bucket with `✨ Draft follow-up` + Copy SMS.
