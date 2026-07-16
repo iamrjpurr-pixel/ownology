@@ -25,18 +25,20 @@ const PREVIEW_BASE = typeof window !== "undefined" ? window.location.origin : ""
 // (Kept duplicated here rather than shared because AdminContacts's copies
 // are inside its own module scope. Refactoring to a shared lib is a
 // clean follow-up; not blocking today's outbound-queue ship.)
-function smsDraft(c: { firstName: string; winery?: string | null; painPoint?: string | null; hookText?: string | null; slug: string }): string {
+// Frontend fallback SMS template — only used when the queue payload
+// doesn't include a server-rendered `opener` field (e.g. hot-reload race,
+// or a variant misconfig). The real source of truth for first-contact
+// copy is now the `sms_opener_variants` table + smsOpeners router
+// (Jul 2026, Rich — controlled A/B cycling of psychology angles).
+function smsDraft(c: { firstName: string; winery?: string | null; painPoint?: string | null; hookText?: string | null; slug: string; opener?: string | null }): string {
+  // Server-rendered variant wins. Includes any operator-hand-crafted override.
+  if (c.opener && c.opener.trim().length > 0) return c.opener;
+
   const url = `${PREVIEW_BASE}/hi/${c.slug}`;
-  if (c.hookText) {
-    const wineryBit = c.winery ? ` (${c.winery})` : "";
-    return `g'day ${c.firstName}${wineryBit} — ${c.hookText}. i've been building a cellar AI grounded in your own vintage logs — 90 sec look: ${url} — Rich P · 0408 105 067`;
-  }
-  if (c.painPoint) {
-    const wineryBit = c.winery ? ` (${c.winery})` : "";
-    return `G'day ${c.firstName} — we crossed paths the other day${wineryBit}. You mentioned ${c.painPoint}; I've since built a cellar AI that answers exactly that, grounded in your own vintage logs. 90 sec look: ${url} — Rich P · 0408 105 067`;
-  }
-  const wineryBit = c.winery ? `, sending this to ${c.winery} too` : "";
-  return `G'day ${c.firstName} — we crossed paths the other day${wineryBit}. I've since built a cellar AI grounded in your own vintage logs — figured you might find it useful. 90 sec look: ${url} — Rich P · 0408 105 067`;
+  const wineryOr = c.winery ? ` at ${c.winery}` : "";
+  // Continuity-lens fallback — matches the smsOpeners.render fallback
+  // exactly so the two paths never disagree.
+  return `Hi ${c.firstName}${wineryOr} — I've built a cellar record that pins quality panels, vintage-log reasoning, and asset trail into one thread, so a decade of craft doesn't walk out the door with the next handover. ${url} · 90 seconds if it resonates. — Rich P · 0408 105 067`;
 }
 
 // ── Instagram / LinkedIn extraction from the notes field ────────────────
@@ -173,7 +175,7 @@ export default function AdminOutboundQueue() {
       .filter((c) => c.mobileAu && c.mobileAu.trim().length > 0)
       .map((c) => {
         const draft = (c as { smsDraftOverride?: string | null }).smsDraftOverride
-          ?? smsDraft({ firstName: c.firstName, winery: c.winery, painPoint: c.painPoint, hookText: c.hookText, slug: c.slug });
+          ?? smsDraft({ firstName: c.firstName, winery: c.winery, painPoint: c.painPoint, hookText: c.hookText, slug: c.slug, opener: (c as { opener?: string | null }).opener });
         const name = `${c.firstName}${c.lastName ? ` ${c.lastName}` : ""}`;
         return `${name}\t${c.mobileAu}\t${draft}`;
       });
@@ -288,7 +290,7 @@ export default function AdminOutboundQueue() {
               const email = extractEmailFromNotes(c.notes);
               const igHandle = extractInstagramFromNotes(c.notes);
               const linkedin = extractLinkedinFromNotes(c.notes);
-              const sms = smsDraft({ firstName: c.firstName, winery: c.winery, painPoint: c.painPoint, hookText: c.hookText, slug: c.slug });
+              const sms = smsDraft({ firstName: c.firstName, winery: c.winery, painPoint: c.painPoint, hookText: c.hookText, slug: c.slug, opener: (c as { opener?: string | null }).opener });
               const igMsg = igDmDraft({ firstName: c.firstName, winery: c.winery, hookText: c.hookText, painPoint: c.painPoint });
               const state = copied[c.slug];
 
@@ -640,7 +642,7 @@ export default function AdminOutboundQueue() {
           const email = extractEmailFromNotes(c.notes);
           const igHandle = extractInstagramFromNotes(c.notes);
           const linkedin = extractLinkedinFromNotes(c.notes);
-          const sms = smsDraft({ firstName: c.firstName, winery: c.winery, painPoint: c.painPoint, hookText: c.hookText, slug: c.slug });
+          const sms = smsDraft({ firstName: c.firstName, winery: c.winery, painPoint: c.painPoint, hookText: c.hookText, slug: c.slug, opener: (c as { opener?: string | null }).opener });
           const igMsg = igDmDraft({ firstName: c.firstName, winery: c.winery, hookText: c.hookText, painPoint: c.painPoint });
           const state = copied[c.slug];
           return (

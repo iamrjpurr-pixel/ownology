@@ -4,7 +4,7 @@
  * first opened / demo booked timestamps.
  */
 import { z } from "zod";
-import { eq, sql, desc, isNull, and } from "drizzle-orm";
+import { eq, sql, desc, isNull, and, asc } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure } from "../trpc.js";
 import { db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
@@ -384,7 +384,46 @@ export const outreachRouter = router({
       return { ...c, hasEmail, hasMobile: hasAuMobile, channel, score };
     });
     scored.sort((a, b) => (b.score - a.score) || (a.createdAt ?? 0) - (b.createdAt ?? 0));
-    return { queue: scored };
+
+    // ── First-contact SMS opener (server-rendered) ────────────────────
+    // The Jul 2026 opener-variants system lives in `sms_opener_variants`.
+    // Load actives once, pick per slug via stable-hash, interpolate. Any
+    // contact already carrying a hand-crafted `smsDraftOverride` wins over
+    // the variant (respects operator polish). See smsOpeners router for
+    // rationale + the fallback template.
+    const actives = await db
+      .select()
+      .from(schema.smsOpenerVariants)
+      .where(eq(schema.smsOpenerVariants.active, 1))
+      .orderBy(asc(schema.smsOpenerVariants.sortIndex));
+    const previewBase = (process.env.PUBLIC_APP_URL?.trim() || process.env.CANONICAL_HOST?.trim() || "https://ownology.ai").replace(/\/$/, "");
+    const stableHash = (s: string): number => {
+      let h = 5381;
+      for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+      return Math.abs(h);
+    };
+    const withOpener = scored.map((c) => {
+      const url = `${previewBase}/hi/${c.slug}`;
+      const winery = c.winery ?? "";
+      const wineryOr = winery ? ` at ${winery}` : "";
+      const firstName = c.firstName ?? "there";
+      let openerVariantKey: string | null = null;
+      let opener: string | null = null;
+      if (c.smsDraftOverride && c.smsDraftOverride.trim()) {
+        opener = c.smsDraftOverride.trim();
+        openerVariantKey = "override";
+      } else if (actives.length > 0) {
+        const pick = actives[stableHash(c.slug) % actives.length];
+        opener = pick.template
+          .replaceAll("${firstName}", firstName)
+          .replaceAll("${winery}", winery)
+          .replaceAll("${wineryOr}", wineryOr)
+          .replaceAll("${url}", url);
+        openerVariantKey = pick.key;
+      }
+      return { ...c, opener, openerVariantKey };
+    });
+    return { queue: withOpener };
   }),
 
   /** OWNER — Stamp a contact as sent (SMS or email) and advance the

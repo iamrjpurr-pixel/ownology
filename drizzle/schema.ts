@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, int, bigint, text, mysqlEnum, index, boolean, float } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, int, bigint, text, mysqlEnum, index, boolean, float, tinyint } from "drizzle-orm/mysql-core";
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
@@ -1506,6 +1506,66 @@ export const outreachContacts = mysqlTable(
     index("oc_status_idx").on(t.status),
   ]
 );
+
+/**
+ * SMS opener variants — controlled A/B cycling for the first-contact SMS.
+ *
+ * The Perplexity-driven Claude "rewrite in region/brief/warm tone" path
+ * (outreach-ai-helpers::claudeRewriteOne) is kept for post-hoc polishing
+ * per-contact. But the FIRST TEMPLATE that lands on a fresh contact — the
+ * copy the operator sees in "Copy SMS" when they've never touched the
+ * card — is arguably the most important sentence in the whole product.
+ *
+ * The old flow generated it client-side from a single hardcoded template
+ * pushing "cellar AI grounded in your own vintage logs" + "worth 90 sec".
+ * Rich's Jul 2026 critique: flippant, missing pronoun, AI-first framing
+ * inverts the value stack (Trinity — quality × vintage-log × asset — IS
+ * the product; AI is a consequence).
+ *
+ * Fix: variants live in the DB. Operator marks one (or more) as active
+ * on /admin/sms-openers, previews against a real contact, and cycles at
+ * will. Each variant has:
+ *   - `lens`  — the psychology angle (continuity, vintage-fog, craft,
+ *                audit, legacy, custom). Tag only; no branching logic.
+ *   - `template` — string with `${firstName}` `${winery}` `${url}` and
+ *                  optional `${wineryOr}` (winery bit or empty).
+ *   - `active` — true when this variant is in the rotation.
+ * When multiple are active, we hash the contact slug to pick one
+ * deterministically — same prospect always sees the same opener across
+ * devices, so A/B measurement is clean.
+ */
+export const smsOpenerVariants = mysqlTable(
+  "sms_opener_variants",
+  {
+    id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
+    // Human-friendly slug used for URLs and log lines, e.g. "continuity-v1".
+    key: varchar("key", { length: 64 }).notNull().unique(),
+    // Display label on /admin/sms-openers.
+    name: varchar("name", { length: 128 }).notNull(),
+    // Psychology angle tag. Not enforced — free-text so Rich can
+    // introduce a new lens without a schema migration.
+    lens: varchar("lens", { length: 32 }).notNull(),
+    // The template with ${firstName}, ${winery}, ${wineryOr}, ${url}
+    // tokens. Kept as plain text; interpolation happens at render time.
+    template: text("template").notNull(),
+    // When true, this variant is eligible for rotation. Multiple can be
+    // active → deterministic hash-based selection per slug.
+    active: tinyint("active").notNull().default(1),
+    // Optional sort order for the admin list. Lower first.
+    sortIndex: int("sort_index").notNull().default(0),
+    // Free-text notes for Rich's own reference (why he wrote this one,
+    // what he's testing, first-response rate observations).
+    notes: text("notes"),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+    updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("sms_opener_active_idx").on(t.active),
+    index("sms_opener_lens_idx").on(t.lens),
+  ]
+);
+
+
 
 
 /**

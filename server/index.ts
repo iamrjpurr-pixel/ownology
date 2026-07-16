@@ -1628,6 +1628,78 @@ async function startServer() {
       console.warn("[bootstrap] founding_reservations table create skipped:", (e as Error).message);
     }
 
+    // ── SMS opener variants (Jul 2026, Rich) ─────────────────────────
+    // First-contact SMS templates managed as DB rows so Rich can cycle
+    // psychology angles (continuity / vintage-fog / craft / audit /
+    // legacy) without redeploying. Seeded once with 4 baseline variants;
+    // Rich can add more from /admin/sms-openers.
+    try {
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS sms_opener_variants (
+          id BIGINT AUTO_INCREMENT PRIMARY KEY,
+          \`key\` VARCHAR(64) NOT NULL UNIQUE,
+          name VARCHAR(128) NOT NULL,
+          lens VARCHAR(32) NOT NULL,
+          template TEXT NOT NULL,
+          active TINYINT NOT NULL DEFAULT 1,
+          sort_index INT NOT NULL DEFAULT 0,
+          notes TEXT,
+          created_at BIGINT NOT NULL,
+          updated_at BIGINT NOT NULL,
+          INDEX sms_opener_active_idx (active),
+          INDEX sms_opener_lens_idx (lens)
+        )
+      `);
+      const now = Date.now();
+      const seeds: Array<{ key: string; name: string; lens: string; template: string; active: number; sortIndex: number }> = [
+        {
+          key: "continuity-v1",
+          name: "Continuity · handover",
+          lens: "continuity",
+          sortIndex: 10,
+          active: 1,
+          template: `Hi \${firstName} — I've built a cellar record that pins quality panels, vintage-log reasoning, and asset trail into one thread, so a decade of craft doesn't walk out the door with the next handover. \${url} · 90 seconds if it resonates. — Rich P · 0408 105 067`,
+        },
+        {
+          key: "vintage-fog-v1",
+          name: "Vintage-fog · yesterday-self",
+          lens: "vintage-fog",
+          sortIndex: 20,
+          active: 0,
+          template: `Hi \${firstName} — day 40 of vintage, 2am, your own notebook reads like a stranger's. I've built a record where quality, vintage-log reasoning, and asset trail sit together, so your yesterday-self still makes sense. \${url} · Worth a look. — Rich P · 0408 105 067`,
+        },
+        {
+          key: "craft-compounding-v1",
+          name: "Craft · compounding vintage",
+          lens: "craft",
+          sortIndex: 30,
+          active: 0,
+          template: `Hi \${firstName} — every vintage seems to rediscover what the last one knew. I've built a cellar record that keeps quality panels, vintage-log reasoning, and asset trail woven into one thread, so your best 2023 calls sharpen the 2026 vintage. \${url} — Rich P · 0408 105 067`,
+        },
+        {
+          key: "audit-v1",
+          name: "Audit · one source of truth",
+          lens: "audit",
+          sortIndex: 40,
+          active: 0,
+          template: `Hi \${firstName}\${wineryOr} — audits reward one source of truth. I've built a cellar record where quality panels, vintage-log decisions, and asset trail live in one thread, so there's no scramble when APCO or a regulator asks about a specific batch. \${url} — Rich P · 0408 105 067`,
+        },
+      ];
+      for (const s of seeds) {
+        try {
+          await db.execute(sql`
+            INSERT INTO sms_opener_variants (\`key\`, name, lens, template, active, sort_index, created_at, updated_at)
+            VALUES (${s.key}, ${s.name}, ${s.lens}, ${s.template}, ${s.active}, ${s.sortIndex}, ${now}, ${now})
+            ON DUPLICATE KEY UPDATE \`key\` = \`key\`
+          `);
+        } catch (e) {
+          console.warn(`[bootstrap] sms_opener seed ${s.key} skipped:`, (e as Error).message);
+        }
+      }
+    } catch (e) {
+      console.warn("[bootstrap] sms_opener_variants table create skipped:", (e as Error).message);
+    }
+
     // ── Cellar equipment WBS expansion + batch traceability (Feb 2026) ──
     // Expand equipment_type enum from 9 → 19 values, add wbs_phase column,
     // and create the batch_equipment_uses junction table. Idempotent DDL.
