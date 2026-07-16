@@ -366,7 +366,7 @@ const FAQS = [
     a: "No. Credit pack credits never expire. We designed it this way deliberately \u2014 curiosity doesn't have a use-by date.",
   },
   {
-    q: "What is the Founding Member offer?",
+    q: "What is the Founding Cohort offer?",
     a: "The first 99 paid subscribers (member numbers 11–99) join the Founding Cohort · 2026: founding pricing locked for life, a permanent Founding Cohort badge, direct input into the product roadmap, and their name in the Meet the Cellar section (optional). Numbers 1–9 are reserved.",
   },
   {

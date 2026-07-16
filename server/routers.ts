@@ -1366,6 +1366,53 @@ const cellarTasksRouter = router({
       return { success: true };
     }),
 
+  /**
+   * Quick-entry hygiene log: create a Clean/Sanitise cellar task that is
+   * already completed (single-write, sidesteps the flaky drizzle MySQL
+   * insertId return path documented in db.ts:169). Feeds the Cellar Board
+   * RAG status — a completed 'sanitise' task resets the equipment
+   * sanitation freshness window (see getEquipmentSanitationStatus).
+   * Feb 2026 P1: wired from /quick-entry Clean/Sanitise tiles.
+   */
+  logCompleted: protectedProcedure
+    .input(
+      z.object({
+        equipmentName: z.string().min(1).max(128),
+        equipmentId: z.number().optional(),
+        taskType: z.enum(["clean", "sanitise"]),
+        methodNotes: z.string().max(2000).optional(),
+        completedBy: z.string().max(256).default("Me"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = await getUserByOpenId(ctx.user.openId);
+      if (!dbUser) throw new Error("User not found");
+      const now = Date.now();
+      const title =
+        input.taskType === "clean"
+          ? `Clean · ${input.equipmentName}`
+          : `Sanitise · ${input.equipmentName}`;
+      await db.insert(schema.cellarTasks).values({
+        userId: dbUser.id,
+        wineryId: dbUser.wineryId ?? null,
+        equipmentId: input.equipmentId ?? null,
+        equipmentName: input.equipmentName,
+        taskType: input.taskType as TaskType,
+        title,
+        methodNotes: input.methodNotes ?? null,
+        frequency: "Ad-hoc",
+        dueAt: null,
+        completedAt: now,
+        completedBy: input.completedBy,
+        aiGenerated: 0,
+        vesselId: null,
+        vesselType: null,
+        createdAt: now,
+        updatedAt: now,
+      });
+      return { success: true, taskType: input.taskType, equipmentName: input.equipmentName };
+    }),
+
   generateForEquipment: protectedProcedure
     .input(
       z.object({

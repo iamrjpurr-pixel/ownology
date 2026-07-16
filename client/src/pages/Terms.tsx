@@ -54,7 +54,7 @@ export default function Terms() {
           <li>You have the legal right to use the winery data you upload (it&apos;s yours, or you have permission).</li>
           <li>You won&apos;t use Ownology to break the law, defraud regulators, or fabricate compliance documents.</li>
           <li>You&apos;re responsible for the accuracy of what you log. Ownology&apos;s outputs (LIP compliance calc, Cellar Book PDF, Cellar Brief, Ask Ownology answers) are only as good as the data you put in.</li>
-          <li>You&apos;ll keep your gate password, login credentials, and account access confidential. One paid seat per account, except The Vigneron tier which includes three seats.</li>
+          <li>You&apos;ll keep your gate password, login credentials, and account access confidential. One paid seat per account by default; team seats roll out with The Vigneron tier as the multi-tenant platform lands.</li>
           <li>You won&apos;t abuse the AI features — no bulk-generating spam, no scraping our LLM outputs to train competing models.</li>
         </ul>
 
@@ -75,11 +75,12 @@ export default function Terms() {
 
         <h2 style={styles.h2}>Payment</h2>
         <ul style={styles.ul}>
-          <li><strong>The Cellar Hand</strong> — AUD $19/month or $190/year. Unlimited Compliance Agent queries, full lesson library, working board, 30 AI-tutor credits/month.</li>
-          <li><strong>The Press</strong> — AUD $49/month or $490/year. Everything in The Cellar Hand plus 150 AI-tutor credits/month, custom document upload, priority responses, vintage log PDF export.</li>
-          <li><strong>The Vigneron</strong> — AUD $99/month or $990/year. Everything in The Press plus unlimited AI credits, three team seats, dedicated onboarding, and an annual knowledge-base review alert.</li>
-          <li><strong>Founding Members</strong> (the first 99 subscribers) lock the above rates for the lifetime of their subscription. See <Link href="/pricing">/pricing</Link> for current availability.</li>
-          <li><strong>Billing</strong> — monthly or annual via Stripe. Cancel any time from <code>/admin/settings</code> or by emailing us; you keep access to the end of the current period.</li>
+          <li><strong>The Cellar Hand</strong> — AUD $22/month founding ($28/month retail after the Founding Cohort closes). Unlimited Compliance AI, full lesson library, 100 Divine Trinity reveals/month, unlimited vintage log.</li>
+          <li><strong>The Press</strong> — AUD $44/month founding ($59/month retail). Everything in The Cellar Hand plus the full cellar operations suite, 38 SOPs, decision logic + tribal knowledge, priority Compliance AI, unlimited Divine Trinity reveals, vintage log PDF export.</li>
+          <li><strong>The Vigneron</strong> — AUD $88/month founding ($124/month retail). Everything in The Press plus team seats (rolling out with multi-tenant), annual knowledge base review, and the Vigneron badge.</li>
+          <li>Annual billing is available at 10× the monthly rate (two months free) — see <Link href="/pricing">/pricing</Link> for current cycle toggles.</li>
+          <li><strong>Founding Cohort · 2026</strong> — the first 99 paying subscribers lock the founding rate for the life of their subscription. Once we hit 99, the offer closes for new sign-ups and retail pricing applies.</li>
+          <li><strong>Billing</strong> — monthly or annual via Stripe. Cancel any time from <code>/admin/settings</code> or by emailing us; you keep access to the end of the current billing period.</li>
           <li><strong>Tax</strong> — Australian customers see GST-inclusive prices at checkout. Non-Australian customers are billed exclusive of local taxes.</li>
           <li><strong>Refunds</strong> — see the <Link href="/refund">Refund Policy</Link> for the 30-day money-back guarantee.</li>
         </ul>
@@ -89,7 +90,7 @@ export default function Terms() {
           <li><strong>Best-effort uptime</strong> — we target 99.5% monthly availability. If we have a material outage that interrupts your work, email us and we&apos;ll credit your account fairly. No auto-triggered SLA maths; we&apos;ll deal with you in good faith.</li>
           <li><strong>Honest change communication</strong> — we&apos;ll email you at least 30 days before shipping anything that changes how your data is handled, priced, or exported. Cosmetic tweaks and normal feature releases don&apos;t trigger notice.</li>
           <li><strong>A working export</strong> — you can always get your cellar data out. Structured JSON, CSV, or the PDF reports we already generate (Audit Trail, LIP Audit Pack, Cellar Book, Vintage Card). No lock-in.</li>
-          <li><strong>Founding-Member price lock</strong> — anyone who bought a Founding-Member subscription before we hit 99 sold keeps their locked tier price for as long as their subscription stays active.</li>
+          <li><strong>Founding Cohort price lock</strong> — anyone who bought a Founding Cohort · 2026 subscription before we hit 99 sold keeps their locked tier price for as long as their subscription stays active.</li>
         </ul>
 
         <h2 style={styles.h2}>What we don&apos;t owe you</h2>
@@ -131,7 +132,7 @@ export default function Terms() {
 
         <h2 style={styles.h2}>Beta status</h2>
         <p style={styles.p}>
-          Ownology is pre-1.0. During the Founding-Member period we ship weekly, occasionally deprecate features that aren&apos;t landing, and rename UI as we sharpen the language. Material changes to data handling, pricing, or exports still trigger the 30-day email notice above. Cosmetic shipping is continuous.
+          Ownology is pre-1.0. During the Founding Cohort · 2026 period we ship weekly, occasionally deprecate features that aren&apos;t landing, and rename UI as we sharpen the language. Material changes to data handling, pricing, or exports still trigger the 30-day email notice above. Cosmetic shipping is continuous.
         </p>
 
         <h2 style={styles.h2}>Termination</h2>

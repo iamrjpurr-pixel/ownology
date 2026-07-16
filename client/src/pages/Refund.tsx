@@ -39,7 +39,7 @@ export default function Refund() {
 
         <h2 style={styles.h2}>How the guarantee works</h2>
         <ul style={styles.ul}>
-          <li>Applies to every paid tier: monthly, annual, and Founding Member.</li>
+          <li>Applies to every paid tier: monthly, annual, and Founding Cohort · 2026.</li>
           <li>Window: 30 days from the date of your first paid charge.</li>
           <li>How to claim: email <strong>refunds@ownology.ai</strong> from the same email address you paid with. Include your name and reason (optional but appreciated — helps us improve).</li>
           <li>Turnaround: refunds are processed within 3 business days. Stripe usually clears them to your card within 5–10 more days depending on your bank.</li>
@@ -48,7 +48,7 @@ export default function Refund() {
 
         <h2 style={styles.h2}>What&apos;s not refundable</h2>
         <ul style={styles.ul}>
-          <li><strong>Founding Member after day 30</strong> — the whole point of the Founding-Member tier is locked-in pricing for the life of your subscription. Once the 30-day window closes, your rate becomes a permanent commitment (and gets you the permanently-locked price). We&apos;ll never re-open this offer to new sign-ups after the 99 cap, so we can&apos;t undo it either.</li>
+          <li><strong>Founding Cohort after day 30</strong> — the whole point of the Founding Cohort · 2026 tier is locked-in pricing for the life of your subscription. Once the 30-day window closes, your rate becomes a permanent commitment (and gets you the permanently-locked price). We&apos;ll never re-open this offer to new sign-ups after the 99 cap, so we can&apos;t undo it either.</li>
           <li><strong>Merch orders</strong> — apparel and printed materials follow the printer&apos;s standard return policy (usually not returnable once shipped). Contact us if there&apos;s a defect and we&apos;ll sort it.</li>
           <li><strong>Free plan usage</strong> — nothing to refund.</li>
         </ul>

@@ -9,18 +9,16 @@ import { toast } from "sonner";
 import { Plus, Trash2, Leaf, Eye, ChevronDown, ChevronUp, MapPin } from "lucide-react";
 
 const TRAINING_SYSTEMS = ["VSP", "Scott Henry", "Smart-Dyson", "Pergola", "Bush Vine", "Other"] as const;
+// Feb 2026 P1: tight rebuild — Vineyard = block register + phenology + yield only.
+// Spray/irrigation/canopy/pest/disease intentionally OUT of scope (that's
+// vineyard-management software territory; Ownology is a cellar tool).
+// The DB enum keeps the older values so historical entries render, but the
+// picker only surfaces the essentials.
 const OBSERVATION_TYPES = [
   { value: "budburst", label: "Budburst" },
   { value: "flowering", label: "Flowering" },
   { value: "veraison", label: "Veraison" },
   { value: "harvest_date", label: "Harvest Date" },
-  { value: "spray_application", label: "Spray Application" },
-  { value: "irrigation", label: "Irrigation" },
-  { value: "canopy_management", label: "Canopy Management" },
-  { value: "disease_scouting", label: "Disease Scouting" },
-  // DR-06: structured disease/pest event types
-  { value: "pest_scouting", label: "Pest Scouting" },
-  { value: "disease_pest_event", label: "Disease / Pest Event" },
   { value: "yield_estimate", label: "Yield Estimate" },
   { value: "other", label: "Other" },
 ] as const;
@@ -304,7 +302,7 @@ export default function Vineyard() {
                 Vineyard
               </h1>
               <p style={{ color: "var(--ow-text-lo)", fontSize: "0.85rem", marginTop: "4px" }}>
-                Block register · Phenology · Observations
+                Block register · Phenology · Yield
               </p>
             </div>
             <Button
@@ -347,7 +345,7 @@ export default function Vineyard() {
             <Leaf size={40} style={{ color: "oklch(0.30 0.010 60)", margin: "0 auto 16px" }} />
             <p style={{ color: "var(--ow-text-lo)", fontSize: "1rem", marginBottom: "8px" }}>No vineyard blocks registered yet</p>
             <p style={{ color: "var(--ow-text-lo)", fontSize: "0.85rem", marginBottom: "24px" }}>
-              Add your first block to start tracking phenology, spray applications, and harvest data.
+              Add your first block to start tracking phenology and yield estimates. Spray diaries and canopy notes stay with your viticulturist&apos;s tool of choice.
             </p>
             <Button
               onClick={() => setShowAddBlock(true)}
@@ -368,6 +366,10 @@ export default function Vineyard() {
                 onDeleteObservation={(id) => deleteObservation.mutate({ id })}
               />
             ))}
+            {/* Scope footer — makes the boundary honest and points to the right tool */}
+            <p style={{ marginTop: 24, fontSize: "0.75rem", color: "var(--ow-text-lo)", lineHeight: 1.55, textAlign: "center", fontStyle: "italic" }}>
+              Vineyard here is the block register + phenology + yield only. Spray diaries, canopy notes, and pest scouting live with your viticulturist&apos;s tool of choice — Ownology&apos;s job starts when the fruit hits the tanks.
+            </p>
           </div>
         )}
       </div>

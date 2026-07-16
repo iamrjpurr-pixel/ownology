@@ -227,35 +227,6 @@ async function startServer() {
     }
   });
 
-  // Admin summary endpoint — feeds /admin/qr-scans dashboard.
-  // Returns totals per SKU + 20 most recent arrivals. Requires the gate cookie
-  // (same wall as the rest of /admin — the express handler downstream applies).
-  app.get("/api/admin/qr-scans", async (_req, res) => {
-    try {
-      const { db } = await import("./db.js");
-      const { sql } = await import("drizzle-orm");
-      const totalsResult = await db.execute(sql`
-        SELECT sku, COUNT(*) AS scans, MAX(arrived_at) AS last_at
-        FROM merch_scan_events
-        GROUP BY sku
-        ORDER BY scans DESC
-      `);
-      const recentResult = await db.execute(sql`
-        SELECT sku, ip_hash, user_agent, referrer, arrived_at
-        FROM merch_scan_events
-        ORDER BY arrived_at DESC
-        LIMIT 20
-      `);
-      // MySQL2 (via drizzle) .execute returns [rows, fields]
-      const totals = Array.isArray(totalsResult) ? totalsResult[0] : totalsResult;
-      const recent = Array.isArray(recentResult) ? recentResult[0] : recentResult;
-      res.setHeader("Cache-Control", "no-store");
-      res.status(200).json({ totals, recent });
-    } catch (err) {
-      res.status(500).json({ error: err instanceof Error ? err.message : "failed" });
-    }
-  });
-
   // ── Build manifest (checkpoint diff) ──────────────────────────────────────
   // Public, cached 60s in-process. Lets /admin/build-check fetch the same
   // shape from local + prod and diff them so Rich always knows whether the
@@ -557,6 +528,36 @@ async function startServer() {
   app.get("/api/scheduled/health-digest", healthDigestHandler); // Daily aggregator: env + DB + Resend + LLM + auth → optional email to ADMIN_EMAILS
   app.get("/api/scheduled/health-watch", healthWatchHandler); // Near-real-time: fires immediate email on OK→FAIL / FAIL→OK transitions
   app.get("/api/admin/health-status", adminHealthStatusHandler); // Admin dashboard: live probes + stored state
+
+  // ── Admin QR scan analytics ──────────────────────────────────────────────
+  // Feeds /admin/qr-scans dashboard: totals per SKU + recent arrivals.
+  // Registered AFTER adminGate (line ~391) so /api/admin/* wall enforces
+  // gate-cookie auth. Prior placement above adminGate leaked scan analytics
+  // publicly (Feb 2026 audit) — do NOT move this back above adminGate.
+  app.get("/api/admin/qr-scans", async (_req, res) => {
+    try {
+      const { db } = await import("./db.js");
+      const { sql } = await import("drizzle-orm");
+      const totalsResult = await db.execute(sql`
+        SELECT sku, COUNT(*) AS scans, MAX(arrived_at) AS last_at
+        FROM merch_scan_events
+        GROUP BY sku
+        ORDER BY scans DESC
+      `);
+      const recentResult = await db.execute(sql`
+        SELECT sku, ip_hash, user_agent, referrer, arrived_at
+        FROM merch_scan_events
+        ORDER BY arrived_at DESC
+        LIMIT 20
+      `);
+      const totals = Array.isArray(totalsResult) ? totalsResult[0] : totalsResult;
+      const recent = Array.isArray(recentResult) ? recentResult[0] : recentResult;
+      res.setHeader("Cache-Control", "no-store");
+      res.status(200).json({ totals, recent });
+    } catch (err) {
+      res.status(500).json({ error: err instanceof Error ? err.message : "failed" });
+    }
+  });
   app.post("/api/scheduled/marketing-coach-email", express.json(), marketingCoachEmailHandler);
   app.get("/api/scheduled/marketing-coach-email", marketingCoachEmailHandler); // GET allowed for manual triggering / dry-run
   app.post("/api/scheduled/nurture-email", express.json(), nurtureEmailHandler);

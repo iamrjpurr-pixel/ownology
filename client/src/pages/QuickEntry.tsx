@@ -372,6 +372,14 @@ export default function QuickEntry() {
   // Session log
   const [sessionLog, setSessionLog] = useState<{ tank: string; summary: string; ts: Date }[]>([]);
 
+  // ── Cellar hygiene quick-log (Clean / Sanitise) ─────────────────────────────
+  // Feb 2026 P1: one-tap logging of a completed Clean or Sanitise task on the
+  // cellar floor. Feeds the /admin/cellar-board RAG status — a completed
+  // 'sanitise' task resets the equipment sanitation freshness window.
+  const [hygieneOpen, setHygieneOpen] = useState<"clean" | "sanitise" | null>(null);
+  const [hygieneEquipment, setHygieneEquipment] = useState("");
+  const [hygieneNote, setHygieneNote] = useState("");
+
   // ── Draft restore (on mount) ────────────────────────────────────────────────
   // Restore an in-progress entry if one was saved within the last 30 minutes.
   // We deliberately do NOT restore the Training sub-flow (free-text people
@@ -440,6 +448,22 @@ export default function QuickEntry() {
         setMValue("0"); setAQty("0"); setAStep("type");
         setIRate("0"); setIStep("type"); setNoteText(""); setRackTo(null); setReasoning("");
       }, 1800);
+    },
+    onError: err => toast.error(err.message),
+  });
+
+  // Hygiene mutation — one-shot add + complete a Clean/Sanitise cellar task.
+  const hygieneMutation = trpc.cellarTasks.logCompleted.useMutation({
+    onSuccess: (r) => {
+      const verb = r.taskType === "clean" ? "Cleaned" : "Sanitised";
+      toast.success(`${verb} · ${r.equipmentName} logged`);
+      setSessionLog(prev => [{ tank: r.equipmentName, summary: `${verb} — feeds Cellar Board RAG`, ts: new Date() }, ...prev]);
+      setHygieneOpen(null);
+      setHygieneEquipment("");
+      setHygieneNote("");
+      utils.cellarTasks.list.invalidate();
+      // Best-effort — cellarBoard router may be lazy; ignore if not yet cached.
+      try { utils.cellarBoard?.board?.invalidate?.(); } catch { /* noop */ }
     },
     onError: err => toast.error(err.message),
   });
@@ -559,6 +583,36 @@ export default function QuickEntry() {
         {screen === "event" && (
           <div>
             <Header step={1} total={4} title="What happened?" sub="Tap the event type" />
+
+            {/* Cellar hygiene quick-strip — one-tap Clean/Sanitise → feeds Cellar Board RAG */}
+            <div style={{ marginBottom: 18 }}>
+              <p style={{ fontSize: "0.72rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 8px" }}>
+                Cellar hygiene · one tap
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <button
+                  data-testid="hygiene-clean-tile"
+                  onClick={() => { setHygieneOpen("clean"); }}
+                  style={{ height: 56, borderRadius: 10, background: CARD, border: `1.5px solid ${BDR}`, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, cursor: "pointer", color: TEXT_HI, fontFamily: "'Fraunces',serif", fontSize: "1rem", fontWeight: 600, WebkitTapHighlightColor: "transparent" }}
+                  onPointerDown={e => (e.currentTarget as HTMLButtonElement).style.background = CARD_ACT}
+                  onPointerUp={e => (e.currentTarget as HTMLButtonElement).style.background = CARD}
+                >
+                  <span style={{ color: GREEN, fontSize: "1.3rem" }}>🧽</span>
+                  <span>Clean</span>
+                </button>
+                <button
+                  data-testid="hygiene-sanitise-tile"
+                  onClick={() => { setHygieneOpen("sanitise"); }}
+                  style={{ height: 56, borderRadius: 10, background: CARD, border: `1.5px solid ${BDR}`, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, cursor: "pointer", color: TEXT_HI, fontFamily: "'Fraunces',serif", fontSize: "1rem", fontWeight: 600, WebkitTapHighlightColor: "transparent" }}
+                  onPointerDown={e => (e.currentTarget as HTMLButtonElement).style.background = CARD_ACT}
+                  onPointerUp={e => (e.currentTarget as HTMLButtonElement).style.background = CARD}
+                >
+                  <span style={{ color: AMBER, fontSize: "1.3rem" }}>🧴</span>
+                  <span>Sanitise</span>
+                </button>
+              </div>
+            </div>
+
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {EVENT_TILES.map(tile => (
                 <button key={tile.id} onClick={() => { setEventType(tile.id); if (tile.id === "training") { setScreen("training_person"); } else { setScreen("tank"); } }}
@@ -897,6 +951,85 @@ export default function QuickEntry() {
         )}
 
       </div>
+
+      {/* ── Hygiene modal (Clean / Sanitise) ────────────────────────────────── */}
+      {hygieneOpen && (
+        <div
+          data-testid="hygiene-modal"
+          onClick={() => setHygieneOpen(null)}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 60, display: "flex", alignItems: "flex-end", justifyContent: "center", padding: 16 }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ width: "100%", maxWidth: 480, background: BG, border: `1px solid ${BDR}`, borderRadius: 16, padding: 20, display: "flex", flexDirection: "column", gap: 14 }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: "1.6rem", color: hygieneOpen === "clean" ? GREEN : AMBER }}>
+                {hygieneOpen === "clean" ? "🧽" : "🧴"}
+              </span>
+              <h3 style={{ margin: 0, fontFamily: "'Fraunces',serif", fontSize: "1.3rem", color: TEXT_HI }}>
+                {hygieneOpen === "clean" ? "Log clean" : "Log sanitise"}
+              </h3>
+            </div>
+            <p style={{ margin: 0, fontSize: "0.85rem", color: TEXT_LO, lineHeight: 1.5 }}>
+              {hygieneOpen === "sanitise"
+                ? "Marks the equipment sanitation window as fresh — Cellar Board turns green."
+                : "Logs a clean pass on this equipment — visible in the Cellar Board history."}
+            </p>
+
+            <div>
+              <p style={{ fontSize: "0.72rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 6px" }}>Equipment</p>
+              <input
+                data-testid="hygiene-equipment-input"
+                type="text"
+                placeholder="e.g. Tank 4 · Press · Pump"
+                value={hygieneEquipment}
+                onChange={(e) => setHygieneEquipment(e.target.value)}
+                autoFocus
+                list="quick-entry-hygiene-equipment"
+                style={{ width: "100%", background: CARD, border: `1.5px solid ${hygieneEquipment.trim() ? AMBER_BDR : BDR}`, borderRadius: 10, padding: "14px 16px", color: TEXT_HI, fontFamily: "'Fraunces',serif", fontSize: "1.1rem", fontWeight: 600, outline: "none", boxSizing: "border-box" }}
+              />
+              <datalist id="quick-entry-hygiene-equipment">
+                {allTanks.map((t) => (<option key={t.name} value={t.name} />))}
+              </datalist>
+            </div>
+
+            <div>
+              <p style={{ fontSize: "0.72rem", color: TEXT_LO, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 6px" }}>Notes <span style={{ color: TEXT_LO, fontWeight: 300 }}>(optional)</span></p>
+              <textarea
+                data-testid="hygiene-note-input"
+                placeholder={hygieneOpen === "sanitise" ? "e.g. Star San @ 300ppm · 5 min contact" : "e.g. Hot rinse + caustic pass"}
+                value={hygieneNote}
+                onChange={(e) => setHygieneNote(e.target.value)}
+                rows={2}
+                style={{ width: "100%", background: CARD, border: `1px solid ${BDR}`, borderRadius: 10, padding: "10px 14px", color: TEXT_HI, fontFamily: "'Lato',sans-serif", fontSize: "0.95rem", outline: "none", boxSizing: "border-box", resize: "vertical" }}
+              />
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
+              <button
+                data-testid="hygiene-log-btn"
+                disabled={!hygieneEquipment.trim() || hygieneMutation.isPending}
+                onClick={() => hygieneMutation.mutate({
+                  equipmentName: hygieneEquipment.trim(),
+                  taskType: hygieneOpen,
+                  methodNotes: hygieneNote.trim() || undefined,
+                })}
+                style={{ ...primaryBtn, height: 60, opacity: (!hygieneEquipment.trim() || hygieneMutation.isPending) ? 0.5 : 1 }}
+              >
+                {hygieneMutation.isPending ? "Logging…" : `LOG ${hygieneOpen === "clean" ? "CLEAN" : "SANITISE"}`}
+              </button>
+              <button
+                data-testid="hygiene-cancel-btn"
+                onClick={() => { setHygieneOpen(null); setHygieneEquipment(""); setHygieneNote(""); }}
+                style={{ ...secondaryBtn, height: 44 }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
