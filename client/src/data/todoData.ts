@@ -451,157 +451,59 @@ export interface ShippedItem {
 
 export const RECENTLY_SHIPPED: ShippedItem[] = [
   {
-    id: "daily-cellar-brief-email-live",
-    title: "Daily 7am Cellar Brief email · LIVE end-to-end",
+    id: "p1p2-batch-qr-analytics-refresh-todo-sw-automation",
+    title: "P1/P2 batch: QR analytics, refresh-todo, SW automation",
     description:
-      "Endpoint at POST /api/scheduled/daily-alert-email (x-cron-secret header required). Verified send to iamrjpurr@gmail.com Feb 06 — Resend ID 719603fe-f348-44b0-994a-4a6cfba100a1, 6 real cellar alerts rendered, alerts@ownology.ai domain verified, CRON_SECRET enforced, ALERT_TEST_TO override active. All that's left for daily delivery: point a cron (Railway `0 21 * * *` UTC, or Emergent scheduler, or cron-job.org) at the endpoint. Demo-ready NOW — screenshot the actual 7am email on Rich's phone during marketing calls.",
-    shippedAt: "2026-02-06",
+      "Ploughed through the remaining P1 items plus quick-win P2s in one session.",
+    shippedAt: "2026-02-15",
   },
   {
-    id: "risk-glossary-anchor-jump",
-    title: "Risk framework — full 3-page depth (briefing + glossary + doctrine)",
+    id: "p0-sweep-comparison-plumbing-home-winery-kit-units",
+    title: "P0 sweep: comparison plumbing + Home Winery Kit units",
     description:
-      "Tier tooltips on /risk-briefing (Quantitative / Qualitative / Environmental info-dots). New /risk-glossary reference book (29 terms across 5 categories with plain-English definition + why-it-matters + source citation). Deep-link jump from every compliance card on /risk-briefing → specific term anchor on /risk-glossary (with wouter-safe useEffect scrolling). SiteMap updated. All member-gated.",
-    shippedAt: "2026-02-06",
+      "P0.1 — Ungate + refresh the two migration guides /for-innovint-users + /for-vintrace-users now in PUBLIC_EXACT on both server/index.ts and viteGateWall.ts (they were gated for pre-existing tortious-interference concerns which no longer apply now that /vs/innovint-vintrace publishes the same names openly and honestly) R…",
+    shippedAt: "2026-02-15",
   },
   {
-    id: "linkedin-brand-asset-pack",
-    title: "LinkedIn brand asset pack (mark-only + banners)",
+    id: "vsinnovint-vintrace-public-comparison-landing-qr-wired-merch",
+    title: "`/vs/innovint-vintrace` public comparison landing + QR-wired merch",
     description:
-      "v2 profile icons designed for LinkedIn's circle-crop (82-86% fill, mark-only, no text): ownology-profile-icon-dark-1024.png, -light-1024.png, -mono-1024.png. v2 banners with stronger typography: linkedin-cover-v2-1128x191.png, linkedin-personal-v2-1584x396.png, x-header-1500x500.png. 4200x700 cover for other channels. All served via /ownology-*.png on the preview URL.",
-    shippedAt: "2026-02-06",
+      "Rich pushed back on my thin competitor knowledge before I wrote comparison copy. Rebuilt Ownology's competitive positioning from first-principles research.",
+    shippedAt: "2026-02-15",
   },
   {
-    id: "risk-briefing-staff-training-page",
-    title: "/risk-briefing · staff training + compliance benefits",
+    id: "merch-artwork-downloader-adminmerch-artwork",
+    title: "Merch artwork downloader (`/admin/merch-artwork`)",
     description:
-      "New member-only page for cellar-team training. Explains the 3-tier risk framework operationally: Section 1 (three tiers with who catches / where lives / example), Section 2 (7 quantitative alerts with fires-when + do-this + AWRI/FSANZ source), Section 3 (5 qualitative flags with look-for + then + source), Section 4 (6 environmental alerts), Section 5 (Daily 10 / Weekly 30 / Vintage-critical rhythm), Section 6 (compliance: FSANZ 4.5.1, Wine Australia LIP, AWRI TR227, OIV, WHS out-of-scope). Registered at /risk-briefing (member-only, default-deny) + added to SiteMap.",
-    shippedAt: "2026-02-06",
+      "Rich asked \"Did you finish merchnimages?\" and provided VistaPrint spec sheets for the Pro Felt Bar Runner (856×225 mm bleed) and Square Coaster (100×100 mm bleed / 90×90 mm safety). Built a client-side print-artwork composer:",
+    shippedAt: "2026-02-15",
   },
   {
-    id: "cellar-brief-info-tooltips",
-    title: "Cellar Brief · info-dot tooltips on every quant + qual risk",
+    id: "quiz-full-quality-pass-waves-a-b-c-d-e",
+    title: "Quiz full quality pass (Waves A + B + C + D + E)",
     description:
-      "24 quantitative info-dots (next to WATCH / PASS / ATTENTION status labels) + 19 qualitative info-dots (next to 'Qualitative risk' headers) on every Cellar Brief vessel card. Hover reveals full risk taxonomy: 7 quant risks with what-fires-them, 6 qual flags with what-to-sniff-for. Every tooltip footer links to /risk-briefing for the full staff training doctrine. Also added inline 'Look for / Then' education strip in the flag picker — the moment a staffer clicks Brett/TCA/H₂S/etc, they see the tribal knowledge before submitting.",
-    shippedAt: "2026-02-06",
+      "Rich flagged the Gewürztraminer recommendation as broken (\"we don't grow that here\" false + \"Riesling isn't the swap\"). Root-cause audit surfaced a class of bugs: home-market swap picked highest-scoring AU/NZ wine regardless of grape identity, so Alsatian Gewürz → Clare Riesling instead of Aus Gewürz. Same failure mode…",
+    shippedAt: "2026-02-15",
   },
   {
-    id: "linkedin-logo-assets",
-    title: "Ownology brand asset set (4 PNGs)",
+    id: "design-pass-on-hi-and-admincontacts",
+    title: "Design pass on `/hi/*` and `/admin/contacts`",
     description:
-      "Programmatic generation via Playwright of 4 LinkedIn/social sizes from the Living-Trinity SVG mark: ownology-logo-1024.png (avatar dark), ownology-logo-1024-light.png (parchment variant), ownology-logo-mark-512.png (transparent PNG-α), ownology-logo-linkedin-personal-1584x396.png (profile background), ownology-logo-linkedin-company-1128x191.png (company page cover), ownology-logo-x-header-1500x500.png (Twitter/X). All at /app/client/public/ served directly by the preview URL.",
-    shippedAt: "2026-02-06",
+      "Rich called the /hi/* and admin/contacts pages \"ugly, confused typeface\" — full brand pass shipped.",
+    shippedAt: "2026-02-15",
   },
   {
-    id: "weather-ai-contextual-advice-gated",
-    title: "Weather widget · LLM-contextualised advice · Founding-Member gated",
+    id: "outreach-workflow-additions",
+    title: "Outreach workflow additions",
     description:
-      "Slice 2b of Tier 3. New tRPC mutation weather.contextualAdvice — takes the fired alert kind + current reading + 48h forecast summary, injects the winemaker's actual cellar history (via getUserCellarContext), calls Claude Sonnet 4.6 via Emergent LLM key. Returns 90-word cellar-floor advice that names specific tanks/barrels by number + variety + current state. Verified live: humidity_high alert returned 'Your biggest exposure is Barrel Rack A (Chardonnay, MLF just confirmed complete on 28 June — those barrels need sulfuring and are sitting unsealed and vulnerable)…'. Cached per (winery, alert_kind, YYYY-MM-DD Sydney) in weather_advice_cache table — one call per day per alert type. Plan-gated: paid tiers (press/amphora/coopers/founding_member) OR admin role get the LLM output; free tier gets a 🔒 Founding Member upsell teaser (both states verified with role/plan flip test).",
-    shippedAt: "2026-02-06",
+      "<AdminOutboundQueue> vCard export button — downloads .vcf for AirDrop/email to phone; iOS + Android Contacts absorb it; Google Messages + WhatsApp autocomplete winemaker names (prefixed \"OW ·\" for easy find/purge later) <AdminOutboundQueue> Force toggle on Bulk AI rewrite — red-bordered checkbox lets operator overwrite…",
+    shippedAt: "2026-02-15",
   },
   {
-    id: "weather-widget-tier-3-environmental",
-    title: "Weather widget · Tier 3 environmental risk on /dashboard",
+    id: "test-infrastructure-hardening",
+    title: "Test infrastructure hardening",
     description:
-      "Third axis of the Risk Management framework — live ambient telemetry from Open-Meteo (no API key, no cost). Renders current humidity/temp/dew-point/pressure/cloud/wind + 7-day forecast + 24h sparkline + 5 threshold-based alerts (humidity high/low, temp high/low, dew-point approach) with 48h forecast-side pre-warning for incoming spikes. Alert thresholds cited to AWRI TR227 + Bulletin 2019 + OIV. /risk-management doctrine page updated with a Tier 3 section. Multi-location tested: Hunter Valley (81% RH · warning), Marlborough (92% RH · critical), Barossa (72% RH · forecast pre-warning). Widget component accepts lat/lng/label as input — ready for Slice 2 per-winery config.",
-    shippedAt: "2026-02-06",
-  },
-  {
-    id: "invite-token-routing-fix",
-    title: "/i/:token magic-link invite routing fix",
-    description:
-      "Express handler for the invite bypass was being swallowed by the K8s ingress on the preview URL (non-/api paths land on Vite, not Express). Added /i to vite.config.ts server.proxy — anonymous GET /i/<token> now returns 302 → /admin + sets ow_gate cookie. Demo attendees can be invited via magic link on preview.",
-    shippedAt: "2026-02-06",
-  },
-  {
-    id: "sitemap-audience-realignment",
-    title: "SiteMap.tsx audience tags realigned with default-deny",
-    description:
-      "Cross-checked every route in the registry against server/index.ts PUBLIC_EXACT + PUBLIC_PREFIXES allowlist. Fixed 4 wrongly-tagged PUBLIC → MEMBER (/competitive-advantage, /compliance, /regulations), 4 wrongly-tagged ADMIN → PUBLIC (/cascade-demo, /branding-mockup, /onboarding-mockup, /resume), added 4 missing admin surfaces (/admin/producers, /admin/marketing-ops, /admin/gate-invites, /admin/quiz-picks) plus /hi/producers/:id. 102 routes now accurate.",
-    shippedAt: "2026-02-06",
-  },
-  {
-    id: "gate-password-rotated",
-    title: "Gate password rotated from default",
-    description:
-      "OWNOLOGY_GATE_PASSWORD changed from the seeded `changeme-set-real-password` default to a real value. Backend restarted; new password verified accepted, old value rejected.",
-    shippedAt: "2026-02-06",
-  },
-  {
-    id: "pre-demo-e2e-validation",
-    title: "Pre-marketing-calls E2E validation",
-    description:
-      "Full testing_agent_v3_fork sweep of every demo-critical surface: gate wall enforcement, /hi/producers/:id cold-email preview, /admin/producers Compose flow, /admin/marketing-ops AI coach, /try LLM sandbox, /risk-management doctrine, /pricing, sample-vintage-log 3 variants, sitemap, health, Perplexity + Resend + Emergent LLM keys. 54/56 pytest green.",
-    shippedAt: "2026-02-06",
-  },
-  {
-    id: "au-producer-bootstrap-perplexity",
-    title: "AU/NZ producer bootstrap via Perplexity",
-    description:
-      "New /admin/producers page with Perplexity Sonar Pro region-bootstrap (~25 producers per region, ~$0.02/call, human-in-the-loop review before import) + per-row winemaker enrichment (91% first-pass hit rate). Verified live on Barossa Valley + McLaren Vale — zero hallucinated wineries.",
-    shippedAt: "2026-02-06",
-  },
-  {
-    id: "compose-modal-cellar-brief-preview",
-    title: "Compose modal + public /hi/producers/:id Cellar Brief preview",
-    description:
-      "1-click Compose button on producer rows with 3 pill-style templates (Cellar Brief demo / Vintage-log intro / Peer share soft), mailto: send from Rich's own inbox. Every cold email now includes a personalised /hi/producers/:id preview URL that renders a region-aware Cellar Brief mockup (Central Otago pinot, Marlborough sauv blanc, Hawke's Bay syrah). Zero LLM cost per view.",
-    shippedAt: "2026-02-06",
-  },
-  {
-    id: "risk-management-doctrine-v1",
-    title: "Risk Management doctrine v1",
-    description:
-      "New public /risk-management page — 12 wine-quality risks (7 quantitative from lab readings + 5 qualitative one-tap flags: Brett/TCA/oxidation/H₂S/sanitation). Explicit scope footer points prospects to Safe Work Australia + AWRI for WHS (positions Ownology as focused, not evasive). Qualitative capture UI live on every Cellar Brief vessel card.",
-    shippedAt: "2026-02-06",
-  },
-  {
-    id: "gate-wall-default-deny-flip",
-    title: "Gate wall flipped to default-DENY",
-    description:
-      "Previously opt-in (block-list — any new page not added leaked publicly). Now default-deny (allowlist of ~50 explicit public paths + 6 prefixes — anything else redirects to /try). Correct fail direction for startup with private customer cellar data. Mirrored in Express prod + Vite dev.",
-    shippedAt: "2026-02-06",
-  },
-  {
-    id: "marketing-ops-dashboard-and-email",
-    title: "Marketing Ops dashboard + 7am Sydney coach email",
-    description:
-      "/admin/marketing-ops — winemaker-psychology-aware daily/weekly ritual dashboard. Season strip (Sydney TZ), Claude-Sonnet-generated coach line (daily-cached, ~$0.005/day), KPI streak, today's focus tasks, weekly rhythm board. Handler for 7am Sydney Resend push shares the same cache (zero extra LLM cost). Code ready — awaiting Railway cron schedule + verified sender domain.",
-    shippedAt: "2026-02-06",
-  },
-  {
-    id: "nz-directory-scraper",
-    title: "NZ Wine directory scraper — Sip+Dine cohort",
-    description:
-      "Cheerio-based scraper (scripts/scrape-nz-winery-directory.mjs) filtered to keyword=winery × tourism=sip+dine — the 23 highest-value NZ wineries (cellar-door hospitality + food = actively marketing cohort). 23/23 rows imported; 21 with emails, all 23 with regions.",
-    shippedAt: "2026-02-06",
-  },
-  {
-    id: "voice-import-whisper",
-    title: "Voice memo → Whisper → structured entries",
-    description:
-      "The flagship 'Import Anything' voice lane. Winemakers speak a memo in the cellar (hands-free, muddy hands) → Whisper via Emergent LLM key transcribes with domain vocabulary hints (DAP, YAN, Brix, MLF, EC1118) → structuring LLM parses into vintage_log entries → user reviews + saves. Verified 3/3 entries from test memo ('Tank 7 Shiraz, added 2.6 kg DAP, Brix 14.2, pH 3.42').",
-    shippedAt: "2026-01-27",
-  },
-  {
-    id: "try-sandbox",
-    title: "The /try sandbox",
-    description:
-      "A 10-minute guided walkthrough of a real winemaker's morning — stuck ferment, decision, log, Ask Ownology, publish. Uses Ownology Cellars data. No signup, no writes.",
-    shippedAt: "2026-02-04",
-  },
-  {
-    id: "admin-playbook",
-    title: "Clickable Playbook at /admin/playbook",
-    description:
-      "45 SOP steps grouped by cadence (Daily / Weekly / Vintage-critical / 5 workflow SOPs / Troubleshooting). Every step is a clickable link to the actual URL where the work happens. Local checkboxes reset daily/weekly. Learning by clicking, not by reading.",
-    shippedAt: "2026-02-03",
-  },
-  {
-    id: "quiz-scoring-fixes",
-    title: "Wine Quiz algorithm hardening",
-    description:
-      "Exhaustive test of all 2,304 answer combinations. Fixed: red-sweet no longer returns Sauternes (added colour-family scoring); Vermouth no longer dominates 14.7% of picks (specialty penalty); Sauv Blanc, Assyrtiko and entry Pinot Noir now reachable (palate differentiation).",
-    shippedAt: "2026-02-04",
+      "test_feb2026_batch.py hardcoded gate password → os.environ[\"OWNOLOGY_GATE_PASSWORD\"] with module-level skip if unset is→== sweep: 51 mechanical fixes across 11 test files (correctly preserving is None idioms) 5 high-complexity tests refactored with named helpers — cyclomatic complexity 15-21 → under 10 each",
+    shippedAt: "2026-02-15",
   },
 ];

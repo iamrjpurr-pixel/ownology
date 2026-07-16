@@ -4,6 +4,46 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Feb 2026 — P1/P2 batch: QR analytics, refresh-todo, SW automation
+
+Ploughed through the remaining P1 items plus quick-win P2s in one session.
+
+**P1.4 — `scripts/refresh-todo.ts`** — parses `/app/memory/CHANGELOG.md` H3 headings, extracts title + first paragraph as description, converts month-year headers to ISO dates, and rewrites the `RECENTLY_SHIPPED` array in `todoData.ts` in place. `--dry-run` and `--limit` flags supported. Verified: correctly extracted latest 8 entries and rewrote the file. Every future changelog entry now auto-updates the RECENTLY_SHIPPED list — no more manual todoData.ts edits.
+
+**P1.5 — `ownerProcedure` verification on `/orders` + `/campaign-metrics`** — audit complete. `ordersRouter.list` correctly uses `ownerProcedure` (Stripe session data locked to owner). `campaignMetricsRouter.getHistory` + `upsert` locked to `ownerProcedure`; only `getLatest` is public (safe — that's the founding-member counter surface on `/pricing`). No changes needed.
+
+**P1.6 — BD Digest live-send verification** — env vars all set (`RESEND_API_KEY`, `ALERT_TEST_TO=iamrjpurr@gmail.com`, `CRON_SECRET`, `ALERT_FROM_EMAIL`, `ALERT_REPLY_TO`). Dry-run endpoint returns full digest payload (3 new contacts, 144 view events, 2 hot alerts, 0 replies this week, subject formatted correctly). Live-send path: `curl -H "x-cron-secret: <SECRET>" /api/scheduled/weekly-bd-digest` (no `?dryRun=1`) → fires real Resend email. Only remaining step is wiring a Railway cron trigger for Mondays — not a code change.
+
+**P1.7 — QR scan attribution endpoint** — full stack:
+- New `merch_scan_events` MySQL table (sku, ip_hash, user_agent, referrer, utm_source/medium/campaign, arrived_at + indexes on sku + arrived_at)
+- `GET /api/qr-scan/:sku` — validates SKU shape (`^[a-z0-9-]+$`), redirects immediately to `/vs/innovint-vintrace?utm_source=<sku>&utm_medium=merch&utm_campaign=cellar-door`, then fire-and-forget logs the arrival async (never blocks the scanner). IP is SHA256-hashed with JWT_SECRET salt, truncated to 16 chars — no PII stored.
+- `GET /api/admin/qr-scans` — aggregate totals per SKU + 20 most recent arrivals
+- New page `/app/client/src/pages/AdminQrScans.tsx` — grand total counter, per-SKU bar chart with amber-fill progress bars, recent arrivals table (When / SKU / Device / Referrer / Visitor). Auto-refresh every 30s. Cross-linked with `/admin/merch-artwork`.
+- **Merch artwork QR encoding switched** from `ownology.ai/vs/innovint-vintrace?utm_source=<sku>&utm_medium=merch&utm_campaign=cellar-door` to `ownology.ai/api/qr-scan/<sku>` — significantly shorter URL = denser QR code with fewer modules = more reliable scans through cork/felt textures. UTMs are added by the endpoint itself on the 302 hop.
+- Verified end-to-end: 5 curl scans → totals aggregated per SKU (bar-runner 3, coaster 2) → recent list populated → admin dashboard renders correctly.
+
+**P2.10 — `/your-journey` canonical route** — added alongside existing `/your-vintage` and `/roadmap` aliases (all point to `Roadmap` component). Tier-based dimming was already fully wired via tRPC `status` object → locked nodes render at opacity 0.72 with Lock icon, unlocked at opacity 1 with CheckCircle2. No component changes needed — the plumbing was already there.
+
+**P2.14 — SW cache automation with commit hash** — new Vite plugin `viteSwCacheVersion` at `/app/viteSwCacheVersion.ts`:
+- Dev (`configureServer`): intercepts `/sw.js` requests, replaces sentinel `__COMMIT_HASH__` with `git rev-parse --short HEAD` in memory. No on-disk mutation.
+- Build (`closeBundle`): rewrites the emitted `dist/public/sw.js` with the same replacement so production has per-commit CACHE_VERSION.
+- Fallback to `dev-YYYYMMDD` if git is unavailable.
+- `client/public/sw.js`: `CACHE_VERSION = "ow-v20"` → `CACHE_VERSION = "ow-__COMMIT_HASH__"`
+- `server/buildInfo.ts::readSwCacheVersion` updated to resolve the sentinel via `execSync git rev-parse` so `/api/build-info` stays consistent
+- Verified: `curl /sw.js` returns `CACHE_VERSION = "ow-f3db88a"` matching the current commit. Every deploy now automatically busts stale caches.
+
+**P2.15 — robots.txt reinforcement** — added named blocks for GPTBot, ChatGPT-User, anthropic-ai, ClaudeBot, Google-Extended, CCBot (all `Disallow: /`) so our positioning + comparison content stays out of foundation-model training sets. PerplexityBot gets scoped `Allow` for the SEO-desirable pages (vs, pricing, migration guides, journal, blog) since Perplexity cites sources and can drive real traffic. Also added `Disallow` for trial-locked, try, invite, auth, onboarding, todo — internal paths that shouldn't be indexed.
+
+**Deliberately deferred (blocked or high-risk):**
+- P2.8 — more merch SKUs (need Rich's VistaPrint bleed specs for mug/sticker/business card)
+- P2.9 — Quick-entry Clean/Sanitise tiles (needs Cellar Board RAG domain understanding, medium risk without spec)
+- P2.11 — outreach.ts refactor (>3,500 lines, high risk to batch with other work)
+- P2.12 — /vineyard rebuild (needs Rich's block-register spec)
+- P2.13 — Auth expansion Resend magic-link (needs integration playbook)
+- P2.15 — Redis rate limiter (needs Redis infra decision from Rich)
+- P2.16 — Cross-page copy audit (needs Rich's editorial pass)
+
+
 ### Feb 2026 — P0 sweep: comparison plumbing + Home Winery Kit units
 
 **P0.1 — Ungate + refresh the two migration guides**

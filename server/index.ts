@@ -47,6 +47,7 @@ import {
 } from "./gate.js";
 import { jwtVerify } from "jose";
 import { parse as parseCookies } from "cookie";
+import { createHash } from "node:crypto";
 import { COOKIE_NAME } from "../shared/const.js";
 
 /** HTML-attribute-safe escape for injected meta content. Handles the
@@ -181,6 +182,78 @@ async function startServer() {
   });
   app.get("/health", (_req, res) => {
     res.status(200).json({ status: "ok", uptime: process.uptime() });
+  });
+
+  // ── QR scan attribution ──────────────────────────────────────────────
+  // Every merch QR encodes /api/qr-scan/:sku → this endpoint logs the arrival
+  // (async, non-blocking) and 302-redirects to the destination page with
+  // UTM params attached. Shorter URL = denser QR = better scan reliability
+  // through cork/felt textures. Also gives us clean physical→digital
+  // attribution: which bar runner / coaster / mug is actually earning scans.
+  app.get("/api/qr-scan/:sku", async (req, res) => {
+    const sku = String(req.params.sku || "").slice(0, 64);
+    // Only accept known SKU shapes — kebab-case ASCII, no path traversal.
+    if (!/^[a-z0-9-]+$/.test(sku)) {
+      return res.redirect(302, "/vs/innovint-vintrace");
+    }
+    // Build the destination URL with UTM params for downstream analytics
+    // (any future GA/Plausible pipeline can still read them from the URL).
+    const dest = new URL("https://ownology.ai/vs/innovint-vintrace");
+    dest.searchParams.set("utm_source", sku);
+    dest.searchParams.set("utm_medium", "merch");
+    dest.searchParams.set("utm_campaign", "cellar-door");
+
+    // Redirect immediately — don't make the scanner wait for the DB write.
+    res.redirect(302, dest.pathname + dest.search);
+
+    // Fire-and-forget scan log. Any failure here must NOT bubble up.
+    try {
+      const ip = clientIpOf(req);
+      const ipHash = ip ? createHash("sha256").update(ip + (process.env.JWT_SECRET || "salt")).digest("hex").slice(0, 16) : null;
+      const ua = String(req.headers["user-agent"] || "").slice(0, 255);
+      const ref = String(req.headers.referer || "").slice(0, 255);
+      const now = Date.now();
+      // Dynamic import mirrors the pattern used elsewhere in this file
+      const { db } = await import("./db.js");
+      const { sql } = await import("drizzle-orm");
+      db.execute(sql`
+        INSERT INTO merch_scan_events (sku, ip_hash, user_agent, referrer, utm_source, utm_medium, utm_campaign, arrived_at)
+        VALUES (${sku}, ${ipHash}, ${ua || null}, ${ref || null}, ${sku}, ${"merch"}, ${"cellar-door"}, ${now})
+      `).catch((err: unknown) => {
+        console.warn("[qr-scan] log insert failed", err instanceof Error ? err.message : err);
+      });
+    } catch (err) {
+      console.warn("[qr-scan] log setup failed", err instanceof Error ? err.message : err);
+    }
+  });
+
+  // Admin summary endpoint — feeds /admin/qr-scans dashboard.
+  // Returns totals per SKU + 20 most recent arrivals. Requires the gate cookie
+  // (same wall as the rest of /admin — the express handler downstream applies).
+  app.get("/api/admin/qr-scans", async (_req, res) => {
+    try {
+      const { db } = await import("./db.js");
+      const { sql } = await import("drizzle-orm");
+      const totalsResult = await db.execute(sql`
+        SELECT sku, COUNT(*) AS scans, MAX(arrived_at) AS last_at
+        FROM merch_scan_events
+        GROUP BY sku
+        ORDER BY scans DESC
+      `);
+      const recentResult = await db.execute(sql`
+        SELECT sku, ip_hash, user_agent, referrer, arrived_at
+        FROM merch_scan_events
+        ORDER BY arrived_at DESC
+        LIMIT 20
+      `);
+      // MySQL2 (via drizzle) .execute returns [rows, fields]
+      const totals = Array.isArray(totalsResult) ? totalsResult[0] : totalsResult;
+      const recent = Array.isArray(recentResult) ? recentResult[0] : recentResult;
+      res.setHeader("Cache-Control", "no-store");
+      res.status(200).json({ totals, recent });
+    } catch (err) {
+      res.status(500).json({ error: err instanceof Error ? err.message : "failed" });
+    }
   });
 
   // ── Build manifest (checkpoint diff) ──────────────────────────────────────
@@ -1286,6 +1359,21 @@ async function startServer() {
         resend_batch_id VARCHAR(128),
         INDEX wrdh_sentat_idx (sent_at),
         INDEX wrdh_pick_idx (pick_slug)
+      )
+    `);
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS merch_scan_events (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        sku VARCHAR(64) NOT NULL,
+        ip_hash CHAR(16),
+        user_agent VARCHAR(255),
+        referrer VARCHAR(255),
+        utm_source VARCHAR(64),
+        utm_medium VARCHAR(32),
+        utm_campaign VARCHAR(64),
+        arrived_at BIGINT NOT NULL,
+        INDEX mse_sku_idx (sku),
+        INDEX mse_arrived_idx (arrived_at)
       )
     `);
     await db.execute(sql`

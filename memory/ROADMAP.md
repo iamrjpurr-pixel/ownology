@@ -9,9 +9,19 @@ Last consolidated: 28 Jun 2026.
 
 ## ✅ Shipped Feb 2026
 
-- **`/vs/innovint-vintrace` public comparison landing** — SEO-tuned three-way comparison, honest "where we lag" section, sitemap-indexed. QR-scan target for all merch. Deep-links to `/for-innovint-users`, `/for-vintrace-users`, `/pricing-comparison`. Positioning: "Ownology isn't replacing their cellar ledger — it's the second brain that runs alongside it."
-- **Competitor research memo** at `/app/memory/COMPETITOR_RESEARCH_INNOVINT_VINTRACE.md` — sourced facts from vendor sites, Capterra, G2, Rich's InnoVint screenshots, Vintrace demo transcript. Source of truth for any future comparison copy.
-- **Merch artwork downloader (`/admin/merch-artwork`)** — VistaPrint-ready PNG composer at 300 DPI for Pro Felt Bar Runner (856×225 mm bleed) and Square Coaster (100×100 mm bleed) with QR + UTM-tagged landing per SKU. Reuses existing brand mark PNGs; SKU array is one-line extensible.
+- **QR scan attribution stack** — `/api/qr-scan/:sku` endpoint + `merch_scan_events` MySQL table + `/admin/qr-scans` dashboard. Every merch QR now encodes the short tracked URL; scans log per-SKU with UTMs so Rich can see whether bar runners or coasters convert. Auto-refresh dashboard.
+- **`refresh-todo.ts` script** — parses CHANGELOG.md and rewrites `RECENTLY_SHIPPED` in `todoData.ts`. No more manual sync.
+- **SW cache invalidation automated** — Vite plugin injects git commit hash into `sw.js` at dev serve + build time. Every deploy → new hash → automatic old-cache purge.
+- **robots.txt AI-crawler reinforcement** — GPTBot/Claude/Perplexity/Google-Extended named blocks; Perplexity gets scoped Allow for high-value SEO pages.
+- **`/your-journey` canonical route** — added alongside `/your-vintage` and `/roadmap` aliases. Tier-dimming already wired via `Roadmap` component.
+- **`/vs/innovint-vintrace` public comparison landing** — three-way honest positioning, sitemap-indexed. Deep-links to `/for-innovint-users`, `/for-vintrace-users`, `/pricing-comparison`.
+- **Migration guides ungated + refreshed** — `/for-innovint-users` + `/for-vintrace-users` now public + robots-crawlable + sitemapped. Fake testimonials replaced with honest "Example use-case" framing.
+- **`/competitive-advantage` retired with 301** — permanent redirect to `/vs/innovint-vintrace` (dev + prod mirror). Stale "0 direct competitors" claim neutralised.
+- **Home Winery Kit units toggle** — metric (23 L) ↔ imperial (6 gal), default metric, localStorage-persisted.
+- **Competitor research memo** at `/app/memory/COMPETITOR_RESEARCH_INNOVINT_VINTRACE.md` — 11 cited sources.
+- **Merch artwork downloader (`/admin/merch-artwork`)** — VistaPrint-ready PNG composer at 300 DPI. Bar Runner + Square Coaster shipped, one-line extensible for more SKUs.
+- **`ownerProcedure` audit** — `/orders.list` + `/campaignMetrics.getHistory + upsert` verified locked. No fix needed.
+- **BD Digest verified** — env ready, dry-run computes real digest. Awaits Monday cron wiring in Railway deploy.
 
 ---
 

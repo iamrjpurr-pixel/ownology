@@ -17,7 +17,11 @@
  * Public files (never cached): /manifest.json, /favicon.*, /robots.txt,
  * /sitemap.xml — small, always fresh from origin.
  */
-const CACHE_VERSION = "ow-v20";
+// Cache version — the sentinel `__COMMIT_HASH__` is replaced at Vite serve +
+// build time by the viteSwCacheVersion plugin (see /app/viteSwCacheVersion.ts).
+// Any commit → new SW file content → browser installs the new SW on next visit
+// and purges old caches in activate. No more manual bumping.
+const CACHE_VERSION = "ow-__COMMIT_HASH__";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 

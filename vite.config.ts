@@ -5,6 +5,7 @@ import path from "node:path";
 import { defineConfig, type Plugin } from "vite";
 import { viteGateWall } from "./viteGateWall";
 import { viteTodoSync } from "./viteTodoSync";
+import { viteSwCacheVersion } from "./viteSwCacheVersion";
 
 // Ownology — Emergent-compatible Vite config.
 // Manus-specific plugins (jsx-loc, manus-runtime, debug-collector, storage-proxy,
@@ -45,7 +46,7 @@ function sampleVintageLogAlias(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), sampleVintageLogAlias(), viteGateWall(), viteTodoSync()],
+  plugins: [react(), tailwindcss(), sampleVintageLogAlias(), viteGateWall(), viteTodoSync(), viteSwCacheVersion()],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),

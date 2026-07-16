@@ -168,6 +168,44 @@ Disallow: /admin
 Disallow: /api/
 Disallow: /hi/
 Disallow: /i/
+Disallow: /trial-locked
+Disallow: /try
+Disallow: /invite
+Disallow: /auth/
+Disallow: /onboarding
+Disallow: /todo
+
+# Aggressive AI-crawler explicit block. GPTBot etc. currently ignore
+# generic User-agent star rules for training. Named blocks stop them
+# scraping our positioning + comparison content into their training set.
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: PerplexityBot
+Allow: /vs/
+Allow: /pricing
+Allow: /pricing-comparison
+Allow: /for-innovint-users
+Allow: /for-vintrace-users
+Allow: /why-ownology
+Allow: /cellar-journal/
+Allow: /blog/
+Disallow: /
 
 # Sitemap
 Sitemap: ${SITE_ORIGIN}/api/sitemap.xml

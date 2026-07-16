@@ -98,7 +98,24 @@ function readCommit(): { hash: string; at: string } {
 function readSwCacheVersion(): string {
   const sw = safeRead("client/public/sw.js");
   const m = sw.match(/CACHE_VERSION\s*=\s*["']([^"']+)["']/);
-  return m ? m[1] : "unknown";
+  if (!m) return "unknown";
+  // The sentinel is replaced at serve/build time by viteSwCacheVersion. If we
+  // read the file BEFORE that replacement, return the resolved value directly
+  // rather than the literal sentinel string.
+  const raw = m[1];
+  if (raw.includes("__COMMIT_HASH__")) {
+    return raw.replace("__COMMIT_HASH__", currentCommitHashForSw());
+  }
+  return raw;
+}
+
+/** Mirror the sw-cache-version plugin's fallback so both agree in dev. */
+function currentCommitHashForSw(): string {
+  try {
+    return execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim();
+  } catch {
+    return "dev";
+  }
 }
 
 function countTrpcProcedures(): number {

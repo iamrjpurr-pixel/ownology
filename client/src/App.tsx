@@ -102,6 +102,7 @@ const UnsubscribeWeeklyReco = lazy(() => import("./pages/UnsubscribeWeeklyReco")
 const AdminEngagement = lazy(() => import("./pages/AdminEngagement"));
 const AdminBrandAssets = lazy(() => import("./pages/AdminBrandAssets"));
 const AdminMerchArtwork = lazy(() => import("./pages/AdminMerchArtwork"));
+const AdminQrScans = lazy(() => import("./pages/AdminQrScans"));
 const VsInnovintVintrace = lazy(() => import("./pages/VsInnovintVintrace"));
 const AdminEventIngest = lazy(() => import("./pages/AdminEventIngest"));
 const AdminAudioHook = lazy(() => import("./pages/AdminAudioHook"));
@@ -407,6 +408,7 @@ function Router() {
       <Route path={"/admin/contacts/engagement"} component={AdminEngagement} />
       <Route path={"/admin/brand-assets"} component={AdminBrandAssets} />
       <Route path={"/admin/merch-artwork"} component={AdminMerchArtwork} />
+      <Route path={"/admin/qr-scans"} component={AdminQrScans} />
       <Route path={"/admin/contacts"} component={AdminContacts} />
       <Route path={"/admin/contacts-migrate"} component={AdminContactsMigrate} />
       <Route path={"/admin/event-ingest"} component={AdminEventIngest} />
@@ -459,9 +461,11 @@ function Router() {
       <Route path={"/call-playbook"} component={CallPlaybook} />
       <Route path={"/todo"} component={Todo} />
       <Route path={"/your-vintage"} component={Roadmap} />
-      {/* Legacy alias — /roadmap kept for bookmark/link compatibility.
-          Feb 2026, Rich: renamed to /your-vintage — "roadmap" reads as
-          startup-speak; "your vintage" is winemaker-native. */}
+      {/* Canonical journey URL — Feb 2026, Rich: "roadmap" reads as
+          startup-speak; "your journey" is warmer than "your vintage" for
+          the first-time visitor context. Both aliases below preserved for
+          any cold-outreach SMS or bookmarks already in the wild. */}
+      <Route path={"/your-journey"} component={Roadmap} />
       <Route path={"/roadmap"} component={Roadmap} />
       <Route path={"/admin/style-guide/induction"} component={StyleGuideInduction} />
       <Route path={"/admin/deck/user-journey"} component={UserJourneyDeck} />

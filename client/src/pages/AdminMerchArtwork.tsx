@@ -311,19 +311,17 @@ function composeArtwork(canvas: HTMLCanvasElement, opts: ComposeOptions): void {
 }
 
 // ─── Default QR landing per SKU ─────────────────────────────────────────────
-// All merch QRs land on the /vs/innovint-vintrace comparison page — the
-// SEO front-door + honest positioning story that converts cellar-door scans
-// into quiz-takers or founding members. UTMs baked in per SKU for attribution.
-const DEFAULT_QR_URL = "https://ownology.ai/vs/innovint-vintrace";
+// Every QR encodes /api/qr-scan/{sku} — a short URL that gives us:
+//   • Denser QR (fewer modules) → more reliable scans through cork/felt
+//   • Server-side attribution logging in merch_scan_events
+//   • Auto-attached UTMs on the 302-redirect to /vs/innovint-vintrace
+// The clean printable URL below is what actually shows on the artwork; the
+// QR itself encodes the tracking endpoint.
+const QR_ENDPOINT_ORIGIN = "https://ownology.ai";
 function qrTargetFor(skuId: string): string {
-  const params = new URLSearchParams({
-    utm_source: skuId,
-    utm_medium: "merch",
-    utm_campaign: "cellar-door",
-  });
-  return `${DEFAULT_QR_URL}?${params.toString()}`;
+  return `${QR_ENDPOINT_ORIGIN}/api/qr-scan/${skuId}`;
 }
-// Human-readable version rendered on the artwork (no UTM noise on the print)
+// Human-readable version rendered on the artwork (no /api/ noise on the print)
 const QR_DISPLAY_URL = "ownology.ai/vs";
 
 // ─── Page ────────────────────────────────────────────────────────────────────
@@ -486,8 +484,14 @@ export default function AdminMerchArtwork() {
           </p>
         </div>
         <Link
-          href="/admin/brand-assets"
+          href="/admin/qr-scans"
           style={{ color: "var(--ow-amber)", fontSize: "0.85rem", textDecoration: "none" }}
+        >
+          scan analytics →
+        </Link>
+        <Link
+          href="/admin/brand-assets"
+          style={{ color: "var(--ow-amber)", fontSize: "0.85rem", textDecoration: "none", marginLeft: 12 }}
         >
           ← brand assets
         </Link>
