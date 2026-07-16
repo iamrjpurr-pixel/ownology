@@ -2,7 +2,7 @@
 
 Living document. Every "Potential improvement 💡" and "Next Action Item" from agent sessions lands here so nothing gets lost across forks/sessions.
 
-Last consolidated: 16 Jul 2026.
+Last consolidated: 16 Jul 2026 (evening — P1 restructured, first-paying-customer triggers isolated).
 
 
 ---
@@ -159,6 +159,10 @@ A single new public page `/ask` where ANY visitor types any winemaking question 
 
 ## 🟠 P1 — Engagement / Retention
 
+### Response Rate Tracking · variant analytics 🆕 (Jul 2026 — top priority)
+Stamp `sent_variant_key` (and `sent_at`) on `outreach_contacts` the moment an operator taps "Copy SMS" for a fresh row (or explicitly "mark SMS sent"). After 20+ sends per variant, compute reply-rate per lens by joining `sent_variant_key` × `replied_at IS NOT NULL`. Surface a small chart on `/admin/sms-openers` — sends, replies, reply-rate — so the winning psychology angle surfaces itself instead of being a hunch. Directly compounds the SMS opener variants system that just shipped.
+> **Files**: schema addition (`sent_variant_key varchar(64)`, `sent_at bigint`); wire the queue's Copy-SMS handler + `markSmsSent` mutation to stamp; new `smsOpeners.responseStats` query; small chart on `/admin/sms-openers`.
+
 ### Sanitised Story Card — consumer-facing batch surface 🆕 (Jul 2026)
 Replaces the earlier idea of putting auditor cellar books on bottle QRs. A public `/batch/:slug` page that shows the batch's story — variety, region, vintage, milestones, cellar notes — but suppresses chemistry, timestamps, and cellar-floor operational notes. Every bottle QR points here; cellar auditors see the full private book on `/cellar-book/:id`. Two surfaces, same underlying batch record.
 > **Files**: new `client/src/pages/StoryCard.tsx`, extension of `server/routers/vintageLog.ts` with a `publicStoryCard` procedure that redacts.
@@ -187,6 +191,18 @@ Currently using stubbed test keys. Need:
 - Create products: Free, Press, Amphora, Coopers, Founding Member (see current `/pricing` for tier structure)
 - Add Price IDs to Railway env vars
 - Switch keys from `sk_test_*` → `sk_live_*`
+
+---
+
+## 🕰 First-paying-customer triggers (park until then)
+
+These have no value while Ownology is single-user (Rich testing on his own cellar). The day the first founding member signs up, work through them.
+
+### Set CRON_SECRET on Railway + wire nightly digests to real inboxes
+The Monday cellar digest and daily alert are ALREADY wired to send via Resend when `CRON_SECRET` is configured. Right now they'd only email Rich (dry-run + manual `/admin/weekly-digest` Send-now already covers that use case). The moment a real founding member's email is in `users.email`, generate a strong random `CRON_SECRET` on Railway prod → add cron schedule `0 20 * * 0` (Mon 07:00 AEDT) for the weekly digest and `0 20 * * *` for daily alerts. Test with `?dryRun=1` first.
+
+### ~~Nightly Mobile Cron~~ — killed
+Considered wiring `outreach.bulkEnrichMobiles` on a nightly cron. Decision: DO NOT BUILD. Reasons: current backlog is ~90 email-only rows (4 taps = done); new-contact intake is 5-10/week so the cron would process 1-2 rows/night — theatre; the manual button gives an eyeball-QC checkpoint on Perplexity's confidence classifier, which a cron removes. Deleted from backlog.
 
 ---
 
