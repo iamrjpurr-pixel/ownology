@@ -2,7 +2,32 @@
 
 Living document. Every "Potential improvement 💡" and "Next Action Item" from agent sessions lands here so nothing gets lost across forks/sessions.
 
-Last consolidated: 28 Jun 2026.
+Last consolidated: 16 Jul 2026.
+
+
+---
+
+## ✅ Shipped Jul 2026
+
+- **Weekly Cellar Digest — Monday-morning heartbeat**. New `/admin/weekly-digest` preview surface + Send-now button. Layers three sections on top of the existing vessel-status cron: cellar tasks rollup (completed / new / overdue / due-next-7), Open-Meteo temperature-outlier scan (compared to `weather_thresholds_json`), and pipeline moves (new contacts / first opens / replies / demo bookings + top-3 most-engaged). Verified live via Resend id `d262eeb6-…`. Cron endpoint already registered — Railway just needs to hit Mon 07:00 Sydney with `x-cron-secret`.
+- **PWA launch → dashboard, not marketing page.** `manifest.json` `start_url` bumped to `/?src=pwa`; `MobileHomeRoute` detects PWA (query flag OR `display-mode: standalone` OR iOS `navigator.standalone`) and hard-redirects to `/dashboard` when authed, `/login?next=/dashboard` when anon. Fixes "I open the PWA and get the landing page with three or four other options".
+- **Fresh-build banner + poll.** `registerServiceWorker.ts` shows a top-right "New version available — Refresh" toast when a waiting SW is detected. Polls `registration.update()` every 30 min so long-lived tabs pick up deploys without a manual reload. `sw.js` gains a `SKIP_WAITING` message handler.
+- **`/admin/environment` — build chip + cache reset.** Displays current commit + SW cache version + latest CHANGELOG title. One-tap **Reset app cache** wipes Cache Storage, unregisters SWs, and reloads. Escape hatch for any "the app looks stale" complaint.
+- **Winery region editor (P0 from last session).** `/admin/environment` gains an editable `Wine region` field (AU/NZ datalist), a **Use my GPS** button, and geocoder-pick auto-fills region from `admin1` when blank. Persists via `region` field added to `weather.saveWineryConfig` mutation.
+- **Windows "Pick an application" SMS dialog killed.** `/hi/:slug` desktop clicks intercept the `sms:` link, parse number + prefilled body, copy both to clipboard, and show an inline amber confirmation strip. Touch devices keep native SMS behaviour untouched.
+- **Outreach router split.** `server/routers/outreach.ts` 3,698 → 3,167 lines (–14%). Pure sync helpers → `outreach-helpers.ts` (194 lines); async Claude/Perplexity helpers → `outreach-ai-helpers.ts` (370 lines). All 50 tRPC procedures unchanged in place, zero external imports touched.
+- **Open card → new tab.** Both `top5-open-card-*` and `queue-open-*` on `/admin/contacts/outbound-queue` swapped from wouter `<Link>` to plain `<a target="_blank" rel="noopener noreferrer">` so middle-click / Ctrl-click / right-click actually work.
+- **Sender sweep + reply-follow-up generator + brand-assets page.** Jamie→Rich across 5 files + 51 SMS drafts. `outreach.replyFollowupAI` drafts the next SMS grounded in pasted reply text. `/admin/brand-assets` catalogs 16 brand images with copy/download.
+- **Reply sentiment + auto-advance.** `saveReply` runs Claude classification inline (interested / objection / not-now / cold), stamps `reply_sentiment`, auto-advances status forward-only. Colour-coded on `/admin/contacts/engagement`.
+- **Auto-rewrite on ingest.** `outreach.create` runs Claude rewrite + region inference inline. New contacts land with a warm SMS draft + backfilled region — zero manual "Rewrite with AI" clicks.
+- **Region-aware cohort bulk + TSV copy.** Bulk AI rewrite strip is context-aware, shows cohort badge, and offers "Copy N SMSes as TSV" for paste-into-Messages workflows.
+- **Passwordless magic-link auth + open sign-up.** Resend-backed link login with auto-provisioning of user + winery on first request. Admin allowlist via `ADMIN_EMAILS` env.
+- **`/admin/users` — user management.** KPI strip + 200-row table + per-row "resend fresh link" that bypasses public 3/hr rate-limit for stuck sign-ins.
+- **Multi-channel outbound queue markers.** `insta_contacted_at` · `linkedin_contacted_at` · `facebook_contacted_at` columns + toggles on the contact card. Queue filter now excludes any row with a timestamp on ANY of the five outbound-channel columns.
+- **Instagram handle backfill (Perplexity Sonar).** Manual button + nightly cron. Auto-populates `insta_handle` on contacts with only a name + winery.
+- **RED keyword removed from customer-facing copy.** SMS bodies rewritten to sound like the customer composed them.
+- **PWA install banner hero variant.** Fires on `/dashboard` with a 7-day snooze (previously permanent-dismiss). Value-forward subtitle.
+- **WeatherWidget coordinates fix.** `wineries.id=1` corrected to Pokolbin coords + owner user id fixed.
 
 
 ---
@@ -114,9 +139,6 @@ Estimated combined build: 3-4 weeks after data models are in. Don't start until 
 2. In-memory per-pod — multi-replica Railway prod deploys would let attackers dodge it by hitting different pods.
 Fix: swap for Redis-backed limiter, widen window to 30/hour, and add optional allowlist env var `OWNOLOGY_GATE_RATE_LIMIT_ALLOWLIST` for preview / office IPs. ~90 min build.
 
-### `server/index.ts` split (found Feb 2026 pre-demo E2E)
-File is 1168 LOC — well past the 700-line threshold. Candidates for extraction: gate middleware + invite handler → `server/gateHandlers.ts`; scheduled handlers → `server/scheduled/index.ts`; SPA meta injection → `server/spaMeta.ts`; sample-vintage-log alias + audit route → `server/publicRoutes.ts`. Do this as part of the Phase 2 router refactor already planned.
-
 ### Demo to a real winemaker
 The full moat (personal history + reasoning + alerts + bibles + AU/NZ regulations) is **end-to-end demoable** on the live URL right now. Outreach targets:
 - Tamburlaine (Orange, NSW) — boutique premium
@@ -137,29 +159,47 @@ A single new public page `/ask` where ANY visitor types any winemaking question 
 
 ## 🟠 P1 — Engagement / Retention
 
-### Daily 7am alert email (via Resend) 💡
-Wire a daily cron that scans each user's `vintageLog.alerts` and sends a morning briefing email: *"Good morning — Tank 9 Shiraz needs DAP today, Tank 5 Cab is running hot, Tank 2 Merlot is ready to rack."* The "AI assistant who actually walks the cellar with you" moment that investors and winemakers both fall in love with. Drives app-open frequency.
+### Sanitised Story Card — consumer-facing batch surface 🆕 (Jul 2026)
+Replaces the earlier idea of putting auditor cellar books on bottle QRs. A public `/batch/:slug` page that shows the batch's story — variety, region, vintage, milestones, cellar notes — but suppresses chemistry, timestamps, and cellar-floor operational notes. Every bottle QR points here; cellar auditors see the full private book on `/cellar-book/:id`. Two surfaces, same underlying batch record.
+> **Files**: new `client/src/pages/StoryCard.tsx`, extension of `server/routers/vintageLog.ts` with a `publicStoryCard` procedure that redacts.
+
+### Founding-Cohort Live Counter 🆕 (Jul 2026)
+Live tally on `/pricing` and `/founding-member` — "12 of 99 seats claimed" with a small spinner so scarcity feels genuine, not fabricated. Reads from `users.plan = "founding_member"` count.
+> **Files**: extend `pricing.ts` router with a `foundingSeatsClaimed` query; add the counter component to `/pricing` and `/founding-member`.
+
+### Reply Capture Inline 🆕 (Jul 2026)
+Let the operator paste an Instagram / LinkedIn reply directly from the queue row so the Claude sentiment classifier auto-warms the card. Currently the flow requires opening the contact card, clicking the reply-capture button, pasting, saving — four clicks. Should be one paste-and-tab.
+> **Files**: `client/src/pages/AdminOutboundQueue.tsx` (inline reply textarea per row); reuse existing `outreach.saveReply` mutation.
+
+### Digest Feedback Loop 🆕 (Jul 2026)
+One-tap 👍 / 👎 links at the bottom of every Monday cellar-digest email so we learn which weeks the copy resonates. Stores to a new `digest_feedback` table keyed on digest date + user id + polarity + optional freeform note.
+> **Files**: new `digest_feedback` schema; extend `server/scheduled/weeklyCellarDigest.ts` email footer with tokenised feedback links; new `/api/digest/feedback` handler.
+
+### Middle-click Everywhere audit 🆕 (Jul 2026)
+Swap wouter `<Link>` → plain `<a>` on every admin surface where the operator wants "keep list open, peek at detail" behaviour. Confirmed done on `/admin/contacts/outbound-queue`; remaining candidates: `/admin/contacts`, `/admin/contacts/engagement`, `/admin/event-ingest`, `/admin/qr-scans`, `/admin/brand-assets`. ~20-30 min.
 
 ### Real-time push notifications
 Once the email loop works, add browser push / SMS (Twilio) for high-severity alerts (stuck ferment, high temp >26°C). Cellar floor doesn't always check email.
 
-### Custom domain `ownology.ai`
-Point DNS to Railway. ~10 minutes on your DNS provider. Step-by-step:
-1. In Railway → ownology service → Settings → Networking → Custom Domain
-2. Add `ownology.ai` (and optionally `www.ownology.ai`)
-3. Railway gives you a CNAME / A record value
-4. In your DNS host, create the record and wait 5–60 min for propagation
-
 ### Real Stripe price IDs + product setup
 Currently using stubbed test keys. Need:
 - Real Stripe account at stripe.com
-- Create 3 products: Free, Premium ($99/mo), Enterprise ($499/mo)
-- Add Price IDs to Railway env vars (`STRIPE_PREMIUM_PRICE_ID`, `STRIPE_ENTERPRISE_PRICE_ID`)
+- Create products: Free, Press, Amphora, Coopers, Founding Member (see current `/pricing` for tier structure)
+- Add Price IDs to Railway env vars
 - Switch keys from `sk_test_*` → `sk_live_*`
 
 ---
 
 ## 🟡 P2 — Product depth
+
+### Railway cron trigger for Weekly Cellar Digest 🆕 (Jul 2026)
+Code is shipped. Railway just needs a cron: `0 20 * * 0` (Sunday 20:00 UTC ≈ Monday 07:00 AEDT) hitting `POST /api/scheduled/weekly-cellar-digest` with `x-cron-secret: $CRON_SECRET` header. Similar wiring already exists for `daily-alert-email`.
+
+### `server/routers/outreach.ts` further split 🆕 (Jul 2026)
+Jul 2026 helper extraction cut 559 lines. Remaining 3,167-line router could still split into: `outreach/public.ts` (bySlug, markViewed, markCtaClicked — ~700 lines) and `outreach/admin.ts` (~2,500 lines with all owner procedures). Only worth doing when next major feature adds to the file.
+
+### `server/index.ts` split (found Feb 2026 pre-demo E2E)
+File is 1168 LOC — well past the 700-line threshold. Candidates for extraction: gate middleware + invite handler → `server/gateHandlers.ts`; scheduled handlers → `server/scheduled/index.ts`; SPA meta injection → `server/spaMeta.ts`; sample-vintage-log alias + audit route → `server/publicRoutes.ts`.
 
 ### The Press post-harvest correlation engine
 Strategy-doc P0 for vintage debrief. For each finished batch, generate a debrief: *"Your tanks fermented at 18°C averaged 1.5 days faster than 19°C tanks. Recommend 18°C as 2027 standard."* Needs:
@@ -168,23 +208,14 @@ Strategy-doc P0 for vintage debrief. For each finished batch, generate a debrief
 - LLM call that correlates events + final metrics + quality scores → narrative debrief
 - UI surface at `/the-press/vintage/{year}`
 
-### Multi-tenant winery model
-Strategy doc calls for `wineries` table + cellar-team roles. Build when the first winery onboards multiple staff. Schema additions:
-- `wineries` (id, owner_id, name, region, total_tanks)
+### Multi-tenant winery model (Phase 3)
+Phase 2 scaffolding shipped Feb 2026 (`winery_id` on all customer-domain tables + auto-provision on signup). Phase 3 = cellar-team roles:
 - `winery_members` (winery_id, user_id, role: owner/cellar_lead/harvest_intern)
-- Add `winery_id` FK to `vintage_log_entries`, `sop_library`, `cellar_journal`
-- Role-based gating in `trpc.ts` (e.g. only owner can edit SOPs; cellar_lead can log; intern can only view)
+- Role-based gating in `trpc.ts` (only owner can edit SOPs; cellar_lead can log; intern can only view)
+- Invite flow that reuses the magic-link path
 
 ### Voice input on QuickEntry
 Strategy doc lists it as a must-have. Web Speech API for browsers, fall back to OpenAI Whisper via Emergent integration for accuracy. "Tank 7 Shiraz, Brix 24.3, time 14:30" → parsed and pre-filled.
-
-### Phase 2 router refactor
-Continue the `routers.ts` split (1,556 LOC remaining). Next 4 extraction targets:
-- `complianceRouter` (~212 LOC)
-- `siteContentRouter` (~213 LOC)
-- `cellarTasksRouter` (~148 LOC)
-- `cellarEquipmentRouter` (~98 LOC)
-**Playbook (learnt from Phase 1 regression):** BEFORE deleting a sub-router from `routers.ts`, grep the moved router for ALL `from "../db.js"` and `from "./trpc.js"` symbol references AND audit which symbols are still needed by the routers staying behind. The Phase 1 regression (`listVintageLogEntries` dropped from imports → dashboard.getStats 500) was caused by skipping this step.
 
 ### Router-level performance dashboard `/admin/perf` 💡
 tRPC middleware tracking p50/p95/p99 latency + cost per procedure. Each extracted sub-router file becomes a measurable unit. Useful for the investor pitch ("our most expensive AI call is X ms; cost per query is Y").
@@ -211,12 +242,13 @@ First-time setup: name, region, tank count, varieties grown → seeds initial SO
 
 | Feature | State |
 |---|---|
-| Authentication | **Fully bypassed** (auto-injects seed admin) — restore via `NODE_ENV` check in `server/trpc.ts` when ready |
-| Stripe payments | Test keys only |
-| File uploads | Disabled |
+| Authentication | ✅ **Live** — Google OAuth + magic-link (Jul 2026) |
+| Custom domain `ownology.ai` | ✅ **Live** — production is on `https://www.ownology.ai` (Jul 2026) |
+| Email (Resend) | ✅ **Live** — daily alert + weekly cellar digest both wired; production cron for weekly still pending Railway config |
+| Stripe payments | Test keys only (`sk_test_stub`) — real IDs + live keys pending |
 | Push notifications | Not wired |
-| SMS alerts (Twilio) | Not wired |
-| Email (Resend) | ✅ Wired (28 Jun 2026) — live send verified, awaiting Railway cron schedule + domain verification |
+| SMS alerts (Twilio) | Not wired — the outbound `SMS_INBOUND_NUMBER` is Rich's real mobile; no automated inbound reply parsing |
+| File uploads | Disabled |
 
 ---
 
