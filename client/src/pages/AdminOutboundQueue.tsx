@@ -29,14 +29,14 @@ function smsDraft(c: { firstName: string; winery?: string | null; painPoint?: st
   const url = `${PREVIEW_BASE}/hi/${c.slug}`;
   if (c.hookText) {
     const wineryBit = c.winery ? ` (${c.winery})` : "";
-    return `g'day ${c.firstName}${wineryBit} — ${c.hookText}. i've been building a cellar AI grounded in your own vintage logs — 90 sec look: ${url} — Rich`;
+    return `g'day ${c.firstName}${wineryBit} — ${c.hookText}. i've been building a cellar AI grounded in your own vintage logs — 90 sec look: ${url} — Rich P · 0408 105 067`;
   }
   if (c.painPoint) {
     const wineryBit = c.winery ? ` (${c.winery})` : "";
-    return `G'day ${c.firstName} — we crossed paths the other day${wineryBit}. You mentioned ${c.painPoint}; I've since built a cellar AI that answers exactly that, grounded in your own vintage logs. 90 sec look: ${url} — Rich`;
+    return `G'day ${c.firstName} — we crossed paths the other day${wineryBit}. You mentioned ${c.painPoint}; I've since built a cellar AI that answers exactly that, grounded in your own vintage logs. 90 sec look: ${url} — Rich P · 0408 105 067`;
   }
   const wineryBit = c.winery ? `, sending this to ${c.winery} too` : "";
-  return `G'day ${c.firstName} — we crossed paths the other day${wineryBit}. I've since built a cellar AI grounded in your own vintage logs — figured you might find it useful. 90 sec look: ${url} — Rich`;
+  return `G'day ${c.firstName} — we crossed paths the other day${wineryBit}. I've since built a cellar AI grounded in your own vintage logs — figured you might find it useful. 90 sec look: ${url} — Rich P · 0408 105 067`;
 }
 
 // ── Instagram / LinkedIn extraction from the notes field ────────────────
@@ -69,13 +69,13 @@ function extractLinkedinFromNotes(notes: string | null | undefined): string | nu
 // Requests.
 function igDmDraft(c: { firstName: string; winery?: string | null; hookText?: string | null; painPoint?: string | null }): string {
   if (c.hookText) {
-    return `hey ${c.firstName} — ${c.hookText}. been quietly building a cellar AI grounded in a winery's own vintage logs (not a textbook). happy to send you the 90 sec look if useful? — Rich`;
+    return `hey ${c.firstName} — ${c.hookText}. been quietly building a cellar AI grounded in a winery's own vintage logs (not a textbook). happy to send you the 90 sec look if useful? — Rich P · 0408 105 067`;
   }
   if (c.painPoint) {
-    return `hey ${c.firstName} — noticed ${c.painPoint}. been building a cellar AI grounded in a winery's own vintage logs. reckon it might scratch that itch — worth a 90 sec look? — Rich`;
+    return `hey ${c.firstName} — noticed ${c.painPoint}. been building a cellar AI grounded in a winery's own vintage logs. reckon it might scratch that itch — worth a 90 sec look? — Rich P · 0408 105 067`;
   }
   const wineryBit = c.winery ? ` — ${c.winery}'s wines have been on my mind` : "";
-  return `hey ${c.firstName}${wineryBit}. been building a cellar AI grounded in a winery's own vintage logs. curious if it'd be useful for you — happy to send a 90 sec look? — Rich`;
+  return `hey ${c.firstName}${wineryBit}. been building a cellar AI grounded in a winery's own vintage logs. curious if it'd be useful for you — happy to send a 90 sec look? — Rich P · 0408 105 067`;
 }
 
 function extractEmailFromNotes(notes: string | null | undefined): string | null {
@@ -91,8 +91,8 @@ function buildMailto(email: string, firstName: string, winery: string | null, pa
     ? `${firstName} — ${hookText.slice(0, 60)}${hookText.length > 60 ? "…" : ""}`
     : `${firstName}${wineryPhrase} — a cellar apprentice grounded in your own logs`;
   const body = hookText
-    ? `G'day ${firstName},\n\n${hookText.charAt(0).toUpperCase() + hookText.slice(1)} — reading that hit home.\n\nI've been quietly building Ownology: a cellar AI grounded in a winery's own vintage logs, not a textbook. Ask it "why did tank 9 stick this year" and it walks you through the actual data before it reaches for theory.\n\n90-second landing page tuned to you${wineryPhrase}:\n\n${url}\n\nNo pressure — happy to be told to bugger off. But if it lands, I'd rather hear it directly than through a form.\n\nCheers,\nRich\nOwnology`
-    : `G'day ${firstName},\n\nI've been building Ownology — a small AI cellar apprentice grounded in a winery's own vintage logs rather than a textbook. Figured you might find it useful.\n\n90-second look, tuned to your operation${wineryPhrase}:\n\n${url}\n\nCheers,\nRich\nOwnology`;
+    ? `G'day ${firstName},\n\n${hookText.charAt(0).toUpperCase() + hookText.slice(1)} — reading that hit home.\n\nI've been quietly building Ownology: a cellar AI grounded in a winery's own vintage logs, not a textbook. Ask it "why did tank 9 stick this year" and it walks you through the actual data before it reaches for theory.\n\n90-second landing page tuned to you${wineryPhrase}:\n\n${url}\n\nNo pressure — happy to be told to bugger off. But if it lands, I'd rather hear it directly than through a form.\n\nCheers,\nRich P\n0408 105 067\nOwnology`
+    : `G'day ${firstName},\n\nI've been building Ownology — a small AI cellar apprentice grounded in a winery's own vintage logs rather than a textbook. Figured you might find it useful.\n\n90-second look, tuned to your operation${wineryPhrase}:\n\n${url}\n\nCheers,\nRich P\n0408 105 067\nOwnology`;
   return buildEmailUrl({ to: email, subject, body });
 }
 

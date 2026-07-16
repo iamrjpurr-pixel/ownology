@@ -76,22 +76,22 @@ function buildFollowupSms(c: Contact, bucket: BucketKey): string {
   const first = c.firstName;
   const winery = c.winery ? ` (${c.winery})` : "";
   if (bucket === "hot") {
-    return `hey ${first}${winery} — noticed you had another look at that link i sent. happy to answer any Qs directly, or i can walk you through it live in 15 min. what works? — Rich`;
+    return `hey ${first}${winery} — noticed you had another look at that link i sent. happy to answer any Qs directly, or i can walk you through it live in 15 min. what works? — Rich P · 0408 105 067`;
   }
   if (bucket === "clickedNoBook") {
-    return `hey ${first} — you tapped through to Ownology the other day. any reservations i can address? happy to grab 15 min live if it's easier than reading — ${url} — Rich`;
+    return `hey ${first} — you tapped through to Ownology the other day. any reservations i can address? happy to grab 15 min live if it's easier than reading — ${url} — Rich P · 0408 105 067`;
   }
   if (bucket === "viewedNoClick") {
-    return `hey ${first} — sent that ownology link the other day, wanted to double-check it landed. if the pitch missed the mark, tell me straight — i'd rather know than guess: ${url} — Rich`;
+    return `hey ${first} — sent that ownology link the other day, wanted to double-check it landed. if the pitch missed the mark, tell me straight — i'd rather know than guess: ${url} — Rich P · 0408 105 067`;
   }
   if (bucket === "ghosted") {
-    return `hey ${first}${winery} — first SMS may not have landed. quick recap: cellar AI grounded in a winery's own vintage logs, not a textbook. 90-sec look ${url} — Rich`;
+    return `hey ${first}${winery} — first SMS may not have landed. quick recap: cellar AI grounded in a winery's own vintage logs, not a textbook. 90-sec look ${url} — Rich P · 0408 105 067`;
   }
   if (bucket === "replied") {
-    return `hey ${first} — following up from your earlier reply. still keen to grab 15 min to walk you through Ownology? happy to do it whenever suits — Rich`;
+    return `hey ${first} — following up from your earlier reply. still keen to grab 15 min to walk you through Ownology? happy to do it whenever suits — Rich P · 0408 105 067`;
   }
   // booked
-  return `hey ${first} — looking forward to our chat. i'll send a calendar reminder + zoom link the day before. if anything shifts on your end just ping. — Rich`;
+  return `hey ${first} — looking forward to our chat. i'll send a calendar reminder + zoom link the day before. if anything shifts on your end just ping. — Rich P · 0408 105 067`;
 }
 
 function buildFollowupEmail(email: string, c: Contact, bucket: BucketKey): string {
@@ -102,22 +102,22 @@ function buildFollowupEmail(email: string, c: Contact, bucket: BucketKey): strin
   let body = "";
   if (bucket === "hot") {
     subject = `${first} — happy to answer questions directly`;
-    body = `G'day ${first},\n\nNoticed you had another look at the Ownology link I sent. Rather than let you keep circling the pitch, let me know if there's anything specific you want answered — happy to jump on a 15-minute call whenever suits, or answer via email if that's easier.\n\nLink again for reference: ${url}\n\nCheers,\nRich`;
+    body = `G'day ${first},\n\nNoticed you had another look at the Ownology link I sent. Rather than let you keep circling the pitch, let me know if there's anything specific you want answered — happy to jump on a 15-minute call whenever suits, or answer via email if that's easier.\n\nLink again for reference: ${url}\n\nCheers,\nRich P\n0408 105 067`;
   } else if (bucket === "clickedNoBook") {
     subject = `${first} — a quick 15 min?`;
-    body = `G'day ${first},\n\nYou tapped through to Ownology the other day but didn't book — any reservations I can address directly? If reading isn't landing, happy to walk you through it live in 15 minutes.\n\n${url}\n\nCheers,\nRich`;
+    body = `G'day ${first},\n\nYou tapped through to Ownology the other day but didn't book — any reservations I can address directly? If reading isn't landing, happy to walk you through it live in 15 minutes.\n\n${url}\n\nCheers,\nRich P\n0408 105 067`;
   } else if (bucket === "viewedNoClick") {
     subject = `${first} — did the pitch miss the mark?`;
-    body = `G'day ${first},\n\nSent an Ownology link the other day, wanted to double-check it landed and that the pitch made sense${wineryPhrase}. If it missed the mark, I'd rather hear it straight than guess.\n\n${url}\n\nCheers,\nRich`;
+    body = `G'day ${first},\n\nSent an Ownology link the other day, wanted to double-check it landed and that the pitch made sense${wineryPhrase}. If it missed the mark, I'd rather hear it straight than guess.\n\n${url}\n\nCheers,\nRich P\n0408 105 067`;
   } else if (bucket === "ghosted") {
     subject = `${first} — trying again${wineryPhrase}`;
-    body = `G'day ${first},\n\nFirst SMS/email may not have landed. Quick recap: I've been quietly building Ownology — a cellar AI grounded in a winery's own vintage logs rather than a textbook. Ask it "why did tank 9 stick this year" and it walks you through your actual data first.\n\n90-second landing tuned to ${c.winery ?? "your operation"}:\n\n${url}\n\nCheers,\nRich`;
+    body = `G'day ${first},\n\nFirst SMS/email may not have landed. Quick recap: I've been quietly building Ownology — a cellar AI grounded in a winery's own vintage logs rather than a textbook. Ask it "why did tank 9 stick this year" and it walks you through your actual data first.\n\n90-second landing tuned to ${c.winery ?? "your operation"}:\n\n${url}\n\nCheers,\nRich P\n0408 105 067`;
   } else if (bucket === "replied") {
     subject = `${first} — following up on your reply`;
-    body = `G'day ${first},\n\nFollowing up from your earlier reply. Still keen to grab 15 min to walk you through Ownology? Happy to do it whenever suits.\n\nLink to your personal page: ${url}\n\nCheers,\nRich`;
+    body = `G'day ${first},\n\nFollowing up from your earlier reply. Still keen to grab 15 min to walk you through Ownology? Happy to do it whenever suits.\n\nLink to your personal page: ${url}\n\nCheers,\nRich P\n0408 105 067`;
   } else {
     subject = `${first} — looking forward to our chat`;
-    body = `G'day ${first},\n\nJust confirming we're set for the demo. I'll send a calendar reminder + Zoom link the day before. If anything shifts on your end just ping.\n\nCheers,\nRich`;
+    body = `G'day ${first},\n\nJust confirming we're set for the demo. I'll send a calendar reminder + Zoom link the day before. If anything shifts on your end just ping.\n\nCheers,\nRich P\n0408 105 067`;
   }
   return buildEmailUrl({ to: email, subject, body });
 }

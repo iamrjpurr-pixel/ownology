@@ -96,16 +96,16 @@ function smsDraft(c: { firstName: string; winery?: string | null; event?: string
   // dated). This is the "human who did their homework" opener.
   if (c.hookText) {
     const wineryBit = c.winery ? ` (${c.winery})` : "";
-    return `g'day ${c.firstName}${wineryBit} — ${c.hookText}. i've been building a cellar AI grounded in your own vintage logs — 90 sec look: ${url} — Rich`;
+    return `g'day ${c.firstName}${wineryBit} — ${c.hookText}. i've been building a cellar AI grounded in your own vintage logs — 90 sec look: ${url} — Rich P · 0408 105 067`;
   }
   // Tier-2 fallback: painPoint (business summary) as before.
   if (c.painPoint) {
     const wineryBit = c.winery ? ` (${c.winery})` : "";
-    return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. You mentioned ${c.painPoint}; I've since built a cellar AI that answers exactly that, grounded in your own vintage logs. 90 sec look: ${url} — Rich`;
+    return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. You mentioned ${c.painPoint}; I've since built a cellar AI that answers exactly that, grounded in your own vintage logs. 90 sec look: ${url} — Rich P · 0408 105 067`;
   }
   // Tier-3 honest fallback — no faux familiarity
   const wineryBit = c.winery ? `, sending this to ${c.winery} too` : "";
-  return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. I've since built a cellar AI grounded in your own vintage logs — figured you might find it useful. 90 sec look: ${url} — Rich`;
+  return `G'day ${c.firstName} — we crossed paths ${where}${wineryBit}. I've since built a cellar AI grounded in your own vintage logs — figured you might find it useful. 90 sec look: ${url} — Rich P · 0408 105 067`;
 }
 
 /**

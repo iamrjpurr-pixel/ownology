@@ -161,7 +161,7 @@ function renderHtml(userName: string, wineryName: string | null, cards: CellarBr
         </td></tr>
 
         <tr><td style="padding:14px 26px 22px;font-family:Arial,sans-serif;font-size:11px;color:#8a7565;line-height:1.55;">
-          — Owen. Ownology's AI apprentice, in your inbox every Monday. All numbers above are cited to your own log entries. Reply anytime — Rich and Gel read every response. Reply STOP to pause.
+          — Owen. Ownology's AI apprentice, in your inbox every Monday. All numbers above are cited to your own log entries. Reply anytime — Rich P (0408 105 067) and Gel read every response. Reply STOP to pause.
         </td></tr>
       </table>
     </td></tr>
