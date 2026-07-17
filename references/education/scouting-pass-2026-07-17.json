@@ -1,0 +1,1874 @@
+{
+  "generatedAt": "2026-07-17T23:42:00.672Z",
+  "model": "sonar-pro",
+  "units": [
+    {
+      "source": "csu",
+      "code": "WSC111",
+      "title": "Grape and Wine Science",
+      "level": 1,
+      "focus": "Introductory overview",
+      "scoutedAt": "2026-07-17T23:39:22.579Z",
+      "perplexity": {
+        "assessmentStyle": "",
+        "awriCrossRefs": [],
+        "keyConcepts": [],
+        "layer": "basic",
+        "learningOutcomes": [],
+        "openAccessPapers": [],
+        "ownedContentBridges": [],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://handbook.csu.edu.au/subject/2026/WSC111",
+          "https://handbook.csu.edu.au/subject/2024/WSC111"
+        ],
+        "wbsDomainCandidates": [
+          "D2_harvest",
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D5_post_ferment"
+        ]
+      },
+      "perplexityCitations": [
+        "https://www.csu.edu.au/current-students/studying/plan-your-study/handbooks",
+        "https://cdn.csu.edu.au/__data/assets/pdf_file/0004/4523017/AGSPS-Subject-Availability-UG-2026.pdf",
+        "https://policy.csu.edu.au/download.php?id=506&version=6",
+        "https://www.csu.edu.au/current-students/studying/subject-enrolment/types-of-subjects",
+        "https://www.csu.edu.au/current-students/studying/subject-enrolment/how-to-enrol",
+        "https://www.csu.edu.au/current-students/home"
+      ],
+      "latencyMs": 2852
+    },
+    {
+      "source": "csu",
+      "code": "WSC115",
+      "title": "Wine Science 1",
+      "level": 1,
+      "focus": "Fermentation, SO₂, phenolics, oxidation, QC",
+      "scoutedAt": "2026-07-17T23:39:31.665Z",
+      "perplexity": {
+        "assessmentStyle": "",
+        "awriCrossRefs": [],
+        "keyConcepts": [
+          "basic wine chemistry (ethanol, organic acids, phenolics)",
+          "yeast fermentation pathways and kinetics",
+          "management of alcoholic fermentation in white and red wine",
+          "sulfur dioxide forms, chemistry, and antimicrobial/antioxidant action",
+          "oxygen exposure and wine oxidation chemistry",
+          "quality control parameters in winery lab (pH, TA, ethanol, SO2)",
+          "measurements of phenolic compounds and colour",
+          "wine faults related to fermentation and oxidation",
+          "introductory wine microbiology (yeast vs bacteria)",
+          "use of additives and preservatives in winemaking"
+        ],
+        "layer": "basic",
+        "learningOutcomes": [],
+        "openAccessPapers": [
+          {
+            "authors": "B. Zoecklein et al.",
+            "journal": "American Journal of Enology and Viticulture",
+            "title": "Effect of Wine Oxidation on Phenolic Composition and Quality",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "I. Bisson et al.",
+            "journal": "American Journal of Enology and Viticulture",
+            "title": "Yeast and Fermentation Management in Wine Production",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "A.L. Waterhouse",
+            "journal": "Food Chemistry",
+            "title": "Wine Oxidation: A Review",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "P.A. Kilmartin",
+            "journal": "American Journal of Enology and Viticulture",
+            "title": "Understanding and Managing Sulfur Dioxide in Wine",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "M. Gump et al.",
+            "journal": "Journal of AOAC International",
+            "title": "Determination of Free and Total Sulfur Dioxide in Wine: Comparison of Methods",
+            "url": null,
+            "year": null
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine Guide to Red Winemaking (bible)",
+          "MoreWine Guide to White Wine Making (bible)",
+          "MoreWine paper: SO2 management",
+          "MoreWine paper: Oxygen in ferment",
+          "MoreWine paper: Sanitation",
+          "MoreWine paper: Bench trials",
+          "MoreWine paper: pH meter",
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: Protein stability",
+          "AWRI fact sheet: Reducing ethanol",
+          "AWRI fact sheet: Small-lot fermentation"
+        ],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://handbook.csu.edu.au/subject/2026/WSC115",
+          "https://handbook.csu.edu.au/subject/2024/WSC115"
+        ],
+        "wbsDomainCandidates": [
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D5_post_ferment",
+          "D6_stabilisation",
+          "D10_compliance"
+        ]
+      },
+      "perplexityCitations": [
+        "https://www.csu.edu.au/current-students/studying/plan-your-study/handbooks",
+        "https://cdn.csu.edu.au/__data/assets/pdf_file/0004/4523017/AGSPS-Subject-Availability-UG-2026.pdf",
+        "https://www.csu.edu.au/current-students/studying/subject-enrolment/types-of-subjects",
+        "https://policy.csu.edu.au/document/view-current.php?id=506&version=3"
+      ],
+      "latencyMs": 8286
+    },
+    {
+      "source": "csu",
+      "code": "WSC202",
+      "title": "Wine Production 1",
+      "level": 2,
+      "focus": "Table wine production fundamentals",
+      "scoutedAt": "2026-07-17T23:39:34.934Z",
+      "perplexity": {
+        "assessmentStyle": "",
+        "awriCrossRefs": [],
+        "keyConcepts": [],
+        "layer": "advanced",
+        "learningOutcomes": [],
+        "openAccessPapers": [],
+        "ownedContentBridges": [],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://handbook.csu.edu.au/"
+        ],
+        "wbsDomainCandidates": [
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D5_post_ferment",
+          "D6_stabilisation"
+        ]
+      },
+      "perplexityCitations": [
+        "https://handbook.csu.edu.au/",
+        "https://cdn.csu.edu.au/__data/assets/pdf_file/0004/4523017/AGSPS-Subject-Availability-UG-2026.pdf",
+        "https://www.csu.edu.au/current-students/studying/subject-enrolment/types-of-subjects",
+        "https://cdn.csu.edu.au/__data/assets/pdf_file/0004/4214326/3.5-A3-Social-Work-Field-Education-Handbook.pdf"
+      ],
+      "latencyMs": 2469
+    },
+    {
+      "source": "csu",
+      "code": "WSC217",
+      "title": "Sensory Science",
+      "level": 2,
+      "focus": "Taste/smell physiology, fault identification",
+      "scoutedAt": "2026-07-17T23:39:39.471Z",
+      "perplexity": {
+        "assessmentStyle": "",
+        "awriCrossRefs": [],
+        "keyConcepts": [],
+        "layer": "advanced",
+        "learningOutcomes": [],
+        "openAccessPapers": [],
+        "ownedContentBridges": [],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://handbook.csu.edu.au/subject/2026/WSC217",
+          "https://handbook.csu.edu.au/subject/2024/WSC217"
+        ],
+        "wbsDomainCandidates": [
+          "D8_sensory"
+        ]
+      },
+      "perplexityCitations": [
+        "https://www.csu.edu.au/current-students/studying/plan-your-study/handbooks",
+        "https://policy.csu.edu.au/download.php?id=506&version=6",
+        "https://www.csu.edu.au/current-students/studying/subject-enrolment/types-of-subjects",
+        "https://cdn.csu.edu.au/__data/assets/pdf_file/0004/4523017/AGSPS-Subject-Availability-UG-2026.pdf"
+      ],
+      "latencyMs": 3737
+    },
+    {
+      "source": "csu",
+      "code": "WSC303",
+      "title": "Wine Production 2",
+      "level": 3,
+      "focus": "Sparkling, fortified, NOLO wines",
+      "scoutedAt": "2026-07-17T23:39:43.293Z",
+      "perplexity": {
+        "assessmentStyle": "",
+        "awriCrossRefs": [],
+        "keyConcepts": [],
+        "layer": "advanced",
+        "learningOutcomes": [],
+        "openAccessPapers": [],
+        "ownedContentBridges": [],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://handbook.csu.edu.au/subject/2026/WSC303",
+          "https://handbook.csu.edu.au/subject/2024/WSC303"
+        ],
+        "wbsDomainCandidates": [
+          "D4_fermentation",
+          "D5_post_ferment",
+          "D6_stabilisation",
+          "D7_packaging"
+        ]
+      },
+      "perplexityCitations": [
+        "https://cdn.csu.edu.au/__data/assets/pdf_file/0004/4523017/AGSPS-Subject-Availability-UG-2026.pdf",
+        "https://policy.csu.edu.au/download.php?id=506&version=6",
+        "https://www.csu.edu.au/current-students/studying/subject-enrolment/types-of-subjects"
+      ],
+      "latencyMs": 3022
+    },
+    {
+      "source": "csu",
+      "code": "WSC316",
+      "title": "Wine Sensory Assessment",
+      "level": 3,
+      "focus": "Advanced sensory evaluation",
+      "scoutedAt": "2026-07-17T23:39:47.394Z",
+      "perplexity": {
+        "assessmentStyle": "",
+        "awriCrossRefs": [
+          "AWRI fact sheet: Small-lot fermentation"
+        ],
+        "keyConcepts": [],
+        "layer": "advanced",
+        "learningOutcomes": [],
+        "openAccessPapers": [],
+        "ownedContentBridges": [
+          "MoreWine Guide to Red Winemaking (bible)",
+          "MoreWine Guide to White Wine Making (bible)",
+          "MoreWine paper: Bench trials"
+        ],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://handbook.csu.edu.au/subject/2026/WSC316",
+          "https://handbook.csu.edu.au/subject/2024/WSC316",
+          "https://handbook.csu.edu.au"
+        ],
+        "wbsDomainCandidates": [
+          "D8_sensory"
+        ]
+      },
+      "perplexityCitations": [
+        "https://handbook.csu.edu.au/",
+        "https://policy.csu.edu.au/download.php?id=506&version=6",
+        "https://cdn.csu.edu.au/__data/assets/pdf_file/0004/4523017/AGSPS-Subject-Availability-UG-2026.pdf",
+        "https://www.csu.edu.au/current-students/studying/subject-enrolment/types-of-subjects"
+      ],
+      "latencyMs": 3301
+    },
+    {
+      "source": "csu",
+      "code": "WSC317",
+      "title": "Wine Science 2",
+      "level": 3,
+      "focus": "Flavour compounds, phenolic chemistry",
+      "scoutedAt": "2026-07-17T23:39:52.448Z",
+      "perplexity": {
+        "assessmentStyle": "",
+        "awriCrossRefs": [],
+        "keyConcepts": [],
+        "layer": "advanced",
+        "learningOutcomes": [],
+        "openAccessPapers": [],
+        "ownedContentBridges": [],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://handbook.csu.edu.au/subject/2026/WSC317",
+          "https://handbook.csu.edu.au/subject/2024/WSC317"
+        ],
+        "wbsDomainCandidates": [
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D5_post_ferment",
+          "D6_stabilisation",
+          "D8_sensory"
+        ]
+      },
+      "perplexityCitations": [
+        "https://handbook.csu.edu.au/",
+        "https://cdn.csu.edu.au/__data/assets/pdf_file/0004/4523017/AGSPS-Subject-Availability-UG-2026.pdf",
+        "https://www.csu.edu.au/current-students/studying/subject-enrolment/types-of-subjects"
+      ],
+      "latencyMs": 4254
+    },
+    {
+      "source": "csu",
+      "code": "WSC318",
+      "title": "Wine Microbiology",
+      "level": 3,
+      "focus": "Yeast ecology, MLF, spoilage control",
+      "scoutedAt": "2026-07-17T23:40:00.017Z",
+      "perplexity": {
+        "assessmentStyle": "",
+        "awriCrossRefs": [
+          "AWRI fact sheet: MLF (achieving successful)",
+          "AWRI fact sheet: MLF in red wine",
+          "AWRI fact sheet: Controlling Brett",
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: Avoiding lab spoilage"
+        ],
+        "keyConcepts": [
+          "Wine yeast ecology and succession during fermentation",
+          "Yeast taxonomy, physiology and metabolism in wine",
+          "Malolactic fermentation microbiology and ecology",
+          "Lactic acid bacteria species relevant to wine (Oenococcus, Lactobacillus, Pediococcus)",
+          "Microbial spoilage organisms in wine (Brettanomyces, acetic acid bacteria, film yeasts, molds)",
+          "Spoilage mechanisms: volatile phenols, acetic acid, mousiness, biogenic amines",
+          "Microbial control strategies: SO2, temperature, pH, oxygen management",
+          "Use of selected and indigenous yeast cultures",
+          "Nutritional requirements of wine yeasts and bacteria",
+          "Monitoring and managing stuck and sluggish fermentations",
+          "Microbiological monitoring and hygiene in winery operations",
+          "Impact of microbiology on wine style and quality"
+        ],
+        "layer": "advanced",
+        "learningOutcomes": [],
+        "openAccessPapers": [
+          {
+            "authors": "Fleet, G.H.",
+            "journal": "International Journal of Food Microbiology",
+            "title": "Wine Microbiology and Biotechnology",
+            "url": null,
+            "year": 1993
+          },
+          {
+            "authors": "Bartowsky, E.J.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "Bacterial spoilage of wine and approaches to minimize it",
+            "url": null,
+            "year": 2009
+          },
+          {
+            "authors": "Lonvaud-Funel, A.",
+            "journal": "Journal International des Sciences de la Vigne et du Vin",
+            "title": "Lactic acid bacteria in the quality and authenticity of wine",
+            "url": null,
+            "year": 1999
+          },
+          {
+            "authors": "Bokulich, N.A., Mills, D.A.",
+            "journal": "International Journal of Food Microbiology",
+            "title": "Facility-specific “house microbiota” and their responses to processing in a large-scale winery",
+            "url": null,
+            "year": 2013
+          },
+          {
+            "authors": "Ciani, M., Comitini, F.",
+            "journal": "World Journal of Microbiology and Biotechnology",
+            "title": "Non-Saccharomyces wine yeasts: ever-expanding frontiers",
+            "url": null,
+            "year": 2015
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine Guide to Red Winemaking (bible)",
+          "MoreWine Guide to White Wine Making (bible)",
+          "MoreWine paper: SO2 management",
+          "MoreWine paper: MLF",
+          "MoreWine paper: Sanitation",
+          "MoreWine paper: Bench trials",
+          "MoreWine paper: Oxygen in ferment",
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: Controlling Brett",
+          "AWRI fact sheet: MLF (achieving successful)",
+          "AWRI fact sheet: MLF in red wine",
+          "AWRI fact sheet: Avoiding lab spoilage"
+        ],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://handbook.csu.edu.au/subject/2026/WSC318",
+          "https://handbook.csu.edu.au/subject/2024/WSC318"
+        ],
+        "wbsDomainCandidates": [
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D5_post_ferment",
+          "D9_maintenance"
+        ]
+      },
+      "perplexityCitations": [
+        "https://handbook.csu.edu.au/",
+        "https://cdn.csu.edu.au/__data/assets/pdf_file/0004/4523017/AGSPS-Subject-Availability-UG-2026.pdf",
+        "https://www.csu.edu.au/current-students/studying/subject-enrolment/types-of-subjects",
+        "https://policy.csu.edu.au/download.php?id=506&version=6"
+      ],
+      "latencyMs": 6769
+    },
+    {
+      "source": "csu",
+      "code": "WSC319",
+      "title": "Wine Chemistry",
+      "level": 3,
+      "focus": "Fining agents, stability, enzyme treatments",
+      "scoutedAt": "2026-07-17T23:40:15.252Z",
+      "perplexity": {
+        "assessmentStyle": "",
+        "awriCrossRefs": [
+          "AWRI fact sheet: Protein stability"
+        ],
+        "keyConcepts": [
+          "colloidal stability of wine",
+          "protein stability and haze formation",
+          "tannin–protein interactions",
+          "fining agents and mechanisms of action",
+          "bentonite fining for protein stability",
+          "PVPP, casein and gelatin fining",
+          "enzyme treatments in wine (pectinases, glycosidases)",
+          "tartrate stability and cold stabilisation",
+          "metal (copper/iron) instability and casse",
+          "oxidation–reduction reactions in wine",
+          "colour chemistry of white and red wines",
+          "effects of pH and ionic strength on wine stability",
+          "impact of fining on flavour and aroma compounds",
+          "use of laboratory trials to optimise fining",
+          "chemical basis of clarification and filtration"
+        ],
+        "layer": "advanced",
+        "learningOutcomes": [],
+        "openAccessPapers": [
+          {
+            "authors": "P. Waters et al.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "The impact of bentonite fining on protein stability and wine quality",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "R. P. Pocock et al.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "Wine protein haze: mechanisms and prevention",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "J. Vidal et al.",
+            "journal": "OENO One",
+            "title": "Influence of fining agents on wine phenolic composition and sensory properties",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "M. Lambri et al.",
+            "journal": "Food Chemistry",
+            "title": "Fining agents in winemaking: a review of effects on wine stability and quality",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "A. Boulton et al.",
+            "journal": "American Journal of Enology and Viticulture",
+            "title": "Chemical stability of wines: tartrate, protein and oxidative equilibria",
+            "url": null,
+            "year": null
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine Guide to Red Winemaking (bible)",
+          "MoreWine Guide to White Wine Making (bible)",
+          "MoreWine paper: Fining agents",
+          "MoreWine paper: Bench trials",
+          "MoreWine paper: Oxygen in ferment",
+          "MoreWine paper: SO2 management",
+          "MoreWine paper: Sanitation"
+        ],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://handbook.csu.edu.au/subject/2026/WSC319",
+          "https://handbook.csu.edu.au/subject/2024/WSC319"
+        ],
+        "wbsDomainCandidates": [
+          "D4_fermentation",
+          "D5_post_ferment",
+          "D6_stabilisation",
+          "D8_sensory"
+        ]
+      },
+      "perplexityCitations": [
+        "https://cdn.csu.edu.au/__data/assets/pdf_file/0004/4523017/AGSPS-Subject-Availability-UG-2026.pdf",
+        "https://policy.csu.edu.au/download.php?id=506&version=6",
+        "https://www.csu.edu.au/current-students/studying/subject-enrolment/types-of-subjects",
+        "https://charlie.csu.edu.au/2026/01/12/confused-about-enrolments-same-lets-fix-that/"
+      ],
+      "latencyMs": 14436
+    },
+    {
+      "source": "csu",
+      "code": "WSC321",
+      "title": "Winery Engineering",
+      "level": 3,
+      "focus": "Equipment design, utilities, waste compliance",
+      "scoutedAt": "2026-07-17T23:40:19.313Z",
+      "perplexity": {
+        "assessmentStyle": "",
+        "awriCrossRefs": [],
+        "keyConcepts": [],
+        "layer": "advanced",
+        "learningOutcomes": [],
+        "openAccessPapers": [],
+        "ownedContentBridges": [],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://handbook.csu.edu.au/subject/2026/WSC321",
+          "https://handbook.csu.edu.au/subject/2024/WSC321",
+          "https://study.csu.edu.au/courses/bachelor-wine-science",
+          "https://www.csu.edu.au/current-students/studying/subject-enrolment/types-of-subjects"
+        ],
+        "wbsDomainCandidates": [
+          "D2_harvest",
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D5_post_ferment",
+          "D6_stabilisation",
+          "D9_maintenance",
+          "D10_compliance"
+        ]
+      },
+      "perplexityCitations": [
+        "https://cdn.csu.edu.au/__data/assets/pdf_file/0004/4523017/AGSPS-Subject-Availability-UG-2026.pdf",
+        "https://www.csu.edu.au/current-students/studying/subject-enrolment/types-of-subjects"
+      ],
+      "latencyMs": 3259
+    },
+    {
+      "source": "adelaide",
+      "code": "OENOLOGY 1018NW",
+      "title": "Foundations of Wine Science I",
+      "level": 1,
+      "focus": "Viticulture, oenology, sensory — integrated intro",
+      "scoutedAt": "2026-07-17T23:40:28.741Z",
+      "perplexity": {
+        "assessmentStyle": "Sensory exam, written theory exam, vine anatomy practical report, and industry-based case study.[2]",
+        "awriCrossRefs": [
+          "AWRI fact sheet: Small-lot fermentation",
+          "AWRI fact sheet: Protein stability",
+          "AWRI fact sheet: Avoiding lab spoilage"
+        ],
+        "keyConcepts": [
+          "basic vine anatomy and growth",
+          "viticultural seasons and key vineyard operations",
+          "introductory grape and wine composition",
+          "fundamentals of wine chemistry relevant to sensory properties",
+          "overview of winemaking stages from harvest to bottling",
+          "basic sensory evaluation principles and tasting methodology",
+          "sensory description of major wine styles and varietals",
+          "linking viticultural practices to wine style and quality outcomes",
+          "industry structure and roles in viticulture and oenology",
+          "introductory understanding of faults and taints (sensory-focused)"
+        ],
+        "layer": "basic",
+        "learningOutcomes": [
+          "Describe the main anatomical structures of the grapevine and their functions.[2]",
+          "Explain the annual growth cycle of the vine and key viticultural practices at each stage.[2]",
+          "Identify major components of grapes and wine and relate them to flavour, aroma and mouthfeel.[2]",
+          "Outline the key stages in the winemaking process and the role of the winemaker.[2]",
+          "Apply basic sensory evaluation techniques to assess and describe wines.[2]",
+          "Discuss the relationship between vineyard management, winemaking decisions and final wine style.[1][2]"
+        ],
+        "openAccessPapers": [
+          {
+            "authors": "G. H. Hearn",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "An introduction to grape and wine phenolics: implications for wine style and quality",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "P. Winter, K. Wilkinson",
+            "journal": "OENO One",
+            "title": "Teaching sensory evaluation of wine: integrating theory and practice for undergraduate students",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "A. J. Robinson",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "Basic aspects of grapevine physiology relevant to viticulture education",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "L. B. Bisson",
+            "journal": "American Journal of Enology and Viticulture",
+            "title": "Stuck and sluggish fermentations in wine: causes, prevention and cures",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "M. L. Lambrechts, I. Pretorius",
+            "journal": "South African Journal of Enology and Viticulture",
+            "title": "Yeast and its importance to wine aroma: an educational overview",
+            "url": null,
+            "year": null
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine Guide to Red Winemaking (bible)",
+          "MoreWine Guide to White Wine Making (bible)",
+          "MoreWine paper: Sanitation",
+          "MoreWine paper: Bench trials",
+          "MoreWine paper: Oxygen in ferment",
+          "MoreWine paper: pH meter"
+        ],
+        "prescribedTexts": [
+          {
+            "chapters": [
+              "General introductory chapters on grapevine biology, grape and wine composition, and basic winemaking"
+            ],
+            "citation": "Jackson, R.S. (2014) Wine Science: Principles and Applications. 4th edn. Academic Press.",
+            "copyright": "paywalled"
+          },
+          {
+            "chapters": [
+              "Introductory sections on grape and wine composition and sensory properties"
+            ],
+            "citation": "Iland, P., Bruer, N., Edwards, G., Weeks, S., Wilkes, E. (2012) Chemical Analysis of Grapes and Wine: Techniques and Concepts. Patrick Iland Wine Promotions.",
+            "copyright": "paywalled"
+          }
+        ],
+        "urlCandidates": [
+          "https://www.adelaide.edu.au/course-outlines/102018/1/sem-1/",
+          "http://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol"
+        ],
+        "wbsDomainCandidates": [
+          "D1_vineyard",
+          "D3_crushing_ferment",
+          "D8_sensory"
+        ]
+      },
+      "perplexityCitations": [
+        "http://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "https://www.adelaide.edu.au/course-outlines/102018/1/sem-1/",
+        "http://calendar.adelaide.edu.au/home",
+        "https://www.adelaide.edu.au/course-outlines/102960/1/sem-2/",
+        "https://www.adelaide.edu.au/degree-finder/mvo_mvitoenol.html",
+        "https://careersforyou.com.au/course/ADELAIDE-068885G"
+      ],
+      "latencyMs": 8628
+    },
+    {
+      "source": "adelaide",
+      "code": "OENOLOGY 2501WT",
+      "title": "Microbiology for Viticulture and Oenology II",
+      "level": 2,
+      "focus": "Yeast + bacteria + spoilage",
+      "scoutedAt": "2026-07-17T23:40:37.986Z",
+      "perplexity": {
+        "assessmentStyle": "Quizzes, practical exams, practical reports, tutorial papers, and a written project report.",
+        "awriCrossRefs": [
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: Controlling Brett",
+          "AWRI fact sheet: Managing botrytis",
+          "AWRI fact sheet: MLF (achieving successful)",
+          "AWRI fact sheet: MLF in red wine",
+          "AWRI fact sheet: Avoiding lab spoilage"
+        ],
+        "keyConcepts": [
+          "General microbiology of agriculture, food and wine systems",
+          "Growth, metabolism and environmental requirements of yeasts and bacteria",
+          "Handling, aseptic technique and cultivation of wine-related microorganisms",
+          "Microscopy for enumeration and identification of microorganisms",
+          "Wine yeast (Saccharomyces and non-Saccharomyces) ecology and physiology",
+          "Lactic acid bacteria and acetic acid bacteria in wine",
+          "Factors modulating yeast and bacterial activity in winemaking (pH, temperature, nutrients, SO2, oxygen)",
+          "Wine spoilage organisms and off-flavour formation",
+          "Microbial aspects of stuck and sluggish fermentation",
+          "Laboratory methods for microbial identification and characterisation",
+          "Basic wine microbiology relevant to viticulture and cellar hygiene",
+          "Data recording, analysis and communication of microbiological results"
+        ],
+        "layer": "advanced",
+        "learningOutcomes": [
+          "Describe the nature, growth and activities of microorganisms in agriculture, food and wine.[1]",
+          "Demonstrate an understanding of the processes for handling and identification of microorganisms.[1]",
+          "Discuss factors modulating the influence of yeast and bacteria in winemaking.[1]",
+          "Demonstrate proficiency in the operation of microscopes to enumerate and identify microorganisms.[1]",
+          "Demonstrate effective information handling and communication skills through individual and group work.[1]"
+        ],
+        "openAccessPapers": [
+          {
+            "authors": "Fleet, G. H.",
+            "journal": "Food Research International",
+            "title": "Wine yeasts for the future",
+            "url": null,
+            "year": 2008
+          },
+          {
+            "authors": "Jolly, N. P.; Varela, C.; Pretorius, I. S.",
+            "journal": "Annals of Microbiology",
+            "title": "Not your ordinary yeast: non-Saccharomyces yeasts in wine production uncovered",
+            "url": null,
+            "year": 2014
+          },
+          {
+            "authors": "Bartowsky, E. J.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "Bacterial spoilage of wine and approaches to minimize it",
+            "url": null,
+            "year": 2009
+          },
+          {
+            "authors": "Liu, S. Q.",
+            "journal": "International Journal of Food Microbiology",
+            "title": "Malolactic fermentation in wine – beyond deacidification",
+            "url": null,
+            "year": 2002
+          },
+          {
+            "authors": "du Toit, W. J.; Pretorius, I. S.; Lonvaud-Funel, A.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "The effect of sulphur dioxide and oxygen on the viability and culturability of a wine strain of Oenococcus oeni",
+            "url": null,
+            "year": 2005
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine paper: SO2 management",
+          "MoreWine paper: MLF",
+          "MoreWine paper: Sanitation",
+          "MoreWine paper: Bench trials",
+          "MoreWine paper: Oxygen in ferment",
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: Controlling Brett",
+          "AWRI fact sheet: Managing botrytis",
+          "AWRI fact sheet: MLF (achieving successful)",
+          "AWRI fact sheet: MLF in red wine",
+          "AWRI fact sheet: Avoiding lab spoilage"
+        ],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://www.adelaide.edu.au/course-outlines/104340/1/sem-1/",
+          "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol"
+        ],
+        "wbsDomainCandidates": [
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D5_post_ferment",
+          "D9_maintenance"
+        ]
+      },
+      "perplexityCitations": [
+        "https://www.adelaide.edu.au/course-outlines/104340/1/sem-1/",
+        "https://careersforyou.com.au/course/ADELAIDE-068885G",
+        "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "https://www.adelaide.edu.au/course-outlines/104350/1/sem-2/",
+        "https://handbook.unimelb.edu.au/2018/subjects/agri90030",
+        "https://adelaideuni.edu.au/study/courses/wine-4000/",
+        "https://australianonlinecourses.com.au/courses/advanced-certificate-of-viticulture-winemaking-oenology/",
+        "https://adelaideuni.edu.au/study/courses/wine-2003/"
+      ],
+      "latencyMs": 8445
+    },
+    {
+      "source": "adelaide",
+      "code": "OENOLOGY 2502WT",
+      "title": "Sensory Studies II",
+      "level": 2,
+      "focus": "Sensory science foundations",
+      "scoutedAt": "2026-07-17T23:40:44.932Z",
+      "perplexity": {
+        "assessmentStyle": "Exams, written exercises, presentations, and practicals; overall pass requires at least 50% in the practical write-up and sensory tasting exam components plus 50% overall.",
+        "awriCrossRefs": [
+          "AWRI fact sheet: Managing botrytis",
+          "AWRI fact sheet: Controlling Brett"
+        ],
+        "keyConcepts": [
+          "basic tastes and tactile sensations",
+          "sensory physiology and psychology",
+          "factors affecting perception",
+          "sensory measurement and quality assessment",
+          "sensory thresholds",
+          "wine aroma and flavour compounds",
+          "common wine faults and their origins",
+          "formal and informal sensory evaluation",
+          "psychophysics and psychographics",
+          "sensory experimentation and statistical analysis",
+          "communicating wine perceptions using technical terminology"
+        ],
+        "layer": "advanced",
+        "learningOutcomes": [
+          "Recognise the basic tastes and tactile sensations and describe their interactions and the mechanisms of how we perceive them.",
+          "Explain the principles of sensory physiology and psychology upon which sensory assessment is based and appreciate the factors that affect perception.",
+          "Describe the principles and practices of sensory measurement and quality assessment.",
+          "Draw sound conclusions and make recommendations following appropriate sensory experimentation and statistical analysis.",
+          "Explain the concept of sensory thresholds.",
+          "Have knowledge of the compounds responsible for wine aroma and flavour.",
+          "Identify common wine faults, their sensory characteristics and explain their origins.",
+          "Communicate confidently and succinctly their perceptions of wine to others using technically correct terminology."
+        ],
+        "openAccessPapers": [
+          {
+            "authors": "Lawless, H.T., Heymann, H.",
+            "journal": "Food Quality and Preference",
+            "title": "Descriptive analysis in sensory evaluation: A review of advances and methodology",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "Auvray, M., Spence, C.",
+            "journal": "Current Biology",
+            "title": "The multisensory perception of flavor",
+            "url": "https://www.cell.com/current-biology/fulltext/S0960-9822(08)01321-9",
+            "year": 2008
+          },
+          {
+            "authors": "King, S.C., Hall, J.R.",
+            "journal": "Foods",
+            "title": "Sensory and consumer science in wine research: A review",
+            "url": "https://www.mdpi.com/2304-8158/9/12/1817",
+            "year": 2020
+          },
+          {
+            "authors": "Noble, A.C.",
+            "journal": "American Journal of Enology and Viticulture",
+            "title": "Wine flavor chemistry and sensory properties",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "Francis, I.L., Newton, J.L.",
+            "journal": "Food Quality and Preference",
+            "title": "Determining wine aroma from compositional data",
+            "url": null,
+            "year": 2005
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine paper: pH meter",
+          "MoreWine paper: Sanitation",
+          "MoreWine paper: Fining agents",
+          "MoreWine paper: Bench trials",
+          "AWRI fact sheet: Controlling Brett",
+          "AWRI fact sheet: Managing botrytis",
+          "AWRI fact sheet: Avoiding lab spoilage"
+        ],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://www.adelaide.edu.au/course-outlines/104349/1/sem-2/",
+          "https://www.adelaide.edu.au/course-outlines/ug/oenology/",
+          "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+          "https://adelaide.edu.au/study/degrees/bachelor-of-viticulture-and-oenology/"
+        ],
+        "wbsDomainCandidates": [
+          "D8_sensory",
+          "D5_post_ferment",
+          "D10_compliance"
+        ]
+      },
+      "perplexityCitations": [
+        "https://www.adelaide.edu.au/course-outlines/104349/1/sem-2/",
+        "https://adelaide.edu.au/study/degrees/bachelor-of-viticulture-and-oenology/",
+        "https://www.adelaide.edu.au/course-outlines/ug/oenology/",
+        "https://careersforyou.com.au/course/ADELAIDE-068885G",
+        "https://set.adelaide.edu.au/ua/media/7000/bachelor-of-vit-and-oenology-study-plan.pdf",
+        "https://www.adelaide.edu.au/course-outlines/102017/1/sem-1/",
+        "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "https://adelaideuni.edu.au/study/courses/wine-2001/",
+        "https://www.adelaide.edu.au/course-outlines/104350/1/sem-2/",
+        "https://adelaide.edu.au/study/courses/wine-3008/",
+        "https://adelaide.edu.au/study/courses/wine-6005/",
+        "https://adelaideuni.edu.au/study/courses/wine-2003/",
+        "https://www.youtube.com/watch?v=kyCC_5Zf_mE"
+      ],
+      "latencyMs": 6146
+    },
+    {
+      "source": "adelaide",
+      "code": "OENOLOGY 2503WT",
+      "title": "Introductory Winemaking II",
+      "level": 2,
+      "focus": "Table wine production",
+      "scoutedAt": "2026-07-17T23:40:53.843Z",
+      "perplexity": {
+        "assessmentStyle": "Practical reports, assignments, online quizzes, and exam.",
+        "awriCrossRefs": [
+          "AWRI fact sheet: MLF (achieving successful)",
+          "AWRI fact sheet: MLF in red wine",
+          "AWRI fact sheet: Protein stability",
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: Managing botrytis",
+          "AWRI fact sheet: Controlling Brett",
+          "AWRI fact sheet: Small-lot fermentation"
+        ],
+        "keyConcepts": [
+          "wine acidity and pH effects on composition and process control",
+          "sulfur dioxide management",
+          "phenolic compound handling during winemaking",
+          "grape harvesting and processing operations",
+          "fermentation equipment and unit operations",
+          "pressing and post-fermentation treatments",
+          "white table wine production",
+          "red table wine production",
+          "aging and maturation effects",
+          "oxidation and wine composition",
+          "yeast management during alcoholic fermentation",
+          "bacterial culture management during secondary fermentation"
+        ],
+        "layer": "advanced",
+        "learningOutcomes": [
+          "Describe the effects of acids and acidity on grape and wine composition and on the control of the winemaking process.",
+          "Explain how sulfur dioxide management is used in winemaking.",
+          "Explain the role and management of phenolic compounds during winemaking processes.",
+          "Describe the basic operations of grape harvesting and processing.",
+          "Describe the unit processes and equipment used in fermentation, pressing and post-fermentation treatments and their impacts on the final wine style outcomes.",
+          "Explain how different styles of white and red table wine are produced.",
+          "Describe the effects of aging, maturation and oxidation on wine composition.",
+          "Explain the basic principles of the management of yeast during alcoholic fermentation and of bacterial cultures during the secondary fermentation."
+        ],
+        "openAccessPapers": [
+          {
+            "authors": "Boulton, R. et al.",
+            "journal": "Journal of Wine Research",
+            "title": "(General open-access coverage not confirmed for a specific matching paper in the provided results)",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "Pretorius, I. S.",
+            "journal": "Current Opinion in Biotechnology",
+            "title": "Tailoring wine yeast for the new millennium: novel approaches to the ancient art of winemaking",
+            "url": "https://doi.org/10.1016/S0958-1669(99)00020-8",
+            "year": 2000
+          },
+          {
+            "authors": "du Toit, W. J., Marais, J., Pretorius, I. S. & Divol, B.",
+            "journal": "South African Journal of Enology and Viticulture",
+            "title": "The role of sulfur dioxide in winemaking and wine preservation",
+            "url": "https://www.sasev.org/index.php/sasev/article/view/1",
+            "year": 2006
+          },
+          {
+            "authors": "Waterhouse, A. L.",
+            "journal": "OENO One",
+            "title": "Wine oxidation: the chemistry, causes, and consequences",
+            "url": "https://oeno-one.eu/article/view/2607",
+            "year": 2016
+          },
+          {
+            "authors": "Gafner, J.",
+            "journal": "American Journal of Enology and Viticulture",
+            "title": "Phenolic compounds and their role in wine quality",
+            "url": "https://www.ajevonline.org/content/51/1/69",
+            "year": 2000
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine Guide to White Wine Making (bible)",
+          "MoreWine Guide to Red Winemaking (bible)",
+          "MoreWine paper: SO2 management",
+          "MoreWine paper: MLF",
+          "MoreWine paper: Oxygen in ferment",
+          "MoreWine paper: Sanitation",
+          "MoreWine paper: Bench trials",
+          "MoreWine paper: pH meter",
+          "MoreWine paper: Fining agents",
+          "MoreWine paper: Inert gas",
+          "AWRI fact sheet: MLF (achieving successful)",
+          "AWRI fact sheet: MLF in red wine",
+          "AWRI fact sheet: Protein stability",
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: Managing botrytis",
+          "AWRI fact sheet: Controlling Brett",
+          "AWRI fact sheet: Small-lot fermentation"
+        ],
+        "prescribedTexts": [
+          {
+            "chapters": [
+              "Winemaking operations",
+              "Fermentation",
+              "Sulfur dioxide",
+              "Acidity and pH",
+              "Phenolics",
+              "White wine production",
+              "Red wine production",
+              "Maturation and oxidation"
+            ],
+            "citation": "No prescribed text explicitly named in the provided University of Adelaide course outline extract for OENOLOGY 2503WT.",
+            "copyright": "unknown"
+          }
+        ],
+        "urlCandidates": [
+          "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+          "https://www.adelaide.edu.au/course-outlines/ug/oenology/",
+          "https://www.adelaide.edu.au/course-outlines/104350/1/sem-2/",
+          "https://set.adelaide.edu.au/ua/media/7000/bachelor-of-vit-and-oenology-study-plan.pdf"
+        ],
+        "wbsDomainCandidates": [
+          "D2_harvest",
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D5_post_ferment",
+          "D6_stabilisation",
+          "D8_sensory"
+        ]
+      },
+      "perplexityCitations": [
+        "http://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "https://www.adelaide.edu.au/course-outlines/ug/oenology/",
+        "https://www.adelaide.edu.au/course-outlines/104350/1/sem-2/",
+        "https://www.adelaide.edu.au/course-outlines/002580/1/sem-1/",
+        "https://calendar.adelaide.edu.au/aprcw/2025/gdwib_gdwinebus",
+        "https://adelaideuni.edu.au/study/courses/wine-3008/",
+        "https://set.adelaide.edu.au/ua/media/7000/bachelor-of-vit-and-oenology-study-plan.pdf",
+        "https://search.studyaustralia.gov.au/course/bachelor-of-viticulture-and-oenology/a5673f2510b7dd3c873664647f17d4c0",
+        "https://www.studiesinaustralia.com/courses-in-australia/adelaide-university/courses/bachelor-of-viticulture-and-oenology"
+      ],
+      "latencyMs": 8111
+    },
+    {
+      "source": "adelaide",
+      "code": "OENOLOGY 3003WT",
+      "title": "Wine Packaging and Quality Management III",
+      "level": 3,
+      "focus": "Packaging, QC, shelf life",
+      "scoutedAt": "2026-07-17T23:41:02.382Z",
+      "perplexity": {
+        "assessmentStyle": "Practicals, reports, written assignments and exam, including an individual HACCP-based packaging line observation/report.",
+        "awriCrossRefs": [
+          "AWRI fact sheet: Reducing ethanol",
+          "AWRI fact sheet: Protein stability",
+          "AWRI fact sheet: Small-lot fermentation",
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: Avoiding lab spoilage"
+        ],
+        "keyConcepts": [
+          "physical and chemical properties of packaging materials for wine",
+          "impact of packaging on wine shelf life and stability",
+          "filling machine principles and selection for different wine styles",
+          "modern packaging formats including containers, closures and decorations",
+          "preparation of wine for final packaging including handling of problem wines",
+          "operation and monitoring of modern bottling lines (start-up, in-process control, shutdown)",
+          "hazard analysis and critical control point (HACCP) in wine packaging lines",
+          "wine taints related to packaging, processing and storage",
+          "agrochemical maximum residue limits in wine and their derivation",
+          "methods for assaying taint contaminants and agrochemical residues in wine",
+          "quality management systems and disciplines in wineries",
+          "application of quality management tools and attitudes in packaging operations",
+          "oxidation and gas management during packaging",
+          "microbiological stability and hygiene in bottling",
+          "traceability and documentation in packaging quality control"
+        ],
+        "layer": "advanced",
+        "learningOutcomes": [
+          "Demonstrate an awareness of the physical and chemical properties of packaging materials and how these affect the shelf life of wine.",
+          "Understand the principles of filling machines and make correct decisions in matching filling machine types to particular wine types.",
+          "Demonstrate an awareness of modern packaging materials and products including containers, closures and bottle decorations.",
+          "Understand how to prepare a wine for final packaging and have an awareness of how to treat difficult or problem wines prior to packaging.",
+          "Understand how modern bottling lines are prepared, operated, monitored and shutdown.",
+          "Understand how taints can be caused in wine, how agrochemical maximum residue limits are derived for wine and how taint contaminants and agrochemical residues are assayed in wine.",
+          "Understand and accept quality management disciplines, techniques and attitudes and how they apply and are increasingly being applied to the wine industry."
+        ],
+        "openAccessPapers": [
+          {
+            "authors": "A.V. Robertson, N. Capone, A.C. Blackman, et al.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "The influence of packaging and storage conditions on the sensory and chemical composition of white wine",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "L. Waterhouse, G.L. Sacks, D.W. Jeffery",
+            "journal": "Comprehensive Reviews in Food Science and Food Safety",
+            "title": "Understanding wine oxidation",
+            "url": null,
+            "year": 2016
+          },
+          {
+            "authors": "M. Ugliano",
+            "journal": "Food Chemistry",
+            "title": "Oxygen contribution to wine aroma evolution during bottle aging",
+            "url": null,
+            "year": 2009
+          },
+          {
+            "authors": "T. Skrbek, A. Panaioli",
+            "journal": "OENO One",
+            "title": "The role of closures and oxygen ingress in bottled wine development",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "S. Rizzoli, C. Versari, A. Ferrarini",
+            "journal": "OENO One",
+            "title": "Quality management systems in wineries: implementation and impact on product quality",
+            "url": null,
+            "year": null
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine Guide to Red Winemaking (bible)",
+          "MoreWine Guide to White Wine Making (bible)",
+          "MoreWine paper: SO2 management",
+          "MoreWine paper: Oxygen in ferment",
+          "MoreWine paper: Fining agents",
+          "MoreWine paper: Sanitation",
+          "MoreWine paper: Bench trials",
+          "MoreWine paper: Inert gas",
+          "MoreWine paper: pH meter",
+          "AWRI fact sheet: Protein stability",
+          "AWRI fact sheet: Small-lot fermentation",
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: Avoiding lab spoilage"
+        ],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://www.adelaide.edu.au/course-outlines/001958/1/sem-2/",
+          "https://careersforyou.com.au/course/ADELAIDE-068885G"
+        ],
+        "wbsDomainCandidates": [
+          "D5_post_ferment",
+          "D6_stabilisation",
+          "D7_packaging",
+          "D10_compliance"
+        ]
+      },
+      "perplexityCitations": [
+        "https://www.adelaide.edu.au/course-outlines/001958/1/sem-2/",
+        "https://careersforyou.com.au/course/ADELAIDE-068885G",
+        "https://adelaide.edu.au/study/courses/wine-3008/",
+        "https://www.adelaide.edu.au/course-outlines/104350/1/sem-2/",
+        "https://adelaide.edu.au/study/courses/wine-6005/",
+        "https://adelaideuni.edu.au/study/courses/wine-6004/",
+        "https://adelaideuni.edu.au/study/courses/wine-3002/",
+        "https://www.wineindustryjobs.com.au/employment/educationcourses1.aspx?courseID=11"
+      ],
+      "latencyMs": 7739
+    },
+    {
+      "source": "adelaide",
+      "code": "OENOLOGY 3007WT",
+      "title": "Stabilisation and Clarification III",
+      "level": 3,
+      "focus": "Fining, cold-stab, filtration",
+      "scoutedAt": "2026-07-17T23:41:11.437Z",
+      "perplexity": {
+        "assessmentStyle": "Three-hour closed-book exam (50%) plus practical sessions with reports/notebook and online quiz (50%).",
+        "awriCrossRefs": [
+          "AWRI fact sheet: Protein stability",
+          "AWRI fact sheet: Reducing ethanol",
+          "AWRI fact sheet: Small-lot fermentation",
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: Managing botrytis"
+        ],
+        "keyConcepts": [
+          "wine instabilities (tartrate, protein, colour, microbiological, oxidative)",
+          "physical, chemical and biochemical parameters affecting wine stability",
+          "principles and practice of fining agents and fining regimes",
+          "cold stabilisation of wines for tartrate stability",
+          "protein stabilisation methods and assessment",
+          "filtration technologies for wine clarification and microbial stabilisation",
+          "centrifugation and flotation as clarification techniques",
+          "membrane and depth filtration performance and limitations",
+          "impact of stabilisation/clarification on wine sensory quality",
+          "measurement and diagnosis of wine instabilities",
+          "clarification and stabilisation of other fermented beverages",
+          "design and interpretation of winery-scale and laboratory trials",
+          "writing scientific reports based on practical work",
+          "quality assurance around stabilisation and clarification operations"
+        ],
+        "layer": "advanced",
+        "learningOutcomes": [
+          "Identify the types of instabilities in wine which might be expected to occur through winemaking and critique the methods used to remove instabilities from wines and the agents involved.[2]",
+          "Define the physical, chemical and biochemical parameters involved in wine stability, and apply methods to stabilise wine and to determine the extent of wine instabilities and their causes.[2]",
+          "Differentiate the types of technologies used in industry for the clarification and stabilisation of wines and other fermented beverages.[2]",
+          "Compose written scientific reports based on the practical work undertaken.[2]"
+        ],
+        "openAccessPapers": [
+          {
+            "authors": "Boulton, R.B.",
+            "journal": "American Journal of Enology and Viticulture",
+            "title": "The General Relationship between Potassium, Sodium, and pH in Wine",
+            "url": "https://www.ajevonline.org/content/34/2/90",
+            "year": 1983
+          },
+          {
+            "authors": "Bayly, A.; Berg, H.; et al.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "Protein instability in wine: mechanisms of haze formation and stability assessment methods",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "Coutures, E.; et al.",
+            "journal": "OENO One",
+            "title": "Cold stabilization of wines: comparison of various techniques",
+            "url": "https://oeno-one.eu/article/view/1615",
+            "year": 2007
+          },
+          {
+            "authors": "Gómez-Plaza, E.; et al.",
+            "journal": "Food Chemistry",
+            "title": "Influence of fining on the phenolic composition and colour of red wine",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "van Wyk, C.J.; Rogers, I.S.",
+            "journal": "South African Journal of Enology and Viticulture",
+            "title": "The use of bentonite in the prevention of protein haze in white wines",
+            "url": "https://www.journals.ac.za/index.php/sajev/article/view/1479",
+            "year": 1985
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine Guide to Red Winemaking (bible)",
+          "MoreWine Guide to White Wine Making (bible)",
+          "MoreWine paper: Fining agents",
+          "MoreWine paper: Bench trials",
+          "MoreWine paper: Oxygen in ferment",
+          "MoreWine paper: Sanitation",
+          "MoreWine paper: Inert gas",
+          "MoreWine paper: pH meter",
+          "AWRI fact sheet: Protein stability",
+          "AWRI fact sheet: Reducing ethanol",
+          "AWRI fact sheet: Small-lot fermentation",
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: Managing botrytis"
+        ],
+        "prescribedTexts": [
+          {
+            "chapters": [],
+            "citation": "Not specified in publicly accessible course outline or calendar.",
+            "copyright": "unknown"
+          }
+        ],
+        "urlCandidates": [
+          "https://www.adelaide.edu.au/course-outlines/002580/1/sem-1/",
+          "http://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol"
+        ],
+        "wbsDomainCandidates": [
+          "D5_post_ferment",
+          "D6_stabilisation",
+          "D7_packaging"
+        ]
+      },
+      "perplexityCitations": [
+        "https://adelaide.edu.au/study/degrees/bachelor-of-viticulture-and-oenology/",
+        "https://www.adelaide.edu.au/course-outlines/002580/1/sem-1/",
+        "http://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "https://careersforyou.com.au/course/ADELAIDE-068885G",
+        "https://set.adelaide.edu.au/ua/media/7000/bachelor-of-vit-and-oenology-study-plan.pdf",
+        "https://adelaide.edu.au/study/courses/wine-3008/",
+        "https://www.adelaide.edu.au/course-outlines/102960/1/sem-2/2024/",
+        "https://australianonlinecourses.com.au/courses/advanced-certificate-of-viticulture-winemaking-oenology/"
+      ],
+      "latencyMs": 8255
+    },
+    {
+      "source": "adelaide",
+      "code": "OENOLOGY 3016WT",
+      "title": "Cellar and Winery Waste Management III",
+      "level": 3,
+      "focus": "Waste streams, environmental compliance",
+      "scoutedAt": "2026-07-17T23:41:20.454Z",
+      "perplexity": {
+        "assessmentStyle": "Final exam (50%) plus practical reports on winery yeast microflora & sanitation practices and winery wastewater components (2 × 25%).",
+        "awriCrossRefs": [
+          "AWRI fact sheet: Sanitation",
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: Protein stability",
+          "AWRI fact sheet: Reducing ethanol"
+        ],
+        "keyConcepts": [
+          "winery wastewater composition and characterisation",
+          "cellar and winery waste streams and segregation",
+          "yeast microflora in winery environments",
+          "sanitation practices and hygiene validation in wineries",
+          "environmental compliance and regulation for winery effluents",
+          "wastewater treatment options for wineries",
+          "solid waste management in wineries (lees, pomace, filter media)",
+          "impacts of winery operations on soil and water quality",
+          "monitoring and reporting of winery waste and effluent quality",
+          "risk management for microbial contamination linked to sanitation and waste"
+        ],
+        "layer": "advanced",
+        "learningOutcomes": [
+          "Investigate winery yeast microflora present in cellar environments and relate them to sanitation practices.[1]",
+          "Evaluate the effectiveness of winery sanitation practices using practical investigation and reporting.[1]",
+          "Identify and characterise the major components of winery wastewater.[1]",
+          "Assess environmental and operational implications of different winery wastewater components and streams.[1]",
+          "Apply scientific methods to measure and report on winery waste and wastewater quality.[1]",
+          "Integrate cellar waste management knowledge into broader viticulture and oenology practice in commercial wineries.[1][2]",
+          "Demonstrate written reporting skills through practical reports on microflora, sanitation, and wastewater.[1]",
+          "Prepare for professional responsibilities in waste management and environmental compliance within the wine industry.[1][2]"
+        ],
+        "openAccessPapers": [
+          {
+            "authors": "D. E. W. Yerema, S. A. Fietcher",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "Winery wastewater composition and treatment options: a review",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "M. E. Santos, L. D. Bustamante",
+            "journal": "OENO One",
+            "title": "Environmental impacts and management of winery effluents",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "C. R. M. Galves, J. C. Serra",
+            "journal": "American Journal of Enology and Viticulture",
+            "title": "Characterisation of solid and liquid waste streams from small and medium wineries",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "A. P. Sheridan, T. Hunter",
+            "journal": "Food Chemistry",
+            "title": "Microbial communities in winery environments and implications for sanitation",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "L. Villalba, P. I. García",
+            "journal": "Journal of the American Society of Brewing Chemists",
+            "title": "Industrial wastewater management in beverage production: lessons for wineries",
+            "url": null,
+            "year": null
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine Guide to Red Winemaking (bible)",
+          "MoreWine Guide to White Wine Making (bible)",
+          "MoreWine paper: Sanitation",
+          "MoreWine paper: Oxygen in ferment",
+          "MoreWine paper: SO2 management",
+          "MoreWine paper: Bench trials",
+          "MoreWine paper: Inert gas"
+        ],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://www.adelaide.edu.au/course-outlines/004880/1/sem-1/2021/",
+          "http://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+          "https://set.adelaide.edu.au/ua/media/7000/bachelor-of-vit-and-oenology-study-plan.pdf"
+        ],
+        "wbsDomainCandidates": [
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D6_stabilisation",
+          "D9_maintenance",
+          "D10_compliance"
+        ]
+      },
+      "perplexityCitations": [
+        "https://www.adelaide.edu.au/course-outlines/004880/1/sem-1/2021/",
+        "http://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "https://careersforyou.com.au/course/ADELAIDE-068885G",
+        "https://set.adelaide.edu.au/ua/media/7000/bachelor-of-vit-and-oenology-study-plan.pdf",
+        "https://adelaide.edu.au/study/courses/wine-3008/",
+        "https://handbook.unimelb.edu.au/2017/subjects/agri90030",
+        "https://adelaideuni.edu.au/study/courses/wine-6003/"
+      ],
+      "latencyMs": 8217
+    },
+    {
+      "source": "adelaide",
+      "code": "OENOLOGY 3037WT",
+      "title": "Distillation, Fortified & Sparkling Winemaking III",
+      "level": 3,
+      "focus": "Fortified + sparkling + spirits",
+      "scoutedAt": "2026-07-17T23:41:27.808Z",
+      "perplexity": {
+        "assessmentStyle": "",
+        "awriCrossRefs": [
+          "AWRI fact sheet: Small-lot fermentation",
+          "AWRI fact sheet: Reducing ethanol",
+          "AWRI fact sheet: Protein stability",
+          "AWRI fact sheet: MLF (achieving successful)"
+        ],
+        "keyConcepts": [
+          "principles of distillation and spirit production",
+          "legal definitions and classifications of fortified wines and spirits",
+          "fortification techniques and spirit addition calculations",
+          "oxidative and reductive maturation of fortified wines",
+          "sparkling wine production methods (traditional, Charmat, transfer, carbonation)",
+          "secondary fermentation management in sparkling wines",
+          "liqueur de tirage and dosage formulation",
+          "control of dissolved CO2 and pressure in sparkling wines",
+          "stability and clarification of fortified and sparkling wines",
+          "sensory attributes and faults specific to fortified and sparkling products",
+          "equipment used in distillation and sparkling production (stills, pressure tanks, bottling lines)",
+          "quality control and analytical parameters for fortified, sparkling wines and spirits",
+          "regulatory and labelling requirements for fortified and sparkling wine styles"
+        ],
+        "layer": "advanced",
+        "learningOutcomes": [],
+        "openAccessPapers": [
+          {
+            "authors": "P. Ribéreau-Gayon et al.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "The production of sparkling wines: A review of technologies and practices",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "A. Heras-Roger et al.",
+            "journal": "Food Chemistry",
+            "title": "Influence of aging on lees on the volatile composition of sparkling wines",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "J. M. Oliveira et al.",
+            "journal": "OENO One",
+            "title": "Chemical and sensory characterization of Port wine styles",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "L. De Reve et al.",
+            "journal": "American Journal of Enology and Viticulture",
+            "title": "Distillation of wine and production of brandy: impact on aroma compounds",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "C. Torrés et al.",
+            "journal": "International Journal of Food Science & Technology",
+            "title": "Carbon dioxide overpressure and bubble characteristics in sparkling wines",
+            "url": null,
+            "year": null
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine Guide to Red Winemaking (bible)",
+          "MoreWine Guide to White Wine Making (bible)",
+          "MoreWine paper: SO2 management",
+          "MoreWine paper: MLF",
+          "MoreWine paper: Fining agents",
+          "MoreWine paper: Sanitation",
+          "MoreWine paper: Bench trials",
+          "MoreWine paper: Inert gas",
+          "MoreWine paper: Oxygen in ferment"
+        ],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol"
+        ],
+        "wbsDomainCandidates": [
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D5_post_ferment",
+          "D6_stabilisation",
+          "D7_packaging"
+        ]
+      },
+      "perplexityCitations": [
+        "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "https://calendar.adelaide.edu.au/home",
+        "https://www.adelaide.edu.au/course-outlines/102017/1/sem-1/",
+        "https://careersforyou.com.au/course/ADELAIDE-068885G",
+        "https://adelaideuni.edu.au/study/courses/wine-4000/",
+        "https://adelaide.edu.au/study/courses/wine-3008/",
+        "https://set.adelaide.edu.au/agriculture-food-wine/disciplines/wine-science"
+      ],
+      "latencyMs": 6554
+    },
+    {
+      "source": "adelaide",
+      "code": "OENOLOGY 3046WT",
+      "title": "Fermentation Technology III",
+      "level": 3,
+      "focus": "Advanced fermentation",
+      "scoutedAt": "2026-07-17T23:41:36.095Z",
+      "perplexity": {
+        "assessmentStyle": "Exam, written assignments, practical reports, group oral presentations.",
+        "awriCrossRefs": [
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: MLF (achieving successful)",
+          "AWRI fact sheet: MLF in red wine",
+          "AWRI fact sheet: Small-lot fermentation",
+          "AWRI fact sheet: Controlling Brett"
+        ],
+        "keyConcepts": [
+          "Advanced control of alcoholic fermentation",
+          "Yeast nutrition and nutrient management",
+          "Effects of fermentation temperature and oxygen on wine style",
+          "Malolactic fermentation management",
+          "Microbial spoilage and Brettanomyces control",
+          "Use of fermentation additives (enzymes, tannins, yeast derivatives)",
+          "Monitoring and troubleshooting sluggish and stuck fermentations",
+          "Fermentation technology for different wine styles",
+          "Integration of fermentation decisions with wine sensory outcomes",
+          "Scaling and managing small-lot experimental ferments"
+        ],
+        "layer": "advanced",
+        "learningOutcomes": [
+          "Apply advanced principles of fermentation technology to manage commercial-scale wine fermentations effectively.",
+          "Evaluate how fermentation conditions (yeast strain, temperature, oxygen, nutrients) influence wine composition and sensory properties.",
+          "Design and implement fermentation strategies to achieve specific wine styles, including management of malolactic fermentation.",
+          "Diagnose and propose solutions for problems such as sluggish and stuck fermentations and microbial spoilage.",
+          "Interpret fermentation monitoring data and use it to make informed process control decisions.",
+          "Critically reflect on practical winemaking activities and link them to fermentation theory and current research."
+        ],
+        "openAccessPapers": [
+          {
+            "authors": "P. Ribéreau-Gayon et al.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "Control of alcoholic fermentation in winemaking: current knowledge and future trends",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "G. H. Fleet",
+            "journal": "Journal of Industrial Microbiology and Biotechnology",
+            "title": "Yeast interactions and wine flavour",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "M. du Toit et al.",
+            "journal": "South African Journal of Enology and Viticulture",
+            "title": "Influence of malolactic fermentation on the sensory properties of wine",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "I. Bartle et al.",
+            "journal": "OENO One",
+            "title": "Nutrient requirements of wine yeast and implications for stuck fermentations",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "A. Curtin et al.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "Brettanomyces bruxellensis in wine: characteristics, detection and control",
+            "url": null,
+            "year": null
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine Red Winemaking Outline",
+          "MoreWine Guide to Red Winemaking (bible)",
+          "MoreWine Guide to White Wine Making (bible)",
+          "MoreWine paper: SO2 management",
+          "MoreWine paper: MLF",
+          "MoreWine paper: Fining agents",
+          "MoreWine paper: Sanitation",
+          "MoreWine paper: Bench trials",
+          "MoreWine paper: Inert gas",
+          "MoreWine paper: pH meter",
+          "MoreWine paper: Oxygen in ferment",
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: Controlling Brett",
+          "AWRI fact sheet: MLF (achieving successful)",
+          "AWRI fact sheet: MLF in red wine",
+          "AWRI fact sheet: Small-lot fermentation"
+        ],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://www.adelaide.edu.au/course-outlines/102016/1/sem-2/",
+          "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol"
+        ],
+        "wbsDomainCandidates": [
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D5_post_ferment"
+        ]
+      },
+      "perplexityCitations": [
+        "https://www.adelaide.edu.au/course-outlines/102016/1/sem-2/",
+        "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "https://careersforyou.com.au/course/ADELAIDE-068885G",
+        "https://adelaide.edu.au/study/courses/wine-3008/",
+        "https://adelaideuni.edu.au/study/courses/wine-2001/",
+        "https://adelaideuni.edu.au/study/courses/wine-4000/",
+        "https://adelaideuni.edu.au/study/courses/wine-3006/"
+      ],
+      "latencyMs": 7487
+    },
+    {
+      "source": "adelaide",
+      "code": "OENOLOGY 3047WT",
+      "title": "Winemaking at Vintage III",
+      "level": 3,
+      "focus": "Vintage operations, practicum",
+      "scoutedAt": "2026-07-17T23:41:47.292Z",
+      "perplexity": {
+        "assessmentStyle": "Practical vintage winemaking participation, written assignments, oral presentations, and a final exam.",
+        "awriCrossRefs": [
+          "AWRI fact sheet: Small-lot fermentation",
+          "AWRI fact sheet: Stuck fermentation",
+          "AWRI fact sheet: MLF (achieving successful)",
+          "AWRI fact sheet: MLF in red wine",
+          "AWRI fact sheet: Controlling Brett",
+          "AWRI fact sheet: Managing botrytis",
+          "AWRI fact sheet: Protein stability",
+          "AWRI fact sheet: Avoiding lab spoilage"
+        ],
+        "keyConcepts": [
+          "Practical management of small-lot vintage fermentations",
+          "Operation and safety of vintage winery machinery and equipment",
+          "Red wine production from crushing to pressing at pilot scale",
+          "White juice production and handling at pilot scale",
+          "Monitoring and control of alcoholic fermentation (temperature, density, nutrients)",
+          "Cellar hygiene and sanitation during vintage",
+          "Fruit receival, processing logistics, and vintage workflow",
+          "Application of prior oenology theory to real vintage operations",
+          "Basic sensory evaluation of in-progress ferments and young wines",
+          "Recording cellar work, work orders, and lab notebook practices",
+          "Group coordination and task allocation in a working winery environment",
+          "Application of occupational health and safety procedures in the winery"
+        ],
+        "layer": "advanced",
+        "learningOutcomes": [
+          "Enhance and apply understanding of winemaking processes during an active vintage through supervised practical work in the winery laboratory.",
+          "Become familiar with the operation and routine use of vintage machinery and cellar equipment in a production-like setting.",
+          "Work effectively in small production teams to produce at least one red wine and one white juice lot from approximately 700 kg of fruit under supervision.",
+          "Apply and extend knowledge from previous oenology courses to real-time decision making in crushing, fermentation management, and pressing.",
+          "Implement appropriate cellar hygiene and occupational health and safety procedures during all vintage operations.",
+          "Accurately document winemaking operations, observations, and results in line with professional winery practice."
+        ],
+        "openAccessPapers": [
+          {
+            "authors": "I Land C., Bruer N., Edwards G. et al.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "Small-lot winemaking: principles and practice for research and education",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "Ribéreau-Gayon P., Dubourdieu D., Donèche B., Lonvaud A.",
+            "journal": "OENO One or similar open-access platforms (methods excerpts)",
+            "title": "Practical aspects of red and white winemaking at pilot scale",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "Ugliano M., Henschke P. A.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "Yeast and fermentation management effects on wine composition and sensory properties",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "Bisson L. F.",
+            "journal": "American Journal of Enology and Viticulture (selected open-access articles)",
+            "title": "Stuck and sluggish fermentations: causes and prevention in practical winemaking",
+            "url": null,
+            "year": null
+          },
+          {
+            "authors": "Boulton R. B. et al.",
+            "journal": "Various open repositories (method-focused extracts)",
+            "title": "Unit operations in winery fermentations and implications for teaching-scale production",
+            "url": null,
+            "year": null
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine Red Winemaking Outline",
+          "MoreWine Guide to Red Winemaking (bible)",
+          "MoreWine Guide to White Wine Making (bible)",
+          "MoreWine paper: Sanitation",
+          "MoreWine paper: Bench trials",
+          "MoreWine paper: Inert gas",
+          "MoreWine paper: Oxygen in ferment"
+        ],
+        "prescribedTexts": [
+          {
+            "chapters": [
+              "Relevant sections on cellar operations and vintage winemaking practice"
+            ],
+            "citation": "(Specific prescribed text not listed on public outline; likely a standard wine production text such as Iland et al. or Boulton et al., but no definitive citation is available from public sources.)",
+            "copyright": "unknown"
+          }
+        ],
+        "urlCandidates": [
+          "https://www.adelaide.edu.au/course-outlines/102017/1/sem-1/",
+          "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol"
+        ],
+        "wbsDomainCandidates": [
+          "D2_harvest",
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D5_post_ferment"
+        ]
+      },
+      "perplexityCitations": [
+        "https://www.adelaide.edu.au/course-outlines/102017/1/sem-1/",
+        "http://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "https://set.adelaide.edu.au/ua/media/7000/bachelor-of-vit-and-oenology-study-plan.pdf",
+        "https://adelaide.edu.au/study/degrees/bachelor-of-viticulture-and-oenology/",
+        "https://www.studocu.com/en-au/quiz/apartheid-practice-questions/9130403",
+        "https://adelaide.edu.au/study/courses/wine-3008/"
+      ],
+      "latencyMs": 10396
+    },
+    {
+      "source": "adelaide",
+      "code": "OENOLOGY 3520WT",
+      "title": "Advances in Wine Science III",
+      "level": 4,
+      "focus": "Contemporary research topics",
+      "scoutedAt": "2026-07-17T23:41:56.729Z",
+      "perplexity": {
+        "assessmentStyle": "Exam, practical report(s), oral presentation(s).",
+        "awriCrossRefs": [
+          "AWRI fact sheet: Protein stability",
+          "AWRI fact sheet: Reducing ethanol",
+          "AWRI fact sheet: MLF (achieving successful)",
+          "AWRI fact sheet: MLF in red wine",
+          "AWRI fact sheet: Small-lot fermentation"
+        ],
+        "keyConcepts": [
+          "Current research in viticulture and oenology",
+          "Advanced practices in viticulture and oenology",
+          "New analytical methods in wine science",
+          "Yeast biochemistry and impacts on wine composition",
+          "Wine composition and stability",
+          "Malolactic fermentation processes and technology",
+          "Fermentation technology and innovation",
+          "Critical evaluation of scientific literature",
+          "Consultancy-style problem solving for viticultural issues",
+          "Industry-relevant research translation",
+          "Sensory evaluation linked to contemporary research topics"
+        ],
+        "layer": "advanced",
+        "learningOutcomes": [
+          "Improved knowledge of current research and advanced practices in viticulture and oenology.[1]",
+          "Ability to identify and explain new methods of analysis in wine science, yeast biochemistry and contributions to wine composition, wine stability, malolactic fermentation and fermentation technology.[1]",
+          "Ability to critically assess current research in viticulture and oenology.[1]",
+          "Improved skills in preparing and delivering oral presentations on advanced wine science topics.[1]",
+          "Ability to prepare and deliver a consultancy report providing solutions to a viticultural issue faced by the wine industry.[1]"
+        ],
+        "openAccessPapers": [
+          {
+            "authors": "Varela, C. et al.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "Non-Saccharomyces yeasts in winemaking: effects on wine composition and quality",
+            "url": "https://onlinelibrary.wiley.com/doi/10.1111/ajgw.12423",
+            "year": 2016
+          },
+          {
+            "authors": "Jiranek, V. et al.",
+            "journal": "American Journal of Enology and Viticulture",
+            "title": "Malolactic fermentation in wine: a review on the role of Oenococcus oeni and lactic acid bacteria",
+            "url": "https://www.ajevonline.org/content/ajev/early/2015/01/01/ajev.2014.14089.full.pdf",
+            "year": 2015
+          },
+          {
+            "authors": "Collins, C. et al.",
+            "journal": "OENO One",
+            "title": "Recent advances in grape and wine phenolic research",
+            "url": "https://oeno-one.eu/article/view/1234",
+            "year": 2018
+          },
+          {
+            "authors": "Pagay, V. et al.",
+            "journal": "Australian Journal of Grape and Wine Research",
+            "title": "Vineyard water management and its impacts on grape and wine composition: a review",
+            "url": "https://onlinelibrary.wiley.com/doi/10.1111/ajgw.12345",
+            "year": 2019
+          },
+          {
+            "authors": "Bastian, S. et al.",
+            "journal": "Food Quality and Preference",
+            "title": "Sensory profiling and consumer acceptance of wines: recent methodological advances",
+            "url": "https://www.sciencedirect.com/science/article/pii/S0950329318301234",
+            "year": 2018
+          }
+        ],
+        "ownedContentBridges": [
+          "MoreWine Guide to Red Winemaking (bible)",
+          "MoreWine Guide to White Wine Making (bible)",
+          "MoreWine paper: SO2 management",
+          "MoreWine paper: MLF",
+          "MoreWine paper: Fining agents",
+          "MoreWine paper: Sanitation",
+          "MoreWine paper: Bench trials",
+          "MoreWine paper: Inert gas",
+          "MoreWine paper: pH meter",
+          "MoreWine paper: Oxygen in ferment",
+          "MoreWine paper: Oak info"
+        ],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://www.adelaide.edu.au/course-outlines/106508/1/sem-2/",
+          "https://set.adelaide.edu.au/ua/media/7000/bachelor-of-vit-and-oenology-study-plan.pdf"
+        ],
+        "wbsDomainCandidates": [
+          "D2_harvest",
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D5_post_ferment",
+          "D8_sensory",
+          "D10_compliance"
+        ]
+      },
+      "perplexityCitations": [
+        "https://www.adelaide.edu.au/course-outlines/106508/1/sem-2/",
+        "https://set.adelaide.edu.au/ua/media/7000/bachelor-of-vit-and-oenology-study-plan.pdf",
+        "https://careersforyou.com.au/course/ADELAIDE-068885G",
+        "https://calendar.adelaide.edu.au/aprcw/2025/mvo_mvitoenol",
+        "https://studynext.com/au/courses/au-master-viticulture-and-oenology",
+        "https://www.adelaide.edu.au/course-outlines/001958/1/sem-2/"
+      ],
+      "latencyMs": 8637
+    },
+    {
+      "source": "adelaide",
+      "code": "OENOLOGY 3530WT",
+      "title": "Engineering for Viticulture and Oenology III",
+      "level": 3,
+      "focus": "Winery engineering, utilities",
+      "scoutedAt": "2026-07-17T23:42:00.672Z",
+      "perplexity": {
+        "assessmentStyle": "",
+        "awriCrossRefs": [],
+        "keyConcepts": [],
+        "layer": "advanced",
+        "learningOutcomes": [],
+        "openAccessPapers": [],
+        "ownedContentBridges": [],
+        "prescribedTexts": [],
+        "urlCandidates": [
+          "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol"
+        ],
+        "wbsDomainCandidates": [
+          "D2_harvest",
+          "D3_crushing_ferment",
+          "D4_fermentation",
+          "D5_post_ferment",
+          "D9_maintenance",
+          "D10_compliance"
+        ]
+      },
+      "perplexityCitations": [
+        "https://careersforyou.com.au/course/ADELAIDE-068885G",
+        "https://set.adelaide.edu.au/ua/media/7000/bachelor-of-vit-and-oenology-study-plan.pdf",
+        "https://www.adelaide.edu.au/course-outlines/109935/1/winter/2021/",
+        "https://www.adelaide.edu.au/course-outlines/102017/1/sem-1/",
+        "https://www.adelaide.edu.au/course-outlines/104350/1/sem-2/",
+        "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "https://adelaide.edu.au/study/courses/wine-3008/",
+        "https://www.adelaide.edu.au/course-outlines/106508/1/sem-2/",
+        "https://www.youtube.com/watch?v=kyCC_5Zf_mE"
+      ],
+      "latencyMs": 3143
+    }
+  ],
+  "tokenTotals": {
+    "prompt": 20087,
+    "completion": 11826
+  }
+}
