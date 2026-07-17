@@ -1,0 +1,15 @@
+Building the Ownology education module.
+
+Path: Private-scoped knowledge base — ingest my paid oenology study guide PDFs into MY winery only, never surfaced to third-party paying users. Legally defensible (personal-use licence honored). Reuse Owen's citation model.
+
+Audience: Working winemakers who need refreshers (Ownology's existing buyer). Deep-cut, cellar-relevant, terse. NOT students studying for exams. NOT drinkers.
+
+Deliverable:
+
+New table private_knowledge_sources + private_knowledge_chunks (winery-scoped)
+/admin/private-knowledge upload UI — I drop PDFs, chunker splits + embeds them
+Owen's tutor.ask gets a retriever step that queries private chunks scoped to caller's wineryId first, falls back to public bibles
+Later: /learn/* public curriculum authored FROM my private notes (I paraphrase, no direct quotes)
+First topic to prototype: [pick one — malolactic fermentation, SO₂ management, or stuck ferments are my top three candidates]
+
+PDFs: I'll drop them into /app/scripts/private-knowledge/ once you've built the pipeline.
