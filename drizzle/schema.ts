@@ -1566,7 +1566,47 @@ export const smsOpenerVariants = mysqlTable(
 );
 
 
-
+/**
+ * industry_news_items — scraped WBM (and later, other AU/NZ trade
+ * publication) headlines used to seed region-matched SMS opener hooks.
+ *
+ * Populated by `industryNews.refresh` (manual button, cron-ready).
+ * Regions are normalised to the same slug space as
+ * outreach_contacts.region so the admin UI can lift matches with a
+ * plain WHERE eq(region) join. Categories are stored as a
+ * newline-joined string (VARCHAR — cheaper than JSON, LSP-friendly).
+ *
+ * Uniqueness on `url` gives us the natural idempotency for the
+ * scraper's upsert pattern. Feb 2026, Rich.
+ */
+export const industryNewsItems = mysqlTable(
+  "industry_news_items",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    source: varchar("source", { length: 32 }).notNull(),
+    url: varchar("url", { length: 500 }).notNull().unique(),
+    headline: varchar("headline", { length: 500 }).notNull(),
+    dek: varchar("dek", { length: 1000 }),
+    imageUrl: varchar("image_url", { length: 500 }),
+    // Normalised region slug (e.g. "mclaren-vale") — nullable when the
+    // article has no region tag (industry-wide, awards, etc.).
+    region: varchar("region", { length: 64 }),
+    // Newline-joined category slugs from the source ("news\nwinemaking\nnew-appointments").
+    categories: varchar("categories", { length: 500 }),
+    author: varchar("author", { length: 120 }),
+    // Epoch ms of the article's own timestamp (from the source page).
+    publishedAt: bigint("published_at", { mode: "number" }).notNull(),
+    // Epoch ms of when Rich's scraper picked it up.
+    fetchedAt: bigint("fetched_at", { mode: "number" }).notNull(),
+    // Soft-archive when Rich has processed / dismissed an item.
+    archived: tinyint("archived").notNull().default(0),
+  },
+  (t) => [
+    index("industry_news_region_published_idx").on(t.region, t.publishedAt),
+    index("industry_news_source_published_idx").on(t.source, t.publishedAt),
+    index("industry_news_archived_idx").on(t.archived),
+  ]
+);
 
 /**
  * event_ingests — history of every wine-event URL the operator has fed

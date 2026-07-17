@@ -2,7 +2,15 @@
 
 Living document. Every "Potential improvement 💡" and "Next Action Item" from agent sessions lands here so nothing gets lost across forks/sessions.
 
-Last consolidated: 16 Jul 2026 (evening — P1 restructured, first-paying-customer triggers isolated).
+Last consolidated: 17 Jul 2026 (industry-news vertical shipped v1 — WBM ingestion + region-matched opener drafting).
+
+
+---
+
+## ✅ Shipped Jul 2026 (later)
+
+- **Industry news vertical (v1 — WBM only).** New `/admin/industry-news` page. `industryNews.refresh` scrapes wbmonline.com.au/news (browser-UA, regex parser) into `industry_news_items` with normalised region slugs matching `outreach_contacts.region`. `itemContacts` returns region-matched contacts sorted SMS-ready-first. `generateOpener` calls Claude with the news headline + dek as a fresh industry signal → returns a news-anchored SMS, stamps it on `smsDraftOverride` + `hookSourceUrl` + `hookTier="industry_signal"`. Human-factors inversion: 10 news items × auto-matched contacts, instead of 2000 contacts × hunt-for-signal.
+- **Site-wide "AI apprentice / second brain / cellar AI" copy sweep.** Retired every banned phrase from user-facing surfaces (Home hero H1, `/why-ownology`, `/vs/innovint-vintrace` x5 spots, `/how-we-trace`, `/knowledge`, `/guide`, `/hi/:slug` personal landing tiles + QMS variants, `UserJourneyDeck`, outbound admin templates, LinkedIn DM kit, email signatures, weekly digest signoff, Claude system prompt, `ownology-descriptor.ts` category noun + sell stack). Unified positioning: **"Quality and risk management for winemakers — across the whole business. Productivity and profit compound year on year."** Owen persona kept; his role label swapped from "AI apprentice" → "working memory".
 
 
 ---
@@ -158,6 +166,17 @@ A single new public page `/ask` where ANY visitor types any winemaking question 
 ---
 
 ## 🟠 P1 — Engagement / Retention
+
+### Industry-news v2 — broaden sources + auto-cron 🆕 (Jul 2026)
+v1 ships WBM only, manual refresh. Extensions Rich called out but deferred:
+- **Daily Wine News** (`winetitles.com.au/daily-wine-news/`) scraper. ~9k daily readers, broadest AU SME coverage. Their layout is a different Nectar-theme variant — new parser required.
+- **Grapegrower & Winemaker** (Winetitles monthly, technical depth) — good for Trinity/quality-panel-angle openers.
+- **The Real Review** (Huon Hooke) — high-signal editorial for `quoted_voice` tier hooks.
+- **Daily cron trigger** — piggyback on the existing weekly-digest cron infra with a new `/api/scheduled/industry-news-refresh` endpoint gated by `CRON_SECRET`. Schedule `0 20 * * *` (07:00 Sydney).
+- **NZ sources** — Rural News Group WineGrower once NZ contacts land in the pipeline.
+- **Show-archived toggle** on `/admin/industry-news` so Rich can re-open dismissed items.
+- **Per-item "compose LinkedIn DM"** action — different tone than SMS, worth its own Claude prompt variant.
+> **Files**: `server/services/dailyWineNewsScraper.ts` + friends; extend `industryNews.refresh` to fan out across sources; new cron file `server/scheduled/industryNewsRefresh.ts`.
 
 ### Response Rate Tracking · variant analytics 🆕 (Jul 2026 — top priority)
 Stamp `sent_variant_key` (and `sent_at`) on `outreach_contacts` the moment an operator taps "Copy SMS" for a fresh row (or explicitly "mark SMS sent"). After 20+ sends per variant, compute reply-rate per lens by joining `sent_variant_key` × `replied_at IS NOT NULL`. Surface a small chart on `/admin/sms-openers` — sends, replies, reply-rate — so the winning psychology angle surfaces itself instead of being a hunch. Directly compounds the SMS opener variants system that just shipped.

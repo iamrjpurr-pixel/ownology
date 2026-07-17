@@ -216,6 +216,18 @@ export async function claudeRewriteOne(args: {
   forgeKey: string;
   previewBase: string;
   tone: "warm" | "brief" | "regional";
+  /** Optional: WBM (or other trade-press) headline + dek + region to
+   *  weave into the SMS. When provided, this is treated as the freshest
+   *  peer/region signal and Claude is instructed to lead with it.
+   *  hookSourceUrl is captured downstream so Rich can verify the article. */
+  industrySignal?: {
+    headline: string;
+    dek: string | null;
+    source: string;      // e.g. "WBM"
+    sourceUrl: string;   // article URL for Rich's audit trail
+    publishedAtIso: string;
+    region: string | null;
+  } | null;
   contact: {
     slug: string;
     firstName: string;
@@ -230,7 +242,7 @@ export async function claudeRewriteOne(args: {
     persona: string | null;
   };
 }): Promise<{ sms: string; signalsAcknowledged: string[] }> {
-  const { forgeUrl, forgeKey, previewBase, tone, contact: c } = args;
+  const { forgeUrl, forgeKey, previewBase, tone, contact: c, industrySignal } = args;
   const link = `${previewBase}/hi/${c.slug}`;
 
   const researchBits: string[] = [];
@@ -241,6 +253,11 @@ export async function claudeRewriteOne(args: {
   if (c.hookText) researchBits.push(`Recent signal / quote (from Perplexity — DO NOT QUOTE VERBATIM, but you may reference the topic): ${c.hookText}`);
   if (c.notes) researchBits.push(`Additional notes: ${c.notes.slice(0, 500)}`);
   if (c.persona) researchBits.push(`Their role at the winery: ${c.persona}`);
+  if (industrySignal) {
+    researchBits.push(
+      `Fresh industry signal (${industrySignal.source}, ${industrySignal.publishedAtIso}${industrySignal.region ? `, region: ${industrySignal.region}` : ""}) — LEAD WITH THIS: "${industrySignal.headline}"${industrySignal.dek ? ` — ${industrySignal.dek}` : ""}. Reference this as something you noticed in the trade press, do NOT quote verbatim, do NOT link to it (the /hi landing is the only link).`,
+    );
+  }
 
   const toneGuidance = {
     warm:     "Warm, mate-to-mate, Australian idiom. Feels like a text from a friend who happens to make winemaking software.",

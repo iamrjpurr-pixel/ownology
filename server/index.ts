@@ -1700,6 +1700,34 @@ async function startServer() {
       console.warn("[bootstrap] sms_opener_variants table create skipped:", (e as Error).message);
     }
 
+    // ── Industry news items (Feb 2026, Rich) ─────────────────────────
+    // Scraped WBM (and later Daily Wine News / Grapegrower) articles
+    // used to seed region-matched SMS opener hooks. See
+    // server/routers/industryNews.ts + server/services/wbmScraper.ts.
+    try {
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS industry_news_items (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          source VARCHAR(32) NOT NULL,
+          url VARCHAR(500) NOT NULL UNIQUE,
+          headline VARCHAR(500) NOT NULL,
+          dek VARCHAR(1000),
+          image_url VARCHAR(500),
+          region VARCHAR(64),
+          categories VARCHAR(500),
+          author VARCHAR(120),
+          published_at BIGINT NOT NULL,
+          fetched_at BIGINT NOT NULL,
+          archived TINYINT NOT NULL DEFAULT 0,
+          INDEX industry_news_region_published_idx (region, published_at),
+          INDEX industry_news_source_published_idx (source, published_at),
+          INDEX industry_news_archived_idx (archived)
+        )
+      `);
+    } catch (e) {
+      console.warn("[bootstrap] industry_news_items table create skipped:", (e as Error).message);
+    }
+
     // ── Cellar equipment WBS expansion + batch traceability (Feb 2026) ──
     // Expand equipment_type enum from 9 → 19 values, add wbs_phase column,
     // and create the batch_equipment_uses junction table. Idempotent DDL.
