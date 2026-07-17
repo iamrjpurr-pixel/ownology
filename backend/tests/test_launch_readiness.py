@@ -12,7 +12,7 @@ import pytest
 import requests
 from urllib.parse import quote
 
-BASE = os.environ.get("REACT_APP_BACKEND_URL", "https://ownership-dev.preview.emergentagent.com").rstrip("/")
+BASE = os.environ.get("REACT_APP_BACKEND_URL", "https://private-tutor-2.preview.emergentagent.com").rstrip("/")
 
 
 def trpc_get(procedure: str, input_obj=None):

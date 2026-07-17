@@ -19,7 +19,7 @@ import time
 import pytest
 import requests
 
-BASE_URL = "https://ownership-dev.preview.emergentagent.com"
+BASE_URL = "https://private-tutor-2.preview.emergentagent.com"
 TIMEOUT = 120
 ENV_PATH = "/app/.env"
 

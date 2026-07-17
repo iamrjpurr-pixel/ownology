@@ -16,7 +16,7 @@ import urllib.parse
 import pytest
 import requests
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://ownership-dev.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://private-tutor-2.preview.emergentagent.com").rstrip("/")
 # Read from env, never commit. Prefer OWNOLOGY_GATE_PASSWORD (the canonical
 # server-side var); fall back to GATE_PASSWORD for CI convenience. Skip the
 # whole gated-flow module if unset so CI without the secret still exits

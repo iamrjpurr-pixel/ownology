@@ -20,7 +20,7 @@ import requests
 
 BASE_URL = os.environ.get(
     "REACT_APP_BACKEND_URL",
-    "https://ownership-dev.preview.emergentagent.com",
+    "https://private-tutor-2.preview.emergentagent.com",
 ).rstrip("/")
 
 

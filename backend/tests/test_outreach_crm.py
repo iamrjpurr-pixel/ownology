@@ -12,7 +12,7 @@ from urllib.parse import quote
 import pytest
 import requests
 
-BASE_URL = "https://ownership-dev.preview.emergentagent.com"
+BASE_URL = "https://private-tutor-2.preview.emergentagent.com"
 
 
 def _enc(payload):

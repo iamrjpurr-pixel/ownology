@@ -7,7 +7,7 @@ import json
 import pytest
 import requests
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://ownership-dev.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://private-tutor-2.preview.emergentagent.com").rstrip("/")
 AUDIO_PATH = "/tmp/voice-test.mp3"
 
 

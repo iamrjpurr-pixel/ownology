@@ -2,7 +2,7 @@
 Pre-demo E2E validation — comprehensive smoke of every demo-critical
 surface for the Ownology app. Run against preview URL.
 
-Run: API_URL=https://ownership-dev.preview.emergentagent.com \
+Run: API_URL=https://private-tutor-2.preview.emergentagent.com \
      python -m pytest backend/tests/test_demo_e2e.py -v
 """
 import os
@@ -10,7 +10,7 @@ import json
 import pytest
 import requests
 
-API_URL = os.environ.get("API_URL", "https://ownership-dev.preview.emergentagent.com").rstrip("/")
+API_URL = os.environ.get("API_URL", "https://private-tutor-2.preview.emergentagent.com").rstrip("/")
 
 
 def _password():

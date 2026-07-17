@@ -19,6 +19,6 @@
   "seed_data_creation": "None — used existing seeded vintage_log_entries (32 rows, 10 unique tanks).",
   "retest_needed": false,
   "should_main_agent_self_test": false,
-  "context_for_next_testing_agent": "Live preview: https://ownership-dev.preview.emergentagent.com. Batch 2 regression file: /app/backend/tests/test_batch2_features.py (15 tests). The PDF endpoint is Express (not tRPC) at /api/compliance/audit-trail.pdf?days=N — content-type application/pdf, %PDF magic bytes, ~5KB with current seed data. Stats page is currently behind ownerProcedure but works in dev because the bypass user is role=admin; convert to publicProcedure when real auth lands. Also: console shows scattered 400s on non-tRPC paths (PWA manifest/icons) — not related to Batch 2, ignore.",
+  "context_for_next_testing_agent": "Live preview: https://private-tutor-2.preview.emergentagent.com. Batch 2 regression file: /app/backend/tests/test_batch2_features.py (15 tests). The PDF endpoint is Express (not tRPC) at /api/compliance/audit-trail.pdf?days=N — content-type application/pdf, %PDF magic bytes, ~5KB with current seed data. Stats page is currently behind ownerProcedure but works in dev because the bypass user is role=admin; convert to publicProcedure when real auth lands. Also: console shows scattered 400s on non-tRPC paths (PWA manifest/icons) — not related to Batch 2, ignore.",
   "rca of the issue": "No bugs found in this iteration."
 }

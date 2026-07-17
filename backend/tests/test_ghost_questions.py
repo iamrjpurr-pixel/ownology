@@ -12,7 +12,7 @@ import requests
 import pytest
 
 BASE_URL = os.environ.get(
-    "REACT_APP_BACKEND_URL", "https://ownership-dev.preview.emergentagent.com"
+    "REACT_APP_BACKEND_URL", "https://private-tutor-2.preview.emergentagent.com"
 ).rstrip("/")
 
 # Mirror of STAGE_TO_WBS in /app/server/cellarBriefEngine.ts (lines 150-171).

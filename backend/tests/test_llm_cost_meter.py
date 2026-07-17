@@ -10,7 +10,7 @@ import pytest
 import requests
 from concurrent.futures import ThreadPoolExecutor
 
-BASE_URL = "https://ownership-dev.preview.emergentagent.com"
+BASE_URL = "https://private-tutor-2.preview.emergentagent.com"
 TIMEOUT = 90
 
 

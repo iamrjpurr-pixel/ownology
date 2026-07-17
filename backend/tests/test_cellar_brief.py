@@ -9,7 +9,7 @@ import requests
 import pytest
 from urllib.parse import quote
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://ownership-dev.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://private-tutor-2.preview.emergentagent.com").rstrip("/")
 
 
 @pytest.fixture

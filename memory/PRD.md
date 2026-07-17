@@ -439,7 +439,7 @@ Three P1/P2 backlog items batched into a single pass, plus the outreach `bySlug`
   - `/api/gate/verify` rate limiter (5 attempts / 15 min per IP) is aggressive — trips easily under legitimate QA hammering. In-memory bucket per-pod → multi-replica prod deploys can dodge it. Move to Redis-backed limiter + widen window (or add allowlist for known preview IPs) before Railway multi-replica.
   - `server/index.ts` is 1168 LOC — well over the 700-line threshold. Extract gate middleware, meta injection, invite handler, scheduled handlers into modules when Phase 2 router refactor picks up.
   - Docs drift: PRD referred to `gate.createInvite/listInvites/revokeInvite` but actual tRPC procedures are `gate.create/list/revoke`. `producers.needsEnrichment` returns `[{id,name}]` not `{ids:[…]}`. `marketingOps.today` does NOT include `coachLine` (that's a separate `.coachLine` procedure).
-- **Verified end-to-end on preview URL** (`https://ownership-dev.preview.emergentagent.com`):
+- **Verified end-to-end on preview URL** (`https://private-tutor-2.preview.emergentagent.com`):
   - 13 public paths → HTTP 200
   - 7 gated paths → HTTP 302 → `/try?from=…`
   - `/api/gate/verify` (password) → 200 + `ow_gate` cookie
@@ -1288,7 +1288,7 @@ have been folded in or marked complete.)
 - See `/app/memory/RESPONSIVE_AUDIT.md` for the last layout audit findings.
 
 ## Service URLs
-- Preview: https://ownership-dev.preview.emergentagent.com
+- Preview: https://private-tutor-2.preview.emergentagent.com
 - DB: Railway MySQL — `reseau.proxy.rlwy.net:34291/railway`
 - Repo: https://github.com/iamrjpurr-pixel/ownology
 
@@ -1379,7 +1379,7 @@ have been folded in or marked complete.)
 - **Files touched**: `client/src/pages/Privacy.tsx` (new), `client/src/pages/Terms.tsx` (new), `client/src/pages/Refund.tsx` (new), `client/src/pages/Home.tsx` (+9 lines footer column + grid fix), `client/src/App.tsx` (+4 route registrations), `client/index.html` (+15 lines meta), `client/public/og-preview.html` (new — design source), `client/public/og-image.png` (new — 299KB launch asset).
 
 ## Service URLs
-- Preview: https://ownership-dev.preview.emergentagent.com
+- Preview: https://private-tutor-2.preview.emergentagent.com
 - DB: Railway MySQL — `reseau.proxy.rlwy.net:34291/railway`
 - Repo: https://github.com/iamrjpurr-pixel/ownology
 
