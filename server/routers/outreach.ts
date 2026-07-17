@@ -1214,7 +1214,7 @@ Return ONLY the JSON, no prose, no fences.`;
         return {
           status: "failed" as const,
           slug,
-          reason: "Perplexity could not extract a firstName",
+          reason: enriched.errorReason ?? "Perplexity returned no firstName (profile may be discontinued or bio wiped)",
           profileUrl: input.profileUrl,
         };
       }

@@ -654,6 +654,10 @@ export async function enrichNakedAngel(input: {
   hookSourceUrl: string | null;
   persona: "winemaker" | "owner" | null;
   citations: string[];
+  /** Diagnostic field — surfaces upstream failure reasons to the operator
+   *  instead of silently returning null firstName. Set on every failure
+   *  path so the ingest UI can render a useful error row. */
+  errorReason: string | null;
 }> {
   const key = process.env.PERPLEXITY_API_KEY;
   const empty = {
@@ -667,8 +671,9 @@ export async function enrichNakedAngel(input: {
     hookSourceUrl: null,
     persona: null,
     citations: [],
+    errorReason: null as string | null,
   };
-  if (!key) return empty;
+  if (!key) return { ...empty, errorReason: "PERPLEXITY_API_KEY env var missing on this environment" };
 
   const responseSchema = {
     type: "object",
@@ -769,14 +774,15 @@ Return ONLY the requested JSON. No prose. No markdown fences.`;
     clearTimeout(timeoutId);
   } catch (err) {
     clearTimeout(timeoutId);
-    console.error("[enrichNakedAngel] fetch error:", err instanceof Error ? err.message : String(err));
-    return empty;
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[enrichNakedAngel] fetch error:", msg);
+    return { ...empty, errorReason: `Perplexity network error: ${msg.slice(0, 120)}` };
   }
 
   if (!resp.ok) {
     const errText = await resp.text().catch(() => "");
     console.error(`[enrichNakedAngel] Perplexity ${resp.status}: ${errText.slice(0, 200)}`);
-    return empty;
+    return { ...empty, errorReason: `Perplexity HTTP ${resp.status}: ${errText.slice(0, 120) || "no body"}` };
   }
 
   const data = (await resp.json()) as { choices?: Array<{ message?: { content?: string } }>; citations?: string[] };
@@ -815,9 +821,11 @@ Return ONLY the requested JSON. No prose. No markdown fences.`;
       hookSourceUrl: trimStr(parsed.hookSourceUrl, 500),
       persona,
       citations,
+      errorReason: null,
     };
   } catch (err) {
-    console.error("[enrichNakedAngel] JSON parse failed:", err instanceof Error ? err.message : String(err));
-    return { ...empty, citations };
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[enrichNakedAngel] JSON parse failed:", msg);
+    return { ...empty, citations, errorReason: `JSON parse failed: ${msg.slice(0, 100)}` };
   }
 }
