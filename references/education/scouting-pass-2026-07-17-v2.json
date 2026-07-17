@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-17T23:52:22.098Z",
+  "generatedAt": "2026-07-17T23:56:47.218Z",
   "model": "sonar-pro",
   "units": [
     {
@@ -10,20 +10,40 @@
       "focus": "Introductory overview",
       "scoutedAt": "2026-07-17T23:39:22.579Z",
       "perplexity": {
-        "assessmentStyle": "",
+        "assessmentStyle": "Lab-based practicals in intensive schools (lab coat, safety glasses, covered footwear required)",
         "awriCrossRefs": [],
-        "keyConcepts": [],
+        "keyConcepts": [
+          "History and classification of the vine and the Australian Wine Industry",
+          "Introduction to wine production and wine styles",
+          "Grapevine structure",
+          "Growth cycles and fruit development",
+          "Rootstocks, hybrids and grapevines of the future",
+          "Introduction to vineyard management practices",
+          "Grape sampling, yield estimation and data handling",
+          "Red and white table wine production",
+          "Fortified and sparkling wine production"
+        ],
         "layer": "basic",
-        "learningOutcomes": [],
+        "learningOutcomes": [
+          "describe historical and geographical factors that affect the Australian and International Wine Industries",
+          "identify phenological stages of the grapevine and describe the vegetative and reproductive structures of a grapevine",
+          "discuss hybrid grapevines, the use of rootstocks and the concept of grapevines of the future",
+          "explain common vineyard management practices",
+          "describe the essential differences and outline basic production steps of the wine making process to produce the major wine types",
+          "apply basic methodology in data processing and analysis as it relates to grape and wine production"
+        ],
         "openAccessPapers": [],
         "ownedContentBridges": [],
         "urlCandidates": [
           "https://handbook.csu.edu.au/subject/2026/wsc111",
           "https://handbook.csu.edu.au/subject/2024/wsc111",
-          "https://www.uac.edu.au"
+          "https://www.uac.edu.au",
+          "https://handbook.csu.edu.au/subject/2025/WSC111"
         ],
         "wbsDomainCandidates": [
-          "WSC111"
+          "D1_vineyard",
+          "D2_harvest",
+          "D3_crushing_ferment"
         ],
         "prescribedTexts": [
           {
@@ -79,7 +99,9 @@
         "https://charlie.csu.edu.au/2026/01/12/confused-about-enrolments-same-lets-fix-that/"
       ],
       "latencyMs": 2852,
-      "retried": true
+      "retried": true,
+      "abstract": "Introduces the principles of grape and wine production, and the factors influencing viticultural and winemaking practices in Australia and around the world. Covers basic winemaking processes, major wine types, grapevine biology/anatomy/life cycle, hybrids/rootstocks, vineyard management practices, and basic scientific experimentation and statistics.",
+      "enrichedFromCrawl": true
     },
     {
       "source": "csu",
@@ -390,15 +412,37 @@
       "focus": "Taste/smell physiology, fault identification",
       "scoutedAt": "2026-07-17T23:39:39.471Z",
       "perplexity": {
-        "assessmentStyle": "",
+        "assessmentStyle": "Compulsory sensory tasting laboratory intensive school (covered footwear required)",
         "awriCrossRefs": [],
-        "keyConcepts": [],
+        "keyConcepts": [
+          "The senses: capabilities and physiology; roles of flavour, odour, taste, texture and appearance",
+          "Taste and smell: sensations, receptors, characteristics and interaction, nasal and retronasal pathways",
+          "Odorant-structure relationships, adaptation, hunger and ageing",
+          "Texture: types, terms and perceptions",
+          "Chemesthesis: receptor types, sensation types, sensitisation and adaptation",
+          "Appearance: principles of colour vision; attributes of appearance",
+          "Sensory assessment: analytic vs hedonic; role of training and statistics",
+          "Sensory testing: difference tests, thresholds, scaling and ranking",
+          "Application to wine: basic tastes, taste interactions, ethanol effect, bitterness and astringency, wine pH and ageing",
+          "Role of odour: taste-smell interaction, grape variety, regional effects",
+          "Wine faults identification, causes and introduction to wine judging"
+        ],
         "layer": "advanced",
-        "learningOutcomes": [],
+        "learningOutcomes": [
+          "explain the physiology of the perception of taste, smell, and texture, chemesthesis and its impact on sample perception characteristics",
+          "describe sensory testing methods and interpret sensory data",
+          "apply sensory principles to wine and grape juice evaluation, to identify the important sensory characteristics and their balance",
+          "discuss the nature and balance of the sensory characteristics in wines and relate those features to wine type, grape variety, wine style and wine processing",
+          "distinguish between wine faults, and explain their causes"
+        ],
         "openAccessPapers": [],
         "ownedContentBridges": [],
-        "urlCandidates": [],
-        "wbsDomainCandidates": [],
+        "urlCandidates": [
+          "https://handbook.csu.edu.au/subject/2025/WSC217"
+        ],
+        "wbsDomainCandidates": [
+          "D8_sensory"
+        ],
         "prescribedTexts": [
           {
             "citation": "Jackson, R.S. (2020). Wine Science: Principles and Applications (5th ed.). Academic Press.",
@@ -455,7 +499,9 @@
         "https://handbook.westernsydney.edu.au/2022-2023/homepage.pdf"
       ],
       "latencyMs": 3737,
-      "retried": true
+      "retried": true,
+      "abstract": "Introduces the key principles underpinning the physiology and characteristics of the senses, with particular focus on wine sensory assessment. Applies sensory testing skills and procedures to describe and identify sensations produced by major wine components, main wine varieties, styles, Australian regions and common faults.",
+      "enrichedFromCrawl": true
     },
     {
       "source": "csu",
@@ -1109,11 +1155,26 @@
       "focus": "Equipment design, utilities, waste compliance",
       "scoutedAt": "2026-07-17T23:40:19.313Z",
       "perplexity": {
-        "assessmentStyle": "",
+        "assessmentStyle": "Coursework · Pre-requisite WSC202. Focus on engineering design and evaluation.",
         "awriCrossRefs": [],
-        "keyConcepts": [],
+        "keyConcepts": [
+          "Principles of heating and cooling",
+          "Principles of solid and liquid handling and separation",
+          "Motors, drives and sensors for process control",
+          "Hygienic design and operation of equipment",
+          "Principles of winery design; equipment selection, scheduling and sizing",
+          "Winery utilities supply and optimisation for sustainable operation",
+          "Winery waste treatment and environmental compliance",
+          "New technologies in winery operations"
+        ],
         "layer": "advanced",
-        "learningOutcomes": [],
+        "learningOutcomes": [
+          "appraise and apply core concepts of process engineering for wine production",
+          "analyse grape supply logistics and wine making practices to select appropriate equipment of optimal capacity and recommend the scheduling of the equipment and winery services for a given scenario",
+          "describe and evaluate options for energy and water supply and their utilisation, and analyse and justify selected opportunities for enhancing the efficiency of energy use",
+          "describe and evaluate alternative options for disposal of liquid and solid wastes and justify the selection of methods appropriate to a given scenario",
+          "describe, evaluate and compare the use of selected procedures or technologies against economic, logistic and product quality constraints"
+        ],
         "openAccessPapers": [],
         "ownedContentBridges": [],
         "urlCandidates": [
@@ -1121,9 +1182,14 @@
           "https://handbook.csu.edu.au/subject/2024/wsc321",
           "https://web.archive.org/web/2024*/handbook.csu.edu.au/subject/*/wsc321",
           "https://www.uac.edu.au",
-          "https://www.csu.edu.au/division/learning-and-teaching/subject-outline/dashboards/current-students-search"
+          "https://www.csu.edu.au/division/learning-and-teaching/subject-outline/dashboards/current-students-search",
+          "https://handbook.csu.edu.au/subject/2025/WSC321"
         ],
-        "wbsDomainCandidates": [],
+        "wbsDomainCandidates": [
+          "D9_maintenance",
+          "D10_compliance",
+          "D3_crushing_ferment"
+        ],
         "prescribedTexts": [
           {
             "citation": "Boulton, R.B., Singleton, V.L., Bisson, L.F. & Kunkee, R.E. (1996). Principles and Practices of Winemaking. Chapman & Hall.",
@@ -1171,7 +1237,9 @@
         "https://www.csu.edu.au/division/learning-and-teaching/subject-outline/dashboards/current-students-search"
       ],
       "latencyMs": 3259,
-      "retried": true
+      "retried": true,
+      "abstract": "Builds on earlier wine production studies with expanded core concepts of process engineering. Focus on process control, hygienic design and operation of food processing equipment. Covers winery design, equipment selection/capacity/scheduling; sustainability including energy and water supply and utilisation; waste disposal alternatives; and design/evaluation of new technologies to meet economic, logistic and product quality requirements. Includes regulatory compliance.",
+      "enrichedFromCrawl": true
     },
     {
       "source": "adelaide",
@@ -2976,11 +3044,26 @@
       "focus": "Winery engineering, utilities",
       "scoutedAt": "2026-07-17T23:42:00.672Z",
       "perplexity": {
-        "assessmentStyle": "",
+        "assessmentStyle": "Waite Campus practicals + engineering design coursework (Level III core, Bachelor of Viticulture & Oenology)",
         "awriCrossRefs": [],
-        "keyConcepts": [],
+        "keyConcepts": [
+          "Principles of heating and cooling",
+          "Principles of solid and liquid handling and separation",
+          "Motors, drives and sensors for process control",
+          "Hygienic design and operation of equipment",
+          "Principles of winery design; equipment selection, scheduling and sizing",
+          "Winery utilities supply and optimisation for sustainable operation",
+          "Winery waste treatment and environmental compliance",
+          "New technologies in winery operations"
+        ],
         "layer": "advanced",
-        "learningOutcomes": [],
+        "learningOutcomes": [
+          "apply core concepts of process engineering to winery operations at the Waite Campus scale",
+          "select and specify winery equipment appropriate to grape supply logistics and target wine styles",
+          "evaluate energy and water utilities for sustainable operation and justify efficiency improvements",
+          "assess winery waste treatment options and select environmentally compliant methods for a given scenario",
+          "compare emerging winery technologies against economic, logistic and product-quality criteria"
+        ],
         "openAccessPapers": [],
         "ownedContentBridges": [],
         "prescribedTexts": [
@@ -3035,12 +3118,9 @@
           "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol"
         ],
         "wbsDomainCandidates": [
-          "D2_harvest",
-          "D3_crushing_ferment",
-          "D4_fermentation",
-          "D5_post_ferment",
           "D9_maintenance",
-          "D10_compliance"
+          "D10_compliance",
+          "D3_crushing_ferment"
         ]
       },
       "perplexityCitations": [
@@ -3054,12 +3134,14 @@
         "https://www.adelaide.edu.au/course-outlines/106508/1/sem-2/",
         "https://www.youtube.com/watch?v=kyCC_5Zf_mE"
       ],
-      "latencyMs": 3143
+      "latencyMs": 3143,
+      "enrichedFromMirror": "WSC321",
+      "abstract": "Adelaide equivalent of CSU WSC321 Winery Engineering — process engineering for wine production, hygienic equipment design, winery design and equipment scheduling, sustainability (energy/water utilities, waste treatment), and evaluation of new technologies against economic/logistic/quality constraints. Level III core unit in the BVitOenol program, taught at the Waite Campus winery. Note: content mirrored from CSU WSC321 as the Adelaide subject page is not publicly reachable — verify against Waite Campus subject outline when accessible."
     }
   ],
   "tokenTotals": {
     "prompt": 20087,
     "completion": 11826
   },
-  "phase": "A.5-final-layers-fixed"
+  "phase": "A.5-complete"
 }
