@@ -23,7 +23,6 @@ const SANS = "'Lato',sans-serif";
 const REGION_LABEL: Record<string, string> = {
   AU: "Australia 🇦🇺",
   NZ: "New Zealand 🇳🇿",
-  US: "United States 🇺🇸",
   UK: "United Kingdom 🇬🇧",
   OTHER: "Other",
 };

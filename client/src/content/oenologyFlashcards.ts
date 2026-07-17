@@ -288,11 +288,11 @@ export const FLASHCARDS: Flashcard[] = [
     id: "so2-legal",
     term: "Legal SO₂ limits",
     category: "so2",
-    sop: "Total SO₂ regulatory ceilings vary by jurisdiction. Aus/NZ: 250 mg/L (dry) / 300 mg/L (sweet). EU: 150 mg/L (dry red) / 200 mg/L (dry white). USA: 350 mg/L. Organic certification bodies impose lower ceilings.",
+    sop: "Total SO₂ regulatory ceilings vary by jurisdiction. Aus/NZ: 250 mg/L (dry) / 300 mg/L (sweet). EU: 150 mg/L (dry red) / 200 mg/L (dry white). Organic certification bodies impose lower ceilings.",
     plain: "Every market has a legal cap. Go over it and you can't sell there. Organic and export specs are tighter than domestic conventional.",
     why: "Exceeding limits blocks export and triggers label recalls. Non-negotiable at commercial scale.",
     when: "Pre-bottling. Any export lot. Any organic-certified wine.",
-    ruleOfThumb: "Aus: 250/300 · EU: 150/200 · USA: 350 · Organic Aus: 150.",
+    ruleOfThumb: "Aus/NZ: 250/300 · EU: 150/200 · Organic Aus: 150.",
   },
   {
     id: "potassium-sorbate",
@@ -509,7 +509,7 @@ export const FLASHCARDS: Flashcard[] = [
     term: "Cool vs warm climate viticulture",
     category: "regions",
     sop: "Growing-Season Temperature (GST) classification per Jones et al: cool <17°C, moderate 17–19°C, warm 19–21°C, hot >21°C. GST correlates with variety suitability, ripening potential, and stylistic tendencies.",
-    plain: "Cool regions ripen grapes slowly, keeping fresh acid. Warm regions ripen fast, keeping more sugar and fruit. Same grape variety tastes wildly different in each — Chardonnay in Yarra vs Napa vs Marlborough are three different wines.",
+    plain: "Cool regions ripen grapes slowly, keeping fresh acid. Warm regions ripen fast, keeping more sugar and fruit. Same grape variety tastes wildly different in each — Chardonnay in Yarra Valley vs Margaret River vs Marlborough are three different wines.",
     why: "Determines variety suitability, style tendencies, and ripening risk.",
     when: "Site selection. Variety matching. Ripening decisions.",
     ruleOfThumb: "Cool: retained acid, esters, ripening risk. Warm: alcohol, ripe fruit, ripening surety.",
@@ -1049,5 +1049,8 @@ export const FLASHCARDS: Flashcard[] = [
     why: "Every 'organic wine' conversation eventually asks about sprays. Have the right answer ready.",
     when: "Any certification conversation. Any organic-curious client.",
     ruleOfThumb: "Organic ≠ unsprayed. Organic = sulfur + copper + more passes. Certification is process, not zero-input.",
+  },
+];
+cess, not zero-input.",
   },
 ];

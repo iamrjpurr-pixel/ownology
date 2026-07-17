@@ -1728,6 +1728,58 @@ async function startServer() {
       console.warn("[bootstrap] industry_news_items table create skipped:", (e as Error).message);
     }
 
+    // ── Demo submissions (Feb 2026) ──────────────────────────────────
+    // Powers /demo — anonymous vintage-notes → AI question → AI answer
+    // conversion funnel. One row per demo session, updated in place as
+    // the user progresses through the three stages.
+    try {
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS demo_submissions (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          session_id VARCHAR(40) NOT NULL,
+          notes_text TEXT NOT NULL,
+          ai_extract TEXT,
+          ai_focus_tank VARCHAR(100),
+          ai_question TEXT,
+          user_answer TEXT,
+          ai_response TEXT,
+          email VARCHAR(200),
+          ip_hash VARCHAR(64),
+          created_at BIGINT NOT NULL,
+          INDEX demo_session_idx (session_id),
+          INDEX demo_created_idx (created_at)
+        )
+      `);
+    } catch (e) {
+      console.warn("[bootstrap] demo_submissions table create skipped:", (e as Error).message);
+    }
+
+    // ── Naked Angel SMS opener variant (Feb 2026) ────────────────────
+    // Cohort-specific lens for Naked Wines "Angels" — winemakers who
+    // chose direct-to-consumer subscription over traditional distribution.
+    // Idempotent — INSERT IGNORE on the unique `key` column. Kept
+    // inactive by default so it only fires when Rich explicitly toggles
+    // it on for Naked-cohort outreach.
+    try {
+      const nowNa = Date.now();
+      await db.execute(sql`
+        INSERT IGNORE INTO sms_opener_variants (\`key\`, name, lens, template, active, notes, sort_index, created_at, updated_at)
+        VALUES (
+          'naked-angel-v1',
+          'Naked Angel · direct-relationship',
+          'peer_pain',
+          ${"Hi ${firstName} — saw the Naked Angel setup${wineryOr}. You're doing what plenty of winemakers wish they could — direct relationships, no distributor margin. Been building a quality-and-risk record for winemakers who own their customer relationship: decisions, panels and asset trail on one thread so productivity and profit compound instead of restarting each vintage. ${url} · 90 seconds. — Rich P · 0408 105 067"},
+          0,
+          'Cohort-specific opener for Naked Wines Angels. Ingested via outreach.ingestNakedAngel with event="Naked Wines Angel".',
+          100,
+          ${nowNa},
+          ${nowNa}
+        )
+      `);
+    } catch (e) {
+      console.warn("[bootstrap] naked-angel-v1 seed skipped:", (e as Error).message);
+    }
+
     // ── Cellar equipment WBS expansion + batch traceability (Feb 2026) ──
     // Expand equipment_type enum from 9 → 19 values, add wbs_phase column,
     // and create the batch_equipment_uses junction table. Idempotent DDL.

@@ -112,6 +112,7 @@ const AdminUsers = lazy(() => import("./pages/AdminUsers"));
 const AdminWeeklyDigest = lazy(() => import("./pages/AdminWeeklyDigest"));
 const AdminSmsOpeners = lazy(() => import("./pages/AdminSmsOpeners"));
 const AdminIndustryNews = lazy(() => import("./pages/AdminIndustryNews"));
+const AdminNakedIngest = lazy(() => import("./pages/AdminNakedIngest"));
 const AdminThemesStats = lazy(() => import("./pages/AdminThemesStats"));
 const AdminQuizPicks = lazy(() => import("./pages/AdminQuizPicks"));
 const AdminProducers = lazy(() => import("./pages/AdminProducers"));
@@ -455,6 +456,7 @@ function Router() {
       <Route path={"/admin/weekly-digest"} component={AdminWeeklyDigest} />
       <Route path={"/admin/sms-openers"} component={AdminSmsOpeners} />
       <Route path={"/admin/industry-news"} component={AdminIndustryNews} />
+      <Route path={"/admin/naked-ingest"} component={AdminNakedIngest} />
       <Route path={"/admin/themes-stats"} component={AdminThemesStats} />
       <Route path={"/admin/quiz-picks"} component={AdminQuizPicks} />
       <Route path={"/admin/producers"} component={AdminProducers} />

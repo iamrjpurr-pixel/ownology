@@ -2,15 +2,19 @@
 
 Living document. Every "Potential improvement 💡" and "Next Action Item" from agent sessions lands here so nothing gets lost across forks/sessions.
 
-Last consolidated: 17 Jul 2026 (industry-news vertical shipped v1 — WBM ingestion + region-matched opener drafting).
+Last consolidated: 17 Jul 2026 (Naked Wines ingestion + `/demo` conversion tool + US market sweep shipped).
 
 
 ---
 
-## ✅ Shipped Jul 2026 (later)
+## ✅ Shipped Jul 2026 (latest)
 
-- **Industry news vertical (v1 — WBM only).** New `/admin/industry-news` page. `industryNews.refresh` scrapes wbmonline.com.au/news (browser-UA, regex parser) into `industry_news_items` with normalised region slugs matching `outreach_contacts.region`. `itemContacts` returns region-matched contacts sorted SMS-ready-first. `generateOpener` calls Claude with the news headline + dek as a fresh industry signal → returns a news-anchored SMS, stamps it on `smsDraftOverride` + `hookSourceUrl` + `hookTier="industry_signal"`. Human-factors inversion: 10 news items × auto-matched contacts, instead of 2000 contacts × hunt-for-signal.
-- **Site-wide "AI apprentice / second brain / cellar AI" copy sweep.** Retired every banned phrase from user-facing surfaces (Home hero H1, `/why-ownology`, `/vs/innovint-vintrace` x5 spots, `/how-we-trace`, `/knowledge`, `/guide`, `/hi/:slug` personal landing tiles + QMS variants, `UserJourneyDeck`, outbound admin templates, LinkedIn DM kit, email signatures, weekly digest signoff, Claude system prompt, `ownology-descriptor.ts` category noun + sell stack). Unified positioning: **"Quality and risk management for winemakers — across the whole business. Productivity and profit compound year on year."** Owen persona kept; his role label swapped from "AI apprentice" → "working memory".
+- **`/demo` — the paste-notes → AI-question → AI-cites-you-back conversion tool.** Public, no login. Stranger pastes any old vintage notes; Claude Sonnet 4.6 (`demo.analyze`) picks the single most interesting tank/decision moment and asks ONE curious question about it. User answers; `demo.answer` weaves a reply citing verbatim fragments from their notes back to them. Ends with soft CTA + optional email capture. E2E verified with a T-04 stuck-ferment sample — AI spotted the "Nervous" annotation and connected the 22 Mar SO₂ addition to the 28 Mar stick as the moment. `demo_submissions` table + `demoRouter` (analyze / answer / captureEmail / recentCount).
+- **Naked Wines Angel bulk ingest.** `/admin/naked-ingest` — paste (or one-click load) 71 Naked Wines Angel profile URLs, client-side loop calls `outreach.ingestNakedAngel` per URL, each URL runs a Perplexity Sonar-Pro enrichment that extracts real estate (not "Naked Wines"), region (normalised to the same slug space as `outreach_contacts.region`), painPoint, fresh public signal, and persona. Then Claude drafts the SMS opener in the Naked-Angel lens. Progress table with retry per row. New `naked-angel-v1` SMS opener variant seeded — cohort-specific direct-relationship pitch. `scripts/naked_urls.txt` persists the 71 seed URLs (never `/tmp` again).
+- **US market sweep.** Removed US/TTB/Napa references from every customer-facing surface: `VsInnovintVintrace` (5 spots including migration path repositioning), `Pricing` (USD line), `WhyOwnology` (TTB in ERP comparison), `ForInnoVintUsers` (TTB in feature list + example use-case), `RiskGlossary` (US TTB in SO₂ regs), `WineBatchSheet` (Napa/Sonoma region options), `AdminQuizPicks` + `Quiz.tsx` (US as market option), `VintageEntrySheet` (USD currency), `oenologyFlashcards` (USA SO₂ ceiling + Napa comparison), `BlogWeightOfHarvest` (Napa Cabernet example). Server AI knowledge base kept (factual export info for user Q&A). Admin cost dashboards kept (USD is how OpenAI bills us).
+- **Stale-check auto-refresh on `/admin/industry-news`.** Value-engineered alt to Railway cron — page checks `MAX(fetched_at)` on mount, silently refreshes if >4h stale. `fetched N hours ago` chip flips to amber `auto-refreshing…` during background fetch. Ref-guarded to fire once per mount.
+- **Industry-news vertical v1 (WBM).** `/admin/industry-news` — scrape wbmonline.com.au/news (browser-UA regex parser), region-matched contact lookup, per-item Claude-drafted news-anchored SMS opener. `industry_news_items` table + `industryNews` tRPC router + WBM scraper service.
+- **Site-wide banned-copy sweep.** "cellar AI / second brain / AI apprentice" retired everywhere. Unified positioning: **"Quality and risk management for winemakers — across the whole business."** Owen persona kept; role label "AI apprentice" → "working memory".
 
 
 ---

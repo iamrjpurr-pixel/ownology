@@ -175,7 +175,7 @@ function HowItFits() {
                 "Cellar task management & scheduling",
                 "Lab analysis records & lot tracking",
                 "Inventory, barrels & tank management",
-                "TTB compliance & regulatory reporting",
+                "Wine Australia LIP audit trail & regulatory reporting",
                 "Blend calculations & COGS tracking",
                 "Vintage history & production audit trail",
               ].map((item) => (
@@ -276,7 +276,7 @@ function Testimonial() {
             Example use-case
           </p>
           <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.0625rem", color: TEXT_MID, lineHeight: 1.8, marginBottom: "1.5rem" }}>
-            You&apos;ve used InnoVint for three vintages. It&apos;s excellent for what it does — lot management, TTB filing, the 3D tank map. But every time a new cellar hand asks you a protocol question, you have to stop what you&apos;re doing. Ownology fixes that. Your team asks the question, gets a cited answer from your own SOP, and you stay focused on the wine.
+            You&apos;ve used InnoVint for three vintages. It&apos;s excellent for what it does — lot management, compliance filing, the 3D tank map. But every time a new cellar hand asks you a protocol question, you have to stop what you&apos;re doing. Ownology fixes that. Your team asks the question, gets a cited answer from your own SOP, and you stay focused on the wine.
           </p>
           <p style={{ fontFamily: SANS, fontSize: "0.78rem", color: TEXT_LO, borderTop: `1px solid ${BORDER}`, paddingTop: "1rem", fontStyle: "italic" }}>
             That&apos;s the situation Ownology is built for. If it sounds like yours, start the free trial.

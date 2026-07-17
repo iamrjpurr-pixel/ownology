@@ -311,7 +311,7 @@ function AdditionDetails({
               minWidth: "5rem",
             }}
           >
-            {["AUD","NZD","USD","EUR","GBP","ZAR"].map((c) => <option key={c} value={c}>{c}</option>)}
+            {["AUD","NZD","EUR","GBP","ZAR"].map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
           <TextInput
             value={details.costPerUnit ?? ""}

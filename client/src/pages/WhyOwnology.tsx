@@ -84,7 +84,7 @@ function Hero() {
 
 function TwoSystems() {
   const { ref, inView } = useInView();
-  const erpItems = ["Cellar logs and tank records","TTB / regulatory compliance","Inventory and COGS tracking","Lab analysis history","Bottling and packaging records"];
+  const erpItems = ["Cellar logs and tank records","Wine Australia / MPI regulatory compliance","Inventory and COGS tracking","Lab analysis history","Bottling and packaging records"];
   const ownItems = ["Natural language cellar Q&A","Answers from your own SOPs and protocols","SO₂, YAN, and fermentation calculations","Mobile-first — works with wet hands","Every answer cites its source"];
   return (
     <section className="py-20" style={{ background: BG_RAISED }}>
@@ -150,7 +150,7 @@ function ComparisonTable() {
     { c: "Cites the source of every answer", o: true, e: false, m: false },
     { c: "Mobile-first — designed for the cellar floor", o: true, e: "Partial", m: false },
     { c: "SO₂, YAN, and fermentation calculations", o: true, e: false, m: false },
-    { c: "Regulatory compliance and TTB records", o: false, e: true, m: false },
+    { c: "Regulatory compliance (Wine Australia LIP · NZ WSMP)", o: false, e: true, m: false },
     { c: "Inventory and COGS tracking", o: false, e: true, m: false },
     { c: "Tasting room copy and social media content", o: false, e: false, m: true },
     { c: "Works alongside your existing production system", o: true, e: "—", m: "—" },

@@ -110,7 +110,7 @@ const CATEGORIES: Category[] = [
         definition:
           "Sulfur dioxide added to wine as a preservative. FREE SO₂ = the reactive fraction available to bind O₂ and inhibit microbes. MOLECULAR SO₂ = the tiny fraction that actively kills microbes (pH-dependent). TOTAL SO₂ = free + bound (bound = already reacted with acetaldehyde etc).",
         whyItMatters:
-          "Regulatory limits (Wine Australia + EU + US TTB) are on TOTAL SO₂. Sensory / antimicrobial protection is on MOLECULAR SO₂. Ownology flags aging vessels below the free SO₂ target for their colour/pH class.",
+          "Regulatory limits (Wine Australia AU · MPI NZ · EU) are on TOTAL SO₂. Sensory / antimicrobial protection is on MOLECULAR SO₂. Ownology flags aging vessels below the free SO₂ target for their colour/pH class.",
         source: "AWRI Fact Sheet: Sulfur dioxide, use in wine. FSANZ Food Standards Code Standard 1.3.1 (permitted preservatives).",
       },
       {

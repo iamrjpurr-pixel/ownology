@@ -52,7 +52,6 @@ const COMMON_GIS = [
   "Yarra Valley", "Mornington Peninsula", "Heathcote", "Rutherglen",
   "Grampians", "Pyrenees", "Macedon Ranges",
   "Marlborough", "Central Otago", "Hawke's Bay",
-  "Napa Valley", "Sonoma County",
   "Other / Not Applicable",
 ];
 

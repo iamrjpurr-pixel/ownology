@@ -1608,7 +1608,7 @@ export default function Pricing() {
       {/* Footer note */}
       <div className="py-6 text-center" style={{ borderTop: "1px solid var(--ow-border)" }}>
         <p className="text-xs" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, color: "oklch(0.40 0.010 75)" }}>
-          All prices in AUD. USD pricing available for international customers. Founding Cohort · 2026 pricing locked for life. No credit card required for Free Run.
+          All prices in AUD (NZD available at parity for NZ customers). Founding Cohort · 2026 pricing locked for life. No credit card required for Free Run.
         </p>
       </div>
 

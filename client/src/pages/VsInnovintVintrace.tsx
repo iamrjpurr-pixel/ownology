@@ -96,8 +96,8 @@ type Vendor = { name: string; kicker: string; audience: string; pricing: string;
 const VENDORS: Vendor[] = [
   {
     name: "InnoVint",
-    kicker: "The US cellar ERP",
-    audience: "40-lot custom-crush facility. US-based. Filing TTB 5120.17 every month. Team of six on the floor. Needs 3D tank maps, lot COGS, AP Compliance.",
+    kicker: "The US cellar ERP (not our market)",
+    audience: "40-lot custom-crush facility. US-based. Team of six on the floor. Needs 3D tank maps, lot COGS, AP Compliance. Not our target buyer — we're AU/NZ only.",
     pricing: "From US$149/mo (aggregator). Custom quote. Free trial. Unlimited users.",
     sourceUrl: "https://www.innovint.us/packages/",
   },
@@ -130,14 +130,9 @@ const ROWS: Row[] = [
     innovintNote: "Lot Explorer with block-level parentage trace-back",
     vintraceNote: "Product Page + Vessels + lot traceability",
     ownologyNote: "Batches with parent/child; not lot-tree depth" },
-  { area: "TTB 5120.17 filing (US)",
-    innovint: "core", vintrace: "yes", ownology: "no",
-    innovintNote: "Auto-generated with audit + lock-backdate",
-    vintraceNote: "TTB reporting supported",
-    ownologyNote: "Not yet built — use incumbent alongside if US-based" },
   { area: "WET filing (Australia)",
     innovint: "no", vintrace: "core", ownology: "no",
-    innovintNote: "US-focused",
+    innovintNote: "Not AU-focused",
     vintraceNote: "Native — this is a Vintrace edge in AU",
     ownologyNote: "Not yet built" },
   { area: "3D interactive tank map",
@@ -298,7 +293,7 @@ function Reframe(): JSX.Element {
           <span style={{ color: AMBER }}>It&apos;s the quality-and-risk layer that runs alongside it.</span>
         </h2>
         <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.05rem", color: TEXT_MID, lineHeight: 1.75, maxWidth: 680 }}>
-          InnoVint and Vintrace were built for the <strong style={{ color: TEXT_HI, fontWeight: 500 }}>full-time cellar team</strong> — assign the work order to Jane, run the trial blend, file TTB. That&apos;s a real job. Both do it well after 10–15 years of iteration.
+          InnoVint and Vintrace were built for the <strong style={{ color: TEXT_HI, fontWeight: 500 }}>full-time cellar team</strong> — assign the work order to Jane, run the trial blend, file the compliance return. That&apos;s a real job. Both do it well after 10–15 years of iteration.
         </p>
         <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: "1.05rem", color: TEXT_MID, lineHeight: 1.75, maxWidth: 680, marginTop: "1rem" }}>
           Ownology is built for the <strong style={{ color: TEXT_HI, fontWeight: 500 }}>owner-operator winemaker</strong> who is also the marketer, DTC channel, tasting-room host, and story publisher. One person doing eight jobs. That job needs a different tool — an AI-native one that reads your protocols, answers your team&apos;s questions in plain language, curates your customer digest, generates your Cellar Book PDF, and pipes buyers in from a quiz.
@@ -444,7 +439,6 @@ function CellDisplay({ cell, note }: { cell: Cell; note?: string }): JSX.Element
 function WhereWeLag(): JSX.Element {
   const { ref, inView } = useInView<HTMLDivElement>();
   const gaps = [
-    { title: "US TTB 5120.17 auto-filing", body: "Both incumbents automate it. We don't yet. If you file monthly with the TTB, keep your incumbent — run Ownology alongside." },
     { title: "AU WET reporting", body: "Vintrace is native. We haven't built our own. On the roadmap." },
     { title: "3D interactive tank maps", body: "InnoVint's distinct visual asset. Ours is a batch board, not a 3D floor plan." },
     { title: "Auto-ingest from Baker Lab / ETS", body: "Vintrace bridges directly to physical lab hardware. Ours is manual entry today." },
@@ -521,8 +515,8 @@ function MigrationPaths(): JSX.Element {
   const paths = [
     {
       badge: "From InnoVint",
-      title: "You&apos;re probably US-based, custom-crush, TTB-filing.",
-      body: "Don&apos;t rip out InnoVint. Their lot ledger + TTB automation is genuinely good. Add Ownology alongside as your quality-and-risk layer — quiz-driven DTC, weekly reco digest, cellar journal, home-market intelligence.",
+      title: "InnoVint isn&apos;t built for AU/NZ — we are.",
+      body: "InnoVint is a strong US-focused cellar ERP. We&apos;re not competing in that market. If you&apos;re AU/NZ and shopping InnoVint, that&apos;s the mismatch — Ownology is the AU-native quality-and-risk layer for boutique winemakers: quiz-driven DTC, weekly reco digest, cellar journal, home-market intelligence.",
       cta: "See our full InnoVint migration guide",
       href: "/for-innovint-users",
     },

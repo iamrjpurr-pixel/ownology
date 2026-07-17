@@ -26,6 +26,7 @@ import {
   claudeRewriteOne,
   classifyReplySentiment,
   mineMobileNumber,
+  enrichNakedAngel,
 } from "./outreach-ai-helpers.js";
 
 export const outreachRouter = router({
@@ -948,6 +949,167 @@ Return JSON: { "sms": "..." }. ONLY JSON. No prose. No fences.`;
       }
 
       return { ok: true, slug, autoRewrote, autoRewriteError };
+    }),
+
+  // ── OWNER — Return the persistent Naked Wines seed URL list ────────
+  // Convenience endpoint for the admin ingest UI so the operator can
+  // one-click load 71 seed URLs instead of pasting them. Reads
+  // /app/scripts/naked_urls.txt (persistent — /tmp doesn't survive
+  // pod restarts, which is why the previous fork's list disappeared).
+  nakedAngelSeedUrls: ownerProcedure.query(async () => {
+    try {
+      // Dynamic import so the fs dependency only loads on this endpoint.
+      const fs = await import("fs/promises");
+      const path = await import("path");
+      const raw = await fs.readFile(path.resolve(process.cwd(), "scripts", "naked_urls.txt"), "utf-8");
+      const urls = raw
+        .split(/\r?\n/)
+        .map((s) => s.trim())
+        .filter((s) => /^https:\/\/www\.nakedwines\.com\.au\/winemakers\/[a-z0-9-]+/.test(s));
+      return { urls };
+    } catch {
+      return { urls: [] as string[] };
+    }
+  }),
+
+  // ── OWNER — Ingest a single Naked Wines Angel profile ──────────────
+  // Client-side loop calls this once per URL from a hand-curated list
+  // (Feb 2026 first batch = 71 URLs scraped from the Naked sitemap).
+  // Per-call cost: ~1 Perplexity Sonar call (~$0.005) + ~1 Claude
+  // rewrite (~$0.005). At 71 URLs, ~$0.70 total. Total wall time is
+  // ~15-20 min because Perplexity averages ~12s per Sonar-Pro call.
+  //
+  // Returns a rich result the UI shows in a progress list so the
+  // operator sees exactly what got created / skipped / failed and can
+  // retry a specific URL if Perplexity had a bad turn.
+  ingestNakedAngel: ownerProcedure
+    .input(z.object({
+      profileUrl: z.string().url().refine((u) => u.includes("nakedwines.com.au/winemakers/"), {
+        message: "Must be a nakedwines.com.au/winemakers/... URL",
+      }),
+    }))
+    .mutation(async ({ input }) => {
+      // Deterministic slug from the URL suffix so re-running the batch
+      // is safe (INSERT trips the UNIQUE constraint on duplicate slugs).
+      const suffix = input.profileUrl.split("/winemakers/")[1]?.replace(/\/$/, "") ?? "";
+      if (!suffix) throw new Error("Malformed Naked Wines URL");
+      const slug = slugify(suffix);
+
+      // Skip if this Angel is already in the CRM. Cheap check first —
+      // avoids a Perplexity call on already-ingested slugs.
+      const existing = await db
+        .select({ slug: schema.outreachContacts.slug })
+        .from(schema.outreachContacts)
+        .where(eq(schema.outreachContacts.slug, slug))
+        .limit(1);
+      if (existing.length > 0) {
+        return {
+          status: "skipped" as const,
+          slug,
+          reason: "already in CRM",
+          profileUrl: input.profileUrl,
+        };
+      }
+
+      const enriched = await enrichNakedAngel({ profileUrl: input.profileUrl });
+      if (!enriched.firstName) {
+        return {
+          status: "failed" as const,
+          slug,
+          reason: "Perplexity could not extract a firstName",
+          profileUrl: input.profileUrl,
+        };
+      }
+
+      // Fall back to Naked's own name if enrichment failed to find the
+      // real estate — better to have the row with winery="Naked Wines"
+      // than to drop it entirely. Region-based flows will still work
+      // because Perplexity almost always resolves the region correctly.
+      const winery = enriched.estateWinery ?? "Naked Wines";
+
+      try {
+        await db.insert(schema.outreachContacts).values({
+          slug,
+          firstName: enriched.firstName,
+          lastName: enriched.lastName,
+          winery,
+          region: enriched.region,
+          painPoint: enriched.painPoint,
+          hookTier: enriched.hookTier,
+          hookText: enriched.hookText,
+          // Use the news source url if Perplexity found one; else the
+          // Naked profile itself is a defensible source citation.
+          hookSourceUrl: enriched.hookSourceUrl ?? input.profileUrl,
+          persona: enriched.persona,
+          // Tag the cohort so we can filter / analytics later without
+          // touching schema. "event" is the free-text context field.
+          event: "Naked Wines Angel",
+          notes: `Naked Wines Angel profile: ${input.profileUrl}${enriched.citations.length ? `\n\nCitations:\n${enriched.citations.slice(0, 5).join("\n")}` : ""}`,
+          status: "cold",
+          viewCount: 0,
+          createdAt: Date.now(),
+        });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        return {
+          status: "failed" as const,
+          slug,
+          reason: msg.includes("Duplicate") ? "slug collision" : msg.slice(0, 200),
+          profileUrl: input.profileUrl,
+        };
+      }
+
+      // Fire the standard auto-rewrite pipeline used by outreach.create.
+      // Uses the naked-angel-v1 opener variant when it exists (see
+      // server/index.ts bootstrap) — otherwise falls back to Continuity.
+      let autoRewroteSms = false;
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      const hasResearch = !!(winery && (enriched.painPoint || enriched.hookText));
+      if (forgeUrl && forgeKey && hasResearch) {
+        try {
+          const previewBase = process.env.PREVIEW_BASE_URL || process.env.PUBLIC_BASE_URL || "https://ownology.ai";
+          const { sms } = await claudeRewriteOne({
+            forgeUrl,
+            forgeKey,
+            previewBase,
+            tone: "regional",
+            contact: {
+              slug,
+              firstName: enriched.firstName,
+              lastName: enriched.lastName,
+              winery,
+              region: enriched.region,
+              event: "Naked Wines Angel",
+              painPoint: enriched.painPoint,
+              hookText: enriched.hookText,
+              hookTier: enriched.hookTier,
+              notes: null,
+              persona: enriched.persona,
+            },
+          });
+          await db
+            .update(schema.outreachContacts)
+            .set({ smsDraftOverride: sms })
+            .where(eq(schema.outreachContacts.slug, slug));
+          autoRewroteSms = true;
+        } catch {
+          // Silent — the contact is created, operator can rewrite from
+          // the card. Don't abort the ingest job on Claude hiccups.
+        }
+      }
+
+      return {
+        status: "created" as const,
+        slug,
+        firstName: enriched.firstName,
+        lastName: enriched.lastName,
+        winery,
+        region: enriched.region,
+        hookTier: enriched.hookTier,
+        autoRewroteSms,
+        profileUrl: input.profileUrl,
+      };
     }),
 
   // ── OWNER — Voice-quick-add a contact ──────────────────────────────────

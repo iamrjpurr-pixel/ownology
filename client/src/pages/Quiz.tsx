@@ -501,7 +501,7 @@ export default function Quiz() {
                       {regionLabel(r)}
                     </button>
                   ))}
-                  {(region === "US" || region === "UK") && (
+                  {(region === "UK") && (
                     <button
                       key={region}
                       type="button"
@@ -537,7 +537,7 @@ export default function Quiz() {
                       travelling?
                     </summary>
                     <div style={{ display: "inline-flex", gap: 6, marginLeft: 6 }}>
-                      {(["US", "UK"] as const).map((r) => (
+                      {(["UK"] as const).map((r) => (
                         <button
                           key={r}
                           type="button"
@@ -694,7 +694,7 @@ function budgetLabel(b: Budget): string {
 }
 
 function regionLabel(r: string): string {
-  return { AU: "Australia 🇦🇺", NZ: "New Zealand 🇳🇿", US: "the US 🇺🇸", UK: "the UK 🇬🇧", OTHER: "your region" }[r as "AU"|"NZ"|"US"|"UK"|"OTHER"] || "your region";
+  return { AU: "Australia 🇦🇺", NZ: "New Zealand 🇳🇿", UK: "the UK 🇬🇧", OTHER: "your region" }[r as "AU"|"NZ"|"UK"|"OTHER"] || "your region";
 }
 
 function availabilityLabel(a: string): string {

@@ -25,6 +25,7 @@ import { weeklyRecoDigestRouter } from "./routers/weeklyRecoDigest.js";
 import { weeklyDigestRouter } from "./routers/weeklyDigest.js";
 import { smsOpenersRouter } from "./routers/smsOpeners.js";
 import { industryNewsRouter } from "./routers/industryNews.js";
+import { demoRouter } from "./routers/demoRouter.js";
 import { wbsAdminRouter } from "./routers/wbsAdmin.js";
 import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
@@ -2226,5 +2227,6 @@ export const appRouter = router({
   weeklyDigest: weeklyDigestRouter,
   smsOpeners: smsOpenersRouter,
   industryNews: industryNewsRouter,
+  demo: demoRouter,
 });
 export type AppRouter = typeof appRouter;

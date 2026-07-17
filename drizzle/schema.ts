@@ -1567,6 +1567,36 @@ export const smsOpenerVariants = mysqlTable(
 
 
 /**
+ * demo_submissions — anonymous /demo page conversion funnel.
+ *
+ * One row per demo session. Analyze stage inserts; answer/captureEmail
+ * stages update the same row via session_id. Reviewed on the future
+ * /admin/demo-submissions dashboard for qualitative learning.
+ */
+export const demoSubmissions = mysqlTable(
+  "demo_submissions",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    sessionId: varchar("session_id", { length: 40 }).notNull(),
+    notesText: text("notes_text").notNull(),
+    aiExtract: text("ai_extract"),
+    aiFocusTank: varchar("ai_focus_tank", { length: 100 }),
+    aiQuestion: text("ai_question"),
+    userAnswer: text("user_answer"),
+    aiResponse: text("ai_response"),
+    email: varchar("email", { length: 200 }),
+    // Hashed IP (sha256, first 32 chars) so we can rate-limit and
+    // dedupe without storing raw IPs. Privacy-friendly.
+    ipHash: varchar("ip_hash", { length: 64 }),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [
+    index("demo_session_idx").on(t.sessionId),
+    index("demo_created_idx").on(t.createdAt),
+  ]
+);
+
+/**
  * industry_news_items — scraped WBM (and later, other AU/NZ trade
  * publication) headlines used to seed region-matched SMS opener hooks.
  *

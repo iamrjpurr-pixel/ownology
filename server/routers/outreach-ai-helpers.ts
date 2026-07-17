@@ -587,3 +587,237 @@ Return ONLY the requested JSON. No prose. No markdown fences.`;
   }
 }
 
+
+/**
+ * enrichNakedAngel — Perplexity Sonar lookup for a single Naked Wines
+ * "Angel" (winemaker) profile URL.
+ *
+ * The Naked Wines site itself carries the winemaker's Naked bio, but the
+ * commercial gold is elsewhere: their REAL estate name, region, and any
+ * dated public signal from Instagram / WBM / The Real Review. We ask
+ * Perplexity to (1) read the Naked profile for name confirmation,
+ * (2) independently research their own-estate identity + region + recent
+ * signal so downstream flows (region-matched news, SMS opener variants)
+ * can hang off it.
+ *
+ * Region slug vocabulary is fixed to the same slug space used by
+ * outreach_contacts.region so nothing needs mapping downstream.
+ *
+ * Feb 2026, Rich — first bulk-industry ingest of the year.
+ */
+const NAKED_ANGEL_REGION_SLUGS = [
+  "adelaide-hills",
+  "barossa",
+  "beechworth",
+  "canberra",
+  "clare",
+  "coonawarra",
+  "eden-valley",
+  "geographe",
+  "gippsland",
+  "grampians",
+  "granite-belt",
+  "great-southern",
+  "heathcote",
+  "hunter",
+  "king-valley",
+  "langhorne-creek",
+  "margaret-river",
+  "mclaren-vale",
+  "mornington-peninsula",
+  "mudgee",
+  "murray-darling",
+  "orange",
+  "riverina",
+  "riverland",
+  "rutherglen",
+  "swan-valley",
+  "tasmania",
+  "tumbarumba",
+  "yarra-valley",
+  "marlborough-nz",
+  "central-otago-nz",
+  "hawkes-bay-nz",
+  "nelson-nz",
+] as const;
+
+export async function enrichNakedAngel(input: {
+  profileUrl: string;
+}): Promise<{
+  firstName: string | null;
+  lastName: string | null;
+  estateWinery: string | null; // THEIR real winery, not "Naked Wines"
+  region: string | null;       // Normalised slug
+  painPoint: string | null;
+  hookTier: "recent_signal" | "quoted_voice" | "peer_signal" | "vintage_pain" | null;
+  hookText: string | null;
+  hookSourceUrl: string | null;
+  persona: "winemaker" | "owner" | null;
+  citations: string[];
+}> {
+  const key = process.env.PERPLEXITY_API_KEY;
+  const empty = {
+    firstName: null,
+    lastName: null,
+    estateWinery: null,
+    region: null,
+    painPoint: null,
+    hookTier: null,
+    hookText: null,
+    hookSourceUrl: null,
+    persona: null,
+    citations: [],
+  };
+  if (!key) return empty;
+
+  const responseSchema = {
+    type: "object",
+    properties: {
+      firstName: { type: ["string", "null"] },
+      lastName: { type: ["string", "null"] },
+      estateWinery: { type: ["string", "null"], description: "Their REAL estate/label — NOT 'Naked Wines'" },
+      region: { type: ["string", "null"], enum: [...NAKED_ANGEL_REGION_SLUGS, null] },
+      painPoint: { type: ["string", "null"] },
+      hookTier: {
+        type: ["string", "null"],
+        enum: ["recent_signal", "quoted_voice", "peer_signal", "vintage_pain", null],
+      },
+      hookText: { type: ["string", "null"] },
+      hookSourceUrl: { type: ["string", "null"] },
+      persona: { type: ["string", "null"], enum: ["winemaker", "owner", null] },
+    },
+    required: [
+      "firstName", "lastName", "estateWinery", "region",
+      "painPoint", "hookTier", "hookText", "hookSourceUrl", "persona",
+    ],
+    additionalProperties: false,
+  } as const;
+
+  const systemPrompt = `You are a wine-industry research assistant. You will be given the URL of a Naked Wines "Angel" winemaker profile (nakedwines.com.au/winemakers/<slug>). Your job is to combine that profile with independent web research to build a structured CRM record.
+
+═══════════════════════════════════════════════════════════════
+STEP 1 — Read the Naked Wines profile:
+═══════════════════════════════════════════════════════════════
+Fetch the URL. Extract:
+  • firstName + lastName (as they present themselves publicly)
+  • The winemaker's OWN estate / label name (NOT "Naked Wines"). Naked Angels typically make wine at their own estate AND under Naked's label. We want the estate name.
+  • Their region
+
+═══════════════════════════════════════════════════════════════
+STEP 2 — Independent verification + enrichment:
+═══════════════════════════════════════════════════════════════
+Once you have the name + estate, verify via at least one non-Naked source:
+  • Their estate's own website
+  • Their Instagram / LinkedIn presence
+  • WBM Online, Halliday, The Real Review, or Grapegrower & Winemaker mentions
+
+The independent verification protects against Naked bio inflation. If you can't verify the estate elsewhere, return estateWinery as null rather than the Naked bio's claim.
+
+═══════════════════════════════════════════════════════════════
+STEP 3 — Signal / hook extraction:
+═══════════════════════════════════════════════════════════════
+Look for ONE specific dated public signal from the last ~120 days (Instagram post, WBM feature, podcast quote, industry-award announcement). Categorise into one of:
+  • "recent_signal" — dated event/complaint/observation (BEST)
+  • "quoted_voice" — direct quote from a caption / interview
+  • "peer_signal" — dated event at a neighbouring winery they engaged with
+  • "vintage_pain" — current-vintage regional conditions affecting them
+
+hookText: max 140 chars, lower-case, Australian idiom, sounds like a mate who saw the post yesterday. NO emojis, NO exclamation marks, NO fabrication. Paraphrase specifically — never generic labels.
+
+If you cannot find a dated signal, return hookTier/hookText/hookSourceUrl as null. NULL IS ALWAYS CORRECT OVER FABRICATION.
+
+═══════════════════════════════════════════════════════════════
+STEP 4 — painPoint (one-sentence business summary):
+═══════════════════════════════════════════════════════════════
+Independent of the hook, write ONE sentence describing this winemaker's operation as it relates to quality and risk management. Naked Angel context matters: they're small-batch producers who chose Naked over traditional distribution — pain-points cluster around scale, capital, and direct-consumer risk. Examples:
+  • "Small-batch McLaren Vale Angel scaling from side-project to full-time; capital-light so risk sits on the winemaker personally."
+  • "Established Hunter Semillon producer; Naked lets him bypass distributor margin but adds vintage-consistency pressure with a subscription base."
+  • "Two-person Beechworth outfit; wild-ferment style with high vintage variability — needs a decision record if second employee joins."
+
+═══════════════════════════════════════════════════════════════
+STEP 5 — persona:
+═══════════════════════════════════════════════════════════════
+"winemaker" if hands-on cellar operator (99% of Angels). "owner" if MD/proprietor with a hired winemaker. Default winemaker.
+
+═══════════════════════════════════════════════════════════════
+REGION SLUG VOCABULARY (fixed — must match one exactly):
+═══════════════════════════════════════════════════════════════
+${NAKED_ANGEL_REGION_SLUGS.join(", ")}
+
+If their region doesn't map to one of these exactly, return null. Do NOT invent a new slug.
+
+Return ONLY the requested JSON. No prose. No markdown fences.`;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 60_000);
+  let resp: Response;
+  try {
+    resp = await fetch("https://api.perplexity.ai/chat/completions", {
+      method: "POST",
+      signal: controller.signal,
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "sonar-pro",
+        max_tokens: 1500,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Naked Wines Angel profile URL: ${input.profileUrl}\n\nRead it, verify independently, extract the structured JSON.` },
+        ],
+        response_format: { type: "json_schema", json_schema: { schema: responseSchema } },
+      }),
+    });
+    clearTimeout(timeoutId);
+  } catch (err) {
+    clearTimeout(timeoutId);
+    console.error("[enrichNakedAngel] fetch error:", err instanceof Error ? err.message : String(err));
+    return empty;
+  }
+
+  if (!resp.ok) {
+    const errText = await resp.text().catch(() => "");
+    console.error(`[enrichNakedAngel] Perplexity ${resp.status}: ${errText.slice(0, 200)}`);
+    return empty;
+  }
+
+  const data = (await resp.json()) as { choices?: Array<{ message?: { content?: string } }>; citations?: string[] };
+  const content = data.choices?.[0]?.message?.content ?? "";
+  const citations = Array.isArray(data.citations) ? data.citations.slice(0, 10) : [];
+
+  try {
+    const cleaned = content.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+    const parsed = JSON.parse(cleaned) as Record<string, string | null>;
+
+    const validTiers = ["recent_signal", "quoted_voice", "peer_signal", "vintage_pain"] as const;
+    type ValidTier = (typeof validTiers)[number];
+    const tier = validTiers.includes(parsed.hookTier as ValidTier) ? (parsed.hookTier as ValidTier) : null;
+
+    const validPersonas = ["winemaker", "owner"] as const;
+    type ValidPersona = (typeof validPersonas)[number];
+    const persona = validPersonas.includes(parsed.persona as ValidPersona) ? (parsed.persona as ValidPersona) : null;
+
+    const validRegions = new Set<string>(NAKED_ANGEL_REGION_SLUGS);
+    const region = parsed.region && validRegions.has(parsed.region) ? parsed.region : null;
+
+    const trimStr = (v: string | null | undefined, max: number): string | null => {
+      if (typeof v !== "string") return null;
+      const t = v.trim();
+      return t ? t.slice(0, max) : null;
+    };
+
+    return {
+      firstName: trimStr(parsed.firstName, 80),
+      lastName: trimStr(parsed.lastName, 80),
+      estateWinery: trimStr(parsed.estateWinery, 120),
+      region,
+      painPoint: trimStr(parsed.painPoint, 400),
+      hookTier: tier,
+      hookText: trimStr(parsed.hookText, 400),
+      hookSourceUrl: trimStr(parsed.hookSourceUrl, 500),
+      persona,
+      citations,
+    };
+  } catch (err) {
+    console.error("[enrichNakedAngel] JSON parse failed:", err instanceof Error ? err.message : String(err));
+    return { ...empty, citations };
+  }
+}
