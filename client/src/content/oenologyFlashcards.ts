@@ -1051,6 +1051,3 @@ export const FLASHCARDS: Flashcard[] = [
     ruleOfThumb: "Organic ≠ unsprayed. Organic = sulfur + copper + more passes. Certification is process, not zero-input.",
   },
 ];
-cess, not zero-input.",
-  },
-];

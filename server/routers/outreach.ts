@@ -973,7 +973,7 @@ Return JSON: { "sms": "..." }. ONLY JSON. No prose. No fences.`;
           smsSentAt: schema.outreachContacts.smsSentAt,
           smsDraftOverride: schema.outreachContacts.smsDraftOverride,
           repliedAt: schema.outreachContacts.repliedAt,
-          openedAt: schema.outreachContacts.openedAt,
+          firstViewedAt: schema.outreachContacts.firstViewedAt,
         })
         .from(schema.outreachContacts)
         .where(eq(schema.outreachContacts.slug, input.slug))
@@ -992,11 +992,11 @@ Return JSON: { "sms": "..." }. ONLY JSON. No prose. No fences.`;
           kind: "reply" as const,
         };
       }
-      // They opened the link but no SMS follow-up in 7 days.
-      if (c.openedAt && c.smsSentAt && c.openedAt > c.smsSentAt && now - c.openedAt < 21 * DAY && now - c.openedAt > 3 * DAY) {
+      // They opened their /hi/ landing (firstViewedAt) but no reply in 3-21 days.
+      if (c.firstViewedAt && c.smsSentAt && c.firstViewedAt > c.smsSentAt && now - c.firstViewedAt < 21 * DAY && now - c.firstViewedAt > 3 * DAY) {
         return {
-          action: "Follow up — they opened your link",
-          reason: `Opened ${Math.floor((now - c.openedAt) / DAY)} days ago but never replied. A soft nudge from the /admin/contacts/engagement page compounds.`,
+          action: "Follow up — they opened your landing page",
+          reason: `Opened ${Math.floor((now - c.firstViewedAt) / DAY)} days ago but never replied. A soft nudge from the engagement page compounds.`,
           kind: "followup" as const,
         };
       }
