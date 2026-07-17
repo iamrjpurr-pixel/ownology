@@ -4,7 +4,7 @@
  * first opened / demo booked timestamps.
  */
 import { z } from "zod";
-import { eq, sql, desc, isNull, and, asc } from "drizzle-orm";
+import { eq, sql, desc, isNull, and, asc, gte } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure } from "../trpc.js";
 import { db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
@@ -949,6 +949,204 @@ Return JSON: { "sms": "..." }. ONLY JSON. No prose. No fences.`;
       }
 
       return { ok: true, slug, autoRewrote, autoRewriteError };
+    }),
+
+  // ── OWNER — Next-Best-Action pill for a single contact ────────────
+  // Advisory only. Reads already-materialised state (no LLM calls, no
+  // Perplexity — must be cheap, must render inline in the card).
+  // Returns { action, reason } when a genuine signal exists, else null.
+  // Rules from the audit:
+  //   - Never more than ONE action.
+  //   - Never appear unless a real signal exists (silence > noise).
+  //   - No side effects — just reads.
+  nextBestAction: ownerProcedure
+    .input(z.object({ slug: z.string().min(1).max(200) }))
+    .query(async ({ input }) => {
+      const [c] = await db
+        .select({
+          slug: schema.outreachContacts.slug,
+          firstName: schema.outreachContacts.firstName,
+          winery: schema.outreachContacts.winery,
+          region: schema.outreachContacts.region,
+          mobileAu: schema.outreachContacts.mobileAu,
+          status: schema.outreachContacts.status,
+          smsSentAt: schema.outreachContacts.smsSentAt,
+          smsDraftOverride: schema.outreachContacts.smsDraftOverride,
+          repliedAt: schema.outreachContacts.repliedAt,
+          openedAt: schema.outreachContacts.openedAt,
+        })
+        .from(schema.outreachContacts)
+        .where(eq(schema.outreachContacts.slug, input.slug))
+        .limit(1);
+      if (!c) return { action: null as string | null, reason: null as string | null };
+
+      const now = Date.now();
+      const DAY = 86_400_000;
+      const hasMobile = !!(c.mobileAu && /^\+614\d{8}$/.test(c.mobileAu));
+
+      // Highest priority: they replied, no follow-up scheduled.
+      if (c.repliedAt && !c.smsSentAt) {
+        return {
+          action: "Reply — they wrote back but haven't been answered",
+          reason: `Replied ${Math.floor((now - c.repliedAt) / DAY)} days ago. This is the hottest lead in your CRM right now.`,
+          kind: "reply" as const,
+        };
+      }
+      // They opened the link but no SMS follow-up in 7 days.
+      if (c.openedAt && c.smsSentAt && c.openedAt > c.smsSentAt && now - c.openedAt < 21 * DAY && now - c.openedAt > 3 * DAY) {
+        return {
+          action: "Follow up — they opened your link",
+          reason: `Opened ${Math.floor((now - c.openedAt) / DAY)} days ago but never replied. A soft nudge from the /admin/contacts/engagement page compounds.`,
+          kind: "followup" as const,
+        };
+      }
+      // Fresh regional industry-news match, not yet SMS'd.
+      if (c.region && !c.smsSentAt) {
+        const cutoff = now - 14 * DAY;
+        const [newsItem] = await db
+          .select({
+            id: schema.industryNewsItems.id,
+            headline: schema.industryNewsItems.headline,
+            publishedAt: schema.industryNewsItems.publishedAt,
+          })
+          .from(schema.industryNewsItems)
+          .where(and(
+            eq(schema.industryNewsItems.region, c.region),
+            eq(schema.industryNewsItems.archived, 0),
+            gte(schema.industryNewsItems.publishedAt, cutoff),
+          ))
+          .orderBy(desc(schema.industryNewsItems.publishedAt))
+          .limit(1);
+        if (newsItem) {
+          return {
+            action: hasMobile ? "Regenerate SMS from fresh news, then send" : "Draft opener from fresh news",
+            reason: `${newsItem.headline.slice(0, 90)}${newsItem.headline.length > 90 ? "…" : ""} — WBM, ${Math.floor((now - newsItem.publishedAt) / DAY)} days ago. Fresher signal than the current draft.`,
+            kind: "news" as const,
+            newsItemId: newsItem.id,
+          };
+        }
+      }
+      // Send: SMS-ready, has a draft, cold, no prior send.
+      if (hasMobile && c.smsDraftOverride && !c.smsSentAt && (c.status ?? "cold") === "cold") {
+        return {
+          action: "Send SMS",
+          reason: "Mobile, drafted, cold, never sent. Do the send.",
+          kind: "send" as const,
+        };
+      }
+      // Nothing worth surfacing — return null silently. Better than noise.
+      return { action: null, reason: null, kind: null };
+    }),
+
+  // ── OWNER — Parse a free-text sentence into a draft contact ────────
+  // Rich pastes "Sarah from Wilkinson Wines, met at Rootstock, complained
+  // about MLF" → Claude extracts structured fields → contact is created
+  // with auto-rewrite in the standard pipeline. Kills the 6-field form
+  // for new-lead capture.
+  //
+  // Feb 2026, Rich — Ship B of the cog-overload sweep.
+  parseFromText: ownerProcedure
+    .input(z.object({ text: z.string().min(4).max(2000) }))
+    .mutation(async ({ input }) => {
+      const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
+      const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+      if (!forgeUrl || !forgeKey) throw new Error("Forge / LLM env not configured");
+
+      const sysPrompt = `Extract a winemaker contact from the sentence. Return STRICT JSON:
+{
+  "firstName": "string (required — best guess if only initials given)",
+  "lastName": "string or null",
+  "winery": "string or null (their estate name)",
+  "event": "string or null (where/how met, if mentioned)",
+  "painPoint": "string or null (one-sentence business summary)",
+  "hookText": "string or null (a fresh signal or complaint they voiced, if mentioned)",
+  "mobileAu": "string or null (E.164 +614XXXXXXXX if a mobile is in the text)"
+}
+Rules: never fabricate — nulls are always correct. AU idiom OK. Max 400 chars per field.
+Return ONLY the JSON, no prose, no fences.`;
+
+      const resp = await fetch(`${forgeUrl.replace(/\/$/, "")}/chat/completions`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${forgeKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 500,
+          temperature: 0.2,
+          messages: [
+            { role: "system", content: sysPrompt },
+            { role: "user", content: input.text.trim() },
+          ],
+        }),
+      });
+      if (!resp.ok) throw new Error(`Claude parse failed: ${resp.status}`);
+      const data = (await resp.json()) as { choices?: Array<{ message?: { content?: string } }> };
+      const raw = data.choices?.[0]?.message?.content ?? "";
+      const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+      let parsed: Record<string, string | null> = {};
+      try { parsed = JSON.parse(cleaned) as Record<string, string | null>; } catch { throw new Error("Claude returned malformed JSON"); }
+      if (!parsed.firstName) throw new Error("Couldn't extract a firstName from that sentence");
+
+      const trim = (v: string | null | undefined, max: number): string | null => {
+        if (typeof v !== "string") return null;
+        const t = v.trim();
+        return t ? t.slice(0, max) : null;
+      };
+
+      const firstName = trim(parsed.firstName, 80) ?? "Unknown";
+      const lastName = trim(parsed.lastName, 80);
+      const winery = trim(parsed.winery, 120);
+      const slug = slugify(firstName, winery ?? lastName ?? "");
+      const inferredRegion = winery ? regionForWinery(winery) : null;
+
+      // Insert. If slug collides, append random suffix to keep the flow
+      // frictionless (better than making Rich re-type).
+      let finalSlug = slug;
+      for (let attempt = 0; attempt < 5; attempt += 1) {
+        const existing = await db.select({ slug: schema.outreachContacts.slug })
+          .from(schema.outreachContacts).where(eq(schema.outreachContacts.slug, finalSlug)).limit(1);
+        if (existing.length === 0) break;
+        finalSlug = `${slug}-${Math.random().toString(36).slice(2, 5)}`;
+      }
+
+      await db.insert(schema.outreachContacts).values({
+        slug: finalSlug,
+        firstName,
+        lastName,
+        winery,
+        region: inferredRegion,
+        event: trim(parsed.event, 120),
+        painPoint: trim(parsed.painPoint, 400),
+        hookText: trim(parsed.hookText, 400),
+        hookTier: parsed.hookText ? "recent_signal" : null,
+        mobileAu: normaliseMobile(trim(parsed.mobileAu, 20) ?? undefined),
+        notes: `Quick-added via text: "${input.text.slice(0, 500)}"`,
+        status: "cold",
+        viewCount: 0,
+        createdAt: Date.now(),
+      });
+
+      // Fire the standard warm-from-birth pipeline.
+      const hasResearch = !!(winery && (parsed.painPoint || parsed.hookText));
+      if (hasResearch) {
+        try {
+          const previewBase = process.env.PREVIEW_BASE_URL || process.env.PUBLIC_BASE_URL || "https://ownology.ai";
+          const { sms } = await claudeRewriteOne({
+            forgeUrl, forgeKey, previewBase, tone: "warm",
+            contact: {
+              slug: finalSlug, firstName, lastName, winery, region: inferredRegion,
+              event: trim(parsed.event, 120), painPoint: trim(parsed.painPoint, 400),
+              hookText: trim(parsed.hookText, 400), hookTier: parsed.hookText ? "recent_signal" : null,
+              notes: null, persona: null,
+            },
+          });
+          await db.update(schema.outreachContacts).set({ smsDraftOverride: sms })
+            .where(eq(schema.outreachContacts.slug, finalSlug));
+        } catch {
+          // Silent — contact is created, operator can rewrite manually.
+        }
+      }
+
+      return { ok: true, slug: finalSlug, firstName, winery, region: inferredRegion };
     }),
 
   // ── OWNER — Return the persistent Naked Wines seed URL list ────────

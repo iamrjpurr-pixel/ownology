@@ -906,24 +906,6 @@ export default function AdminContacts() {
             + Audio hook →
           </Link>
           <Link
-            href="/admin/contacts/pipeline"
-            data-testid="link-to-pipeline"
-            style={{
-              fontFamily: "'Lato',sans-serif",
-              fontSize: "0.82rem",
-              fontWeight: 700,
-              letterSpacing: "0.04em",
-              padding: "8px 14px",
-              border: "1px solid var(--ow-amber)",
-              borderRadius: 6,
-              color: "var(--ow-amber)",
-              textDecoration: "none",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Pipeline board →
-          </Link>
-          <Link
             href="/admin/contacts/outbound-queue"
             data-testid="link-to-outbound-queue"
             style={{
@@ -970,6 +952,12 @@ export default function AdminContacts() {
         <Kpi label={`Replied · ${stats.replyRatePct}%`} value={stats.replied} testid="contacts-kpi-replied" />
         <Kpi label="Demo booked" value={stats.booked} testid="contacts-kpi-booked" />
       </div>
+
+      {/* Quick-add — Feb 2026, Rich. Paste a single sentence, Claude
+          parses it into a warmed contact with region + hook + SMS draft.
+          Replaces the 6-field form for the "met someone at an event"
+          use-case. Ship B of the cog-overload sweep. */}
+      <QuickAddStrip onDone={() => utils.outreach.list.invalidate()} />
 
       {/* Bulk activation strip — A1. Shows the count of cold contacts
           with mobile numbers who haven't been SMS'd yet, plus a single
@@ -1739,6 +1727,7 @@ export default function AdminContacts() {
                 opacity: isSilent ? 0.55 : 1,
               }}
             >
+              <NextBestActionPill slug={c.slug} />
               <div className="flex items-baseline justify-between flex-wrap gap-2 mb-2">
                 <div style={{ flex: 1, minWidth: 0 }}>
                   {editingName === c.slug ? (
@@ -2963,11 +2952,180 @@ export default function AdminContacts() {
   );
 }
 
+/**
+ * NextBestActionPill — Feb 2026, Rich.
+ *
+ * Advisory-only single-suggestion pill at the top of each contact card.
+ * Renders nothing when there's no genuine signal (silence > noise).
+ * All heavy lifting sits server-side in outreach.nextBestAction; this
+ * component just consumes it and paints the pill.
+ *
+ * Rules from the audit:
+ *   1. Never more than ONE action.
+ *   2. No side effects — this pill NEVER executes. Rich still clicks
+ *      the real button below to send/save. The pill only surfaces
+ *      "here's what your CRM state suggests".
+ *   3. Fires only when confidence is high — the server returns null
+ *      otherwise and the pill renders as an empty fragment.
+ */
+function NextBestActionPill({ slug }: { slug: string }) {
+  const q = trpc.outreach.nextBestAction.useQuery({ slug }, {
+    // Don't refetch on window focus — the recommendation is stable
+    // within a session and refetching every tab-switch would burn
+    // pod-per-second calls unnecessarily.
+    refetchOnWindowFocus: false,
+    staleTime: 60_000,
+  });
+  if (!q.data?.action) return null;
+  const kindColour: Record<string, string> = {
+    reply: "oklch(0.75 0.18 25)",   // red — hot
+    news: "var(--ow-amber)",         // amber — fresh signal
+    followup: "oklch(0.75 0.15 210)",// blue — soft nudge
+    send: "oklch(0.75 0.15 145)",    // green — do the thing
+  };
+  const kind = (q.data.kind ?? "news") as string;
+  const colour = kindColour[kind] ?? "var(--ow-amber)";
+  return (
+    <div
+      data-testid={`nba-pill-${slug}`}
+      style={{
+        display: "flex",
+        gap: 10,
+        alignItems: "flex-start",
+        padding: "8px 12px",
+        marginBottom: 10,
+        background: `color-mix(in oklch, ${colour} 8%, transparent)`,
+        border: `1px solid ${colour}`,
+        borderRadius: 4,
+      }}
+    >
+      <span style={{ fontSize: "0.65rem", fontFamily: "ui-monospace,monospace", color: colour, letterSpacing: "0.12em", textTransform: "uppercase", flexShrink: 0, marginTop: 2 }}>
+        Next best
+      </span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ margin: 0, fontFamily: "'Fraunces',serif", fontSize: "0.95rem", color: "var(--ow-text-hi)", fontWeight: 500, lineHeight: 1.3 }}>
+          {q.data.action}
+        </p>
+        {q.data.reason && (
+          <p style={{ margin: "3px 0 0", fontSize: "0.75rem", color: "var(--ow-text-lo)", lineHeight: 1.45 }}>
+            {q.data.reason}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Kpi({ label, value, testid }: { label: string; value: number; testid: string }) {
   return (
     <div className="rounded p-3" data-testid={testid} style={{ background: "var(--ow-bg-card)", border: "1px solid var(--ow-border)" }}>
       <p className="text-xs uppercase tracking-widest" style={{ color: "var(--ow-text-lo)" }}>{label}</p>
       <p style={{ fontFamily: "'Fraunces',serif", fontSize: "1.8rem", fontWeight: 700, color: "var(--ow-text-hi)", margin: 0 }}>{value}</p>
+    </div>
+  );
+}
+
+/**
+ * QuickAddStrip — Feb 2026, Rich.
+ *
+ * The natural-language new-contact entry point. Paste a single sentence
+ * ("Sarah from Wilkinson Wines, met at Rootstock, complained about MLF")
+ * → Claude Sonnet extracts firstName / lastName / winery / event /
+ * painPoint / hookText / mobileAu → contact is inserted with the
+ * standard auto-rewrite pipeline. One input replaces the 6-field form.
+ *
+ * Small, self-contained state — no side effects on the parent contact
+ * list. Uses `onDone` to invalidate the tRPC cache once the new row
+ * lands, so the operator sees their new contact appear at the top
+ * without a manual refresh.
+ */
+function QuickAddStrip({ onDone }: { onDone: () => void }) {
+  const [text, setText] = useState("");
+  const [result, setResult] = useState<{ slug: string; firstName: string; winery: string | null; region: string | null } | null>(null);
+  const parseText = trpc.outreach.parseFromText.useMutation();
+
+  async function onAdd() {
+    setResult(null);
+    try {
+      const r = await parseText.mutateAsync({ text });
+      setResult({ slug: r.slug, firstName: r.firstName, winery: r.winery, region: r.region });
+      setText("");
+      onDone();
+    } catch {
+      // Error surfaces via parseText.error below.
+    }
+  }
+
+  return (
+    <div
+      data-testid="quick-add-strip"
+      style={{
+        marginBottom: 24,
+        padding: "14px 16px",
+        background: "color-mix(in oklch, var(--ow-amber) 6%, transparent)",
+        border: "1px solid var(--ow-amber)",
+        borderRadius: 6,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" }}>
+        <span style={{ fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "0.95rem", color: "var(--ow-text-hi)" }}>
+          ⚡ Quick add — one sentence
+        </span>
+        <span style={{ fontSize: "0.75rem", color: "var(--ow-text-mid)", flex: 1, minWidth: 180 }}>
+          Paste who they are and what you noticed. Claude parses it, region-tags them, and drafts the SMS.
+        </span>
+      </div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <input
+          data-testid="quick-add-input"
+          type="text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter" && text.trim().length >= 4 && !parseText.isPending) onAdd(); }}
+          placeholder='e.g. "Sarah Wilkinson from Wilkinson Wines in McLaren Vale, met at Rootstock, said MLF was a nightmare this vintage"'
+          disabled={parseText.isPending}
+          style={{
+            flex: 1,
+            minWidth: 280,
+            background: "var(--ow-bg-base)",
+            color: "var(--ow-text-hi)",
+            border: "1px solid var(--ow-border)",
+            borderRadius: 4,
+            padding: "9px 12px",
+            fontSize: "0.88rem",
+            fontFamily: "'Lato',sans-serif",
+          }}
+        />
+        <button
+          data-testid="quick-add-btn"
+          onClick={onAdd}
+          disabled={text.trim().length < 4 || parseText.isPending}
+          style={{
+            padding: "9px 18px",
+            background: text.trim().length < 4 ? "transparent" : "var(--ow-amber)",
+            color: text.trim().length < 4 ? "var(--ow-text-lo)" : "oklch(0.10 0.008 60)",
+            border: `1px solid ${text.trim().length < 4 ? "var(--ow-border)" : "var(--ow-amber)"}`,
+            borderRadius: 4,
+            fontSize: "0.85rem",
+            fontWeight: 700,
+            cursor: text.trim().length < 4 || parseText.isPending ? "not-allowed" : "pointer",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {parseText.isPending ? "Claude reading…" : "Add contact"}
+        </button>
+      </div>
+      {parseText.error && (
+        <p data-testid="quick-add-error" style={{ marginTop: 8, fontSize: "0.75rem", color: "#dc2626", fontFamily: "ui-monospace,monospace" }}>
+          {parseText.error.message}
+        </p>
+      )}
+      {result && (
+        <p data-testid="quick-add-result" style={{ marginTop: 8, fontSize: "0.8rem", color: "var(--ow-text-mid)" }}>
+          ✓ Created <Link href={`/admin/contacts?slug=${result.slug}`} style={{ color: "var(--ow-amber)", fontWeight: 600 }}>{result.firstName}{result.winery ? ` · ${result.winery}` : ""}</Link>
+          {result.region ? ` (${result.region.replace(/-/g, " ")})` : ""} — SMS auto-drafted, ready to review.
+        </p>
+      )}
     </div>
   );
 }

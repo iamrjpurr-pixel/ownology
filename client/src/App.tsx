@@ -94,8 +94,6 @@ const TankQr = lazy(() => import("./pages/TankQr"));
 const VintageCompare = lazy(() => import("./pages/VintageCompare"));
 const HiContact = lazy(() => import("./pages/HiContact"));
 const AdminContacts = lazy(() => import("./pages/AdminContacts"));
-const AdminContactsMigrate = lazy(() => import("./pages/AdminContactsMigrate"));
-const AdminContactsPipeline = lazy(() => import("./pages/AdminContactsPipeline"));
 const AdminOutboundQueue = lazy(() => import("./pages/AdminOutboundQueue"));
 const AdminWeeklyRecoDigest = lazy(() => import("./pages/AdminWeeklyRecoDigest"));
 const UnsubscribeWeeklyReco = lazy(() => import("./pages/UnsubscribeWeeklyReco"));
@@ -438,7 +436,6 @@ function Router() {
       <Route path={"/the-press/compare"} component={VintageCompare} />
       <Route path={"/hi/producers/:id"} component={HiProducerPreview} />
       <Route path={"/hi/:slug"} component={HiContact} />
-      <Route path={"/admin/contacts/pipeline"} component={AdminContactsPipeline} />
       <Route path={"/admin/contacts/outbound-queue"} component={AdminOutboundQueue} />
       <Route path={"/admin/digests/weekly-reco"} component={AdminWeeklyRecoDigest} />
       <Route path={"/unsubscribe/weekly-reco"} component={UnsubscribeWeeklyReco} />
@@ -447,7 +444,6 @@ function Router() {
       <Route path={"/admin/merch-artwork"} component={AdminMerchArtwork} />
       <Route path={"/admin/qr-scans"} component={AdminQrScans} />
       <Route path={"/admin/contacts"} component={AdminContacts} />
-      <Route path={"/admin/contacts-migrate"} component={AdminContactsMigrate} />
       <Route path={"/admin/event-ingest"} component={AdminEventIngest} />
       <Route path={"/admin/audio-hook"} component={AdminAudioHook} />
       <Route path={"/admin/marketing-kit"} component={AdminMarketingKit} />

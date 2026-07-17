@@ -122,7 +122,6 @@ export default function AdminOutboundQueue() {
   const [mobileResult, setMobileResult] = useState<{ candidates: number; found: number; saved: number; skipped: number; errors: number } | null>(null);
   const [cohortCopied, setCohortCopied] = useState(false);
   const [vcardCount, setVcardCount] = useState<number | null>(null);
-  const [forceRewrite, setForceRewrite] = useState(false);
 
   async function copySms(slug: string, text: string) {
     try { await navigator.clipboard.writeText(text); setCopied((s) => ({ ...s, [slug]: "sms" })); } catch { /* no-op */ }
@@ -509,59 +508,45 @@ export default function AdminOutboundQueue() {
         </span>
         <span style={{ fontSize: "0.78rem", color: "var(--ow-text-mid)", flex: 1, minWidth: 240 }}>
           {regionFilter === "all"
-            ? `Pre-warm every unsent SMS in the queue via Claude. ${forceRewrite ? "Force mode ON — will overwrite existing drafts." : "Skips hand-crafted overrides."} ~$0.005 per contact.`
-            : `Rewrite the ${filtered.length}-contact ${regionFilter.replace(/-/g, " ")} cohort with a shared story arc. ${forceRewrite ? "Force mode ON — will overwrite existing drafts." : "Skips existing drafts."}`}
+            ? `Pre-warm every unsent SMS in the queue via Claude. Empty drafts (safe) or overwrite everything (destructive). ~$0.005 per contact.`
+            : `Rewrite the ${filtered.length}-contact ${regionFilter.replace(/-/g, " ")} cohort with a shared story arc.`}
         </span>
         <button
           data-testid="bulk-rewrite-warm"
-          onClick={() => runBulkRewrite("warm")}
+          onClick={() => runBulkRewrite("warm", false)}
           disabled={bulkRewrite.isPending || filtered.length === 0}
           style={{ padding: "5px 12px", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.75rem", fontWeight: 700, cursor: bulkRewrite.isPending ? "wait" : "pointer", opacity: bulkRewrite.isPending || filtered.length === 0 ? 0.6 : 1 }}
+          title="Warm tone. Empty drafts only — safe."
         >
-          {bulkRewrite.isPending ? "Rewriting…" : "Warm tone"}
+          {bulkRewrite.isPending ? "Rewriting…" : "Warm · empty only"}
         </button>
         <button
           data-testid="bulk-rewrite-brief"
-          onClick={() => runBulkRewrite("brief")}
+          onClick={() => runBulkRewrite("brief", false)}
           disabled={bulkRewrite.isPending || filtered.length === 0}
           style={{ padding: "5px 12px", background: "transparent", color: "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.75rem", cursor: bulkRewrite.isPending ? "wait" : "pointer", opacity: filtered.length === 0 ? 0.5 : 1 }}
+          title="Brief tone. Empty drafts only — safe."
         >
-          Brief
+          Brief · empty only
         </button>
         <button
           data-testid="bulk-rewrite-regional"
-          onClick={() => runBulkRewrite("regional")}
+          onClick={() => runBulkRewrite("regional", false)}
           disabled={bulkRewrite.isPending || filtered.length === 0}
           style={{ padding: "5px 12px", background: "transparent", color: "var(--ow-text-hi)", border: "1px solid var(--ow-border)", borderRadius: 3, fontSize: "0.75rem", cursor: bulkRewrite.isPending ? "wait" : "pointer", opacity: filtered.length === 0 ? 0.5 : 1 }}
+          title="Regional tone. Empty drafts only — safe."
         >
-          Regional
+          Regional · empty only
         </button>
-        <label
-          data-testid="bulk-rewrite-force-toggle"
-          title="Off (default): keeps existing hand-crafted drafts untouched. On: overwrites them with a fresh Claude rewrite. Use when you want to refresh the whole cohort."
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "4px 10px",
-            background: forceRewrite ? "color-mix(in oklch, #dc2626 12%, transparent)" : "transparent",
-            border: `1px solid ${forceRewrite ? "#dc2626" : "var(--ow-border)"}`,
-            borderRadius: 3,
-            fontSize: "0.72rem",
-            color: forceRewrite ? "#dc2626" : "var(--ow-text-mid)",
-            cursor: "pointer",
-            fontWeight: forceRewrite ? 700 : 500,
-            userSelect: "none",
-          }}
+        <button
+          data-testid="bulk-rewrite-overwrite-all"
+          onClick={() => runBulkRewrite("regional", true)}
+          disabled={bulkRewrite.isPending || filtered.length === 0}
+          style={{ padding: "5px 12px", background: "transparent", color: "#dc2626", border: "1px solid #dc2626", borderRadius: 3, fontSize: "0.72rem", fontWeight: 700, cursor: bulkRewrite.isPending ? "wait" : "pointer", opacity: filtered.length === 0 ? 0.5 : 1 }}
+          title="DESTRUCTIVE: overwrites existing hand-crafted drafts too. Regional tone."
         >
-          <input
-            type="checkbox"
-            checked={forceRewrite}
-            onChange={(e) => setForceRewrite(e.target.checked)}
-            style={{ margin: 0, accentColor: "#dc2626" }}
-          />
-          Force · overwrite existing
-        </label>
+          ⚠ Overwrite everything
+        </button>
         {bulkResult && (
           <span data-testid="bulk-rewrite-result" style={{ fontSize: "0.78rem", color: "#16a34a", fontWeight: 600 }}>
             ✓ {bulkResult.rewritten} rewritten · {bulkResult.skippedExisting} skipped · {bulkResult.failed} failed

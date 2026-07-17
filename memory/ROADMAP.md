@@ -9,17 +9,19 @@ Last consolidated: 17 Jul 2026 (Naked Wines ingestion + `/demo` conversion tool 
 
 ## ✅ Shipped Jul 2026 (latest)
 
-- **`/demo` — the paste-notes → AI-question → AI-cites-you-back conversion tool.** Public, no login. Stranger pastes any old vintage notes; Claude Sonnet 4.6 (`demo.analyze`) picks the single most interesting tank/decision moment and asks ONE curious question about it. User answers; `demo.answer` weaves a reply citing verbatim fragments from their notes back to them. Ends with soft CTA + optional email capture. E2E verified with a T-04 stuck-ferment sample — AI spotted the "Nervous" annotation and connected the 22 Mar SO₂ addition to the 28 Mar stick as the moment. `demo_submissions` table + `demoRouter` (analyze / answer / captureEmail / recentCount).
-- **Naked Wines Angel bulk ingest.** `/admin/naked-ingest` — paste (or one-click load) 71 Naked Wines Angel profile URLs, client-side loop calls `outreach.ingestNakedAngel` per URL, each URL runs a Perplexity Sonar-Pro enrichment that extracts real estate (not "Naked Wines"), region (normalised to the same slug space as `outreach_contacts.region`), painPoint, fresh public signal, and persona. Then Claude drafts the SMS opener in the Naked-Angel lens. Progress table with retry per row. New `naked-angel-v1` SMS opener variant seeded — cohort-specific direct-relationship pitch. `scripts/naked_urls.txt` persists the 71 seed URLs (never `/tmp` again).
-- **US market sweep.** Removed US/TTB/Napa references from every customer-facing surface: `VsInnovintVintrace` (5 spots including migration path repositioning), `Pricing` (USD line), `WhyOwnology` (TTB in ERP comparison), `ForInnoVintUsers` (TTB in feature list + example use-case), `RiskGlossary` (US TTB in SO₂ regs), `WineBatchSheet` (Napa/Sonoma region options), `AdminQuizPicks` + `Quiz.tsx` (US as market option), `VintageEntrySheet` (USD currency), `oenologyFlashcards` (USA SO₂ ceiling + Napa comparison), `BlogWeightOfHarvest` (Napa Cabernet example). Server AI knowledge base kept (factual export info for user Q&A). Admin cost dashboards kept (USD is how OpenAI bills us).
-- **Stale-check auto-refresh on `/admin/industry-news`.** Value-engineered alt to Railway cron — page checks `MAX(fetched_at)` on mount, silently refreshes if >4h stale. `fetched N hours ago` chip flips to amber `auto-refreshing…` during background fetch. Ref-guarded to fire once per mount.
-- **Industry-news vertical v1 (WBM).** `/admin/industry-news` — scrape wbmonline.com.au/news (browser-UA regex parser), region-matched contact lookup, per-item Claude-drafted news-anchored SMS opener. `industry_news_items` table + `industryNews` tRPC router + WBM scraper service.
-- **Site-wide banned-copy sweep.** "cellar AI / second brain / AI apprentice" retired everywhere. Unified positioning: **"Quality and risk management for winemakers — across the whole business."** Owen persona kept; role label "AI apprentice" → "working memory".
+- **Cog-overload sweep — Ships A/B/C.** Three surgical improvements from the workflow audit:
+  - **Ship A** — force-rewrite toggle killed (booby-trap). Replaced with THREE explicit buttons: `Warm · empty only`, `Brief · empty only`, `Regional · empty only`, plus a red-outlined `⚠ Overwrite everything` destructive button. Ephemeral state per click, no persistent toggle to forget. Also deleted dead routes `/admin/contacts/pipeline` + `/admin/contacts-migrate`.
+  - **Ship B** — `outreach.parseFromText` tRPC mutation + `<QuickAddStrip>` on `/admin/contacts`. Paste ONE sentence ("Sarah Wilkinson from Wilkinson Wines in McLaren Vale, met at Rootstock, said MLF was a nightmare") → Claude parses firstName/lastName/winery/region/painPoint/hookText/mobileAu → contact inserted with auto-SMS-draft. Replaces the 6-field form.
+  - **Ship C** — `outreach.nextBestAction` tRPC query + `<NextBestActionPill>` at the top of each contact card. Advisory-only, silence > noise (renders nothing when no signal). Four action types (reply · news-fresh · follow-up-opened · send-drafted) with reason. Reads only materialised state (no LLM calls on render).
+- **`/demo` — the paste-notes → AI-question → AI-cites-you-back conversion tool.** [prior turn]
+- **Naked Wines Angel bulk ingest.** [prior turn]
+- **US market sweep.** [prior turn]
+- **Industry-news vertical + stale-check auto-refresh.** [prior turn]
 
 
 ---
 
-## ✅ Shipped Jul 2026
+## ✅ Shipped Jul 2026 (earlier)
 
 - **Weekly Cellar Digest — Monday-morning heartbeat**. New `/admin/weekly-digest` preview surface + Send-now button. Layers three sections on top of the existing vessel-status cron: cellar tasks rollup (completed / new / overdue / due-next-7), Open-Meteo temperature-outlier scan (compared to `weather_thresholds_json`), and pipeline moves (new contacts / first opens / replies / demo bookings + top-3 most-engaged). Verified live via Resend id `d262eeb6-…`. Cron endpoint already registered — Railway just needs to hit Mon 07:00 Sydney with `x-cron-secret`.
 - **PWA launch → dashboard, not marketing page.** `manifest.json` `start_url` bumped to `/?src=pwa`; `MobileHomeRoute` detects PWA (query flag OR `display-mode: standalone` OR iOS `navigator.standalone`) and hard-redirects to `/dashboard` when authed, `/login?next=/dashboard` when anon. Fixes "I open the PWA and get the landing page with three or four other options".
