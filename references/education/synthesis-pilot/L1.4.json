@@ -1,0 +1,84 @@
+{
+  "lesson_id": "L1.4",
+  "source": {
+    "id": "L1.4",
+    "slug": "wine-chemistry-fundamentals",
+    "title": "The four numbers that run everything",
+    "level": "1",
+    "wbs": [
+      "D3",
+      "D4",
+      "D6"
+    ],
+    "reading_min": "5",
+    "aim": "pH, TA, alcohol, free SO₂ — what each one is, why the others matter when you touch one, and what changes them in a tank.",
+    "application": "These are the four numbers Owen watches on every tank. This lesson lets you read them like the vintage log they are.",
+    "sources_private": [
+      "morewine_bible_red_ch3",
+      "morew_ph_meter",
+      "morew_so2_mgmt"
+    ],
+    "sources_public_ref": [
+      "csu_wsc115",
+      "csu_wsc319"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch1",
+      "waterhouse_sacks_ch1"
+    ]
+  },
+  "generated": {
+    "aim": "pH, TA, alcohol, and free SO₂ — what each one measures, why moving one shifts the others, and what actually changes them inside a tank.",
+    "application": "Owen tracks these four parameters on every tank in your cellar brief and flags deviations in the ferment trajectory. After this lesson, those numbers stop being a checklist and start reading as a system — when Tank 4's pH climbs mid-ferment, you'll know exactly which levers moved and which ones are about to.",
+    "body_md": "### The four numbers and what they actually measure\n\nEvery other decision in the cellar — acid additions, SO₂ timing, yeast nutrition, press calls — runs through these four parameters. They are not independent readings. They are a system.\n\n**pH** measures hydrogen ion activity. It is a logarithmic scale, so a move from 3.4 to 3.6 is not a small step — it represents roughly a 60% reduction in free hydrogen ion concentration. In practical terms, pH governs microbial risk, SO₂ efficacy, and colour stability in reds. Target range at pressing: 3.2–3.4 for whites, 3.4–3.6 for reds, though variety and style will pull you outside those bands.\n\n**TA (titratable acidity)** measures the total buffering capacity of the wine — all the acids that can be neutralised by a base to a set endpoint (typically pH 8.2). It is reported in g/L as tartaric acid equivalents. TA and pH are related but not interchangeable. A wine can have high TA and high pH simultaneously if the acid profile is dominated by weaker acids (malic, lactic) rather than tartaric.\n\n**Alcohol** (ethanol, % v/v) is the primary fermentation product and a co-solvent that affects mouthfeel, volatility of aroma compounds, and microbial stability. It also influences how SO₂ partitions between free and bound forms. Higher alcohol increases the proportion of SO₂ that remains free — a small but real effect at the margins of your addition calculations.\n\n**Free SO₂** is the fraction of total SO₂ that is not bound to carbonyl compounds (acetaldehyde, pyruvate, ketoglutarate). Only the free fraction provides antioxidant and antimicrobial protection. Of that free fraction, only the molecular SO₂ form (H₂SO₃) is genuinely antimicrobial — and its proportion is determined almost entirely by pH.\n\n---\n\n### Why touching one moves the others\n\nThis is the part that catches winemakers out. The four parameters are coupled.\n\n- **Acid addition lowers both pH and raises TA**, but not proportionally. Adding tartaric acid to a high-pH must drops pH more sharply than adding the same mass to a low-pH must, because of buffering. The wine's existing acid composition determines how much pH moves per gram added.\n- **Malolactic fermentation (MLF) raises pH and drops TA** — sometimes dramatically. A wine entering MLF at pH 3.35 and 7.5 g/L TA can finish at pH 3.65 and 4.5 g/L TA. That pH shift cuts your molecular SO₂ by more than half at the same free SO₂ concentration. If you haven't adjusted your SO₂ target post-MLF, the wine is underprotected.\n- **Fermentation raises pH** as yeast consume tartaric acid (via tartrate precipitation driven by ethanol rise and temperature drop) and produce succinic, acetic, and other acids. Alcohol production also shifts the ionic environment. Expect pH to climb 0.1–0.3 units through a typical red ferment.\n- **Temperature affects SO₂ equilibrium** — cooler wine holds more molecular SO₂ at the same free SO₂ level. A wine stored at 10°C is better protected than the same wine at 18°C with identical free SO₂ readings.\n\n---\n\n### What changes these numbers in a tank\n\n**pH rises when:** MLF proceeds, tartrate precipitates (cold stabilisation or ethanol rise), potassium is released from grape solids, or water additions dilute acid concentration.\n\n**pH falls when:** tartaric or citric acid is added, ion exchange is used, or acidic blending components are incorporated.\n\n**TA rises when:** tartaric acid is added, or acidic components are blended in. TA falls when MLF runs, tartrate precipitates, or deacidification agents (calcium carbonate, potassium bicarbonate) are used.\n\n**Free SO₂ falls when:** oxygen exposure occurs (oxidation consumes SO₂), bound fractions increase (acetaldehyde accumulation from stressed ferments binds SO₂ rapidly), pH rises (shifts equilibrium toward bisulfite, reducing molecular SO₂ efficacy), or time passes without topping additions.\n\n**Alcohol rises** through fermentation at roughly 0.55–0.6% v/v per 1° Baumé of sugar fermented. It falls only through dilution, dealcoholisation, or blending.\n\n---\n\n### Reading the numbers together\n\nA single reading in isolation is rarely actionable. The combination tells the story.\n\n- pH 3.65, free SO₂ 28 mg/L: molecular SO₂ is around 0.4 mg/L — below the 0.5–0.8 mg/L threshold most winemakers target for microbial protection. That wine needs SO₂ now, not at the next scheduled addition.\n- pH 3.30, free SO₂ 22 mg/L: molecular SO₂ is around 0.6 mg/L — adequate. No addition required yet.\n- TA 8.5 g/L, pH 3.20, alcohol 13.5%: high acid, low pH, moderate alcohol — structurally tight, likely needs MLF or blending to soften before bottling.\n- TA 4.2 g/L, pH 3.70, alcohol 14.5%: low acid, high pH, high alcohol — elevated microbial risk, oxidation risk, and colour instability in reds. Acid addition and SO₂ correction are both urgent.\n\nThe molecular SO₂ calculation is straightforward: at any given pH, the proportion of free SO₂ present as molecular SO₂ is fixed by the Henderson-Hasselbalch relationship. Published tables (AWRI, Boulton) give you the multiplier directly — no need to calculate from first principles each time.\n\n---\n\n### What to do this vintage\n\nBefore each tank addition or adjustment, pull all four numbers together and check whether the change you're about to make will shift any of the others outside target range — particularly the pH/free SO₂ interaction after MLF. Build the habit of recording these four as a set in your vintage log, not as separate events, so the trajectory of each tank reads as a coherent story rather than a series of isolated data points.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 8–9",
+        "url": null,
+        "note": "Chapman & Hall — covers pH/TA/SO₂ interactions and molecular SO₂ tables"
+      },
+      {
+        "kind": "buy",
+        "label": "Waterhouse, Sacks & Jeffery · Understanding Wine Chemistry · Ch 5, 14",
+        "url": null,
+        "note": "Wiley — acid equilibria, SO₂ chemistry, and ethanol effects"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Sulfur dioxide in wine — fact sheet",
+        "url": "https://www.awri.com.au/industry_support/winemaking_resources/frequently_asked_questions/sulfur-dioxide/",
+        "note": "AU industry reference — molecular SO₂ targets and addition guidance"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC115 Wine Science 1 · LO 3, LO 4",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC115",
+        "note": "Covers QC parameters, SO₂ chemistry, and fermentation management"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 2057,
+    "prompt_tokens": 1510,
+    "total_tokens": 3567,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 2057
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1510,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1104,
+  "overlaps": []
+}

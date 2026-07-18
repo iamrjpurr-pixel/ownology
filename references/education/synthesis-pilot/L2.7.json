@@ -1,0 +1,93 @@
+{
+  "lesson_id": "L2.7",
+  "source": {
+    "id": "L2.7",
+    "slug": "fermentation-management",
+    "title": "Fermentation management — heat, extract, oxygen",
+    "level": "2",
+    "wbs": [
+      "D4"
+    ],
+    "reading_min": "6",
+    "aim": "Temperature control, cap management, oxygen ingress, nutrient timing, stuck-ferment prevention — running the ferment as an active process, not a passive one.",
+    "application": "Owen alarms on your ferment trajectory. This lesson is what those alarms mean and what you do about them.",
+    "sources_private": [
+      "morew_oxygen_ferment",
+      "awri_stuck_ferment",
+      "aoc_2_2_fermentation_science"
+    ],
+    "sources_public_ref": [
+      "csu_wsc115",
+      "adelaide_oenology_3046wt"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch4"
+    ]
+  },
+  "generated": {
+    "aim": "Temperature control, cap management, oxygen ingress, nutrient timing, and stuck-ferment prevention — running the ferment as an active process, not a passive one.",
+    "application": "Owen's ferment trajectory alarms fire when Baumé drop rate, temperature, or CO₂ activity deviate from expected curves. This lesson maps each alarm type to a specific intervention — so when Tank 4 flags a sluggish mid-ferment at 1.8 °Baumé/day instead of 2.5, you know whether to reach for nutrients, adjust jacket temperature, or punch down harder before the window closes.",
+    "body_md": "### Temperature: the throttle you actually control\n\nYeast metabolism generates heat. In a 5,000 L red ferment that heat accumulates fast, and once the must climbs above 30 °C you are trading fruit aromatics for fusel alcohols and risking yeast stress that sets up a stuck ferment two days later.\n\nPractical targets:\n\n- **Reds:** 22–28 °C. Higher end extracts colour and tannin faster; lower end preserves primary fruit and gives you more time to manage extraction.\n- **Whites/rosé:** 12–18 °C. Slower kinetics, longer ferment, better retention of volatile thiols and esters.\n- **Hard ceiling:** 32 °C. Above this, *Saccharomyces cerevisiae* begins to die faster than it reproduces. Recovery is difficult and expensive.\n\nJacket cooling is reactive by default — most small-winery PLCs cool after the fact. If your tank lacks active cooling, ferment in smaller batches or pre-cool the must to 15 °C before inoculation to buy thermal headroom. Monitor with a probe mid-tank, not at the wall; the cap runs 3–5 °C hotter than the liquid below it.\n\n### Cap management: extraction and gas release\n\nFor red ferments on skins, the cap is both an asset and a liability. It concentrates colour and tannin extraction when kept moist and warm, but it also insulates the top of the tank, harbours acetic acid bacteria if left dry, and traps CO₂ that stresses yeast.\n\nThree standard approaches:\n\n- **Pump-over (remontage):** Draws from the base, sprays over the cap. Good for gentle extraction and temperature homogenisation. Typical rate: 1–2 tank volumes per day during peak ferment.\n- **Punch-down (pigeage):** Physically submerges the cap. Higher extraction intensity, more oxygen pickup per event. Suits smaller open-top fermenters.\n- **Rack-and-return:** Full drain-off and return over the cap. High oxygen exposure — use deliberately for stuck-ferment rescue or when building tannin structure, not as routine.\n\nFrequency matters more than method. During peak ferment (roughly 6–2 °Baumé), twice-daily intervention is the minimum for most reds. Taper off as ferment slows to avoid over-extraction of harsh tannins from drying skins.\n\n### Oxygen: when it helps, when it hurts\n\nOxygen during alcoholic fermentation is not the enemy it becomes post-ferment. Yeast requires small amounts of dissolved oxygen — particularly in the first 48–72 hours — to synthesise sterols and unsaturated fatty acids that maintain membrane integrity under increasing ethanol stress.\n\nDeliberate oxygen exposure points:\n\n- **At inoculation:** Splash racking or aeration of the must before yeast addition supports healthy yeast growth.\n- **Mid-ferment pump-overs:** Each pump-over introduces 1–3 mg/L dissolved oxygen depending on spray height and flow rate. This is usually sufficient; additional aeration is rarely needed in a healthy ferment.\n- **Stuck-ferment rescue:** A controlled rack-and-return introducing 6–8 mg/L O₂ can reinvigorate stressed yeast alongside rehydrated yeast hulls and a DAP/organic nitrogen supplement.\n\nPost-ferment, the calculus reverses entirely. Oxygen pickup during pressing, transfers, and vessel topping drives oxidation and accelerates SO₂ depletion. Track your free SO₂ after every transfer.\n\n### Nutrient timing: feed the yeast before it asks\n\nNitrogen deficiency is the single most common precursor to sluggish and stuck fermentations in Australian boutique cellars. Grape juice YAN (yeast assimilable nitrogen) varies enormously — warm vintages, botrytis-affected fruit, and heavily clarified whites are all high-risk for low YAN.\n\nA two-stage addition protocol outperforms a single large dose:\n\n1. **At inoculation or within 24 hours:** DAP (diammonium phosphate) at 20–40 mg N/L, combined with a complex organic nitrogen source (yeast hulls, autolysates). This supports early yeast biomass build.\n2. **At one-third sugar depletion (~8–10 °Baumé for a 14 °Baumé must):** A second addition of organic nitrogen (30–50 mg N/L). Yeast uptake of inorganic nitrogen drops sharply above 5% ethanol, so organic sources carry more weight here.\n\nAvoid large single DAP additions late in ferment — they can generate hydrogen sulphide as yeast metabolise excess inorganic nitrogen under ethanol stress.\n\nIf you don't have a YAN measurement from the lab, use vintage history and fruit condition as a proxy and err toward supplementation. The cost of 50 g of DAP is trivial against the cost of a stuck tank.\n\n### Stuck ferment: recognise it early, act fast\n\nA ferment is sluggish when Baumé drop rate falls below ~1 °Baumé/day without a clear temperature explanation. It is stuck when residual sugar sits above 2 g/L and CO₂ activity has ceased.\n\nDiagnose before you intervene:\n\n- **Temperature too low?** Warm the must to 20–22 °C before anything else.\n- **Nutrient deficiency?** Add rehydrated yeast hulls (300 mg/L) and organic nitrogen immediately.\n- **High ethanol inhibition?** Above ~13.5% ABV, many strains struggle. Acclimatise a restart culture (high-alcohol-tolerant strain, e.g. EC1118) by stepping it into the stuck wine in 10% increments.\n- **Competing microbes?** Check for volatile acidity spike. If VA is rising, the window for rescue is closing.\n\nThe restart protocol — warm must, yeast hulls, acclimatised inoculum, rack-and-return for oxygen — works reliably if caught before VA exceeds 0.8 g/L acetic acid. Above that threshold, the wine's commercial fate changes.\n\n**What to do this vintage:** Set Owen's ferment trajectory alarm to flag any tank dropping less than 1.5 °Baumé/day for two consecutive readings, and cross-reference against tank temperature before assuming a nutrition problem. Run a YAN test on every new fruit parcel at intake — that single data point will tell you more about ferment risk than anything else you measure before inoculation.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 5–6",
+        "url": null,
+        "note": "Chapman & Hall, 1996"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Stuck and sluggish fermentations",
+        "url": "https://www.awri.com.au/industry_support/winemaking_resources/fermentation/stuck-sluggish-fermentations/",
+        "note": "AU industry reference"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Yeast assimilable nitrogen",
+        "url": "https://www.awri.com.au/industry_support/winemaking_resources/fermentation/yeast-assimilable-nitrogen/",
+        "note": "AU industry reference"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC115 Wine Science 1 · LO 2, LO 4",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC115",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "University of Adelaide OENOLOGY 3046WT Fermentation Technology III · LO 1, LO 2, LO 4",
+        "url": "https://www.adelaide.edu.au/course-outlines/109179/1/sem-2/",
+        "note": null
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 2.2 · Fermentation Science",
+        "url": null,
+        "note": "your paid resource"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 2221,
+    "prompt_tokens": 2477,
+    "total_tokens": 4698,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 2221
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 2477,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 5315,
+  "overlaps": []
+}
