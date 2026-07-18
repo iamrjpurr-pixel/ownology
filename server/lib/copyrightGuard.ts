@@ -132,3 +132,53 @@ Respond in the same JSON format as before.`;
 
 /** Exposed for unit tests. */
 export const _internal = { normalise, tokenise, NGRAM_THRESHOLD };
+
+// ─── Persistence ───────────────────────────────────────────────────────────
+// Detection events are logged to `copyright_guard_events` so the
+// /admin/health page can surface hit rates, top offending sources, and
+// regen success stats. Failure is soft — a broken DB write must never
+// break the /ask flow, so we wrap in try/catch and just warn on error.
+
+export type GuardOutcome = "clean" | "still_leaking" | "regen_failed" | "no_regen";
+
+export interface RecordGuardEventInput {
+  question: string;
+  hits: string[];
+  sourceHits: string[];
+  outcome: GuardOutcome;
+  originalAnswerLen: number;
+}
+
+/**
+ * Insert a copyright-guard detection event into the DB.
+ *
+ * The `dbClient` and `table` are injected so this module stays free of
+ * server-side dependencies (keeps unit tests fast and the module reusable
+ * from scripts). tutor.ts passes them at call time.
+ */
+export async function recordGuardEvent(
+  dbClient: { insert: (t: unknown) => { values: (v: unknown) => { execute: () => Promise<unknown> } } },
+  table: unknown,
+  input: RecordGuardEventInput,
+): Promise<void> {
+  try {
+    const snippet = input.question.length > 240
+      ? input.question.slice(0, 237) + "..."
+      : input.question;
+    const primarySource = input.sourceHits[0] ?? null;
+    await dbClient
+      .insert(table)
+      .values({
+        occurredAt: Date.now(),
+        questionSnippet: snippet,
+        hitsJson: JSON.stringify(input.hits.slice(0, 5)),
+        sourceHitsJson: JSON.stringify(input.sourceHits.slice(0, 10)),
+        outcome: input.outcome,
+        primarySource,
+        originalAnswerLen: input.originalAnswerLen,
+      })
+      .execute();
+  } catch (e) {
+    console.warn("[CopyrightGuard] recordGuardEvent failed:", (e as Error)?.message);
+  }
+}

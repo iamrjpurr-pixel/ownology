@@ -2254,3 +2254,43 @@ export const weeklyRecoDigestHistory = mysqlTable(
     index("wrdh_pick_idx").on(t.pickSlug),
   ]
 );
+
+
+// ─── Copyright Guard Events (Feb 2026 — /ask verbatim-leak observability) ─
+// One row per Layer-2 detection in server/lib/copyrightGuard.ts. Lets Rich
+// see on /admin/health which reference sources Claude is tempted to
+// paraphrase closely, when regenerations fire, and whether the stricter
+// prompt cleaned the leak. Retention: last 30 days (pruned by health
+// digest cron). Never stores the actual user prompt or full answer beyond
+// truncated snippets — the offending phrases only, plus source labels.
+export const copyrightGuardEvents = mysqlTable(
+  "copyright_guard_events",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    // UTC ms
+    occurredAt: bigint("occurred_at", { mode: "number" }).notNull(),
+    // Truncated to 240 chars — enough to reproduce the query type without hoarding user data
+    questionSnippet: varchar("question_snippet", { length: 240 }).notNull(),
+    // JSON array of offending 8+ word phrases (up to 5)
+    hitsJson: text("hits_json").notNull(),
+    // JSON array of chapter titles / source doc keys that leaked
+    sourceHitsJson: text("source_hits_json").notNull(),
+    // Outcome of the stricter regeneration attempt:
+    //   clean          — regen removed all overlaps, we returned the clean answer
+    //   still_leaking  — regen ran but overlaps persisted; logged for review
+    //   regen_failed   — regen HTTP or JSON error; original answer retained
+    //   no_regen       — reserved for future async-only detection mode
+    outcome: mysqlEnum("outcome", ["clean", "still_leaking", "regen_failed", "no_regen"]).notNull(),
+    // First offending source's chapter title, denormalised so we can rank
+    // "most tempting sources" without JSON parsing on every query.
+    primarySource: varchar("primary_source", { length: 240 }),
+    // Character length of the original leaking answer — quick sanity signal
+    // for whether the LLM was in a long-answer verbatim binge or short reply.
+    originalAnswerLen: int("original_answer_len").notNull(),
+  },
+  (t) => [
+    index("cge_occurred_idx").on(t.occurredAt),
+    index("cge_outcome_idx").on(t.outcome),
+    index("cge_primary_source_idx").on(t.primarySource),
+  ]
+);

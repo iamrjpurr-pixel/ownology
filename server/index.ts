@@ -25,6 +25,7 @@ import { resendHealthHandler } from "./scheduled/resendHealth.js";
 import { healthDigestHandler } from "./scheduled/healthDigest.js";
 import { healthWatchHandler } from "./scheduled/healthWatch.js";
 import { adminHealthStatusHandler } from "./adminHealth.js";
+import { adminCopyrightGuardStatsHandler } from "./adminCopyrightGuardStats.js";
 import { marketingCoachEmailHandler } from "./scheduled/marketingCoachEmail.js";
 import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
 import { generateLipAuditPackPdf } from "./lipAuditPackPdf.js";
@@ -562,6 +563,7 @@ async function startServer() {
   app.get("/api/scheduled/health-digest", healthDigestHandler); // Daily aggregator: env + DB + Resend + LLM + auth → optional email to ADMIN_EMAILS
   app.get("/api/scheduled/health-watch", healthWatchHandler); // Near-real-time: fires immediate email on OK→FAIL / FAIL→OK transitions
   app.get("/api/admin/health-status", adminHealthStatusHandler); // Admin dashboard: live probes + stored state
+  app.get("/api/admin/copyright-guard-stats", adminCopyrightGuardStatsHandler); // Admin dashboard: /ask verbatim-leak metrics
 
   // ── Admin QR scan analytics ──────────────────────────────────────────────
   // Feeds /admin/qr-scans dashboard: totals per SKU + recent arrivals.
@@ -1397,6 +1399,26 @@ async function startServer() {
         resend_batch_id VARCHAR(128),
         INDEX wrdh_sentat_idx (sent_at),
         INDEX wrdh_pick_idx (pick_slug)
+      )
+    `);
+    // Copyright Guard Events — Feb 2026. One row per Layer-2 verbatim-leak
+    // detection in server/lib/copyrightGuard.ts. Surfaces on /admin/health
+    // so Rich can see which reference sources tempt Claude toward
+    // near-verbatim reproduction and whether the stricter-prompt
+    // regeneration cleaned the leak. See schema.ts:copyrightGuardEvents.
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS copyright_guard_events (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        occurred_at BIGINT NOT NULL,
+        question_snippet VARCHAR(240) NOT NULL,
+        hits_json TEXT NOT NULL,
+        source_hits_json TEXT NOT NULL,
+        outcome ENUM('clean','still_leaking','regen_failed','no_regen') NOT NULL,
+        primary_source VARCHAR(240),
+        original_answer_len INT NOT NULL,
+        INDEX cge_occurred_idx (occurred_at),
+        INDEX cge_outcome_idx (outcome),
+        INDEX cge_primary_source_idx (primary_source)
       )
     `);
     await db.execute(sql`

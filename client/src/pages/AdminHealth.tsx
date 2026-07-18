@@ -45,6 +45,35 @@ type WatchResponse = {
   emailed: string | boolean;
 };
 
+// ─── Copyright Guard stats (Feb 2026) ─────────────────────────────────────
+type GuardOutcome = "clean" | "still_leaking" | "regen_failed" | "no_regen";
+type GuardTotals = { clean: number; still_leaking: number; regen_failed: number; total: number };
+type GuardSource = { primarySource: string | null; count: number; cleanCount: number; stillLeakingCount: number };
+type GuardRecent = {
+  id: number;
+  occurredAt: number;
+  questionSnippet: string;
+  hits: string[];
+  sourceHits: string[];
+  outcome: GuardOutcome;
+  primarySource: string | null;
+  originalAnswerLen: number;
+};
+type GuardPayload = {
+  generatedAt: string;
+  totals: { "7d": GuardTotals; "30d": GuardTotals };
+  cleanRate30d: number | null;
+  topSources: GuardSource[];
+  recent: GuardRecent[];
+};
+
+const GUARD_OUTCOME_META: Record<GuardOutcome, { color: string; bg: string; label: string }> = {
+  clean:          { color: "#4a7c47", bg: "rgba(74,124,71,0.10)",  label: "CLEAN" },
+  still_leaking:  { color: "#b91c1c", bg: "rgba(185,28,28,0.10)",  label: "STILL LEAKING" },
+  regen_failed:   { color: "#b57e14", bg: "rgba(181,126,20,0.10)", label: "REGEN FAILED" },
+  no_regen:       { color: "#6b7280", bg: "rgba(107,114,128,0.10)", label: "NO REGEN" },
+};
+
 const STATUS_META: Record<ProbeStatus, { color: string; bg: string; label: string; Icon: typeof CheckCircle2 }> = {
   ok: { color: "#4a7c47", bg: "rgba(74,124,71,0.10)", label: "OK", Icon: CheckCircle2 },
   warn: { color: "#b57e14", bg: "rgba(181,126,20,0.10)", label: "WARN", Icon: AlertTriangle },
@@ -71,6 +100,9 @@ export default function AdminHealth() {
   const [error, setError] = useState<string | null>(null);
   const [watchResult, setWatchResult] = useState<WatchResponse | null>(null);
   const [watchBusy, setWatchBusy] = useState(false);
+  const [guard, setGuard] = useState<GuardPayload | null>(null);
+  const [guardLoading, setGuardLoading] = useState(true);
+  const [guardError, setGuardError] = useState<string | null>(null);
 
   const fetchStatus = useCallback(async () => {
     setLoading(true);
@@ -87,9 +119,25 @@ export default function AdminHealth() {
     }
   }, []);
 
+  const fetchGuard = useCallback(async () => {
+    setGuardLoading(true);
+    setGuardError(null);
+    try {
+      const r = await fetch("/api/admin/copyright-guard-stats", { credentials: "same-origin" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const j = (await r.json()) as GuardPayload;
+      setGuard(j);
+    } catch (err) {
+      setGuardError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setGuardLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchStatus();
-  }, [fetchStatus]);
+    fetchGuard();
+  }, [fetchStatus, fetchGuard]);
 
   const runWatch = async (send: boolean) => {
     setWatchBusy(true);
@@ -465,6 +513,281 @@ export default function AdminHealth() {
         <div style={{ fontWeight: 700, color: "var(--ow-text-hi)", marginBottom: "0.35rem" }}>Endpoints</div>
         <code style={{ fontFamily: "'JetBrains Mono', monospace" }}>/api/scheduled/health-digest?send=1</code> — daily aggregator email · <code style={{ fontFamily: "'JetBrains Mono', monospace" }}>/api/scheduled/health-watch?send=1</code> — failure-only push (15-min cron)
       </div>
+
+      <CopyrightGuardSection
+        guard={guard}
+        loading={guardLoading}
+        error={guardError}
+        onRefresh={fetchGuard}
+      />
+    </div>
+  );
+}
+
+// ─── Copyright Guard Metrics Section ──────────────────────────────────────
+function CopyrightGuardSection({
+  guard,
+  loading,
+  error,
+  onRefresh,
+}: {
+  guard: GuardPayload | null;
+  loading: boolean;
+  error: string | null;
+  onRefresh: () => void;
+}) {
+  return (
+    <section
+      data-testid="admin-health-guard-section"
+      style={{
+        marginTop: "3rem",
+        paddingTop: "2rem",
+        borderTop: "1px solid rgba(0,0,0,0.08)",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "1rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+        <div>
+          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: "1.5rem", fontWeight: 600, color: "var(--ow-text-hi)", margin: 0, lineHeight: 1.2 }}>
+            Copyright Guard — /ask verbatim-leak monitor
+          </h2>
+          <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.82rem", color: "var(--ow-text-mid)", margin: "0.35rem 0 0", maxWidth: "600px", lineHeight: 1.5 }}>
+            Every Owen answer is checked for 8+ word overlaps with the licensed reference chunks (MoreWine, AWRI, Boulton, Iland). Hits trigger a stricter regeneration. This panel shows where Claude is most tempted to lean on source phrasing.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onRefresh}
+          disabled={loading}
+          data-testid="admin-health-guard-refresh"
+          style={{
+            fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", fontWeight: 600,
+            padding: "0.4rem 0.85rem", borderRadius: 999,
+            border: "1px solid rgba(0,0,0,0.15)", background: "#fff",
+            cursor: loading ? "wait" : "pointer", color: "var(--ow-text-hi)",
+            display: "inline-flex", alignItems: "center", gap: "0.35rem",
+          }}
+        >
+          <RefreshCw size={12} strokeWidth={2.2} /> {loading ? "…" : "Refresh"}
+        </button>
+      </div>
+
+      {error && (
+        <div
+          data-testid="admin-health-guard-error"
+          style={{
+            padding: "0.75rem 1rem", borderRadius: "0.5rem",
+            background: "rgba(185,28,28,0.08)", color: "#b91c1c",
+            fontFamily: "'JetBrains Mono', monospace", fontSize: "0.78rem",
+            marginBottom: "1rem",
+          }}
+        >
+          Guard stats error: {error}
+        </div>
+      )}
+
+      {loading && !guard && (
+        <div style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.85rem", color: "var(--ow-text-mid)", padding: "1rem 0" }}>
+          Loading guard stats…
+        </div>
+      )}
+
+      {guard && (
+        <>
+          {/* Big-number rail: 7d hits · 30d hits · Clean rate */}
+          <div
+            data-testid="admin-health-guard-metrics"
+            style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.75rem", marginBottom: "1.25rem" }}
+          >
+            <MetricCard testid="guard-metric-7d" label="Hits · last 7d" value={String(guard.totals["7d"].total)} accent={guard.totals["7d"].total === 0 ? "#4a7c47" : "#b57e14"} />
+            <MetricCard testid="guard-metric-30d" label="Hits · last 30d" value={String(guard.totals["30d"].total)} accent="#6b7280" />
+            <MetricCard
+              testid="guard-metric-clean-rate"
+              label="Regen clean-rate · 30d"
+              value={guard.cleanRate30d === null ? "—" : `${guard.cleanRate30d}%`}
+              accent={guard.cleanRate30d === null ? "#6b7280" : guard.cleanRate30d >= 90 ? "#4a7c47" : guard.cleanRate30d >= 70 ? "#b57e14" : "#b91c1c"}
+            />
+            <MetricCard
+              testid="guard-metric-still-leaking"
+              label="Still leaking · 30d"
+              value={String(guard.totals["30d"].still_leaking)}
+              accent={guard.totals["30d"].still_leaking === 0 ? "#4a7c47" : "#b91c1c"}
+              subtitle={guard.totals["30d"].still_leaking > 0 ? "manual review needed" : "clean"}
+            />
+          </div>
+
+          {/* Top offending sources */}
+          <div
+            data-testid="admin-health-guard-top-sources"
+            style={{
+              padding: "1rem 1.15rem", borderRadius: "0.5rem",
+              background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.05)",
+              marginBottom: "1.25rem",
+            }}
+          >
+            <div style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ow-text-mid)", marginBottom: "0.85rem" }}>
+              Top offending sources · last 30 days
+            </div>
+            {guard.topSources.length === 0 ? (
+              <div style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.85rem", color: "var(--ow-text-mid)", fontStyle: "italic" }}>
+                No hits recorded — Layer 1 (system prompt) is holding.
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                {guard.topSources.map((s) => (
+                  <div
+                    key={s.primarySource ?? "unknown"}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr auto auto auto",
+                      gap: "0.75rem",
+                      alignItems: "center",
+                      padding: "0.55rem 0.75rem",
+                      background: "#fff",
+                      borderRadius: 4,
+                      border: "1px solid rgba(0,0,0,0.05)",
+                      fontFamily: "'Lato', sans-serif",
+                      fontSize: "0.82rem",
+                    }}
+                  >
+                    <span style={{ color: "var(--ow-text-hi)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={s.primarySource ?? "unknown"}>
+                      {s.primarySource ?? "unknown"}
+                    </span>
+                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.75rem", color: "#6b7280" }}>
+                      {s.count} hits
+                    </span>
+                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.75rem", color: "#4a7c47" }} title="Regenerated clean">
+                      {s.cleanCount} clean
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "'JetBrains Mono', monospace", fontSize: "0.75rem",
+                        color: s.stillLeakingCount > 0 ? "#b91c1c" : "#6b7280",
+                        fontWeight: s.stillLeakingCount > 0 ? 700 : 400,
+                      }}
+                      title="Still leaking after regen"
+                    >
+                      {s.stillLeakingCount} leak
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Recent events table */}
+          <div
+            data-testid="admin-health-guard-recent"
+            style={{ padding: "1rem 1.15rem", borderRadius: "0.5rem", background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.05)" }}
+          >
+            <div style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ow-text-mid)", marginBottom: "0.85rem" }}>
+              Recent detections · last 20
+            </div>
+            {guard.recent.length === 0 ? (
+              <div style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.85rem", color: "var(--ow-text-mid)", fontStyle: "italic" }}>
+                No events yet — the guard has never fired.
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                {guard.recent.map((r) => {
+                  const meta = GUARD_OUTCOME_META[r.outcome] ?? GUARD_OUTCOME_META.no_regen;
+                  return (
+                    <div
+                      key={r.id}
+                      data-testid={`guard-recent-${r.id}`}
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "auto 1fr auto",
+                        gap: "0.75rem",
+                        alignItems: "start",
+                        padding: "0.6rem 0.8rem",
+                        background: "#fff",
+                        borderRadius: 4,
+                        border: "1px solid rgba(0,0,0,0.05)",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontFamily: "'JetBrains Mono', monospace", fontSize: "0.65rem",
+                          fontWeight: 700, letterSpacing: "0.06em",
+                          padding: "0.15rem 0.5rem", borderRadius: 3,
+                          color: meta.color, background: meta.bg,
+                          whiteSpace: "nowrap", marginTop: "0.1rem",
+                        }}
+                      >
+                        {meta.label}
+                      </span>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.82rem", color: "var(--ow-text-hi)", lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+                          {r.questionSnippet}
+                        </div>
+                        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.7rem", color: "var(--ow-text-mid)", marginTop: "0.25rem" }}>
+                          {r.primarySource ?? "unknown source"} · {r.hits.length} phrase{r.hits.length === 1 ? "" : "s"} · {r.originalAnswerLen} chars
+                        </div>
+                        {r.hits.length > 0 && (
+                          <div
+                            style={{
+                              marginTop: "0.4rem",
+                              fontFamily: "'JetBrains Mono', monospace", fontSize: "0.72rem",
+                              color: "#6b7280", fontStyle: "italic",
+                              background: "rgba(0,0,0,0.02)", padding: "0.35rem 0.5rem",
+                              borderRadius: 3, borderLeft: "2px solid rgba(185,28,28,0.35)",
+                              lineHeight: 1.45,
+                            }}
+                            title="Verbatim phrase caught"
+                          >
+                            &ldquo;{r.hits[0]}&rdquo;
+                            {r.hits.length > 1 && ` +${r.hits.length - 1} more`}
+                          </div>
+                        )}
+                      </div>
+                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.7rem", color: "var(--ow-text-mid)", whiteSpace: "nowrap", marginTop: "0.15rem" }}>
+                        {humanAgo(r.occurredAt)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div style={{ marginTop: "1rem", fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "var(--ow-text-mid)", lineHeight: 1.5 }}>
+            <strong>Reading this:</strong> zero hits over 30 days = the system prompt (Layer 1) is doing all the work.
+            Rising counts on one source = time to tighten citation-lane rules or resynth those chunks.
+            Any <span style={{ color: "#b91c1c", fontWeight: 700 }}>still-leaking</span> outcome deserves manual eyes — that&apos;s a copyright-risk answer that shipped.
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+function MetricCard({
+  testid, label, value, accent, subtitle,
+}: {
+  testid: string; label: string; value: string; accent: string; subtitle?: string;
+}) {
+  return (
+    <div
+      data-testid={`admin-health-${testid}`}
+      style={{
+        padding: "0.9rem 1.1rem",
+        borderRadius: "0.5rem",
+        background: "#fff",
+        border: "1px solid rgba(0,0,0,0.06)",
+        borderLeft: `3px solid ${accent}`,
+      }}
+    >
+      <div style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ow-text-mid)", marginBottom: "0.35rem" }}>
+        {label}
+      </div>
+      <div style={{ fontFamily: "'Fraunces', serif", fontSize: "1.75rem", fontWeight: 600, color: accent, lineHeight: 1.1 }}>
+        {value}
+      </div>
+      {subtitle && (
+        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.68rem", color: "var(--ow-text-mid)", marginTop: "0.2rem" }}>
+          {subtitle}
+        </div>
+      )}
     </div>
   );
 }

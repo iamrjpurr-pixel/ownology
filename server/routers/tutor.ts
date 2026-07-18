@@ -15,7 +15,7 @@ import { findProfessionalCitations, renderCitation } from "../professionalCitati
 import { persistJournalEntry } from "../cellarJournalRouter.js";
 import { chatCompletion, MODELS } from "../_core/llm.js";
 import { logMemberActivity } from "../memberActivity.js";
-import { detectCopyrightOverlap, buildStricterPrompt } from "../lib/copyrightGuard.js";
+import { detectCopyrightOverlap, buildStricterPrompt, recordGuardEvent } from "../lib/copyrightGuard.js";
 
 // ─── Public /ask rate limiter — per-IP, sliding 1-hour window ───────────────
 // Only applied to anonymous callers of tutor.ask (the /ask SEO flywheel page).
@@ -636,6 +636,7 @@ ${docContext}`;
         try {
           const guard = detectCopyrightOverlap(diyAnswer, relevantChunks);
           if (guard.scrubbed) {
+            const originalAnswerLen = diyAnswer.length;
             console.warn(
               `[CopyrightGuard] Verbatim leak detected — regenerating.`,
               { hits: guard.hits, sources: guard.sourceHits, question: input.question.slice(0, 120) },
@@ -663,6 +664,13 @@ ${docContext}`;
                     diyAnswer = strictParsed.answer;
                     if (strictParsed.disclaimer) diyDisclaimer = strictParsed.disclaimer;
                     console.info("[CopyrightGuard] Regeneration clean — using stricter answer.");
+                    void recordGuardEvent(db, schema.copyrightGuardEvents, {
+                      question: input.question,
+                      hits: guard.hits,
+                      sourceHits: guard.sourceHits,
+                      outcome: "clean",
+                      originalAnswerLen,
+                    });
                   } else {
                     // Still leaking after retry — log an alert for Rich but
                     // keep the shorter of the two answers as the least-bad
@@ -675,13 +683,34 @@ ${docContext}`;
                     if (strictParsed.answer.length < diyAnswer.length) {
                       diyAnswer = strictParsed.answer;
                     }
+                    void recordGuardEvent(db, schema.copyrightGuardEvents, {
+                      question: input.question,
+                      hits: strictGuard.hits.length > 0 ? strictGuard.hits : guard.hits,
+                      sourceHits: strictGuard.sourceHits.length > 0 ? strictGuard.sourceHits : guard.sourceHits,
+                      outcome: "still_leaking",
+                      originalAnswerLen,
+                    });
                   }
                 }
               } catch (e) {
                 console.warn("[CopyrightGuard] Failed to parse stricter regen JSON:", (e as Error)?.message);
+                void recordGuardEvent(db, schema.copyrightGuardEvents, {
+                  question: input.question,
+                  hits: guard.hits,
+                  sourceHits: guard.sourceHits,
+                  outcome: "regen_failed",
+                  originalAnswerLen,
+                });
               }
             } else {
               console.warn("[CopyrightGuard] Stricter regen HTTP error:", strictResponse.status);
+              void recordGuardEvent(db, schema.copyrightGuardEvents, {
+                question: input.question,
+                hits: guard.hits,
+                sourceHits: guard.sourceHits,
+                outcome: "regen_failed",
+                originalAnswerLen,
+              });
             }
           }
         } catch (e) {
