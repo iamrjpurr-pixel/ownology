@@ -1,0 +1,54 @@
+{
+  "summary": "Curriculum lesson page is BROKEN — crashes on render with 'ReferenceError: access is not defined'. CurriculumLesson.tsx imports useCurriculumAccess but never calls it, yet references `access.canRead.deep`, `access.canRead.flash`, `access.canRead.citations`, `access.isAuthenticated` throughout the JSX. All tier gating tests (Free/Cellar Hand/Press/Vigneron) cannot be executed because the page never mounts. Index (/curriculum) and about (/curriculum/about) pages render correctly.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "CurriculumLesson",
+        "issue": "ReferenceError: access is not defined at CurriculumLesson.tsx:126:201 — page shows ErrorBoundary fallback 'An unexpected error occurred'. Root cause: `useCurriculumAccess` is imported (line 16) but never invoked in the component body; `access` variable is referenced in ~7 places (lines 94, 95, 160, 162, 166, 175, 180, 186, 190).",
+        "selector": "[data-testid='lesson-page'] (never mounts)",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "CurriculumLesson",
+        "issue": "Initial reading mode hardcoded to 'deep' (line 52: useState<Mode>('deep')). Per spec, Free Run tier default should be 'skim'. Once the ReferenceError is fixed, this must also be updated — e.g. useState<Mode>(access.canRead.deep ? 'deep' : 'skim') computed after the hook call.",
+        "selector": "[data-testid='mode-skim']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "CurriculumLesson",
+        "issue": "Dead code: obsolete PaywallBoundary component (lines 532-571) still present with old data-testid='paywall-boundary'. Old testid should be removed per handoff note.",
+        "selector": "[data-testid='paywall-boundary']",
+        "priority": "LOW"
+      },
+      {
+        "component": "CurriculumLesson mode-deep button",
+        "issue": "onClick for mode-deep is `() => access.canRead.deep ? setMode('deep') : setMode('deep')` — both branches identical. When locked, clicking still sets mode to 'deep' which will render UpsellBoundary (that part works), but the ternary is nonsensical and misleading.",
+        "selector": "[data-testid='mode-deep']",
+        "priority": "LOW"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Add `const access = useCurriculumAccess();` near the top of CurriculumLesson component (after useRoute/useState hooks, before the useMemo). This unblocks all tier-gating tests.",
+    "Change initial mode useState from 'deep' to computed default based on access.canRead.deep (Free Run should default to Skim per spec).",
+    "Remove dead PaywallBoundary component and its paywall-boundary testid (replaced by UpsellBoundary).",
+    "Simplify the mode-deep onClick ternary — both branches are identical.",
+    "After fix: rebuild (vite build) and re-test with ?preview=free|cellar_hand|press|vigneron."
+  ],
+  "critical_code_review_comments": [
+    "Missing hook invocation caused a full component crash — an eslint rule (no-undef) or TypeScript strict mode should have caught this. Recommend running `tsc --noEmit` in CI.",
+    "Rules of Hooks fine (all hooks at top), but the missing call means the gating logic is entirely non-functional in code review, not just at runtime.",
+    "Leftover PaywallBoundary is dead code — should have been deleted when replaced by UpsellBoundary."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "20% (index + about pages OK; all lesson pages crash)"},
+  "seed_data_creation": "none",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Once main agent adds `const access = useCurriculumAccess();` and fixes default mode, re-run the 4 tier scenarios via ?preview=<tier> on /curriculum/fermentation-management and verify: (a) Free = skim-mode visible, mode-deep locked, click shows upsell-boundary + upsell-cta-pricing; (b) cellar_hand+ = deep mode default with worked-example/decision-tree/mcqs, flash mode works, NO upsell-boundary.",
+  "rca of the issue": "REPRO: GET https://private-tutor-2.preview.emergentagent.com/curriculum/fermentation-management. Console shows `ReferenceError: access is not defined at CurriculumLesson`. Body renders ErrorBoundary fallback. RCA: /app/client/src/pages/CurriculumLesson.tsx imports useCurriculumAccess (line 16) but never calls it inside the component. The `access` symbol is referenced 9+ times (lines 94, 95, 160, 162, 166, 175, 180, 186, 190) causing an immediate ReferenceError during first render. FIX: insert `const access = useCurriculumAccess();` after existing hooks (e.g. after line 56) and before the `useMemo` at line 59."
+}

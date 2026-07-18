@@ -10,10 +10,10 @@
  * Falls back to plain markdown body if the lesson is v1.
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
-import { useVigneronAccess } from "@/lib/useVigneronAccess";
+import { useCurriculumAccess } from "@/lib/useCurriculumAccess";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
@@ -90,9 +90,9 @@ export default function CurriculumLesson() {
 
           {isV2 && (
             <div className="flex items-center gap-1 bg-stone-100 rounded-full p-1" data-testid="mode-toggle">
-              <ModeBtn active={mode === "deep"} onClick={() => setMode("deep")} icon={BookOpen} label="Deep" testid="mode-deep" />
               <ModeBtn active={mode === "skim"} onClick={() => setMode("skim")} icon={Zap} label="Skim" testid="mode-skim" />
-              <ModeBtn active={mode === "flash"} onClick={() => { setMode("flash"); setFlashIdx(0); setFlashFlipped(false); }} icon={Layers} label="Flash" testid="mode-flash" />
+              <ModeBtn active={mode === "deep"} onClick={() => access.canRead.deep ? setMode("deep") : setMode("deep")} icon={BookOpen} label="Deep" testid="mode-deep" locked={!access.canRead.deep} />
+              <ModeBtn active={mode === "flash"} onClick={() => { if (access.canRead.flash) { setMode("flash"); setFlashIdx(0); setFlashFlipped(false); } else { setMode("flash"); } }} icon={Layers} label="Flash" testid="mode-flash" locked={!access.canRead.flash} />
             </div>
           )}
         </div>
@@ -151,21 +151,20 @@ export default function CurriculumLesson() {
         </div>
       )}
 
-      {/* Body by mode — GATED for Vigneron tier */}
-      {!access.unlocked ? (
-        <PaywallBoundary lessonTitle={lesson.title} isAuthenticated={access.isAuthenticated} />
-      ) : (
-        <>
-          {isV2 && lesson.sections && mode === "deep" && (
-            <DeepModeContent lesson={lesson} quizAnswers={quizAnswers} setQuizAnswers={setQuizAnswers} quizReveal={quizReveal} setQuizReveal={setQuizReveal} />
-          )}
+      {/* Body by mode — GATED per feature */}
+      {isV2 && lesson.sections && mode === "skim" && (
+        <SkimModeContent lesson={lesson} />
+      )}
 
-          {isV2 && lesson.sections && mode === "skim" && (
-            <SkimModeContent lesson={lesson} />
-          )}
+      {isV2 && lesson.sections && mode === "deep" && (
+        access.canRead.deep
+          ? <DeepModeContent lesson={lesson} quizAnswers={quizAnswers} setQuizAnswers={setQuizAnswers} quizReveal={quizReveal} setQuizReveal={setQuizReveal} />
+          : <UpsellBoundary reason="deep" isAuthenticated={access.isAuthenticated} />
+      )}
 
-          {isV2 && lesson.flashcards && mode === "flash" && (
-            <FlashModeContent
+      {isV2 && mode === "flash" && (
+        access.canRead.flash && lesson.flashcards
+          ? <FlashModeContent
               cards={lesson.flashcards}
               idx={flashIdx}
               flipped={flashFlipped}
@@ -173,21 +172,22 @@ export default function CurriculumLesson() {
               onPrev={() => { setFlashIdx((flashIdx - 1 + lesson.flashcards!.length) % lesson.flashcards!.length); setFlashFlipped(false); }}
               onFlip={() => setFlashFlipped((f) => !f)}
             />
-          )}
+          : <UpsellBoundary reason="flash" isAuthenticated={access.isAuthenticated} />
+      )}
 
-          {/* v1 fallback — plain body */}
-          {!isV2 && lesson.body_md && (
-            <div className="max-w-4xl mx-auto px-6 pb-10">
+      {/* v1 fallback — plain body (only for tiers that get deep read) */}
+      {!isV2 && lesson.body_md && (
+        access.canRead.deep
+          ? <div className="max-w-4xl mx-auto px-6 pb-10">
               <article className="prose prose-stone max-w-none prose-headings:font-serif prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3" data-testid="lesson-body">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{lesson.body_md}</ReactMarkdown>
               </article>
             </div>
-          )}
-        </>
+          : <UpsellBoundary reason="deep" isAuthenticated={access.isAuthenticated} />
       )}
 
-      {/* Citations — visible only if unlocked */}
-      {access.unlocked && lesson.cited_in && lesson.cited_in.length > 0 && (mode !== "flash") && (
+      {/* Citations — visible if user can read deep */}
+      {access.canRead.citations && lesson.cited_in && lesson.cited_in.length > 0 && (mode !== "flash") && (
         <CitedIn grouped={groupedCitations} />
       )}
     </div>
@@ -196,15 +196,61 @@ export default function CurriculumLesson() {
 
 /* ============ SUB-COMPONENTS ============ */
 
-function ModeBtn({ active, onClick, icon: Icon, label, testid }: { active: boolean; onClick: () => void; icon: typeof Zap; label: string; testid: string }) {
+function ModeBtn({ active, onClick, icon: Icon, label, testid, locked = false }: { active: boolean; onClick: () => void; icon: typeof Zap; label: string; testid: string; locked?: boolean }) {
   return (
     <button
       onClick={onClick}
       className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all ${active ? "bg-white shadow-sm text-stone-900" : "text-stone-600 hover:text-stone-900"}`}
       data-testid={testid}
+      title={locked ? "Unlock with Cellar Hand or higher" : undefined}
     >
       <Icon className="h-3.5 w-3.5" /> {label}
+      {locked && <Lock className="h-3 w-3 opacity-60" />}
     </button>
+  );
+}
+
+function UpsellBoundary({ reason, isAuthenticated }: { reason: "deep" | "flash"; isAuthenticated: boolean }) {
+  const label = reason === "deep" ? "Deep read" : "Flash cards";
+  const desc = reason === "deep"
+    ? "Full lesson — five sections, worked example, decision tree, ten questions, and citations."
+    : "Retrieval-practice flash cards — the numbers and the traps in swipeable Q/A form.";
+  return (
+    <div className="max-w-4xl mx-auto px-6 py-14" data-testid="upsell-boundary">
+      <div className="rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-8 md:p-12 shadow-sm">
+        <div className="flex items-center gap-3 text-amber-900 font-semibold text-sm uppercase tracking-wider mb-4">
+          <Lock className="h-4 w-4" /> {label} — Cellar Hand and up
+        </div>
+        <h2 className="font-serif text-3xl md:text-4xl text-stone-900 leading-tight mb-4">
+          Ready to open the full lesson?
+        </h2>
+        <p className="text-stone-700 leading-relaxed text-lg mb-6 max-w-2xl">
+          {desc} All 30 lessons unlock at the Cellar Hand tier. Free Run stays free — full Skim mode of the whole curriculum.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/pricing?from=curriculum-upsell">
+            <Button size="lg" className="bg-stone-900 hover:bg-stone-800" data-testid="upsell-cta-pricing">
+              See pricing <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </Link>
+          <Link href="/curriculum/about">
+            <Button variant="outline" size="lg" data-testid="upsell-cta-learn">
+              What's inside the curriculum
+            </Button>
+          </Link>
+          {!isAuthenticated && (
+            <Link href="/login?next=/curriculum">
+              <Button variant="ghost" size="lg" data-testid="upsell-cta-signin">
+                Already a member? Sign in
+              </Button>
+            </Link>
+          )}
+        </div>
+        <p className="mt-6 text-xs text-stone-500">
+          14-day free trial. Cancel anytime. Founding member pricing locks for life.
+        </p>
+      </div>
+    </div>
   );
 }
 
