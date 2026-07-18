@@ -1,0 +1,82 @@
+{
+  "lesson_id": "L4.7",
+  "source": {
+    "id": "L4.7",
+    "slug": "sustainability",
+    "title": "Sustainability — beyond marketing",
+    "level": "4",
+    "wbs": [
+      "D9",
+      "D10"
+    ],
+    "reading_min": "5",
+    "aim": "Energy, water, waste — the operational metrics that ground a sustainability claim, and how to build them into daily practice.",
+    "application": "Owen can log energy and water. This lesson is how you turn that log into a story a buyer will trust.",
+    "sources_private": [],
+    "sources_public_ref": [
+      "adelaide_oenology_3016wt",
+      "csu_wsc321"
+    ],
+    "citations_bibliographic": []
+  },
+  "generated": {
+    "aim": "Energy, water, waste — the operational metrics that ground a sustainability claim, and how to build them into daily practice.",
+    "application": "Owen logs energy and water consumption against each tank and process event. This lesson shows how to read that data as a coherent narrative — one that holds up when a buyer, retailer, or certifier asks for evidence rather than intent.",
+    "body_md": "### Why metrics come before claims\n\nSustainability without numbers is marketing. A buyer who asks for your carbon footprint or water intensity doesn't want a philosophy statement — they want a figure, a unit, and a trend line. The three domains that matter operationally are energy, water, and waste. Each has a standard unit of intensity that makes your winery comparable across vintages and across peers.\n\n- **Energy intensity**: kWh per tonne of fruit crushed, or kWh per litre of wine produced\n- **Water intensity**: kilolitres per tonne of fruit (kL/t) — industry benchmark sits around 2–5 kL/t depending on process; best-practice boutique operations often achieve below 2 kL/t\n- **Waste diversion rate**: percentage of solid and liquid waste streams diverted from landfill or sewer, expressed as a proportion of total waste generated\n\nWithout these three numbers logged consistently, any sustainability claim is unverifiable — and increasingly, unacceptable to export markets.\n\n### Energy: where the load actually sits\n\nRefrigeration dominates winery energy use, typically accounting for 50–70% of total consumption in a cellar-door-scale operation. Knowing this shapes where to look first.\n\nKey audit points:\n- Chiller setpoints and cycling frequency — oversized chillers running short cycles waste more energy than a correctly sized unit running long\n- Insulation on tanks and cold-room panels — heat ingress is silent load\n- Pump scheduling — centrifugal pumps running at full speed against a partially closed valve are burning energy as heat\n- Variable-speed drives (VSDs) on pumps and fans — retrofitting VSDs is one of the highest-return capital investments available to a small winery\n\nLog energy by process event, not just by calendar month. Knowing that your must chilling phase consumed 340 kWh across 18 tonnes of fruit gives you a number to improve against next vintage. A monthly electricity bill gives you nothing actionable.\n\n### Water: intensity and stream segregation\n\nWinery wastewater is not a single stream. Mixing high-strength effluent (tank washings, press water, lees drainage) with low-strength water (equipment rinse, floor wash) raises treatment cost and complicates disposal compliance. Segregation at source is the first operational discipline.\n\nHigh-strength streams — characterised by high biochemical oxygen demand (BOD), elevated pH from caustic CIP, and significant suspended solids — require either on-site treatment or managed discharge under a trade waste agreement. Low-strength streams may be suitable for irrigation or direct disposal depending on local regulation.\n\nPractical reductions in water intensity:\n- Dry clean before wet clean — sweep, squeegee, and vacuum marc before hosing\n- Pressure over volume — a 100-bar pressure washer at low flow rate cleans faster and uses a fraction of the water of a garden hose\n- Capture and reuse first rinses — first-rinse water from tank cleaning is often clean enough to use as pre-rinse on the next vessel\n- Fix dripping hoses and float valves — a 1 mm drip at 300 kPa wastes roughly 1.5 kL per day\n\nTrack water use per event: tank clean, press cycle, barrel wash. Owen's log gives you the granularity to identify which process step is your outlier.\n\n### Waste: solid streams and the diversion calculation\n\nMarc, lees, and wastewater are the three major waste streams by volume. Each has established diversion pathways that avoid landfill and, in some cases, generate revenue or offset input costs.\n\n- **Marc**: composting on-site or supply to a distillery or marc composting operation; some regions have marc-to-energy schemes\n- **Lees**: centrifuge to recover wine before disposal; fine lees can go to a distillery or be composted after dewatering\n- **Wastewater**: constructed wetlands, evaporation ponds, or land application (subject to sodium adsorption ratio and pH — high-caustic CIP water needs pH correction before irrigation)\n- **Glass and cardboard**: standard recycling, but worth tracking volume to demonstrate diversion rate to certifiers\n\nDiversion rate = (total waste diverted from landfill/sewer) ÷ (total waste generated) × 100. A credible claim starts at 70%; best practice is above 90%.\n\n### Building the story a buyer will trust\n\nCertification schemes — Sustainable Winegrowing Australia (SWA), SWNZ, organic and biodynamic bodies — all require documented evidence, not self-assessment alone. The documentation hierarchy that holds up under audit:\n\n1. **Raw logs**: timestamped meter readings, water meter readings per event, waste docket weights\n2. **Intensity calculations**: normalised to tonnes crushed or litres produced, calculated consistently each vintage\n3. **Trend comparison**: year-on-year change with a brief note on what drove improvement or regression\n4. **Third-party verification**: utility bills, waste contractor receipts, or certifier inspection records\n\nOwen's energy and water logs are the raw layer. The intensity calculation and trend comparison are what you build on top. A buyer asking for sustainability credentials is really asking: do you know your operation well enough to improve it? The log is the answer.\n\n**What to do this vintage**: Set up a per-event water and energy log in Owen from the first pump-over — not a monthly summary, a per-process record. At the end of vintage, calculate your kWh/t and kL/t, compare them to the previous vintage, and write two sentences on what changed. That document is the start of a sustainability story that can survive scrutiny.",
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC321 Winery Engineering · LO 3, LO 4",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC321",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3016WT Cellar and Winery Waste Management III · LO 3, LO 4",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      },
+      {
+        "kind": "free",
+        "label": "AWRI Winery Wastewater Management",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'winery wastewater management'"
+      },
+      {
+        "kind": "free",
+        "label": "Wine Australia Sustainable Winegrowing Australia Program",
+        "url": "https://www.wineaustralia.com/",
+        "note": "search Wine Australia for 'Sustainable Winegrowing Australia'"
+      },
+      {
+        "kind": "buy",
+        "label": "Boulton, Singleton, Bisson & Kunkee · Principles and Practices of Winemaking · Ch 16",
+        "url": null,
+        "note": "Springer"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1839,
+    "prompt_tokens": 1810,
+    "total_tokens": 3649,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1839
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1810,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1918,
+  "overlaps": []
+}

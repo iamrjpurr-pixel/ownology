@@ -1,0 +1,82 @@
+{
+  "lesson_id": "L4.4",
+  "source": {
+    "id": "L4.4",
+    "slug": "packaging-labelling",
+    "title": "Packaging and labelling — closures, bottles, compliance",
+    "level": "4",
+    "wbs": [
+      "D7"
+    ],
+    "reading_min": "4",
+    "aim": "Cork vs screwcap vs alternative closures; label mandatories (AU/NZ/EU/US); packaging as brand.",
+    "application": "Owen holds your artwork and compliance checklists. This lesson makes the choice deliberate, not defaulted.",
+    "sources_private": [],
+    "sources_public_ref": [
+      "adelaide_oenology_3003wt"
+    ],
+    "citations_bibliographic": [
+      "robinson_oxford_closures"
+    ]
+  },
+  "generated": {
+    "aim": "Understand the performance trade-offs between cork, screwcap, and alternative closures; know the mandatory label elements for AU, NZ, EU, and US markets; and treat packaging as a deliberate brand decision, not a default.",
+    "application": "Before your next bottling run, open Owen's compliance checklist for the target market and cross-reference every mandatory field against your current artwork file. If closure type isn't logged against the wine's ferment trajectory and intended cellaring window, add it now — that decision affects oxygen ingress from day one.",
+    "body_md": "### Closures: what you're actually choosing\n\nEvery closure decision is an oxygen management decision. The numbers matter.\n\nNatural cork transmits oxygen at roughly 0.5–2 mg/L per year, but the variance between individual corks is wide — wide enough to produce 'cork variation' in the same batch. That inconsistency is the core commercial argument against cork for wines bottled at volume or destined for early drinking.\n\nScrewcap with Saranex liner sits at the low end of oxygen transmission, typically below 0.5 mg/L per year. For aromatic whites and early-release reds, that's a feature. For a wine that needs slow, reductive development over a decade, it can become a liability — retained sulfides, slow colour evolution, and a reductive character that some markets read as a fault.\n\nAlternative closures — DIAM (agglomerated cork with supercritical CO₂ extraction), Nomacorc (synthetic, various OTR grades), and glass stoppers — occupy the middle ground. DIAM's key advantage is consistency: the TCA extraction process removes the taint risk while allowing the winemaker to select an OTR grade matched to the wine style. Nomacorc grades span a wide OTR range, which means a boutique producer can spec the closure to the wine rather than accepting a fixed transmission rate.\n\nPractical decision frame:\n- **Aromatic whites, rosé, early-drinking reds**: low-OTR screwcap or Nomacorc Classic\n- **Premium reds, 5–10 year cellaring**: DIAM 5 or DIAM 10, or high-quality natural cork with TCA testing\n- **Sparkling**: crown seal (tirage), mushroom cork + cage (disgorgement), or Zork for still-sparkling hybrids\n- **Export to traditional markets (EU, UK)**: cork or DIAM — screwcap still carries perception risk in some fine wine segments\n\n### Bottles: glass weight, colour, and format\n\nGlass colour directly affects UV degradation. Flint (clear) glass offers zero UV protection — use it only for wines sold and consumed quickly, or where colour display is the point. Antique green and dead-leaf provide partial protection. Dark green and Burgundy-brown provide the most.\n\nBottle weight is a sustainability and freight cost issue. The industry has moved toward lighter glass (400–450 g for standard 750 mL) without meaningful quality compromise for most styles. Heavy glass (700–900 g) signals premium positioning but adds freight cost and carbon load — justify it deliberately.\n\nFormat choices (375 mL, 750 mL, 1.5 L magnum) affect ageing rate. Wine ages more slowly in larger formats due to the lower surface-area-to-volume ratio at the closure. Magnums are not just a presentation choice.\n\n### Label mandatories by market\n\nGet these wrong and the shipment doesn't clear customs, or it gets recalled.\n\n**Australia (FSANZ Standard 4.5.1)**\n- Product name and wine type\n- Country of origin\n- Net volume\n- Standard drinks statement\n- Allergen declaration (sulphites ≥10 mg/L, milk, egg if used as fining agents)\n- Pregnancy warning (mandatory from 31 July 2023 — the triangle + text format)\n- Name and address of responsible supplier\n\n**New Zealand (Food Standards Code, mirrored FSANZ)**\n- Same core requirements as AU; pregnancy warning mandatory from the same date\n- Sulphite declaration threshold identical (≥10 mg/L)\n\n**European Union**\n- From 8 December 2023: full ingredient list and nutrition declaration mandatory (energy, fat, saturated fat, carbohydrate, sugars, protein, salt)\n- QR code linking to e-label is permitted for ingredients/nutrition but not for allergens — allergens must remain on the physical label\n- 'Contains sulphites' if SO₂ >10 mg/L\n- Importer name and address\n- Lot number\n- Nominal volume\n\n**United States (TTB)**\n- Brand name\n- Class and type designation\n- Appellation of origin (if claimed)\n- Net contents\n- Alcohol content (tolerance ±1.5% for table wine)\n- Name and address of bottler/importer\n- Government warning statement (verbatim, no substitution)\n- Sulfite declaration if >10 mg/L\n- Certificate of Label Approval (COLA) required before import\n\nThe EU update is the one catching boutique exporters off guard right now. If you're shipping to the EU and haven't updated artwork since late 2023, treat this as urgent.\n\n### Packaging as brand signal\n\nLabel design, bottle format, closure type, and capsule finish collectively communicate price point and style before the cork is pulled. That's not marketing theory — it's the first sensory input the buyer receives.\n\nConsistency matters more than novelty. A screwcap on a $15 Marlborough Sauvignon Blanc is expected and trusted. The same closure on a $90 Barossa Shiraz still requires active justification in some retail channels. Neither choice is wrong, but both need to be deliberate and communicated through the trade.\n\nCapsule colour, label substrate (paper weight, texture, uncoated vs gloss), and back-label copy all carry signal. Uncoated paper reads artisan. Gloss reads commercial. Neither is inherently better — the question is whether the signal matches the wine and the price.\n\n**What to do this vintage:** Pull your target-market compliance checklist in Owen and verify every mandatory field against your current label artwork before artwork goes to print. Lock closure type against each wine's intended drinking window in the vintage log — if you can't articulate why you chose that closure for that wine, the decision hasn't been made yet.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton, Singleton, Bisson & Kunkee · Principles and Practices of Winemaking · Ch 14",
+        "url": null,
+        "note": "Springer"
+      },
+      {
+        "kind": "buy",
+        "label": "Zoecklein, Fugelsang, Gump & Nury · Wine Analysis and Production · Ch 16",
+        "url": null,
+        "note": "Springer"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Closures — oxygen transmission and wine development",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'closures oxygen transmission'"
+      },
+      {
+        "kind": "free",
+        "label": "Wine Australia · EU labelling requirements 2023",
+        "url": "https://www.wineaustralia.com/",
+        "note": "Search Wine Australia for 'EU labelling 2023'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3003WT Wine Packaging and Quality Management III · LO 1, 3",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1929,
+    "prompt_tokens": 1627,
+    "total_tokens": 3556,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1929
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1627,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1123,
+  "overlaps": []
+}

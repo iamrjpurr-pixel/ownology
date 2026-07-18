@@ -1,0 +1,91 @@
+{
+  "lesson_id": "L4.6",
+  "source": {
+    "id": "L4.6",
+    "slug": "compliance",
+    "title": "Compliance — LIP, WET, food safety, GI",
+    "level": "4",
+    "wbs": [
+      "D10"
+    ],
+    "reading_min": "5",
+    "aim": "The Australian/NZ regulatory backbone every winery lives under — what triggers what, and what your logbook needs to show.",
+    "application": "Owen's audit-ready mode packages the compliance evidence. This lesson lets you defend the audit conversation confidently.",
+    "sources_private": [
+      "aoc_2_5_wine_classification"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_3003wt",
+      "csu_wsc321"
+    ],
+    "citations_bibliographic": [
+      "robinson_oxford_regulation"
+    ]
+  },
+  "generated": {
+    "aim": "The Australian/NZ regulatory backbone every winery lives under — what triggers what, and what your logbook needs to show.",
+    "application": "Owen's audit-ready mode packages the compliance evidence across your vintage log, tank records, and cellar briefs. Work through this lesson before your next ATO or food safety inspection so you can answer every question without digging through folders.",
+    "body_md": "### The four pillars you're accountable to\n\nAustralian and New Zealand wineries operate under four overlapping regulatory layers. Miss one and you're not just non-compliant — you're potentially uninsured, unlabelled, or unable to export.\n\n- **LIP (Licenced Premises)** — your ATO licence to manufacture and move wine. Triggers: any change to premises footprint, new tank installation, or change of entity structure. Your obligation: keep a cellar record that accounts for every litre in and out, by product class.\n- **WET (Wine Equalisation Tax)** — applies at the point of sale for most still and sparkling wine. Triggers: wholesale value exceeds the producer rebate threshold, or wine is sold to an associate entity. Your obligation: BAS-linked records that reconcile production volume to taxable sales. The rebate cap (currently AUD 350,000 per year) means small producers need to track cumulative claims across all related entities.\n- **Food safety** — in Australia, the Food Standards Code (Standard 4.5.1 for wine) sets compositional limits and labelling requirements. In NZ, the Food Act 2014 applies. Triggers: any additive use, any claim on label (e.g. 'preservative free', 'low alcohol'), any export to a market with bilateral food safety recognition. Your obligation: batch records for every additive — quantity added, date, tank ID, operator.\n- **GI (Geographical Indication)** — if the label carries a region, variety, or vintage claim, the 85% rule applies in Australia (85% of the wine must originate from the stated region/variety/vintage). NZ GI rules under the Geographical Indications (Wine and Spirits) Registration Act 2006 are structurally similar. Triggers: any blending across regions or vintages, any purchased fruit or bulk wine. Your obligation: a traceable blend record linking fruit intake dockets to finished product.\n\n### What your logbook must show\n\nRegulators don't audit your intentions — they audit your paper trail. A compliant cellar record covers:\n\n- **Intake**: grape receival dockets (weight, Baumé, variety, grower, block, region), dated and signed\n- **Processing additions**: every SO₂ addition (mg/L, volume of wine, date, tank), every fining agent, every acid or sugar addition with the same detail\n- **Transfers**: tank-to-tank movements with volume, date, and reason\n- **Blending**: component volumes, origin of each component, pre-blend and post-blend analysis\n- **Packaging**: bottling date, volume, closure type, label batch, finished product analysis (alcohol, pH, TA, free SO₂)\n- **Dispatch**: invoice number, buyer, volume, product code\n\nGaps in this chain are the most common audit failure. A missing transfer record between ferment and press means you cannot prove GI compliance for that batch.\n\n### The 85% rule in practice\n\nBlending is where GI compliance gets complicated fast. If you're making a Barossa Shiraz and you top up a tank with 18% McLaren Vale fruit because you're short on volume, the label claim fails. The fix is not to avoid blending — it's to record every component before the blend is made, confirm the regional percentages, and keep that calculation on file.\n\nFor vintage claims: wine made from 2023 fruit that sits in barrel into 2024 is still a 2023 vintage wine. The vintage date is the harvest year, not the bottling year. This trips up producers who bottle late and assume the label date should match the bottling year.\n\n### Export adds another layer\n\nIf wine leaves Australia for the EU, UK, or USA, Wine Australia's export approval system (the Export Approval Request, or EAR) requires a Certificate of Analysis and, for EU shipments, a VI-1 certificate. The VI-1 must be signed by an approved analyst and reference the specific batch. Your cellar records need to be batch-specific enough to generate this document without reconstructing history from memory.\n\nNZ exporters to the EU operate under a bilateral agreement that requires NZ Wine's certification. The underlying record-keeping obligation is identical: traceable, batch-specific, analyst-verified.\n\n### Triggering an ATO audit — and surviving it\n\nThe ATO's WET audit focus areas are consistent: rebate eligibility, associate entity relationships, and the reconciliation between production records and BAS lodgements. Auditors will ask for:\n\n- Your ATO-registered cellar records for the period under review\n- Evidence that WET rebate claims match actual wholesale value of taxable sales\n- Confirmation that no rebate has been claimed on wine sold to an associate at below-market value\n\nThe single most effective preparation is a monthly reconciliation — production volume against sales volume against BAS — so that any discrepancy is caught and corrected before it compounds across a full financial year.\n\n**What to do this vintage:** Pull your last three months of tank records and check that every SO₂ addition, transfer, and blend has a dated entry with tank ID and operator — if any are missing, reconstruct them now from your lab sheets before the gap becomes an audit finding. Set a recurring task in your cellar brief to run the WET volume reconciliation at the end of each month, not at BAS time.",
+    "cited_in": [
+      {
+        "kind": "free",
+        "label": "Wine Australia — Export Approval and VI-1 Certification",
+        "url": "https://www.wineaustralia.com/selling/export",
+        "note": "search Wine Australia for 'export approval' if URL redirects"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Winemaking Additions and Food Standards Code",
+        "url": "https://www.awri.com.au/industry_support/winemaking_resources/",
+        "note": "search AWRI for 'permitted additives' and 'food standards'"
+      },
+      {
+        "kind": "free",
+        "label": "ATO — Wine Equalisation Tax Guide for Wine Producers",
+        "url": "https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/wine-equalisation-tax",
+        "note": "AU government, free to access"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3003WT Wine Packaging and Quality Management III · LO 4",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "preparation of wine for final packaging; compliance context for labelling and additives"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC321 Winery Engineering · LO 4",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC321",
+        "note": "waste disposal and liquid handling obligations intersect with WET and food safety record-keeping"
+      },
+      {
+        "kind": "buy",
+        "label": "Zoecklein et al. · Wine Analysis and Production · Ch 1",
+        "url": null,
+        "note": "Springer; regulatory context for compositional standards and analytical obligations"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1871,
+    "prompt_tokens": 1838,
+    "total_tokens": 3709,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1871
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1838,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 2177,
+  "overlaps": []
+}

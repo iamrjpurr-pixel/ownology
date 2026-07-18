@@ -1,0 +1,86 @@
+{
+  "lesson_id": "L4.5",
+  "source": {
+    "id": "L4.5",
+    "slug": "storage-ageing",
+    "title": "Storage and ageing — the wine after it leaves you",
+    "level": "4",
+    "wbs": [
+      "D5",
+      "D7"
+    ],
+    "reading_min": "4",
+    "aim": "Bottle ageing chemistry, storage conditions, brand promise vs reality on the shelf.",
+    "application": "Owen tracks your library releases. This lesson tells you what you're actually promising a buyer when you sell them a cellaring wine.",
+    "sources_private": [
+      "aoc_2_10_storing_aging"
+    ],
+    "sources_public_ref": [
+      "csu_wsc317",
+      "adelaide_oenology_3003wt"
+    ],
+    "citations_bibliographic": [
+      "waterhouse_sacks_bottle_aging"
+    ]
+  },
+  "generated": {
+    "aim": "Understand the chemistry driving bottle ageing and how storage conditions interact with it — so every library release you sell carries a promise you can actually keep.",
+    "application": "Owen's library release tracker logs your cellaring wines by vintage and projected drink window. Before you set that window, run through this lesson's condition checklist against your actual storage data. If your cellar brief shows temperature variance above 4°C seasonal swing, revise the promise on the label before it ships.",
+    "body_md": "### What's actually happening inside a sealed bottle\n\nBottle ageing is not passive. From the moment a cork or screwcap goes on, a slow cascade of reactions reshapes the wine. Oxygen is the primary driver — but the quantity matters enormously. A screwcap admits near-zero oxygen; a natural cork admits a small, variable flux; a DIAM or technical cork sits somewhere between. That oxygen reacts with phenolics, sulfur compounds and pigments in ways that are irreversible.\n\nKey reactions running in parallel:\n\n- **Tannin polymerisation.** Smaller, harsher tannin units link into longer chains. Astringency softens. At some point the polymers grow large enough to precipitate as sediment — that's not a fault, it's chemistry completing itself.\n- **Anthocyanin-tannin co-pigmentation and condensation.** Red colour shifts from blue-red to brick-orange as free anthocyanins bind with tannins and the resulting pigments are less pH-sensitive. A wine that looks garnet at two years looks tawny at fifteen.\n- **Ester hydrolysis and formation.** Fruity fermentation esters slowly hydrolyse; acid-catalysed re-esterification builds different, more complex ester profiles. The fresh-fruit character of a young wine is genuinely consumed in this process — it doesn't come back.\n- **Norisoprenoid development.** Carotenoid breakdown products (β-damascenone, TDN in Riesling) continue forming from bound precursors. Kerosene character in aged Riesling is not a storage flaw — it's a predictable chemical endpoint.\n- **Thiol oxidation.** Varietal thiols (3MH, 3MHA) that give Sauvignon Blanc its grapefruit and passionfruit are highly oxidation-sensitive. They degrade within 12–24 months under most closure regimes. Selling a thiol-driven white as a cellaring wine is a promise chemistry will break.\n\n### Storage conditions: the variables you control\n\nTemperature is the single biggest lever. Every 10°C rise roughly doubles reaction rates (the Q10 rule). A wine stored at 22°C ages at approximately twice the rate of the same wine at 12°C. More damaging than a stable warm temperature is fluctuation — thermal cycling stresses the closure, drives micro-ingress, and accelerates oxidative reactions unevenly through the bottle.\n\nPractical thresholds:\n\n- **Target:** 12–14°C, stable within ±2°C year-round\n- **Acceptable:** up to 18°C if stable\n- **Damaging:** repeated swings >4°C seasonal range, or any exposure above 25°C\n\nLight degrades wine through photo-oxidation and riboflavin-mediated reactions. UV is the main culprit. Coloured glass provides meaningful but incomplete protection. Fluorescent and LED cellar lighting both emit some UV; incandescent is lower risk. For library stock, darkness is the only reliable answer.\n\nHumidity affects cork-sealed bottles more than screwcap. Below 50% RH, natural corks dry and shrink, increasing oxygen ingress. Above 85%, label adhesion fails and mould colonises corks — not a wine quality issue, but a presentation problem on release. Target 60–75% RH for cork-finished library stock.\n\nBottle orientation matters only for natural cork: horizontal keeps the cork hydrated. Screwcap wines can be stored upright without penalty.\n\n### Closure choice as a cellaring commitment\n\nThe closure decision at bottling is a long-term promise to the buyer. Screwcap (Saran tin liner) delivers the lowest and most consistent oxygen transmission rate — ideal for preserving reductive, thiol-driven or high-acid whites over 5–10 years. For structured reds intended for 10–20 year cellaring, a small, consistent oxygen flux from a quality natural cork or DIAM supports tannin evolution without tipping into premature oxidation.\n\nThe risk with natural cork is variance. Bottle-to-bottle TCA contamination aside, oxygen transmission rates vary widely even within a single batch. That variance becomes the buyer's problem at the cellar door in 2035. DIAM and other agglomerated technical corks offer tighter OTR consistency and zero TCA risk — the trade-off is a slightly different ageing trajectory than natural cork at the same nominal OTR.\n\nScrewcap reductive risk is real for some red styles: hydrogen sulfide and mercaptan development under very low oxygen can produce off-characters. If your red is going under screwcap for long cellaring, ensure free SO₂ is managed carefully at bottling (typically 25–35 mg/L free for a red at pH 3.5–3.7) and consider a brief post-bottling oxygen exposure protocol.\n\n### Brand promise vs shelf reality\n\nA drink window on a back label is a contract. The chemistry above tells you what that contract requires:\n\n- Know your closure's OTR and what it means for the wine's phenolic and aromatic trajectory.\n- Know your storage conditions — not assumed, measured. A data logger in the library block for one full year gives you real numbers.\n- Know your wine's composition. High tannin, high acid, low pH wines have the structural reserves to age. Low tannin, aromatic whites generally do not, regardless of what the label implies.\n- Communicate honestly. A five-year drink window on a thiol-driven Sauvignon Blanc is defensible. A fifteen-year window is not.\n\nOwners who buy library releases are making a financial and emotional investment based on your stated window. Getting the chemistry right is how you honour it.\n\n**What to do this vintage:** Pull your library block temperature logs for the past 12 months and calculate the actual seasonal swing — if it exceeds 4°C, address insulation or HVAC before the next release goes in. Then cross-check your current library wines' closure type against their stated drink windows using the OTR and phenolic logic above, and adjust any windows that the chemistry won't support.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Waterhouse, Sacks & Jeffery · Understanding Wine Chemistry · Ch 19–21",
+        "url": null,
+        "note": "Wiley — covers bottle ageing reactions, phenolic evolution and closure oxygen transmission in detail"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Wine closures and oxygen transmission",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'closures oxygen transmission rate'"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Wine storage and temperature effects",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'wine storage temperature'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC317 Wine Science 2 · LO 2, LO 3",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC317",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3003WT Wine Packaging and Quality Management III · LO 1, LO 3",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1959,
+    "prompt_tokens": 1875,
+    "total_tokens": 3834,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1959
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1875,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 2020,
+  "overlaps": []
+}

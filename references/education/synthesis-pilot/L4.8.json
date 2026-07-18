@@ -1,0 +1,82 @@
+{
+  "lesson_id": "L4.8",
+  "source": {
+    "id": "L4.8",
+    "slug": "vintage-debrief",
+    "title": "The vintage debrief — how a wine year becomes learning",
+    "level": "4",
+    "wbs": [
+      "D8",
+      "D10"
+    ],
+    "reading_min": "4",
+    "aim": "Structured post-vintage reflection: what worked, what didn't, what to change next year — captured while it's still true.",
+    "application": "Owen runs your vintage debrief workflow. This lesson is why the debrief is the highest-ROI hour of your year.",
+    "sources_private": [],
+    "sources_public_ref": [
+      "csu_wsc317",
+      "adelaide_oenology_3520wt"
+    ],
+    "citations_bibliographic": []
+  },
+  "generated": {
+    "aim": "Structured post-vintage reflection — what worked, what didn't, what to change next year — captured while it's still true.",
+    "application": "Owen holds every ferment trajectory, tank note, and cellar brief from the vintage just closed. Run the debrief workflow now, while sensory memory is sharp and the data is live, and Owen surfaces the gaps between your intentions and your outcomes. The bench trial workbook and harvest log feed directly into next year's pre-vintage plan.",
+    "body_md": "### Why the debrief decays fast\n\nMemory is a worse winemaker than you are. Within six weeks of vintage, the specific reasons a decision was made — why Tank 4 got an extra pump-over on day five, why you picked Block 3 two days early — compress into vague impressions. The debrief is worth doing now, not in winter, because the cost of waiting is losing the causal chain between decision and outcome.\n\nThis isn't about writing a report. It's about converting a season of tacit knowledge into explicit, searchable, actionable records before that knowledge evaporates.\n\n---\n\n### The four questions that structure a useful debrief\n\nA debrief without structure produces a list of complaints and a few wins. Structure it around four questions applied to every significant lot:\n\n- **What did you intend?** The pre-vintage plan: target Baumé at pick, ferment temperature range, maceration length, SO₂ strategy, press fractions.\n- **What actually happened?** The ferment trajectory, actual analytics, any interventions and their timing.\n- **Where did the gap open?** The delta between intention and outcome — and whether that delta was within your control.\n- **What is the single change that would close the gap?** One specific, testable action. Not a philosophy shift.\n\nThe fourth question is the one most debriefs skip. They diagnose but don't prescribe. A debrief that ends with a diagnosis is half a debrief.\n\n---\n\n### What to review, and in what order\n\nWork from fruit inward to finished wine. The sequence matters because each layer of decision depends on the layer before it.\n\n**Fruit and harvest timing**\n- Did Baumé, pH, and TA at pick match the target? If not, was the deviation in the vineyard or in the decision to pick?\n- Were there blocks where timing was compromised by weather, logistics, or picking crew availability? Document the constraint, not just the outcome.\n\n**Fermentation management**\n- Which ferments tracked the intended temperature curve? Which didn't, and why?\n- Where did yeast nutrition fall short — sluggish mid-ferment, elevated volatile acidity, H₂S? Cross-reference against the nutrient additions logged in the cellar brief.\n- Which press fractions were kept, blended, or discarded, and does the tasting now support that call?\n\n**Post-ferment and maturation**\n- MLF timing: did it complete when planned, and did any lots drag?\n- SO₂ management: were free SO₂ levels maintained at target through maturation, or did you find yourself chasing them?\n- Oak or vessel decisions: do the lots in barrel reflect what you intended, or did allocation shift under pressure?\n\n**Sensory and commercial**\n- Blind-taste the lots now, before they're blended or bottled. Write tasting notes without looking at the tank card first.\n- Which lots overdelivered relative to the fruit cost? Which underdelivered? That ratio is your ROI signal for next vintage's resource allocation.\n\n---\n\n### The difference between a debrief and a post-mortem\n\nA post-mortem focuses on failure. A debrief is neutral — it reviews everything, including what worked, because understanding why something worked is as valuable as understanding why something didn't. If a particular yeast strain produced cleaner ferments in a cool year, that's a finding worth capturing with the same rigour as a stuck ferment.\n\nCapture wins with specificity:\n- Not \"the Shiraz fermented well\" but \"Shiraz Tank 4, inoculated at 18°C, peaked at 24°C on day 6, completed in 12 days with no additions beyond DAP at 1/3 sugar depletion — result: clean, no reductive characters at press.\"\n\nThat level of detail is what makes the record useful in 18 months.\n\n---\n\n### Building the forward plan from the debrief\n\nThe debrief's output is not a document — it's a set of pre-vintage decisions for next year. For each significant gap identified, assign:\n\n- A specific change to the process or protocol\n- The lot or block it applies to\n- The metric that will confirm whether the change worked\n\nThis closes the loop. The debrief becomes the first page of next year's vintage plan, not a file that sits in a folder until someone asks what happened in 2025.\n\n---\n\n**What to do this vintage:** Open Owen's debrief workflow within two weeks of your last press, while cellar notes are complete and sensory recall is intact. For each lot, answer the four questions above and log at least one specific forward action — that single step converts reflection into next year's better wine.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton, Singleton, Bisson & Kunkee · Principles and Practices of Winemaking · Ch 1",
+        "url": null,
+        "note": "Springer; process documentation and decision frameworks"
+      },
+      {
+        "kind": "buy",
+        "label": "Zoecklein, Fugelsang, Gump & Nury · Wine Analysis and Production · Ch 2",
+        "url": null,
+        "note": "Springer; analytical record-keeping and quality review"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Winemaking resources overview",
+        "url": "https://www.awri.com.au/industry_support/winemaking_resources/",
+        "note": "search AWRI for 'vintage review' and 'fermentation management'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC317 Wine Science 2 · LO 3",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC317",
+        "note": "Relates winemaking decisions to flavour and phenolic outcomes — the analytical basis for debrief review"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3520WT Advances in Wine Science III · LO 3",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Critical assessment of current practices — underpins structured evaluation methodology"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1687,
+    "prompt_tokens": 1850,
+    "total_tokens": 3537,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1687
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1850,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1792,
+  "overlaps": []
+}

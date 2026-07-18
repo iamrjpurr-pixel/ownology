@@ -1,0 +1,87 @@
+{
+  "lesson_id": "L4.3",
+  "source": {
+    "id": "L4.3",
+    "slug": "filtration-bottling",
+    "title": "Filtration and bottling — the last gate",
+    "level": "4",
+    "wbs": [
+      "D6",
+      "D7"
+    ],
+    "reading_min": "5",
+    "aim": "Depth vs membrane, sterile vs non-sterile, DO/CO₂ management, pre-bottling checklist.",
+    "application": "Owen runs your bottling day workflow. This lesson lets you catch the issue at 6am, not at 10.",
+    "sources_private": [
+      "aoc_2_10_storing_aging",
+      "morew_inert_gas"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_3003wt",
+      "csu_wsc321"
+    ],
+    "citations_bibliographic": [
+      "jackson_wine_science_ch9"
+    ]
+  },
+  "generated": {
+    "aim": "Understand the filtration options available before bottling, when sterile filtration is and isn't required, and how to manage dissolved oxygen and CO₂ through the line so the wine in the bottle matches the wine you approved on the bench.",
+    "application": "Owen's bottling day workflow surfaces your pre-bottling checklist at 6am — turbidity, free SO₂, dissolved oxygen baseline, CO₂ target, and filter integrity test result. This lesson gives you the technical grounding to act on any red flag before the line starts, not after 2,000 bottles are filled.",
+    "body_md": "### Depth vs membrane: choosing the right filter for the job\n\nDepth filtration and membrane filtration do different work. Confusing them costs you either wine quality or unnecessary processing.\n\nDepth filters — sheet filters, lenticular modules, diatomaceous earth (DE) systems — work by trapping particles throughout the filter matrix. They handle high solids loads and are the right tool for clarification passes earlier in the process. They do not give you a sterile cut. Pore sizes are nominal, not absolute, meaning a fraction of particles smaller than the rated size will pass through.\n\nMembrane filters operate on absolute pore ratings. A 0.45 µm membrane will reliably exclude *Saccharomyces* and most spoilage bacteria. A 0.65 µm membrane removes most bacteria but may pass some smaller organisms. For wines at genuine microbiological risk — residual sugar above 5 g/L, pH above 3.5, free SO₂ below 25 mg/L — a 0.45 µm membrane as the final pass is not optional, it is the minimum defensible position.\n\nThe practical sequence for most boutique lines:\n1. Coarse depth pass (if the wine still carries fining lees or cold-stabilisation crystals)\n2. Fine depth or tight sheet pass to reduce membrane loading\n3. 0.45 µm membrane as the terminal sterile barrier\n\nSkipping step 2 when the wine is not brilliantly clear will blind your membrane fast and force a mid-run cartridge change — the highest-risk moment for oxygen pickup on a small line.\n\n### When sterile filtration is and isn't required\n\nNot every wine needs a sterile membrane pass. A dry red at pH 3.35, free SO₂ at 35 mg/L, and zero residual sugar has limited biological risk. Running it through a 0.45 µm membrane removes nothing dangerous and adds handling time and oxygen exposure. A tight sheet filter to NTU < 1 is often sufficient.\n\nSterile filtration is non-negotiable when:\n- Residual sugar is present (off-dry, sweet, or any wine where fermentation was arrested)\n- The wine has a history of *Brettanomyces* activity and is going to bottle without extended maturation time\n- pH is above 3.6 and free SO₂ is marginal\n- The closure system has low oxygen transmission and the wine will be cellared long-term (re-inoculation risk from surviving organisms is real)\n\nFor tank-fermented sparkling or pét-nat, sterile filtration is deliberately avoided — the organisms need to survive. That is a different workflow entirely and outside the scope of this lesson.\n\n### Dissolved oxygen and CO₂: the numbers that matter\n\nDissolved oxygen (DO) at bottling is the single biggest controllable driver of premature oxidation. Target DO in the bottle at fill: below 0.3 mg/L total package oxygen (TPO) for a reductive white or rosé; below 0.5 mg/L for a red destined for early drinking; below 0.8 mg/L for a red going under cork for extended cellaring where some micro-ox is acceptable.\n\nEvery transfer, every filter pass, every length of hose adds oxygen. Measure DO at the tank outlet, after each filter stage, and at the filler bowl. If you are not measuring, you are guessing.\n\nPractical DO management on a small line:\n- Purge all hoses, filter housings, and the filler bowl with inert gas (N₂ or CO₂) before wine contacts them\n- Run wine to waste until the DO reading at the filler nozzle is stable and at target\n- Counter-pressure filling (even on a simple semi-automatic filler) dramatically reduces splash pickup versus gravity fill\n- Check gaskets and tri-clamp connections — a weeping seal is an oxygen leak\n\nCO₂ management is the mirror problem. Whites and rosés typically need 400–700 mg/L CO₂ at bottling to preserve freshness and prevent flat mouthfeel. Reds are usually degassed to below 200 mg/L to avoid gassiness under cork. Measure CO₂ before the run. If you need to add CO₂, do it at the tank with a diffusion stone at least 24 hours before bottling so it equilibrates — not at the filler where it will cause foaming and inconsistent fill levels.\n\n### The pre-bottling checklist: what Owen flags at 6am\n\nBefore the first bottle is filled, confirm:\n\n- **Turbidity** — NTU at target for the filtration strategy chosen (typically < 1 NTU post-membrane)\n- **Free SO₂** — at or slightly above target to account for the small pickup during filtration and filling (add 5–8 mg/L buffer)\n- **DO baseline** — measured at tank outlet; if above 0.5 mg/L before filtration, investigate the transfer\n- **CO₂** — measured and adjusted at least 24 hours prior\n- **Filter integrity test** — bubble point or pressure hold test on the membrane cartridge before wine contacts it; a failed integrity test means the cartridge is compromised and the sterile barrier does not exist\n- **Line temperature** — cold wine (< 12°C) holds CO₂ better and reduces foaming; it also affects fill volume accuracy on volumetric fillers\n- **Bottle and closure inspection** — random sample for glass defects, cork moisture content if natural cork, screw-cap liner condition\n- **First-fill check** — fill the first 6–10 bottles, check fill height, cap torque or cork insertion depth, and label placement before committing the run\n\nA failed integrity test or a DO spike at the filler nozzle are the two faults most likely to appear at 6am and most likely to be ignored under production pressure. Neither should be.\n\n### What to do this vintage\n\nBefore your next bottling run, map every oxygen pickup point from tank outlet to filler nozzle and assign a DO measurement to each — this single exercise will show you where your line leaks. If you do not own a portable DO meter, borrow or hire one for bottling day; the cost of one oxidised batch dwarfs the hire fee.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Jackson · Wine Science 5th ed. · Ch 11",
+        "url": null,
+        "note": "Academic Press"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Dissolved oxygen management at bottling",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'dissolved oxygen bottling'"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Filtration of wine",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'wine filtration'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3003WT Wine Packaging and Quality Management III · LO 2, 4",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC321 Winery Engineering · LO 1, 2",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC321",
+        "note": null
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 2005,
+    "prompt_tokens": 1856,
+    "total_tokens": 3861,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 2005
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1856,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 2177,
+  "overlaps": []
+}
