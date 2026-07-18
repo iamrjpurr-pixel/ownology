@@ -1,0 +1,548 @@
+# Ownology Curriculum Spine — Vigneron Tier
+#
+# Strategy: Ownology's edge is CURATION + APPLICATION, not raw content.
+# Every lesson pairs a synthesised aim (from private-grounding sources)
+# with an APPLICATION angle that lands the concept on the user's own
+# cellar decisions this week.
+#
+# Structure spine: Adelaide 068885G Level 1 → Level 4
+# Voice spine:     AOC "Lesson Aim" clarity, tightened + made practical
+# Depth spine:     MoreWine + AWRI + academic references (private grounding)
+# Application:     Vigneron-tier — ties into user's vintage log, tanks, region
+#
+# Access: Vigneron tier only (top subscription).
+# Anonymous users see title + aim; the body, application, and citation strip
+# are gated. This is deliberate — the education layer is a conversion moat.
+
+version: 1
+tier_gate: "vigneron"
+levels:
+  - id: 1
+    label: "Foundations"
+    tagline: "The science and language every serious winemaker shares"
+  - id: 2
+    label: "Grape to Ferment"
+    tagline: "Season-by-season decisions from vineyard to must"
+  - id: 3
+    label: "Cellar Craft"
+    tagline: "The critical calls between ferment and blend"
+  - id: 4
+    label: "Finishing & Reflection"
+    tagline: "How wine leaves the cellar — and how you learn from it"
+
+wbs_domains:
+  D1: Vineyard
+  D2: Harvest
+  D3: Crushing & Ferment
+  D4: Fermentation
+  D5: Post-Ferment
+  D6: Stabilisation
+  D7: Packaging
+  D8: Sensory
+  D9: Maintenance
+  D10: Compliance
+
+lessons:
+  # ─────────────────────────────────────────────────────
+  # LEVEL 1 · FOUNDATIONS (6 lessons)
+  # ─────────────────────────────────────────────────────
+  - id: L1.1
+    slug: global-viticulture-context
+    title: "Where wine happens — AU/NZ in the global map"
+    level: 1
+    wbs: [D1]
+    reading_min: 3
+    aim: >
+      Locate the AU and NZ wine industries in a global context, and understand
+      why our climate and regulatory setting shapes every downstream choice.
+    application: >
+      When you're deciding blending targets, harvest timing, or export
+      compliance, you're implicitly answering "what wine is my region
+      allowed to make?". This lesson makes that context explicit.
+    sources_private: [morewine_bible_red_ch1, aoc_1_1_viticulture]
+    sources_public_ref: [adelaide_oenology_1018nw, csu_wsc111]
+    citations_bibliographic: [robinson_oxford_intro]
+
+  - id: L1.2
+    slug: vine-biology-essentials
+    title: "The vine — the biology every winemaker needs"
+    level: 1
+    wbs: [D1]
+    reading_min: 4
+    aim: >
+      Understand grapevine anatomy, phenology, and berry maturation as the
+      chain that ends in your press. No morphology quiz — just what changes
+      when the vine changes.
+    application: >
+      Your ripeness calls make sense when you can name what's happening in
+      the berry during veraison. This lesson underwrites every harvest
+      decision Owen will help you make.
+    sources_private: [aoc_1_5_grapevine_culture_a, morewine_bible_red_ch2]
+    sources_public_ref: [lincoln_wine_201, adelaide_viticult_2500wt]
+    citations_bibliographic: [coombe_iland_visc_vol1]
+
+  - id: L1.3
+    slug: climate-soils-terroir
+    title: "Climate, soils and the terroir you actually have"
+    level: 1
+    wbs: [D1]
+    reading_min: 4
+    aim: >
+      Read your climate zone and soil profile as inputs to wine style — not
+      as marketing language.
+    application: >
+      Your regional GI, your MJT, your soil water-holding capacity — Owen
+      pulls all three from your vineyard block record and shows what wines
+      that combination naturally makes.
+    sources_private: [aoc_1_2_climate_soils]
+    sources_public_ref: [adelaide_viticult_2500wt]
+    citations_bibliographic: [coombe_iland_visc_vol1_ch_resources]
+
+  - id: L1.4
+    slug: wine-chemistry-fundamentals
+    title: "The four numbers that run everything"
+    level: 1
+    wbs: [D3, D4, D6]
+    reading_min: 5
+    aim: >
+      pH, TA, alcohol, free SO₂ — what each one is, why the others matter
+      when you touch one, and what changes them in a tank.
+    application: >
+      These are the four numbers Owen watches on every tank. This lesson
+      lets you read them like the vintage log they are.
+    sources_private: [morewine_bible_red_ch3, morew_ph_meter, morew_so2_mgmt]
+    sources_public_ref: [csu_wsc115, csu_wsc319]
+    citations_bibliographic: [boulton_ppw_ch1, waterhouse_sacks_ch1]
+
+  - id: L1.5
+    slug: fermentation-fundamentals
+    title: "What fermentation actually is"
+    level: 1
+    wbs: [D4]
+    reading_min: 5
+    aim: >
+      Sugar → alcohol → CO₂ + heat + everything else. The biochemistry made
+      operational — what changes and when.
+    application: >
+      When your ferment stalls or spikes, this lesson is the mental model
+      you're troubleshooting against.
+    sources_private: [morewine_bible_red_ch4, awri_stuck_ferment]
+    sources_public_ref: [csu_wsc115, adelaide_oenology_2503wt]
+    citations_bibliographic: [boulton_ppw_ch4]
+
+  - id: L1.6
+    slug: winemakers-toolkit
+    title: "Your toolkit — from home-scale to boutique"
+    level: 1
+    wbs: [D3, D5, D9]
+    reading_min: 4
+    aim: >
+      Match equipment to scale honestly. What a 50L test tank teaches you
+      that a 5000L tank cannot, and vice versa.
+    application: >
+      Owen tracks your kit register. This lesson lets you audit whether your
+      kit is the constraint on your quality, or your process is.
+    sources_private: [morewine_bible_red_ch5, aoc_2_1_intro_oenology]
+    sources_public_ref: [csu_wsc321, adelaide_oenology_3530wt]
+    citations_bibliographic: [jackson_wine_science_ch12]
+
+  # ─────────────────────────────────────────────────────
+  # LEVEL 2 · GRAPE TO FERMENT (8 lessons)
+  # ─────────────────────────────────────────────────────
+  - id: L2.1
+    slug: variety-selection
+    title: "Picking varieties for the wine you want to make"
+    level: 2
+    wbs: [D1]
+    reading_min: 4
+    aim: >
+      Match variety, rootstock, and clone to site, climate, and target
+      wine style. What the Aussie/NZ industry has learned about the
+      classics — and about the newer players.
+    application: >
+      When you're planning a replant, or interpreting a fruit contract,
+      this lesson gives you the questions to ask before the bud burst.
+    sources_private: [aoc_1_3_selecting_grape_varieties]
+    sources_public_ref: [adelaide_viticult_2500wt, csu_vit212]
+    citations_bibliographic: [robinson_oxford_varieties]
+
+  - id: L2.2
+    slug: vineyard-establishment
+    title: "Vineyard establishment — the calls that lock in decades"
+    level: 2
+    wbs: [D1]
+    reading_min: 4
+    aim: >
+      Row orientation, spacing, trellis, irrigation, soil prep — the
+      decisions you make at planting that you'll live with for 25 years.
+    application: >
+      Owen captures your vineyard block schema for downstream yield/quality
+      correlation. This lesson tells you which fields matter most and why.
+    sources_private: [aoc_1_4_vineyard_establishment]
+    sources_public_ref: [adelaide_viticult_2500wt, lincoln_wine_201]
+    citations_bibliographic: [coombe_iland_visc_vol2]
+
+  - id: L2.3
+    slug: canopy-yield-management
+    title: "Canopy and yield — steering quality season by season"
+    level: 2
+    wbs: [D1]
+    reading_min: 5
+    aim: >
+      Vigour balance, canopy exposure, crop levels — the levers that turn
+      an average site into a great wine.
+    application: >
+      Your growing-season log becomes actionable when you can score your
+      canopy against Smart's points. Owen prompts the observations,
+      this lesson tells you what they mean.
+    sources_private: [aoc_1_5_grapevine_culture_a, aoc_1_6_grapevine_culture_b, aoc_1_8_improving_grape_quality]
+    sources_public_ref: [adelaide_viticult_3021wt, lincoln_wine_301, csu_vit212]
+    citations_bibliographic: [coombe_iland_visc_vol2_practices]
+
+  - id: L2.4
+    slug: ripeness-harvest-decisions
+    title: "Ripeness — the highest-leverage decision of your year"
+    level: 2
+    wbs: [D2]
+    reading_min: 5
+    aim: >
+      Baumé/Brix, TA, pH, phenolic ripeness, botrytis pressure — how the
+      inputs to a harvest call combine, and how to weigh them for the wine
+      you're actually making.
+    application: >
+      Owen tracks your maturity sampling and forecasts a picking window.
+      This lesson is how you interrogate that recommendation with
+      confidence.
+    sources_private: [aoc_1_9_harvesting_selling, morewine_bible_red_ch6]
+    sources_public_ref: [adelaide_oenology_3047wt, adelaide_viticult_3044wt]
+    citations_bibliographic: [jackson_wine_science_ch4]
+
+  - id: L2.5
+    slug: crushing-must-preparation
+    title: "Crushing, destemming, must handling"
+    level: 2
+    wbs: [D3]
+    reading_min: 4
+    aim: >
+      Whole bunch vs destemmed, crush vs no crush, SO₂ additions, cold
+      soak, must adjustment — what each choice buys you.
+    application: >
+      Owen logs your receival decisions. This lesson makes them
+      intentional rather than habitual.
+    sources_private: [morewine_bible_red_ch7, aoc_2_3_wine_making_process]
+    sources_public_ref: [adelaide_oenology_2503wt, adelaide_oenology_3047wt]
+    citations_bibliographic: [boulton_ppw_ch3]
+
+  - id: L2.6
+    slug: yeast-selection-inoculation
+    title: "Yeast — the decision that flavours everything"
+    level: 2
+    wbs: [D4]
+    reading_min: 5
+    aim: >
+      Wild vs inoculated, strain selection, nutrition, rehydration protocol
+      — what to change when the wine style changes.
+    application: >
+      Owen holds your strain library and preferred pairing history. This
+      lesson tells you when to break your own pattern.
+    sources_private: [morew_yeast_hydration, morew_yeast_pairing, aoc_2_4_yeasts]
+    sources_public_ref: [csu_wsc318, adelaide_oenology_2501wt]
+    citations_bibliographic: [rgayon_handbook_v1_ch4]
+
+  - id: L2.7
+    slug: fermentation-management
+    title: "Fermentation management — heat, extract, oxygen"
+    level: 2
+    wbs: [D4]
+    reading_min: 6
+    aim: >
+      Temperature control, cap management, oxygen ingress, nutrient
+      timing, stuck-ferment prevention — running the ferment as an active
+      process, not a passive one.
+    application: >
+      Owen alarms on your ferment trajectory. This lesson is what those
+      alarms mean and what you do about them.
+    sources_private: [morew_oxygen_ferment, awri_stuck_ferment, aoc_2_2_fermentation_science]
+    sources_public_ref: [csu_wsc115, adelaide_oenology_3046wt]
+    citations_bibliographic: [boulton_ppw_ch4]
+
+  - id: L2.8
+    slug: malolactic-fermentation
+    title: "Malolactic — the second ferment that changes the wine"
+    level: 2
+    wbs: [D4, D5]
+    reading_min: 4
+    aim: >
+      When to run it, when to skip it, nutrient and pH conditions,
+      spontaneous vs inoculated, and how to know it's done.
+    application: >
+      Owen tracks malic across your tanks. This lesson lets you steer that
+      curve confidently.
+    sources_private: [morew_mlf_paper, awri_mlf_successful, awri_mlf_red]
+    sources_public_ref: [csu_wsc318]
+    citations_bibliographic: [rgayon_handbook_v1_mlf]
+
+  # ─────────────────────────────────────────────────────
+  # LEVEL 3 · CELLAR CRAFT (8 lessons)
+  # ─────────────────────────────────────────────────────
+  - id: L3.1
+    slug: red-wine-production
+    title: "Red winemaking — extraction, timing, pressing"
+    level: 3
+    wbs: [D3, D4, D5]
+    reading_min: 6
+    aim: >
+      From cold soak to press cuts — the sequence of decisions that turns
+      good fruit into a red wine that lasts.
+    application: >
+      Owen builds you a run-sheet per red ferment. This lesson lets you
+      customise it to house style.
+    sources_private: [morewine_bible_red_full, aoc_2_8_red_rose]
+    sources_public_ref: [adelaide_oenology_3047wt, lincoln_wine_202]
+    citations_bibliographic: [boulton_ppw_ch3_ch4]
+
+  - id: L3.2
+    slug: white-wine-production
+    title: "White winemaking — reductive handling, phenolic control"
+    level: 3
+    wbs: [D3, D4, D5]
+    reading_min: 6
+    aim: >
+      Juice handling under reductive protection, phenolic control,
+      cold-settling vs floating, lees management — the choices that
+      define white wine texture.
+    application: >
+      Owen prompts oxygen-exposure alerts on white ferments. This lesson
+      tells you which alerts to trust and which to override.
+    sources_private: [morewine_bible_white_full, aoc_2_7_white_sparkling]
+    sources_public_ref: [adelaide_oenology_2503wt, lincoln_wine_202]
+    citations_bibliographic: [rgayon_handbook_v2_whites]
+
+  - id: L3.3
+    slug: sparkling-fortified
+    title: "Sparkling and fortified — outside the still-wine box"
+    level: 3
+    wbs: [D3, D4, D5]
+    reading_min: 5
+    aim: >
+      Traditional method vs Charmat, base wine construction, tirage,
+      dosage; and fortified basics — spirits, timing, oxidation control.
+    application: >
+      Even if you don't make these yet, the tools they need — like riddling
+      or fortification calculations — inform your everyday cellar maths.
+    sources_private: [morew_sparkling_yeast, morew_sparkling_proelif, aoc_2_9_fortified_spirits]
+    sources_public_ref: [csu_wsc303, adelaide_oenology_3037wt]
+    citations_bibliographic: [jackson_wine_science_ch8]
+
+  - id: L3.4
+    slug: so2-management
+    title: "SO₂ — the compound you use every day"
+    level: 3
+    wbs: [D5, D6]
+    reading_min: 5
+    aim: >
+      Molecular vs free vs total; addition maths; pH interaction; the
+      difference between preservation and over-preservation.
+    application: >
+      Owen calculates additions from your pH and target molecular. This
+      lesson is why those numbers matter.
+    sources_private: [morew_so2_mgmt, morew_so2_protocol]
+    sources_public_ref: [csu_wsc319, adelaide_oenology_3007wt]
+    citations_bibliographic: [waterhouse_sacks_so2]
+
+  - id: L3.5
+    slug: fining-agents-practice
+    title: "Fining — bench trials before the tank"
+    level: 3
+    wbs: [D5, D6]
+    reading_min: 5
+    aim: >
+      What each fining agent does (protein, tannin, colour, oxidation),
+      how to bench-trial before you commit, and when to accept the loss.
+    application: >
+      Owen holds your bench-trial history. This lesson makes that history
+      a decision engine, not a diary.
+    sources_private: [morew_fining_agents, morew_bench_trials]
+    sources_public_ref: [csu_wsc319, adelaide_oenology_3007wt]
+    citations_bibliographic: [boulton_ppw_ch5]
+
+  - id: L3.6
+    slug: stabilisation
+    title: "Stabilisation — protein, cold, microbial"
+    level: 3
+    wbs: [D6]
+    reading_min: 6
+    aim: >
+      Heat tests, cold stability testing, microbial screening, and the
+      practical procedures that get a wine bottle-ready.
+    application: >
+      Owen runs your stability workflow. This lesson lets you interpret
+      the borderline results instead of just accepting them.
+    sources_private: [awri_protein_stability, aoc_2_10_storing_aging]
+    sources_public_ref: [csu_wsc319, adelaide_oenology_3007wt]
+    citations_bibliographic: [rgayon_handbook_v2_stab]
+
+  - id: L3.7
+    slug: barrel-program
+    title: "Barrel program — oak as ingredient"
+    level: 3
+    wbs: [D5]
+    reading_min: 5
+    aim: >
+      New vs seasoned, French vs American, toast level, top-up cadence,
+      lees management, and honest cost-benefit.
+    application: >
+      Owen tracks your barrel register and top-up log. This lesson makes
+      the barrel a design choice, not a habit.
+    sources_private: [morew_oak_info, morew_oak_barrel_care]
+    sources_public_ref: [adelaide_oenology_3007wt]
+    citations_bibliographic: [jackson_wine_science_ch8_barrels]
+
+  - id: L3.8
+    slug: blending
+    title: "Blending — decisions with numbers and nose"
+    level: 3
+    wbs: [D5, D8]
+    reading_min: 5
+    aim: >
+      Component analysis, sensory trials, blending maths, and how to
+      resist the temptation to over-engineer.
+    application: >
+      Owen builds you a blending trial workbook. This lesson tells you when
+      to trust the numbers vs the nose.
+    sources_private: [morewine_bible_red_ch_blending, morewine_bible_white_ch_blending]
+    sources_public_ref: [csu_wsc317, adelaide_oenology_3520wt]
+    citations_bibliographic: [boulton_ppw_ch5_blending]
+
+  # ─────────────────────────────────────────────────────
+  # LEVEL 4 · FINISHING & REFLECTION (8 lessons)
+  # ─────────────────────────────────────────────────────
+  - id: L4.1
+    slug: sensory-evaluation
+    title: "Sensory — training your palate and language"
+    level: 4
+    wbs: [D8]
+    reading_min: 6
+    aim: >
+      Structure of sensory testing, common analytical protocols
+      (discriminative / descriptive / hedonic), and building a house
+      vocabulary.
+    application: >
+      Owen holds your tasting notes and links them to lab numbers. This
+      lesson lets you compare notes across vintages meaningfully.
+    sources_private: [aoc_2_6_sensory_evaluation]
+    sources_public_ref: [csu_wsc217, csu_wsc316, otago_fosc306, adelaide_oenology_2502wt]
+    citations_bibliographic: [meilgaard_sensory_ch3_9, lawless_heymann_ch3, stone_bleibaum_ch5]
+
+  - id: L4.2
+    slug: fault-identification
+    title: "Faults — spot them before your consumer does"
+    level: 4
+    wbs: [D8, D5]
+    reading_min: 6
+    aim: >
+      Brett, reductive, VA, MLF-off, oxidation, TCA — how each smells,
+      why it happens, and what you can and can't do about it.
+    application: >
+      Owen flags fault-risk conditions. This lesson lets you smell the
+      wine and confirm — or overrule — the alert.
+    sources_private: [awri_controlling_brett, awri_avoiding_lab_spoilage]
+    sources_public_ref: [csu_wsc318, adelaide_oenology_3007wt]
+    citations_bibliographic: [boulton_ppw_ch6]
+
+  - id: L4.3
+    slug: filtration-bottling
+    title: "Filtration and bottling — the last gate"
+    level: 4
+    wbs: [D6, D7]
+    reading_min: 5
+    aim: >
+      Depth vs membrane, sterile vs non-sterile, DO/CO₂ management,
+      pre-bottling checklist.
+    application: >
+      Owen runs your bottling day workflow. This lesson lets you catch the
+      issue at 6am, not at 10.
+    sources_private: [aoc_2_10_storing_aging, morew_inert_gas]
+    sources_public_ref: [adelaide_oenology_3003wt, csu_wsc321]
+    citations_bibliographic: [jackson_wine_science_ch9]
+
+  - id: L4.4
+    slug: packaging-labelling
+    title: "Packaging and labelling — closures, bottles, compliance"
+    level: 4
+    wbs: [D7]
+    reading_min: 4
+    aim: >
+      Cork vs screwcap vs alternative closures; label mandatories
+      (AU/NZ/EU/US); packaging as brand.
+    application: >
+      Owen holds your artwork and compliance checklists. This lesson makes
+      the choice deliberate, not defaulted.
+    sources_private: []
+    sources_public_ref: [adelaide_oenology_3003wt]
+    citations_bibliographic: [robinson_oxford_closures]
+
+  - id: L4.5
+    slug: storage-ageing
+    title: "Storage and ageing — the wine after it leaves you"
+    level: 4
+    wbs: [D5, D7]
+    reading_min: 4
+    aim: >
+      Bottle ageing chemistry, storage conditions, brand promise vs
+      reality on the shelf.
+    application: >
+      Owen tracks your library releases. This lesson tells you what
+      you're actually promising a buyer when you sell them a cellaring
+      wine.
+    sources_private: [aoc_2_10_storing_aging]
+    sources_public_ref: [csu_wsc317, adelaide_oenology_3003wt]
+    citations_bibliographic: [waterhouse_sacks_bottle_aging]
+
+  - id: L4.6
+    slug: compliance
+    title: "Compliance — LIP, WET, food safety, GI"
+    level: 4
+    wbs: [D10]
+    reading_min: 5
+    aim: >
+      The Australian/NZ regulatory backbone every winery lives under —
+      what triggers what, and what your logbook needs to show.
+    application: >
+      Owen's audit-ready mode packages the compliance evidence. This
+      lesson lets you defend the audit conversation confidently.
+    sources_private: [aoc_2_5_wine_classification]
+    sources_public_ref: [adelaide_oenology_3003wt, csu_wsc321]
+    citations_bibliographic: [robinson_oxford_regulation]
+
+  - id: L4.7
+    slug: sustainability
+    title: "Sustainability — beyond marketing"
+    level: 4
+    wbs: [D9, D10]
+    reading_min: 5
+    aim: >
+      Energy, water, waste — the operational metrics that ground a
+      sustainability claim, and how to build them into daily practice.
+    application: >
+      Owen can log energy and water. This lesson is how you turn that
+      log into a story a buyer will trust.
+    sources_private: []
+    sources_public_ref: [adelaide_oenology_3016wt, csu_wsc321]
+    citations_bibliographic: []
+
+  - id: L4.8
+    slug: vintage-debrief
+    title: "The vintage debrief — how a wine year becomes learning"
+    level: 4
+    wbs: [D8, D10]
+    reading_min: 4
+    aim: >
+      Structured post-vintage reflection: what worked, what didn't, what
+      to change next year — captured while it's still true.
+    application: >
+      Owen runs your vintage debrief workflow. This lesson is why the
+      debrief is the highest-ROI hour of your year.
+    sources_private: []
+    sources_public_ref: [csu_wsc317, adelaide_oenology_3520wt]
+    citations_bibliographic: []
