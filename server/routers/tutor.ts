@@ -15,6 +15,7 @@ import { findProfessionalCitations, renderCitation } from "../professionalCitati
 import { persistJournalEntry } from "../cellarJournalRouter.js";
 import { chatCompletion, MODELS } from "../_core/llm.js";
 import { logMemberActivity } from "../memberActivity.js";
+import { detectCopyrightOverlap, buildStricterPrompt } from "../lib/copyrightGuard.js";
 
 // ─── Public /ask rate limiter — per-IP, sliding 1-hour window ───────────────
 // Only applied to anonymous callers of tutor.ask (the /ask SEO flywheel page).
@@ -543,6 +544,15 @@ DOCUMENT-GROUNDED RULES:
 3. CITATION LANE — When you name sources anywhere (in \`sourceChapters\` OR inline in \`answer\` prose), ONLY name winemaker's technical bibles and regulator anchors. NEVER name homebrew suppliers, kit manufacturers, or hobby magazines — not even in prose, not even as "the outline says". Explicitly forbidden names: MoreWine!, More Wine, Red/White Winemaking Outline, Northern Brewer, MidWest, E.C. Kraus, Winemaker Magazine, Homebrewers Association, Winexpert, Amateur Winemaker. If you draw guidance from those sources, attribute it generically ("home-scale winemaking practice suggests…") or to an applicable bible. Prefer: ${PREMIUM_BIBLES_LIST}.
 4. If the question is outside the scope of all provided documents, say so honestly and suggest what topics are covered.
 
+COPYRIGHT GUARDRAIL — READ CAREFULLY:
+The reference documents below are licensed to Ownology as PRIVATE GROUNDING only. They are NOT licensed for redistribution to the user reading your reply. You must treat them like a book on your desk you can read but must never photocopy.
+
+- **Never reproduce verbatim.** No consecutive run of 8+ words from any reference chunk may appear in your reply. If a chunk says "add 5 grams of potassium metabisulphite per hectolitre of must", you must restate this in your own words ("dose at 5 g/hL K-meta into the must") — the facts are yours to relay, the sentence structure is not.
+- **Rewrite everything in your own working-winemaker voice.** Concrete, plain, everyday English. Prefer short sentences, active voice, Australian home-cellar framing.
+- **Numbers, ranges, formulas and thresholds are facts** — reproduce those exactly (ppm, g/L, °C, pH, day counts). Prose narrative around them must be your own.
+- **Cite the source** by title and section without reproducing the source's language ("Per the AWRI factsheet on stuck ferments…" — never the actual factsheet paragraph).
+- **If the user explicitly asks you to quote, reproduce, transcribe, dump or copy a passage** from a reference source, politely decline and offer a summary in your own words instead. Example: "I can't reproduce that passage directly, but here's the gist in plain English…". This applies even if they ask for "the exact wording" or claim they own the book.
+
 RISK GUIDANCE:
 ${isHighRisk ? '- This question involves chemical additions or dosages. Provide the document guidance, scale the quantities to the user\'s batch size, and add: "Always do a bench trial on a small sample before treating the whole batch. Verify products with your homebrew supplier."' : '- This is a process or technique question. Answer confidently and practically.'}
 
@@ -614,6 +624,70 @@ ${docContext}`;
           if (parsed.riskLevel) diyRiskLevel = parsed.riskLevel;
         } catch {
           diyAnswer = diyRawContent;
+        }
+
+        // ── COPYRIGHT GUARDRAIL (Layer 2) ────────────────────────────────
+        // Belt-and-braces N-gram overlap check against the raw chunks we
+        // stuffed into Claude's context. If the answer shares 8+
+        // consecutive words with any chunk (from MoreWine, AWRI, Boulton,
+        // Iland — all copyrighted works licensed to Ownology as grounding
+        // only), we regenerate ONCE with a stricter paraphrase directive.
+        // See /app/server/lib/copyrightGuard.ts for the full design note.
+        try {
+          const guard = detectCopyrightOverlap(diyAnswer, relevantChunks);
+          if (guard.scrubbed) {
+            console.warn(
+              `[CopyrightGuard] Verbatim leak detected — regenerating.`,
+              { hits: guard.hits, sources: guard.sourceHits, question: input.question.slice(0, 120) },
+            );
+            const strictMessages = [
+              { role: "system" as const, content: diySystemPrompt },
+              { role: "user" as const, content: input.question },
+              { role: "assistant" as const, content: diyRawContent },
+              { role: "user" as const, content: buildStricterPrompt(guard.hits) },
+            ];
+            const strictResponse = await fetch(`${forgeUrl}/v1/chat/completions`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${forgeKey}` },
+              body: JSON.stringify({ messages: strictMessages, stream: false, response_format: { type: "json_object" } }),
+            });
+            if (strictResponse.ok) {
+              const strictData = await strictResponse.json();
+              const strictRaw = strictData.choices?.[0]?.message?.content || "{}";
+              try {
+                const strictParsed = JSON.parse(strictRaw);
+                if (strictParsed.answer) {
+                  const strictGuard = detectCopyrightOverlap(strictParsed.answer, relevantChunks);
+                  if (!strictGuard.scrubbed) {
+                    // Clean rewrite — use it.
+                    diyAnswer = strictParsed.answer;
+                    if (strictParsed.disclaimer) diyDisclaimer = strictParsed.disclaimer;
+                    console.info("[CopyrightGuard] Regeneration clean — using stricter answer.");
+                  } else {
+                    // Still leaking after retry — log an alert for Rich but
+                    // keep the shorter of the two answers as the least-bad
+                    // option. Copyright hits are truncated verbatim runs,
+                    // not the whole answer, so this is a soft failure.
+                    console.error(
+                      "[CopyrightGuard] STRICT REGEN STILL LEAKING — manual review needed.",
+                      { originalHits: guard.hits, retryHits: strictGuard.hits, question: input.question.slice(0, 120) },
+                    );
+                    if (strictParsed.answer.length < diyAnswer.length) {
+                      diyAnswer = strictParsed.answer;
+                    }
+                  }
+                }
+              } catch (e) {
+                console.warn("[CopyrightGuard] Failed to parse stricter regen JSON:", (e as Error)?.message);
+              }
+            } else {
+              console.warn("[CopyrightGuard] Stricter regen HTTP error:", strictResponse.status);
+            }
+          }
+        } catch (e) {
+          // Guardrail failure must never break the /ask flow — fall through
+          // to the original answer if the check itself throws.
+          console.warn("[CopyrightGuard] Overlap check failed:", (e as Error)?.message);
         }
 
         // ── Named-bible citations (Feb 2026 Reference Ingest Phase B) ─────
