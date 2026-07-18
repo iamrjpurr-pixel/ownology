@@ -1,0 +1,331 @@
+{
+  "lesson_id": "L2.4",
+  "source": {
+    "id": "L2.4",
+    "slug": "ripeness-harvest-decisions",
+    "title": "Ripeness — the highest-leverage decision of your year",
+    "level": "2",
+    "wbs": [
+      "D2"
+    ],
+    "reading_min": "5",
+    "aim": "Baumé/Brix, TA, pH, phenolic ripeness, botrytis pressure — how the inputs to a harvest call combine, and how to weigh them for the wine you're actually making.",
+    "application": "Owen tracks your maturity sampling and forecasts a picking window. This lesson is how you interrogate that recommendation with confidence.",
+    "sources_private": [
+      "aoc_1_9_harvesting_selling",
+      "morewine_bible_red_ch6"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_3047wt",
+      "adelaide_viticult_3044wt"
+    ],
+    "citations_bibliographic": [
+      "jackson_wine_science_ch4"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Harvest timing is the single decision that most constrains every winemaking choice that follows it.",
+      "Baumé and pH set the chemistry floor; phenolic ripeness and botrytis pressure set the style ceiling.",
+      "No single number triggers picking — the call is a weighted balance of at least four independent signals."
+    ],
+    "sections": [
+      {
+        "heading": "Baumé is the starting point, not the answer",
+        "iconHint": "gauge",
+        "body_md": "Baumé tells you potential alcohol and fermentability. That's it. A Shiraz at 13.5 °Baumé with green tannins and a pH of 3.25 is not ready. The same reading with ripe seeds, soft skins, and a pH of 3.55 might be exactly where you want it. The number is a gate, not a destination.\n\nFor most dry table wines in warm Australian regions, the practical Baumé window sits between 12.5 and 14.5 °Baumé. Below that floor you're fighting for flavour development; above that ceiling you're managing alcohol and heat stress artefacts. Cooler sites and earlier-ripening varieties compress that window upward in TA and downward in pH, which shifts the whole calculation.\n\nSample frequently enough that you're tracking the rate of change, not just the snapshot. A block moving 0.3 °Baumé per day in a heat spike needs a different response than one sitting at the same reading for a week.",
+        "keyConcept": "Baumé window for dry table wine: 12.5–14.5 °Baumé; rate of change matters as much as the absolute reading.",
+        "trap": "Picking to a Baumé target without checking pH or phenolics produces technically correct sugar but stylistically broken wine."
+      },
+      {
+        "heading": "pH and TA pull in opposite directions — you have to choose your constraint",
+        "iconHint": "activity",
+        "body_md": "As grapes ripen, sugar rises, TA falls, and pH climbs. These three move together but not at fixed ratios — variety, rootstock, soil water, and canopy all modulate the curve. The practical consequence is that you will rarely find a moment when Baumé, TA, and pH are all simultaneously ideal. You pick the constraint that matters most for your wine style and accept the trade-off.\n\nFor a high-acid style — Riesling, Pinot Gris, cool-climate Chardonnay — TA is the constraint. Picking at 6.5–7.5 g/L TA with a pH below 3.3 preserves the acid structure that defines the wine. For a full-bodied red, pH becomes the constraint: above 3.65 you're in microbial risk territory and the wine will feel flat. TA can be corrected post-harvest; pH is harder to move without affecting flavour.\n\nMeasure both in the vineyard, not just the winery. Lab results from the previous day's samples are already history in a fast-moving vintage.",
+        "keyConcept": "pH above 3.65 at harvest signals microbial risk and structural flatness; TA below 5.0 g/L signals acid correction ahead.",
+        "trap": "Relying on TA alone ignores that two wines can share the same TA but differ by 0.4 pH units — a massive difference in microbial stability and palate weight."
+      },
+      {
+        "heading": "Phenolic ripeness is the variable that textbooks underweight",
+        "iconHint": "flask-conical",
+        "body_md": "Seed colour, seed crunch, and skin texture are the three physical proxies for phenolic ripeness. Green seeds with a hard, bitter crunch mean tannins that will extract as harsh and astringent regardless of Baumé. Brown seeds that crush to a soft, slightly oily paste signal polymerised tannins that integrate during maceration. Skin texture follows a similar arc — tight, resistant skins early in ripening give way to skins that release colour and tannin more readily as cell walls degrade.\n\nThere is no instrument in common boutique use that replaces the chew test. Taste twenty berries from across the block — outside rows, inside rows, top of bunch, bottom of bunch. Spit the pulp and chew the seeds and skins separately. What you're scoring is the quality of the astringency: green and grippy versus ripe and grippy are both astringent, but only one resolves with time in barrel.\n\nPhenolic ripeness typically lags sugar accumulation by five to ten days in warm seasons. This lag is where the tension between Baumé and style lives.",
+        "keyConcept": "Phenolic ripeness lags sugar by 5–10 days in warm seasons; brown seeds with soft crush are the minimum threshold for red wine quality.",
+        "trap": "Waiting for full phenolic ripeness in a warm year often means picking at pH 3.7+ and 14.5+ °Baumé — the style trade-off must be made consciously."
+      },
+      {
+        "heading": "Botrytis pressure resets the entire decision",
+        "iconHint": "wind",
+        "body_md": "When Botrytis cinerea is active in a block, the harvest window compresses from weeks to days. Bunch rot spreads exponentially once berry integrity is compromised — a block at 5% infection on Monday can be 25% by Friday if humidity stays above 85% and temperature sits between 15 and 25 °C. At that point, phenolic ripeness and ideal Baumé become secondary to salvage.\n\nThe practical decision rule: if infection is below 5% and weather is stable, you can hold and monitor daily. Between 5% and 15%, you're picking within 48–72 hours regardless of other indicators. Above 15%, you're picking now and managing the chemistry in the winery. Laccase activity from grey rot is the specific threat — it oxidises colour and aroma irreversibly and is not neutralised by SO₂ alone.\n\nFor intentional botrytis styles — late harvest, SGN — the calculus inverts entirely. Noble rot concentration is the target, and you're managing the progression rather than arresting it.",
+        "keyConcept": "At 5–15% botrytis infection, picking within 48–72 hours is the default; above 15%, harvest immediately regardless of ripeness indicators.",
+        "trap": "Adding SO₂ at crush does not neutralise laccase from grey rot — the enzyme is already in the juice and requires ascorbic acid co-treatment or early pressing to manage."
+      },
+      {
+        "heading": "Combining the signals — how the weighted call works",
+        "iconHint": "target",
+        "body_md": "No single threshold triggers picking. The call is a weighted sum: Baumé and TA/pH set the chemistry envelope, phenolic ripeness sets the style floor, and botrytis pressure sets the time constraint. When all four align, the decision is easy. When they conflict — and they usually do — you need to know which constraint is non-negotiable for the wine you're making.\n\nFor a boutique producer, the practical framework is to rank your constraints before vintage, not during it. Write down: what is the maximum pH I will accept? What is the minimum phenolic ripeness I require? What is my botrytis abort threshold? These pre-commitments stop you from rationalising a bad pick under vintage pressure.\n\nOwen's maturity forecast gives you the trajectory — the projected date when your ranked constraints will be met simultaneously, or the earliest date when the binding constraint forces your hand. Your job is to interrogate that projection with daily samples and override it when the vineyard diverges from the model.",
+        "keyConcept": "Pre-commit to your non-negotiable constraints before vintage; the harvest call is the moment those pre-commitments meet real-world data.",
+        "trap": "Deferring the constraint-ranking conversation to the day of picking guarantees that vintage pressure, not winemaking intent, makes the decision."
+      }
+    ],
+    "worked_example": {
+      "title": "Block 7 · Barossa Shiraz 2025 · Final 10 days",
+      "starting_conditions": [
+        "Baumé: 12.8 °Baumé on Day 1 of monitoring window, rising ~0.25 °Baumé/day",
+        "TA: 5.8 g/L, pH: 3.48 — within acceptable envelope for full-bodied red",
+        "Botrytis: 2% visible infection, weather forecast showing 4 days stable then a humid trough"
+      ],
+      "timeline": [
+        {
+          "when": "Day 1",
+          "observation": "Baumé 12.8, pH 3.48, TA 5.8 g/L. Seeds 60% brown, skin texture still firm. Chew test: green grip on seeds, some bitterness.",
+          "decision": "Hold. Continue daily sampling.",
+          "reasoning": "Phenolic ripeness is the binding constraint. Chemistry is acceptable but seeds are not ready. Botrytis at 2% is below the 5% action threshold.",
+          "outcome": "Block held. Sampling frequency increased to morning and afternoon given forecast heat."
+        },
+        {
+          "when": "Day 5",
+          "observation": "Baumé 13.9, pH 3.58, TA 5.2 g/L. Seeds 90% brown, soft crush, no green bitterness. Skin texture releasing easily. Botrytis now 4% — still below threshold but trending up ahead of the humid trough.",
+          "decision": "Pick in 36 hours — schedule harvest for early morning Day 7.",
+          "reasoning": "Phenolic ripeness is now met. pH at 3.58 is approaching the 3.65 ceiling. The incoming humid trough in 4 days creates real botrytis risk; picking before it arrives preserves the option to sort clean fruit rather than manage rot.",
+          "outcome": "Harvest crew booked. Winery cold room prepared. Sorting table set up."
+        },
+        {
+          "when": "Day 7",
+          "observation": "Harvest morning: Baumé 14.1 (overnight cool slowed accumulation), pH 3.60, TA 5.0 g/L. Botrytis 5% — right at threshold. Fruit temperature 14 °C at 5 am pick.",
+          "decision": "Pick. Sort on table, reject all botrytis-affected bunches.",
+          "reasoning": "All four constraints now at or near their limits simultaneously. Delaying even 24 hours risks pH breach and botrytis escalation into the humid trough. Fruit temperature at pick is ideal for cold soak option.",
+          "outcome": "14.2 tonnes picked, 6% rejected on sort table. Clean fruit into tank at 14 °C. Baumé of must: 14.0. pH 3.59. Winemaker satisfied with phenolic and flavour profile."
+        }
+      ],
+      "counterfactual": "Waiting for the humid trough to pass would have pushed botrytis above 15% and pH above 3.68, requiring emergency harvest of compromised fruit with active laccase — colour and aroma loss unavoidable."
+    },
+    "decision_tree": {
+      "title": "When to pick — the diagnostic tree for harvest timing",
+      "rows": [
+        {
+          "symptom": "Baumé on target, but seeds still green and bitter on chew",
+          "first_check": "Phenolic ripeness — seed colour and crush texture",
+          "action": "Hold if weather permits; re-taste every 2 days. Do not pick to a Baumé number alone."
+        },
+        {
+          "symptom": "Phenolic ripeness met, but pH climbing past 3.60 in warm conditions",
+          "first_check": "Rate of pH rise — is it accelerating or plateauing?",
+          "action": "Pick within 48 hours; accept slightly under-ripe tannins over pH breach above 3.65."
+        },
+        {
+          "symptom": "TA falling below 5.0 g/L with pH still acceptable",
+          "first_check": "Variety and style target — is acid correction in your winemaking plan?",
+          "action": "For acid-driven styles, pick now; for full-bodied reds, tartaric addition post-harvest is a viable trade-off if phenolics need more time."
+        },
+        {
+          "symptom": "Botrytis infection 5–15%, weather stable for next 3 days",
+          "first_check": "Infection type — grey rot (Botrytis cinerea) or other bunch disease?",
+          "action": "Pick within 48–72 hours; set up sorting table, plan for laccase management at crush with ascorbic acid co-treatment."
+        },
+        {
+          "symptom": "Botrytis infection above 15%, humid weather incoming",
+          "first_check": "Laccase activity — press a small sample and observe oxidation rate",
+          "action": "Harvest immediately regardless of other ripeness indicators; prioritise sorting and early pressing over extended maceration."
+        },
+        {
+          "symptom": "All indicators aligned but Owen's forecast shows 3 more days to optimal window",
+          "first_check": "Weather forecast reliability and block-specific rate of change",
+          "action": "Trust daily vineyard data over model projection; if on-ground samples confirm readiness, pick — the model is an input, not the decision."
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "Adelaide WINE 3047WT · Harvest Decision Making",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Oenology unit covering ripeness assessment and harvest timing"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide VITI 3044WT · Vineyard Maturity Monitoring",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Viticulture unit covering sampling protocols and ripeness indices"
+      },
+      {
+        "kind": "buy",
+        "label": "Jackson · Wine Science · Ch 4",
+        "url": null,
+        "note": "Academic Press; covers berry development, ripening biochemistry, and harvest indices"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Harvest Decisions and Ripeness Assessment",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'harvest ripeness' and 'botrytis laccase'"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 1.9 · Harvesting and Selling",
+        "url": null,
+        "note": "Your paid curriculum resource"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine Red Bible · Ch 6",
+        "url": null,
+        "note": "Your paid resource — harvest timing and phenolic ripeness for red varieties"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Your Barossa Shiraz reads 13.8 °Baumé with brown seeds that crush softly. pH is 3.55 and TA is 5.8 g/L. Botrytis is absent. What is the most defensible harvest call?",
+        "choices": [
+          "A) Pick now — all indicators are within acceptable range",
+          "B) Wait 3–5 days to push Baumé closer to 14.5 °Baumé",
+          "C) Pick now based on Baumé alone; phenolic data is secondary",
+          "D) Delay until TA drops below 5.0 g/L to reduce acid correction"
+        ],
+        "answer": "A",
+        "rationale": "All three pillars — Baumé within the 12.5–14.5 window, phenolic threshold met, pH and TA within safe limits — are satisfied; chasing higher Baumé risks pH creep and phenolic overripeness."
+      },
+      {
+        "q": "Which Baumé range defines the standard target window for dry table wine?",
+        "choices": [
+          "A) 11.0–13.0 °Baumé",
+          "B) 12.5–14.5 °Baumé",
+          "C) 13.5–15.5 °Baumé",
+          "D) 14.0–16.0 °Baumé"
+        ],
+        "answer": "B",
+        "rationale": "12.5–14.5 °Baumé is the accepted dry table wine window; below it risks thin alcohol and green flavour, above it risks heat and structural imbalance."
+      },
+      {
+        "q": "Block 7 Shiraz shows 8% botrytis infection on Monday morning. Your next scheduled sample is Thursday. What is the correct response?",
+        "choices": [
+          "A) Proceed to Thursday sampling — 8% is below the immediate-harvest threshold",
+          "B) Pick within 48–72 hours regardless of current Baumé",
+          "C) Apply sulfur and reassess in one week",
+          "D) Harvest immediately — any botrytis above 5% requires same-day picking"
+        ],
+        "answer": "B",
+        "rationale": "5–15% infection triggers a 48–72 hour picking window; immediate harvest is reserved for above 15%, and waiting until Thursday risks rapid spread."
+      },
+      {
+        "q": "A grower argues that green, hard seeds are acceptable because Baumé has already hit 14.0 °Baumé. What does this miss?",
+        "choices": [
+          "A) Nothing — Baumé is the primary ripeness indicator for red wine",
+          "B) Phenolic ripeness lags sugar by 5–10 days in warm seasons; seed hardness signals tannin immaturity",
+          "C) Green seeds only matter for white varieties, not Shiraz",
+          "D) Hard seeds indicate the fruit is overripe and should be picked immediately"
+        ],
+        "answer": "B",
+        "rationale": "Sugar accumulation outpaces phenolic development in warm seasons; green hard seeds mean harsh, extractable tannins regardless of Baumé."
+      },
+      {
+        "q": "At harvest, your Shiraz shows pH 3.70 and TA 6.2 g/L. Which parameter is the primary concern and why?",
+        "choices": [
+          "A) TA — 6.2 g/L is too high and will require aggressive acid reduction",
+          "B) pH — 3.70 exceeds 3.65, signalling microbial risk and structural flatness",
+          "C) Neither — both readings are within acceptable limits for red wine",
+          "D) pH — 3.70 is too low and will cause excessive tartness in the finished wine"
+        ],
+        "answer": "B",
+        "rationale": "pH above 3.65 at harvest is the defined risk threshold for microbial instability and palate flatness; TA at 6.2 g/L is above the 5.0 g/L acid-correction trigger and is not the primary concern here."
+      },
+      {
+        "q": "Baumé is rising at 0.3 °Baumé per day and you are currently at 12.8 °Baumé. A heatwave is forecast in four days. What does the rate-of-change data tell you?",
+        "choices": [
+          "A) Nothing actionable — only the absolute Baumé reading matters for the harvest call",
+          "B) You have approximately five days before hitting 14.3 °Baumé, so the heatwave may force an early pick",
+          "C) The rate is too slow; delay harvest until Baumé stabilises",
+          "D) Accelerate irrigation to slow sugar accumulation and wait out the heatwave"
+        ],
+        "answer": "B",
+        "rationale": "Rate of change projects the picking window; at 0.3 °Baumé/day you reach 14.3 °Baumé in ~five days, meaning the heatwave could spike Baumé beyond the target window before phenolics catch up."
+      },
+      {
+        "q": "TA at sampling is 4.6 g/L and pH is 3.58. Baumé is 13.2 °Baumé and seeds are brown with soft crush. What constraint does the TA reading trigger?",
+        "choices": [
+          "A) Immediate harvest — TA below 5.0 g/L means the fruit is overripe",
+          "B) Acid correction will be required post-harvest; factor this into your winemaking plan",
+          "C) No action needed — TA below 5.0 g/L is ideal for red wine style",
+          "D) Delay picking until TA rises above 5.0 g/L naturally"
+        ],
+        "answer": "B",
+        "rationale": "TA below 5.0 g/L signals acid correction ahead, not a reason to delay picking when other indicators are sound; TA does not rise meaningfully as fruit continues to ripen."
+      },
+      {
+        "q": "Botrytis infection jumps from 12% to 19% overnight after rain. Baumé is 13.0 °Baumé and seeds are still partially green. What is the correct call?",
+        "choices": [
+          "A) Wait 48–72 hours as per the 5–15% protocol — the threshold just changed",
+          "B) Harvest immediately — above 15% infection overrides all other ripeness indicators",
+          "C) Delay harvest until seeds brown; botrytis risk is manageable with SO₂ additions",
+          "D) Pick only the most infected rows and leave the rest to ripen"
+        ],
+        "answer": "B",
+        "rationale": "Above 15% botrytis infection, immediate harvest is the default regardless of Baumé or phenolic ripeness; the spoilage risk outweighs the cost of picking slightly underripe."
+      },
+      {
+        "q": "You pre-committed before vintage that pH 3.65 is your non-negotiable upper limit. On the day, pH is 3.63, Baumé is 13.9 °Baumé, and seeds are borderline. Your consultant says wait two more days for phenolics. What should guide your decision?",
+        "choices": [
+          "A) Follow the consultant — phenolic ripeness is the highest-leverage variable",
+          "B) Honour the pre-committed pH constraint; two more days will likely push pH above 3.65",
+          "C) Ignore pH — at 3.63 you have sufficient buffer to wait",
+          "D) Re-run the pH test before making any decision; single readings are unreliable"
+        ],
+        "answer": "B",
+        "rationale": "Pre-committed constraints exist precisely to prevent in-vintage rationalisation; pH typically rises as ripening continues, and two days risks breaching the 3.65 threshold."
+      },
+      {
+        "q": "In a warm Barossa season, sugar hits 13.5 °Baumé on 15 February. Seeds are green and hard. Based on the phenolic lag principle, when is the earliest you should expect the minimum phenolic threshold to be met?",
+        "choices": [
+          "A) 15–17 February — phenolic ripeness tracks sugar within 2 days",
+          "B) 20–25 February — phenolic ripeness lags sugar by 5–10 days in warm seasons",
+          "C) 1–5 March — phenolic ripeness always lags by at least 14 days",
+          "D) Phenolic ripeness is independent of date; only seed colour matters"
+        ],
+        "answer": "B",
+        "rationale": "The 5–10 day lag in warm seasons places the earliest phenolic threshold at 20–25 February; picking at sugar ripeness alone risks harsh, unripe tannin extraction."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Baumé target window for dry table wine — what are the limits?",
+        "back": "12.5–14.5 °Baumé; both the absolute reading and the daily rate of change must be tracked."
+      },
+      {
+        "front": "pH threshold at harvest that signals microbial risk and structural flatness",
+        "back": "pH above 3.65 at harvest is the defined upper limit for safe, structured dry red wine."
+      },
+      {
+        "front": "TA level that triggers an acid correction plan at winemaking",
+        "back": "TA below 5.0 g/L at harvest signals that acid addition will be required post-crush."
+      },
+      {
+        "front": "Minimum phenolic threshold for red wine — what does 'ready' look like?",
+        "back": "Brown seeds that crush softly are the minimum acceptable threshold before picking for red wine quality."
+      },
+      {
+        "front": "How many days does phenolic ripeness lag sugar in a warm season?",
+        "back": "5–10 days; picking at sugar ripeness alone in warm seasons risks harsh, extractable tannins."
+      },
+      {
+        "front": "Botrytis at 5–15% infection — what is the harvest response?",
+        "back": "Pick within 48–72 hours; do not wait for the next scheduled sampling."
+      },
+      {
+        "front": "Botrytis above 15% infection — what overrides all other ripeness signals?",
+        "back": "Harvest immediately regardless of Baumé, pH, TA, or phenolic ripeness status."
+      },
+      {
+        "front": "Why pre-commit to harvest constraints before vintage rather than deciding on the day?",
+        "back": "Pre-commitment prevents in-vintage rationalisation when pressure, fatigue, or conflicting data cloud judgement."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2657,
+    "completion_tokens": 6355
+  },
+  "audit": {
+    "totalWords": 1656,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:25:49.809Z"
+}

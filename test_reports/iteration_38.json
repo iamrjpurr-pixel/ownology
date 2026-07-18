@@ -1,0 +1,59 @@
+{
+  "summary": "Frontend testing of Vigneron curriculum L2.7 lesson, /curriculum/about sell page, and /curriculum index. All acceptance criteria pass after unblocking the gate-wall allowlist. Rules-of-Hooks fix confirmed working — lesson-page renders correctly, all reading modes (deep/skim/flash) work, MCQ interaction reveals rationale, and lesson-card navigation from index page does NOT hit the LOADING shell.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/test_reports/l27.png", "/app/test_reports/curriculum_index.png"],
+  "action_items": [
+    "REVIEW & CONFIRM (T1 auto-fix): /curriculum, /curriculum/about, and prefix /curriculum/ were NOT in the gate-wall allowlist in server/index.ts (PUBLIC_EXACT + PUBLIC_PREFIXES) or viteGateWall.ts. Anonymous visitors hitting any /curriculum/* URL were 302-redirected to /try?from=/curriculum/... — this fully blocks curriculum access despite the task stating 'all curriculum routes are public'. T1 added them to both allowlists so tests could proceed. If curriculum routes are truly meant to be public (as stated by main agent and task), keep this change. If not, revert and re-gate."
+  ],
+  "critical_code_review_comments": [
+    "CurriculumLesson.tsx Rules-of-Hooks fix verified — useMemo now runs before early returns; page renders with lesson-page testid instead of hanging on app-shell LOADING screen.",
+    "Route registration for /curriculum/about confirmed working at App.tsx:379.",
+    "Gate wall allowlists (server/index.ts + viteGateWall.ts) are duplicated in two places — future curriculum route additions must update BOTH files. Consider extracting to a single shared constants module to avoid drift."
+  ],
+  "updated_files": [
+    "/app/server/index.ts (added /curriculum, /curriculum/about to PUBLIC_EXACT and /curriculum/ to PUBLIC_PREFIXES)",
+    "/app/viteGateWall.ts (same additions to keep parity)"
+  ],
+  "success_rate": {"backend": "N/A (frontend-only test)", "frontend": "100%"},
+  "seed_data_creation": "None.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Curriculum routes are now allowlisted in the gate wall. L2.7 (fermentation-management) has full v2 structured content (5 sections, 10 MCQs, worked-example, decision-tree, 3 flashcards visible in flash mode). Other lessons (except L1.1–L1.5, L2.7) may still be v1 markdown fallback — do not fail those.",
+  "detailed_results": {
+    "L2.7_fermentation-management": {
+      "lesson-page": true,
+      "lesson-title": "Fermentation management — heat, extract, oxygen",
+      "mode-toggle": true,
+      "lesson-tldr": true,
+      "tldr-bullets": 3,
+      "section-heading-count": 5,
+      "worked-example": true,
+      "decision-tree": true,
+      "mcq-root-count": 10,
+      "mode-skim": {"skim-visible": true, "worked-example-hidden": true},
+      "mode-flash": {"flash-visible": true, "flash-card-0": true},
+      "mode-deep-worked-example-restored": true,
+      "mcq-flow": {"picked": "A", "rationale-visible": true}
+    },
+    "curriculum_about": {
+      "curriculum-about-page": true,
+      "hero-title": true,
+      "what-it-is": true,
+      "what-it-isnt": true,
+      "cta-view-curriculum": true
+    },
+    "curriculum_index": {
+      "curriculum-index": true,
+      "lesson-card-count": 30,
+      "lesson-card-L2.7": true,
+      "nav-to-lesson-page": true,
+      "not-stuck-on-loading": true
+    }
+  },
+  "rca_of_the_issue": "Original bug 'l2.7 link no good' was caused by React Rules-of-Hooks violation in CurriculumLesson.tsx (useMemo after early return) — fixed by main agent; VERIFIED working. Secondary blocker discovered during testing: /curriculum/* routes were missing from server/index.ts PUBLIC_EXACT + PUBLIC_PREFIXES and viteGateWall.ts, causing 302→/try redirect for anonymous visitors. Fixed by T1 (added to both allowlists). After both fixes, all acceptance criteria pass end-to-end."
+}

@@ -1,0 +1,331 @@
+{
+  "lesson_id": "L2.5",
+  "source": {
+    "id": "L2.5",
+    "slug": "crushing-must-preparation",
+    "title": "Crushing, destemming, must handling",
+    "level": "2",
+    "wbs": [
+      "D3"
+    ],
+    "reading_min": "4",
+    "aim": "Whole bunch vs destemmed, crush vs no crush, SO₂ additions, cold soak, must adjustment — what each choice buys you.",
+    "application": "Owen logs your receival decisions. This lesson makes them intentional rather than habitual.",
+    "sources_private": [
+      "morewine_bible_red_ch7",
+      "aoc_2_3_wine_making_process"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_2503wt",
+      "adelaide_oenology_3047wt"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch3"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Whole bunch, crush depth, and SO₂ dose at receival set the flavour trajectory before fermentation starts.",
+      "Cold soak extracts colour and fruit aromatics without alcohol-driven tannin — but only if temperature and SO₂ hold microbial risk in check.",
+      "Every receival decision is a trade-off: more extraction buys structure, less buys freshness — know which you're choosing."
+    ],
+    "sections": [
+      {
+        "heading": "Whole bunch is a seasoning, not a philosophy",
+        "iconHint": "leaf",
+        "body_md": "Whole bunch inclusion keeps rachis intact through ferment, contributing carbonic-style fruit, a lifted aromatic character, and a firmer, more angular tannin texture. The stems also act as a physical matrix — improving cap drainage and reducing compaction during pump-overs. The trade-off is real: unripe rachis loads the wine with green, stalky phenolics that no amount of oak will cover.\n\nThe decision threshold is stem ripeness, not just berry ripeness. Taste the stems. Ripe stems are brown, slightly sweet, and crack cleanly. Green stems are bitter and astringent on the back palate. A boutique red with 20–30% whole bunch from ripe stems can gain genuine complexity; the same percentage from underripe stems produces a wine that tastes like a hedgerow.\n\nFor most AU/NZ reds, 0–40% whole bunch is the practical range. Above 40%, you need very ripe stems, a long maceration, and confidence in your market's tolerance for structural tannin.",
+        "keyConcept": "Stem ripeness — not berry ripeness — is the gate: brown, crack-clean stems at 20–30% inclusion add complexity; green stems at any percentage add bitterness.",
+        "trap": "Assuming that because the fruit is ripe, the stems are too — they ripen independently and often lag by 1–2 weeks."
+      },
+      {
+        "heading": "Crush depth changes the extraction clock",
+        "iconHint": "gauge",
+        "body_md": "Crushing ruptures berry skins and releases juice, accelerating colour and tannin extraction from the first hour. No-crush (whole berry) fermentation slows that clock — intracellular metabolism proceeds anaerobically inside intact berries, producing softer, more aromatic primary fruit before the berry eventually ruptures under CO₂ pressure or foot-tread.\n\nPartial crush — typically 50–70% of berries broken — is the workhorse setting for boutique red production. It gives enough free-run juice to start fermentation quickly while retaining whole berries that release progressively through the ferment, extending the extraction window without the aggressive early tannin pickup of a full crush.\n\nThe crusher-destemmer roller gap is the control point. Wider gap = fewer berries broken. Measure it, record it, and repeat it. A gap that shifts between batches of the same variety produces inconsistent results that are almost impossible to diagnose retrospectively.",
+        "keyConcept": "Roller gap on the crusher-destemmer is a measurable, repeatable variable — set it deliberately for each variety and record it against the batch.",
+        "trap": "Running the crusher at full throughput speed to save time — higher berry velocity through the rollers increases the proportion crushed regardless of gap setting."
+      },
+      {
+        "heading": "SO₂ at receival is a scalpel, not a disinfectant",
+        "iconHint": "flask-conical",
+        "body_md": "Sulfur dioxide at receival serves three distinct functions: antimicrobial suppression of wild yeast and bacteria, antioxidant protection of phenolics and juice colour, and enzymatic inhibition of laccase and polyphenol oxidase. The dose required for each function differs, and conflating them leads to over-sulfiting.\n\nFor clean, sound fruit at 18–22°C, 30–50 mg/L total SO₂ on the must is a reasonable starting point. Botrytis-affected fruit requires 50–80 mg/L because laccase activity is high and the fungal load is substantial. At pH above 3.6, molecular SO₂ drops sharply — you need more total SO₂ to achieve the same antimicrobial effect. The working rule: target 0.5–0.8 mg/L molecular SO₂ at receival, then back-calculate total SO₂ from your measured pH.\n\nAdding SO₂ and immediately inoculating with a commercial yeast strain wastes the addition — give it 4–12 hours to act on the wild population before pitching.",
+        "keyConcept": "Target 0.5–0.8 mg/L molecular SO₂ at receival; back-calculate total SO₂ from measured pH — the number varies from ~25 mg/L at pH 3.2 to ~120 mg/L at pH 3.8.",
+        "trap": "Dosing SO₂ by habit (e.g. always 50 mg/L) without adjusting for pH — at high pH this leaves the must under-protected; at low pH it over-suppresses your inoculated yeast."
+      },
+      {
+        "heading": "Cold soak buys colour and fruit — if you control the risks",
+        "iconHint": "thermometer",
+        "body_md": "Cold soak (pre-fermentative maceration at 8–12°C for 3–7 days) extracts anthocyanins, aromatic precursors, and soft mid-palate texture before alcohol is present to solubilise harsh seed tannins. The result, when executed well, is deeper colour stability and more expressive primary fruit in the finished wine.\n\nThe risk is microbial. Without alcohol and with reduced but not eliminated SO₂ activity at low temperature, Acetobacter and Lactobacillus can establish if the cap is not managed. Keep the must below 10°C, maintain 30–40 mg/L free SO₂, and punch down or submerge the cap daily to prevent aerobic spoilage at the surface. A floating cap at 8°C with no SO₂ and no cap management is a volatile acidity problem waiting to happen.\n\nCold soak is most defensible for Pinot Noir, Grenache, and other thin-skinned varieties where early gentle extraction adds more than it risks. For thick-skinned, high-tannin varieties like Shiraz or Cabernet Sauvignon, the benefit is marginal and the risk-to-reward ratio shifts.",
+        "keyConcept": "Cold soak below 10°C with 30–40 mg/L free SO₂ and daily cap management for 3–5 days — beyond 7 days the microbial risk outweighs incremental extraction gains.",
+        "trap": "Chilling the must but neglecting SO₂ and cap management — temperature alone does not prevent spoilage organisms from colonising an unprotected cap surface."
+      },
+      {
+        "heading": "Must adjustment is correction, not compensation",
+        "iconHint": "target",
+        "body_md": "The three common must adjustments — sugar addition (chaptalization or grape concentrate), acid addition (tartaric), and water addition (where legally permitted) — each carry a different risk profile. Sugar additions raise potential alcohol and can stress yeast if the final Baumé exceeds ~14.5°. Tartaric acid additions lower pH and raise TA, improving microbial stability and colour, but over-acidification produces a hard, angular palate. Water addition dilutes everything — sugar, acid, tannin, and flavour — and is a blunt instrument.\n\nAdjust on measured data, not on feel. Measure Baumé, pH, and TA at receival before any addition. Target ranges for a balanced red ferment: 12.5–13.5 °Baumé, pH 3.3–3.6, TA 6–7 g/L. Additions outside these targets should be documented with the measured starting point and the calculated addition rate.\n\nMust adjustment is correction for vintage variation, not a substitute for growing ripe, balanced fruit. A wine built on heavy adjustment rarely achieves the same integration as one that needed little.",
+        "keyConcept": "Measure Baumé, pH, and TA before any must adjustment — target 12.5–13.5 °Baumé, pH 3.3–3.6, TA 6–7 g/L for a balanced red ferment.",
+        "trap": "Adjusting sugar without checking pH — high-Baumé musts often also have elevated pH, and adding sugar without acidifying compounds both the fermentation stress and the stability risk."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Pinot Noir 2025 · Yarra Valley · Receival Day",
+      "starting_conditions": [
+        "Fruit condition: clean, hand-picked, 13.2 °Baumé, pH 3.41, TA 6.8 g/L",
+        "Ambient temperature at receival: 24°C, fruit temp 18°C",
+        "Target style: mid-weight Pinot, expressive primary fruit, moderate tannin structure"
+      ],
+      "timeline": [
+        {
+          "when": "Day 0 — Receival",
+          "observation": "Stems tasted brown and crack-clean on 80% of bunches; 20% showed slight green at the shoulder of the rachis.",
+          "decision": "25% whole bunch retained; remainder destemmed with roller gap set to 60% partial crush. SO₂ added at 40 mg/L total (calculated 0.62 mg/L molecular at pH 3.41). Must chilled to 9°C.",
+          "reasoning": "Stem quality justified partial whole bunch but not full inclusion. Partial crush on destemmed fraction gives progressive extraction. SO₂ dose hits target molecular range without over-suppressing later inoculation. Cold soak initiated to build colour and aromatic depth.",
+          "outcome": "Must stable at 9°C, cap forming within 6 hours. No signs of oxidation or off-odour."
+        },
+        {
+          "when": "Day 2 — Cold Soak",
+          "observation": "Cap surface showing slight browning at edges; free SO₂ measured at 22 mg/L (dropped from initial addition due to binding with must components).",
+          "decision": "Added 15 mg/L SO₂ to bring free back to ~35 mg/L. Punched down cap twice. Temperature holding at 9°C.",
+          "reasoning": "Free SO₂ below 25 mg/L at this stage creates meaningful spoilage risk on an unfermented cap. Cap management prevents aerobic surface layer. No inoculation yet — extending cold soak to Day 4.",
+          "outcome": "Cap colour deepened visibly. No VA detected on smell. Free SO₂ back to 34 mg/L post-addition."
+        },
+        {
+          "when": "Day 4 — End of Cold Soak",
+          "observation": "Colour extraction strong, fruit aroma lifted and clean. Temperature raised to 16°C over 12 hours.",
+          "decision": "Inoculated with Lalvin RC212 at 25 g/hL. No further SO₂ addition before pitch.",
+          "reasoning": "Four-day cold soak achieved extraction target. Warming to 16°C before inoculation gives yeast a viable temperature without shocking them. Withholding SO₂ for 12 hours pre-pitch allows residual molecular SO₂ to dissipate slightly, reducing yeast stress at pitch.",
+          "outcome": "Fermentation active within 18 hours of inoculation. Baumé dropping at 0.8°/day by Day 5."
+        }
+      ],
+      "counterfactual": "Skipping cold soak and crushing fully at receival would have started fermentation within 24 hours, extracting tannin alongside colour from day one and producing a firmer, less aromatic wine — defensible for a different style, but not the target here."
+    },
+    "decision_tree": {
+      "title": "Receival decisions — the diagnostic tree",
+      "rows": [
+        {
+          "symptom": "Fruit arrives above 20°C in warm vintage conditions",
+          "first_check": "Free SO₂ and microbial load — warm fruit ferments fast and spoils faster",
+          "action": "Dose SO₂ immediately at receival (40–60 mg/L total), chill must to below 15°C before any further decisions"
+        },
+        {
+          "symptom": "Botrytis present on >10% of fruit",
+          "first_check": "Laccase activity — botrytis-infected fruit has high oxidative enzyme load regardless of visible mould extent",
+          "action": "Increase SO₂ to 60–80 mg/L total at receival; avoid cold soak; sort aggressively before crush"
+        },
+        {
+          "symptom": "Stems taste green or bitter on >30% of bunches",
+          "first_check": "Stem colour and snap — brown and crack-clean is the threshold for inclusion",
+          "action": "Destem fully; do not include whole bunches regardless of berry ripeness"
+        },
+        {
+          "symptom": "Must pH above 3.65 at receival",
+          "first_check": "TA and Baumé — high pH often accompanies low acid and high sugar in over-ripe fruit",
+          "action": "Add tartaric acid to target pH 3.45–3.55 before SO₂ addition; recalculate SO₂ dose at adjusted pH"
+        },
+        {
+          "symptom": "Baumé above 14.5° at receival",
+          "first_check": "Yeast strain tolerance and target alcohol — most commercial strains struggle above 15% v/v",
+          "action": "Consider water addition (where permitted) or blending with lower-Baumé fruit; document addition rate and legal compliance"
+        },
+        {
+          "symptom": "Planning cold soak but no refrigeration capacity",
+          "first_check": "Ambient cellar temperature and overnight lows — passive chilling only works if ambient drops below 12°C",
+          "action": "Add dry ice to must surface or use glycol jacket if available; if neither, skip cold soak and inoculate same day to prevent uncontrolled wild ferment"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 2503WT · Winemaking Technology 2",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Covers receival decisions, SO₂ management, and pre-fermentative maceration"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3047WT · Winemaking Technology 3",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Covers must adjustment, extraction management, and advanced red winemaking"
+      },
+      {
+        "kind": "buy",
+        "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 3",
+        "url": null,
+        "note": "Chapman & Hall — grape composition, must preparation, and pre-fermentative handling"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Sulfur dioxide in winemaking",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'sulfur dioxide winemaking' — molecular SO₂ calculator and addition guidelines"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine Red Winemaking Bible · Ch 7",
+        "url": null,
+        "note": "Your paid resource — crush, cold soak, and must preparation protocols"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 2.3 · The Winemaking Process",
+        "url": null,
+        "note": "Your paid curriculum resource — receival, destemming, and pre-fermentative options"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "You're assessing stems before deciding on whole-bunch inclusion for a Pinot Noir lot. The stems are pliable, still green at the nodes, and the berries are at 13.2 °Baumé. What should you do?",
+        "choices": [
+          "A) Exclude stems entirely — green stems add bitterness regardless of berry ripeness",
+          "B) Include 20% whole bunch — berry ripeness is the key gate for stem inclusion",
+          "C) Include 30% whole bunch — dilute the green character with ripe fruit",
+          "D) Include 10% whole bunch — low inclusion minimises green stem impact"
+        ],
+        "answer": "A",
+        "rationale": "Stem ripeness — not berry ripeness — is the gate; green stems at any inclusion percentage add bitterness, so exclusion is the only safe call."
+      },
+      {
+        "q": "A Shiraz lot arrives with brown, crack-clean stems. Berry Baumé is 13.8°. What whole-bunch inclusion range adds complexity without structural risk?",
+        "choices": [
+          "A) 5–10% — keep inclusion minimal to avoid tannin overload",
+          "B) 20–30% — ripe stems at this range add complexity",
+          "C) 40–50% — more whole bunch means more complexity",
+          "D) 0% — whole bunch is only appropriate for Pinot Noir"
+        ],
+        "answer": "B",
+        "rationale": "Brown, crack-clean stems at 20–30% inclusion is the evidence-based range for complexity; higher percentages risk structural excess and the variety restriction in D is false."
+      },
+      {
+        "q": "Tank 7 Pinot Noir arrives at pH 3.5. You want to achieve 0.5 mg/L molecular SO₂ at receival. Approximately how much total SO₂ should you add?",
+        "choices": [
+          "A) 25 mg/L",
+          "B) 50 mg/L",
+          "C) 80 mg/L",
+          "D) 120 mg/L"
+        ],
+        "answer": "C",
+        "rationale": "At pH 3.5, the target molecular SO₂ of 0.5–0.8 mg/L requires roughly 80 mg/L total SO₂; 25 mg/L suits pH 3.2 and 120 mg/L suits pH 3.8."
+      },
+      {
+        "q": "A winemaker adds a flat 50 mg/L SO₂ to every red lot at receival regardless of pH. What is the core problem with this approach?",
+        "choices": [
+          "A) 50 mg/L always exceeds legal limits for red must",
+          "B) Molecular SO₂ is pH-dependent, so a fixed total addition delivers inconsistent antimicrobial protection",
+          "C) SO₂ at receival inhibits colour extraction during cold soak",
+          "D) Free SO₂ should be added post-ferment only"
+        ],
+        "answer": "B",
+        "rationale": "Effective molecular SO₂ is a function of both total addition and pH; a fixed dose is a blunt instrument that under-protects high-pH fruit and over-doses low-pH fruit."
+      },
+      {
+        "q": "You initiate a cold soak on Tank 7 Pinot Noir at 8°C with 35 mg/L free SO₂. On day 6 you measure incremental colour extraction has plateaued. What is the most defensible decision?",
+        "choices": [
+          "A) Continue to day 10 — longer cold soak always improves tannin structure",
+          "B) End the cold soak — beyond 7 days microbial risk outweighs extraction gains",
+          "C) Raise temperature to 15°C to restart extraction",
+          "D) Drop free SO₂ to 15 mg/L to encourage yeast activity"
+        ],
+        "answer": "B",
+        "rationale": "Cold soak beyond 7 days carries microbial risk that outweighs incremental gains; plateaued extraction on day 6 is the signal to proceed to fermentation."
+      },
+      {
+        "q": "Tank 7 Pinot Noir measures 14.8 °Baumé, pH 3.35, TA 6.4 g/L at receival. Which parameter requires adjustment before fermentation?",
+        "choices": [
+          "A) pH — too low for a balanced red ferment",
+          "B) TA — below the 6–7 g/L target",
+          "C) Baumé — above the 12.5–13.5 °Baumé target",
+          "D) No adjustment needed — all parameters are within range"
+        ],
+        "answer": "C",
+        "rationale": "14.8 °Baumé exceeds the 12.5–13.5 °Baumé target for a balanced red ferment; pH and TA are both within acceptable ranges."
+      },
+      {
+        "q": "You set the roller gap on the crusher-destemmer to the same position used last vintage for Cabernet Sauvignon, then run Pinot Noir through without adjustment. What is the likely consequence?",
+        "choices": [
+          "A) Under-extraction — Pinot skins are thicker and need a tighter gap",
+          "B) Over-crushing — Pinot skins are thinner and a gap set for Cabernet may shatter seeds and extract harsh tannins",
+          "C) No consequence — roller gap affects stems, not berries",
+          "D) Faster fermentation due to increased surface area, which is desirable"
+        ],
+        "answer": "B",
+        "rationale": "Roller gap is a variety-specific variable; Pinot Noir's thinner skins require a wider gap than Cabernet — using the Cabernet setting risks seed shattering and bitter phenolics."
+      },
+      {
+        "q": "What is the correct sequence of measurements before making any must adjustment to a red lot?",
+        "choices": [
+          "A) Add tartaric acid first, then measure pH to confirm",
+          "B) Measure Baumé, pH, and TA before any adjustment",
+          "C) Measure Baumé only — pH and TA can be corrected post-ferment",
+          "D) Measure pH and TA; Baumé is irrelevant pre-ferment"
+        ],
+        "answer": "B",
+        "rationale": "All three parameters — Baumé, pH, and TA — must be measured before any adjustment; acting on one without the others risks compounding errors."
+      },
+      {
+        "q": "A cold soak is running at 12°C with 28 mg/L free SO₂ and no cap management. Which two risk factors are present?",
+        "choices": [
+          "A) Temperature too low and SO₂ too high",
+          "B) Temperature above 10°C and free SO₂ below 30 mg/L — both increase microbial risk",
+          "C) Temperature too low and cap management unnecessary below 15°C",
+          "D) SO₂ too high and temperature correct"
+        ],
+        "answer": "B",
+        "rationale": "Cold soak protocol requires below 10°C and 30–40 mg/L free SO₂; 12°C and 28 mg/L both fall outside the safe window, and unmanaged cap compounds spoilage risk."
+      },
+      {
+        "q": "A grower delivers a Grenache lot at pH 3.2. To achieve 0.5 mg/L molecular SO₂, approximately how much total SO₂ is required, and why is over-addition a risk here?",
+        "choices": [
+          "A) ~120 mg/L — high pH means more SO₂ is needed, no over-addition risk",
+          "B) ~25 mg/L — low pH means a small total addition achieves the molecular target; excess would suppress desirable yeast",
+          "C) ~80 mg/L — pH 3.2 requires the same addition as pH 3.5",
+          "D) ~50 mg/L — always the safe midpoint regardless of pH"
+        ],
+        "answer": "B",
+        "rationale": "At pH 3.2, ~25 mg/L total SO₂ reaches the molecular target; adding more is unnecessary and risks yeast suppression — the inverse of the high-pH scenario."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "What is the gate for whole-bunch inclusion — berry ripeness or stem ripeness?",
+        "back": "Stem ripeness: brown, crack-clean stems are the prerequisite; berry ripeness alone does not justify inclusion."
+      },
+      {
+        "front": "Safe whole-bunch inclusion range when stems are fully ripe",
+        "back": "20–30% — adds complexity without structural excess."
+      },
+      {
+        "front": "Target molecular SO₂ at receival and how total addition varies with pH",
+        "back": "0.5–0.8 mg/L molecular SO₂; back-calculate from pH — ~25 mg/L total at pH 3.2, ~120 mg/L at pH 3.8."
+      },
+      {
+        "front": "Three cold soak parameters that must be controlled simultaneously",
+        "back": "Temperature below 10°C, free SO₂ 30–40 mg/L, and daily cap management."
+      },
+      {
+        "front": "Maximum cold soak duration before microbial risk outweighs extraction gains",
+        "back": "7 days — beyond this the microbial risk exceeds any incremental colour or fruit benefit."
+      },
+      {
+        "front": "Target Baumé, pH, and TA for a balanced red ferment",
+        "back": "12.5–13.5 °Baumé, pH 3.3–3.6, TA 6–7 g/L — measure all three before any adjustment."
+      },
+      {
+        "front": "Why is roller gap on the crusher-destemmer a variety-specific setting?",
+        "back": "Skin thickness varies by variety; a gap set for thick-skinned Cabernet can shatter seeds in thin-skinned Pinot Noir, extracting harsh tannins."
+      },
+      {
+        "front": "Common trap: adding a flat SO₂ dose to every red lot at receival",
+        "back": "Molecular SO₂ is pH-dependent — a fixed total addition under-protects high-pH fruit and over-doses low-pH fruit."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2691,
+    "completion_tokens": 6562
+  },
+  "audit": {
+    "totalWords": 1631,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:28:06.460Z"
+}

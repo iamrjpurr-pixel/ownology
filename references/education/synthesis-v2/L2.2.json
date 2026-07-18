@@ -1,0 +1,324 @@
+{
+  "lesson_id": "L2.2",
+  "source": {
+    "id": "L2.2",
+    "slug": "vineyard-establishment",
+    "title": "Vineyard establishment — the calls that lock in decades",
+    "level": "2",
+    "wbs": [
+      "D1"
+    ],
+    "reading_min": "4",
+    "aim": "Row orientation, spacing, trellis, irrigation, soil prep — the decisions you make at planting that you'll live with for 25 years.",
+    "application": "Owen captures your vineyard block schema for downstream yield/quality correlation. This lesson tells you which fields matter most and why.",
+    "sources_private": [
+      "aoc_1_4_vineyard_establishment"
+    ],
+    "sources_public_ref": [
+      "adelaide_viticult_2500wt",
+      "lincoln_wine_201"
+    ],
+    "citations_bibliographic": [
+      "coombe_iland_visc_vol2"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Row orientation, spacing, and rootstock choice are permanent — get them wrong and you manage consequences for 25 years.",
+      "Soil preparation before planting is the only time you can fix subsoil structure without destroying an established vineyard.",
+      "Every establishment decision feeds Owen's block schema — accurate data here drives yield and quality correlation for the life of the vineyard."
+    ],
+    "sections": [
+      {
+        "heading": "Row orientation locks in your light and heat budget",
+        "iconHint": "sun",
+        "body_md": "North–south rows maximise direct radiation on both canopy faces through the day, reducing disease pressure and improving fruit colour and phenolic development. In cool Australian and NZ regions this is usually the default. East–west rows can suit steep north-facing slopes where you want to capture low-angle morning sun and limit afternoon heat stress — but they also trap humidity in the canopy and complicate mechanical access.\n\nSlope and prevailing wind cut across the pure orientation argument. A 15° slope running east–west may force you to run rows across the fall to prevent erosion, regardless of solar geometry. Map your site's wind corridors before committing: a row orientation that funnels cold air drainage away from the block is worth more in a frost-prone valley than an extra hour of afternoon sun.\n\nRecord your chosen orientation and the reasoning in Owen's block schema now. In five years, when you're correlating brix accumulation rates with aspect, you'll need this as a fixed variable.",
+        "keyConcept": "North–south orientation delivers the most even daily radiation load; deviate only when slope, frost drainage, or wind justify it explicitly.",
+        "trap": "Choosing orientation purely on solar geometry and ignoring prevailing wind direction — canopy disease in a humid site costs more than a suboptimal sun angle."
+      },
+      {
+        "heading": "Spacing is a yield-quality lever you set once",
+        "iconHint": "layout-grid",
+        "body_md": "Vine spacing determines canopy competition, root volume per vine, and whether your machinery fits. In high-vigour, irrigated Australian sites, wider rows (3.0–3.5 m) with closer in-row spacing (1.5–1.8 m) give you machine access while controlling individual vine load. In low-vigour, dry-grown NZ or SA sites, tighter rows (1.8–2.4 m) push vines to compete, restrict vegetative growth, and concentrate fruit flavour — but they demand precision mechanisation or more hand labour.\n\nThe vine-to-row ratio matters as much as the absolute numbers. A 3.0 × 1.5 m spacing gives 2,222 vines/ha; a 2.4 × 1.2 m spacing gives 3,472 vines/ha. Higher density generally means smaller individual vine canopies, better light penetration, and — in the right soil — improved fruit quality. It also means higher establishment cost and a longer break-even horizon.\n\nEnter your row width, in-row spacing, and calculated vine density into Owen's block schema at planting. These numbers anchor every future yield-per-vine and tonnes-per-hectare calculation.",
+        "keyConcept": "Vine density between 2,200 and 3,500 vines/ha covers most Australian and NZ commercial scenarios; the right number depends on vigour potential and machinery width.",
+        "trap": "Matching row spacing to the tractor you already own rather than the vigour of the site — you'll spend the next two decades fighting the mismatch."
+      },
+      {
+        "heading": "Soil preparation is a one-time intervention with permanent consequences",
+        "iconHint": "shovel",
+        "body_md": "Deep ripping to 600–800 mm before planting breaks up hardpans, improves drainage, and allows roots to explore subsoil moisture reserves. Once vines are established, you cannot rip without severing the root system. This is the single most irreversible call in vineyard establishment — skipping it to save $800/ha is a decision you'll explain to every subsequent owner.\n\nSoil amelioration — lime, gypsum, organic matter — should follow a full soil profile analysis, not a surface sample. pH correction at depth requires incorporation before planting; surface applications after establishment move slowly and unevenly. In sodic or compacted subsoils, gypsum rates of 2–5 t/ha worked to depth can transform drainage and root penetration. In acidic soils, target a pH(CaCl₂) of 5.5–6.0 in the top 30 cm before you plant.\n\nRecord your ripping depth, ameliorant type and rate, and pre-plant soil pH in Owen's block schema. These become the baseline against which you interpret every future soil test and vine health observation.",
+        "keyConcept": "Deep rip to at least 600 mm and correct soil pH to 5.5–6.0 (CaCl₂) before planting — neither intervention is practical once vines are in the ground.",
+        "trap": "Running a surface soil test only and missing an acidic or sodic subsoil layer that will cap root depth and restrict vine performance for the life of the block."
+      },
+      {
+        "heading": "Trellis and irrigation infrastructure outlast your first replant",
+        "iconHint": "git-branch",
+        "body_md": "Trellis choice should match your intended canopy management system, not just what the local contractor installs by default. A vertical shoot positioning (VSP) trellis suits low-to-moderate vigour sites and cool climates where canopy exposure is the priority. Scott Henry or Geneva Double Curtain systems suit high-vigour sites where you need to divide and expose a larger canopy. Changing trellis systems mid-life is expensive and disruptive — choose for the vigour potential of the site, not the vigour of the young vine.\n\nDrip irrigation infrastructure — mainlines, submains, emitter spacing — is buried or staked at establishment. Emitter spacing of 0.5–1.0 m suits most wine grape scenarios; wider spacing risks uneven wetting in sandy soils. Pressure-compensating emitters add cost but pay back in uniformity across undulating terrain. If you plan to fertigate, ensure your filtration and injection capacity is specified at installation, not retrofitted.\n\nLog your trellis system, post spacing, wire configuration, emitter type, and design flow rate in Owen's block schema. These fields connect directly to canopy management records and irrigation scheduling downstream.",
+        "keyConcept": "Trellis system must match site vigour potential, not current vine size — a VSP trellis on a high-vigour irrigated site will be a canopy management problem within four years.",
+        "trap": "Installing the cheapest emitter spacing to reduce upfront cost, then discovering uneven vine establishment that takes three seasons to correct."
+      },
+      {
+        "heading": "Rootstock selection is the deepest lock-in of all",
+        "iconHint": "anchor",
+        "body_md": "Rootstock determines phylloxera protection, nematode tolerance, drought adaptation, vigour transmission, and nutrient uptake efficiency — for the life of the planting. In phylloxera-affected or at-risk Australian regions, own-rooted vines are not an option. In NZ, phylloxera biotype B has spread beyond early containment zones; the risk calculus has shifted.\n\nRootstock vigour class matters as much as pest tolerance. 110 Richter and 140 Ruggeri are high-vigour, deep-rooting stocks suited to dry, infertile soils. Schwarzmann and 101-14 Mgt are lower-vigour options for fertile or irrigated sites where you want to contain shoot growth. SO4 is widely planted but transmits high vigour and can exacerbate potassium uptake issues in some soils — worth checking against your soil potassium levels before committing.\n\nRecord rootstock variety, clone, and nursery source in Owen's block schema. Rootstock identity is frequently lost after the first replant; having it documented lets you interpret vine health and nutrition data correctly decades later.",
+        "keyConcept": "Match rootstock vigour class to site fertility and water availability — a high-vigour stock on a fertile irrigated site will require aggressive canopy management to maintain fruit quality.",
+        "trap": "Selecting rootstock on phylloxera tolerance alone and ignoring vigour transmission — you can end up with a phylloxera-safe block that produces unmanageable canopies and dilute fruit."
+      }
+    ],
+    "worked_example": {
+      "title": "Block 7 · Shiraz · Clare Valley · Pre-plant 2024",
+      "starting_conditions": [
+        "Site: 4.2 ha, gently undulating, 8° slope running NNW, elevation 480 m",
+        "Soil: red-brown earth over clay subsoil, pH(CaCl₂) 4.9 at 30 cm, 5.1 at 60 cm, no hardpan detected above 700 mm",
+        "Phylloxera status: low-risk zone but nursery stock available on 1103 Paulsen and own-roots"
+      ],
+      "timeline": [
+        {
+          "when": "Month 1 — Site assessment",
+          "observation": "Full soil profile to 900 mm revealed a clay-enriched B horizon at 550 mm with moderate sodicity (ESP 8%). Surface pH below target. No hardpan but clay layer would restrict drainage.",
+          "decision": "Deep rip to 700 mm on 1.8 m centres, apply gypsum at 3 t/ha incorporated to 400 mm, apply lime at 1.5 t/ha to correct surface pH.",
+          "reasoning": "Sodic clay at 550 mm would cap root depth and cause waterlogging in wet winters. Gypsum flocculates clay colloids and improves structure without raising pH further. Lime targets pH(CaCl₂) 5.5 in top 30 cm before planting.",
+          "outcome": "Post-amelioration pH at 30 cm reached 5.6 by month 3. Gypsum incorporation improved drainage test from 8 mm/hr to 22 mm/hr."
+        },
+        {
+          "when": "Month 2 — Orientation and spacing decision",
+          "observation": "Slope runs NNW, prevailing afternoon wind from the SW. Frost risk moderate — cold air drains to the north-east corner of the block.",
+          "decision": "Rows oriented N–S with a 5° adjustment to align with slope contour in the lower third of the block. Spacing set at 2.7 m × 1.5 m (2,469 vines/ha). Tractor width 2.4 m — confirmed clearance.",
+          "reasoning": "Pure N–S maximises radiation. Contour adjustment in lower third prevents erosion on the steeper section. Spacing balances density economics against existing machinery. Frost drainage corner excluded from planting and left as a grass buffer.",
+          "outcome": "Row layout staked and entered into Owen's block schema. Vine density, row width, and orientation recorded as fixed variables for future yield correlation."
+        },
+        {
+          "when": "Month 3 — Rootstock and trellis commitment",
+          "observation": "Site fertility moderate, irrigation planned (drip), vigour potential assessed as medium-high based on soil organic matter and clay content.",
+          "decision": "Rootstock: 1103 Paulsen (phylloxera-tolerant, moderate-high vigour, drought-adapted). Trellis: VSP with provision for Scott Henry conversion if vigour proves excessive. Drip: 1.0 m emitter spacing, pressure-compensating, 2.3 L/hr, fertigation-ready manifold installed.",
+          "reasoning": "1103 Paulsen suits the moderately fertile, periodically dry Clare site. VSP is the lowest-cost starting point; Scott Henry conversion requires only additional wires and foliage wires, not new posts. Pressure-compensating emitters justified by 8 m elevation change across the block.",
+          "outcome": "Rootstock source and clone logged in Owen's schema. Trellis spec and emitter data entered. Block ready for planting in late winter."
+        }
+      ],
+      "counterfactual": "Skipping the gypsum application to save $12,600 would have left the sodic clay layer intact, likely restricting root depth to 400 mm and requiring supplemental irrigation 30–40% higher than the current design spec."
+    },
+    "decision_tree": {
+      "title": "Establishment call — the diagnostic tree",
+      "rows": [
+        {
+          "symptom": "Slope > 10° running across prevailing frost drainage",
+          "first_check": "Map cold air flow direction and identify low-point frost pockets",
+          "action": "Adjust row orientation to facilitate cold air drainage; exclude frost-pocket areas from planting or use frost-tolerant varieties"
+        },
+        {
+          "symptom": "Soil pH(CaCl₂) below 5.2 at any depth in the top 60 cm",
+          "first_check": "Full profile pH and aluminium toxicity test to 900 mm",
+          "action": "Apply lime at rate calculated to reach pH 5.5 at target depth; incorporate before ripping, not after"
+        },
+        {
+          "symptom": "Subsoil sodicity (ESP > 6%) or clay layer restricting drainage",
+          "first_check": "Drainage rate test and ESP measurement at 300 mm, 600 mm",
+          "action": "Apply gypsum 2–5 t/ha incorporated to depth of restriction; deep rip to 700 mm minimum before planting"
+        },
+        {
+          "symptom": "High-vigour site (fertile soil, full irrigation, warm climate)",
+          "first_check": "Assess soil organic matter, clay content, and planned irrigation volume",
+          "action": "Select low-to-moderate vigour rootstock (Schwarzmann, 101-14 Mgt); consider Scott Henry or divided canopy trellis from the outset"
+        },
+        {
+          "symptom": "Phylloxera-risk region or adjacent to known infested vineyard",
+          "first_check": "Confirm regional phylloxera status with state biosecurity authority",
+          "action": "Specify phylloxera-tolerant rootstock regardless of cost premium; document rootstock variety and nursery source in block schema"
+        },
+        {
+          "symptom": "Row width chosen to match existing machinery before site assessment",
+          "first_check": "Compare planned row width against site vigour potential and canopy management system",
+          "action": "Recalculate spacing from site vigour first; source or hire machinery to match — do not let equipment dictate a 25-year agronomic decision"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "Adelaide VITIC 2500WT · Vineyard Establishment",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Covers site assessment, row orientation, and soil preparation in the viticulture major"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Lincoln WINE 201 · Vineyard Design and Management",
+        "url": "https://www.lincoln.ac.nz/study/courses-2/course-search/",
+        "note": "Search Lincoln course search for WINE 201"
+      },
+      {
+        "kind": "buy",
+        "label": "Coombe & Iland · Viticulture Vol 2 · Ch 3–4",
+        "url": null,
+        "note": "Winetitles; covers rootstock selection, trellis systems, and soil preparation in Australian context"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 1.4 · Vineyard Establishment",
+        "url": null,
+        "note": "Your paid AOC curriculum resource — do not reproduce"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI Vineyard Establishment and Soil Management",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for vineyard establishment and soil preparation"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "You're establishing a Shiraz block on a flat Clare Valley site with no prevailing wind issues and uniform soils. What row orientation should you default to?",
+        "choices": [
+          "A) North–south, to maximise even daily radiation across both canopy faces",
+          "B) East–west, to maximise morning sun on the fruiting zone",
+          "C) Northeast–southwest, to reduce afternoon heat load in a warm region",
+          "D) Follow the fence line for operational efficiency"
+        ],
+        "answer": "A",
+        "rationale": "North–south delivers the most even radiation load across the day; the other orientations may suit specific site constraints but require explicit justification — operational convenience is never sufficient reason to deviate."
+      },
+      {
+        "q": "A grower is planning a new block on a high-vigour, irrigated red clay loam. Which vine density range is most appropriate for a standard Australian commercial scenario?",
+        "choices": [
+          "A) 1,000–1,500 vines/ha to give each vine maximum root volume",
+          "B) 2,200–3,500 vines/ha matched to vigour potential and machinery width",
+          "C) 4,000–5,000 vines/ha to maximise canopy surface area",
+          "D) Density is irrelevant once drip irrigation is installed"
+        ],
+        "answer": "B",
+        "rationale": "2,200–3,500 vines/ha covers most Australian and NZ commercial scenarios; below this range individual vine vigour becomes excessive on fertile sites, and above it machinery compatibility and cost escalate without proportional quality gain."
+      },
+      {
+        "q": "What is the target soil pH range (CaCl₂) that should be achieved before planting?",
+        "choices": [
+          "A) 4.5–5.0",
+          "B) 5.5–6.0",
+          "C) 6.5–7.0",
+          "D) 7.0–7.5"
+        ],
+        "answer": "B",
+        "rationale": "5.5–6.0 (CaCl₂) is the target; below this range aluminium toxicity and nutrient lock-up become problems, and correcting pH after planting is impractical without disturbing the root system."
+      },
+      {
+        "q": "A grower deep-rips to 400 mm to save time before planting Cabernet Sauvignon on a compacted duplex soil. What is the most likely long-term consequence?",
+        "choices": [
+          "A) No consequence — roots will naturally fracture the subsoil over time",
+          "B) Restricted root depth, increased drought stress, and uneven vine performance across the block",
+          "C) Excessive vigour because roots concentrate in the topsoil",
+          "D) Earlier ripening due to warmer shallow soil temperatures"
+        ],
+        "answer": "B",
+        "rationale": "Deep ripping must reach at least 600 mm to break compaction layers; shallower ripping leaves a hardpan that restricts root exploration, amplifying drought stress and creating within-block variability that cannot be corrected post-planting."
+      },
+      {
+        "q": "A VSP trellis is installed on a new high-vigour Chardonnay block with full drip irrigation on a fertile alluvial flat. What problem is most predictable within four years?",
+        "choices": [
+          "A) Insufficient shoot growth to fill the trellis wire",
+          "B) Canopy overcrowding, shading of the fruiting zone, and declining fruit quality",
+          "C) Root competition between vines due to narrow row spacing",
+          "D) Frost damage because VSP exposes buds to cold air"
+        ],
+        "answer": "B",
+        "rationale": "VSP suits low-to-moderate vigour sites; on a high-vigour irrigated site the canopy will rapidly exceed what VSP can manage, causing dense shading, poor fruit exposure, and quality decline — the trellis must match site vigour potential, not current vine size."
+      },
+      {
+        "q": "You are selecting a rootstock for a new Grenache block on a fertile, irrigated sandy loam in the Barossa Valley. Which approach is correct?",
+        "choices": [
+          "A) Choose the highest-vigour rootstock available to maximise early yield",
+          "B) Match rootstock vigour class to site fertility and water availability to avoid excessive canopy management",
+          "C) Rootstock choice only matters on phylloxera-risk sites — use own-rooted vines elsewhere",
+          "D) Select rootstock based on scion variety alone, not site characteristics"
+        ],
+        "answer": "B",
+        "rationale": "A high-vigour rootstock on a fertile irrigated site compounds vigour problems and forces aggressive canopy management to maintain fruit quality; rootstock selection must integrate site fertility and water availability, not just phylloxera risk or variety preference."
+      },
+      {
+        "q": "A grower plans to correct soil pH by liming after the first growing season because pre-plant lime was skipped. Why is this problematic?",
+        "choices": [
+          "A) Lime reacts differently once organic matter is present in the topsoil",
+          "B) Surface-applied lime moves slowly through the profile and cannot reach the root zone effectively once vines are established",
+          "C) Liming post-planting will kill beneficial mycorrhizal fungi established in year one",
+          "D) There is no problem — post-plant liming is equally effective"
+        ],
+        "answer": "B",
+        "rationale": "Lime has very low mobility in soil; applied to the surface after planting it corrects only the top few centimetres and cannot practically reach the subsoil root zone — pre-plant incorporation is the only effective window."
+      },
+      {
+        "q": "Block 7 in Clare Valley is on a north-facing slope with a 12% grade. The agronomist recommends running rows across the slope rather than north–south. What is the most defensible reason?",
+        "choices": [
+          "A) Across-slope rows improve radiation interception on a north-facing aspect",
+          "B) Across-slope rows follow contours, reducing erosion risk and improving machinery safety on steep terrain",
+          "C) Across-slope rows allow wider vine spacing to compensate for slope vigour",
+          "D) There is no defensible reason — north–south always takes priority"
+        ],
+        "answer": "B",
+        "rationale": "Slope, frost drainage, and erosion risk are explicit justifications for deviating from north–south orientation; on a 12% grade, contour rows are a legitimate safety and soil conservation response, not an arbitrary choice."
+      },
+      {
+        "q": "A machinery contractor tells a grower that row spacing must be at least 3.0 m for their mid-row equipment. The grower's vigour assessment suggests 2.5 m rows would be optimal. What is the correct resolution?",
+        "choices": [
+          "A) Always prioritise vigour-based spacing — buy narrower machinery",
+          "B) Machinery width is a legitimate constraint; adjust row spacing to 3.0 m and compensate with in-row vine spacing to maintain target vine density",
+          "C) Use 2.5 m rows and accept that machinery will damage vines during operations",
+          "D) Increase vine spacing within rows to 2.0 m and reduce density below 2,200 vines/ha"
+        ],
+        "answer": "B",
+        "rationale": "Machinery width is a real-world constraint that must be accommodated; the correct response is to maintain target vine density within the 2,200–3,500 vines/ha range by adjusting in-row spacing, not to drop below the commercial density floor."
+      },
+      {
+        "q": "Which of the following establishment decisions is the hardest to reverse once vines reach full production?",
+        "choices": [
+          "A) Irrigation emitter spacing",
+          "B) Rootstock selection",
+          "C) Fertiliser programme in year two",
+          "D) Shoot positioning wire height"
+        ],
+        "answer": "B",
+        "rationale": "Rootstock is described as the deepest lock-in — changing it requires full replanting; emitter spacing, fertiliser, and trellis wire height can all be modified with varying effort but without removing the vineyard."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Default row orientation for a flat, unobstructed vineyard site?",
+        "back": "North–south — delivers the most even daily radiation load across both canopy faces."
+      },
+      {
+        "front": "Target vine density range for most Australian and NZ commercial blocks?",
+        "back": "2,200–3,500 vines/ha, matched to site vigour potential and machinery width."
+      },
+      {
+        "front": "Minimum deep-rip depth required before planting?",
+        "back": "600 mm — shallower ripping leaves compaction layers that permanently restrict root exploration."
+      },
+      {
+        "front": "Target soil pH (CaCl₂) to achieve before planting?",
+        "back": "5.5–6.0 — correction is impractical once vines are established."
+      },
+      {
+        "front": "Why does VSP fail on a high-vigour irrigated site within four years?",
+        "back": "Canopy growth exceeds what VSP can manage, causing dense shading and fruit quality decline."
+      },
+      {
+        "front": "Key trap: matching rootstock to variety rather than to site?",
+        "back": "Rootstock vigour class must match site fertility and water availability — a high-vigour stock on a fertile irrigated site forces aggressive canopy management."
+      },
+      {
+        "front": "Why can't you correct subsoil pH by liming after planting?",
+        "back": "Lime moves too slowly through the soil profile to reach the root zone once vines are in the ground."
+      },
+      {
+        "front": "Three site factors that justify deviating from north–south row orientation?",
+        "back": "Slope (erosion/machinery safety), frost drainage patterns, and prevailing wind direction."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2610,
+    "completion_tokens": 6381
+  },
+  "audit": {
+    "totalWords": 1839,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:21:37.632Z"
+}

@@ -54,6 +54,13 @@ export default function CurriculumLesson() {
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [quizReveal, setQuizReveal] = useState<Record<number, boolean>>({});
 
+  // NOTE: All hooks MUST run before any early return. Rules of Hooks.
+  const groupedCitations = useMemo(() => {
+    const g: Record<string, any[]> = {};
+    for (const c of lesson?.cited_in ?? []) (g[c.kind] ??= []).push(c);
+    return g;
+  }, [lesson?.cited_in]);
+
   if (isLoading) return <div className="max-w-3xl mx-auto p-12 text-stone-500" data-testid="lesson-loading">Loading lesson…</div>;
   if (!lesson) return (
     <div className="max-w-3xl mx-auto p-12" data-testid="lesson-notfound">
@@ -64,12 +71,6 @@ export default function CurriculumLesson() {
 
   const levelMeta = LEVEL_META[lesson.level] ?? LEVEL_META[1];
   const isV2 = lesson.version === "v2";
-
-  const groupedCitations = useMemo(() => {
-    const g: Record<string, typeof lesson.cited_in> = {};
-    for (const c of lesson.cited_in ?? []) (g[c.kind] ??= []).push(c);
-    return g;
-  }, [lesson.cited_in]);
 
   const readingMinutes = isV2 && lesson.sections
     ? Math.max(lesson.reading_min, 5 + lesson.sections.length * 2 + (lesson.mcqs?.length ?? 0))

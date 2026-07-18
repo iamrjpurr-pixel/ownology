@@ -1,0 +1,326 @@
+{
+  "lesson_id": "L1.6",
+  "source": {
+    "id": "L1.6",
+    "slug": "winemakers-toolkit",
+    "title": "Your toolkit — from home-scale to boutique",
+    "level": "1",
+    "wbs": [
+      "D3",
+      "D5",
+      "D9"
+    ],
+    "reading_min": "4",
+    "aim": "Match equipment to scale honestly. What a 50L test tank teaches you that a 5000L tank cannot, and vice versa.",
+    "application": "Owen tracks your kit register. This lesson lets you audit whether your kit is the constraint on your quality, or your process is.",
+    "sources_private": [
+      "morewine_bible_red_ch5",
+      "aoc_2_1_intro_oenology"
+    ],
+    "sources_public_ref": [
+      "csu_wsc321",
+      "adelaide_oenology_3530wt"
+    ],
+    "citations_bibliographic": [
+      "jackson_wine_science_ch12"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Your equipment scale sets a hard ceiling on what you can learn and what you can control.",
+      "A 50 L test tank reveals fermentation behaviour your 5000 L tank will average into invisibility.",
+      "Audit your kit register before blaming process — the constraint is often the vessel, not the winemaker."
+    ],
+    "sections": [
+      {
+        "heading": "Scale is not just volume — it is physics",
+        "iconHint": "gauge",
+        "body_md": "Surface-area-to-volume ratio drops sharply as vessel size increases. A 50 L bucket loses heat to ambient air fast enough that temperature swings of 4–6 °C overnight are routine without jacketing. A 5000 L tank is thermally inert by comparison — it barely notices a cool night. That difference is not a nuisance; it is information. Small vessels expose your fermentation to environmental stress that large tanks absorb silently.\n\nThis matters when you are trying to understand yeast behaviour, nutrient draw-down, or cap management timing. At 50 L, a stuck fermentation announces itself within hours. At 5000 L, the same metabolic slowdown can hide for a day behind residual CO₂ activity and sheer thermal mass. The small tank is a diagnostic instrument. The large tank is a production tool. Treat them accordingly.",
+        "keyConcept": "Surface-area-to-volume ratio at 50 L is roughly 10× higher than at 5000 L — thermal control and gas exchange behave as different problems at each scale.",
+        "trap": "Assuming a trial result from a 50 L vessel will transfer directly to a 5000 L tank without accounting for heat retention, cap dynamics, and pump-over geometry."
+      },
+      {
+        "heading": "What the small tank teaches that the big one cannot",
+        "iconHint": "flask-conical",
+        "body_md": "At 50 L you can pull a full Baumé reading, a pH, a TA, and a free SO₂ every six hours without meaningfully disturbing the ferment. You can try two different nutrient protocols side by side in the same vintage fruit. You can cap-manage by hand and feel the cap resistance change as fermentation peaks. None of this is practical at 5000 L, where sampling alone requires a ladder and a long-handled thief.\n\nThe 50 L vessel is where you build your mental model of how a variety behaves — its nitrogen demand curve, its temperature sensitivity, its tendency to foam. That model is what you carry into the cellar when you are managing tanks you cannot watch as closely. Skipping small-scale trials because they feel like 'hobby winemaking' is one of the more expensive shortcuts a boutique producer can take.",
+        "keyConcept": "A 50 L trial run on the same fruit lot gives you a 5–7 day preview of fermentation trajectory before your main tank commits to the same path.",
+        "trap": "Running small-scale trials in a different temperature environment than your main cellar, then wondering why results do not replicate at production scale."
+      },
+      {
+        "heading": "What the big tank teaches that the small one cannot",
+        "iconHint": "activity",
+        "body_md": "Large-format fermentation generates its own heat at a rate that small vessels cannot replicate without external heating. A 5000 L red ferment at peak activity can self-heat 2–3 °C per day. Cap structure at scale is a different physical object — it compacts under its own weight, develops temperature gradients from base to crown, and responds to pump-over volume in ways a 50 L hand-plunged cap never will.\n\nExtraction at scale is also cumulative and time-dependent in a way that is hard to model down. Tannin and colour release from a large cap under a long pump-over cycle is not the same as three minutes of hand-plunging. If your only fermentation experience is sub-100 L vessels, your first 3000 L vintage will feel like a different craft. The transition requires deliberate scale-up trials, not just arithmetic.",
+        "keyConcept": "Self-generated fermentation heat at 5000 L can exceed 2–3 °C/day at peak activity — a thermal load that 50 L vessels never produce and cannot simulate.",
+        "trap": "Scaling pump-over volume linearly from small-vessel trials without adjusting for cap compaction, temperature stratification, and longer contact time at production scale."
+      },
+      {
+        "heading": "Audit your kit register before blaming your process",
+        "iconHint": "target",
+        "body_md": "A kit register is only useful if it records capability, not just inventory. Knowing you own a 200 L open-top fermenter tells you nothing unless you also know whether it has a jacket, what its maximum pump-over rate is, and whether your refractometer has been calibrated this vintage. Equipment that is present but uncalibrated, unjacketed, or undersized for your current fruit volume is a silent constraint on quality.\n\nThe practical audit asks three questions for each vessel: Can I control temperature in this vessel to within ±1 °C? Can I sample it reliably at any point in fermentation? Can I intervene — add nutrients, adjust SO₂, rack — without disturbing other tanks? If the answer to any of those is no, that vessel is limiting your process regardless of how good your winemaking decisions are. Fix the kit constraint first, then optimise the protocol.",
+        "keyConcept": "A vessel without reliable temperature control and accessible sampling points is a production vessel, not a quality tool — regardless of its size or cost.",
+        "trap": "Attributing fermentation variability to yeast strain or fruit quality when the real variable is inconsistent temperature across unjacketed vessels of different sizes."
+      }
+    ],
+    "worked_example": {
+      "title": "Lot 7 · Shiraz 2025 · 50 L trial vs 3200 L main tank",
+      "starting_conditions": [
+        "Fruit: single-block Shiraz, Baumé 14.2, pH 3.51, TA 6.1 g/L, YAN 148 mg N/L",
+        "50 L trial vessel: open-top HDPE, no jacket, cellar ambient 18 °C, inoculated same day as main tank",
+        "3200 L main tank: jacketed stainless, set to 22 °C, same yeast rate (0.3 g/L EC1118), same DAP addition at inoculation"
+      ],
+      "timeline": [
+        {
+          "when": "Day 2",
+          "observation": "50 L trial at Baumé 12.8 — drop of 1.4. Main tank at Baumé 13.1 — drop of 1.1. Trial vessel temperature overnight hit 14 °C ambient dip.",
+          "decision": "Moved 50 L vessel inside insulated box to stabilise ambient. No change to main tank.",
+          "reasoning": "Temperature drop in the trial vessel was suppressing yeast activity and would skew the comparison. Needed both vessels tracking the same metabolic window.",
+          "outcome": "Trial vessel recovered to 1.6 Baumé/day drop by Day 3. Main tank holding 1.4 Baumé/day — consistent."
+        },
+        {
+          "when": "Day 4",
+          "observation": "Trial vessel showing H₂S off-note on cap sniff. Main tank cap smelling clean. Both at Baumé ~10.",
+          "decision": "Added 20 mg N/L DAP to trial vessel only. Flagged main tank for close monitoring next 24 hours.",
+          "reasoning": "H₂S at mid-fermentation in the trial vessel signalled YAN depletion ahead of schedule — likely because the small vessel's higher surface area accelerated early yeast growth and front-loaded nitrogen draw-down.",
+          "outcome": "Trial vessel H₂S resolved within 18 hours. Main tank showed no H₂S — its slower early growth rate had preserved YAN longer. Confirmed scale difference in nitrogen timing."
+        },
+        {
+          "when": "Day 6",
+          "observation": "Trial vessel at Baumé 2.1 — approaching dryness. Main tank at Baumé 4.8 — still active but slowing.",
+          "decision": "Warmed main tank jacket to 24 °C to push through the final sugar load. No intervention on trial vessel — let it finish naturally.",
+          "reasoning": "Main tank's thermal mass was holding fermentation back in the final third. Trial vessel had already demonstrated the yeast could finish cleanly given adequate temperature.",
+          "outcome": "Main tank reached Baumé < 0.5 by Day 9. Trial vessel finished Day 7. Two-day lag at scale was consistent with expected thermal inertia."
+        }
+      ],
+      "counterfactual": "Without the trial vessel flagging early YAN depletion on Day 4, the main tank would likely have received no mid-fermentation nutrient addition — risking H₂S development in a 3200 L lot with far higher remediation cost."
+    },
+    "decision_tree": {
+      "title": "Is your equipment the constraint? — the diagnostic tree",
+      "rows": [
+        {
+          "symptom": "Fermentation temperature varies > 2 °C between vessels on the same day",
+          "first_check": "Jacketing status and ambient exposure of each vessel",
+          "action": "Insulate or jacket the outlier vessel before attributing variation to yeast or fruit"
+        },
+        {
+          "symptom": "Trial results at 50 L do not replicate at 2000 L+",
+          "first_check": "Temperature environment of trial vessel vs main cellar during the trial period",
+          "action": "Re-run trial inside the main cellar space; match ambient conditions before comparing outcomes"
+        },
+        {
+          "symptom": "Cannot get a clean sample mid-fermentation without disturbing the cap",
+          "first_check": "Vessel design — is there a sample valve below the cap line?",
+          "action": "Add a bottom sample valve or accept that mid-ferment data from this vessel is unreliable"
+        },
+        {
+          "symptom": "Fermentation in large tank stalls in the final 2–3 Baumé",
+          "first_check": "Tank temperature — has thermal mass caused a drop below 18 °C as activity slows?",
+          "action": "Raise jacket setpoint to 24–26 °C; do not add more yeast until temperature is confirmed adequate"
+        },
+        {
+          "symptom": "Small-scale trial finishes 3+ days ahead of main tank on identical fruit",
+          "first_check": "Whether this is thermal lag (expected) or a nutrient or pH divergence",
+          "action": "Check pH and YAN in main tank; if within range, accept the lag as normal scale physics and hold course"
+        },
+        {
+          "symptom": "Kit register lists vessels but no calibration dates for instruments",
+          "first_check": "Last refractometer and pH meter calibration — both degrade faster than most winemakers assume",
+          "action": "Calibrate all instruments at vintage start; log dates in kit register; treat uncalibrated readings as directional only"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC321 · Winery Operations",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC321",
+        "note": "Equipment selection and scale considerations in winery design"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide 3530WT · Oenology 3",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Fermentation management and vessel technology at production scale"
+      },
+      {
+        "kind": "buy",
+        "label": "Jackson Wine Science · Ch 12",
+        "url": null,
+        "note": "Ronald S. Jackson — fermentation vessel design and scale effects; Academic Press"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI Fermentation Management",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for fermentation management and stuck fermentation"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine Red Bible · Ch 5",
+        "url": null,
+        "note": "Your paid resource — equipment and vessel selection for red winemaking"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 2.1 · Intro Oenology",
+        "url": null,
+        "note": "Your paid curriculum resource — foundational winery equipment overview"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "At 50 L, the surface-area-to-volume ratio is approximately how many times higher than at 5000 L?",
+        "choices": [
+          "A) 2×",
+          "B) 5×",
+          "C) 10×",
+          "D) 20×"
+        ],
+        "answer": "C",
+        "rationale": "The lesson states roughly 10× — this drives fundamentally different thermal and gas-exchange behaviour, not just a proportional scaling of the same physics."
+      },
+      {
+        "q": "You run a 50 L trial on Lot 7 Shiraz 2025 fruit before committing your 3200 L main tank. What is the primary operational advantage of this approach?",
+        "choices": [
+          "A) The small tank generates more fermentation heat, giving a clearer temperature curve",
+          "B) You get a 5–7 day preview of fermentation trajectory before the main tank commits",
+          "C) SO₂ binding is more predictable at small scale",
+          "D) Baumé drop rate is faster at 50 L, compressing your timeline"
+        ],
+        "answer": "B",
+        "rationale": "The 50 L trial gives a 5–7 day trajectory preview on the same fruit lot — SO₂ binding and Baumé rate are not the lesson's stated advantages of small-scale trials."
+      },
+      {
+        "q": "At peak fermentation activity, self-generated heat in a 5000 L tank can exceed how many °C per day?",
+        "choices": [
+          "A) 0.5–1 °C/day",
+          "B) 1–2 °C/day",
+          "C) 2–3 °C/day",
+          "D) 4–5 °C/day"
+        ],
+        "answer": "C",
+        "rationale": "The lesson specifies 2–3 °C/day at peak activity in large tanks — a thermal load that 50 L vessels never produce and therefore cannot simulate."
+      },
+      {
+        "q": "A winemaker argues their 50 L trial ferment ran cool and clean, so their 3200 L main tank will behave the same way. What is the critical flaw in this reasoning?",
+        "choices": [
+          "A) 50 L trials always ferment faster, so the timeline projection is invalid",
+          "B) Large tanks generate self-sustaining fermentation heat that small vessels cannot replicate",
+          "C) Yeast nutrient demand scales linearly, so additions will be under-calculated",
+          "D) Gas exchange is too slow at 50 L to reflect real cap management needs"
+        ],
+        "answer": "B",
+        "rationale": "Self-generated thermal load at scale is the key difference — the small tank cannot simulate 2–3 °C/day heat rise, so temperature management conclusions from 50 L do not transfer directly."
+      },
+      {
+        "q": "Which combination of features defines a vessel as a quality tool rather than merely a production vessel?",
+        "choices": [
+          "A) Volume above 500 L and stainless steel construction",
+          "B) Reliable temperature control and accessible sampling points",
+          "C) Variable capacity lid and inert gas blanket capability",
+          "D) Cost above a defined threshold and food-grade certification"
+        ],
+        "answer": "B",
+        "rationale": "The lesson is explicit: reliable temperature control and accessible sampling points are the defining criteria — size, material, and cost are not the standard."
+      },
+      {
+        "q": "Owen's kit register flags your 200 L open-top fermenter as having no temperature control. You are about to ferment a high-value Pinot Noir parcel. What does this lesson indicate?",
+        "choices": [
+          "A) The vessel is acceptable because open-tops are standard for Pinot Noir",
+          "B) The vessel is a production vessel, not a quality tool, regardless of its cost",
+          "C) Add a floating thermometer and the vessel qualifies as a quality tool",
+          "D) Temperature control only matters above 1000 L due to thermal mass differences"
+        ],
+        "answer": "B",
+        "rationale": "Without reliable temperature control, the vessel is classified as a production vessel — a floating thermometer monitors but does not control, and the 1000 L threshold is not the lesson's criterion."
+      },
+      {
+        "q": "Why does gas exchange behave as a fundamentally different problem at 50 L compared to 5000 L?",
+        "choices": [
+          "A) CO₂ solubility increases at larger volumes, suppressing yeast activity",
+          "B) The higher surface-area-to-volume ratio at 50 L means proportionally more gas exchange per litre of wine",
+          "C) Larger tanks accumulate SO₂ faster due to reduced headspace",
+          "D) Oxygen pickup during pump-overs is volume-independent"
+        ],
+        "answer": "B",
+        "rationale": "The ~10× higher surface-area-to-volume ratio at 50 L drives proportionally greater gas exchange per litre — CO₂ solubility, SO₂ accumulation, and oxygen pickup do not explain the scale difference in the way stated."
+      },
+      {
+        "q": "A boutique producer runs a 50 L Shiraz trial and observes a stuck fermentation at 4 Baumé on day 6. What is the most defensible next step before the 3200 L tank reaches the same Baumé?",
+        "choices": [
+          "A) Increase pump-over frequency in the main tank immediately",
+          "B) Investigate and resolve the cause in the trial tank — the 5–7 day preview window is the point",
+          "C) Add a yeast rehydration nutrient to the main tank as a precaution",
+          "D) Discard the trial result because small tanks stick more easily than large ones"
+        ],
+        "answer": "B",
+        "rationale": "The 5–7 day preview exists precisely to diagnose and act before the main tank commits to the same trajectory — precautionary additions without diagnosis and discarding the result both waste the trial's value."
+      },
+      {
+        "q": "Which statement about scale and physics is most accurate according to this lesson?",
+        "choices": [
+          "A) Scale is primarily a logistical challenge — the underlying chemistry is identical at any volume",
+          "B) Scale changes surface-area-to-volume ratio, making thermal control and gas exchange different problems at each size",
+          "C) Larger tanks are always harder to manage because every variable is amplified proportionally",
+          "D) Small tanks are inferior quality tools because they cannot sustain stable fermentation temperatures"
+        ],
+        "answer": "B",
+        "rationale": "Scale is explicitly framed as a physics problem driven by surface-area-to-volume ratio — the chemistry is not identical, not every variable scales proportionally, and small tanks have distinct quality-tool advantages."
+      },
+      {
+        "q": "After auditing your kit register, you find your only temperature-controlled vessel is your 50 L trial tank. Your 3200 L main tank has no cooling. What is the honest conclusion this lesson asks you to draw?",
+        "choices": [
+          "A) Your process is the constraint — better SOPs will compensate for the lack of tank cooling",
+          "B) Your kit is the constraint on quality in the main tank, regardless of how well the trial tank performs",
+          "C) Run longer trials at 50 L to gather more data before committing the main tank",
+          "D) The main tank's thermal mass will self-regulate, making active cooling unnecessary above 2000 L"
+        ],
+        "answer": "B",
+        "rationale": "The lesson's audit purpose is to distinguish kit constraints from process constraints — a main tank without temperature control is a kit constraint that process improvements cannot resolve, and thermal mass does not self-regulate."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Surface-area-to-volume ratio: 50 L vs 5000 L — by how much?",
+        "back": "Roughly 10× higher at 50 L, making thermal control and gas exchange fundamentally different problems at each scale."
+      },
+      {
+        "front": "What does a 50 L trial on the same fruit lot give you?",
+        "back": "A 5–7 day preview of fermentation trajectory before the main tank commits to the same path."
+      },
+      {
+        "front": "Peak self-generated fermentation heat in a 5000 L tank — the number to know.",
+        "back": "Can exceed 2–3 °C per day at peak activity — a thermal load 50 L vessels never produce and cannot simulate."
+      },
+      {
+        "front": "Two criteria that make any vessel a quality tool, not just a production vessel.",
+        "back": "Reliable temperature control and accessible sampling points — size and cost are irrelevant to this classification."
+      },
+      {
+        "front": "Common trap: assuming 50 L trial temperature behaviour predicts main tank behaviour.",
+        "back": "Large tanks generate self-sustaining heat that small vessels cannot replicate — thermal conclusions do not transfer directly."
+      },
+      {
+        "front": "Kit constraint vs process constraint — how do you tell the difference?",
+        "back": "If the vessel lacks temperature control or sampling access, the kit is the constraint; no process improvement can substitute for missing hardware."
+      },
+      {
+        "front": "What does the large tank teach that the small one cannot?",
+        "back": "How to manage self-generated fermentation heat at scale — a real thermal load that only emerges above a certain volume."
+      },
+      {
+        "front": "Why is scale described as a physics problem, not just a logistics problem?",
+        "back": "Because surface-area-to-volume ratio changes the behaviour of heat and gas exchange, not just the quantities involved."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2579,
+    "completion_tokens": 5465
+  },
+  "audit": {
+    "totalWords": 1401,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:17:20.154Z"
+}

@@ -1,0 +1,333 @@
+{
+  "lesson_id": "L2.3",
+  "source": {
+    "id": "L2.3",
+    "slug": "canopy-yield-management",
+    "title": "Canopy and yield — steering quality season by season",
+    "level": "2",
+    "wbs": [
+      "D1"
+    ],
+    "reading_min": "5",
+    "aim": "Vigour balance, canopy exposure, crop levels — the levers that turn an average site into a great wine.",
+    "application": "Your growing-season log becomes actionable when you can score your canopy against Smart's points. Owen prompts the observations, this lesson tells you what they mean.",
+    "sources_private": [
+      "aoc_1_5_grapevine_culture_a",
+      "aoc_1_6_grapevine_culture_b",
+      "aoc_1_8_improving_grape_quality"
+    ],
+    "sources_public_ref": [
+      "adelaide_viticult_3021wt",
+      "lincoln_wine_301",
+      "csu_vit212"
+    ],
+    "citations_bibliographic": [
+      "coombe_iland_visc_vol2_practices"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Vigour balance — not vine elimination — is the lever between bulk fruit and site-expressive wine.",
+      "Smart's canopy scorecard gives you a number; your job is to know which management act moves it.",
+      "Crop load and canopy density interact: fix one without the other and you've solved half the problem."
+    ],
+    "sections": [
+      {
+        "heading": "Vigour is energy — direct it, don't fight it",
+        "iconHint": "activity",
+        "body_md": "A high-vigour vine isn't a bad vine. It's a vine with more photosynthetic capacity than its current trellis and crop can absorb productively. That surplus energy goes somewhere — into shoot extension, lateral growth, and dense canopies that shade the fruit zone. The result is delayed ripening, elevated malic acid retention, and green-character precursors that no amount of winemaking will fully erase.\n\nThe practical goal isn't to suppress vigour but to redirect it. Rootstock selection, vine spacing, cover crop competition, and irrigation management are the long-game tools. Within a season, shoot positioning, leaf removal, and hedging are the short-game tools. Neither set works well without the other.\n\nBoutique vignerons on fertile, irrigated sites often underestimate how much a permanent sward between rows can pull. A competitive cover crop can reduce shoot length by 20–30% in a high-vigour block without touching the vine — and it costs less than a second pass of hedging.",
+        "keyConcept": "Vigour balance = shoot growth matched to trellis capacity; surplus vigour always expresses as canopy density, not fruit quality.",
+        "trap": "Hedging repeatedly to manage vigour stimulates lateral regrowth and worsens density — it treats the symptom, not the cause."
+      },
+      {
+        "heading": "The canopy scorecard — Smart's points in practice",
+        "iconHint": "target",
+        "body_md": "Richard Smart's point-score system translates canopy observations into a single diagnostic number. Scores above 16 out of 20 indicate an open, well-exposed canopy; scores below 10 flag a canopy that will compromise fruit quality regardless of how well the winery performs. The six parameters — interior leaf layers, percentage of interior leaves, shoot density, percentage of shaded clusters, percentage of lateral shoots, and percentage of gaps — are each scored 0–3 or 0–4.\n\nThe value of the scorecard isn't the number itself — it's the repeatability. Walk the same block at the same phenological stage each vintage and you build a baseline. A block that scores 14 in a cool, low-vigour year and 9 in a warm, wet year tells you exactly how sensitive that site is to seasonal conditions, and which management levers to pre-position.\n\nIn practice, score at 50% veraison. Earlier and the canopy is still developing; later and you're scoring the consequence, not the cause.",
+        "keyConcept": "Smart canopy score ≥ 16/20 = adequate exposure; score ≤ 10/20 = fruit quality is already compromised before harvest.",
+        "trap": "Scoring once at harvest confuses cause with effect — by then, shading damage to flavour and colour development is irreversible."
+      },
+      {
+        "heading": "Crop load — the ratio that connects canopy to wine",
+        "iconHint": "gauge",
+        "body_md": "Ravaz Index (fruit weight ÷ pruning weight) is the standard crop-load diagnostic. A ratio of 5–10 is widely cited as the productive range for Vitis vinifera; below 5 suggests over-pruning or under-cropping relative to vine capacity, above 10 points to a vine carrying more fruit than its canopy can ripen. Neither extreme produces the best wine, but the consequences differ: a low Ravaz vine wastes photosynthetic potential and can produce coarse, over-ripe characters; a high Ravaz vine dilutes flavour compounds and struggles to accumulate anthocyanins in red varieties.\n\nFor boutique producers, the Ravaz Index is most useful as a between-block and between-vintage comparator. Pair it with your canopy score and you have two independent signals. A block with a Ravaz of 12 and a canopy score of 8 is in serious trouble. A block with a Ravaz of 7 and a canopy score of 17 is performing well — and you can push crop slightly without penalty.\n\nPruning weight is the anchor. Weigh it. It takes ten minutes per block and gives you a season's worth of context.",
+        "keyConcept": "Ravaz Index 5–10 = productive balance; above 10 indicates the canopy cannot ripen the crop it is carrying.",
+        "trap": "Using yield per hectare alone as a quality proxy ignores vine size — a 10 t/ha yield on a large-canopy vine may be under-cropped."
+      },
+      {
+        "heading": "Leaf removal — timing determines what you get",
+        "iconHint": "wind",
+        "body_md": "Basal leaf removal in the fruit zone is one of the highest-return interventions available to a vigneron. Done early — at or just after fruit set — it improves cluster architecture, reduces botrytis risk, and in red varieties, drives anthocyanin accumulation by increasing light interception at the berry surface. Done late — at veraison or after — it exposes berries that have developed under shade to sudden UV and heat load, risking sunburn and accelerated sugar accumulation without corresponding flavour development.\n\nThe side of the canopy matters as much as the timing. In Australian conditions, east-side leaf removal is generally lower-risk than west-side: morning sun is gentler, afternoon sun in a warm region can push berry temperature above 35°C and halt anthocyanin synthesis. In cooler maritime or elevated sites, west-side removal may be appropriate to capture afternoon warmth and extend the ripening window.\n\nRemove two to three leaves per shoot in the fruit zone at fruit set. That's the practical starting point — adjust based on your canopy score and regional heat load.",
+        "keyConcept": "Early basal leaf removal (fruit set) improves cluster exposure and colour; late removal (veraison+) risks sunburn without flavour benefit.",
+        "trap": "Removing leaves on the west-facing side in a warm inland site to 'open the canopy' routinely causes berry sunburn and stuck anthocyanin synthesis."
+      },
+      {
+        "heading": "Season-to-season calibration — your log becomes the tool",
+        "iconHint": "clock",
+        "body_md": "A single vintage observation is an anecdote. Three vintages of canopy scores, Ravaz indices, pruning weights, and wine outcomes is a dataset. The discipline of recording — block by block, at consistent phenological stages — is what separates reactive management from deliberate site development.\n\nThe minimum useful log: pruning weight per vine (or per metre of row), shoot count at budburst, canopy score at 50% veraison, yield at harvest, and a brief sensory note at bottling. Five data points per block per year. After three vintages you will see patterns that no consultant visit can reveal — which blocks respond to wet springs, which rootstocks amplify vigour in warm years, which rows consistently underperform regardless of season.\n\nOwen's growing-season prompts are structured around these same checkpoints. The log isn't administrative overhead — it's the feedback loop that makes every management decision in the next vintage more precise than the last.",
+        "keyConcept": "Three vintages of consistent block-level data — pruning weight, canopy score, yield, sensory — is the minimum to identify site-specific patterns.",
+        "trap": "Recording yield and nothing else gives you a production number, not a quality diagnostic — without canopy and pruning data it explains nothing."
+      }
+    ],
+    "worked_example": {
+      "title": "Block 3 · Shiraz · McLaren Vale · Vintage 2024",
+      "starting_conditions": [
+        "Vine age: 18 years, own-rooted, Scott Henry trellis, 2.7 m × 1.5 m spacing",
+        "Previous vintage pruning weight: 420 g/vine average; Ravaz Index 2023: 11.2 (flagged as over-cropped)",
+        "Canopy score at veraison 2023: 9/20 — dense interior, >40% shaded clusters, shoot density excessive"
+      ],
+      "timeline": [
+        {
+          "when": "Budburst (Aug)",
+          "observation": "Shoot count per vine averaging 38 — higher than the 28–32 target for this trellis system",
+          "decision": "Shoot thin to 30 shoots per vine at 10 cm shoot length, removing all double buds and basal water shoots",
+          "reasoning": "Reducing shoot number before the canopy closes is the lowest-cost intervention — no regrowth stimulation, no lateral flush",
+          "outcome": "Canopy entry into flowering was noticeably less congested; lateral development at fruit set was moderate rather than aggressive"
+        },
+        {
+          "when": "Fruit set (Nov)",
+          "observation": "Cluster set appeared even; shoot length at 55 cm with moderate lateral development in the fruit zone",
+          "decision": "Removed 2 leaves per shoot on the east-facing side of the fruit zone across the entire block; no west-side removal given forecast of three consecutive 38°C days in week 3",
+          "reasoning": "East-side removal at fruit set improves air circulation and light penetration without sunburn risk; west-side removal deferred given heat forecast",
+          "outcome": "Botrytis incidence at harvest was 3% versus 14% in the same block in 2023; cluster architecture was more open"
+        },
+        {
+          "when": "Veraison (Feb)",
+          "observation": "Canopy score assessed at 15/20 — a six-point improvement on 2023; interior leaf layers reduced from 3.2 to 1.6 average",
+          "decision": "Targeted a 15% crop reduction via green harvest on the most vigorous rows (rows 4–9), removing one cluster per shoot where double clusters present",
+          "reasoning": "Ravaz Index projection at full crop was 9.8 — within range but at the upper limit given the canopy score was still not ideal; reducing to a projected 7.5 gave a margin for the warm finish forecast",
+          "outcome": "Final Ravaz Index: 7.8. Harvest Baumé: 14.2°, pH 3.51, TA 5.8 g/L — all within target window. Colour density at pressing visibly deeper than 2023"
+        }
+      ],
+      "counterfactual": "Had shoot thinning been skipped and only leaf removal applied, the canopy score would likely have reached 12–13 at best — the interior density problem would have persisted and the botrytis improvement would have been marginal."
+    },
+    "decision_tree": {
+      "title": "Canopy and crop — when and how to intervene",
+      "rows": [
+        {
+          "symptom": "Canopy score ≤ 10 at veraison, dense interior, >40% shaded clusters",
+          "first_check": "Shoot count and pruning weight from previous vintage — is this a structural vigour problem or a single-season anomaly?",
+          "action": "Immediate: targeted shoot removal and fruit-zone leaf removal on east side. Medium-term: reassess trellis system and cover crop competition for next season."
+        },
+        {
+          "symptom": "Ravaz Index > 10 at harvest for two consecutive vintages",
+          "first_check": "Pruning weight trend — is vine capacity growing, or is crop being set too high relative to a stable canopy?",
+          "action": "Reduce retained bud count at pruning by 15–20%; consider green harvest at fruit set rather than veraison to avoid wasting vine resources on fruit that will be removed."
+        },
+        {
+          "symptom": "Shoot length > 1.8 m at hedging, excessive lateral regrowth after first hedge",
+          "first_check": "Irrigation volume and timing — is mid-season irrigation driving post-set vigour flush?",
+          "action": "Reduce post-set irrigation by 20–30%; introduce competitive cover crop between rows; avoid a second hedge pass — it stimulates the laterals you are trying to suppress."
+        },
+        {
+          "symptom": "Uneven ripening within a block — some rows at target Baumé, others 1.5° behind",
+          "first_check": "Soil texture and water-holding capacity variation across the block; check canopy scores row by row rather than block average",
+          "action": "Map the variation; manage high-vigour rows as a separate unit for irrigation, leaf removal, and green harvest timing. Do not average the block into a single management decision."
+        },
+        {
+          "symptom": "Colour and flavour development lagging despite adequate sugar accumulation (Baumé on target, wine thin)",
+          "first_check": "Canopy score at veraison — was the fruit zone adequately exposed during the critical 4–6 weeks post-veraison?",
+          "action": "If shading was the cause, advance leaf removal timing to fruit set next vintage. If canopy was open, investigate crop load — Ravaz above 10 can produce dilute flavour even with adequate sugar."
+        },
+        {
+          "symptom": "Botrytis incidence > 10% at harvest in a dry season",
+          "first_check": "Cluster architecture and fruit-zone air circulation — dense, winged clusters in a shaded zone are the primary driver even without rain",
+          "action": "Early leaf removal at fruit set (not veraison) is the primary fix; also review shoot density and consider a trellis lift to separate the fruit zone from the foliage mass."
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Coombe & Iland · Viticulture Vol 2: Practices · Ch 5–6",
+        "url": null,
+        "note": "Winetitles Media — canopy management and crop load chapters"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide VITI 3021WT · Canopy and Yield Management",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "See viticulture electives in the Adelaide wine science calendar"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Lincoln WINE 301 · Vineyard Production Systems",
+        "url": "https://www.lincoln.ac.nz/study/courses-2/course-search/",
+        "note": "Search WINE 301 in Lincoln course finder"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU VIT212 · Canopy Management",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC212",
+        "note": "CSU viticulture subject — canopy and yield learning outcomes"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Canopy Management and Wine Quality",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'canopy management' — technical review articles available"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Modules 1.5, 1.6, 1.8 · Grapevine Culture and Quality Improvement",
+        "url": null,
+        "note": "Your paid AOC curriculum resource — do not reproduce text"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Your Shiraz block scores 9/20 on Smart's canopy scorecard in late November. What does this tell you about fruit quality at harvest?",
+        "choices": [
+          "A) Fruit quality is already compromised before harvest begins",
+          "B) The canopy is borderline — monitor but no action needed",
+          "C) The score is acceptable; quality issues are unlikely",
+          "D) The score reflects vigour balance, not fruit quality directly"
+        ],
+        "answer": "A",
+        "rationale": "A Smart score ≤ 10/20 means fruit quality is already compromised; scores below 16/20 indicate inadequate exposure, and waiting to act at harvest is too late."
+      },
+      {
+        "q": "Block 3 Shiraz has a pruning weight of 1.2 kg/m and a yield of 14 t/ha on a row spacing of 3 m. The Ravaz Index calculates above 10. What is the most likely consequence?",
+        "choices": [
+          "A) The canopy cannot ripen the crop it is carrying",
+          "B) Vigour is too low and shoot growth will stall",
+          "C) The block is in productive balance and no adjustment is needed",
+          "D) Leaf area is excessive relative to fruit weight"
+        ],
+        "answer": "A",
+        "rationale": "Ravaz Index above 10 signals the canopy is overcropped relative to its leaf area; productive balance sits at 5–10, so ripening will be compromised."
+      },
+      {
+        "q": "A vigneron removes basal leaves at veraison on a Pinot Noir block to improve colour. What is the most accurate assessment of this decision?",
+        "choices": [
+          "A) It risks sunburn without delivering meaningful flavour benefit",
+          "B) It is the optimal timing for anthocyanin development",
+          "C) Late removal is preferred because shoots have hardened off",
+          "D) Leaf removal at veraison maximises cluster exposure across the whole season"
+        ],
+        "answer": "A",
+        "rationale": "Late leaf removal (veraison+) exposes previously shaded fruit to direct sun without the flavour-development window that early removal provides, increasing sunburn risk."
+      },
+      {
+        "q": "What does a Ravaz Index of 5–10 indicate about a vineyard block?",
+        "choices": [
+          "A) The block is in productive balance between canopy and crop",
+          "B) The block is undercropped and vigour will increase next season",
+          "C) Crop load is too high for adequate ripening",
+          "D) Pruning weight needs to be reduced to restore balance"
+        ],
+        "answer": "A",
+        "rationale": "Ravaz Index 5–10 is the benchmark for productive balance; outside this range the relationship between canopy capacity and crop load is mismatched."
+      },
+      {
+        "q": "A grower notices consistently dense canopies and poor fruit colour across three vintages on a high-vigour block. They increase irrigation and add nitrogen to improve shoot health. What is wrong with this approach?",
+        "choices": [
+          "A) It adds more energy to a system already expressing surplus vigour as canopy density",
+          "B) It is correct — poor colour is a nutrition problem, not a canopy problem",
+          "C) Irrigation timing is the issue, not nitrogen",
+          "D) Dense canopies indicate low vigour, so inputs are appropriate"
+        ],
+        "answer": "A",
+        "rationale": "Surplus vigour expresses as canopy density, not fruit quality; adding irrigation and nitrogen amplifies the problem rather than redirecting energy to the fruit."
+      },
+      {
+        "q": "Early basal leaf removal at fruit set on a Grenache block is expected to deliver which primary benefit?",
+        "choices": [
+          "A) Improved cluster exposure and colour development",
+          "B) Reduced berry size through water stress",
+          "C) Lower disease pressure only, with no colour effect",
+          "D) Delayed veraison to extend the flavour-development window"
+        ],
+        "answer": "A",
+        "rationale": "Early removal at fruit set opens the canopy during the period when exposure most influences colour and flavour development; colour benefit is well established at this timing."
+      },
+      {
+        "q": "A Smart canopy score of 16/20 is the threshold for what outcome?",
+        "choices": [
+          "A) Adequate canopy exposure",
+          "B) Optimal Ravaz Index",
+          "C) Minimum pruning weight for shoot balance",
+          "D) Acceptable disease pressure without fungicide"
+        ],
+        "answer": "A",
+        "rationale": "Smart's scorecard defines ≥ 16/20 as adequate exposure; it is a canopy quality metric, not a direct measure of crop load or disease."
+      },
+      {
+        "q": "You have one vintage of block-level data — pruning weight, canopy score, yield, and sensory notes. How reliable is this for identifying site-specific vigour patterns?",
+        "choices": [
+          "A) Insufficient — three vintages of consistent data is the minimum to identify patterns",
+          "B) Sufficient if the canopy score and Ravaz Index both fall within target ranges",
+          "C) Reliable enough to make permanent trellis changes",
+          "D) One vintage is adequate when combined with soil mapping"
+        ],
+        "answer": "A",
+        "rationale": "Three vintages of consistent block-level data is the stated minimum; a single season cannot distinguish site pattern from seasonal variation."
+      },
+      {
+        "q": "On a vigorous Shiraz block, shoot growth consistently exceeds trellis capacity. Which statement best describes the vigour balance principle?",
+        "choices": [
+          "A) Vigour balance requires shoot growth matched to trellis capacity; surplus always expresses as canopy density",
+          "B) Excess vigour should be managed by increasing crop load to absorb the energy",
+          "C) Trellis capacity should be expanded to accommodate natural vigour expression",
+          "D) Surplus vigour improves fruit quality by increasing photosynthetic capacity"
+        ],
+        "answer": "A",
+        "rationale": "The vigour balance principle is explicit: surplus vigour expresses as canopy density, not fruit quality; the solution is matching growth to trellis capacity, not accommodating excess."
+      },
+      {
+        "q": "Block 3 Shiraz in McLaren Vale has a Ravaz Index of 7.5 and a Smart score of 17/20 going into veraison. A consultant recommends a green harvest to drop 20% of crop. Is this warranted?",
+        "choices": [
+          "A) No — both metrics are within target ranges, indicating productive balance and adequate exposure",
+          "B) Yes — Ravaz Index should always be below 7 for premium Shiraz",
+          "C) Yes — Smart scores above 16 indicate the canopy is too open and yield should be reduced",
+          "D) No — green harvest is only relevant when Ravaz Index exceeds 15"
+        ],
+        "answer": "A",
+        "rationale": "Ravaz Index 7.5 sits within the 5–10 productive balance range and Smart score 17/20 exceeds the 16/20 adequacy threshold; intervention is not indicated by either metric."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Smart canopy score threshold for adequate exposure — what number?",
+        "back": "≥ 16/20 indicates adequate canopy exposure; ≤ 10/20 means fruit quality is already compromised."
+      },
+      {
+        "front": "Ravaz Index productive balance range — upper and lower limits?",
+        "back": "5–10 is productive balance; above 10 means the canopy cannot ripen the crop it carries."
+      },
+      {
+        "front": "Where does surplus vigour express — canopy or fruit?",
+        "back": "Surplus vigour always expresses as canopy density, not fruit quality."
+      },
+      {
+        "front": "Optimal timing for basal leaf removal to improve colour and flavour?",
+        "back": "Fruit set — early removal maximises cluster exposure during the flavour-development window."
+      },
+      {
+        "front": "Risk of leaf removal at veraison versus fruit set?",
+        "back": "Veraison-timing risks sunburn on previously shaded fruit without delivering meaningful flavour benefit."
+      },
+      {
+        "front": "Minimum vintages of block data needed to identify site-specific vigour patterns?",
+        "back": "Three vintages of consistent pruning weight, canopy score, yield, and sensory data."
+      },
+      {
+        "front": "Vigour balance definition — one phrase?",
+        "back": "Shoot growth matched to trellis capacity."
+      },
+      {
+        "front": "Common trap: dense canopy + poor colour — wrong diagnosis?",
+        "back": "Attributing poor colour to nutrition rather than surplus vigour causing canopy shading."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2678,
+    "completion_tokens": 6001
+  },
+  "audit": {
+    "totalWords": 1607,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:23:41.603Z"
+}

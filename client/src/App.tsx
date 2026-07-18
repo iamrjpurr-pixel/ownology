@@ -376,12 +376,7 @@ function Router() {
       <Route path={"/for-home-winemakers/glossary"} component={HomeWinemakerGlossary} />
       <Route path={"/for-home-winemakers/knowledge"} component={DIYKnowledge} />
       <Route path={"/for-home-winemakers/knowledge/*"} component={DIYKnowledge} />
-      <Route path={"/curriculum-test"}>
-        <div data-testid="curriculum-test" style={{ padding: 40, background: "white", minHeight: "100vh" }}>
-          <h1 style={{ fontSize: 32 }}>Curriculum test route — plain div</h1>
-          <p>If you see this, static routes render fine.</p>
-        </div>
-      </Route>
+      <Route path={"/curriculum/about"} component={CurriculumAbout} />
       <Route path={"/curriculum"} component={Curriculum} />
       <Route path={"/curriculum/:slug"} component={CurriculumLesson} />
       <Route path={"/blog"} component={Blog} />

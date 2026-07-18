@@ -1,0 +1,325 @@
+{
+  "lesson_id": "L1.5",
+  "source": {
+    "id": "L1.5",
+    "slug": "fermentation-fundamentals",
+    "title": "What fermentation actually is",
+    "level": "1",
+    "wbs": [
+      "D4"
+    ],
+    "reading_min": "5",
+    "aim": "Sugar → alcohol → CO₂ + heat + everything else. The biochemistry made operational — what changes and when.",
+    "application": "When your ferment stalls or spikes, this lesson is the mental model you're troubleshooting against.",
+    "sources_private": [
+      "morewine_bible_red_ch4",
+      "awri_stuck_ferment"
+    ],
+    "sources_public_ref": [
+      "csu_wsc115",
+      "adelaide_oenology_2503wt"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch4"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Fermentation converts sugar to ethanol and CO₂ via yeast glycolysis — heat, nitrogen, and oxygen are consumed along the way.",
+      "Rate, temperature, and nutrient depletion are the three levers that explain almost every stuck or sluggish ferment.",
+      "Understanding what yeast are doing biochemically tells you when to act, not just whether something looks wrong."
+    ],
+    "sections": [
+      {
+        "heading": "Glycolysis is the engine — everything else is exhaust",
+        "iconHint": "flask-conical",
+        "body_md": "Yeast convert glucose and fructose through a ten-step glycolytic pathway, producing two molecules of pyruvate per sugar molecule. Pyruvate is then decarboxylated to acetaldehyde, which is reduced to ethanol. The net yield is two ATP per glucose — enough to drive yeast growth and maintenance, but not lavish. CO₂ is the stoichiometric co-product: roughly 47 g per 100 g sugar fermented.\n\nFor every 1 °Baumé drop you see on your refractometer, approximately 5.5 g/L ethanol is being produced and around 3.5 g/L CO₂ is leaving the tank. That CO₂ carries heat with it, but not enough — the rest stays in the must. A 20 °Baumé red ferment starting at 18 °C will generate enough metabolic heat to push past 30 °C without active cooling. The biochemistry is not gentle.\n\nFructose is fermented more slowly than glucose by most *Saccharomyces cerevisiae* strains. Late-ferment residual sugar is therefore disproportionately fructose — relevant when you're chasing the last 2 °Baumé and wondering why the rate has dropped.",
+        "keyConcept": "Each 1 °Baumé drop produces ~5.5 g/L ethanol and ~3.5 g/L CO₂; metabolic heat accumulates unless actively managed.",
+        "trap": "Assuming a slowing rate near 2 °Baumé is a stuck ferment — it may simply be fructose-dominated residual sugar fermenting at its natural slower pace."
+      },
+      {
+        "heading": "Heat is a by-product, not a side effect — it has a budget",
+        "iconHint": "thermometer",
+        "body_md": "Alcoholic fermentation is exothermic. The enthalpy released is approximately 100 kJ per mole of glucose — in practical terms, a 10,000 L red ferment at peak activity can generate enough heat to raise must temperature by 1–2 °C per day without cooling intervention. Small open-top fermenters in a warm shed will spike faster than that.\n\nYeast enzyme kinetics follow a bell curve against temperature. Activity accelerates up to roughly 30–35 °C for most wine strains, then drops sharply as membrane fluidity is compromised and enzyme denaturation begins. Above 38 °C, fermentation arrest becomes likely. Below 12 °C, most strains stall regardless of nutrient status.\n\nThe operational rule: keep reds between 22–28 °C for flavour and rate balance; whites between 12–18 °C for aromatic retention. These aren't arbitrary — they sit on the productive slope of the kinetic curve, away from both the cold floor and the heat ceiling.",
+        "keyConcept": "Yeast enzyme activity peaks near 30–35 °C; above 38 °C arrest risk is high, below 12 °C most strains stall regardless of nutrients.",
+        "trap": "Cooling a hot tank too aggressively — dropping from 34 °C to 16 °C in hours — can shock yeast into dormancy faster than the heat itself would have."
+      },
+      {
+        "heading": "Nitrogen is the fuel gauge, not the ignition key",
+        "iconHint": "gauge",
+        "body_md": "Yeast assimilable nitrogen (YAN) is consumed almost entirely in the first third of fermentation — roughly the first 5 °Baumé drop. Amino acids and ammonium are taken up to build enzymes, membrane proteins, and the cellular machinery that drives the rest of the ferment. Once YAN is exhausted, yeast coast on existing enzyme reserves.\n\nMust YAN below 150 mg N/L at inoculation is a known risk factor for slow or stuck fermentation. Deficiency also drives production of hydrogen sulphide (H₂S) as yeast scavenge sulphur-containing amino acids for nitrogen. The smell of rotten eggs mid-ferment is a YAN distress signal, not a random event.\n\nTiming matters: DAP additions after 5 °Baumé drop are largely wasted because uptake capacity has declined. Add nitrogen early — at inoculation or within the first 24–48 hours — when yeast are in exponential growth and can actually use it.",
+        "keyConcept": "YAN below 150 mg N/L at inoculation is a primary stuck-ferment risk; add DAP within the first 24–48 hours for meaningful uptake.",
+        "trap": "Adding DAP at 2 °Baumé to rescue a sluggish ferment — by that point yeast uptake is minimal and you're mostly acidifying the wine."
+      },
+      {
+        "heading": "Oxygen has one job — and it's early",
+        "iconHint": "wind",
+        "body_md": "Yeast require oxygen during the growth phase to synthesise sterols and unsaturated fatty acids — structural components of the cell membrane. Without them, membranes become rigid and permeable, ethanol tolerance drops, and fermentation stalls at moderate alcohol levels. This is why pump-overs and rack-and-returns in the first 48–72 hours of red fermentation do more than extract colour — they're delivering a critical nutrient.\n\nOnce yeast enter the stationary phase (roughly after the first third of sugar is consumed), oxygen demand drops sharply. Continued aeration at that stage risks oxidation of early-formed aromatics and can encourage acetic acid bacteria if the tank is not clean. The window for beneficial oxygen addition is narrow: growth phase only.\n\nFor whites and rosés fermented in tank, a single splash rack at inoculation or one early pump-over is typically sufficient. Barrel-fermented whites get micro-oxygenation passively through stave porosity — no additional intervention needed.",
+        "keyConcept": "Oxygen is essential during yeast growth phase (first 48–72 hours) for sterol synthesis; aeration after that phase risks oxidation and acetic acid bacteria.",
+        "trap": "Pumping over a white ferment mid-way to 'check on it' — unnecessary oxygen exposure at that stage does more harm than good."
+      },
+      {
+        "heading": "The fermentation curve tells you where you are — if you read it daily",
+        "iconHint": "activity",
+        "body_md": "A healthy fermentation follows a predictable sigmoid curve: slow start as yeast adapt (lag phase, 12–24 hours), rapid exponential drop in Baumé as population peaks, then a decelerating tail as sugar depletes and ethanol accumulates. Plotting Baumé against time daily gives you the shape — and deviations from that shape are your diagnostic signal.\n\nA rate below 0.5 °Baumé/day in the mid-ferment window (8–4 °Baumé) warrants investigation. A complete stop — less than 0.1 °Baumé change over 48 hours — is a stuck ferment by any working definition. The cause is almost always one of four things: temperature out of range, YAN exhausted, ethanol toxicity (above ~14% v/v for sensitive strains), or fatty acid accumulation inhibiting yeast membranes.\n\nKeep a paper or digital log. A single daily Baumé reading takes 30 seconds and gives you a trend. Without the trend, you're reacting to a snapshot.",
+        "keyConcept": "Mid-ferment rate below 0.5 °Baumé/day warrants investigation; below 0.1 °Baumé/day over 48 hours is a stuck ferment by working definition.",
+        "trap": "Taking a single Baumé reading and concluding the ferment is 'fine' — one data point has no trend, and trend is everything in fermentation management."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Shiraz 2025 · McLaren Vale · 20 °Baumé at crush",
+      "starting_conditions": [
+        "Must weight: 20 °Baumé at crush (approx. 220 g/L total sugar)",
+        "YAN measured at 110 mg N/L — below the 150 mg N/L threshold",
+        "Inoculated with EC-1118 at 25 g/hL; must temperature 20 °C; tank capacity 8,000 L"
+      ],
+      "timeline": [
+        {
+          "when": "Day 1",
+          "observation": "Baumé at 19.2 — lag phase ending, CO₂ just beginning. No visible cap formation yet. Must temperature 21 °C.",
+          "decision": "Added DAP at 30 g/hL (delivering ~50 mg N/L) plus Fermaid-O at 20 g/hL. Pump-over for 20 minutes to incorporate and oxygenate.",
+          "reasoning": "YAN was deficient at crush. Day 1 is still within the growth phase window where uptake is active. Oxygen delivery supports sterol synthesis before exponential growth peaks.",
+          "outcome": "By evening, cap forming, CO₂ evolution audible. Baumé trending down."
+        },
+        {
+          "when": "Day 3",
+          "observation": "Baumé at 15.8 — rate of 1.7 °Baumé/day, well within healthy range. Must temperature spiked to 31 °C. Cap firm and thick.",
+          "decision": "Increased cooling to hold tank at 27 °C. Continued twice-daily pump-overs for extraction. No additional nutrients added.",
+          "reasoning": "31 °C is approaching the upper safe limit for sustained fermentation. Cooling now prevents a heat spike that could push past 35 °C within 24 hours. Nutrient window has closed — adding more DAP at this stage would be ineffective.",
+          "outcome": "Temperature stabilised at 26–27 °C. Rate held at 1.4–1.6 °Baumé/day through days 4 and 5."
+        },
+        {
+          "when": "Day 8",
+          "observation": "Baumé at 4.1 — rate has dropped to 0.6 °Baumé/day. Temperature now 24 °C. Faint H₂S detectable on cap.",
+          "decision": "Splash rack to a clean tank, introducing oxygen. No additional DAP. Monitored closely over next 48 hours.",
+          "reasoning": "H₂S at this stage suggests residual sulphur metabolism under low-nitrogen conditions, not a new deficiency. Oxygen exposure can help volatilise H₂S and stimulate remaining yeast activity. DAP addition at 4 °Baumé would not be taken up meaningfully.",
+          "outcome": "H₂S dissipated within 24 hours. Fermentation completed to 0.8 °Baumé by day 11 without further intervention."
+        }
+      ],
+      "counterfactual": "Had the YAN deficiency not been corrected on Day 1, the ferment would likely have stalled near 4–5 °Baumé with significant H₂S and required a full stuck-ferment rescue protocol — rehydration of a new yeast strain, acclimatisation, and a 3–5 day recovery period."
+    },
+    "decision_tree": {
+      "title": "When to intervene — the diagnostic tree",
+      "rows": [
+        {
+          "symptom": "Rate slowing but still moving (0.5–1.0 °Baumé/day) in mid-ferment (8–4 °Baumé)",
+          "first_check": "Temperature and YAN history — was nitrogen added early enough?",
+          "action": "Warm tank 2 °C if below 20 °C; if YAN was never corrected and still within day 2, add Fermaid-O at 20 g/hL"
+        },
+        {
+          "symptom": "Rate below 0.5 °Baumé/day in mid-ferment, no H₂S",
+          "first_check": "Tank temperature — is it above 30 °C or below 15 °C?",
+          "action": "Correct temperature to 22–26 °C first; reassess rate after 24 hours before adding any nutrients"
+        },
+        {
+          "symptom": "Full stop — less than 0.1 °Baumé change over 48 hours",
+          "first_check": "Residual sugar (enzymatic), ethanol level, temperature, and microscopy for yeast viability",
+          "action": "Prepare a stuck-ferment rescue: rehydrate a robust strain (e.g. EC-1118) with Go-Ferm, acclimatise to stuck wine over 24 hours, then inoculate at 10% volume"
+        },
+        {
+          "symptom": "H₂S detectable on cap or at drain",
+          "first_check": "Fermentation stage — early (growth phase) or late (tail)?",
+          "action": "Early: add Fermaid-O or organic nitrogen immediately. Late (below 4 °Baumé): splash rack to volatilise H₂S; avoid DAP at this stage"
+        },
+        {
+          "symptom": "Temperature spike above 33 °C",
+          "first_check": "Cooling capacity and current fermentation rate — is the tank still actively fermenting?",
+          "action": "Cool aggressively but not below 20 °C in a single step; target 26–28 °C; avoid cold shocking an active ferment"
+        },
+        {
+          "symptom": "Ferment stalls at 2–4 °Baumé with high ethanol (above 13.5% v/v estimated)",
+          "first_check": "Yeast strain ethanol tolerance rating and original must weight",
+          "action": "Ethanol toxicity likely — standard nutrient addition will not resolve; proceed to stuck-ferment rescue with a high-tolerance strain"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 4",
+        "url": null,
+        "note": "Chapman & Hall — biochemistry of alcoholic fermentation, yeast nutrition, and heat generation"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC115 · Fermentation Science · LO 2–3",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC115",
+        "note": "Covers yeast metabolism, fermentation monitoring, and intervention thresholds"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide · 2503WT Winemaking Technology · Fermentation module",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Refer to fermentation biochemistry and management sections"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Stuck and Sluggish Fermentation",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'stuck fermentation' — practical diagnosis and rescue protocols"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine Red Winemaking Bible · Ch 4",
+        "url": null,
+        "note": "Your paid resource — fermentation management and nutrient addition timing"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Tank 7 Shiraz starts at 20 °Baumé. Assuming complete fermentation, approximately how much ethanol will be produced?",
+        "choices": [
+          "A) 110 g/L",
+          "B) 55 g/L",
+          "C) 70 g/L",
+          "D) 90 g/L"
+        ],
+        "answer": "A",
+        "rationale": "Each 1 °Baumé drop yields ~5.5 g/L ethanol; 20 × 5.5 = 110 g/L — other options misapply the conversion factor or confuse ethanol with CO₂ yield."
+      },
+      {
+        "q": "Tank 7 drops from 20 °Baumé to 16 °Baumé over two days. How much CO₂ has been produced?",
+        "choices": [
+          "A) 22 g/L",
+          "B) 14 g/L",
+          "C) 28 g/L",
+          "D) 8 g/L"
+        ],
+        "answer": "B",
+        "rationale": "A 4 °Baumé drop × 3.5 g/L CO₂ per degree = 14 g/L; confusing CO₂ yield with ethanol yield (5.5 g/L) gives the wrong figure."
+      },
+      {
+        "q": "On day 3 of Tank 7's ferment, Baumé has moved only 0.08 °Baumé in 48 hours. What is the correct classification and immediate response?",
+        "choices": [
+          "A) Stuck ferment — investigate YAN, temperature, and yeast viability immediately",
+          "B) Normal slow ferment — red wines often plateau mid-ferment",
+          "C) Sluggish but acceptable — wait another 48 hours before acting",
+          "D) Complete ferment — Baumé near zero means little movement is expected"
+        ],
+        "answer": "A",
+        "rationale": "Below 0.1 °Baumé/day over 48 hours meets the working definition of stuck ferment and demands immediate diagnosis — waiting compounds the problem."
+      },
+      {
+        "q": "You measure Tank 7 at 15 °Baumé and the rate has slowed to 0.3 °Baumé/day. What does this signal?",
+        "choices": [
+          "A) Ferment is progressing normally through its natural mid-ferment deceleration",
+          "B) Rate is below 0.5 °Baumé/day and warrants investigation before it stalls",
+          "C) Ferment is stuck and requires immediate re-inoculation",
+          "D) Rate is acceptable — intervention is only needed below 0.1 °Baumé/day"
+        ],
+        "answer": "B",
+        "rationale": "Mid-ferment rate below 0.5 °Baumé/day is the trigger for investigation, not yet stuck, but ignoring it risks progressing to a true stuck ferment."
+      },
+      {
+        "q": "Tank 7's must YAN tests at 120 mg N/L at crush. What is the primary risk and the correct timing for DAP addition?",
+        "choices": [
+          "A) Low stuck-ferment risk; add DAP at mid-ferment for best uptake",
+          "B) High stuck-ferment risk; add DAP within the first 24–48 hours",
+          "C) Moderate risk; YAN only matters if temperature also exceeds 35 °C",
+          "D) No risk; 120 mg N/L is above the threshold of 100 mg N/L"
+        ],
+        "answer": "B",
+        "rationale": "YAN below 150 mg N/L is a primary stuck-ferment risk; DAP must be added in the first 24–48 hours when yeast are actively growing and can assimilate nitrogen."
+      },
+      {
+        "q": "Which statement correctly describes the role of oxygen during fermentation of Tank 7?",
+        "choices": [
+          "A) Oxygen should be added throughout fermentation to keep yeast healthy",
+          "B) Oxygen is critical in the first 48–72 hours for sterol synthesis, then should be avoided",
+          "C) Oxygen addition after mid-ferment improves ethanol tolerance in yeast",
+          "D) Oxygen has no role in fermentation — it is only relevant post-ferment for SO₂ management"
+        ],
+        "answer": "B",
+        "rationale": "Oxygen drives sterol synthesis during yeast growth phase; aeration after that window risks acetic acid bacteria proliferation and oxidation."
+      },
+      {
+        "q": "Tank 7's temperature climbs to 39 °C during peak fermentation. What is the primary biochemical risk?",
+        "choices": [
+          "A) Yeast enzyme denaturation and fermentation arrest",
+          "B) Excessive CO₂ stripping of volatile aromatics only",
+          "C) Accelerated malolactic fermentation onset",
+          "D) Increased YAN demand causing nitrogen deficiency"
+        ],
+        "answer": "A",
+        "rationale": "Above 38 °C yeast enzyme activity is compromised and arrest risk is high — the other options are secondary concerns or unrelated to this temperature threshold."
+      },
+      {
+        "q": "A cool-climate winery holds Tank 7 at 11 °C to preserve aromatics. What fermentation outcome should they anticipate?",
+        "choices": [
+          "A) Faster fermentation due to reduced microbial competition",
+          "B) Stalled or arrested fermentation — most strains cannot sustain activity below 12 °C",
+          "C) Normal fermentation rate with enhanced ester production",
+          "D) Increased YAN uptake efficiency at low temperature"
+        ],
+        "answer": "B",
+        "rationale": "Below 12 °C most strains stall regardless of nutrient status — temperature is a hard physiological limit, not just a rate modifier."
+      },
+      {
+        "q": "Glycolysis converts glucose to pyruvate, which yeast then reduce to ethanol. What is the direct operational consequence of this pathway producing heat?",
+        "choices": [
+          "A) Heat must be actively managed or it accumulates and risks enzyme arrest above 38 °C",
+          "B) Heat is self-limiting because CO₂ release cools the tank passively",
+          "C) Heat only matters in open-top fermenters where evaporation cannot occur",
+          "D) Heat production peaks at the end of fermentation when sugar is lowest"
+        ],
+        "answer": "A",
+        "rationale": "Metabolic heat accumulates continuously and requires active temperature control — CO₂ release provides negligible cooling relative to heat generated."
+      },
+      {
+        "q": "A winemaker adds DAP to Tank 7 at 8 °Baumé (mid-to-late ferment) because early addition was missed. What is the likely outcome?",
+        "choices": [
+          "A) Full benefit — yeast assimilate nitrogen at any fermentation stage",
+          "B) Minimal benefit — yeast uptake of DAP is poor outside the first 24–48 hours of active growth",
+          "C) Negative outcome — late DAP addition always causes H₂S production",
+          "D) Moderate benefit — DAP at 8 °Baumé is the recommended timing for red wines"
+        ],
+        "answer": "B",
+        "rationale": "Meaningful DAP uptake occurs during active yeast growth in the first 24–48 hours; late addition has poor assimilation and does not rescue a nitrogen-deficient ferment."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Ethanol yield per 1 °Baumé drop — what is the figure?",
+        "back": "Each 1 °Baumé drop produces approximately 5.5 g/L ethanol."
+      },
+      {
+        "front": "CO₂ yield per 1 °Baumé drop — what is the figure?",
+        "back": "Each 1 °Baumé drop produces approximately 3.5 g/L CO₂."
+      },
+      {
+        "front": "Stuck ferment: working definition by Baumé rate",
+        "back": "Below 0.1 °Baumé/day over 48 hours is a stuck ferment by working definition."
+      },
+      {
+        "front": "YAN threshold — below what level is stuck ferment risk primary?",
+        "back": "YAN below 150 mg N/L at inoculation is a primary stuck-ferment risk."
+      },
+      {
+        "front": "Temperature window: arrest risk above, stall risk below — what are the numbers?",
+        "back": "Above 38 °C arrest risk is high; below 12 °C most strains stall regardless of nutrients."
+      },
+      {
+        "front": "Oxygen timing trap — when does aeration help, when does it harm?",
+        "back": "Oxygen is essential in the first 48–72 hours for sterol synthesis; aeration after that risks oxidation and acetic acid bacteria."
+      },
+      {
+        "front": "DAP addition window — why does timing matter?",
+        "back": "DAP must be added within the first 24–48 hours when yeast are actively growing and can assimilate nitrogen."
+      },
+      {
+        "front": "Mid-ferment rate flag — what Baumé/day reading triggers investigation?",
+        "back": "A mid-ferment rate below 0.5 °Baumé/day warrants investigation before the ferment stalls."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2632,
+    "completion_tokens": 6302
+  },
+  "audit": {
+    "totalWords": 1503,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:15:29.098Z"
+}

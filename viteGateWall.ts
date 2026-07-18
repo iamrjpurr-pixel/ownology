@@ -42,6 +42,8 @@ const PUBLIC_EXACT = new Set<string>([
   "/for-home-winemakers/glossary",
   "/for-home-winemakers/knowledge",
   "/blog",
+  "/curriculum",
+  "/curriculum/about",
   "/pricing",
   "/quiz",
   "/compliance-score",
@@ -98,6 +100,7 @@ const PUBLIC_EXACT = new Set<string>([
 ]);
 const PUBLIC_PREFIXES = [
   "/api/", // tRPC + REST endpoints enforce own auth
+  "/curriculum/", // /curriculum/:slug — public curriculum lesson pages
   "/blog/",
   "/hi/",
   "/i/", // /i/:token — magic-link invites

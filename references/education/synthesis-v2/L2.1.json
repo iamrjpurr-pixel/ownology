@@ -1,0 +1,324 @@
+{
+  "lesson_id": "L2.1",
+  "source": {
+    "id": "L2.1",
+    "slug": "variety-selection",
+    "title": "Picking varieties for the wine you want to make",
+    "level": "2",
+    "wbs": [
+      "D1"
+    ],
+    "reading_min": "4",
+    "aim": "Match variety, rootstock, and clone to site, climate, and target wine style. What the Aussie/NZ industry has learned about the classics — and about the newer players.",
+    "application": "When you're planning a replant, or interpreting a fruit contract, this lesson gives you the questions to ask before the bud burst.",
+    "sources_private": [
+      "aoc_1_3_selecting_grape_varieties"
+    ],
+    "sources_public_ref": [
+      "adelaide_viticult_2500wt",
+      "csu_vit212"
+    ],
+    "citations_bibliographic": [
+      "robinson_oxford_varieties"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Variety sets the ceiling — site, clone, and rootstock determine how close you get to it.",
+      "Match ripening window to your site's heat accumulation before committing to a block; wrong variety means permanent compromise.",
+      "In AU/NZ, newer players like Fiano and Grüner Veltliner are earning serious ground where classics overheat or underperform."
+    ],
+    "sections": [
+      {
+        "heading": "Variety is a promise, not a guarantee",
+        "iconHint": "target",
+        "body_md": "Every variety carries a genetic blueprint — acid retention, tannin structure, aromatic profile — but that blueprint only expresses cleanly when climate, soil, and management align. Shiraz on a cool Heathcote ironstone site delivers something fundamentally different from Shiraz on a warm Riverland flat, even from the same clone. The variety is the same; the wine is not.\n\nBefore committing to a replant, define the wine first. Work backwards: what acid range, what phenolic weight, what aromatic register? That answer narrows the variety list faster than any catalogue. Boutique vignerons who skip this step end up managing a variety that fights the site every season rather than one that expresses it.",
+        "keyConcept": "Define the target wine style before selecting variety — variety choice is irreversible for 25-40 years.",
+        "trap": "Choosing variety based on current market price rather than site suitability locks you into permanent agronomic compromise."
+      },
+      {
+        "heading": "Heat accumulation is the non-negotiable filter",
+        "iconHint": "thermometer",
+        "body_md": "Growing degree days (GDD, base 10 °C) give you the first filter. Early-ripening varieties — Pinot Noir, Chardonnay, Pinot Gris — need roughly 1,000–1,200 GDD to reach physiological maturity without stress. Mid-season varieties like Shiraz and Tempranillo sit around 1,200–1,500 GDD. Late varieties — Cabernet Sauvignon, Mourvèdre — want 1,400 GDD and above, with enough hang time to resolve tannin.\n\nIn practice, match the variety's ripening window to your site's coolest reliable finish date. A Cabernet block that routinely hits 14.5 Baumé before tannin ripeness is a site problem wearing a variety label. Conversely, Pinot Noir planted where summer temperatures regularly exceed 35 °C for extended runs will lose aromatic finesse regardless of clone or canopy management.",
+        "keyConcept": "Late-ripening varieties need 1,400+ GDD and reliable autumn warmth; mismatching by even 200 GDD costs tannin ripeness.",
+        "trap": "GDD averages hide vintage extremes — check the 10th-percentile cool vintage, not just the mean, before planting a late variety."
+      },
+      {
+        "heading": "Clone and rootstock multiply — or cap — variety potential",
+        "iconHint": "activity",
+        "body_md": "Clone selection operates within the variety's envelope. For Pinot Noir, the difference between MV6 (reliable, generous) and 115 (tighter, more aromatic) is commercially meaningful at the cellar door. For Shiraz, D8V12 versus 1654 shifts the balance between fruit weight and spice. These are not marginal differences — they affect blending decisions and price point.\n\nRootstock adds another layer. Phylloxera-affected regions in Victoria and parts of South Australia require grafted vines; rootstock choice then shapes vigour, drought tolerance, and nutrient uptake. 101-14 suits heavier soils with moderate vigour requirements; Schwarzmann tolerates sandy, low-fertility ground; 110R pushes drought tolerance in drier sites. In NZ, own-rooted vines remain common in Marlborough and Central Otago, but any new planting in a phylloxera-risk zone without rootstock is a liability, not a saving.",
+        "keyConcept": "Rootstock controls vigour and stress tolerance; clone shapes aromatic and structural expression within the variety's range.",
+        "trap": "Ordering the cheapest available clone because the preferred selection has a two-year wait is a false economy over a 30-year block life."
+      },
+      {
+        "heading": "The newer players are earning their place",
+        "iconHint": "flask-conical",
+        "body_md": "Fiano, Vermentino, Nero d'Avola, Grüner Veltliner, and Assyrtiko are no longer novelty plantings in Australia. They are solving real agronomic problems: heat tolerance, acid retention at high Baumé, and water-use efficiency. Fiano in the Adelaide Hills and McLaren Vale retains natural acidity at 13.5–14 Baumé where Chardonnay would need significant tartaric addition. Vermentino in the Swan Valley and Riverland handles 40 °C days without the flavour collapse that plagues Sauvignon Blanc.\n\nIn NZ, Grüner Veltliner trials in Martinborough and Hawke's Bay show genuine promise for sites that are too warm for consistent Pinot Gris quality. The commercial risk is real — market recognition lags behind agronomic performance by a decade — but for a boutique producer with a direct-to-consumer model, the differentiation argument is strong.",
+        "keyConcept": "Heat-tolerant Mediterranean and Central European varieties retain acid at high Baumé where classic varieties require correction.",
+        "trap": "Planting an alternative variety without a clear sales channel assumes the market will catch up to your timeline — it may not."
+      },
+      {
+        "heading": "Reading a fruit contract through a variety lens",
+        "iconHint": "gauge",
+        "body_md": "When you're buying fruit rather than growing it, the variety-site match question shifts to: does this contract deliver fruit at the Baumé and acid profile the variety should achieve on that site? A Cabernet Sauvignon contract from a warm, irrigated site picked at 14.8 Baumé with 5.2 g/L TA is telling you the site is pushing the variety past its comfort zone. You can make wine from it, but you're correcting, not expressing.\n\nAsk the grower for three vintages of pick data: Baumé at harvest, TA, pH, and berry weight. That sequence reveals whether the site consistently delivers the variety's potential or whether you're buying a compromise. For a replant decision, the same logic applies — historical climate data plus soil mapping before variety selection, not after.",
+        "keyConcept": "Three vintages of pick data — Baumé, TA, pH, berry weight — reveal whether a site genuinely suits the contracted variety.",
+        "trap": "Accepting a fruit contract based on variety name and price alone, without site-specific pick history, is buying blind."
+      }
+    ],
+    "worked_example": {
+      "title": "Replant Decision · Yarra Valley · 2.4 ha Chardonnay block · 2024",
+      "starting_conditions": [
+        "2.4 ha block, north-facing slope, elevation 380 m, red clay loam over weathered granite",
+        "Existing Chardonnay (clone P58) planted 1998, yields declining to 3.2 t/ha, virus load confirmed by PCR",
+        "Site GDD (base 10 °C, 30-year average): 1,080 — marginal for late-ripening varieties, strong for early-mid"
+      ],
+      "timeline": [
+        {
+          "when": "March 2024",
+          "observation": "Harvest data: 12.8 Baumé, TA 7.4 g/L, pH 3.18 — textbook cool-climate Chardonnay numbers. Virus confirmed as GLRaV-3.",
+          "decision": "Retain Chardonnay as the variety; replace with certified clean planting material.",
+          "reasoning": "GDD and pick data confirm the site suits Chardonnay well. The problem is virus, not variety-site mismatch.",
+          "outcome": "Variety decision locked. Clone and rootstock selection begins."
+        },
+        {
+          "when": "April–June 2024",
+          "observation": "Soil mapping reveals two distinct zones: upper slope is free-draining with lower water-holding capacity; lower slope retains moisture, higher vigour historically.",
+          "decision": "Upper slope: clone 96 (Dijon) on 101-14 rootstock. Lower slope: clone 277 (Dijon) on Schwarzmann to moderate vigour.",
+          "reasoning": "Clone 96 delivers tighter, more mineral expression suited to the drier upper zone. Schwarzmann reduces vigour on the heavier lower soil, improving fruit exposure.",
+          "outcome": "Two-zone planting plan submitted to nursery. Two-year wait for certified 96 accepted — false economy to substitute."
+        },
+        {
+          "when": "August 2024",
+          "observation": "Nursery confirms Dijon 96 availability for 2026 planting. Schwarzmann rootstock grafts confirmed.",
+          "decision": "Schedule roguing and fumigation for winter 2025, planting spring 2026.",
+          "reasoning": "One full fallow season reduces nematode pressure and allows cover crop to rebuild organic matter before vine establishment.",
+          "outcome": "Block timeline set. Estimated first commercial harvest 2030 at target 13.0–13.5 Baumé, TA 6.8–7.2 g/L."
+        }
+      ],
+      "counterfactual": "Substituting the available P58 clone (same as the virus-affected block) to avoid the two-year wait would have replicated the original planting with no aromatic or structural improvement over the 30-year block life."
+    },
+    "decision_tree": {
+      "title": "Variety-site fit — the diagnostic questions before you commit",
+      "rows": [
+        {
+          "symptom": "Site GDD below 1,100 and target is a full-bodied red",
+          "first_check": "Is there a warmer aspect or slope position that adds 100–150 GDD?",
+          "action": "If not, pivot to early-mid ripening variety (Pinot Noir, Gamay, Tempranillo) or accept lighter style as the product"
+        },
+        {
+          "symptom": "Existing block consistently picked above 14.5 Baumé with TA below 5.5 g/L",
+          "first_check": "Is the variety heat-sensitive, or is the site genuinely too warm for the style target?",
+          "action": "Trial a heat-tolerant alternative (Fiano, Vermentino, Nero d'Avola) on a small block before full replant commitment"
+        },
+        {
+          "symptom": "Phylloxera-risk zone, vines currently own-rooted",
+          "first_check": "Confirm phylloxera status via soil sampling and regional biosecurity maps",
+          "action": "Replant on appropriate rootstock; do not replant own-rooted in a confirmed or adjacent risk zone"
+        },
+        {
+          "symptom": "Preferred clone has 2+ year nursery wait",
+          "first_check": "Is the second-choice clone genuinely suited to the site, or just available?",
+          "action": "Accept the wait for the correct clone; one fallow season is recoverable, 30 years of wrong clone is not"
+        },
+        {
+          "symptom": "Fruit contract variety shows inconsistent pick data across vintages (±1.5 Baumé swing)",
+          "first_check": "Is the swing driven by vintage weather or by grower management decisions (irrigation, pick date)?",
+          "action": "Negotiate pick-date clauses tied to Baumé and TA targets, not calendar date; or source from a more consistent site"
+        },
+        {
+          "symptom": "Considering an alternative variety with no local commercial precedent",
+          "first_check": "Is there trial data from a comparable climate zone in AU or NZ, and is there a viable sales channel?",
+          "action": "Plant a trial block (0.2–0.5 ha) under the existing variety's contract before full conversion; validate market before scale"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Robinson · Oxford Companion to Wine · Varieties entries",
+        "url": null,
+        "note": "Oxford University Press; consult individual variety entries for ripening, climate range, and clone notes"
+      },
+      {
+        "kind": "curriculum",
+        "label": "University of Adelaide · Viticulture 2500WT",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Covers variety-site matching and rootstock selection in the Adelaide viticulture program"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU VIT212 · Variety and Rootstock Selection",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC212",
+        "note": "Charles Sturt University wine science program; LO covers clone and rootstock decision-making"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Variety and Site Suitability",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for variety site suitability and alternative varieties for current technical summaries"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 1.3 · Selecting Grape Varieties",
+        "url": null,
+        "note": "Your paid AOC curriculum resource; consult for structured variety selection frameworks"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "A Yarra Valley grower is replanting 2.4 ha and wants to produce a structured, age-worthy red. Before selecting a variety, what is the most critical first step?",
+        "choices": [
+          "A) Define the target wine style in detail, then filter varieties against site and climate",
+          "B) Choose the variety with the highest market price per tonne in the current season",
+          "C) Select the rootstock first, then match a variety to its vigour profile",
+          "D) Review what neighbouring vineyards are growing as a proxy for site suitability"
+        ],
+        "answer": "A",
+        "rationale": "Variety choice locks the block in for 25-40 years, so the target style must drive selection; market price and neighbour benchmarking are secondary, and rootstock is chosen after variety."
+      },
+      {
+        "q": "A grower in a region accumulating 1,180 GDD is considering planting Cabernet Sauvignon. What is the most likely outcome?",
+        "choices": [
+          "A) Cabernet will ripen fully but will need acid adjustment every vintage",
+          "B) Tannin ripeness will be compromised because the site falls well short of the 1,400+ GDD threshold late-ripening varieties require",
+          "C) The variety will perform well provided a heat-tolerant clone is selected",
+          "D) Yields will be lower but wine quality will be unaffected"
+        ],
+        "answer": "B",
+        "rationale": "Late-ripening varieties need 1,400+ GDD; at 1,180 GDD the 200+ GDD shortfall directly costs tannin ripeness, and clone selection cannot compensate for fundamental heat deficit."
+      },
+      {
+        "q": "Which of the following best describes the functional difference between rootstock choice and clone choice?",
+        "choices": [
+          "A) Rootstock shapes aromatic expression; clone controls water and nutrient uptake",
+          "B) Rootstock controls vigour and stress tolerance; clone shapes aromatic and structural expression within the variety's range",
+          "C) Both rootstock and clone primarily influence yield, with minimal effect on wine style",
+          "D) Clone determines ripening date; rootstock determines berry size only"
+        ],
+        "answer": "B",
+        "rationale": "Rootstock operates at the whole-vine physiological level (vigour, drought/nematode tolerance); clone operates within the variety's genetic ceiling to modulate aroma and structure."
+      },
+      {
+        "q": "A fruit contract specifies Fiano from a warm inland site. You obtain three vintages of pick data showing Baumé consistently at 14.5–15.0 with TA holding at 5.8–6.2 g/L. What does this suggest about variety-site fit?",
+        "choices": [
+          "A) The site is too cool for Fiano; acid retention indicates under-ripeness",
+          "B) Fiano is performing as expected for a heat-tolerant Mediterranean variety — retaining acid at high Baumé without correction",
+          "C) The TA figures indicate the grower is adding tartaric acid before pick, inflating the apparent result",
+          "D) High Baumé with retained acid is a sign of vine stress, not variety suitability"
+        ],
+        "answer": "B",
+        "rationale": "Heat-tolerant Mediterranean varieties like Fiano retain natural acid at high Baumé — this is precisely their advantage over classic varieties in warm sites, not a sign of under-ripeness or manipulation."
+      },
+      {
+        "q": "You are reviewing a fruit contract for Shiraz from a McLaren Vale site. Pick data across three vintages shows Baumé averaging 15.2, pH 3.85, and TA 4.9 g/L. What is the most useful diagnostic conclusion?",
+        "choices": [
+          "A) The site suits Shiraz well; all parameters are within ideal range",
+          "B) Low TA and elevated pH at high Baumé suggest the site may be pushing Shiraz beyond comfortable ripeness, requiring acid correction",
+          "C) The data confirms the rootstock is suppressing vigour too aggressively",
+          "D) Berry weight data is missing, so no conclusion about variety fit can be drawn"
+        ],
+        "answer": "B",
+        "rationale": "TA below 5 g/L with pH near 3.85 at 15.2 Baumé signals acid loss outpacing sugar accumulation — a classic warm-site Shiraz problem requiring winemaking intervention that a better-matched variety might avoid."
+      },
+      {
+        "q": "What is the minimum GDD threshold that should be confirmed before planting a late-ripening variety such as Cabernet Sauvignon or Nebbiolo?",
+        "choices": [
+          "A) 1,100 GDD",
+          "B) 1,200 GDD",
+          "C) 1,400 GDD",
+          "D) 1,600 GDD"
+        ],
+        "answer": "C",
+        "rationale": "The lesson specifies 1,400+ GDD as the non-negotiable filter for late-ripening varieties; even a 200 GDD shortfall is enough to compromise tannin ripeness."
+      },
+      {
+        "q": "A grower replanting in a region with reliable autumn warmth and 1,500 GDD selects a high-vigour rootstock to maximise canopy. Which risk does this decision most directly introduce?",
+        "choices": [
+          "A) Frost damage at budburst due to earlier shoot emergence",
+          "B) Excessive vigour shading the canopy, capping the variety's aromatic and structural potential despite adequate heat",
+          "C) Reduced nematode resistance in sandy loam soils",
+          "D) Accelerated ripening that pushes harvest into cooler weather"
+        ],
+        "answer": "B",
+        "rationale": "Rootstock controls vigour; a high-vigour rootstock on an already productive site creates canopy shade that caps the clone's aromatic and structural expression regardless of heat accumulation."
+      },
+      {
+        "q": "A winemaker wants to produce a high-Baumé dry red from a hot inland site without relying on acid addition. Which variety selection strategy best addresses this goal?",
+        "choices": [
+          "A) Plant a cool-climate Pinot Noir clone selected for thin skins and early ripening",
+          "B) Choose a heat-tolerant Mediterranean or Central European variety that retains natural acid at high Baumé",
+          "C) Select a vigorous rootstock to slow ripening and preserve acid",
+          "D) Plant Chardonnay and blend with the red to lift acidity"
+        ],
+        "answer": "B",
+        "rationale": "Mediterranean and Central European varieties are specifically noted for retaining acid at high Baumé in hot conditions — the core advantage over classic varieties that lose acid rapidly in heat."
+      },
+      {
+        "q": "When interpreting a fruit contract through a variety lens, which dataset provides the most reliable evidence that a site genuinely suits the contracted variety?",
+        "choices": [
+          "A) The grower's stated irrigation schedule and fertiliser programme",
+          "B) Three vintages of pick data including Baumé, TA, pH, and berry weight",
+          "C) Regional GDD averages published by the local wine authority",
+          "D) The rootstock and clone combination recorded at planting"
+        ],
+        "answer": "B",
+        "rationale": "Three vintages of actual pick data — Baumé, TA, pH, berry weight — reveal real site performance across seasons; regional averages and planting records don't capture site-specific ripening behaviour."
+      },
+      {
+        "q": "A grower argues that selecting a different clone of Cabernet Sauvignon can overcome a site's 200 GDD deficit relative to the variety's requirement. This reasoning is flawed because:",
+        "choices": [
+          "A) Clone selection affects colour only, not ripening date",
+          "B) Clone shapes expression within the variety's range but cannot substitute for the base heat accumulation the variety requires for tannin ripeness",
+          "C) Cabernet Sauvignon has no commercially available clones suited to cool climates",
+          "D) GDD calculations are unreliable below 1,200 GDD and should not be used as a filter"
+        ],
+        "answer": "B",
+        "rationale": "Clones modulate aromatic and structural expression within a variety's genetic ceiling — they cannot manufacture heat units the site doesn't accumulate, so tannin ripeness remains compromised."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Minimum GDD for late-ripening varieties — what is the threshold?",
+        "back": "1,400+ GDD; a shortfall of even 200 GDD is enough to compromise tannin ripeness."
+      },
+      {
+        "front": "How long does a variety choice lock in a vineyard block?",
+        "back": "25–40 years — making target wine style definition the essential first step before any variety is selected."
+      },
+      {
+        "front": "Rootstock vs clone — which controls vigour and which controls aroma/structure?",
+        "back": "Rootstock controls vigour and stress tolerance; clone shapes aromatic and structural expression within the variety's range."
+      },
+      {
+        "front": "Why do Mediterranean varieties suit hot inland sites better than classic varieties?",
+        "back": "They retain natural acid at high Baumé where classic varieties lose acid rapidly, reducing the need for winemaking correction."
+      },
+      {
+        "front": "Three vintages of pick data — which four parameters matter most for variety-site fit?",
+        "back": "Baumé, TA, pH, and berry weight — together they reveal whether a site genuinely suits the contracted variety across seasons."
+      },
+      {
+        "front": "Common trap: can a cool-climate clone fix a heat-deficit site for a late-ripening variety?",
+        "back": "No — clone selection operates within the variety's genetic range and cannot compensate for missing heat accumulation."
+      },
+      {
+        "front": "Pick data red flag: Shiraz at 15.2 Baumé, TA 4.9 g/L, pH 3.85 — what does this signal?",
+        "back": "Acid loss is outpacing sugar accumulation; the site is likely pushing Shiraz beyond comfortable ripeness and will require acid correction."
+      },
+      {
+        "front": "What is the primary purpose of reviewing fruit contract pick data before signing?",
+        "back": "To confirm the site's actual ripening pattern suits the variety — not to rely on regional averages or the grower's stated practices."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2560,
+    "completion_tokens": 5939
+  },
+  "audit": {
+    "totalWords": 1408,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:19:23.927Z"
+}
