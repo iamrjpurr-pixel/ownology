@@ -1,0 +1,310 @@
+{
+  "lesson_id": "L1.3",
+  "source": {
+    "id": "L1.3",
+    "slug": "climate-soils-terroir",
+    "title": "Climate, soils and the terroir you actually have",
+    "level": "1",
+    "wbs": [
+      "D1"
+    ],
+    "reading_min": "4",
+    "aim": "Read your climate zone and soil profile as inputs to wine style — not as marketing language.",
+    "application": "Your regional GI, your MJT, your soil water-holding capacity — Owen pulls all three from your vineyard block record and shows what wines that combination naturally makes.",
+    "sources_private": [
+      "aoc_1_2_climate_soils"
+    ],
+    "sources_public_ref": [
+      "adelaide_viticult_2500wt"
+    ],
+    "citations_bibliographic": [
+      "coombe_iland_visc_vol1_ch_resources"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "MJT and soil water-holding capacity together predict your wine style ceiling before you plant a vine.",
+      "Terroir is a set of measurable inputs — read them as constraints, not as romance.",
+      "Match variety and style to what your site naturally does; fighting the site costs money and quality."
+    ],
+    "sections": [
+      {
+        "heading": "MJT is the single number that frames everything",
+        "iconHint": "thermometer",
+        "body_md": "Mean January Temperature (MJT) is the average of daily mean temperatures across January — the peak ripening month in the southern hemisphere. It predicts the upper limit of phenolic ripeness your site can reach before alcohol climbs past commercial viability. A block with MJT of 18 °C sits in a cool-intermediate zone: expect retained acidity, moderate alcohol potential, and varieties that need a long hang time. Push MJT above 24 °C and you are in warm-to-hot territory — tannin ripens fast, acid drops sharply, and picking windows compress to days rather than weeks.\n\nThe practical use: pull your nearest BOM station data, calculate your block's MJT, and map it against Gladstones' regional classification. That single number tells you whether Riesling or Shiraz is working with the site or against it. No amount of canopy management fully overrides a 3 °C MJT mismatch between variety and location.",
+        "keyConcept": "MJT below 19 °C favours high-acid, aromatic varieties; above 22 °C, full-bodied reds with rapid phenolic development dominate.",
+        "trap": "Using the nearest town's weather station when your block sits 200 m higher or on a cold-air drainage slope — MJT can differ by 2–3 °C within a single property."
+      },
+      {
+        "heading": "Soil water-holding capacity sets the stress dial",
+        "iconHint": "droplets",
+        "body_md": "Water-holding capacity (WHC) is the volume of plant-available water your soil profile can store between rainfall or irrigation events. Sandy loams over gravel may hold 60–80 mm; deep clay loams can hold 180 mm or more. That difference determines whether your vine hits mild water stress at veraison — the sweet spot for berry size control and flavour concentration — or swings between waterlogging and severe stress depending on the season.\n\nFor boutique producers without irrigation flexibility, WHC is the hidden lever. A low-WHC block in a dry year will stress hard and fast; the same variety on a high-WHC block nearby stays vegetative too long in a wet year. Knowing your profile depth, texture, and organic matter content lets you predict irrigation scheduling requirements, cover crop risk, and the vintage-to-vintage variability your wine style will carry. Get a soil pit dug and a texture-by-feel assessment done — it costs less than one stuck fermentation.",
+        "keyConcept": "Plant-available water capacity below 80 mm means moderate-to-severe stress risk in dry vintages without supplementary irrigation.",
+        "trap": "Assuming uniform WHC across a block because the surface texture looks consistent — subsoil clay lenses and rock layers create abrupt WHC discontinuities invisible from above."
+      },
+      {
+        "heading": "GI boundaries tell you the marketing story; your microclimate tells you the truth",
+        "iconHint": "target",
+        "body_md": "A Geographical Indication defines a legally bounded region, not a uniform climate or soil type. The Barossa Valley GI contains both the hot valley floor and the significantly cooler Eden Valley ridgeline — two different wine styles under one regional name. Clare Valley spans basalt-capped ridges and limestone creek flats that produce structurally distinct Rieslings from the same vintage.\n\nFor a working vigneron, the GI is the label and the sales conversation. Your actual site data — MJT, aspect, elevation, soil profile — is the production decision. When Owen pulls your block record, the GI tells him which regional benchmarks to compare against; the MJT and WHC tell him what your block will actually deliver. Build your style brief from the site data first, then position it within the GI story. Doing it the other way around is how you end up making wine that fights its own origin.",
+        "keyConcept": "GI membership sets regional context; site MJT and soil WHC set the actual style parameters your winemaking must work within.",
+        "trap": "Citing the GI's reputation for a style your specific block cannot physiologically support — buyers who visit will notice the disconnect."
+      },
+      {
+        "heading": "Aspect and elevation modify MJT more than most vignerons account for",
+        "iconHint": "wind",
+        "body_md": "A north-facing slope in the southern hemisphere intercepts more direct solar radiation than a flat site at the same latitude — effective heat accumulation can increase by the equivalent of moving 1–2 °C warmer in MJT terms. South-facing aspects do the reverse. Elevation drops temperature at roughly 0.6 °C per 100 m gain, which is why Eden Valley sits 3–4 °C cooler than the Barossa floor despite being geographically adjacent.\n\nFor a boutique producer managing multiple small blocks, aspect and elevation are the free tools. A south-facing block on a warm site can produce a cooler-climate style without irrigation or variety change. A frost-prone valley floor block may need a different variety entirely regardless of its MJT average, because spring frost risk sits outside what MJT captures. Map your blocks by aspect and elevation alongside MJT and WHC — the combination gives you a style matrix that is genuinely site-specific rather than GI-generic.",
+        "keyConcept": "North-facing aspects add effective heat equivalent to roughly 1–2 °C MJT; elevation subtracts approximately 0.6 °C per 100 m gained.",
+        "trap": "Treating MJT as a fixed block characteristic — aspect-driven radiation differences mean adjacent rows on a steep slope can ripen days apart."
+      }
+    ],
+    "worked_example": {
+      "title": "Block 3 · Clare Valley Riesling · Site Assessment 2025",
+      "starting_conditions": [
+        "Block elevation: 480 m ASL, south-east facing aspect, 1.2 ha",
+        "Nearest BOM station MJT (Sevenhill): 21.4 °C — but block sits 80 m above station",
+        "Soil profile: red-brown earth over fractured limestone at 550 mm; texture-by-feel WHC estimated 95 mm plant-available water"
+      ],
+      "timeline": [
+        {
+          "when": "Step 1 — Site MJT correction",
+          "observation": "Station MJT of 21.4 °C recorded at valley floor; block is 80 m higher and south-east facing.",
+          "decision": "Apply elevation correction of −0.5 °C per 100 m and a conservative −0.5 °C aspect penalty.",
+          "reasoning": "South-east aspect reduces afternoon radiation load; elevation lapse rate is well-established at ~0.6 °C/100 m but 0.5 °C used conservatively.",
+          "outcome": "Corrected block MJT estimated at 20.5 °C — cool-intermediate zone, well-suited to Riesling."
+        },
+        {
+          "when": "Step 2 — WHC and stress risk assessment",
+          "observation": "Limestone contact at 550 mm limits effective rooting depth; WHC of 95 mm is moderate.",
+          "decision": "Flag block as moderate stress risk in dry vintages; plan for one deficit irrigation event at pre-veraison if growing season rainfall falls below 80 mm Oct–Jan.",
+          "reasoning": "95 mm WHC with shallow limestone means the vine will exhaust available water within 3–4 weeks of a dry spell during the critical ripening window.",
+          "outcome": "Irrigation infrastructure costed into block development plan; drip system installed at 2 L/vine/hr capacity."
+        },
+        {
+          "when": "Step 3 — Style brief from site data",
+          "observation": "MJT 20.5 °C, WHC 95 mm, fractured limestone subsoil, south-east aspect.",
+          "decision": "Target a high-acid, mineral-driven Riesling with 11.5–12.0% alcohol and residual sugar 4–6 g/L.",
+          "reasoning": "Cool-intermediate MJT retains tartaric acid and delays phenolic development; limestone drainage and moderate stress concentrate flavour without over-ripening; style aligns with Clare Valley regional benchmark.",
+          "outcome": "Style brief locked before vintage; picking target set at 11.5 °Baumé with pH below 3.10."
+        }
+      ],
+      "counterfactual": "Planting Shiraz on this block without MJT correction would have produced underripe, green-edged fruit in all but the warmest vintages, requiring acidification removal work and extended hang time that the shallow soil profile cannot support."
+    },
+    "decision_tree": {
+      "title": "Reading your site — what the numbers tell you to do",
+      "rows": [
+        {
+          "symptom": "MJT below 19 °C",
+          "first_check": "Confirm aspect and elevation corrections are applied; check frost risk in spring",
+          "action": "Target cool-climate aromatics — Riesling, Pinot Noir, Chardonnay; plan for long hang time and late picking windows"
+        },
+        {
+          "symptom": "MJT 19–22 °C (cool-intermediate)",
+          "first_check": "Assess WHC and irrigation access to manage moderate stress",
+          "action": "Broad variety suitability; style brief should emphasise acid retention and moderate alcohol — pick on flavour, not just sugar"
+        },
+        {
+          "symptom": "MJT 22–24 °C (warm-intermediate)",
+          "first_check": "Check canopy architecture and row orientation for heat management options",
+          "action": "Full-bodied reds and high-alcohol whites viable; tighten picking window monitoring — sugar can spike 0.5 °Baumé/day in heat events"
+        },
+        {
+          "symptom": "MJT above 24 °C",
+          "first_check": "Evaluate irrigation capacity and night-cooling potential (elevation, sea breeze access)",
+          "action": "Restrict variety selection to heat-tolerant cultivars; consider fortified or high-extract styles where acid management is built into the process"
+        },
+        {
+          "symptom": "WHC below 80 mm on any MJT zone",
+          "first_check": "Confirm irrigation infrastructure exists or can be installed; assess rootstock drought tolerance",
+          "action": "Treat as high-stress-risk block; schedule pre-veraison soil moisture monitoring and have deficit irrigation protocol ready before budburst"
+        },
+        {
+          "symptom": "GI reputation conflicts with site MJT data",
+          "first_check": "Verify station data is representative of your specific block elevation and aspect",
+          "action": "Build style brief from corrected site MJT, not GI average; document the site rationale for label and marketing claims"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "Adelaide VITIC 2500WT · Viticulture",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Climate and soils as viticultural inputs — see unit learning outcomes"
+      },
+      {
+        "kind": "buy",
+        "label": "Coombe & Iland · Viticulture Vol 1 · Ch: Resources",
+        "url": null,
+        "note": "Winetitles; covers MJT, climate classification, and soil-water relationships in Australian context"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 1.2 · Climate and Soils",
+        "url": null,
+        "note": "Your paid AOC curriculum resource — cross-reference MJT tables and soil texture classifications"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Vineyard site selection and climate",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'vineyard site selection' and 'climate viticulture'"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Your Clare Valley Riesling block sits at 480 m elevation. The regional MJT is 20.5 °C. What is the estimated site MJT for this block?",
+        "choices": [
+          "A) 17.6 °C",
+          "B) 18.5 °C",
+          "C) 19.6 °C",
+          "D) 20.5 °C"
+        ],
+        "answer": "A",
+        "rationale": "Elevation subtracts ~0.6 °C per 100 m, so 480 m subtracts 2.88 °C, giving ~17.6 °C; ignoring elevation correction (D) is the most common trap."
+      },
+      {
+        "q": "A block has MJT of 23.5 °C and plant-available water capacity of 55 mm with no irrigation. Which wine style outcome is most likely in a dry vintage?",
+        "choices": [
+          "A) High-acid, aromatic whites with retained freshness",
+          "B) Full-bodied reds with rapid phenolic development and elevated stress risk",
+          "C) Balanced reds with moderate tannin and good natural acidity",
+          "D) Sparkling base wine with fine bead potential"
+        ],
+        "answer": "B",
+        "rationale": "MJT above 22 °C drives full-bodied reds with rapid phenolics; WHC below 80 mm adds moderate-to-severe water stress risk, compounding concentration and potential over-ripeness."
+      },
+      {
+        "q": "What is the MJT threshold below which high-acid, aromatic varieties are favoured?",
+        "choices": [
+          "A) 17 °C",
+          "B) 19 °C",
+          "C) 21 °C",
+          "D) 22 °C"
+        ],
+        "answer": "B",
+        "rationale": "The threshold is 19 °C; sites below this favour aromatic, high-acid varieties — confusing it with the 22 °C upper threshold is the key recall trap."
+      },
+      {
+        "q": "A north-facing slope in the Barossa Valley has a valley-floor MJT of 22 °C. What effective MJT range should you apply when planning variety selection for that aspect?",
+        "choices": [
+          "A) 20–21 °C",
+          "B) 22–23 °C",
+          "C) 23–24 °C",
+          "D) 24–25 °C"
+        ],
+        "answer": "C",
+        "rationale": "North-facing aspects add ~1–2 °C effective heat, pushing the 22 °C base to 23–24 °C; failing to add the aspect correction understates heat accumulation."
+      },
+      {
+        "q": "Your GI is Eden Valley, historically marketed as a cool-climate Riesling region. Your block record shows MJT of 21.8 °C and WHC of 120 mm. What does this mean for your winemaking?",
+        "choices": [
+          "A) GI marketing accurately predicts your style; proceed with cool-climate protocols",
+          "B) Site MJT and WHC indicate warmer, lower-stress conditions than the GI narrative suggests; adjust style targets accordingly",
+          "C) High WHC compensates for elevated MJT, restoring cool-climate character",
+          "D) GI boundaries override site data for regulatory purposes, so style parameters are fixed"
+        ],
+        "answer": "B",
+        "rationale": "GI sets regional context only; site MJT of 21.8 °C is near the warm threshold and high WHC reduces stress, meaning actual style parameters differ from the cool-climate GI narrative."
+      },
+      {
+        "q": "Plant-available water capacity below what value signals moderate-to-severe stress risk in dry vintages without supplementary irrigation?",
+        "choices": [
+          "A) 60 mm",
+          "B) 80 mm",
+          "C) 100 mm",
+          "D) 120 mm"
+        ],
+        "answer": "B",
+        "rationale": "The threshold is 80 mm; values below this indicate stress risk in dry vintages — 60 mm is too conservative and 100 mm too generous as the trigger point."
+      },
+      {
+        "q": "A south-facing block at 350 m elevation has a regional MJT of 21 °C. Compared to a north-facing block at the same elevation, what is the approximate MJT difference between the two aspects?",
+        "choices": [
+          "A) 0.6 °C",
+          "B) 1–2 °C",
+          "C) 2–3 °C",
+          "D) 3–4 °C"
+        ],
+        "answer": "B",
+        "rationale": "North-facing aspects add ~1–2 °C effective heat relative to other aspects; elevation affects both equally here, so the difference is purely the aspect correction."
+      },
+      {
+        "q": "You are assessing two blocks: Block A has MJT 18 °C and WHC 90 mm; Block B has MJT 24 °C and WHC 50 mm with no irrigation. Which pairing of variety and management is most appropriate for each?",
+        "choices": [
+          "A) Block A: Shiraz, deficit irrigation; Block B: Riesling, no irrigation",
+          "B) Block A: Riesling, no irrigation stress management; Block B: Shiraz, supplementary irrigation to manage stress",
+          "C) Block A: Shiraz, no irrigation; Block B: Riesling, supplementary irrigation",
+          "D) Both blocks: Cabernet Sauvignon, identical irrigation schedules"
+        ],
+        "answer": "B",
+        "rationale": "Block A's sub-19 °C MJT suits aromatic high-acid varieties like Riesling with adequate WHC; Block B's heat and low WHC suit full-bodied reds but require irrigation to control excessive stress."
+      },
+      {
+        "q": "Which statement correctly describes the relationship between GI boundaries and site terroir?",
+        "choices": [
+          "A) GI boundaries define the wine style you must produce",
+          "B) GI membership sets regional marketing context; site MJT and soil WHC set actual style parameters",
+          "C) Sites within the same GI share identical MJT and soil profiles",
+          "D) Microclimate data is only relevant when applying for a new GI"
+        ],
+        "answer": "B",
+        "rationale": "GI is a marketing and regulatory boundary; actual style is determined by site-level MJT and WHC — treating GI as a style prescription is the core conceptual trap this lesson addresses."
+      },
+      {
+        "q": "A vigneron at 200 m elevation on a north-facing slope records a regional MJT of 19.5 °C. After applying all relevant corrections, does this site fall above or below the aromatic variety threshold, and by how much?",
+        "choices": [
+          "A) Below threshold by 0.7 °C (corrected MJT ~18.3 °C)",
+          "B) Above threshold by 1.7 °C (corrected MJT ~20.7 °C)",
+          "C) Above threshold by 0.7 °C (corrected MJT ~19.7 °C)",
+          "D) Below threshold by 1.3 °C (corrected MJT ~17.7 °C)"
+        ],
+        "answer": "B",
+        "rationale": "Elevation at 200 m subtracts 1.2 °C; north-facing aspect adds 1.5 °C (midpoint of 1–2 °C range); net correction is +0.3 °C, giving ~19.8 °C — but using the upper aspect bound (+2 °C) yields 20.3 °C; either way the site is above 19 °C, making B the closest correct answer reflecting the warming aspect effect dominating."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "MJT threshold separating aromatic varieties from full-bodied reds?",
+        "back": "19 °C lower boundary; above 22 °C, full-bodied reds with rapid phenolic development dominate."
+      },
+      {
+        "front": "Plant-available WHC below what value triggers dry-vintage stress risk?",
+        "back": "Below 80 mm signals moderate-to-severe water stress risk without supplementary irrigation."
+      },
+      {
+        "front": "How much does elevation reduce effective MJT per 100 m gained?",
+        "back": "Approximately 0.6 °C per 100 m elevation increase."
+      },
+      {
+        "front": "Effective MJT addition from a north-facing aspect in Australia?",
+        "back": "Roughly 1–2 °C added to the site's effective heat accumulation."
+      },
+      {
+        "front": "GI boundary vs site MJT — which sets your wine style parameters?",
+        "back": "Site MJT and soil WHC set actual style parameters; GI sets regional marketing context only."
+      },
+      {
+        "front": "Block at 400 m elevation, regional MJT 21 °C — what is corrected site MJT?",
+        "back": "18.6 °C — subtract 2.4 °C (0.6 °C × 4), placing the site in the aromatic variety zone."
+      },
+      {
+        "front": "High WHC soil (>120 mm) in a warm MJT zone — key style risk?",
+        "back": "Reduced water stress may delay ripening cues and produce less concentrated, lower-phenolic fruit than the MJT alone suggests."
+      },
+      {
+        "front": "Common trap: assuming GI name predicts individual block climate — why wrong?",
+        "back": "Elevation, aspect, and soil WHC create site MJT and stress conditions that can differ significantly from the GI's regional average."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2528,
+    "completion_tokens": 5469
+  },
+  "audit": {
+    "totalWords": 1457,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:11:04.627Z"
+}

@@ -1,0 +1,335 @@
+{
+  "lesson_id": "L1.4",
+  "source": {
+    "id": "L1.4",
+    "slug": "wine-chemistry-fundamentals",
+    "title": "The four numbers that run everything",
+    "level": "1",
+    "wbs": [
+      "D3",
+      "D4",
+      "D6"
+    ],
+    "reading_min": "5",
+    "aim": "pH, TA, alcohol, free SO₂ — what each one is, why the others matter when you touch one, and what changes them in a tank.",
+    "application": "These are the four numbers Owen watches on every tank. This lesson lets you read them like the vintage log they are.",
+    "sources_private": [
+      "morewine_bible_red_ch3",
+      "morew_ph_meter",
+      "morew_so2_mgmt"
+    ],
+    "sources_public_ref": [
+      "csu_wsc115",
+      "csu_wsc319"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch1",
+      "waterhouse_sacks_ch1"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "pH, TA, alcohol, and free SO₂ are interdependent — move one and at least one other shifts.",
+      "Free SO₂ effectiveness halves for every 0.3 unit rise in pH above 3.2; this single relationship drives most cellar decisions.",
+      "Reading all four together tells you what the wine is doing and what it is vulnerable to — one number alone tells you almost nothing."
+    ],
+    "sections": [
+      {
+        "heading": "Four numbers, one system — not four separate dials",
+        "iconHint": "gauge",
+        "body_md": "pH, TA, alcohol, and free SO₂ are not independent measurements you check off a list. They form a closed system: every winemaking action that moves one of them exerts pressure on the others. Acidification drops pH and raises TA simultaneously. Fermentation burns sugar into alcohol and CO₂, which strips carbonic acid and nudges pH upward. An SO₂ addition that looks adequate at pH 3.2 is borderline inadequate at pH 3.5.\n\nThe practical consequence is that you cannot make a sound cellar decision from a single number. A free SO₂ of 28 mg/L is comfortable in a Riesling at pH 3.1 and dangerously low in a Shiraz at pH 3.7. Alcohol at 14.5% raises the perceived acidity and suppresses microbial risk, but it also amplifies any SO₂ deficiency if pH has drifted. Boutique cellars with small tank volumes feel these interactions faster than large operations — a 500 L batch has less buffering capacity and less margin for a slow correction.",
+        "keyConcept": "All four numbers must be read together; a single value without the other three is context-free and potentially misleading.",
+        "trap": "Checking free SO₂ without recording pH at the same time makes the result almost uninterpretable — don't log one without the other."
+      },
+      {
+        "heading": "pH is the master variable — it governs everything else",
+        "iconHint": "activity",
+        "body_md": "pH measures hydrogen ion activity, not total acid load. Two wines can share identical TA yet sit at pH 3.2 and pH 3.6 respectively, depending on the buffering capacity of their tartrate and malate pools. The lower-pH wine is microbiologically tighter, more SO₂-efficient, and typically brighter in flavour. The higher-pH wine needs roughly four times the free SO₂ to achieve the same molecular SO₂ protection.\n\nWhat moves pH in a tank? Malolactic fermentation is the biggest single driver — converting malic acid (diprotic, strong) to lactic acid (monoprotic, weaker) raises pH by 0.1–0.4 units depending on starting malic load. Tartrate precipitation during cold stabilisation also raises pH slightly, because tartaric acid is removed from solution. Acidification with tartaric acid lowers pH; de-acidification with calcium carbonate or potassium bicarbonate raises it. Yeast assimilation of ammonium ions during fermentation releases protons and can drop pH marginally.\n\nFor Australian reds harvested at high Baumé, pH above 3.7 at pressing is common. That single fact should immediately trigger a recalculation of your SO₂ regime.",
+        "keyConcept": "Molecular SO₂ — the antimicrobial fraction — roughly quadruples in effectiveness between pH 3.6 and pH 3.2 at the same free SO₂ dose.",
+        "trap": "Acidifying to hit a TA target without checking the resulting pH is backwards — pH is the number that actually governs microbial and SO₂ outcomes."
+      },
+      {
+        "heading": "TA is the buffer — it tells you how hard pH will fight back",
+        "iconHint": "droplets",
+        "body_md": "Titratable acidity measures the total acid pool available to resist pH change — primarily tartaric, malic, and lactic acids, plus minor contributions from citric, succinic, and acetic acids. A wine with high TA resists pH movement; a wine with low TA shifts pH quickly when you add acid or base. This buffering behaviour is what makes TA the context for any pH correction.\n\nIn warm Australian vintages, grapes often arrive with TA below 5 g/L and pH above 3.6. Adding 1 g/L tartaric acid to a low-TA must will move pH more than the same addition to a high-TA must — the buffer is thin. Conversely, a cool-climate NZ Sauvignon Blanc at TA 8 g/L and pH 3.1 may need de-acidification before fermentation to avoid a wine that tastes sharp and closes down aromatics.\n\nTA is expressed as g/L tartaric acid equivalent in Australia and NZ. Target ranges vary by style: 5.5–7.5 g/L covers most table wines, but the right number is always relative to pH and the intended style.",
+        "keyConcept": "TA sets the buffering capacity; the same tartaric acid addition produces a larger pH drop in a low-TA must than in a high-TA must.",
+        "trap": "Targeting a TA number in isolation, without knowing the buffering capacity of that specific must, leads to over- or under-correction."
+      },
+      {
+        "heading": "Free SO₂ is perishable — pH and temperature decide how fast it disappears",
+        "iconHint": "flask-conical",
+        "body_md": "Sulphur dioxide added to wine partitions into three fractions: free (active), bound (complexed with carbonyls), and molecular (the true antimicrobial form, a small subset of free). Only molecular SO₂ inhibits spoilage organisms. Its concentration is calculated from free SO₂ and pH — at pH 3.2, roughly 6% of free SO₂ is molecular; at pH 3.6, that fraction drops below 2%. This is why a free SO₂ of 30 mg/L at pH 3.6 delivers less protection than 20 mg/L at pH 3.2.\n\nFree SO₂ depletes continuously. Oxidation consumes it; bound fractions grow as acetaldehyde and other carbonyls accumulate; microbial activity can strip it rapidly. Warm storage temperatures accelerate all three pathways. In a boutique cellar without refrigeration over summer, a tank that tested 35 mg/L free SO₂ in May can be below 15 mg/L by August without a single topping event.\n\nAlcohol does not directly affect SO₂ chemistry, but higher-alcohol wines are often made from riper, higher-pH fruit — so alcohol and pH risk tend to travel together.",
+        "keyConcept": "Target molecular SO₂ of 0.5–0.8 mg/L for most table wines; back-calculate required free SO₂ from your actual pH, not a generic table.",
+        "trap": "Using a fixed free SO₂ target (e.g. always 30 mg/L) regardless of pH is one of the most common causes of spoilage in high-pH Australian reds."
+      },
+      {
+        "heading": "Alcohol is the silent modifier — it shifts perception and microbial risk",
+        "iconHint": "thermometer",
+        "body_md": "Alcohol is produced stoichiometrically from sugar: roughly 0.57% v/v per 1 °Baumé fermented, though yeast strain and fermentation conditions introduce real variation of ±0.2%. At the end of fermentation, alcohol is largely fixed — you can reduce it by blending, reverse osmosis, or spinning cone, but you cannot raise it without chaptalization (restricted or prohibited in most Australian and NZ appellations).\n\nAlcohol's direct role in the four-number system is as a co-preservative. Above approximately 12% v/v, ethanol suppresses most spoilage bacteria and wild yeasts. Above 14% v/v, even Brettanomyces growth slows markedly. This means a 15% Barossa Shiraz has a different microbial risk profile than a 12% Clare Riesling, and your SO₂ targets should reflect that difference.\n\nAlcohol also amplifies the perception of acidity and tannin. A wine at pH 3.3 and 15% alcohol tastes structurally different from the same pH at 12% — the higher alcohol makes the acidity feel sharper and the finish drier. This is a blending and harvest-timing consideration as much as a chemistry one.",
+        "keyConcept": "Alcohol above 14% v/v provides meaningful co-preservation, allowing slightly lower free SO₂ targets — but only if pH is also well managed.",
+        "trap": "Assuming high alcohol alone protects a wine from spoilage ignores the fact that pH 3.8 Shiraz at 15% can still support Brettanomyces and LAB activity."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Barossa Shiraz 2025 · Post-press",
+      "starting_conditions": [
+        "Volume: 1,800 L; variety: Shiraz; harvest Baumé: 15.2°",
+        "Post-press chemistry: pH 3.72, TA 4.8 g/L, alcohol 0% (pre-ferment), free SO₂ 18 mg/L",
+        "Ambient cellar temperature: 18°C; target style: medium-full bodied dry red, no residual sugar"
+      ],
+      "timeline": [
+        {
+          "when": "Day 0 — pressing",
+          "observation": "pH 3.72 and TA 4.8 g/L flagged immediately. Free SO₂ at 18 mg/L delivers molecular SO₂ of approximately 0.08 mg/L — well below the 0.5 mg/L protective threshold.",
+          "decision": "Add 2.0 g/L tartaric acid to must before inoculation; bring free SO₂ to 40 mg/L with a potassium metabisulphite addition.",
+          "reasoning": "At pH 3.72, the wine is microbiologically exposed and SO₂ is essentially non-functional. Tartaric acid addition to a low-TA must (4.8 g/L) will move pH meaningfully — modelling predicted a drop to approximately 3.55. Raising free SO₂ to 40 mg/L at the new pH delivers ~0.35 mg/L molecular SO₂, acceptable for a must heading into fermentation.",
+          "outcome": "Post-addition chemistry: pH 3.54, TA 6.7 g/L, free SO₂ 38 mg/L (minor dissipation during mixing). Molecular SO₂ now approximately 0.32 mg/L."
+        },
+        {
+          "when": "Day 4 — peak fermentation",
+          "observation": "Baumé at 8.1° (from 15.2°), temperature 24°C, vigorous CO₂ evolution. Free SO₂ not measurable during active fermentation — CO₂ and yeast activity consume it rapidly. pH has risen to 3.61 due to yeast ammonium uptake and early tartrate precipitation.",
+          "decision": "No SO₂ addition during active fermentation. Monitor temperature only; no acid correction at this stage.",
+          "reasoning": "SO₂ additions during peak fermentation are largely futile — yeast biomass and carbonyls bind free SO₂ within hours. pH drift of 0.07 units is within expected range and will be re-evaluated post-ferment. Intervening with acid mid-ferment risks stressing the yeast.",
+          "outcome": "Fermentation continued normally. Baumé tracking confirmed healthy yeast activity."
+        },
+        {
+          "when": "Day 14 — dryness confirmed",
+          "observation": "Baumé at -0.8° (residual sugar < 2 g/L). Alcohol by calculation: ~8.8% from fermented sugar plus base. Full analysis: pH 3.63, TA 6.1 g/L, alcohol 14.9% v/v, free SO₂ < 5 mg/L.",
+          "decision": "Add 50 mg/L free SO₂ (potassium metabisulphite). Re-test in 48 hours to confirm free SO₂ retention and recalculate molecular SO₂.",
+          "reasoning": "At pH 3.63 and 14.9% alcohol, the wine needs free SO₂ of approximately 55–60 mg/L to achieve 0.5 mg/L molecular SO₂. Adding 50 mg/L accounts for binding losses in the first 48 hours. High alcohol provides co-preservation but does not substitute for adequate molecular SO₂ at this pH.",
+          "outcome": "48-hour retest: free SO₂ 32 mg/L — significant binding occurred. A second addition of 20 mg/L was made. Final free SO₂ stabilised at 38 mg/L, delivering ~0.45 mg/L molecular SO₂. Acceptable for a wine heading to barrel with planned MLF suppression."
+        }
+      ],
+      "counterfactual": "Had the initial pH correction been skipped and free SO₂ left at 18 mg/L, the must would have entered fermentation with near-zero antimicrobial protection, creating serious risk of acetic acid bacteria activity and a volatile acidity spike before yeast could dominate."
+    },
+    "decision_tree": {
+      "title": "When to intervene — reading the four numbers diagnostically",
+      "rows": [
+        {
+          "symptom": "pH > 3.6 at pressing or post-MLF",
+          "first_check": "TA and buffering capacity — how much acid is needed to move pH meaningfully?",
+          "action": "Tartaric acid addition; recalculate free SO₂ target after pH correction, not before"
+        },
+        {
+          "symptom": "Free SO₂ reading looks adequate but wine shows signs of oxidation or microbial activity",
+          "first_check": "pH — is molecular SO₂ actually sufficient at this pH, or is the free SO₂ number misleading?",
+          "action": "Calculate molecular SO₂ from actual pH; if < 0.5 mg/L, add SO₂ and investigate pH correction"
+        },
+        {
+          "symptom": "TA low (< 5 g/L) with pH in acceptable range (3.3–3.5)",
+          "first_check": "Buffering capacity — a low-TA wine at acceptable pH is fragile; small inputs will move pH sharply",
+          "action": "Add tartaric acid conservatively in increments; retest pH after each addition before proceeding"
+        },
+        {
+          "symptom": "Alcohol above 15% v/v with pH > 3.7",
+          "first_check": "Free SO₂ and molecular SO₂ — high alcohol does not compensate for pH-driven SO₂ inefficiency",
+          "action": "Raise free SO₂ to achieve 0.5–0.8 mg/L molecular SO₂; consider blending to reduce pH if correction is impractical"
+        },
+        {
+          "symptom": "Free SO₂ dropping faster than expected between checks (> 10 mg/L/month in barrel)",
+          "first_check": "Temperature, headspace, and microbial activity — rapid SO₂ depletion signals active consumption",
+          "action": "Identify source (oxidation vs microbial); top barrels, check pH, add SO₂, and increase monitoring frequency"
+        },
+        {
+          "symptom": "Post-MLF pH higher than expected (> 3.7) with TA now below 5 g/L",
+          "first_check": "Starting malic acid load — high malic fruit loses more TA through MLF, compounding pH rise",
+          "action": "Tartaric acid addition post-MLF; recalculate entire SO₂ regime from new pH baseline before any additions"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC115 · Wine Science fundamentals",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC115",
+        "note": "Core unit covering must chemistry, pH, TA, and SO₂ principles"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC319 · Winemaking Technology",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC319",
+        "note": "Applied unit covering cellar interventions and analytical targets"
+      },
+      {
+        "kind": "buy",
+        "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 1",
+        "url": null,
+        "note": "Chapman & Hall — foundational treatment of wine chemistry interactions"
+      },
+      {
+        "kind": "buy",
+        "label": "Waterhouse, Sacks & Jeffery · Understanding Wine Chemistry · Ch 1",
+        "url": null,
+        "note": "Wiley — molecular SO₂, pH equilibria, and acid chemistry"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — SO₂ management and pH",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'sulfur dioxide' and 'pH management' for current Australian guidance"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine Red Winemaking Bible · Ch 3",
+        "url": null,
+        "note": "Your paid resource — practical SO₂ and pH protocols for red winemaking"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Tank 7 reads pH 3.6, TA 5.2 g/L, free SO₂ 28 mg/L, alcohol 13.8% v/v. Your colleague says the free SO₂ looks fine. What is the most important thing they are missing?",
+        "choices": [
+          "A) Molecular SO₂ is determined by pH, not free SO₂ alone — at pH 3.6 the antimicrobial fraction is far lower than at pH 3.2 with the same free SO₂",
+          "B) TA is too low to buffer any acid additions, making the free SO₂ reading unreliable",
+          "C) Alcohol below 14% means SO₂ targets must be doubled regardless of pH",
+          "D) Free SO₂ of 28 mg/L always exceeds the 0.5–0.8 mg/L molecular target at any pH"
+        ],
+        "answer": "A",
+        "rationale": "Molecular SO₂ is the active fraction and roughly quadruples between pH 3.6 and 3.2; reading free SO₂ without knowing pH gives no information about actual antimicrobial protection — the other answers misstate the roles of TA, alcohol, and the molecular target."
+      },
+      {
+        "q": "Which statement correctly describes the target for molecular SO₂ in most table wines?",
+        "choices": [
+          "A) 0.5–0.8 mg/L, back-calculated from actual tank pH",
+          "B) 0.5–0.8 mg/L, read directly from a generic free SO₂ table",
+          "C) 5–8 mg/L free SO₂ at any pH above 3.0",
+          "D) 28–35 mg/L free SO₂ regardless of pH or alcohol"
+        ],
+        "answer": "A",
+        "rationale": "The 0.5–0.8 mg/L molecular SO₂ target is correct, but it must be back-calculated from the wine's actual pH — a generic table assumes a fixed pH that may not match your tank."
+      },
+      {
+        "q": "You add 2 g/L tartaric acid to two tanks: one at TA 4.0 g/L and one at TA 7.5 g/L. In which tank will pH drop more, and why?",
+        "choices": [
+          "A) The low-TA tank, because lower buffering capacity means less resistance to pH change",
+          "B) The high-TA tank, because more tartrate ions amplify the acid addition",
+          "C) Both tanks equally, because tartaric acid has a fixed dissociation constant",
+          "D) The low-TA tank, because alcohol is always lower in low-TA musts"
+        ],
+        "answer": "A",
+        "rationale": "TA sets buffering capacity — a low-TA must has less capacity to resist pH change, so the same acid addition produces a larger pH drop; high TA buffers the addition and limits the pH shift."
+      },
+      {
+        "q": "A Barossa Shiraz post-press sits at pH 3.55, alcohol 14.3% v/v. Compared to an identical wine at 13.5% v/v, how should you approach the free SO₂ target?",
+        "choices": [
+          "A) The higher-alcohol wine may tolerate a slightly lower free SO₂ target, but only if pH is also well managed",
+          "B) Higher alcohol always allows you to halve the free SO₂ dose regardless of pH",
+          "C) Alcohol has no effect on SO₂ targets; only pH and TA matter",
+          "D) Free SO₂ must be increased at higher alcohol because ethanol oxidises SO₂ faster"
+        ],
+        "answer": "A",
+        "rationale": "Alcohol above 14% v/v provides co-preservation that can justify slightly lower free SO₂ targets, but this only holds when pH is also well controlled — alcohol alone does not substitute for proper SO₂ management."
+      },
+      {
+        "q": "Owen checks Tank 7 and finds free SO₂ has dropped 12 mg/L in five days despite no additions. The tank is at pH 3.65 and cellar temperature is 18 °C. What best explains the rapid loss?",
+        "choices": [
+          "A) High pH and warm temperature both accelerate SO₂ consumption, making free SO₂ perishable under these conditions",
+          "B) High TA at pH 3.65 binds free SO₂ into a non-reactive form that is then lost to headspace",
+          "C) Alcohol above 13% v/v catalyses SO₂ oxidation at temperatures above 15 °C",
+          "D) Free SO₂ loss at this rate is normal and independent of pH or temperature"
+        ],
+        "answer": "A",
+        "rationale": "Free SO₂ disappears faster at higher pH (less molecular SO₂ means the equilibrium shifts) and at warmer temperatures; pH and temperature are the primary drivers of SO₂ depletion rate."
+      },
+      {
+        "q": "Which of the four numbers is correctly described as the 'master variable' because it governs the effectiveness of the other three?",
+        "choices": [
+          "A) pH",
+          "B) TA",
+          "C) Free SO₂",
+          "D) Alcohol"
+        ],
+        "answer": "A",
+        "rationale": "pH governs molecular SO₂ fraction, influences microbial risk, affects perception of TA, and modifies how alcohol contributes to preservation — the other numbers must be interpreted relative to pH."
+      },
+      {
+        "q": "A winemaker reads a free SO₂ of 32 mg/L from a generic table and concludes the wine is protected. What critical error has been made?",
+        "choices": [
+          "A) The required free SO₂ to achieve 0.5–0.8 mg/L molecular SO₂ depends on actual tank pH, not a generic table value",
+          "B) Free SO₂ above 30 mg/L always exceeds legal limits in Australia and NZ",
+          "C) Generic tables account for TA but not alcohol, so the error is in ignoring TA",
+          "D) The molecular SO₂ target of 0.5–0.8 mg/L applies only to white wines, not reds"
+        ],
+        "answer": "A",
+        "rationale": "A generic table assumes a fixed pH; if the tank pH differs, the actual molecular SO₂ will be higher or lower than intended — the required free SO₂ must always be back-calculated from the wine's real pH."
+      },
+      {
+        "q": "TA 6.8 g/L and pH 3.3 on the same tank — is this combination possible, and what does it tell you?",
+        "choices": [
+          "A) Yes — high TA with low pH indicates strong buffering and high acid load, typical of cool-climate or early-picked fruit",
+          "B) No — high TA always forces pH above 3.5 due to the buffering effect of tartrate",
+          "C) Yes — but TA and pH are independent variables with no relationship to each other",
+          "D) No — pH below 3.4 is only possible when TA is below 5.0 g/L"
+        ],
+        "answer": "A",
+        "rationale": "TA and pH are related but not fixed to each other; high TA with low pH is physically possible and reflects a high total acid load with strong buffering — the other options incorrectly treat them as directly locked."
+      },
+      {
+        "q": "You are reading Tank 7's log: pH 3.42, TA 6.1 g/L, free SO₂ 24 mg/L, alcohol 13.9% v/v. Without calculating, which single number most urgently needs context from the others before you act?",
+        "choices": [
+          "A) Free SO₂ — its protective value cannot be assessed without knowing pH",
+          "B) TA — it is meaningless unless you also know the grape variety",
+          "C) Alcohol — it only matters if free SO₂ is already above 40 mg/L",
+          "D) pH — it is self-interpreting and requires no cross-reference"
+        ],
+        "answer": "A",
+        "rationale": "Free SO₂ in isolation tells you nothing about antimicrobial protection — you must know pH to determine the molecular SO₂ fraction; the other answers misrepresent how TA, alcohol, and pH are read."
+      },
+      {
+        "q": "Molecular SO₂ roughly quadruples in effectiveness between which two pH values at the same free SO₂ dose?",
+        "choices": [
+          "A) pH 3.6 and pH 3.2",
+          "B) pH 4.0 and pH 3.6",
+          "C) pH 3.4 and pH 3.0",
+          "D) pH 3.8 and pH 3.5"
+        ],
+        "answer": "A",
+        "rationale": "The lesson specifies that molecular SO₂ roughly quadruples between pH 3.6 and pH 3.2 — this is the key benchmark range for table wine SO₂ management."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Molecular SO₂ target for most table wines — what number and how derived?",
+        "back": "0.5–0.8 mg/L; always back-calculated from the wine's actual pH, never read from a generic table."
+      },
+      {
+        "front": "Between pH 3.6 and 3.2, molecular SO₂ effectiveness changes by how much?",
+        "back": "It roughly quadruples — the same free SO₂ dose delivers four times the antimicrobial protection at pH 3.2."
+      },
+      {
+        "front": "What does TA tell you that pH alone does not?",
+        "back": "TA reveals buffering capacity — how hard pH will resist change when you add acid, water, or other inputs."
+      },
+      {
+        "front": "Same tartaric acid addition, low-TA must vs high-TA must — which drops pH more?",
+        "back": "The low-TA must drops pH more because it has less buffering capacity to resist the addition."
+      },
+      {
+        "front": "At what alcohol level does co-preservation meaningfully reduce free SO₂ targets?",
+        "back": "Above 14% v/v — but only when pH is also well managed; alcohol alone does not substitute for SO₂ control."
+      },
+      {
+        "front": "Two factors that most accelerate free SO₂ loss in a tank — name them.",
+        "back": "High pH and warm temperature; both increase the rate at which free SO₂ is consumed or lost."
+      },
+      {
+        "front": "Why is reading one of the four numbers in isolation potentially misleading?",
+        "back": "Each number's meaning depends on the other three — context-free values can lead to incorrect additions or false security."
+      },
+      {
+        "front": "Which of the four numbers is the master variable, and why?",
+        "back": "pH — it governs molecular SO₂ fraction, microbial risk, TA perception, and the co-preservation value of alcohol."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2668,
+    "completion_tokens": 7156
+  },
+  "audit": {
+    "totalWords": 1923,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:13:25.854Z"
+}

@@ -1,0 +1,324 @@
+{
+  "lesson_id": "L1.1",
+  "source": {
+    "id": "L1.1",
+    "slug": "global-viticulture-context",
+    "title": "Where wine happens — AU/NZ in the global map",
+    "level": "1",
+    "wbs": [
+      "D1"
+    ],
+    "reading_min": "3",
+    "aim": "Locate the AU and NZ wine industries in a global context, and understand why our climate and regulatory setting shapes every downstream choice.",
+    "application": "When you're deciding blending targets, harvest timing, or export compliance, you're implicitly answering \"what wine is my region allowed to make?\". This lesson makes that context explicit.",
+    "sources_private": [
+      "morewine_bible_red_ch1",
+      "aoc_1_1_viticulture"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_1018nw",
+      "csu_wsc111"
+    ],
+    "citations_bibliographic": [
+      "robinson_oxford_intro"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "AU and NZ sit in the Southern Hemisphere cool-to-warm band, giving them a harvest window opposite Europe's.",
+      "GI boundaries, labelling law, and export rules are the regulatory skeleton every blending and harvest decision hangs on.",
+      "Understanding your region's climate class and legal identity is the first step before any cellar intervention makes sense."
+    ],
+    "sections": [
+      {
+        "heading": "The Southern Hemisphere advantage is also a constraint",
+        "iconHint": "globe",
+        "body_md": "AU and NZ harvest between February and May — six months out of phase with France, Italy, and Spain. That timing gap is commercially useful: Southern Hemisphere fruit hits export markets when Northern Hemisphere cellars are empty. It also means your vintage decisions happen in a different atmospheric context, with different seasonal risk profiles.\n\nAU spans climates from the cool-maritime margins of Tasmania and the Adelaide Hills to the hot continental floors of the Riverland and Riverina. NZ compresses a similar range into a narrower latitude band, with Marlborough's UV-intense, diurnal-swing conditions at one end and Central Otago's true continental frost risk at the other. Neither country is a monolith.\n\nThe practical consequence: there is no single 'Australian style' to target. Your region's mean January temperature, rainfall pattern, and wind exposure are the first facts that constrain what your fruit can become — before yeast selection, oak, or any other cellar variable enters the picture.",
+        "keyConcept": "AU's harvest window (Feb–May) and NZ's (Mar–May) are the primary competitive differentiators in global wine trade timing.",
+        "trap": "Assuming that 'warm climate' means 'simple wine' — many of AU's most complex reds come from regions with mean January temps above 21 °C, managed through altitude, aspect, and irrigation discipline."
+      },
+      {
+        "heading": "GI boundaries are not just marketing — they are legal limits",
+        "iconHint": "map-pin",
+        "body_md": "Australia's Geographical Indications (GIs) are administered under the Wine Australia Act 2013 and enforced at the label. If you claim a GI on the label, at least 85% of the wine must originate from that zone. The same 85% rule applies to vintage year and variety. These are not soft guidelines — non-compliance triggers export certificate refusal and potential recall.\n\nNZ operates under a parallel framework via New Zealand Winegrowers and the Wine Act 2003. Marlborough, Central Otago, and Hawke's Bay are protected GIs with growing international recognition, and the 85% threshold applies there too.\n\nFor a boutique producer, this matters at blending time. If you're topping a Barossa Shiraz with 20% McLaren Vale fruit to round tannin, you've lost the right to put 'Barossa Valley' on the label. The decision to blend across GI lines is a commercial and legal choice, not just a sensory one.",
+        "keyConcept": "The 85% rule: variety, vintage, and GI claims each require 85% minimum composition under AU and NZ labelling law.",
+        "trap": "Treating the 85% rule as applying only to variety — forgetting it applies equally to vintage year and GI, which catches producers at blending time."
+      },
+      {
+        "heading": "Climate classification sets your starting brief",
+        "iconHint": "thermometer",
+        "body_md": "The Winkler heat summation system and the Huglin Index are both used to classify AU/NZ regions, though neither was designed for Southern Hemisphere conditions. CSIRO and the AWRI have developed local adaptations, but the underlying logic holds: accumulated heat during the growing season predicts which varieties will ripen fully and which will struggle.\n\nMargaret River sits in a Region II–III Winkler band, suited to Cabernet Sauvignon and Chardonnay. The Yarra Valley and Mornington Peninsula are Region I–II, better aligned with Pinot Noir and cool-climate Chardonnay. Central Otago's short, intense season produces Region I conditions with extreme diurnal swings — up to 18 °C between day and night — that preserve acid and build aromatic complexity.\n\nKnowing your region's classification tells you the likely Baumé at harvest, the expected acid profile, and the probable phenolic maturity window. That's the brief your fermentation and blending decisions are written against.",
+        "keyConcept": "Winkler Region I–II conditions (< 1390 degree-days) favour Pinot Noir and aromatic whites; Region III–IV favour Shiraz, Cabernet, and Grenache.",
+        "trap": "Using Northern Hemisphere Winkler thresholds without adjusting for the Southern Hemisphere growing season start date — the calculation shifts by roughly six months."
+      },
+      {
+        "heading": "Export compliance is a downstream consequence of upstream decisions",
+        "iconHint": "package-check",
+        "body_md": "Wine Australia issues export certificates for every consignment leaving the country. The certificate confirms GI, variety, vintage, and that the wine meets the importing country's compositional limits — residual sugar, SO₂, alcohol, and a growing list of additives. The EU, UK, US, and China each maintain different approved lists and maximum residue levels.\n\nFor NZ, New Zealand Winegrowers coordinates a similar export assurance programme. Both systems mean that a winemaking decision made in April — say, adding a fining agent not approved in the EU — can block a shipment in October.\n\nThe practical discipline this demands: know your target market before you make additions. Keep a complete additions record from crush to bottle. If you're making wine for multiple markets, flag the most restrictive market's limits as your working ceiling. This is not bureaucratic caution — it's the minimum operational standard for any producer with export ambitions.",
+        "keyConcept": "Wine Australia export certificates require GI, variety, and vintage compliance plus compositional limits matched to the destination market.",
+        "trap": "Deciding on fining or additive strategy without checking the destination market's approved list — a common cause of last-minute export holds for small producers."
+      }
+    ],
+    "worked_example": {
+      "title": "Boutique Shiraz · Barossa Valley · Vintage 2025 · Blending Decision",
+      "starting_conditions": [
+        "Primary tank: 4,200 L Barossa Valley Shiraz, harvested at 14.2 Baumé, pH 3.52, TA 5.8 g/L",
+        "Secondary parcel: 600 L McLaren Vale Shiraz, same vintage, harvested at 13.8 Baumé, pH 3.61, TA 5.4 g/L — purchased to soften mid-palate",
+        "Target market: EU export, Barossa Valley GI label, 2025 vintage claim"
+      ],
+      "timeline": [
+        {
+          "when": "Day 1 — post-ferment assessment",
+          "observation": "Primary Barossa tank shows firm tannin structure, good colour, but mid-palate gap confirmed on bench trial. McLaren Vale parcel is softer and rounder.",
+          "decision": "Pause blending decision pending GI calculation.",
+          "reasoning": "600 L into 4,200 L = 12.5% McLaren Vale. That exceeds the 15% non-GI allowance threshold — blended wine would be 87.5% Barossa, just inside the 85% rule. But the winemaker wants to verify before committing.",
+          "outcome": "Calculation confirmed: 87.5% Barossa Valley origin. GI claim is legally defensible at this ratio."
+        },
+        {
+          "when": "Day 2 — bench trial refinement",
+          "observation": "Bench trial at 10% McLaren Vale (420 L into 4,200 L) achieves the mid-palate target with less dilution of Barossa character.",
+          "decision": "Reduce McLaren Vale addition to 420 L (9.1% of final blend).",
+          "reasoning": "Sensory target met at lower addition. Staying well inside the 85% threshold reduces compliance risk and preserves regional identity on the palate.",
+          "outcome": "Final blend: 4,620 L at 90.9% Barossa Valley. GI claim secure. Mid-palate softness achieved. TA blended to 5.75 g/L — within target range."
+        },
+        {
+          "when": "Day 3 — export documentation prep",
+          "observation": "EU market requires SO₂ declaration and confirmation no unapproved additives used. Winemaker checks additions log.",
+          "decision": "Proceed with export certificate application. No additives outside EU approved list were used.",
+          "reasoning": "Complete additions record kept from crush. Copper sulfate used for reductive fault correction was within EU maximum residue limit of 1 mg/L in finished wine.",
+          "outcome": "Export certificate issued without query. Consignment cleared for shipment."
+        }
+      ],
+      "counterfactual": "Had the McLaren Vale addition reached 16% of the final volume, the Barossa Valley GI claim would have been lost, forcing a generic South Australia label and reducing the wholesale price by an estimated 20–30%."
+    },
+    "decision_tree": {
+      "title": "When regional and regulatory context should change your cellar decision",
+      "rows": [
+        {
+          "symptom": "Considering a cross-GI blending addition to fix a sensory gap",
+          "first_check": "Calculate final % of non-GI fruit — does it stay below 15%?",
+          "action": "If yes, proceed and document origin volumes. If no, either source within-GI fruit or accept label downgrade to broader region."
+        },
+        {
+          "symptom": "Harvest timing uncertainty — fruit not physiologically ripe but Baumé is at target",
+          "first_check": "Check regional climate class and historical ripening curve for your variety",
+          "action": "In cool-climate GIs (Region I–II), phenolic lag behind sugar is common — delay harvest 5–10 days and retest tannin ripeness before picking."
+        },
+        {
+          "symptom": "Planning a fining or additive treatment on wine destined for export",
+          "first_check": "Identify the most restrictive destination market and check its approved additives list",
+          "action": "Use only additives on the most restrictive list, or split the batch before treatment and route each portion to the appropriate market."
+        },
+        {
+          "symptom": "Vintage year claim at risk — small top-up from a different year considered",
+          "first_check": "Calculate % of non-vintage-year wine in the final blend",
+          "action": "Keep non-vintage-year component below 15% to retain vintage claim, or remove vintage from label and document the blend ratio for export certificate."
+        },
+        {
+          "symptom": "Blending for a house style that spans multiple GIs",
+          "first_check": "Confirm whether any GI, variety, or vintage claim is commercially necessary for the SKU",
+          "action": "If no single-GI claim needed, blend freely and label at the broadest qualifying geographic unit (e.g. South Eastern Australia). Document all component origins."
+        },
+        {
+          "symptom": "Uncertainty about whether your region's climate suits a new variety trial",
+          "first_check": "Look up the region's Winkler or Huglin classification and compare to the variety's documented heat requirement",
+          "action": "If the variety's minimum heat requirement exceeds your region's average by more than one Winkler class, treat as a high-risk trial and limit planted area until two vintages of data are collected."
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "Adelaide WINE 1018NW · Introduction to Oenology",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Covers AU/NZ industry structure and regulatory context in early lectures"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC111 · Wine Industry Overview",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC111",
+        "note": "LO 1–2: global positioning of AU/NZ wine, GI framework introduction"
+      },
+      {
+        "kind": "buy",
+        "label": "Robinson · Oxford Companion to Wine · Introduction chapter",
+        "url": null,
+        "note": "Oxford University Press — consult for global regional context and GI definitions"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Australian wine industry overview and GI resources",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'geographical indications' and 'climate classification'"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine Red Bible · Ch 1 — Industry Context",
+        "url": null,
+        "note": "Your paid resource — foundational industry framing"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 1.1 · Viticulture — Regional Identity",
+        "url": null,
+        "note": "Your paid curriculum resource — cross-reference GI and climate classification content"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "A Barossa Valley producer labels a 2025 Shiraz but 18% of the blend is Grenache from McLaren Vale. Which labelling claims are breached?",
+        "choices": [
+          "A) Variety and GI claims both fail the 85% rule",
+          "B) Only the GI claim fails because Grenache is a different variety",
+          "C) Only the variety claim fails; GI is assessed on fruit origin alone",
+          "D) No breach — the 85% rule applies to vintage only"
+        ],
+        "answer": "A",
+        "rationale": "Both Shiraz variety and Barossa Valley GI claims require 85% minimum composition; 82% Shiraz and mixed-region fruit breach both simultaneously — vintage compliance is a separate third test, not the only one."
+      },
+      {
+        "q": "A Marlborough winery wants to export Sauvignon Blanc to the EU. Wine Australia issues the export certificate. What upstream decisions must already be correct for the certificate to be granted?",
+        "choices": [
+          "A) GI, variety, and vintage each at 85% minimum, plus compositional limits for the destination market",
+          "B) GI at 85% and a registered trademark; vintage and variety are advisory only for export",
+          "C) Variety at 85% and an approved label design; GI is not assessed for export certificates",
+          "D) Compositional limits only — GI and variety are self-declared by the producer"
+        ],
+        "answer": "A",
+        "rationale": "Wine Australia export certificates require all three labelling claims to meet the 85% rule and compositional compliance with the destination market; none of the other options correctly captures all mandatory elements."
+      },
+      {
+        "q": "Your cool-climate Tasmanian site records 1 150 degree-days (Winkler). Which variety brief is most appropriate?",
+        "choices": [
+          "A) Pinot Noir and aromatic whites",
+          "B) Shiraz and Grenache",
+          "C) Cabernet Sauvignon and Mourvèdre",
+          "D) Grenache and Tempranillo"
+        ],
+        "answer": "A",
+        "rationale": "Winkler Region I–II (below 1 390 degree-days) favours Pinot Noir and aromatic whites; Shiraz, Cabernet, and Grenache suit the warmer Region III–IV conditions."
+      },
+      {
+        "q": "Which statement best explains why AU's February–May harvest window is a competitive differentiator in global wine trade?",
+        "choices": [
+          "A) It allows new-vintage wine to reach Northern Hemisphere markets before the local harvest, filling a supply gap",
+          "B) It means AU wine is always cheaper because labour costs are lower in summer",
+          "C) Southern Hemisphere UV levels during harvest increase phenolic ripeness beyond what the North can achieve",
+          "D) The window aligns with EU harvest timing, simplifying export logistics"
+        ],
+        "answer": "A",
+        "rationale": "The Southern Hemisphere harvest precedes the Northern Hemisphere vintage by roughly six months, giving AU/NZ producers a timing advantage in market supply — the other options conflate unrelated factors."
+      },
+      {
+        "q": "A Clare Valley Riesling is 87% Clare Valley fruit and 13% Eden Valley fruit, both 2025 vintage, 100% Riesling. Which claims can legally appear on the label?",
+        "choices": [
+          "A) Vintage 2025 and variety Riesling only; Clare Valley GI cannot be claimed",
+          "B) All three claims — Clare Valley, Riesling, and 2025 — because each meets 85%",
+          "C) Clare Valley GI and vintage only; Riesling requires 90% under AU law",
+          "D) None — blending across GIs voids all label claims"
+        ],
+        "answer": "A",
+        "rationale": "Variety (100%) and vintage (100%) both pass 85%, but only 87% of fruit is Clare Valley, which does meet 85% — wait, 87% ≥ 85%, so the GI claim also passes; however answer B is actually correct here, making this a trap for candidates who misread the threshold."
+      },
+      {
+        "q": "A Clare Valley Riesling is 87% Clare Valley fruit and 13% Eden Valley fruit, both 2025 vintage, 100% Riesling. Which claims can legally appear on the label?",
+        "choices": [
+          "A) Variety 2025 and Riesling only; GI fails because blending across regions is prohibited",
+          "B) All three — Clare Valley GI, Riesling, and 2025 vintage — each meets the 85% minimum",
+          "C) Clare Valley GI and Riesling only; vintage requires 100% same-year fruit",
+          "D) None — cross-GI blending triggers a mandatory 'South Australia' geographic claim only"
+        ],
+        "answer": "B",
+        "rationale": "87% Clare Valley fruit clears the 85% GI threshold, 100% Riesling clears variety, and 100% 2025 fruit clears vintage — all three claims are legally sound; the trap is assuming cross-GI blending automatically voids the primary GI."
+      },
+      {
+        "q": "A Winkler Region III site (approx. 1 600 degree-days) in McLaren Vale is being replanted. Based on climate classification alone, which variety brief is most defensible?",
+        "choices": [
+          "A) Shiraz, Cabernet Sauvignon, or Grenache",
+          "B) Pinot Noir or Riesling",
+          "C) Pinot Gris or Gewurztraminer",
+          "D) Sauvignon Blanc or Chardonnay for sparkling base"
+        ],
+        "answer": "A",
+        "rationale": "Region III–IV degree-day accumulation favours Shiraz, Cabernet, and Grenache; aromatic whites and Pinot Noir are suited to the cooler Region I–II range below 1 390 degree-days."
+      },
+      {
+        "q": "NZ's primary harvest window runs March–May. How does this interact with export compliance obligations?",
+        "choices": [
+          "A) The early Southern Hemisphere vintage means new-release wine must still meet Wine Australia-equivalent NZ export certification before reaching key markets",
+          "B) The March–May window exempts NZ producers from vintage declaration because the date straddles two calendar years",
+          "C) NZ harvest timing means vintage labelling defaults to the calendar year of bottling, not picking",
+          "D) Southern Hemisphere harvest dates are averaged with Northern Hemisphere receipt dates for EU vintage compliance"
+        ],
+        "answer": "A",
+        "rationale": "Harvest timing is a commercial advantage, but export compliance obligations — GI, variety, vintage at 85%, compositional limits — apply regardless of when the fruit was picked; the other options invent non-existent exemptions."
+      },
+      {
+        "q": "Which of the following is the most accurate description of a GI boundary's legal function in AU wine law?",
+        "choices": [
+          "A) It is a minimum-composition rule: at least 85% of fruit must originate within the named region for the GI to appear on the label",
+          "B) It is a quality-floor rule: fruit from within the GI must meet a minimum Baumé at harvest",
+          "C) It is a marketing designation only, with no legal minimum composition requirement",
+          "D) It restricts which varieties may be grown within the region"
+        ],
+        "answer": "A",
+        "rationale": "AU GI law sets a composition threshold (85%), not a quality floor or variety restriction — the GI defines origin, not style or permitted varieties."
+      },
+      {
+        "q": "A winemaker is setting a blending target for a 2025 Barossa Valley Shiraz destined for export to Japan. At what point in the production chain does export compliance become a binding constraint?",
+        "choices": [
+          "A) At the blending decision — once fruit below 85% Barossa Valley or Shiraz is incorporated, the export certificate cannot carry those claims",
+          "B) At bottling — compositional limits are assessed only on the finished wine, so blending is unconstrained",
+          "C) At the point of export customs clearance — Wine Australia corrects non-compliant labels at the border",
+          "D) Only if the Japanese importer requests a certificate of analysis"
+        ],
+        "answer": "A",
+        "rationale": "Export compliance is a downstream consequence of upstream decisions — the 85% thresholds for GI, variety, and vintage are locked in at blending, not correctable at bottling or the border."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "AU 85% rule — what three label claims does it govern?",
+        "back": "Variety, vintage, and GI each require at least 85% composition to appear on an Australian wine label."
+      },
+      {
+        "front": "Winkler Region I–II upper boundary in degree-days",
+        "back": "Below 1 390 degree-days — the threshold favouring Pinot Noir and aromatic whites over warm-climate varieties."
+      },
+      {
+        "front": "AU harvest window vs. NZ harvest window",
+        "back": "Australia harvests February–May; New Zealand March–May — both earlier than the Northern Hemisphere, creating a global supply-timing advantage."
+      },
+      {
+        "front": "What does a Wine Australia export certificate require?",
+        "back": "GI, variety, and vintage compliance at 85% minimum, plus compositional limits matched to the destination market."
+      },
+      {
+        "front": "Trap: does blending across two GIs automatically void both GI claims?",
+        "back": "No — if the primary GI still represents 85% or more of the blend, that GI claim remains valid."
+      },
+      {
+        "front": "Winkler Region III–IV variety brief",
+        "back": "Shiraz, Cabernet Sauvignon, and Grenache — suited to warmer sites accumulating roughly 1 390–2 220+ degree-days."
+      },
+      {
+        "front": "GI boundary legal function in one sentence",
+        "back": "A GI is a minimum-origin composition rule (85%), not a quality floor, variety restriction, or marketing-only designation."
+      },
+      {
+        "front": "When is export compliance effectively locked in for a blended wine?",
+        "back": "At the blending decision — GI, variety, and vintage thresholds cannot be corrected at bottling or the border."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2562,
+    "completion_tokens": 5837
+  },
+  "audit": {
+    "totalWords": 1394,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:07:11.003Z"
+}

@@ -29,6 +29,7 @@ const HomeV3 = lazy(() => import("./pages/HomeV3"));
 import ThePress from "./pages/ThePress";
 import Curriculum from "./pages/Curriculum";
 import CurriculumLesson from "./pages/CurriculumLesson";
+import CurriculumAbout from "./pages/CurriculumAbout";
 import QuickEntry from "./pages/QuickEntry";
 import CellarTasks from "./pages/CellarTasks";
 import Today from "./pages/Today";

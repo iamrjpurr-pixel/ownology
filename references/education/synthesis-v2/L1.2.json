@@ -1,0 +1,331 @@
+{
+  "lesson_id": "L1.2",
+  "source": {
+    "id": "L1.2",
+    "slug": "vine-biology-essentials",
+    "title": "The vine — the biology every winemaker needs",
+    "level": "1",
+    "wbs": [
+      "D1"
+    ],
+    "reading_min": "4",
+    "aim": "Understand grapevine anatomy, phenology, and berry maturation as the chain that ends in your press. No morphology quiz — just what changes when the vine changes.",
+    "application": "Your ripeness calls make sense when you can name what's happening in the berry during veraison. This lesson underwrites every harvest decision Owen will help you make.",
+    "sources_private": [
+      "aoc_1_5_grapevine_culture_a",
+      "morewine_bible_red_ch2"
+    ],
+    "sources_public_ref": [
+      "lincoln_wine_201",
+      "adelaide_viticult_2500wt"
+    ],
+    "citations_bibliographic": [
+      "coombe_iland_visc_vol1"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Berry composition at harvest is determined by decisions made weeks and months before picking.",
+      "Veraison resets the berry's chemistry — sugar accumulates, acids fall, phenolics shift from green to ripe.",
+      "Reading vine signals accurately is the foundation of every harvest call; anatomy gives you the vocabulary."
+    ],
+    "sections": [
+      {
+        "heading": "The vine is a sugar factory with a delivery problem",
+        "iconHint": "activity",
+        "body_md": "Photosynthesis happens in the canopy; the fruit is the destination. Leaves fix carbon dioxide into sucrose, which travels via the phloem to developing berries. The vine's capacity to load sugar into fruit depends on leaf area, canopy health, and the ratio of fruit to foliage — the crop load. A vine carrying too much fruit relative to its leaf area will simply run out of capacity to ripen it all.\n\nThis is why canopy management decisions made in spring — shoot thinning, leaf removal, bunch thinning — directly set the ceiling on what you can achieve at harvest. By the time you're standing in the vineyard with a refractometer, those decisions are locked in. Understanding the source-sink relationship means you stop treating Baumé as a surprise and start treating it as a consequence.\n\nFor boutique producers managing small blocks, this matters acutely. A single stressed row — waterlogged, shaded, or overcropped — can pull your whole tank average down and mask the quality sitting in the rest of the fruit.",
+        "keyConcept": "Leaf-to-fruit ratio drives ripening capacity; roughly 10–14 cm² of leaf area per gram of fruit is a widely cited functional target.",
+        "trap": "Assuming late-season irrigation or nutrition can rescue an overcropped vine — the source-sink ceiling was set at flowering."
+      },
+      {
+        "heading": "Phenology is a calendar you can't override, only read",
+        "iconHint": "clock",
+        "body_md": "Grapevine phenology describes the sequence of growth stages from budburst through to leaf fall. Each stage is triggered by accumulated heat (degree days above a base temperature, typically 10 °C) and modified by water status, nutrition, and variety. The stages that matter most to a winemaker are flowering, fruit set, veraison, and harvest maturity — because each one changes what's possible in the berry.\n\nFlowering and fruit set determine berry number and initial berry size. Poor fruit set — caused by cold, wet weather or boron deficiency — produces millerandage (shot berries), which concentrates flavour but reduces yield unpredictably. Veraison marks the transition from a hard, green, acid-dominated berry to a soft, sugar-accumulating one. From veraison to harvest is typically 40–70 days depending on variety and season.\n\nTracking phenology across vintages builds your site's fingerprint. A block that consistently hits veraison three weeks before your neighbours is telling you something about aspect, soil depth, or rootstock — information that sharpens your harvest window prediction year on year.",
+        "keyConcept": "Veraison to harvest spans roughly 40–70 days; variety, heat accumulation, and water status all compress or extend that window.",
+        "trap": "Counting days from veraison as a fixed harvest timer — heat accumulation post-veraison varies enormously between seasons."
+      },
+      {
+        "heading": "Veraison is not one event — it's a cascade",
+        "iconHint": "flask-conical",
+        "body_md": "At veraison, the berry undergoes a fundamental metabolic shift. Chlorophyll breaks down, anthocyanins accumulate in red varieties, and the berry softens as cell walls loosen. Simultaneously, the phloem connection that was delivering malic acid is redirected toward sucrose import. Tartaric acid, synthesised earlier in the season, stays relatively stable in absolute terms but falls in concentration as the berry expands and dilutes.\n\nMalic acid is the acid that matters most post-veraison. It is actively respired — consumed by the berry's own metabolism — at a rate that accelerates with temperature. A warm post-veraison period can drop titratable acidity by 2–3 g/L in a fortnight. This is why the same variety harvested one week apart in a heat spike can show dramatically different pH and TA profiles.\n\nAnthocyanin and tannin development also follow veraison. Skin tannins polymerise and soften over the ripening period; seed tannins remain harsh until very late maturity. Picking before seed tannins have lignified (turned brown) guarantees green, extractable astringency in your red — no amount of winemaking corrects it fully.",
+        "keyConcept": "Malic acid is respired post-veraison; warm nights accelerate loss and can drop TA by 2–3 g/L in under two weeks.",
+        "trap": "Relying on Baumé alone as a harvest trigger — pH and seed colour are equally critical signals of true physiological ripeness."
+      },
+      {
+        "heading": "Berry anatomy tells you where the flavour lives",
+        "iconHint": "target",
+        "body_md": "The berry has three tissue zones that contribute differently to wine. The skin carries anthocyanins, flavonols, and aromatic precursors — it is the primary source of colour and varietal character in red wine and a significant contributor to texture. The pulp is mostly water, sugar, and acid; it provides the fermentable substrate but relatively little flavour complexity. The seeds carry condensed tannins that, when unripe, are the harshest component in the berry.\n\nThis anatomy explains extraction logic. Gentle whole-berry fermentation minimises seed contact and extracts primarily from skin. Extended maceration post-fermentation targets skin tannin polymerisation. Pressing at different pressures accesses different tissue zones — free-run juice is pulp-dominated, hard press fractions carry increasing skin and seed contribution.\n\nFor winemakers assessing fruit in the vineyard, tasting the skin separately from the pulp — and chewing seeds to assess their hardness and bitterness — gives more actionable information than Baumé alone. A berry at 13.5 °Baumé with brown, crunchy seeds and silky skin tannins is a different picking decision from the same Baumé reading with green, bitter seeds.",
+        "keyConcept": "Skin = colour and aroma; pulp = sugar and acid; seeds = tannin — each tissue zone ripens on its own timeline.",
+        "trap": "Pressing hard to chase yield without accounting for the seed tannin fraction that enters the wine at high press pressures."
+      },
+      {
+        "heading": "What the vine is telling you — reading stress signals",
+        "iconHint": "gauge",
+        "body_md": "Vines communicate stress visibly before it shows in the fruit. Mild water deficit post-veraison is generally positive — it slows berry expansion, concentrating existing solutes, and can improve skin-to-pulp ratio. Severe deficit causes stomatal closure, halting photosynthesis and stalling sugar accumulation; the vine looks fine but Baumé plateaus.\n\nHeat stress above approximately 35 °C degrades aromatic precursors and accelerates malic acid respiration. Sunburn on exposed berries creates localised dehydration and off-flavour precursors. Excessive vigour — often a nitrogen or irrigation management issue — produces thick canopies that shade fruit, delay ripening, and promote fungal disease pressure.\n\nFor a boutique producer walking blocks daily in the final fortnight, the signals to track are: shoot tip activity (still growing = vine not yet in shutdown), leaf colour and turgor, berry softness uniformity across the bunch, and seed colour progression from green through to brown. These visual and tactile cues, combined with regular Baumé and pH measurements, give you a multi-dimensional picture that no single number can replicate.",
+        "keyConcept": "Mild post-veraison water deficit concentrates solutes; severe deficit stalls photosynthesis and plateaus Baumé without improving quality.",
+        "trap": "Interpreting a Baumé plateau as 'nearly there' — it may signal vine shutdown requiring an immediate harvest decision, not patience."
+      }
+    ],
+    "worked_example": {
+      "title": "Block 3 · Shiraz 2025 · Barossa foothills · Final fortnight",
+      "starting_conditions": [
+        "Veraison recorded 28 January; harvest window opens approximately 10–14 March based on prior vintages",
+        "Baumé at 28 January: 6.5 °Baumé; TA 9.8 g/L; pH 3.18",
+        "Season: warm January, above-average rainfall at fruit set, moderate crop load estimated at 8 t/ha"
+      ],
+      "timeline": [
+        {
+          "when": "28 Feb",
+          "observation": "Baumé 12.1 °Baumé; pH 3.41; TA 6.9 g/L. Seeds 60% brown. Skin tannins silky on tasting. Shoot tips fully stopped.",
+          "decision": "No action — monitor every 3 days.",
+          "reasoning": "Baumé on track, acid still has buffer, seeds not fully ripe. Vine shutdown is a positive sign — energy redirecting to fruit.",
+          "outcome": "Fermentation baseline established. Picking date projected 10–14 March confirmed as realistic."
+        },
+        {
+          "when": "5 Mar",
+          "observation": "Three-day heat event forecast (38–41 °C). Baumé 13.0 °Baumé; pH 3.52; TA 6.1 g/L. Seeds 80% brown.",
+          "decision": "Harvest brought forward to 7 March — two days ahead of original window.",
+          "reasoning": "pH already at 3.52 with three days of 40 °C forecast. Malic acid respiration at those temperatures could push pH above 3.65 and drop TA below 5 g/L — a difficult fermentation and stability problem. Seeds sufficiently ripe. Baumé will be adequate at 13.2–13.5 °Baumé estimated at pick.",
+          "outcome": "Fruit picked 7 March at 13.3 °Baumé, pH 3.54, TA 6.0 g/L. Seed tannins fully brown and non-bitter on taste."
+        },
+        {
+          "when": "10 Mar (counterfactual date)",
+          "observation": "Post-heat: Baumé 14.1 °Baumé; pH 3.71; TA 4.8 g/L. Some sunburn visible on exposed berries.",
+          "decision": "N/A — fruit already in cellar.",
+          "reasoning": "Monitoring continued on unharvested neighbouring block for comparison. pH 3.71 would have required significant tartaric acid addition to achieve fermentation stability, and sunburnt berry fraction would have introduced off-flavour risk.",
+          "outcome": "Decision to pick early validated. Neighbouring block required 1.8 g/L tartaric addition and showed elevated volatile acidity post-ferment."
+        }
+      ],
+      "counterfactual": "Waiting for the original 10 March date would have delivered a wine at pH 3.71 with compromised acid structure and sunburn-derived off-flavours that no cellar intervention could fully mask."
+    },
+    "decision_tree": {
+      "title": "Reading the block — when to act before harvest",
+      "rows": [
+        {
+          "symptom": "Baumé plateauing for 5+ days, shoot tips still active",
+          "first_check": "Soil moisture and canopy density — is the vine still growing vegetatively?",
+          "action": "Reduce irrigation if applicable; consider targeted leaf removal to redirect energy. Reassess in 4 days."
+        },
+        {
+          "symptom": "Baumé on track but pH rising faster than expected (>0.05 units/day)",
+          "first_check": "Night-time temperatures — warm nights accelerate malic acid respiration",
+          "action": "Bring harvest forward; do not wait for Baumé target if pH is approaching 3.65 in a warm-acid variety."
+        },
+        {
+          "symptom": "Seeds still green and bitter at target Baumé",
+          "first_check": "Variety and season — late-ripening varieties and cool seasons delay seed maturation relative to sugar",
+          "action": "Hold if acid and pH permit; if pH is already high, accept the seed tannin risk and manage extraction gently in cellar."
+        },
+        {
+          "symptom": "Uneven veraison — significant proportion of berries still red-green at 80% veraison",
+          "first_check": "Bunch position and canopy shading — shaded interior bunches lag by 1–2 weeks",
+          "action": "Targeted leaf removal on shaded zones; consider selective picking (two passes) if block value justifies it."
+        },
+        {
+          "symptom": "Berry shrivel appearing before target Baumé",
+          "first_check": "Distinguish dehydration concentration (positive) from botrytis-driven shrivel (negative) — smell and visual inspection",
+          "action": "If clean dehydration: harvest immediately and adjust Baumé expectation upward. If botrytis: harvest urgently regardless of Baumé."
+        },
+        {
+          "symptom": "TA below 5.0 g/L at harvest Baumé with pH above 3.65",
+          "first_check": "Confirm with lab — field refractometer and pH meter have error margins; verify before acting",
+          "action": "Plan tartaric acid addition at intake; alert winemaking team to elevated pH fermentation protocols and SO₂ management."
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Coombe & Iland · Viticulture Vol. 1 · Ch 3–5",
+        "url": null,
+        "note": "Winetitles Media — covers vine anatomy, phenology, and berry development in detail"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Lincoln WINE201 · Viticulture fundamentals",
+        "url": "https://www.lincoln.ac.nz/study/courses-2/course-search/",
+        "note": "Search Lincoln course search for WINE201"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide VITI 2500WT · Grapevine biology and management",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Adelaide Bachelor of Viticulture and Oenology program calendar"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Berry ripening and harvest decisions",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for berry ripening and harvest maturity"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 1.5 · Grapevine culture A",
+        "url": null,
+        "note": "Your paid curriculum resource — covers phenology and canopy management"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine Red Bible · Ch 2",
+        "url": null,
+        "note": "Your paid resource — fruit assessment and harvest timing"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Your Shiraz block has a leaf-to-fruit ratio of 7 cm² per gram of fruit at veraison. What is the most likely consequence at harvest?",
+        "choices": [
+          "A) Insufficient photosynthetic capacity to fully ripen the crop",
+          "B) Excessive sugar accumulation with poor colour development",
+          "C) Accelerated malic acid respiration leading to flabby wine",
+          "D) No effect — leaf area only influences canopy disease pressure"
+        ],
+        "answer": "A",
+        "rationale": "The functional target is 10–14 cm² per gram; at 7 cm² the vine lacks the photosynthetic source area to drive sugar loading and full phenolic ripeness, not an acid or colour issue in isolation."
+      },
+      {
+        "q": "Which tissue zone of the berry is the primary site of anthocyanin and aromatic compound accumulation?",
+        "choices": [
+          "A) Pulp",
+          "B) Seeds",
+          "C) Skin",
+          "D) Brush"
+        ],
+        "answer": "C",
+        "rationale": "Skin houses colour (anthocyanins) and key aroma precursors; pulp is the reservoir for sugar and acid, and seeds carry tannin — each zone ripens on its own timeline."
+      },
+      {
+        "q": "Block 3 Shiraz is at 12.5 Baumé and TA has dropped 2.8 g/L in 11 days. Nights have been averaging 22 °C. What is the most likely driver?",
+        "choices": [
+          "A) Potassium uptake diluting tartrate in the pulp",
+          "B) Accelerated malic acid respiration driven by warm nights post-veraison",
+          "C) Severe water deficit stalling acid synthesis",
+          "D) Leaf senescence reducing sugar-to-acid conversion"
+        ],
+        "answer": "B",
+        "rationale": "Warm nights accelerate malic acid respiration post-veraison and can drop TA by 2–3 g/L in under two weeks; potassium effects are real but slower and secondary here."
+      },
+      {
+        "q": "Veraison is best described as:",
+        "choices": [
+          "A) A single event where all berries simultaneously soften and colour",
+          "B) A cascade of biochemical changes that unfolds across days to weeks",
+          "C) The point at which seed tannin polymerisation is complete",
+          "D) The onset of tartaric acid synthesis in the pulp"
+        ],
+        "answer": "B",
+        "rationale": "Veraison is a cascade — softening, colour change, sugar loading, and acid metabolism are sequential and overlapping processes, not a single synchronous switch."
+      },
+      {
+        "q": "For a Barossa Shiraz block, the veraison-to-harvest window is most accurately described as:",
+        "choices": [
+          "A) Fixed at 45 days regardless of variety",
+          "B) 40–70 days, compressed or extended by variety, heat accumulation, and water status",
+          "C) 30–40 days in warm climates, driven solely by heat units",
+          "D) 60–90 days, primarily controlled by rootstock vigour"
+        ],
+        "answer": "B",
+        "rationale": "The 40–70 day range reflects the interaction of variety, heat accumulation, and water status; no single factor fixes the window, and warm climates compress rather than eliminate variability."
+      },
+      {
+        "q": "You impose a mild post-veraison water deficit on Block 3. What is the expected primary effect on berry composition?",
+        "choices": [
+          "A) Solute concentration as berry expansion slows",
+          "B) Stalled photosynthesis and a Baumé plateau",
+          "C) Accelerated seed tannin ripening",
+          "D) Increased malic acid synthesis to compensate for reduced turgor"
+        ],
+        "answer": "A",
+        "rationale": "Mild post-veraison deficit concentrates solutes by limiting berry cell expansion; severe deficit is what stalls photosynthesis and plateaus Baumé without quality gain."
+      },
+      {
+        "q": "Baumé in Block 3 has plateaued at 13.8 for eight days despite warm days. Vine leaves show rolling and early afternoon wilt. What is the most likely explanation?",
+        "choices": [
+          "A) The block has reached physiological maturity and sugar loading is complete",
+          "B) Severe water deficit has stalled photosynthesis, halting further sugar accumulation",
+          "C) Leaf-to-fruit ratio is too high, diluting sugar concentration",
+          "D) Cool nights are slowing phloem transport of sucrose to berries"
+        ],
+        "answer": "B",
+        "rationale": "Leaf rolling and wilt signal severe water stress; at this level photosynthesis is suppressed, phloem loading stalls, and Baumé plateaus without the quality improvement of mild deficit."
+      },
+      {
+        "q": "Seed tannin ripeness is important to a winemaker primarily because:",
+        "choices": [
+          "A) Seeds are the main source of wine colour stability",
+          "B) Unripe seed tannins contribute harsh, green astringency independent of sugar ripeness",
+          "C) Seed ripeness determines the rate of malic acid respiration post-veraison",
+          "D) Seeds must be fully ripe before anthocyanin synthesis begins in the skin"
+        ],
+        "answer": "B",
+        "rationale": "Seeds ripen on their own timeline; unripe seeds yield harsh green tannins even when Baumé and colour targets are met — this is a classic harvest-timing trap."
+      },
+      {
+        "q": "A grower increases crop load by 40% without adjusting canopy size. Assuming the original leaf-to-fruit ratio was at the lower end of the functional target, what is the most direct risk?",
+        "choices": [
+          "A) Excessive malic acid retention due to reduced respiration",
+          "B) Inadequate photosynthetic source area to ripen the larger crop fully",
+          "C) Accelerated veraison timing due to increased berry competition",
+          "D) Higher seed tannin polymerisation from increased light interception"
+        ],
+        "answer": "B",
+        "rationale": "Adding fruit without adding leaf area pushes the ratio below the 10–14 cm²/g target, reducing the vine's capacity to supply sugars and drive full ripeness across all tissue zones."
+      },
+      {
+        "q": "Which statement correctly pairs berry tissue with its primary ripeness contribution?",
+        "choices": [
+          "A) Pulp = tannin; skin = sugar; seeds = aroma",
+          "B) Skin = colour and aroma; pulp = sugar and acid; seeds = tannin",
+          "C) Seeds = acid; pulp = colour; skin = tannin and sugar",
+          "D) Pulp = aroma; skin = acid; seeds = sugar and colour"
+        ],
+        "answer": "B",
+        "rationale": "This is the foundational anatomy map: skin for colour/aroma, pulp for sugar/acid, seeds for tannin — each with its own ripening trajectory that harvest timing must reconcile."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Functional leaf-to-fruit ratio target for ripening capacity?",
+        "back": "Approximately 10–14 cm² of leaf area per gram of fruit is the widely cited functional target."
+      },
+      {
+        "front": "Veraison-to-harvest window: typical range and what compresses or extends it?",
+        "back": "40–70 days; variety, heat accumulation, and water status all compress or extend the window."
+      },
+      {
+        "front": "Which acid is respired post-veraison, and how fast can it drop?",
+        "back": "Malic acid; warm nights can drive a TA drop of 2–3 g/L in under two weeks."
+      },
+      {
+        "front": "Three berry tissue zones and their primary ripeness contributions?",
+        "back": "Skin = colour and aroma; pulp = sugar and acid; seeds = tannin — each ripens on its own timeline."
+      },
+      {
+        "front": "Mild vs severe post-veraison water deficit: what's the critical difference in outcome?",
+        "back": "Mild deficit concentrates solutes; severe deficit stalls photosynthesis and plateaus Baumé without quality gain."
+      },
+      {
+        "front": "Why can high Baumé mislead a harvest decision?",
+        "back": "Sugar ripeness in the pulp can be achieved while seed tannins remain unripe and skin aroma precursors are underdeveloped."
+      },
+      {
+        "front": "Veraison is a cascade — name three distinct changes that occur across it.",
+        "back": "Berry softening, anthocyanin accumulation in the skin, and the shift from sugar import to active phloem loading all occur sequentially, not simultaneously."
+      },
+      {
+        "front": "What does a Baumé plateau combined with vine wilt signal in the vineyard?",
+        "back": "Severe water deficit suppressing photosynthesis — further hang time will not improve quality and may worsen it."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2645,
+    "completion_tokens": 6063
+  },
+  "audit": {
+    "totalWords": 1585,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:09:14.751Z"
+}
