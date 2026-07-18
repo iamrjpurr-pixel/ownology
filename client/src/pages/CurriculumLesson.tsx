@@ -49,11 +49,17 @@ export default function CurriculumLesson() {
   const [, params] = useRoute("/curriculum/:slug");
   const slug = params?.slug ?? "";
   const { data: lesson, isLoading } = trpc.curriculum.bySlug.useQuery({ slug }, { enabled: !!slug });
-  const [mode, setMode] = useState<Mode>("deep");
+  const access = useCurriculumAccess();
+  const [mode, setMode] = useState<Mode>(access.canRead.deep ? "deep" : "skim");
   const [flashIdx, setFlashIdx] = useState(0);
   const [flashFlipped, setFlashFlipped] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [quizReveal, setQuizReveal] = useState<Record<number, boolean>>({});
+
+  useEffect(() => {
+    setMode(access.canRead.deep ? "deep" : "skim");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [access.tier]);
 
   // NOTE: All hooks MUST run before any early return. Rules of Hooks.
   const groupedCitations = useMemo(() => {
@@ -529,43 +535,3 @@ function CitedIn({ grouped }: { grouped: Record<string, any[]> }) {
   );
 }
 
-function PaywallBoundary({ lessonTitle, isAuthenticated }: { lessonTitle: string; isAuthenticated: boolean }) {
-  return (
-    <div className="max-w-4xl mx-auto px-6 py-14" data-testid="paywall-boundary">
-      <div className="rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-8 md:p-12 shadow-sm">
-        <div className="flex items-center gap-3 text-amber-900 font-semibold text-sm uppercase tracking-wider mb-4">
-          <Lock className="h-4 w-4" /> Vigneron members only
-        </div>
-        <h2 className="font-serif text-3xl md:text-4xl text-stone-900 leading-tight mb-4">
-          Ready to open the full lesson?
-        </h2>
-        <p className="text-stone-700 leading-relaxed text-lg mb-6 max-w-2xl">
-          The rest of <em>{lessonTitle}</em> — five sections, a Tank-4-style worked example, decision tree, ten questions and eight flashcards —
-          is unlocked with a Vigneron membership. Free-Run visitors read the aim; members do the work.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/pricing?from=curriculum-paywall">
-            <Button size="lg" className="bg-stone-900 hover:bg-stone-800" data-testid="paywall-cta-pricing">
-              See Vigneron pricing <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          </Link>
-          <Link href="/curriculum/about">
-            <Button variant="outline" size="lg" data-testid="paywall-cta-learn">
-              What's inside the curriculum
-            </Button>
-          </Link>
-          {!isAuthenticated && (
-            <Link href="/login?next=/curriculum">
-              <Button variant="ghost" size="lg" data-testid="paywall-cta-signin">
-                Already a member? Sign in
-              </Button>
-            </Link>
-          )}
-        </div>
-        <p className="mt-6 text-xs text-stone-500">
-          14-day free trial available. Cancel anytime. Founding member pricing locks for life.
-        </p>
-      </div>
-    </div>
-  );
-}
