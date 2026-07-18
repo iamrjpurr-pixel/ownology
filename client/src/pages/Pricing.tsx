@@ -335,6 +335,11 @@ const FEATURE_EXPLANATIONS: Record<string, string> = {
   "Annual knowledge base review alert": "Each year, Ownology flags any regulatory changes in your state jurisdictions so your compliance knowledge stays current without manual checking.",
   "Onboarding call \u2014 30 min": "A 30-minute video call with the Ownology team to configure your Knowledge Platform, set up team seats, and walk through the platform for your specific winery.",
   "Unlimited Divine Trinity reveals": "No monthly cap on Deep Dive credits. Every question you ask can be taken all the way to the Divine Trinity — The Science, The Vineyard, and The Craft — without counting the cost.",
+  // Curriculum (across tiers)
+  "Curriculum library \u2014 Skim mode across all 30 lessons": "Every one of the thirty lessons visible in Skim mode — the key numbers and traps of each concept, in ~2 minutes. The synthesised working reference across fermentation chemistry, viticulture, microbial risk and cellar craft. Deep + Flash modes unlock at Cellar Hand.",
+  "Curriculum unlocked \u2014 Deep, Skim & Flash + MCQ practice": "Full access to every reading mode: Deep (~15 min per lesson, worked examples + decision tree + quiz), Skim (~2 min), and Flash retrieval cards (~5 min). Play the MCQs to test yourself — scoring persists from The Press up.",
+  "Curriculum \u2014 scored MCQs, saved progress, attainment PDF": "Your MCQ scores are saved, bookmarks persist across devices, and you can generate a personal attainment PDF showing lessons completed and levels reached — useful for portfolio, CV, or team development records.",
+  "Team curriculum \u2014 seats, admin view, branded attainment PDFs": "Assign lessons to your team, see who has completed what from the admin view, and generate winery-branded attainment PDFs. One shared reference your new cellar hand can grow into.",
 };
 
 // Pillar tags shown on each tier card

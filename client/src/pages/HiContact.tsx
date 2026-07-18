@@ -281,6 +281,16 @@ export default function HiContact() {
                 </>
               }
             />
+            <WhatTile
+              testid="hi-tile-curriculum"
+              kicker="Curriculum"
+              body={
+                <>
+                  Not a course. A working reference — twelve bibles, four unis, thirty lessons in one voice —
+                  that unfolds beside every batch you run.
+                </>
+              }
+            />
           </div>
           <p
             data-testid="hi-what-summary"
@@ -308,8 +318,8 @@ export default function HiContact() {
             audit. Same panel treatment as everything else on the page. */}
         <div data-testid="hi-authority" style={{ ...panelStyle, marginTop: "1.25rem", textAlign: "center" }}>
           <p style={{ ...bodyStyle, color: "var(--ow-text-mid)" }}>
-            Built by a working winemaker · Cited from 12+ industry bibles including{" "}
-            <AcronymTooltip term="AWRI" />, Boulton and Iland.
+            Built by a working winemaker · Thirty lessons distilled from{" "}
+            <AcronymTooltip term="AWRI" />, Boulton, Iland and four university syllabi — in one voice.
           </p>
         </div>
 
@@ -443,6 +453,15 @@ export default function HiContact() {
           style={btnTertiary}
         >
           See today&apos;s live Cellar Brief →
+        </Link>
+
+        {/* Tertiary CTA — Curriculum peek */}
+        <Link
+          href={`/curriculum/about?from=sms-${contact.slug}`}
+          data-testid="hi-cta-curriculum"
+          style={btnTertiary}
+        >
+          Peek the Curriculum — thirty lessons, one voice →
         </Link>
 
         {/* Signature */}

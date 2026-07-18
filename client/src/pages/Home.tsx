@@ -907,6 +907,70 @@ function Features() {
             </div>
           </div>
 
+          {/* Feature 5 — Curriculum (full-width, contextual-moat framing) */}
+          <div
+            className={`md:col-span-3 cellar-card overflow-hidden ${inView ? "fade-up fade-up-delay-3" : "opacity-0"}`}
+            data-testid="home-feature-curriculum"
+          >
+            <div className="grid md:grid-cols-5 gap-0">
+              <div className="md:col-span-3 p-8">
+                <p style={{fontFamily:"'Lato',sans-serif", fontWeight:700, fontSize:"0.6rem", letterSpacing:"0.14em", textTransform:"uppercase", color:"var(--ow-amber)", marginBottom:"1rem"}}>LEARN — The Curriculum</p>
+                <div className="w-10 h-10 rounded-sm flex items-center justify-center mb-5" style={{background:"color-mix(in oklch, var(--ow-amber) 12%, transparent)", border:"1px solid color-mix(in oklch, var(--ow-amber) 25%, transparent)"}}>
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path d="M3 3v11l6-2 6 2V3l-6 2-6-2z" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinejoin="round"/>
+                    <path d="M9 5v10" stroke="var(--ow-amber)" strokeWidth="1.2" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <h3 style={{fontFamily:"'Fraunces',serif", fontWeight:600, fontSize:"1.5rem", color:"var(--ow-text-hi)", marginBottom:"0.85rem", lineHeight:1.2}}>
+                  The lesson finds you at the vessel.
+                </h3>
+                <p style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"0.9375rem", color:"var(--ow-text-mid)", lineHeight:1.7, maxWidth:"460px"}}>
+                  Not a course. A working reference — twelve winemaking bibles, four university syllabi, thirty structured lessons in one voice — that unfolds beside every batch you run. The stuck-ferment lesson is right there the moment you log a stalled ferment.
+                </p>
+                <div className="mt-6 flex flex-wrap items-center gap-2">
+                  {["Deep · ~15 min","Skim · ~2 min","Flash · ~5 min"].map(m=>(
+                    <span key={m} style={{
+                      fontFamily:"'Lato',sans-serif",
+                      fontSize:"0.75rem",
+                      fontWeight:600,
+                      color:"var(--ow-amber)",
+                      padding:"0.35rem 0.7rem",
+                      background:"color-mix(in oklch, var(--ow-amber) 8%, transparent)",
+                      border:"1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
+                      borderRadius: 4,
+                      letterSpacing:"0.02em",
+                    }}>{m}</span>
+                  ))}
+                </div>
+                <div className="mt-6">
+                  <Link href="/curriculum/about" data-testid="home-curriculum-cta" className="btn-amber" style={{display:"inline-flex", alignItems:"center", gap:"0.5rem"}}>
+                    Peek the thirty lessons
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </Link>
+                </div>
+              </div>
+              <div className="md:col-span-2 p-8 border-t md:border-t-0 md:border-l" style={{borderColor:"var(--ow-border)", background:"var(--ow-bg-base)"}}>
+                <p className="data-readout text-xs mb-4" style={{color:"color-mix(in oklch, var(--ow-amber) 60%, transparent)", letterSpacing:"0.14em"}}>THE FOUR LEVELS</p>
+                <div className="flex flex-col gap-2.5">
+                  {[
+                    ["L1","Foundations","The language you need to share."],
+                    ["L2","Grape to Ferment","Season-by-season decisions."],
+                    ["L3","Cellar Craft","The critical calls."],
+                    ["L4","Finishing & Reflection","Out the door, into next year."],
+                  ].map(([n,t,tag])=>(
+                    <div key={n} className="flex items-start gap-3 px-3 py-2 rounded-sm" style={{background:"var(--ow-bg-card)", border:"1px solid var(--ow-border)"}}>
+                      <span style={{fontFamily:"'Fira Code',monospace", fontSize:"0.72rem", color:"var(--ow-amber)", fontWeight:700, minWidth:"20px", paddingTop:"2px"}}>{n}</span>
+                      <div>
+                        <div style={{fontFamily:"'Lato',sans-serif", fontSize:"0.85rem", color:"var(--ow-text-hi)", fontWeight:600}}>{t}</div>
+                        <div style={{fontFamily:"'Fraunces',serif", fontStyle:"italic", fontSize:"0.78rem", color:"var(--ow-text-lo)", marginTop:"1px"}}>{tag}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
