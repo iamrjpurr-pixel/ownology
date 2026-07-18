@@ -1,0 +1,327 @@
+{
+  "lesson_id": "L2.8",
+  "source": {
+    "id": "L2.8",
+    "slug": "malolactic-fermentation",
+    "title": "Malolactic — the second ferment that changes the wine",
+    "level": "2",
+    "wbs": [
+      "D4",
+      "D5"
+    ],
+    "reading_min": "4",
+    "aim": "When to run it, when to skip it, nutrient and pH conditions, spontaneous vs inoculated, and how to know it's done.",
+    "application": "Owen tracks malic across your tanks. This lesson lets you steer that curve confidently.",
+    "sources_private": [
+      "morew_mlf_paper",
+      "awri_mlf_successful",
+      "awri_mlf_red"
+    ],
+    "sources_public_ref": [
+      "csu_wsc318"
+    ],
+    "citations_bibliographic": [
+      "rgayon_handbook_v1_mlf"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "MLF converts sharp malic acid to softer lactic acid — run it deliberately or block it completely.",
+      "pH, temperature, SO₂, and bacterial nutrition determine whether MLF finishes cleanly or stalls mid-tank.",
+      "Paper chromatography or enzymatic assay confirms completion; residual malic above 0.3 g/L means the job is unfinished."
+    ],
+    "sections": [
+      {
+        "heading": "Malic acid is the target, lactic acid is the reward",
+        "iconHint": "flask-conical",
+        "body_md": "Malic acid sits at roughly 1–4 g/L in most red musts and up to 6 g/L in cool-climate whites. It tastes hard — green apple, angular. Oenococcus oeni converts it to lactic acid (plus CO₂), dropping titratable acidity by roughly half the malic consumed. A wine at 3 g/L malic that completes MLF loses around 1.5 g/L TA. That shift is felt immediately in texture and perceived fruit weight.\n\nThe reaction is decarboxylation, not fermentation in the alcoholic sense — no sugar is consumed, no significant ethanol is produced. What changes is acid balance, pH (rises 0.1–0.3 units typically), and microbial stability. The bacterial biomass also contributes minor flavour metabolites — diacetyl being the most discussed — but at controlled levels these integrate rather than dominate.",
+        "keyConcept": "MLF reduces TA by approximately 0.5 × the malic acid consumed; a 3 g/L malic drop cuts TA by ~1.5 g/L.",
+        "trap": "Assuming MLF always softens a wine usefully — in a low-acid warm-vintage red it can strip structure and leave the wine flat."
+      },
+      {
+        "heading": "The window opens and closes fast — timing is everything",
+        "iconHint": "clock",
+        "body_md": "The best inoculation window for Oenococcus oeni is late alcoholic fermentation or immediately at dryness — typically 0–2 °Baumé residual sugar. Inoculating earlier risks bacterial competition with yeast, elevated volatile acidity, and off-flavour production from residual sugar metabolism. Waiting too long after dryness allows free SO₂ to accumulate from yeast autolysis and the wine to cool below the bacterial activity threshold.\n\nFor spontaneous MLF, the same timing logic applies — the native lactic acid bacteria present on skins and in the cellar will activate when conditions suit them, not when you want them to. In a boutique setting where you know your cellar flora and have consistent vintage history, spontaneous MLF can deliver complexity. In a first vintage at a new site, or with a high-value parcel, inoculated MLF with a commercial Oenococcus strain removes the guesswork.\n\nPost-alcoholic fermentation, keep the wine on gross lees at 18–22 °C and hold SO₂ additions until MLF is confirmed complete.",
+        "keyConcept": "Inoculate at 0–2 °Baumé or immediately at dryness; waiting beyond 48 hours post-dry risks rising free SO₂ blocking bacterial activity.",
+        "trap": "Adding SO₂ at dryness before checking whether MLF has already started — even 15 mg/L free SO₂ can arrest Oenococcus mid-conversion."
+      },
+      {
+        "heading": "pH and SO₂ are the gatekeepers",
+        "iconHint": "gauge",
+        "body_md": "Oenococcus oeni is sensitive to molecular SO₂, not total SO₂. At pH 3.2, even 10 mg/L free SO₂ produces inhibitory molecular SO₂ levels. At pH 3.5, the same free SO₂ is far less threatening. This is why low-pH wines — cool-climate Riesling, high-acid Pinot Noir — are the hardest to push through MLF. The bacteria are fighting both acidity and SO₂ simultaneously.\n\nPractical thresholds: free SO₂ below 10 mg/L and pH above 3.2 gives Oenococcus a workable environment. Below pH 3.1, MLF completion is unreliable even with robust commercial strains. Temperature below 15 °C slows activity sharply; below 12 °C it effectively stops. Alcohol above 14% v/v adds further stress. When multiple inhibitors stack — high alcohol, low pH, cool cellar — even the most tolerant strains struggle.",
+        "keyConcept": "Target free SO₂ < 10 mg/L, pH > 3.2, and cellar temperature 18–22 °C for reliable MLF completion.",
+        "trap": "Relying on total SO₂ figures rather than calculating molecular SO₂ — the bacteria only respond to the molecular fraction."
+      },
+      {
+        "heading": "Knowing it's done — don't guess, measure",
+        "iconHint": "target",
+        "body_md": "Paper chromatography is the cellar standard — cheap, fast, and visual. A yellow malic acid spot on the chromatogram that has disappeared (or reduced to a faint smear) against the reference standard indicates completion. Run it yourself; don't wait for the lab if you have tanks at risk of re-fermentation or spoilage.\n\nEnzymatic assay gives a precise malic acid concentration in g/L and is worth running on any wine destined for early bottling or where you plan to add SO₂ and cold-stabilise. The threshold for 'complete' is residual malic acid below 0.3 g/L — above that, biological instability in bottle remains a real risk. Lactic acid test strips and in-line sensors are emerging tools but enzymatic remains the gold standard for confirmation.\n\nOnce MLF is confirmed complete, act promptly: rack off gross lees, adjust free SO₂ to your target (typically 25–35 mg/L free for reds at pH 3.4–3.6), and drop cellar temperature to arrest any residual bacterial activity.",
+        "keyConcept": "MLF is complete when residual malic acid is below 0.3 g/L — confirmed by paper chromatography or enzymatic assay.",
+        "trap": "Declaring MLF done based on CO₂ activity stopping — CO₂ release slows before malic is fully consumed, giving a false finish signal."
+      },
+      {
+        "heading": "When to skip it — the deliberate block",
+        "iconHint": "wind",
+        "body_md": "Not every wine benefits from MLF. High-volume aromatic whites — Riesling, Gewürztraminer, Sauvignon Blanc — typically retain more varietal character and structural tension without it. The decision is stylistic, but it must be executed with discipline: a partial or accidental MLF in a wine meant to stay crisp is worse than a complete one.\n\nTo block MLF reliably: add SO₂ at crush to suppress native bacteria, use a low-pH must (< 3.2 helps), ferment cool, and add lysozyme (up to 500 mg/L is permitted in Australia) if bacterial populations are already elevated. Post-ferment, maintain free SO₂ above 30 mg/L, keep the wine cold (< 10 °C), and consider sterile filtration before bottling if any doubt remains. Dimethyl dicarbonate (DMDC) at bottling provides a final bacterial kill for wines with residual sugar.\n\nIn a boutique context, the block strategy requires consistent monitoring — one warm week in the cellar can restart dormant bacteria.",
+        "keyConcept": "Block MLF with free SO₂ > 30 mg/L, temperature < 10 °C, and lysozyme up to 500 mg/L where bacterial pressure is high.",
+        "trap": "Using lysozyme as a substitute for SO₂ management — lysozyme targets gram-positive bacteria only and has no effect on Brett or acetic acid bacteria."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Pinot Noir 2025 · Yarra Valley · Post-dryness Day 1",
+      "starting_conditions": [
+        "Residual sugar: 0.1 °Baumé (effectively dry)",
+        "Malic acid: 2.8 g/L (enzymatic, Day 0)",
+        "pH: 3.38 · TA: 6.4 g/L · Free SO₂: 6 mg/L · Temp: 19 °C",
+        "Inoculated with commercial Oenococcus oeni strain (rehydrated per manufacturer spec, 25 g/hL)"
+      ],
+      "timeline": [
+        {
+          "when": "Day 1",
+          "observation": "CO₂ bead visible on surface; paper chromatography shows strong malic spot, faint lactic spot.",
+          "decision": "Hold temperature at 19 °C, no SO₂ addition, leave on gross lees.",
+          "reasoning": "Bacterial activity confirmed. SO₂ addition now would arrest conversion. Gross lees provide bacterial nutrition (yeast autolysate).",
+          "outcome": "Activity continues steadily over next 48 hours."
+        },
+        {
+          "when": "Day 8",
+          "observation": "CO₂ bead reduced significantly. Paper chromatography: malic spot faint but still present. Enzymatic assay: malic 0.9 g/L.",
+          "decision": "Maintain conditions. No intervention. Re-test in 4 days.",
+          "reasoning": "Conversion is progressing — 1.9 g/L consumed in 8 days is normal for this temperature and pH. Premature SO₂ addition would lock in 0.9 g/L residual malic.",
+          "outcome": "Bacterial activity continues at reduced but measurable rate."
+        },
+        {
+          "when": "Day 14",
+          "observation": "CO₂ activity stopped. Paper chromatography: malic spot absent. Enzymatic assay: malic 0.18 g/L.",
+          "decision": "MLF declared complete. Rack off gross lees, adjust free SO₂ to 28 mg/L, drop cellar to 12 °C.",
+          "reasoning": "Residual malic below 0.3 g/L threshold. Prompt SO₂ addition and cooling arrests any residual bacterial activity and protects against oxidation.",
+          "outcome": "Wine stable. pH post-MLF: 3.52. TA: 5.1 g/L. Ready for oak or vessel ageing."
+        }
+      ],
+      "counterfactual": "Adding 20 mg/L free SO₂ at Day 1 dryness — a common reflex — would have arrested Oenococcus at 2.8 g/L malic, leaving the wine microbiologically unstable and structurally hard."
+    },
+    "decision_tree": {
+      "title": "MLF diagnostic — what the tank is telling you",
+      "rows": [
+        {
+          "symptom": "No MLF activity 5+ days post-inoculation",
+          "first_check": "Free SO₂, temperature, and pH",
+          "action": "If free SO₂ > 10 mg/L, rack to remove SO₂ and re-inoculate; warm tank to 20 °C minimum"
+        },
+        {
+          "symptom": "MLF started then stalled — malic dropping slowly or stopped above 0.5 g/L",
+          "first_check": "Temperature drop or SO₂ addition since inoculation",
+          "action": "Warm to 20–22 °C, add yeast autolysate (bacterial nutrient) at 20 g/hL, re-inoculate if stalled > 7 days"
+        },
+        {
+          "symptom": "Elevated volatile acidity (> 0.6 g/L acetic) during MLF",
+          "first_check": "Residual sugar at time of inoculation and Lactobacillus contamination",
+          "action": "If sugar was present at inoculation, arrest MLF with SO₂ and assess VA trajectory — do not continue conversion"
+        },
+        {
+          "symptom": "Diacetyl character dominant (buttery, distracting) post-MLF",
+          "first_check": "Whether wine was racked and SO₂-adjusted promptly after completion",
+          "action": "Stir gross lees briefly to encourage diacetyl reduction by yeast; ensure free SO₂ is adjusted and wine is racked — diacetyl diminishes with time on lees"
+        },
+        {
+          "symptom": "MLF occurring in a wine meant to be blocked",
+          "first_check": "Free SO₂ level and cellar temperature",
+          "action": "If malic > 1.5 g/L, consider allowing completion under controlled conditions rather than arresting mid-conversion; if malic < 1.0 g/L, arrest with SO₂ and cold-stabilise immediately"
+        },
+        {
+          "symptom": "Paper chromatography ambiguous — faint malic spot, unclear result",
+          "first_check": "Run enzymatic assay for precise malic g/L",
+          "action": "If enzymatic malic > 0.3 g/L, do not add SO₂; hold conditions and re-test in 5 days"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC318 · Winemaking Technology",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC318",
+        "note": "Covers MLF management within red and white winemaking technology units"
+      },
+      {
+        "kind": "buy",
+        "label": "Handbook of Enology Vol. 1 · Ribéreau-Gayon et al. · Ch 5",
+        "url": null,
+        "note": "Wiley; covers Oenococcus oeni biology, inhibition factors, and MLF kinetics"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Successful MLF",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'successful malolactic fermentation'"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · MLF in Red Winemaking",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'malolactic fermentation red wine'"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine MLF Paper · full guide",
+        "url": null,
+        "note": "Your paid resource — covers inoculation protocols and troubleshooting"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Tank 7 Pinot Noir finishes fermentation with 3.2 g/L malic acid. If MLF runs to completion, what is the approximate reduction in titratable acidity?",
+        "choices": [
+          "A) 1.6 g/L",
+          "B) 3.2 g/L",
+          "C) 0.8 g/L",
+          "D) 2.4 g/L"
+        ],
+        "answer": "A",
+        "rationale": "TA reduction ≈ 0.5 × malic consumed; 0.5 × 3.2 = 1.6 g/L — B confuses malic consumed with TA drop, C and D apply wrong multipliers."
+      },
+      {
+        "q": "Which combination of conditions gives the highest probability of reliable MLF completion?",
+        "choices": [
+          "A) Free SO₂ 8 mg/L, pH 3.35, cellar temp 20 °C",
+          "B) Free SO₂ 15 mg/L, pH 3.1, cellar temp 20 °C",
+          "C) Free SO₂ 8 mg/L, pH 3.1, cellar temp 14 °C",
+          "D) Free SO₂ 25 mg/L, pH 3.35, cellar temp 20 °C"
+        ],
+        "answer": "A",
+        "rationale": "All three gatekeepers are met: free SO₂ < 10 mg/L, pH > 3.2, and temperature 18–22 °C — B fails on pH and SO₂, C fails on pH and temperature, D fails on SO₂."
+      },
+      {
+        "q": "On post-dryness Day 1 for Tank 7, you have not yet inoculated with MLB. What is the latest you should inoculate to avoid free SO₂ becoming a barrier?",
+        "choices": [
+          "A) Within 48 hours of going dry",
+          "B) Within 7 days of going dry",
+          "C) Once free SO₂ drops below 30 mg/L, regardless of timing",
+          "D) At the next pump-over, whenever that falls"
+        ],
+        "answer": "A",
+        "rationale": "Waiting beyond 48 hours post-dry risks rising free SO₂ that blocks bacterial activity — the other options ignore the time-sensitive window."
+      },
+      {
+        "q": "Paper chromatography of a Chardonnay shows a faint malic acid spot. An enzymatic assay returns 0.35 g/L residual malic. Is MLF complete?",
+        "choices": [
+          "A) No — residual malic must be below 0.3 g/L for completion",
+          "B) Yes — a faint spot on chromatography confirms completion",
+          "C) Yes — any residual below 0.5 g/L is acceptable",
+          "D) No — both methods must show zero malic before completion is declared"
+        ],
+        "answer": "A",
+        "rationale": "The completion threshold is < 0.3 g/L residual malic; 0.35 g/L is above that threshold — B misreads chromatography intensity, C uses a wrong threshold, D sets an unrealistic zero target."
+      },
+      {
+        "q": "A winemaker wants to block MLF in a high-pH Viognier (pH 3.6) where bacterial pressure is high. Which combination is most effective?",
+        "choices": [
+          "A) Free SO₂ > 30 mg/L, temperature < 10 °C, lysozyme up to 500 mg/L",
+          "B) Free SO₂ > 10 mg/L, temperature 15 °C, lysozyme 100 mg/L",
+          "C) Free SO₂ > 30 mg/L, temperature 18 °C, no lysozyme",
+          "D) Temperature < 10 °C alone is sufficient at pH 3.6"
+        ],
+        "answer": "A",
+        "rationale": "All three blocking tools together — high SO₂, cold temperature, and lysozyme at up to 500 mg/L — are required when bacterial pressure is high; partial measures leave the wine vulnerable."
+      },
+      {
+        "q": "Recall: at what Baumé reading is inoculation with MLB considered optimal during fermentation?",
+        "choices": [
+          "A) 0–2 °Baumé",
+          "B) 4–6 °Baumé",
+          "C) 8–10 °Baumé",
+          "D) At or below −0.5 °Baumé"
+        ],
+        "answer": "A",
+        "rationale": "Inoculation at 0–2 °Baumé or immediately at dryness gives bacteria the best conditions before SO₂ rises — earlier inoculation risks alcohol stress, later risks SO₂ inhibition."
+      },
+      {
+        "q": "A cool-climate Riesling is being made for high-acid, fruit-driven style. Which blocking strategy is most appropriate to prevent unwanted MLF?",
+        "choices": [
+          "A) Add SO₂ to maintain free SO₂ > 30 mg/L and hold tank below 10 °C",
+          "B) Inoculate with MLB immediately at dryness to control the process",
+          "C) Do nothing — Riesling at low pH will block MLF naturally without intervention",
+          "D) Add lysozyme at 100 mg/L as the sole measure"
+        ],
+        "answer": "A",
+        "rationale": "Deliberate blocking requires free SO₂ > 30 mg/L and temperature < 10 °C; relying on pH alone (C) is unreliable, and lysozyme alone (D) is insufficient when bacterial pressure exists."
+      },
+      {
+        "q": "You measure free SO₂ at 12 mg/L in a tank you want to run MLF on. The pH is 3.3 and temperature is 19 °C. What is the most likely outcome if you inoculate now?",
+        "choices": [
+          "A) MLF will be sluggish or stall — free SO₂ exceeds the < 10 mg/L target",
+          "B) MLF will proceed normally — pH and temperature are within range",
+          "C) MLF will complete faster than normal due to the elevated SO₂ stimulating bacteria",
+          "D) MLF will fail entirely and cannot be restarted"
+        ],
+        "answer": "A",
+        "rationale": "Free SO₂ above 10 mg/L inhibits bacterial activity even when pH and temperature are correct — B ignores the SO₂ gatekeeper, C is physiologically wrong, D overstates the outcome."
+      },
+      {
+        "q": "Which analytical method confirms MLF completion and what is the threshold?",
+        "choices": [
+          "A) Paper chromatography or enzymatic assay showing residual malic < 0.3 g/L",
+          "B) Titration showing TA has dropped by at least 1 g/L",
+          "C) Sensory assessment confirming reduced acidity and buttery character",
+          "D) Refractometer reading stable at 0 °Baumé for 5 consecutive days"
+        ],
+        "answer": "A",
+        "rationale": "Only direct measurement of residual malic acid — by chromatography or enzymatic assay — against the < 0.3 g/L threshold confirms completion; TA drop and sensory cues are indirect and unreliable."
+      },
+      {
+        "q": "Tank 7 Pinot Noir has been dry for 52 hours. Free SO₂ has climbed to 14 mg/L. You want to inoculate with MLB. What should you do first?",
+        "choices": [
+          "A) Reduce free SO₂ below 10 mg/L before inoculating",
+          "B) Inoculate immediately — the 48-hour window has passed so speed is critical",
+          "C) Add lysozyme to reset bacterial populations, then inoculate",
+          "D) Abandon MLF and block with temperature and SO₂"
+        ],
+        "answer": "A",
+        "rationale": "Free SO₂ must be below 10 mg/L for reliable bacterial activity; inoculating into 14 mg/L SO₂ will likely cause a stall — lysozyme (C) kills bacteria rather than enabling them."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "TA reduction formula when malic acid is consumed by MLF?",
+        "back": "TA reduction ≈ 0.5 × grams of malic acid consumed; a 3 g/L malic drop cuts TA by ~1.5 g/L."
+      },
+      {
+        "front": "Three gatekeeper conditions required for reliable MLF completion?",
+        "back": "Free SO₂ < 10 mg/L, pH > 3.2, and cellar temperature 18–22 °C must all be met simultaneously."
+      },
+      {
+        "front": "Residual malic acid threshold that confirms MLF is complete?",
+        "back": "MLF is complete when residual malic acid is below 0.3 g/L, confirmed by paper chromatography or enzymatic assay."
+      },
+      {
+        "front": "Latest safe inoculation window after alcoholic fermentation finishes?",
+        "back": "Inoculate at 0–2 °Baumé or within 48 hours of dryness — beyond this, rising free SO₂ blocks bacterial activity."
+      },
+      {
+        "front": "Three tools used together to deliberately block MLF under high bacterial pressure?",
+        "back": "Free SO₂ > 30 mg/L, cellar temperature < 10 °C, and lysozyme up to 500 mg/L applied in combination."
+      },
+      {
+        "front": "Common trap: TA drop alone confirms MLF is done — true or false?",
+        "back": "False — TA drop is indirect; only direct measurement of residual malic acid below 0.3 g/L confirms completion."
+      },
+      {
+        "front": "Why is lysozyme ineffective as the sole MLF block at high pH?",
+        "back": "Lysozyme targets bacterial cell walls but cannot compensate for the permissive environment that high pH creates for surviving bacteria."
+      },
+      {
+        "front": "Optimal inoculation Baumé and why not earlier in fermentation?",
+        "back": "Inoculate at 0–2 °Baumé; earlier inoculation exposes bacteria to high sugar osmotic stress and rising alcohol before they are established."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2626,
+    "completion_tokens": 6317
+  },
+  "audit": {
+    "totalWords": 1456,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:34:24.849Z"
+}

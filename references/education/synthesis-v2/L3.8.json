@@ -1,0 +1,332 @@
+{
+  "lesson_id": "L3.8",
+  "source": {
+    "id": "L3.8",
+    "slug": "blending",
+    "title": "Blending — decisions with numbers and nose",
+    "level": "3",
+    "wbs": [
+      "D5",
+      "D8"
+    ],
+    "reading_min": "5",
+    "aim": "Component analysis, sensory trials, blending maths, and how to resist the temptation to over-engineer.",
+    "application": "Owen builds you a blending trial workbook. This lesson tells you when to trust the numbers vs the nose.",
+    "sources_private": [
+      "morewine_bible_red_ch_blending",
+      "morewine_bible_white_ch_blending"
+    ],
+    "sources_public_ref": [
+      "csu_wsc317",
+      "adelaide_oenology_3520wt"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch5_blending"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Blending is a numbers problem first — get the chemistry right before the sensory work begins.",
+      "Trial blends at 100 mL scale reveal interactions that component analysis alone cannot predict.",
+      "The best blend is usually the simplest one that meets spec — resist adding a third component to fix a two-component problem."
+    ],
+    "sections": [
+      {
+        "heading": "Component analysis is the map, not the destination",
+        "iconHint": "gauge",
+        "body_md": "Before you pull a single sample, build a component table. Every tank or parcel in the blend pool needs pH, TA, free SO₂, volatile acidity, alcohol, residual sugar, and a sensory descriptor. These numbers define the boundaries of what the blend can achieve — you cannot blend your way to a lower pH than your lowest-pH component, and you cannot dilute VA below the weighted average of the pool.\n\nThe table also flags incompatibilities early. A high-pH Shiraz at 3.72 blended 50/50 with a Grenache at 3.55 lands at roughly 3.64 — still above the 3.60 threshold where free SO₂ efficacy drops sharply. That calculation takes thirty seconds and saves you from a microbiological problem six months post-bottling.\n\nTreat the component table as a constraint engine. It tells you which combinations are chemically viable before you waste bench time on sensory trials that were never going to work.",
+        "keyConcept": "Blend pH is a weighted average by volume — calculate it before any sensory trial to eliminate non-viable combinations.",
+        "trap": "Skipping the component table and going straight to sensory trials wastes bench time on blends that fail basic chemistry."
+      },
+      {
+        "heading": "The maths of blending — weighted averages and the one exception",
+        "iconHint": "activity",
+        "body_md": "Most blending parameters — alcohol, TA, VA, residual sugar, free SO₂ — behave as simple weighted averages by volume. If Tank A is 14.2% alcohol at 60% of the blend and Tank B is 13.4% at 40%, the result is 13.88%. This arithmetic is non-negotiable and the workbook handles it automatically.\n\nThe exception is pH. Because pH is a logarithmic scale, blending two wines at different pH values produces a result that sits closer to the higher-pH component than a linear average would suggest. For practical boutique-scale work, the weighted average of [H⁺] concentration gives a more accurate prediction than averaging pH directly. The difference is small within a 0.2-unit range but becomes meaningful at the extremes — particularly when you are trying to hit a pH ceiling for SO₂ efficacy.\n\nColour and tannin are additive in volume terms but interact non-linearly in the glass. Calculate the numbers, then verify with the trial.",
+        "keyConcept": "Blend pH using weighted [H⁺] averages, not pH values directly — the log scale skews results toward the higher-pH component.",
+        "trap": "Averaging pH values directly overstates the acidity of the final blend, leading to under-acidulation at bottling."
+      },
+      {
+        "heading": "Sensory trials — small scale, structured, and blind",
+        "iconHint": "flask-conical",
+        "body_md": "Work at 100 mL total volume. Use a 10 mL syringe and a calibrated pipette — precision here matters because a 5% error at 100 mL scale becomes a 50 L error when you scale to a 1,000 L tank. Prepare no more than six trial blends per session; palate fatigue compresses discrimination after that.\n\nRun trials blind wherever possible. Label cups with codes, not component names. Knowing that Cup 3 contains your best-performing Cabernet Franc introduces confirmation bias that undermines the whole exercise. Have at least two evaluators if the cellar allows it, and record scores on a structured sheet before any discussion.\n\nRest the trials for 24 hours before a second evaluation. Freshly made bench blends show integration artefacts — a slight disjointedness on the palate — that resolve overnight. A blend that reads disjointed at Day 0 but cohesive at Day 1 is a good sign. One that is still disjointed at Day 1 is telling you something real.",
+        "keyConcept": "Rest bench blends 24 hours before final evaluation — Day 0 integration artefacts are normal and should not drive the decision.",
+        "trap": "Evaluating bench blends immediately after preparation and rejecting good combinations because of transient disjointedness."
+      },
+      {
+        "heading": "When the nose and the numbers disagree — who wins?",
+        "iconHint": "target",
+        "body_md": "Numbers set the floor. If a blend fails on pH, VA, or free SO₂, it does not matter how good it smells — it will not hold in bottle. Chemistry is veto power, not a suggestion.\n\nAbove the chemical floor, the nose leads. Two blends that are analytically identical to two decimal places will still taste different, and the one that reads better in the glass is the right choice. This is not mysticism — it reflects tannin polymerisation, aromatic compound interactions, and textural integration that current bench analytics do not fully capture.\n\nThe dangerous zone is when a blend smells marginally better but sits at the edge of a chemical threshold. A wine at pH 3.61 that is slightly more expressive than the pH 3.58 version is not worth the free SO₂ compromise unless you are prepared to adjust post-blend. Make the adjustment, recheck, then re-evaluate sensorially. Do not accept a chemical risk because the nose was persuasive on one tasting.",
+        "keyConcept": "Chemistry is veto power — above the chemical floor, sensory preference decides; below it, numbers override the nose every time.",
+        "trap": "Choosing a marginally better-smelling blend that sits outside safe pH or VA thresholds without planning a post-blend correction."
+      },
+      {
+        "heading": "Simplicity is a blending strategy, not a compromise",
+        "iconHint": "target",
+        "body_md": "Every additional component adds complexity to the blend calculation, the sensory evaluation, and the production logistics. A two-component blend that meets spec and reads well in the glass is a better outcome than a four-component blend that achieves the same result — because the two-component version is reproducible, scalable, and easier to adjust if one parcel underperforms in a future vintage.\n\nThe temptation to add a third or fourth component usually arrives when the two-component blend has a specific deficit — a mid-palate gap, a short finish, a slight green edge. Before reaching for another tank, ask whether that deficit can be addressed by adjusting the ratio of the existing two components, or by a targeted addition such as a tannin or acid correction. Often it can.\n\nBoutique vignerons with limited parcel volumes face an additional constraint: adding a small percentage of a rare component ties up that parcel across the entire blend volume. Reserve the complex multi-component blends for wines where the style genuinely demands it.",
+        "keyConcept": "A two-component blend that meets spec is preferable to a four-component blend achieving the same result — simplicity aids reproducibility.",
+        "trap": "Adding a third component to fix a two-component deficit when a ratio adjustment or targeted correction would solve the problem cleanly."
+      }
+    ],
+    "worked_example": {
+      "title": "Blend Trial · Barossa Shiraz-Grenache 2025 · 1,000 L target",
+      "starting_conditions": [
+        "Tank S1 — Shiraz, 850 L: alcohol 14.5%, pH 3.68, TA 5.8 g/L, VA 0.48 g/L, free SO₂ 28 mg/L. Sensory: dark fruit, firm tannin, slightly short finish.",
+        "Tank G1 — Grenache, 420 L: alcohol 13.9%, pH 3.51, TA 6.4 g/L, VA 0.31 g/L, free SO₂ 34 mg/L. Sensory: red fruit, lifted, soft tannin, good length.",
+        "Target spec: alcohol 14.0–14.4%, pH ≤ 3.62, TA 6.0–6.5 g/L, VA < 0.45 g/L, free SO₂ ≥ 30 mg/L post-blend."
+      ],
+      "timeline": [
+        {
+          "when": "Day 1 — Component table",
+          "observation": "S1 pH at 3.68 exceeds the 3.62 ceiling. VA at 0.48 g/L is above target. G1 is within spec on all parameters.",
+          "decision": "Model three ratios: 70S/30G, 60S/40G, 50S/50G. Calculate weighted averages for all parameters before any bench work.",
+          "reasoning": "70/30 gives predicted pH 3.63 (marginal fail), VA 0.43 g/L (pass). 60/40 gives pH 3.61 (pass), VA 0.41 g/L (pass), alcohol 14.26% (pass). 50/50 gives pH 3.60 (pass), VA 0.40 g/L (pass), alcohol 14.20% (pass). Eliminate 70/30 on pH grounds.",
+          "outcome": "Two viable ratios proceed to bench trial: 60/40 and 50/50."
+        },
+        {
+          "when": "Day 1 — Bench trials (afternoon)",
+          "observation": "100 mL samples prepared blind. 60/40 shows better colour depth and tannin structure. 50/50 reads lifted and fruit-forward but slightly thin on mid-palate.",
+          "decision": "Preference for 60/40 noted by both evaluators. Samples rested overnight before second evaluation.",
+          "reasoning": "Day 0 evaluation is indicative only — integration artefacts expected. Record scores but do not finalise.",
+          "outcome": "60/40 scores 7.8/10, 50/50 scores 7.1/10 at Day 0. Both rested at 14°C."
+        },
+        {
+          "when": "Day 2 — Re-evaluation and decision",
+          "observation": "60/40 has tightened and integrated overnight. Mid-palate has filled. 50/50 remains lifted but the thin mid-palate persists.",
+          "decision": "Select 60/40 ratio. Scale to 600 L S1 + 400 L G1 = 1,000 L blend. Post-blend free SO₂ predicted at 30.4 mg/L — marginal. Add 10 mg/L SO₂ post-blend to reach 40 mg/L working buffer.",
+          "reasoning": "60/40 meets all chemical targets and is sensorially preferred at Day 1 evaluation. The SO₂ top-up is a planned correction, not a rescue.",
+          "outcome": "Blend executed. Post-blend analysis confirms pH 3.61, TA 6.0 g/L, VA 0.42 g/L, alcohol 14.3%, free SO₂ 39 mg/L after addition. All parameters within spec."
+        }
+      ],
+      "counterfactual": "Selecting 70/30 on Day 0 sensory preference alone would have produced a blend at pH 3.63 with compromised free SO₂ efficacy, requiring a tartaric acid addition that was never budgeted and risked stripping the mid-palate structure that made the wine worth blending in the first place."
+    },
+    "decision_tree": {
+      "title": "When to intervene — blending diagnostic tree",
+      "rows": [
+        {
+          "symptom": "Blend pH exceeds 3.62 after ratio modelling",
+          "first_check": "Review component pH values and identify which parcel is driving the excess",
+          "action": "Reduce proportion of high-pH component, or plan post-blend tartaric addition — calculate required addition before bench trials"
+        },
+        {
+          "symptom": "Blend VA above 0.45 g/L at any viable ratio",
+          "first_check": "Confirm VA on both components — is one parcel the sole source?",
+          "action": "Exclude the high-VA component from the blend pool or cap its inclusion at the ratio where VA stays below 0.45 g/L; do not blend hoping it will resolve"
+        },
+        {
+          "symptom": "Predicted free SO₂ post-blend falls below 25 mg/L",
+          "first_check": "Check component free SO₂ and pH — low free SO₂ and high pH compound the risk",
+          "action": "Plan a post-blend SO₂ addition to reach a minimum 35 mg/L working buffer; factor this into the blend decision, not as an afterthought"
+        },
+        {
+          "symptom": "Sensory trial shows persistent mid-palate gap across all ratios",
+          "first_check": "Evaluate whether the gap is structural (tannin) or aromatic (fruit weight) — these require different responses",
+          "action": "Try a ratio adjustment toward the fuller-bodied component before adding a third parcel; if gap persists, consider a targeted tannin addition rather than a new component"
+        },
+        {
+          "symptom": "Day 0 and Day 1 sensory scores diverge significantly (> 1.5 points)",
+          "first_check": "Check whether the Day 0 favourite has integrated or deteriorated — both are informative",
+          "action": "Always use Day 1 scores as the decision basis; if a blend deteriorates overnight, it is signalling a compatibility issue worth investigating before scaling"
+        },
+        {
+          "symptom": "Two blends are analytically and sensorially equivalent after Day 1 evaluation",
+          "first_check": "Compare component volumes available and production logistics for each ratio",
+          "action": "Select the simpler ratio or the one that leaves the most flexibility in the remaining parcel volumes for future blending decisions"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton PPW · Ch 5 — Blending",
+        "url": null,
+        "note": "Chapman & Hall — covers blending mathematics and component interaction theory"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC317 · Blending and Wine Style",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC317",
+        "note": "Covers sensory evaluation methodology and blend trial protocols"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide Oenology — WINE 3520WT",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Includes blending decision frameworks and post-blend chemistry management"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI Blending and Wine Composition",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for blending — technical notes on pH, VA, and SO₂ interactions"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine Red Winemaking Bible · Blending chapter",
+        "url": null,
+        "note": "Your paid resource — practical bench trial protocols for red blends"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine White Winemaking Bible · Blending chapter",
+        "url": null,
+        "note": "Your paid resource — white and rosé blend trial methodology"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "You have two Shiraz components: 400 L at pH 3.45 and 600 L at pH 3.65. A colleague averages the pH values directly and gets pH 3.57. What is wrong with this approach?",
+        "choices": [
+          "A) pH is a log scale — you must average [H⁺] concentrations weighted by volume, then convert back to pH",
+          "B) Nothing is wrong; weighted arithmetic average of pH values is the accepted method",
+          "C) You should weight by Baumé at harvest, not by volume",
+          "D) The error is minor and within analytical tolerance, so it can be ignored"
+        ],
+        "answer": "A",
+        "rationale": "Because pH is logarithmic, averaging pH values directly underestimates the true blend pH; correct method converts each pH to [H⁺], takes the volume-weighted mean, then converts back — B ignores the log scale, C and D are both wrong in principle."
+      },
+      {
+        "q": "Before setting up bench trials for a Grenache-Shiraz blend, which calculation should you run first to eliminate non-viable combinations?",
+        "choices": [
+          "A) Weighted-average SO₂ to confirm free SO₂ will be above 25 mg/L at target pH",
+          "B) Weighted-average pH (via [H⁺]) to screen out blends outside acceptable pH range before any sensory work",
+          "C) Baumé of each component to ensure alcohol balance",
+          "D) Colour density ratio to predict final hue"
+        ],
+        "answer": "B",
+        "rationale": "pH is the primary chemical gatekeeper — screening it first via weighted [H⁺] eliminates non-viable combinations before you waste time on sensory trials; SO₂ check (A) is also important but secondary to pH viability."
+      },
+      {
+        "q": "You evaluate a bench blend on Day 0 and find the mid-palate feels disjointed and the finish is short. What is the correct response?",
+        "choices": [
+          "A) Reject the blend and reformulate immediately",
+          "B) Add a third component to bridge the mid-palate gap",
+          "C) Rest the blend for 24 hours before final evaluation — Day 0 integration artefacts are normal",
+          "D) Increase the higher-pH component to soften the finish"
+        ],
+        "answer": "C",
+        "rationale": "Day 0 artefacts from component integration are expected and should not drive decisions; rest 24 hours first — acting on Day 0 sensory (A, B, D) risks over-engineering a blend that would have resolved."
+      },
+      {
+        "q": "A four-component blend and a two-component blend both achieve the same final pH, TA, and sensory score. Which should you choose, and why?",
+        "choices": [
+          "A) Four-component — more components give greater complexity and style flexibility",
+          "B) Two-component — simplicity improves reproducibility and reduces compounding variation",
+          "C) Four-component — it demonstrates more rigorous trial work to the winemaking team",
+          "D) Whichever has the lower cost of goods, regardless of component count"
+        ],
+        "answer": "B",
+        "rationale": "When outcomes are equal, fewer components means fewer variables to source and match in future vintages — A and C confuse complexity with quality, D ignores the reproducibility argument central to blending strategy."
+      },
+      {
+        "q": "Your bench blend has a weighted-average pH of 3.82 and free SO₂ of 18 mg/L. Sensory evaluation is outstanding. What is the correct decision?",
+        "choices": [
+          "A) Proceed — sensory preference overrides chemistry when the wine tastes exceptional",
+          "B) Adjust the blend or add acid/SO₂ — chemistry is veto power and the numbers override sensory below the chemical floor",
+          "C) Bottle immediately to preserve the sensory profile before SO₂ drops further",
+          "D) Dilute with a lower-pH component and re-evaluate on Day 0"
+        ],
+        "answer": "B",
+        "rationale": "Below the chemical floor (high pH, inadequate free SO₂), numbers override the nose every time — A is the classic trap the lesson warns against; C worsens the problem; D requires a 24-hour rest before re-evaluation."
+      },
+      {
+        "q": "Component A: 300 L, pH 3.30. Component B: 700 L, pH 3.60. Using correct [H⁺] weighted-average method, the blend pH will be closest to:",
+        "choices": [
+          "A) pH 3.51",
+          "B) pH 3.45",
+          "C) pH 3.57",
+          "D) pH 3.48"
+        ],
+        "answer": "A",
+        "rationale": "[H⁺] at pH 3.30 ≈ 501 µmol/L, at pH 3.60 ≈ 251 µmol/L; weighted mean = (300×501 + 700×251)/1000 = 326 µmol/L → pH ≈ 3.49–3.51; direct pH average gives 3.51 coincidentally close but the method matters — D and B underestimate, C overestimates."
+      },
+      {
+        "q": "Which statement correctly describes the role of component analysis in blending?",
+        "choices": [
+          "A) It predicts the final sensory outcome and replaces the need for bench trials",
+          "B) It is the map — it narrows viable combinations before sensory trials begin, but does not replace them",
+          "C) It is only relevant when blending more than three components",
+          "D) It should be run after sensory trials to confirm the panel's preferred blend"
+        ],
+        "answer": "B",
+        "rationale": "Component analysis eliminates non-viable combinations efficiently but cannot predict sensory integration — A overstates its power, C and D reverse the correct workflow sequence."
+      },
+      {
+        "q": "A winemaker insists on adding a fifth component to 'round out' a blend that already meets all chemical and sensory specifications. What principle does this violate?",
+        "choices": [
+          "A) The weighted-average pH rule",
+          "B) The 24-hour rest protocol",
+          "C) The principle that simplicity is a blending strategy — unnecessary components reduce reproducibility without improving the outcome",
+          "D) The chemical veto rule — sensory preference should not be pursued once specs are met"
+        ],
+        "answer": "C",
+        "rationale": "Adding components beyond what is needed to meet spec is over-engineering; it complicates future vintage matching without benefit — A and B are unrelated, D misapplies the veto rule which governs chemistry vs sensory, not component count."
+      },
+      {
+        "q": "In a structured blind blending trial, the panel prefers Blend X but its pH is 3.78 with free SO₂ at 20 mg/L. Blend Y is rated second but has pH 3.52 and free SO₂ at 32 mg/L. What is the correct outcome?",
+        "choices": [
+          "A) Select Blend X — panel preference is the primary decision criterion in a blind trial",
+          "B) Select Blend Y — it sits above the chemical floor; Blend X fails the chemistry veto",
+          "C) Blend X and Y together to average the chemistry and preserve sensory preference",
+          "D) Re-run the trial after acidulating Blend X to bring pH below 3.70"
+        ],
+        "answer": "B",
+        "rationale": "Blend X falls below the chemical floor (high pH, low free SO₂) so chemistry vetoes sensory preference — D could be valid as a reformulation step but is not the correct outcome from this trial as stated; A ignores the veto principle."
+      },
+      {
+        "q": "Why is Baumé used rather than °Brix when discussing sugar levels in Australian winemaking contexts?",
+        "choices": [
+          "A) Baumé directly predicts likely alcohol level and is the industry-standard unit in Australian/NZ winemaking",
+          "B) Baumé is more accurate than °Brix for measuring residual sugar post-fermentation",
+          "C) Baumé is required by the Australian Food Standards Code for label alcohol claims",
+          "D) Baumé corrects for temperature variation in the vineyard, unlike °Brix"
+        ],
+        "answer": "A",
+        "rationale": "Baumé is the conventional unit in Australian and NZ viticulture and winemaking for expressing must sugar/potential alcohol — B is incorrect (both measure sugar density), C and D are fabricated regulatory and technical claims."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Why can't you average pH values directly when calculating blend pH?",
+        "back": "pH is logarithmic — you must convert to [H⁺], take the volume-weighted mean, then convert back to pH to avoid skewing toward the higher-pH component."
+      },
+      {
+        "front": "When does chemistry override sensory preference in blending decisions?",
+        "back": "When the blend falls below the chemical floor (e.g. pH too high, free SO₂ too low) — numbers veto the nose every time; above the floor, sensory preference decides."
+      },
+      {
+        "front": "How long must a bench blend rest before final sensory evaluation, and why?",
+        "back": "24 hours — Day 0 integration artefacts are normal and should not drive the decision."
+      },
+      {
+        "front": "Two blends meet identical spec: one has 2 components, one has 4. Which do you choose?",
+        "back": "The two-component blend — simplicity improves reproducibility and reduces compounding variation in future vintages."
+      },
+      {
+        "front": "What is the first calculation to run before setting up blending bench trials?",
+        "back": "Weighted-average pH via [H⁺] — it eliminates non-viable combinations before any sensory work begins."
+      },
+      {
+        "front": "Component analysis is the map, not the destination — what does this mean in practice?",
+        "back": "It narrows viable blend combinations efficiently but cannot predict sensory integration; bench trials are still required."
+      },
+      {
+        "front": "Free SO₂ adequacy depends on pH — why does a high-pH blend demand immediate attention even if SO₂ mg/L looks acceptable?",
+        "back": "At higher pH, a greater proportion of SO₂ is in the less protective bisulfite form, so effective molecular SO₂ drops sharply — the chemical floor is pH-dependent."
+      },
+      {
+        "front": "Common trap: a winemaker adds a fifth component to 'round out' an already-compliant blend. What principle does this violate?",
+        "back": "Simplicity as strategy — unnecessary components reduce reproducibility without improving the outcome; this is over-engineering."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2584,
+    "completion_tokens": 6676
+  },
+  "audit": {
+    "totalWords": 1738,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:51:26.441Z"
+}

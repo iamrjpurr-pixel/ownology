@@ -1,0 +1,309 @@
+{
+  "lesson_id": "L4.8",
+  "source": {
+    "id": "L4.8",
+    "slug": "vintage-debrief",
+    "title": "The vintage debrief — how a wine year becomes learning",
+    "level": "4",
+    "wbs": [
+      "D8",
+      "D10"
+    ],
+    "reading_min": "4",
+    "aim": "Structured post-vintage reflection: what worked, what didn't, what to change next year — captured while it's still true.",
+    "application": "Owen runs your vintage debrief workflow. This lesson is why the debrief is the highest-ROI hour of your year.",
+    "sources_private": [],
+    "sources_public_ref": [
+      "csu_wsc317",
+      "adelaide_oenology_3520wt"
+    ],
+    "citations_bibliographic": []
+  },
+  "generated": {
+    "tldr": [
+      "The vintage debrief converts raw experience into repeatable decisions — do it within two weeks of drain-down.",
+      "Separate what happened (fact) from why it happened (hypothesis) — conflating them kills the learning.",
+      "A debrief without assigned actions and a named owner is just a complaint session."
+    ],
+    "sections": [
+      {
+        "heading": "Memory decays faster than wine",
+        "iconHint": "clock",
+        "body_md": "Six weeks after vintage ends, the sensory details blur, the sequence of decisions compresses, and the frustration that drove a good call gets forgotten. The debrief window is roughly ten to fourteen days post drain-down — long enough for ferments to settle, short enough that the team still remembers Tuesday of week three.\n\nThis is not a post-mortem. It is a structured capture of signal before noise takes over. The goal is to produce a small set of high-confidence changes for next vintage, not a comprehensive audit of everything that occurred. Trying to capture everything produces a document nobody reads.\n\nBoutique operations have one structural advantage here: the winemaker who made the call is usually the same person who lived the consequence. That closed loop is rare. Use it.",
+        "keyConcept": "Debrief within 14 days of drain-down — recall accuracy drops sharply beyond that window and detail cannot be recovered.",
+        "trap": "Waiting until the wine is in barrel and 'things have quietened down' — by then the critical context is gone and only the broad strokes survive."
+      },
+      {
+        "heading": "Fact and hypothesis are not the same entry",
+        "iconHint": "activity",
+        "body_md": "The most common debrief failure is recording 'the Shiraz fermented slowly because of low YAN' when the actual fact is 'the Shiraz fermented slowly' and the YAN hypothesis was never tested. Next vintage, the winemaker adds DAP pre-emptively, the slow ferment recurs for a different reason, and the loop never closes.\n\nA disciplined debrief separates three layers: observation (what the data showed), interpretation (the most likely cause), and confidence (how certain you are). Low-confidence interpretations should trigger a specific measurement or trial next vintage, not a blanket protocol change.\n\nOwen's debrief workflow enforces this split by design — each entry has a type field. It is a small friction that pays back every time you read last year's notes in March.",
+        "keyConcept": "Every debrief entry needs a type: Observation, Interpretation, or Action — mixing them produces false certainty and bad protocol drift.",
+        "trap": "Treating a plausible explanation as a confirmed cause and writing it into SOP without a verification step the following vintage."
+      },
+      {
+        "heading": "The three questions that structure everything",
+        "iconHint": "target",
+        "body_md": "A debrief does not need a long agenda. Three questions, answered honestly, generate most of the useful output. First: what produced a better result than expected, and do you know why? Second: what produced a worse result than expected, and do you know why? Third: what would you change if you ran the same vintage again tomorrow?\n\nThe third question is the most productive and the most avoided. It forces specificity. 'Pick earlier' is not an answer. 'Pick Block 7 Grenache at 13.8 Baumé rather than 14.4, based on the phenolic lag we saw this year' is an answer.\n\nKeep the output list short. Three to five concrete changes per vintage is a strong result. Ten changes means none of them will be implemented with care.",
+        "keyConcept": "Three to five concrete, specific changes per vintage debrief — more than that and implementation quality collapses across the board.",
+        "trap": "Generating a long list of improvements that feels productive in the room but has no owner, no deadline, and no check-in before next vintage begins."
+      },
+      {
+        "heading": "Data without narrative is archaeology",
+        "iconHint": "flask-conical",
+        "body_md": "Fermentation logs, pump-over records, and lab sheets survive vintage intact. What does not survive is the reasoning behind the decisions made at 11 pm on day four. Why did you drop the cap temperature? What made you hold off on the press cut? That context is the actual intellectual property of a small winery.\n\nThe debrief is where narrative gets attached to data. A single sentence per decision point — written while the winemaker still remembers — transforms a spreadsheet into a decision record. Future vintages, future staff, and future you will read the narrative, not the raw numbers.\n\nThis is also where sensory notes earn their keep. If the wine that received extended maceration shows differently at six months, the debrief note is the only thread connecting that outcome back to the cellar choice that produced it.",
+        "keyConcept": "Attach a one-sentence rationale to every significant cellar decision during debrief — the data alone cannot reconstruct the reasoning.",
+        "trap": "Assuming the fermentation log speaks for itself — it records what happened, never why, and the why is what compounds into expertise over successive vintages."
+      },
+      {
+        "heading": "The debrief is a commitment device, not a report",
+        "iconHint": "gauge",
+        "body_md": "A debrief that ends with a list of observations has done half the job. The other half is converting observations into dated commitments with named owners. In a two-person operation that might mean the winemaker owns all of them — but writing your own name next to an action still changes the probability it happens.\n\nSet a review trigger, not a review date. 'Check this before budmove' is more durable than 'review in August' because it ties the action to a vineyard event that will definitely occur. Owen surfaces these commitments at the relevant workflow stage so they are not buried in a document opened once a year.\n\nThe measure of a good debrief is not how thorough the notes are. It is how many of last year's actions were actually implemented this vintage.",
+        "keyConcept": "Every debrief action needs a named owner and a vineyard-event trigger — date-based reminders get ignored; event-based ones get actioned.",
+        "trap": "Closing the debrief document after the meeting and not opening it again until the following vintage, by which point the actions have no context and no momentum."
+      }
+    ],
+    "worked_example": {
+      "title": "Barossa Grenache 2025 · Debrief · 12 days post drain-down",
+      "starting_conditions": [
+        "Vintage: 3.2 t from a single block, hand-picked 14 March at 14.6 Baumé",
+        "Ferment: open-top 2,000 L, ambient yeast, target 28°C, 14-day maceration",
+        "Outcome: wine pressed at day 16, finished at 0.8 g/L RS, colour lighter than 2024, mid-palate thin"
+      ],
+      "timeline": [
+        {
+          "when": "Day 1 of debrief",
+          "observation": "Reviewed fermentation log — peak temperature hit 31.2°C on day 5, held there for 36 hours before cooling intervened",
+          "decision": "Flag temperature spike as a confirmed observation; list mid-palate thinness as a separate observation, not yet linked",
+          "reasoning": "Avoid assuming the heat caused the texture issue without checking other variables — pump-over frequency also changed on day 5",
+          "outcome": "Two separate entries created: one for temperature excursion, one for palate outcome — no causal link recorded yet"
+        },
+        {
+          "when": "Day 2 of debrief",
+          "observation": "Tasted the 2025 alongside 2024 Grenache — 2024 had three pump-overs per day at peak, 2025 had two due to staffing on day 4–6",
+          "decision": "Record reduced pump-over frequency as a plausible contributing factor to mid-palate thinness; confidence rated medium",
+          "reasoning": "Grenache is extraction-sensitive and the timing coincided with peak colour and tannin extraction window — worth testing, not worth asserting",
+          "outcome": "Interpretation entry added: 'Reduced pump-overs during days 4–6 may have limited mid-palate structure — test with three/day protocol in 2026'"
+        },
+        {
+          "when": "Day 3 of debrief",
+          "observation": "Reviewed pick date decision — block was scheduled for 14 March but phenolic assessment on 10 March showed seeds still green-brown",
+          "decision": "Record action: in 2026, pick Grenache block only when seed colour is fully brown across 80% of berry sample, regardless of Baumé target",
+          "reasoning": "Baumé was at target on 10 March; phenolics were not — the pick was driven by schedule pressure, not fruit readiness",
+          "outcome": "Action logged with owner (winemaker), trigger (pre-harvest phenolic walk, week prior to estimated pick), and a note to brief the picker contractor earlier"
+        }
+      ],
+      "counterfactual": "Skipping the debrief and relying on memory would have preserved the Baumé-driven pick date as standard practice, repeating the phenolic lag in 2026 without ever identifying the cause."
+    },
+    "decision_tree": {
+      "title": "When and how to intervene in your debrief process",
+      "rows": [
+        {
+          "symptom": "Debrief keeps getting postponed past 14 days",
+          "first_check": "Is there a fixed date in the calendar before drain-down is complete?",
+          "action": "Book the debrief session as a non-negotiable during vintage planning — treat it like a press date"
+        },
+        {
+          "symptom": "Team cannot agree on what actually happened",
+          "first_check": "Are you working from the fermentation log and lab records, or from memory?",
+          "action": "Pull the primary data first; reconstruct the sequence from records before discussion begins"
+        },
+        {
+          "symptom": "Every outcome is being attributed to a single cause (weather, fruit quality, etc.)",
+          "first_check": "Have cellar decisions been reviewed independently of external factors?",
+          "action": "Separate the vintage conditions (fixed) from the cellar responses (variable) — only the latter are learnable"
+        },
+        {
+          "symptom": "Action list from last year's debrief was not implemented",
+          "first_check": "Did each action have a named owner and a vineyard-event trigger?",
+          "action": "Rebuild the action list with explicit owners and triggers before closing this year's debrief"
+        },
+        {
+          "symptom": "Debrief produces the same observations as the previous year",
+          "first_check": "Were last year's interpretations tested or just assumed?",
+          "action": "Treat recurring observations as unresolved hypotheses — design a specific trial or measurement for next vintage"
+        },
+        {
+          "symptom": "Sensory outcomes cannot be connected to any cellar decision",
+          "first_check": "Were decision rationales recorded at the time, or only the decisions themselves?",
+          "action": "Implement in-vintage decision logging — even one sentence per major call — so the debrief has narrative to work with"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC317 · Winery Management",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC317",
+        "note": "Covers post-vintage review and continuous improvement in winery operations"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide Oenology · WINE 3520WT",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Winery technology and management; post-vintage analysis and quality systems"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI Winery Management Resources",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for winery management and continuous improvement"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Owen flags a debrief entry that reads: 'Ferment ran hot — probably because the coolant failed, so next year we'll add a second chiller.' What is wrong with this entry?",
+        "choices": [
+          "A) It mixes Observation, Interpretation, and Action into a single undifferentiated entry",
+          "B) It should be filed under Harvest Data, not the debrief log",
+          "C) The action item lacks a Baumé threshold trigger",
+          "D) Coolant failure is a capital decision and belongs in the budget, not the debrief"
+        ],
+        "answer": "A",
+        "rationale": "A single entry that blends a fact, a cause, and a fix creates false certainty; separating entry types (Observation, Interpretation, Action) prevents protocol drift from unverified assumptions."
+      },
+      {
+        "q": "A winemaker completes drain-down on 28 March and plans to hold the debrief at the end-of-vintage dinner on 15 May. What is the primary risk?",
+        "choices": [
+          "A) The debrief will conflict with pruning decisions already underway",
+          "B) Recall accuracy drops sharply beyond 14 days and detail cannot be recovered",
+          "C) Staff availability is lower after 30 days, reducing input quality",
+          "D) Lab data is typically archived after 30 days, making cross-referencing impossible"
+        ],
+        "answer": "B",
+        "rationale": "The 14-day window is the critical threshold; beyond it, memory decay is irreversible and no amount of data review can reconstruct the reasoning behind decisions."
+      },
+      {
+        "q": "Which of the following best describes the purpose of attaching a one-sentence rationale to every significant cellar decision during debrief?",
+        "choices": [
+          "A) To satisfy audit requirements under CSU WSC317 documentation standards",
+          "B) To allow the data alone to be interpreted correctly by a future winemaker",
+          "C) To reconstruct the reasoning that the data alone cannot preserve",
+          "D) To provide a narrative summary for the annual vintage report"
+        ],
+        "answer": "C",
+        "rationale": "Data records what happened; the rationale records why — without it, future interpretation is archaeology, not learning."
+      },
+      {
+        "q": "Your debrief produces eleven specific changes you want to implement next vintage. What does structured debrief methodology recommend?",
+        "choices": [
+          "A) Rank all eleven and assign each a named owner before closing the debrief",
+          "B) Reduce to three to five changes, because implementation quality collapses beyond that",
+          "C) Split the list into cellar and vineyard streams and action both in parallel",
+          "D) Carry the full list forward and review at budburst to reprioritise"
+        ],
+        "answer": "B",
+        "rationale": "Three to five concrete changes is the ceiling for maintaining implementation quality; more than that and execution degrades across all items."
+      },
+      {
+        "q": "An action item in the debrief reads: 'Add 20 mg/L SO₂ at press — reminder set for 1 April.' Why is this action item poorly structured?",
+        "choices": [
+          "A) The SO₂ rate should be expressed in Baumé, not mg/L",
+          "B) The trigger is date-based; event-based triggers are actioned more reliably",
+          "C) Press additions require a separate SO₂ protocol document, not a debrief entry",
+          "D) The named owner is missing, but the date trigger is otherwise acceptable"
+        ],
+        "answer": "B",
+        "rationale": "Date-based reminders get ignored; a vineyard-event trigger (e.g., 'at press') ensures the action fires at the moment it is relevant — though a named owner is also required."
+      },
+      {
+        "q": "Owen categorises a debrief entry as an Interpretation. Which of the following entries fits that type correctly?",
+        "choices": [
+          "A) 'Free SO₂ dropped to 18 mg/L at 6 weeks post-bottling'",
+          "B) 'The colour instability was likely caused by low pH at ferment rather than poor cap management'",
+          "C) 'Increase pump-over frequency to four times daily during peak ferment next vintage'",
+          "D) 'Baumé at harvest was 14.2 across all Grenache blocks'"
+        ],
+        "answer": "B",
+        "rationale": "An Interpretation is a causal hypothesis drawn from observations; A and D are Observations (measured facts), and C is an Action."
+      },
+      {
+        "q": "A winemaker argues that the vintage debrief is just a reporting exercise and can be delegated to the cellar hand to compile from tank logs. What does the lesson's framing of the debrief challenge about this view?",
+        "choices": [
+          "A) Tank logs lack SO₂ and Baumé data, making delegation technically incomplete",
+          "B) The debrief is a commitment device — it generates named owners and event triggers, which require decision-maker authority to assign",
+          "C) Cellar hands cannot distinguish Observation from Interpretation without winemaker training",
+          "D) Delegation is acceptable provided the winemaker reviews and signs off within 14 days"
+        ],
+        "answer": "B",
+        "rationale": "The debrief's value is in generating binding commitments with owners and triggers, not in compiling records — that function requires the people who hold accountability."
+      },
+      {
+        "q": "In the Barossa Grenache 2025 debrief, conducted 12 days post drain-down, which aspect of timing is most significant?",
+        "choices": [
+          "A) 12 days falls within the 14-day recall window, preserving decision-level detail",
+          "B) 12 days is too early — fermentation data is still being finalised by the lab",
+          "C) 12 days post drain-down means harvest observations are already beyond reliable recall",
+          "D) The timing is irrelevant if all tank data has been logged digitally"
+        ],
+        "answer": "A",
+        "rationale": "12 days sits inside the critical 14-day window, which is the threshold beyond which recall accuracy drops sharply and cannot be recovered regardless of data availability."
+      },
+      {
+        "q": "Which pairing of debrief entry type and example is correctly matched?",
+        "choices": [
+          "A) Observation — 'Extended skin contact probably drove the phenolic grip we saw at pressing'",
+          "B) Action — 'Juice pH was 3.31 at crush across the Grenache parcels'",
+          "C) Interpretation — 'Reduce whole-bunch inclusion to 15% and review at veraison'",
+          "D) Observation — 'Peak ferment temperature reached 28°C on day four'"
+        ],
+        "answer": "D",
+        "rationale": "An Observation is a measured, verifiable fact; A is an Interpretation (causal hypothesis), B is an Observation misclassified, and C is an Action."
+      },
+      {
+        "q": "A winemaker completes a thorough debrief with eight well-written action items, each with a rationale and a named owner, but all triggered by calendar dates. What single change would most improve the debrief's effectiveness?",
+        "choices": [
+          "A) Reduce the action list to five items to maintain implementation quality",
+          "B) Replace date-based triggers with vineyard-event triggers for each action",
+          "C) Add entry-type classifications (Observation, Interpretation, Action) to each item",
+          "D) Conduct a follow-up debrief at budburst to reconfirm owner assignments"
+        ],
+        "answer": "B",
+        "rationale": "Named owners are already present; the single structural gap is date-based triggers, which get ignored — event-based triggers are what convert debrief commitments into actioned change."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Maximum days post drain-down to conduct a vintage debrief?",
+        "back": "14 days — beyond this window, recall accuracy drops sharply and lost detail cannot be recovered."
+      },
+      {
+        "front": "Three entry types required in a structured debrief — what are they?",
+        "back": "Observation (measured fact), Interpretation (causal hypothesis), and Action (committed change) — mixing them creates false certainty."
+      },
+      {
+        "front": "How many action items should a vintage debrief produce, and why?",
+        "back": "Three to five — more than that and implementation quality collapses across all items."
+      },
+      {
+        "front": "Why attach a one-sentence rationale to every significant cellar decision at debrief?",
+        "back": "Data records what happened; the rationale records why — without it, future interpretation is archaeology, not learning."
+      },
+      {
+        "front": "Date-based reminder vs. event-based trigger — which works and why?",
+        "back": "Event-based triggers work — they fire at the moment of relevance; date-based reminders get ignored."
+      },
+      {
+        "front": "What two elements must every debrief action item contain to function as a commitment?",
+        "back": "A named owner and a vineyard-event trigger — without both, the action has no accountability and no reliable activation point."
+      },
+      {
+        "front": "Common trap: logging 'ferment ran hot — coolant failed — add second chiller' as one entry.",
+        "back": "This merges Observation, Interpretation, and Action — each must be a separate typed entry to prevent protocol drift from unverified assumptions."
+      },
+      {
+        "front": "Why is the vintage debrief described as a commitment device, not a report?",
+        "back": "Its value is generating binding actions with owners and triggers, not compiling records — it changes next vintage, not just documents this one."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2517,
+    "completion_tokens": 5504
+  },
+  "audit": {
+    "totalWords": 1390,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T04:08:14.960Z"
+}

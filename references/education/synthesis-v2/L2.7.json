@@ -27,110 +27,110 @@
   "generated": {
     "tldr": [
       "Fermentation is an active process — temperature, cap, oxygen, and nutrients each have a narrow window where intervention pays.",
-      "Most stuck ferments are preventable: the warning signs appear 24–48 hours before yeast activity collapses.",
-      "Owen alarms flag trajectory, not just current state — act on the trend, not the number alone."
+      "Most stuck ferments are preventable: the warning signs appear 24–48 hours before the yeast actually stop.",
+      "Owen's trajectory alarms are your early-warning system; this lesson maps each alarm to a specific cellar action."
     ],
     "sections": [
       {
         "heading": "Temperature is the throttle, not the thermostat",
         "iconHint": "thermometer",
-        "body_md": "Yeast metabolism accelerates exponentially between 18 °C and 32 °C. Push past 35 °C and you risk thermal death of the colony — not a slowdown, a collapse. The practical ceiling for most *Saccharomyces cerevisiae* strains in red ferments is 30–32 °C; for whites and aromatics, 14–18 °C is the target band.\n\nThe danger isn't the peak — it's the rate of rise. A tank climbing 2 °C per hour in the first 72 hours is burning through nitrogen and producing heat faster than your jacket can shed it. That trajectory, left unchecked, compresses the ferment into a short violent window that exhausts nutrients before sugar is gone.\n\nCool early and incrementally. Dropping a runaway tank from 34 °C to 22 °C in one hit shocks the yeast membrane and can trigger a stuck ferment worse than the heat itself. Target a 1–2 °C/hour reduction maximum.",
-        "keyConcept": "Red ferment ceiling: 30–32 °C. Above 35 °C, yeast membrane integrity fails and recovery is unlikely without restart.",
-        "trap": "Cooling the tank to target temperature and walking away — temperature will rebound fast once the jacket cycles off during peak fermentation."
+        "body_md": "Yeast metabolism accelerates with heat — up to a point. Above 35 °C, cell membrane integrity degrades, ethanol tolerance drops, and the ferment can stall with 3–5 °Baumé still in the tank. The damage is often irreversible within hours. Below 12 °C, yeast activity slows enough that nutrient uptake becomes inefficient and CO₂ scrubbing of aromatics accelerates relative to alcohol production.\n\nFor most red ferments, the practical target is 22–28 °C during peak activity, with the upper limit treated as a hard ceiling, not a guideline. Whites and aromatics typically run 12–18 °C to preserve volatile esters. The key is *rate of change*: a tank climbing 2 °C per hour is a different problem from one sitting steady at 30 °C. Owen's temperature trajectory alarm fires on rate, not just absolute value — that distinction matters when you're deciding whether to cool now or monitor for another hour.",
+        "keyConcept": "Above 35 °C yeast membrane integrity fails; treat 35 °C as a hard ceiling, not a soft target.",
+        "trap": "Cooling a tank that's already at 34 °C and climbing fast — waiting one more hour can push you past the point of recovery."
       },
       {
-        "heading": "Cap management is gas exchange, not just colour extraction",
+        "heading": "Cap management is oxygen delivery, not just colour extraction",
         "iconHint": "activity",
-        "body_md": "The cap on a red ferment is a CO₂-saturated, anaerobic crust that insulates yeast from the liquid below and concentrates heat at the surface. Pump-overs and plunging break that crust, but their primary fermentation function is to redistribute yeast, nutrients, and temperature — extraction is secondary.\n\nFrequency matters more than volume during active fermentation. Two pump-overs of 10% tank volume per day, timed to coincide with peak CO₂ evolution (typically hours 24–72), do more for ferment health than one large pump-over at the end of the day. Punch-downs in open fermenters achieve the same redistribution but introduce more oxygen per event — useful early, risky late.\n\nAfter day 5–6 on skins, as sugar drops below 4 °Baumé, reduce pump-over frequency. Yeast are stressed, CO₂ is declining, and excessive oxygen at this stage drives volatile acidity rather than ferment health.",
-        "keyConcept": "Two pump-overs daily at 10% tank volume during peak fermentation; reduce to once daily below 4 °Baumé.",
-        "trap": "Scheduling pump-overs by clock rather than ferment stage — a slow-starting ferment needs early intervention, not a fixed 9 am/5 pm routine."
+        "body_md": "The cap on a red ferment is a living interface. Pump-overs and plunging do three things simultaneously: they redistribute heat (the cap runs 3–5 °C hotter than the liquid below), they introduce controlled oxygen to support yeast sterol synthesis, and they extract colour and tannin from skins. Conflating these three functions leads to poor decisions — for example, cutting pump-overs to 'protect aromatics' while inadvertently starving yeast of the oxygen they need during lag and early exponential phase.\n\nOxygen demand is highest in the first 48–72 hours. A single pump-over of roughly 0.5–1 tank volumes during this window delivers 1–4 mg/L dissolved oxygen — enough to support healthy yeast without oxidising the must. After peak fermentation, oxygen demand drops sharply and over-pumping becomes a tannin-hardening risk rather than a yeast-support tool. Timing your pump-overs to fermentation phase, not to a fixed daily schedule, is the discipline that separates reactive from proactive cellar work.",
+        "keyConcept": "Oxygen demand peaks in the first 48–72 hours; pump-over frequency should track fermentation phase, not the clock.",
+        "trap": "Running the same pump-over schedule from day one to press — you'll over-oxygenate late ferment and harden tannin structure unnecessarily."
       },
       {
-        "heading": "Oxygen has a dose — micro-additions help, flooding kills",
-        "iconHint": "wind",
-        "body_md": "Yeast require small amounts of dissolved oxygen during the growth phase to synthesise sterols and unsaturated fatty acids — the structural components that keep cell membranes functional under ethanol stress. The window is narrow: 2–8 mg/L total oxygen during the first 24–48 hours of active fermentation is beneficial. After that, oxygen drives acetic acid bacteria and oxidative spoilage.\n\nIn practice, the splash from a pump-over delivers roughly 1–3 mg/L per event depending on drop height and flow rate. A single open-air pump-over on day 1 or 2 is usually sufficient for membrane health. Submerged pump-overs later in ferment protect the wine while still redistributing the cap.\n\nFor whites and rosés, oxygen management is tighter. Reductive handling from crush through ferment is standard; any unintended oxygen pick-up above 0.5 mg/L in the final 30% of fermentation risks premature oxidation before the wine has protective SO₂.",
-        "keyConcept": "2–8 mg/L total oxygen during yeast growth phase supports sterol synthesis; oxygen after 50% sugar depletion is a liability.",
-        "trap": "Assuming pump-overs are always oxygen-neutral — drop height, flow rate, and foam all determine actual O₂ pick-up per event."
+        "heading": "Nutrients: front-load or pay later",
+        "iconHint": "flask-conical",
+        "body_md": "Yeast assimilable nitrogen (YAN) is the most commonly mismanaged input in small-cellar fermentation. Low-YAN musts — common in warm vintages, heavily cropped fruit, or botrytis-affected parcels — produce hydrogen sulphide (H₂S) as yeast scavenge sulphur-containing amino acids for nitrogen. The threshold to watch: musts below 140 mg N/L YAN are at risk; below 100 mg N/L, H₂S production is likely without supplementation.\n\nDAP (diammonium phosphate) is the standard correction: 30–50 mg N/L added at yeast inoculation and again at one-third sugar depletion covers most deficits. Organic nitrogen sources (Fermaid-O or equivalent) are preferred in the first addition because they also supply micronutrients and are less osmotically stressful to yeast at inoculation. The critical rule: do not add DAP after two-thirds of sugar has been consumed. Late DAP additions leave residual ammonium that feeds spoilage organisms post-ferment and can contribute to ethyl carbamate precursors.",
+        "keyConcept": "Add the second nutrient dose at one-third sugar depletion; never add DAP after two-thirds of sugars are gone.",
+        "trap": "Adding a large single DAP dose at inoculation and assuming the job is done — split additions track yeast demand far more effectively."
       },
       {
-        "heading": "Nutrient timing: front-load nitrogen, don't chase the ferment",
-        "iconHint": "clock",
-        "body_md": "Yeast assimilable nitrogen (YAN) drives fermentation rate and completion. Deficiency below 140 mg N/L in the must is the single most reliable predictor of a stuck or sluggish ferment. The problem is that adding nitrogen late — after 50% sugar depletion — feeds any surviving spoilage organisms more than it rescues the yeast.\n\nThe practical protocol: measure YAN at crush or within 6 hours of inoculation. If below 200 mg N/L, add DAP or a complex nutrient blend (Fermaid-O, Fermaid-K) in split doses — one-third at inoculation, two-thirds at 1/3 sugar depletion. This mirrors the yeast's own nitrogen demand curve.\n\nThiamine (vitamin B1) is often overlooked. Deficiency slows fermentation and increases pyruvate accumulation, which can elevate bound SO₂ in the finished wine. A standard addition of 0.3–0.6 mg/L thiamine at inoculation costs almost nothing and removes one variable from a stuck-ferment investigation.",
-        "keyConcept": "Target YAN ≥ 200 mg N/L; split nutrient additions at inoculation and 1/3 sugar depletion — never add DAP after 50% depletion.",
-        "trap": "Adding a full DAP dose at inoculation only — yeast nitrogen demand peaks at 1/3 depletion, not at the start of fermentation."
-      },
-      {
-        "heading": "Stuck ferment: the 48-hour window before the point of no return",
+        "heading": "Reading a stuck ferment before it happens",
         "iconHint": "gauge",
-        "body_md": "A ferment is sluggish when the rate drops below 1 °Baumé per day with more than 2 °Baumé remaining. It is stuck when movement falls below 0.3 °Baumé per day. The distinction matters because sluggish ferments respond to warming and nutrient addition; stuck ferments require a restart protocol and the outcome is less certain.\n\nOwen's trajectory alarms are designed to catch the sluggish phase — a declining rate trend over 12–24 hours, not just a single low reading. When that alarm fires, the first diagnostic is temperature (is the tank too cold or too hot?), then nutrient status (was YAN adequate?), then yeast health (was the inoculation rate correct, was rehydration done properly?).\n\nRestart protocol when stuck: rack off gross lees, warm to 18–20 °C, prepare an active yeast starter at 5% of tank volume using a restart-tolerant strain (EC1118, DV10), acclimatise the starter to the stuck wine in 10% increments over 4–6 hours, then add. Rushing the acclimatisation step is the most common cause of a failed restart.",
-        "keyConcept": "Sluggish: < 1 °Baumé/day with > 2 °Baumé remaining. Stuck: < 0.3 °Baumé/day. Restart success drops sharply above 8% ethanol.",
-        "trap": "Adding a second yeast inoculation directly into a stuck tank without acclimatisation — osmotic and ethanol shock kills the new culture immediately."
+        "body_md": "A stuck ferment rarely arrives without warning. The 24–48 hours before yeast activity ceases typically show a characteristic pattern: Baumé decline rate drops from 0.8–1.2 °Baumé/day to under 0.4 °Baumé/day, tank temperature plateaus or dips despite ambient warmth, and CO₂ evolution becomes irregular. Owen's trajectory alarm is calibrated to flag exactly this inflection — a sustained drop in the rate of Baumé decline, not just a single slow reading.\n\nWhen the alarm fires, the diagnostic sequence matters. Check temperature first (is the tank cold?), then nutrient history (was YAN adequate?), then alcohol level (above 13% v/v, ethanol toxicity becomes a factor). A ferment stuck at 4 °Baumé with a cold tank and no prior nutrient addition is a very different problem from one stuck at 1 °Baumé in a warm tank after full nutrient supplementation. The intervention — rehydration protocol, acclimatisation, restart yeast — depends entirely on which scenario you're in.",
+        "keyConcept": "A Baumé decline rate below 0.4 °Baumé/day for two consecutive readings is the operational definition of a ferment in trouble.",
+        "trap": "Treating a slow ferment and a stuck ferment identically — the restart protocol for a truly stuck ferment is far more involved than a simple nutrient addition."
+      },
+      {
+        "heading": "Trajectory thinking: managing the whole arc, not the moment",
+        "iconHint": "target",
+        "body_md": "Individual readings — a single Baumé, a single temperature — are less useful than the rate and direction of change over time. A tank at 28 °C and falling is in a different position from one at 28 °C and rising. A Baumé of 6 dropping at 1.0 °Baumé/day is healthy; the same reading dropping at 0.2 °Baumé/day is a warning. This is the logic behind Owen's alarm architecture: thresholds are set on trajectory, not snapshots.\n\nPractically, this means logging readings at consistent intervals (twice daily minimum during active ferment), plotting the rate of change, and making decisions based on trend rather than point-in-time values. A simple spreadsheet or Owen's ferment view gives you this automatically. The discipline is acting on the trend early — when a single nutrient addition or a 2 °C temperature adjustment can still change the outcome — rather than waiting until the trajectory has already failed.",
+        "keyConcept": "Twice-daily Baumé readings plotted as a rate of change give you 24–48 hours of lead time before a ferment actually stalls.",
+        "trap": "Checking Baumé once daily and comparing to yesterday's single reading — you lose the rate signal that predicts problems before they become crises."
       }
     ],
     "worked_example": {
-      "title": "Tank 7 · Shiraz 2025 · Barossa Valley · Day 1–5",
+      "title": "Tank 7 · Shiraz 2025 · Barossa · Day 1–4",
       "starting_conditions": [
-        "Fruit: 14.2 °Baumé at crush, pH 3.55, TA 6.2 g/L",
-        "YAN measured at 148 mg N/L — below target threshold",
-        "Inoculated with BM4x4 at 25 g/hL; tank capacity 8,000 L; ferment temp target 28 °C"
+        "Fruit: 14.2 °Baumé at crush, pH 3.55, TA 6.1 g/L",
+        "YAN measured at 118 mg N/L — below the 140 mg N/L risk threshold",
+        "Inoculated with EC-1118 at 25 g/hL; tank volume 8,000 L; ambient cellar 18 °C"
       ],
       "timeline": [
         {
-          "when": "Day 1",
-          "observation": "Temperature 22 °C, rising at 1.5 °C/hour. Baumé 13.8. CO₂ evolution visible but modest.",
-          "decision": "Added 40 mg N/L as Fermaid-O plus 0.4 mg/L thiamine. No DAP at this stage. Ran one open pump-over at 15% tank volume.",
-          "reasoning": "YAN was deficient at crush. Front-loading organic nitrogen at inoculation covers early growth phase demand. Open pump-over on day 1 delivers oxygen for sterol synthesis without risk.",
-          "outcome": "Temperature stabilised at 24 °C by evening. Fermentation rate picked up overnight."
+          "when": "Day 1 — 12 h post-inoculation",
+          "observation": "Tank at 21 °C, Baumé 13.9, CO₂ evolution just beginning, no visible cap yet",
+          "decision": "Added 40 mg N/L as Fermaid-O (organic nitrogen) plus first pump-over at 0.5 tank volumes",
+          "reasoning": "YAN was below threshold; organic nitrogen preferred at inoculation for lower osmotic stress; early pump-over delivers oxygen for yeast sterol synthesis before cap forms",
+          "outcome": "Fermentation established cleanly; cap formed by evening, temperature climbing at 1.5 °C per hour"
         },
         {
-          "when": "Day 2–3",
-          "observation": "Owen alarm: temperature trajectory projecting 34 °C within 18 hours. Current temp 29 °C, Baumé 11.2 — approximately 1/3 depletion reached.",
-          "decision": "Engaged cooling jacket to hold 28–29 °C. Added second nutrient dose: 60 mg N/L as DAP split across two pump-overs. Switched to submerged pump-overs twice daily.",
-          "reasoning": "1/3 depletion is the optimal window for second nutrient addition — yeast demand is at peak. Submerged pump-overs protect against excess oxygen pick-up as ethanol climbs above 6%.",
-          "outcome": "Temperature held at 28–29 °C through peak fermentation. Rate maintained at 1.8–2.0 °Baumé/day."
+          "when": "Day 2 — 36 h post-inoculation",
+          "observation": "Tank at 29 °C and still climbing; Baumé 11.8, decline rate 1.05 °Baumé/day; Owen temperature trajectory alarm fired at 28.5 °C",
+          "decision": "Initiated cooling to hold at 27 °C; increased pump-over to twice daily at 0.75 tank volumes",
+          "reasoning": "Rate of climb (1.8 °C/h) projected to breach 35 °C within 3 hours without intervention; 27 °C preserves yeast viability while maintaining extraction rate",
+          "outcome": "Temperature stabilised at 27.2 °C within 90 minutes; fermentation rate maintained; no H₂S detected"
         },
         {
-          "when": "Day 5",
-          "observation": "Baumé 3.8, temperature 26 °C, rate slowing to 0.9 °Baumé/day. Owen trajectory alarm: rate declining faster than expected curve.",
-          "decision": "Warmed tank 1 °C to 27 °C. Reduced pump-overs to once daily, submerged. No further nutrient addition.",
-          "reasoning": "Rate decline at this stage is normal but the trajectory suggested it was ahead of the expected curve. Slight warming encourages yeast to complete without adding nutrients that could feed spoilage organisms at low sugar.",
-          "outcome": "Fermentation completed to 0.1 °Baumé by day 8. No residual sugar issues. VA 0.38 g/L."
+          "when": "Day 3 — one-third sugar depletion (~9.5 °Baumé consumed)",
+          "observation": "Baumé 9.4, decline rate 1.1 °Baumé/day, tank holding at 26.5 °C; Owen flagged the one-third depletion marker",
+          "decision": "Added second nutrient dose: 25 mg N/L DAP; reduced pump-over back to once daily at 0.5 tank volumes",
+          "reasoning": "One-third depletion is the optimal window for second nutrient addition; yeast are in exponential phase and uptake is efficient; reducing pump-over frequency as oxygen demand begins to decline",
+          "outcome": "Fermentation continued at 1.0–1.2 °Baumé/day through day 6; no stall; pressed at 1.8 °Baumé on day 7"
         }
       ],
-      "counterfactual": "Had the YAN deficiency not been corrected at inoculation, the ferment would likely have stalled around 4–5 °Baumé — the classic low-nutrient stuck point — requiring a restart that would have added two to three days and risked elevated VA."
+      "counterfactual": "Without the Day 1 nutrient addition and the Day 2 cooling response, the combination of YAN deficiency and heat stress above 32 °C would likely have produced H₂S and a partial stuck ferment around 4–5 °Baumé — a restart protocol costing 2–3 days and risking oxidation."
     },
     "decision_tree": {
       "title": "When to intervene — fermentation trajectory diagnostics",
       "rows": [
         {
-          "symptom": "Rate declining but still > 1 °Baumé/day, > 4 °Baumé remaining",
-          "first_check": "Tank temperature vs. yeast strain optimal range",
-          "action": "Warm 1–2 °C if below 18 °C; cool if above 32 °C. Run pump-over to redistribute yeast. Check if second nutrient dose is due."
+          "symptom": "Baumé decline slowing (0.4–0.8 °Baumé/day, was >1.0)",
+          "first_check": "Tank temperature — is it below 18 °C or above 32 °C?",
+          "action": "Adjust temperature to 22–26 °C; if already in range, add 20–30 mg N/L DAP and re-check in 12 h"
         },
         {
-          "symptom": "Sluggish: rate 0.3–1.0 °Baumé/day, > 2 °Baumé remaining",
-          "first_check": "Temperature, then YAN history — was nutrient addition adequate and timed correctly?",
-          "action": "Warm to 20–22 °C. If nutrient addition was missed or insufficient and sugar > 50% depleted, add 20–30 mg N/L complex nutrient only (not DAP). Increase pump-over frequency."
+          "symptom": "Baumé decline near-stopped (<0.3 °Baumé/day for two readings)",
+          "first_check": "Alcohol level and remaining sugar — is there >2 °Baumé left to ferment?",
+          "action": "Treat as stuck: warm to 25 °C, prepare restart yeast (acclimatise to within 5 °C of tank), add 30 mg N/L Fermaid-O before pitching restart culture"
         },
         {
-          "symptom": "Stuck: < 0.3 °Baumé/day for 48 hours, > 1 °Baumé remaining",
-          "first_check": "Ethanol level — if > 13% v/v, restart success rate drops significantly",
-          "action": "Rack off gross lees. Warm to 18–20 °C. Prepare EC1118 or DV10 starter at 5% volume; acclimatise to stuck wine in 10% increments over 4–6 hours before adding."
+          "symptom": "Temperature climbing >1.5 °C/h during peak fermentation",
+          "first_check": "Current tank temperature — how far from the 35 °C ceiling?",
+          "action": "Initiate cooling immediately if above 30 °C; target 26–28 °C; increase pump-over frequency to redistribute heat from cap"
         },
         {
-          "symptom": "Temperature spike > 35 °C detected mid-ferment",
-          "first_check": "Cooling system function — is the jacket actually flowing?",
-          "action": "Cool at maximum 1–2 °C/hour to avoid thermal shock. Do not drop below 20 °C in one step. Check yeast viability with methylene blue stain before assuming ferment will recover."
+          "symptom": "H₂S detected (rotten egg odour at pump-over)",
+          "first_check": "YAN history — was supplementation adequate? Current Baumé — how far through ferment?",
+          "action": "Add 20–30 mg N/L DAP if below two-thirds depletion; splash rack to volatilise H₂S; do not add DAP if >two-thirds sugar consumed — use copper fining instead"
         },
         {
-          "symptom": "VA rising above 0.6 g/L during active fermentation",
-          "first_check": "Oxygen exposure history — pump-over method, drop height, any leaks in transfer lines",
-          "action": "Switch immediately to submerged pump-overs. Reduce frequency. Check for acetic acid bacteria contamination on cap surface. Consider SO₂ addition if ferment is near completion."
+          "symptom": "Ferment running fast and hot (>1.5 °Baumé/day, >30 °C)",
+          "first_check": "Is this the first 48 h (expected) or mid-ferment (concerning)?",
+          "action": "If mid-ferment: cool to 26 °C, reduce pump-over to once daily, monitor for volatile acidity increase — fast hot ferments elevate acetic acid production"
         },
         {
-          "symptom": "H₂S detected (reductive off-aroma) during fermentation",
-          "first_check": "YAN status and copper levels in must — both deficiency and excess sulphur can drive H₂S",
-          "action": "Splash pump-over to volatilise H₂S. Add 20 mg N/L complex nutrient if YAN was marginal. If persistent, copper fining at 0.1–0.5 mg/L copper sulphate solution — bench trial first."
+          "symptom": "Ferment cold and sluggish from day one (<0.5 °Baumé/day, <16 °C)",
+          "first_check": "Was inoculation temperature-matched? Is the yeast strain cold-tolerant?",
+          "action": "Warm tank to 20–22 °C; if no response in 24 h, re-inoculate with a fresh acclimatised culture of a cold-tolerant strain; check YAN before re-pitch"
         }
       ]
     },
@@ -139,194 +139,194 @@
         "kind": "buy",
         "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 4",
         "url": null,
-        "note": "Chapman & Hall — fermentation kinetics, nutrient demand, and temperature effects on yeast physiology"
+        "note": "Chapman & Hall — fermentation kinetics, temperature effects, nutrient metabolism"
       },
       {
         "kind": "free",
         "label": "AWRI · Stuck and Sluggish Fermentation",
         "url": "https://www.awri.com.au/",
-        "note": "Search AWRI for 'stuck fermentation' — practical restart protocols and nutrient guidelines"
+        "note": "Search AWRI for 'stuck fermentation' — practical restart protocols and YAN guidance"
       },
       {
         "kind": "curriculum",
         "label": "CSU WSC115 · LO 3 — Fermentation Management",
         "url": "https://handbook.csu.edu.au/subject/2025/WSC115",
-        "note": "Covers temperature control, cap management, and stuck ferment prevention"
+        "note": "Temperature control, cap management, and nutrient addition timing"
       },
       {
         "kind": "curriculum",
         "label": "University of Adelaide · WINE 3046WT — Oenology 3",
         "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
-        "note": "Fermentation science including oxygen management and nutrient protocols"
+        "note": "Fermentation science, oxygen management, and stuck ferment prevention"
       },
       {
         "kind": "private",
         "label": "MoreWine · Oxygen and Fermentation Guide",
         "url": null,
-        "note": "Your paid resource — oxygen dosing during pump-overs and submerged vs. open technique"
+        "note": "Your paid resource — pump-over oxygen delivery and timing"
       },
       {
         "kind": "private",
         "label": "AOC Module 2.2 · Fermentation Science",
         "url": null,
-        "note": "Your paid curriculum resource — YAN thresholds, nutrient timing, and restart protocols"
+        "note": "Your paid curriculum resource — YAN thresholds and nutrient protocols"
       }
     ],
     "mcqs": [
       {
-        "q": "Tank 7 Shiraz reads 32 °C at peak fermentation. What is the correct action?",
+        "q": "Tank 7 Shiraz reads 35.2 °C at the 10 pm check. What is the correct immediate response?",
         "choices": [
-          "A) Hold — 32 °C is the upper ceiling for red fermentation, monitor closely",
-          "B) Cool immediately to below 20 °C to protect yeast",
-          "C) Add DAP to support yeast under heat stress",
-          "D) Increase pump-over frequency to 4× daily to dissipate heat"
+          "A) Begin cooling immediately — 35 °C is a hard ceiling and membrane integrity is already at risk",
+          "B) Monitor through the night and cool if it hits 36 °C, as 35 °C is within normal range",
+          "C) Increase pump-over frequency to dissipate heat through evaporation",
+          "D) Add a cold-water splash to the cap surface to bring surface temperature down"
         ],
         "answer": "A",
-        "rationale": "32 °C is the accepted ceiling for red ferments; aggressive cooling to 20 °C is unnecessary and risks stuck ferment, DAP timing rules still apply independently, and extra pump-overs add oxygen not cooling."
+        "rationale": "35 °C is defined as a hard ceiling, not a soft target — yeast membrane integrity fails above it, so any reading at or above 35 °C demands immediate cooling, not monitoring."
       },
       {
-        "q": "Your Shiraz ferment hits 36 °C overnight. You cool it back to 28 °C within two hours. What is the most likely outcome?",
+        "q": "Your Barossa Shiraz shows Baumé readings of 8.2 on Monday morning and 7.9 on Monday evening — a decline of 0.3 °Baumé in 12 hours. How do you interpret this?",
         "choices": [
-          "A) Full recovery is probable if cooling was fast enough",
-          "B) Yeast membrane integrity is likely compromised and restart should be prepared",
-          "C) Fermentation will slow temporarily but self-correct within 24 hours",
-          "D) Increase nutrient additions immediately to compensate for yeast stress"
+          "A) Normal — a 0.3 drop per 12 hours is within healthy range",
+          "B) Concerning — the daily rate projects to 0.6 °Baumé/day, which is above the trouble threshold",
+          "C) Concerning — the daily rate projects to 0.6 °Baumé/day, but only flag it if the next reading confirms the trend",
+          "D) Critical — call for a stuck-ferment rescue protocol immediately"
         ],
         "answer": "B",
-        "rationale": "Above 35 °C yeast membrane integrity fails and recovery is unlikely without a restart; speed of cooling does not reverse membrane damage already sustained."
+        "rationale": "0.3 per 12 hours projects to 0.6 °Baumé/day, which is above the 0.4 threshold, so this reading alone is not alarming — but B is the best interpretation of the data as presented; C is close but the lesson defines the threshold as two consecutive daily readings below 0.4, making B the most accurate single-reading interpretation."
       },
       {
-        "q": "On Day 3, Tank 7 is at 6 °Baumé and fermenting vigorously. What is the correct pump-over regime?",
+        "q": "A ferment shows a Baumé decline rate below 0.4 °Baumé/day on Tuesday and again on Wednesday. According to the operational definition, what is the correct call?",
         "choices": [
-          "A) Once daily at 10% tank volume",
-          "B) Twice daily at 10% tank volume",
-          "C) Twice daily at 25% tank volume",
-          "D) Once daily at 5% tank volume"
+          "A) The ferment is in trouble — two consecutive sub-threshold readings meet the operational definition of a stuck ferment in progress",
+          "B) Wait for a third consecutive reading before intervening to avoid unnecessary disruption",
+          "C) The ferment is stuck only if Baumé has stopped declining entirely",
+          "D) Flag it as slow but only intervene if temperature is also elevated"
         ],
-        "answer": "B",
-        "rationale": "Two pump-overs daily at 10% tank volume is the protocol during peak fermentation; the reduction to once daily applies only below 4 °Baumé."
+        "answer": "A",
+        "rationale": "Two consecutive daily readings below 0.4 °Baumé/day is the explicit operational definition of a ferment in trouble; waiting for a third reading or requiring a full stall loses the 24–48 hour lead time that trajectory thinking provides."
       },
       {
-        "q": "Tank 7 drops below 4 °Baumé on Day 5. How should cap management change?",
+        "q": "It is Day 3 of fermentation on Tank 7. When should the second nutrient dose have been added?",
         "choices": [
-          "A) Increase to three pump-overs daily to maximise late extraction",
-          "B) Reduce to once daily pump-over",
-          "C) Cease pump-overs entirely to avoid oxygen pickup",
-          "D) Maintain twice daily — Baumé is irrelevant to pump-over frequency"
+          "A) At inoculation, alongside the first dose",
+          "B) At one-third sugar depletion",
+          "C) At two-thirds sugar depletion",
+          "D) At the first sign of fermentation slowing"
         ],
         "answer": "B",
-        "rationale": "Below 4 °Baumé the protocol reduces to once daily; ceasing entirely risks cap drying, and increasing frequency adds unnecessary oxygen late in ferment."
+        "rationale": "The second nutrient dose is timed to one-third sugar depletion; adding it at two-thirds or later is explicitly prohibited for DAP and misses the window when yeast can still utilise nitrogen effectively."
       },
       {
-        "q": "A winemaker plans to add 2–8 mg/L oxygen to Tank 7 on Day 4 when the ferment is 60% complete by sugar depletion. Is this appropriate?",
+        "q": "A winemaker adds a DAP dose when the tank reads 3.5 °Baumé on a must that started at 13.5 °Baumé. What is the problem?",
         "choices": [
-          "A) Yes — micro-oxygen additions are beneficial throughout fermentation",
-          "B) No — oxygen additions after 50% sugar depletion are a liability",
-          "C) Yes — oxygen supports sterol synthesis at any fermentation stage",
-          "D) No — any oxygen addition during red fermentation risks oxidation"
+          "A) DAP should never be added after two-thirds of sugars are gone — at 3.5 °Baumé from 13.5 °Baumé, roughly 74% of sugars have been consumed",
+          "B) DAP is only harmful if added after Baumé reaches zero",
+          "C) The dose is too late to help but causes no harm at this stage",
+          "D) DAP addition timing only matters for white ferments, not reds"
         ],
-        "answer": "B",
-        "rationale": "Oxygen supports sterol synthesis during the yeast growth phase; after 50% sugar depletion yeast growth is complete and oxygen becomes a liability, not a benefit."
+        "answer": "A",
+        "rationale": "Two-thirds depletion from 13.5 °Baumé occurs at approximately 4.5 °Baumé; at 3.5 °Baumé roughly 74% of sugars are gone, making DAP addition a protocol breach that risks producing volatile acidity from stressed yeast metabolising excess nitrogen late in ferment."
       },
       {
-        "q": "Pre-ferment analysis shows Tank 7 has a YAN of 140 mg N/L. When should nutrient additions be made?",
+        "q": "Why should pump-over frequency track fermentation phase rather than a fixed daily schedule?",
         "choices": [
-          "A) At inoculation only — front-loading is sufficient",
-          "B) At inoculation and again at one-third sugar depletion",
-          "C) At inoculation, one-third depletion, and 50% depletion to ensure coverage",
-          "D) At 50% sugar depletion when yeast demand is highest"
+          "A) Because oxygen demand peaks in the first 48–72 hours, so more frequent pump-overs are needed early and can be reduced as fermentation progresses",
+          "B) Because cap management is primarily about colour extraction, which is highest at the end of fermentation",
+          "C) Because pump-overs raise temperature and should be minimised when the ferment is running hot in the first 48 hours",
+          "D) Because fixed schedules are adequate — phase-based scheduling only matters for white ferments"
         ],
-        "answer": "B",
-        "rationale": "The split addition at inoculation and one-third depletion targets the yeast growth phase; adding DAP after 50% depletion is prohibited and additions at inoculation alone are insufficient when YAN is below 200 mg N/L."
+        "answer": "A",
+        "rationale": "Oxygen demand peaks in the first 48–72 hours for yeast membrane sterol synthesis; treating pump-overs as a fixed clock schedule under-delivers oxygen early and over-delivers it late, missing the biological window."
       },
       {
-        "q": "Tank 7 is at 3 °Baumé and dropping only 0.2 °Baumé per day. How is this classified and what is the immediate priority?",
+        "q": "Twice-daily Baumé readings are plotted as a rate of change rather than absolute values. What is the primary operational benefit?",
         "choices": [
-          "A) Sluggish — add DAP immediately to restore fermentation rate",
-          "B) Stuck — initiate restart protocol within the 48-hour window",
-          "C) Sluggish — reduce temperature to slow yeast stress",
-          "D) Normal — rates below 4 °Baumé are expected to slow"
+          "A) It gives 24–48 hours of lead time before a ferment actually stalls, allowing intervention while options are still open",
+          "B) It reduces the number of tank entries required per day",
+          "C) It allows the winemaker to calculate final alcohol more accurately",
+          "D) It identifies colour extraction efficiency in real time"
         ],
-        "answer": "B",
-        "rationale": "Less than 0.3 °Baumé/day is the stuck ferment threshold; at 3 °Baumé remaining the 48-hour window applies and restart must be initiated — DAP after 50% depletion is contraindicated."
+        "answer": "A",
+        "rationale": "Rate-of-change plotting converts raw Baumé data into trajectory information, providing 24–48 hours of warning before a stall — the core value of trajectory thinking over moment-to-moment monitoring."
       },
       {
-        "q": "A stuck Shiraz ferment has reached 9% ethanol. What does this mean for restart success?",
+        "q": "Tank 7 Shiraz is on Day 2 and running at 28 °C with vigorous fermentation. The winemaker proposes dropping pump-over frequency to twice daily to 'let it run.' What is the risk?",
         "choices": [
-          "A) Restart is straightforward — ethanol level is within normal tolerance",
-          "B) Restart success drops sharply above 8% ethanol, making recovery unlikely",
-          "C) Add a high-alcohol-tolerant yeast strain and restart immediately",
-          "D) Ethanol level is irrelevant — temperature management determines restart success"
+          "A) Reducing pump-overs during peak oxygen demand (first 48–72 hours) starves yeast of oxygen needed for membrane sterol synthesis, increasing stuck-ferment risk later",
+          "B) Twice-daily pump-overs are standard and appropriate at this stage regardless of fermentation vigour",
+          "C) The main risk is over-extraction of harsh tannins if pump-overs are too infrequent",
+          "D) There is no risk — oxygen demand is lowest in the first 48 hours when CO₂ production is highest"
         ],
-        "answer": "B",
-        "rationale": "Restart success drops sharply above 8% ethanol; while a tolerant strain may be attempted, the prognosis is poor and ethanol toxicity is the primary barrier, not temperature."
+        "answer": "A",
+        "rationale": "Oxygen demand peaks in the first 48–72 hours; reducing pump-overs during this window deprives yeast of oxygen for sterol and unsaturated fatty acid synthesis, compromising membrane integrity and setting up a stuck ferment."
       },
       {
-        "q": "Which combination of conditions best defines a sluggish ferment?",
+        "q": "At what temperature does yeast membrane integrity fail, and why does this matter operationally?",
         "choices": [
-          "A) Less than 0.3 °Baumé/day with more than 2 °Baumé remaining",
-          "B) Less than 1 °Baumé/day with more than 2 °Baumé remaining",
-          "C) Less than 1 °Baumé/day with less than 1 °Baumé remaining",
-          "D) Less than 0.5 °Baumé/day with more than 4 °Baumé remaining"
+          "A) 35 °C — above this, membrane function is compromised, nutrient uptake fails, and the ferment can stall irreversibly",
+          "B) 38 °C — below this, temperature is a throttle not a ceiling and can be managed reactively",
+          "C) 32 °C — this is the recommended ceiling for red fermentation to preserve aroma",
+          "D) 40 °C — yeast are robust up to 38 °C and only die above 40 °C"
         ],
-        "answer": "B",
-        "rationale": "Sluggish is defined as less than 1 °Baumé/day with more than 2 °Baumé remaining; below 0.3 °Baumé/day is the stuck threshold, and low rate near dryness is expected, not sluggish."
+        "answer": "A",
+        "rationale": "35 °C is the hard ceiling defined in this lesson; above it, membrane integrity fails and the ferment may stall in a way that is difficult to rescue, making reactive management above this point too late."
       },
       {
-        "q": "A winemaker argues that pump-overs are primarily about colour extraction from the cap. What does fermentation science say?",
+        "q": "Owen raises an alarm on Tank 7 showing two consecutive Baumé decline rates of 0.35 °Baumé/day. Fermentation temperature is 29 °C and the tank is on Day 5. Which action set is most appropriate?",
         "choices": [
-          "A) Correct — anthocyanin extraction is the primary function of pump-overs",
-          "B) Incorrect — pump-overs are primarily a gas exchange mechanism; colour extraction is secondary",
-          "C) Correct — but only during the first 48 hours when colour is most soluble",
-          "D) Incorrect — pump-overs serve only to regulate temperature, not extraction or gas exchange"
+          "A) Confirm nutrient status, check yeast viability, consider a targeted nutrient addition, and increase monitoring to three readings per day",
+          "B) Immediately add a full DAP dose and raise temperature to 32 °C to stimulate yeast activity",
+          "C) No action needed — 0.35 is close to 0.4 and within normal variation; recheck in 24 hours",
+          "D) Press the tank immediately to avoid a complete stuck ferment"
         ],
-        "answer": "B",
-        "rationale": "Cap management is fundamentally gas exchange — CO₂ release and controlled oxygen introduction — with colour and tannin extraction as secondary outcomes; framing it as colour-only leads to incorrect frequency and volume decisions."
+        "answer": "A",
+        "rationale": "Two consecutive sub-threshold readings meet the operational definition of a ferment in trouble; the correct response is diagnostic (nutrient and viability check) plus increased monitoring — adding DAP late on Day 5 may breach the two-thirds rule, and pressing is premature."
       }
     ],
     "flashcards": [
       {
-        "front": "Red ferment temperature ceiling before membrane failure risk",
-        "back": "30–32 °C is the ceiling; above 35 °C yeast membrane integrity fails and restart is likely required."
+        "front": "Hard ceiling for yeast membrane integrity during red fermentation?",
+        "back": "35 °C — above this, membrane function fails and the ferment risks an irreversible stall."
       },
       {
-        "front": "Pump-over regime during peak fermentation vs below 4 °Baumé",
-        "back": "Twice daily at 10% tank volume during peak; reduce to once daily below 4 °Baumé."
+        "front": "Operational definition of a ferment in trouble — Baumé decline rate?",
+        "back": "Below 0.4 °Baumé/day for two consecutive readings signals a ferment in trouble."
       },
       {
-        "front": "Oxygen dose window — when it helps vs when it harms",
-        "back": "2–8 mg/L during yeast growth phase supports sterol synthesis; oxygen after 50% sugar depletion is a liability."
+        "front": "When does oxygen demand peak, and what drives it?",
+        "back": "First 48–72 hours — yeast require oxygen for sterol and unsaturated fatty acid synthesis to maintain membrane integrity."
       },
       {
-        "front": "YAN target and the split-addition rule",
-        "back": "Target ≥ 200 mg N/L; add at inoculation and at one-third sugar depletion — never add DAP after 50% depletion."
+        "front": "Correct timing for the second nutrient dose?",
+        "back": "At one-third sugar depletion — this is the last effective window for yeast to utilise nitrogen."
       },
       {
-        "front": "Sluggish vs stuck ferment — the numbers",
-        "back": "Sluggish: < 1 °Baumé/day with > 2 °Baumé remaining; stuck: < 0.3 °Baumé/day."
+        "front": "Hard cut-off for DAP addition — why?",
+        "back": "Never add DAP after two-thirds of sugars are consumed — late nitrogen stresses yeast and risks volatile acidity production."
       },
       {
-        "front": "Ethanol threshold where stuck-ferment restart success drops sharply",
-        "back": "Above 8% ethanol, restart success drops sharply and recovery becomes unlikely."
+        "front": "Lead time gained by plotting Baumé as rate of change rather than absolute value?",
+        "back": "24–48 hours — enough time to intervene before a ferment actually stalls."
       },
       {
-        "front": "The 48-hour window — what triggers it and why it matters",
-        "back": "A stuck ferment must be addressed within 48 hours; delay allows ethanol accumulation and yeast cell death that make restart impractical."
+        "front": "Common trap: treating pump-over frequency as a fixed daily schedule?",
+        "back": "Pump-over frequency must track fermentation phase — oxygen demand is highest in the first 48–72 hours, not uniform across the ferment."
       },
       {
-        "front": "Common trap: adding DAP to rescue a stuck ferment at 3 °Baumé",
-        "back": "DAP after 50% sugar depletion is contraindicated — yeast cannot utilise it effectively and it does not address the root cause of sticking."
+        "front": "Temperature is the throttle, not the thermostat — what does this mean operationally?",
+        "back": "Temperature should be actively managed to control fermentation rate, not just monitored and corrected reactively when limits are breached."
       }
     ]
   },
   "usage": {
-    "prompt_tokens": 2669,
-    "completion_tokens": 6424
+    "prompt_tokens": 2606,
+    "completion_tokens": 6793
   },
   "audit": {
-    "totalWords": 1530,
+    "totalWords": 1665,
     "ngramWindow": 8
   },
   "version": "structured-v2",
-  "generated_at": "2026-07-18T03:04:00.370Z"
+  "generated_at": "2026-07-18T03:32:26.103Z"
 }

@@ -1,0 +1,308 @@
+{
+  "lesson_id": "L4.7",
+  "source": {
+    "id": "L4.7",
+    "slug": "sustainability",
+    "title": "Sustainability — beyond marketing",
+    "level": "4",
+    "wbs": [
+      "D9",
+      "D10"
+    ],
+    "reading_min": "5",
+    "aim": "Energy, water, waste — the operational metrics that ground a sustainability claim, and how to build them into daily practice.",
+    "application": "Owen can log energy and water. This lesson is how you turn that log into a story a buyer will trust.",
+    "sources_private": [],
+    "sources_public_ref": [
+      "adelaide_oenology_3016wt",
+      "csu_wsc321"
+    ],
+    "citations_bibliographic": []
+  },
+  "generated": {
+    "tldr": [
+      "Sustainability claims only hold weight when backed by measured energy, water, and waste data.",
+      "Three metrics — kWh/tonne crushed, kL water/tonne, and landfill diversion rate — are the minimum credible baseline.",
+      "A logged trend across two or more vintages is what converts a marketing claim into a buyer-trusted story."
+    ],
+    "sections": [
+      {
+        "heading": "Measurement is the credential",
+        "iconHint": "gauge",
+        "body_md": "A sustainability claim without a number behind it is a brand position, not a fact. Buyers — particularly export buyers, supermarket gatekeepers, and B-corp-aligned importers — are increasingly asking for primary data, not certifications alone. The certification may open the door; the data keeps you in the room.\n\nFor a boutique operation, the three metrics that matter most are energy intensity (kWh per tonne of fruit processed), water intensity (kilolitres per tonne), and waste diversion (percentage of total waste stream diverted from landfill). These are auditable, comparable across vintages, and directly actionable. Everything else — carbon offsets, biodiversity indices, social equity scores — builds on top of this foundation.\n\nStart with what Owen already logs. Sub-meter your refrigeration, your pump circuits, and your compressed air separately if you can. Even a single whole-of-winery meter read at crush start and crush end, divided by tonnes received, gives you a number worth tracking.",
+        "keyConcept": "Energy intensity below 150 kWh/tonne and water intensity below 5 kL/tonne are credible benchmarks for a small-to-mid Australian winery.",
+        "trap": "Reporting total kWh consumed without normalising to tonnes processed makes year-on-year comparison meaningless — vintage size swings everything."
+      },
+      {
+        "heading": "Water is the metric buyers read first",
+        "iconHint": "droplets",
+        "body_md": "In Australian and NZ wine regions, water use is politically and commercially visible in a way that energy is not. Buyers in drought-aware markets — and that now includes most of Europe — treat water intensity as a proxy for overall environmental stewardship. A winery using 12 kL per tonne when the regional benchmark is 5 kL has a story problem, regardless of its solar panels.\n\nThe main water consumers in a small winery are barrel washing, tank cleaning, and heat exchange cooling. Barrel washing alone can account for 30–40% of total winery water use if done with a lance rather than a recirculating system. Fitting a simple flow meter to your barrel wash station and logging litres per barrel per wash cycle takes under an hour to set up and immediately shows you where the waste is.\n\nCooling water is the other lever. Evaporative coolers and once-through cooling systems are the biggest offenders. Closed-loop glycol systems with a cooling tower, or ground-source options where geology allows, cut water use dramatically and reduce energy draw simultaneously.",
+        "keyConcept": "Winery water use below 5 kL/tonne is achievable with closed-loop cooling and recirculating barrel wash; above 8 kL/tonne requires a formal reduction plan.",
+        "trap": "Counting only process water and ignoring vineyard irrigation in your reported figure is a disclosure gap that sophisticated buyers will notice and question."
+      },
+      {
+        "heading": "Waste diversion is the easiest win to document",
+        "iconHint": "activity",
+        "body_md": "Marc, lees, filter media, cardboard, glass breakage, and chemical containers make up the bulk of winery waste. Most boutique wineries already divert marc to compost or vineyard return, but few document it formally. Weighing your marc at press and recording the destination takes two minutes per pressing and builds a diversion record that is genuinely auditable.\n\nLandfill diversion rate is calculated simply: total waste diverted (composted, recycled, reused) divided by total waste generated, expressed as a percentage. A winery diverting marc, cardboard, and glass cullet while sending only contaminated filter pads and chemical containers to landfill can legitimately claim 80–90% diversion. That number, with a two-vintage trend, is a credible sustainability data point.\n\nThe trap is conflating diversion with zero-waste. Diversion is measurable and honest. Zero-waste is a marketing construct that rarely survives audit. Claim what you can prove.",
+        "keyConcept": "An 80%+ landfill diversion rate is achievable for most boutique wineries by documenting marc composting, cardboard recycling, and glass cullet return.",
+        "trap": "Claiming high diversion rates without weighing or volumetrically estimating each waste stream means the number is an estimate, not a measurement — disclose that."
+      },
+      {
+        "heading": "Turning a log into a story a buyer trusts",
+        "iconHint": "target",
+        "body_md": "Raw numbers in a spreadsheet are not a story. A buyer needs to see trend, context, and intent. Trend means at least two data points — ideally three vintages — showing direction. Context means comparison to a regional or industry benchmark. Intent means a stated target for the next vintage with a named action attached to it.\n\nOwen's log becomes a buyer-facing document when it shows: energy intensity dropping from 180 kWh/tonne in 2023 to 140 kWh/tonne in 2025 (context: AWRI benchmark ~120–160 kWh/tonne for small wineries); water intensity holding at 4.8 kL/tonne against a regional average of 6.2 kL/tonne; and a 2026 target of 4.2 kL/tonne via a recirculating barrel wash retrofit planned for March.\n\nThis structure — measured baseline, trend, benchmark, named next action — is what separates a credible sustainability narrative from a label claim. It also happens to be what most third-party certification auditors are looking for before they issue a certificate.",
+        "keyConcept": "Trend + benchmark + named next action is the three-part structure that converts raw winery data into a buyer-trusted sustainability narrative.",
+        "trap": "Publishing a single vintage's data without trend context invites the question 'was that year unusually good?' — one number proves nothing, two numbers show direction."
+      }
+    ],
+    "worked_example": {
+      "title": "Redgum Ridge Wines · 2025 Vintage Review · Sustainability Baseline Build",
+      "starting_conditions": [
+        "80-tonne crush, single-variety Shiraz and Grenache, Barossa fringe boutique operation",
+        "One whole-of-winery sub-meter installed pre-vintage; no prior water metering; marc weighed at press for the first time",
+        "Target: produce a one-page sustainability data sheet for a UK importer requesting ESG disclosure before listing"
+      ],
+      "timeline": [
+        {
+          "when": "Crush week",
+          "observation": "Meter read at first bin receipt and at end of last pressing: 9,400 kWh consumed over 6 days. 80 tonnes processed. Marc weighed at press: 18 tonnes total.",
+          "decision": "Record energy intensity as 117.5 kWh/tonne. Log marc destination (local compost operator, documented with docket).",
+          "reasoning": "Crush is the highest energy draw of vintage — capturing it separately gives the most meaningful intensity figure rather than diluting it across the full year.",
+          "outcome": "First credible energy intensity baseline established. Marc diversion documented with a third-party docket — auditable."
+        },
+        {
+          "when": "Fermentation and pressing (weeks 2–4)",
+          "observation": "No dedicated water meter yet. Estimated water use by reading the property water meter at vintage start and end: 380 kL total for the winery footprint over 4 weeks.",
+          "decision": "Record water intensity as 4.75 kL/tonne with a disclosure note that the figure includes domestic use from the on-site cottage and is therefore a conservative overestimate.",
+          "reasoning": "Transparency about measurement limitations is more credible than a clean number with no methodology note. The importer can see the methodology and trust the intent.",
+          "outcome": "Water intensity figure accepted by importer with the methodology note attached. They flagged it as better disclosure than most suppliers they work with."
+        },
+        {
+          "when": "Post-vintage reporting (June)",
+          "observation": "Cardboard and glass breakage weighed at bin collection: 420 kg cardboard, 85 kg glass cullet. Chemical containers: 12 kg to licensed waste contractor. Filter pads: 60 kg to landfill (contaminated, no diversion pathway found).",
+          "decision": "Calculate diversion rate: (18,000 kg marc + 420 kg cardboard + 85 kg glass) ÷ (18,000 + 420 + 85 + 12 + 60) = 99.4% by mass. Report as 99% with a note that marc dominates the figure.",
+          "reasoning": "Marc mass dominates the calculation, which is honest and typical for wineries. The note prevents the figure from appearing misleadingly precise about non-marc streams.",
+          "outcome": "One-page data sheet delivered: 117.5 kWh/tonne energy, 4.75 kL/tonne water (est.), 99% diversion by mass. Importer listed the wine. Noted the methodology transparency as a differentiator."
+        }
+      ],
+      "counterfactual": "Without the pre-vintage meter read, energy intensity would have been calculated from an annual bill estimate — a figure the importer's ESG team would have immediately flagged as unverified and likely rejected."
+    },
+    "decision_tree": {
+      "title": "When your sustainability data is challenged — the diagnostic tree",
+      "rows": [
+        {
+          "symptom": "Buyer asks for energy intensity but you only have a total annual kWh bill",
+          "first_check": "Do you have tonne records for each vintage within that billing period?",
+          "action": "Divide annual kWh by total tonnes crushed; disclose that the figure includes non-vintage energy (refrigeration, office) and is therefore an overestimate of crush-only intensity"
+        },
+        {
+          "symptom": "Water intensity figure is above 8 kL/tonne",
+          "first_check": "Identify the top two water consumers — likely barrel washing and cooling",
+          "action": "Install a flow meter on barrel wash station this week; audit cooling system type — if once-through, cost a closed-loop retrofit before next vintage"
+        },
+        {
+          "symptom": "Landfill diversion rate is below 60%",
+          "first_check": "Is marc being sent to landfill or is there no local composting or vineyard return pathway?",
+          "action": "Contact local council or neighbouring growers for marc offtake; even a verbal agreement with a documented destination lifts diversion rate substantially"
+        },
+        {
+          "symptom": "Certification body requests third-party verified data but you only have self-reported logs",
+          "first_check": "Are your meter reads dated and cross-referenceable to utility bills or property meter records?",
+          "action": "Align your internal log dates with utility bill periods — this creates an independent cross-check without a formal audit; engage a certifier for the next vintage cycle"
+        },
+        {
+          "symptom": "You have two vintages of data but they show no improvement trend",
+          "first_check": "Was vintage size significantly different between the two years? Normalise by intensity, not totals.",
+          "action": "If intensity is flat, identify one capital action (e.g. LED lighting retrofit, variable-speed drive on a pump) with a projected kWh saving and include it as a forward commitment in your disclosure"
+        },
+        {
+          "symptom": "Importer requests a carbon footprint figure but you have no Scope 1/2/3 calculation",
+          "first_check": "Do you have energy intensity and purchased goods data (glass, packaging)?",
+          "action": "Use AWRI's carbon calculator tool as a starting point; disclose the methodology and its limitations — a transparent estimate is more credible than silence"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "Adelaide WINE ENG 3016WT · Sustainable Winegrowing",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Search the Adelaide oenology calendar for WINE ENG 3016WT"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC321 · Sustainable Wine Business",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC321",
+        "note": null
+      },
+      {
+        "kind": "free",
+        "label": "AWRI Winery Sustainability Resources",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for winery water use, energy benchmarking, and carbon calculator"
+      },
+      {
+        "kind": "free",
+        "label": "Wine Australia Sustainability Framework",
+        "url": "https://www.wineaustralia.com/",
+        "note": "Search Wine Australia for sustainability framework and ESG reporting guidance"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Redgum Ridge logs 162 kWh per tonne crushed for the 2025 vintage. How should the winemaker present this figure to a sustainability-focused buyer?",
+        "choices": [
+          "A) Acknowledge it exceeds the 150 kWh/tonne benchmark and name a specific next action to reduce it",
+          "B) Report it without comment because 162 kWh/tonne is within normal industry variation",
+          "C) Convert it to CO₂-equivalent emissions to avoid direct comparison with the benchmark",
+          "D) Omit it until the figure falls below 150 kWh/tonne"
+        ],
+        "answer": "A",
+        "rationale": "Transparency plus a named next action is the structure buyers trust; hiding or reframing a figure above benchmark undermines credibility rather than protecting it."
+      },
+      {
+        "q": "Which energy intensity figure represents a credible benchmark for a small-to-mid Australian winery?",
+        "choices": [
+          "A) 100 kWh/tonne",
+          "B) 150 kWh/tonne",
+          "C) 200 kWh/tonne",
+          "D) 250 kWh/tonne"
+        ],
+        "answer": "B",
+        "rationale": "150 kWh/tonne is the cited benchmark; 100 is aspirational for large efficient operations, while 200–250 signals poor performance requiring a reduction plan."
+      },
+      {
+        "q": "A boutique winery uses 7.2 kL of water per tonne of fruit processed. According to the operational benchmarks, what is the correct response?",
+        "choices": [
+          "A) No action needed — 7.2 kL/tonne is below the 8 kL/tonne threshold where a formal plan is required",
+          "B) Implement a formal reduction plan immediately because 7.2 kL/tonne exceeds the credible benchmark of 5 kL/tonne",
+          "C) Report the figure as compliant because it is below 10 kL/tonne",
+          "D) Switch entirely to dry processing to eliminate water use"
+        ],
+        "answer": "B",
+        "rationale": "5 kL/tonne is the credible benchmark; 7.2 kL/tonne exceeds it and, while below the 8 kL/tonne formal-plan trigger, still requires active improvement to support a credible sustainability claim."
+      },
+      {
+        "q": "At what water intensity does a winery trigger the requirement for a formal reduction plan?",
+        "choices": [
+          "A) Above 5 kL/tonne",
+          "B) Above 6 kL/tonne",
+          "C) Above 8 kL/tonne",
+          "D) Above 10 kL/tonne"
+        ],
+        "answer": "C",
+        "rationale": "8 kL/tonne is the explicit threshold; 5 kL/tonne is the credible benchmark to aim for, not the trigger for a formal plan."
+      },
+      {
+        "q": "Which combination of practices most directly enables a winery to achieve water intensity below 5 kL/tonne?",
+        "choices": [
+          "A) Closed-loop cooling and recirculating barrel wash",
+          "B) Rainwater harvesting and drip irrigation of vineyards",
+          "C) Reduced barrel maturation time and dry yeast rehydration",
+          "D) Gravity-flow winery design and natural fermentation"
+        ],
+        "answer": "A",
+        "rationale": "Closed-loop cooling and recirculating barrel wash directly target the winery's largest water draws; the other options address vineyard or winemaking style, not winery water intensity."
+      },
+      {
+        "q": "Redgum Ridge diverts marc to a local composter, returns glass cullet, and bales cardboard. They have not yet documented these streams. What is the most accurate statement about their landfill diversion rate?",
+        "choices": [
+          "A) They likely achieve 80%+ diversion but cannot claim it credibly without documentation",
+          "B) They achieve 80%+ diversion because the practices themselves are sufficient proof",
+          "C) They cannot achieve 80%+ diversion without also diverting wastewater solids",
+          "D) Documentation is only required if the winery sells into export markets"
+        ],
+        "answer": "A",
+        "rationale": "The practices create the diversion rate, but documentation is what converts the operational reality into a buyer-trusted claim; undocumented diversion cannot be reported."
+      },
+      {
+        "q": "Which three waste streams are cited as the primary contributors to an 80%+ landfill diversion rate in a boutique winery?",
+        "choices": [
+          "A) Marc composting, cardboard recycling, and glass cullet return",
+          "B) Wastewater treatment, spent filter media, and marc composting",
+          "C) Glass cullet return, chemical drum recycling, and cardboard recycling",
+          "D) Marc composting, spent lees disposal, and label paper recycling"
+        ],
+        "answer": "A",
+        "rationale": "Marc, cardboard, and glass cullet are the three named streams; the other options include streams not cited as primary contributors to the 80%+ benchmark."
+      },
+      {
+        "q": "A buyer asks Redgum Ridge for evidence that their sustainability performance is improving, not just a single-year snapshot. Which response structure best satisfies this request?",
+        "choices": [
+          "A) Trend data across vintages, comparison against the relevant benchmark, and a named next action",
+          "B) A third-party certification logo and a one-page environmental policy statement",
+          "C) Current-year kWh/tonne and kL/tonne figures with a note that they meet industry norms",
+          "D) A list of sustainability initiatives planned for the next vintage"
+        ],
+        "answer": "A",
+        "rationale": "Trend + benchmark + named next action is the three-part structure that converts raw data into a trusted narrative; certifications and plans without trend data do not demonstrate improvement."
+      },
+      {
+        "q": "A winery reports energy intensity of 148 kWh/tonne, water intensity of 4.8 kL/tonne, and an 82% landfill diversion rate, but presents only this year's figures with no stated next action. What is the key weakness in their sustainability narrative?",
+        "choices": [
+          "A) All three metrics are below benchmark so no weakness exists",
+          "B) The narrative lacks trend data and a named next action, making it a snapshot rather than a story",
+          "C) The diversion rate should be expressed as a weight in tonnes, not a percentage",
+          "D) Water intensity must be below 3 kL/tonne before a credible claim can be made"
+        ],
+        "answer": "B",
+        "rationale": "Meeting benchmarks in a single year is necessary but not sufficient; without trend and next action the buyer cannot assess trajectory or commitment, which are the trust-building elements."
+      },
+      {
+        "q": "A winemaker argues that publishing water and energy intensity figures is risky because a bad vintage year could inflate the numbers and damage the winery's reputation. What is the strongest counter-argument?",
+        "choices": [
+          "A) Buyers understand vintage variation; contextualising a spike with trend data and a named response demonstrates integrity rather than weakness",
+          "B) Intensity figures should be replaced with absolute totals to avoid vintage-size distortion",
+          "C) Sustainability data should only be shared under NDA with major retail buyers",
+          "D) The winery should wait until three consecutive years of benchmark performance before publishing any figures"
+        ],
+        "answer": "A",
+        "rationale": "Transparency about variation, explained with context and a response action, builds more trust than silence; intensity metrics are specifically designed to normalise for vintage size, and withholding data signals avoidance."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Energy intensity credible benchmark — small-to-mid Australian winery?",
+        "back": "150 kWh per tonne of fruit processed."
+      },
+      {
+        "front": "Water intensity credible benchmark vs. formal-plan trigger — what are the two numbers?",
+        "back": "Credible benchmark is 5 kL/tonne; a formal reduction plan is required above 8 kL/tonne."
+      },
+      {
+        "front": "Two winery practices that most directly achieve sub-5 kL/tonne water intensity?",
+        "back": "Closed-loop cooling and recirculating barrel wash."
+      },
+      {
+        "front": "Landfill diversion rate target for a boutique winery, and the three streams that get you there?",
+        "back": "80%+ diversion via marc composting, cardboard recycling, and glass cullet return."
+      },
+      {
+        "front": "Three-part structure that turns a winery data log into a buyer-trusted sustainability story?",
+        "back": "Trend across vintages + comparison against benchmark + named next action."
+      },
+      {
+        "front": "Common trap: winery diverts marc, cardboard, and glass but claims 80%+ diversion — what's missing?",
+        "back": "Documentation; the practices create the rate but only documented evidence supports the claim."
+      },
+      {
+        "front": "Why use intensity metrics (kWh/tonne, kL/tonne) rather than absolute totals for sustainability reporting?",
+        "back": "Intensity figures normalise for vintage size, making year-on-year and winery-to-winery comparisons valid."
+      },
+      {
+        "front": "A single year of benchmark-level metrics — sufficient for a credible sustainability claim?",
+        "back": "No; buyers require trend data and a named next action to assess trajectory and commitment."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2482,
+    "completion_tokens": 5731
+  },
+  "audit": {
+    "totalWords": 1471,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T04:06:17.313Z"
+}

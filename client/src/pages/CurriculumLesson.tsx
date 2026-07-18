@@ -13,13 +13,14 @@
 import { useState, useMemo } from "react";
 import { Link, useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { useVigneronAccess } from "@/lib/useVigneronAccess";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, ArrowRight, BookOpen, Clock, ExternalLink, GraduationCap, Lock,
   Zap, Layers, Sparkles, Thermometer, Wind, Activity, Gauge, Clock as ClockIcon,
-  FlaskConical, Droplets, Target, AlertTriangle, Lightbulb, ChevronDown, ChevronRight,
+  FlaskConical, Droplets, Target, AlertTriangle, Lightbulb,
   Globe, RotateCcw
 } from "lucide-react";
 
@@ -150,37 +151,43 @@ export default function CurriculumLesson() {
         </div>
       )}
 
-      {/* Body by mode */}
-      {isV2 && lesson.sections && mode === "deep" && (
-        <DeepModeContent lesson={lesson} quizAnswers={quizAnswers} setQuizAnswers={setQuizAnswers} quizReveal={quizReveal} setQuizReveal={setQuizReveal} />
+      {/* Body by mode — GATED for Vigneron tier */}
+      {!access.unlocked ? (
+        <PaywallBoundary lessonTitle={lesson.title} isAuthenticated={access.isAuthenticated} />
+      ) : (
+        <>
+          {isV2 && lesson.sections && mode === "deep" && (
+            <DeepModeContent lesson={lesson} quizAnswers={quizAnswers} setQuizAnswers={setQuizAnswers} quizReveal={quizReveal} setQuizReveal={setQuizReveal} />
+          )}
+
+          {isV2 && lesson.sections && mode === "skim" && (
+            <SkimModeContent lesson={lesson} />
+          )}
+
+          {isV2 && lesson.flashcards && mode === "flash" && (
+            <FlashModeContent
+              cards={lesson.flashcards}
+              idx={flashIdx}
+              flipped={flashFlipped}
+              onNext={() => { setFlashIdx((flashIdx + 1) % lesson.flashcards!.length); setFlashFlipped(false); }}
+              onPrev={() => { setFlashIdx((flashIdx - 1 + lesson.flashcards!.length) % lesson.flashcards!.length); setFlashFlipped(false); }}
+              onFlip={() => setFlashFlipped((f) => !f)}
+            />
+          )}
+
+          {/* v1 fallback — plain body */}
+          {!isV2 && lesson.body_md && (
+            <div className="max-w-4xl mx-auto px-6 pb-10">
+              <article className="prose prose-stone max-w-none prose-headings:font-serif prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3" data-testid="lesson-body">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{lesson.body_md}</ReactMarkdown>
+              </article>
+            </div>
+          )}
+        </>
       )}
 
-      {isV2 && lesson.sections && mode === "skim" && (
-        <SkimModeContent lesson={lesson} />
-      )}
-
-      {isV2 && lesson.flashcards && mode === "flash" && (
-        <FlashModeContent
-          cards={lesson.flashcards}
-          idx={flashIdx}
-          flipped={flashFlipped}
-          onNext={() => { setFlashIdx((flashIdx + 1) % lesson.flashcards!.length); setFlashFlipped(false); }}
-          onPrev={() => { setFlashIdx((flashIdx - 1 + lesson.flashcards!.length) % lesson.flashcards!.length); setFlashFlipped(false); }}
-          onFlip={() => setFlashFlipped((f) => !f)}
-        />
-      )}
-
-      {/* v1 fallback — plain body */}
-      {!isV2 && lesson.body_md && (
-        <div className="max-w-4xl mx-auto px-6 pb-10">
-          <article className="prose prose-stone max-w-none prose-headings:font-serif prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3" data-testid="lesson-body">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{lesson.body_md}</ReactMarkdown>
-          </article>
-        </div>
-      )}
-
-      {/* Citations */}
-      {lesson.cited_in && lesson.cited_in.length > 0 && (mode !== "flash") && (
+      {/* Citations — visible only if unlocked */}
+      {access.unlocked && lesson.cited_in && lesson.cited_in.length > 0 && (mode !== "flash") && (
         <CitedIn grouped={groupedCitations} />
       )}
     </div>
@@ -470,6 +477,47 @@ function CitedIn({ grouped }: { grouped: Record<string, any[]> }) {
         <p className="mt-6 text-xs text-stone-500 leading-relaxed">
           This lesson is Ownology-original writing. Referenced textbooks are cited for further reading — their contents are not reproduced here.
           Purchase from the publisher for the full source.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function PaywallBoundary({ lessonTitle, isAuthenticated }: { lessonTitle: string; isAuthenticated: boolean }) {
+  return (
+    <div className="max-w-4xl mx-auto px-6 py-14" data-testid="paywall-boundary">
+      <div className="rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-8 md:p-12 shadow-sm">
+        <div className="flex items-center gap-3 text-amber-900 font-semibold text-sm uppercase tracking-wider mb-4">
+          <Lock className="h-4 w-4" /> Vigneron members only
+        </div>
+        <h2 className="font-serif text-3xl md:text-4xl text-stone-900 leading-tight mb-4">
+          Ready to open the full lesson?
+        </h2>
+        <p className="text-stone-700 leading-relaxed text-lg mb-6 max-w-2xl">
+          The rest of <em>{lessonTitle}</em> — five sections, a Tank-4-style worked example, decision tree, ten questions and eight flashcards —
+          is unlocked with a Vigneron membership. Free-Run visitors read the aim; members do the work.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/pricing?from=curriculum-paywall">
+            <Button size="lg" className="bg-stone-900 hover:bg-stone-800" data-testid="paywall-cta-pricing">
+              See Vigneron pricing <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </Link>
+          <Link href="/curriculum/about">
+            <Button variant="outline" size="lg" data-testid="paywall-cta-learn">
+              What's inside the curriculum
+            </Button>
+          </Link>
+          {!isAuthenticated && (
+            <Link href="/login?next=/curriculum">
+              <Button variant="ghost" size="lg" data-testid="paywall-cta-signin">
+                Already a member? Sign in
+              </Button>
+            </Link>
+          )}
+        </div>
+        <p className="mt-6 text-xs text-stone-500">
+          14-day free trial available. Cancel anytime. Founding member pricing locks for life.
         </p>
       </div>
     </div>

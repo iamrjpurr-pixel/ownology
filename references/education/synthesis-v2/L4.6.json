@@ -1,0 +1,331 @@
+{
+  "lesson_id": "L4.6",
+  "source": {
+    "id": "L4.6",
+    "slug": "compliance",
+    "title": "Compliance — LIP, WET, food safety, GI",
+    "level": "4",
+    "wbs": [
+      "D10"
+    ],
+    "reading_min": "5",
+    "aim": "The Australian/NZ regulatory backbone every winery lives under — what triggers what, and what your logbook needs to show.",
+    "application": "Owen's audit-ready mode packages the compliance evidence. This lesson lets you defend the audit conversation confidently.",
+    "sources_private": [
+      "aoc_2_5_wine_classification"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_3003wt",
+      "csu_wsc321"
+    ],
+    "citations_bibliographic": [
+      "robinson_oxford_regulation"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "LIP, WET, food safety, and GI each trigger separate obligations — missing one costs real money or market access.",
+      "Your logbook is your alibi: if it isn't written down, the auditor assumes it didn't happen.",
+      "GI integrity starts in the vineyard; compliance evidence must trace fruit origin through to the label."
+    ],
+    "sections": [
+      {
+        "heading": "Four frameworks, one winery — know which clock is ticking",
+        "iconHint": "gauge",
+        "body_md": "Australian wine compliance isn't a single rulebook. It's four overlapping frameworks that each carry their own triggers, thresholds, and enforcement bodies. The Label Integrity Program (LIP) governs vintage, variety, and geographic indication claims on every label. The Wine Equalisation Tax (WET) determines when and how much tax is remitted — and whether your rebate survives scrutiny. Food safety obligations under the Australia New Zealand Food Standards Code sit on top of both. GI protection under the AGWA register controls what place names you can print.\n\nFor a boutique operation, the practical risk is treating these as one compliance task. They aren't. LIP is administered by the ATO and AGWA jointly. WET is ATO territory. Food safety is a state/territory matter with federal standards. GI disputes can involve IP Australia. A single vintage can trigger all four simultaneously — and each has its own record-retention clock.",
+        "keyConcept": "LIP requires 85% minimum for any vintage, variety, or GI claim; all four must be met simultaneously if you make all three claims.",
+        "trap": "Assuming a passed label approval satisfies LIP — label approval checks format, not whether your cellar records actually support the claim."
+      },
+      {
+        "heading": "LIP: the 85% rule lives in your intake records",
+        "iconHint": "target",
+        "body_md": "The Label Integrity Program requires that if you declare a vintage, variety, or GI on the label, at least 85% of the wine by volume must genuinely qualify. For GI claims in export markets — particularly the EU — the threshold rises to 85% for variety and vintage, and 85% for the GI itself, with no stacking loophole.\n\nThe evidence base is your receival dockets, crush records, tank allocation logs, and blending records. Every transfer that dilutes a claim must be traceable. If you blend 200 L of 2023 Barossa Shiraz into a 2022 McLaren Vale Shiraz tank, your 2022 vintage claim may survive — but only if your records show the final blend calculation. Auditors don't reconstruct your records for you; they check whether yours hold together. Retain all source documents for at least five years from the date of the last label use.",
+        "keyConcept": "85% threshold applies per claim — vintage, variety, and GI are assessed independently; blending records must show each calculation explicitly.",
+        "trap": "Logging fruit receival by weight but blending records by volume — unit inconsistency creates gaps an auditor will flag immediately."
+      },
+      {
+        "heading": "WET rebate: the $350 k ceiling and the producer test",
+        "iconHint": "activity",
+        "body_md": "The Wine Equalisation Tax rebate allows eligible producers to offset up to $350,000 of WET liability per financial year. To qualify, you must be a 'producer' under the ATO's definition — meaning you grew or processed the grapes into wine, or you are a New Zealand producer selling into Australia under the bilateral arrangement. Purchasing finished wine and rebottling it generally disqualifies you from the rebate on that product.\n\nThe rebate is claimed on your BAS. The risk for boutique wineries is claiming the rebate on wine where the production chain is ambiguous — custom crush arrangements, contract winemaking, or fruit purchased as juice rather than grapes. Each scenario has a different answer, and the ATO has published specific guidance. Keep your contract winemaking agreements, grape purchase invoices, and processing records in the same file as your BAS workings. If the ATO audits, they will ask for all three together.",
+        "keyConcept": "WET rebate cap is $350,000 per financial year; eligibility turns on producer status, not just ownership of the finished wine.",
+        "trap": "Claiming the WET rebate on contract-made wine where you supplied only grapes — the producer test may not be satisfied without a processing role."
+      },
+      {
+        "heading": "Food safety: HACCP thinking without the manufacturing plant overhead",
+        "iconHint": "flask-conical",
+        "body_md": "Wine sits under Standard 3.2.1 of the Food Standards Code, which requires a documented food safety program for most commercial producers. In practice, this means identifying your critical control points — SO₂ additions, filtration, bottling hygiene, allergen management — and keeping records that show each was monitored and acted on.\n\nFor boutique wineries, the allergen obligation is the most commonly missed. Fining agents derived from milk (casein), egg (albumin), and fish (isinglass) are all Schedule 9 allergen sources. If any are used, even if the final wine tests below detectable limits, your label must carry an allergen declaration unless you can demonstrate through validated testing that the allergen is absent. 'We always fine out completely' is not a validated claim without analytical evidence. Build the testing record into your fining protocol, not as an afterthought before bottling.",
+        "keyConcept": "Casein, albumin, and isinglass are Schedule 9 allergens — absence must be analytically validated, not assumed from standard fining practice.",
+        "trap": "Relying on the fining agent supplier's technical sheet as your allergen clearance — it covers their product, not your finished wine."
+      },
+      {
+        "heading": "GI integrity: the paper trail starts at the vineyard gate",
+        "iconHint": "target",
+        "body_md": "A Geographic Indication claim is only as strong as the chain of custody from the vineyard block to the sealed tank. AGWA maintains the Australian GI register; the boundaries are legally defined and non-negotiable. Fruit grown one kilometre outside the boundary cannot contribute to the GI claim regardless of how similar the terroir is.\n\nFor multi-vineyard blends, your intake records must identify each source by property, GI zone, and volume. If you source from contract growers, their delivery dockets must state the property address — not just the grower name. For NZ producers, the Wine Act 2003 and associated regulations govern appellation claims; the same principle applies: origin evidence must be documentary, not testimonial. Where a GI claim is made on an export label, retain the supporting records for the full five-year LIP window, even if the wine has long since sold through.",
+        "keyConcept": "GI chain of custody runs from vineyard block ID on the intake docket to the sealed tank record — a grower name alone is insufficient evidence.",
+        "trap": "Accepting a grower's verbal assurance that fruit is within the GI boundary — without a property address on the docket, the claim is undefendable."
+      }
+    ],
+    "worked_example": {
+      "title": "Barossa Shiraz 2024 · Boutique 3,000-case release · Pre-bottling audit prep",
+      "starting_conditions": [
+        "Fruit sourced from two growers: 18 t from a Nuriootpa property (confirmed Barossa Valley GI), 4 t from a property whose boundary status was unverified at intake",
+        "Custom crush arrangement — winemaking conducted at a shared facility under a contract winemaking agreement",
+        "Planned label: '2024 Barossa Valley Shiraz' — all three LIP claims triggered",
+        "One fining trial used egg albumin at 40 g/hL; final addition was bentonite only"
+      ],
+      "timeline": [
+        {
+          "when": "Week 1 post-vintage",
+          "observation": "Intake dockets for the 4 t parcel listed grower name and suburb but no cadastral property address or GI zone confirmation.",
+          "decision": "Quarantine the 4 t parcel in a separate tank; do not blend until GI status is confirmed.",
+          "reasoning": "Blending before confirmation would contaminate the 18 t parcel's clean GI chain of custody. Separation preserves options.",
+          "outcome": "Grower provided a property title extract confirming the block sits within the Barossa Valley GI boundary. Docket updated and filed."
+        },
+        {
+          "when": "Week 3",
+          "observation": "Contract winemaking agreement reviewed — it assigned ownership of the wine to the boutique producer from crush, but the facility held the ATO producer registration.",
+          "decision": "Sought written confirmation from the facility that the boutique producer was the 'producer' for WET purposes under the arrangement.",
+          "reasoning": "Without clarity, the WET rebate claim on this wine was at risk. The ATO's producer test requires the claimant to have processed the grapes.",
+          "outcome": "Agreement amended to explicitly state the boutique producer directed and owned the winemaking process from crush; facility role defined as service provider only."
+        },
+        {
+          "when": "Week 8 — pre-bottling",
+          "observation": "Fining records showed an albumin trial at 40 g/hL on a 200 L bench trial sample; the production tank received bentonite only.",
+          "decision": "Commission a finished wine allergen test (egg albumin ELISA) on the production tank before bottling.",
+          "reasoning": "The bench trial used albumin; even though the production tank did not, the shared facility environment created a cross-contact risk that required analytical clearance.",
+          "outcome": "ELISA result: egg albumin below 0.25 mg/L (below the 0.5 mg/L regulatory threshold). Result filed with fining records. Label carries no allergen declaration."
+        }
+      ],
+      "counterfactual": "Had the 4 t parcel been blended before GI confirmation, the entire 22 t tank would have required either a non-GI label or a costly re-analysis and potential declassification."
+    },
+    "decision_tree": {
+      "title": "Compliance trigger — what to check and what to do",
+      "rows": [
+        {
+          "symptom": "Label will carry vintage, variety, and GI claims",
+          "first_check": "Do intake dockets record volume, variety, vintage year, and property address for every source parcel?",
+          "action": "Audit all receival records before blending; quarantine any parcel with incomplete origin data until resolved"
+        },
+        {
+          "symptom": "Fruit sourced from a grower whose block boundary is unconfirmed",
+          "first_check": "Does the delivery docket include a cadastral address or AGWA-registered property reference?",
+          "action": "Hold parcel separate; obtain property title or AGWA boundary confirmation in writing before blending into a GI-claimed tank"
+        },
+        {
+          "symptom": "Wine made under a contract winemaking arrangement",
+          "first_check": "Does the written agreement establish the boutique producer as the directing party from crush, not just the owner of finished wine?",
+          "action": "Amend agreement before BAS lodgement; retain signed copy with WET rebate workings for ATO audit trail"
+        },
+        {
+          "symptom": "Any fining agent of animal origin used at any stage — including bench trials",
+          "first_check": "Was the agent used in the production tank, or only in a trial? Is there any shared equipment risk?",
+          "action": "Commission ELISA allergen testing on the production batch; file result with fining records; apply label declaration if result exceeds 0.5 mg/L"
+        },
+        {
+          "symptom": "Blend calculation shows a claim component is close to the 85% threshold",
+          "first_check": "Are all volumes recorded in consistent units (litres) across receival, tank transfer, and blending logs?",
+          "action": "Recalculate using verified litre volumes; if margin is under 2%, consider adjusting blend or downgrading the claim before label submission"
+        },
+        {
+          "symptom": "Wine approaching five years since last label use",
+          "first_check": "Are all LIP source records — dockets, tank logs, blending sheets — still physically or digitally accessible?",
+          "action": "Archive to a retrievable format; do not delete until the five-year window from last label use has fully elapsed"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOL 3003WT · Regulatory Frameworks",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Wine law and compliance module within the Adelaide oenology program"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC321 · Wine Business and Compliance",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC321",
+        "note": "Covers LIP, WET, and food safety obligations for Australian producers"
+      },
+      {
+        "kind": "buy",
+        "label": "Robinson · Oxford Companion to Wine · Regulation chapter",
+        "url": null,
+        "note": "Oxford University Press; consult the regulation and appellation entries for comparative GI context"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Label Integrity and Compliance",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'label integrity program' and 'allergen labelling wine'"
+      },
+      {
+        "kind": "free",
+        "label": "ATO · Wine Equalisation Tax — producer rebate",
+        "url": "https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/wine-equalisation-tax",
+        "note": "Authoritative source for WET rebate eligibility and producer test criteria"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 2.5 · Wine Classification and Appellation",
+        "url": null,
+        "note": "Your paid AOC curriculum resource — covers GI classification principles"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "A winery labels a wine 'Barossa Valley Shiraz 2024.' Under LIP, what is the minimum percentage of Barossa Valley fruit required?",
+        "choices": [
+          "A) 85% of total volume",
+          "B) 75% of total volume",
+          "C) 85% applies to GI only; variety and vintage have separate thresholds",
+          "D) 100% is required when all three claims are made simultaneously"
+        ],
+        "answer": "A",
+        "rationale": "LIP requires 85% minimum for each claim independently — GI, variety, and vintage are each assessed at 85%; making all three claims simultaneously means all three 85% thresholds must be met at once, not a blended average."
+      },
+      {
+        "q": "Owen's blending records show 84% Barossa Valley fruit and 16% McLaren Vale fruit in a wine labelled 'Barossa Valley Shiraz 2024.' Which claim fails the LIP audit?",
+        "choices": [
+          "A) The GI claim fails; the variety and vintage claims may still stand",
+          "B) All three claims fail because they are assessed as a combined threshold",
+          "C) Only the vintage claim fails because the blend dilutes provenance",
+          "D) No claim fails; 84% rounds to 85% under LIP tolerance"
+        ],
+        "answer": "A",
+        "rationale": "Each claim is assessed independently at 85%; 84% Barossa Valley fruit fails the GI threshold, but the variety (Shiraz %) and vintage (2024 %) are calculated separately and may still qualify."
+      },
+      {
+        "q": "A boutique producer receives a WET rebate of $280,000 in the current financial year and expects a further $90,000 rebate on a late-season release. What is the compliance outcome?",
+        "choices": [
+          "A) The total exceeds the $350,000 cap; only $70,000 of the second claim is claimable",
+          "B) Both claims are fully payable because each relates to a separate wine lot",
+          "C) The cap resets mid-year, so the second claim is assessed independently",
+          "D) The producer must choose which claim to lodge; both cannot be submitted"
+        ],
+        "answer": "A",
+        "rationale": "The WET rebate cap is $350,000 per financial year across all claims; $280,000 + $90,000 = $370,000, so only the remaining $70,000 headroom is claimable in that year."
+      },
+      {
+        "q": "Under LIP, a winery's intake docket records the grower's name and region but not the specific vineyard block ID. Is this sufficient evidence for a GI claim?",
+        "choices": [
+          "A) No — GI chain of custody requires vineyard block ID on the intake docket",
+          "B) Yes — grower name and region together satisfy the chain-of-custody requirement",
+          "C) Yes — the sealed tank record alone is sufficient if the grower name appears there",
+          "D) No — a statutory declaration from the grower must also be attached to every docket"
+        ],
+        "answer": "A",
+        "rationale": "GI chain of custody runs from vineyard block ID on the intake docket through to the sealed tank record; a grower name alone is explicitly insufficient evidence under the framework."
+      },
+      {
+        "q": "A winery uses casein fining on a white wine and assumes no allergen declaration is needed because the casein is fully removed during filtration. Is this approach compliant with food safety requirements?",
+        "choices": [
+          "A) No — absence of casein must be analytically validated, not assumed from standard fining practice",
+          "B) Yes — standard filtration is accepted as sufficient removal evidence under Schedule 9",
+          "C) Yes — casein is only declarable if it appears on the finished wine label as an ingredient",
+          "D) No — casein use triggers mandatory label declaration regardless of analytical result"
+        ],
+        "answer": "A",
+        "rationale": "Casein is a Schedule 9 allergen; absence must be confirmed by analytical validation — assuming removal from standard fining practice is not compliant, but a validated absence does not automatically require a label declaration."
+      },
+      {
+        "q": "Which three substances are classified as Schedule 9 allergens relevant to winery fining practice?",
+        "choices": [
+          "A) Casein, albumin, and isinglass",
+          "B) Bentonite, PVPP, and casein",
+          "C) Albumin, bentonite, and carrageenan",
+          "D) Isinglass, gelatin, and silica gel"
+        ],
+        "answer": "A",
+        "rationale": "Casein (milk), albumin (egg), and isinglass (fish) are the three Schedule 9 allergens directly linked to common fining agents; bentonite, PVPP, and silica gel are not allergen-listed."
+      },
+      {
+        "q": "Owen is preparing audit evidence for a 3,000-case Barossa Shiraz 2024 release. His blending records show the GI and variety calculations but do not explicitly show the vintage calculation. What is the audit risk?",
+        "choices": [
+          "A) The vintage claim is unsupported — LIP requires each calculation to be shown explicitly in blending records",
+          "B) No risk — vintage is self-evident from the harvest date on intake dockets",
+          "C) Minor risk only — auditors accept implicit vintage evidence if the GI calculation is documented",
+          "D) The entire label is invalidated because all three calculations must appear on a single document"
+        ],
+        "answer": "A",
+        "rationale": "LIP requires blending records to show each of the three calculations — vintage, variety, and GI — explicitly; an implicit or assumed vintage percentage is not audit-ready evidence."
+      },
+      {
+        "q": "A winery owner holds 100% equity in the finished wine but contracted all grape growing and winemaking to third parties. Does the owner qualify for the WET rebate?",
+        "choices": [
+          "A) Not necessarily — WET rebate eligibility turns on producer status, not just ownership of the finished wine",
+          "B) Yes — ownership of the finished wine is the sole eligibility criterion for the rebate",
+          "C) Yes — equity stake above 50% satisfies the producer test under WET legislation",
+          "D) No — only growers who also make the wine can claim the rebate"
+        ],
+        "answer": "A",
+        "rationale": "The WET rebate producer test requires the claimant to meet the definition of 'producer,' which is not satisfied by ownership of finished wine alone; contracting out growing and winemaking can disqualify the claim."
+      },
+      {
+        "q": "A winery applies HACCP principles to its fining process. Which step is non-negotiable before releasing a wine fined with isinglass as 'allergen-free'?",
+        "choices": [
+          "A) Analytical validation confirming isinglass absence below the detectable threshold",
+          "B) A signed HACCP plan showing isinglass as a controlled hazard at the fining CCP",
+          "C) A supplier certificate confirming food-grade isinglass was used",
+          "D) A filtration log showing 0.45 µm membrane filtration was completed"
+        ],
+        "answer": "A",
+        "rationale": "Analytical validation of absence is the non-negotiable step; a HACCP plan, supplier cert, or filtration log supports the process but does not substitute for validated analytical evidence of allergen absence."
+      },
+      {
+        "q": "At a pre-bottling audit for Barossa Shiraz 2024, the auditor asks for the chain-of-custody document linking fruit origin to the sealed tank. What is the minimum starting point of that chain?",
+        "choices": [
+          "A) Vineyard block ID recorded on the intake docket",
+          "B) Grower invoice showing the Barossa Valley postcode",
+          "C) Vintage report filed with the winery's regional association",
+          "D) Fermentation vessel log showing fruit receipt date"
+        ],
+        "answer": "A",
+        "rationale": "The GI chain of custody must start at vineyard block ID on the intake docket; a grower invoice, regional report, or vessel log does not establish block-level provenance required under the framework."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "LIP minimum threshold — vintage, variety, or GI claim",
+        "back": "85% of total volume per claim, assessed independently; all three must each hit 85% if all three are made simultaneously."
+      },
+      {
+        "front": "WET rebate annual cap and the key eligibility trap",
+        "back": "$350,000 per financial year; eligibility requires producer status — owning the finished wine alone is not sufficient."
+      },
+      {
+        "front": "Three Schedule 9 allergens from common fining agents",
+        "back": "Casein (milk), albumin (egg), and isinglass (fish) — absence must be analytically validated, not assumed from fining practice."
+      },
+      {
+        "front": "GI chain of custody — where does it start?",
+        "back": "Vineyard block ID on the intake docket; grower name alone is insufficient evidence for a GI claim."
+      },
+      {
+        "front": "Blending records under LIP — what must be shown explicitly?",
+        "back": "Each of the three calculations — vintage %, variety %, and GI % — must be documented separately and explicitly."
+      },
+      {
+        "front": "Common LIP trap when making all three label claims",
+        "back": "Each claim is assessed independently at 85%; failing one (e.g. GI at 84%) invalidates that claim even if the other two pass."
+      },
+      {
+        "front": "Allergen compliance — why filtration logs are not enough",
+        "back": "Standard fining and filtration practice does not prove allergen absence; only analytical validation satisfies the food safety requirement."
+      },
+      {
+        "front": "Four frameworks a winery must satisfy simultaneously",
+        "back": "LIP (label integrity), WET (tax rebate), food safety (allergens/HACCP), and GI (geographic indication chain of custody)."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2565,
+    "completion_tokens": 5962
+  },
+  "audit": {
+    "totalWords": 1569,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T04:04:20.944Z"
+}

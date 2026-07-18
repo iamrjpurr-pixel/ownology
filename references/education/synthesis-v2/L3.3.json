@@ -1,0 +1,334 @@
+{
+  "lesson_id": "L3.3",
+  "source": {
+    "id": "L3.3",
+    "slug": "sparkling-fortified",
+    "title": "Sparkling and fortified — outside the still-wine box",
+    "level": "3",
+    "wbs": [
+      "D3",
+      "D4",
+      "D5"
+    ],
+    "reading_min": "5",
+    "aim": "Traditional method vs Charmat, base wine construction, tirage, dosage; and fortified basics — spirits, timing, oxidation control.",
+    "application": "Even if you don't make these yet, the tools they need — like riddling or fortification calculations — inform your everyday cellar maths.",
+    "sources_private": [
+      "morew_sparkling_yeast",
+      "morew_sparkling_proelif",
+      "aoc_2_9_fortified_spirits"
+    ],
+    "sources_public_ref": [
+      "csu_wsc303",
+      "adelaide_oenology_3037wt"
+    ],
+    "citations_bibliographic": [
+      "jackson_wine_science_ch8"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Traditional method builds complexity in-bottle; Charmat trades that for freshness and scale — choose deliberately.",
+      "Base wine construction sets the ceiling: low alcohol, high acid, neutral fruit is the brief every time.",
+      "Fortification timing is a winemaking decision, not a recipe — spirit addition locks residual sugar and kills ferment simultaneously."
+    ],
+    "sections": [
+      {
+        "heading": "Base wine is the brief, not the afterthought",
+        "iconHint": "flask-conical",
+        "body_md": "Every sparkling or fortified wine starts with a base that is deliberately incomplete. For sparkling, that means picking early — typically 8.5–10 Baumé — to keep potential alcohol low (10–11% v/v finished base), preserve malic acid, and avoid the ripe fruit characters that will fight the bead. Neutral variety or neutral site is a feature, not a flaw.\n\nFor fortified, the base is constructed around the moment of spirit addition. A Port-style base might be picked at 12–13 Baumé; a Muscat base at 13–14 Baumé or higher, where the aromatic load is the whole point. In both cases, the base wine's acid structure, phenolic grip, and residual sugar at the point of fortification are the levers you still control.\n\nThe shared principle: you are building a platform, not a finished wine. Every decision — picking date, press fraction, SO₂ regime, MLF yes/no — must be evaluated against what comes next, not against still-wine benchmarks.",
+        "keyConcept": "Sparkling base targets 10–11% v/v alcohol and pH 3.0–3.2; fortified base is picked to match the intended residual sugar at fortification.",
+        "trap": "Running MLF on a sparkling base to soften acid destroys the freshness and structural tension the second fermentation depends on."
+      },
+      {
+        "heading": "Traditional method vs Charmat — the decision is commercial and stylistic",
+        "iconHint": "activity",
+        "body_md": "Traditional method (méthode traditionnelle) conducts the second fermentation inside the individual bottle. Tirage — the addition of sugar (typically 18–24 g/L) plus a selected yeast strain and yeast nutrient — triggers a sealed fermentation that generates approximately 6 atm CO₂ and deposits lees inside that same bottle. Extended lees contact (12 months minimum for non-vintage, 36+ for vintage) drives autolysis: the yeast cells break down and release mannoproteins, fatty acids, and nucleotides that give brioche, toast, and textural weight.\n\nCharmat (tank method) runs the second fermentation in a sealed pressure vessel. The wine sees lees for weeks, not years. The result is fresher, more primary, and — critically — far cheaper to produce at scale. For aromatic varieties like Prosecco-style Glera or Moscato, Charmat is the correct tool: you are preserving volatile aromatics that autolysis would bury.\n\nFor a boutique AU/NZ producer, the honest question is: do you have the riddling capacity, the disgorgement line, and the 18-month cash-flow runway? Traditional method is a capital commitment as much as a stylistic one.",
+        "keyConcept": "Tirage sugar of 18–24 g/L produces approximately 1.2–1.3% v/v alcohol and 5.5–6.2 atm pressure in a sealed bottle at 10–12°C.",
+        "trap": "Under-dosing tirage to reduce pressure risk leaves insufficient CO₂ and flat wine; over-dosing above 24 g/L risks bottle failure under cellar temperature swings."
+      },
+      {
+        "heading": "Dosage is the final seasoning — treat it like acid adjustment",
+        "iconHint": "droplets",
+        "body_md": "After disgorgement, the crown seal or cork is removed and the yeast plug (gyropalette-consolidated or hand-riddled) is expelled. The small volume lost is replaced with expedition liqueur — a blend of base wine and sucrose, sometimes with a trace of SO₂. This is dosage.\n\nDosage sugar is expressed in g/L of the finished wine. Brut Nature = 0–3 g/L; Extra Brut = 0–6 g/L; Brut = up to 12 g/L; Extra Dry = 12–17 g/L. In practice, even a Brut Nature benefits from a small dosage of 1–2 g/L to round the finish — the CO₂ accentuates perceived acidity and a zero-dosage wine can read as harsh without exceptional base acid balance.\n\nThe calculation is straightforward: if your tank volume post-disgorgement is 1,000 L and you want 8 g/L dosage, you need 8,000 g (8 kg) of sucrose dissolved in your liqueur volume. Adjust for the liqueur volume itself displacing wine. This is the same mass-balance arithmetic used in chaptilisation — the maths transfers directly.",
+        "keyConcept": "Brut dosage sits at ≤12 g/L residual sugar; each 1 g/L sucrose added raises RS by approximately 1 g/L in the finished wine.",
+        "trap": "Adding dosage to a wine that has not fully stabilised post-disgorgement risks refermentation in bottle — confirm yeast viability is zero before dosing."
+      },
+      {
+        "heading": "Fortification timing locks sugar and kills ferment in one move",
+        "iconHint": "clock",
+        "body_md": "Fortification is the addition of high-strength grape spirit (typically 95–96% v/v neutral spirit, or 77% v/v for some styles) to a fermenting must. The spirit raises the alcohol to a level — usually 17–22% v/v depending on style — at which Saccharomyces cannot survive. Whatever sugar remains at that moment becomes the wine's permanent residual sugar.\n\nThe timing calculation is non-negotiable: you must know your current Baumé, your target RS, and your target final alcohol before you open the spirit valve. A standard fortification formula: volume of spirit required = (target % v/v − current % v/v) × volume of wine ÷ (spirit % v/v − target % v/v). Run this before ferment starts, not during the panic of a fast-fermenting tank.\n\nOxidation management post-fortification diverges sharply by style. Tawny and Muscat styles are deliberately oxidised — fractional blending (solera-style) and barrel ageing in warm conditions drives the rancio and raisin characters. Vintage Port-style and Rutherglen Muscat at the young end are protected with SO₂ and sealed storage. Knowing which oxidation regime you are in determines every subsequent handling decision.",
+        "keyConcept": "Fortification to 18% v/v with 96% v/v spirit on a 1,000 L tank at 6% v/v current alcohol requires approximately 130 L of spirit.",
+        "trap": "Fortifying too late — after the yeast has consumed more sugar than planned — leaves a drier wine than intended with no practical way to recover residual sweetness."
+      },
+      {
+        "heading": "Cellar maths from sparkling and fortified applies everywhere",
+        "iconHint": "gauge",
+        "body_md": "The calculations underpinning tirage, dosage, and fortification are not exotic — they are the same dilution, mass-balance, and alcohol-by-volume arithmetic used in blending, chaptilisation, and water additions for still wine. Working through a fortification sum sharpens your instinct for what a 2% v/v alcohol shift actually means in volume terms. Calculating tirage sugar makes dosage adjustments intuitive.\n\nFor a winemaker who will never make Champagne-method sparkling, the riddling rack and disgorgement line are irrelevant. But the pressure vessel physics, the yeast behaviour under CO₂ back-pressure, and the lees autolysis chemistry all inform how you think about extended lees contact in still wine, tank carbonation, and even reductive handling. The concepts are not siloed.\n\nApproach these styles as a set of boundary conditions — extreme cases that stress-test your understanding of fermentation, yeast nutrition, alcohol tolerance, and oxidation. If you can calculate a fortification addition and a tirage dose, your cellar maths is solid.",
+        "keyConcept": "Fortification and tirage calculations use the same C1V1 = C2V2 dilution logic as every other cellar addition — master one, master all.",
+        "trap": "Treating sparkling and fortified as specialist silos means missing the cross-training value — these styles expose gaps in fundamental cellar arithmetic faster than still wine does."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Pinot Noir base for traditional method · Vintage 2026",
+      "starting_conditions": [
+        "Fruit picked at 9.8 Baumé, pH 3.05, TA 9.2 g/L — Clare Valley high-altitude block",
+        "Whole-bunch pressed to 500 L; free-run only, no pressings fraction included",
+        "Fermented at 14°C with EC1118, no MLF, SO₂ held at 25 mg/L free post-ferment"
+      ],
+      "timeline": [
+        {
+          "when": "Day 0 — tirage preparation",
+          "observation": "Base wine at 10.4% v/v alcohol, RS < 1 g/L, pH 3.08, TA 8.9 g/L. Sensory: lean, high-acid, neutral stone fruit.",
+          "decision": "Tirage at 20 g/L sucrose, EC1118 rehydrated with GoFerm at 30 g/hL, plus 30 mg/L DAP.",
+          "reasoning": "20 g/L targets 5.8–6.0 atm — within safe range for standard 750 mL sparkling bottles. EC1118 handles the CO₂ back-pressure and low-nutrient environment of a sealed bottle.",
+          "outcome": "Tirage liqueur prepared, bottles filled, crown-sealed, and stacked horizontally at 12°C."
+        },
+        {
+          "when": "Week 3 — pressure check",
+          "observation": "Spot-check bottle shows 4.2 atm at 12°C. Fermentation still active — slight haze visible.",
+          "decision": "No intervention. Continue at 12°C.",
+          "reasoning": "Pressure is tracking correctly for mid-fermentation. Intervening now risks temperature shock to the yeast before sugar is fully consumed.",
+          "outcome": "By week 6, pressure stabilised at 5.9 atm. RS confirmed < 2 g/L by enzymatic assay on a sacrificed bottle."
+        },
+        {
+          "when": "Month 18 — disgorgement and dosage",
+          "observation": "Riddling complete (gyropalette, 7-day programme). Lees consolidated at neck. Sensory on a disgorged trial bottle: fine persistent bead, autolytic biscuit notes developing, acid still driving the finish.",
+          "decision": "Dosage at 7 g/L (Extra Brut). Expedition liqueur: 70 g sucrose per litre of liqueur, added at 50 mL per bottle.",
+          "reasoning": "The high TA base means zero-dosage would read as harsh. 7 g/L rounds the finish without pushing into Brut territory and masking the autolytic complexity.",
+          "outcome": "Finished wine: 11.6% v/v, RS 7 g/L, TA 8.6 g/L, pH 3.12. Bead persistent, finish clean. Bottled under cork and cage."
+        }
+      ],
+      "counterfactual": "Running MLF on this base to soften the acid would have consumed malic acid and left a flatter, broader palate — the 7 g/L dosage would then have tipped the wine into cloying rather than balanced."
+    },
+    "decision_tree": {
+      "title": "When to intervene — sparkling and fortified diagnostics",
+      "rows": [
+        {
+          "symptom": "Tirage fermentation stalled before 5.5 atm (< 3 weeks in)",
+          "first_check": "Temperature and yeast viability — bottles below 10°C will arrest EC1118",
+          "action": "Warm cellar to 14–16°C; if no recovery in 5 days, sacrifice a bottle and check RS — may need retirage with fresh yeast"
+        },
+        {
+          "symptom": "Excessive pressure (> 6.5 atm) on spot-check bottle",
+          "first_check": "Confirm tirage sugar addition was measured correctly; check if base wine RS was higher than assumed",
+          "action": "Cool cellar to 8°C to slow any residual activity; do not stack further — assess bottle integrity before proceeding"
+        },
+        {
+          "symptom": "Riddling incomplete after standard gyropalette programme — lees not consolidated",
+          "first_check": "Lees volume and yeast strain — some strains produce sticky lees that resist consolidation",
+          "action": "Extend programme by 3–4 days; add a 24-hour vertical (neck-down) rest before disgorgement"
+        },
+        {
+          "symptom": "Fortified wine drier than target RS at pressing — ferment consumed more sugar than planned",
+          "first_check": "Confirm current Baumé and alcohol; calculate whether sweetening with grape concentrate post-fortification is permitted under your label's style rules",
+          "action": "If within 2 g/L of target, blend with a sweeter tank fraction; if outside, document and adjust next vintage's fortification trigger point earlier"
+        },
+        {
+          "symptom": "Oxidative fortified wine developing off-aromas (acetaldehyde dominant, not rancio)",
+          "first_check": "Free SO₂ level and barrel ullage — excessive headspace accelerates acetaldehyde accumulation beyond the desired oxidative character",
+          "action": "Top barrels, adjust free SO₂ to 20–25 mg/L, and reduce cellar temperature if above 20°C"
+        },
+        {
+          "symptom": "Dosage wine showing refermentation signs in bottle post-disgorgement",
+          "first_check": "Yeast viability at disgorgement — was the wine cold enough (≤ 4°C) during disgorgement to suppress any surviving cells?",
+          "action": "Quarantine affected bottles; do not release — assess whether sterile filtration of remaining undisgorged stock before disgorgement is feasible"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC303 · Sparkling and Fortified Wine Production",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC303",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide 3037WT · Oenology 3 — sparkling and fortified modules",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      },
+      {
+        "kind": "buy",
+        "label": "Jackson Wine Science · Ch 8 — sparkling and fortified wine production",
+        "url": null,
+        "note": "Academic Press; covers tirage chemistry, autolysis, and fortification principles"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI Sparkling Wine Technical Review",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for sparkling wine base wine and tirage"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI Fortified Wine Production",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for fortified wine spirit addition and oxidation"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine Sparkling — Yeast and Proelif guides",
+        "url": null,
+        "note": "Your paid resource — covers tirage yeast selection and riddling aids"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Your Chardonnay base for traditional method finishes ferment at 12.8% v/v and pH 3.35. What is the primary problem with using it as-is for tirage?",
+        "choices": [
+          "A) Alcohol is too high, leaving insufficient headroom for secondary fermentation pressure without over-pressurising the bottle",
+          "B) pH is too low, which will inhibit tirage yeast activity",
+          "C) The wine will be too acidic for dosage to correct",
+          "D) Secondary fermentation cannot occur above 12% v/v alcohol"
+        ],
+        "answer": "A",
+        "rationale": "Sparkling base targets 10–11% v/v; at 12.8% the secondary ferment adds ~1.2–1.3% v/v, pushing total alcohol high and risking bottle pressure beyond safe limits — pH 3.35 is slightly above target but not the primary issue, and fermentation is not blocked by 12% alcohol."
+      },
+      {
+        "q": "You add 20 g/L tirage sugar to a sealed bottle at 10°C. Which pressure outcome is closest to expected?",
+        "choices": [
+          "A) 3.0–3.5 atm",
+          "B) 5.5–6.2 atm",
+          "C) 7.0–7.5 atm",
+          "D) 4.0–4.5 atm"
+        ],
+        "answer": "B",
+        "rationale": "18–24 g/L tirage sugar produces approximately 5.5–6.2 atm at 10–12°C; lower figures reflect incomplete fermentation and higher figures exceed the expected range for standard tirage rates."
+      },
+      {
+        "q": "A winemaker wants a Brut NV at exactly 10 g/L residual sugar. The base wine after disgorgement has 2 g/L RS. How much sucrose (g/L) must the dosage liqueur deliver to the finished wine?",
+        "choices": [
+          "A) 10 g/L",
+          "B) 12 g/L",
+          "C) 8 g/L",
+          "D) 6 g/L"
+        ],
+        "answer": "C",
+        "rationale": "Target RS minus existing RS: 10 − 2 = 8 g/L; each 1 g/L sucrose added raises RS by ~1 g/L, so 8 g/L sucrose in dosage is required — adding 10 g/L would overshoot to 12 g/L."
+      },
+      {
+        "q": "Which statement best explains why Charmat method is preferred for Prosecco-style wines over traditional method?",
+        "choices": [
+          "A) Charmat produces higher bottle pressure, giving a finer, more persistent bead",
+          "B) Charmat is faster and cost-effective at scale, and preserves fresh primary fruit character better than extended lees contact",
+          "C) Charmat allows higher tirage sugar additions, increasing alcohol without affecting style",
+          "D) Traditional method cannot be used with Glera because the variety lacks sufficient acid for secondary fermentation"
+        ],
+        "answer": "B",
+        "rationale": "Charmat's shorter, tank-based secondary ferment is commercially efficient and retains aromatic freshness — traditional method's extended lees contact adds autolytic complexity that suits Champagne style but masks Prosecco's primary fruit."
+      },
+      {
+        "q": "You are fortifying a 1,000 L tank of Grenache at 6% v/v to 18% v/v using 96% v/v grape spirit. Approximately how many litres of spirit are required?",
+        "choices": [
+          "A) 100 L",
+          "B) 115 L",
+          "C) 130 L",
+          "D) 145 L"
+        ],
+        "answer": "C",
+        "rationale": "Using C1V1 = C2V2: (96 × V_spirit) + (6 × 1000) = 18 × (1000 + V_spirit); solving gives ~130 L — 100 L undershoots the target alcohol and 145 L overshoots it."
+      },
+      {
+        "q": "A fortified wine is made from a base picked at 14° Baumé. The winemaker fortifies early, leaving substantial residual sugar. What style outcome does early fortification timing primarily achieve?",
+        "choices": [
+          "A) Higher final alcohol because more spirit is added before yeast consume sugar",
+          "B) Lower residual sugar because fermentation has already converted most of the grape sugar",
+          "C) Higher residual sugar because fermentation is arrested before yeast convert the remaining grape sugar",
+          "D) No effect on residual sugar — dosage controls sweetness in fortified wines"
+        ],
+        "answer": "C",
+        "rationale": "Fortification kills the yeast and locks in whatever sugar remains at that moment; fortifying early means more grape sugar survives unconverted, producing a sweeter style — later fortification allows yeast to consume more sugar first."
+      },
+      {
+        "q": "After disgorgement, a traditional method wine has 0 g/L RS. The winemaker targets Brut Nature (≤3 g/L RS) with zero dosage. Which risk is most relevant to flag?",
+        "choices": [
+          "A) The wine will re-ferment in bottle due to residual yeast",
+          "B) Without dosage, the wine may taste austere and any oxidation from disgorgement is not buffered by sugar",
+          "C) Pressure will drop below 3.5 atm, failing legal sparkling wine classification",
+          "D) Lees contact flavours will be lost without the preservative effect of dosage sugar"
+        ],
+        "answer": "B",
+        "rationale": "Zero dosage leaves no sugar buffer to soften acidity or mask oxidation picked up at disgorgement — re-fermentation risk is negligible post-disgorgement and pressure is set by tirage, not dosage."
+      },
+      {
+        "q": "Which base wine specification is correctly matched to its wine style?",
+        "choices": [
+          "A) Sparkling base: 13% v/v alcohol, pH 3.4",
+          "B) Sparkling base: 10–11% v/v alcohol, pH 3.0–3.2",
+          "C) Fortified base: 10–11% v/v alcohol, pH 3.0–3.2",
+          "D) Fortified base: 8% v/v alcohol, pH 3.5–3.8"
+        ],
+        "answer": "B",
+        "rationale": "Sparkling base targets 10–11% v/v and pH 3.0–3.2 to leave headroom for secondary ferment and maintain freshness; fortified base is picked to match intended RS at fortification, not to a fixed alcohol/pH target."
+      },
+      {
+        "q": "A cellar hand argues that tirage calculations and fortification calculations are fundamentally different and require separate formulas. How do you respond?",
+        "choices": [
+          "A) Correct — tirage uses a yeast growth model, fortification uses dilution algebra, and they cannot be compared",
+          "B) Partially correct — both use dilution logic but tirage also requires a CO₂ pressure conversion factor unique to sparkling wine",
+          "C) Incorrect — both use C1V1 = C2V2 dilution logic; mastering one transfers directly to the other",
+          "D) Incorrect — fortification uses a Pearson square, which is unrelated to the C1V1 formula used in tirage"
+        ],
+        "answer": "C",
+        "rationale": "Both tirage sugar additions and fortification spirit additions are solved with C1V1 = C2V2 dilution algebra — the Pearson square is simply a visual rearrangement of the same equation, not a separate method."
+      },
+      {
+        "q": "Your Tank 7 Pinot Noir base (vintage 2026, traditional method) tests at 10.5% v/v and pH 3.15 before tirage. You plan 22 g/L tirage sugar. What is the most accurate predicted outcome?",
+        "choices": [
+          "A) ~1.5% v/v alcohol gain and ~7.0 atm pressure — tirage sugar is above the standard range",
+          "B) ~1.2–1.3% v/v alcohol gain and ~5.5–6.2 atm pressure — within expected range for 18–24 g/L tirage",
+          "C) ~0.8% v/v alcohol gain and ~4.0 atm pressure — base alcohol is too high for full secondary fermentation",
+          "D) ~1.2–1.3% v/v alcohol gain but pressure will exceed 6.5 atm because Pinot Noir base wines ferment more vigorously"
+        ],
+        "answer": "B",
+        "rationale": "22 g/L sits within the 18–24 g/L tirage range, producing ~1.2–1.3% v/v and 5.5–6.2 atm at 10–12°C; base alcohol at 10.5% is on target and variety does not alter the pressure outcome."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Target alcohol and pH for a sparkling base wine",
+        "back": "10–11% v/v alcohol and pH 3.0–3.2, leaving headroom for secondary fermentation."
+      },
+      {
+        "front": "Tirage sugar range and resulting pressure at 10–12°C",
+        "back": "18–24 g/L tirage sugar produces ~1.2–1.3% v/v alcohol gain and 5.5–6.2 atm in bottle."
+      },
+      {
+        "front": "Brut category maximum residual sugar after dosage",
+        "back": "≤12 g/L RS; each 1 g/L sucrose added raises finished wine RS by approximately 1 g/L."
+      },
+      {
+        "front": "Spirit volume formula for fortification — what equation applies?",
+        "back": "C1V1 = C2V2 dilution algebra; same logic as tirage and every other cellar addition."
+      },
+      {
+        "front": "Fortifying 1,000 L at 6% v/v to 18% v/v with 96% v/v spirit — answer",
+        "back": "Approximately 130 L of spirit required."
+      },
+      {
+        "front": "What does fortification timing control in a fortified wine?",
+        "back": "It locks residual sugar and kills fermentation simultaneously — earlier fortification means more residual sugar."
+      },
+      {
+        "front": "Key commercial reason to choose Charmat over traditional method",
+        "back": "Faster, lower cost at scale, and preserves fresh primary fruit aromatics rather than building autolytic complexity."
+      },
+      {
+        "front": "Trap: why a base wine at 13% v/v is unsuitable for traditional method",
+        "back": "Secondary fermentation adds ~1.2–1.3% v/v, pushing total alcohol and bottle pressure beyond safe limits."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2710,
+    "completion_tokens": 6784
+  },
+  "audit": {
+    "totalWords": 1739,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:41:02.130Z"
+}

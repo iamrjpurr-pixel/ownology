@@ -1,0 +1,315 @@
+{
+  "lesson_id": "L4.4",
+  "source": {
+    "id": "L4.4",
+    "slug": "packaging-labelling",
+    "title": "Packaging and labelling — closures, bottles, compliance",
+    "level": "4",
+    "wbs": [
+      "D7"
+    ],
+    "reading_min": "4",
+    "aim": "Cork vs screwcap vs alternative closures; label mandatories (AU/NZ/EU/US); packaging as brand.",
+    "application": "Owen holds your artwork and compliance checklists. This lesson makes the choice deliberate, not defaulted.",
+    "sources_private": [],
+    "sources_public_ref": [
+      "adelaide_oenology_3003wt"
+    ],
+    "citations_bibliographic": [
+      "robinson_oxford_closures"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Closure choice is a wine quality decision, not a cost-cutting exercise — TCA risk vs oxygen ingress vs consumer expectation.",
+      "Every AU/NZ label must carry nine mandatory elements before artwork goes to print; EU and US add their own layers.",
+      "Packaging is the first sensory signal your wine sends — bottle weight, label stock, and closure type all encode quality cues."
+    ],
+    "sections": [
+      {
+        "heading": "Cork is a spectrum, not a single choice",
+        "iconHint": "flask-conical",
+        "body_md": "Natural cork delivers micro-oxygenation through the cork matrix — roughly 0.5–2 mg/L oxygen over 12 months depending on density and compression. That slow ingress suits wines built for bottle age: structured reds, complex whites with reductive winemaking. The risk is 2,4,6-trichloroanisole (TCA), which at concentrations above 2–4 ng/L renders a wine undrinkable to most consumers. Industry rejection rates for natural cork sit around 1–3%, though figures vary by supplier and lot.\n\nTechnical corks — agglomerate, 1+1, micro-agglomerate with surface discs — reduce TCA risk by processing cork granules through steam or supercritical CO₂ extraction. They also deliver more consistent oxygen transmission rates (OTR). For wines sold within 18 months of vintage, a quality technical cork is often the better risk-adjusted call than a premium natural, particularly at price points under $30 RRP.\n\nDiam (DIAM) closures use supercritical CO₂-cleaned granules and a defined, selectable OTR. Diam 3, 5, 10, and 30 correspond to intended cellaring windows. This is the closest the industry has to a programmable closure.",
+        "keyConcept": "Natural cork OTR varies 0.5–2 mg/L O₂/year; Diam closures offer selectable, reproducible OTR matched to wine style and cellaring window.",
+        "trap": "Specifying 'natural cork' without auditing TCA screening data from your supplier is accepting unknown contamination risk at the bottling line."
+      },
+      {
+        "heading": "Screwcap reductivity is a feature you must manage, not ignore",
+        "iconHint": "gauge",
+        "body_md": "Stelvin and equivalent aluminium roll-on pilfer-proof (ROPP) closures deliver near-zero oxygen ingress post-seal — typically 0.01–0.05 mg/L O₂/year through the liner. That is excellent for preserving primary fruit and protecting aromatic whites. It is a liability for wines with high free SO₂ at bottling, elevated thiol precursors, or reductive winemaking history, where post-bottle reductivity can develop into H₂S or mercaptan characters.\n\nLiner selection matters. Saranex liners allow marginally more oxygen than Saran tin liners; the difference is measurable over 3–5 years. For a Riesling or Sauvignon Blanc destined for early drinking, Saranex is appropriate. For a Chardonnay with 2–3 years projected cellaring, the choice deserves deliberate thought.\n\nIn the AU/NZ market, screwcap carries no quality stigma for white wine. For red wine above $40 RRP, consumer resistance persists in some segments — particularly export markets in the UK and Asia. That is a commercial reality, not a technical one.",
+        "keyConcept": "Screwcap OTR is 0.01–0.05 mg/L O₂/year; liner choice (Saranex vs Saran tin) shifts that range and affects long-term reductive risk.",
+        "trap": "Bottling a reductively made Pinot Noir under screwcap without checking free SO₂ and dissolved oxygen at fill is a recipe for post-bottle H₂S complaints."
+      },
+      {
+        "heading": "Label mandatories are non-negotiable before artwork is finalised",
+        "iconHint": "target",
+        "body_md": "Australian and New Zealand labels share a core set of mandatory declarations under FSANZ Standard 2.7.1 and the Australia New Zealand Food Standards Code. These are: product name, country of origin, producer name and address, net volume, standard drinks (AU) or alcohol units (NZ), alcohol by volume (% v/v), allergen declarations (sulphites ≥10 mg/L must be declared), lot identification, and — for AU — the pregnancy warning graphic from November 2023 under the mandatory standard.\n\nEU export adds geographic indication rules, 'Contains sulphites' text, and from December 2023, the requirement for a QR code linking to ingredient and nutrition information. US TTB approval requires a Certificate of Label Approval (COLA) before importation; key elements include net contents in metric and US customary, appellation of origin, and the US government health warning statement.\n\nThe practical workflow: build a compliance matrix by market before briefing your designer. Artwork changes after print-ready sign-off cost time and money. Owen's compliance checklist in your account maps each field to each market — use it before the brief goes out, not after proofs come back.",
+        "keyConcept": "AU labels require nine mandatory elements including the pregnancy warning graphic (mandatory from November 2023); EU export adds QR-linked ingredient data from December 2023.",
+        "trap": "Treating label compliance as a post-design check rather than a pre-brief constraint is the single most common cause of reprint costs at small wineries."
+      },
+      {
+        "heading": "Bottle choice encodes quality before the cork is pulled",
+        "iconHint": "activity",
+        "body_md": "Glass weight, punt depth, shoulder profile, and finish diameter are all legible to a consumer before they read the label. A 750 mL bottle at 550–650 g signals premium positioning; the same wine in a 400 g standard bottle reads as commodity. This is not superficial — it is how packaging communicates price-to-quality alignment before the label is processed.\n\nFor boutique AU/NZ producers, bottle selection also has practical implications. Heavier glass increases freight cost per case, which matters on thin export margins. Burgundy-profile bottles suit Pinot Noir and Chardonnay brand narratives; Bordeaux profiles suit Cabernet and Shiraz. Choosing against type is a deliberate brand statement that needs to be intentional, not accidental.\n\nAlternative formats — 375 mL, 1.5 L magnums, 500 mL — each carry distinct consumer associations. Magnums age more slowly due to the lower wine-to-headspace ratio and are a legitimate quality tool for wines intended for 10+ years cellaring, not just a restaurant upsell format.",
+        "keyConcept": "Bottle weight above 550 g signals premium tier to consumers; magnum format slows ageing via reduced wine-to-headspace ratio — a quality decision, not just a format choice.",
+        "trap": "Selecting a bottle profile to match a competitor's aesthetic without checking whether your finish diameter is compatible with your chosen closure is a production line problem waiting to happen."
+      }
+    ],
+    "worked_example": {
+      "title": "Watervale Riesling 2025 · 600-case run · Pre-bottling packaging review",
+      "starting_conditions": [
+        "Wine: Watervale Riesling, 11.5% v/v, free SO₂ 38 mg/L, pH 3.1, residual sugar 6 g/L",
+        "Target market: 70% domestic AU cellar door and online, 30% UK export",
+        "RRP: AU$28 domestic, £18 UK",
+        "Intended drinking window: 2–8 years from vintage"
+      ],
+      "timeline": [
+        {
+          "when": "Week 1 — closure decision",
+          "observation": "Winemaker reviews OTR requirements: Riesling at this style and pH benefits from low oxygen ingress to preserve acidity and primary citrus character over 5+ years.",
+          "decision": "Screwcap selected — Stelvin 30×60 with Saranex liner.",
+          "reasoning": "Near-zero OTR protects the wine's reductive character. Free SO₂ at 38 mg/L is within safe range for screwcap; no H₂S detected at tank. UK market for Riesling at this price point accepts screwcap without resistance.",
+          "outcome": "Closure confirmed. Bottling line set up for ROPP application. Dissolved oxygen target at fill set at <0.1 mg/L."
+        },
+        {
+          "when": "Week 2 — label compliance matrix",
+          "observation": "Designer submits initial artwork. Pregnancy warning graphic is present but sized below the minimum 44 mm height requirement. UK label is missing the 'Contains sulphites' declaration in the correct font size.",
+          "decision": "Artwork returned to designer with compliance matrix attached. Two separate label versions confirmed: AU/NZ and UK.",
+          "reasoning": "AU pregnancy warning graphic has mandatory minimum dimensions under the 2023 standard. UK post-Brexit labelling follows retained EU rules requiring sulphite declaration. Single label cannot satisfy both markets at this bottle size.",
+          "outcome": "Revised proofs received within 5 days. Both versions pass compliance check before print order placed."
+        },
+        {
+          "when": "Week 3 — bottle and format finalisation",
+          "observation": "Original bottle spec was a 420 g Alsace-profile flint glass. Freight quote for UK came in 18% above budget due to glass weight combined with case dimensions.",
+          "decision": "Switched to 380 g Alsace-profile flint. Punt depth reduced. Finish diameter confirmed compatible with Stelvin 30×60.",
+          "reasoning": "At £18 RRP, freight margin is tight. The 380 g bottle still reads premium for the price point; the profile change is imperceptible to the consumer. Finish diameter compatibility was verified before order — not assumed.",
+          "outcome": "Freight cost brought within budget. Bottling run completed without line stoppages. 600 cases labelled across two SKUs."
+        }
+      ],
+      "counterfactual": "Had the compliance check happened after print, a full reprint of the UK label run — approximately 700 labels plus setup — would have added $380 and a two-week delay to the bottling schedule."
+    },
+    "decision_tree": {
+      "title": "Closure and packaging — the diagnostic decision path",
+      "rows": [
+        {
+          "symptom": "White wine, early drinking (0–3 years), aromatic style, AU/NZ domestic market",
+          "first_check": "Free SO₂ at bottling and dissolved oxygen target at fill",
+          "action": "Screwcap with Saranex liner; confirm DO at fill <0.1 mg/L; no reductive winemaking concerns flagged"
+        },
+        {
+          "symptom": "Red wine, 5–10 year cellaring target, export to UK or Asia",
+          "first_check": "Consumer segment expectations in target market + wine's oxygen demand for development",
+          "action": "Diam 5 or Diam 10 closure; select OTR tier to match cellaring window; document choice in technical file"
+        },
+        {
+          "symptom": "Wine shows reductive character (H₂S or mercaptan detectable) at pre-bottling assessment",
+          "first_check": "Copper fining trial + free SO₂ level + dissolved oxygen at fill",
+          "action": "Do not bottle under screwcap until reductive fault resolved; consider Diam or natural cork with higher OTR as interim; recheck after copper treatment and racking"
+        },
+        {
+          "symptom": "Label artwork returned from designer — compliance not yet checked",
+          "first_check": "Run against market-specific mandatory elements checklist before approving for print",
+          "action": "AU: verify pregnancy warning graphic dimensions, standard drinks, allergen declaration, lot ID; EU/UK: add sulphite text and QR ingredient link; US: confirm COLA elements and health warning statement"
+        },
+        {
+          "symptom": "Freight cost per case exceeds margin target for export SKU",
+          "first_check": "Bottle weight and case cube dimensions",
+          "action": "Evaluate lighter glass option in same profile; confirm finish diameter compatibility with chosen closure before switching spec; recalculate freight on revised weight"
+        },
+        {
+          "symptom": "Premium red wine (>$50 RRP), natural cork preferred, but TCA risk is a concern",
+          "first_check": "Request TCA screening data and lot-specific rejection rates from cork supplier",
+          "action": "If supplier cannot provide lot-level TCA data, specify Diam 10 or 30 as lower-risk alternative; document decision rationale for brand consistency review"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOL 3003WT · Packaging and Closures",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Bachelor of Viticulture and Oenology — search unit 3003WT for closure and labelling content"
+      },
+      {
+        "kind": "buy",
+        "label": "Robinson · Oxford Companion to Wine · Closures entry",
+        "url": null,
+        "note": "Oxford University Press; see entry on closures for TCA, OTR, and alternative closure overview"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI Closures and Packaging",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'closures' and 'screwcap' for OTR data and TCA research summaries"
+      },
+      {
+        "kind": "free",
+        "label": "FSANZ Standard 2.7.1 — Labelling of Alcoholic Beverages",
+        "url": "https://www.foodstandards.gov.au/",
+        "note": "Search Food Standards Australia New Zealand for Standard 2.7.1 and the pregnancy warning mandatory standard"
+      },
+      {
+        "kind": "free",
+        "label": "TTB — Certificate of Label Approval (COLA) guidance",
+        "url": "https://www.ttb.gov/wine/labeling",
+        "note": "US Alcohol and Tobacco Tax and Trade Bureau; mandatory elements for wine exported to the United States"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "You are bottling a Watervale Riesling intended for 8–10 years cellaring. Which closure property is most critical to specify?",
+        "choices": [
+          "A) A reproducible, low OTR matched to the wine's reductive potential and cellaring window",
+          "B) The highest possible OTR to accelerate early phenolic development",
+          "C) Natural cork for its prestige signal regardless of OTR variability",
+          "D) Screwcap with Saranex liner to maximise oxygen ingress over time"
+        ],
+        "answer": "A",
+        "rationale": "Long-cellaring Riesling needs predictable, low oxygen exposure; Diam or a specified screwcap liner delivers reproducible OTR, whereas natural cork's 0.5–2 mg/L/year variability introduces bottle-to-bottle inconsistency and high OTR risks premature oxidation."
+      },
+      {
+        "q": "Natural cork OTR ranges from 0.5 to 2 mg/L O₂/year. What is the primary winemaking risk this variability creates?",
+        "choices": [
+          "A) Uniform reduction across all bottles in a batch",
+          "B) Bottle-to-bottle inconsistency in oxidative development and potential premature oxidation in high-OTR corks",
+          "C) Excessive reductive sulfide development in every bottle",
+          "D) Accelerated tartrate precipitation regardless of wine chemistry"
+        ],
+        "answer": "B",
+        "rationale": "Wide OTR variance means identical wines under the same cork batch can age at different rates; high-OTR corks risk premature oxidation while low-OTR corks may retain reductive characters — the opposite of the uniform cellar trajectory a winemaker intends."
+      },
+      {
+        "q": "A winemaker bottling under screwcap notices persistent H₂S-like reductive characters developing after 18 months. Which liner choice most likely contributed?",
+        "choices": [
+          "A) Saran tin liner, which allows slightly higher OTR than Saranex",
+          "B) Saranex liner, which has a lower OTR and restricts oxygen ingress more aggressively",
+          "C) Natural cork, which has negligible oxygen transmission under screwcap",
+          "D) PVDC-free liner, which accelerates reductive sulfur formation"
+        ],
+        "answer": "B",
+        "rationale": "Saranex liners sit at the lower end of screwcap OTR (≈0.01 mg/L/year), restricting oxygen ingress and increasing reductive risk; Saran tin allows marginally more oxygen, making it the better choice when reductive tendency is a known concern."
+      },
+      {
+        "q": "Screwcap OTR sits at 0.01–0.05 mg/L O₂/year. Compared to the upper end of natural cork OTR, this is approximately how much lower?",
+        "choices": [
+          "A) 2× lower",
+          "B) 10× lower",
+          "C) 40× lower",
+          "D) Equal — the ranges overlap substantially"
+        ],
+        "answer": "C",
+        "rationale": "Natural cork peaks at 2 mg/L/year; screwcap peaks at 0.05 mg/L/year — a 40-fold difference at the extremes — which explains why screwcap wines require active reductive-risk management rather than passive reliance on oxygen ingress."
+      },
+      {
+        "q": "You are finalising artwork for a 2025 Australian Riesling release. Which element became mandatory on Australian wine labels from November 2023?",
+        "choices": [
+          "A) QR code linking to full ingredient and nutritional data",
+          "B) The pregnancy warning graphic (not text-only warning)",
+          "C) Allergen declaration for sulfites above 10 mg/L",
+          "D) Country of origin map graphic"
+        ],
+        "answer": "B",
+        "rationale": "Australia mandated the pregnancy warning graphic (the specific pictogram) from November 2023; a text-only warning no longer satisfies compliance — the QR-linked ingredient data requirement applies to EU export from December 2023, not domestic AU labels."
+      },
+      {
+        "q": "A Watervale Riesling is being exported to the EU from December 2023 onward. Which labelling requirement is specific to that market and does not apply to the domestic AU label?",
+        "choices": [
+          "A) Pregnancy warning graphic",
+          "B) Standard drink declaration",
+          "C) QR-linked ingredient and nutritional data",
+          "D) Lot identification code"
+        ],
+        "answer": "C",
+        "rationale": "The EU's QR-linked ingredient and nutritional data requirement came into force December 2023 for wines produced after that date; the pregnancy graphic is an AU/NZ mandate, and standard drinks and lot codes are separate obligations."
+      },
+      {
+        "q": "How many mandatory elements does an Australian wine label require?",
+        "choices": [
+          "A) Six",
+          "B) Seven",
+          "C) Nine",
+          "D) Eleven"
+        ],
+        "answer": "C",
+        "rationale": "Australian wine labels require nine mandatory elements under FSANZ and the Wine Australia Act; confusing this with the EU's or US's different counts is a common compliance trap when producing artwork for multiple markets."
+      },
+      {
+        "q": "A producer is choosing between a 420 g and a 620 g bottle for a flagship Shiraz. Beyond physical protection, what does the heavier bottle communicate?",
+        "choices": [
+          "A) Lower carbon footprint and sustainability credentials",
+          "B) Premium tier positioning — bottle weight above 550 g signals quality to consumers before the wine is tasted",
+          "C) Faster ageing due to increased headspace ratio",
+          "D) Compliance with EU single-use plastics regulations"
+        ],
+        "answer": "B",
+        "rationale": "Consumer research consistently links bottle weight above 550 g with premium quality perception; the 420 g bottle undercuts that signal regardless of wine quality, while sustainability trade-offs are a separate consideration not resolved by the weight threshold alone."
+      },
+      {
+        "q": "A producer bottles 300 cases in 750 mL and 50 cases in 1500 mL (magnum) from the same Riesling batch. After 10 years, the magnum is expected to show slower ageing. What is the primary mechanism?",
+        "choices": [
+          "A) Magnums use heavier glass that blocks UV more effectively",
+          "B) The wine-to-headspace ratio is higher in magnum, reducing relative oxygen exposure per litre of wine",
+          "C) Magnum closures have a lower OTR than standard 750 mL closures",
+          "D) Larger format bottles are stored at lower cellar temperatures by convention"
+        ],
+        "answer": "B",
+        "rationale": "Magnum format slows ageing because the same headspace oxygen is diluted across twice the wine volume, lowering oxygen per litre; this is a deliberate quality decision, not an incidental format effect."
+      },
+      {
+        "q": "A winemaker defaults to natural cork for a high-volume Chardonnay because 'it's always been done that way.' Which diagnostic question should Owen's packaging review prompt first?",
+        "choices": [
+          "A) What is the target retail price point and does cork OTR variability align with the intended drinking window?",
+          "B) Is the winery's bottling line compatible with cork insertion at the required torque?",
+          "C) Does the cork supplier hold FSC certification for sustainability reporting?",
+          "D) Will the cork colour match the capsule foil chosen by the marketing team?"
+        ],
+        "answer": "A",
+        "rationale": "The first diagnostic question must link closure OTR to wine style and cellaring intent — a high-volume early-drinking Chardonnay may be better served by a reproducible low-OTR closure; price point, line compatibility, and aesthetics are secondary to the oxygen management decision."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Natural cork OTR range — what are the numbers and the risk?",
+        "back": "0.5–2 mg/L O₂/year; wide variability causes bottle-to-bottle inconsistency in oxidative development within the same batch."
+      },
+      {
+        "front": "Screwcap OTR range and which liner gives the lower end?",
+        "back": "0.01–0.05 mg/L O₂/year; Saranex liner sits at the lower end, increasing reductive risk compared to Saran tin."
+      },
+      {
+        "front": "Diam closure advantage over natural cork — one sentence.",
+        "back": "Diam offers selectable, reproducible OTR, eliminating batch variability and allowing the winemaker to match oxygen ingress to wine style and cellaring window."
+      },
+      {
+        "front": "Australian label mandatories — how many, and what changed in November 2023?",
+        "back": "Nine mandatory elements; from November 2023 the pregnancy warning graphic (pictogram) became mandatory — text-only warnings no longer comply."
+      },
+      {
+        "front": "EU export labelling — what is new from December 2023?",
+        "back": "QR-linked ingredient and nutritional data is required on EU wine labels for wines produced from December 2023 onward."
+      },
+      {
+        "front": "Bottle weight threshold that signals premium tier to consumers?",
+        "back": "Above 550 g; bottles below this threshold undercut premium quality perception before the wine is tasted."
+      },
+      {
+        "front": "Why does magnum format slow wine ageing compared to 750 mL?",
+        "back": "The higher wine-to-headspace ratio means the same headspace oxygen is diluted across twice the wine volume, reducing oxygen exposure per litre."
+      },
+      {
+        "front": "Common trap: screwcap reductivity — feature or fault?",
+        "back": "It is a feature you must actively manage; the very low OTR restricts oxygen ingress, so reductive-prone wines require pre-bottling SO₂ and copper management, not a closure change."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2531,
+    "completion_tokens": 6059
+  },
+  "audit": {
+    "totalWords": 1594,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T04:00:17.292Z"
+}

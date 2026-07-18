@@ -1,0 +1,332 @@
+{
+  "lesson_id": "L4.3",
+  "source": {
+    "id": "L4.3",
+    "slug": "filtration-bottling",
+    "title": "Filtration and bottling — the last gate",
+    "level": "4",
+    "wbs": [
+      "D6",
+      "D7"
+    ],
+    "reading_min": "5",
+    "aim": "Depth vs membrane, sterile vs non-sterile, DO/CO₂ management, pre-bottling checklist.",
+    "application": "Owen runs your bottling day workflow. This lesson lets you catch the issue at 6am, not at 10.",
+    "sources_private": [
+      "aoc_2_10_storing_aging",
+      "morew_inert_gas"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_3003wt",
+      "csu_wsc321"
+    ],
+    "citations_bibliographic": [
+      "jackson_wine_science_ch9"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Depth filters clarify; membrane filters sterilise — confusing the two costs you a bottling run.",
+      "Dissolved oxygen pickup above 0.3 mg/L at bottling is the single fastest route to premature oxidation.",
+      "A 6am pre-bottling checklist — filters, gas, seals, temperature — is cheaper than a recall."
+    ],
+    "sections": [
+      {
+        "heading": "Depth vs membrane — two jobs, not two versions of the same job",
+        "iconHint": "layers",
+        "body_md": "Depth filtration works by trapping particles throughout a thick matrix — diatomaceous earth, cellulose pads, or lenticular cartridges. It removes gross turbidity, yeast cells, and protein aggregates. What it does not do is guarantee microbial exclusion. Pore size in a depth filter is nominal, not absolute, meaning a fraction of particles smaller than the rated size pass through every time.\n\nMembrane filtration — typically 0.45 µm for wines with residual sugar, 0.65 µm for dry reds — works by size exclusion across a defined pore. At 0.45 µm you are removing viable yeast and most spoilage bacteria. This is what \"sterile filtration\" actually means in a bottling context. The membrane is the last gate; everything upstream is preparation for it.\n\nRunning a membrane without a depth pre-filter upstream is the fastest way to blind a cartridge mid-run. Sequence matters: coarse pad or DE first, then membrane. Budget the pre-filtration step as part of the sterile filtration cost, not an optional extra.",
+        "keyConcept": "0.45 µm membrane = absolute yeast and bacteria exclusion; depth filtration alone does not constitute sterile filtration.",
+        "trap": "Assuming a 0.45 µm pad filter equals a 0.45 µm membrane — pad ratings are nominal, not absolute; they will pass viable cells."
+      },
+      {
+        "heading": "When sterile filtration is non-negotiable vs when it adds nothing",
+        "iconHint": "shield-check",
+        "body_md": "Sterile filtration earns its cost when the wine carries any residual fermentable substrate — residual sugar above roughly 2 g/L, or malic acid in a wine that has not completed MLF. Bottle refermentation from surviving yeast or active Oenococcus is a real commercial risk. For a bone-dry red at 0 g/L RS that has completed MLF and is going under screwcap, sterile filtration is largely insurance against a problem that does not exist in that wine.\n\nThe decision is not binary. A dry red destined for natural cork in a warm climate has a different risk profile from the same wine under DIAM. Cork allows micro-oxygen ingress; that same oxygen suppresses most spoilage organisms. Screwcap eliminates that buffer. Know your closure, your RS, and your MLF status before you decide on filter specification.\n\nFor sweet or off-dry styles — late harvest, Riesling with 8 g/L RS, sparkling base — 0.45 µm membrane is not optional. One viable Saccharomyces cell per bottle is enough.",
+        "keyConcept": "Residual sugar > 2 g/L or incomplete MLF = sterile filtration non-negotiable, regardless of closure type.",
+        "trap": "Skipping sterile filtration on a 'nearly dry' wine at 3 g/L RS because it 'tastes finished' — yeast viability does not correlate with sensory dryness."
+      },
+      {
+        "heading": "Dissolved oxygen is the enemy you cannot see until it is too late",
+        "iconHint": "wind",
+        "body_md": "Every transfer, filter pass, and filling head contact is an opportunity for oxygen pickup. The target at the point of fill is total package oxygen (TPO) below 0.5 mg/L for most table wines; for wines with low SO₂ or high phenolic sensitivity, below 0.3 mg/L is a more defensible ceiling. Above 1 mg/L, you are measurably shortening shelf life in the bottle.\n\nThe practical levers are: inert gas blanketing on the receiving tank, counter-pressure filling heads, nitrogen or CO₂ purging of empty bottles before fill, and minimising turbulence at every transfer point. A dissolved oxygen meter inline — not just a grab sample at the end — tells you where the pickup is happening. Most boutique operations discover the problem is at the filler head, not the filter.\n\nCO₂ management runs in parallel. Wines bottled with CO₂ below about 400 mg/L can taste flat and harsh; above 800 mg/L in a still red, you risk perceptible spritz complaints. Measure CO₂ before bottling and adjust by sparging or by controlled warming, not by guessing.",
+        "keyConcept": "Target TPO < 0.5 mg/L at fill; inline DO measurement locates the pickup point — grab samples at the end miss it.",
+        "trap": "Purging the tank with inert gas but ignoring the fill head and bottle headspace — most DO pickup happens at the last 30 cm of the wine's path."
+      },
+      {
+        "heading": "The 6am checklist — catch it before the truck arrives",
+        "iconHint": "clipboard-check",
+        "body_md": "Bottling day failures are almost always detectable the morning before the run starts. By the time the mobile bottling truck is set up and running, the cost of stopping is measured in hours and thousands of dollars. The checklist is not bureaucracy — it is the cheapest quality intervention available.\n\nKey checks before first bottle: filter integrity test on the membrane cartridge (bubble point or pressure hold — a failed test means the filter is not sterile regardless of what the supplier says); SO₂ free and molecular levels confirmed against target for closure type; wine temperature within 2°C of target (cold wine can cause CO₂ supersaturation issues at fill; warm wine accelerates DO pickup); inert gas supply pressure confirmed; filler head seals inspected; first-fill bottle check for cork taint or foreign material.\n\nDocument every check with a timestamp and a name. If something fails at 6am, you have time to act. If you discover it at 10am when 2,000 bottles are filled, you do not.",
+        "keyConcept": "Membrane integrity test (bubble point) must pass before first fill — a visual inspection of the cartridge is not a substitute.",
+        "trap": "Skipping the bubble-point test because 'we used this cartridge last week' — a cartridge can be compromised by a single rough handling or freeze event."
+      },
+      {
+        "heading": "Free SO₂ at bottling — the number that ties everything together",
+        "iconHint": "gauge",
+        "body_md": "Free SO₂ at bottling is not just an antimicrobial target — it is the primary antioxidant buffer protecting the wine through its entire shelf life. The molecular SO₂ fraction (the active form) is pH-dependent: at pH 3.2 you need roughly 22 mg/L free SO₂ to achieve 0.8 mg/L molecular; at pH 3.6 you need around 55 mg/L. These are not interchangeable numbers across different wines.\n\nFor screwcap closures, target free SO₂ on the higher end of your range — the reductive environment under screwcap means the SO₂ is not consumed by micro-oxygen ingress, but any pre-bottling oxidation is locked in permanently. For natural cork, a slightly lower free SO₂ is acceptable because the cork provides a slow oxygen buffer that consumes some of the antioxidant demand post-bottling.\n\nCheck free SO₂ on the day of bottling, not the day before. A 24-hour gap after a filter pass can drop free SO₂ by 5–10 mg/L depending on wine chemistry and equipment contact.",
+        "keyConcept": "Molecular SO₂ target 0.8 mg/L; calculate required free SO₂ from your actual wine pH — do not use a generic table from a different pH range.",
+        "trap": "Measuring free SO₂ the afternoon before bottling and not re-checking the morning of — a filter pass overnight can drop it below target before first fill."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Riesling 2025 · Bottling Day · 8 g/L RS",
+      "starting_conditions": [
+        "Wine: Riesling, 8 g/L RS, pH 3.18, 11.2% alc, MLF not attempted (correct for style)",
+        "Target free SO₂: 38 mg/L (0.8 mg/L molecular at pH 3.18); measured 6am = 41 mg/L — within range",
+        "Filter train: DE pre-coat → 0.65 µm lenticular pad → 0.45 µm membrane cartridge; bubble-point test scheduled 6:15am"
+      ],
+      "timeline": [
+        {
+          "when": "6:15am",
+          "observation": "Bubble-point test on 0.45 µm cartridge fails — holds pressure to 2.8 bar, drops at 2.9 bar; spec requires hold to 3.2 bar.",
+          "decision": "Replace cartridge with spare; delay run start by 40 minutes.",
+          "reasoning": "A failed bubble-point means the membrane has a breach and cannot guarantee sterile exclusion. With 8 g/L RS, a single viable yeast cell per bottle is an unacceptable risk. The 40-minute delay is trivial against a potential recall.",
+          "outcome": "Replacement cartridge passes at 3.3 bar. Run proceeds."
+        },
+        {
+          "when": "8:30am",
+          "observation": "Inline DO meter reads 0.7 mg/L at the filler head — above 0.5 mg/L target. Tank blanket and transfer line are reading 0.1 mg/L.",
+          "decision": "Stop run. Inspect filler head seals and bottle pre-purge nozzles.",
+          "reasoning": "The pickup is isolated to the last stage. Continuing would oxidise every bottle filled. Filler head O-ring on valve 3 is found cracked.",
+          "outcome": "O-ring replaced, bottle pre-purge nitrogen flow rate increased from 0.8 to 1.2 L/min. DO at filler head drops to 0.28 mg/L. Run resumes."
+        },
+        {
+          "when": "11:00am",
+          "observation": "CO₂ measured on first 50-bottle sample: 520 mg/L — within target range of 450–650 mg/L for this style.",
+          "decision": "Continue run without CO₂ adjustment.",
+          "reasoning": "520 mg/L sits comfortably in range for a fresh, off-dry Riesling under screwcap. No spritz risk, no flatness risk.",
+          "outcome": "Run completes 3,200 bottles. Final QC: TPO 0.31 mg/L, free SO₂ 37 mg/L, CO₂ 510 mg/L average. All within spec."
+        }
+      ],
+      "counterfactual": "Skipping the 6am bubble-point test and bottling through the breached cartridge would have put viable yeast into 3,200 bottles of 8 g/L RS wine — a near-certain refermentation event within 6 months."
+    },
+    "decision_tree": {
+      "title": "Bottling day — diagnostic intervention guide",
+      "rows": [
+        {
+          "symptom": "Bubble-point test fails on membrane cartridge",
+          "first_check": "Confirm test pressure against cartridge spec sheet; check for air leak at housing seal before condemning cartridge",
+          "action": "Replace cartridge if test genuinely fails; re-test before proceeding — never bottle through an unverified membrane"
+        },
+        {
+          "symptom": "Inline DO > 0.5 mg/L at filler head",
+          "first_check": "Isolate pickup point: check tank blanket, transfer line, then filler head seals and bottle pre-purge in sequence",
+          "action": "Stop run; fix the identified pickup source; confirm DO back below 0.5 mg/L before resuming"
+        },
+        {
+          "symptom": "Free SO₂ measured morning of bottling is 8–10 mg/L below target",
+          "first_check": "Confirm measurement method (Ripper vs aeration-oxidation); check if a filter pass occurred overnight",
+          "action": "Add calculated SO₂ correction to tank, mix thoroughly, re-measure after 30 minutes before first fill"
+        },
+        {
+          "symptom": "CO₂ measured below 400 mg/L on a still table wine",
+          "first_check": "Confirm wine temperature — warm wine loses CO₂ faster; check if tank was left open or sparged excessively",
+          "action": "Sparge with CO₂ to target range; re-measure; for red wines 400–600 mg/L is typical, for fresh whites 500–700 mg/L"
+        },
+        {
+          "symptom": "Filter flow rate drops > 40% during run (membrane blinding)",
+          "first_check": "Check turbidity of wine entering the membrane — upstream depth filter may be exhausted or bypassed",
+          "action": "Stop run; replace or regenerate depth pre-filter; if membrane is irreversibly blinded, replace cartridge and re-test"
+        },
+        {
+          "symptom": "Wine temperature at fill is > 4°C above cellar target",
+          "first_check": "Check if tank was moved from cold storage too early; measure CO₂ — warm wine may be losing CO₂ and picking up DO faster",
+          "action": "Return wine to target temperature before resuming; do not bottle warm to 'save time' — DO pickup rate increases significantly above 18°C"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3003WT · Bottling and Packaging",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Covers sterile filtration, DO management, and pre-bottling QC within the Adelaide oenology program"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC321 · Wine Processing and Packaging",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC321",
+        "note": "Filtration theory, membrane integrity testing, and bottling line management"
+      },
+      {
+        "kind": "buy",
+        "label": "Jackson · Wine Science · Ch 9",
+        "url": null,
+        "note": "Academic Press; covers filtration mechanisms, DO chemistry, and SO₂ equilibria at bottling"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Dissolved Oxygen at Bottling",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'dissolved oxygen bottling' — practical benchmarks and pickup-point diagnostics"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Filtration of Wine",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'wine filtration' — depth vs membrane, integrity testing, and flow rate management"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine · Inert Gas Handling Guide",
+        "url": null,
+        "note": "Your paid resource — covers nitrogen and CO₂ blanketing protocols relevant to bottling line DO control"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Tank 7 Riesling has 8 g/L RS. Your cellar hand asks whether depth filtration alone is sufficient before bottling. What do you tell him?",
+        "choices": [
+          "A) Depth filtration is insufficient — sterile filtration through a 0.45 µm membrane is non-negotiable at this RS level.",
+          "B) Depth filtration is fine provided the wine has been cold-stabilised first.",
+          "C) Depth filtration is sufficient if you follow up with a tight pad filter at 0.65 µm.",
+          "D) Sterile filtration is only required if the closure is a screwcap, not cork."
+        ],
+        "answer": "A",
+        "rationale": "Residual sugar > 2 g/L makes sterile filtration non-negotiable regardless of closure; depth filtration does not provide absolute yeast and bacteria exclusion, and 0.65 µm pads do not meet the 0.45 µm sterile threshold."
+      },
+      {
+        "q": "At 6am your operator does a visual inspection of the membrane cartridge, declares it looks fine, and wants to start filling. What is the correct response?",
+        "choices": [
+          "A) Proceed — a visual inspection is an accepted pre-run check under standard protocols.",
+          "B) Stop — a bubble-point integrity test must pass before the first fill; visual inspection is not a substitute.",
+          "C) Proceed but pull a 10-bottle sample from the first run for later microbial testing.",
+          "D) Stop only if the wine contains residual sugar; dry wines can proceed on visual check."
+        ],
+        "answer": "B",
+        "rationale": "The bubble-point integrity test is the only valid confirmation that membrane integrity is intact; a visual check cannot detect micro-defects that allow microbial passage."
+      },
+      {
+        "q": "Your inline DO meter reads 0.3 mg/L at the filler head, but grab samples taken at the end of the run average 0.8 mg/L. What does this most likely indicate?",
+        "choices": [
+          "A) The inline meter is faulty and should be replaced.",
+          "B) Oxygen pickup is occurring after the filler head, likely at the capper or during headspace formation.",
+          "C) Grab-sample analysis is more reliable; the inline reading should be discarded.",
+          "D) The wine's antioxidant capacity has been exhausted, causing post-fill oxidation."
+        ],
+        "answer": "B",
+        "rationale": "Inline DO measurement locates the pickup point precisely; a lower inline reading with higher end-of-line grab results confirms oxygen ingress downstream of the measurement point, not meter error."
+      },
+      {
+        "q": "Which statement correctly distinguishes depth filtration from membrane filtration?",
+        "choices": [
+          "A) Both achieve sterile filtration; membrane filtration is simply faster.",
+          "B) Depth filtration clarifies and reduces microbial load; membrane filtration at 0.45 µm provides absolute yeast and bacteria exclusion.",
+          "C) Membrane filtration is used for rough filtration; depth filtration provides the sterile barrier.",
+          "D) Depth filtration at 0.45 µm is equivalent to membrane filtration at the same rating."
+        ],
+        "answer": "B",
+        "rationale": "Depth and membrane filters perform two distinct jobs; only a 0.45 µm membrane delivers absolute exclusion — depth filtration alone cannot guarantee sterility regardless of its nominal rating."
+      },
+      {
+        "q": "A Sauvignon Blanc at pH 3.2 is being bottled dry (RS 0.8 g/L). You want molecular SO₂ at 0.8 mg/L. A colleague hands you a generic free SO₂ table calibrated for pH 3.5 wines. What should you do?",
+        "choices": [
+          "A) Use the table — molecular SO₂ targets are pH-independent.",
+          "B) Use the table as a starting point and add 10 mg/L as a safety buffer.",
+          "C) Reject the table and calculate required free SO₂ from your actual pH 3.2.",
+          "D) Use the table only if the wine has been through MLF."
+        ],
+        "answer": "C",
+        "rationale": "Molecular SO₂ is strongly pH-dependent; a table from pH 3.5 will significantly underestimate the free SO₂ needed at pH 3.2, leaving the wine under-protected."
+      },
+      {
+        "q": "MLF in your Chardonnay is confirmed incomplete at bottling day. RS is 1.5 g/L. Is sterile filtration required?",
+        "choices": [
+          "A) No — RS is below 2 g/L so sterile filtration is not triggered.",
+          "B) Yes — incomplete MLF is an independent trigger for sterile filtration regardless of RS level.",
+          "C) No — incomplete MLF only matters for red wines under cork closure.",
+          "D) Only if free SO₂ is below 25 mg/L at the time of bottling."
+        ],
+        "answer": "B",
+        "rationale": "Incomplete MLF is a standalone non-negotiable trigger for sterile filtration; either condition — RS > 2 g/L or incomplete MLF — independently requires it."
+      },
+      {
+        "q": "Your target TPO at fill is < 0.5 mg/L. During the run you measure 0.45 mg/L inline at the filter outlet but have not yet measured at the filler valve. Why does the filler-valve measurement still matter?",
+        "choices": [
+          "A) It doesn't — passing at the filter outlet confirms the entire line is within spec.",
+          "B) Oxygen can be picked up between the filter outlet and the filler valve, so the target must be met at the point of fill.",
+          "C) The filler-valve reading is only relevant for sparkling wine production.",
+          "D) A reading at the filter outlet is the industry-standard final measurement point."
+        ],
+        "answer": "B",
+        "rationale": "TPO < 0.5 mg/L is a fill-point target; oxygen pickup can occur anywhere along the transfer line, making measurement at the filler valve essential."
+      },
+      {
+        "q": "Tank 7 Riesling (8 g/L RS, pH 3.35) is ready to bottle. You calculate that molecular SO₂ of 0.8 mg/L at pH 3.35 requires approximately 28 mg/L free SO₂. Your current free SO₂ is 18 mg/L. What is the correct action?",
+        "choices": [
+          "A) Bottle immediately — 18 mg/L free SO₂ is within acceptable range for a white wine.",
+          "B) Adjust free SO₂ upward to ~28 mg/L before bottling.",
+          "C) Reduce the molecular SO₂ target to match the available free SO₂.",
+          "D) Proceed and rely on the screwcap to limit post-bottling oxygen ingress."
+        ],
+        "answer": "B",
+        "rationale": "The molecular SO₂ target drives the required free SO₂ at your actual pH; bottling short of that target leaves the wine unprotected regardless of closure type."
+      },
+      {
+        "q": "Which of the following is the correct definition of sterile filtration in a winery context?",
+        "choices": [
+          "A) Any filtration that renders the wine visually clear and free of visible particles.",
+          "B) Filtration through a 0.45 µm membrane that provides absolute exclusion of yeast and bacteria.",
+          "C) Sequential depth filtration through progressively tighter pads ending at 0.65 µm.",
+          "D) Filtration combined with UV treatment to achieve a 5-log microbial reduction."
+        ],
+        "answer": "B",
+        "rationale": "Sterile filtration is defined by absolute exclusion at 0.45 µm membrane level; clarity, pad sequences, or UV treatment do not meet this definition."
+      },
+      {
+        "q": "It is 6am. The bubble-point test on your 0.45 µm cartridge fails. The truck arrives at 10am. What is the correct sequence of actions?",
+        "choices": [
+          "A) Begin filling — a single failed test can be a false negative; retest after 500 L.",
+          "B) Replace the cartridge, retest with a new bubble-point test, and only begin filling once the test passes.",
+          "C) Proceed with depth filtration only and document the membrane failure for the quality log.",
+          "D) Increase free SO₂ by 20 mg/L to compensate for the loss of sterile filtration."
+        ],
+        "answer": "B",
+        "rationale": "A failed bubble-point test means the membrane cannot be trusted; the only valid path is cartridge replacement and a passing retest before any wine is filled."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "What pore size defines sterile filtration and what does it exclude?",
+        "back": "0.45 µm membrane — provides absolute exclusion of yeast and bacteria; depth filtration alone does not achieve this."
+      },
+      {
+        "front": "Two independent triggers that make sterile filtration non-negotiable",
+        "back": "Residual sugar > 2 g/L OR incomplete MLF — either condition alone requires sterile filtration regardless of closure."
+      },
+      {
+        "front": "TPO target at the point of fill",
+        "back": "Total package oxygen < 0.5 mg/L measured at the filler valve, not at the filter outlet."
+      },
+      {
+        "front": "Why use inline DO measurement rather than grab samples alone?",
+        "back": "Inline measurement locates the exact pickup point; grab samples at line end miss where oxygen is entering the system."
+      },
+      {
+        "front": "Molecular SO₂ target at bottling and the trap with generic tables",
+        "back": "Target 0.8 mg/L molecular SO₂; always calculate required free SO₂ from your actual wine pH — a table from a different pH range will give the wrong number."
+      },
+      {
+        "front": "Pre-bottling membrane integrity check — what is required and what is not enough?",
+        "back": "Bubble-point integrity test must pass before first fill; visual inspection of the cartridge is not an acceptable substitute."
+      },
+      {
+        "front": "Depth filtration vs membrane filtration — one sentence on each job",
+        "back": "Depth filtration clarifies and reduces microbial load; membrane filtration at 0.45 µm provides the absolute sterile barrier."
+      },
+      {
+        "front": "Tank 7 Riesling 2025 — why does its RS level change your filtration decision?",
+        "back": "At 8 g/L RS — well above the 2 g/L threshold — sterile filtration through a 0.45 µm membrane is non-negotiable to prevent refermentation in bottle."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2607,
+    "completion_tokens": 6714
+  },
+  "audit": {
+    "totalWords": 1663,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:58:06.021Z"
+}

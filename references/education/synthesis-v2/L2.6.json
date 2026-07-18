@@ -1,0 +1,332 @@
+{
+  "lesson_id": "L2.6",
+  "source": {
+    "id": "L2.6",
+    "slug": "yeast-selection-inoculation",
+    "title": "Yeast — the decision that flavours everything",
+    "level": "2",
+    "wbs": [
+      "D4"
+    ],
+    "reading_min": "5",
+    "aim": "Wild vs inoculated, strain selection, nutrition, rehydration protocol — what to change when the wine style changes.",
+    "application": "Owen holds your strain library and preferred pairing history. This lesson tells you when to break your own pattern.",
+    "sources_private": [
+      "morew_yeast_hydration",
+      "morew_yeast_pairing",
+      "aoc_2_4_yeasts"
+    ],
+    "sources_public_ref": [
+      "csu_wsc318",
+      "adelaide_oenology_2501wt"
+    ],
+    "citations_bibliographic": [
+      "rgayon_handbook_v1_ch4"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Yeast strain choice shapes aroma, mouthfeel, and alcohol tolerance before fermentation even starts.",
+      "Wild ferments add complexity but carry real risk — know your fruit condition and your market before committing.",
+      "Rehydration protocol and nitrogen timing are where most strain-selection gains are lost in practice."
+    ],
+    "sections": [
+      {
+        "heading": "The strain is a flavour decision, not a safety net",
+        "iconHint": "flask-conical",
+        "body_md": "Every commercial strain carries a flavour profile baked in by its genetics — ester production, glycerol yield, volatile acidity tendency, alcohol tolerance ceiling. Selecting a strain because it's reliable is legitimate, but it's a different decision from selecting one because it fits the wine you're building. Conflating the two is how cellars end up with technically clean but characterless reds.\n\nBefore you open the packet, answer three questions: What aromatic register does this variety want to sit in? What's the likely fermentation temperature range? And what's the residual sugar target? A high-ester strain on a cool-fermented Riesling destined for 8 g/L RS is a different call to the same strain on a bone-dry Sauvignon Blanc going straight to tank. Owen's pairing history tells you what worked — this lesson tells you when that history is no longer the right guide.",
+        "keyConcept": "Strain selection is a flavour architecture decision; reliability and style-fit are separate criteria that must both be satisfied.",
+        "trap": "Defaulting to your 'house red' strain on every vintage regardless of variety, fruit condition, or target style — consistency becomes a ceiling."
+      },
+      {
+        "heading": "Wild ferments: the risk-reward maths",
+        "iconHint": "activity",
+        "body_md": "Uninoculated ferments draw on the native microbial population of the fruit, skins, and cellar surfaces. The upside is real: greater aromatic complexity, textural weight from mixed-species activity, and a sense of place that no packet strain replicates. The downside is equally real: longer lag phases, unpredictable VA production, and a meaningful stuck-ferment risk if non-Saccharomyces species dominate too long.\n\nThe decision framework is simple but strict. Wild ferments earn their place on healthy, low-SO₂ fruit from sites you know well, in a cellar where you can monitor daily and intervene fast. They are not appropriate on botrytis-affected parcels, on fruit above 14 Baumé, or when your tank capacity leaves no room to manage a slow or stuck ferment. Partial-wild approaches — inoculating at 4–5 Baumé after a spontaneous start — capture much of the complexity while dramatically reducing the completion risk.",
+        "keyConcept": "Wild ferments are viable on clean, known-site fruit below 14 Baumé; botrytis or high sugar shifts the risk-reward calculation firmly toward inoculation.",
+        "trap": "Treating a wild ferment as a set-and-forget decision — native populations need closer daily monitoring than inoculated tanks, not less."
+      },
+      {
+        "heading": "Nitrogen: the fuel the strain can't make itself",
+        "iconHint": "droplets",
+        "body_md": "Yeast assimilable nitrogen (YAN) drives fermentation rate, yeast biomass, and — critically — the production of higher alcohols and esters. Too little YAN and fermentation slows, H₂S risk climbs, and the yeast produces fusel alcohols as it scavenges alternative nitrogen sources. Too much, particularly late in ferment, feeds microbial spoilage organisms and can push ester production into excess.\n\nTarget YAN is strain-dependent and Baumé-dependent. A general working range for a 13–14 Baumé red is 200–250 mg N/L total, with roughly half present at inoculation and the remainder added as DAP or complex organic nutrient (Fermaid-O equivalent) at one-third sugar depletion. Measure your juice YAN before you add anything — many Australian and NZ musts from irrigated fruit arrive deficient at under 120 mg N/L, while cool-climate dry-grown whites can sit above 300 mg N/L and need no addition at all.",
+        "keyConcept": "Target 200–250 mg N/L total YAN for a 13–14 Baumé ferment; split additions at inoculation and one-third sugar depletion.",
+        "trap": "Adding all nitrogen at inoculation — late-ferment YAN deficiency is the primary driver of H₂S and stuck ferments, and front-loading doesn't prevent it."
+      },
+      {
+        "heading": "Rehydration is where the strain is won or lost",
+        "iconHint": "thermometer",
+        "body_md": "Active dried yeast is metabolically dormant and osmotically stressed. Rehydration protocol determines how many viable cells you pitch and how quickly they establish dominance. The standard protocol — 35–40 °C water, 20-minute hydration, then gradual acclimatisation to must temperature before pitching — exists because the cell membrane is in a critical transition state during rehydration. Cold shock at this point causes irreversible membrane damage and dramatically reduces viable cell count.\n\nThe temperature differential between your rehydrated yeast slurry and the must should not exceed 10 °C at pitch. In practice this means if your must is sitting at 14 °C for a cool white ferment, you need to step the slurry down before pitching — not tip it straight in from 38 °C. Rehydration nutrients (Go-Ferm equivalent) added to the hydration water, not the must, supply sterols and unsaturated fatty acids that support membrane integrity through the first hours of fermentation.",
+        "keyConcept": "Pitch temperature differential must stay within 10 °C; cold shock during rehydration kills cells before fermentation begins.",
+        "trap": "Adding rehydration nutrients to the must rather than the hydration water — they are only effective when present during the rehydration window itself."
+      },
+      {
+        "heading": "When to break your own pattern",
+        "iconHint": "target",
+        "body_md": "Owen's strain library and pairing history is a record of what worked under previous conditions. It is not a prescription. Three triggers should prompt you to reassess your default strain choice: a meaningful shift in fruit ripeness profile (more than 0.5 Baumé above your site average), a change in target style or market (e.g. moving from a full-malolactic red to an early-drinking, lower-alcohol expression), or a new parcel from a site with no fermentation history in your cellar.\n\nIn each case, the process is the same: define the target wine first, then work backwards through alcohol tolerance, temperature range, ester profile, and nitrogen demand to identify the strain that fits. If your library doesn't contain it, that's useful information. A single-tank trial with a new strain on a defined parcel — documented in Owen — builds the pairing history that makes future decisions faster and better grounded.",
+        "keyConcept": "Reassess your default strain when fruit Baumé shifts more than 0.5 above site average, target style changes, or a new site enters the programme.",
+        "trap": "Running a new strain without documenting conditions and outcomes — one undocumented trial teaches nothing and can't inform the next vintage."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Marlborough Sauvignon Blanc 2025 · Rehydration to Day 4",
+      "starting_conditions": [
+        "Fruit: Marlborough SB, single block, harvested at 13.2 Baumé, pH 3.18, TA 7.4 g/L",
+        "YAN measured at 148 mg N/L — below target for style and strain",
+        "Target style: high-thiol expression, bone dry, ferment at 14–15 °C, no MLF"
+      ],
+      "timeline": [
+        {
+          "when": "Harvest day",
+          "observation": "YAN at 148 mg N/L — deficient for a thiols-focused strain requiring 250+ mg N/L. Must temperature at 12 °C off cold settling.",
+          "decision": "Selected a high-thiol-releasing strain (VL3 equivalent). Rehydrated in 38 °C water with Go-Ferm at 1.25× yeast weight. Added 50 mg N/L as Fermaid-O to rehydration water.",
+          "reasoning": "Thiols-focused strains have high nitrogen demand. Rehydration nutrient in the water, not the must, supports membrane integrity. Must too cold to pitch directly — step-down required.",
+          "outcome": "Slurry stepped down to 22 °C over 30 minutes before pitching into 12 °C must. Temperature differential at pitch: 10 °C — within tolerance."
+        },
+        {
+          "when": "Day 2",
+          "observation": "Fermentation active, 0.8 Baumé drop in 48 hours. CO₂ evolution steady. No H₂S detected on sniff test.",
+          "decision": "Added 60 mg N/L as DAP split with Fermaid-O at one-third sugar depletion point (approximately 8.8 Baumé remaining).",
+          "reasoning": "Front-loaded rehydration nutrient covered early demand. Mid-ferment addition prevents late-ferment nitrogen crash — the primary H₂S and stuck-ferment trigger for this strain at this temperature.",
+          "outcome": "Fermentation rate held at 0.9–1.0 Baumé/day through days 3–5. No reductive characters."
+        },
+        {
+          "when": "Day 4",
+          "observation": "Tank at 10.1 Baumé. Rate steady. Aroma profile showing early passionfruit and grapefruit — thiol precursor conversion on track. Temperature crept to 16 °C overnight.",
+          "decision": "Chilled jacket to return to 14 °C. No additional nutrient addition.",
+          "reasoning": "Temperature above 16 °C risks accelerating ferment past the window where thiol expression is maximised. YAN now adequate — further addition unnecessary and risks feeding any spoilage organisms post-ferment.",
+          "outcome": "Temperature stabilised at 14 °C by Day 5. Fermentation completed at Day 12 with final residual sugar at 1.8 g/L."
+        }
+      ],
+      "counterfactual": "Pitching the slurry directly from 38 °C into the 12 °C must would have cold-shocked the culture, reduced viable cell count by an estimated 30–40%, and handed the early ferment to native flora — likely producing a slower, higher-VA outcome inconsistent with the target style."
+    },
+    "decision_tree": {
+      "title": "Yeast decision diagnostics — from strain selection to stuck ferment",
+      "rows": [
+        {
+          "symptom": "Ferment slow to start — no visible CO₂ by 48 hours post-pitch",
+          "first_check": "Rehydration temperature differential at pitch and must temperature",
+          "action": "If must below 12 °C, warm 2–3 °C; if pitch differential exceeded 10 °C, consider rescue inoculation with a fresh, correctly rehydrated culture"
+        },
+        {
+          "symptom": "Rate dropping below 0.8 Baumé/day before 5 Baumé remaining",
+          "first_check": "YAN status and fermentation temperature",
+          "action": "Add 30–40 mg N/L as complex organic nutrient; confirm temperature is within strain tolerance range and adjust jacket"
+        },
+        {
+          "symptom": "H₂S detectable on tank — reductive, struck-match character",
+          "first_check": "YAN history — was mid-ferment addition made at one-third depletion?",
+          "action": "Add 20 mg N/L DAP immediately; splash rack if character is persistent; do not add copper until SO₂ management is confirmed"
+        },
+        {
+          "symptom": "Full stop — less than 0.2 Baumé movement over 48 hours, sugar above 2 Baumé",
+          "first_check": "Alcohol level vs strain tolerance ceiling, temperature, and VA",
+          "action": "Prepare a 5% acclimatised rescue culture using a high-alcohol-tolerant strain; add in stages with nutrient support; do not pitch cold yeast directly into warm stuck wine"
+        },
+        {
+          "symptom": "Wild ferment lag exceeding 5 days with no visible activity",
+          "first_check": "SO₂ level at crush and fruit condition — high SO₂ or botrytis suppresses native Saccharomyces",
+          "action": "Inoculate with a neutral, robust strain; do not wait further — VA risk climbs sharply after day 5 of non-Saccharomyces dominance"
+        },
+        {
+          "symptom": "Finished wine showing excessive ester character inconsistent with variety",
+          "first_check": "Strain selection record and fermentation temperature log",
+          "action": "Review Owen pairing history; if temperature ran 2 °C+ above target, log as contributing factor; trial lower-ester strain or lower temperature ceiling next vintage on same parcel"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC318 · Winemaking Technology",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC318",
+        "note": "Covers strain selection, nutrition, and fermentation management in commercial context"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide WINE 2501WT · Oenology",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Fermentation microbiology and yeast management learning outcomes"
+      },
+      {
+        "kind": "buy",
+        "label": "Ribéreau-Gayon Handbook of Enology Vol. 1 · Ch 4",
+        "url": null,
+        "note": "Dubourdieu et al., Wiley — yeast physiology, nitrogen metabolism, and strain characteristics"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI Yeast Nutrition and Fermentation Management",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'yeast nutrition' and 'stuck fermentation'"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine Yeast Hydration Guide",
+        "url": null,
+        "note": "Your paid resource — rehydration protocol detail and Go-Ferm usage rates"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine Yeast Pairing Chart",
+        "url": null,
+        "note": "Your paid resource — strain-by-variety flavour profile reference"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Your Marlborough Sauvignon Blanc fruit comes in at 13.2 Baumé from a site you've harvested for four vintages. No botrytis. You're weighing wild versus inoculated ferment. Which factor most strongly supports proceeding wild?",
+        "choices": [
+          "A) Clean fruit below 14 Baumé from a known site",
+          "B) High YAN in the juice reducing competition risk",
+          "C) Planned use of a thiol-expressive inoculated strain",
+          "D) Fruit temperature below 10 °C at receival"
+        ],
+        "answer": "A",
+        "rationale": "Clean, sub-14 Baumé fruit from a known site is the core criterion for viable wild ferment; YAN and receival temp are management variables, not the primary risk-reward determinants."
+      },
+      {
+        "q": "A parcel arrives at 14.8 Baumé with 15% botrytis infection. You had planned a wild ferment. What does the risk-reward calculation demand?",
+        "choices": [
+          "A) Proceed wild but add SO₂ to suppress non-Saccharomyces",
+          "B) Switch to inoculation — botrytis and high sugar together shift the calculation firmly toward inoculation",
+          "C) Proceed wild; botrytis adds complexity that justifies the risk",
+          "D) Dilute the must to below 14 Baumé then proceed wild"
+        ],
+        "answer": "B",
+        "rationale": "Botrytis infection combined with high sugar are the two explicit triggers that shift risk-reward toward inoculation; SO₂ suppression alone does not resolve the fermentation reliability risk."
+      },
+      {
+        "q": "What is the target total YAN range for a 13–14 Baumé ferment?",
+        "choices": [
+          "A) 100–150 mg N/L",
+          "B) 150–200 mg N/L",
+          "C) 200–250 mg N/L",
+          "D) 300–350 mg N/L"
+        ],
+        "answer": "C",
+        "rationale": "200–250 mg N/L is the specified target for this Baumé range; lower values risk sluggish or stuck ferments, higher values can drive excessive volatile acidity."
+      },
+      {
+        "q": "You're adding DAP and organic nitrogen to Tank 7. At what two points should the additions be split?",
+        "choices": [
+          "A) At inoculation and at dryness",
+          "B) At inoculation and at one-third sugar depletion",
+          "C) Twenty-four hours before inoculation and at half-sugar depletion",
+          "D) At pump-over one and pump-over two"
+        ],
+        "answer": "B",
+        "rationale": "Split additions at inoculation and one-third sugar depletion match yeast nitrogen demand curve; adding at dryness is too late, and pre-inoculation addition wastes nitrogen to non-Saccharomyces."
+      },
+      {
+        "q": "During rehydration of your active dried yeast, the must is at 18 °C. What is the maximum allowable rehydration water temperature to avoid cold shock?",
+        "choices": [
+          "A) 20 °C",
+          "B) 25 °C",
+          "C) 28 °C",
+          "D) 38 °C"
+        ],
+        "answer": "C",
+        "rationale": "The pitch temperature differential must stay within 10 °C; must at 18 °C means rehydration water must be no higher than 28 °C to keep the differential ≤10 °C and avoid cold shock cell death."
+      },
+      {
+        "q": "A winemaker rehydrates yeast at 38 °C then pitches directly into must at 14 °C. What is the most likely consequence?",
+        "choices": [
+          "A) Accelerated lag phase followed by vigorous fermentation",
+          "B) Significant cell death from cold shock before fermentation begins",
+          "C) Increased thiol expression due to thermal stress on the yeast membrane",
+          "D) No effect if YAN is adequate"
+        ],
+        "answer": "B",
+        "rationale": "A 24 °C differential far exceeds the 10 °C limit; cold shock kills cells at the membrane level before fermentation starts, regardless of YAN status."
+      },
+      {
+        "q": "Strain selection is described as a flavour architecture decision. Which statement best reflects the correct framework for choosing a strain?",
+        "choices": [
+          "A) Reliability is the primary criterion; style fit is secondary once fermentation completes cleanly",
+          "B) Style fit and reliability are separate criteria that must both be satisfied",
+          "C) Style fit alone determines strain choice; modern strains are universally reliable",
+          "D) Default to the strain with the widest Baumé tolerance to cover all scenarios"
+        ],
+        "answer": "B",
+        "rationale": "The lesson explicitly states reliability and style-fit are separate criteria that must both be satisfied; treating reliability as primary or assuming universal reliability are the named traps."
+      },
+      {
+        "q": "Your Hawke's Bay Chardonnay site has a three-vintage average of 13.0 Baumé. This vintage fruit arrives at 13.6 Baumé. Should you reassess your default strain?",
+        "choices": [
+          "A) No — 0.6 Baumé above average is within normal vintage variation",
+          "B) Yes — a shift of more than 0.5 Baumé above site average is a trigger to reassess",
+          "C) Only if the target style has also changed",
+          "D) Only if the fruit shows signs of botrytis or disease"
+        ],
+        "answer": "B",
+        "rationale": "A Baumé shift of more than 0.5 above site average is an explicit reassessment trigger; 0.6 Baumé exceeds that threshold regardless of whether style or disease pressure has changed."
+      },
+      {
+        "q": "You've used the same inoculated strain on a Central Otago Pinot Noir block for five vintages. A new contract block from a different site enters the programme this year. What does best practice require?",
+        "choices": [
+          "A) Apply the existing default strain — five vintages of data validates it broadly",
+          "B) Reassess strain selection — a new site entering the programme is an explicit trigger",
+          "C) Run a wild ferment first to characterise the site before committing to a strain",
+          "D) Use the new site fruit as a blending component only until strain data is established"
+        ],
+        "answer": "B",
+        "rationale": "A new site entering the programme is one of the three named triggers to reassess default strain; prior vintage data from a different site does not transfer."
+      },
+      {
+        "q": "Tank 7 Marlborough Sauvignon Blanc is at Day 2 post-inoculation. Brix is dropping normally but you notice a H₂S character developing. Juice YAN was measured at 140 mg N/L pre-ferment and no additions were made. What is the most likely cause and correction?",
+        "choices": [
+          "A) Strain incompatibility with Marlborough terroir; switch strain at Day 4",
+          "B) Insufficient YAN driving yeast to scavenge sulphur; add nitrogen now and assess at one-third sugar depletion",
+          "C) Wild yeast contamination producing H₂S; add SO₂ to suppress",
+          "D) Rehydration cold shock causing membrane stress; aerate the tank"
+        ],
+        "answer": "B",
+        "rationale": "140 mg N/L is well below the 200–250 mg N/L target; nitrogen deficiency is the primary driver of H₂S production as yeast scavenge sulphur compounds — immediate nitrogen addition is the correct intervention."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Target total YAN for a 13–14 Baumé ferment?",
+        "back": "200–250 mg N/L, split at inoculation and one-third sugar depletion."
+      },
+      {
+        "front": "Maximum pitch temperature differential during yeast rehydration?",
+        "back": "10 °C — exceeding this causes cold shock and kills cells before fermentation begins."
+      },
+      {
+        "front": "Two conditions that shift wild ferment risk-reward toward inoculation?",
+        "back": "Botrytis infection or fruit Baumé at or above 14 — either alone justifies inoculation."
+      },
+      {
+        "front": "Three triggers to reassess your default yeast strain?",
+        "back": "Fruit Baumé shifts >0.5 above site average, target style changes, or a new site enters the programme."
+      },
+      {
+        "front": "Strain selection: reliability vs style-fit — what's the rule?",
+        "back": "Both must be satisfied independently — reliability is not a substitute for style-fit, or vice versa."
+      },
+      {
+        "front": "Wild ferment: what fruit conditions make it viable?",
+        "back": "Clean fruit below 14 Baumé from a known site with no botrytis or disease pressure."
+      },
+      {
+        "front": "Why split nitrogen additions rather than dose all at inoculation?",
+        "back": "Yeast nitrogen demand peaks at inoculation and again at one-third sugar depletion — splitting matches the demand curve."
+      },
+      {
+        "front": "Common trap: H₂S developing mid-ferment — first thing to check?",
+        "back": "YAN — nitrogen deficiency drives yeast to scavenge sulphur; check against the 200–250 mg N/L target."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2607,
+    "completion_tokens": 6120
+  },
+  "audit": {
+    "totalWords": 1593,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:30:12.868Z"
+}

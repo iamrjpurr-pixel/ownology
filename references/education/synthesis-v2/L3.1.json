@@ -1,0 +1,333 @@
+{
+  "lesson_id": "L3.1",
+  "source": {
+    "id": "L3.1",
+    "slug": "red-wine-production",
+    "title": "Red winemaking — extraction, timing, pressing",
+    "level": "3",
+    "wbs": [
+      "D3",
+      "D4",
+      "D5"
+    ],
+    "reading_min": "6",
+    "aim": "From cold soak to press cuts — the sequence of decisions that turns good fruit into a red wine that lasts.",
+    "application": "Owen builds you a run-sheet per red ferment. This lesson lets you customise it to house style.",
+    "sources_private": [
+      "morewine_bible_red_full",
+      "aoc_2_8_red_rose"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_3047wt",
+      "lincoln_wine_202"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch3_ch4"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Cold soak builds colour and aroma before fermentation heat drives alcohol extraction of harsher tannins.",
+      "Pump-over frequency and cap management are the primary levers — adjust daily, not once at crush.",
+      "Press timing and cut selection determine tannin quality in the final blend; free-run and pressings are separate decisions."
+    ],
+    "sections": [
+      {
+        "heading": "Cold soak is a bet — know what you're backing",
+        "iconHint": "thermometer",
+        "body_md": "A cold soak at 8–12 °C for 3–5 days extracts anthocyanins and aromatic compounds before yeast activity begins. No alcohol means no lignin-derived tannin extraction yet — you're loading colour and fruit character ahead of the ferment. For thin-skinned varieties like Pinot Noir, this window matters enormously. For Shiraz or Cabernet with dense skins, the gain is real but smaller.\n\nThe risk is microbial. Sulphur dioxide at 40–60 mg/L free SO₂ and cold temperature together suppress spoilage organisms, but a warm snap or a leaky chiller will let Brettanomyces or acetic bacteria establish before your yeast even pitches. Check temperature twice daily. If the must climbs above 15 °C, inoculate immediately rather than hold the soak.\n\nNot every vintage warrants a cold soak. Fruit with compromised skin integrity — botrytis, sunburn, split berries — carries higher microbial load. In those cases, skip the soak, sulphur hard at 60 mg/L, and pitch within 24 hours.",
+        "keyConcept": "Cold soak at 8–12 °C for 3–5 days selectively extracts colour and aroma before alcohol opens the door to harsh tannin.",
+        "trap": "Extending cold soak past 5 days without tight SO₂ control invites spoilage that no pump-over regime will fix later."
+      },
+      {
+        "heading": "Cap management is a daily calibration, not a recipe",
+        "iconHint": "activity",
+        "body_md": "The cap — compressed grape solids floating on CO₂ — is both your extraction engine and your spoilage risk. Pump-overs (remontage) and punch-downs (pigeage) achieve the same goal — wetting the cap and redistributing heat — but with different tannin outcomes. Punch-downs are more aggressive: they break berry structure and accelerate tannin extraction. Pump-overs are gentler and allow more aeration, which supports yeast health and polymerises tannins toward softer structures.\n\nDuring the first half of fermentation (above 8 °Baumé), prioritise yeast health — two pump-overs per day of 10–15 minutes each is a workable baseline. As sugar drops below 4 °Baumé, shift focus to tannin integration: reduce frequency but increase duration or switch to delestage if the wine needs structure. A delestage — full drain-and-return — strips seeds from the cap and softens the tannin profile markedly.\n\nTrack cap temperature at every pump-over. A cap running more than 5 °C above the fermenting juice signals poor wetting and potential acetic acid development in the dry, hot interior.",
+        "keyConcept": "Two pump-overs per day during active ferment; reduce frequency below 4 °Baumé and shift to longer, gentler passes.",
+        "trap": "Maintaining high pump-over frequency into late fermentation over-extracts seed tannin when skins are already spent and seeds are exposed."
+      },
+      {
+        "heading": "Fermentation temperature shapes the wine's architecture",
+        "iconHint": "gauge",
+        "body_md": "Red fermentation typically runs 22–30 °C. The lower end favours aromatic retention and finer-grained tannin; the upper end accelerates extraction and colour stability but risks volatile acidity if yeast stress sets in. A peak above 32 °C is a hard limit — above this, yeast mortality rises sharply and stuck fermentation becomes likely.\n\nFor a structured, age-worthy red, a rising temperature profile works well: allow the ferment to climb from 20 °C at inoculation to a peak of 28–30 °C at mid-ferment, then cool to 24–26 °C for the final sugar drop. This mimics the natural heat curve while keeping the yeast comfortable through the critical low-sugar phase where stuck ferments most commonly occur.\n\nSmall open-top fermenters in a warm cellar can overshoot quickly. If you lack active cooling, plan your inoculation temperature lower — pitch at 16–18 °C so the natural heat rise lands you at 28 °C rather than 34 °C.",
+        "keyConcept": "Peak fermentation temperature of 28–30 °C balances extraction and yeast health; above 32 °C, yeast mortality risk rises sharply.",
+        "trap": "Pitching at ambient temperature in a warm cellar without active cooling leaves no headroom — the ferment overshoots before you can intervene."
+      },
+      {
+        "heading": "Press timing is where tannin quality is won or lost",
+        "iconHint": "clock",
+        "body_md": "Pressing at dryness (0–0.5 °Baumé) versus pressing early (2–4 °Baumé) produces fundamentally different wines. Early pressing — sometimes called pressing off with residual sugar — shortens skin contact, softens tannin, and leaves the wine to finish fermentation in barrel or tank without further extraction. It suits lighter styles, early-drinking reds, or vintages where tannin is already aggressive.\n\nLate pressing at dryness maximises extraction and suits wines built for cellaring. Extended maceration beyond dryness — holding the wine on skins for 5–20 days post-ferment — can paradoxically soften tannin through polymerisation, but requires scrupulous hygiene and SO₂ management to avoid volatile acidity.\n\nThe press cut decision is equally important. Free-run juice is the most refined fraction. First press (up to roughly 0.5 bar) adds body and structure. Second press (0.5–1.5 bar) is coarser and often kept separate for blending decisions later. Third press and above is rarely worth incorporating in a quality programme — the harsh, phenolic character is difficult to integrate.",
+        "keyConcept": "Free-run plus first press is the standard quality cut; second press is a blending reserve, third press is rarely worth the tannin cost.",
+        "trap": "Blending all press fractions together at pressing to save tank space destroys the flexibility to correct tannin balance at assemblage."
+      },
+      {
+        "heading": "Post-press: the window before MLF closes",
+        "iconHint": "flask-conical",
+        "body_md": "Immediately after pressing, the wine is warm, low in SO₂, and loaded with malic acid — ideal conditions for malolactic fermentation (MLF) to begin spontaneously or by inoculation. For most red wines, MLF is desirable: it converts sharp malic acid to softer lactic acid, reduces total acidity by 1–3 g/L, and adds textural roundness.\n\nInoculate with a selected Oenococcus oeni strain within 24–48 hours of pressing if you want control over the process. Spontaneous MLF is possible but slower and carries the risk of off-character production from wild bacteria. Keep the wine above 18 °C during MLF — below this threshold, bacterial activity stalls and the wine sits vulnerable without SO₂ protection.\n\nDo not add SO₂ until MLF is confirmed complete by paper chromatography or enzymatic assay. Adding SO₂ prematurely arrests MLF, leaving residual malic acid and an unstable wine. Once MLF is complete, adjust free SO₂ to 25–35 mg/L depending on pH, and the wine is ready for its maturation vessel.",
+        "keyConcept": "Inoculate for MLF within 48 hours of pressing; hold above 18 °C and withhold SO₂ until paper chromatography confirms completion.",
+        "trap": "Adding sulphur dioxide 'just to be safe' before MLF is confirmed locks in malic acid and forces a restart that may never fully complete."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Shiraz 2025 · McLaren Vale · 14-day ferment",
+      "starting_conditions": [
+        "Fruit: 22.4 °Baumé, pH 3.51, TA 6.2 g/L, healthy skins, no botrytis",
+        "Additions at crusher: 60 mg/L SO₂, 30 mg/L Opti-Red (yeast derivative), no enzyme",
+        "Cold soak planned: 4 days at 10 °C, then inoculate with Lalvin BM4x4 at 20 °C"
+      ],
+      "timeline": [
+        {
+          "when": "Day 1–4 (cold soak)",
+          "observation": "Must holding at 10–11 °C. Cap forming but not active. Free SO₂ checked at 42 mg/L on Day 2.",
+          "decision": "Maintained cold soak. One gentle pump-over per day for cap wetting only.",
+          "reasoning": "Colour and aroma extraction proceeding without alcohol. SO₂ adequate for microbial control at this temperature.",
+          "outcome": "Must colour deepened visibly. No signs of spoilage. Ready for inoculation Day 5."
+        },
+        {
+          "when": "Day 5–9 (active ferment)",
+          "observation": "Ferment climbing from 20 °C to 28 °C by Day 7. Baumé dropping 2–3 °Baumé/day. Cap firm and hot.",
+          "decision": "Two pump-overs per day, 12 minutes each. Cooled to hold peak at 29 °C.",
+          "reasoning": "Yeast health priority during rapid sugar drop. Cap temperature was running 6 °C above juice — increased pump-over duration to wet thoroughly.",
+          "outcome": "Ferment proceeded cleanly. VA checked at Day 8: 0.38 g/L — acceptable. Colour stable and deep."
+        },
+        {
+          "when": "Day 10–14 (late ferment and press)",
+          "observation": "Baumé at 2.1 on Day 10, dropping slowly. Reached 0.3 °Baumé on Day 13. Tannin tasting firm but not aggressive.",
+          "decision": "Pressed on Day 14 at 0.1 °Baumé. Kept free-run and first press separate. Second press held in a 500 L tank for later assessment.",
+          "reasoning": "Tannin quality was good — no benefit to extended maceration. Early separation preserved fruit character and avoided seed tannin creep.",
+          "outcome": "Free-run: 3,200 L, pH 3.58, TA 5.8 g/L. First press: 480 L, noticeably firmer. MLF inoculated within 36 hours of pressing."
+        }
+      ],
+      "counterfactual": "Pressing two days later with continued pump-overs would have added seed tannin hardness that would have required 18+ months of oak to soften."
+    },
+    "decision_tree": {
+      "title": "When to intervene — cap management and ferment diagnostics",
+      "rows": [
+        {
+          "symptom": "Cap temperature > 5 °C above juice temperature",
+          "first_check": "Pump-over frequency and duration — is the cap being fully wetted?",
+          "action": "Increase pump-over duration immediately; consider a full delestage to collapse and rewet the cap"
+        },
+        {
+          "symptom": "Ferment rate slow but not stopped (< 1 °Baumé/day, above 4 °Baumé)",
+          "first_check": "Fermentation temperature and assimilable nitrogen — check YAN if available",
+          "action": "Warm tank 2 °C; add 30 mg N/L as DAP or complex nutrient; check yeast viability under microscope"
+        },
+        {
+          "symptom": "Ferment effectively stopped (< 0.3 °Baumé/day, residual sugar > 2 °Baumé)",
+          "first_check": "Temperature, alcohol level, and SO₂ — rule out yeast toxicity before adding more yeast",
+          "action": "Prepare a yeast rehydration starter at 5% volume; add acclimatised active culture; hold at 22–24 °C"
+        },
+        {
+          "symptom": "VA rising above 0.6 g/L during ferment",
+          "first_check": "Cap management history and temperature peaks — identify the source before treating",
+          "action": "Increase pump-over frequency; cool cap; consider pressing early to stop further acetic acid development"
+        },
+        {
+          "symptom": "Colour dropping or browning mid-ferment",
+          "first_check": "pH and SO₂ — high pH accelerates anthocyanin degradation; check free SO₂",
+          "action": "Adjust pH toward 3.5 with tartaric acid if above 3.7; ensure free SO₂ is above 15 mg/L"
+        },
+        {
+          "symptom": "Tannin tasting harsh and green at pressing decision point",
+          "first_check": "Seed exposure — are seeds visible and free in the must after skin breakdown?",
+          "action": "Press earlier rather than later; keep first and second press strictly separate; assess second press before any blending"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton PPW · Ch 3 & Ch 4",
+        "url": null,
+        "note": "Boulton, Singleton, Bisson, Kunkee — Principles and Practices of Winemaking, Chapman & Hall"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide 3047WT · Red Winemaking",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Bachelor of Viticulture and Oenology — see unit 3047WT"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Lincoln WINE202 · Red Wine Production",
+        "url": "https://www.lincoln.ac.nz/study/courses-2/course-search/",
+        "note": "Search Lincoln course finder for WINE202"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Extraction and Cap Management",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for cap management and extraction in red winemaking"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine Red Winemaking Bible · Full",
+        "url": null,
+        "note": "Your paid resource — covers pump-over schedules and press cut guidance"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 2.8 · Red and Rosé",
+        "url": null,
+        "note": "Your paid curriculum resource — extraction and MLF sections"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "You're planning a cold soak for a McLaren Vale Shiraz. Which temperature range and duration gives you selective colour and aroma extraction before alcohol begins mobilising harsh tannins?",
+        "choices": [
+          "A) 8–12 °C for 3–5 days",
+          "B) 4–6 °C for 1–2 days",
+          "C) 14–16 °C for 5–7 days",
+          "D) 8–12 °C for 7–10 days"
+        ],
+        "answer": "A",
+        "rationale": "8–12 °C for 3–5 days is the established window; colder or shorter undershoots extraction, warmer or longer risks early tannin pickup before alcohol is present to justify it."
+      },
+      {
+        "q": "During active fermentation on Tank 7 Shiraz, your team is running two pump-overs per day. Baumé drops to 3.5 °Baumé overnight. What is the correct adjustment?",
+        "choices": [
+          "A) Reduce pump-over frequency and shift to longer, gentler passes",
+          "B) Maintain two pump-overs per day — consistency is critical through to dryness",
+          "C) Increase to three pump-overs to extract remaining colour before pressing",
+          "D) Switch immediately to rack-and-return to maximise final extraction"
+        ],
+        "answer": "A",
+        "rationale": "Below 4 °Baumé, yeast are stressed and tannin structure is fragile; reducing frequency and using gentler passes protects both."
+      },
+      {
+        "q": "Fermentation temperature on Tank 7 spikes to 33 °C on day 6. What is the primary risk that makes this a critical intervention point?",
+        "choices": [
+          "A) Yeast mortality risk rises sharply above 32 °C",
+          "B) Colour pigments begin to precipitate irreversibly above 32 °C",
+          "C) MLF bacteria are killed, preventing post-press inoculation",
+          "D) Pump-over efficiency drops because CO₂ production slows"
+        ],
+        "answer": "A",
+        "rationale": "Above 32 °C yeast mortality risk rises sharply; colour precipitation and MLF impacts are secondary concerns at this stage."
+      },
+      {
+        "q": "Your winemaker wants maximum tannin extraction on a Shiraz destined for 3+ years in barrel. Which press cut strategy best supports that goal?",
+        "choices": [
+          "A) Free-run plus first and second press blended together into the main wine",
+          "B) Free-run only, discarding all press fractions",
+          "C) Free-run plus first press as the quality cut; second press held as blending reserve",
+          "D) Free-run plus first, second, and third press combined to maximise volume"
+        ],
+        "answer": "C",
+        "rationale": "Free-run plus first press is the standard quality cut; second press is a reserve for blending decisions, and third press tannin cost rarely justifies inclusion."
+      },
+      {
+        "q": "It is 52 hours after pressing Tank 7 and MLF inoculation has not yet occurred. What is the key concern?",
+        "choices": [
+          "A) The 48-hour post-press inoculation window has passed, increasing MLF risk",
+          "B) SO₂ added at pressing will have fully dissipated, leaving the wine unprotected",
+          "C) Residual yeast will restart fermentation before MLF bacteria can establish",
+          "D) Temperature will have dropped too low for any MLF culture to survive"
+        ],
+        "answer": "A",
+        "rationale": "Inoculation within 48 hours of pressing is the target; delay narrows the competitive window for MLF bacteria and increases spoilage risk."
+      },
+      {
+        "q": "A cold soak is described as 'a bet.' What are you specifically betting on when you choose to cold soak?",
+        "choices": [
+          "A) That selective extraction of colour and aroma will occur before alcohol opens the door to harsh tannin",
+          "B) That low temperature will inhibit wild yeast long enough for SO₂ to fully protect the must",
+          "C) That extended skin contact will polymerise tannins before fermentation begins",
+          "D) That cold temperatures will precipitate tartrate, reducing the need for cold stabilisation later"
+        ],
+        "answer": "A",
+        "rationale": "Cold soak bets on selective pre-fermentation extraction; the risk is that temperature control fails and fermentation or harsh tannin extraction begins early."
+      },
+      {
+        "q": "You are holding a post-press red at 16 °C waiting for MLF to complete before adding SO₂. Paper chromatography still shows malic acid present on day 18. What is the correct action?",
+        "choices": [
+          "A) Continue withholding SO₂ and maintain temperature above 18 °C until chromatography confirms completion",
+          "B) Add 30 mg/L SO₂ immediately to protect against oxidation regardless of MLF status",
+          "C) Raise temperature to 25 °C to accelerate MLF completion within 48 hours",
+          "D) Assume MLF is stalled and rack to barrel, adding SO₂ at 50 mg/L"
+        ],
+        "answer": "A",
+        "rationale": "SO₂ must be withheld until paper chromatography confirms MLF completion; adding it prematurely kills the bacteria and leaves malic acid in the wine."
+      },
+      {
+        "q": "Which peak fermentation temperature range balances extraction and yeast health for red winemaking?",
+        "choices": [
+          "A) 22–24 °C",
+          "B) 28–30 °C",
+          "C) 32–34 °C",
+          "D) 18–20 °C"
+        ],
+        "answer": "B",
+        "rationale": "28–30 °C is the target; lower temperatures under-extract and slow fermentation, while above 32 °C yeast mortality risk rises sharply."
+      },
+      {
+        "q": "A junior winemaker argues that running three pump-overs per day throughout the entire ferment will produce a more extracted, age-worthy Shiraz. What is the flaw in this approach?",
+        "choices": [
+          "A) High-frequency pump-overs below 4 °Baumé stress yeast and risk extracting harsh tannin at the wrong time",
+          "B) Three pump-overs per day will over-oxygenate the must, causing premature colour polymerisation",
+          "C) Pump-over frequency has no effect on tannin quality — only temperature matters",
+          "D) Excessive pump-overs will cool the tank below the 28–30 °C target and stall fermentation"
+        ],
+        "answer": "A",
+        "rationale": "Cap management must be calibrated to ferment stage; maintaining high frequency below 4 °Baumé stresses yeast and extracts tannin when the wine is least able to integrate it."
+      },
+      {
+        "q": "Tank 7 Shiraz is pressed on day 14. The third press fraction is available. Under what circumstance would you most likely include it in the blend?",
+        "choices": [
+          "A) Rarely — third press tannin cost almost never justifies inclusion in a quality wine",
+          "B) When the free-run is too light in structure and needs tannin reinforcement",
+          "C) When the wine is destined for early release and needs volume rather than longevity",
+          "D) When SO₂ levels in the main wine are too high and dilution is needed"
+        ],
+        "answer": "A",
+        "rationale": "Third press is rarely worth the tannin cost; the other options describe situations where better tools exist than adding harsh press fractions."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Cold soak target: what temperature range and how many days?",
+        "back": "8–12 °C for 3–5 days, extracting colour and aroma before alcohol mobilises harsh tannin."
+      },
+      {
+        "front": "At what Baumé do you reduce pump-over frequency and why?",
+        "back": "Below 4 °Baumé — yeast are stressed and tannin structure is fragile, so shift to longer, gentler passes."
+      },
+      {
+        "front": "Peak fermentation temperature target for red winemaking?",
+        "back": "28–30 °C; above 32 °C yeast mortality risk rises sharply."
+      },
+      {
+        "front": "Standard quality press cut for a red wine destined for ageing?",
+        "back": "Free-run plus first press; second press is a blending reserve, third press is rarely worth the tannin cost."
+      },
+      {
+        "front": "MLF inoculation window after pressing — how long do you have?",
+        "back": "Within 48 hours of pressing, held above 18 °C with SO₂ withheld until completion is confirmed."
+      },
+      {
+        "front": "How do you confirm MLF is complete before adding SO₂?",
+        "back": "Paper chromatography showing no remaining malic acid — never add SO₂ on time elapsed alone."
+      },
+      {
+        "front": "Trap: why is a cold soak called 'a bet'?",
+        "back": "Temperature control failure lets fermentation start early, opening the door to harsh tannin before alcohol is present to justify it."
+      },
+      {
+        "front": "Standard pump-over frequency during active red fermentation?",
+        "back": "Two pump-overs per day during active ferment, reduced in frequency and intensity below 4 °Baumé."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2604,
+    "completion_tokens": 6215
+  },
+  "audit": {
+    "totalWords": 1530,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:36:28.012Z"
+}

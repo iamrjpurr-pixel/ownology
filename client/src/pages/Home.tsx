@@ -151,6 +151,7 @@ type NavItem = { label: string; href: string; external?: boolean };
 // ownology.ai lands on ONE clear next step, not five parallel doors.
 const PRIMARY_NAV: NavItem[] = [
   { label: "Ask Owen",         href: "/ask" },
+  { label: "Curriculum",       href: "/curriculum/about" },
   { label: "Founding Members", href: "/join" },
   { label: "Pricing",          href: "/pricing" },
 ];

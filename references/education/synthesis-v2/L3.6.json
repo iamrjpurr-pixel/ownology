@@ -1,0 +1,325 @@
+{
+  "lesson_id": "L3.6",
+  "source": {
+    "id": "L3.6",
+    "slug": "stabilisation",
+    "title": "Stabilisation — protein, cold, microbial",
+    "level": "3",
+    "wbs": [
+      "D6"
+    ],
+    "reading_min": "6",
+    "aim": "Heat tests, cold stability testing, microbial screening, and the practical procedures that get a wine bottle-ready.",
+    "application": "Owen runs your stability workflow. This lesson lets you interpret the borderline results instead of just accepting them.",
+    "sources_private": [
+      "awri_protein_stability",
+      "aoc_2_10_storing_aging"
+    ],
+    "sources_public_ref": [
+      "csu_wsc319",
+      "adelaide_oenology_3007wt"
+    ],
+    "citations_bibliographic": [
+      "rgayon_handbook_v2_stab"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Heat test + bentonite trial together — never interpret protein stability without knowing your fining rate first.",
+      "Cold stability is a spectrum: mini-contact seeding gives a faster, more reliable answer than the freezer-overnight shortcut.",
+      "Microbial screening before bottling is not optional — a clean sensory panel does not rule out Brett or residual yeast."
+    ],
+    "sections": [
+      {
+        "heading": "The heat test tells you risk, not the answer",
+        "iconHint": "thermometer",
+        "body_md": "A heat test — 80 °C for 30 minutes, cool, assess haze — flags whether unstable proteins are present. What it cannot tell you is how much bentonite you need, or whether that haze will actually appear in bottle under real storage conditions. Treat it as a binary screen: pass means low risk, fail means you have work to do.\n\nThe NTU reading after heating matters more than a visual call. A wine sitting at 1–2 NTU post-heat is borderline; one at 8 NTU is not. Pair every heat test with a bentonite jar trial run in parallel — same day, same wine sample — so you have a fining rate ready before the heat result even dries. Waiting for the heat test result before starting the trial costs you two days in a busy bottling schedule.",
+        "keyConcept": "A post-heat NTU below 2 is generally considered stable; above 4 NTU warrants bentonite addition — the 2–4 NTU band requires a judgement call.",
+        "trap": "Relying on visual clarity alone after the heat test — turbidity meters catch hazes the eye misses at borderline NTU levels."
+      },
+      {
+        "heading": "Bentonite rate is a negotiation between stability and quality",
+        "iconHint": "flask-conical",
+        "body_md": "Bentonite strips protein, but it also strips aroma compounds, colour, and mouthfeel — particularly in white and rosé wines. The goal is the minimum effective rate, not the maximum safe rate. Run a jar trial at 4–6 dose levels (e.g. 0, 200, 400, 600, 800, 1000 mg/L), heat-test each jar, and identify the lowest dose that achieves your target NTU. Then sense-check that dose against a panel before committing to tank.\n\nFor boutique volumes, over-fining is a more common error than under-fining. A winemaker who adds 800 mg/L because it 'definitely works' is sacrificing texture and aromatic lift that no subsequent addition can restore. If your wine sits right on the stability threshold at 300 mg/L, that is the rate to use — not 600 mg/L as a buffer.",
+        "keyConcept": "Minimum effective bentonite rate is determined by jar trial, not by rule of thumb — typical white wine rates range 200–600 mg/L but vary widely by variety and vintage.",
+        "trap": "Adding a 'safety margin' above the trial rate without sensory verification — excess bentonite strips more than protein."
+      },
+      {
+        "heading": "Cold stability is not a single pass/fail event",
+        "iconHint": "droplets",
+        "body_md": "Tartrate crystallisation in bottle is cosmetically damaging and commercially embarrassing, but the standard 'freeze overnight and check' method is notoriously unreliable — it tells you what happened to that sample on that night, not what will happen to your wine in a consumer's fridge over six months. Mini-contact seeding (adding a small quantity of potassium bitartrate seed crystals to a chilled sample and monitoring conductivity drop) gives a reproducible, quantitative result in 3–4 hours.\n\nThe conductivity method works because tartrate precipitation reduces ionic concentration — a drop of more than 3% after seeding indicates instability. If you do not have a conductivity meter, a freeze test run for a minimum of 5 days at −4 °C is more reliable than overnight. Metatartaric acid and CMC (carboxymethylcellulose) are practical alternatives to cold stabilisation for wines not destined for long ageing, but both have limitations: metatartaric acid hydrolyses over time, and CMC can interact with protein in wines not already protein-stable.",
+        "keyConcept": "Conductivity drop greater than 3% after mini-contact seeding indicates tartrate instability — this is the most reliable bench test available without specialised equipment.",
+        "trap": "Applying CMC to a wine that has not been protein-stabilised first — the interaction can cause a haze that is worse than the tartrate problem you were solving."
+      },
+      {
+        "heading": "Microbial screening catches what your senses miss",
+        "iconHint": "activity",
+        "body_md": "A wine can smell and taste clean at bottling and still carry a viable Brettanomyces population below sensory threshold, residual Saccharomyces capable of refermentation in bottle, or lactic acid bacteria that will restart MLF under warm storage. Plating on selective media — WL nutrient agar for yeast, MRS or Rogosa for LAB — before bottling is the minimum standard. PCR-based methods are faster and more sensitive, but plating remains accessible to any cellar with a basic incubator.\n\nFor boutique producers, the practical screen is: plate at least 7 days before bottling, incubate at 25 °C for 5 days, and hold the bottling date until results are clear. A free SO₂ check on the same day is not a substitute — SO₂ suppresses but does not always eliminate viable populations, particularly in wines above pH 3.6 where molecular SO₂ is low.",
+        "keyConcept": "Free SO₂ at bottling does not confirm microbial stability — plate counts on selective media 7 days prior are the only way to confirm a clean bill of health.",
+        "trap": "Assuming a wine that completed MLF cleanly has no residual LAB — populations can persist at low levels and restart activity post-bottling under warm storage."
+      },
+      {
+        "heading": "Borderline results demand a decision framework, not a coin flip",
+        "iconHint": "target",
+        "body_md": "Borderline stability results — a heat test at 3 NTU, a conductivity drop of 2.5%, a single colony on a plate — are where winemakers earn their keep. The temptation is to either ignore them ('probably fine') or over-correct ('add more of everything'). Neither is defensible.\n\nFor each stability parameter, define your risk tolerance before you run the test: what is the wine's price point, its intended storage life, and its likely retail environment? A $15 screwcap white going to a warm Queensland bottle shop needs a tighter stability margin than a $60 Riesling going to a temperature-controlled cellar door. Document your decision and the reasoning — not for compliance, but because you will face the same borderline result next vintage and the notes will save you.",
+        "keyConcept": "Stability thresholds are risk management decisions, not absolute chemistry — price point, storage life, and distribution channel all shift the acceptable margin.",
+        "trap": "Applying the same stability specification to every wine in the cellar regardless of style, price point, or intended storage conditions."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Sauvignon Blanc 2025 · Pre-bottling week",
+      "starting_conditions": [
+        "Volume: 1,800 L, pH 3.28, TA 6.4 g/L, free SO₂ 28 mg/L",
+        "Heat test result: 3.1 NTU — borderline, not a clear pass",
+        "Conductivity drop after mini-contact seeding: 2.8% — marginal instability"
+      ],
+      "timeline": [
+        {
+          "when": "Day 1",
+          "observation": "Heat test returns 3.1 NTU. Bentonite jar trial run simultaneously at 0, 200, 400, 600 mg/L.",
+          "decision": "Do not bottle. Wait for jar trial results and run conductivity test in parallel.",
+          "reasoning": "3.1 NTU sits in the 2–4 NTU ambiguous band. Bottling without further data risks a protein haze complaint within 12 months.",
+          "outcome": "Jar trial shows 400 mg/L bentonite brings post-heat NTU to 1.4 — below threshold. Conductivity drop of 2.8% flagged for review."
+        },
+        {
+          "when": "Day 2",
+          "observation": "Sensory panel on jar trial samples: 400 mg/L shows no detectable aromatic loss versus control. 600 mg/L shows slight reduction in mid-palate weight.",
+          "decision": "Proceed with 400 mg/L bentonite addition to tank. Defer cold stabilisation decision pending a second conductivity reading after bentonite settling.",
+          "reasoning": "400 mg/L achieves protein stability with no sensory penalty. The 2.8% conductivity drop is below the 3% threshold but close enough to warrant a second check rather than assuming stability.",
+          "outcome": "Bentonite added, tank stirred, left to settle 48 hours."
+        },
+        {
+          "when": "Day 5",
+          "observation": "Wine racked off bentonite lees. Second conductivity test after 2-hour cold soak at 4 °C with seeding: drop now 1.9%.",
+          "decision": "Add 100 mg/L CMC as tartrate inhibitor. Confirm protein stability with a second heat test on the racked wine.",
+          "reasoning": "The drop fell below 2% after cold soak, suggesting the wine is close to stable. CMC provides a practical safety net for a wine at this price point ($28 retail) without the energy cost of full cold stabilisation. Second heat test confirms bentonite worked: 1.2 NTU.",
+          "outcome": "Wine passes both stability checks. Microbial plates (plated Day 1) return clear at Day 6. Bottling confirmed for Day 8."
+        }
+      ],
+      "counterfactual": "Bottling on Day 1 without resolving the borderline heat test would have risked a protein haze complaint within the first summer — a recall or credit scenario on 2,400 bottles."
+    },
+    "decision_tree": {
+      "title": "When to intervene — stability diagnostic tree",
+      "rows": [
+        {
+          "symptom": "Heat test 0–2 NTU, conductivity drop < 2%",
+          "first_check": "Confirm free SO₂ is at target and microbial plates are clear",
+          "action": "No fining required — proceed to bottling schedule"
+        },
+        {
+          "symptom": "Heat test 2–4 NTU (borderline)",
+          "first_check": "Run bentonite jar trial immediately; check wine pH and protein load by variety",
+          "action": "Determine minimum effective bentonite rate by trial; do not assume instability without NTU confirmation post-fining"
+        },
+        {
+          "symptom": "Heat test > 4 NTU (clear fail)",
+          "first_check": "Bentonite jar trial at 400–1000 mg/L range; sensory check at effective rate",
+          "action": "Fine at minimum effective rate confirmed by trial; re-heat-test racked wine before proceeding"
+        },
+        {
+          "symptom": "Conductivity drop 2–3% (marginal tartrate instability)",
+          "first_check": "Confirm wine is already protein-stable before considering CMC; check intended storage temperature and shelf life",
+          "action": "Add CMC at 100–150 mg/L if wine is protein-stable and shelf life < 2 years; cold stabilise if longer-lived or CMC unsuitable"
+        },
+        {
+          "symptom": "Conductivity drop > 3% (tartrate instability confirmed)",
+          "first_check": "Check whether cold stabilisation capacity is available; assess wine style and ageing intent",
+          "action": "Cold stabilise at −2 to −4 °C until conductivity drop < 2%, or use metatartaric acid for early-drinking styles only"
+        },
+        {
+          "symptom": "Colonies present on microbial plates at bottling check",
+          "first_check": "Identify organism type (yeast vs LAB vs Brett) by colony morphology or PCR; check free SO₂ and pH",
+          "action": "Delay bottling; adjust free SO₂ to target molecular SO₂ ≥ 0.8 mg/L; re-plate after 5 days before proceeding"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC319 · Stabilisation and Finishing",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC319",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOL 3007WT · Wine Processing Technology",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      },
+      {
+        "kind": "buy",
+        "label": "Ribéreau-Gayon et al. · Handbook of Enology Vol. 2 · Ch. Stabilisation",
+        "url": null,
+        "note": "Wiley; covers protein, tartrate, and microbial stability in depth"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI Protein Stability",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for protein stability and bentonite fining"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 2.10 · Storing and Ageing",
+        "url": null,
+        "note": "Your paid AOC curriculum resource — covers stabilisation in the context of wine ageing"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Tank 7 Sauvignon Blanc returns a post-heat NTU of 3.1. Owen flags it as borderline. Which action is most defensible?",
+        "choices": [
+          "A) Conduct a jar trial to find the minimum effective bentonite rate before deciding",
+          "B) Add 400 mg/L bentonite as a standard mid-range rate for white wine",
+          "C) Pass the wine as stable — 3.1 NTU is below the 4 NTU action threshold",
+          "D) Re-run the heat test on a fresh sample and average the two results"
+        ],
+        "answer": "A",
+        "rationale": "The 2–4 NTU band requires a judgement call informed by a jar trial, not a default rate; B applies a rule of thumb the lesson explicitly rejects, C ignores the borderline band, D is not a recognised protocol."
+      },
+      {
+        "q": "A post-heat NTU reading of 1.7 is returned for a tank of Riesling destined for cellar-door release. What does this result tell you?",
+        "choices": [
+          "A) The wine is at low risk of protein haze — no bentonite addition is indicated by this result alone",
+          "B) The wine requires a jar trial before any stability decision can be made",
+          "C) The wine is definitively protein-stable and no further testing is needed",
+          "D) The wine should receive a precautionary 200 mg/L bentonite addition"
+        ],
+        "answer": "A",
+        "rationale": "Below 2 NTU is generally considered stable, indicating low risk; C overstates certainty (the test shows risk, not a guarantee), B and D are not warranted at this reading."
+      },
+      {
+        "q": "Owen's jar trial on Tank 7 shows that 350 mg/L bentonite drops the post-heat NTU to 1.4, while 250 mg/L drops it to 1.9. Which rate should be used?",
+        "choices": [
+          "A) 250 mg/L — it achieves a result below 2 NTU and minimises quality impact",
+          "B) 350 mg/L — it provides a larger safety margin below the stable threshold",
+          "C) 600 mg/L — always use the top of the typical range for white wine",
+          "D) Neither — both rates fall within the typical 200–600 mg/L range so either is acceptable without further consideration"
+        ],
+        "answer": "A",
+        "rationale": "The minimum effective rate is the target to protect wine quality; 250 mg/L achieves stability (below 2 NTU), so adding more bentonite than necessary strips aroma and texture without benefit."
+      },
+      {
+        "q": "Which of the following best describes what the heat test measures?",
+        "choices": [
+          "A) The likelihood of protein haze forming in bottle — a risk indicator, not a definitive outcome",
+          "B) The exact quantity of unstable protein present in mg/L",
+          "C) Whether bentonite fining has been completed successfully",
+          "D) The wine's susceptibility to microbial spoilage under warm storage"
+        ],
+        "answer": "A",
+        "rationale": "The heat test is a risk indicator expressed in NTU; it does not quantify protein directly (B), confirm fining completion (C), or assess microbial risk (D)."
+      },
+      {
+        "q": "A conductivity drop of 2.1% is recorded after mini-contact seeding on a Chardonnay. How should this result be interpreted?",
+        "choices": [
+          "A) The wine is likely tartrate-stable — the drop does not exceed the 3% instability threshold",
+          "B) The wine is tartrate-unstable and requires cold stabilisation treatment",
+          "C) The result is inconclusive — mini-contact seeding is not a reliable bench test",
+          "D) A second seeding test must be run before any conclusion can be drawn"
+        ],
+        "answer": "A",
+        "rationale": "A conductivity drop greater than 3% indicates instability; 2.1% falls below this threshold, suggesting stability; C is wrong — mini-contact seeding is described as the most reliable bench test without specialised equipment."
+      },
+      {
+        "q": "Free SO₂ at bottling is measured at 32 mg/L, within the target range for the wine's pH. Can microbial stability be confirmed from this result?",
+        "choices": [
+          "A) No — plate counts on selective media are required to confirm microbial stability",
+          "B) Yes — free SO₂ at the correct level is the primary indicator of microbial control",
+          "C) Yes — SO₂ combined with sensory evaluation is sufficient for bottling clearance",
+          "D) No — a turbidity reading below 2 NTU must also be confirmed before bottling"
+        ],
+        "answer": "A",
+        "rationale": "Free SO₂ does not confirm microbial stability; plate counts on selective media 7 days prior are the only way to confirm a clean bill of health; B and C conflate SO₂ function with microbial screening."
+      },
+      {
+        "q": "Microbial plate counts should be completed how far in advance of bottling to be meaningful?",
+        "choices": [
+          "A) 7 days prior to bottling",
+          "B) 24 hours prior to bottling",
+          "C) On the day of bottling",
+          "D) 14 days prior to bottling"
+        ],
+        "answer": "A",
+        "rationale": "The lesson specifies plate counts on selective media 7 days prior as the required timing; shorter windows don't allow adequate incubation, and 14 days is not specified."
+      },
+      {
+        "q": "A budget Pinot Gris destined for immediate supermarket release returns a post-heat NTU of 2.6. A premium single-vineyard Pinot Gris from the same vintage returns the same result. Should the same stability decision apply to both?",
+        "choices": [
+          "A) Not necessarily — price point, storage life, and distribution channel all shift the acceptable margin",
+          "B) Yes — the NTU result is the same so the treatment decision must be identical",
+          "C) Yes — stability thresholds are absolute chemistry and cannot be adjusted for commercial factors",
+          "D) Not necessarily — the premium wine should always receive more bentonite to protect brand reputation"
+        ],
+        "answer": "A",
+        "rationale": "Stability thresholds are risk management decisions; the supermarket wine faces faster turnover and different storage risk than the premium wine, legitimately shifting the acceptable margin; D is a simplification that ignores quality cost of over-fining."
+      },
+      {
+        "q": "What is the typical bentonite rate range for white wine, and why is this range alone insufficient to determine the addition rate for a specific tank?",
+        "choices": [
+          "A) 200–600 mg/L; the minimum effective rate must be determined by jar trial because variety and vintage cause wide variation",
+          "B) 200–600 mg/L; the midpoint of 400 mg/L is the standard starting point for all white varieties",
+          "C) 100–400 mg/L; rates above 400 mg/L are not permitted under Australian wine regulations",
+          "D) 400–800 mg/L; higher rates are always safer for protein stability in warm climates"
+        ],
+        "answer": "A",
+        "rationale": "The lesson states 200–600 mg/L as typical but explicitly rejects rule-of-thumb application — jar trials are required because variety and vintage cause wide variation; B, C, and D all misstate the range or the rationale."
+      },
+      {
+        "q": "Owen receives a conductivity drop result of 3.4% from the mini-contact seeding test on a Sauvignon Blanc. The wine is scheduled to bottle in 10 days. What is the correct interpretation and likely next step?",
+        "choices": [
+          "A) The wine is tartrate-unstable; cold stabilisation treatment should be initiated before bottling",
+          "B) The wine is borderline stable; re-test with a longer seeding contact time before deciding",
+          "C) The wine is stable; a 3.4% drop is within normal variation for Sauvignon Blanc",
+          "D) The result is unreliable; mini-contact seeding requires specialised equipment to be valid"
+        ],
+        "answer": "A",
+        "rationale": "A conductivity drop greater than 3% indicates tartrate instability; 3.4% clearly exceeds the threshold, requiring treatment; D is directly contradicted by the lesson, which describes mini-contact seeding as the most reliable bench test without specialised equipment."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Post-heat NTU thresholds: stable, borderline, and action required?",
+        "back": "Below 2 NTU = generally stable; 2–4 NTU = judgement call; above 4 NTU = bentonite addition warranted."
+      },
+      {
+        "front": "What does the heat test actually tell you about protein stability?",
+        "back": "It indicates risk of haze formation — it is a risk indicator, not a definitive outcome."
+      },
+      {
+        "front": "How is the minimum effective bentonite rate determined for a specific tank?",
+        "back": "By jar trial — not by rule of thumb — because variety and vintage cause wide variation within the 200–600 mg/L typical range."
+      },
+      {
+        "front": "Conductivity drop threshold that indicates tartrate instability in mini-contact seeding?",
+        "back": "Greater than 3% drop after mini-contact seeding indicates tartrate instability."
+      },
+      {
+        "front": "Does correct free SO₂ at bottling confirm microbial stability? Why or why not?",
+        "back": "No — plate counts on selective media 7 days prior are the only way to confirm microbial stability."
+      },
+      {
+        "front": "Timing trap: when must microbial plate counts be completed before bottling?",
+        "back": "7 days prior to bottling — not on the day, which allows no time for meaningful incubation."
+      },
+      {
+        "front": "What three commercial factors legitimately shift the acceptable stability margin?",
+        "back": "Price point, storage life, and distribution channel — stability thresholds are risk management decisions, not absolute chemistry."
+      },
+      {
+        "front": "Why is minimum effective bentonite rate the target, not maximum?",
+        "back": "Excess bentonite strips aroma and texture without additional stability benefit, reducing wine quality unnecessarily."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2600,
+    "completion_tokens": 6060
+  },
+  "audit": {
+    "totalWords": 1568,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:47:09.615Z"
+}

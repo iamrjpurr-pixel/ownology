@@ -1,0 +1,333 @@
+{
+  "lesson_id": "L3.2",
+  "source": {
+    "id": "L3.2",
+    "slug": "white-wine-production",
+    "title": "White winemaking — reductive handling, phenolic control",
+    "level": "3",
+    "wbs": [
+      "D3",
+      "D4",
+      "D5"
+    ],
+    "reading_min": "6",
+    "aim": "Juice handling under reductive protection, phenolic control, cold-settling vs floating, lees management — the choices that define white wine texture.",
+    "application": "Owen prompts oxygen-exposure alerts on white ferments. This lesson tells you which alerts to trust and which to override.",
+    "sources_private": [
+      "morewine_bible_white_full",
+      "aoc_2_7_white_sparkling"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_2503wt",
+      "lincoln_wine_202"
+    ],
+    "citations_bibliographic": [
+      "rgayon_handbook_v2_whites"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Reductive handling preserves aromatic freshness — every oxygen exposure before fermentation is a trade-off, not a mistake.",
+      "Cold-settling removes gross lees in 12–18 hours at 4–8 °C; fine lees kept post-ferment build texture without risking reduction.",
+      "Phenolic control starts in the vineyard and ends at press — SO₂, temperature, and press fraction management are your three levers."
+    ],
+    "sections": [
+      {
+        "heading": "Oxygen is the variable, not the enemy",
+        "iconHint": "wind",
+        "body_md": "White juice oxidises fast. Polyphenol oxidase (PPO) and laccase are active from the moment the berry breaks, and at harvest temperatures above 15 °C they can brown juice within minutes of air contact. That does not mean zero oxygen is always the goal — it means every exposure needs a purpose.\n\nControlled micro-oxidation during crushing can consume the most reactive phenolic fractions early, leaving a juice that is actually more stable through fermentation. This is hyperoxidation, and it works best on neutral varieties destined for early drinking. For aromatic varieties — Riesling, Sauvignon Blanc, Gewürztraminer — reductive handling from crusher to tank is non-negotiable. Thiols and terpenes are lost irreversibly once oxidised.\n\nThe practical rule: protect aromatics at all costs, manage phenolics in neutrals by choosing your oxidation window deliberately. Owen's oxygen alerts on white ferments are calibrated for aromatic varieties by default — if your tank is a neutral variety under hyperoxidation protocol, that alert is expected, not a fault.",
+        "keyConcept": "PPO activity peaks between pH 3.5–4.0 and 15–25 °C — cold juice and early SO₂ addition together suppress it more than either alone.",
+        "trap": "Adding SO₂ at the crusher but skipping inert gas cover on the press means you've protected the juice you can't see and exposed the juice you can."
+      },
+      {
+        "heading": "SO₂ timing sets the phenolic ceiling",
+        "iconHint": "gauge",
+        "body_md": "Free SO₂ added at crushing does two things simultaneously: it inhibits PPO and it binds the first wave of oxidation products before they polymerise into stable brown pigments. The window is narrow — SO₂ needs to be in contact with juice within 30 seconds of cell rupture to intercept the fastest reactions.\n\nTarget 30–50 mg/L total SO₂ at the crusher for reductive handling. For hyperoxidation, withhold SO₂ entirely until settling is complete, then add 40–60 mg/L to arrest further oxidation before inoculation. Never add SO₂ mid-press on a hyperoxidation run — you'll lock in partially oxidised intermediates that are worse than either fully oxidised or fully protected juice.\n\nJuice pH is the multiplier. At pH 3.0, roughly 6% of total SO₂ is in the active molecular form; at pH 3.6, that drops to under 1.5%. A Chardonnay at pH 3.5 needs nearly four times the total SO₂ addition to achieve the same antimicrobial effect as a Riesling at pH 3.1. Adjust your addition to juice pH, not to a fixed recipe.",
+        "keyConcept": "At pH 3.5, you need ~40 mg/L free SO₂ to hold ~0.6 mg/L molecular SO₂ — the threshold for yeast inhibition and effective PPO suppression.",
+        "trap": "Dosing SO₂ by variety habit rather than measured juice pH means your Chardonnay is chronically under-protected and your Riesling is over-dosed."
+      },
+      {
+        "heading": "Cold-settling is a decision about texture, not just clarity",
+        "iconHint": "droplets",
+        "body_md": "Gross lees — skins, seeds, pulp fragments, and insoluble proteins — carry PPO, fatty acids, and lipids that stress yeast and generate off-characters. Removing them before fermentation gives cleaner fermentation kinetics and reduces the risk of reductive fault. Cold-settling at 4–8 °C for 12–18 hours under inert gas is the standard approach for boutique-scale tanks.\n\nThe NTU target for settled juice depends on style. Aromatic whites destined for early release: 50–100 NTU. Chardonnay going to barrel with lees contact: 150–250 NTU — some fine lees are deliberately retained to feed autolysis and build palate weight. Sparkling base wines sit tighter again, often below 50 NTU, because gross lees compounds interfere with secondary fermentation.\n\nFloatation is the alternative when time or tank space is the constraint. CO₂ or nitrogen bubbles carry solids to the surface in 2–4 hours; the clarified juice is drawn from below. It achieves similar NTU outcomes to cold-settling but requires a flotation unit and produces a more compact lees cap. For a 10-tonne boutique crush, cold-settling is almost always the practical choice.",
+        "keyConcept": "Retain 150–250 NTU for barrel-fermented Chardonnay; drop to 50–100 NTU for tank-fermented aromatics; below 50 NTU for sparkling base.",
+        "trap": "Over-clarifying to below 50 NTU for a tank-fermented Chardonnay starves yeast of the lipids and sterols they need for a healthy, complete fermentation."
+      },
+      {
+        "heading": "Lees contact after ferment — texture without reduction",
+        "iconHint": "flask-conical",
+        "body_md": "Fine lees — dead yeast cells and small protein-polysaccharide fragments — release mannoproteins and fatty acids during autolysis. These compounds bind to tannins, soften perceived acidity, and add mid-palate weight. The effect is real and measurable, but it requires time and management to avoid the reductive off-characters that accompany lees contact in poorly handled tanks.\n\nSurlie management for white wine comes down to two variables: frequency of bâtonnage and free SO₂ level. Stirring once a week keeps lees in suspension, accelerates autolysis, and — critically — introduces micro-doses of oxygen that prevent the reductive environment from tipping into H₂S or mercaptan territory. If you cannot stir, you must monitor free SO₂ closely; dropping below 15 mg/L free in a lees-contact tank creates the conditions for reductive fault.\n\nFor boutique Chardonnay, 3–6 months on fine lees with weekly bâtonnage is a practical target. Extended contact beyond 9 months without careful monitoring risks protein instability and phenolic pickup from the lees themselves.",
+        "keyConcept": "Weekly bâtonnage during lees contact introduces enough oxygen to suppress H₂S formation — stirring is a reductive-fault prevention tool, not just a texture tool.",
+        "trap": "Stopping bâtonnage in winter because the cellar is cold and 'nothing is happening' is exactly when reductive fault builds undetected in settled lees."
+      },
+      {
+        "heading": "Press fractions — where phenolic control is won or lost",
+        "iconHint": "activity",
+        "body_md": "The press cycle separates juice into fractions with dramatically different phenolic loads. Free-run juice from a whole-bunch or lightly crushed load carries the lowest phenolics and highest aromatics. As pressure increases, phenolics — particularly hydroxycinnamic acids and flavonoids extracted from skin and seed — climb steeply. The final hard-press fractions can carry three to five times the phenolic concentration of free-run.\n\nFor a reductive white wine program, keep free-run and early light-press fractions together and assess hard-press fractions separately. Taste and measure: a simple absorbance at 280 nm on a spectrophotometer gives a rapid total phenolic index. Hard-press fractions above a total phenolic index of 25–30 are typically blended out, used for rosé, or sold off.\n\nPress programme matters as much as fraction separation. A gentle, slow programme on a modern pneumatic press — low initial pressure, long drain cycles, incremental pressure steps — extracts less phenolic per litre than an aggressive short cycle. For whole-bunch pressing of sparkling base, a 2–2.5 bar maximum pressure and a 3–4 hour cycle is the standard boutique benchmark.",
+        "keyConcept": "Free-run plus light-press fractions (up to ~0.4 bar) typically yield 60–70% of juice volume with phenolics well below the threshold for browning risk.",
+        "trap": "Blending hard-press fractions back in to hit a volume target without measuring phenolics first is how a clean aromatic white becomes a flat, bitter one."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Sauvignon Blanc 2025 · Marlborough · Harvest Day 1",
+      "starting_conditions": [
+        "Fruit: 8 tonnes whole-bunch pressed, harvest temp 18 °C, pH 3.18, TA 7.4 g/L",
+        "Juice volume: 5,200 L free-run + light press combined; 480 L hard-press fraction held separate",
+        "Initial SO₂: 35 mg/L total added at crusher; inert gas blanketed throughout press"
+      ],
+      "timeline": [
+        {
+          "when": "Day 1 — post-press",
+          "observation": "Juice NTU measured at 310 — above target for aromatic reductive style. Free SO₂ measured at 22 mg/L. Juice temp 12 °C in tank.",
+          "decision": "Cold-settle at 6 °C for 16 hours under CO₂ blanket. No additional SO₂ added yet.",
+          "reasoning": "Temperature is already near target; extending cold-settle time will drop NTU without requiring fining agents. SO₂ is adequate to hold PPO suppression at this temperature and pH.",
+          "outcome": "After 16 hours, NTU dropped to 88. Lees volume approximately 180 L drawn off the bottom."
+        },
+        {
+          "when": "Day 2 — pre-inoculation",
+          "observation": "Settled juice NTU 88, free SO₂ now 18 mg/L after settling losses. Juice temp 12 °C. Owen oxygen alert triggered — 0.08 mg/L dissolved O₂ detected during lees draw-off.",
+          "decision": "Override Owen alert. Top up free SO₂ to 25 mg/L with a small addition. Inoculate with rehydrated Saccharomyces cerevisiae (aromatic thiol-releasing strain) at 12 °C.",
+          "reasoning": "The dissolved O₂ spike was a predictable consequence of lees draw-off, not a handling fault. At 12 °C and pH 3.18 with 25 mg/L free SO₂, oxidative risk is low. Delaying inoculation risks native yeast activity.",
+          "outcome": "Fermentation initiated within 36 hours. No browning observed. CO₂ evolution confirmed by Day 3."
+        },
+        {
+          "when": "Day 4 — active ferment",
+          "observation": "Baumé dropping at 0.8 °/day. Tank temp rising to 14 °C. Owen oxygen alert clear. Hard-press fraction (480 L) assessed: NTU 620, total phenolic index 31 at 280 nm absorbance.",
+          "decision": "Hard-press fraction excluded from this tank. Redirected to rosé program.",
+          "reasoning": "Total phenolic index above 28 threshold for this style. Blending in would compromise aromatic clarity and increase browning risk post-bottling.",
+          "outcome": "Main tank continues clean. Hard-press fraction added to rosé blend at 15% where phenolic contribution is desirable."
+        }
+      ],
+      "counterfactual": "Blending the hard-press fraction in to recover volume would have added an estimated 18–22 mg/L additional hydroxycinnamic acids, accelerating post-bottling browning within 6 months."
+    },
+    "decision_tree": {
+      "title": "White juice and ferment — when to intervene",
+      "rows": [
+        {
+          "symptom": "Owen oxygen alert during cold-settling or lees draw-off",
+          "first_check": "Was the exposure a predictable mechanical event (pump transfer, valve open)?",
+          "action": "Override alert if event was brief and deliberate; top up free SO₂ to 20–25 mg/L and continue"
+        },
+        {
+          "symptom": "Juice browning visible in tank within 2 hours of crushing",
+          "first_check": "Was SO₂ added at crusher? Was juice temperature above 15 °C?",
+          "action": "Add 40 mg/L SO₂ immediately, chill juice to below 10 °C, assess NTU and phenolic index before proceeding"
+        },
+        {
+          "symptom": "NTU above 250 after 18-hour cold-settle on aromatic variety",
+          "first_check": "Is tank temperature actually at 4–8 °C? Was inert gas blanket maintained?",
+          "action": "Extend settling 6–8 hours or add 0.5 g/hL bentonite to assist flocculation; recheck NTU before inoculation"
+        },
+        {
+          "symptom": "Reductive/H₂S character developing during lees contact post-ferment",
+          "first_check": "When was last bâtonnage? What is current free SO₂?",
+          "action": "Stir immediately to introduce micro-oxygen; if H₂S persists after 48 hours, rack off lees with splash and reassess"
+        },
+        {
+          "symptom": "Fermentation sluggish below 0.5 °Baumé/day on cold-settled juice",
+          "first_check": "Was juice clarified below 50 NTU? Yeast nutrient status?",
+          "action": "Add 20 mg/L DAP plus 0.3 g/hL yeast hulls; warm tank 1–2 °C; over-clarification is the likely cause"
+        },
+        {
+          "symptom": "Hard-press fraction total phenolic index above 28",
+          "first_check": "What is the target style — aromatic/early release or structured/barrel?",
+          "action": "Exclude from aromatic tank; assess for rosé, base wine, or distillation — do not blend in to hit volume targets"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "University of Adelaide · WINE 2503WT",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "White winemaking technology unit — phenolic management and juice handling"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Lincoln University · WINE 202",
+        "url": "https://www.lincoln.ac.nz/study/courses-2/course-search/",
+        "note": "Search Lincoln course search for WINE 202 — white wine production"
+      },
+      {
+        "kind": "buy",
+        "label": "Ribéreau-Gayon et al. · Handbook of Enology Vol. 2 · Ch. 9–11",
+        "url": null,
+        "note": "Wiley — white wine processing, phenolics, and lees management chapters"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Reductive handling and white wine style",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for reductive handling white wine"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine White Winemaking Bible · Full",
+        "url": null,
+        "note": "Your paid resource — cross-reference SO₂ and settling protocols"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 2.7 · White and Sparkling",
+        "url": null,
+        "note": "Your paid curriculum resource — juice handling and press fraction management"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Tank 7 Sauvignon Blanc arrives at the winery at 18 °C and pH 3.7. Owen flags an oxygen-exposure alert. What is the primary reason this combination is high-risk for PPO-driven browning?",
+        "choices": [
+          "A) Both temperature and pH sit within the range where PPO activity peaks, maximising oxidative enzyme efficiency",
+          "B) pH 3.7 denatures SO₂ faster than at lower pH, leaving juice unprotected",
+          "C) PPO activity is highest below 15 °C, so the juice has not yet reached its danger zone",
+          "D) Oxygen solubility is highest at 18 °C, independently of PPO activity"
+        ],
+        "answer": "A",
+        "rationale": "PPO peaks between pH 3.5–4.0 and 15–25 °C — Tank 7 sits squarely in both ranges; B confuses SO₂ chemistry direction, C inverts the temperature relationship, D is a secondary factor not the primary risk."
+      },
+      {
+        "q": "At pH 3.5, approximately how much free SO₂ is needed to achieve 0.6 mg/L molecular SO₂, the threshold for effective PPO suppression?",
+        "choices": [
+          "A) 20 mg/L",
+          "B) 40 mg/L",
+          "C) 60 mg/L",
+          "D) 80 mg/L"
+        ],
+        "answer": "B",
+        "rationale": "At pH 3.5, ~40 mg/L free SO₂ yields ~0.6 mg/L molecular SO₂; lower doses leave PPO active, higher doses risk yeast inhibition at inoculation."
+      },
+      {
+        "q": "You are cold-settling a Marlborough Sauvignon Blanc destined for tank fermentation. Which target NTU range is most appropriate before racking to ferment?",
+        "choices": [
+          "A) 150–250 NTU",
+          "B) 50–100 NTU",
+          "C) Below 50 NTU",
+          "D) 250–400 NTU"
+        ],
+        "answer": "B",
+        "rationale": "50–100 NTU suits tank-fermented aromatics; 150–250 NTU is for barrel-fermented Chardonnay where lees interaction is desired, and below 50 NTU is reserved for sparkling base wine."
+      },
+      {
+        "q": "A winemaker skips bâtonnage for six weeks during lees contact on a barrel-fermented Chardonnay. Owen raises a reductive-fault alert. What is the mechanistic reason this alert is valid?",
+        "choices": [
+          "A) Without stirring, lees compact and yeast autolysis accelerates, producing excess diacetyl",
+          "B) Without stirring, micro-oxygen introduction ceases and H₂S accumulation from lees becomes likely",
+          "C) Bâtonnage is required to maintain barrel temperature, not to manage reduction",
+          "D) Lees contact without stirring increases VA production above legal limits"
+        ],
+        "answer": "B",
+        "rationale": "Weekly bâtonnage introduces trace oxygen that suppresses H₂S formation from lees; skipping it removes this reductive-fault prevention mechanism, making Owen's alert valid."
+      },
+      {
+        "q": "During pressing of Tank 7 Sauvignon Blanc, the operator asks whether to include the hard-press fraction collected above 0.4 bar. What is the key phenolic risk of blending it in?",
+        "choices": [
+          "A) Hard-press juice contains higher residual sugar, pushing Baumé above target",
+          "B) Hard-press fractions carry elevated phenolics that push the blend above browning-risk thresholds",
+          "C) Hard-press juice has lower pH, reducing molecular SO₂ effectiveness",
+          "D) Hard-press fractions are high in tartrate, causing instability"
+        ],
+        "answer": "B",
+        "rationale": "Free-run plus light-press (up to ~0.4 bar) captures 60–70% of volume with phenolics well below browning risk; fractions above 0.4 bar are phenolic-rich and elevate oxidation risk."
+      },
+      {
+        "q": "Cold juice at 8 °C arrives with SO₂ added immediately on receipt. Compared to either intervention alone, what does this combination achieve?",
+        "choices": [
+          "A) It doubles free SO₂ half-life but has no additional effect on PPO",
+          "B) It suppresses PPO activity more than either cold temperature or SO₂ addition would alone",
+          "C) Cold temperature alone is sufficient; SO₂ at this stage is redundant",
+          "D) SO₂ alone is sufficient; cold temperature slows fermentation but not PPO"
+        ],
+        "answer": "B",
+        "rationale": "Cold temperature and early SO₂ act synergistically — cold reduces PPO reaction rates while SO₂ inhibits the enzyme directly; combined suppression exceeds either alone."
+      },
+      {
+        "q": "A sparkling base wine from Chardonnay is being cold-settled. The winemaker targets 80 NTU before racking. Owen flags this as too high. Is the alert correct?",
+        "choices": [
+          "A) No — 80 NTU is within the correct range for sparkling base wine",
+          "B) Yes — sparkling base wine requires below 50 NTU to minimise phenolics and ensure tirage stability",
+          "C) No — sparkling base wine benefits from higher turbidity for autolysis character",
+          "D) Yes — but only because 80 NTU exceeds the legal limit for base wine clarity"
+        ],
+        "answer": "B",
+        "rationale": "Sparkling base wine targets below 50 NTU; 80 NTU sits in the tank-fermented aromatic range and carries excess phenolics and solids incompatible with tirage stability."
+      },
+      {
+        "q": "Free SO₂ is measured at 40 mg/L in a juice at pH 3.5. The winemaker raises pH to 3.8 by adding potassium bicarbonate before fermentation. What happens to molecular SO₂?",
+        "choices": [
+          "A) Molecular SO₂ increases because higher pH drives equilibrium toward the molecular form",
+          "B) Molecular SO₂ decreases because a higher pH shifts equilibrium away from the molecular form",
+          "C) Molecular SO₂ is unchanged — it depends only on total SO₂, not pH",
+          "D) Molecular SO₂ doubles because potassium bicarbonate reacts with bisulfite"
+        ],
+        "answer": "B",
+        "rationale": "Molecular SO₂ is pH-dependent — as pH rises, a greater proportion of free SO₂ exists as bisulfite, reducing molecular SO₂ and therefore PPO suppression at the same free SO₂ dose."
+      },
+      {
+        "q": "Owen issues an oxygen alert on a white ferment that is 48 hours post-inoculation and actively fermenting at 14 °C. Should you act on this alert?",
+        "choices": [
+          "A) Yes — any oxygen exposure during fermentation causes irreversible browning",
+          "B) No — active CO₂ production during fermentation provides a protective blanket, making this alert low priority",
+          "C) Yes — PPO is most active during fermentation and SO₂ is fully consumed by yeast",
+          "D) No — oxygen is beneficial at this stage to support yeast growth and should be encouraged"
+        ],
+        "answer": "B",
+        "rationale": "Active fermentation generates CO₂ that displaces oxygen and protects the wine; this alert can be overridden — the highest-risk windows are pre-ferment juice handling and post-ferment lees contact."
+      },
+      {
+        "q": "A winemaker retains 200 NTU turbidity in juice destined for a tank-fermented Riesling, citing 'texture goals.' What is the likely consequence?",
+        "choices": [
+          "A) No consequence — 200 NTU is the standard target for all white wine styles",
+          "B) Elevated solids will increase phenolic extraction and browning risk, and may generate reductive off-characters during fermentation",
+          "C) Higher turbidity improves aromatic intensity in Riesling without phenolic penalty",
+          "D) 200 NTU will accelerate cold stabilisation, reducing processing time"
+        ],
+        "answer": "B",
+        "rationale": "200 NTU is appropriate for barrel-fermented Chardonnay, not tank-fermented aromatics — excess solids in Riesling elevate phenolics and increase reductive and browning risk during fermentation."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "PPO activity peaks at what temperature and pH range?",
+        "back": "Between 15–25 °C and pH 3.5–4.0 — both conditions together maximise oxidative enzyme risk."
+      },
+      {
+        "front": "Free SO₂ needed at pH 3.5 to reach 0.6 mg/L molecular SO₂?",
+        "back": "~40 mg/L free SO₂ — the threshold for effective PPO suppression and yeast inhibition."
+      },
+      {
+        "front": "Target NTU for barrel-fermented Chardonnay vs. tank-fermented aromatics vs. sparkling base?",
+        "back": "150–250 NTU for barrel Chardonnay; 50–100 NTU for tank aromatics; below 50 NTU for sparkling base."
+      },
+      {
+        "front": "Why is bâtonnage a reductive-fault prevention tool, not just a texture tool?",
+        "back": "Weekly stirring introduces trace oxygen that suppresses H₂S accumulation from compacted lees."
+      },
+      {
+        "front": "Press pressure threshold for phenolic-safe white juice fractions?",
+        "back": "Up to ~0.4 bar — free-run plus light-press yields 60–70% of volume with phenolics below browning risk."
+      },
+      {
+        "front": "Common trap: does raising pH increase or decrease molecular SO₂ at the same free SO₂ dose?",
+        "back": "Decreases it — higher pH shifts equilibrium toward bisulfite, reducing the protective molecular SO₂ fraction."
+      },
+      {
+        "front": "When is an Owen oxygen alert on a white ferment safe to override?",
+        "back": "During active fermentation — CO₂ production provides a protective blanket; highest risk is pre-ferment juice handling."
+      },
+      {
+        "front": "Why do cold temperature and early SO₂ together outperform either alone?",
+        "back": "Cold slows PPO reaction rates while SO₂ directly inhibits the enzyme — the combination is synergistic, not additive."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2674,
+    "completion_tokens": 6894
+  },
+  "audit": {
+    "totalWords": 1719,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:38:43.701Z"
+}

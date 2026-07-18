@@ -1,0 +1,334 @@
+{
+  "lesson_id": "L4.1",
+  "source": {
+    "id": "L4.1",
+    "slug": "sensory-evaluation",
+    "title": "Sensory — training your palate and language",
+    "level": "4",
+    "wbs": [
+      "D8"
+    ],
+    "reading_min": "6",
+    "aim": "Structure of sensory testing, common analytical protocols (discriminative / descriptive / hedonic), and building a house vocabulary.",
+    "application": "Owen holds your tasting notes and links them to lab numbers. This lesson lets you compare notes across vintages meaningfully.",
+    "sources_private": [
+      "aoc_2_6_sensory_evaluation"
+    ],
+    "sources_public_ref": [
+      "csu_wsc217",
+      "csu_wsc316",
+      "otago_fosc306",
+      "adelaide_oenology_2502wt"
+    ],
+    "citations_bibliographic": [
+      "meilgaard_sensory_ch3_9",
+      "lawless_heymann_ch3",
+      "stone_bleibaum_ch5"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Sensory testing has three distinct protocol types — discriminative, descriptive, hedonic — each answering a different question.",
+      "A shared house vocabulary turns subjective impressions into data you can track across vintages and link to lab numbers.",
+      "Palate training is a skill with a method: structured repetition against reference standards, not casual tasting."
+    ],
+    "sections": [
+      {
+        "heading": "Three protocols, three questions — pick the right tool",
+        "iconHint": "target",
+        "body_md": "Every sensory session should start with one question: what decision does this result need to drive? The answer determines your protocol.\n\nDiscriminative tests (triangle, duo-trio) ask whether two samples are perceptibly different. They need no trained vocabulary — just a statistically valid panel size (minimum 20 judges for a triangle at p < 0.05). Descriptive analysis asks *how* samples differ and by how much — it demands trained assessors and an agreed attribute list. Hedonic testing asks which sample is preferred — it needs naïve consumers, not winemakers, because trained palates skew preference data.\n\nMixing these up is expensive. Sending a triangle test to your winemaking team when you actually need consumer preference data wastes a vintage's worth of decisions. Define the question first, then choose the protocol.",
+        "keyConcept": "Triangle test minimum: 20 judges to detect a difference at p < 0.05; fewer judges and your null result means nothing.",
+        "trap": "Running hedonic preference tests with trained winemakers — their calibrated palates systematically distort preference scores away from consumer reality."
+      },
+      {
+        "heading": "Reference standards anchor the language",
+        "iconHint": "flask-conical",
+        "body_md": "Abstract descriptors — 'earthy', 'tight', 'lifted' — drift in meaning between tasters and across vintages unless they are pinned to a physical reference. A reference standard is a prepared sample that defines exactly what your team means by a given term: a measured addition of guaiacol in neutral white wine for 'smoky', a strip of fresh capsicum skin in a glass for 'pyrazine character', a tartaric acid solution at 3 g/L for 'sharp acidity'.\n\nBuilding a house lexicon means agreeing on 20–40 attributes, preparing reproducible standards for each, and running calibration sessions at the start of every vintage. The investment is roughly four hours across two sessions. The return is tasting notes that mean the same thing in March as they do in August, and that correlate with measurable chemistry — pH, TA, volatile acidity, free SO₂ — rather than floating in qualitative space.\n\nOwnership of the lexicon matters: it should live in a shared document your whole team can access and challenge.",
+        "keyConcept": "A house lexicon of 20–40 attributes, each tied to a physical reference standard, makes tasting notes comparable across vintages and tasters.",
+        "trap": "Assuming your team already shares the same meaning for common terms — 'green', 'fresh', 'complex' — without ever testing that assumption against a reference."
+      },
+      {
+        "heading": "Descriptive panels: structure beats enthusiasm",
+        "iconHint": "activity",
+        "body_md": "A descriptive panel without structure produces noise. The minimum viable structure for a boutique operation is: a defined attribute list (your house lexicon), an unstructured line scale (15 cm, anchored at each end), individual booths or at least visual separation between assessors, and samples coded with three-digit random numbers.\n\nPanel size for descriptive work is typically 8–12 trained assessors. For a small winery, that means training your team plus two or three trusted external tasters. Training involves repeated exposure to the reference standards, consensus sessions to align scale usage, and at least one practice run on a known sample before live vintage assessment begins.\n\nData from a descriptive panel should be analysed — even a simple mean and range per attribute tells you whether your team is aligned. Spider (radar) charts are a practical output format: they make vintage-to-vintage comparison visual and fast to interpret at a morning meeting.",
+        "keyConcept": "8–12 trained assessors, random three-digit sample codes, and 15 cm unstructured line scales are the minimum for credible descriptive panel data.",
+        "trap": "Letting the winemaker reveal which sample is which before scoring is complete — confirmation bias collapses inter-assessor reliability immediately."
+      },
+      {
+        "heading": "Linking sensory scores to lab numbers",
+        "iconHint": "gauge",
+        "body_md": "Sensory data earns its keep when it correlates with chemistry. A tasting note that says 'high perceived acidity' should map to a measured TA and pH. 'Elevated volatile character' should correspond to a VA reading. When the correlation breaks down — high TA but low perceived acidity, for example — that is analytically interesting: it points to buffering capacity, residual sugar, or phenolic structure doing work the numbers alone don't show.\n\nIn practice, log your sensory scores and lab results in the same record against the same tank and date. Over two or three vintages, patterns emerge: your panel's 'grippy tannin' threshold might consistently appear above a certain tannin index reading; 'reductive' notes might reliably precede a free SO₂ drop below 15 mg/L. These correlations become decision rules — sensory triggers that prompt a lab check, or lab thresholds that prompt a panel session.\n\nThis is the core value of Owen's integration: tasting notes and lab numbers in one timeline, searchable by vintage, variety, and attribute.",
+        "keyConcept": "Sensory scores logged against lab data across vintages reveal correlation thresholds that become practical decision rules for the cellar.",
+        "trap": "Treating sensory and analytical records as separate systems — the insight only emerges when both datasets share a common tank-date key."
+      },
+      {
+        "heading": "Palate fatigue is a variable, not an excuse",
+        "iconHint": "clock",
+        "body_md": "Palate fatigue is real and measurable: sensitivity to bitterness and astringency declines after roughly 8–10 samples; olfactory adaptation to a persistent aroma begins within 90 seconds of continuous exposure. These are not personal weaknesses — they are physiological limits that must be designed around.\n\nPractical controls: cap tasting sessions at 12 samples maximum, serve in ascending order of intensity (lightest to heaviest), provide palate cleansers (plain water, unflavoured crackers) between samples, and schedule sessions before lunch rather than after. For critical assessments — final blend decisions, fault detection — limit the flight to 6 samples and allow a 10-minute break at the midpoint.\n\nFor training sessions specifically, shorter is better: 4–6 reference standards per session, repeated across multiple sessions, builds retention faster than a single marathon calibration day. Frequency of exposure matters more than duration.",
+        "keyConcept": "Cap tasting sessions at 12 samples; for critical blend or fault decisions, limit to 6 samples with a mid-session break.",
+        "trap": "Scheduling final blend assessments after a full day of tank work — fatigue-compromised scores on a blend decision can cost you the wine."
+      }
+    ],
+    "worked_example": {
+      "title": "Cellar Door Blend Trial · Shiraz 2025 · Three-Tank Comparison",
+      "starting_conditions": [
+        "Three Shiraz tanks: T12 (whole-berry, 14 days skin contact), T14 (destemmed, 12 days), T17 (destemmed, extended maceration 21 days)",
+        "Lab baseline: T12 pH 3.61 / TA 6.2 g/L / VA 0.38 g/L; T14 pH 3.58 / TA 6.5 g/L / VA 0.41 g/L; T17 pH 3.67 / TA 5.9 g/L / VA 0.52 g/L",
+        "Panel: 9 trained assessors, house lexicon of 28 attributes, 15 cm unstructured line scales, samples coded 447 / 819 / 263"
+      ],
+      "timeline": [
+        {
+          "when": "Session 1 — Morning, Day 1",
+          "observation": "Panel scored 447 (T12) highest on 'red fruit intensity' and 'floral lift'; 263 (T17) scored highest on 'grip' and 'dark fruit depth' but two assessors flagged 'elevated volatile' on 263.",
+          "decision": "Ran VA check on T17 before proceeding to blend ratios.",
+          "reasoning": "Two independent assessors flagging the same fault attribute on a blinded sample is a statistically meaningful signal — VA of 0.52 g/L was already borderline and the panel confirmed it was perceptible.",
+          "outcome": "VA confirmed at 0.54 g/L post-press. T17 flagged for separate handling; blend trial continued with T12 and T14 only."
+        },
+        {
+          "when": "Session 2 — Morning, Day 2",
+          "observation": "50/50 blend of T12 and T14 (coded 731) scored higher on 'structural balance' and 'mid-palate weight' than either component alone; 'floral lift' score dropped slightly versus T12 alone.",
+          "decision": "Adjusted trial to 60% T12 / 40% T14 to recover aromatic lift while retaining structure.",
+          "reasoning": "Spider chart from Session 1 showed T14's contribution was primarily textural; increasing T12 proportion was a targeted move to recover the attribute the blend was losing.",
+          "outcome": "60/40 blend (coded 502) in Session 2 scored within 0.4 cm of T12 on 'floral lift' and retained T14's 'grip' score — best combined profile of all samples assessed."
+        },
+        {
+          "when": "Session 3 — Morning, Day 3 (validation)",
+          "observation": "502 re-presented alongside the Day 1 individual tank samples as a blind validation. Panel correctly ranked 502 as preferred on overall balance in 8 of 9 assessments.",
+          "decision": "Confirmed 60/40 blend ratio for T12/T14. T17 held separately pending VA treatment assessment.",
+          "reasoning": "Validation session confirmed the Day 2 result was not an artefact of session order or fatigue — replication on a fresh morning with reset palates.",
+          "outcome": "Blend locked. Lab numbers (pH 3.59, TA 6.4 g/L, VA 0.39 g/L) logged against sensory scores in Owen for vintage record."
+        }
+      ],
+      "counterfactual": "Proceeding to blend ratios without the Day 1 VA check would have incorporated T17 into the trial, potentially masking the fault in a complex blend until post-bottling."
+    },
+    "decision_tree": {
+      "title": "When to intervene — choosing and troubleshooting your sensory protocol",
+      "rows": [
+        {
+          "symptom": "Need to know if two treatments produced a perceptible difference",
+          "first_check": "How many available judges? Is training feasible?",
+          "action": "Run triangle test with minimum 20 judges; no training required — just clear instructions and coded samples"
+        },
+        {
+          "symptom": "Need to characterise *how* samples differ, not just whether they differ",
+          "first_check": "Is your house lexicon current? Are reference standards prepared?",
+          "action": "Run descriptive panel (8–12 trained assessors, line scales, random codes); analyse means and ranges per attribute"
+        },
+        {
+          "symptom": "Need to know which wine consumers will prefer for a new release",
+          "first_check": "Who is on the panel — trained winemakers or naïve consumers?",
+          "action": "Recruit 50+ naïve consumers for hedonic test; remove trained winemakers from the panel entirely"
+        },
+        {
+          "symptom": "Panel results are inconsistent — high variance between assessors on the same sample",
+          "first_check": "When were reference standards last reviewed? Has scale anchoring been calibrated this vintage?",
+          "action": "Run a calibration session against reference standards before the next live assessment; check for assessors with systematically high or low scale usage"
+        },
+        {
+          "symptom": "Sensory scores don't correlate with lab data in the expected direction",
+          "first_check": "Are sensory and lab records logged against the same tank-date key? Check for residual sugar, pH buffering, or phenolic matrix effects.",
+          "action": "Cross-reference full chemistry panel (RS, pH, TA, phenolics) against the outlier sensory result; document the discrepancy as a calibration data point"
+        },
+        {
+          "symptom": "Two or more assessors flag the same fault attribute on a blinded sample",
+          "first_check": "What is the relevant lab value for that fault (VA, free SO₂, Brett markers)?",
+          "action": "Pull a lab sample immediately before proceeding — two independent blinded flags is a statistically meaningful signal regardless of panel size"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC217 · Sensory Evaluation of Wine",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC217",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC316 · Advanced Wine Sensory",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC316",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Otago FOSC306 · Sensory Science",
+        "url": "https://www.otago.ac.nz/courses/papers?papercode=FOSC306",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide 2502WT · Wine Tasting and Evaluation",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      },
+      {
+        "kind": "buy",
+        "label": "Meilgaard, Civille & Carr · Sensory Evaluation Techniques · Ch 3 & 9",
+        "url": null,
+        "note": "CRC Press — discriminative and descriptive methods"
+      },
+      {
+        "kind": "buy",
+        "label": "Lawless & Heymann · Sensory Evaluation of Food · Ch 3",
+        "url": null,
+        "note": "Springer — panel design and scale construction"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "You run a triangle test with 14 judges to assess whether a new fining agent changes the palate of your Shiraz. The result is non-significant. What is the correct interpretation?",
+        "choices": [
+          "A) The fining agent has no detectable effect on palate",
+          "B) The result is inconclusive — insufficient judges to detect a difference at p < 0.05",
+          "C) The panel was too experienced and over-corrected for bias",
+          "D) A duo-trio test should have been used instead of a triangle test"
+        ],
+        "answer": "B",
+        "rationale": "Triangle tests require a minimum of 20 judges to detect a difference at p < 0.05; with only 14, a null result lacks statistical power and cannot be interpreted as 'no difference'."
+      },
+      {
+        "q": "A winemaker wants to know whether consumers prefer Tank A or Tank B Shiraz for the cellar door blend. Which protocol is the correct tool?",
+        "choices": [
+          "A) Triangle test — discriminative protocol",
+          "B) Descriptive analysis panel — descriptive protocol",
+          "C) Preference test — hedonic protocol",
+          "D) Duo-trio test — discriminative protocol"
+        ],
+        "answer": "C",
+        "rationale": "Hedonic protocols measure preference or liking; discriminative tests answer 'are these different?' and descriptive panels answer 'how are these different?' — neither addresses consumer preference directly."
+      },
+      {
+        "q": "Your descriptive panel has 6 trained assessors, randomised three-digit codes, and 15 cm line scales. What is the primary credibility problem with this dataset?",
+        "choices": [
+          "A) Three-digit codes introduce order bias",
+          "B) 15 cm unstructured line scales are too short for wine attributes",
+          "C) The panel size is below the minimum of 8–12 trained assessors",
+          "D) Trained assessors should not be used for descriptive work"
+        ],
+        "answer": "C",
+        "rationale": "Credible descriptive panel data requires 8–12 trained assessors; 6 assessors reduces statistical reliability of attribute means and increases the influence of individual outliers."
+      },
+      {
+        "q": "Which of the following best describes the purpose of tying each lexicon attribute to a physical reference standard?",
+        "choices": [
+          "A) It speeds up panel training by reducing the number of attributes needed",
+          "B) It ensures tasting notes are comparable across vintages and tasters",
+          "C) It replaces the need for line scales in descriptive analysis",
+          "D) It anchors hedonic scores to objective chemical thresholds"
+        ],
+        "answer": "B",
+        "rationale": "Physical reference standards anchor language so that 'cassis' or 'firm tannin' means the same thing to every assessor across every vintage, making notes genuinely comparable."
+      },
+      {
+        "q": "During a critical blend decision for the 2025 Shiraz, your senior winemaker insists on tasting all 14 tank samples in a single session. Based on sensory protocol, what is the risk?",
+        "choices": [
+          "A) Hedonic bias will inflate scores for later samples",
+          "B) Palate fatigue beyond 6 samples compromises critical decisions; 14 samples exceeds even the general cap of 12",
+          "C) Triangle test validity requires samples to be tasted in a single session",
+          "D) Three-digit coding becomes unreliable beyond 10 samples"
+        ],
+        "answer": "B",
+        "rationale": "For critical blend or fault decisions, the limit is 6 samples with a mid-session break; the general cap is 12 — 14 samples in one session introduces palate fatigue as an uncontrolled variable."
+      },
+      {
+        "q": "A house lexicon contains 55 attributes. What is the practical problem with this, and what is the recommended range?",
+        "choices": [
+          "A) Over 50 attributes cause hedonic drift; the recommended range is 10–20",
+          "B) 55 attributes exceed the recommended 20–40, increasing assessor fatigue and reducing reproducibility",
+          "C) 55 attributes are acceptable if each has a reference standard attached",
+          "D) The lexicon size is irrelevant provided assessors are trained for at least six months"
+        ],
+        "answer": "B",
+        "rationale": "A house lexicon of 20–40 attributes is the recommended range; exceeding this increases cognitive load, assessor fatigue, and reduces the consistency that makes cross-vintage comparison meaningful."
+      },
+      {
+        "q": "Owen flags that your tasting scores for 'mid-palate weight' correlate strongly with measured alcohol across five vintages. How should this correlation be used?",
+        "choices": [
+          "A) Replace sensory panels with alcohol measurement alone going forward",
+          "B) Use it as a practical decision rule — a lab threshold that predicts a sensory outcome in the cellar",
+          "C) Discard the sensory data as redundant once a lab correlation is established",
+          "D) Report the correlation only if r² exceeds 0.95"
+        ],
+        "answer": "B",
+        "rationale": "Linking sensory scores to lab data across vintages is designed to reveal correlation thresholds that become practical cellar decision rules, not to eliminate sensory evaluation."
+      },
+      {
+        "q": "A triangle test is the correct protocol when the winemaker's question is:",
+        "choices": [
+          "A) 'Which wine do our cellar door visitors enjoy most?'",
+          "B) 'How does the oak character of Tank A differ from Tank B in intensity and quality?'",
+          "C) 'Can trained assessors detect any sensory difference between the two fining treatments?'",
+          "D) 'What attributes define the house style of our Reserve Shiraz?'"
+        ],
+        "answer": "C",
+        "rationale": "Triangle tests are discriminative — they answer whether a detectable difference exists between two samples; preference, descriptive profiling, and style definition require hedonic or descriptive protocols."
+      },
+      {
+        "q": "You are designing a descriptive panel session for a three-tank Shiraz comparison. Which combination of controls is correct?",
+        "choices": [
+          "A) Named samples, 10 cm structured scales, 10 assessors",
+          "B) Random three-digit codes, 15 cm unstructured line scales, 8–12 trained assessors",
+          "C) Random three-digit codes, 10 cm structured scales, 6 trained assessors",
+          "D) Named samples, 15 cm unstructured line scales, 12 untrained assessors"
+        ],
+        "answer": "B",
+        "rationale": "Credible descriptive panels require random three-digit codes to prevent order/label bias, 15 cm unstructured line scales, and 8–12 trained assessors — all three controls together."
+      },
+      {
+        "q": "A new vintage tasting note reads 'good fruit, nice finish.' Why is this note not useful for cross-vintage comparison in Owen?",
+        "choices": [
+          "A) It uses hedonic language, which is reserved for consumer panels only",
+          "B) It lacks attributes anchored to a house lexicon with physical reference standards, making it subjective and non-comparable",
+          "C) It should be expressed in Baumé and mg/L units to be linked to lab data",
+          "D) Finish length must be recorded on a 15 cm line scale to be valid"
+        ],
+        "answer": "B",
+        "rationale": "Without a shared lexicon tied to reference standards, terms like 'good fruit' and 'nice finish' are subjective and cannot be meaningfully compared across vintages or between tasters."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Triangle test: minimum judges needed to detect difference at p < 0.05?",
+        "back": "20 trained judges — fewer and a null result is statistically meaningless."
+      },
+      {
+        "front": "Recommended size of a house sensory lexicon?",
+        "back": "20–40 attributes, each anchored to a physical reference standard."
+      },
+      {
+        "front": "Minimum and maximum trained assessors for a credible descriptive panel?",
+        "back": "8–12 trained assessors — below 8 reduces reliability, above 12 adds diminishing returns."
+      },
+      {
+        "front": "Sample cap for a general tasting session vs. a critical blend or fault decision?",
+        "back": "12 samples general maximum; 6 samples with a mid-session break for critical decisions."
+      },
+      {
+        "front": "Three-digit random codes in descriptive panels — what bias do they prevent?",
+        "back": "They prevent label and order bias from influencing assessor scores."
+      },
+      {
+        "front": "Which protocol answers 'do consumers prefer Wine A or Wine B?'",
+        "back": "Hedonic protocol — it measures preference or liking, not difference or description."
+      },
+      {
+        "front": "What is the scale specification for descriptive panel line scales?",
+        "back": "15 cm unstructured line scales — the standard for capturing continuous intensity ratings."
+      },
+      {
+        "front": "How does linking sensory scores to lab data across vintages create value in the cellar?",
+        "back": "Correlations reveal lab thresholds that predict sensory outcomes, becoming practical decision rules."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2631,
+    "completion_tokens": 6038
+  },
+  "audit": {
+    "totalWords": 1531,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:53:31.030Z"
+}

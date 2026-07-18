@@ -1,0 +1,325 @@
+{
+  "lesson_id": "L3.5",
+  "source": {
+    "id": "L3.5",
+    "slug": "fining-agents-practice",
+    "title": "Fining — bench trials before the tank",
+    "level": "3",
+    "wbs": [
+      "D5",
+      "D6"
+    ],
+    "reading_min": "5",
+    "aim": "What each fining agent does (protein, tannin, colour, oxidation), how to bench-trial before you commit, and when to accept the loss.",
+    "application": "Owen holds your bench-trial history. This lesson makes that history a decision engine, not a diary.",
+    "sources_private": [
+      "morew_fining_agents",
+      "morew_bench_trials"
+    ],
+    "sources_public_ref": [
+      "csu_wsc319",
+      "adelaide_oenology_3007wt"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch5"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Bench trials are mandatory — committing a fining agent to tank without them is a gamble you will lose.",
+      "Each agent targets a specific substrate: protein, tannin, colour, or oxidised phenolics — match agent to problem.",
+      "Owen's bench-trial history turns past results into rate predictions; use it before you open a new bag."
+    ],
+    "sections": [
+      {
+        "heading": "One agent, one target — don't reach for the kitchen sink",
+        "iconHint": "target",
+        "body_md": "Fining agents are not interchangeable. Bentonite strips protein and heat-unstable material; it does almost nothing to green tannin. Egg white and PVPP pull out polymerised tannin and colour respectively; neither touches protein stability. Activated carbon chases oxidised, volatile phenolics — use it sparingly because it strips aroma indiscriminately.\n\nThe first discipline is diagnosis. Run a heat stability test before you reach for bentonite. Run a gelatine or casein trial before you assume tannin is the problem. If you skip diagnosis and layer agents, you lose more than you fix — and you have no idea which agent did the work.\n\nIn a boutique cellar where every barrel matters, over-fining is a more common loss than under-fining. The goal is the minimum effective rate, confirmed by trial, not the rate on the data sheet.",
+        "keyConcept": "Bentonite targets protein; PVPP targets colour; egg white targets tannin — cross-application wastes product and strips wine.",
+        "trap": "Using bentonite as a catch-all 'clarifier' when the real problem is tannin astringency — you'll strip body and solve nothing."
+      },
+      {
+        "heading": "The bench trial is the decision, not the preamble",
+        "iconHint": "flask-conical",
+        "body_md": "A bench trial is not a formality before you do what you already planned. It is the actual decision point. Set up a minimum of five rates — including a zero control — in identical vessels under identical conditions. Evaluate blind after the appropriate contact time: 24–48 hours for most agents, 72 hours for bentonite in white wine.\n\nAssess in order: clarity first (visual), then aroma, then palate. The control tells you what you are protecting. The highest rate tells you where over-fining begins. Your target rate sits just below the point where the wine starts tasting stripped — typically where clarity is achieved but mid-palate weight is still intact.\n\nRecord every trial in Owen: agent, lot number, rate range, wine matrix (pH, TA, alcohol), contact time, and your sensory call. That record becomes your starting-point rate for the next similar wine, compressing the trial range and saving reagent.",
+        "keyConcept": "Run five rates minimum including a zero control; evaluate blind; the optimal rate is the lowest that achieves the target without stripping mid-palate.",
+        "trap": "Evaluating trials immediately after addition — most agents need full contact time before sensory assessment is valid."
+      },
+      {
+        "heading": "Rate maths: scaling from 100 mL to tank without error",
+        "iconHint": "gauge",
+        "body_md": "Bench trial rates are expressed in g/L or mL/L. Scaling to tank is arithmetic, but the errors are common and costly. A rate of 0.5 g/L in a 100 mL trial jar is 50 mg of agent. In a 5,000 L tank that is 2.5 kg. Prepare your stock solution at a known concentration — typically 5% w/v for bentonite, 1% w/v for egg white — and calculate addition volume from there, not from dry weight directly.\n\nFor bentonite, hydration time matters: minimum 12 hours in warm water before use, or swelling is incomplete and dosing is inaccurate. For tannin-active agents like egg white, prepare fresh in low-sulphur saline solution and add with gentle pump-over to avoid localised over-dosing.\n\nAlways back-calculate: if your trial used 0.4 g/L and your tank is 3,200 L, you need 1.28 kg dry weight. Check that against your stock solution volume before you start pumping.",
+        "keyConcept": "Prepare bentonite as a 5% w/v slurry, hydrated ≥12 hours; scale dry-weight rate to tank volume before preparing stock solution.",
+        "trap": "Scaling from trial jar to tank using volume ratios on dry agent without accounting for stock solution concentration — leads to systematic under- or over-dosing."
+      },
+      {
+        "heading": "Accepting the loss — yield, aroma, and when to stop",
+        "iconHint": "activity",
+        "body_md": "Every fining agent removes something you wanted to keep alongside what you wanted to remove. Bentonite at high rates strips aromatic compounds, particularly thiols in Sauvignon Blanc. PVPP removes colour indiscriminately in rosé. Egg white at rates above 1 g/hL can flatten tannin structure in a wine that needed texture, not softening.\n\nThe bench trial quantifies that loss before it happens at scale. If the trial shows that the rate required to achieve heat stability also strips the varietal aroma below an acceptable threshold, you have three options: accept instability and manage cold chain, use a lower rate and retest, or switch to a more selective agent.\n\nIn Owen, flag trials where the sensory loss exceeded the gain. That flag prevents you repeating the same trade-off on the next vintage of the same variety. The history is only useful if the outcome — including the losses — is recorded honestly.",
+        "keyConcept": "If the effective fining rate strips aroma or texture below threshold, the correct call may be to accept instability and manage it downstream.",
+        "trap": "Chasing perfect heat stability at the cost of varietal character — protein haze in bottle is recoverable; stripped Sauvignon Blanc is not."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Sauvignon Blanc 2025 · Pre-bottling fining",
+      "starting_conditions": [
+        "Volume: 2,800 L, pH 3.21, TA 6.8 g/L, alcohol 12.8% v/v, free SO₂ 28 mg/L",
+        "Heat stability test: fail at 80°C/6 hours — visible haze, NTU increase of 4.2",
+        "Sensory: strong passionfruit/thiol character, lean mid-palate, no obvious tannin issue"
+      ],
+      "timeline": [
+        {
+          "when": "Day 1",
+          "observation": "Heat stability fail confirmed. Owen shows last SB from this block required 0.6 g/L bentonite in 2024 to achieve stability.",
+          "decision": "Set bench trial at 0.3, 0.5, 0.6, 0.8, 1.0 g/L bentonite plus zero control. Hydrate 5% w/v slurry overnight.",
+          "reasoning": "Prior Owen record narrows the range — no need to trial from 0.1 g/L. Starting just below last year's effective rate accounts for possible vintage variation in protein load.",
+          "outcome": "Six 100 mL jars prepared, labelled blind, placed at 18°C for 48-hour contact."
+        },
+        {
+          "when": "Day 2 (48 hours)",
+          "observation": "Blind sensory: 0.3 g/L — no perceptible change from control. 0.5 g/L — clarity improved, aroma intact. 0.6 g/L — clarity good, slight reduction in passionfruit intensity. 0.8 and 1.0 g/L — noticeably flatter, thiol character muted.",
+          "decision": "Select 0.5 g/L as target rate. Run heat stability retest on the 0.5 g/L trial jar before committing to tank.",
+          "reasoning": "0.5 g/L achieves visible clarity improvement without detectable aroma stripping. Retesting stability on the actual trial jar confirms the rate works — not just that clarity improved.",
+          "outcome": "Heat stability retest on 0.5 g/L jar: pass. NTU increase post-heating < 0.5. Decision confirmed."
+        },
+        {
+          "when": "Day 3",
+          "observation": "Tank addition calculated: 0.5 g/L × 2,800 L = 1.4 kg dry bentonite. Prepared as 5% w/v slurry = 28 L slurry volume.",
+          "decision": "Add slurry via slow pump-over over 45 minutes with tank recirculation. Allow 5-day settling before racking.",
+          "reasoning": "Slow addition with recirculation ensures even distribution and avoids localised over-dosing at the inlet. Five-day settling at 4°C maximises lees compaction and minimises wine loss on racking.",
+          "outcome": "Post-racking volume: 2,755 L (loss 45 L, 1.6%). Heat stability retest on racked wine: pass. Sensory: thiol character retained, mid-palate unchanged from pre-fining assessment."
+        }
+      ],
+      "counterfactual": "Using the data-sheet maximum of 1.0 g/L without a bench trial would have stripped the varietal thiol character and added roughly 25 mg/L unnecessary bentonite lees, increasing wine loss on racking."
+    },
+    "decision_tree": {
+      "title": "When to intervene — fining diagnostic tree",
+      "rows": [
+        {
+          "symptom": "Heat stability fail (NTU rise > 2 after 80°C/6 h)",
+          "first_check": "Confirm protein is the cause — not starch or pectin residue from processing",
+          "action": "Bench trial bentonite 0.3–1.0 g/L; select minimum effective rate; retest stability on trial jar before scaling"
+        },
+        {
+          "symptom": "Excessive astringency or green tannin on palate",
+          "first_check": "Confirm tannin origin — grape-derived vs. oak-derived vs. oxidised; check vintage ripeness data",
+          "action": "Bench trial egg white (0.5–2.0 g/hL) or gelatine (5–30 mg/L); evaluate texture, not just softness"
+        },
+        {
+          "symptom": "Colour too deep or browning in white/rosé",
+          "first_check": "Measure absorbance at 420 nm; check SO₂ status and oxidation history before attributing to pigment excess",
+          "action": "Bench trial PVPP (10–50 mg/L) for colour; casein (50–200 mg/L) if oxidised phenolics are also present"
+        },
+        {
+          "symptom": "Oxidised or phenolic off-aroma (cardboard, stale)",
+          "first_check": "Confirm SO₂ is adequate; rule out Brett or acetic acid before assuming oxidation is the sole cause",
+          "action": "Bench trial casein (100–200 mg/L) or activated carbon (50–150 mg/L); carbon is last resort — evaluate aroma loss in trial carefully"
+        },
+        {
+          "symptom": "Persistent haze post-fining and racking",
+          "first_check": "Identify haze type — protein, microbial, tartrate, or pectin — before adding a second agent",
+          "action": "If protein: increase bentonite rate or extend contact time. If microbial: sterile filtration, not fining. If tartrate: cold stabilisation protocol."
+        },
+        {
+          "symptom": "Trial shows effective rate strips aroma or texture below acceptable threshold",
+          "first_check": "Confirm the instability risk is real and the consequence (haze in bottle, trade return) outweighs the sensory loss",
+          "action": "Accept instability and manage cold chain, or switch agent class — do not fine at a rate you know damages the wine"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 5",
+        "url": null,
+        "note": "Chapman & Hall — fining agents, mechanisms, and rate selection"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC319 · Winemaking Technology",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC319",
+        "note": "Covers fining agent selection and bench-trial methodology"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide · WINE 3007WT · Oenology 3",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Protein stability, fining, and pre-bottling treatments"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Fining Agents and Protein Stability",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'fining agents' and 'heat stability'"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine · Fining Agents Reference",
+        "url": null,
+        "note": "Your paid resource — agent-by-agent rate tables and application notes"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine · Bench Trial Protocols",
+        "url": null,
+        "note": "Your paid resource — step-by-step bench trial procedure and scaling calculations"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Owen's bench-trial history for Tank 7 Sauvignon Blanc shows that bentonite at 400 mg/L removes heat instability but strips thiol-driven aroma. At 200 mg/L the wine passes heat test marginally. What is the correct call?",
+        "choices": [
+          "A) Use 200 mg/L bentonite and accept marginal stability, managing the risk downstream",
+          "B) Add 400 mg/L bentonite because protein stability is non-negotiable before bottling",
+          "C) Combine 200 mg/L bentonite with PVPP to compensate for the aroma loss",
+          "D) Re-run the bench trial with egg white to find an alternative protein-removal agent"
+        ],
+        "answer": "A",
+        "rationale": "The lowest effective rate that meets the target without stripping character is the decision; if no rate achieves both goals, accepting instability and managing downstream is correct — adding PVPP targets colour not protein, and egg white targets tannin not protein."
+      },
+      {
+        "q": "Which fining agent is correctly matched to its primary target?",
+        "choices": [
+          "A) PVPP → protein stability",
+          "B) Bentonite → tannin reduction",
+          "C) Egg white → tannin reduction",
+          "D) Bentonite → colour stripping"
+        ],
+        "answer": "C",
+        "rationale": "Egg white binds tannin via hydrogen bonding; bentonite targets protein, PVPP targets oxidised colour compounds — cross-application wastes product and risks over-stripping."
+      },
+      {
+        "q": "A winemaker runs a bench trial with rates of 0, 100, 200, 300, and 400 mg/L bentonite. The evaluator knows which glass is which. What is the key methodological flaw?",
+        "choices": [
+          "A) Too few rates were tested",
+          "B) The evaluation was not conducted blind",
+          "C) A 5% w/v slurry was not prepared",
+          "D) The zero control was unnecessary"
+        ],
+        "answer": "B",
+        "rationale": "Blind evaluation is required to avoid bias; knowing the rate primes the evaluator to perceive differences that may not exist, making the trial a diary entry rather than a decision engine."
+      },
+      {
+        "q": "To prepare a 5% w/v bentonite slurry, how many grams of bentonite are dissolved per 100 mL of water?",
+        "choices": [
+          "A) 0.5 g",
+          "B) 5 g",
+          "C) 10 g",
+          "D) 50 g"
+        ],
+        "answer": "B",
+        "rationale": "5% w/v means 5 g per 100 mL; 0.5 g is 0.5%, 10 g is 10%, and 50 g is impractically concentrated and would not hydrate correctly."
+      },
+      {
+        "q": "A bench trial on a 100 mL sample identifies an optimal bentonite rate of 300 mg/L. The tank holds 12,000 L. What mass of dry bentonite is required for the tank addition?",
+        "choices": [
+          "A) 3.6 kg",
+          "B) 36 kg",
+          "C) 360 g",
+          "D) 3,600 kg"
+        ],
+        "answer": "A",
+        "rationale": "300 mg/L × 12,000 L = 3,600,000 mg = 3.6 kg; scaling must be done on dry-weight rate before preparing stock solution to avoid dosing errors."
+      },
+      {
+        "q": "PVPP is added to a white wine showing browning after oxidative handling. What is the mechanism of action?",
+        "choices": [
+          "A) PVPP adsorbs oxidised phenolic compounds responsible for browning",
+          "B) PVPP precipitates unstable proteins that cause haze",
+          "C) PVPP binds tannins to soften mid-palate astringency",
+          "D) PVPP chelates iron to prevent casse"
+        ],
+        "answer": "A",
+        "rationale": "PVPP targets oxidised colour compounds (quinones and polyphenols); protein haze is bentonite's domain, tannin softening is egg white's domain, and iron chelation requires citric acid or similar."
+      },
+      {
+        "q": "A bench trial uses only three rates — 0, 200, and 400 mg/L — and the 200 mg/L sample appears optimal. Why is this trial insufficient as a decision?",
+        "choices": [
+          "A) The hydration time for the slurry was not specified",
+          "B) Five rates minimum are required; the true optimum may lie between 100 and 300 mg/L",
+          "C) A zero control should not be included in a blind tasting",
+          "D) The trial should be repeated on a 1 L sample, not 100 mL"
+        ],
+        "answer": "B",
+        "rationale": "Running five rates minimum ensures the dose-response curve is resolved finely enough to identify the lowest effective rate; three points may skip the true optimum and lead to over-dosing."
+      },
+      {
+        "q": "Bentonite slurry must be hydrated for at least how many hours before use?",
+        "choices": [
+          "A) 2 hours",
+          "B) 6 hours",
+          "C) 12 hours",
+          "D) 24 hours"
+        ],
+        "answer": "C",
+        "rationale": "A minimum of 12 hours hydration is required for bentonite to swell fully and disperse uniformly; under-hydrated slurry produces uneven dosing and reduced efficacy."
+      },
+      {
+        "q": "A winemaker adds both bentonite and egg white to a red wine bench trial simultaneously to 'cover all bases.' What is the primary risk of this approach?",
+        "choices": [
+          "A) The agents will react and form a precipitate that is difficult to rack",
+          "B) Cross-application strips mid-palate texture and wastes product without isolating which agent achieved the target",
+          "C) Egg white denatures bentonite, reducing protein-removal efficiency",
+          "D) Combined additions always exceed legal fining limits under Australian food standards"
+        ],
+        "answer": "B",
+        "rationale": "Using multiple agents simultaneously prevents attribution of effect to any single agent, risks over-stripping wine structure, and wastes product — the principle is one agent, one target."
+      },
+      {
+        "q": "After reviewing bench-trial data in Owen, a winemaker finds that no bentonite rate achieves heat stability without unacceptable aroma loss in a high-value Riesling. What is the most defensible decision?",
+        "choices": [
+          "A) Use the lowest tested rate regardless of stability outcome and note it in the trial history",
+          "B) Accept protein instability and manage the risk downstream, such as through cold-chain control",
+          "C) Switch to PVPP, which removes protein without aroma impact",
+          "D) Double the highest tested rate to ensure stability is achieved"
+        ],
+        "answer": "B",
+        "rationale": "When no fining rate achieves the target without stripping wine quality below threshold, accepting instability and managing it downstream is the correct call — PVPP targets colour not protein, and doubling an already-stripping rate compounds the problem."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Primary target of bentonite in wine fining?",
+        "back": "Unstable proteins — bentonite adsorbs them via electrostatic attraction, preventing heat haze."
+      },
+      {
+        "front": "Minimum number of rates in a valid bench trial?",
+        "back": "Five, including a zero control, to resolve the dose-response curve and identify the lowest effective rate."
+      },
+      {
+        "front": "5% w/v bentonite slurry — how to prepare?",
+        "back": "Dissolve 5 g of dry bentonite in 100 mL of warm water and hydrate for a minimum of 12 hours before use."
+      },
+      {
+        "front": "Scaling trap: bench rate 300 mg/L, tank 12,000 L — dry bentonite required?",
+        "back": "3.6 kg — always calculate dry-weight mass from tank volume before preparing stock solution."
+      },
+      {
+        "front": "PVPP targets which wine fault?",
+        "back": "Oxidised colour — PVPP adsorbs quinones and polyphenols responsible for browning in white and rosé wines."
+      },
+      {
+        "front": "When is the correct call to accept fining instability?",
+        "back": "When every effective rate strips aroma or texture below quality threshold — manage the risk downstream instead."
+      },
+      {
+        "front": "Egg white fining — what does it target and why not in white wine?",
+        "back": "Egg white binds tannin via hydrogen bonding; white wines lack sufficient tannin to justify its use."
+      },
+      {
+        "front": "Why must bench-trial evaluation be conducted blind?",
+        "back": "Knowing the rate biases perception — blind tasting ensures the result is a genuine sensory decision, not confirmation of expectation."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2547,
+    "completion_tokens": 5827
+  },
+  "audit": {
+    "totalWords": 1463,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:45:06.248Z"
+}

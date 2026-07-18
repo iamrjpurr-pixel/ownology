@@ -1,0 +1,324 @@
+{
+  "lesson_id": "L3.7",
+  "source": {
+    "id": "L3.7",
+    "slug": "barrel-program",
+    "title": "Barrel program — oak as ingredient",
+    "level": "3",
+    "wbs": [
+      "D5"
+    ],
+    "reading_min": "5",
+    "aim": "New vs seasoned, French vs American, toast level, top-up cadence, lees management, and honest cost-benefit.",
+    "application": "Owen tracks your barrel register and top-up log. This lesson makes the barrel a design choice, not a habit.",
+    "sources_private": [
+      "morew_oak_info",
+      "morew_oak_barrel_care"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_3007wt"
+    ],
+    "citations_bibliographic": [
+      "jackson_wine_science_ch8_barrels"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Oak is an ingredient with dose, timing, and origin — treat it like any other addition.",
+      "New French 225 L adds 3–5× more extractable tannin than a second-fill barrel of the same size.",
+      "Top-up cadence and lees contact are as influential on final texture as the barrel origin itself."
+    ],
+    "sections": [
+      {
+        "heading": "New vs seasoned — the dose dial, not a binary choice",
+        "iconHint": "gauge",
+        "body_md": "A new 225 L French barrel delivers roughly 40–60 mg/L of ellagitannins in the first fill. By the third fill that figure drops below 10 mg/L. Neither is wrong — they are different doses. The mistake is treating 'new oak' as a quality signal rather than a concentration decision.\n\nFor a boutique red at 14 Baumé with moderate natural tannin, 30–40% new oak in a blend of fills often lands better than 100% new, which can push extractable tannin beyond what the fruit structure can absorb. Map your barrel register by fill number before vintage, not during it.\n\nSeasoned barrels still contribute oxygen ingress (1–3 mg/L per year through stave and bung) and gentle evaporative concentration. Their value is textural integration, not flavour addition. Price them accordingly — a sound fourth-fill barrel doing oxygen work costs a fraction of a new barrel doing the same job.",
+        "keyConcept": "New 225 L French barrel: ~40–60 mg/L ellagitannins first fill; drops to <10 mg/L by third fill.",
+        "trap": "Buying 100% new oak to signal quality, then over-extracting a wine that lacks the fruit weight to carry it."
+      },
+      {
+        "heading": "French vs American — grain, not geography, drives the difference",
+        "iconHint": "flask-conical",
+        "body_md": "French oak (Quercus petraea, Q. robur) is tight-grained, lower in volatile phenols, and releases tannin more slowly. American oak (Q. alba) is wider-grained, higher in vanillin and cis-oak lactone, and extracts faster — sometimes aggressively so in the first six months. The flavour contrast is real, but it is a grain-density and species effect, not a French-versus-American mystique.\n\nFor Shiraz and Grenache, American oak at medium-plus toast can complement the variety's spice profile. For Pinot Noir or Chardonnay, tight-grain French is the default because the extraction rate matches the wine's delicate structure. Mixing origins within a blend is a legitimate design tool — 70% French / 30% American on a Barossa Shiraz is a documented house style, not a compromise.\n\nCooperage matters more than country. A poorly seasoned French stave delivers more harsh tannin than a well-seasoned American one. Ask your cooper for stave seasoning duration — 24 months minimum is the working benchmark.",
+        "keyConcept": "American oak extracts cis-oak lactone and vanillin faster; French oak releases ellagitannins more slowly — match rate to wine structure.",
+        "trap": "Defaulting to French oak for prestige on a variety whose flavour profile actually suits American — and paying a 30–40% price premium for the wrong result."
+      },
+      {
+        "heading": "Toast level sets the flavour register, not just the colour",
+        "iconHint": "activity",
+        "body_md": "Toasting degrades ellagitannins at the stave surface and generates volatile phenols (guaiacol, eugenol), furans, and vanillin. Light toast preserves more raw tannin and delivers a savoury, woody character. Medium toast is the broadest-use option — it reduces harsh tannin while building spice and vanilla. Heavy toast pushes toward smoke, mocha, and coffee, and can mask fruit in lighter wines.\n\nMedium-plus is the most common specification for Australian red winemaking because it balances tannin softening against flavour addition. Medium-heavy suits wines with high natural phenolic load — Tannat, Sagrantino, or a very extracted Cabernet — where the toast-derived compounds integrate rather than dominate.\n\nToast level also affects oxygen permeability slightly — heavier toast chars the inner stave surface and can reduce direct wood-to-wine contact. This is a secondary effect, but it matters if you are relying on the barrel for slow oxidative development rather than flavour extraction.",
+        "keyConcept": "Medium toast is the broadest-use specification; heavy toast suits high-phenolic varieties where smoke and mocha notes integrate rather than dominate.",
+        "trap": "Specifying heavy toast on a delicate variety to add complexity, then finding the toast character outlasts the fruit on a three-year timeline."
+      },
+      {
+        "heading": "Top-up cadence — oxygen management disguised as housekeeping",
+        "iconHint": "droplets",
+        "body_md": "Evaporation from a 225 L barrel runs 2–5% per year in a temperate cellar, more in a warm or dry environment. That ullage is not just volume loss — it is an oxygen ingress point. Every day of headspace above the bung is uncontrolled oxidation. Top-up weekly for the first three months post-ferment, then fortnightly once the wine is stable.\n\nThe topping wine matters. Use the same wine, same vintage, same variety where possible. Topping with a different variety or a significantly older vintage introduces compositional noise that shows up in blending. Keep a dedicated top-up vessel — a 20 L demijohn under inert gas is the practical solution for small cellars.\n\nLees contact interacts directly with top-up frequency. A barrel on gross lees needs more frequent attention because CO₂ evolution slows and oxygen risk rises as fermentation completes. Once on fine lees, monthly stirring (bâtonnage) combined with fortnightly top-up is a workable cadence for white and rosé programs.",
+        "keyConcept": "Top-up weekly for the first three months; every day of ullage above the bung is uncontrolled oxidation, not passive ageing.",
+        "trap": "Topping up monthly because it is convenient, then attributing the resulting oxidative character to 'barrel influence' rather than management failure."
+      },
+      {
+        "heading": "Cost-benefit is a calculation, not a feeling",
+        "iconHint": "target",
+        "body_md": "A new French 225 L barrel costs $1,200–$1,800 AUD at current cooperage prices. Amortised over three fills at 225 L per fill, that is $1.80–$2.65 per litre of wine touched by new oak. By fill four the barrel is an oxygen-management tool worth $200–$400 at resale. Model this before ordering.\n\nFor a boutique producer at 2,000–5,000 cases, the barrel program is often the single largest variable cost after fruit. A 20% reduction in new-oak percentage — offset by quality seasoned barrels and stave inserts for entry-level tiers — can fund an extra tonne of premium fruit. That is a design trade-off worth running the numbers on.\n\nAlternatives — stave inserts, oak spirals, inner staves — deliver extractable compounds at lower cost but without the oxygen-ingress benefit of a barrel. They are not inferior; they are a different tool. Use them deliberately on wines where flavour addition is the goal and oxidative development is not.",
+        "keyConcept": "New French 225 L barrel costs ~$1.80–$2.65/L amortised over three fills; model this against fruit cost before ordering.",
+        "trap": "Treating barrel alternatives as a quality compromise rather than a deliberate cost-benefit decision matched to the wine's actual needs."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Shiraz 2025 · Barossa Valley · Barrel allocation decision",
+      "starting_conditions": [
+        "Fruit: 4.2 t Barossa Shiraz, 14.2 Baumé at pick, pH 3.55, natural TA 6.1 g/L",
+        "Ferment complete at 0.1 Baumé, pressed to 2,800 L, moderate tannin extraction (mid-range by sensory)",
+        "Barrel inventory: 4× new French 225 L (medium-plus toast), 6× second-fill French 225 L, 3× third-fill American 225 L"
+      ],
+      "timeline": [
+        {
+          "when": "Day 1 post-press",
+          "observation": "Wine is fruit-forward, moderate tannin, good colour. Sensory suggests it will carry some new oak but is not a blockbuster structure.",
+          "decision": "Allocate 2× new French, 4× second-fill French, 1× third-fill American — 7 barrels total, ~1,575 L, remainder to 500 L seasoned puncheon.",
+          "reasoning": "28% new oak gives extractable tannin addition without overwhelming the mid-weight fruit. American third-fill adds oxygen work at low flavour cost. Puncheon handles overflow with minimal oak impact.",
+          "outcome": "Wine distributed across 8 vessels; barrel register updated with fill number, origin, toast, and date filled."
+        },
+        {
+          "when": "Week 2",
+          "observation": "Ullage forming in new barrels faster than expected — cellar at 18°C, humidity 65%, evaporation running high.",
+          "decision": "Move to twice-weekly top-up on all new-oak barrels; fortnightly on seasoned.",
+          "reasoning": "New barrels have higher stave porosity in first fill; combined with warm cellar, ullage risk is elevated. Oxidation at this stage would strip primary fruit before integration.",
+          "outcome": "Ullage controlled to bung level; no oxidative lift detected at four-week sensory check."
+        },
+        {
+          "when": "Month 3",
+          "observation": "Sensory: new-oak barrels showing vanilla and spice integration, tannin softening on track. Third-fill American showing slightly more development than expected — possible the barrels are more active than register suggested.",
+          "decision": "Pull a sample from the American barrels for SO₂ check and sensory comparison; if oxidative character is developing, consolidate into a single barrel and monitor closely.",
+          "reasoning": "Third-fill American at 18°C may be passing more oxygen than modelled. Early detection prevents a full barrel going oxidative before blending.",
+          "outcome": "SO₂ at 22 mg/L free — borderline. Added 15 mg/L SO₂ via bung injection, consolidated to 2 barrels, flagged for monthly sensory."
+        }
+      ],
+      "counterfactual": "Allocating 100% new French oak on this mid-weight fruit would have delivered extractable tannin well beyond what the wine's structure could integrate, producing a hard, woody finish that would require 18+ months additional ageing to resolve — if it resolved at all."
+    },
+    "decision_tree": {
+      "title": "Barrel program intervention — the diagnostic tree",
+      "rows": [
+        {
+          "symptom": "Wine showing excessive vanilla/coconut after 3 months",
+          "first_check": "Barrel origin and fill number — likely first-fill American oak or high-lactone cooperage",
+          "action": "Rack to neutral vessel; blend back at lower percentage; flag cooperage for future specification change"
+        },
+        {
+          "symptom": "Oxidative lift (nutty, flat fruit) developing before 6 months",
+          "first_check": "Top-up frequency and ullage level; free SO₂ — should be ≥25 mg/L at pH 3.5",
+          "action": "Top-up immediately, adjust SO₂ to target, increase top-up cadence to weekly, check bung seal"
+        },
+        {
+          "symptom": "Tannin not softening as expected at 6-month sensory",
+          "first_check": "Toast level and fill number — light-toast or first-fill barrels extract more raw tannin; also check wine pH",
+          "action": "Extend barrel time 4–6 weeks, consider micro-ox at 2–4 mg/L/month if timeline is fixed"
+        },
+        {
+          "symptom": "Lees compacting and off-aromas developing (reductive, sulfidic)",
+          "first_check": "Bâtonnage frequency and SO₂ level — reductive lees need stirring and oxygen, not more SO₂",
+          "action": "Stir weekly for 4 weeks; if sulfide persists, rack off lees with splash, assess before returning to barrel"
+        },
+        {
+          "symptom": "Barrel leaking at stave joint after filling",
+          "first_check": "Was barrel properly hydrated before filling? Dry staves shrink and gaps open",
+          "action": "Stand barrel upright with water for 24–48 hours to swell staves; if leak persists, return to cooperage — do not fill with wine"
+        },
+        {
+          "symptom": "Cost per litre of barrel-aged wine exceeding budget threshold",
+          "first_check": "New-oak percentage vs wine retail price point — is the cost justified by the price tier?",
+          "action": "Reduce new-oak allocation to 20–25%; substitute stave inserts for entry-level tier; redirect savings to fruit or bottle quality"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3007WT · Barrel Maturation",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Bachelor of Viticulture and Oenology — search 3007WT within the Adelaide calendar"
+      },
+      {
+        "kind": "buy",
+        "label": "Jackson · Wine Science · Ch 8 · Barrel Maturation",
+        "url": null,
+        "note": "Academic Press — covers oak species, toasting chemistry, and ellagitannin extraction in detail"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Oak and barrel management",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'oak barrel management' and 'oak alternatives'"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine · Oak Information Guide",
+        "url": null,
+        "note": "Your paid MoreWine resource — oak species, formats, and usage rates"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine · Oak Barrel Care Guide",
+        "url": null,
+        "note": "Your paid MoreWine resource — hydration, storage, and sanitation protocols"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "A first-fill French 225 L barrel is expected to contribute approximately how many mg/L of ellagitannins to the wine?",
+        "choices": [
+          "A) 40–60 mg/L",
+          "B) 10–20 mg/L",
+          "C) 80–100 mg/L",
+          "D) <5 mg/L"
+        ],
+        "answer": "A",
+        "rationale": "First-fill French oak delivers ~40–60 mg/L ellagitannins; by third fill this drops below 10 mg/L — the other options either understate first-fill extraction or overstate it."
+      },
+      {
+        "q": "By the third fill, ellagitannin contribution from a French 225 L barrel drops to approximately what level?",
+        "choices": [
+          "A) 20–30 mg/L",
+          "B) <10 mg/L",
+          "C) 40 mg/L",
+          "D) 15–25 mg/L"
+        ],
+        "answer": "B",
+        "rationale": "<10 mg/L by third fill reflects the progressive exhaustion of extractable tannin; the other options overestimate residual extraction from seasoned wood."
+      },
+      {
+        "q": "You are ageing a high-phenolic Barossa Shiraz with dense tannin structure. Which toast level is most appropriate to integrate oak character without dominating the fruit?",
+        "choices": [
+          "A) Light toast — preserves wood sugars and vanilla",
+          "B) Medium toast — broadest-use specification for most varieties",
+          "C) Heavy toast — smoke and mocha notes integrate with high-phenolic structure",
+          "D) Untoasted — maximum ellagitannin extraction"
+        ],
+        "answer": "C",
+        "rationale": "Heavy toast suits high-phenolic varieties where smoke and mocha integrate rather than dominate; medium toast is the default for lighter structures, not the optimal choice here."
+      },
+      {
+        "q": "Owen's barrel log shows Tank 7 Shiraz has gone 10 days without a top-up in month two of maturation. What is the primary risk?",
+        "choices": [
+          "A) Excessive CO₂ retention slowing malolactic fermentation",
+          "B) Uncontrolled oxidation from ullage above the bung",
+          "C) Ellagitannin precipitation reducing tannin complexity",
+          "D) Lees compaction causing reductive off-flavours"
+        ],
+        "answer": "B",
+        "rationale": "Every day of ullage above the bung is uncontrolled oxidation, not passive ageing; the other options describe unrelated or secondary risks."
+      },
+      {
+        "q": "What is the recommended top-up cadence for the first three months of barrel maturation?",
+        "choices": [
+          "A) Monthly, aligned with SO₂ additions",
+          "B) Fortnightly, to minimise disturbance",
+          "C) Weekly",
+          "D) Daily, to eliminate all headspace"
+        ],
+        "answer": "C",
+        "rationale": "Weekly top-up for the first three months manages oxygen ingress; daily is excessive and fortnightly or monthly leaves too much uncontrolled ullage."
+      },
+      {
+        "q": "American oak is preferred over French oak when the winemaker wants to deliver which primary flavour and structural outcome more rapidly?",
+        "choices": [
+          "A) Slow ellagitannin release and fine-grained tannin integration",
+          "B) High cis-oak lactone and vanillin extraction at a faster rate",
+          "C) Elevated phenolic polymerisation through tight grain",
+          "D) Neutral maturation with minimal oak flavour contribution"
+        ],
+        "answer": "B",
+        "rationale": "American oak extracts cis-oak lactone and vanillin faster due to grain structure; French oak is the slower, ellagitannin-dominant option — grain, not geography, is the mechanism."
+      },
+      {
+        "q": "A winery is costing a new French 225 L barrel program for a Barossa Shiraz retailing at $35/bottle. Amortised over three fills, what is the approximate per-litre oak cost?",
+        "choices": [
+          "A) $0.50–$0.80/L",
+          "B) $1.80–$2.65/L",
+          "C) $3.50–$4.20/L",
+          "D) $0.10–$0.30/L"
+        ],
+        "answer": "B",
+        "rationale": "$1.80–$2.65/L is the correct amortised range over three fills; the other options either understate or overstate the real cost and would distort the cost-benefit model."
+      },
+      {
+        "q": "A winemaker describes their barrel program as '100% new French oak every vintage because that's what we've always done.' Which principle does this violate?",
+        "choices": [
+          "A) The rule that American oak must be blended with French oak",
+          "B) Treating new vs seasoned oak as a dose dial, not a binary habit",
+          "C) The requirement to model ellagitannin mg/L against free SO₂",
+          "D) The toast-level specification for medium-bodied varieties"
+        ],
+        "answer": "B",
+        "rationale": "New vs seasoned is a dose decision calibrated to wine structure and economics — defaulting to 100% new oak every year is habit, not design."
+      },
+      {
+        "q": "Owen's barrel register shows a wine with moderate tannin structure being matured in a heavy-toast barrel. What is the most likely sensory risk?",
+        "choices": [
+          "A) Insufficient vanillin extraction leaving the wine flat",
+          "B) Smoke and mocha notes dominating rather than integrating",
+          "C) Excessive ellagitannin astringency from over-extraction",
+          "D) Reductive character from suppressed micro-oxygenation"
+        ],
+        "answer": "B",
+        "rationale": "Heavy toast suits high-phenolic wines; on a moderate-structure wine, smoke and mocha will dominate rather than integrate — the lesson explicitly flags this trap."
+      },
+      {
+        "q": "A vigneron argues that grain tightness in French oak is purely a function of the forest region (Allier vs Vosges). What does the lesson correct about this reasoning?",
+        "choices": [
+          "A) Region is irrelevant — only cooperage technique determines grain",
+          "B) Grain, not geography, drives extraction rate differences between French and American oak",
+          "C) American oak has tighter grain than French oak, slowing extraction",
+          "D) Toast level overrides grain structure as the primary extraction variable"
+        ],
+        "answer": "B",
+        "rationale": "The lesson states grain structure — not geographic origin per se — drives the extraction rate difference; while French forest regions affect grain, the mechanism is grain, and American vs French is the primary comparison made."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Ellagitannin contribution: first-fill vs third-fill French 225 L barrel?",
+        "back": "First fill ~40–60 mg/L; by third fill drops to <10 mg/L — use fill number as your dose dial."
+      },
+      {
+        "front": "Why does American oak extract vanillin and cis-oak lactone faster than French?",
+        "back": "Wider grain in American oak allows faster solvent penetration — grain structure, not geography, drives extraction rate."
+      },
+      {
+        "front": "Which toast level suits high-phenolic varieties and why?",
+        "back": "Heavy toast — smoke and mocha notes integrate with dense tannin structure rather than dominating a lighter wine."
+      },
+      {
+        "front": "Correct top-up cadence for the first three months of barrel maturation?",
+        "back": "Weekly — every day of ullage above the bung is uncontrolled oxidation, not passive ageing."
+      },
+      {
+        "front": "Amortised cost of a new French 225 L barrel over three fills?",
+        "back": "~$1.80–$2.65/L — model this against fruit cost before committing to a barrel order."
+      },
+      {
+        "front": "What is the broadest-use toast specification for barrel maturation?",
+        "back": "Medium toast — appropriate across the widest range of wine structures and varieties."
+      },
+      {
+        "front": "Common trap: treating new vs seasoned oak as a binary choice?",
+        "back": "It is a dose dial — blend fill numbers to calibrate oak extraction to wine structure and economics."
+      },
+      {
+        "front": "What primary compound distinguishes French oak's slower structural contribution?",
+        "back": "Ellagitannins — released more slowly from tight-grained French oak, matching wines that need gradual tannin integration."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2568,
+    "completion_tokens": 5842
+  },
+  "audit": {
+    "totalWords": 1555,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:49:11.445Z"
+}

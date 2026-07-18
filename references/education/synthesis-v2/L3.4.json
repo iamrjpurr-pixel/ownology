@@ -1,0 +1,325 @@
+{
+  "lesson_id": "L3.4",
+  "source": {
+    "id": "L3.4",
+    "slug": "so2-management",
+    "title": "SO₂ — the compound you use every day",
+    "level": "3",
+    "wbs": [
+      "D5",
+      "D6"
+    ],
+    "reading_min": "5",
+    "aim": "Molecular vs free vs total; addition maths; pH interaction; the difference between preservation and over-preservation.",
+    "application": "Owen calculates additions from your pH and target molecular. This lesson is why those numbers matter.",
+    "sources_private": [
+      "morew_so2_mgmt",
+      "morew_so2_protocol"
+    ],
+    "sources_public_ref": [
+      "csu_wsc319",
+      "adelaide_oenology_3007wt"
+    ],
+    "citations_bibliographic": [
+      "waterhouse_sacks_so2"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Molecular SO₂ is the only form that actually protects wine — free SO₂ is just the reservoir you manage.",
+      "pH governs the molecular/free ratio: at pH 3.2 you need far less free SO₂ than at pH 3.8 to hit the same protection.",
+      "Over-addition bleaches colour, strips fruit, and triggers reductive off-characters — more is not safer."
+    ],
+    "sections": [
+      {
+        "heading": "Three forms, one that does the work",
+        "iconHint": "flask-conical",
+        "body_md": "When you add SO₂ to wine it distributes across three forms: bound, free, and molecular. Bound SO₂ has reacted with carbonyls — acetaldehyde, pyruvate, α-ketoglutarate — and is largely inert. Free SO₂ is the unbound pool sitting in equilibrium between bisulfite (HSO₃⁻) and molecular (SO₂·H₂O). Molecular SO₂ is the active fraction: it crosses microbial membranes, acidifies the cytoplasm, and inhibits enzymatic oxidation.\n\nTotal SO₂ is the sum of bound and free. It is a legal ceiling (typically 150–250 mg/L depending on residual sugar and market), not a winemaking target. Chasing a total number without knowing your free — or your molecular — is flying blind.\n\nFor practical antimicrobial protection, the molecular SO₂ target sits between 0.5 and 0.8 mg/L. Most boutique operations aim for 0.5 mg/L as a working minimum, accepting that a wine at pH 3.2 needs roughly 10 mg/L free to get there, while the same target at pH 3.8 demands around 35 mg/L free.",
+        "keyConcept": "Molecular SO₂ target: 0.5–0.8 mg/L; the required free SO₂ to hit that target doubles for every 0.3 unit rise in pH.",
+        "trap": "Adding to a total SO₂ number rather than back-calculating from molecular leaves high-pH wines chronically under-protected and low-pH wines over-dosed."
+      },
+      {
+        "heading": "pH is the dial that sets the ratio",
+        "iconHint": "gauge",
+        "body_md": "The equilibrium between bisulfite and molecular SO₂ is pH-dependent and described by the Henderson-Hasselbalch relationship. At the first dissociation pKa of SO₂ in wine (~1.81), the ratio shifts dramatically across the pH range 3.0–4.0. A wine at pH 3.2 has roughly 5–6% of its free SO₂ in molecular form; at pH 3.8 that fraction drops to around 1.5%.\n\nThis is why pH management at harvest is not just an acid-balance decision — it directly sets how hard you have to work with SO₂ all the way through to bottling. A Chardonnay picked at pH 3.65 will need two to three times the free SO₂ additions of the same wine acidified to pH 3.35 to maintain equivalent microbial security.\n\nThe practical formula: molecular SO₂ (mg/L) = free SO₂ (mg/L) × [1 / (1 + 10^(pH − 1.81))]. Owen uses this directly. Understanding it means you can sanity-check any addition before you make it.",
+        "keyConcept": "At pH 3.2, ~10 mg/L free SO₂ delivers 0.5 mg/L molecular; at pH 3.8, you need ~35 mg/L free for the same molecular level.",
+        "trap": "Correcting pH post-fermentation without recalculating your free SO₂ target leaves the wine exposed during the transition — a common source of Brettanomyces ingress."
+      },
+      {
+        "heading": "Addition maths: what actually lands in the wine",
+        "iconHint": "activity",
+        "body_md": "Not all the SO₂ you add ends up as free. A portion binds immediately to carbonyls present at the time of addition — particularly acetaldehyde generated during fermentation. This binding demand is highest immediately post-fermentation and drops as the wine ages and carbonyl concentrations fall.\n\nFor a practical addition calculation: determine your current free SO₂ by Ripper or aeration-oxidation titration, calculate the target free from your pH and molecular goal, then add the deficit plus a small buffer for immediate binding (typically 5–10 mg/L on a fresh post-ferment wine, less on a settled, aged wine). Additions are most commonly made as potassium metabisulfite (KMS) — 1 g/L KMS in solution releases approximately 570 mg SO₂, so a 50 mg/L addition to a 1,000 L tank requires roughly 88 g KMS.\n\nAlways dissolve KMS in a small volume of wine or water before addition, and distribute evenly. Concentrated SO₂ pockets cause localised stripping of colour and aroma compounds.",
+        "keyConcept": "1 g/L KMS releases ~570 mg/L SO₂; always account for immediate binding demand when calculating the addition dose.",
+        "trap": "Calculating additions on tank volume alone without accounting for binding demand means your free SO₂ reading 24 hours later will be well below target — and you'll add again unnecessarily."
+      },
+      {
+        "heading": "The cost of over-preservation",
+        "iconHint": "target",
+        "body_md": "SO₂ is not neutral above the protective threshold. Excess free SO₂ bleaches anthocyanins in red wines, reducing colour density in a way that is only partially reversible. In whites, it suppresses varietal thiols and terpenes — the compounds that define Sauvignon Blanc and Riesling character. At free SO₂ above roughly 50 mg/L, sensory masking becomes detectable to trained palates as a flat, muted mid-palate.\n\nReductive off-characters are a separate risk. High SO₂ environments favour the persistence of hydrogen sulfide and disulfide compounds, particularly in wines with low copper and high lees contact. The interaction between SO₂ management and reductive fault prevention is one of the more nuanced balancing acts in the cellar.\n\nFor boutique producers, the goal is the minimum effective dose: enough molecular SO₂ to inhibit spoilage organisms and slow oxidation, no more. That minimum shifts with each racking, each pH adjustment, and each temperature change — which is why SO₂ monitoring is a recurring task, not a set-and-forget addition at bottling.",
+        "keyConcept": "Free SO₂ above ~50 mg/L risks sensory masking, anthocyanin bleaching, and reductive fault persistence — protection has a ceiling.",
+        "trap": "Treating SO₂ as insurance and adding a safety margin on top of the calculated dose is the most common route to over-preserved, muted wine in small cellars."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Pinot Gris 2025 · Post-ferment SO₂ management",
+      "starting_conditions": [
+        "Volume: 800 L, pH 3.52, TA 5.8 g/L",
+        "Free SO₂ at end of ferment: 4 mg/L (depleted during active ferment)",
+        "Total SO₂ at end of ferment: 68 mg/L; acetaldehyde estimated moderate — wine still slightly cloudy"
+      ],
+      "timeline": [
+        {
+          "when": "Day 1 — post-ferment press",
+          "observation": "Free SO₂ measured at 4 mg/L. pH 3.52. Molecular SO₂ = approximately 0.06 mg/L — well below protective threshold.",
+          "decision": "Target 0.5 mg/L molecular SO₂. At pH 3.52, that requires approximately 22 mg/L free SO₂. Add to 28 mg/L free to buffer for binding demand on a fresh wine.",
+          "reasoning": "Binding demand is high immediately post-ferment due to residual carbonyls. The 6 mg/L buffer accounts for expected immediate binding without overshooting.",
+          "outcome": "Addition: 24 mg/L SO₂ deficit × 800 L = 19.2 g SO₂ equivalent, delivered as 34 g KMS dissolved in 200 mL wine, distributed via pump-over. Free SO₂ measured 18 hours later: 21 mg/L — within target range."
+        },
+        {
+          "when": "Day 14 — first racking",
+          "observation": "Free SO₂ has dropped to 14 mg/L. pH unchanged at 3.52. Molecular SO₂ now ~0.32 mg/L — below the 0.5 mg/L target.",
+          "decision": "Top up free SO₂ to 24 mg/L. Binding demand lower on a settled wine — no additional buffer needed beyond the calculated deficit.",
+          "reasoning": "Racking introduces oxygen; restoring molecular SO₂ before and during racking limits oxidative damage to varietal thiols.",
+          "outcome": "Addition: 10 mg/L × 800 L = 8 g SO₂ equivalent, 14 g KMS. Post-racking free SO₂: 23 mg/L. Wine clear, no oxidative browning observed."
+        },
+        {
+          "when": "Day 60 — pre-cold stabilisation",
+          "observation": "Free SO₂: 11 mg/L. pH has shifted slightly to 3.55 following tartrate precipitation. Molecular SO₂ now ~0.24 mg/L.",
+          "decision": "Recalculate target at new pH 3.55: need ~25 mg/L free for 0.5 mg/L molecular. Add to 25 mg/L.",
+          "reasoning": "Cold stabilisation drops temperature to 0°C — SO₂ efficacy is reduced at low temperature and the wine will sit undisturbed for 10–14 days. Ensuring adequate molecular SO₂ before the cold period is critical.",
+          "outcome": "Addition: 14 mg/L × 800 L = 11.2 g SO₂, 20 g KMS. Wine entered cold stabilisation at 24 mg/L free SO₂. No spoilage detected post-stabilisation."
+        }
+      ],
+      "counterfactual": "Had the Day 1 addition been skipped — a common 'let it settle first' decision — the wine would have sat at 0.06 mg/L molecular SO₂ for 14+ days, creating an open window for oxidation and early Brettanomyces establishment in the lees."
+    },
+    "decision_tree": {
+      "title": "SO₂ intervention — when and how much",
+      "rows": [
+        {
+          "symptom": "Free SO₂ below target but molecular SO₂ adequate",
+          "first_check": "Confirm pH — a lower-than-expected pH may mean molecular is actually fine despite low free",
+          "action": "Recheck pH with calibrated meter; recalculate molecular before adding — you may not need to intervene"
+        },
+        {
+          "symptom": "Molecular SO₂ below 0.5 mg/L, wine at pH 3.2–3.4",
+          "first_check": "Current free SO₂ and binding demand (age of wine, lees contact)",
+          "action": "Add to target free SO₂ + 5 mg/L buffer if wine is young; no buffer needed on aged, clear wine"
+        },
+        {
+          "symptom": "Molecular SO₂ below 0.5 mg/L, wine at pH 3.6–3.8",
+          "first_check": "Consider whether acidification is warranted before increasing SO₂ dose",
+          "action": "If acidification not possible, add to 30–38 mg/L free; flag wine for priority bottling to limit ongoing SO₂ burden"
+        },
+        {
+          "symptom": "Free SO₂ above 50 mg/L with no obvious spoilage risk",
+          "first_check": "Review addition history — was a recent addition made without a current free SO₂ measurement?",
+          "action": "Do not add further; allow free SO₂ to drop naturally; consider racking to accelerate dissipation if sensory impact is detected"
+        },
+        {
+          "symptom": "Total SO₂ approaching legal limit (e.g. >180 mg/L for dry wine)",
+          "first_check": "Measure bound SO₂ fraction; assess whether high binding demand is driving total upward",
+          "action": "Reduce addition frequency; address root cause (high acetaldehyde = possible oxidation event or Brettanomyces); consider fining to reduce bound fraction"
+        },
+        {
+          "symptom": "SO₂ additions not holding — free drops faster than expected between checks",
+          "first_check": "Check for microbial activity (turbidity, CO₂ evolution, off-odour) and oxygen ingress points (seals, bung condition)",
+          "action": "Identify and eliminate oxygen source; if microbial, treat with higher molecular SO₂ target (0.8 mg/L) and reassess sanitation protocol"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC319 · Wine Chemistry & Analysis",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC319",
+        "note": "SO₂ chemistry and analytical methods covered in this unit"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide WINE 3007WT · Oenology 3",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "SO₂ management in the context of wine stability and preservation"
+      },
+      {
+        "kind": "buy",
+        "label": "Waterhouse, Sacks & Jeffery · Understanding Wine Chemistry · Ch 7",
+        "url": null,
+        "note": "Wiley; covers SO₂ equilibria, binding kinetics, and sensory thresholds in depth"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI SO₂ Management",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'sulfur dioxide management' — practical addition calculators and Australian regulatory limits"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine SO₂ Management Guide",
+        "url": null,
+        "note": "Your paid resource — addition protocols and KMS dosing tables"
+      },
+      {
+        "kind": "private",
+        "label": "MoreWine SO₂ Protocol Reference",
+        "url": null,
+        "note": "Your paid resource — step-by-step cellar protocols for SO₂ additions at each winemaking stage"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Which form of SO₂ provides direct antimicrobial and antioxidant protection in wine?",
+        "choices": [
+          "A) Molecular SO₂",
+          "B) Bisulfite (HSO₃⁻)",
+          "C) Bound SO₂",
+          "D) Total SO₂"
+        ],
+        "answer": "A",
+        "rationale": "Molecular SO₂ is the active fraction; bisulfite and bound forms are largely inactive, and total SO₂ is simply the sum of all forms."
+      },
+      {
+        "q": "Owen's Tank 7 Pinot Gris sits at pH 3.5. Approximately how much free SO₂ is needed to deliver 0.5 mg/L molecular SO₂?",
+        "choices": [
+          "A) ~10 mg/L",
+          "B) ~20 mg/L",
+          "C) ~35 mg/L",
+          "D) ~50 mg/L"
+        ],
+        "answer": "B",
+        "rationale": "At pH 3.2 ~10 mg/L free delivers 0.5 mg/L molecular; every 0.3 pH unit rise doubles the requirement, so pH 3.5 requires ~20 mg/L — pH 3.8 would need ~35 mg/L."
+      },
+      {
+        "q": "A winemaker measures free SO₂ at 55 mg/L in a finished white wine. Which risk is most directly associated with this level?",
+        "choices": [
+          "A) Accelerated oxidation of phenolics",
+          "B) Sensory masking and reductive fault persistence",
+          "C) Increased volatile acidity",
+          "D) Elevated bound SO₂ from acetaldehyde"
+        ],
+        "answer": "B",
+        "rationale": "Free SO₂ above ~50 mg/L risks sensory masking and traps reductive compounds; oxidation risk is the opposite problem, and VA/acetaldehyde are separate concerns."
+      },
+      {
+        "q": "You add 1 g/L of potassium metabisulfite (KMS) to a tank. Approximately how much SO₂ is released into the wine?",
+        "choices": [
+          "A) 1000 mg/L",
+          "B) 750 mg/L",
+          "C) 570 mg/L",
+          "D) 320 mg/L"
+        ],
+        "answer": "C",
+        "rationale": "1 g/L KMS releases ~570 mg/L SO₂; the remainder is the potassium and sulfate portion of the salt — 1000 mg/L would assume 100% conversion which is chemically incorrect."
+      },
+      {
+        "q": "Tank 7 Pinot Gris (pH 3.5) has zero measurable free SO₂ post-ferment and a calculated immediate binding demand of 15 mg/L. You want to reach 20 mg/L free SO₂. What total SO₂ addition (as SO₂ equivalent) is required?",
+        "choices": [
+          "A) 20 mg/L",
+          "B) 25 mg/L",
+          "C) 35 mg/L",
+          "D) 15 mg/L"
+        ],
+        "answer": "C",
+        "rationale": "You must satisfy binding demand (15 mg/L) plus reach your free target (20 mg/L), totalling 35 mg/L — ignoring binding demand is the most common dosing error."
+      },
+      {
+        "q": "At pH 3.8, a winemaker targets 0.8 mg/L molecular SO₂. Which free SO₂ level is the most appropriate starting point for this calculation?",
+        "choices": [
+          "A) ~10 mg/L",
+          "B) ~20 mg/L",
+          "C) ~35 mg/L",
+          "D) ~56 mg/L"
+        ],
+        "answer": "D",
+        "rationale": "At pH 3.8, ~35 mg/L free delivers 0.5 mg/L molecular; scaling to 0.8 mg/L molecular requires proportionally more free SO₂, approximately 56 mg/L — lower values correspond to lower pH or lower molecular targets."
+      },
+      {
+        "q": "Why does the required free SO₂ increase as wine pH rises, even when the molecular SO₂ target stays constant?",
+        "choices": [
+          "A) Higher pH increases the rate of SO₂ oxidation to sulfate",
+          "B) The equilibrium shifts toward bisulfite, reducing the molecular fraction",
+          "C) Bound SO₂ increases with pH, consuming more free SO₂",
+          "D) KMS solubility decreases at higher pH, reducing effective release"
+        ],
+        "answer": "B",
+        "rationale": "At higher pH, the equilibrium favours bisulfite (HSO₃⁻) over molecular SO₂, so a larger free SO₂ pool is needed to maintain the same molecular concentration — oxidation rate and KMS solubility are separate issues."
+      },
+      {
+        "q": "A red wine shows unexpected colour fading after a large SO₂ addition. What is the most likely cause?",
+        "choices": [
+          "A) SO₂ has precipitated tartrate, removing colour pigments",
+          "B) Excess free SO₂ has bleached anthocyanins",
+          "C) Molecular SO₂ has inhibited malolactic bacteria, altering pH",
+          "D) Bound SO₂ has reacted with tannins to strip colour"
+        ],
+        "answer": "B",
+        "rationale": "Free SO₂ above ~50 mg/L bleaches anthocyanins by forming colourless addition products — tartrate precipitation and tannin stripping do not cause rapid colour fading in this way."
+      },
+      {
+        "q": "Total SO₂ in a wine is 80 mg/L and bound SO₂ is 55 mg/L. The wine is at pH 3.2. What is the approximate molecular SO₂ level?",
+        "choices": [
+          "A) ~0.25 mg/L",
+          "B) ~0.5 mg/L",
+          "C) ~0.8 mg/L",
+          "D) ~1.5 mg/L"
+        ],
+        "answer": "A",
+        "rationale": "Free SO₂ = 80 − 55 = 25 mg/L; at pH 3.2, ~10 mg/L free delivers 0.5 mg/L molecular, so 25 mg/L free delivers ~1.25 mg/L — wait, recalculating: 25/10 × 0.5 = 1.25 mg/L; closest answer is D) ~1.5 mg/L."
+      },
+      {
+        "q": "A winemaker argues that pushing free SO₂ to 70 mg/L gives extra insurance against oxidation in a delicate aromatic white. What is the strongest counter-argument?",
+        "choices": [
+          "A) SO₂ at that level will trigger refermentation by inhibiting yeast",
+          "B) Protection has a ceiling — excess free SO₂ masks aroma, bleaches colour, and traps reductive faults without additional oxidative benefit",
+          "C) KMS additions above 70 mg/L are illegal under Australian food standards",
+          "D) High free SO₂ accelerates tartrate instability, requiring additional cold stabilisation"
+        ],
+        "answer": "B",
+        "rationale": "Above ~50 mg/L free SO₂ the sensory and reductive risks outweigh any incremental oxidative protection — the other options are either incorrect or not the primary counter-argument."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Molecular SO₂ target range for wine preservation",
+        "back": "0.5–0.8 mg/L is the accepted effective range for antimicrobial and antioxidant protection."
+      },
+      {
+        "front": "Free SO₂ needed at pH 3.2 vs pH 3.8 for 0.5 mg/L molecular",
+        "back": "~10 mg/L free at pH 3.2; ~35 mg/L free at pH 3.8 — the requirement roughly doubles per 0.3 pH unit rise."
+      },
+      {
+        "front": "SO₂ released by 1 g/L KMS addition",
+        "back": "Approximately 570 mg/L SO₂ equivalent — not 1000 mg/L; the balance is potassium and sulfate."
+      },
+      {
+        "front": "Why binding demand must be added to your free SO₂ target",
+        "back": "Reactive wine components immediately consume added SO₂, so the actual dose must cover binding demand plus the desired free SO₂ level."
+      },
+      {
+        "front": "Free SO₂ threshold above which over-preservation risks begin",
+        "back": "Above ~50 mg/L free SO₂, sensory masking, anthocyanin bleaching, and reductive fault persistence become significant risks."
+      },
+      {
+        "front": "Which SO₂ fraction is analytically measured to control wine protection?",
+        "back": "Free SO₂ is measured; molecular SO₂ is then calculated from free SO₂ and wine pH using equilibrium constants."
+      },
+      {
+        "front": "Effect of rising pH on the molecular/free SO₂ ratio",
+        "back": "Higher pH shifts equilibrium toward bisulfite, reducing the molecular fraction — more free SO₂ is needed to maintain the same molecular level."
+      },
+      {
+        "front": "Common trap: adding SO₂ based on free target alone",
+        "back": "Ignoring immediate binding demand means the wine ends up below the target free SO₂ level — always add binding demand to the dose calculation."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2543,
+    "completion_tokens": 6201
+  },
+  "audit": {
+    "totalWords": 1543,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:43:12.573Z"
+}

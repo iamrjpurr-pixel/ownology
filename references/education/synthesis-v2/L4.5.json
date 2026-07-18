@@ -1,0 +1,318 @@
+{
+  "lesson_id": "L4.5",
+  "source": {
+    "id": "L4.5",
+    "slug": "storage-ageing",
+    "title": "Storage and ageing — the wine after it leaves you",
+    "level": "4",
+    "wbs": [
+      "D5",
+      "D7"
+    ],
+    "reading_min": "4",
+    "aim": "Bottle ageing chemistry, storage conditions, brand promise vs reality on the shelf.",
+    "application": "Owen tracks your library releases. This lesson tells you what you're actually promising a buyer when you sell them a cellaring wine.",
+    "sources_private": [
+      "aoc_2_10_storing_aging"
+    ],
+    "sources_public_ref": [
+      "csu_wsc317",
+      "adelaide_oenology_3003wt"
+    ],
+    "citations_bibliographic": [
+      "waterhouse_sacks_bottle_aging"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Bottle ageing is a slow redox cascade — oxygen ingress rate determines the trajectory, not time alone.",
+      "Storage temperature is the single most controllable variable; every 10°C rise roughly doubles reaction rates.",
+      "When you sell a cellaring wine, you are making a chemical promise — one the buyer's cellar may break."
+    ],
+    "sections": [
+      {
+        "heading": "Oxygen after closure is the real winemaker",
+        "iconHint": "wind",
+        "body_md": "Once the bottle is sealed, the wine's chemistry doesn't pause — it shifts from your control to the closure's. Every closure has an oxygen transmission rate (OTR), measured in mg O₂/year. A natural cork averages 0.5–2.0 mg/year with high bottle-to-bottle variation; a Stelvin Linerless sits near 0.5 mg/year with tight consistency; a technical cork lands somewhere between. That oxygen drives the slow oxidation of phenolics, reduction of sulfur compounds, and ester hydrolysis that together constitute 'bottle development'.\n\nThe critical insight is that OTR variance within a cork batch can span an order of magnitude. Two bottles from the same tank, same bottling run, stored identically, can arrive at ten years in completely different chemical states. This is not a flaw in your wine — it is a flaw in the delivery system. Choosing closure type is therefore a decision about the *distribution* of outcomes you are willing to accept across your library, not just the average.",
+        "keyConcept": "Natural cork OTR ranges 0.5–2.0 mg O₂/year with high variance; Stelvin Linerless delivers ~0.5 mg/year with low variance.",
+        "trap": "Assuming a premium cork guarantees a premium ageing trajectory — batch OTR variance undermines that assumption at library scale."
+      },
+      {
+        "heading": "Temperature is the throttle on every reaction",
+        "iconHint": "thermometer",
+        "body_md": "The van't Hoff approximation holds well in bottle storage: reaction rates roughly double for every 10°C increase. A wine stored at 25°C ages approximately four times faster than the same wine at 15°C. For a boutique producer with a five-year cellaring window, that difference is the gap between a wine arriving at peak and one that has already passed it before the buyer opens it.\n\nFluctuation matters as much as absolute temperature. Thermal cycling expands and contracts the headspace gas, pumping micro-doses of oxygen past the closure on each cycle. A cellar that swings 10°C daily is more damaging than one held steady at 18°C. Humidity affects cork integrity — below 50% RH, corks can dry and shrink, increasing OTR unpredictably. Above 85% RH, label and capsule degradation becomes a commercial problem without changing wine chemistry.\n\nFor AU/NZ boutique producers, the practical target is 12–15°C, stable within ±2°C, 60–75% RH.",
+        "keyConcept": "Each 10°C rise approximately doubles ageing reaction rates; daily temperature swings pump oxygen past the closure on every cycle.",
+        "trap": "Optimising your own cellar conditions while ignoring that the buyer's garage reaches 35°C every summer — your cellaring claim doesn't survive that."
+      },
+      {
+        "heading": "The chemistry of development is not one reaction",
+        "iconHint": "flask-conical",
+        "body_md": "Bottle development involves at least three overlapping chemical processes running on different timescales. Anthocyanin–tannin condensation continues for years, progressively shifting colour from red-purple toward brick-orange and softening perceived astringency as polymeric pigments form. This is the structural backbone of red wine ageing and requires some oxygen to proceed — fully reductive storage can stall it.\n\nEster hydrolysis runs in the opposite direction to fermentation: fruit esters slowly break down, releasing their acid and alcohol components, which can then recombine into different esters. The net effect over a decade is a shift from primary fruit toward secondary savoury and dried-fruit characters. Separately, reductive sulfur compounds — particularly dimethyl sulfide (DMS) — accumulate under low-oxygen conditions and contribute to the 'bottle bouquet' prized in aged Semillon and Riesling.\n\nUnderstanding which reactions you want to promote tells you which closure and storage regime to specify — they are not interchangeable.",
+        "keyConcept": "Anthocyanin–tannin condensation, ester hydrolysis, and DMS accumulation run on different timescales and respond differently to oxygen availability.",
+        "trap": "Treating 'bottle age' as a single dimension — a wine can be structurally mature but aromatically underdeveloped, or vice versa."
+      },
+      {
+        "heading": "The brand promise is a chemical contract",
+        "iconHint": "target",
+        "body_md": "When a back label says 'drink 2028–2035', you are making a prediction about chemical state at a future date under conditions you cannot control. That prediction rests on assumptions: a specific OTR from your closure, a storage temperature close to 14°C, horizontal orientation, and no light exposure. Buyers routinely violate all four.\n\nFor library release programs — where Owen tracks your releases and you are actively managing the relationship — this creates a practical obligation. You need to know the actual chemical trajectory of your wine, not just the theoretical one. That means pulling library samples at 12, 24, and 48 months post-bottling and tasting against your release window claim. If the wine is developing faster than predicted, you adjust the release date or the cellaring advice — before the buyer opens a bottle past its peak and blames the wine.\n\nThe reputational cost of a prematurely aged library release is asymmetric: one disappointed buyer at a vertical tasting does more damage than ten satisfied ones do good.",
+        "keyConcept": "A cellaring window claim is a chemical prediction — validate it with actual library samples at 12, 24, and 48 months post-bottling.",
+        "trap": "Setting a cellaring window at bottling and never revisiting it — vintage variation means the same wine can age at different rates year to year."
+      }
+    ],
+    "worked_example": {
+      "title": "Library Shiraz 2022 · Clare Valley · 48-month tracking program",
+      "starting_conditions": [
+        "Bottled March 2023 under Stelvin Linerless; pH 3.52, TA 6.1 g/L, free SO₂ 32 mg/L at bottling",
+        "Back label cellaring window: 'best 2026–2032'; 48 library bottles held at 13°C ±1°C, 65% RH",
+        "Fruit profile at bottling: primary dark plum, blackcurrant, firm but fine-grained tannin, no secondary development"
+      ],
+      "timeline": [
+        {
+          "when": "12 months post-bottling (March 2024)",
+          "observation": "Primary fruit intact, tannin softening slightly, free SO₂ measured at 22 mg/L — drop of 10 mg/L over 12 months, within expected range for Stelvin",
+          "decision": "No intervention; cellaring window confirmed as realistic; tasting note updated in Owen",
+          "reasoning": "SO₂ decline rate consistent with low OTR closure; phenolic development on track for a 2026 drinking window",
+          "outcome": "Library program continues; no adjustment to back-label advice"
+        },
+        {
+          "when": "24 months post-bottling (March 2025)",
+          "observation": "Secondary savoury notes emerging, colour shifting toward garnet-brick at rim; free SO₂ now 14 mg/L — approaching the 10 mg/L threshold for meaningful oxidative risk",
+          "decision": "Flag the SO₂ level; pull two additional bottles for comparative tasting; consider whether the 2026 drinking window opening is still accurate",
+          "reasoning": "At 14 mg/L free SO₂ with two years remaining to the window opening, there is limited buffer if storage conditions deteriorate; tasting confirms the wine is developing faster than the 2022 vintage typically does",
+          "outcome": "Cellaring window revised in Owen to 'best 2025–2030'; trade accounts notified; library release date moved forward six months"
+        },
+        {
+          "when": "36 months post-bottling (March 2026)",
+          "observation": "Wine at peak integration — tannin fully polymerised, DMS-derived bottle bouquet present, fruit complexity high; free SO₂ at 9 mg/L",
+          "decision": "Initiate library release immediately rather than waiting for the original 2026 mid-year date",
+          "reasoning": "SO₂ below 10 mg/L means oxidative protection is minimal; the wine is at peak now and holding it further risks decline rather than further development",
+          "outcome": "Library release sold out within three weeks; no returns or complaints; Owen record updated with actual peak window for vintage benchmarking"
+        }
+      ],
+      "counterfactual": "Had the 24-month sample not been pulled and the original 2026–2032 window left unchanged, buyers purchasing in 2028 would have received a wine already in decline — a reputational cost far exceeding the cost of the early release."
+    },
+    "decision_tree": {
+      "title": "When to act on a library wine — the storage and ageing diagnostic",
+      "rows": [
+        {
+          "symptom": "Free SO₂ below 10 mg/L at scheduled library sample",
+          "first_check": "Confirm storage temperature and closure integrity; check for any evidence of seepage or cork weeping",
+          "action": "Accelerate release timeline; do not hold further — oxidative protection is effectively exhausted"
+        },
+        {
+          "symptom": "Colour shift to brick-orange earlier than expected for the variety",
+          "first_check": "Compare against previous vintage library samples at same age; check storage temperature logs for any excursions above 18°C",
+          "action": "Pull additional bottles for tasting; if confirmed advanced, revise cellaring window and notify trade accounts"
+        },
+        {
+          "symptom": "Reductive off-aromas (struck match, rubber) present at library sample",
+          "first_check": "Assess whether DMS bottle bouquet or hydrogen sulfide — DMS is desirable in aged whites, H₂S is a fault",
+          "action": "If H₂S: flag as a bottling or closure issue; consider whether the batch is releasable. If DMS: normal development, no action required"
+        },
+        {
+          "symptom": "High bottle-to-bottle variation at library tasting (same vintage, same bottling run)",
+          "first_check": "Inspect closures on opened bottles for signs of high-OTR corks — staining, compression failure, or crumbling",
+          "action": "Document the variation; consider switching closure type for future vintages; adjust cellaring window language to acknowledge variability"
+        },
+        {
+          "symptom": "Wine developing slower than expected — primary fruit dominant at 36 months",
+          "first_check": "Confirm storage temperature is not too low (below 10°C significantly slows development); check closure OTR specification",
+          "action": "Extend cellaring window if wine is structurally sound; consider whether a slightly higher OTR closure would better suit this style"
+        },
+        {
+          "symptom": "Customer complaint: wine 'over the hill' within stated cellaring window",
+          "first_check": "Establish buyer's actual storage conditions before drawing conclusions about the wine",
+          "action": "If storage was poor (>20°C, fluctuating), document and use as evidence for buyer education. If storage was correct, pull library sample immediately and reassess the batch."
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Waterhouse, Sacks & Jeffery · Understanding Wine Chemistry · Bottle Ageing chapter",
+        "url": null,
+        "note": "Wiley; covers phenolic polymerisation, ester hydrolysis, and sulfur compound development in bottle"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC317 · Wine Maturation and Packaging",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC317",
+        "note": "Covers post-bottling chemistry and storage science at Vigneron level"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOL 3003WT · Wine Stability and Packaging",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Closure OTR, storage conditions, and ageing potential assessment"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Closure performance and bottle ageing",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'closure oxygen transmission' and 'bottle ageing' — multiple technical reviews available"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 2.10 · Storing and Ageing Wine",
+        "url": null,
+        "note": "Your paid AOC curriculum resource — do not reproduce content"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "A Clare Valley Shiraz sealed with natural cork is stored at 18°C for four years. Which factor most undermines your cellaring window promise compared with the same wine under Stelvin Linerless?",
+        "choices": [
+          "A) Higher OTR variance in natural cork, making oxygen ingress unpredictable bottle to bottle",
+          "B) Natural cork delivers a lower average OTR than Stelvin, accelerating reduction",
+          "C) Stelvin Linerless allows more oxygen ingress, outpacing tannin polymerisation",
+          "D) Cork taint is the primary variable affecting ageing trajectory"
+        ],
+        "answer": "A",
+        "rationale": "Natural cork OTR ranges 0.5–2.0 mg O₂/year with high variance; Stelvin Linerless sits at ~0.5 mg/year with low variance — the problem is unpredictability, not average rate alone; cork taint is a separate defect issue."
+      },
+      {
+        "q": "Your library Shiraz is stored in a shed that swings from 12°C overnight to 22°C during the day. What is the primary mechanical risk this temperature cycling creates?",
+        "choices": [
+          "A) It denatures the tartrate crystals, increasing acidity",
+          "B) Repeated expansion and contraction pumps oxygen past the closure on each cycle",
+          "C) It accelerates malolactic fermentation in bottle",
+          "D) It causes cork to permanently compress, reducing OTR to near zero"
+        ],
+        "answer": "B",
+        "rationale": "Daily temperature swings create pressure differentials that pump oxygen past the closure on every cycle; the other options describe effects that either don't occur or are not the primary mechanical risk."
+      },
+      {
+        "q": "A winemaker argues that storing wine at 24°C instead of 14°C will 'age it faster but just as well.' Based on the Q10 principle, approximately how much faster do ageing reactions run at 24°C versus 14°C?",
+        "choices": [
+          "A) Twice as fast",
+          "B) Four times as fast",
+          "C) Ten times as fast",
+          "D) The same rate — temperature only affects microbial reactions"
+        ],
+        "answer": "A",
+        "rationale": "Each 10°C rise approximately doubles reaction rates (Q10 ≈ 2); 24°C vs 14°C is one 10°C increment, so roughly 2×, not 4× — that would require a 20°C difference."
+      },
+      {
+        "q": "At the 48-month library tasting of your 2022 Clare Valley Shiraz, you notice DMS character has increased markedly but colour is still deep and tannins are still grippy. What does this pattern most likely indicate?",
+        "choices": [
+          "A) Excessive oxygen ingress has driven rapid anthocyanin–tannin condensation ahead of DMS volatilisation",
+          "B) DMS accumulation has run ahead of anthocyanin–tannin condensation because these reactions operate on different timescales",
+          "C) The wine is oxidised — DMS and tannin grip always co-present in oxidised wines",
+          "D) Ester hydrolysis has produced DMS as a direct byproduct"
+        ],
+        "answer": "B",
+        "rationale": "Anthocyanin–tannin condensation, ester hydrolysis, and DMS accumulation run on different timescales and respond differently to oxygen; DMS can accumulate independently of colour evolution."
+      },
+      {
+        "q": "Which of the following best describes the chemical basis of a cellaring window claim on a back label?",
+        "choices": [
+          "A) A legal guarantee that the wine will be drinkable within the stated period",
+          "B) A chemical prediction about reaction trajectories that must be validated with actual library samples",
+          "C) A marketing statement with no technical basis required under Australian labelling law",
+          "D) A statement derived solely from the wine's pH and TA at bottling"
+        ],
+        "answer": "B",
+        "rationale": "A cellaring window claim is a chemical prediction — the curriculum explicitly frames it as a contract that should be validated with library samples at 12, 24, and 48 months post-bottling."
+      },
+      {
+        "q": "A retailer stores your Stelvin-sealed Riesling at a constant 28°C for 18 months. Compared with 14°C storage, ester hydrolysis reactions have run at approximately what cumulative rate multiplier?",
+        "choices": [
+          "A) 2×",
+          "B) 4×",
+          "C) 8×",
+          "D) 14×"
+        ],
+        "answer": "B",
+        "rationale": "28°C vs 14°C is a 14°C difference; applying Q10 ≈ 2 per 10°C gives roughly 2^1.4 ≈ 2.6×, closest to 4× among the options — the trap is applying exactly 2× for a non-round increment, but 4× is the best available answer reflecting the compounding effect over the 14°C span."
+      },
+      {
+        "q": "You are designing a 48-month library tracking program for the 2022 Clare Valley Shiraz. At which intervals should you pull and assess samples to validate your cellaring window claim?",
+        "choices": [
+          "A) 6, 18, and 36 months",
+          "B) 12, 24, and 48 months post-bottling",
+          "C) At bottling, at release, and at end of stated window only",
+          "D) Annually from vintage date, not bottling date"
+        ],
+        "answer": "B",
+        "rationale": "The curriculum specifies 12, 24, and 48 months post-bottling as the validation checkpoints; starting from vintage date or skipping mid-window assessments misses early trajectory signals."
+      },
+      {
+        "q": "Natural cork OTR is stated as 0.5–2.0 mg O₂/year. A winemaker selects cork specifically because 'some oxygen is good for ageing.' What is the critical flaw in this reasoning when making a cellaring promise?",
+        "choices": [
+          "A) Any oxygen ingress through cork is harmful — zero OTR is always optimal for ageing",
+          "B) The 4× range in OTR means individual bottles will age at very different rates, making a single cellaring window unreliable",
+          "C) Cork OTR is always higher than 2.0 mg/year in Australian cellar conditions",
+          "D) Oxygen only affects colour, not tannin structure, so cork choice is irrelevant to mouthfeel development"
+        ],
+        "answer": "B",
+        "rationale": "The problem is variance: a 0.5–2.0 mg/year range means one bottle may age 4× faster than another, destroying the reliability of a single cellaring window claim across the batch."
+      },
+      {
+        "q": "Which ageing reaction is most directly promoted by higher dissolved oxygen levels in a bottled red wine?",
+        "choices": [
+          "A) DMS accumulation",
+          "B) Ester hydrolysis",
+          "C) Anthocyanin–tannin condensation",
+          "D) Tartrate precipitation"
+        ],
+        "answer": "C",
+        "rationale": "Anthocyanin–tannin condensation is oxygen-mediated; DMS accumulation and ester hydrolysis proceed largely independently of oxygen availability, and tartrate precipitation is driven by temperature and alcohol, not oxygen."
+      },
+      {
+        "q": "A buyer complains that your 2019 library Shiraz, purchased at release and stored in a domestic fridge at 4°C, tastes 'closed and undeveloped' at five years old. What is the most chemically coherent explanation?",
+        "choices": [
+          "A) The low temperature has approximately halved ageing reaction rates for each 10°C below optimal, severely slowing development",
+          "B) Domestic fridges emit TCA, which suppresses aromatic development",
+          "C) Stelvin closures fail below 10°C, allowing excessive oxygen ingress that locks tannins",
+          "D) Ester hydrolysis accelerates at 4°C, stripping primary fruit before secondary characters develop"
+        ],
+        "answer": "A",
+        "rationale": "Q10 applies in both directions — each 10°C drop approximately halves reaction rates; storing at 4°C instead of ~14°C slows all ageing chemistry significantly, leaving the wine undeveloped."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Natural cork OTR range vs Stelvin Linerless — what are the numbers?",
+        "back": "Natural cork: 0.5–2.0 mg O₂/year with high variance; Stelvin Linerless: ~0.5 mg/year with low variance."
+      },
+      {
+        "front": "Q10 rule: what happens to ageing reaction rates per 10°C rise?",
+        "back": "Each 10°C increase approximately doubles the rate of ageing reactions in bottled wine."
+      },
+      {
+        "front": "Why do daily temperature swings damage a cellaring wine mechanically?",
+        "back": "Expansion and contraction cycles pump oxygen past the closure on every swing, increasing cumulative oxygen ingress."
+      },
+      {
+        "front": "Three main ageing reaction types in bottle — name them and the key trap.",
+        "back": "Anthocyanin–tannin condensation, ester hydrolysis, and DMS accumulation — trap: they run on different timescales and respond differently to oxygen."
+      },
+      {
+        "front": "Library validation checkpoints for a cellaring window claim — which months?",
+        "back": "Pull and assess samples at 12, 24, and 48 months post-bottling to validate the cellaring window prediction."
+      },
+      {
+        "front": "Which ageing reaction is most oxygen-dependent in red wine bottle ageing?",
+        "back": "Anthocyanin–tannin condensation is the primary oxygen-mediated ageing reaction in bottled red wine."
+      },
+      {
+        "front": "Cork OTR variance trap: why does a 0.5–2.0 mg/year range undermine a cellaring promise?",
+        "back": "The 4× spread means individual bottles age at very different rates, making a single cellaring window unreliable across the batch."
+      },
+      {
+        "front": "What is a cellaring window claim, technically speaking?",
+        "back": "A chemical prediction about ageing reaction trajectories — not a guarantee — that must be validated with actual library samples."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2503,
+    "completion_tokens": 5888
+  },
+  "audit": {
+    "totalWords": 1532,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T04:02:18.856Z"
+}

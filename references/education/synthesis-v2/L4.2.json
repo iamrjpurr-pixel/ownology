@@ -1,0 +1,326 @@
+{
+  "lesson_id": "L4.2",
+  "source": {
+    "id": "L4.2",
+    "slug": "fault-identification",
+    "title": "Faults — spot them before your consumer does",
+    "level": "4",
+    "wbs": [
+      "D8",
+      "D5"
+    ],
+    "reading_min": "6",
+    "aim": "Brett, reductive, VA, MLF-off, oxidation, TCA — how each smells, why it happens, and what you can and can't do about it.",
+    "application": "Owen flags fault-risk conditions. This lesson lets you smell the wine and confirm — or overrule — the alert.",
+    "sources_private": [
+      "awri_controlling_brett",
+      "awri_avoiding_lab_spoilage"
+    ],
+    "sources_public_ref": [
+      "csu_wsc318",
+      "adelaide_oenology_3007wt"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch6"
+    ]
+  },
+  "generated": {
+    "tldr": [
+      "Six faults — Brett, reductive, VA, MLF-off, oxidation, TCA — each has a distinct smell and a distinct cause you can trace.",
+      "Catching a fault at tank is a winemaking decision; catching it at retail is a brand problem.",
+      "Owen flags risk conditions early; your nose and a few bench tests confirm whether the risk has become reality."
+    ],
+    "sections": [
+      {
+        "heading": "Your nose is the first instrument — trust it, then verify",
+        "iconHint": "activity",
+        "body_md": "Fault detection starts with smell, not chemistry. A trained nose picks up Brett at 200 µg/L 4-ethylphenol — well below the 425 µg/L threshold where most consumers notice something wrong. The gap between those two numbers is your intervention window. Use it.\n\nEvery fault has a primary descriptor and a secondary one that confirms it. Brett smells like band-aid or barnyard, but the confirming note is a dry, leathery finish that doesn't wash off. Reductive wine smells like struck match or rubber, but the tell is that it lifts immediately when you splash the sample. Oxidation smells flat and nutty, but the confirming sign is colour shift — pink to orange in whites, red to brick in reds.\n\nWhen Owen raises a fault-risk flag, pull a sample within 24 hours. Smell it cold (12 °C), then warm it in your palm to 20 °C and smell again. Volatile faults amplify with warmth. If you're unsure, aerate the sample and smell a third time — reductive faults will improve, oxidative faults will worsen.",
+        "keyConcept": "Brett becomes consumer-detectable above ~425 µg/L 4-ethylphenol; your nose can catch it at half that concentration.",
+        "trap": "Smelling a wine straight from a cold tank suppresses volatile faults — you'll miss Brett and VA that a warm glass would reveal immediately."
+      },
+      {
+        "heading": "Brett and VA — the two faults that compound each other",
+        "iconHint": "flask-conical",
+        "body_md": "Brettanomyces bruxellensis and acetic acid bacteria don't always arrive together, but when they do, each masks the other in the glass and both are feeding on the same neglect: warm cellars, low free SO₂, and residual sugar above 0.5 g/L. Brett produces 4-ethylphenol (band-aid) and 4-ethylguaiacol (smoky, spicy). VA is primarily acetic acid with ethyl acetate as the solvent-nail-polish carrier note.\n\nThe legal VA limit in Australia is 1.2 g/L acetic acid for red wine, but consumer tolerance is lower — most tasters flag it above 0.8 g/L. At boutique scale, VA above 0.6 g/L in a wine under 18 months old is a process signal, not just a sensory one: something is wrong with your SO₂ management or your tank hygiene.\n\nFor Brett, the only reliable remediation at cellar scale is early intervention — SO₂ correction to ≥ 0.8 mg/L molecular, sterile filtration, and cold stabilisation to slow residual activity. VA cannot be removed without dealcoholisation or blending; prevention is the only practical tool.",
+        "keyConcept": "Free SO₂ below 20 mg/L at pH 3.6+ gives Brett a viable growth window; molecular SO₂ must stay ≥ 0.8 mg/L to suppress it.",
+        "trap": "Blending a high-VA wine down to below the legal limit doesn't fix the fault — it dilutes it into a larger volume of wine that now carries the problem."
+      },
+      {
+        "heading": "Reductive faults — the spectrum from fixable to permanent",
+        "iconHint": "wind",
+        "body_md": "Reduction is a spectrum. Hydrogen sulphide (H₂S, rotten egg) forms during fermentation under yeast stress — nitrogen deficiency, high turbidity, or certain yeast strains under heat. It's volatile and usually disperses with a single rack or splash. Mercaptans (methanethiol, ethanethiol) form post-fermentation when H₂S reacts with ethanol or other wine components. They smell like cooked cabbage, onion, or rubber, and they do not blow off with aeration alone.\n\nDimethyl sulphide (DMS) sits at the far end — a cooked corn or tinned asparagus note that develops slowly in bottle under reductive conditions. At low levels (< 25 µg/L) it can add complexity to aged reds; above 50 µg/L it's a fault.\n\nThe bench test is simple: add a small amount of copper sulphate solution (0.5 g/L) to a 50 mL sample. If the fault lifts, it's H₂S or a light mercaptan — copper fining at 0.5–1.0 mg/L will treat it. If it doesn't lift, you're dealing with heavier sulphur compounds that require a different approach or blending.",
+        "keyConcept": "H₂S lifts with aeration or copper; mercaptans require copper fining at 0.5–1.0 mg/L Cu²⁺, confirmed by bench trial first.",
+        "trap": "Over-adding copper to chase a stubborn reductive fault strips fruit and can leave residual copper above the 1 mg/L legal limit — always bench trial."
+      },
+      {
+        "heading": "MLF-off, oxidation, and TCA — the three you can't fix in tank",
+        "iconHint": "target",
+        "body_md": "A stuck or partial MLF produces lactic acid bacteria by-products beyond diacetyl — acrolein, mouse cage taint, and geranium note (from sorbate degradation by LAB) are the three that make wine unsaleable. Mouse cage is the most insidious: it's not detectable on the nose at wine pH, only on the palate when saliva raises the pH. Rub a drop on your palm, wait 10 seconds, and smell — if it's there, it's there at a level that will cost you the wine.\n\nOxidation in a finished wine is irreversible. Acetaldehyde (bruised apple, sherry-like) is the primary marker; it forms when ethanol oxidises and free SO₂ is insufficient to bind it. In a white wine, 100 mg/L bound SO₂ suggests significant oxidative history. Prevention is headspace management, SO₂ discipline, and inert gas blanketing.\n\nTCA (2,4,6-trichloroanisole) smells like wet cardboard or damp hessian at detection thresholds as low as 1.5 ng/L. It comes from chlorine-treated wood or cork in contact with mould. There is no remediation. Source identification and elimination — corks, barrel staves, wooden pallets — is the only path.",
+        "keyConcept": "Mouse taint from MLF is only detectable on the palate; rub a drop on your palm at pH 7 to confirm before committing to a blend decision.",
+        "trap": "Adding more SO₂ to an oxidised wine binds acetaldehyde and masks the smell temporarily — it does not reverse the oxidation or restore the wine."
+      },
+      {
+        "heading": "Owen's alert is a probability flag — your sensory confirms the verdict",
+        "iconHint": "gauge",
+        "body_md": "Owen monitors the conditions that precede faults: free SO₂ drift, temperature excursions, residual sugar, pH creep, and MLF completion status. An alert means the risk window is open, not that the fault has occurred. Your job is to close the loop with a physical sample within 24 hours.\n\nA structured tasting protocol takes four minutes: appearance (colour, clarity, bubbles), nose cold, nose warm, palate, and palm test for mouse. Record what you find against the alert type. If the fault is confirmed, the decision tree below gives you the first action. If the fault is absent, the alert still tells you something — the condition that triggered it needs correcting before it becomes a fault.\n\nAt boutique scale, a single tank of Brett-contaminated wine can cross-contaminate cooperage, hoses, and pump seals. The cost of one confirmed fault that reaches bottle is not just that wine — it's the audit of every surface that wine touched.",
+        "keyConcept": "A risk alert without sensory follow-up is incomplete; a sensory check without correcting the underlying condition is also incomplete.",
+        "trap": "Dismissing an Owen alert because the wine 'smells fine today' without correcting the triggering condition — low SO₂, warm cellar — means the fault is still forming."
+      }
+    ],
+    "worked_example": {
+      "title": "Tank 7 · Shiraz 2025 · Post-MLF · Owen VA + Brett risk alert",
+      "starting_conditions": [
+        "Volume: 3,200 L Shiraz, 14.2% alc, pH 3.68, TA 5.8 g/L",
+        "Free SO₂: 14 mg/L (target 30 mg/L); molecular SO₂: 0.31 mg/L — below Brett suppression threshold",
+        "MLF confirmed complete 6 days prior; wine held at 17 °C; residual glucose + fructose 0.6 g/L"
+      ],
+      "timeline": [
+        {
+          "when": "Day 1 — Alert received",
+          "observation": "Owen flags low molecular SO₂ (0.31 mg/L) and residual sugar above 0.5 g/L as concurrent Brett risk conditions. No VA alert yet.",
+          "decision": "Pull a 250 mL sample at tank temperature (17 °C), then warm to 20 °C in hand. Conduct palm test for mouse.",
+          "reasoning": "Molecular SO₂ below 0.8 mg/L at pH 3.68 is a confirmed growth window for Brett. Residual sugar provides substrate. Sensory check determines whether colonisation has already begun.",
+          "outcome": "Nose at 17 °C: clean. Nose at 20 °C: faint band-aid detectable, not yet confirmed. Palm test: negative for mouse. Decision: fault is early-stage, intervention is viable."
+        },
+        {
+          "when": "Day 2 — Bench trial and SO₂ correction",
+          "observation": "4-ethylphenol bench test (Kovats extraction, sent to lab same day): result 190 µg/L — below consumer threshold but above zero, confirming active Brett.",
+          "decision": "Add SO₂ to achieve 35 mg/L free (accounting for pH 3.68, targeting 0.85 mg/L molecular). Calculate addition: 21 mg/L addition as potassium metabisulphite. Cool tank to 13 °C.",
+          "reasoning": "Raising molecular SO₂ above 0.8 mg/L suppresses further Brett activity. Cooling slows enzymatic conversion of hydroxycinnamic acids to ethylphenols. At 190 µg/L, the wine is still below the 425 µg/L consumer threshold — there is time.",
+          "outcome": "SO₂ corrected. Tank temperature dropped to 13 °C within 8 hours. Wine held for 48 hours before re-sampling."
+        },
+        {
+          "when": "Day 4 — Re-evaluation and filtration decision",
+          "observation": "Re-sample at 20 °C: band-aid note no longer detectable. Free SO₂ confirmed at 33 mg/L. Lab result pending for 4-ethylphenol recheck.",
+          "decision": "Schedule sterile filtration (0.45 µm membrane) prior to bottling. Do not blend into other tanks until filtration is confirmed. Flag cooperage used for this wine for hot-water sanitation.",
+          "reasoning": "SO₂ suppresses Brett activity but does not eliminate viable cells. Filtration removes the organism. Cooperage audit prevents cross-contamination to clean wine.",
+          "outcome": "Wine proceeds to filtration. Final 4-ethylphenol result: 195 µg/L — stable, no further production confirmed. Wine bottled within 10 days with no detectable fault at sensory panel."
+        }
+      ],
+      "counterfactual": "Without the Day 1 SO₂ correction and cooling, Brett activity at 17 °C would likely have pushed 4-ethylphenol above 425 µg/L within 10–14 days, making the fault consumer-detectable and the wine unsaleable under the Ownology label."
+    },
+    "decision_tree": {
+      "title": "Fault confirmed — first action by fault type",
+      "rows": [
+        {
+          "symptom": "Band-aid / barnyard on warm nose; lab confirms 4-EP > 150 µg/L",
+          "first_check": "Free SO₂ and molecular SO₂ at current pH; residual sugar; cellar temperature",
+          "action": "Correct to ≥ 0.8 mg/L molecular SO₂, cool to ≤ 13 °C, plan sterile filtration before bottling"
+        },
+        {
+          "symptom": "Struck match or rubber on nose; lifts when sample is splashed",
+          "first_check": "Copper sulphate bench test — does fault lift with 0.5 g/L CuSO₄ addition?",
+          "action": "If yes: copper fine at 0.5–1.0 mg/L Cu²⁺ with bench trial confirmation; rack with aeration. If no: assess for heavier mercaptans, consider blending trial"
+        },
+        {
+          "symptom": "Nail polish / solvent on nose; VA titration > 0.7 g/L acetic acid",
+          "first_check": "Source identification — active fermentation vessel, dirty hose, warm headspace?",
+          "action": "Isolate the tank, correct SO₂, eliminate the source. VA above 1.0 g/L: assess blending ratio or declassify. VA cannot be removed at cellar scale"
+        },
+        {
+          "symptom": "Mouse cage detectable on palm test; MLF recently completed or stuck",
+          "first_check": "Confirm MLF status (paper chromatography or enzymatic); check sorbate addition history",
+          "action": "If sorbate was added pre-MLF completion: wine is likely unsaleable — do not blend. If no sorbate: assess severity; partial mouse can sometimes be masked in a large blend but carries legal and brand risk"
+        },
+        {
+          "symptom": "Flat, nutty, bruised-apple nose; colour shifted orange/brick; acetaldehyde > 50 mg/L",
+          "first_check": "Headspace history, SO₂ records, transfer logs for oxygen exposure events",
+          "action": "Oxidation is irreversible. Bind acetaldehyde with SO₂ addition to stabilise further change. Assess for blending or bulk sale. Audit headspace management protocols immediately"
+        },
+        {
+          "symptom": "Wet cardboard / damp hessian; fault present in multiple bottles or tanks",
+          "first_check": "Cork batch, barrel staves, wooden pallets, any chlorine-treated surfaces in contact with wine",
+          "action": "TCA has no remediation. Quarantine affected wine. Identify and remove the TCA source before any further wine contacts the same surface or closure"
+        }
+      ]
+    },
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 6",
+        "url": null,
+        "note": "Chapman & Hall — spoilage organisms, sulphur chemistry, and fault thresholds"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC318 · Wine Faults and Sensory Analysis",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC318",
+        "note": "Covers Brett, VA, and oxidation in the Australian regulatory context"
+      },
+      {
+        "kind": "curriculum",
+        "label": "University of Adelaide · WINE 3007WT · Oenology 3",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Fault identification and remediation at production scale"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Controlling Brettanomyces",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'Brettanomyces control' — molecular SO₂ thresholds and filtration guidance"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Avoiding Laboratory Spoilage",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'lactic acid bacteria spoilage' — mouse taint and MLF management"
+      }
+    ],
+    "mcqs": [
+      {
+        "q": "Owen flags a Brett risk on Tank 7 Shiraz post-MLF. You pull a sample and detect a faint barnyard character. At approximately what 4-ethylphenol concentration does Brett become detectable by a trained nose — before it reaches consumer-detectable levels?",
+        "choices": [
+          "A) ~210 µg/L",
+          "B) ~425 µg/L",
+          "C) ~850 µg/L",
+          "D) ~1200 µg/L"
+        ],
+        "answer": "A",
+        "rationale": "A trained nose can detect 4-ethylphenol at roughly half the consumer-detectable threshold of ~425 µg/L, giving you an intervention window before the fault becomes a commercial problem."
+      },
+      {
+        "q": "At pH 3.6, what is the minimum free SO₂ level (mg/L) required to keep Brett in check?",
+        "choices": [
+          "A) 10 mg/L",
+          "B) 20 mg/L",
+          "C) 35 mg/L",
+          "D) 50 mg/L"
+        ],
+        "answer": "B",
+        "rationale": "Free SO₂ below 20 mg/L at pH 3.6 or above opens a viable growth window for Brett; 35 and 50 mg/L are above the threshold, and 10 mg/L is dangerously low."
+      },
+      {
+        "q": "Molecular SO₂ must stay at or above what concentration to actively suppress Brettanomyces growth?",
+        "choices": [
+          "A) 0.4 mg/L",
+          "B) 0.6 mg/L",
+          "C) 0.8 mg/L",
+          "D) 1.2 mg/L"
+        ],
+        "answer": "C",
+        "rationale": "≥0.8 mg/L molecular SO₂ is the established suppression threshold; lower values leave Brett viable even if free SO₂ appears adequate on paper."
+      },
+      {
+        "q": "A tank of Chardonnay smells of struck match and rotten egg. You aerate the wine and the struck-match character lifts but a rubbery, onion-like note persists. What does this tell you?",
+        "choices": [
+          "A) H₂S is still present and needs more aeration",
+          "B) Mercaptans have formed and aeration alone will not fix them",
+          "C) The wine has developed TCA and requires carbon fining",
+          "D) VA is masking residual H₂S — check acetic acid levels first"
+        ],
+        "answer": "B",
+        "rationale": "H₂S lifts with aeration; persistence of rubbery/onion character after aeration indicates mercaptans, which require copper fining — aeration alone is insufficient."
+      },
+      {
+        "q": "You decide to copper-fine a reductive Grenache. What is the correct copper sulfate addition rate range to trial on the bench first?",
+        "choices": [
+          "A) 0.1–0.3 mg/L Cu²⁺",
+          "B) 0.5–1.0 mg/L Cu²⁺",
+          "C) 1.5–2.5 mg/L Cu²⁺",
+          "D) 3.0–5.0 mg/L Cu²⁺"
+        ],
+        "answer": "B",
+        "rationale": "0.5–1.0 mg/L Cu²⁺ is the working range for mercaptan removal; lower rates are ineffective, and higher rates risk copper excess and potential legal non-compliance."
+      },
+      {
+        "q": "Owen raises a VA alert on Tank 7 alongside a Brett flag. Why are these two faults particularly dangerous in combination?",
+        "choices": [
+          "A) Acetic acid accelerates 4-ethylphenol production directly",
+          "B) Elevated VA indicates the low-SO₂ and high-pH conditions that also enable Brett growth",
+          "C) Brett metabolises acetic acid, reducing VA but increasing ethyl acetate",
+          "D) VA masks the barnyard aroma, making Brett harder to detect sensorially"
+        ],
+        "answer": "B",
+        "rationale": "High VA is a symptom of the same permissive environment — low free SO₂, elevated pH — that allows Brett to thrive; the two faults share a root cause, not a direct causal link."
+      },
+      {
+        "q": "A winemaker detects a mousy character in a Pinot Noir that has just completed MLF. She can't smell it on the nose. What is the correct sensory confirmation technique?",
+        "choices": [
+          "A) Smell the wine directly from a warm glass to volatilise mouse compounds",
+          "B) Add a drop of NaOH to the sample and smell immediately",
+          "C) Rub a drop on your palm and smell after a few seconds at skin pH",
+          "D) Taste the wine and expectorate — mouse taint is only detectable retronasally"
+        ],
+        "answer": "C",
+        "rationale": "Mouse taint compounds are only volatile at near-neutral pH; rubbing a drop on your palm raises the local pH to ~7, releasing the characteristic popcorn/mouse cage aroma for confirmation."
+      },
+      {
+        "q": "You confirm mouse taint in Tank 7 post-MLF. Which action is most appropriate?",
+        "choices": [
+          "A) Add 50 mg/L free SO₂ immediately to arrest the fault",
+          "B) Fine with bentonite to strip the taint compounds",
+          "C) Recognise this fault cannot be remediated in tank and make a commercial decision accordingly",
+          "D) Rack to a clean vessel and re-inoculate with a fresh MLF culture"
+        ],
+        "answer": "C",
+        "rationale": "Mouse taint, like TCA and oxidation, cannot be fixed in tank; SO₂ addition, bentonite, and re-inoculation do not remove established mouse taint compounds."
+      },
+      {
+        "q": "A cork-tainted wine is confirmed by sensory analysis. The winemaker considers a large-format activated-carbon fining trial. What is the most accurate statement about TCA remediation?",
+        "choices": [
+          "A) Carbon fining reliably removes TCA to below sensory threshold in tank",
+          "B) TCA is classified as a fault you cannot fix in tank; carbon may reduce but rarely eliminates it",
+          "C) TCA is volatile and will dissipate with extended barrel ageing",
+          "D) Re-corking with DIAM closures will neutralise residual TCA in the wine"
+        ],
+        "answer": "B",
+        "rationale": "TCA is listed among the faults that cannot be fixed in tank; carbon may partially reduce concentration but does not reliably restore the wine, and re-corking does not remove TCA already dissolved."
+      },
+      {
+        "q": "Owen's algorithm raises a Brett + VA risk alert on Tank 7 but your sensory check finds no detectable fault. What is the correct next step?",
+        "choices": [
+          "A) Clear the alert — sensory is the gold standard and the wine is clean",
+          "B) Confirm sensory finding, then correct the underlying condition (SO₂, pH) that triggered the alert",
+          "C) Wait 48 hours and re-smell before taking any action",
+          "D) Send a sample to the lab and take no action until results return"
+        ],
+        "answer": "B",
+        "rationale": "A clean sensory result does not mean the risk condition has resolved; the underlying permissive environment must be corrected or Brett and VA will develop — sensory without corrective action is incomplete."
+      }
+    ],
+    "flashcards": [
+      {
+        "front": "Consumer-detectable threshold for 4-ethylphenol (Brett)?",
+        "back": "~425 µg/L; a trained nose can detect Brett at roughly half this concentration, around 210 µg/L."
+      },
+      {
+        "front": "Free SO₂ floor to deny Brett a growth window at pH 3.6+?",
+        "back": "Free SO₂ must stay above 20 mg/L; molecular SO₂ must be ≥0.8 mg/L to actively suppress Brett."
+      },
+      {
+        "front": "Reductive fault: aeration fixes it vs. copper fining required — how do you tell?",
+        "back": "H₂S lifts with aeration; if rubbery or onion character persists after aeration, mercaptans have formed and copper fining is needed."
+      },
+      {
+        "front": "Copper fining rate for mercaptans — bench trial range?",
+        "back": "0.5–1.0 mg/L Cu²⁺; always confirm rate with a bench trial before tank addition."
+      },
+      {
+        "front": "Why rub a drop of wine on your palm to test for mouse taint?",
+        "back": "Mouse taint compounds only volatilise at near-neutral pH (~7); skin pH releases the aroma, which is undetectable on the nose at wine pH."
+      },
+      {
+        "front": "Three faults classified as unfixable in tank?",
+        "back": "Mouse taint (MLF-off), oxidation, and TCA — sensory confirmation drives a commercial decision, not a remediation plan."
+      },
+      {
+        "front": "Owen alert without sensory follow-up — what's missing?",
+        "back": "The alert is a probability flag only; sensory confirmation is required to verify the fault and correcting the underlying condition is required to resolve the risk."
+      },
+      {
+        "front": "Brett and VA alerts together — shared root cause?",
+        "back": "Both thrive under the same conditions: free SO₂ below 20 mg/L and pH 3.6 or above — fix the environment, not just one fault."
+      }
+    ]
+  },
+  "usage": {
+    "prompt_tokens": 2655,
+    "completion_tokens": 6672
+  },
+  "audit": {
+    "totalWords": 1744,
+    "ngramWindow": 8
+  },
+  "version": "structured-v2",
+  "generated_at": "2026-07-18T03:55:52.344Z"
+}
