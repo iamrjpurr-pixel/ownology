@@ -1,0 +1,87 @@
+{
+  "lesson_id": "L4.2",
+  "source": {
+    "id": "L4.2",
+    "slug": "fault-identification",
+    "title": "Faults — spot them before your consumer does",
+    "level": "4",
+    "wbs": [
+      "D8",
+      "D5"
+    ],
+    "reading_min": "6",
+    "aim": "Brett, reductive, VA, MLF-off, oxidation, TCA — how each smells, why it happens, and what you can and can't do about it.",
+    "application": "Owen flags fault-risk conditions. This lesson lets you smell the wine and confirm — or overrule — the alert.",
+    "sources_private": [
+      "awri_controlling_brett",
+      "awri_avoiding_lab_spoilage"
+    ],
+    "sources_public_ref": [
+      "csu_wsc318",
+      "adelaide_oenology_3007wt"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch6"
+    ]
+  },
+  "generated": {
+    "aim": "Brett, reductive, VA, MLF-off, oxidation, and TCA — how each fault smells, why it develops, and what intervention options remain once you've confirmed it in the glass.",
+    "application": "When Owen raises a fault-risk alert — elevated temperature in Tank 4, a stalled MLF, a free SO₂ drop — this lesson gives you the sensory vocabulary and mechanistic logic to smell the wine, weigh the evidence, and decide whether to act or hold. Log your sensory call against the alert in your cellar brief so the ferment trajectory builds a real record.",
+    "body_md": "### Brett (Brettanomyces/Dekkera)\n\nThe descriptors range from barnyard and band-aid through to smoked meat and medicinal iodine. The compounds responsible are 4-ethylphenol (4-EP) and 4-ethylguaiacol (4-EG), produced when *Brettanomyces bruxellensis* decarboxylates hydroxycinnamic acid precursors — coumaric and ferulic acids — already present in the wine. Detection thresholds sit around 140–600 µg/L for 4-EP depending on matrix; 4-EG is detectable at much lower concentrations and adds the smoky character.\n\nWhy it happens:\n- Residual sugar (even <2 g/L) feeds slow Brett growth post-ferment\n- Low free SO₂ (<20 mg/L at wine pH) removes the primary chemical brake\n- Warm storage, oak contact, and high pH all accelerate colonisation\n- Barrels are the main reservoir — the wood harbours cells beyond the reach of surface sanitation\n\nWhat you can do: Raise free SO₂ to ≥30 mg/L (adjust for pH — at pH 3.6 you need more molecular SO₂ than at 3.4). Flash pasteurise or sterile filter if the fault is early and the wine is salvageable. Heavily infected barrels are rarely worth keeping. Prevention — rigorous barrel hygiene, SO₂ management, cold storage — is the only reliable strategy.\n\n---\n\n### Reductive / Sulfide Faults\n\nHydrogen sulfide (H₂S) is the sharp rotten-egg hit detectable at <1 µg/L. Mercaptans (methanethiol, ethanethiol) are the more persistent, rubbery or onion-like compounds that form when H₂S reacts with wine components over time. The distinction matters because H₂S is often fixable; bound mercaptans are not.\n\nWhy it happens:\n- Yeast under nutrient stress (low YAN, high sugar load) shunts sulfur metabolism toward H₂S\n- Excessive elemental sulfur residues on fruit\n- Post-ferment, absence of oxygen allows sulfide accumulation\n- Lees contact without stirring can trap reductive compounds\n\nWhat you can do: Rack with splash to volatilise H₂S early. Copper additions (copper sulfate, 0.1–0.5 mg/L Cu²⁺ as copper metal equivalent) precipitate sulfides — bench trial first, and stay well under the legal limit. Mercaptans respond poorly to copper and may require ascorbic acid trials or blending. If the fault is caught at ferment, a nutrient addition (DAP + organic nitrogen) addresses the root cause.\n\n---\n\n### Volatile Acidity (VA)\n\nAcetic acid is the primary compound; ethyl acetate (nail-polish remover) is the ester that amplifies the perception. Threshold for acetic acid is roughly 0.6–0.7 g/L in red wine, though ethyl acetate becomes intrusive at lower VA levels in some styles. Legal limits in Australia sit at 1.2 g/L (white) and 1.5 g/L (red) acetic acid.\n\nWhy it happens:\n- Acetic acid bacteria (*Acetobacter*, *Gluconobacter*) oxidise ethanol in the presence of oxygen\n- *Brettanomyces* also produces acetic acid as a metabolic byproduct\n- Stuck or sluggish ferments allow lactic acid bacteria to generate VA from residual sugar\n- Fruit with Botrytis infection arrives with elevated baseline VA\n\nWhat you can do: Very little once VA is high. Reverse osmosis (VA reduction) is available commercially and can bring a wine back inside legal limits, but the process strips other volatiles. Prevention is the answer — minimise oxygen exposure, manage ferment health, keep SO₂ up on high-pH fruit.\n\n---\n\n### MLF-Off Characters\n\nA clean MLF converts malic to lactic acid via *Oenococcus oeni* (primarily) and produces diacetyl as a byproduct — desirable in small amounts (buttery), a fault at high concentrations (rancid butter, sauerkraut). Mousiness is the more serious MLF-associated fault: a cage-floor, popcorn character caused by 2-acetyltetrahydropyridine and related compounds, produced mainly by *Lactobacillus* and *Pediococcus* species under low-SO₂, high-pH conditions. Mousiness is pH-dependent in perception — it's more apparent when the wine is alkalised in the mouth, which is why it's often missed on initial nosing.\n\nWhy it happens:\n- Delayed SO₂ addition post-MLF allows spoilage LAB to proliferate\n- High pH (>3.6) favours *Pediococcus* and *Lactobacillus* over *Oenococcus*\n- Ropy wine (polysaccharide production by *Pediococcus*) often accompanies mousiness\n\nWhat you can do: Diacetyl can be reduced by stirring lees (yeast reductases) or extended MLF contact. Mousiness has no reliable cure — SO₂ addition stops further production but does not remove existing compounds. Heavily mousy wine is generally unsalvageable for commercial release.\n\n---\n\n### Oxidation\n\nThe sensory profile shifts from fresh fruit toward cooked apple, sherry, bruised pear (acetaldehyde-dominant), then to flat, brown, and cardboard characters as oxidation progresses. Acetaldehyde is the primary early marker — threshold around 100–125 mg/L, though it's perceptible at lower levels in delicate whites.\n\nWhy it happens:\n- Inadequate free SO₂ leaves wine unprotected during racking, topping, or bottling\n- Headspace oxygen in tank or barrel\n- Premature oxidation (premox) in white wines involves iron and copper catalysis of phenolic oxidation — a separate mechanism from simple air exposure\n\nWhat you can do: Early-stage acetaldehyde is bound by SO₂ (though this consumes free SO₂ and the bound form is inactive). Ascorbic acid at bottling provides a sacrificial antioxidant but requires adequate free SO₂ to be effective. Advanced oxidation is irreversible.\n\n---\n\n### TCA (Cork Taint)\n\n2,4,6-trichloroanisole is the dominant compound — musty, damp hessian, wet cardboard. Threshold is extremely low: 1.5–5 ng/L. TCA suppresses olfactory receptor response, which is why corked wine smells flat as much as it smells musty.\n\nWhy it happens:\n- Chlorine-based sanitisers react with airborne moulds on cork or wood to produce chlorophenols, which are then methylated to chloroanisoles\n- TCA can also originate from winery infrastructure (wooden pallets, cardboard, treated timber) and migrate as vapour\n\nWhat you can do: Nothing post-bottling. At winery level, eliminate chlorine-based sanitisers from any area with cork or wood contact. Source cork from suppliers with documented TCA testing programs. Anisole contamination from winery fabric requires identification of the source and physical removal.\n\n---\n\n**What to do this vintage:** When an Owen alert fires on a tank, pull a 100 mL sample into a clean ISO glass within 24 hours and work through the fault checklist above before deciding on intervention — the alert tells you the risk condition, but your nose confirms the fault. Record both the alert trigger and your sensory verdict in the cellar brief so the pattern becomes useful data across vintages.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 8",
+        "url": null,
+        "note": "Chapman & Hall — covers microbial spoilage mechanisms and VA formation"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC318 Wine Microbiology · spoilage organisms and volatile phenol production",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC318",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3007WT Stabilisation and Clarification III · LO 1–2",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "microbiological and oxidative instabilities"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Brettanomyces management",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'Brettanomyces'"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Reductive winemaking and sulfide faults",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'reductive sulfide'"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 2472,
+    "prompt_tokens": 1843,
+    "total_tokens": 4315,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 2472
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1843,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1678,
+  "overlaps": []
+}

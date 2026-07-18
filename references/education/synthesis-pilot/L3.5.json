@@ -1,0 +1,81 @@
+{
+  "lesson_id": "L3.5",
+  "source": {
+    "id": "L3.5",
+    "slug": "fining-agents-practice",
+    "title": "Fining — bench trials before the tank",
+    "level": "3",
+    "wbs": [
+      "D5",
+      "D6"
+    ],
+    "reading_min": "5",
+    "aim": "What each fining agent does (protein, tannin, colour, oxidation), how to bench-trial before you commit, and when to accept the loss.",
+    "application": "Owen holds your bench-trial history. This lesson makes that history a decision engine, not a diary.",
+    "sources_private": [
+      "morew_fining_agents",
+      "morew_bench_trials"
+    ],
+    "sources_public_ref": [
+      "csu_wsc319",
+      "adelaide_oenology_3007wt"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch5"
+    ]
+  },
+  "generated": {
+    "aim": "Understand what each major fining agent targets — protein, tannin, colour, oxidative load — run a disciplined bench trial before committing to tank, and know when the volume loss is worth taking.",
+    "application": "Owen logs every bench trial you run. Pull up your bench-trial workbook before touching a fining agent this vintage — the dose-response data you recorded last year is the fastest shortcut to a confident tank addition, and the cellar brief will flag any wine already showing instability signals worth acting on now.",
+    "body_md": "### What fining agents actually do\n\nFining works by adsorption, charge neutralisation, or co-precipitation. The agent binds to a target compound, forms a larger particle, and drops out. Each agent has a primary target; secondary effects are real and can strip things you wanted to keep.\n\n- **Bentonite** — negatively charged clay. Binds positively charged proteins. The workhorse for protein stability and haze prevention. Dose range typically 0.2–2.0 g/L; higher doses strip aroma and body. Always trial before committing.\n- **Gelatin** — positively charged protein. Binds negatively charged tannins. Softens astringency in reds. Works best when tannin load is high; in low-tannin wines it can leave a haze of its own if not followed by a complementary agent.\n- **Casein / potassium caseinate** — milk protein. Targets oxidised phenolics and brown pigments. Useful for whites and rosés showing early oxidative colour shift. Also reduces some bitter phenolics.\n- **PVPP (polyvinylpolypyrrolidone)** — synthetic polymer. Binds low-molecular-weight phenolics, particularly catechins. Reduces browning tendency and bitterness without the protein-stripping risk of bentonite. Approved for use and then removed by filtration.\n- **Egg white (albumin)** — gentle tannin fining for premium reds. Binds large polymeric tannins selectively, softening texture while preserving colour. Traditional for barrel-aged wines; impractical at large scale.\n- **Activated carbon** — broad-spectrum. Removes colour, off-odours, and oxidised compounds, but it is indiscriminate. Use only when the wine has a serious problem and you accept the collateral stripping.\n\n### Running a bench trial that means something\n\nA bench trial is only useful if it mimics tank conditions closely enough to predict tank outcomes. Shortcuts here cost you.\n\n**Preparation**\n- Use wine drawn from the same tank, same day, at cellar temperature.\n- Prepare stock solutions at a known concentration (e.g. 10 g/L bentonite slurry) so your additions are precise and repeatable.\n- Include an untreated control in every trial. Always.\n\n**Dose range**\n- Run at least five dose points: zero, low, mid, target, high. A single-dose trial tells you almost nothing about where the optimum sits.\n- Space doses logarithmically if you're unsure of the range — you'll find the shoulder of the curve faster.\n\n**Mixing and settling**\n- Stir vigorously at addition, then allow to settle under the same conditions the tank will see (temperature, time). Centrifuge or filter to clarify before assessment.\n\n**Assessment**\n- Measure what you're targeting: heat test for protein stability (80 °C, 2 hours, check for haze), colour measurement for casein/PVPP trials, tannin assay or sensory for gelatin.\n- Sensory panel every dose point. Aroma, palate weight, astringency, finish. The instrument tells you if the problem is solved; your palate tells you what you gave up.\n- Record volume of lees at each dose. That's your loss estimate before you scale.\n\n**Scaling up**\n- Multiply bench dose by tank volume, then add a small buffer (5–10%) for mixing inefficiency in tank. Do not over-correct — the bench trial is your ceiling, not your floor.\n\n### Protein stability — the bentonite decision\n\nThe heat test remains the standard screen. A wine that hazes at 80 °C for two hours has heat-labile proteins that will cause problems in bottle. The question is how much bentonite to use, not whether to use it.\n\nBentonite dose is non-linear in its effect on aroma. At 0.3 g/L you may see minimal sensory impact; at 1.5 g/L you will notice it. If your bench trial shows you need more than 1.0 g/L to pass the heat test, consider whether the wine has a protein load problem upstream — juice fining, flotation efficiency, or harvest condition — rather than just adding more clay.\n\nLees volume from bentonite is significant. Budget 1–3% volume loss at typical doses. For a small producer, that's a real number. Factor it into your tank allocation before you fine.\n\n### Colour and oxidative load — casein and PVPP\n\nCasein targets oxidised, brown-toned phenolics. It's particularly effective on whites that have seen air during processing. The dose-response curve for colour removal is steep — a small increase in dose can shift the wine from acceptable to stripped. Bench trial is non-negotiable here.\n\nPVPP works on the catechin fraction specifically. It's useful when you want to reduce browning tendency without touching the protein fraction. Because it's removed by filtration, it leaves no residue, but it does require a filtration step post-addition.\n\nNeither agent is a substitute for good oxidation management at intake and during processing. They correct; they don't compensate indefinitely.\n\n### When to accept the loss\n\nEvery fining addition costs you something — volume, aroma, texture, or all three. The decision framework is simple:\n\n- If the wine fails a stability test and will be sold in bottle, you fine. The alternative is a customer complaint or a recall.\n- If the wine passes stability tests and the sensory impact of fining is negative, you don't fine. Stability tests exist to define the threshold, not to push you past it.\n- If the bench trial shows you need a dose that damages the wine unacceptably, the problem is upstream. Revisit harvest, juice handling, or fermentation management before the next vintage.\n\nVolume loss is a cost of production. Record it in Owen against the tank and the agent. Over three vintages, that data tells you whether your process is generating wines that need heavy fining — and that's the question worth asking.\n\n**What to do this vintage:** Pull your bench-trial workbook in Owen and check whether any current tank has a heat test or colour flag outstanding — if it does, set up a five-dose bentonite or casein trial this week using wine at current cellar temperature. Record lees volume at each dose point; that number is your volume loss forecast before you touch the tank.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 8",
+        "url": null,
+        "note": "Chapman & Hall"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC319 Wine Chemistry · colloidal stability, fining agents and mechanisms of action",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC319",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3007WT Stabilisation and Clarification III · LO 1, LO 2",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Fining agents and wine stability",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'fining agents'"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1965,
+    "prompt_tokens": 1764,
+    "total_tokens": 3729,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1965
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1764,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1464,
+  "overlaps": []
+}

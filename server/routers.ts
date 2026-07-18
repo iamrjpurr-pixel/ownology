@@ -5,6 +5,7 @@ import { cellarJournalRouter } from "./cellarJournalRouter.js";
 import { trinityRouter } from "./trinityRouter.js";
 import { vintageLogRouter } from "./routers/vintageLog.js";
 import { knowledgeRouter } from "./routers/knowledge.js";
+import { curriculumRouter } from "./routers/curriculum.js";
 import { tutorRouter } from "./routers/tutor.js";
 import { pricingRouter } from "./routers/pricing.js";
 import { outreachRouter } from "./routers/outreach.js";
@@ -2202,6 +2203,7 @@ export const appRouter = router({
   packaging: packagingRouter,
   vineyard: vineyardRouter,
   knowledge: knowledgeRouter,
+  curriculum: curriculumRouter,
   tutor: tutorRouter,
   vintageIntelligence: vintageIntelligenceRouter,
   wbsAdmin: wbsAdminRouter,

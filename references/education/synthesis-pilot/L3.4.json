@@ -25,47 +25,41 @@
     ]
   },
   "generated": {
-    "aim": "Understand the relationship between molecular, free, and total SO₂; calculate additions from pH and target molecular SO₂; and recognise where preservation ends and over-preservation begins.",
-    "application": "Owen derives every SO₂ addition from your current pH and a target molecular SO₂ level. When your cellar brief flags an addition or your ferment trajectory shows a free SO₂ drop, this lesson is the arithmetic behind those alerts — and the reason a pH shift of 0.2 units changes the dose more than most winemakers expect.",
-    "body_md": "### The three numbers on the label\n\nSO₂ in wine exists in several forms, but three matter operationally.\n\n**Total SO₂** is everything — bound fractions locked onto carbonyls (acetaldehyde, pyruvate, α-ketoglutarate), plus the free fraction. It's what regulators measure for labelling and what accumulates across a wine's life. High total SO₂ is a record of every addition ever made, minus what has bound or been driven off.\n\n**Free SO₂** is the unbound pool. It sits in equilibrium between three species: the hydrated form (H₂SO₃), bisulfite (HSO₃⁻), and molecular SO₂ (SO₂·H₂O). At wine pH, bisulfite dominates — it's the largest fraction of free SO₂ but the least antimicrobially active.\n\n**Molecular SO₂** is the small, uncharged fraction of free SO₂. It's the species that actually crosses microbial cell membranes and does the antimicrobial work. At pH 3.2, roughly 6–7% of free SO₂ is molecular. At pH 3.6, that drops to around 2%. Same free SO₂ reading; very different protection.\n\nThe target molecular SO₂ for most table wines sits between 0.5 and 0.8 mg/L. Sensitive microorganisms — Brettanomyces, lactic acid bacteria — are inhibited at the lower end of that range. Resistant strains and wines with high microbial loads need the upper end.\n\n### The pH lever\n\nThe equilibrium between bisulfite and molecular SO₂ is governed by the Henderson–Hasselbalch relationship, using the first dissociation constant of SO₂ (pKa ≈ 1.81 at wine temperature). In practical terms:\n\n- At pH 3.0: ~10 mg/L free SO₂ delivers ~0.8 mg/L molecular SO₂\n- At pH 3.2: ~10 mg/L free SO₂ delivers ~0.5 mg/L molecular SO₂\n- At pH 3.4: ~10 mg/L free SO₂ delivers ~0.3 mg/L molecular SO₂\n- At pH 3.6: ~10 mg/L free SO₂ delivers ~0.2 mg/L molecular SO₂\n\nA wine at pH 3.6 needs roughly 30–35 mg/L free SO₂ to hit 0.6 mg/L molecular — the same protection a pH 3.2 wine achieves with around 8–10 mg/L free. This is why pH management during winemaking is not just an acid balance question; it's a preservation economics question.\n\nOwen's addition calculator uses your logged pH to work backwards from a target molecular SO₂ to the free SO₂ you need, then calculates the dose required to reach that free level from your current measured free SO₂.\n\n### Addition maths\n\nPotassium metabisulfite (KMBS) is the standard addition form. It releases SO₂ at approximately 57% by weight — so 1 g of KMBS yields roughly 0.57 g of SO₂. For a 1000 L tank:\n\n- 1 g/hL SO₂ = 10 g SO₂ per tank = ~17.5 g KMBS\n\nIn practice, not all added SO₂ becomes free SO₂. A portion binds immediately to carbonyls present in the wine. Wines with high acetaldehyde (from oxidation or certain yeast strains) have a higher SO₂ demand — the binding fraction consumes the first portion of every addition before free SO₂ rises at all. This is why a wine that has been exposed to oxygen often needs a larger-than-expected dose to move the free SO₂ needle.\n\nWhen logging additions in your vintage log, record:\n- Free SO₂ before addition (mg/L)\n- pH at time of addition\n- Target free SO₂ post-addition\n- Dose added (g KMBS or g SO₂ equivalent)\n- Free SO₂ measured 24–48 hours later\n\nThe gap between expected and actual free SO₂ post-addition is your binding demand. Track it across the vintage — it tells you how much oxidative stress the wine has accumulated.\n\n### Preservation vs over-preservation\n\nOver-sulfiting is a real and underappreciated fault. Excess free SO₂ above ~50 mg/L is detectable as a sharp, prickling sensation on the palate and a bleaching effect on colour. At very high levels it suppresses desirable aromatic compounds — thiols and esters are particularly vulnerable.\n\nMore subtly, high total SO₂ limits your options later. Wines approaching regulatory limits (typically 150 mg/L total for dry reds, 200–250 mg/L for whites and sweets depending on residual sugar and market) have no headroom for further additions if something goes wrong at bottling.\n\nThe discipline is to add SO₂ to a specific molecular target, not to a round number of free SO₂. A winemaker who always adds \"30 mg/L free\" regardless of pH is under-protecting high-pH wines and over-protecting low-pH wines simultaneously.\n\nBound SO₂ also matters at the other end: wines with high bound fractions can show elevated total SO₂ on analysis while offering relatively little antimicrobial protection. Total SO₂ is not a proxy for wine security.\n\n### What to do this vintage\n\nBefore every SO₂ addition, pull the current pH from your tank log and use Owen's molecular SO₂ calculator to confirm the free SO₂ target — don't default to a fixed number. Measure free SO₂ 48 hours after each addition and log the result against the predicted value; a consistent shortfall signals binding demand that needs to be factored into your next dose.",
+    "aim": "Understand the relationship between molecular, free, and total SO₂; calculate additions from pH and target molecular SO₂; and know where preservation ends and over-preservation begins.",
+    "application": "Owen uses your tank's current pH and free SO₂ reading to calculate every addition in your cellar brief. This lesson explains the chemistry behind those numbers so you can interrogate them, override them when the wine demands it, and log your reasoning in the vintage log.",
+    "body_md": "### Three forms, one compound\n\nSulphur dioxide exists in wine in three interconverting forms, and only one of them does the antimicrobial and antioxidant work you actually care about.\n\n- **Total SO₂** — everything: free plus all the SO₂ bound to aldehydes, ketones, sugars, and pigments. The number on your legal label. High total SO₂ is not the same as effective SO₂.\n- **Free SO₂** — the portion not yet bound. It sits in equilibrium between two sub-forms: bisulphite (HSO₃⁻) and molecular SO₂ (SO₂·H₂O). Free SO₂ is what you measure with aspiration-oxidation or the Ripper method.\n- **Molecular SO₂** — the tiny, uncharged fraction of free SO₂. This is the active form. It crosses microbial cell membranes, disrupts enzyme function, and scavenges oxygen. At typical wine pH, molecular SO₂ represents less than 5% of free SO₂ — sometimes far less.\n\nThe practical consequence: two wines with identical free SO₂ readings can have very different levels of protection, purely because of pH.\n\n---\n\n### pH is the lever\n\nThe equilibrium between bisulphite and molecular SO₂ is governed by pH. As pH rises, the fraction present as molecular SO₂ shrinks — sharply.\n\nAt pH 3.2, roughly 6–7% of free SO₂ is molecular. At pH 3.6, that drops to around 2–3%. At pH 3.8, you're below 1.5%. This is not a linear slide; it's a steep curve.\n\nThe target molecular SO₂ for most table wines is 0.5–0.8 mg/L for microbial stability. Some winemakers push to 0.8 mg/L for wines with elevated volatile acidity or residual sugar. To hit 0.5 mg/L molecular at pH 3.2, you need roughly 8 mg/L free SO₂. At pH 3.6, you need around 25 mg/L free SO₂ to achieve the same protection. At pH 3.8, you're looking at 40+ mg/L free.\n\nThis is why pH management during winemaking is not just a flavour decision — it directly determines how much SO₂ you'll need to carry through the wine's life.\n\n---\n\n### Addition maths\n\nWhen Owen calculates an SO₂ addition, the logic runs like this:\n\n1. **Target molecular SO₂** — set by wine style and microbial risk (typically 0.5–0.8 mg/L)\n2. **Current wine pH** — measured, not assumed\n3. **Required free SO₂** — derived from the molecular target and pH using the equilibrium constant (pKa ≈ 1.77 at wine temperature)\n4. **Current free SO₂** — measured\n5. **Deficit** — required free minus current free\n6. **Addition in mg/L** — deficit adjusted for the form of SO₂ being added (potassium metabisulphite, K₂S₂O₅, releases approximately 57% SO₂ by weight)\n\nFor a 1000 L tank, every 1 mg/L increase in free SO₂ requires roughly 1.75 g of potassium metabisulphite. Dissolve additions in a small volume of wine before adding; never add powder directly to a full tank.\n\nBound SO₂ matters too. High-aldehyde wines (from oxidation or certain yeasts) bind SO₂ aggressively. If your total SO₂ climbs but free SO₂ stays stubbornly low, the wine is consuming additions faster than expected — investigate the source before adding more.\n\n---\n\n### Preservation vs over-preservation\n\nSO₂ is not benign at high concentrations. The problems compound:\n\n- **Sensory** — free SO₂ above 50 mg/L becomes detectable as a prickle or struck-match character. Total SO₂ above 100 mg/L can suppress fruit expression and flatten mid-palate.\n- **Legal** — Australian maximum total SO₂ limits are 250 mg/L for dry table wine, 300 mg/L for wines with residual sugar above 35 g/L. Export markets (EU, UK) have their own thresholds; some are lower.\n- **Winemaking consequence** — over-sulphited wines are harder to correct than under-sulphited ones. Aeration removes some free SO₂ but also oxidises the wine. Ascorbic acid additions to mask low SO₂ without addressing the underlying deficit create their own problems.\n\nThe discipline is to add the minimum effective dose, measured against a known molecular SO₂ target, at the right pH. Blanket additions based on habit rather than measurement are how wines end up carrying 200 mg/L total SO₂ with no corresponding microbial security — because the pH was never addressed.\n\nLow-intervention winemaking does not mean low-SO₂ winemaking by default. It means precise SO₂ management: fewer, targeted additions that actually achieve the molecular concentration required.\n\n---\n\n### What to do this vintage\n\nMeasure free SO₂ and pH together at every addition point — one number without the other is incomplete data. Use Owen's cellar brief to set your molecular SO₂ target before harvest, then let the pH of each tank determine the free SO₂ level required to hit it.",
     "cited_in": [
       {
         "kind": "buy",
-        "label": "Waterhouse, Sacks & Jeffery · Understanding Wine Chemistry · Ch 14–15",
+        "label": "Waterhouse, Sacks & Jeffery · Understanding Wine Chemistry · Ch 7 (Sulphur Dioxide)",
         "url": null,
-        "note": "Wiley, 2016 — definitive treatment of SO₂ equilibria and antimicrobial mechanisms"
+        "note": "Wiley, 2016"
       },
       {
         "kind": "free",
-        "label": "AWRI — Sulfur dioxide: a practical guide",
-        "url": "https://www.awri.com.au/industry_support/winemaking_resources/so2/",
-        "note": "AU industry reference; includes addition tables by pH"
-      },
-      {
-        "kind": "free",
-        "label": "Wine Australia — SO₂ and wine stability technical review",
-        "url": "https://www.wineaustralia.com/research/projects/so2-management",
-        "note": "AU industry reference"
+        "label": "AWRI — Sulfur dioxide in winemaking",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'sulfur dioxide winemaking'"
       },
       {
         "kind": "curriculum",
-        "label": "University of Adelaide OENOLOGY 3007WT · Stabilisation and Clarification III · LO 2",
-        "url": "https://www.adelaide.edu.au/course-outlines/109408/1/sem-2/",
-        "note": "Covers physical, chemical and biochemical parameters in wine stability including oxidative instability"
+        "label": "Adelaide OENOLOGY 3007WT Stabilisation and Clarification III · LO 2",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Physical and chemical parameters in wine stability"
       }
     ]
   },
   "usage": {
-    "completion_tokens": 1949,
-    "prompt_tokens": 1513,
-    "total_tokens": 3462,
+    "completion_tokens": 1735,
+    "prompt_tokens": 1757,
+    "total_tokens": 3492,
     "completion_tokens_details": {
       "reasoning_tokens": 0,
-      "text_tokens": 1949
+      "text_tokens": 1735
     },
     "prompt_tokens_details": {
       "cached_tokens": 0,
-      "text_tokens": 1513,
+      "text_tokens": 1757,
       "cache_creation_tokens": 0,
       "cache_creation_token_details": {
         "ephemeral_5m_input_tokens": 0,

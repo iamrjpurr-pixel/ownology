@@ -1,0 +1,88 @@
+{
+  "lesson_id": "L3.2",
+  "source": {
+    "id": "L3.2",
+    "slug": "white-wine-production",
+    "title": "White winemaking — reductive handling, phenolic control",
+    "level": "3",
+    "wbs": [
+      "D3",
+      "D4",
+      "D5"
+    ],
+    "reading_min": "6",
+    "aim": "Juice handling under reductive protection, phenolic control, cold-settling vs floating, lees management — the choices that define white wine texture.",
+    "application": "Owen prompts oxygen-exposure alerts on white ferments. This lesson tells you which alerts to trust and which to override.",
+    "sources_private": [
+      "morewine_bible_white_full",
+      "aoc_2_7_white_sparkling"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_2503wt",
+      "lincoln_wine_202"
+    ],
+    "citations_bibliographic": [
+      "rgayon_handbook_v2_whites"
+    ]
+  },
+  "generated": {
+    "aim": "Juice handling under reductive protection, phenolic control, cold-settling vs flotation, and lees management — the choices that define white wine texture and longevity.",
+    "application": "Owen raises oxygen-exposure alerts on white ferments whenever dissolved oxygen climbs or pump-over timing drifts. This lesson maps which of those alerts demand immediate action, which are calibrated for red-wine logic and can be overridden, and what to log in your ferment trajectory so the next vintage has a baseline.",
+    "body_md": "### Why oxygen is the enemy before fermentation, not during\n\nWhite juice is fragile in a way red must is not. Phenolic compounds — primarily hydroxycinnamic acids such as caffeic and p-coumaric — oxidise rapidly in the presence of oxygen and the enzyme polyphenol oxidase (PPO). The result is browning, bitterness, and a loss of the aromatic volatiles you spent harvest chasing.\n\nThe window of maximum vulnerability runs from crusher to tank. Every transfer, every pump, every open-top vessel is a risk. Reductive handling means closing that window:\n\n- Harvest into a cold chain where possible (night pick, refrigerated bins).\n- Dose SO₂ at the crusher — 30–60 mg/L free is a reasonable starting range depending on fruit health; lower for clean fruit, higher for botrytis pressure.\n- Blanket receiving tanks with inert gas (CO₂ or N₂) before juice arrives.\n- Keep transfer lines full and avoid splash-filling.\n\nOnce fermentation is underway, the calculus flips. Yeast need some oxygen for sterol and fatty acid synthesis, particularly in the first 24–48 hours. A brief, controlled splash at inoculation is not a mistake — it is physiology. Owen's oxygen alerts during active ferment are informational, not emergencies. Log them, but don't panic-purge a healthy ferment.\n\n---\n\n### Phenolic control: settling, fining, and the texture trade-off\n\nPhenolics in white wine exist on a spectrum. At low concentrations they contribute body and mid-palate grip. At high concentrations — or when oxidised — they deliver bitterness and astringency that no amount of residual sugar will fix.\n\nThe primary control lever is juice turbidity at the point of fermentation. Cleaner juice ferments to a lighter, more aromatic wine. Turbid juice ferments to something broader, sometimes coarser, sometimes more complex. Neither is wrong; both are choices.\n\n**Cold-settling** (static clarification at 0–4 °C for 12–24 hours) is the workhorse method:\n- Gravity does the work; no capital equipment beyond a refrigerated tank.\n- Aim for 50–150 NTU going into ferment for aromatic varieties (Sauvignon Blanc, Riesling, Pinot Gris).\n- Allow 200–300 NTU for varieties where phenolic texture is a style goal (Roussanne, Marsanne, skin-contact whites).\n\n**Flotation** inverts the process — fine bubbles carry solids to the surface for removal. It is faster (2–4 hours vs overnight), better suited to high-throughput operations, and gentler on aromatic compounds because the juice spends less time at low temperature. The trade-off: capital cost and the need for a dissolved air flotation (DAF) unit. For a boutique operation processing under 50 tonnes, cold-settling is usually the better return on complexity.\n\nBentonite fining pre-ferment removes heat-unstable proteins and co-precipitates some phenolics. Dose rates of 0.3–0.8 g/L are typical; always bench-trial first. Over-fining strips aroma and reduces fermentable nitrogen — a direct path to sluggish ferments. Record your bench trial results in the bench trial workbook so you're not guessing next vintage.\n\n---\n\n### Lees management: contact, stirring, and knowing when to stop\n\nPost-ferment lees are not waste. They are a texture tool. Yeast autolysis releases mannoproteins and polysaccharides that bind to phenolics, soften acidity perception, and add mid-palate weight. The effect is cumulative and time-dependent.\n\nPractical parameters:\n\n- **Gross lees** (the heavy sediment of skins, seeds, tartrate crystals, and dead yeast clumps) should be racked off within 1–2 weeks of fermentation completion. They contribute off-characters, not texture.\n- **Fine lees** (the creamy layer that remains after gross lees removal) are where the value is. Extended contact of 3–9 months is standard for Chardonnay and Semillon styles targeting complexity.\n- **Bâtonnage** (lees stirring) accelerates autolysis and keeps lees in suspension. Weekly stirring for the first 2–3 months, then monthly, is a reasonable starting protocol. Stop stirring if reductive characters (H₂S, mercaptans) develop — you are depleting oxygen faster than autolysis can benefit you.\n- Maintain free SO₂ at 15–25 mg/L during lees contact. Lower pH wines (Riesling at pH 3.0–3.1) sit at the lower end; higher pH wines (Chardonnay at pH 3.4–3.5) need the upper end to maintain equivalent molecular SO₂.\n\nLees contact under reductive conditions is not the same as neglect. Monitor regularly. Log turbidity, free SO₂, and any sensory flags in your cellar brief.\n\n---\n\n### Reading Owen's white-ferment alerts\n\nOwen is calibrated across wine types. Some alerts are red-wine logic applied to a white tank — useful as a flag, not always as an instruction.\n\n| Alert type | Trust it? | Action |\n|---|---|---||\n| DO spike during juice transfer | Yes — act immediately | Purge headspace, check pump seals |\n| DO spike during active ferment (first 72 h) | Override with context | Log it; yeast need some O₂ at this stage |\n| DO spike post-ferment during lees contact | Yes — investigate | Check bung integrity, stir gently, assess SO₂ |\n| Temperature excursion above 18 °C on aromatic variety | Yes — act | Aromatic loss accelerates sharply above this threshold |\n| Pump-over timing alert on white tank | Override | White ferments rarely need pump-overs; this is red-wine logic |\n\nThe ferment trajectory log is where these overrides get recorded with reasoning. A future vintage — or a future winemaker — needs to know why the alert was dismissed, not just that it was.\n\n---\n\n### What to do this vintage\n\nAudit every transfer point in your white-wine line for oxygen ingress — fittings, pump seals, tank inlets — and blanket with inert gas before juice arrives. Set your target turbidity before cold-settling begins, record it against variety and style intent in the ferment trajectory, and use that number to calibrate which of Owen's oxygen alerts are actionable versus informational for your specific tanks.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Ribéreau-Gayon et al. · Handbook of Enology Vol. 1 · Ch 9",
+        "url": null,
+        "note": "Wiley, 2nd ed. 2006 — phenolic oxidation and juice handling"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Juice Clarification and Lees Management",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'juice clarification lees management'"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Sulfur Dioxide in Winemaking",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'sulfur dioxide winemaking'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 2503WT Introductory Winemaking II · LO 3",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Phenolic compound handling during winemaking"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Lincoln WINE 202 Principles of Wine Science · LO 4",
+        "url": "https://www.lincoln.ac.nz/study/courses-2/course-search/",
+        "note": "Effects of processing on wine style and quality parameters"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 2163,
+    "prompt_tokens": 1818,
+    "total_tokens": 3981,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 2163
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1818,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1656,
+  "overlaps": []
+}

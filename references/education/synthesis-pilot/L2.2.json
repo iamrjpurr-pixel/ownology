@@ -1,0 +1,79 @@
+{
+  "lesson_id": "L2.2",
+  "source": {
+    "id": "L2.2",
+    "slug": "vineyard-establishment",
+    "title": "Vineyard establishment — the calls that lock in decades",
+    "level": "2",
+    "wbs": [
+      "D1"
+    ],
+    "reading_min": "4",
+    "aim": "Row orientation, spacing, trellis, irrigation, soil prep — the decisions you make at planting that you'll live with for 25 years.",
+    "application": "Owen captures your vineyard block schema for downstream yield/quality correlation. This lesson tells you which fields matter most and why.",
+    "sources_private": [
+      "aoc_1_4_vineyard_establishment"
+    ],
+    "sources_public_ref": [
+      "adelaide_viticult_2500wt",
+      "lincoln_wine_201"
+    ],
+    "citations_bibliographic": [
+      "coombe_iland_visc_vol2"
+    ]
+  },
+  "generated": {
+    "aim": "Row orientation, spacing, trellis, irrigation, and soil prep — the decisions made at planting that shape every vintage for the next 25 years.",
+    "application": "Owen's vineyard block schema captures row orientation, vine spacing, trellis type, and irrigation infrastructure as fixed attributes against each block. Fill these fields accurately now — they anchor every yield and quality correlation the platform runs downstream, from canopy heat-load modelling to per-block ferment trajectory comparisons across vintages.",
+    "body_md": "### Row orientation — light, airflow, and the slope you can't move\n\nOrientation is the single most permanent call in vineyard design. North–south rows maximise direct sunlight on both canopy faces across the day in the southern hemisphere, which suits most table and premium wine varieties. East–west rows shade the afternoon canopy, useful in high-radiation, high-temperature sites where sunburn and heat stress are the primary risk. On sloped ground, contour planting to follow the fall line controls erosion and simplifies irrigation design, but it often forces a compromise on solar exposure. Prevailing wind direction matters too — rows aligned with the dominant airflow improve air drainage through the canopy, reducing botrytis pressure in humid climates.\n\nDocument the actual bearing (degrees from north) in Owen, not just 'north–south'. A 20° deviation from true north has measurable afternoon shade implications on a tight VSP trellis.\n\n### Vine and row spacing — the yield/quality lever you set once\n\nSpacing decisions fix vine density, which drives competition, root depth, and ultimately the balance between vegetative vigour and fruit load.\n\n- **Row spacing** is largely dictated by machinery width. Standard Australian mechanised vineyards run 3.0–3.5 m between rows. Narrower rows (2.5 m or less) require specialised equipment and are only worth the cost where site quality justifies premium fruit.\n- **Vine spacing within the row** controls individual vine load. Closer spacing (1.0–1.5 m) increases density, encourages root competition, and can concentrate flavour on low-vigour soils. Wider spacing (2.0–2.5 m) suits high-vigour sites where you need each vine to carry more fruit to maintain balance.\n- **Planting density** (vines/ha) is the number Owen uses for yield modelling. Calculate it precisely: 10,000 ÷ (row spacing × vine spacing).\n\nHigh-density planting is not inherently better — it's a tool for specific soil and variety combinations. On a fertile, deep-watered site, planting at 5,000 vines/ha and managing vigour through rootstock and irrigation is often more practical than 8,000 vines/ha with chronic canopy problems.\n\n### Trellis system — matching structure to variety and management intent\n\nTrellis choice determines canopy architecture for the life of the vineyard. The main options in Australian and NZ production:\n\n- **Vertical Shoot Positioning (VSP):** Industry standard for cool to moderate climates. Suits mechanisation, gives good spray penetration, and is compatible with mechanical harvesting and pruning. Works best where vigour is moderate and fruit exposure is a priority.\n- **Scott Henry / Smart-Dyson:** Split-canopy systems that divide shoots upward and downward. Used to manage high-vigour sites by increasing leaf area without shading the fruit zone. More complex to manage mechanically.\n- **Minimal pruning / sprawl:** Low-cost, high-yield systems suited to warm inland regions producing volume fruit. Not appropriate where canopy management and fruit quality are the goal.\n- **Geneva Double Curtain (GDC):** Two-curtain system on a T-bar, useful on very vigorous sites. Rarely established new in boutique contexts.\n\nPost and wire specifications — post height, wire gauges, foliage wire positions — belong in Owen's block schema. They determine the physical limits of canopy management decisions you'll make every season.\n\n### Irrigation infrastructure — design for the worst season, not the average\n\nDrip irrigation is standard in most Australian wine regions. The infrastructure decisions locked in at establishment:\n\n- **Emitter spacing and flow rate** determine the wetted soil volume per vine. Under-designed systems can't support vines through a severe drought year, and retrofitting is expensive.\n- **Pressure regulation and filtration** at the block level affect emitter longevity and uniformity — poor uniformity means variable vine stress across the block, which shows up as within-block Baumé spread at harvest.\n- **Fertigation capacity:** If the system is designed for fertigation from the start, nutrient management options are far broader. Retrofitting injection points is straightforward; retrofitting header sizing is not.\n- **Sub-block zoning:** Splitting a block into two or more irrigation zones based on soil variability is worth the additional valve cost at installation. It's the difference between managing the block as a single unit and being able to apply deficit irrigation where the soil holds water and full irrigation where it doesn't.\n\nRecord emitter flow rate (L/hr), spacing (m), and zone boundaries in Owen. These fields feed the platform's water-use and vine-stress estimates.\n\n### Soil preparation — the work that happens before the vine goes in\n\nDeep ripping (typically 600–900 mm) breaks up compaction layers and improves drainage. On duplex soils — a common profile in southern Australian wine regions — ripping through the clay interface is often the difference between a vine that roots deeply and one that sits in a perched water table every winter.\n\nPre-plant soil amendment based on a full soil chemistry profile (pH, CEC, macro and micronutrients, organic matter) is far cheaper than trying to correct deficiencies through fertigation once vines are established. Lime incorporation to adjust pH takes years to move through the profile; surface applications post-planting are slow. Get the pH right before the first vine goes in.\n\nCover crop selection for inter-row management also starts at establishment — whether you're sowing a permanent sward or managing bare earth affects erosion, compaction, and nitrogen cycling from year one.\n\n**What to do this vintage:** If you're establishing a new block, complete Owen's vineyard block schema before any earthworks begin — orientation, spacing, trellis spec, and irrigation zone design should be locked in as a single integrated decision, not assembled piecemeal. If you're back-filling schema data on an existing block, walk the rows with a compass bearing and measure actual emitter spacing rather than relying on the original plan — what was installed and what was designed are often different.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Dry & Coombe · Viticulture Vol. 1 — Resources, Ch. 5",
+        "url": null,
+        "note": "Winetitles, Adelaide — standard AU viticulture reference"
+      },
+      {
+        "kind": "buy",
+        "label": "Smart & Robinson · Sunlight into Wine · Ch. 3–4",
+        "url": null,
+        "note": "Winetitles, Adelaide — row orientation and trellis design"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Vineyard establishment and design",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'vineyard establishment'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Lincoln WINE201 Viticulture I · LO 4",
+        "url": "https://www.lincoln.ac.nz/study/courses-2/course-search/",
+        "note": "Vineyard establishment and structure design"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1845,
+    "prompt_tokens": 1584,
+    "total_tokens": 3429,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1845
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1584,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 729,
+  "overlaps": []
+}

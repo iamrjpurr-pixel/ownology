@@ -1,0 +1,81 @@
+{
+  "lesson_id": "L2.6",
+  "source": {
+    "id": "L2.6",
+    "slug": "yeast-selection-inoculation",
+    "title": "Yeast — the decision that flavours everything",
+    "level": "2",
+    "wbs": [
+      "D4"
+    ],
+    "reading_min": "5",
+    "aim": "Wild vs inoculated, strain selection, nutrition, rehydration protocol — what to change when the wine style changes.",
+    "application": "Owen holds your strain library and preferred pairing history. This lesson tells you when to break your own pattern.",
+    "sources_private": [
+      "morew_yeast_hydration",
+      "morew_yeast_pairing",
+      "aoc_2_4_yeasts"
+    ],
+    "sources_public_ref": [
+      "csu_wsc318",
+      "adelaide_oenology_2501wt"
+    ],
+    "citations_bibliographic": [
+      "rgayon_handbook_v1_ch4"
+    ]
+  },
+  "generated": {
+    "aim": "Wild vs inoculated fermentation, strain selection criteria, yeast nutrition, and rehydration protocol — what to change when the wine style changes.",
+    "application": "Owen stores your strain library and tracks which yeast paired with which fruit parcel across vintages. This lesson gives you the framework to decide when that history is a guide and when it's a trap — use it before you commit inoculant for any new tank or style shift flagged in your cellar brief.",
+    "body_md": "### Wild or inoculated — the real trade-off\n\nWild fermentation is not a philosophy, it's a risk profile. Ambient yeast populations on fruit and in the cellar are dominated early by non-Saccharomyces species — Hanseniaspora, Metschnikowia, Lachancea — that contribute texture, ester complexity, and volatile acidity in proportions you cannot fully predict. Saccharomyces cerevisiae, present at low numbers on healthy fruit, typically takes over once ethanol climbs past 4–5% v/v and the environment becomes hostile to the weaker species.\n\nThe upside: genuine site expression, textural complexity, and differentiation that inoculated ferments rarely replicate. The downside: stuck ferments, elevated volatile acidity, inconsistent timelines, and H₂S spikes when indigenous populations are nutritionally stressed.\n\nFor a boutique producer, wild fermentation makes sense when:\n- The fruit is clean, ripe, and from a site with a known fermentation history\n- You have tank capacity to manage a slow or erratic timeline\n- The style tolerates — or benefits from — some VA lift and textural weight\n- You can monitor daily and intervene fast\n\nInoculated fermentation is the right call when fruit condition is marginal, when you need predictable timing across multiple tanks, or when the style demands a clean, varietal-primary profile.\n\n### Strain selection — matching yeast to style\n\nNot all S. cerevisiae strains behave the same. Commercial strains differ meaningfully across several axes:\n\n- **Ester and higher alcohol production** — some strains are net ester producers (isoamyl acetate, ethyl acetate); others are neutral. Aromatic whites and early-drinking reds benefit from ester-positive strains; complex reds destined for oak often don't need the help.\n- **Glycerol yield** — higher glycerol contributes mouthfeel. Strains vary by 1–3 g/L under identical conditions.\n- **Nitrogen demand** — high-demand strains ferment fast and clean but crash hard if YAN is insufficient. Low-demand strains are more forgiving on lean fruit.\n- **Alcohol tolerance** — critical above 14% v/v. Strains rated to 16–18% v/v cost more but earn their place on late-picked or fortified base wines.\n- **Killer factor** — a strain with killer activity will suppress wild yeast competition. Useful for inoculated ferments on wild-yeast-heavy fruit; irrelevant if you're going fully wild.\n- **SO₂ tolerance** — relevant if you're adding free SO₂ at crush. Some strains stall below 20 mg/L free; others handle 40 mg/L without issue.\n\nRibéreau-Gayon et al. cover strain physiology and metabolic outputs in detail — worth reading before locking in a strain list for a new variety or style (Handbook of Enology Vol. 1, Ch. 2).\n\n### Yeast nutrition — the step most producers underdo\n\nYeast assimilable nitrogen (YAN) is the single biggest lever on fermentation health after temperature. Low-YAN musts — common in cool vintages, heavily botrytised fruit, or juice that has been cold-settled hard — produce slow ferments, H₂S, and elevated residual sugar.\n\nTarget YAN by style:\n- Dry white/rosé: 150–250 mg/L\n- Dry red: 200–300 mg/L\n- High-sugar (late harvest, fortified base): 300–400 mg/L\n\nMeasure YAN at crush, not from a vintage average. Supplement with diammonium phosphate (DAP) and/or organic nitrogen (Fermaid-O or equivalent) in split additions — one-third at inoculation, two-thirds at one-third sugar depletion. Front-loading all nitrogen at inoculation drives early yeast biomass but leaves the mid-ferment population nutritionally exposed.\n\nMicronutrients matter too. Thiamine (vitamin B1) is consumed rapidly and deficiency correlates with pyruvate accumulation and off-character development. Most commercial yeast nutrients include thiamine; if you're using DAP alone, you're leaving a gap.\n\n### Rehydration protocol — where inoculated ferments are lost before they start\n\nPoor rehydration is the most common cause of sluggish inoculated ferments. Dried active yeast (DAY) is in a fragile state — cell membranes are compressed and require controlled rehydration to restore integrity.\n\nStandard protocol:\n1. Rehydrate in clean water at 35–40°C (not must, not cold water) at roughly 10:1 water-to-yeast ratio by weight\n2. Hydrate for 15–20 minutes without stirring aggressively\n3. Acclimatise: add small volumes of must to the rehydration slurry over 20–30 minutes to close the temperature gap to ≤10°C before pitching\n4. Pitch at a rate of 20–30 g/hL for standard ferments; increase to 30–40 g/hL for high-sugar or high-SO₂ musts\n\nSkipping the acclimatisation step when must temperature is well below 35°C causes thermal shock and kills a significant proportion of cells before fermentation begins. That's a YAN and population problem you cannot fix later.\n\nRehydration activators (GoFerm or equivalent) added to the rehydration water — not the must — provide sterols and unsaturated fatty acids that strengthen cell membranes and improve ethanol tolerance. Worth the cost on any ferment above 13.5 Baumé.\n\n### What to do this vintage\n\nBefore inoculating each tank, pull the strain pairing history from Owen and check it against this vintage's YAN measurement, fruit condition, and target style — if any of those three have shifted materially, treat the historical pairing as a starting point, not a decision. Run your rehydration with an activator on any must above 13 Baumé or below 15°C, and split your nitrogen additions rather than front-loading.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Ribéreau-Gayon et al. · Handbook of Enology Vol. 1 · Ch. 2",
+        "url": null,
+        "note": "Wiley, 2nd ed. 2006"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Yeast and Fermentation Resources",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'yeast nutrition' and 'stuck fermentation'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC318 Wine Microbiology — yeast ecology and succession",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC318",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 2501WT Microbiology for Viticulture and Oenology II · LO 3",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1937,
+    "prompt_tokens": 2744,
+    "total_tokens": 4681,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1937
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 2744,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 5050,
+  "overlaps": []
+}

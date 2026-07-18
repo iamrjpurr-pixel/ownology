@@ -29,7 +29,7 @@ const CHAT_URL = "https://integrations.emergentagent.com/llm/chat/completions";
 const SCOUT_JSON = "/app/references/education/scouting-pass-2026-07-17-v2.json";
 const SPINE_YAML = "/app/references/education/curriculum-spine-v1.yaml";
 
-const PILOT_LESSON_IDS = ["L1.4", "L2.7", "L3.4"];
+const PILOT_LESSON_IDS = null; // synthesise all lessons
 
 // --- Load spine + scouting ----------------------------------------------
 
@@ -217,8 +217,13 @@ STRUCTURE — return STRICTLY this JSON shape and nothing else:
 
 CITATION RULES:
 - kind: "buy" = paywalled textbook you cite for further reading, no URL needed, always include publisher in note
-- kind: "free" = free-to-web reference (AWRI, Wine Australia, GWRDC), URL required
-- kind: "curriculum" = a scouted university unit that covers this territory, URL to handbook, LO number if referenced
+- kind: "free" = free-to-web reference (AWRI, Wine Australia, GWRDC), URL required. USE ONLY these AWRI URL patterns you actually know exist: https://www.awri.com.au/industry_support/winemaking_resources/... — if unsure of the exact path, use https://www.awri.com.au/ and set note to "search AWRI for [topic]".
+- kind: "curriculum" = a scouted university unit. Use ONLY these verified URLs:
+    · CSU units: https://handbook.csu.edu.au/subject/2025/WSC{code}  (real)
+    · Adelaide degree: https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol  (real, one URL for all Adelaide units)
+    · Lincoln WINE units: https://www.lincoln.ac.nz/study/courses-2/course-search/  (real, generic search page)
+    · Otago FOSC306: https://www.otago.ac.nz/courses/papers?papercode=FOSC306  (real)
+  NEVER invent Adelaide course-outline URLs (they don't exist). NEVER invent CSU course/degree URLs.
 - kind: "private" = user's own paid library (MoreWine bibles + AOC modules), no URL, note "your paid resource"
 - Minimum 3 citations, maximum 6. At least one "buy", at least one "curriculum".
 - NEVER cite anything you don't have in the context provided.
@@ -312,12 +317,13 @@ function checkOverlap(body, grounding, ngram = 8) {
 
 (async () => {
   fs.mkdirSync(OUT_DIR, { recursive: true });
-  console.log(`▶ Synthesising ${PILOT_LESSON_IDS.length} pilot Lesson Cards via ${MODEL}\n`);
+  const targetIds = PILOT_LESSON_IDS ?? spine.lessons.map((l) => l.id);
+  console.log(`▶ Synthesising ${targetIds.length} Lesson Cards via ${MODEL}\n`);
 
   const summary = [];
   let totalIn = 0, totalOut = 0;
 
-  for (const id of PILOT_LESSON_IDS) {
+  for (const id of targetIds) {
     const lesson = spine.lessons.find((l) => l.id === id);
     if (!lesson) { console.log(`  ${id}: NOT FOUND`); continue; }
     process.stdout.write(`  ${id} · ${lesson.title.slice(0, 55)} … `);

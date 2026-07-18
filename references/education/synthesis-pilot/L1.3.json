@@ -1,0 +1,84 @@
+{
+  "lesson_id": "L1.3",
+  "source": {
+    "id": "L1.3",
+    "slug": "climate-soils-terroir",
+    "title": "Climate, soils and the terroir you actually have",
+    "level": "1",
+    "wbs": [
+      "D1"
+    ],
+    "reading_min": "4",
+    "aim": "Read your climate zone and soil profile as inputs to wine style — not as marketing language.",
+    "application": "Your regional GI, your MJT, your soil water-holding capacity — Owen pulls all three from your vineyard block record and shows what wines that combination naturally makes.",
+    "sources_private": [
+      "aoc_1_2_climate_soils"
+    ],
+    "sources_public_ref": [
+      "adelaide_viticult_2500wt"
+    ],
+    "citations_bibliographic": [
+      "coombe_iland_visc_vol1_ch_resources"
+    ]
+  },
+  "generated": {
+    "aim": "Read your climate zone and soil profile as inputs to wine style — not as marketing language.",
+    "application": "Owen pulls your regional GI, mean January temperature (MJT), and soil water-holding capacity directly from your vineyard block record. Cross-reference these against your ferment trajectory this vintage to see whether your fruit is tracking where that combination should naturally land.",
+    "body_md": "### Climate is a number, not a vibe\n\nEvery Australian and New Zealand wine region sits somewhere on a thermal axis. The most useful single figure is mean January temperature (MJT) — the average temperature across the warmest month. Below about 19 °C and you're in cool-climate territory: slower ripening, higher natural acidity, lower potential alcohol. Above 22 °C and the fruit loads sugar fast, phenolic ripeness can lag behind Baumé, and your picking window compresses.\n\nThe Winkler heat-summation system (degree-days above 10 °C, October–April) gives a fuller seasonal picture and is still the standard reference in Australian viticulture. Region I sits below 1390 degree-days; Region V is above 2220. Knowing where your blocks sit tells you what the climate is structurally capable of — and, just as importantly, what it will fight you on.\n\nGI boundaries are legal lines, not agronomic ones. Two blocks inside the same GI can sit in different Winkler regions if one is 200 m higher or 15 km closer to the coast. Work from your block's actual data, not the regional average.\n\n### Soils do two things that matter\n\nSoil affects wine style primarily through water availability and heat retention. Everything else — mineral flavour, terroir complexity — is downstream of those two levers.\n\n**Water-holding capacity (WHC)** controls vine stress. Sandy loams and gravels drain fast and impose moderate stress mid-season, which concentrates flavour and limits berry size. Heavy clays hold water longer, keeping vines vegetative later into the season and risking dilution in wet years. Knowing your soil's WHC lets you calibrate irrigation scheduling rather than guessing from canopy colour.\n\n**Soil colour and texture** affect heat absorption. Dark, fine-textured soils warm faster in spring and retain heat overnight — useful in cool climates for advancing phenological timing. Light, coarse soils reflect more radiation and stay cooler, which can be an asset in warm regions where night-time temperature drop (diurnal range) is already limited.\n\nA basic soil pit — texture by feel, colour by Munsell or eye, drainage assessment after rain — gives you more actionable data than most lab reports for day-to-day decisions.\n\n### Matching the combination to wine style\n\nClimate and soil interact, and the interaction is what actually shapes your wine:\n\n- **Cool climate + low WHC soil** (e.g., Yarra Valley granite over clay): tight berry size, high acid retention, moderate alcohol. Suited to varieties that need a long hang time — Pinot Noir, Chardonnay, Riesling.\n- **Cool climate + high WHC soil**: risk of excess vigour and dilution unless canopy management is tight. Irrigation should be minimal or off entirely post-veraison.\n- **Warm climate + low WHC soil** (e.g., Barossa Valley sandy loam over ironstone): vine stress concentrates sugars quickly. Watch Baumé — fruit can hit 14–15 °B before phenolics are fully ripe. Earlier picking or water application at lag phase may be warranted.\n- **Warm climate + high WHC soil**: the hardest combination to manage for quality. Vigour stays high, canopy shades fruit, colour and tannin development suffer. Deficit irrigation and aggressive shoot thinning are non-negotiable.\n\nVarietal selection should follow from this matrix, not precede it. Planting Shiraz on a cool-climate, high-WHC block because the neighbour does it is a structural problem no amount of winemaking will fully fix.\n\n### Reading terroir without the mysticism\n\nTerroir is a useful word when it means the measurable, repeatable influence of place on fruit composition. It becomes useless when it's used to avoid specifics.\n\nThe three inputs that explain most of what terroir actually does:\n\n1. **Thermal regime** — MJT, Winkler region, diurnal range\n2. **Water availability** — soil WHC, rainfall distribution, irrigation access\n3. **Radiation and aspect** — row orientation, slope angle, canopy architecture\n\nAll three are quantifiable. All three show up in fruit chemistry at harvest — acid levels, sugar accumulation rate, anthocyanin and tannin development. When you track these inputs against your harvest data across vintages, patterns emerge that are specific to your blocks, not to the regional marketing story.\n\nOwen's block record links GI, MJT, and soil type precisely so that comparison is automatic rather than something you reconstruct from memory each year.\n\n### What to do this vintage\n\nPull your block record in Owen and confirm that MJT and soil WHC are populated for every picking unit — if they're not, add them now before harvest data starts coming in. Then, when you're making picking decisions over the next few weeks, check whether Baumé accumulation rate is tracking fast or slow relative to what your climate-soil combination predicts, and adjust your target harvest window accordingly.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Gladstones · Viticulture and Environment · Ch 2–3",
+        "url": null,
+        "note": "Winetitles, Adelaide — the foundational text on climate indices and Australian viticulture"
+      },
+      {
+        "kind": "buy",
+        "label": "Jackson & Lombard · Wine Science · Ch 2",
+        "url": null,
+        "note": "Academic Press — covers Winkler regions and soil–vine water relations"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Climate and wine style",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'climate wine style' and 'viticulture resources'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC115 Wine Science 1 · LO 3",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC115",
+        "note": "Covers climate indices and soil–vine interactions in Australian viticulture context"
+      },
+      {
+        "kind": "curriculum",
+        "label": "University of Adelaide · Bachelor of Viticulture and Oenology",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Viticulture units address terroir, climate classification, and soil management"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1684,
+    "prompt_tokens": 1404,
+    "total_tokens": 3088,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1684
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1404,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 0,
+  "overlaps": []
+}

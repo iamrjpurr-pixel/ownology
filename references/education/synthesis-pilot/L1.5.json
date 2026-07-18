@@ -1,0 +1,80 @@
+{
+  "lesson_id": "L1.5",
+  "source": {
+    "id": "L1.5",
+    "slug": "fermentation-fundamentals",
+    "title": "What fermentation actually is",
+    "level": "1",
+    "wbs": [
+      "D4"
+    ],
+    "reading_min": "5",
+    "aim": "Sugar → alcohol → CO₂ + heat + everything else. The biochemistry made operational — what changes and when.",
+    "application": "When your ferment stalls or spikes, this lesson is the mental model you're troubleshooting against.",
+    "sources_private": [
+      "morewine_bible_red_ch4",
+      "awri_stuck_ferment"
+    ],
+    "sources_public_ref": [
+      "csu_wsc115",
+      "adelaide_oenology_2503wt"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch4"
+    ]
+  },
+  "generated": {
+    "aim": "Sugar → alcohol + CO₂ + heat + a cascade of chemical change. This lesson maps the biochemistry of fermentation as a working mental model — what happens, in what order, and why it matters when something goes wrong.",
+    "application": "When Tank 4 stalls at 4 Baumé or your ferment trajectory spikes overnight, this is the framework you're troubleshooting against. Cross-reference your cellar brief temperature logs and Owen's ferment trajectory alerts against the phases described here — the timing of a problem usually tells you which phase broke down.",
+    "body_md": "### The core reaction — and what it leaves out\n\nThe textbook summary is deceptively tidy: glucose and fructose are converted by yeast into roughly equal parts ethanol and CO₂, releasing energy as heat. In a 25 Baumé must, that's approximately 14.5% v/v alcohol potential and enough CO₂ to push a tank lid if you're not paying attention.\n\nWhat the equation omits is everything that makes wine wine. Alongside ethanol, yeast produce glycerol (texture, sweetness perception), acetic acid (volatile acidity, always present in small amounts), succinic acid, and a suite of esters and higher alcohols that define aroma. The ratio of these byproducts shifts depending on temperature, nutrient status, yeast strain, and how hard the yeast are working. Fermentation is not a single reaction — it's a metabolic negotiation.\n\n### The three operational phases\n\nThink in thirds, not as a smooth curve:\n\n**Lag phase (0–24 h, roughly)**\nYeast are adapting to the must environment — building cell membranes, synthesising enzymes, beginning to multiply. Sugar consumption is minimal. CO₂ is barely visible. This is when temperature and nutrient decisions matter most; yeast stressed here carry that deficit through the whole ferment.\n\n**Exponential / log phase (days 1–5 in a typical red)**\nCell numbers peak, CO₂ production is vigorous, and Baumé drops fastest — often 1–2 Baumé per day. Heat generation is at its highest. This is the phase most winemakers are watching closely, and rightly so: temperature excursions here drive volatile acidity up and strip delicate aromatics. Nutrient demand (particularly nitrogen, thiamine, and key minerals) is highest in the first third of sugar consumption.\n\n**Stationary / decline phase (Baumé < 4)**\nCell numbers plateau then fall. Fermentation rate slows. The must becomes increasingly hostile — high ethanol, low sugar, low pH, depleted nutrients. This is where sluggish and stuck ferments originate. Yeast that were under-nourished in the log phase often fail to close out the last few degrees.\n\n### Heat — the variable most often underestimated\n\nFermentation is exothermic. A standard red ferment in a 10-tonne open fermenter can generate enough heat to raise must temperature by 5–8°C above ambient without active cooling. At temperatures above 35°C, yeast membrane integrity degrades, ethanol tolerance drops, and fermentation can arrest suddenly.\n\nThe practical implication: temperature management is not comfort — it's yeast survival. Cooling during the log phase is protecting the organism that's doing your work. A ferment that peaks at 28°C and holds there is a different biochemical environment from one that spikes to 34°C and crashes back.\n\n### What changes in the must — and when\n\n- **pH** tends to rise slightly early as tartrate precipitates and potassium is released from skins, then stabilises. A must that starts at pH 3.4 may finish a degree higher if you're not watching.\n- **Volatile acidity (VA)** accumulates throughout, but spikes during heat stress or when fermentation slows. Acetic acid is a normal byproduct; the question is rate and total.\n- **Colour and phenolics** (in reds) are extracted most aggressively in the first half of fermentation when alcohol is building and the aqueous-to-ethanolic shift is occurring. Cap management timing is tied directly to this window.\n- **Nutrient depletion** follows a predictable curve — yeast-assimilable nitrogen (YAN) is consumed rapidly in the log phase. If the must was deficient at inoculation, no amount of late addition fully compensates.\n\n### Why stalls happen — the short version\n\nA fermentation stalls when yeast can no longer sustain the metabolic rate needed to consume remaining sugar. The proximate causes are almost always one or more of:\n\n- Nutrient deficiency (low YAN, thiamine, or minerals)\n- Temperature extremes (too hot or, in late ferment, too cold)\n- Ethanol toxicity in a yeast strain pushed beyond its tolerance\n- Inoculation failure — low viable cell count from the start\n- Inhibitory compounds (fatty acids, pesticide residues, excessive SO₂ at inoculation)\n\nThe biochemical model tells you which of these is most likely based on *when* the stall occurs. A stall at 8 Baumé points to early nutrient or temperature failure. A stall at 2 Baumé is almost always ethanol toxicity or cold temperature shutting down a yeast already running on empty.\n\n### What to do this vintage\n\nBefore inoculation, confirm your YAN and adjust if below 150 mg/L — this single number predicts more fermentation outcomes than any other. During the log phase, log Baumé and temperature at least twice daily and compare against your ferment trajectory in Ownology; a rate that drops faster than expected is a warning, not a data point to skip.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 4",
+        "url": null,
+        "note": "Chapman & Hall — core reference for fermentation kinetics and yeast physiology"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Stuck and Sluggish Fermentation",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'stuck fermentation' — practical diagnostic guidance"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC115 Wine Science 1 · LO 4",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC115",
+        "note": "yeast fermentation pathways and kinetics; management of alcoholic fermentation"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 2503WT Introductory Winemaking II · LO 1",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "acidity and pH effects on fermentation process control"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1716,
+    "prompt_tokens": 1787,
+    "total_tokens": 3503,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1716
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1787,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1536,
+  "overlaps": []
+}

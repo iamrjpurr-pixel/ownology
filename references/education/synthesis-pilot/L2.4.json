@@ -1,0 +1,80 @@
+{
+  "lesson_id": "L2.4",
+  "source": {
+    "id": "L2.4",
+    "slug": "ripeness-harvest-decisions",
+    "title": "Ripeness — the highest-leverage decision of your year",
+    "level": "2",
+    "wbs": [
+      "D2"
+    ],
+    "reading_min": "5",
+    "aim": "Baumé/Brix, TA, pH, phenolic ripeness, botrytis pressure — how the inputs to a harvest call combine, and how to weigh them for the wine you're actually making.",
+    "application": "Owen tracks your maturity sampling and forecasts a picking window. This lesson is how you interrogate that recommendation with confidence.",
+    "sources_private": [
+      "aoc_1_9_harvesting_selling",
+      "morewine_bible_red_ch6"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_3047wt",
+      "adelaide_viticult_3044wt"
+    ],
+    "citations_bibliographic": [
+      "jackson_wine_science_ch4"
+    ]
+  },
+  "generated": {
+    "aim": "Baumé, TA, pH, phenolic ripeness, and botrytis pressure don't each give you a picking date — they give you a set of tensions. This lesson is how to read those tensions against the wine you're actually trying to make.",
+    "application": "Owen's maturity sampling log tracks your Baumé trajectory and flags a projected picking window in your cellar brief. Use this lesson to stress-test that window: check whether the phenolic and acid picture supports the call, or whether you need a bench trial or a second sample run before you commit.",
+    "body_md": "### Baumé is the starting point, not the answer\n\nSugar accumulation — measured as Baumé in Australian and New Zealand cellars — is the most tractable number in the ripeness toolkit. It's fast, cheap, and consistent. A refractometer reading takes thirty seconds. But Baumé tells you potential alcohol and nothing else. A Shiraz at 13.5 °Bé with green tannin and a pH of 3.25 is a different problem from the same reading with ripe phenolics and a pH of 3.55.\n\nThe practical floor and ceiling for most table wine styles:\n- Lighter whites and sparkling base: 10.5–11.5 °Bé\n- Full-bodied whites and rosé: 12.0–13.0 °Bé\n- Light to medium reds: 12.5–13.5 °Bé\n- Full-bodied reds: 13.0–14.5 °Bé\n\nAbove 14.5 °Bé, fermentation risk rises sharply and you're making a decision about alcohol management before you've even picked. Know your ceiling before the season starts.\n\n### TA and pH: the acid picture is two numbers, not one\n\nTotal acidity and pH move in opposite directions through ripening but they're not mirrors of each other — tartrate and malate degrade at different rates, and potassium uptake drives pH independently of titratable acid. A wine can have a TA of 6.5 g/L and a pH of 3.65 if potassium is high. That's a stability and colour problem that TA alone won't flag.\n\nWhat to track at each maturity sample:\n- TA (g/L as tartaric): target range varies by style, but below 5.5 g/L pre-ferment you're likely adding acid post-harvest\n- pH: above 3.6 at harvest for reds, you're managing microbial risk from day one; above 3.7, free SO₂ efficiency drops significantly\n- The TA/pH relationship: if pH is climbing faster than TA is falling, suspect high potassium uptake — common in stressed or over-cropped vines\n\nFor sparkling base, pH at harvest should sit under 3.2 and TA above 8 g/L. Picking to Baumé alone for sparkling is a reliable way to make flat, flabby base wine.\n\n### Phenolic ripeness: the hardest call, the highest leverage\n\nSeed and skin tannin maturity determines whether your red wine is grippy and green or structured and fine. It doesn't show up in any of the numbers above. You have to taste it.\n\nA practical tasting protocol at each vineyard visit:\n- Chew three to five seeds from berries across the bunch. Green, bitter, and astringent means seeds are immature — the tannin will be harsh and extractable under fermentation conditions. Ripe seeds taste nutty or almost neutral.\n- Crush a berry and assess skin tannin separately. Silky and coating is ripe. Grippy and drying is not.\n- Check the colour of the seed. Brown through to the centre indicates phenolic maturity. Green or white at the core means more hang time if the rest of the picture allows it.\n\nPhenolic ripeness typically lags sugar accumulation by one to two weeks in cool seasons. This is the most common source of tension in the harvest call: Baumé is where you want it, seeds are not. Your options are to wait (and manage the acid and botrytis risk that comes with it), pick and manage extraction carefully, or accept a lighter style.\n\nJackson's *Wine Science* covers the biochemistry of tannin polymerisation and seed maturation in detail — worth reading before you set your extraction protocol, not after.\n\n### Botrytis pressure: the clock you can't pause\n\nBotrytis cinerea changes the harvest decision from a quality optimisation into a risk calculation. Once bunch infection is visible above roughly 5% incidence in susceptible varieties, the window is closing. Botrytis elevates pH (gluconic acid displaces tartrate), destroys colour pigments in red varieties, and produces laccase — an oxidative enzyme that survives into the wine and is not neutralised by normal SO₂ additions.\n\nAt each maturity sample during high-pressure periods:\n- Record bunch infection incidence as a percentage (count 100 bunches per block)\n- Note whether infection is on the berry surface (grey rot, manageable) or inside the bunch (bunch rot, accelerating)\n- Check the forecast: two or more days of rain on a block already at 5% incidence is a picking trigger regardless of Baumé\n\nFor white varieties where noble rot is the goal, the calculus inverts — but that's a separate decision framework.\n\n### Weighing the inputs against your wine\n\nNo single number makes the call. The harvest decision is a weighted sum, and the weights depend on the wine you're making:\n\n| Input | Light white / sparkling | Full-bodied red |\n|---|---|---|\n| Baumé | High weight | Medium weight |\n| TA / pH | High weight | High weight |\n| Phenolic ripeness | Low–medium | Very high |\n| Botrytis pressure | High (pick early) | High (pick early) |\n\nFor a sparkling base, Baumé and acid dominate — phenolic ripeness is largely irrelevant. For a premium Cabernet, phenolic ripeness and pH are the deciding factors; Baumé is almost secondary. Knowing which inputs matter most for your style before the season starts means you're not improvising when the numbers diverge.\n\n**What to do this vintage:** Pull your Owen maturity log and check whether the projected picking window is being driven by Baumé alone or whether TA, pH, and a tasting note are in the record. If phenolic assessment isn't in your sampling protocol yet, add it at the next vineyard visit — it's the one input that can't be reconstructed from lab data after the fact.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Jackson · Wine Science (5th ed.) · Ch 6 — Grape Maturation and Harvest",
+        "url": null,
+        "note": "Academic Press"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Harvest decisions and grape maturity",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'harvest maturity decision'"
+      },
+      {
+        "kind": "free",
+        "label": "Wine Australia — Botrytis management in vineyards",
+        "url": "https://www.wineaustralia.com/",
+        "note": "search Wine Australia for 'botrytis bunch rot'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3047WT · Winemaking at Vintage III · LO 4",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "Real-time vintage decision-making in a supervised production context"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1915,
+    "prompt_tokens": 1670,
+    "total_tokens": 3585,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1915
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1670,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1072,
+  "overlaps": []
+}

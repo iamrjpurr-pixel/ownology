@@ -1,0 +1,79 @@
+{
+  "lesson_id": "L3.7",
+  "source": {
+    "id": "L3.7",
+    "slug": "barrel-program",
+    "title": "Barrel program — oak as ingredient",
+    "level": "3",
+    "wbs": [
+      "D5"
+    ],
+    "reading_min": "5",
+    "aim": "New vs seasoned, French vs American, toast level, top-up cadence, lees management, and honest cost-benefit.",
+    "application": "Owen tracks your barrel register and top-up log. This lesson makes the barrel a design choice, not a habit.",
+    "sources_private": [
+      "morew_oak_info",
+      "morew_oak_barrel_care"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_3007wt"
+    ],
+    "citations_bibliographic": [
+      "jackson_wine_science_ch8_barrels"
+    ]
+  },
+  "generated": {
+    "aim": "Understand the key variables in a barrel program — wood origin, age, toast level, top-up cadence, and lees contact — and evaluate each against real cost and sensory outcome so every barrel in the shed is earning its place.",
+    "application": "Owen's barrel register and top-up log hold the raw data; this lesson gives you the framework to interrogate it. After reading, open your barrel register and flag any barrel where age, toast, or species hasn't been recorded — those gaps are costing you control. Use the bench trial workbook to run a new vs seasoned split on your current vintage before the next racking decision.",
+    "body_md": "### Wood origin: French vs American vs everything else\n\nFrench oak (predominantly *Quercus petraea* and *Quercus robur*) is tighter-grained, slower to release tannin, and tends toward spice, cedar, and subtle vanilla. American oak (*Quercus alba*) is wider-grained, extracts faster, and delivers more pronounced coconut, dill, and sweet vanilla — largely from higher lactone concentrations. Neither is inherently superior; the question is fit for wine style.\n\nFor a Barossa Shiraz built for early drinking, American oak at 20–30% new can add aromatic lift without overwhelming the fruit. For a Pinot Noir or Chardonnay where integration is everything, French oak at lower new-barrel percentages gives you more room to manoeuvre. Hungarian and Slavonian oak sit between the two in grain tightness and are worth considering on cost grounds, particularly for larger-format vessels where extraction rate is slower anyway.\n\nThe practical rule: match extraction speed to wine structure. A high-tannin red can absorb more oak input before it tips into hardness. A delicate white cannot.\n\n### New vs seasoned: the extraction curve\n\nA new barrel contributes the most extractable compounds in its first fill — tannins, lactones, volatile phenols, and wood-derived aldehydes all transfer at their highest rate. By the third or fourth fill, the barrel is contributing primarily oxygen ingress and a mild toasty character; the extractable wood compounds are largely spent.\n\nThis is the cost-benefit core of any barrel program:\n\n- **New barrels** (225 L French, ~$1,100–$1,500 AUD): high flavour and tannin input, high cost, typically 3–5 fills before retirement\n- **Second-fill barrels**: moderate oak character, useful for wines where new oak would dominate\n- **Third-fill and beyond**: essentially neutral vessels — use them for oxygen management and lees contact, not oak flavour\n- **Large format (500 L puncheons, 2,400 L foudres)**: lower surface-area-to-volume ratio means slower, gentler extraction — well suited to extended maturation programs\n\nTrack fill number in Owen's barrel register against sensory outcomes at each racking. Over two or three vintages, patterns emerge: which barrels are still contributing at fill three, which are dead by fill two.\n\n### Toast level: light, medium, heavy, and the char question\n\nToasting transforms the inner stave surface through pyrolysis. Light toast preserves more raw wood tannin and green, resinous characters. Medium toast — the most common specification — develops vanillin, guaiacol, and furfural, softening the tannin and adding spice. Heavy toast pushes further into smoky, roasted, and bitter chocolate territory while reducing extractable tannin significantly.\n\nMedium-plus is the default for most red programs for good reason: it balances tannin softening with aromatic complexity without tipping into smoke dominance. Heavy toast suits wines with the structure to carry it — think high-extract Cabernet or Grenache from a warm vintage.\n\nA note on heads toast: some coopers offer separately toasted barrel heads, which can meaningfully increase aromatic input given the end-grain exposure. Worth specifying if you're working with a cooper directly.\n\n### Top-up cadence and oxidation management\n\nBarrels lose volume to evaporation — typically 2–5% per year depending on humidity, temperature, and barrel age. That ullage space is an oxidation risk. Top-up frequency is one of the most underrated variables in a barrel program.\n\n- In a warm, dry cellar: top up weekly or fortnightly in the first months\n- In a cool, humid cellar: monthly may be adequate once the wine has settled\n- Older, more porous barrels lose volume faster and need closer attention\n\nUse wine of the same or similar quality for topping — never a lower-tier wine unless you're deliberately blending down. Log every top-up in Owen's barrel register with volume and source. Over a vintage, this tells you which barrels are leaking excessively and may need retiring or re-heading.\n\nSO₂ management runs parallel: check free SO₂ at each racking and adjust. Barrel-aged wines are more vulnerable to oxidation than tank wine; free SO₂ targets of 25–35 mg/L (depending on pH) are a reasonable working range for most red programs.\n\n### Lees contact: when to stir, when to rack\n\nFine lees — primarily yeast cell wall fragments and mannoproteins — contribute textural richness, mouthfeel, and some protection against oxidation. Stirring (bâtonnage) redistributes these compounds and can enhance mid-palate weight, particularly in white wines and Chardonnay programs.\n\nFor reds, extended lees contact without stirring is more common: the lees provide a mild reductive buffer while the wine integrates oak. Racking off gross lees early (within 2–4 weeks post-ferment) is standard; fine lees contact for 6–18 months is a deliberate textural tool.\n\nThe decision to stir or not should be driven by the wine's current trajectory — if it's showing reductive character, rack and expose; if it's integrating well and showing good texture, leave it alone. Bâtonnage for its own sake adds labour without guaranteed return.\n\n**What to do this vintage:** Pull up Owen's barrel register and confirm fill number, species, toast level, and top-up history are recorded for every barrel in the program. If any of those fields are blank, fill them before the next racking — you cannot make a design decision from incomplete data.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Jackson · Wine Science 5th ed · Ch 9 (Maturation)",
+        "url": null,
+        "note": "Academic Press"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Oak and wine",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'oak and wine'"
+      },
+      {
+        "kind": "free",
+        "label": "Wine Australia — Oak use in Australian winemaking",
+        "url": "https://www.wineaustralia.com/",
+        "note": "search Wine Australia for 'oak winemaking'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3007WT Stabilisation & Clarification III · LO 2",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1802,
+    "prompt_tokens": 1657,
+    "total_tokens": 3459,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1802
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1657,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1142,
+  "overlaps": []
+}

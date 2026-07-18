@@ -1,0 +1,81 @@
+{
+  "lesson_id": "L3.8",
+  "source": {
+    "id": "L3.8",
+    "slug": "blending",
+    "title": "Blending — decisions with numbers and nose",
+    "level": "3",
+    "wbs": [
+      "D5",
+      "D8"
+    ],
+    "reading_min": "5",
+    "aim": "Component analysis, sensory trials, blending maths, and how to resist the temptation to over-engineer.",
+    "application": "Owen builds you a blending trial workbook. This lesson tells you when to trust the numbers vs the nose.",
+    "sources_private": [
+      "morewine_bible_red_ch_blending",
+      "morewine_bible_white_ch_blending"
+    ],
+    "sources_public_ref": [
+      "csu_wsc317",
+      "adelaide_oenology_3520wt"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch5_blending"
+    ]
+  },
+  "generated": {
+    "aim": "Understand how to use component analysis and sensory trials together to make blending decisions — and know when the spreadsheet should yield to the glass.",
+    "application": "Owen's blending trial workbook walks you through proportional maths, sensory scoring grids, and a final blend log. Use it alongside your cellar brief this week: pull your component analytics, set up bench trials at three or four ratios, and record both the numbers and your nose before committing to tank.",
+    "body_md": "### Know your components before you blend anything\n\nBlending without component data is guesswork dressed up as craft. Before a single trial, pull the analytics on every component: alcohol, pH, TA, volatile acidity, residual sugar, free and total SO₂, and — for reds — colour density and tannin index if you have them. Map where each component sits relative to your target style.\n\nThe questions worth asking at this stage:\n\n- Which component carries the structural backbone (tannin, acid)?\n- Which carries the aromatic lift?\n- Where are the outliers — the tank that's 0.3 pH units higher than everything else, or the one with VA creeping toward 0.6 g/L?\n- What does the final blend need to achieve analytically, and is it achievable from what's in front of you?\n\nThis is not about finding the 'perfect' component. It's about understanding the range you're working with before you start mixing.\n\n### Blending maths: proportional calculation\n\nThe arithmetic is straightforward. For any additive parameter — alcohol, TA, pH (approximately, and only for small adjustments), SO₂ — a weighted average by volume gives you the predicted blend value.\n\nFor a two-component blend:\n\n**Blend value = (Volume A × Value A + Volume B × Value B) ÷ Total Volume**\n\nScale this across three or four components and you can model a target blend on paper before opening a tap. This matters most when you're trying to hit a specific alcohol level for labelling, or when one component's VA is high enough that dilution is the only practical correction.\n\nA few things the maths won't tell you:\n\n- How tannins from different varieties or oak regimes will integrate\n- Whether two aromatic profiles will add, suppress, or create something unexpected\n- How the blend will evolve over the next six months\n\nThat's where the bench trial earns its place.\n\n### Sensory trials: structure before preference\n\nSet up bench trials at a minimum of three ratios — typically anchored around your modelled target, then 10–15% either side. Use identical glassware, identical temperature, and evaluate blind where possible. Even in a small cellar, removing label bias is worth the extra five minutes.\n\nEvaluate in order: appearance, aroma, palate structure (acid, tannin, body), then flavour length and integration. Score each attribute separately before forming an overall impression. The temptation is to jump straight to 'which one do I like?' — resist it. A blend that scores highest on immediate appeal often isn't the one that holds up after six weeks in bottle.\n\nKey sensory checkpoints:\n\n- Does the acid feel integrated or does it stick out?\n- Is tannin texture consistent across the palate, or does it clump at the finish?\n- Does the aromatic profile read as coherent, or are two distinct varietal characters fighting each other?\n- Would this blend benefit from another six months in component before assembly?\n\n### When to trust the numbers, when to trust the nose\n\nThe numbers are authoritative on a narrow set of questions: legal compliance (alcohol, SO₂), stability risk (VA, pH), and additive corrections (acid, sugar). If a blend's modelled pH is 3.82 and you need 3.65 for stability, the nose doesn't get a vote on whether to add tartaric.\n\nThe nose takes over when the analytical targets are met and the question becomes which blend is actually better. Phenolic integration, aromatic complexity, and palate length are not yet reliably predicted by any single analytical parameter. Colour density and tannin index give useful proxies for red structure, but two blends with identical indices can feel completely different in the glass.\n\nA practical rule: use the numbers to eliminate options that fail on technical grounds, then use sensory evaluation to choose among the survivors.\n\n### Resisting over-engineering\n\nThe biggest blending error in small cellars isn't a bad ratio — it's too many components, too many corrections, and too many trials that blur the original intent. Every component added introduces another variable. Every correction (acid here, tannin addition there) compounds the complexity of predicting how the blend will behave.\n\nIf a component needs significant correction to be usable, ask whether it belongs in the blend at all. Sometimes the right answer is a single-variety, single-tank wine that's honest about what it is.\n\nSet a decision deadline before you start trials. Blends that stay open for weeks of 'just one more trial' rarely improve — they accumulate fatigue and indecision.\n\n**What to do this vintage:** Pull component analytics today, model two or three target ratios in Owen's blending trial workbook, and run bench trials this week with structured sensory scoring before any final blend decision. Once the numbers clear the technical bar, let the glass make the call — and commit.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 9",
+        "url": null,
+        "note": "Chapman & Hall — blending calculations and component analysis"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI Winemaking Resources — Blending",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'blending'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC317 Wine Science 2 · LO 4",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC317",
+        "note": "Interpreting analytical data on phenolics, colour and flavour compounds"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3520WT Advances in Wine Science III · LO 2",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": "New analytical methods and wine composition"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1596,
+    "prompt_tokens": 1853,
+    "total_tokens": 3449,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1596
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1853,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1792,
+  "overlaps": []
+}

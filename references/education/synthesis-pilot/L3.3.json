@@ -1,0 +1,89 @@
+{
+  "lesson_id": "L3.3",
+  "source": {
+    "id": "L3.3",
+    "slug": "sparkling-fortified",
+    "title": "Sparkling and fortified — outside the still-wine box",
+    "level": "3",
+    "wbs": [
+      "D3",
+      "D4",
+      "D5"
+    ],
+    "reading_min": "5",
+    "aim": "Traditional method vs Charmat, base wine construction, tirage, dosage; and fortified basics — spirits, timing, oxidation control.",
+    "application": "Even if you don't make these yet, the tools they need — like riddling or fortification calculations — inform your everyday cellar maths.",
+    "sources_private": [
+      "morew_sparkling_yeast",
+      "morew_sparkling_proelif",
+      "aoc_2_9_fortified_spirits"
+    ],
+    "sources_public_ref": [
+      "csu_wsc303",
+      "adelaide_oenology_3037wt"
+    ],
+    "citations_bibliographic": [
+      "jackson_wine_science_ch8"
+    ]
+  },
+  "generated": {
+    "aim": "Understand how sparkling and fortified wines diverge from still-wine production — the mechanics of secondary fermentation, tirage, dosage, and spirit addition — and see how the underlying calculations apply to everyday cellar decisions.",
+    "application": "Even if Tank 4 is running a straight Shiraz this vintage, the pressure and sugar maths behind tirage, or the alcohol-by-volume arithmetic behind fortification, are the same tools you use for chaptalization limits, SO₂ additions, and blending targets. Run the fortification calculation as a bench trial workbook exercise now, before you ever need it in anger.",
+    "body_md": "### Two methods, one goal: bubbles in the bottle\n\nSparkling wine production splits cleanly into two commercial approaches. Traditional method (méthode traditionnelle) induces a second fermentation inside the individual bottle. Charmat method (also called tank method or cuve close) runs that second fermentation in a sealed pressure vessel, then bottles under counter-pressure.\n\nThe choice is not purely stylistic — it is structural. Traditional method gives extended lees contact (months to years), which drives autolytic character: brioche, toast, creamy texture. Charmat is faster, preserves primary fruit and floral aromatics, and suits varieties like Prosecco or aromatic Riesling where freshness is the point. Neither is inferior; they are different tools.\n\n### Base wine construction\n\nThe base wine (cuvée) sets the ceiling for everything that follows. Targets differ sharply from still-wine benchmarks:\n\n- **Alcohol**: typically 10–11% for traditional method. Higher alcohol compresses the room for CO₂ development and stresses the yeast at tirage.\n- **Acidity**: elevated TA (8–10 g/L as tartaric) is not a fault — it is insurance against the softening that occurs during secondary fermentation and ageing.\n- **Baumé at harvest**: grapes picked at 10–11 °Baumé rather than 12–13 °Baumé. Every extra degree of sugar at harvest is a degree of alcohol you cannot remove.\n- **Phenolics**: minimal. Whole-bunch pressing, gentle extraction, early racking. Tannin and colour are liabilities in a sparkling base.\n- **SO₂**: keep free SO₂ low at tirage — residual SO₂ inhibits the tirage yeast. Aim for free SO₂ below 10 mg/L before adding the liqueur de tirage.\n\n### Tirage and secondary fermentation\n\nThe liqueur de tirage is a measured addition of sugar, yeast, and yeast nutrients (plus a riddling aid such as bentonite or alginate beads for remuage). The sugar dose is calculated to produce a target pressure — typically 5–6 atm (around 600 kPa) for traditional sparkling.\n\nThe conversion factor: approximately 4 g/L of sucrose yields 1 atm of pressure and roughly 0.5% additional alcohol. So a tirage addition of 24 g/L sugar targets ~6 atm. Get this wrong by 4 g/L and you are either under-pressured or risking bottle failure.\n\nAfter secondary fermentation, the wine rests on lees (sur lattes). Autolysis — the breakdown of spent yeast cells — releases mannoproteins and nucleotides that build mouthfeel and complexity. Minimum legal periods exist by appellation, but quality-focused producers extend well beyond them.\n\nRiddling (remuage) gradually consolidates the lees plug into the neck. Mechanical gyropalettes do in days what hand riddling takes weeks. Disgorgement removes the frozen plug; the dosage (liqueur d'expédition) is added immediately to adjust sweetness and top up the bottle.\n\n**Dosage** is the final flavour lever. It is a blend of wine and sugar, expressed as g/L residual sugar in the finished product:\n- Brut Nature / Zero Dosage: 0–3 g/L\n- Extra Brut: 0–6 g/L\n- Brut: up to 12 g/L\n- Extra Dry / Sec / Demi-Sec: progressively sweeter\n\nDosage also compensates for acidity perception. A wine at 9 g/L TA may taste austere at Brut Nature but balanced at Extra Brut — bench trials before disgorgement are not optional.\n\n### Fortified wine: the spirit addition\n\nFortification arrests fermentation by raising alcohol to a level that kills or inhibits yeast — typically 17–22% ABV depending on style. The timing of spirit addition determines residual sugar and therefore style:\n\n- **Early addition** (high Baumé remaining): more residual sugar, sweeter style (think Rutherglen Muscat, vintage Port).\n- **Late addition** (fermentation near complete): drier style (dry Apera/Sherry style, dry Madeira).\n\nThe spirit used must meet legal definitions — in Australia, grape spirit at 94–96% ABV for most fortified categories. The fortification calculation is straightforward Pearson square algebra:\n\n> Volume of spirit = (Target ABV − Wine ABV) ÷ (Spirit ABV − Target ABV) × Volume of wine\n\nExample: 1000 L of wine at 8% ABV, targeting 18% ABV, using 96% spirit.\nSpirit required = (18 − 8) ÷ (96 − 18) × 1000 = 10 ÷ 78 × 1000 ≈ 128 L.\n\nRun this before you open the spirit drum. The addition is irreversible.\n\n### Oxidation as a tool, not a flaw\n\nStill-wine production treats oxidation as an enemy. Fortified winemaking weaponises it. Styles like Tawny, Amontillado, and Rutherglen Muscat develop their characteristic rancio, dried-fruit, and nutty complexity through deliberate, controlled oxidative maturation — in small oak, sometimes with ullage, over years or decades.\n\nSO₂ management in fortified wines is different from still wines. The high alcohol provides microbial stability; SO₂ additions are lower and less frequent. The focus shifts to managing oxidation rate through vessel size, topping frequency, and temperature.\n\nReductive styles (Vintage Port, some Muscats) are the exception — bottled young to preserve primary fruit, with SO₂ and inert gas used to limit oxygen exposure during maturation.\n\n**What to do this vintage:** Pull up the fortification calculation in your bench trial workbook and run it against a hypothetical — pick a wine at 9% ABV, a target of 17.5%, and 95% spirit, and confirm your arithmetic before vintage pressure makes it urgent. If you are making a sparkling base, check free SO₂ is below 10 mg/L and TA is tracking above 8 g/L before you even think about tirage.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Jackson · Wine Science 5th ed. · Ch 14 (Sparkling) & Ch 15 (Fortified)",
+        "url": null,
+        "note": "Academic Press"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Sparkling wine production resources",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'sparkling wine production'"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Fortified wine technical resources",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'fortified wine'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC303 Wine Production 2 · LO 1–2",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC303",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3037WT Distillation, Fortified & Sparkling III · all LOs",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 2073,
+    "prompt_tokens": 1717,
+    "total_tokens": 3790,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 2073
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1717,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1262,
+  "overlaps": []
+}

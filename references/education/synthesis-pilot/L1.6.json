@@ -1,0 +1,82 @@
+{
+  "lesson_id": "L1.6",
+  "source": {
+    "id": "L1.6",
+    "slug": "winemakers-toolkit",
+    "title": "Your toolkit — from home-scale to boutique",
+    "level": "1",
+    "wbs": [
+      "D3",
+      "D5",
+      "D9"
+    ],
+    "reading_min": "4",
+    "aim": "Match equipment to scale honestly. What a 50L test tank teaches you that a 5000L tank cannot, and vice versa.",
+    "application": "Owen tracks your kit register. This lesson lets you audit whether your kit is the constraint on your quality, or your process is.",
+    "sources_private": [
+      "morewine_bible_red_ch5",
+      "aoc_2_1_intro_oenology"
+    ],
+    "sources_public_ref": [
+      "csu_wsc321",
+      "adelaide_oenology_3530wt"
+    ],
+    "citations_bibliographic": [
+      "jackson_wine_science_ch12"
+    ]
+  },
+  "generated": {
+    "aim": "Match equipment to scale honestly. What a 50L test tank teaches you that a 5000L tank cannot, and vice versa.",
+    "application": "Owen's kit register holds every vessel, press, and pump you've logged. After this lesson, open that register and tag each item as either a quality constraint or a process constraint — the distinction matters when you're deciding whether to fix a stuck ferment by changing technique or by changing gear. If a bench trial workbook entry contradicts what your tank data shows at scale, the gap is usually equipment, not recipe.",
+    "body_md": "### Scale is not just volume — it's a different experiment\n\nA 50L tank and a 5000L tank are not the same winemaking environment at different sizes. Surface-area-to-volume ratio drops sharply as vessel size increases, which changes heat retention, oxygen ingress, and the behaviour of solids in suspension. A small vessel loses temperature faster, picks up more ambient oxygen per litre through seals and sampling ports, and lets you see stratification and cap behaviour in ways a large tank obscures. That visibility is the 50L tank's core value: it is a diagnostic tool, not just a production shortcut.\n\nAt boutique scale — say 500L to 5000L — the physics shift. Thermal mass becomes an asset rather than a liability, pump-overs become harder to calibrate per-litre, and small errors in additions (nutrients, SO₂, acid) are amplified because you're working with less margin for correction. The equipment has to match the precision the winemaking demands, not just the volume the vintage delivers.\n\n### What small-scale kit does well\n\nTest tanks, demijohns, and pilot fermenters earn their place for:\n\n- **Variety and clone trialling** — run three treatments side by side without committing fruit\n- **Yeast and nutrient screening** — a 20L ferment tells you whether a strain finishes cleanly before you pitch 2000L\n- **Skin-contact and maceration timing** — pull samples at 24h, 48h, 72h without disrupting a commercial batch\n- **Acid and tannin addition trials** — bench trial workbook data at 5L translates to tank additions with a correction factor, not a guess\n- **Fault diagnosis** — a small vessel lets you test remediation (fining, blending, SO₂ adjustment) before committing the whole parcel\n\nThe limitation is thermal inertia. A 20L vessel in a 22°C room will drift toward ambient temperature within hours. If your commercial ferments run at 14°C in a jacketed tank, your small-scale trial is not replicating that environment unless you control it deliberately — water bath, temperature-controlled room, or insulated jacket.\n\n### What boutique-scale kit does well\n\nOnce you move into vessels above roughly 500L, you gain:\n\n- **Thermal stability** — larger volumes hold temperature longer, reducing the risk of runaway fermentation peaks\n- **Realistic cap management data** — pump-over volumes, punch-down frequency, and extraction curves at this scale reflect what you'll see in commercial production\n- **Blending resolution** — small lots can be kept separate long enough to make genuine blending decisions, rather than being forced together by vessel shortage\n- **Gravity and lees behaviour** — settling rates, lees compaction, and racking clarity are scale-dependent; 500L gives you data that 20L cannot\n\nThe constraint at boutique scale is inflexibility. A 2000L open-top fermenter commits you to a red winemaking path. If the fruit comes in underripe or over-extracted, your options narrow fast. Equipment diversity — having vessels of different sizes and types — is a quality lever, not a luxury.\n\n### Hygienic design is non-negotiable at any scale\n\nThe single most common equipment-driven quality failure across both scales is hygiene design. Fittings with dead legs, butterfly valves that trap solids, hoses stored wet, and pumps with worn seals all introduce microbial risk that no winemaking technique fully corrects downstream. This applies equally to a 20L demijohn with a poorly fitted airlock and a 5000L tank with a leaking sample valve.\n\nWhen auditing your kit register, flag:\n\n- Any fitting or hose that cannot be fully drained and dried between uses\n- Vessels where internal surfaces cannot be visually inspected or physically reached for cleaning\n- Pumps where seal condition hasn't been checked this vintage\n- Temperature sensors that haven't been calibrated against a reference thermometer\n\nHygienic design principles — smooth internal surfaces, full-drain fittings, CIP-compatible connections — apply regardless of whether the vessel holds 50L or 50,000L.\n\n### Equipment selection drives scheduling, not just capacity\n\nA boutique operation with one press, one pump, and three tanks of the same size has a scheduling problem disguised as an equipment problem. When fruit arrives in a compressed window, the bottleneck is usually the press or the cooling capacity, not the tank volume. Equipment selection at the planning stage — before vintage — should map against your expected grape intake curve, not just your total annual crush.\n\nFor a 20-tonne boutique crush, the practical questions are:\n- Can the press cycle fast enough to keep up with intake on the busiest day?\n- Does cooling capacity cover simultaneous ferments at target temperature?\n- Are there enough small vessels (200–500L) to handle single-row or single-block parcels separately?\n\nIf the answer to any of these is no, the constraint is equipment. If the answer is yes and quality is still inconsistent, the constraint is process.\n\n### What to do this vintage\n\nOpen your kit register in Owen and work through each vessel and piece of equipment against two questions: does it limit what you can make, or does it limit how consistently you make it? Flag anything where the answer is unclear — those are the items worth a bench trial or a scheduled maintenance check before the next fruit arrives.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Jackson · Wine Science 5th ed. · Ch 8 (Winery Design and Equipment)",
+        "url": null,
+        "note": "Academic Press"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC321 Winery Engineering · LO 2 (equipment selection and scheduling)",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC321",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3530WT Engineering for Viticulture and Oenology III · LO 2 (equipment specification for target wine styles)",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Winery equipment and hygiene resources",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'winery equipment hygiene'"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1730,
+    "prompt_tokens": 1824,
+    "total_tokens": 3554,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1730
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1824,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1936,
+  "overlaps": []
+}

@@ -1,0 +1,81 @@
+{
+  "lesson_id": "L2.8",
+  "source": {
+    "id": "L2.8",
+    "slug": "malolactic-fermentation",
+    "title": "Malolactic — the second ferment that changes the wine",
+    "level": "2",
+    "wbs": [
+      "D4",
+      "D5"
+    ],
+    "reading_min": "4",
+    "aim": "When to run it, when to skip it, nutrient and pH conditions, spontaneous vs inoculated, and how to know it's done.",
+    "application": "Owen tracks malic across your tanks. This lesson lets you steer that curve confidently.",
+    "sources_private": [
+      "morew_mlf_paper",
+      "awri_mlf_successful",
+      "awri_mlf_red"
+    ],
+    "sources_public_ref": [
+      "csu_wsc318"
+    ],
+    "citations_bibliographic": [
+      "rgayon_handbook_v1_mlf"
+    ]
+  },
+  "generated": {
+    "aim": "When to run MLF, when to block it, what conditions LAB need to work, how to choose between spontaneous and inoculated, and how to confirm it's finished.",
+    "application": "Owen logs malic acid across your tanks in real time. Use this lesson to set your MLF thresholds, read the trajectory curves with confidence, and act before a sluggish ferment turns into a stuck one or a spoilage risk.",
+    "body_md": "### What MLF actually does\n\nMalolactic fermentation is the bacterial conversion of malic acid to lactic acid plus CO₂. One dicarboxylic acid becomes one monocarboxylic acid — the wine loses a proton, pH rises, and perceived acidity softens. The flavour shift is real too: diacetyl production (a byproduct of citric acid metabolism by lactic acid bacteria) adds buttery or creamy character at low concentrations, and can become a fault at high ones.\n\nThe net result is a wine with lower titratable acidity, higher pH, and greater microbial stability — because malic acid, which many spoilage organisms can metabolise, is gone.\n\n---\n\n### When to run it — and when to block it\n\n**Run MLF when:**\n- The wine is high in malic acid and the style calls for softer acidity (most reds, cool-climate Chardonnay, Viognier blends)\n- You want microbial stability without relying solely on SO₂\n- The base pH is 3.2–3.5 and the wine has finished primary fermentation cleanly\n\n**Block MLF when:**\n- The style depends on bright, crisp acidity — aromatic whites (Riesling, Sauvignon Blanc, Pinot Gris for early drinking)\n- pH is already above 3.5; completing MLF will push you into a zone where SO₂ becomes less effective and spoilage risk climbs\n- You're blending across tanks and need consistent acid profiles\n\nTo block: add SO₂ immediately post-primary (target 0.8 mg/L molecular SO₂), drop temperature below 10°C, and consider sterile filtration if the wine will be bottled early.\n\n---\n\n### Conditions LAB need — and where they fail\n\nThe dominant organism in wine MLF is *Oenococcus oeni*, selected by evolution for low pH and high ethanol tolerance. *Lactobacillus* and *Pediococcus* species are also present but carry higher spoilage risk, particularly for biogenic amines and mousiness.\n\nFor *O. oeni* to work reliably:\n\n- **pH:** 3.2–3.5 is the workable range. Below 3.1, even robust strains struggle. Above 3.5, *Pediococcus* and *Lactobacillus* gain competitive advantage — a problem.\n- **Temperature:** 18–22°C is optimal. Below 15°C, MLF stalls. Above 25°C, diacetyl accumulates and spoilage risk increases.\n- **Ethanol:** Above 14% v/v, LAB populations drop sharply. High-alcohol reds often need inoculation rather than spontaneous MLF.\n- **SO₂:** Free SO₂ above 10–15 mg/L inhibits LAB. Total SO₂ above 30–40 mg/L is problematic. Check your free SO₂ before inoculating — this is the most common reason MLF fails to start.\n- **Nutrients:** LAB are fastidious. Malic acid is their carbon source, but they also need amino acids and vitamins. Nitrogen-depleted musts (common after a heavy yeast fining) can slow MLF significantly. Specific LAB nutrients are available commercially and are worth bench-trialling if you're seeing sluggish starts.\n- **Yeast-LAB compatibility:** Some yeast strains release SO₂ or fatty acids that inhibit LAB. Know your yeast's MLF compatibility rating before you commit.\n\n---\n\n### Spontaneous vs inoculated\n\n**Spontaneous MLF** relies on the indigenous LAB population surviving primary fermentation. It's slower, less predictable, and carries more risk of off-species dominance — particularly *Pediococcus* in warmer cellars. The upside is complexity and site expression, which some winemakers value in premium reds.\n\n**Inoculated MLF** uses a commercial *O. oeni* starter, added either:\n- **Co-inoculation** — LAB added during primary fermentation, typically at 1–3 Baumé. Faster total processing time, lower diacetyl, but requires a yeast strain with good LAB compatibility.\n- **Sequential inoculation** — LAB added after primary fermentation is complete and the wine has been racked. More control, easier to manage SO₂ and temperature, the standard approach for most boutique operations.\n\nFor most Vigneron-tier cellars, sequential inoculation with a proven *O. oeni* strain is the lower-risk path. Reserve spontaneous MLF for tanks where you've seen it work cleanly in previous vintages.\n\n---\n\n### Knowing it's done\n\nDo not rely on CO₂ bubbling alone — that stops before malic is fully consumed. Use:\n\n- **Paper chromatography:** Low cost, reliable, shows malic acid spot disappearing. Still the field standard for small cellars.\n- **Enzymatic assay:** Quantitative, accurate to ±0.1 g/L. Worth running at the end to confirm malic is below 0.2 g/L before you add your post-MLF SO₂.\n- **Owen's malic tracking:** The platform logs malic trajectory across tanks. A flattening curve that hasn't reached your target threshold is a flag — not a finish line.\n\nOnce confirmed complete, act within 24–48 hours: rack, add SO₂ to your target molecular level, and adjust temperature down if the wine is going to barrel or tank for extended maturation. Leaving wine on LAB post-MLF risks diacetyl accumulation and, in warmer cellars, the onset of spoilage from residual *Pediococcus* or *Lactobacillus* activity.\n\n---\n\n**What to do this vintage:** Pull your current malic readings from the cellar brief and flag any tank sitting above 0.5 g/L malic with a pH over 3.4 — those need a decision on inoculation or blocking within the week. Set an Owen alert to notify you when malic drops below 0.3 g/L so you're ready to act on SO₂ addition the same day.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Ribéreau-Gayon et al. · Handbook of Enology Vol. 1 (2nd ed.) · Ch 5–6",
+        "url": null,
+        "note": "Wiley — covers LAB species, MLF biochemistry and conditions in depth"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Malolactic fermentation resources",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'malolactic fermentation' — multiple technical reviews available"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Lactic acid bacteria and wine spoilage",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'lactic acid bacteria spoilage' — covers Pediococcus and biogenic amines"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC318 Wine Microbiology · MLF microbiology and ecology",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC318",
+        "note": "Covers Oenococcus, Lactobacillus, Pediococcus and spoilage risk in wine"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 2001,
+    "prompt_tokens": 1588,
+    "total_tokens": 3589,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 2001
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1588,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 529,
+  "overlaps": []
+}

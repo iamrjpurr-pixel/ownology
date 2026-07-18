@@ -1,0 +1,88 @@
+{
+  "lesson_id": "L2.3",
+  "source": {
+    "id": "L2.3",
+    "slug": "canopy-yield-management",
+    "title": "Canopy and yield — steering quality season by season",
+    "level": "2",
+    "wbs": [
+      "D1"
+    ],
+    "reading_min": "5",
+    "aim": "Vigour balance, canopy exposure, crop levels — the levers that turn an average site into a great wine.",
+    "application": "Your growing-season log becomes actionable when you can score your canopy against Smart's points. Owen prompts the observations, this lesson tells you what they mean.",
+    "sources_private": [
+      "aoc_1_5_grapevine_culture_a",
+      "aoc_1_6_grapevine_culture_b",
+      "aoc_1_8_improving_grape_quality"
+    ],
+    "sources_public_ref": [
+      "adelaide_viticult_3021wt",
+      "lincoln_wine_301",
+      "csu_vit212"
+    ],
+    "citations_bibliographic": [
+      "coombe_iland_visc_vol2_practices"
+    ]
+  },
+  "generated": {
+    "aim": "Vigour balance, canopy exposure, and crop levels — the levers that turn an average site into a great wine. Understand how to read your canopy, score it honestly, and act before the season runs away from you.",
+    "application": "Your growing-season log in Ownology becomes a decision tool the moment you can score canopy density, shoot vigour, and exposed leaf area against Smart's benchmarks. Owen prompts the field observations at the right growth stages — this lesson tells you what those numbers mean and which lever to pull. Run the scoring after your next walk and flag anything outside range in your cellar brief before veraison.",
+    "body_md": "### Why vigour balance is the whole game\n\nA vine with too much vigour pushes energy into shoots and leaves rather than fruit. A vine starved of vigour can't ripen adequately. The target is a vine in balance — enough leaf area to ripen the crop, not so much canopy that the fruit zone becomes a humid, shaded tunnel.\n\nThe practical benchmark most Australian and NZ viticulturists use comes from Richard Smart's point-score system. A well-balanced canopy typically scores:\n\n- Shoot length at harvest: 0.9–1.5 m (longer = excess vigour)\n- Lateral shoot development: minimal, one node or fewer\n- Exposed leaf area in the fruit zone: >50% of leaves in direct sun\n- Canopy gaps: 20–40% of the trellis face open\n- Layers of leaves at the fruit zone: ≤2 (more than 4 is a problem)\n- Bunch exposure: >50% of bunches with direct light contact\n\nIf your canopy scores poorly on three or more of these, fruit composition will suffer — higher pH, lower colour, elevated disease pressure, and flavours that read as herbaceous or jammy depending on the direction of the imbalance.\n\n### Reading the canopy mid-season\n\nThe window to act is narrow. By the time you're at 50% veraison, canopy interventions have diminishing returns on that vintage — though they still matter for vine balance heading into dormancy.\n\nKey observations to make at flowering, fruit set, and again at bunch closure:\n\n**Shoot vigour** — internodes longer than 80 mm at the growing tip signal excess nitrogen or water. Check your irrigation schedule and any recent fertigation events.\n\n**Canopy density** — push your hand into the fruit zone. If you can't see daylight through the canopy from the other side, you have a shading problem. This is the fastest field test.\n\n**Lateral growth** — heavy lateral development after fruit set is the canopy's way of telling you it has more energy than it needs. Hedging laterals is a short-term fix; the underlying cause is usually excess water or nitrogen.\n\n**Fruit zone humidity** — dense canopies trap moisture. If you're seeing early botrytis or powdery mildew in the bunch zone before bunch closure, canopy density is almost always a contributing factor.\n\n### Crop level and its relationship to quality\n\nYield and quality are not automatically in opposition, but there is a real relationship between crop load and the vine's capacity to ripen fruit fully.\n\nThe useful metric is yield-to-pruning-weight ratio — the Ravaz Index. A ratio between 5 and 10 generally indicates a balanced vine. Below 5 suggests the vine is under-cropped relative to its vegetative capacity (excess vigour likely). Above 10 suggests the crop is outrunning the canopy's ability to ripen it.\n\nPractical crop management decisions:\n\n- **Green harvest** (crop thinning): most effective before veraison. Removing bunches after veraison has limited impact on berry composition and wastes the vine's investment in those bunches.\n- **Timing matters more than volume**: removing 20% of the crop at fruit set has a larger compositional effect than removing 30% at veraison.\n- **Whole-bunch vs. berry thinning**: removing entire bunches is more efficient and less likely to cause compensatory berry swelling in the remaining fruit.\n- **Don't chase a yield target in isolation**: a 3 t/ha crop on a low-vigour site in a dry year may be perfectly balanced. The same yield on a high-vigour, irrigated site may still be under-cropped.\n\n### Pruning decisions that set up next season\n\nAbout 90% of the previous season's wood is removed at winter pruning. The retained 10% — whether as spurs or canes — determines bud number, and bud number sets the ceiling on next year's crop before the season even starts.\n\nLight pruning leaves more buds, which typically means more shoots, more crop, and — if vigour is already high — a canopy that's harder to manage. Heavy pruning reduces bud number, concentrates the vine's resources into fewer shoots, and can push vegetative growth if the vine's root system has more capacity than the canopy above it.\n\nThe practical rule: match bud number to the site's demonstrated capacity to ripen that crop. If last vintage showed excess vigour (long internodes, heavy laterals, poor fruit zone exposure), reduce bud number at pruning and reassess irrigation and nutrition inputs before budburst.\n\nSpur pruning suits high-vigour sites and mechanised operations. Cane pruning gives more flexibility in bud placement and suits varieties with low basal bud fruitfulness — Chardonnay and Pinot Noir being the obvious examples.\n\n### What to do this vintage\n\nScore your canopy against Smart's benchmarks at bunch closure and record the result in your growing-season log — Owen's prompts will flag the right timing. If you're outside range on shoot length, canopy density, or fruit zone exposure, note the likely cause (water, nitrogen, or pruning weight) so your winter pruning and pre-season nutrition plan addresses the root issue rather than just the symptom.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Smart & Robinson · Sunlight into Wine · Ch 2–3",
+        "url": null,
+        "note": "Winetitles, Adelaide — the canonical canopy scoring reference"
+      },
+      {
+        "kind": "buy",
+        "label": "Dry & Coombe · Viticulture Vol 2 · Ch 9",
+        "url": null,
+        "note": "Winetitles, Adelaide — crop load, Ravaz Index, and pruning weight"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Canopy Management",
+        "url": "https://www.awri.com.au/industry_support/winemaking_resources/",
+        "note": "Search AWRI for 'canopy management'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Lincoln WINE 301 Viticulture II · LO 1, LO 3",
+        "url": "https://www.lincoln.ac.nz/study/courses-2/course-search/",
+        "note": "Advanced canopy management and yield-quality decisions"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 1.5 Grapevine Culture Part A",
+        "url": null,
+        "note": "your paid resource"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1777,
+    "prompt_tokens": 2467,
+    "total_tokens": 4244,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1777
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 2467,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 4275,
+  "overlaps": []
+}

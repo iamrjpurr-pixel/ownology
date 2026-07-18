@@ -1,0 +1,88 @@
+{
+  "lesson_id": "L1.2",
+  "source": {
+    "id": "L1.2",
+    "slug": "vine-biology-essentials",
+    "title": "The vine — the biology every winemaker needs",
+    "level": "1",
+    "wbs": [
+      "D1"
+    ],
+    "reading_min": "4",
+    "aim": "Understand grapevine anatomy, phenology, and berry maturation as the chain that ends in your press. No morphology quiz — just what changes when the vine changes.",
+    "application": "Your ripeness calls make sense when you can name what's happening in the berry during veraison. This lesson underwrites every harvest decision Owen will help you make.",
+    "sources_private": [
+      "aoc_1_5_grapevine_culture_a",
+      "morewine_bible_red_ch2"
+    ],
+    "sources_public_ref": [
+      "lincoln_wine_201",
+      "adelaide_viticult_2500wt"
+    ],
+    "citations_bibliographic": [
+      "coombe_iland_visc_vol1"
+    ]
+  },
+  "generated": {
+    "aim": "Understand grapevine anatomy, phenology, and berry maturation as the chain that ends in your press. No morphology quiz — just what changes when the vine changes.",
+    "application": "Your ripeness calls make sense when you can name what's happening in the berry during veraison. Every harvest decision Owen surfaces in your cellar brief — pick date projections, ferment trajectory flags, Baumé targets — traces back to the biology covered here. Run this lesson before you open your vintage log for the season.",
+    "body_md": "### The vine is a perennial factory, not a seasonal crop\n\nGrapevines store carbohydrate reserves in their permanent wood — trunk, cordons, roots — over winter, then spend those reserves to push budburst in spring. This matters practically: a vine carrying too much crop in year one enters dormancy with depleted reserves and struggles to push vigorous shoots the following season. The vine's annual cycle is a budget, not a reset.\n\nThe permanent structure you're working with:\n\n- **Roots** — anchor, store reserves, absorb water and minerals. Depth and distribution shape drought response and nutrient uptake.\n- **Trunk and cordons** — the carbohydrate bank. Graft union sits here; rootstock physiology operates below it.\n- **Canes and spurs** — one-year-old wood that carries the buds. Everything above this is removed or managed each winter.\n- **Shoots, leaves, tendrils** — the season's working tissue. Leaves are the solar panels; tendrils are the climbing mechanism.\n- **Cluster and berry** — the output. Anatomy within the berry (skin, pulp, seeds, brush) determines what you extract.\n\nPruning decisions directly set the number of buds retained, which sets potential shoot number, which sets potential crop load. Roughly 90% of the previous season's growth is removed each winter. The remaining first-year wood is where next season's fruit will form.\n\n---\n\n### Phenology: the eight stages that matter\n\nPhenology is the calendar of vine development. The stages run in sequence; you can't skip one. Each stage has a temperature threshold and a resource demand.\n\n1. **Budburst** — triggered when soil temperature consistently exceeds ~10°C. Frost risk is highest here.\n2. **Shoot growth** — rapid cell division; shoot elongation driven by stored reserves before canopy is photosynthetically self-sufficient.\n3. **Flowering** — typically 6–9 weeks after budburst. Temperature and wind at this stage set fruit set percentage and, therefore, bunch size.\n4. **Fruit set** — fertilised ovaries swell; unfertilised drop (coulure). Berry number per bunch is fixed here.\n5. **Berry development (pre-veraison)** — green, hard, high acid, accumulating tartrate and malate. Seeds developing inside.\n6. **Veraison** — the pivot point (see below).\n7. **Ripening** — sugar accumulation, acid degradation, colour and flavour development.\n8. **Harvest** — your decision, based on the balance you're chasing.\n\nHeat accumulation (degree days) drives the pace between stages. Cool climates compress the ripening window; warm climates accelerate it. Knowing where your site sits on that curve tells you how much runway you have between veraison and harvest.\n\n---\n\n### Veraison: the biology behind your ripeness call\n\nVeraison is not just colour change. It's a wholesale metabolic switch inside the berry.\n\nBefore veraison, the berry is a sink for malic acid and is accumulating it rapidly. Cell division has stopped; the berry is at maximum hardness. After veraison:\n\n- **Sugar loading begins** — sucrose moves from leaves through the phloem into the berry, where it's cleaved into glucose and fructose. Baumé rises from near zero to your target range.\n- **Malic acid respiration accelerates** — malic acid is consumed by the berry's own metabolism, especially in warm nights. Tartaric acid remains relatively stable. This is why warm vintages produce lower-acid wines: malic degradation, not tartrate loss.\n- **Potassium influx** — K⁺ moves into the berry alongside sugar. It binds tartrate, raising pH. High-potassium sites or varieties can push pH uncomfortably fast even before Baumé is where you want it.\n- **Anthocyanin synthesis (red varieties)** — skin colour develops. Requires UV light and moderate temperatures; excessive heat above ~35°C can inhibit anthocyanin formation.\n- **Flavour precursor accumulation** — terpenes, methoxypyrazines (declining post-veraison), thiols (as precursors). The timing of harvest relative to these curves is variety-specific.\n\nThe practical consequence: Baumé alone is not a harvest trigger. pH, TA, and flavour development can diverge from sugar accumulation, particularly in warm seasons or on high-vigour sites.\n\n---\n\n### What the canopy does to the berry\n\nLeaf area drives photosynthesis, which drives sugar accumulation. But canopy architecture also controls:\n\n- **Berry temperature** — shaded berries run cooler, retain more malic acid, develop less colour.\n- **Disease pressure** — dense canopies trap humidity, increasing Botrytis risk through ripening.\n- **Flavour profile** — shaded fruit in Sauvignon Blanc retains methoxypyrazines (green, capsicum characters) longer into the season.\n\nTraining systems — VSP, Scott Henry, GDC — are engineering solutions to the same problem: maximise useful leaf area while keeping fruit in a defined microclimate. The pruning and training choices made in winter determine the canopy geometry you're managing at harvest.\n\n---\n\n### What to do this vintage\n\nBefore your first ripeness walk, note the date of veraison for each block and variety — it's the most reliable internal clock for estimating days-to-harvest and benchmarking against previous seasons. When Baumé is climbing faster than pH or TA is moving, go back to the berry biology: check night temperatures, assess canopy shade, and consider whether you're watching malic degradation outpace sugar accumulation on a warm site.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Coombe & Dry · Viticulture Vol. 1 · Ch. 3 (Grapevine Phenology)",
+        "url": null,
+        "note": "Winetitles, Adelaide"
+      },
+      {
+        "kind": "buy",
+        "label": "Boulton, Singleton, Bisson & Kunkee · Principles and Practices of Winemaking · Ch. 1",
+        "url": null,
+        "note": "Chapman & Hall"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Berry composition and wine quality",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'berry composition veraison'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Lincoln WINE 201 · Viticulture I · LO 1–2",
+        "url": "https://www.lincoln.ac.nz/study/courses-2/course-search/",
+        "note": "Grapevine morphology, phenology, and berry maturation"
+      },
+      {
+        "kind": "private",
+        "label": "AOC Module 1.5 · Grapevine Culture Part A",
+        "url": null,
+        "note": "your paid resource"
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1881,
+    "prompt_tokens": 2496,
+    "total_tokens": 4377,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1881
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 2496,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 4320,
+  "overlaps": [
+    "90 of the previous seasons growth is removed"
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "lesson_id": "L4.1",
+  "source": {
+    "id": "L4.1",
+    "slug": "sensory-evaluation",
+    "title": "Sensory — training your palate and language",
+    "level": "4",
+    "wbs": [
+      "D8"
+    ],
+    "reading_min": "6",
+    "aim": "Structure of sensory testing, common analytical protocols (discriminative / descriptive / hedonic), and building a house vocabulary.",
+    "application": "Owen holds your tasting notes and links them to lab numbers. This lesson lets you compare notes across vintages meaningfully.",
+    "sources_private": [
+      "aoc_2_6_sensory_evaluation"
+    ],
+    "sources_public_ref": [
+      "csu_wsc217",
+      "csu_wsc316",
+      "otago_fosc306",
+      "adelaide_oenology_2502wt"
+    ],
+    "citations_bibliographic": [
+      "meilgaard_sensory_ch3_9",
+      "lawless_heymann_ch3",
+      "stone_bleibaum_ch5"
+    ]
+  },
+  "generated": {
+    "aim": "Understand the three classes of sensory testing — discriminative, descriptive, and hedonic — and build a consistent house vocabulary so tasting notes carry analytical weight across vintages.",
+    "application": "Owen stores every tasting note against the tank and date it was made. Once your house vocabulary is locked in, Owen can surface patterns — 'Tank 4 shows elevated volatile acidity descriptors at day 8 across three consecutive vintages' — and link those notes directly to your ferment trajectory and lab numbers for that period.",
+    "body_md": "### Why sensory protocol matters more than a good palate\n\nA sharp palate without a repeatable method produces data you can't use. Two tasters describing the same wine differently, or the same taster using different words on different days, generates noise rather than signal. Sensory science treats the human evaluator as a measuring instrument — one that needs calibration, controlled conditions, and a shared language to produce comparable results.\n\nThe three protocol classes cover different questions:\n\n- **Discriminative** — Is there a detectable difference between two samples? No opinion required, just a reliable answer.\n- **Descriptive** — What are the specific attributes present, and how intense is each one?\n- **Hedonic** — How much does a panel or consumer group like it?\n\nFor a boutique winemaker, discriminative and descriptive protocols do the heavy lifting. Hedonic data matters at the blending bench or when targeting a specific market, but it's the least useful for cellar decisions.\n\n---\n\n### Discriminative testing: detecting a difference\n\nThe triangle test is the workhorse here. Three samples, two identical, one different — the evaluator identifies the odd one out. It's used to confirm whether a process change (different yeast strain, adjusted SO₂ addition, earlier press cut) produces a perceptible difference in the finished wine.\n\nThe duo-trio test is a lighter-load alternative: a reference sample is presented alongside two unknowns, one of which matches the reference. Useful when you have a known house style and want to check whether a trial lot deviates from it.\n\nKey discipline: discriminative tests require naive or trained panellists working blind, in isolated booths or at minimum without discussion, under neutral lighting. Running a triangle test at the kitchen table with your winemaking team talking through it produces nothing reliable.\n\n---\n\n### Descriptive analysis: building the map\n\nDescriptive analysis generates a profile — a list of attributes with intensity ratings. The classic academic form is Quantitative Descriptive Analysis (QDA), where a trained panel develops consensus terminology and scores each attribute on a line scale. For a small operation, a simplified version is entirely workable.\n\nThe process:\n\n1. **Generate a lexicon.** Taste a range of reference standards — tartaric acid solution for sourness, sucrose for sweetness, tannin extract for astringency, a set of aroma compounds for key varietal characters. Name each sensation precisely.\n2. **Anchor the scales.** Agree what 'low', 'medium', and 'high' mean for each attribute, ideally with a physical reference (e.g., a wine spiked to a known concentration).\n3. **Score blind.** Rate each attribute independently. Don't let overall impression bleed into individual scores.\n4. **Average and compare.** Multiple tasters on the same sample reduce individual bias.\n\nFor a house vocabulary, keep the attribute list tight — 10 to 15 terms covering appearance, aroma, palate structure (acidity, tannin, body, sweetness, alcohol warmth), and finish. Expanding beyond that without a trained panel creates more disagreement than insight.\n\n---\n\n### Sensory physiology: knowing your instrument\n\nPerception is not passive. Adaptation, fatigue, contrast effects, and expectation all shift what you detect and how intensely you rate it. Practical implications:\n\n- **Adaptation:** Continuous exposure to a stimulus reduces perceived intensity. Rinse, rest, and limit tasting runs to 6–8 samples before a break.\n- **Retronasal pathway:** Much of what registers as 'flavour' is aroma compounds travelling from the back of the mouth to the olfactory epithelium during exhalation. Orthonasal (sniffing) and retronasal perception can diverge — a wine may smell clean but show reductive characters on the palate.\n- **Chemesthesis:** Heat from alcohol, the grip of tannin, CO₂ tingle — these are not taste or smell. They're trigeminal nerve responses. Treating them as separate from flavour prevents conflation in your notes (e.g., 'hot finish' is an alcohol sensation, not a flavour descriptor).\n- **Interaction effects:** Acidity suppresses perceived bitterness; sweetness suppresses perceived acidity. When evaluating a wine with elevated residual sugar, consciously isolate the acid assessment rather than letting the sugar mask it.\n\nThreshold awareness matters too. Every taster has different detection thresholds for individual compounds. A house panel should include tasters who are sensitive to brett, VA, and reduction — not just those with the most pleasant palates.\n\n---\n\n### Building and maintaining a house vocabulary\n\nA house vocabulary is a controlled list of terms your team uses consistently, with agreed definitions and reference standards where possible. It doesn't need to match the WSET wheel or any external framework — it needs to match your wines and your decisions.\n\nSteps to establish one:\n\n- Run a reference standard session early in vintage. Taste tartaric acid at 4 g/L and 8 g/L. Taste a tannin solution at low and high concentration. Smell a brett reference. Name each sensation and write it down.\n- Agree on structural terms: use 'firm' and 'grippy' for tannin texture only if you've defined the difference. If you can't define it, collapse them into one term.\n- Log every tasting note in Owen against the tank, date, and evaluator. After three vintages, patterns in the language become patterns in the wine.\n- Review the vocabulary annually. Drop terms nobody uses consistently. Add terms that keep appearing without a home.\n\nThe goal is not richness of language — it's repeatability. A note that says 'medium+ acidity, low tannin grip, clean fruit, no reductive character' is more useful than 'vibrant and elegant with silky tannins' because the first one means the same thing next year.\n\n---\n\n**What to do this vintage:** Set up a reference standard session before your first red ferment — tartaric acid, a tannin extract, and at minimum a brett-positive wine as a fault reference — and run your team through it to lock in shared language. From that point, log every tank evaluation in Owen with the agreed attribute list so the notes accumulate into a dataset rather than a diary.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Meilgaard et al. · Sensory Evaluation Techniques (5th ed.) · Ch 4–6",
+        "url": null,
+        "note": "CRC Press — covers discriminative, descriptive, and hedonic methods in full"
+      },
+      {
+        "kind": "buy",
+        "label": "Lawless & Heymann · Sensory Evaluation of Food (2nd ed.) · Ch 6–9",
+        "url": null,
+        "note": "Springer — strong treatment of descriptive analysis and panel training"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Sensory evaluation resources",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'sensory evaluation' — industry-specific guidance and fault reference standards"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC217 Sensory Science · LO 2–3",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC217",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Otago FOSC306 Food Sensory and Consumer Science · LO 3–4",
+        "url": "https://www.otago.ac.nz/courses/papers?papercode=FOSC306",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 2502WT Sensory Studies II · LO 1–3",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 2091,
+    "prompt_tokens": 2187,
+    "total_tokens": 4278,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 2091
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 2187,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 3250,
+  "overlaps": []
+}

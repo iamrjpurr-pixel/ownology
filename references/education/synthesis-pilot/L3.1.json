@@ -1,0 +1,88 @@
+{
+  "lesson_id": "L3.1",
+  "source": {
+    "id": "L3.1",
+    "slug": "red-wine-production",
+    "title": "Red winemaking — extraction, timing, pressing",
+    "level": "3",
+    "wbs": [
+      "D3",
+      "D4",
+      "D5"
+    ],
+    "reading_min": "6",
+    "aim": "From cold soak to press cuts — the sequence of decisions that turns good fruit into a red wine that lasts.",
+    "application": "Owen builds you a run-sheet per red ferment. This lesson lets you customise it to house style.",
+    "sources_private": [
+      "morewine_bible_red_full",
+      "aoc_2_8_red_rose"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_3047wt",
+      "lincoln_wine_202"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch3_ch4"
+    ]
+  },
+  "generated": {
+    "aim": "From cold soak to press cuts — the sequence of decisions that turns good fruit into a red wine that lasts.",
+    "application": "Owen generates a run-sheet for each red ferment in your vintage log, pre-populated with your target Baumé curve, pump-over schedule, and press-cut flags. Use this lesson to override the defaults — cold soak duration, cap management frequency, free-run/press split — so the run-sheet reflects your house style, not a generic template.",
+    "body_md": "### Cold soak — what you're actually buying\n\nCold soak extracts colour and aromatic compounds before alcohol is present to solubilise tannin. The practical window is 2–5 days at 8–12 °C. Beyond that, microbial risk climbs and the marginal colour gain flattens.\n\nWhat cold soak does not do: build structure. Tannin extraction is minimal at these temperatures because the cell walls haven't been disrupted by ethanol. If your goal is a fruit-forward, early-drinking style, a 3-day soak earns its place. If you're building a wine for 8+ years in bottle, don't expect cold soak to do the structural work — that happens during fermentation and at the press.\n\nPractical check before you start:\n- Fruit must be clean. Cold soak amplifies any Botrytis or rot character.\n- SO₂ at crush: 30–50 mg/L free to suppress wild yeast and bacteria during the soak window.\n- Tank temperature control must be reliable. A soak that drifts to 18 °C overnight is a spontaneous ferment, not a cold soak.\n\n### Fermentation — managing the cap\n\nOnce yeast is pitched and CO₂ production begins, the cap forms within 12–24 hours. From here, every decision is a trade-off between extraction and oxidation, between colour stability and harsh tannin.\n\n**Pump-overs** (remontage): circulate juice from the base of the tank over the cap. Gentle, oxygenating, good for colour fixation and yeast health. Typical frequency: 2–3 times daily, 10–15 minutes per cycle per 10,000 L. Reduce frequency in the final third of fermentation to avoid over-extracting seed tannin.\n\n**Punch-downs** (pigeage): physically submerge the cap. More aggressive extraction, less oxygen pickup. Suits smaller tanks and varieties where you want density — Shiraz, Grenache, Pinot Noir at pilot scale. Once or twice daily is usually sufficient; more than that on a thin-skinned variety risks bitterness.\n\n**Rack-and-return** (délestage): drain the tank completely, let the cap fall, then pump juice back over. High extraction, high oxygen. Use once or twice per ferment for structure, not as a routine tool.\n\nTemperature during fermentation shapes the extraction profile:\n- 22–24 °C: more aromatic, lighter colour, softer tannin\n- 26–30 °C: deeper colour, firmer tannin, higher extraction rate — monitor closely above 28 °C for yeast stress\n\nNutrient additions (DAP + complex nutrients) belong in the first third of fermentation, before 8 Baumé remaining. Adding nutrients late feeds bacteria, not yeast.\n\n### Timing the press — reading the ferment\n\nPress timing is the single decision with the longest downstream consequence. Two reference points:\n\n**Press at dryness (0–2 Baumé):** more integrated tannin, lower astringency, wine has had maximum skin contact time. Risk: if the ferment sticks near zero, you're pressing under difficult conditions with elevated VA potential.\n\n**Press early (4–6 Baumé):** retains more fruit character, reduces harsh phenolic extraction, fermentation completes in tank or barrel post-press. Suits lighter styles or varieties prone to green tannin (cool-vintage Cabernet Sauvignon, for example).\n\nSigns the wine is ready to press regardless of Baumé:\n- Cap is no longer rising vigorously\n- Colour has plateaued on daily spectrophotometric checks\n- Tasting shows tannin becoming grippy or drying rather than firm\n\n### Press cuts — free-run, light press, hard press\n\nNot all press fractions belong in the same blend. A disciplined press cut protocol:\n\n- **Free-run:** drains under gravity before the press cycle begins. Typically the most aromatic, softest fraction. Goes straight to your primary vessel.\n- **Light press (0–0.5 bar):** adds body and mid-palate weight. Usually blended with free-run after a bench trial.\n- **Medium press (0.5–1.5 bar):** elevated tannin and phenolics. Keep separate; assess after 3–4 weeks in vessel.\n- **Hard press (>1.5 bar):** harsh, often bitter. Rarely blended into premium wine. Useful for house wine or distillation.\n\nKeep fractions in separate vessels for at least one month before making a blending call. Tannin integrates; what tastes aggressive at pressing can be a useful structural addition by the time you're preparing for barrel.\n\n### Malolactic fermentation — set it up at pressing\n\nMLF is easier to initiate when the wine is warm and the population of lactic acid bacteria is manageable. The window at pressing — when the wine is still 18–22 °C and nutrient-replete — is the best inoculation point for a reliable, complete conversion.\n\nIf you're inoculating with a commercial MLB culture, follow the rehydration protocol precisely; temperature shock at inoculation is the most common cause of sluggish MLF. Target free SO₂ below 15 mg/L at inoculation — higher levels suppress the bacteria before they establish.\n\nMonitor by paper chromatography or enzymatic assay. Don't assume MLF is complete because the wine tastes round. Incomplete MLF in bottle is a fault, not a style.\n\n---\n\n**What to do this vintage:** Pull up the Owen run-sheet for your first red ferment and set your cold soak duration, cap management method, and target press Baumé before fruit arrives — decisions made under time pressure at the crusher are rarely your best ones. After pressing, keep all fractions separate and schedule a bench trial at four weeks; the blend you make then will be more accurate than anything you can assess on press day.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 6–7",
+        "url": null,
+        "note": "Chapman & Hall — covers extraction kinetics, cap management mechanics, and press fraction composition in detail"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Managing red wine fermentations",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'red wine fermentation management'"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Malolactic fermentation",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'malolactic fermentation'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3047WT Winemaking at Vintage III · LO 3–4",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Lincoln WINE 202 Principles of Wine Science · LO 4",
+        "url": "https://www.lincoln.ac.nz/study/courses-2/course-search/",
+        "note": null
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1962,
+    "prompt_tokens": 1858,
+    "total_tokens": 3820,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1962
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1858,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1981,
+  "overlaps": []
+}

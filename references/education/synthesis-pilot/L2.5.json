@@ -1,0 +1,86 @@
+{
+  "lesson_id": "L2.5",
+  "source": {
+    "id": "L2.5",
+    "slug": "crushing-must-preparation",
+    "title": "Crushing, destemming, must handling",
+    "level": "2",
+    "wbs": [
+      "D3"
+    ],
+    "reading_min": "4",
+    "aim": "Whole bunch vs destemmed, crush vs no crush, SO₂ additions, cold soak, must adjustment — what each choice buys you.",
+    "application": "Owen logs your receival decisions. This lesson makes them intentional rather than habitual.",
+    "sources_private": [
+      "morewine_bible_red_ch7",
+      "aoc_2_3_wine_making_process"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_2503wt",
+      "adelaide_oenology_3047wt"
+    ],
+    "citations_bibliographic": [
+      "boulton_ppw_ch3"
+    ]
+  },
+  "generated": {
+    "aim": "Whole bunch vs destemmed, crush vs no crush, SO₂ additions, cold soak, must adjustment — what each choice buys you and what it costs you.",
+    "application": "Every receival decision you make at the crusher gets logged in Owen as a cellar event. This lesson gives you the vocabulary and reasoning to fill those fields deliberately — not just 'destemmed, 50 mg/L SO₂' but why, and what you're watching for in the ferment trajectory that follows.",
+    "body_md": "### Whole bunch vs destemmed — the real trade-off\n\nLeaving stems in is not a shortcut to complexity. Stems contribute potassium, which strips protons from solution and lifts pH. A higher pH means less effective SO₂, reduced colour stability, and a flatter acid profile. The upside is structural: well-lignified stems add a reductive, spicy tannin character and can improve cap permeability during extraction. Under-ripe or green stems give you nothing but harshness.\n\nPractical thresholds:\n- Stems are worth including when they snap cleanly and taste woody rather than vegetal — typically when the vineyard has had enough heat to lignify them fully.\n- Whole-bunch proportions above 30% on a cool-climate Pinot Noir will almost certainly require a pH correction post-ferment. Measure before you commit.\n- Full whole-bunch (100%) is a deliberate style choice, not a default. It demands clean fruit, cold conditions, and a plan for extended maceration.\n\n### Crush vs no crush\n\nCrushing breaks skins and starts juice release immediately. That accelerates colour and tannin extraction from the first hour of maceration, which suits full-extraction styles. It also exposes more surface area to oxygen and spoilage organisms, so your SO₂ timing matters more.\n\nNot crushing (whole berry or whole cluster) preserves intracellular fermentation — carbonic or semi-carbonic — which produces fruity, low-tannin primary characters. The berries eventually rupture under their own CO₂ pressure or cap weight. This approach is slower to extract and more sensitive to fruit condition; any split or compromised berries become problem sites.\n\nFor most boutique red production, a partial crush — rollers set wide enough to split most berries without pulverising seeds — is the practical middle ground. It gives you extraction control without the fragility of fully whole-berry.\n\n### SO₂ at receival — dose to the situation\n\nSulphur dioxide at crushing serves two functions: antimicrobial suppression of wild yeasts and bacteria, and antioxidant protection of phenolics. The effective fraction is molecular SO₂, which is pH-dependent. At pH 3.5 you need roughly 0.8 mg/L molecular SO₂; at pH 3.8 you need closer to 0.8 mg/L but require a much higher total addition to get there.\n\nTypical receival additions:\n- Healthy red fruit, inoculated ferment: 30–50 mg/L total SO₂\n- Compromised or botrytis-affected fruit: 50–80 mg/L, sometimes higher — bench-trial first\n- Whole-bunch parcels: consider delaying SO₂ until after crushing to avoid inhibiting intracellular activity\n- White must going to cold settling: 50–80 mg/L to protect against oxidation during clarification\n\nAlways measure free SO₂ at the point of inoculation and adjust. A receival addition is a starting point, not a set-and-forget.\n\n### Cold soak — what it actually does\n\nPre-fermentative cold maceration (typically 4–10°C for 3–7 days) extracts anthocyanins and some flavour compounds before alcohol is present. Alcohol is a better solvent for tannins than water, so cold soak preferentially loads colour without the same tannin burden you'd get from warm maceration.\n\nThe risks are real:\n- Without alcohol, the must is vulnerable to Brettanomyces and Lactobacillus. SO₂ management and cold temperature are your only protection.\n- Extended cold soak on fruit with any rot will amplify laccase activity and oxidative browning.\n- The colour gains can be partially lost post-ferment as anthocyanins bind with tannins and precipitate.\n\nCold soak earns its place on clean, high-quality red fruit where you want colour depth without aggressive tannin extraction. It is not a rescue tool for compromised parcels.\n\n### Must adjustment — acid, water, sugar\n\nMust adjustment is about putting the ferment in a position to finish cleanly and produce a balanced wine. The decisions are:\n\n**Acidification:** Tartaric acid is the standard addition — it is metabolically stable through fermentation. Malic acid is partially consumed by MLF. Add tartaric to must (not finished wine) for best integration. Target a pre-ferment pH of 3.3–3.5 for reds, 3.1–3.3 for whites, adjusted for your style.\n\n**Sugar (chaptalization or grape concentrate):** Legal in some jurisdictions, prohibited in others — know your local rules. Adding sugar raises potential alcohol but does nothing for flavour or acid balance. Concentrate additions also increase body and colour. Neither substitutes for ripe fruit.\n\n**Water addition:** Permitted under specific conditions in Australia (check your state's food standards and any export compliance requirements). Dilution reduces Baumé, acid, and phenolic concentration simultaneously — it is a blunt instrument. If fruit comes in at 16–17 Baumé and you need 13.5% alcohol, the arithmetic is straightforward, but the flavour impact is real.\n\nBench-trial any significant adjustment before committing the tank.\n\n**What to do this vintage:** Before the first bin tips, decide your whole-bunch percentage and crush setting based on stem lignification and target style — log both in Owen with your reasoning. Set your receival SO₂ dose against measured pH, not habit, and record it as a cellar event so your ferment trajectory has a clean baseline to build from.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Boulton et al. · Principles and Practices of Winemaking · Ch 4",
+        "url": null,
+        "note": "Chapman & Hall, 1996"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Sulfur dioxide in winemaking",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'sulfur dioxide winemaking'"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Cold maceration of red grapes",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'cold maceration red grapes'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 2503WT · Introductory Winemaking II · LO 2, 3, 4",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3047WT · Winemaking at Vintage III · LO 4",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1868,
+    "prompt_tokens": 2718,
+    "total_tokens": 4586,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1868
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 2718,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 5417,
+  "overlaps": []
+}

@@ -1,0 +1,91 @@
+{
+  "lesson_id": "L2.1",
+  "source": {
+    "id": "L2.1",
+    "slug": "variety-selection",
+    "title": "Picking varieties for the wine you want to make",
+    "level": "2",
+    "wbs": [
+      "D1"
+    ],
+    "reading_min": "4",
+    "aim": "Match variety, rootstock, and clone to site, climate, and target wine style. What the Aussie/NZ industry has learned about the classics — and about the newer players.",
+    "application": "When you're planning a replant, or interpreting a fruit contract, this lesson gives you the questions to ask before the bud burst.",
+    "sources_private": [
+      "aoc_1_3_selecting_grape_varieties"
+    ],
+    "sources_public_ref": [
+      "adelaide_viticult_2500wt",
+      "csu_vit212"
+    ],
+    "citations_bibliographic": [
+      "robinson_oxford_varieties"
+    ]
+  },
+  "generated": {
+    "aim": "Match variety, rootstock, and clone to site, climate, and target wine style. What the Aussie/NZ industry has learned about the classics — and about the newer players.",
+    "application": "If you're planning a replant block or reviewing a fruit contract before next season, run the questions in this lesson against your cellar brief and vintage log before bud burst. Flag any variety-site mismatches in your ferment trajectory notes so you're not chasing problems in the tank.",
+    "body_md": "### Why variety selection is a winemaking decision, not just a viticulture one\n\nThe variety you plant — or buy fruit from — sets a ceiling on what you can make. Tannin structure, natural acidity, colour stability, aromatic profile, and ripening window are all baked into the genetics before you touch a grape. Rootstock and clone then modulate expression within those genetic limits. Getting the match wrong means compensating in the winery for problems that should have been solved in the paddock.\n\nThe practical question isn't \"what grows here?\" It's \"what grows here in a way that produces the wine I'm trying to sell at the price point I need?\"\n\n### Climate fit: the non-negotiables\n\nEvery variety has a thermal requirement — a heat summation range where it ripens to the style window you want without losing acid or gaining excessive alcohol. In Australian and NZ terms:\n\n- **Cool sites** (Marlborough, Mornington, Tasmania, high-altitude SA): Pinot Noir, Chardonnay, Riesling, Grüner Veltliner, and Pinot Gris perform reliably. Cabernet Sauvignon struggles to achieve phenolic ripeness without elevated Baumé.\n- **Warm to hot sites** (Barossa, McLaren Vale, Riverland, Hawke's Bay flats): Shiraz, Grenache, Mourvèdre, Nero d'Avola, and Fiano are better aligned. Sauvignon Blanc at these temperatures loses the varietal character that drives its market.\n- **Transitional climates** (Coonawarra, Central Otago, Wairarapa, Adelaide Hills): Cabernet Sauvignon, Merlot, and Syrah can all work, but clone and rootstock selection becomes more critical because the margin for error narrows.\n\nRainfall pattern matters as much as temperature. High humidity at ripening pushes you toward thick-skinned varieties with botrytis tolerance — Sangiovese, Durif, Montepulciano — or toward varieties that ripen early enough to avoid the autumn break.\n\n### Rootstock: the lever most boutique producers underuse\n\nRootstock selection is often treated as a soil-type decision (limestone = 41B, sandy = Ramsey), but it's also a vigour and ripening-timing decision. High-vigour rootstocks on fertile soils push canopy at the expense of fruit quality. In a boutique context where you're farming for flavour rather than yield, that trade-off is rarely worth it.\n\nKey considerations:\n\n- **Nematode pressure**: If the block has a history of root-knot or dagger nematode, rootstock choice is non-negotiable — Freedom and Ramsey offer resistance; own-rooted vines are not an option.\n- **Lime-induced chlorosis**: High active limestone soils require rootstocks with strong iron uptake (41B, Fercal). Getting this wrong means chronic deficiency that no foliar spray fully corrects.\n- **Vigour matching**: On low-fertility sites, a high-vigour rootstock like Ramsey can actually help. On rich red loam, it will cost you concentration. 101-14 and 3309C are moderate-vigour options that suit many cool-climate boutique situations.\n- **Drought tolerance**: With irrigation restrictions tightening across SA and Victoria, rootstocks with deeper rooting habit (140 Ruggeri, 1103 Paulsen) are worth the conversation with your viticulturist.\n\n### Clone: the detail that changes the wine in the glass\n\nWithin a variety, clonal selection shifts the flavour profile, bunch architecture, and disease susceptibility in ways that are commercially significant.\n\nFor Shiraz in Australia, the old \"Penfolds clone\" selections tend toward smaller berries and higher skin-to-juice ratios — useful if you're building a structured red. The newer SA clones released through CSIRO and Nuriootpa selections vary considerably; trial data from your region is more reliable than generalised reputation.\n\nFor Pinot Noir, the Dijon clones (113, 114, 115, 667, 777) have largely displaced the older MV6 and AM10 in new plantings across Marlborough and Mornington. Dijon clones tend to earlier ripening and more consistent colour — relevant if your site is marginal for Pinot ripeness. MV6 still has advocates for its structural backbone in warmer Pinot sites.\n\nFor Chardonnay, clone I10V1 (Mendoza) gives a different acid profile and bunch size compared to the Dijon Chardonnay clones — worth knowing if you're buying fruit from a block you didn't plant.\n\nAlways ask the grower which clone is in the block. It's a basic due-diligence question that many fruit contracts don't answer upfront.\n\n### The newer players: emerging varieties in the AU/NZ context\n\nThe industry's interest in alternative varieties has moved from novelty to commercial reality in the last decade. Fiano, Vermentino, Nero d'Avola, Montepulciano, Grüner Veltliner, and Albariño are now producing commercially viable wines across multiple regions. The selection logic is the same as for classics:\n\n- Does the variety's natural acid retention suit your site's heat?\n- Is there a market for the style it produces at your price point?\n- Is certified planting material available, and is it phylloxera-compliant for your region?\n\nPhylloxera compliance is the hard stop. Bringing uncertified material into a phylloxera-free zone (most of WA, parts of SA) is a biosecurity offence, not just a risk. Verify certification before any new variety discussion goes further.\n\n### What to do this vintage\n\nIf you're reviewing a fruit contract, request the variety, clone, rootstock, and block history before signing — these four data points belong in your vintage log alongside Baumé at harvest and yield per tonne. If a replant is on the horizon, map your site's heat summation and soil constraints first, then work backwards to variety and rootstock rather than starting with what your neighbours grow.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Gladstones · Viticulture and Environment · Ch 3–4",
+        "url": null,
+        "note": "Winetitles, Adelaide"
+      },
+      {
+        "kind": "buy",
+        "label": "Robinson, Harding & Vouillamoz · Wine Grapes · variety entries",
+        "url": null,
+        "note": "Allen Lane / Penguin"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Alternative varieties",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'alternative varieties'"
+      },
+      {
+        "kind": "free",
+        "label": "Wine Australia — Rootstock selection guide",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'rootstock'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC115 Wine Science 1 · LO 3",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC115",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "University of Adelaide · Bachelor of Viticulture and Oenology — viticulture units",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 2012,
+    "prompt_tokens": 1413,
+    "total_tokens": 3425,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 2012
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1413,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 0,
+  "overlaps": []
+}

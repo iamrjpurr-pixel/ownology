@@ -1,0 +1,92 @@
+{
+  "lesson_id": "L1.1",
+  "source": {
+    "id": "L1.1",
+    "slug": "global-viticulture-context",
+    "title": "Where wine happens — AU/NZ in the global map",
+    "level": "1",
+    "wbs": [
+      "D1"
+    ],
+    "reading_min": "3",
+    "aim": "Locate the AU and NZ wine industries in a global context, and understand why our climate and regulatory setting shapes every downstream choice.",
+    "application": "When you're deciding blending targets, harvest timing, or export compliance, you're implicitly answering \"what wine is my region allowed to make?\". This lesson makes that context explicit.",
+    "sources_private": [
+      "morewine_bible_red_ch1",
+      "aoc_1_1_viticulture"
+    ],
+    "sources_public_ref": [
+      "adelaide_oenology_1018nw",
+      "csu_wsc111"
+    ],
+    "citations_bibliographic": [
+      "robinson_oxford_intro"
+    ]
+  },
+  "generated": {
+    "aim": "Locate the AU and NZ wine industries in a global context, and understand why our climate and regulatory setting shapes every downstream choice.",
+    "application": "When you're setting blending targets, calling harvest timing, or checking export compliance in your cellar brief, you're implicitly answering 'what wine is my region allowed to make?'. Pull up your vintage log alongside this lesson and mark which regulatory or climatic constraints already appear as fixed parameters in your ferment trajectory — they belong there by design, not accident.",
+    "body_md": "### Where AU and NZ sit on the global map\n\nWorld wine production is dominated by the Old World — France, Italy, Spain, and Germany collectively account for roughly half of global output. The New World (AU, NZ, Chile, Argentina, South Africa, USA) has reshaped the market since the 1980s, but AU and NZ together still represent a relatively small share of global volume. What they punch above their weight on is export value per litre and varietal clarity.\n\nAustralia produces around 1.0–1.3 billion litres annually depending on vintage conditions, with the bulk coming from the Murray–Darling and Riverland systems. New Zealand sits closer to 300–350 million litres, with Marlborough Sauvignon Blanc accounting for a disproportionate share of both volume and international identity. Neither country can compete on bulk commodity price with Spain or Chile, so the strategic position has always been quality-differentiated, region-specific wine.\n\n### Climate as the first constraint\n\nBoth countries sit in the Southern Hemisphere's temperate band, roughly 30–45°S latitude. This matters because:\n\n- Seasons are inverted relative to Europe — harvest runs February–April, not September–October.\n- Southern Ocean influence moderates many coastal regions, extending hang time and preserving acid.\n- UV intensity at southern latitudes is higher than equivalent northern latitudes, affecting phenolic development and sunscreen management in the vineyard.\n- Rainfall patterns are highly variable: McLaren Vale and Barossa receive winter-dominant rainfall and dry summers; Marlborough is semi-arid; Margaret River is Mediterranean; Central Otago is continental with frost risk.\n\nClimate classification systems (Winkler heat summation, MJT, HI) are tools for benchmarking regions against each other and against European appellations. A Barossa floor site at ~1800–2000 GDD (Winkler) maps loosely to southern Rhône conditions — useful shorthand when pitching to export markets.\n\n### Regulatory architecture: GI, labelling, and what it means for your wine\n\nAustralia's Geographical Indications (GIs) are administered under the Wine Australia Act 2013. The hierarchy runs: Zone → Region → Sub-region. Using a GI on a label requires 85% of the wine to originate from that area — the same 85% rule applies to vintage and variety claims.\n\nKey practical implications:\n\n- A 'Barossa Valley Shiraz 2023' label requires ≥85% Barossa Valley fruit, ≥85% Shiraz, ≥85% 2023 vintage.\n- Blending across GIs is legal and common for commercial tiers, but forfeits the regional claim.\n- Export to the EU requires compliance with bilateral agreements — certain traditional expressions (Champagne, Chablis) are prohibited on AU labels in EU-destined shipments.\n- NZ operates under the Wine Act 2003 and the Geographical Indications (Wine and Spirits) Registration Act 2006. Marlborough's GI protection has been a significant trade asset.\n\nFor boutique producers, the GI framework is both a constraint and a marketing asset. Sub-regional claims (Eden Valley vs Barossa Valley, Wrattonbully vs Coonawarra) carry real price premiums in informed markets.\n\n### Why the Southern Hemisphere vintage calendar changes everything\n\nOperational decisions that seem purely technical are shaped by the inverted calendar:\n\n- Southern Hemisphere fruit is available to northern buyers in their spring/summer — a genuine market timing advantage for fresh-style wines.\n- Harvest pressure coincides with the southern autumn, meaning equipment, labour, and analytical lab capacity are all in peak demand February–April.\n- Vintage-to-vintage variation in AU is amplified by ENSO cycles. El Niño years tend toward drought and heat stress; La Niña years bring disease pressure and dilution risk. Understanding where a season sits in the ENSO cycle is a legitimate input to your harvest timing decision.\n\n### What to do this vintage\n\nReview your cellar brief and identify every wine where a GI, variety, or vintage claim appears on the intended label — then confirm your intake records will support the 85% thresholds before you blend. If you're targeting export markets, flag any wines destined for the EU and check the current Wine Australia prohibited terms list before finalising label copy.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Iland et al. · The Grapevine · Ch 1",
+        "url": null,
+        "note": "Winetitles Media — foundational AU viticulture reference"
+      },
+      {
+        "kind": "buy",
+        "label": "Robinson & Harding · The Oxford Companion to Wine · 'Australia' & 'New Zealand' entries",
+        "url": null,
+        "note": "Oxford University Press"
+      },
+      {
+        "kind": "free",
+        "label": "Wine Australia · GI Map and Labelling Requirements",
+        "url": "https://www.wineaustralia.com/",
+        "note": "Search Wine Australia for 'geographical indications' and 'labelling'"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI · Climate and Viticulture Resources",
+        "url": "https://www.awri.com.au/",
+        "note": "Search AWRI for 'climate viticulture'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC111 Grape and Wine Science · LO 1",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC111",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 1018NW Foundations of Wine Science I · LO 4",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 1590,
+    "prompt_tokens": 1807,
+    "total_tokens": 3397,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 1590
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1807,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1588,
+  "overlaps": []
+}

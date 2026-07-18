@@ -1,0 +1,86 @@
+{
+  "lesson_id": "L3.6",
+  "source": {
+    "id": "L3.6",
+    "slug": "stabilisation",
+    "title": "Stabilisation — protein, cold, microbial",
+    "level": "3",
+    "wbs": [
+      "D6"
+    ],
+    "reading_min": "6",
+    "aim": "Heat tests, cold stability testing, microbial screening, and the practical procedures that get a wine bottle-ready.",
+    "application": "Owen runs your stability workflow. This lesson lets you interpret the borderline results instead of just accepting them.",
+    "sources_private": [
+      "awri_protein_stability",
+      "aoc_2_10_storing_aging"
+    ],
+    "sources_public_ref": [
+      "csu_wsc319",
+      "adelaide_oenology_3007wt"
+    ],
+    "citations_bibliographic": [
+      "rgayon_handbook_v2_stab"
+    ]
+  },
+  "generated": {
+    "aim": "Heat tests, cold stability testing, microbial screening, and the practical procedures that get a wine bottle-ready.",
+    "application": "Owen flags borderline stability results in your cellar brief before bottling windows close. This lesson gives you the framework to read those flags — whether it's a marginal heat test on Tank 4, a cold stability result sitting on the fence, or a microbial screen that needs a decision by Friday.",
+    "body_md": "### Why stability matters before the bottle goes on\n\nA wine that looks brilliant in tank can throw a haze, deposit crystals, or referment in bottle. None of those are recoverable without cost and reputation damage. Stability testing isn't bureaucratic box-ticking — it's the last real decision point before you lose control of the product. The three domains to clear are protein stability, tartrate (cold) stability, and microbial stability. Each has its own test, its own threshold, and its own intervention.\n\n---\n\n### Protein stability — the heat test and what it tells you\n\nProtein haze forms when grape-derived proteins — mainly thaumatin-like proteins and chitinases — denature and aggregate with tannins at elevated temperatures. The standard bench test is straightforward: heat a sample to 80 °C for two hours, cool, and assess turbidity against an unheated control. A nephelometric reading (NTU) above your house threshold — typically 2 NTU above the control, though this varies by market and style — flags a problem.\n\nKey variables that affect the result:\n\n- **pH** — higher pH wines are more prone to protein haze; a wine at pH 3.8 will fail a heat test that a pH 3.3 wine passes at the same protein load.\n- **Tannin level** — low-tannin whites and rosés are most vulnerable; red wines generally self-fine through tannin–protein binding during maceration.\n- **Alcohol** — higher alcohol slightly reduces haze risk by denaturing proteins during fermentation.\n\nThe fix is bentonite. Dose rate is determined by bench trial: run a series from 0 to 1000 mg/L in 100–200 mg/L steps, heat-test each, and find the minimum dose that passes. Bentonite strips aroma compounds and reduces volume through lees, so minimum effective dose is the commercial and quality target. Additions above 500 mg/L in a single pass are rarely justified — if you're there, check your grape source and harvest timing first.\n\nAlternatives to bentonite — flash pasteurisation, zirconium dioxide-based fining, or ultrafiltration — exist but require capital or contract processing. For most boutique operations, bentonite bench trials remain the practical standard.\n\n---\n\n### Cold (tartrate) stability — testing and intervention\n\nPotassium bitartrate (KHT) crystallises when temperature drops, producing harmless but commercially problematic crystals in bottle. The classic test is a freeze test: chill a sample to −4 °C for four to seven days and check for crystal formation or a conductivity drop. A conductivity reduction of less than 3% between the pre- and post-chill sample is the common pass threshold, though some producers use a tighter 2% criterion for export markets.\n\nThe mini-contact process is the industry workaround for avoiding weeks of cold stabilisation:\n\n1. Seed the wine with finely ground KHT crystals (4 g/L).\n2. Hold at −4 °C with gentle agitation for 1–2 hours.\n3. Filter off the seed crystals.\n4. Retest conductivity.\n\nThis accelerates nucleation and precipitation dramatically compared to passive cold stabilisation. It requires a refrigerated tank and a filtration step, but saves energy and tank time versus holding at −4 °C for weeks.\n\nCarboxymethylcellulose (CMC) and metatartaric acid are inhibitor options rather than removal treatments. CMC is effective and now widely accepted under Australian and EU regulations for still wines; it works by adsorbing onto crystal nuclei and blocking growth. Metatartaric acid is cheaper but degrades at cellar temperatures within months — unsuitable for wines with more than six months in bottle. Mannoproteins offer a third route, particularly relevant for wines on lees.\n\n---\n\n### Microbial stability — what you're screening for\n\nThe organisms that matter at bottling are:\n\n- **Brettanomyces bruxellensis** — produces 4-ethylphenol and 4-ethylguaiacol; detectable by PCR or culture plating; threshold for sensory impact is around 400–600 µg/L 4-EP in most tasters.\n- **Lactic acid bacteria (LAB)** — *Pediococcus* and *Lactobacillus* can cause ropiness, mousiness, or refermentation if viable populations remain post-MLF.\n- **Acetic acid bacteria** — less common in closed systems but relevant if oxygen ingress has occurred.\n- **Residual yeast** — critical in wines with any residual sugar; even 0.5 g/L glucose + fructose is enough substrate for refermentation if yeast counts are above 10³ CFU/mL.\n\nMolecular SO₂ is the primary microbial control. At bottling, target free SO₂ to achieve molecular SO₂ of 0.5–0.8 mg/L for most table wines (0.8 mg/L for wines with Brett history or elevated pH). Calculate from your actual pH — a wine at pH 3.6 needs roughly 35 mg/L free SO₂ to hit 0.8 mg/L molecular; at pH 3.8 that rises to around 55 mg/L.\n\nFiltration is the mechanical backstop. A 0.45 µm membrane filter removes viable yeast and most bacteria; a 0.65 µm nominal depth filter does not. Know what your filter is rated for, not just what it's labelled. Sterile filtration (0.45 µm absolute, integrity-tested) combined with correct molecular SO₂ gives the highest confidence for wines with residual sugar or a Brett history.\n\n---\n\n### Interpreting borderline results\n\nA result that sits just above the pass threshold is not automatically a treatment decision — it's a question. Ask:\n\n- What is the wine's intended shelf life and storage conditions? A wine going to a warm export market needs a tighter pass than one sold cellar-door within six months.\n- What is the commercial cost of the intervention versus the risk of the instability? A 50 mg/L bentonite addition on a high-volume white is trivial; the same decision on a small-batch skin-contact wine with significant phenolic complexity deserves more scrutiny.\n- Is the test itself reliable? Heat tests on high-phenolic wines can give false positives; cold stability tests on wines with elevated alcohol can give false negatives.\n\nDocument every bench trial result in your ferment trajectory log. Owen's stability workflow flags the result; the call is yours.\n\n---\n\n**What to do this vintage:** Run heat tests and cold stability checks at least three weeks before your bottling date — not the week before — so you have time for a bentonite trial, a cold stabilisation run, and a retest without compressing your schedule. Log every bench trial dose and NTU result against the tank so the data is there when the next vintage of the same wine comes around.",
+    "cited_in": [
+      {
+        "kind": "buy",
+        "label": "Ribéreau-Gayon et al. · Handbook of Enology Vol. 1 · Ch 5 & 9",
+        "url": null,
+        "note": "Wiley, 2nd ed. 2006 — protein and tartrate stability mechanisms"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Protein stability of wine",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'protein stability bentonite'"
+      },
+      {
+        "kind": "free",
+        "label": "AWRI — Tartrate stabilisation",
+        "url": "https://www.awri.com.au/",
+        "note": "search AWRI for 'tartrate stabilisation CMC'"
+      },
+      {
+        "kind": "curriculum",
+        "label": "CSU WSC319 Wine Chemistry · colloidal stability, bentonite fining",
+        "url": "https://handbook.csu.edu.au/subject/2025/WSC319",
+        "note": null
+      },
+      {
+        "kind": "curriculum",
+        "label": "Adelaide OENOLOGY 3007WT Stabilisation and Clarification III · LO 1–3",
+        "url": "https://calendar.adelaide.edu.au/aprcw/2025/bvito_bvitoenol",
+        "note": null
+      }
+    ]
+  },
+  "usage": {
+    "completion_tokens": 2186,
+    "prompt_tokens": 1756,
+    "total_tokens": 3942,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "text_tokens": 2186
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 1756,
+      "cache_creation_tokens": 0,
+      "cache_creation_token_details": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global"
+  },
+  "groundingBytes": 1464,
+  "overlaps": []
+}
