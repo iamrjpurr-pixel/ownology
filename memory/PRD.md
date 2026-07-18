@@ -3,6 +3,17 @@
 ## Original problem statement
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
+## Jul 2026 (18 Jul) · Curriculum spine strategy locked — SCOUTING SHIPPED, EXECUTION QUEUED
+
+**Session outcome**: A + A.5 + A.6 scouting phases COMPLETE. 27 university units scouted (10 CSU + 12 Adelaide + 4 Lincoln + 1 Otago), 145 learning outcomes, 301 key concepts, 100 prescribed-text mappings, 192 owned-asset bridges. Benchmarked to CSU 4410WS01 confirming 100% wine-specific curriculum coverage. Data at `/app/references/education/scouting-pass-2026-07-17-v2.json`.
+
+**Rich's paid PDFs staged** at `/app/references/viticulture-modules/` (9 AOC modules 1.1-1.9) + `/app/references/oenology-modules/` (11 AOC modules 1.10 + 2.1-2.10).
+
+**Copyright architecture decided**: Four layers — Ownology Original (served) · Private Grounding (Claude reads only) · Bibliographic Reference · Fair Dealing. **AOC content will NOT be ingested as served chunks** — used only as structural template + private synthesis input.
+
+**Next session execution plan** documented in full at `/app/memory/CURRICULUM_PLAN.md`. P0 blocker: copyright remediation of existing `diy_knowledge_chunks` served surface (`server/routers/tutor.ts:404` currently reproduces MoreWine text verbatim). Est. ~1 focused session + ~$5 LLM spend to complete Ownology Curriculum Spine (OCS) build.
+
+
 
 **Jul 2026 (17 Jul) — Industry-news vertical v1 + site-wide copy sweep — SHIPPED (this session):**
 - **Industry-news v1 (WBM):** new `/admin/industry-news` page — scrape `wbmonline.com.au/news/` (browser-UA regex parser, `industry_news_items` table with normalised regions), see 10 fresh headlines with region-matched contacts pre-attached, one-click Claude-drafted news-anchored SMS opener. E2E dry-run verified — Tasmania item matched 10 real contacts (Apogee, Pooley, Tolpuddle, House of Arras, Jansz). Human-factors inversion: 10 items × auto-matched contacts scales far better than 2000 contacts × hunt-for-signal.
