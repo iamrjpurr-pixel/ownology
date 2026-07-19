@@ -758,6 +758,7 @@ async function startServer() {
     "/blog",
     "/curriculum",
     "/curriculum/about",
+    "/curriculum/one-page",
     "/pricing",
     "/quiz",
     "/compliance-score",

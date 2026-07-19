@@ -30,6 +30,7 @@ import ThePress from "./pages/ThePress";
 import Curriculum from "./pages/Curriculum";
 import CurriculumLesson from "./pages/CurriculumLesson";
 import CurriculumAbout from "./pages/CurriculumAbout";
+import CurriculumOnePager from "./pages/CurriculumOnePager";
 import QuickEntry from "./pages/QuickEntry";
 import CellarTasks from "./pages/CellarTasks";
 import Today from "./pages/Today";
@@ -377,6 +378,7 @@ function Router() {
       <Route path={"/for-home-winemakers/knowledge"} component={DIYKnowledge} />
       <Route path={"/for-home-winemakers/knowledge/*"} component={DIYKnowledge} />
       <Route path={"/curriculum/about"} component={CurriculumAbout} />
+      <Route path={"/curriculum/one-page"} component={CurriculumOnePager} />
       <Route path={"/curriculum"} component={Curriculum} />
       <Route path={"/curriculum/:slug"} component={CurriculumLesson} />
       <Route path={"/blog"} component={Blog} />
