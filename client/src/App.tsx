@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { SiteFooter } from "@/components/SiteFooter";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
+import Cookies from "@/pages/Cookies";
 import { Route, Switch, Redirect, useLocation } from "wouter";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -492,6 +493,7 @@ function Router() {
       <Route path={"/onboarding"} component={Onboarding} />
       <Route path={"/privacy"} component={Privacy} />
       <Route path={"/terms"} component={Terms} />
+      <Route path={"/cookies"} component={Cookies} />
       <Route path={"/refund"} component={Refund} />
       <Route path={"/quiz"} component={Quiz} />
       <Route path={"/site-map"} component={SiteMapPage} />

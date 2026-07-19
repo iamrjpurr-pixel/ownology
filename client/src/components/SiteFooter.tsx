@@ -44,6 +44,7 @@ const COLUMNS: Array<{ heading: string; links: Array<{ label: string; href: stri
     links: [
       { label: "Privacy policy", href: "/privacy", testid: "footer-privacy" },
       { label: "Terms of service", href: "/terms", testid: "footer-terms" },
+      { label: "Cookies", href: "/cookies", testid: "footer-cookies" },
       { label: "Refund policy", href: "/refund", testid: "footer-refund" },
     ],
   },

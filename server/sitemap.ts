@@ -70,6 +70,10 @@ const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }
   { path: "/regulations/detail",   priority: "0.5", changefreq: "monthly" },
   { path: "/resources",            priority: "0.5", changefreq: "monthly" },
   { path: "/merch",                priority: "0.4", changefreq: "monthly" },
+  // Legal + policy pages (Feb 2026 audit — required for compliance transparency)
+  { path: "/privacy",              priority: "0.3", changefreq: "yearly" },
+  { path: "/terms",                priority: "0.3", changefreq: "yearly" },
+  { path: "/cookies",              priority: "0.3", changefreq: "yearly" },
 ];
 
 /** GET /api/sitemap.xml — ROOT sitemap. Lists all public marketing pages

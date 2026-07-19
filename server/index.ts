@@ -837,6 +837,7 @@ async function startServer() {
     "/onboarding",
     "/privacy",
     "/terms",
+    "/cookies",
     "/refund",
     "/resources",
     "/resources/home-winery-kit",
@@ -1194,8 +1195,28 @@ async function startServer() {
   // chunk names that no longer exist post-deploy (Feb 2026 cache-bust fix).
   // Also stamps the BUILD_ID so /admin surfaces and other non-meta-injected
   // routes still show which deploy they're on.
-  app.get("*", async (_req, res) => {
+  //
+  // Soft-404 fix (Feb 2026 security audit — Pass 2):
+  // For paths that clearly aren't valid Ownology routes (wordpress scanners,
+  // env probes, .php dumps, etc.) we return HTTP 404 alongside the SPA shell
+  // so search engines register a real 404 instead of a soft 404. Combined
+  // with <meta name="prerender-status-code" content="404"> in NotFound.tsx,
+  // this eliminates the audit finding without maintaining a fragile
+  // exhaustive route allowlist.
+  const OBVIOUS_404_PATTERNS = [
+    /\.(php|asp|aspx|jsp|cgi|pl|py|sh|bak|old|swp|dll|exe|env|conf|config|ini|log|sql|zip|tar|gz|rar)$/i,
+    /^\/(wp-admin|wp-login|wp-content|wp-includes|xmlrpc\.php|wordpress|drupal|phpMyAdmin|phpmyadmin|admin\.php|shell|cmd|eval)/i,
+    /^\/(\.env|\.git|\.svn|\.htaccess|\.aws|\.ssh|\.DS_Store)/i,
+    /^\/(vendor\/|node_modules\/|\.well-known\/(?!apple-app-site-association|assetlinks))/i,
+    /(\/|^)(config|backup|database|dump|debug|test|staging)\.(txt|log|sql|json|yml|yaml)$/i,
+  ];
+  app.get("*", async (req, res) => {
     res.setHeader("Cache-Control", "no-store, must-revalidate");
+    const p = req.path;
+    const isObviouslyBad = OBVIOUS_404_PATTERNS.some((rx) => rx.test(p));
+    if (isObviouslyBad) {
+      res.status(404);
+    }
     try {
       const fs = await import("fs/promises");
       const raw = await fs.readFile(path.join(staticPath, "index.html"), "utf8");

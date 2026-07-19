@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Home } from "lucide-react";
 import { useLocation } from "wouter";
+import { Helmet } from "react-helmet";
 
 export default function NotFound() {
   const [, setLocation] = useLocation();
@@ -13,7 +14,18 @@ export default function NotFound() {
     <div
       className="min-h-screen w-full flex items-center justify-center px-4"
       style={{ background: "var(--background)" }}
+      data-testid="not-found-page"
     >
+      <Helmet>
+        <title>404 · Page not found · Ownology</title>
+        <meta name="robots" content="noindex, nofollow" />
+        {/* prerender-status-code — Google, Bing, Prerender.io and most modern
+            crawlers respect this meta tag to derive the HTTP status of a
+            client-rendered SPA route. Combined with server/index.ts sending
+            HTTP 404 for unknown paths, this eliminates the soft-404 SEO
+            penalty flagged in the Feb 2026 audit. */}
+        <meta name="prerender-status-code" content="404" />
+      </Helmet>
       <div className="w-full max-w-lg text-center">
         <div className="flex justify-center mb-6">
           <div className="relative">
@@ -40,7 +52,7 @@ export default function NotFound() {
         </h2>
 
         <p className="mb-8 leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
-          Sorry, the page you are looking for doesn't exist.
+          Sorry, the page you are looking for doesn&apos;t exist.
           <br />
           It may have been moved or deleted.
         </p>
