@@ -39,7 +39,7 @@ export default function CurriculumOnePager() {
             <span>Curriculum — one-page brief</span>
           </div>
           <div className="flex items-center gap-3 opacity-70">
-            <span>v1 · Feb 2026</span>
+            <span>v1</span>
           </div>
         </div>
       </header>
@@ -331,7 +331,7 @@ export default function CurriculumOnePager() {
           </div>
 
           <div className="mt-10 pt-6 border-t border-stone-800 flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono text-stone-500 uppercase tracking-[0.12em]">
-            <div>Ownology · Built by a working winemaker · Feb 2026</div>
+            <div>Ownology · Built by a working winemaker</div>
             <div className="flex items-center gap-3">
               <span>ownology.ai/curriculum/one-page</span>
               <span className="opacity-40">·</span>
