@@ -195,6 +195,37 @@ async function startServer() {
   const trustProxyValue: string | number = /^\d+$/.test(trustProxy) ? Number(trustProxy) : trustProxy;
   app.set("trust proxy", trustProxyValue);
 
+  // ── Security hardening (Feb 2026 audit — Pass 1) ────────────────────
+  // 1. Disable X-Powered-By to stop leaking "Express" as our stack.
+  // 2. Add defence-in-depth headers on every response:
+  //      - HSTS: force HTTPS for 1 year (2 years is stricter but locks us
+  //        into a subdomain of ownology.ai for that period; 1 year is
+  //        pragmatic and still preload-eligible after we add includeSubDomains).
+  //      - X-Content-Type-Options: nosniff — stops MIME-sniffing attacks.
+  //      - X-Frame-Options: SAMEORIGIN — clickjacking defence.
+  //        (CSP frame-ancestors is stricter but a full CSP roll-out needs
+  //        more testing against our inline styles / analytics.)
+  //      - Referrer-Policy: strict-origin-when-cross-origin — outbound
+  //        links to Andrew Pirie's site / competitors don't leak full URL.
+  //      - Permissions-Policy: disable browser sensor APIs we don't use
+  //        (camera, mic, geolocation, USB, etc.) so third-party embeds
+  //        can't opportunistically request them from our origin.
+  // We deliberately do NOT add a Content-Security-Policy here — it needs
+  // per-page tuning against React inline styles, Emergent debug bundle,
+  // Stripe checkout iframe, and merch storefront. Deferred to Pass 2.
+  app.disable("x-powered-by");
+  app.use((_req, res, next) => {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    res.setHeader(
+      "Permissions-Policy",
+      "camera=(), microphone=(), geolocation=(), payment=(self), usb=(), bluetooth=(), magnetometer=(), gyroscope=(), accelerometer=()",
+    );
+    next();
+  });
+
   // ── Health probe (MUST be registered before adminGate/routers) ───────────
   // k8s readiness/liveness probes hit /api/health, /healthz, or /health.
   // Returns 200 immediately without touching the DB so a slow Railway MySQL
@@ -362,6 +393,28 @@ async function startServer() {
   // Blanket per-IP throttling to protect the Perplexity + Resend budgets
   // and the Emergent LLM key from bot loops. Health probes are exempt so
   // k8s liveness never gets rate-limited.
+
+  // ── LLM cost-drain protection (Feb 2026 audit) ────────────────────────
+  // tutor.ask calls Claude/OpenAI per request via the Emergent LLM key —
+  // each hit is real money. The general tRPC limit of 100 req/min is
+  // fine for reads but a single scripted loop against tutor.ask could
+  // burn hundreds of dollars in an hour. Cap it to 15 per minute per IP
+  // (~1 every 4s — well above any human browsing rhythm, way below any
+  // bot's ability to drain the key).
+  app.use((req, res, next) => {
+    // Match both single-call and batch endpoints containing "tutor.ask".
+    const p = req.path || "";
+    if (p.startsWith("/api/trpc/") && (p.includes("tutor.ask") || p.includes("tutor%2Cask"))) {
+      const ip = clientIpOf(req);
+      const r = rateLimitCheck("tutor.ask", ip, 60_000, 15);
+      if (!r.allowed) {
+        res.setHeader("Retry-After", String(Math.ceil((r.retryAfterMs ?? 0) / 1000)));
+        return res.status(429).json({ error: "rate limited on tutor.ask" });
+      }
+    }
+    next();
+  });
+
   app.use("/api/trpc", (req, res, next) => {
     const ip = clientIpOf(req);
     const r = rateLimitCheck("trpc", ip, 60_000, 100); // 100 req/min per IP
@@ -602,6 +655,11 @@ async function startServer() {
   // ── SEO: sitemap + robots + RSS ──────────────────────────────────────────────
   app.get("/api/cellar-journal/sitemap.xml", cellarJournalSitemapHandler);
   app.get("/api/sitemap.xml", mainSitemapHandler);
+  // Root-level /sitemap.xml — most crawlers (Google, Bing) check /sitemap.xml
+  // FIRST by convention before reading robots.txt. Serving the real sitemap
+  // here (not a redirect stub) ensures we don't lose crawls from crawlers
+  // that don't follow the Sitemap directive in robots.txt.
+  app.get("/sitemap.xml", mainSitemapHandler);
   app.get("/api/cellar-journal/rss.xml", cellarJournalRssHandler);
   app.get("/api/robots.txt", robotsTxtHandler);
 

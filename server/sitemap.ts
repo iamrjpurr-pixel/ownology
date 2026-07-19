@@ -58,6 +58,13 @@ const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }
   { path: "/for-home-winemakers",  priority: "0.6", changefreq: "monthly" },
   { path: "/for-home-winemakers/troubleshooting", priority: "0.5", changefreq: "monthly" },
   { path: "/for-home-winemakers/glossary",         priority: "0.5", changefreq: "monthly" },
+  // Curriculum surfaces — the education/learn stack. High SEO value:
+  //   /curriculum        → 30-lesson index
+  //   /curriculum/about  → long-form sell page
+  //   /curriculum/one-page → peer-brief sell surface (for warm outreach)
+  { path: "/curriculum",           priority: "0.9",  changefreq: "weekly" },
+  { path: "/curriculum/about",     priority: "0.85", changefreq: "monthly" },
+  { path: "/curriculum/one-page",  priority: "0.75", changefreq: "monthly" },
   // Competitor-migration pages intentionally excluded from sitemap + PUBLIC_EXACT
   // (see server/index.ts). They exist for warm outreach only.
   { path: "/regulations/detail",   priority: "0.5", changefreq: "monthly" },

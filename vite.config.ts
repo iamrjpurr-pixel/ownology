@@ -59,6 +59,11 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Never ship source maps to production. Source maps let anyone
+    // reverse-engineer the original TSX + component names, business
+    // logic, and route table. Explicit `false` here overrides Vite's
+    // default heuristic that ships maps when NODE_ENV != production.
+    sourcemap: false,
   },
   server: {
     port: 3000,
