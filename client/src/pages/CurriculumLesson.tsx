@@ -48,7 +48,8 @@ type Mode = "deep" | "skim" | "flash";
 export default function CurriculumLesson() {
   const [, params] = useRoute("/curriculum/:slug");
   const slug = params?.slug ?? "";
-  const { data: lesson, isLoading } = trpc.curriculum.bySlug.useQuery({ slug }, { enabled: !!slug });
+  const { data, isLoading } = trpc.curriculum.bySlug.useQuery({ slug }, { enabled: !!slug });
+  const lesson = data?.lesson;
   const access = useCurriculumAccess();
   const [mode, setMode] = useState<Mode>(access.canRead.deep ? "deep" : "skim");
   const [flashIdx, setFlashIdx] = useState(0);

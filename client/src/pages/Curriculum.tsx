@@ -29,7 +29,8 @@ const WBS_LABEL: Record<string, string> = {
 };
 
 export default function Curriculum() {
-  const { data: lessons, isLoading } = trpc.curriculum.list.useQuery();
+  const { data, isLoading } = trpc.curriculum.list.useQuery();
+  const lessons = data?.lessons;
 
   const byLevel = new Map<number, typeof lessons>();
   if (lessons) {

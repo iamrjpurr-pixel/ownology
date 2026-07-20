@@ -4,16 +4,29 @@
  * Reads synthesised Lesson Card JSONs from /app/references/education/synthesis-pilot/
  * and vends them via tRPC.
  *
- * Design decision: for the MVP demo we skip the DB layer entirely and serve
- * the JSON files as-is. This lets us ship the UI in the same session as the
- * synthesis without a schema migration. Once Rich signs off on the shape,
- * a later pass migrates these into a proper `curriculum_lessons` table.
+ * Server-side paywall (Feb 2026, security audit P0):
+ *   Client-side tier gating alone is insufficient — a savvy user can spoof
+ *   ?preview=vigneron and unlock premium content in the client bundle. So
+ *   every lesson response is now stripped SERVER-SIDE based on the caller's
+ *   real subscription tier (from wineries.plan). The client hook still
+ *   controls UI (lock icons, upgrade prompts) but the actual sections /
+ *   worked_example / decision_tree / mcqs / flashcards / body_md are
+ *   redacted from the JSON payload for tiers that shouldn't see them.
+ *
+ * Design decision: for the MVP demo we skip the DB layer for lesson content
+ * and serve the JSON files as-is. This lets us ship the UI in the same
+ * session as the synthesis without a schema migration. Once Rich signs off
+ * on the shape, a later pass migrates these into a proper
+ * `curriculum_lessons` table.
  */
 
 import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
+import { eq } from "drizzle-orm";
 import { router, publicProcedure } from "../trpc.js";
+import { db } from "../db.js";
+import * as schema from "../../drizzle/schema.js";
 
 const SYNTH_V1_DIR = "/app/references/education/synthesis-pilot";
 const SYNTH_V2_DIR = "/app/references/education/synthesis-v2";
@@ -143,28 +156,159 @@ function readAll(): LessonCard[] {
 }
 
 const curriculumRouter = router({
-  list: publicProcedure.query(async () => {
+  list: publicProcedure.query(async ({ ctx }) => {
     const cards = readAll();
-    return cards.map((c) => ({
-      id: c.id,
-      slug: c.slug,
-      level: c.level,
-      wbs: c.wbs,
-      reading_min: c.reading_min,
-      title: c.title,
-      aim: c.aim,
-      version: c.version,
-      hasBody: Boolean(c.body_md || c.sections),
-    }));
+    const tier = await resolveCurriculumTier(ctx);
+    // Every tier sees titles + aim + level of every lesson — the "shelf".
+    // What differs is the reading-mode access, gated in bySlug.
+    return {
+      tier,
+      lessons: cards.map((c) => ({
+        id: c.id,
+        slug: c.slug,
+        level: c.level,
+        wbs: c.wbs,
+        reading_min: c.reading_min,
+        title: c.title,
+        aim: c.aim,
+        version: c.version,
+        hasBody: Boolean(c.body_md || c.sections),
+      })),
+    };
   }),
 
   bySlug: publicProcedure
     .input(z.object({ slug: z.string().min(1) }))
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const cards = readAll();
       const card = cards.find((c) => c.slug === input.slug);
-      return card ?? null;
+      if (!card) return null;
+      const tier = await resolveCurriculumTier(ctx);
+      return { tier, lesson: gateLessonByTier(card, tier) };
     }),
 });
+
+// ─── Server-side paywall helpers ────────────────────────────────────────────
+//
+// We resolve the caller's real subscription tier from wineries.plan on every
+// request. Cheap (indexed single-row lookup, cached-friendly). See
+// /app/server/routers/curriculum.ts header comment for the design rationale.
+
+export type CurriculumTier = "free" | "cellar_hand" | "press" | "vigneron";
+
+/** Map a raw wineries.plan enum value to a curriculum access tier.
+ *  wineries.plan values: 'free' | 'press' | 'amphora' | 'coopers' | 'founding_member'
+ *  Curriculum tiers:     'free' | 'cellar_hand' | 'press' | 'vigneron'
+ *  founding_member gets vigneron courtesy — they backed early. */
+function planToCurriculumTier(plan: string | null | undefined): CurriculumTier {
+  switch (plan) {
+    case "coopers":
+    case "founding_member":
+      return "vigneron";
+    case "press":
+      return "press";
+    case "amphora":
+      return "cellar_hand";
+    case "free":
+    default:
+      return "free";
+  }
+}
+
+/** Read the caller's tier from ctx.user.wineryId → wineries.plan.
+ *
+ *  Admin bypass: an authenticated admin can pass `?preview=<tier>` on the
+ *  URL and see the app as that tier. This is what lets Rich QA each tier
+ *  without needing multiple test accounts. Non-admin `?preview` is ignored.
+ *  This is enforced HERE not in the client to prevent bundle-hack bypass.
+ *
+ *  Unauthenticated visitors → 'free'. */
+async function resolveCurriculumTier(ctx: {
+  user: { wineryId: number | null; role?: string | null } | null;
+  req?: { query?: Record<string, unknown>; url?: string } | undefined;
+}): Promise<CurriculumTier> {
+  // Admin preview escape hatch (server-enforced — admin role only)
+  const isAdmin = ctx.user?.role === "admin";
+  if (isAdmin && ctx.req) {
+    // Extract ?preview= from the request URL. Works whether tRPC gave us
+    // parsed query object or just a URL string.
+    let previewParam: string | null = null;
+    const q = ctx.req.query;
+    if (q && typeof q === "object") {
+      const p = q.preview;
+      if (typeof p === "string") previewParam = p;
+    }
+    if (!previewParam && typeof ctx.req.url === "string") {
+      try {
+        const u = new URL(ctx.req.url, "http://localhost");
+        previewParam = u.searchParams.get("preview");
+      } catch {
+        /* ignore malformed */
+      }
+    }
+    if (previewParam) {
+      const normalised = previewParam.toLowerCase().replace(/[\s-]+/g, "_").replace(/^the_/, "");
+      if (normalised === "vigneron" || normalised === "coopers") return "vigneron";
+      if (normalised === "press") return "press";
+      if (normalised === "cellar_hand" || normalised === "amphora" || normalised === "cellarhand") return "cellar_hand";
+      if (normalised === "free") return "free";
+    }
+  }
+
+  const wineryId = ctx.user?.wineryId ?? null;
+  if (wineryId === null) return "free";
+  try {
+    const rows = await db
+      .select({ plan: schema.wineries.plan })
+      .from(schema.wineries)
+      .where(eq(schema.wineries.id, wineryId))
+      .limit(1);
+    return planToCurriculumTier(rows[0]?.plan);
+  } catch (err) {
+    // If DB lookup fails, fail closed (free) rather than falsely granting access.
+    console.warn("[curriculum] tier lookup failed, defaulting to free:", (err as Error)?.message);
+    return "free";
+  }
+}
+
+/** Redact lesson fields based on the caller's tier.
+ *
+ *   free         → titles + aim + tldr + section HEADINGS + keyConcept +
+ *                  trap only (Skim mode — teaser of every lesson).
+ *   cellar_hand+ → full content: sections body_md, worked_example,
+ *                  decision_tree, mcqs (rationale still included so learners
+ *                  can self-check), flashcards, citations.
+ *   press+       → same content as cellar_hand — differentiation is in
+ *                  persistence (scored MCQs, progress) handled elsewhere.
+ *   vigneron+    → same content — differentiation is team seats + branded
+ *                  attainment PDFs handled elsewhere.
+ */
+function gateLessonByTier(card: LessonCard, tier: CurriculumTier): LessonCard {
+  if (tier === "free") {
+    return {
+      ...card,
+      // Skim: keep section HEADINGS and the keyConcept/trap callouts, drop
+      // the prose body. Enough to hook a reader; not enough to substitute
+      // for the full lesson.
+      sections: card.sections
+        ? card.sections.map((s) => ({
+            heading: s.heading,
+            iconHint: s.iconHint,
+            body_md: "",
+            keyConcept: s.keyConcept,
+            trap: s.trap,
+          }))
+        : null,
+      worked_example: null,
+      decision_tree: null,
+      mcqs: null,
+      flashcards: null,
+      body_md: null, // v1 lessons: no body for free tier
+      cited_in: [], // sources shown only to paid tiers
+    };
+  }
+  // cellar_hand and up get everything.
+  return card;
+}
 
 export { curriculumRouter };
