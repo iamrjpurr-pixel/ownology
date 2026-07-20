@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import Cookies from "@/pages/Cookies";
+import AdminGuestPasses from "@/pages/AdminGuestPasses";
 import { Route, Switch, Redirect, useLocation } from "wouter";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -408,6 +409,7 @@ function Router() {
           Old URLs kept as aliases so existing bookmarks don't 404. */}
       <Route path={"/admin/campaign-metrics"} component={CampaignMetrics} />
       <Route path={"/admin/orders"} component={Orders} />
+      <Route path={"/admin/guest-passes"} component={AdminGuestPasses} />
       <Route path={"/campaign-metrics"} component={CampaignMetrics} />
       <Route path={"/orders"} component={Orders} />
       <Route path={"/admin"} component={Admin} />

@@ -27,6 +27,7 @@ import { eq } from "drizzle-orm";
 import { router, publicProcedure } from "../trpc.js";
 import { db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
+import { verifyGuestPass, GUEST_PASS_COOKIE } from "../lib/guestPass.js";
 
 const SYNTH_V1_DIR = "/app/references/education/synthesis-pilot";
 const SYNTH_V2_DIR = "/app/references/education/synthesis-v2";
@@ -225,8 +226,19 @@ function planToCurriculumTier(plan: string | null | undefined): CurriculumTier {
  *  Unauthenticated visitors → 'free'. */
 async function resolveCurriculumTier(ctx: {
   user: { wineryId: number | null; role?: string | null } | null;
-  req?: { query?: Record<string, unknown>; url?: string } | undefined;
+  req?: { query?: Record<string, unknown>; url?: string; headers?: Record<string, string | string[] | undefined>; cookies?: Record<string, string> } | undefined;
 }): Promise<CurriculumTier> {
+  // ── Guest-pass short-circuit ────────────────────────────────────────
+  // Signed HMAC token in the ow_curriculum_guest cookie grants the tier
+  // encoded in the token, taking priority over the caller's actual
+  // wineries.plan. This is the pragmatic interim path until the Stripe
+  // subscription loop is closed (see /app/server/lib/guestPass.ts).
+  const guestToken = extractGuestPassToken(ctx.req);
+  if (guestToken) {
+    const payload = verifyGuestPass(guestToken);
+    if (payload) return payload.tier;
+  }
+
   // Admin preview escape hatch (server-enforced — admin role only)
   const isAdmin = ctx.user?.role === "admin";
   if (isAdmin && ctx.req) {
@@ -312,3 +324,23 @@ function gateLessonByTier(card: LessonCard, tier: CurriculumTier): LessonCard {
 }
 
 export { curriculumRouter };
+
+/** Pull the guest-pass token out of the request cookie header, if present.
+ *  Works whether tRPC context gave us a parsed cookies object or just raw
+ *  headers. Failure to find the cookie is not an error — most requests
+ *  won't have one. */
+function extractGuestPassToken(
+  req: { headers?: Record<string, string | string[] | undefined>; cookies?: Record<string, string> } | undefined,
+): string | null {
+  if (!req) return null;
+  const parsed = req.cookies?.[GUEST_PASS_COOKIE];
+  if (typeof parsed === "string" && parsed.length > 0) return parsed;
+  const raw = req.headers?.cookie;
+  const cookieHeader = Array.isArray(raw) ? raw.join("; ") : raw ?? "";
+  if (!cookieHeader) return null;
+  for (const chunk of cookieHeader.split(";")) {
+    const [k, ...rest] = chunk.trim().split("=");
+    if (k === GUEST_PASS_COOKIE) return decodeURIComponent(rest.join("="));
+  }
+  return null;
+}

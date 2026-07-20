@@ -26,6 +26,8 @@ import { healthDigestHandler } from "./scheduled/healthDigest.js";
 import { healthWatchHandler } from "./scheduled/healthWatch.js";
 import { adminHealthStatusHandler } from "./adminHealth.js";
 import { adminCopyrightGuardStatsHandler } from "./adminCopyrightGuardStats.js";
+import { adminGuestPassCreateHandler } from "./adminGuestPassCreate.js";
+import { unlockHandler } from "./unlockHandler.js";
 import { marketingCoachEmailHandler } from "./scheduled/marketingCoachEmail.js";
 import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
 import { generateLipAuditPackPdf } from "./lipAuditPackPdf.js";
@@ -617,6 +619,11 @@ async function startServer() {
   app.get("/api/scheduled/health-watch", healthWatchHandler); // Near-real-time: fires immediate email on OK→FAIL / FAIL→OK transitions
   app.get("/api/admin/health-status", adminHealthStatusHandler); // Admin dashboard: live probes + stored state
   app.get("/api/admin/copyright-guard-stats", adminCopyrightGuardStatsHandler); // Admin dashboard: /ask verbatim-leak metrics
+  // Guest-pass admin generator + public /unlock redemption (Feb 2026 —
+  // interim curriculum-access mechanism while Stripe subs are wired up).
+  app.post("/api/admin/guest-pass/create", express.json(), adminGuestPassCreateHandler);
+  app.get("/unlock", unlockHandler);
+
 
   // ── Admin QR scan analytics ──────────────────────────────────────────────
   // Feeds /admin/qr-scans dashboard: totals per SKU + recent arrivals.
@@ -817,6 +824,7 @@ async function startServer() {
     "/curriculum",
     "/curriculum/about",
     "/curriculum/one-page",
+    "/unlock",
     "/pricing",
     "/quiz",
     "/compliance-score",
