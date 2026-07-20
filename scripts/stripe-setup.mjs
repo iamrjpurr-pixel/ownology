@@ -42,10 +42,14 @@ if (!IS_TEST && !IS_LIVE) {
 const stripe = new Stripe(STRIPE_KEY, { apiVersion: "2024-06-20" });
 
 // ─── Tier config — mirror of /app/client/src/data/pricing.ts ───────────────
-// Prices in AUD. Annual = 10× monthly (2 months free — standard SaaS
-// annual discount). Retail price shown as strike-through for founding
-// cohort marketing only, not a real Stripe price.
-const ANNUAL_MULTIPLIER = 10;
+// Prices in AUD.
+// FOUNDING COHORT PROMO (active until 31 July 2026):
+//   Annual billing = 9× monthly (3 months free).
+// AFTER 31 July 2026:
+//   Update ANNUAL_MULTIPLIER to 10 (2 months free — retail rate) and
+//   re-run this script. Lookup-keys stay stable, so Stripe prices update
+//   in place — no Pricing.tsx or code changes needed elsewhere.
+const ANNUAL_MULTIPLIER = 9; // ← 3 months free · founding cohort · expires 2026-07-31
 const CURRENCY = "aud";
 const TIERS = [
   {
@@ -148,6 +152,9 @@ async function main() {
   console.log("\n────────────────────────────────────────────────────────────");
   console.log(`  Ownology Stripe setup · ${IS_LIVE ? "🔴 LIVE MODE" : "🧪 TEST MODE"}`);
   console.log(`  Currency: ${CURRENCY.toUpperCase()}   Annual multiplier: ×${ANNUAL_MULTIPLIER}`);
+  if (ANNUAL_MULTIPLIER === 9) {
+    console.log(`  🍇 Founding-cohort promo ACTIVE: 3 months free on annual · expires 2026-07-31`);
+  }
   console.log("────────────────────────────────────────────────────────────\n");
 
   const envLines = [];
