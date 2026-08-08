@@ -142,6 +142,57 @@ router.post(
       const session = event.data.object as Stripe.Checkout.Session;
       const meta = session.metadata ?? {};
 
+      // ── Update wineries.plan for ANY completed subscription checkout ────
+      // Runs BEFORE the founding-member branch so both share this path.
+      // Maps tier string (from session metadata) → wineries.plan enum,
+      // then looks up the winery by client_reference_id OR by matching a
+      // user's email → user.wineryId. First hit wins.
+      // Feb 2026 — closing the revenue loop (audit P0).
+      if (session.mode === "subscription") {
+        const tierRaw = String(meta.tier ?? "").toLowerCase();
+        // Map incoming tier label → wineries.plan enum value.
+        const planForTier: Record<string, string> = {
+          cellar: "amphora",
+          cellar_hand: "amphora",
+          amphora: "amphora",
+          press: "press",
+          the_press: "press",
+          cellar_master: "coopers",
+          vigneron: "coopers",
+          the_vigneron: "coopers",
+          coopers: "coopers",
+        };
+        const newPlan = planForTier[tierRaw];
+        const email = String(meta.customer_email || session.customer_email || "").trim().toLowerCase();
+        const clientRef = String(session.client_reference_id ?? "").trim();
+        if (newPlan && (email || clientRef)) {
+          try {
+            const { db } = await import("../db.js");
+            const { wineries, users } = await import("../../drizzle/schema.js");
+            const { eq } = await import("drizzle-orm");
+            let wineryId: number | null = null;
+            if (clientRef && /^\d+$/.test(clientRef)) {
+              wineryId = Number(clientRef);
+            } else if (email) {
+              const rows = await db.select({ wineryId: users.wineryId }).from(users).where(eq(users.email, email)).limit(1);
+              wineryId = rows[0]?.wineryId ?? null;
+            }
+            if (wineryId !== null) {
+              const stripeCustomerId = typeof session.customer === "string" ? session.customer : null;
+              await db.update(wineries).set({
+                plan: newPlan as never,
+                ...(stripeCustomerId ? { stripeCustomerId } : {}),
+              }).where(eq(wineries.id, wineryId));
+              console.log(`[Webhook] wineries.plan updated → ${newPlan} for winery ${wineryId} (session ${session.id})`);
+            } else {
+              console.warn(`[Webhook] No winery matched for subscription checkout (email=${email}, ref=${clientRef})`);
+            }
+          } catch (dbErr) {
+            console.error("[Webhook] wineries.plan update failed:", dbErr);
+          }
+        }
+      }
+
       // ── Founding Member subscription checkout ─────────────────────────────
       if (meta.founding_member === "true" && session.mode === "subscription") {
         const email = meta.customer_email || session.customer_email || "";
@@ -285,6 +336,59 @@ router.post(
           }
         } catch (notifyErr) {
           console.error("[Webhook] Owner notification failed:", notifyErr);
+        }
+      }
+    }
+
+    // ── Subscription lifecycle: downgrade to free on cancellation ───────────
+    // Fires when a customer cancels or their subscription is deleted for any
+    // reason (chargeback, dunning failure after retries, admin cancel). We
+    // downgrade wineries.plan to 'free' to reflect real access status.
+    if (event.type === "customer.subscription.deleted") {
+      const sub = event.data.object as Stripe.Subscription;
+      const stripeCustomerId = typeof sub.customer === "string" ? sub.customer : null;
+      if (stripeCustomerId) {
+        try {
+          const { db } = await import("../db.js");
+          const { wineries } = await import("../../drizzle/schema.js");
+          const { eq } = await import("drizzle-orm");
+          const upd = await db.update(wineries)
+            .set({ plan: "free" as never })
+            .where(eq(wineries.stripeCustomerId, stripeCustomerId));
+          console.log(`[Webhook] Subscription deleted → downgraded to free for customer ${stripeCustomerId}`, upd);
+        } catch (err) {
+          console.error("[Webhook] subscription.deleted downgrade failed:", err);
+        }
+      }
+    }
+
+    // ── Subscription lifecycle: tier change / re-activation ──────────────────
+    // Fires when a customer upgrades/downgrades between tiers, or when a
+    // paused subscription resumes. Re-syncs wineries.plan from the current
+    // active price via metadata (set at checkout time in metadata.tier).
+    if (event.type === "customer.subscription.updated") {
+      const sub = event.data.object as Stripe.Subscription;
+      const stripeCustomerId = typeof sub.customer === "string" ? sub.customer : null;
+      const tierRaw = String(sub.metadata?.tier ?? "").toLowerCase();
+      const planForTier: Record<string, string> = {
+        cellar: "amphora", cellar_hand: "amphora", amphora: "amphora",
+        press: "press", the_press: "press",
+        cellar_master: "coopers", vigneron: "coopers", the_vigneron: "coopers", coopers: "coopers",
+      };
+      // Only touch plan if the subscription is currently in a paying state.
+      const activeStatuses = new Set(["active", "trialing", "past_due"]);
+      const newPlan = planForTier[tierRaw];
+      if (stripeCustomerId && newPlan && activeStatuses.has(sub.status)) {
+        try {
+          const { db } = await import("../db.js");
+          const { wineries } = await import("../../drizzle/schema.js");
+          const { eq } = await import("drizzle-orm");
+          await db.update(wineries)
+            .set({ plan: newPlan as never })
+            .where(eq(wineries.stripeCustomerId, stripeCustomerId));
+          console.log(`[Webhook] subscription.updated → wineries.plan = ${newPlan} for customer ${stripeCustomerId}`);
+        } catch (err) {
+          console.error("[Webhook] subscription.updated sync failed:", err);
         }
       }
     }
