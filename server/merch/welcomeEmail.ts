@@ -122,6 +122,7 @@ export async function sendSubscriptionWelcome(params: {
   email: string;
   tier: string;
   cycle: string; // "monthly" | "annual"
+  isReturningBuyer?: boolean; // true = already had a paid plan; send tier-switch receipt
 }): Promise<void> {
   const resendKey = process.env.RESEND_API_KEY;
   if (!params.email) return;
@@ -130,6 +131,41 @@ export async function sendSubscriptionWelcome(params: {
   const firstName = firstNameFromEmail(params.email);
   const cycleLabel = params.cycle === "annual" ? "annual" : "monthly";
 
+  // ── Returning buyer path — short receipt, no product tour ────────
+  // Fires when the buyer already had a paid tier before this checkout
+  // (e.g. Cellar Hand → Press upgrade, or annual renewal from monthly).
+  if (params.isReturningBuyer) {
+    const html = baseTemplate({
+      firstName,
+      headline: `You're on ${meta.name} now.`,
+      intro: `Your ${cycleLabel} subscription switched to ${meta.name}. Everything already unlocked stays unlocked — plus whatever this tier adds.`,
+      bulletsHtml: "",
+      ctaLabel: "Open dashboard",
+      ctaHref: `${PROD_URL}/dashboard`,
+      outro: `Any questions about the switch, just hit reply.`,
+    });
+    if (!resendKey) {
+      console.log(`[Welcome] (dev) tier-switch receipt for ${params.email} — tier=${params.tier}`);
+      return;
+    }
+    try {
+      const { Resend } = await import("resend");
+      const resend = new Resend(resendKey);
+      await resend.emails.send({
+        from: `${FROM_NAME} <${FROM_EMAIL}>`,
+        to: params.email,
+        subject: `Your Ownology tier is now ${meta.name}`,
+        html,
+        replyTo: "rich@ownology.ai",
+      });
+      console.log(`[Welcome] Tier-switch receipt sent to ${params.email} (${params.tier})`);
+    } catch (err) {
+      console.error(`[Welcome] Tier-switch send failed for ${params.email}:`, (err as Error).message);
+    }
+    return;
+  }
+
+  // ── First-time buyer — full warm welcome ─────────────────────────
   const bulletsHtml = `<div style="background:#faf7f0;border-left:3px solid #b8860b;padding:16px 20px;margin:20px 0;border-radius:4px">
     <p style="margin:0 0 8px;font-size:13px;font-weight:600;color:#b8860b;letter-spacing:0.04em;text-transform:uppercase">What just unlocked</p>
     <ul style="margin:0;padding-left:20px;font-size:14px;line-height:1.7;color:#374151">
@@ -173,12 +209,50 @@ export async function sendCreditPackWelcome(params: {
   email: string;
   packName: string; // "Pour" | "Glass" | "Flight" | "Cellar"
   credits: number;
+  isReturningBuyer?: boolean; // true = has bought credits before; send short top-up receipt
+  newBalance?: number; // total balance AFTER this top-up (used in receipt copy)
 }): Promise<void> {
   const resendKey = process.env.RESEND_API_KEY;
   if (!params.email) return;
 
   const firstName = firstNameFromEmail(params.email);
 
+  // ── Returning buyer path — short top-up receipt ──────────────────
+  if (params.isReturningBuyer) {
+    const balanceLine = params.newBalance != null
+      ? `You now have <strong>${params.newBalance.toLocaleString()} credits</strong> in the bank.`
+      : "";
+    const html = baseTemplate({
+      firstName,
+      headline: `${params.credits} credits topped up.`,
+      intro: `Your ${params.packName} pack landed. ${balanceLine} Never expire, never reset.`,
+      bulletsHtml: "",
+      ctaLabel: "Ask a question",
+      ctaHref: `${PROD_URL}/free-run`,
+      outro: `Reply here if anything's off. Otherwise, back to the ferment.`,
+    });
+    if (!resendKey) {
+      console.log(`[Welcome] (dev) credit top-up receipt for ${params.email} — +${params.credits}`);
+      return;
+    }
+    try {
+      const { Resend } = await import("resend");
+      const resend = new Resend(resendKey);
+      await resend.emails.send({
+        from: `${FROM_NAME} <${FROM_EMAIL}>`,
+        to: params.email,
+        subject: `+${params.credits} Ownology credits`,
+        html,
+        replyTo: "rich@ownology.ai",
+      });
+      console.log(`[Welcome] Credit top-up receipt sent to ${params.email} (+${params.credits})`);
+    } catch (err) {
+      console.error(`[Welcome] Credit top-up send failed for ${params.email}:`, (err as Error).message);
+    }
+    return;
+  }
+
+  // ── First-time buyer — full warm welcome ─────────────────────────
   const bulletsHtml = `<div style="background:#faf7f0;border-left:3px solid #b8860b;padding:16px 20px;margin:20px 0;border-radius:4px">
     <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:#b8860b;letter-spacing:0.04em;text-transform:uppercase">Balance</p>
     <p style="margin:0;font-family:'Fraunces',Georgia,serif;font-size:28px;font-weight:700;color:#1f2937">${params.credits.toLocaleString()} credits</p>

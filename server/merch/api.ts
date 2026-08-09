@@ -180,12 +180,22 @@ router.post(
             if (wineryId !== null) {
               const stripeCustomerId = typeof session.customer === "string" ? session.customer : null;
               const stripeSubscriptionId = typeof session.subscription === "string" ? session.subscription : null;
+              // Detect returning subscriber — if they already had a paid
+              // plan before this checkout, send the tier-switch receipt
+              // instead of the full onboarding welcome.
+              const [prior] = await db.select({ plan: wineries.plan })
+                .from(wineries).where(eq(wineries.id, wineryId)).limit(1);
+              const wasPaid = prior && prior.plan && prior.plan !== "free";
               await db.update(wineries).set({
                 plan: newPlan as never,
                 ...(stripeCustomerId ? { stripeCustomerId } : {}),
                 ...(stripeSubscriptionId ? { stripeSubscriptionId } : {}),
               }).where(eq(wineries.id, wineryId));
               console.log(`[Webhook] wineries.plan updated → ${newPlan} for winery ${wineryId} (session ${session.id})`);
+              // Store the returning-buyer flag on the session for the warm
+              // email downstream. Attached to session object via meta so the
+              // founding-member branch below can read it without another SELECT.
+              (session as unknown as { _ownologyIsReturning: boolean })._ownologyIsReturning = !!wasPaid;
             } else {
               console.warn(`[Webhook] No winery matched for subscription checkout (email=${email}, ref=${clientRef})`);
             }
@@ -216,12 +226,16 @@ router.post(
           // Fire warm welcome email — fire-and-forget, never blocks webhook.
           // Runs alongside Stripe's automatic receipt (different purpose:
           // theirs is a payment receipt, ours is a product welcome).
+          // Returning subscribers get the tier-switch receipt (short),
+          // first-timers get the full onboarding welcome.
           try {
             const { sendSubscriptionWelcome } = await import("./welcomeEmail.js");
+            const isReturning = !!(session as unknown as { _ownologyIsReturning?: boolean })._ownologyIsReturning;
             await sendSubscriptionWelcome({
               email,
               tier: String(meta.tier ?? tier),
               cycle: String(meta.cycle ?? "monthly"),
+              isReturningBuyer: isReturning,
             });
           } catch (emailErr) {
             console.error("[Webhook] sendSubscriptionWelcome failed:", emailErr);
