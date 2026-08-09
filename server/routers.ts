@@ -183,64 +183,113 @@ const foundingMembersRouter = router({
       return { ok: true };
     }),
 
-  // Public: create a Stripe Checkout session for a founding member subscription.
-  // Uses price_data so no pre-created Stripe products are needed.
-  // Cycle: 'monthly' = $19/mo, 'annual' = $190/yr.
+  // Public: create a Stripe Checkout session for a subscription.
+  //
+  // Prefers pre-created Stripe Price IDs from env vars (populated by
+  // `scripts/stripe-setup.mjs`). Falls back to inline `price_data` so the
+  // flow still works during first-boot / before the setup script has run.
+  //
+  // Env-var contract (populated by stripe-setup.mjs, one per tier × cycle):
+  //   STRIPE_CELLAR_HAND_MONTHLY_PRICE_ID / _ANNUAL_PRICE_ID
+  //   STRIPE_PRESS_MONTHLY_PRICE_ID       / _ANNUAL_PRICE_ID
+  //   STRIPE_VIGNERON_MONTHLY_PRICE_ID    / _ANNUAL_PRICE_ID
+  //
+  // Cycle math (matches client/src/data/pricing.ts):
+  //   Founding cohort (until 2026-07-31): annual = monthly × 9  (3 months free)
+  //   Retail (from 2026-08-01):           annual = monthly × 10 (2 months free)
   createCheckout: publicProcedure
     .input(
       z.object({
         tier: z.enum(["cellar", "press", "cellar_master"]).default("cellar"),
         cycle: z.enum(["monthly", "annual"]).default("monthly"),
         customerEmail: z.string().email().optional(),
+        // Optional wineryId — surfaced to the webhook as client_reference_id
+        // so we can update wineries.plan without an email lookup.
+        wineryId: z.number().int().positive().optional(),
         origin: z.string().url(),
       })
     )
     .mutation(async ({ input }) => {
       const stripe = getStripe();
 
-      // Tier pricing (AUD cents)
-      const TIER_PRICES: Record<string, { monthly: number; annual: number; name: string }> = {
-        cellar: { monthly: 1900, annual: 19000, name: "Ownology — The Cellar" },
-        press: { monthly: 4900, annual: 49000, name: "Ownology — The Press" },
-        cellar_master: { monthly: 9900, annual: 99000, name: "Ownology — The Vigneron" },
+      // ── Founding cohort math (kept in sync with client/src/data/pricing.ts)
+      const EOFY_END_MS = new Date("2026-08-01T00:00:00+10:00").getTime();
+      const ANNUAL_MULTIPLIER = Date.now() < EOFY_END_MS ? 9 : 10;
+
+      // Tier config — monthly price only; annual is derived.
+      // Env-var suffix matches scripts/stripe-setup.mjs upper-cased tier id.
+      const TIER_CONFIG: Record<string, {
+        monthlyAud: number;
+        name: string;
+        description: string;
+        envPrefix: string;
+      }> = {
+        cellar: {
+          monthlyAud: 22,
+          name: "Ownology — The Cellar Hand",
+          description:
+            "Full curiosity AI, unlimited Compliance AI, unlimited vintage log, and the full Curriculum with Deep, Skim & Flash reading modes. Founding member pricing locked for life.",
+          envPrefix: "STRIPE_CELLAR_HAND",
+        },
+        press: {
+          monthlyAud: 44,
+          name: "Ownology — The Press",
+          description:
+            "Everything in Cellar Hand plus full cellar operations, 38 SOPs, Decision Logic, unlimited Divine Trinity, and Curriculum with scored MCQs + attainment PDF.",
+          envPrefix: "STRIPE_PRESS",
+        },
+        cellar_master: {
+          monthlyAud: 88,
+          name: "Ownology — The Vigneron",
+          description:
+            "Everything in The Press plus team seats, branded team attainment PDFs, annual knowledge-base review, and a dedicated onboarding call.",
+          envPrefix: "STRIPE_VIGNERON",
+        },
       };
 
-      const tierInfo = TIER_PRICES[input.tier];
-      const unitAmount = input.cycle === "annual" ? tierInfo.annual : tierInfo.monthly;
+      const cfg = TIER_CONFIG[input.tier];
+      const unitAmount =
+        input.cycle === "annual"
+          ? cfg.monthlyAud * ANNUAL_MULTIPLIER * 100
+          : cfg.monthlyAud * 100;
       const interval = input.cycle === "annual" ? "year" : "month";
-      const tierLabel = input.tier === "cellar" ? "The Cellar Hand" : input.tier === "press" ? "The Press" : "The Vigneron";
+      const tierLabel =
+        input.tier === "cellar" ? "The Cellar Hand" : input.tier === "press" ? "The Press" : "The Vigneron";
       const cycleLabel = input.cycle === "annual" ? "Annual" : "Monthly";
+
+      // Prefer pre-created Stripe Price ID from env var (idempotent, tracked).
+      const envKey = `${cfg.envPrefix}_${input.cycle === "annual" ? "ANNUAL" : "MONTHLY"}_PRICE_ID`;
+      const prebuiltPriceId = process.env[envKey];
+
+      const lineItem = prebuiltPriceId
+        ? { quantity: 1, price: prebuiltPriceId }
+        : {
+            quantity: 1,
+            price_data: {
+              currency: "aud",
+              unit_amount: unitAmount,
+              recurring: { interval: interval as "month" | "year" },
+              product_data: {
+                name: `${cfg.name} (${cycleLabel})`,
+                description: cfg.description,
+              },
+            },
+          };
 
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
         payment_method_types: ["card"],
         allow_promotion_codes: true,
         ...(input.customerEmail ? { customer_email: input.customerEmail } : {}),
-        line_items: [
-          {
-            quantity: 1,
-            price_data: {
-              currency: "aud",
-              unit_amount: unitAmount,
-              recurring: { interval },
-              product_data: {
-                name: `${tierInfo.name} (${cycleLabel})`,
-                description:
-                  input.tier === "cellar"
-                    ? "Unlimited Compliance Agent queries, Full Free Run lesson library, 30 AI tutor credits/mo, The Press working board. Founding member pricing locked for life."
-                    : input.tier === "press"
-                    ? "Everything in The Cellar + 150 AI tutor credits/mo, custom document upload, priority responses, vintage log PDF export."
-                    : "Everything in The Press + unlimited AI credits, 3 team seats, dedicated onboarding call, annual knowledge base review alert.",
-              },
-            },
-          },
-        ],
+        ...(input.wineryId ? { client_reference_id: String(input.wineryId) } : {}),
+        line_items: [lineItem as never],
         metadata: {
           tier: input.tier,
           tier_label: tierLabel,
           cycle: input.cycle,
           customer_email: input.customerEmail ?? "",
           founding_member: "true",
+          price_source: prebuiltPriceId ? "env_price_id" : "inline_price_data",
         },
         subscription_data: {
           metadata: {
@@ -254,6 +303,22 @@ const foundingMembersRouter = router({
 
       return { url: session.url };
     }),
+
+  // Public: health probe — does the server have Stripe wired up end-to-end?
+  // Used by /pricing to decide between real checkout redirect vs the warm-
+  // lead reservation modal fallback. Requires BOTH a Stripe secret key AND
+  // at least one tier's Price IDs in env.
+  stripeReady: publicProcedure.query(async () => {
+    const hasKey = !!process.env.STRIPE_SECRET_KEY;
+    const hasPrices = !!(
+      process.env.STRIPE_CELLAR_HAND_MONTHLY_PRICE_ID ||
+      process.env.STRIPE_PRESS_MONTHLY_PRICE_ID ||
+      process.env.STRIPE_VIGNERON_MONTHLY_PRICE_ID
+    );
+    // If STRIPE_SECRET_KEY is present, checkout works via inline price_data
+    // even without pre-created Price IDs. So the gate is just the secret key.
+    return { ready: hasKey, hasKey, hasPriceIds: hasPrices };
+  }),
 
   // Public: get the count of Founding-Member reservations (used for the
   // "Slot #X of 99" scarcity indicator on the Pricing modal). Combines

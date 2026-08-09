@@ -179,9 +179,11 @@ router.post(
             }
             if (wineryId !== null) {
               const stripeCustomerId = typeof session.customer === "string" ? session.customer : null;
+              const stripeSubscriptionId = typeof session.subscription === "string" ? session.subscription : null;
               await db.update(wineries).set({
                 plan: newPlan as never,
                 ...(stripeCustomerId ? { stripeCustomerId } : {}),
+                ...(stripeSubscriptionId ? { stripeSubscriptionId } : {}),
               }).where(eq(wineries.id, wineryId));
               console.log(`[Webhook] wineries.plan updated → ${newPlan} for winery ${wineryId} (session ${session.id})`);
             } else {

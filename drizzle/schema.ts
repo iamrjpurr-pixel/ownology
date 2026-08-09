@@ -1720,10 +1720,16 @@ export const wineries = mysqlTable(
     // Unique per-winery invite code (shape: SLUGPREFIX-XXXXXX). Referrals
     // land as `/hi/:slug?ref=<code>` — click captured, sign-up attributed.
     referralCode: varchar("referral_code", { length: 16 }),
+    // Stripe linkage — populated by the /api/stripe/webhook on completed
+    // subscription checkouts. Used to keep wineries.plan in sync with
+    // Stripe on subscription.updated / .deleted events (Feb 2026).
+    stripeCustomerId: varchar("stripe_customer_id", { length: 64 }),
+    stripeSubscriptionId: varchar("stripe_subscription_id", { length: 64 }),
     createdAt: bigint("created_at", { mode: "number" }).notNull(),
   },
   (t) => [
     index("wineries_owner_idx").on(t.ownerUserId),
+    index("wineries_stripe_customer_idx").on(t.stripeCustomerId),
   ]
 );
 

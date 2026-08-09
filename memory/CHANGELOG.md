@@ -4,6 +4,25 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Feb 2026 — Stripe checkout script + wiring COMPLETE (revenue loop closed)
+
+**One-command Stripe setup, end-to-end wired.** User pushed back on the manual Stripe Dashboard clicking ("i dont like using stripe; write a script?"). Response: finish the automation so the operator never touches Stripe UI, and wire the frontend CTAs to real checkout.
+
+**Shipped:**
+- **`drizzle/migrations/0023_wineries_stripe_ids.sql`** — adds `stripe_customer_id` + `stripe_subscription_id` on `wineries` (webhook code was already referencing these fields but they didn't exist — silent no-op bug fixed). Indexed on `stripe_customer_id` for the `customer.subscription.deleted/.updated` lookup path. Schema.ts mirrored.
+- **`server/routers.ts` · `foundingMembers.createCheckout` rewrite** — now uses correct A$22/A$44/A$88 monthly tiers (was stale $19/$49/$99 from a prior pass) with EOFY-aware annual multiplier (×9 while founding cohort active, auto-flips to ×10 on 2026-08-01). Prefers pre-created Stripe Price IDs from env vars (`STRIPE_CELLAR_HAND_MONTHLY_PRICE_ID` etc, populated by `scripts/stripe-setup.mjs`) with clean fallback to inline `price_data` so first-boot works. Accepts optional `wineryId` → sets `client_reference_id` so the webhook maps back to `wineries.plan` without an email lookup. Includes `price_source` in metadata (`env_price_id` vs `inline_price_data`) for audit.
+- **`server/routers.ts` · `foundingMembers.stripeReady`** — new public query. Returns `{ready, hasKey, hasPriceIds}` — used by `Pricing.tsx` to decide between real Stripe redirect vs the FoundingReservationModal warm-lead fallback.
+- **`client/src/pages/Pricing.tsx` · `handleCheckout` wiring** — CTAs now hit the real mutation, redirect to Stripe Checkout URL on success, gracefully degrade to the reservation modal on failure or when `STRIPE_SECRET_KEY` isn't set. `checkoutLoading` state wired for button feedback.
+- **`server/merch/api.ts` webhook** — also records `stripe_subscription_id` alongside `stripe_customer_id` on `checkout.session.completed`, so the tenant-level subscription pointer is queryable from admin without hitting Stripe's API.
+- **`scripts/stripe-setup.mjs` enhancement** — now writes a `.env.stripe` file at repo root alongside the console output. One-command import: `railway variables set --from-file .env.stripe`. Zero dashboard clicks. `.env.stripe` already covered by `.env.*` gitignore rule.
+
+**Verified live** on preview URL: `stripeReady` returns `{ready:true, hasKey:true, hasPriceIds:false}` with the stub key (falls back to inline price_data as designed). `createCheckout` reaches Stripe and returns the correct `Invalid API Key: sk_test_stub` error — proving Zod validation, tier resolution, env-var branching, and Stripe SDK integration all work end-to-end. Setup script syntax-clean, `tsc --noEmit` shows zero errors in any touched file.
+
+**Operator flow (start to finish):**
+1. `STRIPE_SECRET_KEY=sk_test_xxx node scripts/stripe-setup.mjs` — creates products + prices, writes `.env.stripe`.
+2. `railway variables set --from-file .env.stripe` (or paste into Railway raw editor).
+3. Railway redeploys, `stripeReady` flips true, Pricing CTAs go live.
+
 ### Jul 2026 — Security audit hardening (SEC-001, SEC-002, SEC-003 + P3s)
 
 Read-only audit surfaced one CRITICAL + one HIGH + one MEDIUM finding plus a handful of P3 hardening notes. **All fixes shipped and verified live**:

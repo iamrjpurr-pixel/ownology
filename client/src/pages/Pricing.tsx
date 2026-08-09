@@ -589,23 +589,52 @@ function TierCard({
     };
   }, [flashRef]);
 
-  // Stripe live keys are pending — Founding-Member CTAs open a reservation
-  // modal instead (captures warm lead, Resend confirmation, owner alert).
-  // Once STRIPE_SECRET_KEY is real, we can flip this back to createCheckout.
+  // Stripe live: when STRIPE_SECRET_KEY is set on the server, we redirect
+  // straight to Stripe Checkout. When it isn't (dev / pre-launch), we fall
+  // back to the FoundingReservationModal — a warm-lead capture form that
+  // fires two Resend emails (customer confirmation + owner alert) and
+  // returns the slot number. Fetched once at mount, cheap public query.
+  const { data: stripeReadyData } = trpc.foundingMembers.stripeReady.useQuery(undefined, {
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
+  const stripeReady = stripeReadyData?.ready ?? false;
+  const createCheckout = trpc.foundingMembers.createCheckout.useMutation();
   const [reservationOpen, setReservationOpen] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (tier.monthlyPrice === 0) {
       // Free tier — scroll to waitlist
       document.querySelector("#waitlist")?.scrollIntoView({ behavior: "smooth" });
       return;
     }
-    setReservationOpen(true);
+    // Fallback: no Stripe key on the server → capture as reservation.
+    if (!stripeReady) {
+      setReservationOpen(true);
+      return;
+    }
+    // Stripe is live → redirect to Checkout.
+    setCheckoutLoading(true);
+    try {
+      const { url } = await createCheckout.mutateAsync({
+        tier: tier.id as "cellar" | "press" | "cellar_master",
+        cycle: cycle === "annual" ? "annual" : "monthly",
+        origin: window.location.origin,
+      });
+      if (url) {
+        window.location.href = url;
+      } else {
+        // Server returned no URL — degrade to reservation.
+        setReservationOpen(true);
+      }
+    } catch (err) {
+      console.error("[Pricing] createCheckout failed, falling back to reservation:", err);
+      setReservationOpen(true);
+    } finally {
+      setCheckoutLoading(false);
+    }
   };
-
-  // Retained for future re-enable of real Stripe checkout — currently unused
-  // because reservation modal owns the founding-member flow.
-  const checkoutLoading = false;
 
   return (
     <div
