@@ -406,13 +406,16 @@ Write "The Craft" panel — explain how a winemaker shapes, controls, or exploit
       if (!pack) throw new Error("Invalid pack");
 
       const stripe = getStripe();
-      const session = await stripe.checkout.sessions.create({
-        mode: "payment",
-        payment_method_types: ["card"],
-        allow_promotion_codes: true,
-        customer_email: ctx.user.email ?? undefined,
-        line_items: [
-          {
+
+      // Prefer pre-created Stripe Price ID from env (set by
+      // scripts/stripe-setup.mjs). Falls back to inline price_data so the
+      // flow still works before the setup script has been run.
+      const envKey = `STRIPE_PACK_${pack.id.toUpperCase()}_PRICE_ID`;
+      const prebuiltPriceId = process.env[envKey];
+
+      const lineItem = prebuiltPriceId
+        ? { quantity: 1, price: prebuiltPriceId }
+        : {
             quantity: 1,
             price_data: {
               currency: "aud",
@@ -422,14 +425,21 @@ Write "The Craft" panel — explain how a winemaker shapes, controls, or exploit
                 description: pack.description,
               },
             },
-          },
-        ],
+          };
+
+      const session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        payment_method_types: ["card"],
+        allow_promotion_codes: true,
+        customer_email: ctx.user.email ?? undefined,
+        line_items: [lineItem],
         metadata: {
           credit_pack: "true",
           pack_id: pack.id,
           credits: String(pack.credits),
           user_open_id: ctx.user.openId,
           customer_email: ctx.user.email ?? "",
+          price_source: prebuiltPriceId ? "env_price_id" : "inline_price_data",
         },
         success_url: `${input.origin}/free-run?credits_purchased=1`,
         cancel_url: `${input.origin}/free-run?credits_cancelled=1`,

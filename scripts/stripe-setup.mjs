@@ -75,6 +75,17 @@ const TIERS = [
   },
 ];
 
+// Credit packs — one-time top-ups for Free Run users. Product per pack,
+// single price per product (no monthly/annual cycle). Kept in sync with
+// server/freeRunRouter.ts::CREDIT_PACKS — if you edit the amounts there,
+// edit here too (they must match down to the cent).
+const CREDIT_PACKS = [
+  { id: "pour",   name: "Pour",   priceAud: 2,  credits: 5,  description: "5 Divine Trinity reveals — a taste." },
+  { id: "glass",  name: "Glass",  priceAud: 5,  credits: 15, description: "15 Divine Trinity reveals — a working session." },
+  { id: "flight", name: "Flight", priceAud: 10, credits: 35, description: "35 Divine Trinity reveals — a vintage's worth of questions." },
+  { id: "cellar", name: "Cellar", priceAud: 20, credits: 80, description: "80 Divine Trinity reveals — the obsessive's rate." },
+];
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 /** Find an existing product by our metadata tag. */
@@ -82,6 +93,15 @@ async function findProductByTier(tierId) {
   // Stripe search API — clean, indexed, idempotent-lookup friendly.
   const res = await stripe.products.search({
     query: `active:'true' AND metadata['ownology_tier']:'${tierId}'`,
+    limit: 1,
+  });
+  return res.data[0] ?? null;
+}
+
+/** Find an existing credit-pack product by our metadata tag. */
+async function findProductByPack(packId) {
+  const res = await stripe.products.search({
+    query: `active:'true' AND metadata['ownology_pack']:'${packId}'`,
     limit: 1,
   });
   return res.data[0] ?? null;
@@ -106,6 +126,59 @@ async function upsertProduct(tier) {
     metadata: { ownology_tier: tier.id },
   });
   console.log(`  ✓ Created product: ${tier.name} (${created.id})`);
+  return created;
+}
+
+/** Upsert a credit-pack product. Returns the product. */
+async function upsertPackProduct(pack) {
+  const existing = await findProductByPack(pack.id);
+  const productBody = {
+    name: `Ownology Credits — ${pack.name}`,
+    description: pack.description,
+    metadata: {
+      ownology_pack: pack.id,
+      credits: String(pack.credits),
+    },
+  };
+  if (existing) {
+    const updated = await stripe.products.update(existing.id, productBody);
+    console.log(`  ↻ Updated pack product: ${pack.name} (${updated.id})`);
+    return updated;
+  }
+  const created = await stripe.products.create(productBody);
+  console.log(`  ✓ Created pack product: ${pack.name} (${created.id})`);
+  return created;
+}
+
+/** Upsert a one-time Price (no recurring). Returns the price. */
+async function upsertOneTimePrice(product, packId, unitAmountAud) {
+  const lookupKey = `ownology_pack_${packId}`;
+  const existingList = await stripe.prices.list({
+    lookup_keys: [lookupKey],
+    active: true,
+    limit: 1,
+  });
+  const existing = existingList.data[0];
+  const desiredAmount = unitAmountAud * 100;
+
+  if (existing && existing.unit_amount === desiredAmount && !existing.recurring) {
+    console.log(`    · price:  ${existing.id}  (unchanged · ${lookupKey})`);
+    return existing;
+  }
+
+  if (existing) {
+    await stripe.prices.update(existing.id, { lookup_key: null, active: false });
+    console.log(`    · price:  archived old ${existing.id} (amount changed)`);
+  }
+
+  const created = await stripe.prices.create({
+    product: product.id,
+    currency: CURRENCY,
+    unit_amount: desiredAmount,
+    lookup_key: lookupKey,
+    metadata: { ownology_pack: packId },
+  });
+  console.log(`    · price:  ${created.id}  (${lookupKey} · A$${unitAmountAud})`);
   return created;
 }
 
@@ -170,6 +243,17 @@ async function main() {
     const upper = tier.id.toUpperCase();
     envLines.push(`STRIPE_${upper}_MONTHLY_PRICE_ID=${monthlyPrice.id}`);
     envLines.push(`STRIPE_${upper}_ANNUAL_PRICE_ID=${annualPrice.id}`);
+    console.log("");
+  }
+
+  // ── Credit packs (one-time top-ups) ────────────────────────────────────
+  // Same idempotent upsert pattern, one product + one price per pack.
+  // Kept in sync with server/freeRunRouter.ts::CREDIT_PACKS.
+  for (const pack of CREDIT_PACKS) {
+    console.log(`▸ Pack · ${pack.name}   (A$${pack.priceAud} · ${pack.credits} credits)`);
+    const product = await upsertPackProduct(pack);
+    const price = await upsertOneTimePrice(product, pack.id, pack.priceAud);
+    envLines.push(`STRIPE_PACK_${pack.id.toUpperCase()}_PRICE_ID=${price.id}`);
     console.log("");
   }
 
