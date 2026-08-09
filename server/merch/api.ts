@@ -212,6 +212,20 @@ router.post(
             // Duplicate email is fine — member already exists
             console.warn("[Webhook] addFoundingMember skipped (may already exist):", dbErr);
           }
+
+          // Fire warm welcome email — fire-and-forget, never blocks webhook.
+          // Runs alongside Stripe's automatic receipt (different purpose:
+          // theirs is a payment receipt, ours is a product welcome).
+          try {
+            const { sendSubscriptionWelcome } = await import("./welcomeEmail.js");
+            await sendSubscriptionWelcome({
+              email,
+              tier: String(meta.tier ?? tier),
+              cycle: String(meta.cycle ?? "monthly"),
+            });
+          } catch (emailErr) {
+            console.error("[Webhook] sendSubscriptionWelcome failed:", emailErr);
+          }
         }
 
         // Notify owner
@@ -285,6 +299,18 @@ router.post(
             }
           } catch (dbErr) {
             console.error("[Webhook] Credit top-up failed:", dbErr);
+          }
+        }
+
+        // Warm welcome email for pack purchase — fire-and-forget.
+        if (email && credits > 0) {
+          try {
+            const { sendCreditPackWelcome } = await import("./welcomeEmail.js");
+            const packName = (meta.pack_id ?? "")
+              .replace(/^./, (c) => c.toUpperCase()); // "pour" → "Pour"
+            await sendCreditPackWelcome({ email, packName, credits });
+          } catch (emailErr) {
+            console.error("[Webhook] sendCreditPackWelcome failed:", emailErr);
           }
         }
 

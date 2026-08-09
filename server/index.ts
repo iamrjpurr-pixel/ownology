@@ -1662,17 +1662,44 @@ async function startServer() {
       "ADD COLUMN IF NOT EXISTS location_label VARCHAR(255) NULL",
       "ADD COLUMN IF NOT EXISTS cellar_type VARCHAR(24) NULL",
       "ADD COLUMN IF NOT EXISTS weather_thresholds_json TEXT NULL",
-      // Stripe linkage (Feb 2026) — set by /api/stripe/webhook on
-      // completed subscription checkouts. Used to keep wineries.plan
-      // in sync with Stripe on subscription.updated/.deleted events.
-      // Idempotent — safe to re-run on every boot.
-      "ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR(64) NULL",
-      "ADD COLUMN IF NOT EXISTS stripe_subscription_id VARCHAR(64) NULL",
     ]) {
       try {
         await db.execute(sql.raw(`ALTER TABLE wineries ${alter}`));
       } catch {
         // Column already exists (MySQL <8.0.29 or re-run). Best-effort.
+      }
+    }
+
+    // wineries — Stripe linkage columns (Feb 2026).
+    // Set by /api/stripe/webhook on completed subscription checkouts.
+    // Used to keep wineries.plan in sync with Stripe on subscription
+    // .updated/.deleted events. MUST run before any SELECT from wineries
+    // otherwise the Drizzle SELECT breaks because the ORM includes these
+    // fields in its query projection.
+    //
+    // Uses the same double-attempt pattern as public_audit_enabled below
+    // — first try IF NOT EXISTS (MySQL 8.0.29+), fall back to plain ADD
+    // COLUMN (older MySQL), swallow the "duplicate column" error on
+    // re-run. This is the only pattern in this codebase that survives
+    // both fresh installs AND re-runs on older MySQL.
+    for (const [colName, colDef] of [
+      ["stripe_customer_id", "VARCHAR(64) NULL"],
+      ["stripe_subscription_id", "VARCHAR(64) NULL"],
+    ]) {
+      try {
+        await db.execute(sql.raw(`ALTER TABLE wineries ADD COLUMN IF NOT EXISTS ${colName} ${colDef}`));
+        console.log(`[bootstrap] wineries.${colName} — added or exists (IF NOT EXISTS path)`);
+      } catch {
+        try {
+          await db.execute(sql.raw(`ALTER TABLE wineries ADD COLUMN ${colName} ${colDef}`));
+          console.log(`[bootstrap] wineries.${colName} — added (fallback ADD COLUMN)`);
+        } catch (err) {
+          // Duplicate column — safe to ignore. Log for observability.
+          const msg = (err as Error)?.message ?? "";
+          if (!msg.includes("Duplicate") && !msg.includes("already exists")) {
+            console.warn(`[bootstrap] wineries.${colName} ALTER unexpected error:`, msg);
+          }
+        }
       }
     }
 
