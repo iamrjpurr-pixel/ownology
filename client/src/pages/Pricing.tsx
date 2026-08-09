@@ -965,6 +965,36 @@ function TierCard({
 
 // ─── Credit pack card ─────────────────────────────────────────────────────────
 function CreditPackCard({ pack }: { pack: (typeof CREDIT_PACKS)[0] }) {
+  const authQ = trpc.freeRun.authCheck.useQuery(undefined, { staleTime: 30_000 });
+  const createPackCheckout = trpc.freeRun.createCreditPackCheckout.useMutation();
+  const [loading, setLoading] = useState(false);
+
+  const handleBuy = async () => {
+    // Anon visitors → send to login with a return path back to Pricing so
+    // they land on the credit-pack strip on return. Login preserves ?next.
+    if (!authQ.data?.isAuthenticated) {
+      window.location.href = `/login?next=${encodeURIComponent("/pricing#credit-packs")}`;
+      return;
+    }
+    setLoading(true);
+    try {
+      const { url } = await createPackCheckout.mutateAsync({
+        packId: pack.id as "pour" | "glass" | "flight" | "cellar",
+        origin: window.location.origin,
+      });
+      if (url) {
+        window.location.href = url;
+      } else {
+        alert("Couldn't start checkout. Please try again or DM Rich.");
+      }
+    } catch (err) {
+      console.error("[Pricing] createCreditPackCheckout failed:", err);
+      alert("Checkout failed. Please try again — if it keeps happening, DM Rich.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       className="relative rounded-sm p-5"
@@ -1015,9 +1045,11 @@ function CreditPackCard({ pack }: { pack: (typeof CREDIT_PACKS)[0] }) {
           Never expire
         </span>
       </div>
-      <a
-        href="#waitlist"
-        className="block text-center mt-4 py-2.5 rounded-sm text-sm transition-colors"
+      <button
+        onClick={handleBuy}
+        disabled={loading}
+        data-testid={`purchase-pack-${pack.id}`}
+        className="block w-full text-center mt-4 py-2.5 rounded-sm text-sm transition-colors"
         style={{
           background: "transparent",
           color: "var(--ow-amber)",
@@ -1027,12 +1059,14 @@ function CreditPackCard({ pack }: { pack: (typeof CREDIT_PACKS)[0] }) {
           textTransform: "uppercase",
           border: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
           fontSize: "0.75rem",
+          cursor: loading ? "wait" : "pointer",
+          opacity: loading ? 0.6 : 1,
         }}
-        onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = "color-mix(in oklch, var(--ow-amber) 10%, transparent)"; }}
-        onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}
+        onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = "color-mix(in oklch, var(--ow-amber) 10%, transparent)"; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
       >
-        Purchase Pack
-      </a>
+        {loading ? "Loading Stripe…" : "Purchase Pack"}
+      </button>
     </div>
   );
 }
