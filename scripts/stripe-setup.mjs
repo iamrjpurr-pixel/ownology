@@ -35,8 +35,8 @@ if (!STRIPE_KEY) {
   process.exit(1);
 }
 
-const IS_TEST = STRIPE_KEY.startsWith("sk_test_");
-const IS_LIVE = STRIPE_KEY.startsWith("sk_live_");
+const IS_TEST = STRIPE_KEY.startsWith("sk_test_") || STRIPE_KEY.startsWith("rk_test_");
+const IS_LIVE = STRIPE_KEY.startsWith("sk_live_") || STRIPE_KEY.startsWith("rk_live_");
 if (!IS_TEST && !IS_LIVE) {
   console.error("\n❌ STRIPE_SECRET_KEY doesn't look like a Stripe secret key.\n");
   process.exit(1);
