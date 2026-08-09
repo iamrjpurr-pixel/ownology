@@ -173,7 +173,68 @@ async function main() {
     console.log("");
   }
 
-  console.log("────────────────────────────────────────────────────────────");
+  // ── Create/reuse webhook endpoint ─────────────────────────────────────
+  // Zero Stripe Dashboard clicks — the endpoint gets created programmatically,
+  // signing secret extracted, appended to .env.stripe. Idempotent: re-runs
+  // find the existing endpoint by URL and reuse it (never duplicates).
+  //
+  // WEBHOOK_URL priority:
+  //   1. env WEBHOOK_URL (explicit override — e.g. Railway preview)
+  //   2. hardcoded https://www.ownology.ai/api/stripe/webhook (prod default)
+  const WEBHOOK_URL = process.env.WEBHOOK_URL || "https://www.ownology.ai/api/stripe/webhook";
+  const WEBHOOK_EVENTS = [
+    "checkout.session.completed",
+    "customer.subscription.updated",
+    "customer.subscription.deleted",
+  ];
+
+  console.log(`\n▸ Webhook endpoint`);
+  console.log(`  URL: ${WEBHOOK_URL}`);
+
+  let webhookSecret = null;
+  try {
+    // Find existing endpoint with the same URL (idempotency).
+    const existing = await stripe.webhookEndpoints.list({ limit: 100 });
+    const match = existing.data.find((w) => w.url === WEBHOOK_URL);
+
+    if (match) {
+      console.log(`  ✓ Endpoint already exists (${match.id})`);
+      // Ensure the enabled_events list is up to date — but never widen scope
+      // if the user has customised it in the Dashboard (we only ADD what we
+      // need, never remove).
+      const missing = WEBHOOK_EVENTS.filter((e) => !match.enabled_events.includes(e));
+      if (missing.length > 0) {
+        console.log(`  ⤷ Adding missing events: ${missing.join(", ")}`);
+        await stripe.webhookEndpoints.update(match.id, {
+          enabled_events: [...new Set([...match.enabled_events, ...WEBHOOK_EVENTS])],
+        });
+      }
+      // NOTE: `secret` is only returned on the initial create() call. For an
+      // existing endpoint we can't retrieve it — the user either has it in
+      // Railway already, or they need to roll it via the Dashboard.
+      console.log(`  ⚠️  Signing secret only visible on first creation.`);
+      console.log(`     If STRIPE_WEBHOOK_SECRET is not already in Railway,`);
+      console.log(`     roll it at: https://dashboard.stripe.com/${IS_LIVE ? "" : "test/"}webhooks/${match.id}`);
+    } else {
+      const created = await stripe.webhookEndpoints.create({
+        url: WEBHOOK_URL,
+        enabled_events: WEBHOOK_EVENTS,
+        description: "Ownology · subscription lifecycle sync (auto-created by stripe-setup.mjs)",
+        api_version: "2024-06-20",
+      });
+      webhookSecret = created.secret;
+      console.log(`  ✓ Created webhook endpoint (${created.id})`);
+      console.log(`  ✓ Signing secret captured (${webhookSecret.slice(0, 12)}…)`);
+      envLines.push(`STRIPE_WEBHOOK_SECRET=${webhookSecret}`);
+    }
+  } catch (e) {
+    console.log(`  ❌ Webhook setup failed: ${e.message}`);
+    console.log(`     Products/prices were still created successfully.`);
+    console.log(`     You can create the webhook manually at:`);
+    console.log(`     https://dashboard.stripe.com/${IS_LIVE ? "" : "test/"}webhooks/create`);
+  }
+
+  console.log("\n────────────────────────────────────────────────────────────");
   console.log("  ✅ Done. Copy these lines into Railway env vars:");
   console.log("────────────────────────────────────────────────────────────\n");
   for (const line of envLines) console.log(`  ${line}`);
