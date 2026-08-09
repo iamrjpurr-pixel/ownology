@@ -4,6 +4,19 @@ Growing log of shipped work, most recent first. PRD.md holds the static
 problem statement + long-form architecture; ROADMAP.md holds P0/P1/P2
 backlog. This file just records what actually shipped, and when.
 
+### Feb 2026 — `scripts/stripe-go-live.mjs` · one-command paywall activation
+
+**Companion to `stripe-setup.mjs`.** User asked "did you account for annual payments?" — yes, both the setup script (creates 6 prices = 3 tiers × monthly + annual) and the checkout mutation (`cycle: "monthly" | "annual"` picks the correct env var suffix) handle annual end-to-end. Also shipped `stripe-go-live.mjs` — a 4-step operator button that runs the full activation in one command:
+
+1. **Preflight** — asserts `STRIPE_SECRET_KEY` is present, reports test vs live mode.
+2. **Setup** — invokes `stripe-setup.mjs`, produces `.env.stripe` at repo root.
+3. **Railway upload** — if the Railway CLI is installed and linked, calls `railway variables --set KEY=VALUE` for every line in `.env.stripe`. Graceful degrade: prints paste-into-raw-editor instructions if CLI missing.
+4. **Poll** — waits up to 5 min (configurable via `--timeout`) for `<APP_URL>/api/trpc/foundingMembers.stripeReady` to return `{ready:true, hasPriceIds:true}`, proving the deploy picked up the new vars.
+
+Flags: `--skip-setup` (reuse existing `.env.stripe`), `--skip-railway`, `--skip-poll`, `--app-url=<url>`, `--timeout=<sec>`.
+
+Verified against the live preview URL — poll correctly parses the tRPC response and reports state changes in real time.
+
 ### Feb 2026 — Stripe checkout script + wiring COMPLETE (revenue loop closed)
 
 **One-command Stripe setup, end-to-end wired.** User pushed back on the manual Stripe Dashboard clicking ("i dont like using stripe; write a script?"). Response: finish the automation so the operator never touches Stripe UI, and wire the frontend CTAs to real checkout.
