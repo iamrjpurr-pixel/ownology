@@ -238,6 +238,23 @@ function Nav() {
           </div>
 
           <div className="hidden md:flex items-center gap-2">
+            {/* Log in — subtle text link, sits between primary nav and CTA
+                pills. Shown to everyone (already-signed-in users get
+                forwarded to /dashboard by the login page). */}
+            <Link
+              href="/login"
+              data-testid="nav-login"
+              className="text-sm font-light tracking-wide transition-colors mr-2"
+              style={{
+                color: "var(--ow-text-mid)",
+                fontFamily: "'Lato',sans-serif",
+                padding: "0.5rem 0.75rem",
+              }}
+              onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-amber)")}
+              onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "var(--ow-text-mid)")}
+            >
+              Log in
+            </Link>
             {/* Symmetric CTA pair — Feb 2026 (Rich).
                 Both pills share shape, padding, typography, and border-radius.
                 Left pill (Enthusiasts) = soft/transparent amber → the curiosity
@@ -375,6 +392,17 @@ function Nav() {
           {/* Primary nav group */}
           <div className="pt-2">
             <p style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.65rem", letterSpacing: "0.14em", color: "var(--ow-text-lo)", textTransform: "uppercase", padding: "0.75rem 0 0.25rem" }}>Explore</p>
+            {/* Log in — first item in mobile drawer for prominence. */}
+            <Link
+              href="/login"
+              onClick={handleNavClick}
+              data-testid="mobile-nav-login"
+              className="flex items-center justify-between transition-colors"
+              style={{ fontFamily: "'Lato',sans-serif", fontWeight: 400, fontSize: "1.0625rem", color: "var(--ow-amber)", borderBottom: "1px solid var(--ow-border)", letterSpacing: "0.01em", minHeight: "52px" }}
+            >
+              Log in
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="var(--ow-amber)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </Link>
             {PRIMARY_NAV.map((item) => (
               item.href.startsWith("/") ? (
                 <Link
