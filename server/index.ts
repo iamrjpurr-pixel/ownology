@@ -1662,6 +1662,12 @@ async function startServer() {
       "ADD COLUMN IF NOT EXISTS location_label VARCHAR(255) NULL",
       "ADD COLUMN IF NOT EXISTS cellar_type VARCHAR(24) NULL",
       "ADD COLUMN IF NOT EXISTS weather_thresholds_json TEXT NULL",
+      // Stripe linkage (Feb 2026) — set by /api/stripe/webhook on
+      // completed subscription checkouts. Used to keep wineries.plan
+      // in sync with Stripe on subscription.updated/.deleted events.
+      // Idempotent — safe to re-run on every boot.
+      "ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR(64) NULL",
+      "ADD COLUMN IF NOT EXISTS stripe_subscription_id VARCHAR(64) NULL",
     ]) {
       try {
         await db.execute(sql.raw(`ALTER TABLE wineries ${alter}`));
