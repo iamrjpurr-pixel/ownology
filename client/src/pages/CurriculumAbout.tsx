@@ -81,8 +81,8 @@ export default function CurriculumAbout() {
       <section className="border-b border-stone-200 bg-stone-100">
         <div className="max-w-4xl mx-auto px-6 py-14">
           <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">The structure</div>
-          <h2 className="font-serif text-3xl md:text-4xl text-stone-900 mb-8 leading-tight">
-            Four levels. Same order a good degree teaches them in.
+          <h2 className="font-serif text-3xl md:text-4xl text-stone-900 mb-8 leading-tight" style={{ textWrap: "balance" }}>
+            Four levels. Taught in the order a good degree teaches them.
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <LevelCard n="1" title="Foundations" tag="The language you need to share." bullets={["Global viticulture context", "Vine biology essentials", "Climate, soils, terroir", "The four numbers that run everything", "Fermentation fundamentals", "Winemaker's toolkit"]} accent="border-amber-400 bg-amber-50" />

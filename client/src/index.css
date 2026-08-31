@@ -674,3 +674,23 @@ html[data-weather="storm"] {
 html[data-weather="storm"].dark {
   --ow-bg-base: oklch(0.06 0.008 250);
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Typography polish — global widow/orphan control (Feb 2026 audit)
+   `text-wrap: balance` gives the browser latitude to break headlines
+   so no single word (like "in.") ends up alone on the last line. Safe
+   default for all H1-H4 across the site; individual pages can still
+   opt out with an inline `text-wrap: normal` style if needed.
+
+   Body prose gets `text-wrap: pretty` — same idea but for paragraphs,
+   avoids single-word last lines without the aggressive balance pass
+   that would slow render on long paragraphs.
+
+   Both properties are progressive-enhancement — older browsers ignore
+   them and render normally. No layout risk. */
+h1, h2, h3, h4 {
+  text-wrap: balance;
+}
+p, li, blockquote {
+  text-wrap: pretty;
+}
