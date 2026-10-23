@@ -106,10 +106,10 @@ const wineInput = z.object({
   })).max(12).default([]),
   targets: z.object({ alcohol: short, ph: short, ta: short, rs: short, so2: short, va: short }).default({}),
   regime: z.object({
-    yeast: z.string().max(300).optional(),
-    fermentTemp: z.string().max(300).optional(),
-    mlf: z.string().max(300).optional(),
-    oak: z.string().max(300).optional(),
+    yeast: z.string().max(600).optional(),
+    fermentTemp: z.string().max(600).optional(),
+    mlf: z.string().max(600).optional(),
+    oak: z.string().max(600).optional(),
     additions: z.string().max(600).optional(),
     finishing: z.string().max(600).optional(),
     bottling: z.string().max(600).optional(),
@@ -119,7 +119,10 @@ const wineInput = z.object({
 });
 const brandId = z.object({ wineryId: z.number().int().positive() });
 
-async function sendContractorInvite(to: string, brandName: string, inviterEmail: string) {
+const esc = (v: string) => v.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+
+async function sendContractorInvite(to: string, rawBrand: string, inviterEmail: string) {
+  const brandName = esc(rawBrand);
   const key = process.env.RESEND_API_KEY;
   const link = `${PROD_URL}/login?next=/brand`;
   if (!key) {
@@ -134,14 +137,14 @@ async function sendContractorInvite(to: string, brandName: string, inviterEmail:
     <p style="font-size:15px;line-height:1.6">${brandName} has given you contract-winemaker access to their Brand Vault on Ownology.</p>
     <p style="font-size:15px;line-height:1.6">You can view their wine specs and protocols and log your cellar work and lab readings against each wine. The specs stay ${brandName}'s property, so downloads and exports are switched off.</p>
     <p style="margin:24px 0;text-align:center"><a href="${link}" style="display:inline-block;padding:12px 28px;background:#b8860b;color:#fff;text-decoration:none;border-radius:6px;font-weight:700">Open the Brand Vault</a></p>
-    <p style="font-size:13px;color:#6b7280">Sign in with this email address (${to}) and the brand appears automatically. Invited by ${inviterEmail}.</p>
+    <p style="font-size:13px;color:#6b7280">Sign in with this email address (${to}) and the brand appears automatically. Invited by ${esc(inviterEmail)}.</p>
   </td></tr></table></body></html>`;
   try {
     const { Resend } = await import("resend");
     await new Resend(key).emails.send({
       from: `${process.env.ALERT_FROM_NAME || "Ownology"} <${from}>`,
       to,
-      subject: `${brandName} invited you to their Brand Vault`,
+      subject: `${rawBrand} invited you to their Brand Vault`,
       html,
       replyTo: inviterEmail || undefined,
     });
@@ -185,7 +188,12 @@ export const brandPortalRouter = router({
     const wine = toWine(await getWineRow(input.wineryId, input.wineId));
     const logs = await rows<LogRow>(sql`
       SELECT * FROM brand_wine_logs WHERE winery_id = ${input.wineryId} AND wine_id = ${input.wineId} ORDER BY created_at DESC LIMIT 200`);
-    if (role === "contractor") await logActivity(ctx.user, input.wineryId, role, "viewed", wine.name);
+    if (role === "contractor") {
+      const recent = await rows<{ id: number }>(sql`
+        SELECT id FROM brand_activity WHERE winery_id = ${input.wineryId} AND actor_email = ${emailOf(ctx.user) || ctx.user.openId}
+          AND action = 'viewed' AND target = ${wine.name.slice(0, 300)} AND created_at > ${Date.now() - 10 * 60_000} LIMIT 1`);
+      if (!recent.length) await logActivity(ctx.user, input.wineryId, role, "viewed", wine.name);
+    }
     return { role, wine, logs: logs.map(toLog) };
   }),
 
@@ -264,7 +272,7 @@ export const brandPortalRouter = router({
     const [{ n }] = await rows<{ n: number }>(sql`SELECT COUNT(*) AS n FROM brand_members WHERE winery_id = ${input.wineryId} AND revoked_at IS NULL`);
     if (Number(n) >= MAX_CONTRACTORS) throw new TRPCError({ code: "BAD_REQUEST", message: `Limit of ${MAX_CONTRACTORS} contractors reached.` });
     if (existing[0]) {
-      await db.execute(sql`UPDATE brand_members SET revoked_at = NULL, invited_at = ${Date.now()} WHERE id = ${existing[0].id}`);
+      await db.execute(sql`UPDATE brand_members SET revoked_at = NULL, accepted_at = NULL, user_id = NULL, invited_at = ${Date.now()} WHERE id = ${existing[0].id}`);
     } else {
       await db.execute(sql`
         INSERT INTO brand_members (winery_id, email, role, invited_by_user_id, invited_at)

@@ -360,6 +360,13 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
           >
             🍇 Start 14-day trial →
           </Link>
+          <Link
+            href="/demo/tour?from=hero-carousel"
+            data-testid="hero-carousel-cta-demo"
+            style={ctaSecondary}
+          >
+            Try the free demo →
+          </Link>
         </div>
       </SceneWrap>
 

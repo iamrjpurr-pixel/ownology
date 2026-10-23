@@ -47,7 +47,7 @@ function TankSnapshot() {
         {DEMO_TANKS.map((t) => {
           const s = STATUS[t.status];
           return (
-            <div key={t.id} className="rounded-lg border border-[var(--ow-border)] bg-[var(--ow-bg-card)] p-5" data-testid={`demo-tank-${t.id}`}>
+            <div key={t.id} className="rounded-lg border border-[var(--ow-border)] bg-[var(--ow-bg-card)] p-5" data-testid={`demo-tank-${t.id.replace(/[^A-Za-z0-9]+/g, "-")}`}>
               <div className="flex items-center justify-between">
                 <span className="font-mono text-sm font-bold text-[var(--ow-text-hi)]">{t.id}</span>
                 <span className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider ${s.cls}`}><s.Icon className="h-3 w-3" />{s.label}</span>
@@ -122,12 +122,12 @@ function OwnerControls({ role }: { role: Role }) {
         <h2 className="mt-2 font-['Fraunces',serif] text-2xl text-[var(--ow-text-hi)] md:text-3xl">Who sees what, and when it ends.</h2>
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-lg border border-[var(--ow-border)] bg-[var(--ow-bg-card)] p-6">
+        <div className="min-w-0 rounded-lg border border-[var(--ow-border)] bg-[var(--ow-bg-card)] p-6">
           <ContractorsPanel members={members}
             onInvite={(email) => { setMembers((m) => [{ id: Date.now(), email, invitedAt: Date.now(), status: "invited" }, ...m]); record("invited", email); }}
             onRevoke={(id) => { const m = members.find((x) => x.id === id); setMembers((all) => all.map((x) => (x.id === id ? { ...x, status: "revoked" } : x))); if (m) record("revoked", m.email); }} />
         </div>
-        <div className="rounded-lg border border-[var(--ow-border)] bg-[var(--ow-bg-card)] p-6"><ActivityFeed items={activity} /></div>
+        <div className="min-w-0 rounded-lg border border-[var(--ow-border)] bg-[var(--ow-bg-card)] p-6"><ActivityFeed items={activity} /></div>
       </div>
     </section>
   );

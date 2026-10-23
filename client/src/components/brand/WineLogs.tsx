@@ -14,8 +14,10 @@ function LogForm({ onAdd, pending }: { onAdd: (kind: LogKind, note: string, read
   const [kind, setKind] = useState<LogKind>("work");
   const [note, setNote] = useState("");
   const [readings, setReadings] = useState<Record<string, string>>({});
+  const empty = !note.trim() && !Object.values(readings).some((v) => v.trim());
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (empty) return;
     await onAdd(kind, note.trim(), readings);
     setNote("");
     setReadings({});
@@ -47,7 +49,7 @@ function LogForm({ onAdd, pending }: { onAdd: (kind: LogKind, note: string, read
       <Textarea rows={2} maxLength={2000} value={note} onChange={(e) => setNote(e.target.value)}
         placeholder={kind === "work" ? "e.g. Pumped over T3 twice, 20 min each. Cap temp 27°C." : "What happened?"}
         data-testid="log-note-input" />
-      <Button type="submit" size="sm" disabled={pending} data-testid="log-submit-button">
+      <Button type="submit" size="sm" disabled={pending || empty} data-testid="log-submit-button">
         {pending ? "Saving…" : "Add to the record"}
       </Button>
     </form>

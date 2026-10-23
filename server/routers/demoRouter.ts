@@ -277,10 +277,14 @@ export const demoRouter = router({
       if (remaining === null) throw new TRPCError({ code: "BAD_REQUEST", message: "Enter your email to start the demo." });
       if (remaining <= 0) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: `You've used your ${DEMO_ASK_LIMIT} free questions.` });
       if (!checkDemoIp(reqIpHash(ctx.req))) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Daily demo limit reached on this network. Try again tomorrow." });
-      await db.execute(sql`UPDATE demo_ask_usage SET asks = asks + 1, updated_at = ${Date.now()} WHERE email = ${input.email}`);
+      const [upd] = await db.execute(sql`
+        UPDATE demo_ask_usage SET asks = asks + 1, updated_at = ${Date.now()} WHERE email = ${input.email} AND asks < ${DEMO_ASK_LIMIT}`);
+      if (!(upd as unknown as { affectedRows: number }).affectedRows) {
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: `You've used your ${DEMO_ASK_LIMIT} free questions.` });
+      }
       try {
         const res = await tutorRouter.createCaller({ ...ctx, user: null }).ask({ question: input.question, mode: "winemaking" });
-        return { answer: res.answer, sopTitles: res.sopTitles ?? [], disclaimer: res.disclaimer ?? "", remaining: remaining - 1 };
+        return { answer: res.answer, sopTitles: res.sopTitles ?? [], disclaimer: res.disclaimer ?? "", remaining: (await remainingFor(input.email)) ?? 0 };
       } catch (e) {
         await db.execute(sql`UPDATE demo_ask_usage SET asks = GREATEST(asks - 1, 0) WHERE email = ${input.email}`);
         throw e;

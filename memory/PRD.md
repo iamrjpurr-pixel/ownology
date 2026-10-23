@@ -3,6 +3,17 @@
 ## Original problem statement
 > Import the existing project at https://github.com/iamrjpurr-pixel/ownology (originally built on Manus / ownology.ai) into Emergent and continue development.
 
+## Jun 2026 · Free demo tour + Brand Vault (contract-winemaker IP control) — SHIPPED (preview, needs Save to GitHub)
+
+**Asks**: (1) "did we build a free demo area for prospective new clients?" → Ask Owen (3 free Qs, email gate) + dashboard tour with a made-up winery. (2) "Client hires a contract winemaker but wants to control his IP for his wines… open a portal for him to create his own data. Client has done the oenology degree."
+
+- **/demo/tour** (public, sitemap): sample brand Saltbush Hill Wines — owner Kate Morrow (B.Oenology) / contractor Dan Reyes. Role toggle, morning tank snapshot, Brand Vault spec + cellar record (local-only), owner controls (contractors + activity) vs contractor locked view, Ask Owen panel (`demo.askOwenStart` / `demo.askOwen`, 3 Qs per email, atomic counter, 12/day/IP, lead saved as `leads.source="demo-tour"`). CTAs: nav "Demo", HeroCarousel last scene, HeroPillarsSection, classic hero, /pricing link, /curriculum/about button.
+- **/brand Brand Vault** (gated, `server/routers/brandPortal.ts`): owner writes technical wine specs (blend %, targets incl. VA, regime: yeast/ferment temp/MLF/oak/additions/finishing/bottling, protocol, tasting intent); invites contractor by email (Resend invite → /login?next=/brand); contractor views read-only (copy/context-menu disabled, confidentiality banner), logs work/readings/notes; owner-only: edit/archive/export JSON/members/revoke/activity. Instant revoke. One login switches brands. Activity log dedupes contractor views (10 min) and records blocked attempts. Link in UserMenu.
+- New tables (bootstrap CREATE IF NOT EXISTS): brand_members, brand_wines, brand_wine_logs, brand_activity, demo_ask_usage.
+- Test users script: `scripts/e1-test-users.ts seed|clean` (see test_credentials.md). Testing agent iteration_41: backend 16/16; all frontend issues fixed after.
+
+**Backlog from this work**: watermark owner name on printed specs; contractor "propose change" → owner approve; PDF export of a wine spec for the owner; per-wine contractor scoping.
+
 ## Jul 2026 (18 Jul) · Curriculum spine strategy locked — SCOUTING SHIPPED, EXECUTION QUEUED
 
 **Session outcome**: A + A.5 + A.6 scouting phases COMPLETE. 27 university units scouted (10 CSU + 12 Adelaide + 4 Lincoln + 1 Otago), 145 learning outcomes, 301 key concepts, 100 prescribed-text mappings, 192 owned-asset bridges. Benchmarked to CSU 4410WS01 confirming 100% wine-specific curriculum coverage. Data at `/app/references/education/scouting-pass-2026-07-17-v2.json`.

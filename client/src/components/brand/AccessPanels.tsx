@@ -74,10 +74,10 @@ export function ActivityFeed({ items }: { items: Activity[] }) {
         {items.map((a) => {
           const Icon = ACTION_ICON[a.action] ?? (a.action.startsWith("logged") ? PenLine : ShieldCheck);
           return (
-            <li key={a.id} className="flex items-start gap-3 text-sm" data-testid={`activity-${a.id}`}>
+            <li key={a.id} className="flex min-w-0 items-start gap-3 break-words text-sm" data-testid={`activity-${a.id}`}>
               <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${a.action === "blocked" ? "text-red-600" : "text-[var(--ow-amber)]"}`} />
-              <div>
-                <span className="text-[var(--ow-text-hi)]">{a.actorEmail}</span>
+              <div className="min-w-0">
+                <span className="break-all text-[var(--ow-text-hi)]">{a.actorEmail}</span>
                 <span className="text-[var(--ow-text-lo)]"> ({a.actorRole}) </span>
                 <span className="text-[var(--ow-text-mid)]">{a.action} {a.target}</span>
                 <div className="text-xs text-[var(--ow-text-lo)]">{fmtDate(a.createdAt)}</div>

@@ -1,0 +1,45 @@
+{
+  "summary": "Tested the Brand Vault (brandPortal tRPC) backend with 16 pytest cases, all passing. Tested the /demo/tour public demo, Ask Owen, the 'Try the demo' links, and /brand as owner and as contractor in the browser on the public preview URL. Owner, contractor and outsider permissions, invite/revoke (including case-insensitive email), activity log, export, archive and the Ask Owen 3-question limit all work. Problems found: (1) the homepage hero has no demo link, because hero-pillars-cta-demo sits in HeroPillarsSection, which the homepage (HeroCarousel) no longer renders. (2) /demo/tour at 390px: the 'Kate's controls' cards run past the screen edge and get cut off. (3) The demo log form adds an empty entry when submitted with nothing in it. Plus some minor code-review items.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "brandPortal.getWine", "issue": "Every contractor getWine call adds a 'viewed' activity row, including React Query refetches on window focus or remount. One test session produced 2 'viewed' rows for the same wine within seconds. Suggest de-duplicating per user and wine (e.g. one row per 10 minutes)."},
+      {"endpoint": "brandPortal.invite", "issue": "Re-inviting a contractor who was revoked and had accepted before shows status 'active' straight away, because accepted_at is never cleared. Probably fine, but the owner sees 'active' rather than 'invited'."},
+      {"endpoint": "brandPortal.invite (email HTML)", "issue": "brandName and inviterEmail go into the invite email HTML without escaping. A winery name containing '<' could inject markup. Escape them."},
+      {"endpoint": "demo.askOwen", "issue": "The remaining-questions check and the asks+1 increment are separate steps (not atomic). Parallel requests can go past the 3-question limit. Fix with a conditional update: UPDATE ... SET asks=asks+1 WHERE email=? AND asks<3, then check affectedRows."},
+      {"endpoint": "brandPortal.saveWine vs WineEditorDialog", "issue": "Backend allows 300 characters for regime yeast/fermentTemp/mlf/oak, but the UI inputs allow 600 (maxLength=600). Text over 300 characters gets a raw zod error toast."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Homepage hero", "issue": "No 'Try the demo' link in the homepage hero. data-testid=hero-pillars-cta-demo is in HeroPillarsSection, but Home's main render (line ~2090) uses <HeroCarousel/>, so it never shows (not found on '/' or '/?ui=v1', even after 'Skip intro'). Add a demo link to HeroCarousel's CTA group (next to hero-carousel-cta-curious / hero-carousel-cta-pro, around line 349). The nav 'Demo' link does work.", "selector": "[data-testid='hero-pillars-cta-demo']", "priority": "MEDIUM"},
+      {"component": "DemoTour OwnerControls (mobile 390px)", "issue": "The contractors and activity cards run to about 520px wide. documentElement.scrollWidth stays 390 because the overflow is clipped, so the right side is simply cut off: 'Remove access' buttons and status badges for the long email 'cellarhand@riverbendcrush.example', and the end of activity lines. Cause: the grid items in 'grid gap-6 lg:grid-cols-2' (DemoTour.tsx ~line 124) default to min-width:auto, so the email's 'truncate' never applies. Fix: add 'min-w-0' to both card divs (and optionally to the email column in ContractorsPanel; it already has min-w-0).", "selector": "[data-testid='demo-owner-controls']", "priority": "MEDIUM"},
+      {"component": "DemoTour VaultDemo log form", "issue": "Submitting the demo log form empty adds a blank entry (log count went 2→3). The real /brand backend rejects this ('Add a note or at least one reading.'). Make the demo onAdd do the same check.", "selector": "[data-testid='log-submit-button']", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/demo/tour tank snapshot", "issues": ["The barrel group's testid is 'demo-tank-B1–12' (contains an en dash), which is awkward for selectors. Consider slugifying it, e.g. demo-tank-B1-12."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_brand_vault.py", "/app/test_reports/pytest/pytest_brand_vault.xml"],
+  "action_items": [
+    "Add a 'Try the demo' link (/demo/tour?from=home-hero) to HeroCarousel, which is what the homepage actually renders. The existing hero-pillars-cta-demo is in a component that is not rendered.",
+    "DemoTour.tsx OwnerControls: add min-w-0 to the two grid children so the cards don't overflow and get cut off at 390px.",
+    "Demo VaultDemo onAdd: ignore submissions with no note and no readings.",
+    "Optional: make the demo askOwen increment atomic; escape HTML in the invite email; match the regime maxLength between UI (600) and zod (300); de-duplicate contractor 'viewed' activity rows; wrap onArchive/onRevoke/onExport in BrandPortal.tsx in try/catch with toast.error (they currently have no error handling)."
+  ],
+  "critical_code_review_comments": [
+    "BrandPortal.tsx onExport, onArchive and onRevoke (in useOwnerPanels) have no try/catch. A failed mutation becomes an unhandled promise rejection and the user gets no feedback.",
+    "The confidential 'copying switched off' promise relies only on CSS user-select:none on the article. A contractor can still read the full spec from the getWine network response, print, or screenshot. Fine as a deterrent, but the banner copy promises more than this.",
+    "demoIpLog (the per-IP daily limit) is held in memory. It resets on every redeploy and isn't shared across instances.",
+    "resolveRole treats any user whose wineryId equals the brand as owner, so every staff user in that winery gets owner-level vault powers. Confirm this is intended."
+  ],
+  "updated_files": ["/app/backend/tests/test_brand_vault.py"],
+  "success_rate": {"backend": "100% (16/16)", "frontend": "~90% (all core flows pass; homepage hero demo link missing; mobile demo controls cut off)"},
+  "test_credentials": "Used /app/memory/test_credentials.md 'Brand Vault test users'. Ran scripts/e1-test-users.ts seed. Owner wineryId=15982, contractor's own winery 15983, outsider 15984.",
+  "seed_data_creation": "Owner brand 15982: wine 'TEST_Pytest Grenache v2' (archived), wine 'TEST_UI Mataro Reserve' (active) with owner and contractor logs, activity rows. Ask Owen email e1-test-t1ask95498@example.com used all 3 questions (one in the UI, two via curl), and the 4th returned TOO_MANY_REQUESTS. The contractor membership ends REVOKED. 2 invite emails sent. Clean script NOT run, per instructions.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run test_brand_vault.py with env OWNER_JWT/CONTRACTOR_JWT/OUTSIDER_JWT/OWNER_WINERY from the seed script plus REACT_APP_BACKEND_URL. The tests expect the contractor membership to exist (revoked or active); the first lifecycle test re-invites it. Use wait_until='domcontentloaded'. Keep LLM calls low: this run used 3 askOwen LLM calls in total.",
+  "rca of the issue": "Homepage demo link: Home.tsx renders <HeroCarousel/> as the primary hero (around line 2090). The demo CTA was added to HeroPillarsSection, which is only used by the old Hero component that is no longer mounted. Mobile cut-off: CSS grid items default to min-width:auto, so the long, non-wrapping email in the truncate span sets the card's minimum width (about 520px) beyond the 342px column, and the overflow is clipped by a hidden overflow-x further up the page."
+}
