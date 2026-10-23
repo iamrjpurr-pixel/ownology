@@ -55,6 +55,7 @@ const PUBLIC_EXACT = new Set<string>([
   "/free-run",
   "/waitlist",
   "/demo",
+  "/demo/tour",
   "/join",
   "/invite",
   "/login",

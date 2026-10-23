@@ -310,6 +310,14 @@ export function HeroPillarsSection() {
           Start 14-Day Free Trial
         </a>
         <Link
+          href="/demo/tour?from=hero-pillars"
+          className="btn-ghost text-center flex items-center justify-center gap-2"
+          data-testid="hero-pillars-cta-demo"
+          style={{ borderColor: "var(--ow-amber)", color: "var(--ow-amber)", fontWeight: 600 }}
+        >
+          Try the free demo
+        </Link>
+        <Link
           href="/try?from=hero-pillars"
           className="btn-ghost text-center flex items-center justify-center gap-2"
           data-testid="hero-pillars-cta-try"

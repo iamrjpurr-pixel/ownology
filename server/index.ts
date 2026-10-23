@@ -838,6 +838,7 @@ async function startServer() {
     "/apco",
     "/waitlist",
     "/demo",
+    "/demo/tour",
     "/join",
     "/invite",
     "/login",
@@ -1898,6 +1899,41 @@ async function startServer() {
       `);
     } catch (e) {
       console.warn("[bootstrap] demo_submissions table create skipped:", (e as Error).message);
+    }
+
+    // ── Brand Vault + demo Ask Owen usage (Jun 2026) ────────────────
+    const brandVaultDdl = [
+      sql`CREATE TABLE IF NOT EXISTS brand_members (
+        id INT AUTO_INCREMENT PRIMARY KEY, winery_id INT NOT NULL, email VARCHAR(200) NOT NULL,
+        user_id INT NULL, role VARCHAR(32) NOT NULL DEFAULT 'contractor', invited_by_user_id INT NULL,
+        invited_at BIGINT NOT NULL, accepted_at BIGINT NULL, revoked_at BIGINT NULL,
+        INDEX bm_winery_idx (winery_id), INDEX bm_email_idx (email), INDEX bm_user_idx (user_id))`,
+      sql`CREATE TABLE IF NOT EXISTS brand_wines (
+        id INT AUTO_INCREMENT PRIMARY KEY, winery_id INT NOT NULL, name VARCHAR(160) NOT NULL, vintage INT NULL,
+        style VARCHAR(160) NOT NULL DEFAULT '', blend_json TEXT, targets_json TEXT, regime_json TEXT,
+        protocol TEXT, tasting_notes TEXT, created_by_user_id INT NULL,
+        created_at BIGINT NOT NULL, updated_at BIGINT NOT NULL, archived_at BIGINT NULL,
+        INDEX bw_winery_idx (winery_id))`,
+      sql`CREATE TABLE IF NOT EXISTS brand_wine_logs (
+        id INT AUTO_INCREMENT PRIMARY KEY, winery_id INT NOT NULL, wine_id INT NOT NULL, author_user_id INT NULL,
+        author_email VARCHAR(200) NOT NULL, author_role VARCHAR(32) NOT NULL, kind VARCHAR(32) NOT NULL,
+        note TEXT, readings_json TEXT, created_at BIGINT NOT NULL,
+        INDEX bwl_wine_idx (winery_id, wine_id))`,
+      sql`CREATE TABLE IF NOT EXISTS brand_activity (
+        id INT AUTO_INCREMENT PRIMARY KEY, winery_id INT NOT NULL, actor_user_id INT NULL,
+        actor_email VARCHAR(200) NOT NULL, actor_role VARCHAR(32) NOT NULL, action VARCHAR(64) NOT NULL,
+        target VARCHAR(300) NOT NULL DEFAULT '', created_at BIGINT NOT NULL,
+        INDEX ba_winery_idx (winery_id, created_at))`,
+      sql`CREATE TABLE IF NOT EXISTS demo_ask_usage (
+        email VARCHAR(200) NOT NULL PRIMARY KEY, asks INT NOT NULL DEFAULT 0, ip_hash VARCHAR(64),
+        created_at BIGINT NOT NULL, updated_at BIGINT NOT NULL)`,
+    ];
+    for (const ddl of brandVaultDdl) {
+      try {
+        await db.execute(ddl);
+      } catch (e) {
+        console.warn("[bootstrap] brand vault table create skipped:", (e as Error).message);
+      }
     }
 
     // ── Naked Angel SMS opener variant (Feb 2026) ────────────────────

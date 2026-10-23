@@ -252,6 +252,13 @@ export default function UserMenu() {
             </span>
           </div>
 
+          <a
+            href="/brand"
+            data-testid="user-menu-brand-vault"
+            style={{ display: "block", marginBottom: 8, fontSize: "0.8rem", fontWeight: 600, color: "var(--ow-amber)", textDecoration: "none" }}
+          >
+            Brand Vault →
+          </a>
           <button
             type="button"
             data-testid="user-menu-logout"

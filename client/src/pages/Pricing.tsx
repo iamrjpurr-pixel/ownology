@@ -1409,6 +1409,11 @@ export default function Pricing() {
           >
             Start with free run juice — unforced, natural, no commitment. When you&apos;re ready to deep dive, step into The Press. Every tier is designed around the winemaker&apos;s rhythm.
           </p>
+          <p className="-mt-6 mb-8" style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.95rem" }}>
+            <a href="/demo/tour?from=pricing" data-testid="pricing-demo-link" style={{ color: "var(--ow-amber)", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3 }}>
+              Not sure yet? Try the free demo first →
+            </a>
+          </p>
           <BillingToggle cycle={cycle} onChange={setCycle} />
           {/* EOFY urgency caption — replaces the standalone EOFY banner
               (Feb 2026 HF pass). The old banner duplicated the toggle chip

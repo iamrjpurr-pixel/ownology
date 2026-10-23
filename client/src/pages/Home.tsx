@@ -151,6 +151,7 @@ type NavItem = { label: string; href: string; external?: boolean };
 // ownology.ai lands on ONE clear next step, not five parallel doors.
 const PRIMARY_NAV: NavItem[] = [
   { label: "Ask Owen",         href: "/ask" },
+  { label: "Demo",             href: "/demo/tour" },
   { label: "Curriculum",       href: "/curriculum/about" },
   { label: "Founding Members", href: "/join" },
   { label: "Pricing",          href: "/pricing" },
@@ -606,6 +607,7 @@ function Hero() {
             <EditableText contentKey="home.hero.subheading" defaultValue="Log cellar readings. Access 38 industry SOPs across 12 categories. Quality panels, vintage-log reasoning and asset trail on one thread — so productivity and profit compound year on year. Built by boutique winemakers, for boutique wineries between 5 and 50 tonnes." as="p" className="mt-6 fade-up fade-up-delay-2" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", lineHeight:1.7, color:"var(--ow-text-mid)", maxWidth:"480px"}} multiline contentMap={contentMap} />
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-10 fade-up fade-up-delay-3">
               <a href="/pricing?from=homepage-hero" className="btn-amber text-center">Start 14-Day Free Trial</a>
+              <Link href="/demo/tour?from=homepage-hero" data-testid="hero-demo-cta" className="btn-ghost text-center">Try the free demo</Link>
               <Link
                 href="/cellar-brief?from=homepage-hero"
                 data-testid="hero-cellar-brief-cta"

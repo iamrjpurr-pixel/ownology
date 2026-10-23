@@ -36,6 +36,11 @@ export default function CurriculumAbout() {
                 Vigneron membership
               </Button>
             </Link>
+            <Link href="/demo/tour?from=curriculum-about">
+              <Button variant="ghost" size="lg" data-testid="cta-demo">
+                Try the free demo
+              </Button>
+            </Link>
           </div>
 
           {/* Trust strip */}

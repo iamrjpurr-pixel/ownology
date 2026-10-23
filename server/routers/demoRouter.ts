@@ -26,7 +26,9 @@ import { z } from "zod";
 import { randomUUID, createHash } from "crypto";
 import { eq, sql } from "drizzle-orm";
 import { router, publicProcedure } from "../trpc.js";
-import { db } from "../db.js";
+import { TRPCError } from "@trpc/server";
+import { db, addLead } from "../db.js";
+import { tutorRouter } from "./tutor.js";
 import { chatCompletion, MODELS } from "../_core/llm.js";
 import * as schema from "../../drizzle/schema.js";
 
@@ -91,6 +93,27 @@ function safeParse(raw: string): Partial<AnalysisResponse> {
   } catch {
     return {};
   }
+}
+
+const DEMO_ASK_LIMIT = 3;
+const DEMO_IP_DAILY_MAX = 12;
+const demoIpLog = new Map<string, number[]>();
+function reqIpHash(req: { headers: Record<string, unknown>; socket?: { remoteAddress?: string | null } | null }): string {
+  const xff = req.headers?.["x-forwarded-for"];
+  return hashIp(typeof xff === "string" && xff ? xff.split(",")[0]!.trim() : req.socket?.remoteAddress);
+}
+function checkDemoIp(ipHash: string): boolean {
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+  const hits = (demoIpLog.get(ipHash) ?? []).filter((t) => t > cutoff);
+  if (hits.length >= DEMO_IP_DAILY_MAX) return false;
+  hits.push(Date.now());
+  demoIpLog.set(ipHash, hits);
+  return true;
+}
+async function remainingFor(email: string): Promise<number | null> {
+  const [res] = await db.execute(sql`SELECT asks FROM demo_ask_usage WHERE email = ${email} LIMIT 1`);
+  const row = (res as unknown as { asks: number }[])[0];
+  return row ? Math.max(0, DEMO_ASK_LIMIT - Number(row.asks)) : null;
 }
 
 export const demoRouter = router({
@@ -224,6 +247,44 @@ export const demoRouter = router({
         .set({ email: input.email.trim().slice(0, 200) })
         .where(eq(schema.demoSubmissions.sessionId, input.sessionId));
       return { ok: true };
+    }),
+
+  /**
+   * askOwenStart / askOwen — /demo/tour "Ask Owen" panel. Email-gated,
+   * DEMO_ASK_LIMIT questions per email, plus a per-IP daily ceiling. Each
+   * email lands in the leads CRM with source "demo-tour".
+   */
+  askOwenStart: publicProcedure
+    .input(z.object({ email: z.string().trim().toLowerCase().email().max(200) }))
+    .mutation(async ({ input, ctx }) => {
+      const now = Date.now();
+      await db.execute(sql`
+        INSERT INTO demo_ask_usage (email, asks, ip_hash, created_at, updated_at)
+        VALUES (${input.email}, 0, ${reqIpHash(ctx.req)}, ${now}, ${now})
+        ON DUPLICATE KEY UPDATE updated_at = ${now}`);
+      await addLead({ email: input.email, source: "demo-tour", tags: ["demo", "ask-owen"] }).catch((e) =>
+        console.warn("[demo] lead capture failed:", (e as Error).message));
+      return { remaining: await remainingFor(input.email) };
+    }),
+
+  askOwen: publicProcedure
+    .input(z.object({
+      email: z.string().trim().toLowerCase().email().max(200),
+      question: z.string().trim().min(3).max(600),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const remaining = await remainingFor(input.email);
+      if (remaining === null) throw new TRPCError({ code: "BAD_REQUEST", message: "Enter your email to start the demo." });
+      if (remaining <= 0) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: `You've used your ${DEMO_ASK_LIMIT} free questions.` });
+      if (!checkDemoIp(reqIpHash(ctx.req))) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Daily demo limit reached on this network. Try again tomorrow." });
+      await db.execute(sql`UPDATE demo_ask_usage SET asks = asks + 1, updated_at = ${Date.now()} WHERE email = ${input.email}`);
+      try {
+        const res = await tutorRouter.createCaller({ ...ctx, user: null }).ask({ question: input.question, mode: "winemaking" });
+        return { answer: res.answer, sopTitles: res.sopTitles ?? [], disclaimer: res.disclaimer ?? "", remaining: remaining - 1 };
+      } catch (e) {
+        await db.execute(sql`UPDATE demo_ask_usage SET asks = GREATEST(asks - 1, 0) WHERE email = ${input.email}`);
+        throw e;
+      }
     }),
 
   /**

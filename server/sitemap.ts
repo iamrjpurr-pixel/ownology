@@ -45,6 +45,7 @@ const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }
   { path: "/join",                 priority: "0.95", changefreq: "weekly" },
   { path: "/founding-partners",    priority: "0.9", changefreq: "weekly" },
   { path: "/demo",                 priority: "0.8", changefreq: "weekly" },
+  { path: "/demo/tour",            priority: "0.85", changefreq: "weekly" },
   { path: "/waitlist",             priority: "0.7", changefreq: "monthly" },
   { path: "/risk-management",      priority: "0.8", changefreq: "monthly" },
   { path: "/why-ownology",         priority: "0.7", changefreq: "monthly" },

@@ -92,6 +92,8 @@ const OurStory = lazy(() => import("./pages/OurStory"));
 const PricingComparison = lazy(() => import("./pages/PricingComparison"));
 const Learn = lazy(() => import("./pages/Learn"));
 const Demo = lazy(() => import("./pages/Demo"));
+const DemoTour = lazy(() => import("./pages/DemoTour"));
+const BrandPortal = lazy(() => import("./pages/BrandPortal"));
 const Waitlist = lazy(() => import("./pages/Waitlist"));
 const VineReference = lazy(() => import("./pages/VineReference"));
 const Resume = lazy(() => import("./pages/Resume"));
@@ -438,7 +440,9 @@ function Router() {
       <Route path={"/cellar-brief"} component={CellarBriefPage} />
       <Route path={"/trial-ending"} component={TrialEndingPage} />
       <Route path={"/invite"} component={InvitePage} />
+      <Route path={"/demo/tour"} component={DemoTour} />
       <Route path={"/demo"} component={Demo} />
+      <Route path={"/brand"} component={BrandPortal} />
       <Route path={"/waitlist"} component={Waitlist} />
       <Route path={"/reference/vine"} component={VineReference} />
       <Route path={"/resume"} component={Resume} />

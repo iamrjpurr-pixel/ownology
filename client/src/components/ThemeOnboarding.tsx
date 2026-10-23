@@ -37,6 +37,7 @@ const STORAGE_DISMISSED = "ownology-theme-onboarded";
 // added later should be appended here.
 const SUPPRESSED_PREFIXES = [
   "/admin",
+  "/brand",
   "/hi/",
   "/founding-member/success",
   "/merch/success",
