@@ -1720,6 +1720,20 @@ async function startServer() {
         // Column already exists — best-effort.
       }
     }
+    // outreach_contacts.email — real column (Jun 2026); backfill from legacy "Email: x" notes.
+    try {
+      await db.execute(sql.raw("ALTER TABLE outreach_contacts ADD COLUMN email VARCHAR(200) NULL"));
+    } catch {
+      // Column already exists.
+    }
+    try {
+      await db.execute(sql.raw(
+        "UPDATE outreach_contacts SET email = LOWER(REGEXP_SUBSTR(SUBSTRING(notes, LOCATE('email:', LOWER(notes)) + 6), '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+[.][A-Za-z]{2,}')) " +
+        "WHERE (email IS NULL OR email = '') AND LOWER(notes) LIKE '%email:%@%'"
+      ));
+    } catch (e) {
+      console.warn("[bootstrap] outreach_contacts.email backfill skipped:", (e as Error).message);
+    }
 
     // Create cellar_briefs table (Feb 2026, Cellar Brief feature).
     // Idempotent CREATE TABLE IF NOT EXISTS. Drizzle ORM only handles schema

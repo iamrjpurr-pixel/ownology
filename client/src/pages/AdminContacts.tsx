@@ -89,6 +89,11 @@ function extractChannels(notes: string | null | undefined): {
   };
 }
 
+function channelsFor(c: { notes?: string | null; email?: string | null }) {
+  const ch = extractChannels(c.notes);
+  return { ...ch, email: c.email || ch.email };
+}
+
 function smsDraft(c: { firstName: string; winery?: string | null; event?: string | null; painPoint?: string | null; hookText?: string | null; slug: string; opener?: string | null }): string {
   // ── Trinity-first opener (Jul 2026, Rich) ──────────────────────────
   // Server-rendered variant from sms_opener_variants wins if present.
@@ -344,6 +349,7 @@ export default function AdminContacts() {
     firstName: "",
     lastName: "",
     mobileAu: "",
+    email: "",
     winery: "",
     event: "",
     painPoint: "",
@@ -551,7 +557,7 @@ export default function AdminContacts() {
     }
     try {
       const result = await createMutation.mutateAsync(form);
-      setForm({ firstName: "", lastName: "", mobileAu: "", winery: "", event: form.event, painPoint: "", calendlyOverride: form.calendlyOverride, notes: "", persona: "winemaker", hookTier: null, hookText: null, hookSourceUrl: null });
+      setForm({ firstName: "", lastName: "", mobileAu: "", email: "", winery: "", event: form.event, painPoint: "", calendlyOverride: form.calendlyOverride, notes: "", persona: "winemaker", hookTier: null, hookText: null, hookSourceUrl: null });
       // Clear the OCR card after a successful Add so the operator has a
       // clean surface for the next business card.
       setOcrCardResult(null);
@@ -609,8 +615,9 @@ export default function AdminContacts() {
           firstName: prev.firstName || result.fields!.firstName || "",
           lastName: prev.lastName || result.fields!.lastName || "",
           mobileAu: prev.mobileAu || result.fields!.mobileAu || "",
+          email: prev.email || result.fields!.email || "",
           winery: prev.winery || result.fields!.winery || "",
-          notes: prev.notes || [result.fields!.email, result.fields!.notes].filter(Boolean).join(" · "),
+          notes: prev.notes || result.fields!.notes || "",
           persona: prev.persona === "winemaker" && result.fields!.persona !== "winemaker"
             ? result.fields!.persona
             : prev.persona,
@@ -673,7 +680,6 @@ export default function AdminContacts() {
       const d = result.draft as Record<string, unknown>;
       // Merge extras that don't map to form fields into notes.
       const extras: string[] = [];
-      if (typeof d.email === "string" && d.email) extras.push(`Email: ${d.email}`);
       if (typeof d.instagram === "string" && d.instagram) extras.push(`IG: @${d.instagram}`);
       if (typeof d.instagramPersonal === "string" && d.instagramPersonal) extras.push(`IG-personal: @${d.instagramPersonal}`);
       if (typeof d.linkedin === "string" && d.linkedin) extras.push(`LinkedIn: ${d.linkedin}`);
@@ -688,6 +694,7 @@ export default function AdminContacts() {
         firstName: typeof d.firstName === "string" ? d.firstName : "",
         lastName: typeof d.lastName === "string" ? d.lastName : "",
         mobileAu: typeof d.mobileAu === "string" ? d.mobileAu : "",
+        email: typeof d.email === "string" ? d.email : "",
         winery: typeof d.winery === "string" ? d.winery : "",
         event: form.event,
         painPoint: typeof d.painPoint === "string" ? d.painPoint : "",
@@ -747,7 +754,6 @@ export default function AdminContacts() {
       const d = result.draft as Record<string, unknown>;
       // Extras that don't map to form fields go into notes so nothing is lost.
       const extras: string[] = [];
-      if (typeof d.email === "string" && d.email) extras.push(`Email: ${d.email}`);
       if (typeof d.instagram === "string" && d.instagram) extras.push(`IG: @${d.instagram}`);
       if (typeof d.website === "string" && d.website) extras.push(`Web: ${d.website}`);
       const notesBase = typeof d.notes === "string" ? d.notes : "";
@@ -757,6 +763,7 @@ export default function AdminContacts() {
         firstName: typeof d.firstName === "string" ? d.firstName : "",
         lastName: typeof d.lastName === "string" ? d.lastName : "",
         mobileAu: typeof d.mobileAu === "string" ? d.mobileAu : "",
+        email: typeof d.email === "string" ? d.email : "",
         winery: typeof d.winery === "string" ? d.winery : "",
         event: typeof d.event === "string" ? d.event : form.event,
         painPoint: typeof d.painPoint === "string" ? d.painPoint : "",
@@ -820,12 +827,12 @@ export default function AdminContacts() {
       firstName: p.firstName,
       lastName: p.lastName ?? "",
       mobileAu: p.mobileAu ?? "",
+      email: p.email ?? "",
       winery: form.winery,
       event: form.event,
       painPoint: "",
       calendlyOverride: form.calendlyOverride,
       notes: [
-        p.email ? `Email: ${p.email}` : null,
         p.role ? `Role: ${p.role}` : null,
         otherPeopleSourceUrl ? `Source: ${otherPeopleSourceUrl}` : null,
       ].filter(Boolean).join(" · "),
@@ -1490,6 +1497,7 @@ export default function AdminContacts() {
           <Field label="First name *" testid="form-firstName" value={form.firstName} onChange={(v) => setForm({ ...form, firstName: v })} />
           <Field label="Last name" testid="form-lastName" value={form.lastName} onChange={(v) => setForm({ ...form, lastName: v })} />
           <Field label="Mobile (AU)" placeholder="0412 345 678" testid="form-mobile" value={form.mobileAu} onChange={(v) => setForm({ ...form, mobileAu: v })} />
+          <Field label="Email" placeholder="rod@patinawines.com.au" testid="form-email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
           <Field label="Winery" testid="form-winery" value={form.winery} onChange={(v) => setForm({ ...form, winery: v })} />
           <Field label="Event" placeholder="McLaren Vale 2025 · Pluto Wine Bar takeover · Perplexity research" testid="form-event" value={form.event} onChange={(v) => setForm({ ...form, event: v })} />
           <Field label="Calendly URL (optional override)" testid="form-calendly" value={form.calendlyOverride} onChange={(v) => setForm({ ...form, calendlyOverride: v })} />
@@ -2100,7 +2108,7 @@ export default function AdminContacts() {
                       </button>
                     )}
                     {(() => {
-                      const ch = extractChannels(c.notes);
+                      const ch = channelsFor(c);
                       const chipStyle: React.CSSProperties = {
                         display: "inline-flex",
                         alignItems: "center",
@@ -2157,17 +2165,7 @@ export default function AdminContacts() {
                               💼 LinkedIn
                             </a>
                           )}
-                          {ch.email && (
-                            <button
-                              type="button"
-                              data-testid={`email-chip-${c.slug}`}
-                              onClick={() => copy(c.slug, "url", ch.email!)}
-                              style={{ ...chipStyle, border: "1px solid var(--ow-border)" }}
-                              title="Tap to copy email"
-                            >
-                              ✉ {ch.email}
-                            </button>
-                          )}
+                          <EmailChip slug={c.slug} email={ch.email} chipStyle={chipStyle} onCopy={(v) => copy(c.slug, "url", v)} onSaved={() => utils.outreach.list.invalidate()} />
                           {ch.website && (
                             <a
                               href={ch.website.startsWith("http") ? ch.website : `https://${ch.website}`}
@@ -2756,7 +2754,7 @@ export default function AdminContacts() {
                       Gmail/Apple Mail/Outlook — signature, tracking,
                       threading all stay client-side). */}
                   {(() => {
-                    const ch = extractChannels(c.notes);
+                    const ch = channelsFor(c);
                     if (!ch.email) return null;
                     const { subject, body } = emailDraft({
                       firstName: c.firstName,
@@ -3013,6 +3011,58 @@ function NextBestActionPill({ slug }: { slug: string }) {
         )}
       </div>
     </div>
+  );
+}
+
+function EmailChip({ slug, email, chipStyle, onCopy, onSaved }: {
+  slug: string;
+  email: string | null;
+  chipStyle: React.CSSProperties;
+  onCopy: (v: string) => void;
+  onSaved: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [buf, setBuf] = useState("");
+  const setEmail = trpc.outreach.setEmail.useMutation();
+  const small: React.CSSProperties = { padding: "3px 10px", borderRadius: 4, fontFamily: "'Lato',sans-serif", fontSize: "0.74rem", cursor: "pointer" };
+  if (editing) {
+    return (
+      <span data-testid={`email-editor-${slug}`} style={{ display: "inline-flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+        <input
+          data-testid={`email-input-${slug}`}
+          autoFocus
+          type="email"
+          value={buf}
+          onChange={(e) => setBuf(e.target.value)}
+          placeholder="name@winery.com.au"
+          style={{ padding: "3px 8px", borderRadius: 4, border: "1px solid var(--ow-border)", background: "var(--ow-bg-card)", color: "var(--ow-text-hi)", fontSize: "0.84rem", minWidth: 200 }}
+        />
+        <button
+          type="button"
+          data-testid={`email-save-${slug}`}
+          disabled={setEmail.isPending}
+          onClick={() => setEmail.mutate({ slug, email: buf.trim() }, { onSuccess: () => { setEditing(false); onSaved(); } })}
+          style={{ ...small, border: "1px solid var(--ow-amber)", background: "var(--ow-amber)", color: "#111", fontWeight: 600 }}
+        >
+          {setEmail.isPending ? "Saving…" : "Save"}
+        </button>
+        <button type="button" data-testid={`email-cancel-${slug}`} onClick={() => setEditing(false)} style={{ ...small, border: "1px solid var(--ow-border)", background: "transparent", color: "var(--ow-text-mid)" }}>
+          Cancel
+        </button>
+        {setEmail.error && <span data-testid={`email-error-${slug}`} style={{ color: "#dc2626", fontSize: "0.74rem" }}>Enter a valid email</span>}
+      </span>
+    );
+  }
+  const open = () => { setBuf(email ?? ""); setEditing(true); };
+  return email ? (
+    <span style={{ display: "inline-flex", gap: 4 }}>
+      <button type="button" data-testid={`email-chip-${slug}`} onClick={() => onCopy(email)} style={chipStyle} title="Tap to copy email">✉ {email}</button>
+      <button type="button" data-testid={`edit-email-btn-${slug}`} onClick={open} title="Edit email" style={{ ...chipStyle, border: "1px dashed var(--ow-border)", color: "var(--ow-text-lo)" }}>✏️</button>
+    </span>
+  ) : (
+    <button type="button" data-testid={`email-missing-${slug}`} onClick={open} title="Click to add an email" style={{ ...chipStyle, border: "1px dashed var(--ow-border)", color: "var(--ow-text-lo)", fontStyle: "italic" }}>
+      + add email
+    </button>
   );
 }
 

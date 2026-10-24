@@ -1415,6 +1415,7 @@ export const outreachContacts = mysqlTable(
     firstName: varchar("first_name", { length: 80 }).notNull(),
     lastName: varchar("last_name", { length: 80 }),
     mobileAu: varchar("mobile_au", { length: 20 }), // +61 4XX XXX XXX
+    email: varchar("email", { length: 200 }),
     winery: varchar("winery", { length: 120 }),
     event: varchar("event", { length: 120 }), // e.g. "McLaren Vale 2025"
     painPoint: varchar("pain_point", { length: 300 }), // what they complained about

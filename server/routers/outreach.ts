@@ -380,7 +380,7 @@ export const outreachRouter = router({
       const hasAuMobile = AU_MOBILE_RE.test(mobile);
       const notes = c.notes ?? "";
       const notesLower = notes.toLowerCase();
-      const hasEmail = /email:\s*\S+@\S+/i.test(notes);
+      const hasEmail = !!c.email || /email:\s*\S+@\S+/i.test(notes);
       const hasIgPersonal = /ig-personal:\s*@/i.test(notesLower);
       const hasLinkedin = /linkedin(?:\.com)?:?\s*\S+/i.test(notesLower);
 
@@ -842,6 +842,7 @@ Return JSON: { "sms": "..." }. ONLY JSON. No prose. No fences.`;
         firstName: z.string().min(1).max(80),
         lastName: z.string().max(80).optional(),
         mobileAu: z.string().max(20).optional(),
+        email: z.string().trim().toLowerCase().email().max(200).optional().or(z.literal("")),
         winery: z.string().max(120).optional(),
         event: z.string().max(120).optional(),
         painPoint: z.string().max(300).optional(),
@@ -868,6 +869,7 @@ Return JSON: { "sms": "..." }. ONLY JSON. No prose. No fences.`;
           firstName: input.firstName.trim(),
           lastName: input.lastName?.trim() || null,
           mobileAu: mobile,
+          email: input.email || null,
           winery: input.winery?.trim() || null,
           event: input.event?.trim() || null,
           painPoint: input.painPoint?.trim() || null,
@@ -1662,6 +1664,7 @@ Return ONLY valid JSON. No markdown. If no contact can be identified, return {"f
         firstName: z.string().min(1).max(80),
         lastName: z.string().max(80).nullable().optional(),
         mobileAu: z.string().max(20).nullable().optional(),
+        email: z.string().max(200).nullable().optional(),
         winery: z.string().max(120).nullable().optional(),
         event: z.string().max(120).nullable().optional(),
         painPoint: z.string().max(300).nullable().optional(),
@@ -1696,6 +1699,7 @@ Return ONLY valid JSON. No markdown. If no contact can be identified, return {"f
           firstName: c.firstName,
           lastName: c.lastName ?? null,
           mobileAu: c.mobileAu ?? null,
+          email: c.email?.trim().toLowerCase() || null,
           winery: c.winery ?? null,
           event: c.event ?? null,
           painPoint: c.painPoint ?? null,
@@ -2211,9 +2215,8 @@ Speech-recognition normalisations do NOT apply here — this is scraped HTML. Bu
       const existingNotes = (existing.notes ?? "").trim();
       const appendages: string[] = [];
       const notesLower = existingNotes.toLowerCase();
-      if (input.email && !notesLower.includes(input.email.toLowerCase())) {
-        appendages.push(`Email: ${input.email}`);
-      }
+      const emailNorm = input.email?.trim().toLowerCase();
+      if (emailNorm && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailNorm) && !existing.email) update.email = emailNorm;
       if (input.instagramPersonal) {
         const igClean = input.instagramPersonal.replace(/^@/, "");
         if (!notesLower.includes(igClean.toLowerCase())) {
@@ -2931,6 +2934,18 @@ Propose the three hook candidates.`;
         .set({ mobileAu: value })
         .where(eq(schema.outreachContacts.slug, input.slug));
       return { ok: true, mobileAu: value };
+    }),
+
+  /** OWNER — set or clear a contact's email address. */
+  setEmail: ownerProcedure
+    .input(z.object({ slug: z.string(), email: z.string().trim().toLowerCase().email().max(200).or(z.literal("")) }))
+    .mutation(async ({ input }) => {
+      const value = input.email || null;
+      await db
+        .update(schema.outreachContacts)
+        .set({ email: value })
+        .where(eq(schema.outreachContacts.slug, input.slug));
+      return { ok: true, email: value };
     }),
 
   /** OWNER — update the private notes on an existing contact.
