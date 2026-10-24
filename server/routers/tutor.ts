@@ -151,6 +151,23 @@ function detectSopCategories(question: string): string[] {
   return Array.from(matched);
 }
 
+
+// Orientation ("I'm new, where do I start?") questions get a static welcome
+// that asks who the visitor is — no LLM call, never published to the journal.
+const ORIENTATION_RE = /\b(new (to|on|here)|first time|where (do|should|can) i (start|begin)|how (do|should) i (start|begin|get started)|get(ting)? started|what is (this|ownology|owen)|what does (this|ownology|owen) do|how does (this|ownology|owen|the site|it) work|what can (you|owen|ownology) do|who are you|show me around|help me (navigate|find my way))\b/i;
+const WINE_TECH_RE = /\b(ferment\w*|yeast|so2|sulph\w*|sulf\w*|metabisul\w*|mlf|malo\w*|acid\w*|ph|brix|baum\w*|rack\w*|lees|oak|barrel|tank|grapes?|must|kit|ros[eé]|bottl\w*|press\w*|yan|h2s|fault\w*|tannin|blend\w*|fining|filter\w*|carboy|demijohn|hydrometer)\b/i;
+export function isOrientationQuestion(q: string): boolean {
+  const t = q.trim();
+  return t.length <= 200 && ORIENTATION_RE.test(t) && !WINE_TECH_RE.test(t);
+}
+export const ORIENTATION_ANSWER = `Welcome to Ownology, glad you're here. So I can point you the right way, which of these sounds like you?
+
+- **Home or DIY winemaker.** You make kits, fresh-grape or fruit wine at home. Ask me anything about your batch and I'll answer in home-batch quantities. A good first question: *"How do I know when my fermentation is finished?"*
+- **Wine professional.** You work in or run a winery, or make wine under contract. Switch me to *Wine professional* and I'll answer from commercial cellar SOPs. You can also try the [free demo](/demo/tour) with a sample winery, or see the [Curriculum](/curriculum/about).
+- **Just curious about wine.** Browse real questions in the [Cellar Journal](/cellar-journal) or take the [two-minute guide](/guide).
+
+Pick one below and I'll tailor everything from there.`;
+
 const tutorRouter = router({
   ask: publicProcedure
     .input(
@@ -165,6 +182,9 @@ const tutorRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      if (isOrientationQuestion(input.question)) {
+        return { answer: ORIENTATION_ANSWER, sopTitles: [] as string[], disclaimer: "", welcome: true };
+      }
       const forgeUrl = process.env.BUILT_IN_FORGE_API_URL;
       const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
       if (!forgeUrl || !forgeKey) throw new Error("LLM service not configured");
@@ -175,7 +195,7 @@ const tutorRouter = router({
       // Any signed-in user is exempt (paying members shouldn't hit a cap).
       // Anonymous DIY calls (the /ask SEO flywheel) get 5/hour/IP to protect
       // LLM budget from scrapers/spam without hurting real curious visitors.
-      if (isHomeWinemaker && !ctx.user) {
+      if (!ctx.user) {
         const ip = extractClientIp(ctx.req);
         const gate = checkPublicAskRate(ip);
         if (!gate.allowed) {

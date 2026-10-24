@@ -14,6 +14,8 @@
 
 - **CRM email field (Jun 2026)**: `outreach_contacts.email` real column (bootstrap ALTER + backfill of 138 legacy "Email: x" notes). `create`/`importContacts` accept email; `mergeFields` writes the column (no more notes-append); new `outreach.setEmail`; `outboundQueue.hasEmail` reads column OR notes. /admin/contacts: Email field on Add form (OCR/URL/deep-research autofill fill it), per-card "+ add email" / ✏️ inline editor (`EmailChip`). Root cause: CRM was built SMS-first; emails were only parsed from free-text notes.
 
+- **Ask Owen orientation fix (Jun 2026)**: `tutor.ask` short-circuits "new here / where do I start / what is Ownology / how does this work" questions (`isOrientationQuestion`, excludes winemaking terms) → static welcome asking home/DIY vs professional vs curious; no LLM call, never published to Cellar Journal. /ask now has "I am a: Home / DIY winemaker | Wine professional" toggle (localStorage `ow_ask_audience`; pro → `mode: "winemaking"`), audience-specific samples/placeholder, welcome picker buttons. Anonymous 5/hr/IP limit now covers both modes. Unpublished journal entry #837 ("im new to the site; where should i start?"). Note: there is NO answer cache — every question calls the LLM.
+
 **Backlog from this work**: watermark owner name on printed specs; contractor "propose change" → owner approve; PDF export of a wine spec for the owner; per-wine contractor scoping.
 
 ## Jul 2026 (18 Jul) · Curriculum spine strategy locked — SCOUTING SHIPPED, EXECUTION QUEUED

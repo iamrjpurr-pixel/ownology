@@ -60,17 +60,77 @@ const SAMPLE_QUESTIONS: Array<{ q: string; topic: string }> = [
   { q: "My wine tastes too acidic — can I fix it?", topic: "Acid adjustment" },
 ];
 
+const PRO_SAMPLE_QUESTIONS: Array<{ q: string; topic: string }> = [
+  { q: "Shiraz stuck at 2 Baumé, cap at 31°C, YAN was 150. What do I check first?", topic: "Pro stuck ferment" },
+  { q: "Free SO₂ dropped from 28 to 14 mg/L in a Pinot barrel after MLF. How much do I add?", topic: "Pro SO2 top-up" },
+  { q: "VA at 0.7 g/L in a red after MLF. What are my options?", topic: "Pro VA" },
+  { q: "How do I run a bentonite fining trial for heat stability?", topic: "Pro heat stability" },
+];
+
+type Audience = "home" | "pro";
+const AUDIENCE_KEY = "ow_ask_audience";
+
+function AudienceToggle({ audience, onChange }: { audience: Audience | null; onChange: (a: Audience) => void }) {
+  const opts: Array<{ id: Audience; label: string }> = [
+    { id: "home", label: "Home / DIY winemaker" },
+    { id: "pro", label: "Wine professional" },
+  ];
+  return (
+    <div className="mt-8 flex flex-wrap items-center gap-2" data-testid="ask-audience-toggle">
+      <span className="font-mono text-[11px] uppercase tracking-[0.22em] opacity-60 mr-1">I am a</span>
+      {opts.map((o) => (
+        <button
+          key={o.id}
+          type="button"
+          onClick={() => onChange(o.id)}
+          data-testid={`ask-audience-${o.id}`}
+          aria-pressed={audience === o.id}
+          className="text-sm px-4 py-2 rounded-full border transition-colors duration-150"
+          style={{
+            borderColor: audience === o.id ? "var(--ow-amber)" : "var(--ow-border, rgba(255,255,255,0.18))",
+            background: audience === o.id ? "var(--ow-amber)" : "transparent",
+            color: audience === o.id ? "var(--ow-bg)" : "var(--ow-text-mid, var(--ow-text-hi))",
+            fontFamily: "'Lato', sans-serif",
+            fontWeight: audience === o.id ? 700 : 400,
+          }}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function Ask() {
   const [question, setQuestion] = React.useState("");
   const [submitted, setSubmitted] = React.useState<string | null>(null);
+  const [audience, setAudienceState] = React.useState<Audience | null>(() => {
+    if (typeof window === "undefined") return null;
+    const v = localStorage.getItem(AUDIENCE_KEY);
+    return v === "home" || v === "pro" ? v : null;
+  });
   const askMutation = trpc.tutor.ask.useMutation();
+
+  const setAudience = (a: Audience) => {
+    setAudienceState(a);
+    localStorage.setItem(AUDIENCE_KEY, a);
+  };
 
   const submit = (q: string) => {
     const cleaned = q.trim();
     if (cleaned.length < 5) return;
     setSubmitted(cleaned);
-    askMutation.mutate({ question: cleaned, mode: "home_winemaker" });
+    askMutation.mutate({ question: cleaned, mode: audience === "pro" ? "winemaking" : "home_winemaker" });
   };
+
+  const pickAudienceFromWelcome = (a: Audience) => {
+    setAudience(a);
+    setSubmitted(null);
+    setQuestion("");
+    askMutation.reset();
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const samples = audience === "pro" ? PRO_SAMPLE_QUESTIONS : SAMPLE_QUESTIONS;
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,6 +156,7 @@ export default function Ask() {
         riskLevel?: string;
         journalSlug?: string | null;
         journalIsNew?: boolean;
+        welcome?: boolean;
       }
     | undefined;
 
@@ -158,8 +219,10 @@ export default function Ask() {
           entry.
         </p>
 
+        <AudienceToggle audience={audience} onChange={setAudience} />
+
         {/* ── Question box ────────────────────────────────────────────── */}
-        <form onSubmit={onSubmit} className="mt-10" data-testid="ask-form">
+        <form onSubmit={onSubmit} className="mt-6" data-testid="ask-form">
           <label
             htmlFor="ask-question"
             className="block font-mono text-[11px] uppercase tracking-[0.22em] opacity-70 mb-3"
@@ -170,7 +233,9 @@ export default function Ask() {
             id="ask-question"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="e.g. My Shiraz has been stuck at 8 Brix for 3 days — YAN was 148 at inoculation, tank hit 26°C yesterday. What do I do?"
+            placeholder={audience === "pro"
+              ? "e.g. My Shiraz has been stuck at 8 Brix for 3 days — YAN was 148 at inoculation, tank hit 26°C yesterday. What do I do?"
+              : "e.g. My 23L red kit stopped bubbling after 4 days and the hydrometer reads 1.020. What do I do?"}
             rows={5}
             maxLength={500}
             data-testid="ask-input"
@@ -217,7 +282,7 @@ export default function Ask() {
               Or try one of these
             </p>
             <div className="flex flex-wrap gap-2">
-              {SAMPLE_QUESTIONS.map((s) => (
+              {samples.map((s) => (
                 <button
                   key={s.q}
                   type="button"
@@ -405,8 +470,28 @@ export default function Ask() {
               </div>
             )}
 
+            {result.welcome && (
+              <div className="mt-8 flex flex-wrap gap-3" data-testid="ask-welcome-picker">
+                <button type="button" onClick={() => pickAudienceFromWelcome("home")} data-testid="ask-welcome-home"
+                  className="px-5 py-2.5 rounded-full font-mono text-xs uppercase tracking-[0.18em]"
+                  style={{ background: "var(--ow-amber)", color: "var(--ow-bg)", fontWeight: 700 }}>
+                  I make wine at home
+                </button>
+                <button type="button" onClick={() => pickAudienceFromWelcome("pro")} data-testid="ask-welcome-pro"
+                  className="px-5 py-2.5 rounded-full font-mono text-xs uppercase tracking-[0.18em]"
+                  style={{ background: "var(--ow-amber)", color: "var(--ow-bg)", fontWeight: 700 }}>
+                  I work in wine
+                </button>
+                <Link href="/cellar-journal" data-testid="ask-welcome-curious"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-mono text-xs uppercase tracking-[0.18em] border"
+                  style={{ borderColor: "var(--ow-border)", color: "var(--ow-text-hi)" }}>
+                  Just curious
+                </Link>
+              </div>
+            )}
+
             {/* ── CTA: ask another / reserve ──────────────────────────── */}
-            <div className="mt-10 flex flex-wrap gap-3">
+            <div className={`mt-10 flex-wrap gap-3 ${result.welcome ? "hidden" : "flex"}`}>
               <button
                 type="button"
                 onClick={() => {
