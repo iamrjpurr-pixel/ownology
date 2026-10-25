@@ -64,7 +64,7 @@ export const DEMO_MEMBERS: Member[] = [
 export const DEMO_ACTIVITY: Activity[] = [
   { id: 1, actorEmail: DEMO_CONTRACTOR.email, actorRole: "contractor", action: "logged reading", target: "Ridgeline Shiraz", createdAt: t0 + 3 * day },
   { id: 2, actorEmail: DEMO_CONTRACTOR.email, actorRole: "contractor", action: "viewed", target: "Ridgeline Shiraz", createdAt: t0 + 3 * day - 600_000 },
-  { id: 3, actorEmail: DEMO_CONTRACTOR.email, actorRole: "contractor", action: "blocked", target: "Export attempted", createdAt: t0 + 2 * day },
+  { id: 3, actorEmail: DEMO_CONTRACTOR.email, actorRole: "contractor", action: "logged work", target: "Quarry Chardonnay", createdAt: t0 + 2 * day },
   { id: 4, actorEmail: DEMO_OWNER.email, actorRole: "owner", action: "edited", target: "Ridgeline Shiraz", createdAt: t0 + day },
   { id: 5, actorEmail: DEMO_OWNER.email, actorRole: "owner", action: "invited", target: "cellarhand@riverbendcrush.example", createdAt: t0 - 2 * day },
 ];
@@ -73,5 +73,5 @@ export const DEMO_TANKS = [
   { id: "T3", wine: "Ridgeline Shiraz", stage: "Primary ferment", reading: "4.2 Bé · 29°C", status: "watch" as const, note: "Cap near the top of spec (28–30°C). Dan is pumping over twice a day." },
   { id: "T4", wine: "Ridgeline Shiraz · whole bunch", stage: "Cold soak, day 2", reading: "12.8 Bé · 9°C", status: "ok" as const, note: "Holding cold until Kate's sign-off to warm up." },
   { id: "B1–12", wine: "Quarry Chardonnay", stage: "Barrel ferment", reading: "1.1 Bé · 18°C", status: "ok" as const, note: "On track. Bâtonnage done for all 12 barrels." },
-  { id: "B7", wine: "Quarry Chardonnay", stage: "Barrel ferment", reading: "Slight reduction", status: "alert" as const, note: "Racked and splashed per Kate's protocol. Kate has been told." },
+  { id: "B7", wine: "Quarry Chardonnay", stage: "Barrel ferment", reading: "Slight reduction", status: "alert" as const, note: "Dan racked and splashed it per Kate's protocol and let her know." },
 ];

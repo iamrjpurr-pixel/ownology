@@ -81,9 +81,9 @@ function VaultDemo({ role }: { role: Role }) {
     <section className="space-y-5" data-testid="demo-vault">
       <div>
         <div className={eyebrow}>02 · The Brand Vault</div>
-        <h2 className="mt-2 font-['Fraunces',serif] text-2xl text-[var(--ow-text-hi)] md:text-3xl">Your recipes stay yours, even when someone else makes the wine.</h2>
+        <h2 className="mt-2 font-['Fraunces',serif] text-2xl text-[var(--ow-text-hi)] md:text-3xl">One shared record. Your specs, safely yours.</h2>
         <p className="mt-2 max-w-3xl text-sm text-[var(--ow-text-mid)]">
-          Kate holds the oenology degree and writes the spec. Dan runs the cellar under contract. He works to her spec and logs every pump-over and reading against it. He can't edit the spec, export it or take it with him.
+          Kate holds the oenology degree and writes the spec. Dan, an old friend, makes the wine at his crush facility. He works to her spec and logs every pump-over and reading alongside it, so they always see the same picture. Kate's specs stay protected in her vault, and she decides how much control to switch on.
         </p>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -114,8 +114,8 @@ function OwnerControls({ role }: { role: Role }) {
       <section className="flex items-start gap-4 rounded-lg border border-dashed border-[var(--ow-border-md)] p-6" data-testid="demo-owner-locked">
         <Lock className="mt-1 h-5 w-5 text-[var(--ow-text-lo)]" />
         <div>
-          <h3 className="font-['Fraunces',serif] text-xl text-[var(--ow-text-hi)]">Owner-only controls</h3>
-          <p className="mt-1 text-sm text-[var(--ow-text-mid)]">As the contractor, Dan never sees who else has access, the activity history or the export button. Switch to Kate to see them.</p>
+          <h3 className="font-['Fraunces',serif] text-xl text-[var(--ow-text-hi)]">Access settings sit with the owner</h3>
+          <p className="mt-1 text-sm text-[var(--ow-text-mid)]">Who has access, the shared history and exports are looked after by Kate. Switch to Kate to see them.</p>
         </div>
       </section>
     );
@@ -124,7 +124,7 @@ function OwnerControls({ role }: { role: Role }) {
     <section className="space-y-5" data-testid="demo-owner-controls">
       <div>
         <div className={eyebrow}>03 · Kate's controls</div>
-        <h2 className="mt-2 font-['Fraunces',serif] text-2xl text-[var(--ow-text-hi)] md:text-3xl">Who sees what, and when it ends.</h2>
+        <h2 className="mt-2 font-['Fraunces',serif] text-2xl text-[var(--ow-text-hi)] md:text-3xl">Controls, if and when you need them.</h2>
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="min-w-0 rounded-lg border border-[var(--ow-border)] bg-[var(--ow-bg-card)] p-6">
@@ -162,7 +162,7 @@ export default function DemoTour() {
       {step !== null && <DemoGuide step={step} onStep={goStep} onClose={closeGuide} />}
       <Helmet>
         <title>Free demo · Ownology</title>
-        <meta name="description" content="Try Ownology with a made-up winery: the morning brief, a Brand Vault that protects your wine IP from contractors, and three free questions to Owen." />
+        <meta name="description" content="Try Ownology with a made-up winery: the morning brief, a Brand Vault that keeps your wine IP safe while you share it with your winemaker, and three free questions to Owen." />
       </Helmet>
       <header className="border-b border-[var(--ow-border)]">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
@@ -182,7 +182,7 @@ export default function DemoTour() {
           {guest ? `${guest.firstName}, meet ${DEMO_BRAND}.` : `Meet ${DEMO_BRAND}. A made-up winery you can poke at.`}
         </h1>
         <p className="mt-6 max-w-2xl text-base text-[var(--ow-text-mid)] md:text-lg">
-          Kate owns the brand and holds an oenology degree. Dan makes her wine under contract at his crush facility. See how Ownology lets her hand over the cellar work without handing over her wine IP.
+          Kate owns the brand and holds an oenology degree. Dan, a long-time friend, makes her wine at his crush facility. See how Ownology gives them one shared record of every wine, while keeping Kate's wine IP safely hers.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <Button size="lg" className="gap-2" onClick={() => goStep(0)} data-testid="demo-guide-start">
@@ -204,7 +204,7 @@ export default function DemoTour() {
         </section>
         <section className="rounded-lg bg-[var(--ow-text-hi)] p-8 text-[var(--ow-bg-base)] md:p-12" data-testid="demo-final-cta">
           <h2 className="max-w-2xl font-['Fraunces',serif] text-3xl leading-tight md:text-4xl">Ready to put your own wines in a vault?</h2>
-          <p className="mt-3 max-w-xl text-sm opacity-80">Sign in, write your first spec, and invite your contract winemaker. You can remove their access any time.</p>
+          <p className="mt-3 max-w-xl text-sm opacity-80">Sign in, write your first spec, and invite the winemaker you work with. Your specs stay yours, and you set the level of access.</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/login?next=/brand"><Button size="lg" className="gap-2 bg-[var(--ow-amber)] text-white hover:opacity-90" data-testid="demo-cta-open-vault">Open my Brand Vault <ArrowRight className="h-4 w-4" /></Button></Link>
             <Link href="/pricing?from=demo-tour"><Button size="lg" variant="outline" className="border-current bg-transparent text-inherit hover:bg-white/10" data-testid="demo-cta-pricing">See pricing</Button></Link>

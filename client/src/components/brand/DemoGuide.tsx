@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 import type { Role } from "./types";
 
 export const GUIDE_STEPS: { title: string; body: string; role: Role; target: string }[] = [
-  { title: "Your wine spec", body: "This is how Kate records a wine: blend, targets, regime and the protocol her contractor must follow. Only she can edit it.", role: "owner", target: "demo-vault" },
-  { title: "What your contract winemaker sees", body: "Dan sees the same spec, read-only. He can't edit, copy or export it, but he logs his cellar work and readings against it.", role: "contractor", target: "demo-vault" },
-  { title: "You stay in control", body: "Kate sees everything Dan viewed or logged, and removes his access in one click when the contract ends.", role: "owner", target: "demo-owner-section" },
+  { title: "Your wine spec", body: "This is how Kate records a wine: blend, targets, regime and the protocol she and Dan work to. It's her spec, kept safe in her vault.", role: "owner", target: "demo-vault" },
+  { title: "What your winemaker sees", body: "Dan works from the same spec and logs his cellar work and readings against it, so they're both looking at the same picture.", role: "contractor", target: "demo-vault" },
+  { title: "Controls if you need them", body: "Everything Dan logs shows up for Kate. If she ever wants to, she can change or remove access in one click.", role: "owner", target: "demo-owner-section" },
 ];
 
 export function DemoGuide({ step, onStep, onClose }: { step: number; onStep: (s: number) => void; onClose: () => void }) {

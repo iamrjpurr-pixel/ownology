@@ -28,7 +28,7 @@ export function ContractorsPanel({ members, onInvite, onRevoke, pending }: {
       <div>
         <h3 className="font-['Fraunces',serif] text-xl text-[var(--ow-text-hi)]">Contract winemakers</h3>
         <p className="mt-1 text-sm text-[var(--ow-text-mid)]">
-          They can view your specs and log cellar work and readings. They can't edit specs or export anything. Remove access and it ends immediately.
+          They can view your specs and log cellar work and readings. Editing and exporting stay with you, and you can change access any time.
         </p>
       </div>
       <form onSubmit={submit} className="flex flex-col gap-2 sm:flex-row">
@@ -67,7 +67,7 @@ export function ActivityFeed({ items }: { items: Activity[] }) {
     <section className="space-y-4" data-testid="activity-feed">
       <div>
         <h3 className="font-['Fraunces',serif] text-xl text-[var(--ow-text-hi)]">Activity history</h3>
-        <p className="mt-1 text-sm text-[var(--ow-text-mid)]">Every view, log, edit and blocked attempt on your vault.</p>
+        <p className="mt-1 text-sm text-[var(--ow-text-mid)]">A shared timeline of what's been viewed, logged and changed.</p>
       </div>
       {items.length === 0 && <p className="text-sm text-[var(--ow-text-lo)]">No activity yet.</p>}
       <ol className="space-y-2.5">

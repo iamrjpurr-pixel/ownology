@@ -11,8 +11,8 @@ export function ConfidentialBanner({ brandName, viewer }: { brandName: string; v
     >
       <Lock className="mt-0.5 h-4 w-4 shrink-0 text-[var(--ow-amber)]" />
       <p>
-        <strong className="text-[var(--ow-text-hi)]">Confidential. These specs belong to {brandName}.</strong>{" "}
-        You're viewing as {viewer}. Editing, copying and exporting are switched off, and every view is recorded.
+        <strong className="text-[var(--ow-text-hi)]">Shared with you by {brandName}.</strong>{" "}
+        You're viewing as {viewer}. {brandName} keeps ownership of these specs, so editing and exporting stay with them. Log your work against each wine below.
       </p>
     </div>
   );
