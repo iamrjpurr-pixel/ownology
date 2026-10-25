@@ -110,6 +110,21 @@ function checkDemoIp(ipHash: string): boolean {
   demoIpLog.set(ipHash, hits);
   return true;
 }
+type InviteContact = { first_name: string; winery: string | null; email: string | null };
+async function inviteContact(slug: string): Promise<InviteContact | null> {
+  if (!slug) return null;
+  const [res] = await db.execute(sql`SELECT first_name, winery, email FROM outreach_contacts WHERE slug = ${slug} LIMIT 1`);
+  return (res as unknown as InviteContact[])[0] ?? null;
+}
+async function resolveDemoEmail(input: { email?: string; invite?: string }): Promise<string> {
+  if (input.invite) {
+    const c = await inviteContact(input.invite);
+    if (c?.email) return c.email.toLowerCase();
+  }
+  if (input.email) return input.email;
+  throw new TRPCError({ code: "BAD_REQUEST", message: "Enter your email to start the demo." });
+}
+
 async function remainingFor(email: string): Promise<number | null> {
   const [res] = await db.execute(sql`SELECT asks FROM demo_ask_usage WHERE email = ${email} LIMIT 1`);
   const row = (res as unknown as { asks: number }[])[0];
@@ -254,39 +269,51 @@ export const demoRouter = router({
    * DEMO_ASK_LIMIT questions per email, plus a per-IP daily ceiling. Each
    * email lands in the leads CRM with source "demo-tour".
    */
+  personalise: publicProcedure
+    .input(z.object({ invite: z.string().trim().max(120) }))
+    .query(async ({ input }) => {
+      const c = await inviteContact(input.invite);
+      return c ? { firstName: c.first_name, winery: c.winery ?? "", hasEmail: !!c.email } : null;
+    }),
+
   askOwenStart: publicProcedure
-    .input(z.object({ email: z.string().trim().toLowerCase().email().max(200) }))
+    .input(z.object({ email: z.string().trim().toLowerCase().email().max(200).optional(), invite: z.string().trim().max(120).optional() }))
     .mutation(async ({ input, ctx }) => {
+      const email = await resolveDemoEmail(input);
       const now = Date.now();
       await db.execute(sql`
         INSERT INTO demo_ask_usage (email, asks, ip_hash, created_at, updated_at)
-        VALUES (${input.email}, 0, ${reqIpHash(ctx.req)}, ${now}, ${now})
+        VALUES (${email}, 0, ${reqIpHash(ctx.req)}, ${now}, ${now})
         ON DUPLICATE KEY UPDATE updated_at = ${now}`);
-      await addLead({ email: input.email, source: "demo-tour", tags: ["demo", "ask-owen"] }).catch((e) =>
-        console.warn("[demo] lead capture failed:", (e as Error).message));
-      return { remaining: await remainingFor(input.email) };
+      if (!input.invite) {
+        await addLead({ email, source: "demo-tour", tags: ["demo", "ask-owen"] }).catch((e) =>
+          console.warn("[demo] lead capture failed:", (e as Error).message));
+      }
+      return { remaining: await remainingFor(email) };
     }),
 
   askOwen: publicProcedure
     .input(z.object({
-      email: z.string().trim().toLowerCase().email().max(200),
+      email: z.string().trim().toLowerCase().email().max(200).optional(),
+      invite: z.string().trim().max(120).optional(),
       question: z.string().trim().min(3).max(600),
     }))
     .mutation(async ({ input, ctx }) => {
-      const remaining = await remainingFor(input.email);
+      const email = await resolveDemoEmail(input);
+      const remaining = await remainingFor(email);
       if (remaining === null) throw new TRPCError({ code: "BAD_REQUEST", message: "Enter your email to start the demo." });
       if (remaining <= 0) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: `You've used your ${DEMO_ASK_LIMIT} free questions.` });
       if (!checkDemoIp(reqIpHash(ctx.req))) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Daily demo limit reached on this network. Try again tomorrow." });
       const [upd] = await db.execute(sql`
-        UPDATE demo_ask_usage SET asks = asks + 1, updated_at = ${Date.now()} WHERE email = ${input.email} AND asks < ${DEMO_ASK_LIMIT}`);
+        UPDATE demo_ask_usage SET asks = asks + 1, updated_at = ${Date.now()} WHERE email = ${email} AND asks < ${DEMO_ASK_LIMIT}`);
       if (!(upd as unknown as { affectedRows: number }).affectedRows) {
         throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: `You've used your ${DEMO_ASK_LIMIT} free questions.` });
       }
       try {
         const res = await tutorRouter.createCaller({ ...ctx, user: null }).ask({ question: input.question, mode: "winemaking" });
-        return { answer: res.answer, sopTitles: res.sopTitles ?? [], disclaimer: res.disclaimer ?? "", remaining: (await remainingFor(input.email)) ?? 0 };
+        return { answer: res.answer, sopTitles: res.sopTitles ?? [], disclaimer: res.disclaimer ?? "", remaining: (await remainingFor(email)) ?? 0 };
       } catch (e) {
-        await db.execute(sql`UPDATE demo_ask_usage SET asks = GREATEST(asks - 1, 0) WHERE email = ${input.email}`);
+        await db.execute(sql`UPDATE demo_ask_usage SET asks = GREATEST(asks - 1, 0) WHERE email = ${email}`);
         throw e;
       }
     }),

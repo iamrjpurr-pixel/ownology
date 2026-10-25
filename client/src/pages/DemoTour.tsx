@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { Helmet } from "react-helmet";
+import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
+import { DemoGuide, GUIDE_STEPS } from "@/components/brand/DemoGuide";
 import { AlertTriangle, ArrowRight, CheckCircle2, Eye, Lock, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WineSpecView, ConfidentialBanner } from "@/components/brand/WineSpecView";
@@ -72,6 +75,7 @@ function VaultDemo({ role }: { role: Role }) {
   const onAdd = (kind: LogKind, note: string, readings: Record<string, string>) => {
     const entry: WineLog = { id: Date.now(), authorEmail: me.email, authorRole: role, kind, note, readings: Object.fromEntries(Object.entries(readings).filter(([, v]) => v)), createdAt: Date.now() };
     setLogs((l) => ({ ...l, [wineId]: [entry, ...(l[wineId] ?? [])] }));
+    toast.success("Added to the demo record", { description: "Demo only: nothing is saved, and it disappears when you refresh." });
   };
   return (
     <section className="space-y-5" data-testid="demo-vault">
@@ -93,6 +97,7 @@ function VaultDemo({ role }: { role: Role }) {
       <div className="space-y-8 rounded-lg border border-[var(--ow-border)] bg-[var(--ow-bg-card)] p-5 md:p-8">
         {role === "contractor" && <ConfidentialBanner brandName={DEMO_BRAND} viewer={DEMO_CONTRACTOR.email} />}
         <WineSpecView wine={wine} role={role} actions={role === "owner" ? <span className="rounded border border-[var(--ow-border-md)] px-2 py-1 text-xs text-[var(--ow-text-lo)]">Owner can edit</span> : undefined} />
+        <p className="text-xs text-[var(--ow-text-lo)]" data-testid="demo-log-note">Try logging something below as {me.name}. It's a demo, so nothing is saved.</p>
         <WineLogs logs={logs[wineId] ?? []} onAdd={onAdd} />
       </div>
     </section>
@@ -135,8 +140,26 @@ function OwnerControls({ role }: { role: Role }) {
 
 export default function DemoTour() {
   const [role, setRole] = useState<Role>("owner");
+  const [step, setStep] = useState<number | null>(null);
+  const [guideDone, setGuideDone] = useState(false);
+  const invite = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("for") ?? undefined : undefined;
+  const who = trpc.demo.personalise.useQuery({ invite: invite ?? "" }, { enabled: !!invite });
+  const guest = who.data;
+
+  const goStep = (s: number) => {
+    setStep(s);
+    setRole(GUIDE_STEPS[s].role);
+    setTimeout(() => document.getElementById(GUIDE_STEPS[s].target)?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+  };
+  const closeGuide = () => {
+    setStep(null);
+    setGuideDone(true);
+    setTimeout(() => document.getElementById("demo-ask-section")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+  };
+
   return (
     <div className="min-h-screen bg-[var(--ow-bg-base)]" data-testid="demo-tour-page">
+      {step !== null && <DemoGuide step={step} onStep={goStep} onClose={closeGuide} />}
       <Helmet>
         <title>Free demo · Ownology</title>
         <meta name="description" content="Try Ownology with a made-up winery: the morning brief, a Brand Vault that protects your wine IP from contractors, and three free questions to Owen." />
@@ -152,24 +175,32 @@ export default function DemoTour() {
       </header>
 
       <section className="mx-auto max-w-6xl px-6 pb-12 pt-14 md:pt-20">
-        <div className={eyebrow}>Free demo · no sign-up · sample data</div>
+        <div className={eyebrow} data-testid="demo-eyebrow">
+          {guest ? `Prepared for ${guest.firstName}${guest.winery ? ` · ${guest.winery}` : ""}` : "Free demo · no sign-up · sample data"}
+        </div>
         <h1 className="mt-4 max-w-4xl font-['Fraunces',serif] text-4xl leading-[1.05] tracking-tight text-[var(--ow-text-hi)] sm:text-5xl lg:text-6xl">
-          Meet {DEMO_BRAND}. A made-up winery you can poke at.
+          {guest ? `${guest.firstName}, meet ${DEMO_BRAND}.` : `Meet ${DEMO_BRAND}. A made-up winery you can poke at.`}
         </h1>
         <p className="mt-6 max-w-2xl text-base text-[var(--ow-text-mid)] md:text-lg">
           Kate owns the brand and holds an oenology degree. Dan makes her wine under contract at his crush facility. See how Ownology lets her hand over the cellar work without handing over her wine IP.
         </p>
-        <div className="mt-10 max-w-3xl"><RoleToggle role={role} setRole={setRole} /></div>
+        <div className="mt-10 flex flex-wrap items-center gap-4">
+          <Button size="lg" className="gap-2" onClick={() => goStep(0)} data-testid="demo-guide-start">
+            {guideDone ? "Replay the 3-step tour" : "Start the 3-step tour"} <ArrowRight className="h-4 w-4" />
+          </Button>
+          <span className="text-sm text-[var(--ow-text-lo)]">About 3 minutes. Or explore on your own below.</span>
+        </div>
+        <div className="mt-8 max-w-3xl"><RoleToggle role={role} setRole={setRole} /></div>
         <p className="mt-3 flex items-center gap-2 text-xs text-[var(--ow-text-lo)]"><ShieldCheck className="h-3.5 w-3.5" /> Nothing you do here is saved. It's all sample data.</p>
       </section>
 
       <div className="mx-auto max-w-6xl space-y-20 px-6 pb-20">
         <TankSnapshot />
-        <VaultDemo role={role} />
-        <OwnerControls role={role} />
-        <section className="space-y-5">
+        <div id="demo-vault" className="scroll-mt-56 md:scroll-mt-28"><VaultDemo role={role} /></div>
+        <div id="demo-owner-section" className="scroll-mt-56 md:scroll-mt-28"><OwnerControls role={role} /></div>
+        <section id="demo-ask-section" className="scroll-mt-8 space-y-5">
           <div className={eyebrow}>04 · Ask Owen</div>
-          <DemoAskOwen />
+          <DemoAskOwen invite={guest?.hasEmail ? invite : undefined} />
         </section>
         <section className="rounded-lg bg-[var(--ow-text-hi)] p-8 text-[var(--ow-bg-base)] md:p-12" data-testid="demo-final-cta">
           <h2 className="max-w-2xl font-['Fraunces',serif] text-3xl leading-tight md:text-4xl">Ready to put your own wines in a vault?</h2>

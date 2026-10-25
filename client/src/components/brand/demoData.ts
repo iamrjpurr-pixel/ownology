@@ -70,8 +70,8 @@ export const DEMO_ACTIVITY: Activity[] = [
 ];
 
 export const DEMO_TANKS = [
-  { id: "T3", wine: "Ridgeline Shiraz", stage: "Primary ferment", reading: "4.2 Bé · 29°C", status: "watch" as const, note: "Cap at the top of spec. Watch it doesn't pass 32°C." },
-  { id: "B1–12", wine: "Quarry Chardonnay", stage: "Barrel ferment", reading: "1.1 Bé · 18°C", status: "ok" as const, note: "On track. Barrel 7 racked for reduction." },
-  { id: "T5", wine: "Estate Pinot Noir", stage: "MLF", reading: "Malic 0.4 g/L", status: "ok" as const, note: "MLF nearly done. Test again Friday." },
-  { id: "T1", wine: "Riesling", stage: "Cold stabilisation", reading: "-2°C · SO₂ 18", status: "alert" as const, note: "Free SO₂ below the 25 mg/L target. Top-up due." },
+  { id: "T3", wine: "Ridgeline Shiraz", stage: "Primary ferment", reading: "4.2 Bé · 29°C", status: "watch" as const, note: "Cap near the top of spec (28–30°C). Dan is pumping over twice a day." },
+  { id: "T4", wine: "Ridgeline Shiraz · whole bunch", stage: "Cold soak, day 2", reading: "12.8 Bé · 9°C", status: "ok" as const, note: "Holding cold until Kate's sign-off to warm up." },
+  { id: "B1–12", wine: "Quarry Chardonnay", stage: "Barrel ferment", reading: "1.1 Bé · 18°C", status: "ok" as const, note: "On track. Bâtonnage done for all 12 barrels." },
+  { id: "B7", wine: "Quarry Chardonnay", stage: "Barrel ferment", reading: "Slight reduction", status: "alert" as const, note: "Racked and splashed per Kate's protocol. Kate has been told." },
 ];

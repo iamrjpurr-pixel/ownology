@@ -20,6 +20,8 @@
 
 - **Theme picker fix (Jun 2026)**: picker was dead in prod. `AutoThemeByTime` captured the override once at mount, so every pick was instantly overwritten with the time-based default and saved picks never applied after reload. Now `apply()` reads the override (window or localStorage `ownology:theme-override`) on every run. All 6 options + reload persistence + Auto verified in preview.
 
+- **Demo refinements for pioneer clients (Jun 2026)**: guided 3-step tour on /demo/tour (`DemoGuide.tsx`, fixed top bar; drives role + scroll: owner spec → contractor view → owner controls → Ask Owen). Personal links `/demo/tour?for=<outreach slug>` (`demo.personalise` returns firstName/winery only) greet by name and pre-unlock Ask Owen via the CRM email (`askOwenStart/askOwen` accept `invite`; no lead re-capture). Tank brief now uses only the two vault wines. Demo log entries toast "demo only, not saved". Rod's link: /demo/tour?for=rod-patina-wines.
+
 **Backlog from this work**: watermark owner name on printed specs; contractor "propose change" → owner approve; PDF export of a wine spec for the owner; per-wine contractor scoping.
 
 ## Jul 2026 (18 Jul) · Curriculum spine strategy locked — SCOUTING SHIPPED, EXECUTION QUEUED
