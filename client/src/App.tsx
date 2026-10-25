@@ -569,8 +569,9 @@ function AutoThemeByTime() {
     // Feb 2026, Rich —
     // added because the auto-theme was flipping erratically on his dev
     // server while iterating on component colours.
-    const override = typeof window !== "undefined"
-      ? ((window as unknown as { __ownologyThemeOverride?: string }).__ownologyThemeOverride ?? "")
+    const readOverride = () => typeof window !== "undefined"
+      ? ((window as unknown as { __ownologyThemeOverride?: string }).__ownologyThemeOverride
+        ?? (() => { try { return window.localStorage.getItem(THEME_STORAGE_KEY) ?? ""; } catch { return ""; } })())
       : "";
     // Map Open-Meteo weathercode → coarse weather bucket
     // https://open-meteo.com/en/docs — WMO weather interpretation codes
@@ -630,7 +631,8 @@ function AutoThemeByTime() {
       } else {
         timeThemeId = "parchment";
       }
-      const themeId = (override as ThemeId) || timeThemeId;
+      const override = readOverride();
+      const themeId = (override && override !== "auto" ? override as ThemeId : null) || timeThemeId;
       try {
         window.localStorage.setItem("ownology-theme", themeId);
         window.dispatchEvent(new CustomEvent("ownology:theme", { detail: themeId }));

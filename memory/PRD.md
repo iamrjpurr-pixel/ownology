@@ -18,6 +18,8 @@
 
 - **Winery name setting (Jun 2026)**: `brandPortal.renameBrand` (owner-only, 2–120 chars, logged as "renamed brand old → new"). /brand header shows brand name + Rename; owners whose winery is still auto-named "X's Winery" see a "Set winery name" prompt banner (`components/brand/BrandNameEditor.tsx`).
 
+- **Theme picker fix (Jun 2026)**: picker was dead in prod. `AutoThemeByTime` captured the override once at mount, so every pick was instantly overwritten with the time-based default and saved picks never applied after reload. Now `apply()` reads the override (window or localStorage `ownology:theme-override`) on every run. All 6 options + reload persistence + Auto verified in preview.
+
 **Backlog from this work**: watermark owner name on printed specs; contractor "propose change" → owner approve; PDF export of a wine spec for the owner; per-wine contractor scoping.
 
 ## Jul 2026 (18 Jul) · Curriculum spine strategy locked — SCOUTING SHIPPED, EXECUTION QUEUED
