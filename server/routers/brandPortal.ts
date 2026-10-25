@@ -301,6 +301,16 @@ export const brandPortalRouter = router({
     return list.map((a) => ({ id: a.id, actorEmail: a.actor_email, actorRole: a.actor_role, action: a.action, target: a.target, createdAt: Number(a.created_at) }));
   }),
 
+  renameBrand: protectedProcedure
+    .input(brandId.extend({ name: z.string().trim().min(2).max(120) }))
+    .mutation(async ({ ctx, input }) => {
+      await requireOwner(ctx.user, input.wineryId);
+      const [old] = await rows<{ name: string }>(sql`SELECT name FROM wineries WHERE id = ${input.wineryId} LIMIT 1`);
+      await db.execute(sql`UPDATE wineries SET name = ${input.name} WHERE id = ${input.wineryId}`);
+      await logActivity(ctx.user, input.wineryId, "owner", "renamed brand", `${old?.name ?? ""} → ${input.name}`);
+      return { name: input.name };
+    }),
+
   exportVault: protectedProcedure.input(brandId).mutation(async ({ ctx, input }) => {
     await requireOwner(ctx.user, input.wineryId);
     const [brand] = await rows<{ name: string }>(sql`SELECT name FROM wineries WHERE id = ${input.wineryId} LIMIT 1`);

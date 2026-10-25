@@ -16,6 +16,8 @@
 
 - **Ask Owen orientation fix (Jun 2026)**: `tutor.ask` short-circuits "new here / where do I start / what is Ownology / how does this work" questions (`isOrientationQuestion`, excludes winemaking terms) → static welcome asking home/DIY vs professional vs curious; no LLM call, never published to Cellar Journal. /ask now has "I am a: Home / DIY winemaker | Wine professional" toggle (localStorage `ow_ask_audience`; pro → `mode: "winemaking"`), audience-specific samples/placeholder, welcome picker buttons. Anonymous 5/hr/IP limit now covers both modes. Unpublished journal entry #837 ("im new to the site; where should i start?"). Note: there is NO answer cache — every question calls the LLM.
 
+- **Winery name setting (Jun 2026)**: `brandPortal.renameBrand` (owner-only, 2–120 chars, logged as "renamed brand old → new"). /brand header shows brand name + Rename; owners whose winery is still auto-named "X's Winery" see a "Set winery name" prompt banner (`components/brand/BrandNameEditor.tsx`).
+
 **Backlog from this work**: watermark owner name on printed specs; contractor "propose change" → owner approve; PDF export of a wine spec for the owner; per-wine contractor scoping.
 
 ## Jul 2026 (18 Jul) · Curriculum spine strategy locked — SCOUTING SHIPPED, EXECUTION QUEUED

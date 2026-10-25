@@ -10,6 +10,7 @@ import { WineSpecView, ConfidentialBanner } from "@/components/brand/WineSpecVie
 import { WineLogs } from "@/components/brand/WineLogs";
 import { ContractorsPanel, ActivityFeed } from "@/components/brand/AccessPanels";
 import { WineEditorDialog } from "@/components/brand/WineEditorDialog";
+import { BrandNameEditor, looksAutoNamed } from "@/components/brand/BrandNameEditor";
 import type { LogKind, Role, Wine, WineInput } from "@/components/brand/types";
 
 const BRAND_KEY = "ow_brand_vault";
@@ -186,6 +187,12 @@ export default function BrandPortal() {
           <div>
             <Link href="/" className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ow-amber)]">Ownology</Link>
             <h1 className="font-['Fraunces',serif] text-2xl text-[var(--ow-text-hi)] md:text-3xl">Brand Vault</h1>
+            {current && (
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[var(--ow-text-mid)]">
+                <span data-testid="vault-brand-name">{current.name}</span>
+                {current.role === "owner" && <BrandNameEditor wineryId={current.wineryId} name={current.name} />}
+              </div>
+            )}
           </div>
           {brands.length > 0 && current && (
             <div className="flex items-center gap-3">
@@ -208,8 +215,13 @@ export default function BrandPortal() {
         {my.isLoading ? <p className="text-sm text-[var(--ow-text-lo)]">Loading your brands…</p> : !current ? (
           <p className="text-sm text-[var(--ow-text-mid)]" data-testid="vault-no-brands">No brands linked to {my.data?.email} yet. If a brand owner invited you, sign in with the email address they used.</p>
         ) : current.role === "owner" ? (
-          <OwnerSections key={current.wineryId} wineryId={current.wineryId}
-            wines={<WinesTab wineryId={current.wineryId} role="owner" brandName={current.name} viewer={my.data!.email} />} />
+          <>
+            {looksAutoNamed(current.name) && (
+              <div className="mb-8"><BrandNameEditor key={`p-${current.wineryId}`} wineryId={current.wineryId} name={current.name} prompt /></div>
+            )}
+            <OwnerSections key={current.wineryId} wineryId={current.wineryId}
+              wines={<WinesTab wineryId={current.wineryId} role="owner" brandName={current.name} viewer={my.data!.email} />} />
+          </>
         ) : (
           <WinesTab key={current.wineryId} wineryId={current.wineryId} role="contractor" brandName={current.name} viewer={my.data!.email} />
         )}
