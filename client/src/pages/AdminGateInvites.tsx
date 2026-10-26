@@ -46,7 +46,7 @@ function statusOf(invite: {
   return { label: "UNCLAIMED", color: "#6b7280" };
 }
 
-export default function AdminGateInvites() {
+export default function AdminGateInvites({ embedded = false }: { embedded?: boolean }) {
   const utils = trpc.useUtils();
   const listQ = trpc.gate.list.useQuery();
   const createMut = trpc.gate.create.useMutation({
@@ -91,6 +91,8 @@ export default function AdminGateInvites() {
 
   return (
     <div data-testid="admin-gate-invites-page" className="container py-8" style={{ maxWidth: 1100 }}>
+      {!embedded && (
+        <>
       <Link href="/admin" style={{ fontFamily: SANS, fontSize: "0.78rem", color: LO }} data-testid="gate-invites-back">
         ← Back to admin
       </Link>
@@ -100,6 +102,8 @@ export default function AdminGateInvites() {
       <h1 style={{ fontFamily: SERIF, fontSize: "2.1rem", color: HI, margin: "8px 0 6px" }}>
         Per-tester magic links
       </h1>
+        </>
+      )}
       <p style={{ fontFamily: SANS, color: MID, fontSize: "0.92rem", maxWidth: 720, lineHeight: 1.55 }}>
         Better hygiene than sharing the gate password. Each invite is a unique link (
         <code style={{ background: CARD, padding: "0 4px", borderRadius: 2 }}>/i/&lt;token&gt;</code>

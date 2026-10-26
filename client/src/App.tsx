@@ -102,6 +102,7 @@ const HiContact = lazy(() => import("./pages/HiContact"));
 const AdminContacts = lazy(() => import("./pages/AdminContacts"));
 const AdminActivity = lazy(() => import("./pages/AdminActivity"));
 const AdminPeople = lazy(() => import("./pages/AdminPeople"));
+const AdminContactsPipeline = lazy(() => import("./pages/AdminContactsPipeline"));
 const AdminAccess = lazy(() => import("./pages/AdminAccess"));
 const AdminOutboundQueue = lazy(() => import("./pages/AdminOutboundQueue"));
 const AdminWeeklyRecoDigest = lazy(() => import("./pages/AdminWeeklyRecoDigest"));
@@ -462,6 +463,7 @@ function Router() {
       <Route path={"/unsubscribe/weekly-reco"} component={UnsubscribeWeeklyReco} />
       <Route path={"/admin/activity"} component={AdminActivity} />
       <Route path={"/admin/contacts/engagement"} component={AdminEngagement} />
+      <Route path={"/admin/contacts/pipeline"} component={AdminContactsPipeline} />
       <Route path={"/admin/brand-assets"} component={AdminBrandAssets} />
       <Route path={"/admin/merch-artwork"} component={AdminMerchArtwork} />
       <Route path={"/admin/qr-scans"} component={AdminQrScans} />

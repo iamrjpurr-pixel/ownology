@@ -150,7 +150,7 @@ const SECTIONS: Section[] = [
     routes: [
       { path: "/hi/nathan-brokenwood-wines", label: "SMS landing — example (Nathan)", desc: "Any /hi/:slug renders a personalised card. Nathan resolves to Hunter + Book demo variant.", audience: "public" },
       { path: "/hi/producers/8",       label: "Cellar Brief preview — example (Felton Road)", desc: "Public Cellar Brief mockup baked into every cold email. Any /hi/producers/:id renders a region-aware sample. Zero LLM cost. Feb 2026.", audience: "public" },
-      { path: "/i/example-token",      label: "Invite magic link",   desc: "Any /i/:token bypasses the default-deny gate for one prospect. Generated at /admin/gate-invites.", audience: "public" },
+      { path: "/i/example-token",      label: "Invite magic link",   desc: "Any /i/:token bypasses the default-deny gate for one prospect. Generated at /admin/access (Invite links tab).", audience: "public" },
       { path: "/join",                 label: "Join / warm intro",   desc: "Warm-intro entry point for referred prospects", audience: "public" },
       { path: "/invite",               label: "Invite",              desc: "Invitation-code entry (per-prospect gated onboarding)", audience: "public" },
       { path: "/trial-ending",         label: "Trial ending",        desc: "End-of-trial nudge page", audience: "public" },

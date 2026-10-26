@@ -329,7 +329,7 @@ export default function AdminLeads() {
   const allSources = Array.from(new Set(leads.map((l) => l.source))).sort();
 
   // Filtered leads
-  const filtered = useMemo(() => {
+  const filtered = (() => {
     let result = leads;
     if (sourceFilter !== "all") result = result.filter((l) => l.source === sourceFilter);
     if (search.trim()) {
@@ -345,7 +345,7 @@ export default function AdminLeads() {
       );
     }
     return result;
-  }, [leads, sourceFilter, search]);
+  })();
 
   const handleSaveNotes = (id: number, notes: string) => {
     updateNotesMutation.mutate({ id, notes });

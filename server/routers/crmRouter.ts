@@ -31,7 +31,7 @@ export type CrmPerson = {
 
 const n = (v: unknown) => Number(v ?? 0);
 // Automated-test addresses never belong in the CRM.
-const isTestEmail = (e: string) => /[@.]example(\.|$)|@test\.|^(e1-?test|pytest|cs-|test-)|-test@/.test(e);
+const isTestEmail = (e: string) => /[@.]example(\.|$)|@test\.|^(e1-?test|pytest)|^(cs-|test-|[^@]*-test@)[^@]*@ownology\.ai$|^[^@]*-test@ownology\.ai$/.test(e);
 const fmtName = (...parts: (string | null | undefined)[]) => parts.filter(Boolean).join(" ").trim();
 
 export const crmRouter = router({
@@ -67,7 +67,10 @@ export const crmRouter = router({
     }
 
     const survey = await rows<{ slug: string; answers: number; at: number }>(sql`
-      SELECT slug, COUNT(*) AS answers, MAX(created_at) AS at FROM survey_answers WHERE slug IS NOT NULL GROUP BY slug`).catch(() => []);
+      SELECT s.slug, COUNT(*) AS answers, MAX(s.created_at) AS at FROM (
+        SELECT COALESCE(sa.slug, (SELECT e.slug FROM user_events e WHERE e.session_id = sa.session_id AND e.slug IS NOT NULL LIMIT 1)) AS slug, sa.created_at
+        FROM survey_answers sa) s
+      WHERE s.slug IS NOT NULL GROUP BY s.slug`).catch(() => []);
     for (const s of survey) {
       const key = slugKey.get(s.slug);
       const p = key ? map.get(key) : null;

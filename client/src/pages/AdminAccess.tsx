@@ -27,7 +27,7 @@ export default function AdminAccess() {
           <span className="self-center text-xs text-[var(--ow-text-lo)]">{TABS.find((t) => t.id === tab)?.hint}</span>
         </div>
       </div>
-      {tab === "members" ? <AdminMembers /> : <AdminGateInvites />}
+      {tab === "members" ? <AdminMembers embedded /> : <AdminGateInvites embedded />}
     </div>
   );
 }

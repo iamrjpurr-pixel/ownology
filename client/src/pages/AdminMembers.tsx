@@ -590,7 +590,7 @@ function IssueDrawer({ onClose }: { onClose: () => void }) {
 }
 
 // ─── Main page ────────────────────────────────────────────────────────────
-export default function AdminMembers() {
+export default function AdminMembers({ embedded = false }: { embedded?: boolean }) {
   const [tierFilter, setTierFilter] = useState<"all" | "gate" | "trial" | "member">("all");
   const [healthFilter, setHealthFilter] = useState<"all" | "attention" | "healthy">("all");
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -602,14 +602,16 @@ export default function AdminMembers() {
   const members: MemberRow[] = useMemo(() => (listQ.data?.members as MemberRow[]) || [], [listQ.data]);
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--ow-bg-base)", color: HI, padding: "2rem 1.5rem" }}>
-      <div style={{ maxWidth: 1400, margin: "0 auto" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
-          <Link href="/admin" style={{ color: LO, fontSize: "0.85rem", textDecoration: "none" }}>← Admin</Link>
-        </div>
+    <div style={{ minHeight: embedded ? undefined : "100vh", background: "var(--ow-bg-base)", color: HI, padding: embedded ? "1.25rem 1.5rem 2rem" : "2rem 1.5rem" }}>
+      <div style={{ maxWidth: embedded ? 1104 : 1400, margin: "0 auto" }}>
+        {!embedded && (
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
+            <Link href="/admin" style={{ color: LO, fontSize: "0.85rem", textDecoration: "none" }}>← Admin</Link>
+          </div>
+        )}
         <div style={{ display: "flex", alignItems: "flex-end", gap: "1rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
           <h1 style={{ margin: 0, fontFamily: SERIF, fontSize: "2rem", color: HI, flex: 1 }} data-testid="page-heading">
-            Members · Command Center
+            {embedded ? "" : "Members · Command Center"}
           </h1>
           <Button
             onClick={() => setIssuing(true)}

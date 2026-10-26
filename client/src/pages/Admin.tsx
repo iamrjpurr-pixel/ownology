@@ -160,8 +160,12 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
 // ─── Tool card ────────────────────────────────────────────────────────────────
 
 function ToolCard({ tool }: { tool: AdminTool }) {
+  // Server endpoints must leave the SPA router, so open them as plain links.
+  const Wrap = tool.href.startsWith("/api/")
+    ? ({ children }: { children: React.ReactElement }) => <span onClickCapture={(e) => { e.preventDefault(); window.open(tool.href, "_blank", "noopener"); }}>{children}</span>
+    : ({ children }: { children: React.ReactElement }) => <Link href={tool.href}>{children}</Link>;
   return (
-    <Link href={tool.href}>
+    <Wrap>
       <a
         className="group flex flex-col gap-4 p-6 rounded-sm transition-all duration-200 cursor-pointer"
         style={{
@@ -242,7 +246,7 @@ function ToolCard({ tool }: { tool: AdminTool }) {
           </svg>
         </div>
       </a>
-    </Link>
+    </Wrap>
   );
 }
 
@@ -559,7 +563,7 @@ export default function Admin() {
       {/* Tool sections */}
       <div className="container py-10 space-y-10" data-testid="admin-sections">
         {SECTIONS.map((sec) => {
-          const id = `admin-section-${sec.title.split(" ")[0].toLowerCase()}`;
+          const id = `admin-section-${sec.title.split(" ")[0].toLowerCase().replace(/[^a-z]/g, "")}`;
           return sec.collapsed ? (
             <details key={sec.title} data-testid={id}>
               <summary className="cursor-pointer mb-4"><SectionHead title={sec.title} hint={sec.hint} /></summary>

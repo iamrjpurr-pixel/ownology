@@ -1,0 +1,48 @@
+{
+  "summary": "Read-only test of the admin/CRM streamlining on preview (live prod DB). Backend: crm.people passes 11/11 pytest checks. It returns 286 people, sorted newest first, with the full field shape, no test addresses, zero reservations, unique lower-cased keys, and rejects anonymous and non-admin (e1test-owner) callers with 401/403. Frontend: /admin/people works. Filter chips and counts are correct (Everyone 286, Wants to pay 0, Paying 0, In outreach 282, Has an account 3, Found us themselves 2), search narrows and empties as expected, the ?filter= preset works, and a row expands to its timeline. Open-contact goes to /admin/contacts?slug= and the card gets the amber highlight, the activity link goes to ?slug= or ?user=, and the email link is a mailto. The Wants-to-pay and Paying chips show the empty state. No horizontal overflow at 390px. /admin/access tabs, ?tab=invites and the /admin/members and /admin/gate-invites redirects all work. All 14 old-URL redirects work, and /founding-partners still renders. /site-map lists /admin/people and none of the removed entries. Regression pages (contacts, activity, outbound queue, engagement) load. The hub has 5 sections, People first with 'Start here', and help is a collapsed <details>. Three hub problems remain: the 2 /api/* cards open the in-app 404 page, /admin/leads crashes with a hooks error, and the help section's data-testid was 'admin-section-help,' (I fixed that). Intermittent blank pages during bulk navigation were Cloudflare 429 rate limits on the preview, not app bugs; every page loaded on retry.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "crm.people (survey merge)", "issue": "Survey answers are matched only by survey_answers.slug, and all 10 current rows have slug=NULL, so 'Survey' never appears for anyone. Example: Rod Shields' /admin/activity shows survey clicks on /know (after he first opened /know?for=rod-patina-wines), but his People card shows no Survey. demoRouter.surveyAnswer stores slug only when ?for= is in the URL at answer time. Fix: carry the invite slug through the survey session, or fall back to user_events.session_id -> slug."},
+      {"endpoint": "crm.people (gate_invites)", "issue": "The 20 gate_invites have no contact_email, so 'Access link' never shows on any person. This follows from the email-only matching design; consider matching on member_name or slug, or show unmatched invites."},
+      {"endpoint": "crm.people isTestEmail", "issue": "The regex '^cs-' and '-test@' would also hide real addresses such as cs-team@winery.com.au or wine-test@.... It currently hides only intended rows."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Admin hub ToolCard (Help section)", "issue": "The cards 'Email deliverability check' (/api/scheduled/resend-health) and 'Weekly cellar digest — dry run' (/api/scheduled/weekly-cellar-digest?dryRun=1) use the wouter <Link>, so the click navigates inside the app and shows the NotFound page instead of reaching the server endpoint. Reproduced: clicking resend-health showed data-testid=not-found-page. Fix: in ToolCard, render a plain <a href> (or target=_blank) when href starts with '/api/'.", "selector": "[data-testid='admin-section-help'] a[href^='/api/']", "priority": "HIGH"},
+      {"component": "AdminLeads (/admin/leads, hub card 'Old lead list')", "issue": "Crashes into the error boundary with 'Rendered more hooks than during the previous render'. useMemo (line ~332) runs after the early returns for isLoading and AccessDenied (lines 320-324). Not a new bug, but it is now linked from the hub. Fix: move useMemo above the early returns.", "selector": "/admin/leads", "priority": "HIGH"},
+      {"component": "SiteMap / AdminMarketingKit / AdminOperatorGuide / AdminPlaybook", "issue": "They link to /admin/contacts/pipeline, which has no route and shows the 404 page. The SiteMap /i/example-token description still says 'Generated at /admin/gate-invites' (the redirect works, but the text is stale).", "selector": "a[href='/admin/contacts/pipeline']", "priority": "MEDIUM"},
+      {"component": "Admin hub sections", "issue": "FIXED by testing agent: the help section's data-testid was 'admin-section-help,' with a trailing comma, because it came from 'Help,'.split(' ')[0]. It now strips non-letters.", "selector": "[data-testid='admin-section-help']", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/admin/access", "issues": ["Back links and titles appear twice. The Access header's '← Admin' + 'Access' sits above the embedded page's own '← Admin' + 'Members · Command Center' (or '← Back to admin' + 'Per-tester magic links'). Hide the inner back link and title when embedded.", "Container widths don't match: the header is max-w-6xl, the members body is wider, and the invites body is narrower."]},
+      {"screen": "/admin/people mobile", "issues": ["The email is hidden below the sm breakpoint, which leaves an orphan '· 24 Oct 26' with a leading dot."]},
+      {"screen": "/admin hub", "issues": ["ToolCard nests <a> inside the wouter v3 <Link> (which already renders an <a>), so each card has 2 anchors and the inner one has no href. This is invalid HTML.", "The 'Weekly cellar digest — dry run' card says the email 'goes to your test address', but dryRun=1 only logs 'would send'. The wording is misleading."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_crm_people.py", "/app/test_reports/pytest/pytest_crm_people.xml"],
+  "action_items": [
+    "Render a plain <a> for /api/* hrefs in the Admin ToolCard; the two Help cards currently 404 inside the app",
+    "Fix AdminLeads.tsx Rules of Hooks: move useMemo above the early returns (the /admin/leads page crashes)",
+    "Add a route for /admin/contacts/pipeline or remove the links to it (SiteMap, MarketingKit, OperatorGuide, Playbook)",
+    "Optional: link survey answers to contacts when slug is NULL (session_id -> user_events.slug) so the Survey kind shows in People",
+    "Optional: on /admin/access, hide the embedded pages' own back link and H1"
+  ],
+  "critical_code_review_comments": [
+    "crmRouter: the survey query swallows errors with .catch(() => []), while the other queries throw. Be consistent, or at least log the error.",
+    "crmRouter: if several outreach_contacts share one email, p.slug is overwritten by whichever comes last, so 'Open contact card' may open a different card each time.",
+    "crmRouter loads every table into memory on each request. Fine at ~300 rows, but there is no pagination or cache.",
+    "AdminPeople reads ?filter only once (useState initializer), so a client-side change to ?filter while on the page is not reflected. Minor.",
+    "data-testid values for people rows contain raw emails ('@', '.'), which forces attribute selectors. Acceptable, but a hash or index would be more robust."
+  ],
+  "updated_files": ["/app/client/src/pages/Admin.tsx (section data-testid fix)", "/app/backend/tests/test_crm_people.py (new)"],
+  "success_rate": {"backend": "100% (11/11)", "frontend": "~90% (hub /api cards and /admin/leads fail; everything else passed)"},
+  "test_credentials": "Admin JWT from /root/admin.jwt as the app_session_id cookie. Non-admin: e1test-owner seeded via scripts/e1-test-users.ts seed, then cleaned.",
+  "seed_data_creation": "Seeded e1test users (owner/contractor/outsider) for the non-admin 401/403 check, then removed them with 'e1-test-users.ts clean'. No CRM, access or reservation writes. No emails, no LLM calls.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Preview = live prod DB; stay read-only. test_crm_people.py needs /root/admin.jwt, and a non-admin JWT at /tmp/owner.jwt (written from e1-test-users seed output; the test skips if missing). Preview Cloudflare returns 429 on rapid full-page loads (vite dev modules). Navigate client-side with history.pushState + popstate after a single load, and pause about 20-30s between batches. Counts at test time: 286 people, 282 outreach, 3 accounts, 2 inbound, 0 reservations, 0 members.",
+  "rca of the issue": "Hub /api cards: ToolCard wraps every href in wouter <Link>, which intercepts the click and pushState-navigates, so server-only /api/* paths fall through to the SPA NotFound route. /admin/leads: AdminLeads calls useMemo after conditional early returns (isLoading, then AccessDenied). The first render returns early with fewer hooks; the next render calls useMemo, React throws 'Rendered more hooks', and the error boundary catches it."
+}
