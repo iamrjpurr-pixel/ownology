@@ -368,175 +368,90 @@ const QUICKLINK_COLUMNS: Array<{
   },
 ];
 
-const TOOLS: AdminTool[] = [
+const T = (label: string, href: string, description: string, icon: React.ReactNode, badge?: string): AdminTool => ({ label, href, description, icon, badge });
+
+// Grouped by job-to-be-done. Help, health & developer starts collapsed.
+const SECTIONS: { title: string; hint: string; collapsed?: boolean; tools: AdminTool[] }[] = [
   {
-    label: "Operator Guide",
-    description: "Not sure where to start? This is the manual — daily rhythm, when-to-use-what, and troubleshooting. Bookmark it on your phone.",
-    href: "/admin/operator-guide",
-    icon: <IconKnowledge />,
-    badge: "Start here",
+    title: "People & CRM",
+    hint: "Who's out there, who's interested, who's paying",
+    tools: [
+      T("People", "/admin/people", "Everyone once, matched by email — outreach, sign-ups, quiz, demo, survey, founding reservations, paying members, access links and accounts. Filter 'Wants to pay' to see who to call.", <IconMembers />, "Start here"),
+      T("Outreach contacts", "/admin/contacts", "Your outreach list: add a winemaker, get their personal /hi link and SMS draft, track opens, replies and bookings.", <IconLeads />, "Outreach"),
+      T("Outbound queue", "/admin/contacts/outbound-queue", "Who to contact next, with AI-rewritten SMS drafts and bulk enrichment.", <IconLeads />),
+      T("Replies & follow-ups", "/admin/contacts/engagement", "Paste a reply, get its tone and a follow-up draft. See who needs chasing.", <IconLeads />),
+      T("Activity", "/admin/activity", "Click-by-click visits from invited prospects and signed-in members.", <IconChart />, "Live"),
+      T("Access", "/admin/access", "Members and personal invite links in one place — see progress, pause, revoke.", <IconMembers />, "Access"),
+      T("Producers", "/admin/producers", "AU + NZ winery directory — the source list for new outreach.", <IconLeads />),
+      T("Press bypass requests", "/admin/press-bypass", "Wine writers and judges asking for preview access to The Press. Grant in one click.", <IconMembers />),
+    ],
   },
   {
-    label: "Site Map",
-    description: "Every route on the site — marketing, member, admin, SEO — grouped by audience with one-tap links. The reference when you can't remember where something lives.",
-    href: "/site-map",
-    icon: <IconKnowledge />,
-    badge: "All URLs",
+    title: "Sales & money",
+    hint: "Orders, conversion and what visitors see",
+    tools: [
+      T("Orders", "/admin/orders", "Live Stripe checkout history — customers, line items, revenue and Stripe links.", <IconOrders />, "Live Stripe"),
+      T("Conversion funnel", "/admin/funnel", "Where paid sign-ups come from, by source tag.", <IconLeads />, "Attribution"),
+      T("Campaign metrics", "/admin/campaign-metrics", "Week-by-week KPIs — waitlist, MRR, open rates, sessions.", <IconChart />, "Weekly"),
+      T("Pricing page", "/pricing", "Check tiers, credit packs and the founding counter as visitors see them.", <IconPricing />),
+      T("Merch store", "/merch", "The public merch store and its checkout.", <IconMerch />),
+    ],
   },
   {
-    label: "Campaign Metrics",
-    description: "Week-by-week KPI snapshots — waitlist growth, MRR trajectory, email open rates, organic sessions, and compliance query volume.",
-    href: "/campaign-metrics",
-    icon: <IconChart />,
-    badge: "Weekly cron",
+    title: "Marketing",
+    hint: "Daily ritual and ready-to-use assets",
+    tools: [
+      T("Marketing Ops", "/admin/marketing-ops", "Today's marketing to-dos from the AI coach, streak and reply-rate KPI.", <IconLeads />, "AI Coach"),
+      T("Marketing kit", "/admin/marketing-kit", "Sample-log URLs, email signatures and DM copy, one click to copy.", <IconLeads />, "Assets"),
+      T("SMS openers", "/admin/sms-openers", "The opening lines used in outreach texts, by region.", <IconLeads />),
+    ],
   },
   {
-    label: "Orders",
-    description: "Live Stripe checkout session history — order table, customer emails, line items, revenue summary, and direct links to the Stripe dashboard.",
-    href: "/orders",
-    icon: <IconOrders />,
-    badge: "Live Stripe",
+    title: "Content & AI",
+    hint: "What Owen and the tutors know",
+    tools: [
+      T("Compliance doctrine", "/admin/compliance-doctrine", "Every canonical compliance answer with citations and last-verified dates.", <IconCompliance />),
+      T("Compliance agent", "/compliance", "Test the regulatory Q&A across all seven jurisdictions.", <IconCompliance />),
+      T("Vintage intelligence", "/admin/vintage-intelligence", "Regional vintage data fed to Owen when a region or year comes up.", <IconVintage />, "AI Context"),
+      T("WBS knowledge publisher", "/admin/wbs", "Which wine-bible chapters are live in the home-winemaker tutor.", <IconKnowledge />),
+      T("Trinity review", "/admin/trinity", "Nightly AI-drafted community pieces — promote, suppress, fix.", <IconKnowledge />),
+    ],
   },
   {
-    label: "Founding Members",
-    description: "View and manage founding member registrations. Add members manually, track winery names and states, and monitor tier distribution.",
-    href: "/campaign-metrics",
-    icon: <IconMembers />,
-  },
-  {
-    label: "Press Bypass Requests",
-    description: "Wine writers, judges, and evaluators can request preview access to The Press without racking a batch. Grant here — one-click.",
-    href: "/admin/press-bypass",
-    icon: <IconMembers />,
-  },
-  {
-    label: "App Health Dashboard",
-    description: "Live probe status (env vars · DB · Resend · LLM · auth) with last-transition timestamps. Run the daily digest or the failure-only watcher from here.",
-    href: "/admin/health",
-    icon: <IconMembers />,
-  },
-  {
-    label: "Resend Deliverability Check",
-    description: "One-URL verdict on email deliverability — API key valid, domains verified, sandbox detection. Add ?to=you@example.com to trigger a real test send.",
-    href: "/api/scheduled/resend-health",
-    icon: <IconMembers />,
-  },
-  {
-    label: "Weekly Cellar Digest — send now",
-    description: "Fire the Monday-morning weekly Cellar Brief email to every winery user (dry-run first — redirects to your test address). Uses your existing Resend integration.",
-    href: "/api/scheduled/weekly-cellar-digest?dryRun=1",
-    icon: <IconMembers />,
-  },
-  {
-    label: "Compliance Agent",
-    description: "The owner-facing view of the AI regulatory Q&A tool. Test questions across all seven jurisdictions and review knowledge base coverage.",
-    href: "/compliance",
-    icon: <IconCompliance />,
-  },
-  {
-    label: "Merch Store",
-    description: "The public-facing merch store. Review product listings, artwork, cart behaviour, and Stripe checkout flow before publishing.",
-    href: "/merch",
-    icon: <IconMerch />,
-  },
-  {
-    label: "Pricing Page",
-    description: "Review subscription tiers, credit packs, founding member counter, and the Buttondown waitlist capture CTA.",
-    href: "/pricing",
-    icon: <IconPricing />,
-  },
-  {
-    label: "Lead CRM",
-    description: "Every email sign-up stored in your own database — source tag, date, winery name, and inline notes. CSV export included.",
-    href: "/admin/leads",
-    icon: <IconLeads />,
-    badge: "New",
-  },
-  {
-    label: "Compliance Doctrine Map",
-    description: "Read-only view of all canonical Q&A doctrine entries — grouped by topic, with jurisdiction badges, citations, keywords, and last-verified dates.",
-    href: "/admin/compliance-doctrine",
-    icon: <IconCompliance />,
-    badge: "Doctrine",
-  },
-  {
-    label: "Vintage Intelligence",
-    description: "Manage regional vintage data (2024 and beyond) that is automatically injected into the Free Run AI Tutor when a user mentions a region or vintage year.",
-    href: "/admin/vintage-intelligence",
-    icon: <IconVintage />,
-    badge: "AI Context",
-  },
-  {
-    label: "WBS Knowledge Publisher",
-    description: "Control which Red Wine Bible (and White Wine Bible) chapters are live in the DIY home winemaker tutor. Toggle individual chapters or entire WBS domains.",
-    href: "/admin/wbs",
-    icon: <IconKnowledge />,
-    badge: "DIY Tutor",
-  },
-  {
-    label: "Trinity Review",
-    description: "Review community blog pieces auto-drafted nightly from clusters of real Free Run questions. Promote the best to Featured, suppress duplicates, and action accuracy flags.",
-    href: "/admin/trinity",
-    icon: <IconKnowledge />,
-    badge: "Pipeline",
-  },
-  {
-    label: "Conversion Funnel",
-    description: "Where do paid signups actually come from? Every /pricing visit is tagged by source (free-paused, homepage, press CTA, cellar-journal…) so you can tune budgets and CTAs against real conversion data.",
-    href: "/admin/funnel",
-    icon: <IconLeads />,
-    badge: "Attribution",
-  },
-  {
-    label: "Personal SMS Contacts",
-    description: "Outreach pipeline for warm leads met at wine events. Add a winemaker → get a personalised /hi/<slug> landing page + ready-to-send SMS draft. Tracks who opened the link and who booked a demo.",
-    href: "/admin/contacts",
-    icon: <IconLeads />,
-    badge: "Outreach",
-  },
-  {
-    label: "Marketing Kit",
-    description: "Every outreach asset in one place — sample-vintage-log variant URLs (Hunter / Boutique / Large), email signature templates, and LinkedIn DM copy. One-click copy for each. Bookmark this.",
-    href: "/admin/marketing-kit",
-    icon: <IconLeads />,
-    badge: "Assets",
-  },
-  {
-    label: "Theme Picks",
-    description: "Anonymous tally of which themes operators are choosing. See first-time defaults vs. switched-to, plus the percentage currently using each theme. Use it to decide which themes stay enabled.",
-    href: "/admin/themes-stats",
-    icon: <IconLeads />,
-    badge: "Telemetry",
-  },
-  {
-    label: "Quiz Picks",
-    description: "What the /quiz recommender is picking in the wild — winner distribution, swap rate (algorithm overriding the pure-palate best), buying-market split, and CTA click-through to the Founding-Member plan. Use it to fine-tune quizData.ts.",
-    href: "/admin/quiz-picks",
-    icon: <IconLeads />,
-    badge: "Telemetry",
-  },
-  {
-    label: "Producers",
-    description: "AU + NZ winery directory — foundation for the 3-touch cold-email engine. Seed 10 real wineries or drop a CSV to build your pipeline.",
-    href: "/admin/producers",
-    icon: <IconLeads />,
-    badge: "Pipeline",
-  },
-  {
-    label: "Marketing Ops",
-    description: "Your daily/weekly marketing ritual dashboard. AI Coach reads the season + funnel state and tells you exactly what to do today. Tick tasks, hold your streak, watch the reply-rate KPI.",
-    href: "/admin/marketing-ops",
-    icon: <IconLeads />,
-    badge: "AI Coach",
-  },
-  {
-    label: "Gate invites",
-    description: "Per-tester magic links (/i/<token>). Share individual invites with beta users, see who's active, revoke individually without rotating the shared password.",
-    href: "/admin/gate-invites",
-    icon: <IconLeads />,
-    badge: "Access",
+    title: "Help, health & developer",
+    hint: "Manuals, diagnostics and internal tools",
+    collapsed: true,
+    tools: [
+      T("Operator guide", "/admin/operator-guide", "The manual — daily rhythm, when to use what, troubleshooting.", <IconKnowledge />),
+      T("Site map", "/site-map", "Every page on the site, grouped by audience.", <IconKnowledge />),
+      T("App health", "/admin/health", "Live status of env vars, database, email, AI and sign-in.", <IconMembers />),
+      T("Email deliverability check", "/api/scheduled/resend-health", "One-URL verdict on email sending. Add ?to=you@example.com for a test send.", <IconMembers />),
+      T("Weekly cellar digest — dry run", "/api/scheduled/weekly-cellar-digest?dryRun=1", "Preview the Monday cellar email (goes to your test address).", <IconMembers />),
+      T("Old lead list", "/admin/leads", "The original email sign-up table (now also shown inside People).", <IconLeads />),
+      T("Quiz picks", "/admin/quiz-picks", "What the /quiz recommender is picking and click-through.", <IconLeads />, "Telemetry"),
+      T("Theme picks", "/admin/themes-stats", "Which site themes visitors choose.", <IconLeads />, "Telemetry"),
+      T("Users", "/admin/users", "Every account, recent magic links, resend a login link.", <IconMembers />),
+      T("Build index", "/admin/build-index", "Internal index of builds and pages.", <IconKnowledge />),
+    ],
   },
 ];
+
+function SectionGrid({ tools }: { tools: AdminTool[] }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {tools.map((tool) => <ToolCard key={tool.href + tool.label} tool={tool} />)}
+    </div>
+  );
+}
+
+function SectionHead({ title, hint }: { title: string; hint: string }) {
+  return (
+    <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+      <span style={{ fontFamily: "'Fraunces',serif", fontSize: "1.25rem", color: "var(--ow-text-hi)" }}>{title}</span>
+      <span style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.78rem", color: "var(--ow-text-lo)" }}>{hint}</span>
+    </span>
+  );
+}
 
 export default function Admin() {
   const { data, isLoading, error } = trpc.admin.summary.useQuery();
@@ -641,25 +556,22 @@ export default function Admin() {
         </div>
       </div>
 
-      {/* Tool cards grid */}
-      <div className="container py-10">
-        <p
-          style={{
-            fontFamily: "'Lato',sans-serif",
-            fontSize: "0.7rem",
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            color: "var(--ow-text-lo)",
-            marginBottom: "1.5rem",
-          }}
-        >
-          Owner Tools
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {TOOLS.map((tool) => (
-            <ToolCard key={tool.href + tool.label} tool={tool} />
-          ))}
-        </div>
+      {/* Tool sections */}
+      <div className="container py-10 space-y-10" data-testid="admin-sections">
+        {SECTIONS.map((sec) => {
+          const id = `admin-section-${sec.title.split(" ")[0].toLowerCase()}`;
+          return sec.collapsed ? (
+            <details key={sec.title} data-testid={id}>
+              <summary className="cursor-pointer mb-4"><SectionHead title={sec.title} hint={sec.hint} /></summary>
+              <SectionGrid tools={sec.tools} />
+            </details>
+          ) : (
+            <section key={sec.title} data-testid={id}>
+              <div className="mb-4"><SectionHead title={sec.title} hint={sec.hint} /></div>
+              <SectionGrid tools={sec.tools} />
+            </section>
+          );
+        })}
       </div>
 
       {/* Marketing quick-links — moved out of the public "More" mega-menu

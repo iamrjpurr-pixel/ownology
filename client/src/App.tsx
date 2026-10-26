@@ -27,8 +27,6 @@ import Home from "./pages/Home";
 import FreeRun from "./pages/FreeRun";
 const FreeRunJournal = lazy(() => import("./pages/FreeRunJournal"));
 const Apco = lazy(() => import("./pages/Apco"));
-const HomeV2 = lazy(() => import("./pages/HomeV2"));
-const HomeV3 = lazy(() => import("./pages/HomeV3"));
 import ThePress from "./pages/ThePress";
 import Curriculum from "./pages/Curriculum";
 import CurriculumLesson from "./pages/CurriculumLesson";
@@ -65,8 +63,6 @@ const ForHomeWinemakers = lazy(() => import("./pages/ForHomeWinemakers"));
 const DIYKnowledge = lazy(() => import("./pages/DIYKnowledge"));
 const HomeWinemakerTroubleshooting = lazy(() => import("./pages/HomeWinemakerTroubleshooting"));
 const HomeWinemakerGlossary = lazy(() => import("./pages/HomeWinemakerGlossary"));
-const CompetitiveAdvantage = lazy(() => import("./pages/CompetitiveAdvantage"));
-const Preview = lazy(() => import("./pages/Preview"));
 const AdminLeads = lazy(() => import("./pages/AdminLeads"));
 const AdminComplianceDoctrine = lazy(() => import("./pages/AdminComplianceDoctrine"));
 const AdminVintageIntelligence = lazy(() => import("./pages/AdminVintageIntelligence"));
@@ -105,6 +101,8 @@ const VintageCompare = lazy(() => import("./pages/VintageCompare"));
 const HiContact = lazy(() => import("./pages/HiContact"));
 const AdminContacts = lazy(() => import("./pages/AdminContacts"));
 const AdminActivity = lazy(() => import("./pages/AdminActivity"));
+const AdminPeople = lazy(() => import("./pages/AdminPeople"));
+const AdminAccess = lazy(() => import("./pages/AdminAccess"));
 const AdminOutboundQueue = lazy(() => import("./pages/AdminOutboundQueue"));
 const AdminWeeklyRecoDigest = lazy(() => import("./pages/AdminWeeklyRecoDigest"));
 const UnsubscribeWeeklyReco = lazy(() => import("./pages/UnsubscribeWeeklyReco"));
@@ -127,8 +125,6 @@ const AdminQuizPicks = lazy(() => import("./pages/AdminQuizPicks"));
 const AdminProducers = lazy(() => import("./pages/AdminProducers"));
 const AdminMarketingOps = lazy(() => import("./pages/AdminMarketingOps"));
 const AdminEnvironment = lazy(() => import("./pages/AdminEnvironment"));
-const AdminGateInvites = lazy(() => import("./pages/AdminGateInvites"));
-const AdminMembers = lazy(() => import("./pages/AdminMembers"));
 const TrialLocked = lazy(() => import("./pages/TrialLocked"));
 const JoinLandscape = lazy(() => import("./pages/JoinLandscape"));
 const JoinQr = lazy(() => import("./pages/JoinQr"));
@@ -139,9 +135,6 @@ const RiskBriefing = lazy(() => import("./pages/RiskBriefing"));
 const RiskGlossary = lazy(() => import("./pages/RiskGlossary"));
 const HiProducerPreview = lazy(() => import("./pages/HiProducerPreview"));
 const CascadeDemo = lazy(() => import("./pages/CascadeDemo"));
-const CopilotMockup = lazy(() => import("./pages/CopilotMockup"));
-const BrandingMockup = lazy(() => import("./pages/BrandingMockup"));
-const OnboardingMockup = lazy(() => import("./pages/OnboardingMockup"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
@@ -412,8 +405,8 @@ function Router() {
       <Route path={"/free-run/journal"} component={FreeRunJournal} />
       <Route path={"/free-run"} component={FreeRunPage} />
       <Route path={"/apco"} component={Apco} />
-      <Route path={"/home-v2"} component={HomeV2} />
-      <Route path={"/home-v3"} component={HomeV3} />
+      <Route path={"/home-v2"}><Redirect to="/" /></Route>
+      <Route path={"/home-v3"}><Redirect to="/" /></Route>
       <Route path={"/the-press"} component={ThePressPage} />
       <Route path={"/pricing"} component={Pricing} />
       <Route path={"/merch/success"} component={MerchSuccess} />
@@ -424,13 +417,13 @@ function Router() {
       <Route path={"/admin/campaign-metrics"} component={CampaignMetrics} />
       <Route path={"/admin/orders"} component={Orders} />
       <Route path={"/admin/guest-passes"} component={AdminGuestPasses} />
-      <Route path={"/campaign-metrics"} component={CampaignMetrics} />
-      <Route path={"/orders"} component={Orders} />
+      <Route path={"/campaign-metrics"}><Redirect to="/admin/campaign-metrics" /></Route>
+      <Route path={"/orders"}><Redirect to="/admin/orders" /></Route>
       <Route path={"/admin"} component={Admin} />
       <Route path={"/quick-entry"} component={QuickEntryPage} />
       <Route path={"/cellar-tasks"} component={CellarTasksPage} />
-      <Route path={"/competitive-advantage"} component={CompetitiveAdvantage} />
-      <Route path={"/preview"} component={Preview} />
+      <Route path={"/competitive-advantage"}><Redirect to="/vs/innovint-vintrace" /></Route>
+      <Route path={"/preview"}><Redirect to="/admin" /></Route>
       <Route path={"/admin/leads"} component={AdminLeads} />
       <Route path={"/admin/compliance-doctrine"} component={AdminComplianceDoctrine} />
       <Route path={"/admin/vintage-intelligence"} component={AdminVintageIntelligence} />
@@ -442,7 +435,7 @@ function Router() {
       <Route path={"/vineyard"} component={Vineyard} />
       {/* /build-index moved to /admin/* — dev-only surface, was leaking on prod. */}
       <Route path={"/admin/build-index"} component={BuildIndex} />
-      <Route path={"/build-index"} component={BuildIndex} />
+      <Route path={"/build-index"}><Redirect to="/admin/build-index" /></Route>
       <Route path={"/knowledge/using-ownology"} component={KnowledgeUsingOwnology} />
       <Route path={"/knowledge"} component={KnowledgePage} />
       <Route path={"/knowledge/*"} component={KnowledgePage} />
@@ -487,14 +480,16 @@ function Router() {
       <Route path={"/admin/producers"} component={AdminProducers} />
       <Route path={"/admin/marketing-ops"} component={AdminMarketingOps} />
       <Route path={"/admin/environment"} component={AdminEnvironment} />
-      <Route path={"/admin/gate-invites"} component={AdminGateInvites} />
-      <Route path={"/admin/members"} component={AdminMembers} />
+      <Route path={"/admin/gate-invites"}><Redirect to="/admin/access?tab=invites" /></Route>
+      <Route path={"/admin/access"} component={AdminAccess} />
+      <Route path={"/admin/people"} component={AdminPeople} />
+      <Route path={"/admin/members"}><Redirect to="/admin/access?tab=members" /></Route>
       <Route path={"/trial-locked"} component={TrialLocked} />
       <Route path={"/join/landscape"} component={JoinLandscape} />
       <Route path={"/join/qr"} component={JoinQr} />
       <Route path={"/install-ios"} component={InstallIos} />
-      <Route path={"/pwa/install"} component={InstallIos} />
-      <Route path={"/pwa/ios"} component={InstallIos} />
+      <Route path={"/pwa/install"}><Redirect to="/install-ios" /></Route>
+      <Route path={"/pwa/ios"}><Redirect to="/install-ios" /></Route>
       <Route path={"/tasting"} component={TastingEntry} />
       <Route path={"/risk-management"} component={RiskManagement} />
       <Route path={"/risk-briefing"} component={RiskBriefing} />
@@ -507,9 +502,9 @@ function Router() {
       <Route path={"/login"} component={Login} />
       <Route path={"/auth/callback"} component={AuthCallback} />
       <Route path={"/cascade-demo"} component={CascadeDemo} />
-      <Route path={"/copilot-mockup"} component={CopilotMockup} />
-      <Route path={"/branding-mockup"} component={BrandingMockup} />
-      <Route path={"/onboarding-mockup"} component={OnboardingMockup} />
+      <Route path={"/copilot-mockup"}><Redirect to="/admin" /></Route>
+      <Route path={"/branding-mockup"}><Redirect to="/admin" /></Route>
+      <Route path={"/onboarding-mockup"}><Redirect to="/admin" /></Route>
       <Route path={"/onboarding"} component={Onboarding} />
       <Route path={"/privacy"} component={Privacy} />
       <Route path={"/terms"} component={Terms} />
@@ -533,7 +528,7 @@ function Router() {
           startup-speak; "your journey" is warmer than "your vintage" for
           the first-time visitor context. Both aliases below preserved for
           any cold-outreach SMS or bookmarks already in the wild. */}
-      <Route path={"/your-journey"} component={Roadmap} />
+      <Route path={"/your-journey"}><Redirect to="/your-vintage" /></Route>
       <Route path={"/roadmap"} component={Roadmap} />
       <Route path={"/admin/style-guide/induction"} component={StyleGuideInduction} />
       <Route path={"/admin/deck/user-journey"} component={UserJourneyDeck} />

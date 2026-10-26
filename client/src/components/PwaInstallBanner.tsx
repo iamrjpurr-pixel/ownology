@@ -172,7 +172,7 @@ export default function PwaInstallBanner() {
         )}
         {isIos && (
           <Link
-            href="/pwa/install"
+            href="/install-ios"
             data-testid="pwa-install-ios-guide"
             className="text-xs px-4 py-1.5 rounded-sm font-semibold"
             style={{

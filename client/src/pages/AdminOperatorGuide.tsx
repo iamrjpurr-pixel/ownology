@@ -576,7 +576,7 @@ export default function AdminOperatorGuide() {
                 (button below) for anyone offline, or screen-share it live during onboarding.
                 For temporary in-app access, create a magic link at{" "}
                 <Link
-                  href="/admin/gate-invites"
+                  href="/admin/access?tab=invites"
                   className="underline"
                   style={{ color: "var(--ow-amber)" }}
                 >

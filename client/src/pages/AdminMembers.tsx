@@ -743,7 +743,7 @@ export default function AdminMembers() {
 
         <p style={{ margin: "1rem 0 0", fontSize: "0.72rem", color: LO }}>
           {listQ.data?.total ?? 0} member{(listQ.data?.total ?? 0) === 1 ? "" : "s"} shown ·{" "}
-          <Link href="/admin/gate-invites" style={{ color: LO }}>Legacy invite table →</Link>
+          <Link href="/admin/access?tab=invites" style={{ color: LO }}>Invite links →</Link>
         </p>
       </div>
 
