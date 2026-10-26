@@ -1986,3 +1986,5 @@ The real drivers:
 ### Future / Backlog (unchanged from previous session)
 Impersonate mode (M4) · Diagnostic panels (M6) · Morning brief email (M7) · Analytics tiles (M8) · Staged reveal (Phase D) · Regional multi-currency SKUs · Home Winemaker bridge tier · Capacitor wrap for App Store · Sensory Assessment on `/cellar-brief` · Owen voice guide · Refactor `server/routers/outreach.ts` (>3300 lines) · SW `CACHE_VERSION` auto-bump from commit hash · Multi-tenant winery model (Vigneron tier)
 
+
+- **Jun 2026 link check:** live /know?for=rod-patina-wines verified loading (personalised "Rod,"). Earlier /try?from=%2Fknow redirect was from before the deploy reached Railway.
