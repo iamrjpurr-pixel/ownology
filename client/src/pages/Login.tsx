@@ -144,7 +144,7 @@ export default function Login() {
           }}
         >
           Continue with your Google account to access your cellar dashboard,
-          admin tools, and personalised SOPs.
+          Brand Vault and personalised SOPs.
         </p>
 
         <button

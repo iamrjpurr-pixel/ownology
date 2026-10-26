@@ -777,15 +777,16 @@ function ThemePicker() {
   // so this early return is safe under rules-of-hooks.
   const HIDDEN_ON = new Set(["/try", "/auth/callback", "/know"]);
   if (HIDDEN_ON.has(pathname) || pathname.startsWith("/i/")) return null;
+  const raise = pathname.startsWith("/pricing") || pathname.startsWith("/free-run");
 
   return (
     <div
       ref={rootRef}
       data-testid="theme-picker"
-      className={pathname.startsWith("/pricing") ? "ow-theme-picker-raise" : undefined}
+      className={raise ? "ow-theme-picker-raise" : undefined}
       style={{
         position: "fixed",
-        bottom: pathname.startsWith("/pricing") ? undefined : 20,
+        bottom: raise ? undefined : 20,
         left: 20,
         zIndex: 40, // below modals (50+) but above hero content
         fontFamily: "'Fira Code',monospace",

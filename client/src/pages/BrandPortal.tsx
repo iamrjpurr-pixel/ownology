@@ -200,7 +200,7 @@ export default function BrandPortal() {
                 {current.role === "owner" ? "Owner" : "Contract winemaker"}
               </span>
               <Select value={String(current.wineryId)} onValueChange={(v) => setBrandId(Number(v))}>
-                <SelectTrigger className="w-auto min-w-[220px] max-w-[340px]" data-testid="brand-switcher"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-full sm:w-auto min-w-[220px] max-w-full sm:max-w-[480px]" data-testid="brand-switcher"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {brands.map((b) => (
                     <SelectItem key={b.wineryId} value={String(b.wineryId)} data-testid={`brand-option-${b.wineryId}`}>{b.name}{b.role === "contractor" ? " · contract" : ""}</SelectItem>

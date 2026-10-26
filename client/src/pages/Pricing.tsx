@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearch } from "wouter";
+import { toast } from "sonner";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
@@ -985,11 +986,11 @@ function CreditPackCard({ pack }: { pack: (typeof CREDIT_PACKS)[0] }) {
       if (url) {
         window.location.href = url;
       } else {
-        alert("Couldn't start checkout. Please try again or DM Rich.");
+        toast.error("Couldn't start checkout. Please try again or DM Rich.");
       }
     } catch (err) {
       console.error("[Pricing] createCreditPackCheckout failed:", err);
-      alert("Checkout failed. Please try again — if it keeps happening, DM Rich.");
+      toast.error("Checkout failed. Please try again — if it keeps happening, DM Rich.");
     } finally {
       setLoading(false);
     }

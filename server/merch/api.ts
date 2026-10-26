@@ -443,8 +443,15 @@ router.post(
       const paymentIntent = typeof charge.payment_intent === "string" ? charge.payment_intent : null;
       const { db } = await import("../db.js");
       const { sql } = await import("drizzle-orm");
-      const [claim] = await db.execute(sql`INSERT IGNORE INTO stripe_events_processed (event_id, created_at) VALUES (${event.id}, ${Date.now()})`);
-      const fresh = (claim as unknown as { affectedRows: number }).affectedRows === 1;
+      let fresh: boolean;
+      try {
+        const [claim] = await db.execute(sql`INSERT IGNORE INTO stripe_events_processed (event_id, created_at) VALUES (${event.id}, ${Date.now()})`);
+        fresh = (claim as unknown as { affectedRows: number }).affectedRows === 1;
+      } catch (err) {
+        console.error("[Webhook] charge.refunded claim failed:", err);
+        res.status(500).json({ error: "refund processing failed; please retry" });
+        return;
+      }
       if (fresh && paymentIntent && charge.amount > 0) {
         try {
           const stripe = getStripe();

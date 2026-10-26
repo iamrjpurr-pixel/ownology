@@ -45,9 +45,13 @@ async function authAwareFetch(input: RequestInfo | URL, init?: RequestInit): Pro
       path.startsWith("/work-mode") ||
       path.startsWith("/todo") ||
       path.startsWith("/roadmap") ||
-      path.startsWith("/onboarding") ||
       path.startsWith("/your-vintage");
-    if (needsAuth) {
+    // A 401 from one admin-only call doesn't mean the session is dead —
+    // only log out when the session itself is rejected.
+    const sessionDead = needsAuth
+      ? await globalThis.fetch("/api/auth/me", { credentials: "include" }).then((r) => r.status === 401).catch(() => false)
+      : false;
+    if (sessionDead && !redirectedOnce) {
       redirectedOnce = true;
       // Best-effort cookie clear — server also clears on /api/auth/logout.
       try {

@@ -91,7 +91,7 @@ export default function KnowSurvey() {
           <>
             <div className="mt-10" data-testid="survey-progress">
               <div className="flex justify-between text-xs text-[var(--ow-text-lo)]"><span>Question {i + 1} of {SURVEY.length}</span><span>About 2 minutes</span></div>
-              <div className="mt-2 h-1.5 rounded-full bg-[var(--ow-bg-inset)]"><div className="h-1.5 rounded-full bg-[var(--ow-amber)] transition-[width] duration-500" style={{ width: `${(i / SURVEY.length) * 100}%` }} /></div>
+              <div className="mt-2 h-1.5 rounded-full bg-[var(--ow-bg-inset)]"><div className="h-1.5 rounded-full bg-[var(--ow-amber)] transition-[width] duration-500" style={{ width: `${((i + 1) / SURVEY.length) * 100}%` }} /></div>
             </div>
             {i === 0 && (
               <p className="mt-8 text-sm text-[var(--ow-text-mid)]" data-testid="survey-intro">

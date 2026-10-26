@@ -1,5 +1,5 @@
 // Single source of truth for pages anonymous visitors may open.
-// Used by the production wall (server/index.ts) and the dev wall (server/vitePluginApi.ts).
+// Used by the production wall (server/index.ts) and the dev wall (viteGateWall.ts).
 // Fail-closed: any page not listed here is gated. Ask "is this ready for a stranger?" before adding.
 export const PUBLIC_EXACT = new Set<string>([
   "/",
