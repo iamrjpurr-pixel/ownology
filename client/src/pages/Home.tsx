@@ -15,7 +15,7 @@ import WhyOwnologyBoxes from "@/components/WhyOwnologyBoxes";
 import { CellarBriefTeaser } from "@/components/CellarBriefTeaser";
 import { useUiPillarsV1 } from "@/config/ui";
 import { useAutoCascade, pickCrushByDay } from "@/hooks/useAutoCascade";
-import { Link } from "wouter";
+import { VisitorLink as Link } from "@/components/VisitorLink";
 import ThemeToggle, { useOwnologyTheme } from "@/components/ThemeToggle";
 import { trpc } from "@/lib/trpc";
 import { EditableText, useSiteContent } from "@/components/EditableText";

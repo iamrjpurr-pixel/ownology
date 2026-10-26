@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { Link } from "wouter";
+import { VisitorLink as Link } from "@/components/VisitorLink";
 import { trpc } from "@/lib/trpc";
 import OwnologyLogo from "@/components/OwnologyLogo";
 import {

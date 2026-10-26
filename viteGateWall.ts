@@ -23,7 +23,7 @@ import { parse as parseCookies } from "cookie";
 import { jwtVerify } from "jose";
 import mysql from "mysql2/promise";
 import "dotenv/config"; // Load /app/.env into process.env so we can read JWT_SECRET.
-import { isPublicPath } from "./server/publicPaths";
+import { isPublicPath } from "./shared/publicPaths";
 
 // Same names as production so cookies are cross-compatible with the
 // Express wall in server/index.ts.

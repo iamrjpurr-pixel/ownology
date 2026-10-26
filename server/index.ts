@@ -9,7 +9,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "./routers.js";
 import { createContext } from "./trpc.js";
 import merchRouter from "./merch/api.js";
-import { isPublicPath } from "./publicPaths.js";
+import { isPublicPath } from "../shared/publicPaths.js";
 import { campaignMetricsHandler } from "./scheduled/campaignMetrics.js";
 import { vintageRemindersHandler } from "./scheduled/vintageReminders.js";
 import { regulationMonitorHandler } from "./scheduled/regulationMonitor.js";

@@ -15,7 +15,7 @@
  *    surface never breaks even without auth cookie.
  *  - No new data model, no new dependencies.
  */
-import { Link } from "wouter";
+import { VisitorLink as Link } from "@/components/VisitorLink";
 import { ArrowRight } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 

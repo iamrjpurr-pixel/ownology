@@ -295,6 +295,12 @@ function KnowledgePage() {
  * Browser visits keep the marketing homepage, and mobile-first visitors are
  * still routed to Work Mode on first session (unchanged).
  */
+// Read once per page load: was this browser here before today's visit?
+const RETURNING_VISITOR = (() => {
+  try { const seen = localStorage.getItem("ow_home_seen") === "1"; localStorage.setItem("ow_home_seen", "1"); return seen; }
+  catch { return false; }
+})();
+
 function MobileHomeRoute() {
   const [, navigate] = useLocation();
   const { user, status } = useAuth();
@@ -327,7 +333,9 @@ function MobileHomeRoute() {
       try { return localStorage.getItem("ownology_guide_seen") === "1"; }
       catch { return true; /* if storage unavailable, never force-redirect */ }
     })();
-    if (!guideSeen) {
+    if (status === "loading") return;
+    // Only signed-in members get the guide; strangers always see the homepage.
+    if (status === "authed" && !guideSeen) {
       navigate("/guide", { replace: true });
       return;
     }
@@ -335,7 +343,7 @@ function MobileHomeRoute() {
     // Returning mobile users are routed straight to Work Mode (Free Run) once per session.
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
     const alreadyRedirected = sessionStorage.getItem("ow_mobile_redirected");
-    if (isMobile && !alreadyRedirected) {
+    if (RETURNING_VISITOR && isMobile && !alreadyRedirected) {
       sessionStorage.setItem("ow_mobile_redirected", "1");
       navigate("/free-run", { replace: true });
     }

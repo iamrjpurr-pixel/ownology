@@ -20,7 +20,7 @@
  * If we hate it, flip the flag; the original hero code in Home.tsx is
  * untouched and re-appears in the same paint frame.
  */
-import { Link } from "wouter";
+import { VisitorLink as Link } from "@/components/VisitorLink";
 
 interface Pillar {
   n: string;
