@@ -24,7 +24,7 @@ function PeopleList() {
             <li key={p.slug}>
               <Link href={`/admin/activity?slug=${encodeURIComponent(p.slug)}`} className="flex justify-between gap-3 py-2.5 text-sm hover:opacity-80" data-testid={`activity-person-${p.slug}`}>
                 <span className="text-[var(--ow-text-hi)]">{p.name}{p.winery && <span className="text-[var(--ow-text-lo)]"> · {p.winery}</span>}</span>
-                <span className="shrink-0 text-xs text-[var(--ow-text-lo)]">{p.sessions} visits · {p.events} events · {fmt(p.lastAt)}</span>
+                <span className="shrink-0 text-xs text-[var(--ow-text-lo)]">{p.sessions} visit{p.sessions === 1 ? "" : "s"} · {p.events} events · {fmt(p.lastAt)}</span>
               </Link>
             </li>
           ))}
@@ -39,7 +39,7 @@ function PeopleList() {
             <li key={m.userId}>
               <Link href={`/admin/activity?user=${m.userId}`} className="flex justify-between gap-3 py-2.5 text-sm hover:opacity-80" data-testid={`activity-member-${m.userId}`}>
                 <span className="min-w-0 truncate text-[var(--ow-text-hi)]">{m.name || m.email}</span>
-                <span className="shrink-0 text-xs text-[var(--ow-text-lo)]">{m.sessions} visits · {m.events} events · {fmt(m.lastAt)}</span>
+                <span className="shrink-0 text-xs text-[var(--ow-text-lo)]">{m.sessions} visit{m.sessions === 1 ? "" : "s"} · {m.events} events · {fmt(m.lastAt)}</span>
               </Link>
             </li>
           ))}

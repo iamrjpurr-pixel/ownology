@@ -1,0 +1,40 @@
+{
+  "summary": "Tested the Ask Owen orientation answer, the theme pill on /pricing mobile, the demo tour (personal link, guided tour, mobile), the new site-wide tracking (events.batch/people/person), the /admin/activity page and the /admin/contacts email chip. Re-tested the Brand Vault through the API and the UI (owner, contractor, revoke, export, rename). The Stripe charge.refunded handler was code-reviewed only, because live signed events can't be sent from preview. Backend: 31/31 pytest pass after one test-ordering fix in test_brand_vault.py (a test-data dependency, not an app bug). Frontend: every requested flow passed. Only 1 LLM ask was used (via the API: the 'I'm new to winemaking, how do I check my pH?' question got a real LLM answer, not the welcome). The rod-patina-wines contact was never used.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "events.batch", "issue": "The first-visit alert has a race. It counts existing rows for the slug before inserting, so two batches arriving together could both send the alert email. The client-supplied 'at' timestamp is capped at now but can be backdated."},
+      {"endpoint": "demo.askOwen (invite)", "issue": "The server stores the typed question text in user_events ('asked Owen: <question>') with session_id='server'. This works against the 'typed values never recorded' rule (intentional, but should be documented). Because the session_id is 'server', it shows in /admin/activity as its own 'Visit' instead of inside the visitor's session."},
+      {"endpoint": "events.people", "issue": "Invited prospects have no 30-day window, but members and anonymous are limited to 30 days. events.person is limited to 400 rows (DESC), so older visits are silently cut off."},
+      {"endpoint": "Stripe webhook charge.refunded", "issue": "Code review only. The logic is correct: it looks up the checkout session by payment_intent, only acts when metadata.credit_pack==='true', uses target=floor(credits*amount_refunded/amount) minus already-reversed (credit_refunds PK charge_id, upsert), and clamps with GREATEST(…,0) on signed INT columns. Gaps: (1) the read-then-update is not atomic, so two concurrent redeliveries of the same event could double-reverse; there is no event.id dedupe. (2) Errors are caught and the handler still returns 200, so Stripe won't retry after a transient DB failure. (3) The handler only runs if 'charge.refunded' is enabled on the Stripe webhook endpoint in the dashboard."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Tracking attribution", "issue": "ow_track_invite in localStorage is overwritten by any ?for= value, including unknown slugs (e.g. ?for=e1test-doesnotexist replaces a valid invite). It is never cleared, even after sign-in. If an admin opens a prospect's personal link to preview it, all of that admin's later non-admin browsing on that device is attributed to the prospect, and it fires the 'just opened their link' alert email.", "affected_selectors": []}
+    ],
+    "design_issues": [
+      {"screen": "/admin/activity", "issues": ["Pluralization: '1 visits'"]},
+      {"screen": "/brand (contractor)", "issues": ["The brand switcher label is cut off ('E1 Test Brand Co · contract')"]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_events_tracking.py", "/app/backend/tests/test_brand_vault.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Optional: stop ?for= from overwriting a valid stored invite with an unknown slug. Consider skipping tracking/attribution when the signed-in user is an admin, so admin previews don't pollute prospect timelines or trigger alert emails.",
+    "Optional: make the charge.refunded reversal atomic, e.g. a conditional UPDATE on credit_refunds or a transaction, or dedupe by event.id. Return 500 on DB failure so Stripe retries. Confirm charge.refunded is enabled on the live Stripe webhook endpoint.",
+    "Optional: group server-side 'asked Owen' events into the visitor's session (pass the client sessionId to demo.askOwen).",
+    "Minor copy: pluralize 'visits'."
+  ],
+  "critical_code_review_comments": [
+    "client/src/pages/AdminContacts.tsx is 4091 lines; it should be split.",
+    "track.ts relies only on visibilitychange for the final flush (keepalive fetch). This worked in testing: events from before a full navigation arrived.",
+    "isOrientationQuestion runs before the rate limit and the LLM call, so welcome answers cost no quota. In the demo askOwen path, an orientation question still uses one of the visitor's 3 demo asks."
+  ],
+  "updated_files": ["/app/backend/tests/test_events_tracking.py (new)", "/app/backend/tests/test_brand_vault.py (test_contractor_view_and_log now makes sure a non-archived wine exists)"],
+  "success_rate": {"backend": "100% (31/31)", "frontend": "100% of requested flows"},
+  "seed_data_creation": "Used scripts/e1-test-users.ts seed and the existing e1test-track contact. At the end ran `e1-test-users.ts clean` and `e1-admin-jwt.ts clean`. That deleted the e1test-track contact, so the next tester must recreate it. The e1test-track email was edited through the UI and restored before cleanup.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Env exports are in /root/e1env.sh (ADMIN_JWT, OWNER_JWT, CONTRACTOR_JWT, OUTSIDER_JWT, OWNER_WINERY); regenerate them because the JWTs expire or the users get cleaned. The gate cookie comes from POST /api/gate/verify {password:'middx99'}. The pytest file test_events_tracking.py needs the e1test-track contact (firstName Testy, winery E1 Track Wines, with an email). The tour has 3 steps; the 3rd Next is 'finish' and scrolls to demo-ask-owen. Export lives on the Wine specs tab. Theme options use data-testid theme-<id> (theme-auto, theme-cellar, …). Verified: orientation ul has list-style disc and 3 li, links are amber oklch(0.55 0.15 65) and underlined; ow_ask_audience persists; the /pricing mobile pill bottom is 760 vs the sticky bar top 779 (no overlap); other pages use 20px; theme persists after reload and Auto clears the override; no typed value was sent in a batch; /admin pages send no events."
+}

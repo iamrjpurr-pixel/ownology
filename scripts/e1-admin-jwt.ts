@@ -7,6 +7,7 @@ if (process.argv[2] === "clean") {
   await db.execute(sql`DELETE FROM user_events WHERE slug LIKE 'e1test%' OR session_id LIKE 'e1test%' OR path LIKE '/e1test%'`);
   await db.execute(sql`DELETE FROM outreach_contacts WHERE slug LIKE 'e1test%'`);
   await db.execute(sql`DELETE FROM demo_ask_usage WHERE email LIKE 'e1test%'`);
+  await db.execute(sql`DELETE FROM invite_alerts WHERE slug LIKE 'e1test%'`);
   console.log("cleaned");
 } else {
   const [u] = await db.execute(sql`SELECT open_id, email, name FROM users WHERE role='admin' AND LOWER(email) IN ('iamrjpurr@gmail.com','richard@ownology.ai') LIMIT 1`);

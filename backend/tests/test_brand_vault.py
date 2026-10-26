@@ -154,6 +154,9 @@ class TestAccessLifecycle:
         assert r.status_code == 400
 
     def test_contractor_view_and_log(self, contractor, owner):
+        # ensure a live (non-archived) wine exists — TestOwnerWines archives its own
+        if not data(q(owner, "brandPortal.listWines", {"wineryId": WINERY}))["wines"]:
+            m(owner, "brandPortal.saveWine", {"wineryId": WINERY, "wine": {"name": "TEST_Contractor Shiraz", "vintage": 2024, "blend": []}})
         lst = data(q(contractor, "brandPortal.listWines", {"wineryId": WINERY}))
         assert lst["role"] == "contractor"
         assert len(lst["wines"]) >= 1

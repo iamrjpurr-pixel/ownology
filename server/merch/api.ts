@@ -441,15 +441,18 @@ router.post(
     if (event.type === "charge.refunded") {
       const charge = event.data.object as Stripe.Charge;
       const paymentIntent = typeof charge.payment_intent === "string" ? charge.payment_intent : null;
-      if (paymentIntent && charge.amount > 0) {
+      const { db } = await import("../db.js");
+      const { sql } = await import("drizzle-orm");
+      const [claim] = await db.execute(sql`INSERT IGNORE INTO stripe_events_processed (event_id, created_at) VALUES (${event.id}, ${Date.now()})`);
+      const fresh = (claim as unknown as { affectedRows: number }).affectedRows === 1;
+      if (fresh && paymentIntent && charge.amount > 0) {
         try {
           const stripe = getStripe();
           const sessions = await stripe.checkout.sessions.list({ payment_intent: paymentIntent, limit: 1 });
           const meta = sessions.data[0]?.metadata ?? {};
           const credits = parseInt(meta.credits ?? "0", 10);
           if (meta.credit_pack === "true" && credits > 0 && meta.user_open_id) {
-            const { db, getUserByOpenId } = await import("../db.js");
-            const { sql } = await import("drizzle-orm");
+            const { getUserByOpenId } = await import("../db.js");
             const dbUser = await getUserByOpenId(meta.user_open_id);
             const target = Math.floor((credits * charge.amount_refunded) / charge.amount);
             const [prev] = await db.execute(sql`SELECT credits_reversed FROM credit_refunds WHERE charge_id = ${charge.id} LIMIT 1`);
@@ -470,6 +473,9 @@ router.post(
           }
         } catch (err) {
           console.error("[Webhook] charge.refunded credit reversal failed:", err);
+          await db.execute(sql`DELETE FROM stripe_events_processed WHERE event_id = ${event.id}`).catch(() => {});
+          res.status(500).json({ error: "refund processing failed; please retry" });
+          return;
         }
       }
     }

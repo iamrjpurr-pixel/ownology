@@ -68,23 +68,24 @@ export const eventsRouter = router({
       const ip = hashIp(typeof xff === "string" && xff ? xff.split(",")[0]!.trim() : ctx.req.socket?.remoteAddress);
       if (!allowIp(ip, input.events.length)) return { ok: false };
       let slug: string | null = null;
-      if (input.invite) {
+      const isOperator = ctx.user?.role === "admin";
+      if (input.invite && !isOperator) {
         const [c] = await rows<{ slug: string }>(sql`SELECT slug FROM outreach_contacts WHERE slug = ${input.invite} LIMIT 1`);
         slug = c?.slug ?? null;
       }
       if (slug) {
-        const [seen] = await rows<{ n: number }>(sql`SELECT COUNT(*) AS n FROM user_events WHERE slug = ${slug}`);
-        if (Number(seen?.n ?? 0) === 0) void alertFirstVisit(slug);
+        const [ins] = await db.execute(sql`INSERT IGNORE INTO invite_alerts (slug, created_at) VALUES (${slug}, ${Date.now()})`);
+        if ((ins as unknown as { affectedRows: number }).affectedRows === 1) void alertFirstVisit(slug);
       }
       const userId = ctx.user?.userId ?? null;
       const now = Date.now();
       for (const e of input.events) {
-        const at = Math.min(e.at, now);
+        const at = Math.max(now - 3_600_000, Math.min(e.at, now));
         await db.execute(sql`
           INSERT INTO user_events (user_id, slug, session_id, path, event, detail, ip_hash, created_at)
           VALUES (${userId}, ${slug}, ${input.sessionId}, ${e.path}, ${e.event}, ${e.detail}, ${ip}, ${at})`);
       }
-      return { ok: true };
+      return { ok: true, inviteValid: input.invite ? !!slug || isOperator : undefined };
     }),
 
   people: ownerProcedure.query(async () => {
@@ -149,7 +150,7 @@ export const eventsRouter = router({
       const events = await rows<{ id: number; session_id: string; path: string; event: string; detail: string; created_at: number }>(sql`
         SELECT id, session_id, path, event, detail, created_at FROM user_events
         WHERE (${input.slug ?? null} IS NOT NULL AND slug = ${input.slug ?? null}) OR (${userId} IS NOT NULL AND user_id = ${userId})
-        ORDER BY created_at DESC LIMIT 400`);
+        ORDER BY created_at DESC LIMIT 1000`);
       return {
         label,
         email,

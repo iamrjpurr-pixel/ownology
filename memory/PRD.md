@@ -24,6 +24,10 @@
 
 - **Softer IP tone (Jun 2026)**: demo, vault banner, contractor panel, activity feed, guide steps and invite email reworded from "locked down / can't / blocked" to "one shared record, your specs safely yours, controls if you need them". Controls unchanged.
 
+- **Round of fixes + tracking (Jun 2026)**: Owen answers render real bullets/amber links (`components/AnswerMarkdown.tsx`); theme pill raised above Pricing mobile sticky bar (`.ow-theme-picker-raise`); Stripe `charge.refunded` reverses credit-pack credits proportionally (credit_refunds + stripe_events_processed dedupe; 500 on failure so Stripe retries) — **charge.refunded must be enabled on the live Stripe webhook endpoint** (added to scripts/stripe-setup.mjs WEBHOOK_EVENTS).
+- **Site-wide click tracking (Jun 2026)**: `ActivityTracker` (App.tsx) + `lib/track.ts` batch page views, clicks on `[data-testid]`, `[data-track-section]` views and guide steps to `events.batch` (user_events table, 90-day prune on boot). Never records typed values, except invited prospects' demo Owen questions. `?for=<outreach slug>` stored in localStorage `ow_track_invite` (cleared if invalid; ignored for admins). First visit per slug emails OPERATOR_ALERT_EMAIL once (invite_alerts). /admin/activity (link on /admin/contacts) lists invited prospects + members, per-person visit timelines + Brand Vault summary. Testing iteration_42: backend 31/31, frontend all flows pass; minor items fixed after.
+- Next idea (proposed, not built): Owen "stuck" nudges using the click sequences.
+
 **Backlog from this work**: watermark owner name on printed specs; contractor "propose change" → owner approve; PDF export of a wine spec for the owner; per-wine contractor scoping.
 
 ## Jul 2026 (18 Jul) · Curriculum spine strategy locked — SCOUTING SHIPPED, EXECUTION QUEUED

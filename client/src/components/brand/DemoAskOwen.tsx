@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AnswerMarkdown } from "@/components/AnswerMarkdown";
+import { sessionId } from "@/lib/track";
 import { Link } from "wouter";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,7 @@ export function DemoAskOwen({ invite }: { invite?: string }) {
   const [error, setError] = useState("");
   const start = trpc.demo.askOwenStart.useMutation();
   const ask = trpc.demo.askOwen.useMutation();
-  const who = invite ? { invite } : { email };
+  const who = invite ? { invite, sessionId: sessionId() } : { email };
 
   useEffect(() => {
     if (!invite) return;

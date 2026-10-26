@@ -7,7 +7,7 @@ const INVITE_KEY = "ow_track_invite";
 let queue: Ev[] = [];
 let timer: ReturnType<typeof setTimeout> | null = null;
 
-function sessionId(): string {
+export function sessionId(): string {
   let id = sessionStorage.getItem(SESSION_KEY);
   if (!id) {
     id = (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`).slice(0, 64);
@@ -32,7 +32,10 @@ function flush() {
     credentials: "include",
     keepalive: true,
     body: JSON.stringify({ json: { sessionId: sessionId(), invite, events } }),
-  }).catch(() => {});
+  })
+    .then((r) => r.json())
+    .then((d) => { if (d?.result?.data?.json?.inviteValid === false) localStorage.removeItem(INVITE_KEY); })
+    .catch(() => {});
   if (queue.length) flush();
 }
 

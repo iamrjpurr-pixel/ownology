@@ -296,6 +296,7 @@ export const demoRouter = router({
     .input(z.object({
       email: z.string().trim().toLowerCase().email().max(200).optional(),
       invite: z.string().trim().max(120).optional(),
+      sessionId: z.string().max(64).optional(),
       question: z.string().trim().min(3).max(600),
     }))
     .mutation(async ({ input, ctx }) => {
@@ -311,10 +312,11 @@ export const demoRouter = router({
       }
       try {
         const res = await tutorRouter.createCaller({ ...ctx, user: null }).ask({ question: input.question, mode: "winemaking" });
+        // Intentional exception to "no typed values": invited prospects' demo questions are recorded for follow-up.
         if (input.invite) {
           await db.execute(sql`
             INSERT INTO user_events (user_id, slug, session_id, path, event, detail, ip_hash, created_at)
-            SELECT NULL, slug, 'server', '/demo/tour', 'custom', ${`asked Owen: ${input.question}`.slice(0, 600)}, ${reqIpHash(ctx.req)}, ${Date.now()}
+            SELECT NULL, slug, ${input.sessionId || "server"}, '/demo/tour', 'custom', ${`asked Owen: ${input.question}`.slice(0, 600)}, ${reqIpHash(ctx.req)}, ${Date.now()}
             FROM outreach_contacts WHERE slug = ${input.invite} LIMIT 1`).catch(() => {});
         }
         return { answer: res.answer, sopTitles: res.sopTitles ?? [], disclaimer: res.disclaimer ?? "", remaining: (await remainingFor(email)) ?? 0 };
