@@ -12,6 +12,11 @@ import pytest
 import requests
 from urllib.parse import quote
 
+LIVE_RESERVE = pytest.mark.skipif(
+    os.environ.get("ALLOW_LIVE_RESERVATION_TESTS") != "1",
+    reason="Writes a real founding reservation + sends 2 real emails on the live DB",
+)
+
 BASE = os.environ.get("REACT_APP_BACKEND_URL", "https://private-tutor-2.preview.emergentagent.com").rstrip("/")
 
 
@@ -51,6 +56,7 @@ class TestFoundingReservation:
         assert isinstance(data["total"], int)
         assert data["total"] == data["paid"] + data["reserved"]
 
+    @LIVE_RESERVE
     def test_reserve_slot_press_monthly_persists(self):
         # Capture count before
         before = trpc_get("foundingMembers.getReservationCount").json()["result"]["data"]["json"]["total"]
@@ -99,6 +105,7 @@ class TestFoundingReservation:
         })
         assert r.status_code == 400
 
+    @LIVE_RESERVE
     def test_reserve_all_tiers(self):
         for tier in ["cellar", "press", "cellar_master"]:
             for cycle in ["monthly", "annual"]:

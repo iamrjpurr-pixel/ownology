@@ -2003,3 +2003,5 @@ Impersonate mode (M4) · Diagnostic panels (M6) · Morning brief email (M7) · A
 - `client/src/components/VisitorLink.tsx`: drop-in Link used by Home, Guide, CellarBriefTeaser, HeroPillarsSection. Visitors (not signed in, no team gate) get public equivalents: /knowledge→/curriculum, /compliance & /regulations→/compliance-score, other members-only pages→/demo/tour. Uses `shared/publicPaths.ts` (moved from server/) + `/api/gate/status`.
 - What's New ribbon on homepage now fixed just under the nav (was hidden behind it).
 - Known minor: during the first few hundred ms before sign-in status loads, links show their member targets. Home.tsx `Footer()` is unused (site footer is SiteFooter).
+
+- **Jun 2026:** 43 test founding reservations deleted (all tests / Rich self-tests; 7 came from the iteration_43 E2E re-running test_launch_readiness.py → ~15 emails). Reserve tests now skip unless ALLOW_LIVE_RESERVATION_TESTS=1.
