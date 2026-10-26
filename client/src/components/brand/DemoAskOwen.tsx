@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { AnswerMarkdown } from "@/components/AnswerMarkdown";
 import { Link } from "wouter";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -99,7 +98,7 @@ export function DemoAskOwen({ invite }: { invite?: string }) {
         <div className="mt-6 border-t border-[var(--ow-border)] pt-6" data-testid="demo-ask-answer">
           <p className="text-sm font-semibold text-[var(--ow-text-hi)]">{answer.q}</p>
           <div className="prose prose-sm mt-3 max-w-none text-[var(--ow-text-hi)] prose-headings:text-[var(--ow-text-hi)] prose-strong:text-[var(--ow-text-hi)]">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer.a}</ReactMarkdown>
+            <AnswerMarkdown>{answer.a}</AnswerMarkdown>
           </div>
           {answer.sources.length > 0 && <p className="mt-3 text-xs text-[var(--ow-text-lo)]">Grounded in: {answer.sources.join(" · ")}</p>}
           <div className="mt-4"><OwenDisclaimer /></div>

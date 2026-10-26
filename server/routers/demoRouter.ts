@@ -311,6 +311,12 @@ export const demoRouter = router({
       }
       try {
         const res = await tutorRouter.createCaller({ ...ctx, user: null }).ask({ question: input.question, mode: "winemaking" });
+        if (input.invite) {
+          await db.execute(sql`
+            INSERT INTO user_events (user_id, slug, session_id, path, event, detail, ip_hash, created_at)
+            SELECT NULL, slug, 'server', '/demo/tour', 'custom', ${`asked Owen: ${input.question}`.slice(0, 600)}, ${reqIpHash(ctx.req)}, ${Date.now()}
+            FROM outreach_contacts WHERE slug = ${input.invite} LIMIT 1`).catch(() => {});
+        }
         return { answer: res.answer, sopTitles: res.sopTitles ?? [], disclaimer: res.disclaimer ?? "", remaining: (await remainingFor(email)) ?? 0 };
       } catch (e) {
         await db.execute(sql`UPDATE demo_ask_usage SET asks = GREATEST(asks - 1, 0) WHERE email = ${email}`);

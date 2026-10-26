@@ -28,6 +28,7 @@ import { smsOpenersRouter } from "./routers/smsOpeners.js";
 import { industryNewsRouter } from "./routers/industryNews.js";
 import { demoRouter } from "./routers/demoRouter.js";
 import { brandPortalRouter } from "./routers/brandPortal.js";
+import { eventsRouter } from "./routers/eventsRouter.js";
 import { wbsAdminRouter } from "./routers/wbsAdmin.js";
 import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
@@ -2297,5 +2298,6 @@ export const appRouter = router({
   industryNews: industryNewsRouter,
   demo: demoRouter,
   brandPortal: brandPortalRouter,
+  events: eventsRouter,
 });
 export type AppRouter = typeof appRouter;

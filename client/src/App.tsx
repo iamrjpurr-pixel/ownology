@@ -7,6 +7,7 @@ import AdminGuestPasses from "@/pages/AdminGuestPasses";
 import { Route, Switch, Redirect, useLocation } from "wouter";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { ActivityTracker } from "./components/ActivityTracker";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider, useAuth } from "@/lib/useAuth";
 // Removed (Feb 2026, Rich): ThemeToggle, ThemeSuggestion, ThemeOnboarding,
@@ -102,6 +103,7 @@ const TankQr = lazy(() => import("./pages/TankQr"));
 const VintageCompare = lazy(() => import("./pages/VintageCompare"));
 const HiContact = lazy(() => import("./pages/HiContact"));
 const AdminContacts = lazy(() => import("./pages/AdminContacts"));
+const AdminActivity = lazy(() => import("./pages/AdminActivity"));
 const AdminOutboundQueue = lazy(() => import("./pages/AdminOutboundQueue"));
 const AdminWeeklyRecoDigest = lazy(() => import("./pages/AdminWeeklyRecoDigest"));
 const UnsubscribeWeeklyReco = lazy(() => import("./pages/UnsubscribeWeeklyReco"));
@@ -363,6 +365,7 @@ function Router() {
         theme is now auto-switched by time of day via AutoThemeByTime
         below. Q "Try Parchment for now?" popups are muted. */}
     <AutoThemeByTime />
+    <ActivityTracker />
     <CrushCascade />
     <BackToAdminBadge />
     <Suspense fallback={<PageLoading />}>
@@ -454,6 +457,7 @@ function Router() {
       <Route path={"/admin/contacts/outbound-queue"} component={AdminOutboundQueue} />
       <Route path={"/admin/digests/weekly-reco"} component={AdminWeeklyRecoDigest} />
       <Route path={"/unsubscribe/weekly-reco"} component={UnsubscribeWeeklyReco} />
+      <Route path={"/admin/activity"} component={AdminActivity} />
       <Route path={"/admin/contacts/engagement"} component={AdminEngagement} />
       <Route path={"/admin/brand-assets"} component={AdminBrandAssets} />
       <Route path={"/admin/merch-artwork"} component={AdminMerchArtwork} />
@@ -776,9 +780,10 @@ function ThemePicker() {
     <div
       ref={rootRef}
       data-testid="theme-picker"
+      className={pathname.startsWith("/pricing") ? "ow-theme-picker-raise" : undefined}
       style={{
         position: "fixed",
-        bottom: 20,
+        bottom: pathname.startsWith("/pricing") ? undefined : 20,
         left: 20,
         zIndex: 40, // below modals (50+) but above hero content
         fontFamily: "'Fira Code',monospace",

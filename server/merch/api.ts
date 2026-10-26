@@ -435,6 +435,45 @@ router.post(
       }
     }
 
+    // ── Credit pack refunds: claw back credits proportionally ───────────────
+    // amount_refunded is cumulative, so we track what we've already reversed
+    // per charge in credit_refunds to stay idempotent across partial refunds.
+    if (event.type === "charge.refunded") {
+      const charge = event.data.object as Stripe.Charge;
+      const paymentIntent = typeof charge.payment_intent === "string" ? charge.payment_intent : null;
+      if (paymentIntent && charge.amount > 0) {
+        try {
+          const stripe = getStripe();
+          const sessions = await stripe.checkout.sessions.list({ payment_intent: paymentIntent, limit: 1 });
+          const meta = sessions.data[0]?.metadata ?? {};
+          const credits = parseInt(meta.credits ?? "0", 10);
+          if (meta.credit_pack === "true" && credits > 0 && meta.user_open_id) {
+            const { db, getUserByOpenId } = await import("../db.js");
+            const { sql } = await import("drizzle-orm");
+            const dbUser = await getUserByOpenId(meta.user_open_id);
+            const target = Math.floor((credits * charge.amount_refunded) / charge.amount);
+            const [prev] = await db.execute(sql`SELECT credits_reversed FROM credit_refunds WHERE charge_id = ${charge.id} LIMIT 1`);
+            const already = Number((prev as unknown as { credits_reversed: number }[])[0]?.credits_reversed ?? 0);
+            const delta = target - already;
+            if (dbUser && delta > 0) {
+              const now = Date.now();
+              await db.execute(sql`
+                UPDATE free_run_credits SET balance = GREATEST(balance - ${delta}, 0),
+                  total_purchased = GREATEST(total_purchased - ${delta}, 0), updated_at = ${now}
+                WHERE user_id = ${dbUser.id}`);
+              await db.execute(sql`
+                INSERT INTO credit_refunds (charge_id, user_id, credits_reversed, updated_at)
+                VALUES (${charge.id}, ${dbUser.id}, ${target}, ${now})
+                ON DUPLICATE KEY UPDATE credits_reversed = ${target}, updated_at = ${now}`);
+              console.log(`[Webhook] charge.refunded → reversed ${delta} credits (total ${target}/${credits}) for user ${dbUser.id}`);
+            }
+          }
+        } catch (err) {
+          console.error("[Webhook] charge.refunded credit reversal failed:", err);
+        }
+      }
+    }
+
     res.json({ received: true });
   }
 );

@@ -948,6 +948,24 @@ export default function AdminContacts() {
           >
             Engagement →
           </Link>
+          <Link
+            href="/admin/activity"
+            data-testid="link-to-activity"
+            style={{
+              fontFamily: "'Lato',sans-serif",
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              padding: "8px 14px",
+              border: "1px solid var(--ow-amber)",
+              borderRadius: 6,
+              color: "var(--ow-amber)",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Activity →
+          </Link>
         </div>
       </div>
 

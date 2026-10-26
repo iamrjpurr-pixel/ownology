@@ -270,6 +270,7 @@ async function main() {
     "checkout.session.completed",
     "customer.subscription.updated",
     "customer.subscription.deleted",
+    "charge.refunded",
   ];
 
   console.log(`\n▸ Webhook endpoint`);

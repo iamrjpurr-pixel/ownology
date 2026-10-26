@@ -18,8 +18,7 @@
 import React from "react";
 import { Link } from "wouter";
 import { Helmet } from "react-helmet";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { AnswerMarkdown } from "@/components/AnswerMarkdown";
 import { trpc } from "@/lib/trpc";
 import { Sparkles, BookOpen, ArrowRight, AlertTriangle } from "lucide-react";
 import { OwenDisclaimer } from "@/components/OwenDisclaimer";
@@ -409,7 +408,7 @@ export default function Ask() {
                 lineHeight: 1.7,
               }}
             >
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{result.answer}</ReactMarkdown>
+              <AnswerMarkdown>{result.answer}</AnswerMarkdown>
             </div>
 
             {result.sopTitles && filterPremiumCitations(result.sopTitles).length > 0 && (

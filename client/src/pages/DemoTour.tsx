@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Helmet } from "react-helmet";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import { track } from "@/lib/track";
 import { DemoGuide, GUIDE_STEPS } from "@/components/brand/DemoGuide";
 import { AlertTriangle, ArrowRight, CheckCircle2, Eye, Lock, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -149,6 +150,7 @@ export default function DemoTour() {
   const goStep = (s: number) => {
     setStep(s);
     setRole(GUIDE_STEPS[s].role);
+    track("guide_step", `${s + 1}: ${GUIDE_STEPS[s].title}`);
     setTimeout(() => document.getElementById(GUIDE_STEPS[s].target)?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
   };
   const closeGuide = () => {
@@ -195,10 +197,10 @@ export default function DemoTour() {
       </section>
 
       <div className="mx-auto max-w-6xl space-y-20 px-6 pb-20">
-        <TankSnapshot />
-        <div id="demo-vault" className="scroll-mt-56 md:scroll-mt-28"><VaultDemo role={role} /></div>
-        <div id="demo-owner-section" className="scroll-mt-56 md:scroll-mt-28"><OwnerControls role={role} /></div>
-        <section id="demo-ask-section" className="scroll-mt-8 space-y-5">
+        <div data-track-section="tank-brief"><TankSnapshot /></div>
+        <div id="demo-vault" data-track-section="vault" className="scroll-mt-56 md:scroll-mt-28"><VaultDemo role={role} /></div>
+        <div id="demo-owner-section" data-track-section="owner-controls" className="scroll-mt-56 md:scroll-mt-28"><OwnerControls role={role} /></div>
+        <section id="demo-ask-section" data-track-section="ask-owen" className="scroll-mt-8 space-y-5">
           <div className={eyebrow}>04 · Ask Owen</div>
           <DemoAskOwen invite={guest?.hasEmail ? invite : undefined} />
         </section>

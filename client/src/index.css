@@ -694,3 +694,9 @@ h1, h2, h3, h4 {
 p, li, blockquote {
   text-wrap: pretty;
 }
+
+/* Theme pill sits above the Pricing page mobile sticky CTA bar. */
+.ow-theme-picker-raise { bottom: 20px; }
+@media (max-width: 639px) {
+  .ow-theme-picker-raise { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+}

@@ -1941,6 +1941,16 @@ async function startServer() {
       sql`CREATE TABLE IF NOT EXISTS demo_ask_usage (
         email VARCHAR(200) NOT NULL PRIMARY KEY, asks INT NOT NULL DEFAULT 0, ip_hash VARCHAR(64),
         created_at BIGINT NOT NULL, updated_at BIGINT NOT NULL)`,
+      sql`CREATE TABLE IF NOT EXISTS user_events (
+        id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id INT NULL, slug VARCHAR(120) NULL, session_id VARCHAR(64) NOT NULL,
+        path VARCHAR(300) NOT NULL DEFAULT '', event VARCHAR(40) NOT NULL, detail VARCHAR(600) NOT NULL DEFAULT '',
+        ip_hash VARCHAR(64), created_at BIGINT NOT NULL,
+        INDEX ue_slug_idx (slug, created_at), INDEX ue_user_idx (user_id, created_at),
+        INDEX ue_session_idx (session_id, created_at), INDEX ue_created_idx (created_at))`,
+      sql`DELETE FROM user_events WHERE created_at < ${Date.now() - 90 * 24 * 60 * 60 * 1000}`,
+      sql`CREATE TABLE IF NOT EXISTS credit_refunds (
+        charge_id VARCHAR(64) NOT NULL PRIMARY KEY, user_id INT NOT NULL,
+        credits_reversed INT NOT NULL DEFAULT 0, updated_at BIGINT NOT NULL)`,
     ];
     for (const ddl of brandVaultDdl) {
       try {
