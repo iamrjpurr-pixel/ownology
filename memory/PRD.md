@@ -1988,3 +1988,12 @@ Impersonate mode (M4) · Diagnostic panels (M6) · Morning brief email (M7) · A
 
 
 - **Jun 2026 link check:** live /know?for=rod-patina-wines verified loading (personalised "Rod,"). Earlier /try?from=%2Fknow redirect was from before the deploy reached Railway.
+
+## Jun 2026 — Finalisation E2E pass (iterations 43–44)
+- Public page list consolidated into `server/publicPaths.ts`; used by prod wall (`server/index.ts`) AND preview wall (`/app/viteGateWall.ts`, registered in vite.config.ts). Dead `server/vitePluginApi.ts` deleted. Preview `/admin*` now → `/login?next=` like prod.
+- `main.tsx` authAwareFetch: only logs out when `/api/auth/me` is 401 (members no longer kicked out by one admin-only 401). `/onboarding` removed from needsAuth.
+- charge.refunded claim moved inside try/catch (500 → Stripe retries). Refund credit clawback already existed.
+- /know progress (i+1)/8; /login copy w/o "admin tools"; brand switcher row wraps; theme pill hidden on /free-run; pricing checkout errors use toast.
+- Full 8-path E2E passed (iteration_43/44). Test users + e1test outreach/events cleaned from live DB.
+- Open (needs user decision): first visit to / redirects to /guide, and ~12 /guide links (plus home "Explore the platform" → /knowledge, /cellar-brief teaser) are gated for anonymous visitors → bounce to /try.
+- Preview Stripe key is a stub → checkout can only be verified on live. Ensure `charge.refunded` is enabled on the Stripe webhook endpoint.

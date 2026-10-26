@@ -775,9 +775,9 @@ function ThemePicker() {
   // Suppress the picker on pre-auth surfaces — the bottom-left pill clashes
   // with the /try password box on mobile. All hooks above have already run,
   // so this early return is safe under rules-of-hooks.
-  const HIDDEN_ON = new Set(["/try", "/auth/callback", "/know"]);
+  const HIDDEN_ON = new Set(["/try", "/auth/callback", "/know", "/free-run"]);
   if (HIDDEN_ON.has(pathname) || pathname.startsWith("/i/")) return null;
-  const raise = pathname.startsWith("/pricing") || pathname.startsWith("/free-run");
+  const raise = pathname.startsWith("/pricing");
 
   return (
     <div

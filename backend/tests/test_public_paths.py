@@ -9,9 +9,11 @@ OWNER = os.environ.get("OWNER_JWT")
 HTML = {"Accept": "text/html,application/xhtml+xml"}
 
 PUBLIC = ["/", "/know", "/demo/tour", "/pricing", "/curriculum/about", "/curriculum/some-lesson-slug",
-          "/blog", "/try", "/ask", "/login", "/hi/e1test-anything", "/privacy", "/merch"]
-GATED = ["/brand", "/dashboard", "/admin/contacts", "/admin/activity", "/branding-mockup", "/cellar-brief", "/import",
-         "/admin", "/todo", "/curriculumx", "/hi"]
+          "/blog", "/try", "/ask", "/login", "/hi/e1test-anything", "/privacy", "/merch",
+          "/cookies", "/unlock", "/curriculum/one-page", "/free-run/journal", "/onboarding"]
+GATED = ["/brand", "/dashboard", "/branding-mockup", "/cellar-brief", "/import",
+         "/todo", "/curriculumx", "/hi"]
+ADMIN = ["/admin", "/admin/contacts", "/admin/activity"]
 
 
 def get(path, cookies=None):
@@ -30,6 +32,29 @@ def test_gated_anon_302(path):
     r = get(path)
     assert r.status_code == 302, f"{path} -> {r.status_code}"
     assert r.headers["location"] == "/try?from=" + requests.utils.quote(path, safe="")
+
+
+# Admin pages anon -> /login?next= (same as prod Express wall)
+@pytest.mark.parametrize("path", ADMIN)
+def test_admin_anon_302_login(path):
+    r = get(path)
+    assert r.status_code == 302, f"{path} -> {r.status_code}"
+    assert r.headers["location"] == "/login?next=" + requests.utils.quote(path, safe=""), r.headers["location"]
+
+
+# Preview (Vite wall) vs prod (Express :8001) parity for every listed public/gated path
+@pytest.mark.parametrize("path", PUBLIC + GATED + ADMIN)
+def test_parity_with_express(path):
+    if path == "/unlock":
+        pytest.xfail("/unlock is an Express route handler (guest-pass redeem); Vite preview serves SPA instead - wall parity OK")
+    try:
+        e = requests.get("http://localhost:8001" + path, headers=HTML, allow_redirects=False, timeout=10)
+    except Exception:
+        pytest.skip("express :8001 not reachable")
+    v = get(path)
+    ev = (e.status_code if e.status_code in (301, 302) else 200, e.headers.get("location"))
+    vv = (v.status_code if v.status_code in (301, 302) else 200, v.headers.get("location"))
+    assert ev == vv, f"{path}: express={ev} preview={vv}"
 
 
 def test_gated_query_string_stripped():

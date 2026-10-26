@@ -195,7 +195,7 @@ export default function BrandPortal() {
             )}
           </div>
           {brands.length > 0 && current && (
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <span className={`rounded px-2 py-1 text-[0.65rem] font-bold uppercase tracking-wider ${current.role === "owner" ? "bg-[var(--ow-amber)] text-white" : "border border-[var(--ow-border-md)] text-[var(--ow-text-mid)]"}`} data-testid="vault-role-badge">
                 {current.role === "owner" ? "Owner" : "Contract winemaker"}
               </span>

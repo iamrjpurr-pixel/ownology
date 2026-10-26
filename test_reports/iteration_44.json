@@ -1,0 +1,38 @@
+{
+  "summary": "Re-tested the fixes from iteration_43 on the preview, using only e1test identities, with 0 LLM calls and no writes. 1) HIGH (preview wall): FIXED. viteGateWall.ts imports isPublicPath from server/publicPaths.ts, and server/vitePluginApi.ts is deleted. test_public_paths.py was updated: /admin* anonymous now expects /login?next=, and new cases cover /cookies, /unlock, /curriculum/one-page, /free-run/journal and /onboarding. A new parity test compares the preview against Express :8001 for 29 paths. Result: 69 passed, 1 xfailed (/unlock, explained below). 2) MEDIUM (authAwareFetch): FIXED. With the e1test-outsider session, /admin/activity stays signed in. admin.me returns 401 and events.people 403, /api/auth/me returns 200, there is no logout and no banner, and the cookie is kept (the page shows 'Owner access required'). A garbage app_session_id on /dashboard redirects to /login?next=%2Fdashboard&reason=session_expired and the 'Session expired' banner shows. 3) charge.refunded: the claim INSERT IGNORE is now in a try/catch that returns 500 (code review only). 4) /know Q1 progress bar is width 12.5% (1/8), PASS. 5) /login no longer says 'admin tools', PASS. 6) /brand switcher: PASS for real labels at 390 and 1920, with partial evidence (see issues). 7) /free-run at 390px: the theme pill no longer touches the Learn tab (pill bottom 760, tab top 765.6), PASS, but it now covers the chat input. 8) Pricing as e1test-owner: clicking purchase-pack-pour/glass calls the API, which returns 500 'Invalid API Key: sk_test_stub' as expected. A sonner error toast appears ('Checkout failed. Please try again...'), no native dialog fires, PASS.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /unlock (preview only)", "issue": "/unlock is an Express route (unlockHandler: redeem guest pass, 302 to /curriculum?guest=1 or /?err=guest-pass-invalid). The preview Vite server serves the SPA for this path, so the Express handler never runs. Guest-pass redemption cannot be tested on the preview, but works in prod. The wall itself is consistent: the page is public on both. This is not a regression from this fix."},
+      {"endpoint": "Stripe webhook charge.refunded (server/merch/api.ts 441-486)", "issue": "Code review: the claim is now wrapped (try/catch, 500), which is good. Remaining nits: (a) the dynamic imports of ../db.js and drizzle-orm sit before the try, low risk. (b) Two different refund events for the same charge can still race on the read-then-update of credit_refunds (carried over from iteration_43)."},
+      {"endpoint": "freeRun.createCreditPackCheckout", "issue": "The raw Stripe error message and stack are still returned to the client in the tRPC 500 body (data.stack is visible on the preview). Check that NODE_ENV=production strips the stack."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "ThemePicker pill on /free-run (390px)", "issue": "The pill moved up (top 730, bottom 760) and now overlaps the lower-left of the fixed 'Ask a question...' chat input (about y 695-747). It no longer touches the Learn tab, but it covers part of the input and its placeholder.", "selector": "THEME pill / free-run chat input", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/brand at 390px", "issues": ["Real label 'E1 Test Crush Co' fits at both 390 and 1920. A simulated 38-character label ('E1 Test Owner Winery Estate · contract') still truncates at 390px (trigger 272px wide; scrollWidth 243 vs clientWidth 222) because the OWNER badge sits on the same row. Shorter names plus ' · contract' fit. The real contractor membership no longer exists (the contractor now sees only its own brand), so the actual ' · contract' label could not be rendered."]},
+      {"screen": "/pricing desktop", "issues": ["A faint blurred shadow or ghost element shows at top-centre (around x 800-1040, y 0-30) behind the header, possibly an empty floating banner or toast container. Worth a look."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_public_paths.py", "/app/test_reports/pytest/public_paths_44.xml"],
+  "action_items": [
+    "Optional: move the /free-run theme pill above the chat composer at 390px, or hide it on /free-run, so it does not cover the Ask input",
+    "Optional: let the /brand switcher wrap below the OWNER badge on mobile (e.g. flex-wrap, or w-full on its own row) so long '<name> · contract' labels do not truncate",
+    "Optional: strip the Stripe error and stack from the tRPC error body for checkout",
+    "Note: /unlock guest-pass redemption cannot be tested on the preview (Vite serves the SPA); verify it in prod"
+  ],
+  "critical_code_review_comments": [
+    "viteGateWall.ts: single source of truth confirmed. A cookie that merely exists (any app_session_id value) bypasses the preview wall without JWT verification, unlike the gate cookie. The SPA then catches it via authAwareFetch on needsAuth paths. Gated pages outside needsAuth (e.g. /brand, /import) would render the shell for a garbage cookie. Low risk because data APIs are auth-checked, but this differs from prod if prod verifies the JWT.",
+    "main.tsx authAwareFetch: concurrent 401s each fire their own /api/auth/me probe. Harmless, but could be de-duplicated with a shared promise."
+  ],
+  "updated_files": ["/app/backend/tests/test_public_paths.py"],
+  "success_rate": {"backend": "100% (69/69 + 1 expected xfail)", "frontend": "100% of requested fix checks (8/8); 1 new low-priority overlap"},
+  "seed_data_creation": "None. No writes; no e1test users deleted.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run: source /root/e1env.sh && pytest /app/backend/tests/test_public_paths.py (includes the preview vs Express :8001 parity test). The Vite preview sometimes renders a blank page when navigating with networkidle; use wait_until='load' with long timeouts. Sonner toasts disappear after about 4s, so assert right after the click. The e1test-contractor currently has only its own brand (16030, 'E1 Test Crush Co'). The owner brand is 'E1 Test Brand Co' (16029)."
+}
