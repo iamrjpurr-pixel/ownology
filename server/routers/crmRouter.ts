@@ -6,6 +6,7 @@
 import { sql } from "drizzle-orm";
 import { router, ownerProcedure } from "../trpc.js";
 import { db } from "../db.js";
+import { isTestEmail } from "../../shared/testEmails.js";
 
 async function rows<T>(q: ReturnType<typeof sql>): Promise<T[]> {
   const [res] = await db.execute(q);
@@ -25,13 +26,12 @@ export type CrmPerson = {
   userId: number | null;
   kinds: CrmKind[];
   reservation: { id: number; status: string } | null;
+  otherEmails: string[];
   lastAt: number;
   records: CrmRecord[];
 };
 
 const n = (v: unknown) => Number(v ?? 0);
-// Automated-test addresses never belong in the CRM.
-const isTestEmail = (e: string) => /[@.]example(\.|$)|@test\.|^(e1-?test|pytest)|^(cs-|test-|[^@]*-test@)[^@]*@ownology\.ai$|^[^@]*-test@ownology\.ai$/.test(e);
 const fmtName = (...parts: (string | null | undefined)[]) => parts.filter(Boolean).join(" ").trim();
 
 export const crmRouter = router({
@@ -46,7 +46,7 @@ export const crmRouter = router({
       if (!key) return null;
       let p = map.get(key);
       if (!p) {
-        p = { key, email, name: "", winery: "", slug: null, userId: null, kinds: [], reservation: null, lastAt: 0, records: [] };
+        p = { key, email, name: "", winery: "", slug: null, userId: null, kinds: [], reservation: null, otherEmails: [], lastAt: 0, records: [] };
         map.set(key, p);
       }
       if (!p.name && who.name) p.name = who.name;
@@ -66,15 +66,15 @@ export const crmRouter = router({
       if (p) { p.slug = c.slug; slugKey.set(c.slug, p.key); }
     }
 
-    const survey = await rows<{ slug: string; answers: number; at: number }>(sql`
-      SELECT s.slug, COUNT(*) AS answers, MAX(s.created_at) AS at FROM (
-        SELECT COALESCE(sa.slug, (SELECT e.slug FROM user_events e WHERE e.session_id = sa.session_id AND e.slug IS NOT NULL LIMIT 1)) AS slug, sa.created_at
+    const survey = await rows<{ slug: string; answers: number; visits: number; at: number }>(sql`
+      SELECT s.slug, COUNT(DISTINCT s.question_id) AS answers, COUNT(DISTINCT s.session_id) AS visits, MAX(s.created_at) AS at FROM (
+        SELECT COALESCE(sa.slug, (SELECT e.slug FROM user_events e WHERE e.session_id = sa.session_id AND e.slug IS NOT NULL LIMIT 1)) AS slug, sa.question_id, sa.session_id, sa.created_at
         FROM survey_answers sa) s
       WHERE s.slug IS NOT NULL GROUP BY s.slug`).catch((err) => { console.error("[crm.people] survey merge failed:", err); return []; });
     for (const s of survey) {
       const key = slugKey.get(s.slug);
       const p = key ? map.get(key) : null;
-      if (p) add(p.email, p.key, { kind: "survey", at: n(s.at), summary: `Answered ${n(s.answers)} of 8 survey questions` });
+      if (p) add(p.email, p.key, { kind: "survey", at: n(s.at), summary: `Answered ${n(s.answers)} of 8 survey questions${n(s.visits) > 1 ? ` over ${n(s.visits)} visits` : ""}` });
     }
 
     for (const l of await rows<{ id: number; email: string; name: string | null; winery_name: string | null; source: string | null; stripe_paid: number | null; created_at: number }>(sql`
@@ -107,10 +107,21 @@ export const crmRouter = router({
       SELECT referred_email, status, created_at FROM referrals WHERE referred_email IS NOT NULL AND referred_email <> ''`))
       add(r.referred_email, null, { kind: "referral", at: n(r.created_at), status: r.status, summary: `Referred by another winery · ${r.status.replace("_", " ")}` });
 
+    // An account opened from a personal link joins that contact's card, even under a different email.
+    const userSlug = new Map<number, string>();
+    for (const r of await rows<{ user_id: number; slug: string }>(sql`
+      SELECT user_id, MIN(slug) AS slug FROM user_events WHERE user_id IS NOT NULL AND slug IS NOT NULL GROUP BY user_id`))
+      userSlug.set(n(r.user_id), r.slug);
+
     for (const u of await rows<{ id: number; email: string | null; name: string | null; created_at: number }>(sql`
       SELECT id, email, name, created_at FROM users WHERE email IS NOT NULL AND open_id NOT LIKE 'e1test-%'`)) {
-      const p = add(u.email, null, { kind: "account", at: n(u.created_at), id: n(u.id), summary: "Has an Ownology account" }, { name: u.name });
-      if (p) p.userId = n(u.id);
+      const email = u.email!.trim().toLowerCase();
+      const linkedKey = slugKey.get(userSlug.get(n(u.id)) ?? "");
+      const rec: CrmRecord = { kind: "account", at: n(u.created_at), id: n(u.id), summary: linkedKey && email !== map.get(linkedKey)?.email ? `Has an Ownology account · ${email} (signed up from their personal link)` : "Has an Ownology account" };
+      const p = linkedKey && !isTestEmail(email) ? add(map.get(linkedKey)!.email, linkedKey, rec) : add(email, null, rec, { name: u.name });
+      if (!p) continue;
+      p.userId = n(u.id);
+      if (email !== p.email && !p.otherEmails.includes(email)) p.otherEmails.push(email);
     }
 
     return [...map.values()]

@@ -23,7 +23,7 @@ function HelpCard({ i, answer }: { i: number; answer: SurveyAnswer }) {
   );
 }
 
-function Summary({ answers, name }: { answers: Record<string, SurveyAnswer>; name?: string }) {
+function Summary({ answers, name, invite }: { answers: Record<string, SurveyAnswer>; name?: string; invite?: string }) {
   const gaps = SURVEY.filter((s) => answers[s.id] && answers[s.id] !== "yes").length;
   return (
     <section data-testid="survey-summary">
@@ -46,9 +46,10 @@ function Summary({ answers, name }: { answers: Record<string, SurveyAnswer>; nam
         ))}
       </ol>
       <div className="mt-10 flex flex-wrap gap-3">
-        <Link href="/login?next=/brand"><Button size="lg" className="gap-2" data-testid="survey-open-vault">Open my Brand Vault <ArrowRight className="h-4 w-4" /></Button></Link>
-        <Link href="/demo/tour"><Button size="lg" variant="outline" data-testid="survey-take-tour">Take the 3-minute tour</Button></Link>
+        <Link href={invite ? `/demo/tour?for=${encodeURIComponent(invite)}` : "/demo/tour"}><Button size="lg" className="gap-2" data-testid="survey-take-tour">Take the 3-minute tour <ArrowRight className="h-4 w-4" /></Button></Link>
+        <Link href="/login?next=/brand"><Button size="lg" variant="outline" data-testid="survey-open-vault">Set up my free Brand Vault</Button></Link>
       </div>
+      <p className="mt-3 text-xs text-[var(--ow-text-lo)]">The tour uses sample data, so there's nothing to sign up for. Your own vault is free and takes one Google sign-in.</p>
     </section>
   );
 }
@@ -77,6 +78,13 @@ export default function KnowSurvey() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // New question → back to the top, so phones never open mid-page.
+  useEffect(() => { window.scrollTo({ top: 0 }); }, [i]);
+
+  useEffect(() => {
+    try { localStorage.setItem("ow_know_answers", JSON.stringify(answers)); } catch { /* private mode */ }
+  }, [answers]);
+
   useEffect(() => {
     if (done) complete.mutate({ invite, sessionId: sessionId() });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,7 +95,7 @@ export default function KnowSurvey() {
       <Helmet><title>If you don't already know… · Ownology</title></Helmet>
       <div className="mx-auto max-w-2xl px-6 py-14 md:py-20">
         <Link href="/" className="font-['Fraunces',serif] text-xl font-bold text-[var(--ow-amber)]">Ownology</Link>
-        {done ? <div className="mt-10"><Summary answers={answers} name={name} /></div> : (
+        {done ? <div className="mt-10"><Summary answers={answers} name={name} invite={invite} /></div> : (
           <>
             <div className="mt-10" data-testid="survey-progress">
               <div className="flex justify-between text-xs text-[var(--ow-text-lo)]"><span>Question {i + 1} of {SURVEY.length}</span><span>About 2 minutes</span></div>

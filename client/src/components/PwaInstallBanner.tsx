@@ -24,7 +24,7 @@ const SNOOZE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days — after this, the banner 
 /** Prospect / conversion surfaces where the install nudge would distract
  *  from the story we're telling. `/try` is the main sandbox — asking a
  *  visitor to install a PWA before they've even subscribed is friction. */
-const SUPPRESSED_PREFIXES = ["/try", "/hi/", "/audit/", "/join", "/founding-member/success"];
+const SUPPRESSED_PREFIXES = ["/try", "/hi/", "/audit/", "/join", "/founding-member/success", "/know"];
 
 /** Routes where we render the FATTER post-login variant of the banner.
  *  `/dashboard` is the first landing after a magic-link click or Google

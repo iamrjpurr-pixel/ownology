@@ -63,6 +63,7 @@ function PersonDetail({ p }: { p: CrmPerson }) {
         {p.slug && <Link href={`/admin/contacts?slug=${encodeURIComponent(p.slug)}`} className={btn} data-testid="people-open-contact"><UserRound className="h-3.5 w-3.5" /> Open contact card</Link>}
         {activity && <Link href={activity} className={btn} data-testid="people-open-activity"><MousePointerClick className="h-3.5 w-3.5" /> See their clicks</Link>}
         {p.email && <a href={`mailto:${p.email}`} className={btn} data-testid="people-email"><Mail className="h-3.5 w-3.5" /> Email</a>}
+        {p.otherEmails.length > 0 && <span className="text-xs text-[var(--ow-text-lo)]" data-testid="people-other-emails">Also signs in as {p.otherEmails.join(", ")}</span>}
         {p.reservation && <span className="flex items-center gap-2 text-xs text-[var(--ow-text-mid)]">Founding slot: <ReservationStatus id={p.reservation.id} status={p.reservation.status} /></span>}
       </div>
       <ol className="space-y-2">
@@ -102,13 +103,13 @@ function PersonRow({ p }: { p: CrmPerson }) {
 export default function AdminPeople() {
   const q = trpc.crm.people.useQuery();
   const [filter, setFilter] = useState(() => new URLSearchParams(window.location.search).get("filter") ?? "all");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => new URLSearchParams(window.location.search).get("q") ?? "");
   const people = q.data ?? [];
   const counts = useMemo(() => Object.fromEntries(FILTERS.map((f) => [f.id, people.filter(f.test).length])), [people]);
   const shown = useMemo(() => {
     const f = FILTERS.find((x) => x.id === filter) ?? FILTERS[0];
     const s = search.trim().toLowerCase();
-    return people.filter((p) => f.test(p) && (!s || `${p.name} ${p.winery} ${p.email ?? ""}`.toLowerCase().includes(s)));
+    return people.filter((p) => f.test(p) && (!s || `${p.name} ${p.winery} ${p.email ?? ""} ${p.otherEmails.join(" ")}`.toLowerCase().includes(s)));
   }, [people, filter, search]);
 
   return (

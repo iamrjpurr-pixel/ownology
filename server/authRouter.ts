@@ -18,6 +18,7 @@
  * Admins: any user whose email matches a comma-separated entry in
  * ADMIN_EMAILS env is granted role="admin". Falls back to "user".
  */
+import { sendSignupEmails } from "./signupEmail.js";
 import express from "express";
 import type { Request, Response } from "express";
 import { SignJWT } from "jose";
@@ -210,6 +211,7 @@ router.post("/exchange", express.json(), async (req: Request, res: Response) => 
     }
 
     const user = await upsertUserFromEmergent(data);
+    if (user.isNew) void sendSignupEmails({ name: user.name, email: user.email, via: "Google sign-in" }).catch(() => {});
     const jwt = await signSessionJwt(user);
     setSessionCookie(res, jwt);
     return res.json({
@@ -282,6 +284,7 @@ async function provisionUserByEmail(email: string): Promise<{ id: number; openId
   } catch (e) {
     console.warn("[auth/email-signup] winery provisioning skipped:", (e as Error).message);
   }
+  void sendSignupEmails({ name: "", email, via: "email sign-in link" }).catch(() => {});
   return { id: justCreated.id, openId, role };
 }
 

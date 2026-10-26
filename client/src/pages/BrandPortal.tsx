@@ -11,6 +11,7 @@ import { WineLogs } from "@/components/brand/WineLogs";
 import { ContractorsPanel, ActivityFeed } from "@/components/brand/AccessPanels";
 import { WineEditorDialog } from "@/components/brand/WineEditorDialog";
 import { BrandNameEditor, looksAutoNamed } from "@/components/brand/BrandNameEditor";
+import { GettingStarted, SAMPLE_WINE } from "@/components/brand/GettingStarted";
 import type { LogKind, Role, Wine, WineInput } from "@/components/brand/types";
 
 const BRAND_KEY = "ow_brand_vault";
@@ -66,7 +67,7 @@ function WineDetail({ wineryId, wineId, role, brandName, viewer, onEdit }: { win
   );
 }
 
-function WinesTab({ wineryId, role, brandName, viewer }: { wineryId: number; role: Role; brandName: string; viewer: string }) {
+function WinesTab({ wineryId, role, brandName, viewer, onInvite }: { wineryId: number; role: Role; brandName: string; viewer: string; onInvite?: () => void }) {
   const utils = trpc.useUtils();
   const list = trpc.brandPortal.listWines.useQuery({ wineryId });
   const save = trpc.brandPortal.saveWine.useMutation();
@@ -76,9 +77,9 @@ function WinesTab({ wineryId, role, brandName, viewer }: { wineryId: number; rol
   const wines = list.data?.wines ?? [];
   useEffect(() => { if (wines.length && !wines.some((w) => w.id === selected)) setSelected(wines[0].id); }, [wines, selected]);
 
-  const onSave = async (w: WineInput) => {
+  const onSave = async (w: WineInput, wineId = editing.wine?.id) => {
     try {
-      const r = await save.mutateAsync({ wineryId, wineId: editing.wine?.id, wine: { ...w, targets: w.targets as Record<string, string>, regime: w.regime as Record<string, string> } });
+      const r = await save.mutateAsync({ wineryId, wineId, wine: { ...w, targets: w.targets as Record<string, string>, regime: w.regime as Record<string, string> } });
       setEditing({ open: false, wine: null });
       await utils.brandPortal.listWines.invalidate({ wineryId });
       utils.brandPortal.getWine.invalidate({ wineryId, wineId: r.id });
@@ -114,6 +115,8 @@ function WinesTab({ wineryId, role, brandName, viewer }: { wineryId: number; rol
       <main className="min-w-0 rounded-lg border border-[var(--ow-border)] bg-[var(--ow-bg-card)] p-5 md:p-8">
         {selected ? (
           <WineDetail wineryId={wineryId} wineId={selected} role={role} brandName={brandName} viewer={viewer} onEdit={(w) => setEditing({ open: true, wine: w })} />
+        ) : role === "owner" && !list.isLoading && !wines.length ? (
+          <GettingStarted pending={save.isPending} onSample={() => onSave(SAMPLE_WINE, undefined)} onNew={() => setEditing({ open: true, wine: null })} onInvite={() => onInvite?.()} />
         ) : (
           <div className="flex flex-col items-center py-16 text-center text-[var(--ow-text-lo)]"><WineIcon className="mb-3 h-8 w-8" /><p className="text-sm">Pick a wine to see its spec and cellar record.</p></div>
         )}
@@ -148,16 +151,17 @@ function useOwnerPanels(wineryId: number) {
   };
 }
 
-function OwnerSections({ wineryId, wines }: { wineryId: number; wines: React.ReactNode }) {
+function OwnerSections({ wineryId, wines }: { wineryId: number; wines: (goTo: (tab: string) => void) => React.ReactNode }) {
   const t = useOwnerPanels(wineryId);
+  const [tab, setTab] = useState("wines");
   return (
-    <Tabs defaultValue="wines">
+    <Tabs value={tab} onValueChange={setTab}>
       <TabsList data-testid="vault-tabs">
         <TabsTrigger value="wines" data-testid="tab-wines">Wine specs</TabsTrigger>
         <TabsTrigger value="contractors" data-testid="tab-contractors">Contractors</TabsTrigger>
         <TabsTrigger value="activity" data-testid="tab-activity">Activity history</TabsTrigger>
       </TabsList>
-      <TabsContent value="wines" className="mt-6">{wines}</TabsContent>
+      <TabsContent value="wines" className="mt-6">{wines(setTab)}</TabsContent>
       <TabsContent value="contractors" className="mt-6 max-w-2xl">{t.contractors}</TabsContent>
       <TabsContent value="activity" className="mt-6 max-w-2xl">{t.activity}</TabsContent>
     </Tabs>
@@ -220,7 +224,7 @@ export default function BrandPortal() {
               <div className="mb-8"><BrandNameEditor key={`p-${current.wineryId}`} wineryId={current.wineryId} name={current.name} prompt /></div>
             )}
             <OwnerSections key={current.wineryId} wineryId={current.wineryId}
-              wines={<WinesTab wineryId={current.wineryId} role="owner" brandName={current.name} viewer={my.data!.email} />} />
+              wines={(goTo) => <WinesTab wineryId={current.wineryId} role="owner" brandName={current.name} viewer={my.data!.email} onInvite={() => goTo("contractors")} />} />
           </>
         ) : (
           <WinesTab key={current.wineryId} wineryId={current.wineryId} role="contractor" brandName={current.name} viewer={my.data!.email} />
