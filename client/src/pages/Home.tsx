@@ -74,12 +74,24 @@ function WhatsNewRibbon() {
     try { localStorage.setItem(WHATS_NEW_KEY, "1"); } catch { /* ignore */ }
   }, []);
 
+  // Sit just under the fixed nav so the ribbon isn't hidden behind it.
+  const [navH, setNavH] = useState(0);
+  useEffect(() => {
+    const nav = document.querySelector("nav");
+    if (!nav) return;
+    const ro = new ResizeObserver(() => setNavH(nav.getBoundingClientRect().height));
+    ro.observe(nav);
+    return () => ro.disconnect();
+  }, []);
+
   if (dismissed) return null;
 
   return (
     <div
-      className="relative z-40 flex items-center justify-center gap-3 px-4 py-2.5"
+      className="fixed left-0 right-0 z-40 flex items-center justify-center gap-3 px-4 py-2.5"
+      data-testid="whats-new-ribbon"
       style={{
+        top: navH,
         background: "color-mix(in oklch, var(--ow-amber) 12%, var(--ow-bg-base))",
         borderBottom: "1px solid color-mix(in oklch, var(--ow-amber) 30%, transparent)",
       }}

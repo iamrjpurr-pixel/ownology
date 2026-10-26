@@ -1,0 +1,31 @@
+{
+  "summary": "Frontend-only test of the first-visit landing and VisitorLink guide/home link changes on the preview, using a fresh browser context for each scenario. All 7 requested scenarios passed. (1) A fresh desktop visit to / stays on /. (2) A fresh mobile (390px) visit to / stays on / and sets ow_home_seen=1. After sessionStorage is cleared, reloading / goes to /free-run, and a second load in the same session stays on /. (3) Anonymous visitor: I collected every a[href^='/'] on /, /home and /guide (29 unique links, including the collapsed guide sections after expanding them) and requested each one as a page navigation with redirects off. None returned a 302 to /try. Clicking the guide cards works: roadmap link and sub-links go to /demo/tour, Cellar Operations to /demo/tour, Knowledge to /curriculum, Compliance to /compliance-score. All 14 guide-sublink-* elements point to the expected public pages. (4) Homepage while anonymous: 'Explore the platform' href is /curriculum, cellar-brief-teaser-cta clicks through to /demo/tour, and hero-carousel-cta-demo href is /demo/tour?from=hero-carousel. (5) Signed in as e1test-owner (/api/auth/me returns 200) with empty localStorage: / redirects to /guide, the guide shows the real member links (/your-vintage, /cellar-brief, /the-press, /knowledge, /compliance, /regulations, ...), and a second visit to / stays on /. (6) Team gate unlocked (ow_gate cookie from POST /api/gate/verify, no session): the guide and the homepage teaser show the real links. (7) /know, /demo/tour and /pricing load, and there are no VisitorLink console errors (only the expected 401 from /api/auth/me when anonymous, plus 429s caused by my own rapid testing).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Home WhatsNewRibbon", "issue": "Existing issue, not caused by this change: the ribbon at y=14 sits underneath the fixed Nav. document.elementFromPoint at the 'Explore the platform' link returns the nav container, and a normal Playwright click times out because the element is covered. A real user cannot see or click this link. Its href (/curriculum) is correct; it works when clicked with JS.", "selector": "a:has-text('Explore the platform')", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [
+      {"flow": "Footer links on the homepage", "issue": "The review asks for footer Knowledge base / Regulations / Compliance / Cellar Brief links to point to public pages. But the Footer() function in Home.tsx (around line 1937) is never rendered; Home() says the footer is mounted site-wide via SiteFooter. SiteFooter only has Privacy/Terms/Cookies/Refund links and imports Link straight from wouter. So none of those footer links appear on the page and this item could not be tested. Home.tsx Footer() is dead code.", "affected_selectors": ["[data-testid=footer-cellar-brief]"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Optional: delete the unused Footer() in Home.tsx, or render it if the footer links to Knowledge base/Regulations/Compliance are wanted.",
+    "Optional (existing issue): fix WhatsNewRibbon being hidden under the fixed Nav, e.g. move it below the nav or add top offset/z-index.",
+    "Minor: useIsVisitor returns false while auth or gate status is still loading, so for a few hundred ms anonymous visitors see the real gated hrefs. A very fast click could still land on /try. You could treat 'loading' as visitor, or rewrite the link when it is clicked.",
+    "Minor: gateStatus is cached once per page load at module level. If a visitor unlocks the gate during the session (via /unlock, with client-side navigation), the links stay rewritten until a full reload. Clear the cache after a successful gate verify."
+  ],
+  "critical_code_review_comments": [
+    "VisitorLink.tsx: the module-level gateStatus promise is never reset (see action item).",
+    "VisitorLink.tsx: visitorHref drops the query string when it rewrites a link (e.g. /cellar-brief?from=homepage-teaser becomes /demo/tour), so the ?from= attribution is lost. You may want to keep it.",
+    "App.tsx RETURNING_VISITOR sets ow_home_seen on the first load of any route, not only /. So a visitor who first lands on /pricing on mobile and later opens / in a new session counts as returning. This matches the spec's 'previous page load' wording."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100% of requested scenarios (footer item not testable: that footer is not rendered)"},
+  "seed_data_creation": "None. Read-only checks; the only write was POST /api/gate/verify, which just sets a cookie.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Use browser.new_context() for each scenario. To simulate a returning mobile visitor, add an init script that sets ow_home_seen=1. Hero carousel CTAs are opacity:0 unless their scene is active, so check the href or click with JS. Rapid navigation triggers 429s on the preview; wait about 45s. Gated paths return 302 to /try only for page navigations (send Accept: text/html); a plain curl gets 200."
+}

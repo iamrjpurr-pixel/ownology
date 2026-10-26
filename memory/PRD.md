@@ -1997,3 +1997,9 @@ Impersonate mode (M4) · Diagnostic panels (M6) · Morning brief email (M7) · A
 - Full 8-path E2E passed (iteration_43/44). Test users + e1test outreach/events cleaned from live DB.
 - Open (needs user decision): first visit to / redirects to /guide, and ~12 /guide links (plus home "Explore the platform" → /knowledge, /cellar-brief teaser) are gated for anonymous visitors → bounce to /try.
 - Preview Stripe key is a stub → checkout can only be verified on live. Ensure `charge.refunded` is enabled on the Stripe webhook endpoint.
+
+## Jun 2026 — First visit + guide links (iteration_45)
+- Strangers always land on the homepage; /guide auto-opens only for signed-in members who haven't seen it. Mobile → /free-run only for returning visitors (localStorage `ow_home_seen`, read once per page load), once per session.
+- `client/src/components/VisitorLink.tsx`: drop-in Link used by Home, Guide, CellarBriefTeaser, HeroPillarsSection. Visitors (not signed in, no team gate) get public equivalents: /knowledge→/curriculum, /compliance & /regulations→/compliance-score, other members-only pages→/demo/tour. Uses `shared/publicPaths.ts` (moved from server/) + `/api/gate/status`.
+- What's New ribbon on homepage now fixed just under the nav (was hidden behind it).
+- Known minor: during the first few hundred ms before sign-in status loads, links show their member targets. Home.tsx `Footer()` is unused (site footer is SiteFooter).
