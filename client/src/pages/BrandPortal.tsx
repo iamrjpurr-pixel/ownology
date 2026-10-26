@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
-import { Archive, Download, Pencil, Plus, Wine as WineIcon } from "lucide-react";
+import { Archive, Download, Globe, Pencil, Plus, Wine as WineIcon } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +12,7 @@ import { ContractorsPanel, ActivityFeed } from "@/components/brand/AccessPanels"
 import { WineEditorDialog } from "@/components/brand/WineEditorDialog";
 import { BrandNameEditor, looksAutoNamed } from "@/components/brand/BrandNameEditor";
 import { GettingStarted, SAMPLE_WINE } from "@/components/brand/GettingStarted";
+import { ImportWebsiteDialog } from "@/components/brand/ImportWebsiteDialog";
 import type { LogKind, Role, Wine, WineInput } from "@/components/brand/types";
 
 const BRAND_KEY = "ow_brand_vault";
@@ -76,6 +77,16 @@ function WinesTab({ wineryId, role, brandName, viewer, onInvite }: { wineryId: n
   const [editing, setEditing] = useState<{ open: boolean; wine: Wine | null }>({ open: false, wine: null });
   const wines = list.data?.wines ?? [];
   useEffect(() => { if (wines.length && !wines.some((w) => w.id === selected)) setSelected(wines[0].id); }, [wines, selected]);
+  const suggested = trpc.brandPortal.suggestedWebsite.useQuery({ wineryId }, { enabled: role === "owner" });
+  const siteUrl = suggested.data?.url ?? null;
+  const [importing, setImporting] = useState<{ open: boolean; auto: boolean }>({ open: false, auto: false });
+  // Empty vault + a known website → offer the import straight away, once per brand.
+  useEffect(() => {
+    const key = `ow_import_offered_${wineryId}`;
+    if (role !== "owner" || list.isLoading || wines.length || !siteUrl || localStorage.getItem(key)) return;
+    localStorage.setItem(key, "1");
+    setImporting({ open: true, auto: true });
+  }, [role, list.isLoading, wines.length, siteUrl, wineryId]);
 
   const onSave = async (w: WineInput, wineId = editing.wine?.id) => {
     try {
@@ -101,6 +112,7 @@ function WinesTab({ wineryId, role, brandName, viewer, onInvite }: { wineryId: n
         {role === "owner" && (
           <div className="flex gap-2">
             <Button size="sm" className="flex-1 gap-1.5" onClick={() => setEditing({ open: true, wine: null })} data-testid="new-wine-button"><Plus className="h-4 w-4" /> New wine</Button>
+            <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setImporting({ open: true, auto: false })} data-testid="import-website-button"><Globe className="h-4 w-4" /> Import</Button>
             <Button size="sm" variant="outline" className="gap-1.5" onClick={onExport} disabled={exportVault.isPending} data-testid="export-vault-button"><Download className="h-4 w-4" /> Export</Button>
           </div>
         )}
@@ -116,11 +128,15 @@ function WinesTab({ wineryId, role, brandName, viewer, onInvite }: { wineryId: n
         {selected ? (
           <WineDetail wineryId={wineryId} wineId={selected} role={role} brandName={brandName} viewer={viewer} onEdit={(w) => setEditing({ open: true, wine: w })} />
         ) : role === "owner" && !list.isLoading && !wines.length ? (
-          <GettingStarted pending={save.isPending} onSample={() => onSave(SAMPLE_WINE, undefined)} onNew={() => setEditing({ open: true, wine: null })} onInvite={() => onInvite?.()} />
+          <GettingStarted pending={save.isPending} siteHost={siteUrl ? new URL(siteUrl).host : null} onImport={() => setImporting({ open: true, auto: !!siteUrl })} onSample={() => onSave(SAMPLE_WINE, undefined)} onNew={() => setEditing({ open: true, wine: null })} onInvite={() => onInvite?.()} />
         ) : (
-          <div className="flex flex-col items-center py-16 text-center text-[var(--ow-text-lo)]"><WineIcon className="mb-3 h-8 w-8" /><p className="text-sm">Pick a wine to see its spec and cellar record.</p></div>
+          <div className="flex flex-col items-center py-16 text-center text-[var(--ow-text-lo)]"><WineIcon className="mb-3 h-8 w-8" /><p className="text-sm">{!list.isLoading && !wines.length ? "Nothing shared with you yet. Specs appear here as soon as the owner adds them." : "Pick a wine to see its spec and cellar record."}</p></div>
         )}
       </main>
+      {role === "owner" && (
+        <ImportWebsiteDialog wineryId={wineryId} open={importing.open} autoRun={importing.auto} initialUrl={siteUrl}
+          onOpenChange={(o) => setImporting((s) => ({ ...s, open: o }))} onImported={() => utils.brandPortal.listWines.invalidate({ wineryId })} />
+      )}
       <WineEditorDialog open={editing.open} onOpenChange={(o) => setEditing((s) => ({ ...s, open: o }))} initial={editing.wine} onSave={onSave} pending={save.isPending} />
     </div>
   );
@@ -200,7 +216,7 @@ export default function BrandPortal() {
           </div>
           {brands.length > 0 && current && (
             <div className="flex flex-wrap items-center gap-3">
-              <span className={`rounded px-2 py-1 text-[0.65rem] font-bold uppercase tracking-wider ${current.role === "owner" ? "bg-[var(--ow-amber)] text-white" : "border border-[var(--ow-border-md)] text-[var(--ow-text-mid)]"}`} data-testid="vault-role-badge">
+              <span className={`rounded px-2 py-1 text-[0.65rem] font-bold uppercase tracking-wider ${current.role === "owner" ? "bg-[var(--ow-amber)] text-[var(--ow-bg-base)]" : "border border-[var(--ow-border-md)] text-[var(--ow-text-mid)]"}`} data-testid="vault-role-badge">
                 {current.role === "owner" ? "Owner" : "Contract winemaker"}
               </span>
               <Select value={String(current.wineryId)} onValueChange={(v) => setBrandId(Number(v))}>

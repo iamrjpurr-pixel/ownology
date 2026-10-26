@@ -573,7 +573,7 @@ export default function Compliance() {
                 alignItems: "center",
                 gap: "0.5rem",
                 padding: "0.6rem 1rem",
-                background: "var(--ow-amber)",
+                background: "var(--primary)",
                 color: "oklch(0.10 0.008 60)",
                 fontFamily: "'Lato',sans-serif",
                 fontWeight: 600,

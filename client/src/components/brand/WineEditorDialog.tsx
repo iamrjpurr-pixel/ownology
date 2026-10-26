@@ -39,7 +39,7 @@ export function WineEditorDialog({ open, onOpenChange, initial, onSave, pending 
           <div><label className={lbl}>Style</label><Input maxLength={160} placeholder="e.g. Cool-climate Shiraz, whole-bunch, medium-bodied" value={w.style} onChange={(e) => set("style", e.target.value)} data-testid="wine-style-input" /></div>
 
           <fieldset className="space-y-2">
-            <legend className={lbl}>Blend <span className={total === 100 ? "text-emerald-700" : "text-[var(--ow-amber)]"}>({total}%)</span></legend>
+            <legend className={lbl}>Blend <span className={total === 100 ? "text-emerald-700 dark:text-emerald-300" : "text-[var(--ow-amber)]"}>({total}%)</span></legend>
             {w.blend.map((b, i) => (
               <div key={i} className="grid grid-cols-[1fr_70px_1fr_32px] gap-2">
                 <Input placeholder="Variety" value={b.variety} onChange={(e) => setBlend(i, { variety: e.target.value })} data-testid={`blend-variety-${i}`} />

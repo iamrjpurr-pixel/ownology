@@ -98,7 +98,7 @@ export default function Apco() {
             data-testid="apco-cta-pricing"
             style={{
               padding: "0.75rem 1.5rem",
-              background: "var(--ow-amber)",
+              background: "var(--primary)",
               color: "oklch(0.10 0.008 60)",
               borderRadius: 4,
               fontFamily: "'Lato',sans-serif",
@@ -370,7 +370,7 @@ export default function Apco() {
               data-testid="apco-footer-cta-pricing"
               style={{
                 padding: "0.85rem 1.75rem",
-                background: "var(--ow-amber)",
+                background: "var(--primary)",
                 color: "oklch(0.10 0.008 60)",
                 borderRadius: 4,
                 fontFamily: "'Lato',sans-serif",

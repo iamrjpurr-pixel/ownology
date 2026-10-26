@@ -284,7 +284,6 @@ async function provisionUserByEmail(email: string): Promise<{ id: number; openId
   } catch (e) {
     console.warn("[auth/email-signup] winery provisioning skipped:", (e as Error).message);
   }
-  void sendSignupEmails({ name: "", email, via: "email sign-in link" }).catch(() => {});
   return { id: justCreated.id, openId, role };
 }
 

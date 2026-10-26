@@ -12,7 +12,7 @@ const KIND_LABEL: Record<CrmKind, string> = {
   reservation: "Reserved", member: "Paying", access: "Access link", referral: "Referred", account: "Account",
 };
 const KIND_TONE: Partial<Record<CrmKind, string>> = {
-  reservation: "bg-[var(--ow-amber)] text-white border-transparent",
+  reservation: "bg-[var(--ow-amber)] text-[var(--ow-bg-base)] border-transparent",
   member: "bg-emerald-700 text-white border-transparent",
 };
 
@@ -122,7 +122,7 @@ export default function AdminPeople() {
         <div className="mt-8 flex flex-wrap gap-2" data-testid="people-filters">
           {FILTERS.map((f) => (
             <button key={f.id} type="button" onClick={() => setFilter(f.id)} data-testid={`people-filter-${f.id}`}
-              className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${filter === f.id ? "border-[var(--ow-amber)] bg-[var(--ow-amber)] text-white" : "border-[var(--ow-border-md)] text-[var(--ow-text-mid)] hover:border-[var(--ow-amber)]"}`}>
+              className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${filter === f.id ? "border-[var(--ow-amber)] bg-[var(--ow-amber)] text-[var(--ow-bg-base)]" : "border-[var(--ow-border-md)] text-[var(--ow-text-mid)] hover:border-[var(--ow-amber)]"}`}>
               {f.label} <span className="opacity-70">{counts[f.id] ?? 0}</span>
             </button>
           ))}

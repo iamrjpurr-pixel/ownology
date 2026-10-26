@@ -110,7 +110,7 @@ export default function UserMenu() {
             height: 28,
             borderRadius: "50%",
             background: "var(--ow-amber)",
-            color: "white",
+            color: "var(--ow-bg-base)",
             fontSize: "0.74rem",
             fontWeight: 700,
             letterSpacing: "0.02em",

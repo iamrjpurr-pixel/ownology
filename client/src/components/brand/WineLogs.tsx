@@ -31,7 +31,7 @@ function LogForm({ onAdd, pending }: { onAdd: (kind: LogKind, note: string, read
             type="button"
             data-testid={`log-kind-${k.id}`}
             onClick={() => setKind(k.id)}
-            className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors duration-150 ${kind === k.id ? "border-[var(--ow-amber)] bg-[var(--ow-amber)] text-white" : "border-[var(--ow-border-md)] text-[var(--ow-text-mid)] hover:border-[var(--ow-amber)]"}`}
+            className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors duration-150 ${kind === k.id ? "border-[var(--ow-amber)] bg-[var(--ow-amber)] text-[var(--ow-bg-base)]" : "border-[var(--ow-border-md)] text-[var(--ow-text-mid)] hover:border-[var(--ow-amber)]"}`}
           >
             {k.label}
           </button>
@@ -68,7 +68,7 @@ export function WineLogs({ logs, onAdd, pending }: { logs: WineLog[]; onAdd?: (k
             <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--ow-text-lo)]">
               <span className="font-semibold uppercase tracking-wider text-[var(--ow-text-mid)]">{KINDS.find((k) => k.id === l.kind)?.label ?? l.kind}</span>
               <span>· {l.authorEmail}</span>
-              <span className={`rounded px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-wider ${l.authorRole === "owner" ? "bg-[var(--ow-amber)] text-white" : "border border-[var(--ow-border-md)]"}`}>
+              <span className={`rounded px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-wider ${l.authorRole === "owner" ? "bg-[var(--ow-amber)] text-[var(--ow-bg-base)]" : "border border-[var(--ow-border-md)]"}`}>
                 {l.authorRole === "owner" ? "Owner" : "Contractor"}
               </span>
               <span>· {fmtDate(l.createdAt)}</span>

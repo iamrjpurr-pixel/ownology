@@ -69,9 +69,9 @@ export default function CurriculumLesson() {
     return g;
   }, [lesson?.cited_in]);
 
-  if (isLoading) return <div className="max-w-3xl mx-auto p-12 text-stone-500" data-testid="lesson-loading">Loading lesson…</div>;
+  if (isLoading) return <div className="max-w-3xl mx-auto p-12 text-stone-600" data-testid="lesson-loading">Loading lesson…</div>;
   if (!lesson) return (
-    <div className="max-w-3xl mx-auto p-12" data-testid="lesson-notfound">
+    <div className="force-light max-w-3xl mx-auto p-12" data-testid="lesson-notfound">
       <p className="text-stone-600 mb-4">Lesson not found.</p>
       <Link href="/curriculum"><Button variant="outline" data-testid="back-to-index-btn">Back to curriculum</Button></Link>
     </div>
@@ -85,12 +85,12 @@ export default function CurriculumLesson() {
     : lesson.reading_min;
 
   return (
-    <div className="min-h-screen bg-stone-50" data-testid="lesson-page">
+    <div className="force-light min-h-screen bg-stone-50" data-testid="lesson-page">
       {/* Sticky header strip */}
       <div className="sticky top-0 z-10 border-b border-stone-200 bg-white/95 backdrop-blur">
         <div className="max-w-4xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
           <Link href="/curriculum">
-            <button className="flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-900" data-testid="back-btn">
+            <button className="flex items-center gap-1.5 text-sm text-stone-600 hover:text-stone-900" data-testid="back-btn">
               <ArrowLeft className="h-4 w-4" /> All lessons
             </button>
           </Link>
@@ -111,11 +111,11 @@ export default function CurriculumLesson() {
           <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${levelMeta.accent}`} data-testid="lesson-level">
             {levelMeta.label}
           </span>
-          <span className="text-xs text-stone-500 font-mono" data-testid="lesson-id">{lesson.id}</span>
+          <span className="text-xs text-stone-600 font-mono" data-testid="lesson-id">{lesson.id}</span>
           {lesson.wbs.map((d) => (
             <span key={d} className="text-xs bg-stone-100 border border-stone-200 rounded px-2 py-0.5 font-mono text-stone-700">{d}</span>
           ))}
-          <span className="flex items-center gap-1 text-xs text-stone-500">
+          <span className="flex items-center gap-1 text-xs text-stone-600">
             <Clock className="h-3 w-3" /> ~{readingMinutes} min
           </span>
         </div>
@@ -143,7 +143,7 @@ export default function CurriculumLesson() {
       {isV2 && lesson.tldr && lesson.tldr.length > 0 && (
         <div className="max-w-4xl mx-auto px-6 pb-6">
           <div className={`rounded-xl bg-white border border-stone-200 ring-4 ${levelMeta.ring} p-6`} data-testid="lesson-tldr">
-            <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+            <div className="text-xs font-semibold text-stone-600 uppercase tracking-wider mb-3 flex items-center gap-1.5">
               <Zap className="h-3 w-3" /> TL;DR
             </div>
             <ul className="space-y-2.5">
@@ -236,7 +236,7 @@ function UpsellBoundary({ reason, isAuthenticated }: { reason: "deep" | "flash";
         </p>
         <div className="flex flex-wrap gap-3">
           <Link href="/pricing?from=curriculum-upsell">
-            <Button size="lg" className="bg-stone-900 hover:bg-stone-800" data-testid="upsell-cta-pricing">
+            <Button size="lg" className="bg-stone-900 text-white hover:bg-stone-800" data-testid="upsell-cta-pricing">
               See pricing <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>
@@ -253,7 +253,7 @@ function UpsellBoundary({ reason, isAuthenticated }: { reason: "deep" | "flash";
             </Link>
           )}
         </div>
-        <p className="mt-6 text-xs text-stone-500">
+        <p className="mt-6 text-xs text-stone-600">
           14-day free trial. Cancel anytime. Founding member pricing locks for life.
         </p>
       </div>
@@ -272,7 +272,7 @@ function DeepModeContent({ lesson, quizAnswers, setQuizAnswers, quizReveal, setQ
               <div className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center">
                 <SectionIcon hint={s.iconHint} />
               </div>
-              <div className="text-xs text-stone-500 font-mono">Section {i + 1}</div>
+              <div className="text-xs text-stone-600 font-mono">Section {i + 1}</div>
             </div>
             <h2 className="font-serif text-2xl md:text-3xl text-stone-900 leading-snug mb-4" data-testid={`section-heading-${i}`}>
               {s.heading}
@@ -331,10 +331,10 @@ function DeepModeContent({ lesson, quizAnswers, setQuizAnswers, quizReveal, setQ
                 <div key={j} className="grid grid-cols-1 md:grid-cols-[100px_1fr] gap-3 md:gap-6 border-l-2 border-rose-500 pl-4 pb-2">
                   <div className="text-rose-300 font-mono text-sm font-semibold">{t.when}</div>
                   <div className="space-y-1 text-sm">
-                    <div className="text-stone-300"><span className="text-stone-500">Observed:</span> {t.observation}</div>
-                    <div className="text-white"><span className="text-stone-500">Decision:</span> <strong>{t.decision}</strong></div>
-                    <div className="text-stone-300"><span className="text-stone-500">Why:</span> {t.reasoning}</div>
-                    <div className="text-stone-300"><span className="text-stone-500">Outcome:</span> {t.outcome}</div>
+                    <div className="text-stone-300"><span className="text-stone-600">Observed:</span> {t.observation}</div>
+                    <div className="text-white"><span className="text-stone-600">Decision:</span> <strong>{t.decision}</strong></div>
+                    <div className="text-stone-300"><span className="text-stone-600">Why:</span> {t.reasoning}</div>
+                    <div className="text-stone-300"><span className="text-stone-600">Outcome:</span> {t.outcome}</div>
                   </div>
                 </div>
               ))}
@@ -355,22 +355,22 @@ function DeepModeContent({ lesson, quizAnswers, setQuizAnswers, quizReveal, setQ
         <div className="max-w-4xl mx-auto px-6 pb-10">
           <div className="rounded-xl bg-white border border-stone-200 overflow-hidden" data-testid="decision-tree">
             <div className="px-6 py-4 border-b border-stone-200 bg-stone-50">
-              <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">Decision tree</div>
+              <div className="text-xs font-semibold text-stone-600 uppercase tracking-wider mb-1">Decision tree</div>
               <h3 className="font-serif text-2xl text-stone-900">{lesson.decision_tree.title}</h3>
             </div>
             <div className="divide-y divide-stone-200">
               {lesson.decision_tree.rows.map((r: any, j: number) => (
                 <div key={j} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr] gap-4 p-5 hover:bg-stone-50">
                   <div>
-                    <div className="text-xs text-stone-500 uppercase tracking-wider mb-1">Symptom</div>
+                    <div className="text-xs text-stone-600 uppercase tracking-wider mb-1">Symptom</div>
                     <div className="text-stone-900 font-medium">{r.symptom}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-stone-500 uppercase tracking-wider mb-1">First check</div>
+                    <div className="text-xs text-stone-600 uppercase tracking-wider mb-1">First check</div>
                     <div className="text-stone-700">{r.first_check}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-stone-500 uppercase tracking-wider mb-1">Action</div>
+                    <div className="text-xs text-stone-600 uppercase tracking-wider mb-1">Action</div>
                     <div className="text-emerald-900 font-medium">{r.action}</div>
                   </div>
                 </div>
@@ -384,13 +384,13 @@ function DeepModeContent({ lesson, quizAnswers, setQuizAnswers, quizReveal, setQ
       {lesson.mcqs?.length > 0 && (
         <div className="max-w-4xl mx-auto px-6 pb-14">
           <div className="mb-6">
-            <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">Check your understanding</div>
+            <div className="text-xs font-semibold text-stone-600 uppercase tracking-wider mb-1">Check your understanding</div>
             <h3 className="font-serif text-2xl text-stone-900">{lesson.mcqs.length} questions to close the loop</h3>
           </div>
           <div className="space-y-4">
             {lesson.mcqs.map((m: any, j: number) => (
               <div key={j} className="rounded-lg border border-stone-200 bg-white p-5" data-testid={`mcq-${j}`}>
-                <p className="font-medium text-stone-900 mb-3"><span className="text-stone-500 font-mono mr-1">Q{j + 1}.</span> {m.q}</p>
+                <p className="font-medium text-stone-900 mb-3"><span className="text-stone-600 font-mono mr-1">Q{j + 1}.</span> {m.q}</p>
                 <div className="space-y-2 mb-3">
                   {m.choices.map((c: string) => {
                     const letter = c.charAt(0);
@@ -463,13 +463,13 @@ function FlashModeContent({ cards, idx, flipped, onNext, onPrev, onFlip }: any) 
   const card = cards[idx];
   return (
     <div className="max-w-3xl mx-auto px-6 pb-14 mt-8" data-testid="flash-mode">
-      <div className="text-center text-sm text-stone-500 mb-6">Card {idx + 1} of {cards.length}</div>
+      <div className="text-center text-sm text-stone-600 mb-6">Card {idx + 1} of {cards.length}</div>
       <button
         onClick={onFlip}
         className={`w-full min-h-[280px] rounded-2xl border-2 border-stone-200 bg-white p-8 md:p-12 flex flex-col items-center justify-center text-center transition-all hover:border-stone-400 shadow-sm ${flipped ? "bg-stone-50" : "bg-white"}`}
         data-testid={`flash-card-${idx}`}
       >
-        <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-4">
+        <div className="text-xs font-semibold text-stone-600 uppercase tracking-wider mb-4">
           {flipped ? "Back" : "Front — tap to reveal"}
         </div>
         <p className="font-serif text-2xl md:text-3xl text-stone-900 leading-snug">
@@ -527,7 +527,7 @@ function CitedIn({ grouped }: { grouped: Record<string, any[]> }) {
             );
           })}
         </div>
-        <p className="mt-6 text-xs text-stone-500 leading-relaxed">
+        <p className="mt-6 text-xs text-stone-600 leading-relaxed">
           This lesson is Ownology-original writing. Referenced textbooks are cited for further reading — their contents are not reproduced here.
           Purchase from the publisher for the full source.
         </p>

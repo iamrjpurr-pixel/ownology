@@ -84,7 +84,7 @@ export default function FreeRunJournal() {
             data-testid="journal-back-to-ask"
             style={{
               padding: "0.5rem 1rem",
-              background: "var(--ow-amber)",
+              background: "var(--primary)",
               color: "oklch(0.10 0.008 60)",
               border: "none",
               borderRadius: 4,
@@ -203,7 +203,7 @@ function EmptyState() {
         style={{
           display: "inline-block",
           padding: "0.6rem 1.4rem",
-          background: "var(--ow-amber)",
+          background: "var(--primary)",
           color: "oklch(0.10 0.008 60)",
           borderRadius: 4,
           fontFamily: "'Lato',sans-serif",

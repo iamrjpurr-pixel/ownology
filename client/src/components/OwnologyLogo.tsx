@@ -300,7 +300,7 @@ export default function OwnologyLogo({
             style={{
               fontFamily: "'Fira Code', 'Courier New', monospace",
               fontSize: Math.max(size * 0.38, 10),
-              color: AMBER,
+              color: "var(--ow-amber)",
               minWidth: "2em",
               display: "inline-block",
               letterSpacing: "0.02em",

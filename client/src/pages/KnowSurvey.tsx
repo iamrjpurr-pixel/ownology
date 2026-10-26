@@ -110,7 +110,7 @@ export default function KnowSurvey() {
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
               {ANSWERS.map((a) => (
                 <button key={a} type="button" onClick={() => answer(a)} data-testid={`survey-answer-${a}`}
-                  className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-3.5 text-sm font-semibold transition-[border-color,background-color,transform] duration-150 hover:-translate-y-0.5 ${answers[s.id] === a ? "border-[var(--ow-amber)] bg-[var(--ow-amber)] text-white" : "border-[var(--ow-border-md)] bg-[var(--ow-bg-card)] text-[var(--ow-text-hi)] hover:border-[var(--ow-amber)]"}`}>
+                  className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-3.5 text-sm font-semibold transition-[border-color,background-color,transform] duration-150 hover:-translate-y-0.5 ${answers[s.id] === a ? "border-[var(--ow-amber)] bg-[var(--ow-amber)] text-[var(--ow-bg-base)]" : "border-[var(--ow-border-md)] bg-[var(--ow-bg-card)] text-[var(--ow-text-hi)] hover:border-[var(--ow-amber)]"}`}>
                   {answers[s.id] === a && <Check className="h-4 w-4" />} {ANSWER_LABEL[a]}
                 </button>
               ))}

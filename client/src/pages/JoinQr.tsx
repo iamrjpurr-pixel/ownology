@@ -319,7 +319,7 @@ export default function JoinQr() {
 }
 
 const btnPrimary: React.CSSProperties = {
-  background: "var(--ow-amber)",
+  background: "var(--primary)",
   color: "#1a1210",
   border: "none",
   borderRadius: 999,

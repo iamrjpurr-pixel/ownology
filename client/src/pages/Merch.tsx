@@ -1146,7 +1146,7 @@ export default function Merch() {
               {cartCount > 0 && (
                 <span
                   style={{
-                    background: "var(--ow-amber)",
+                    background: "var(--primary)",
                     color: "oklch(0.10 0.008 60)",
                     borderRadius: "50%",
                     width: "18px",

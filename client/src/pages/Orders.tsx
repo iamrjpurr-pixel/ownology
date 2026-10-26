@@ -163,7 +163,7 @@ export default function Orders() {
             href={getLoginUrl()}
             className="px-6 py-2.5 rounded-sm text-sm font-medium"
             style={{
-              background: "var(--ow-amber)",
+              background: "var(--primary)",
               color: "oklch(0.12 0.01 60)",
               fontFamily: "'Lato',sans-serif",
             }}

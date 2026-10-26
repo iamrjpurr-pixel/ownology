@@ -259,11 +259,11 @@ const STATUS_RANK: Record<ContactStatus, number> = {
 };
 
 const STATUS_OPTIONS: { value: ContactStatus; label: string; color: string }[] = [
-  { value: "warm",     label: "Warm",     color: "#16a34a" },
-  { value: "lukewarm", label: "Lukewarm", color: "#ca8a04" },
+  { value: "warm",     label: "Warm",     color: "#15803d" },
+  { value: "lukewarm", label: "Lukewarm", color: "#a16207" },
   { value: "cold",     label: "Cold",     color: "#6b7280" },
   { value: "sales",    label: "Sales/Vendor", color: "#7c3aed" },
-  { value: "skip",     label: "Skip",     color: "#9ca3af" },
+  { value: "skip",     label: "Skip",     color: "#4b5563" },
 ];
 
 const STATUS_META: Record<ContactStatus, { label: string; color: string }> = Object.fromEntries(
@@ -1108,7 +1108,7 @@ export default function AdminContacts() {
             data-testid="deep-research-btn"
             style={{
               padding: "0.6rem 1.2rem",
-              background: "var(--ow-amber)",
+              background: "var(--primary)",
               color: "oklch(0.10 0.008 60)",
               border: "none",
               borderRadius: 4,
@@ -1246,7 +1246,7 @@ export default function AdminContacts() {
             data-testid="url-quickadd-fetch-btn"
             style={{
               padding: "0.6rem 1.2rem",
-              background: "var(--ow-amber)",
+              background: "var(--primary)",
               color: "oklch(0.10 0.008 60)",
               border: "none",
               borderRadius: 4,
@@ -1335,7 +1335,7 @@ export default function AdminContacts() {
                         style={{
                           padding: "4px 12px",
                           borderRadius: 3,
-                          background: "var(--ow-amber)",
+                          background: "var(--primary)",
                           color: "oklch(0.10 0.008 60)",
                           border: "none",
                           fontFamily: "'Lato',sans-serif",
@@ -1640,7 +1640,7 @@ export default function AdminContacts() {
           style={{
             marginTop: 12,
             padding: "0.7rem 1.5rem",
-            background: "var(--ow-amber)",
+            background: "var(--primary)",
             color: "oklch(0.10 0.008 60)",
             fontFamily: "'Lato',sans-serif",
             fontWeight: 700,
@@ -1820,7 +1820,7 @@ export default function AdminContacts() {
                           padding: "4px 10px",
                           borderRadius: 4,
                           border: "1px solid var(--ow-amber)",
-                          background: "var(--ow-amber)",
+                          background: "var(--primary)",
                           color: "#111",
                           fontFamily: "'Lato',sans-serif",
                           fontSize: "0.78rem",
@@ -1930,7 +1930,7 @@ export default function AdminContacts() {
                           padding: "3px 10px",
                           borderRadius: 4,
                           border: "1px solid var(--ow-amber)",
-                          background: "var(--ow-amber)",
+                          background: "var(--primary)",
                           color: "#111",
                           fontFamily: "'Lato',sans-serif",
                           fontSize: "0.74rem",
@@ -2023,7 +2023,7 @@ export default function AdminContacts() {
                             padding: "3px 10px",
                             borderRadius: 4,
                             border: "1px solid var(--ow-amber)",
-                            background: "var(--ow-amber)",
+                            background: "var(--primary)",
                             color: "#111",
                             fontFamily: "'Lato',sans-serif",
                             fontSize: "0.74rem",
@@ -2294,7 +2294,7 @@ export default function AdminContacts() {
                         borderRadius: 999,
                         border: "1px solid color-mix(in oklch, #7c3aed 40%, transparent)",
                         background: "color-mix(in oklch, #7c3aed 15%, transparent)",
-                        color: "#a78bfa",
+                        color: "color-mix(in oklch, #7c3aed 55%, var(--ow-text-hi))",
                         fontFamily: "'Lato',sans-serif",
                         fontSize: "0.72rem",
                         fontWeight: 600,
@@ -2350,7 +2350,7 @@ export default function AdminContacts() {
                       padding: "6px 14px",
                       borderRadius: 4,
                       border: 0,
-                      background: "var(--ow-amber)",
+                      background: "var(--primary)",
                       color: "oklch(0.10 0.008 60)",
                       fontFamily: "'Lato',sans-serif",
                       fontSize: "0.8rem",
@@ -2449,7 +2449,7 @@ export default function AdminContacts() {
                       }}
                       style={{
                         padding: "0.4rem 0.9rem",
-                        background: "var(--ow-amber)",
+                        background: "var(--primary)",
                         color: "oklch(0.10 0.008 60)",
                         border: "none",
                         borderRadius: 3,
@@ -3389,7 +3389,7 @@ function SmsDraftEditor({
               fontSize: "0.65rem",
               padding: "1px 6px",
               borderRadius: 8,
-              background: "var(--ow-amber)",
+              background: "var(--primary)",
               color: "oklch(0.10 0.008 60)",
               fontWeight: 700,
               letterSpacing: "0.03em",
@@ -3411,7 +3411,7 @@ function SmsDraftEditor({
             fontSize: "0.72rem",
             fontWeight: 700,
             padding: "3px 10px",
-            background: "var(--ow-amber)",
+            background: "var(--primary)",
             color: "oklch(0.10 0.008 60)",
             border: "none",
             borderRadius: 3,

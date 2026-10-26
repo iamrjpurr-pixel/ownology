@@ -20,7 +20,7 @@ export default function AdminAccess() {
         <div className="mt-5 flex flex-wrap gap-2 border-b border-[var(--ow-border)] pb-3" role="tablist">
           {TABS.map((t) => (
             <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => navigate(`/admin/access?tab=${t.id}`)} data-testid={`access-tab-${t.id}`}
-              className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${tab === t.id ? "border-[var(--ow-amber)] bg-[var(--ow-amber)] text-white" : "border-[var(--ow-border-md)] text-[var(--ow-text-mid)] hover:border-[var(--ow-amber)]"}`}>
+              className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${tab === t.id ? "border-[var(--ow-amber)] bg-[var(--ow-amber)] text-[var(--ow-bg-base)]" : "border-[var(--ow-border-md)] text-[var(--ow-text-mid)] hover:border-[var(--ow-amber)]"}`}>
               {t.label}
             </button>
           ))}

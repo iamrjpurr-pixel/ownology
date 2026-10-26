@@ -5,7 +5,7 @@ import { ShieldCheck, UserMinus, Eye, PenLine, Ban, Download, Send } from "lucid
 import { fmtDate, type Activity, type Member } from "./types";
 
 const STATUS_STYLE: Record<string, string> = {
-  active: "bg-emerald-600/10 text-emerald-700",
+  active: "bg-emerald-600/10 text-emerald-700 dark:text-emerald-300",
   invited: "bg-[color-mix(in_oklch,var(--ow-amber)_15%,transparent)] text-[var(--ow-amber)]",
   revoked: "bg-[var(--ow-bg-inset)] text-[var(--ow-text-lo)] line-through",
 };

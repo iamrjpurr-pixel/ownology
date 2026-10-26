@@ -57,7 +57,7 @@
   --secondary: oklch(0.24 0.014 35);
   --secondary-foreground: oklch(0.82 0.018 70);
   --muted: oklch(0.22 0.014 35);
-  --muted-foreground: oklch(0.62 0.018 70);
+  --muted-foreground: oklch(0.72 0.018 70);
   /* Terracotta accent — slightly more vibrant against warmer base */
   --accent: oklch(0.64 0.12 42);
   --accent-foreground: oklch(0.97 0.005 75);
@@ -72,9 +72,9 @@
   --ow-bg-card:   oklch(0.20 0.016 35);   /* card / panel surface — lamp-lit */
   --ow-bg-inset:  oklch(0.24 0.018 35);   /* code blocks, inset areas */
   --ow-text-hi:   oklch(0.93 0.020 70);   /* headings — warm cream */
-  --ow-text-mid:  oklch(0.72 0.016 70);   /* body copy — slightly lifted */
-  --ow-text-lo:   oklch(0.62 0.014 70);   /* captions — bumped 0.54→0.62 to clear WCAG AA at small sizes */
-  --ow-amber:     oklch(0.74 0.13 72);    /* brand amber — lamp-light bright */
+  --ow-text-mid:  oklch(0.80 0.016 70);   /* body copy — slightly lifted */
+  --ow-text-lo:   oklch(0.72 0.014 70);   /* captions — bumped 0.54→0.62 to clear WCAG AA at small sizes */
+  --ow-amber:     oklch(0.80 0.13 72);    /* brand amber — lifted to clear 4.5:1 on cards */
   /* Live/active accent — overridden by Crush Pad to vibrant pink.
      In all other themes it inherits the amber for backward compatibility,
      so components referencing var(--ow-accent-live) stay safe. */
@@ -91,7 +91,8 @@
 
 /* ── Light "Cellar Daylight" theme ── */
 html.light-mode,
-html.theme-parchment {
+html.theme-parchment,
+.force-light {
   --background: oklch(0.97 0.010 75);
   --foreground: oklch(0.18 0.012 60);
   --card: oklch(0.93 0.012 75);
@@ -109,8 +110,8 @@ html.theme-parchment {
   --ow-bg-inset:  oklch(0.86 0.016 75);   /* inset / code areas */
   --ow-text-hi:   oklch(0.16 0.012 60);   /* headings — near-black warm */
   --ow-text-mid:  oklch(0.32 0.010 60);   /* body copy — dark warm grey */
-  --ow-text-lo:   oklch(0.50 0.008 60);   /* captions */
-  --ow-amber:     oklch(0.55 0.15 65);    /* slightly deeper amber — clears WCAG AA on parchment (was 0.62, 3.4:1) */
+  --ow-text-lo:   oklch(0.44 0.008 60);   /* captions — 4.5:1 on cards */
+  --ow-amber:     oklch(0.50 0.14 62);    /* slightly deeper amber — clears WCAG AA on parchment (was 0.62, 3.4:1) */
   --ow-border:    oklch(0 0 0 / 0.10);
   --ow-border-md: oklch(0 0 0 / 0.18);
   --ow-shadow:    oklch(0 0 0 / 0.12);
@@ -150,7 +151,7 @@ html.theme-soft-cellar {
   --popover: oklch(0.30 0.008 50);
   --popover-foreground: oklch(0.94 0.006 60);
   --muted: oklch(0.28 0.005 40);
-  --muted-foreground: oklch(0.72 0.008 50);
+  --muted-foreground: oklch(0.82 0.008 50);
   --border: oklch(1 0 0 / 0.14);
   --input: oklch(1 0 0 / 0.16);
 
@@ -159,9 +160,9 @@ html.theme-soft-cellar {
   --ow-bg-card:   oklch(0.30 0.008 50);   /* stainless tank catching light */
   --ow-bg-inset:  oklch(0.34 0.008 50);
   --ow-text-hi:   oklch(0.95 0.006 60);   /* near-white, very slight warm cast */
-  --ow-text-mid:  oklch(0.84 0.008 60);
-  --ow-text-lo:   oklch(0.68 0.010 60);
-  --ow-amber:     oklch(0.74 0.13 72);    /* lamp-light amber, unchanged */
+  --ow-text-mid:  oklch(0.88 0.008 60);
+  --ow-text-lo:   oklch(0.80 0.010 60);
+  --ow-amber:     oklch(0.84 0.13 75);    /* lifted so small amber text clears 4.5:1 on concrete cards */
   --ow-border:    oklch(1 0 0 / 0.14);
   --ow-border-md: oklch(1 0 0 / 0.22);
   --ow-shadow:    oklch(0 0 0 / 0.40);
@@ -454,7 +455,7 @@ html.theme-white-crush strong { font-weight: 700; }
 
   /* Amber glow button */
   .btn-amber {
-    background: var(--ow-amber);
+    background: var(--primary);
     color: oklch(0.10 0.008 60);
     font-family: 'Lato', sans-serif;
     font-weight: 700;
@@ -700,3 +701,7 @@ p, li, blockquote {
 @media (max-width: 639px) {
   .ow-theme-picker-raise { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* Pages designed on a fixed light palette keep light theme tokens under any site theme,
+   so theme-coloured buttons/links never land dark-on-dark or light-on-light. */
+.force-light { color: var(--foreground); color-scheme: light; }

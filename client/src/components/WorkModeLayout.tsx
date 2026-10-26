@@ -256,7 +256,7 @@ export default function WorkModeLayout({
                     background: "none",
                     border: "none",
                     cursor: "pointer",
-                    color: isActive ? "#B0741A" : "#999999",
+                    color: isActive ? "#8a5a10" : "#5f5f5f",
                     transition: "color 0.15s",
                     minHeight: "60px",
                   }}
@@ -271,7 +271,7 @@ export default function WorkModeLayout({
                       fontWeight: isActive ? 600 : 400,
                       letterSpacing: "0.05em",
                       textTransform: "uppercase",
-                      color: isActive ? "#B0741A" : "#999999",
+                      color: isActive ? "#8a5a10" : "#5f5f5f",
                     }}
                   >
                     {item.label}
@@ -289,7 +289,7 @@ export default function WorkModeLayout({
                       fontSize: "0.56rem",
                       fontStyle: "italic",
                       letterSpacing: "0.02em",
-                      color: isActive ? "#B0741A" : "#c9b590",
+                      color: isActive ? "#8a5a10" : "#7a6440",
                       marginTop: "-0.1rem",
                       lineHeight: 1,
                       opacity: isActive ? 0.95 : 0.7,

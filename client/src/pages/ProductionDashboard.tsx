@@ -768,7 +768,7 @@ export default function ProductionDashboard() {
         })()}
 
         {/* ── Footer note ── */}
-        <p className="text-xs text-center pb-4" style={{ color: "oklch(0.38 0.008 75)" }}>
+        <p className="text-xs text-center pb-4" style={{ color: "var(--ow-text-lo)" }}>
           Data sourced from The Press vintage log · DR-19 Production Dashboard · Ownology v1.0
         </p>
       </div>

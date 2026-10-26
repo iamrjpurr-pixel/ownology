@@ -95,7 +95,7 @@ async function getWineRow(wineryId: number, wineId: number) {
 }
 
 const short = z.string().max(24).optional();
-const wineInput = z.object({
+export const wineInput = z.object({
   name: z.string().trim().min(1).max(160),
   vintage: z.number().int().min(1900).max(2100).nullable(),
   style: z.string().max(160).default(""),
@@ -220,6 +220,50 @@ export const brandPortalRouter = router({
       await logActivity(ctx.user, input.wineryId, "owner", input.wineId ? "edited" : "created", w.name);
       return { id };
     }),
+
+  // Reads the owner's own website and returns draft specs to tick through — nothing is saved here.
+  websitePreview: protectedProcedure
+    .input(brandId.extend({ url: z.string().trim().min(4).max(300) }))
+    .mutation(async ({ ctx, input }) => {
+      await requireOwner(ctx.user, input.wineryId);
+      const { readWinesFromWebsite } = await import("../websiteWineImport.js");
+      let read;
+      try { read = await readWinesFromWebsite(input.url); }
+      catch (e) { throw new TRPCError({ code: "BAD_REQUEST", message: `Couldn't read that website: ${(e as Error).message.slice(0, 120)}` }); }
+      const wines = read.wines.flatMap((w) => {
+        const p = wineInput.safeParse(w);
+        return p.success ? [{ ...p.data, sourceUrl: typeof (w as { sourceUrl?: unknown }).sourceUrl === "string" ? String((w as { sourceUrl: string }).sourceUrl).slice(0, 300) : "" }] : [];
+      });
+      return { host: read.host, platform: read.platform, wines };
+    }),
+
+  importWines: protectedProcedure
+    .input(brandId.extend({ host: z.string().max(120), wines: z.array(wineInput.extend({ sourceUrl: z.string().max(300).default("") })).min(1).max(40) }))
+    .mutation(async ({ ctx, input }) => {
+      await requireOwner(ctx.user, input.wineryId);
+      const now = Date.now();
+      for (const w of input.wines) {
+        const protocol = w.protocol || `Imported from ${input.host}${w.sourceUrl ? ` (${w.sourceUrl})` : ""}. Please check, then add your cellar detail.`;
+        await db.execute(sql`
+          INSERT INTO brand_wines (winery_id, name, vintage, style, blend_json, targets_json, regime_json, protocol, tasting_notes, created_by_user_id, created_at, updated_at)
+          VALUES (${input.wineryId}, ${w.name}, ${w.vintage}, ${w.style}, ${JSON.stringify(w.blend)}, ${JSON.stringify(w.targets)}, ${JSON.stringify(w.regime)},
+            ${protocol}, ${w.tastingNotes}, ${ctx.user.userId ?? null}, ${now}, ${now})`);
+      }
+      await logActivity(ctx.user, input.wineryId, "owner", `imported ${input.wines.length} wines from`, input.host);
+      return { added: input.wines.length };
+    }),
+
+  // Best guess at the owner's website: their outreach contact's email domain, else their own.
+  suggestedWebsite: protectedProcedure.input(brandId).query(async ({ ctx, input }) => {
+    await requireOwner(ctx.user, input.wineryId);
+    const FREE = /@(gmail|googlemail|outlook|hotmail|live|yahoo|icloud|me|msn|aol|proton(mail)?|bigpond|optusnet|iinet|tpg|internode)\./i;
+    const [rows] = await db.execute(sql`
+      SELECT oc.email AS email FROM user_events e JOIN outreach_contacts oc ON oc.slug = e.slug
+      WHERE e.user_id = ${ctx.user.userId ?? -1} AND e.slug IS NOT NULL AND oc.email IS NOT NULL LIMIT 1`);
+    const emails = [((rows as unknown as { email: string }[])[0]?.email ?? ""), ctx.user.email ?? ""];
+    const domain = emails.map((e) => e.trim().toLowerCase()).find((e) => e.includes("@") && !FREE.test(e))?.split("@")[1];
+    return { url: domain ? `https://${domain}` : null };
+  }),
 
   archiveWine: protectedProcedure.input(brandId.extend({ wineId: z.number().int() })).mutation(async ({ ctx, input }) => {
     await requireOwner(ctx.user, input.wineryId);

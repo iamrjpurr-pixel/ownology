@@ -113,7 +113,7 @@ export function CellarJournalIndex() {
               }`}
               style={{ borderColor: "var(--ow-border, rgba(255,255,255,0.2))" }}
             >
-              {t.topic} <span className="opacity-60">· {t.count}</span>
+              {t.topic} <span className="opacity-80">· {t.count}</span>
             </button>
           ))}
         </div>
@@ -220,7 +220,7 @@ function TrendingRail() {
           >
             <div className="flex items-baseline justify-between text-[10px] font-mono uppercase tracking-[0.18em]">
               <span style={{ color: "var(--ow-amber)" }}>#{i + 1} · {r.topicTag}</span>
-              <span className="opacity-50">{r.askedCount}× asked</span>
+              <span className="opacity-80">{r.askedCount}× asked</span>
             </div>
             <p className="font-serif italic text-base mt-2 leading-snug">{r.question}</p>
           </Link>
@@ -365,12 +365,12 @@ export function CellarJournalEntry({ slug }: { slug: string }) {
 
         <div className="mt-8 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em] flex-wrap" style={{ color: "var(--ow-amber, #b8924a)" }}>
           <span>{entry.topicTag}</span>
-          <span className="opacity-50">·</span>
+          <span className="opacity-80">·</span>
           <span className="opacity-60">Asked {entry.askedCount}× · Viewed {entry.viewCount + 1}</span>
           {/* Tier chip — Cellar Journal answers come from the Free Run
               (home-scale) tutor. Signal that clearly so professional readers
               know what to expect + linked to the product page. */}
-          <span className="opacity-50">·</span>
+          <span className="opacity-80">·</span>
           <Link
             href="/free-run"
             data-testid="cj-tier-chip"

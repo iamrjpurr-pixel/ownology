@@ -313,7 +313,7 @@ function Nav() {
               style={{
                 padding: "0.5rem 1rem",
                 border: "1px solid var(--ow-amber)",
-                background: "var(--ow-amber)",
+                background: "var(--primary)",
                 color: "oklch(0.14 0.008 60)",
                 fontFamily: "'Lato', sans-serif",
                 fontSize: "0.72rem",

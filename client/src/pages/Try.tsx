@@ -1774,7 +1774,7 @@ function TeamAccessPrompt() {
                 padding: "6px 14px",
                 borderRadius: 4,
                 border: "1px solid var(--ow-amber)",
-                background: "var(--ow-amber)",
+                background: "var(--primary)",
                 color: "#111",
                 fontFamily: "'Lato',sans-serif",
                 fontSize: "0.8rem",

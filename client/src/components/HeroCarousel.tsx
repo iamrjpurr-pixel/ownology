@@ -561,7 +561,7 @@ const h1: React.CSSProperties = {
 
 const ctaPrimary: React.CSSProperties = {
   padding: "1rem 1.75rem",
-  background: "var(--ow-amber)",
+  background: "var(--primary)",
   color: "oklch(0.10 0.008 60)",
   borderRadius: 6,
   fontFamily: "'Lato',sans-serif",

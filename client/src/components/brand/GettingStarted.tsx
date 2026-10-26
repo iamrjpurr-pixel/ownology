@@ -1,4 +1,4 @@
-import { ArrowRight, FlaskConical, Plus, UserPlus } from "lucide-react";
+import { ArrowRight, FlaskConical, Globe, Plus, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { WineInput } from "./types";
 
@@ -41,9 +41,9 @@ function surveyGaps(): string[] {
   } catch { return []; }
 }
 
-type Props = { onSample: () => void; onNew: () => void; onInvite: () => void; pending: boolean };
+type Props = { onSample: () => void; onNew: () => void; onInvite: () => void; onImport: () => void; siteHost: string | null; pending: boolean };
 
-export function GettingStarted({ onSample, onNew, onInvite, pending }: Props) {
+export function GettingStarted({ onSample, onNew, onInvite, onImport, siteHost, pending }: Props) {
   const gaps = surveyGaps();
   const step = "flex items-start gap-4 rounded-lg border border-[var(--ow-border)] bg-[var(--ow-bg-base)] p-4";
   return (
@@ -56,13 +56,21 @@ export function GettingStarted({ onSample, onNew, onInvite, pending }: Props) {
         </ul>
       )}
       <ol className="mt-6 space-y-3">
+        <li className={`${step} border-[var(--ow-amber)]`}>
+          <Globe className="mt-0.5 h-5 w-5 shrink-0 text-[var(--ow-amber)]" />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-[var(--ow-text-hi)]">Shortcut: bring in your wines from your website</p>
+            <p className="mt-1 text-xs text-[var(--ow-text-lo)]">{siteHost ? `We'll read the wine list on ${siteHost} and draft a spec for each.` : "Paste your website and we'll draft a spec for each wine you sell."} You choose what to keep.</p>
+          </div>
+          <Button size="sm" onClick={onImport} data-testid="vault-import-website">Import</Button>
+        </li>
         <li className={step}>
           <FlaskConical className="mt-0.5 h-5 w-5 shrink-0 text-[var(--ow-amber)]" />
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-[var(--ow-text-hi)]">1. Look around with a sample wine</p>
             <p className="mt-1 text-xs text-[var(--ow-text-lo)]">A filled-in Shiraz spec you can explore, log against, then archive.</p>
           </div>
-          <Button size="sm" onClick={onSample} disabled={pending} data-testid="vault-add-sample">{pending ? "Adding…" : "Add sample"}</Button>
+          <Button size="sm" variant="outline" onClick={onSample} disabled={pending} data-testid="vault-add-sample">{pending ? "Adding…" : "Add sample"}</Button>
         </li>
         <li className={step}>
           <Plus className="mt-0.5 h-5 w-5 shrink-0 text-[var(--ow-amber)]" />

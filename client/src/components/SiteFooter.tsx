@@ -55,7 +55,7 @@ export function SiteFooter() {
   if (SUPPRESS_PREFIXES.some((p) => pathname.startsWith(p))) return null;
 
   return (
-    <footer className="py-12" data-testid="site-footer" style={{ borderTop: "1px solid var(--ow-border)" }}>
+    <footer className="py-12" data-testid="site-footer" style={{ borderTop: "1px solid var(--ow-border)", background: "var(--ow-bg-base)" }}>
       <div className="container">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
           <div style={{ maxWidth: "360px" }}>

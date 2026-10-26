@@ -15,13 +15,13 @@ function welcomeHtml(first: string) {
   <p>Welcome to Ownology. Your Brand Vault is set up and ready. It's the place your wine specs live, owned by you, with contract winemakers logging their work against them.</p>
   <p style="margin:20px 0;padding:16px;background:#fef3c7;border-left:3px solid #b45309;border-radius:4px">
     <strong>Three things to try first:</strong><br>
-    1. Add the sample wine to see how a spec and cellar record look.<br>
-    2. Add your flagship wine: blend, vineyard sources, targets.<br>
+    1. Import your wines from your website. We draft a spec for each, you choose what to keep.<br>
+    2. Fill in your flagship: blend, vineyard sources, targets.<br>
     3. Invite your contract winemaker, if you use one.
   </p>
   <p><a href="${SITE}/brand" style="display:inline-block;background:#b45309;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:600">Open my Brand Vault</a></p>
   <p>Prefer to look before you touch anything? The <a href="${SITE}/demo/tour" style="color:#78350f">3-minute tour</a> shows it all with sample data.</p>
-  <p>Sign in with the same Google account you used today. Any questions, just reply. It comes straight to me.</p>
+  <p>Sign in the same way you did today. Any questions, just reply. It comes straight to me.</p>
   <p>Cheers,<br>Rich<br>Ownology</p>
 </body></html>`;
 }
@@ -30,12 +30,12 @@ const welcomeText = (first: string) => [
   `Hi ${first},`, ``,
   `Welcome to Ownology. Your Brand Vault is set up and ready.`, ``,
   `Three things to try first:`,
-  `1. Add the sample wine to see how a spec and cellar record look.`,
-  `2. Add your flagship wine: blend, vineyard sources, targets.`,
+  `1. Import your wines from your website. We draft a spec for each, you choose what to keep.`,
+  `2. Fill in your flagship: blend, vineyard sources, targets.`,
   `3. Invite your contract winemaker, if you use one.`, ``,
   `Open it: ${SITE}/brand`,
   `Or take the 3-minute tour first: ${SITE}/demo/tour`, ``,
-  `Sign in with the same Google account you used today. Any questions, just reply.`, ``,
+  `Sign in the same way you did today. Any questions, just reply.`, ``,
   `Cheers,`, `Rich`, `Ownology`,
 ].join("\n");
 

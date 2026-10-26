@@ -14,7 +14,7 @@ import { Loader2, ChevronDown, ThumbsUp, ThumbsDown } from "lucide-react";
 import MadeWithOwnology from "@/components/MadeWithOwnology";
 
 // ── Work Mode brand accent (amber) ───────────────────────────────────────────
-const ACCENT = "#B0741A"; // deep amber — text, strokes, active accents
+const ACCENT = "#8a5a10"; // deep amber — text, strokes, active accents
 const ACCENT_INK = "#2A1E0A"; // near-black warm ink for text on amber fills
 const ACCENT_SOFT = "#FBF3E4"; // amber-tinted surface
 const ACCENT_BORDER = "#E8D3A8"; // soft amber border
@@ -386,7 +386,7 @@ export default function FreeRun() {
                     style={{
                       fontFamily: "'Lato', sans-serif",
                       fontSize: "0.75rem",
-                      color: "#999",
+                      color: "#5f5f5f",
                       lineHeight: 1.3,
                     }}
                   >
@@ -860,7 +860,7 @@ export default function FreeRun() {
               borderRadius: "24px",
               border: "none",
               background: input.trim() && !isLoading ? ACCENT : "#E8EAED",
-              color: input.trim() && !isLoading ? ACCENT_INK : "#999999",
+              color: input.trim() && !isLoading ? ACCENT_INK : "#6b6b6b",
               fontFamily: "'Lato', sans-serif",
               fontSize: "0.9rem",
               fontWeight: 600,

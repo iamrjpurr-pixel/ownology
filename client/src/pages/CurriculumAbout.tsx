@@ -11,11 +11,11 @@ import { ArrowRight, BookOpen, GraduationCap, Sparkles, Target, Layers, Zap, Shi
 
 export default function CurriculumAbout() {
   return (
-    <div className="min-h-screen bg-stone-50" data-testid="curriculum-about-page">
+    <div className="force-light min-h-screen bg-stone-50" data-testid="curriculum-about-page">
       {/* HERO */}
       <section className="border-b border-stone-200 bg-white">
         <div className="max-w-4xl mx-auto px-6 py-16 md:py-20">
-          <div className="flex items-center gap-2 text-sm text-stone-500 mb-6">
+          <div className="flex items-center gap-2 text-sm text-stone-600 mb-6">
             <GraduationCap className="h-4 w-4" /> Vigneron Tier · Curriculum
           </div>
           <h1 className="font-serif text-5xl md:text-6xl text-stone-900 tracking-tight leading-[1.05]" data-testid="hero-title">
@@ -27,7 +27,7 @@ export default function CurriculumAbout() {
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link href="/curriculum">
-              <Button size="lg" className="bg-stone-900 hover:bg-stone-800" data-testid="cta-view-curriculum">
+              <Button size="lg" className="bg-stone-900 text-white hover:bg-stone-800" data-testid="cta-view-curriculum">
                 See the 30 lessons <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </Link>
@@ -56,7 +56,7 @@ export default function CurriculumAbout() {
       {/* WHAT WE BUILT */}
       <section className="border-b border-stone-200">
         <div className="max-w-4xl mx-auto px-6 py-14">
-          <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">What we built</div>
+          <div className="text-xs font-semibold text-stone-600 uppercase tracking-wider mb-2">What we built</div>
           <h2 className="font-serif text-3xl md:text-4xl text-stone-900 mb-6 leading-tight">
             Every lesson is written for one person: the winemaker in the middle of vintage.
           </h2>
@@ -85,7 +85,7 @@ export default function CurriculumAbout() {
       {/* THE STRUCTURE */}
       <section className="border-b border-stone-200 bg-stone-100">
         <div className="max-w-4xl mx-auto px-6 py-14">
-          <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">The structure</div>
+          <div className="text-xs font-semibold text-stone-600 uppercase tracking-wider mb-2">The structure</div>
           <h2 className="font-serif text-3xl md:text-4xl text-stone-900 mb-8 leading-tight" style={{ textWrap: "balance" }}>
             Four levels. Taught in the order a good degree teaches them.
           </h2>
@@ -101,7 +101,7 @@ export default function CurriculumAbout() {
       {/* LEARNING MODES */}
       <section className="border-b border-stone-200 bg-white">
         <div className="max-w-4xl mx-auto px-6 py-14">
-          <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">How you read it</div>
+          <div className="text-xs font-semibold text-stone-600 uppercase tracking-wider mb-2">How you read it</div>
           <h2 className="font-serif text-3xl md:text-4xl text-stone-900 mb-8 leading-tight">
             One lesson. Three modes. Because winemakers don't all read the same way.
           </h2>
@@ -116,7 +116,7 @@ export default function CurriculumAbout() {
       {/* HONEST CALIBRATION */}
       <section className="border-b border-stone-200">
         <div className="max-w-4xl mx-auto px-6 py-14">
-          <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">The honest calibration</div>
+          <div className="text-xs font-semibold text-stone-600 uppercase tracking-wider mb-2">The honest calibration</div>
           <h2 className="font-serif text-3xl md:text-4xl text-stone-900 mb-4 leading-tight">
             What this is. What it isn't.
           </h2>
@@ -173,7 +173,7 @@ export default function CurriculumAbout() {
       {/* THE BUSINESS ANGLE */}
       <section className="border-b border-stone-200 bg-white">
         <div className="max-w-4xl mx-auto px-6 py-14">
-          <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">For the boss</div>
+          <div className="text-xs font-semibold text-stone-600 uppercase tracking-wider mb-2">For the boss</div>
           <h2 className="font-serif text-3xl md:text-4xl text-stone-900 mb-6 leading-tight">
             The retention play. Say it plainly.
           </h2>
@@ -207,7 +207,7 @@ export default function CurriculumAbout() {
       {/* HOW WE WROTE IT */}
       <section className="border-b border-stone-200 bg-stone-100">
         <div className="max-w-4xl mx-auto px-6 py-14">
-          <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">How we wrote it</div>
+          <div className="text-xs font-semibold text-stone-600 uppercase tracking-wider mb-2">How we wrote it</div>
           <h2 className="font-serif text-3xl md:text-4xl text-stone-900 mb-6 leading-tight">
             Original writing, grounded in the reference library. Never republished.
           </h2>
@@ -246,7 +246,7 @@ export default function CurriculumAbout() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link href="/curriculum">
-              <Button size="lg" className="bg-stone-900 hover:bg-stone-800" data-testid="cta-final-view">
+              <Button size="lg" className="bg-stone-900 text-white hover:bg-stone-800" data-testid="cta-final-view">
                 Open the curriculum <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </Link>
@@ -266,7 +266,7 @@ function TrustStat({ n, label, testid }: { n: string; label: string; testid: str
   return (
     <div data-testid={testid}>
       <div className="font-serif text-3xl md:text-4xl text-stone-900">{n}</div>
-      <div className="text-xs text-stone-500 leading-tight mt-1">{label}</div>
+      <div className="text-xs text-stone-600 leading-tight mt-1">{label}</div>
     </div>
   );
 }
@@ -274,7 +274,7 @@ function TrustStat({ n, label, testid }: { n: string; label: string; testid: str
 function LevelCard({ n, title, tag, bullets, accent }: { n: string; title: string; tag: string; bullets: string[]; accent: string }) {
   return (
     <div className={`rounded-xl border-2 ${accent} p-5 bg-white`}>
-      <div className="text-xs font-mono text-stone-500 mb-1">Level {n}</div>
+      <div className="text-xs font-mono text-stone-600 mb-1">Level {n}</div>
       <h3 className="font-serif text-2xl text-stone-900 mb-1">{title}</h3>
       <p className="text-sm text-stone-600 italic mb-3">{tag}</p>
       <ul className="text-sm text-stone-700 space-y-1">
@@ -289,7 +289,7 @@ function ModeCard({ icon: Icon, title, caption, desc }: any) {
     <div className="rounded-xl border border-stone-200 bg-white p-5">
       <Icon className="h-6 w-6 text-stone-700 mb-3" />
       <h3 className="font-serif text-xl text-stone-900 mb-1">{title} mode</h3>
-      <div className="text-xs text-stone-500 font-mono mb-2">{caption}</div>
+      <div className="text-xs text-stone-600 font-mono mb-2">{caption}</div>
       <p className="text-sm text-stone-700 leading-relaxed">{desc}</p>
     </div>
   );

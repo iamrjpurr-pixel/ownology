@@ -120,7 +120,7 @@ export function FeedbackWidget({
               padding: "4px 12px",
               borderRadius: 4,
               border: "none",
-              background: "var(--ow-amber)",
+              background: "var(--primary)",
               color: "oklch(0.10 0.008 60)",
               fontWeight: 600,
               cursor: "pointer",

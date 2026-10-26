@@ -535,7 +535,7 @@ export default function PricingComparison() {
               data-testid="pc-cta-pricing"
               style={{
                 padding: "0.85rem 1.5rem",
-                background: "var(--ow-amber)",
+                background: "var(--primary)",
                 color: "oklch(0.10 0.008 60)",
                 borderRadius: 6,
                 fontFamily: "'Lato',sans-serif",

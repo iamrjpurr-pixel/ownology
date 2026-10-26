@@ -392,7 +392,7 @@ export default function AdminEventIngest() {
               data-testid="parse-event-btn"
               style={{
                 padding: "0.65rem 1.4rem",
-                background: "var(--ow-amber)",
+                background: "var(--primary)",
                 color: "oklch(0.10 0.008 60)",
                 border: "none",
                 borderRadius: 4,
@@ -508,7 +508,7 @@ export default function AdminEventIngest() {
                   data-testid="research-selected-btn"
                   style={{
                     padding: "0.35rem 1rem",
-                    background: "var(--ow-amber)",
+                    background: "var(--primary)",
                     color: "oklch(0.10 0.008 60)",
                     border: "none",
                     borderRadius: 4,
@@ -694,7 +694,7 @@ function ResearchResultBlock({
             data-testid="save-contact-btn"
             style={{
               padding: "0.35rem 0.9rem",
-              background: "var(--ow-amber)",
+              background: "var(--primary)",
               color: "oklch(0.10 0.008 60)",
               border: "none",
               borderRadius: 4,

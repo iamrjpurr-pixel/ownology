@@ -69,7 +69,7 @@ export default function MerchCancel() {
             fontFamily: "'Lato', sans-serif",
             fontWeight: 600,
             letterSpacing: "0.12em",
-            background: "var(--ow-amber)",
+            background: "var(--primary)",
             color: "oklch(0.10 0.008 60)",
             textDecoration: "none",
           }}

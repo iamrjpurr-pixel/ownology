@@ -42,11 +42,11 @@ export default function Curriculum() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50" data-testid="curriculum-index">
+    <div className="force-light min-h-screen bg-stone-50" data-testid="curriculum-index">
       {/* Hero */}
       <div className="border-b border-stone-200 bg-white">
         <div className="max-w-6xl mx-auto px-6 py-10">
-          <div className="flex items-center gap-2 text-sm text-stone-500 mb-4">
+          <div className="flex items-center gap-2 text-sm text-stone-600 mb-4">
             <GraduationCap className="h-4 w-4" />
             <span>Vigneron Tier · Curriculum</span>
           </div>
@@ -71,7 +71,7 @@ export default function Curriculum() {
 
       <div className="max-w-6xl mx-auto px-6 py-10 space-y-14">
         {isLoading && (
-          <p className="text-stone-500" data-testid="curriculum-loading">Loading curriculum…</p>
+          <p className="text-stone-600" data-testid="curriculum-loading">Loading curriculum…</p>
         )}
 
         {[1, 2, 3, 4].map((lvl) => {
@@ -96,7 +96,7 @@ export default function Curriculum() {
                     data-testid={`lesson-card-${l.id}`}
                   >
                     <div className="flex items-start justify-between gap-3 mb-2">
-                      <div className="flex items-center gap-2 text-xs text-stone-500 font-mono">
+                      <div className="flex items-center gap-2 text-xs text-stone-600 font-mono">
                         <span>{l.id}</span>
                         {l.wbs.map((d) => (
                           <span key={d} className="rounded bg-stone-100 px-1.5 py-0.5" title={WBS_LABEL[d] ?? d}>
@@ -104,7 +104,7 @@ export default function Curriculum() {
                           </span>
                         ))}
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-stone-500 whitespace-nowrap">
+                      <div className="flex items-center gap-1 text-xs text-stone-600 whitespace-nowrap">
                         <Clock className="h-3 w-3" />
                         {l.reading_min} min
                       </div>
@@ -115,7 +115,7 @@ export default function Curriculum() {
                     </h3>
                     <p className="text-sm text-stone-600 line-clamp-2 leading-relaxed">{l.aim}</p>
 
-                    <div className="mt-3 flex items-center text-sm text-stone-500 group-hover:text-stone-800">
+                    <div className="mt-3 flex items-center text-sm text-stone-600 group-hover:text-stone-800">
                       Read lesson
                       <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
                     </div>
@@ -124,7 +124,7 @@ export default function Curriculum() {
 
                 {/* Placeholder for lessons still synthesising */}
                 {items.length === 0 && (
-                  <div className="col-span-2 rounded-lg border border-dashed border-stone-300 p-6 text-center text-stone-500 text-sm">
+                  <div className="col-span-2 rounded-lg border border-dashed border-stone-300 p-6 text-center text-stone-600 text-sm">
                     Lessons synthesising — check back in a few minutes
                   </div>
                 )}

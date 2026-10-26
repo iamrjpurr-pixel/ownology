@@ -27,10 +27,10 @@ import { ArrowRight, GraduationCap, ScrollText } from "lucide-react";
 
 export default function CurriculumOnePager() {
   return (
-    <div className="min-h-screen bg-[#f8f5f0]" data-testid="curriculum-one-pager">
+    <div className="force-light min-h-screen bg-[#f8f5f0]" data-testid="curriculum-one-pager">
       {/* HEADER STRIP */}
       <header className="border-b border-stone-300/70 bg-[#f8f5f0]">
-        <div className="max-w-[1180px] mx-auto px-8 py-4 flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.14em] text-stone-500">
+        <div className="max-w-[1180px] mx-auto px-8 py-4 flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.14em] text-stone-600">
           <div className="flex items-center gap-3">
             <Link href="/" className="font-serif not-italic normal-case text-lg text-stone-900 tracking-tight">
               Ownology
@@ -47,7 +47,7 @@ export default function CurriculumOnePager() {
       {/* HERO — deliberately compact, no giant type */}
       <section className="border-b border-stone-300/70 bg-white">
         <div className="max-w-[1180px] mx-auto px-8 py-12 md:py-14">
-          <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.14em] text-stone-500 mb-4">
+          <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.14em] text-stone-600 mb-4">
             <ScrollText className="h-3.5 w-3.5" />
             <span>For working winemakers, cellar hands, and their teams</span>
           </div>
@@ -71,7 +71,7 @@ export default function CurriculumOnePager() {
         <div className="max-w-[1180px] mx-auto px-8 py-12 grid md:grid-cols-2 gap-10 md:gap-14">
           {/* LEFT — The method */}
           <div>
-            <div className="text-[11px] font-mono uppercase tracking-[0.14em] text-stone-500 mb-3">
+            <div className="text-[11px] font-mono uppercase tracking-[0.14em] text-stone-600 mb-3">
               I · The method
             </div>
             <h2 className="font-serif text-2xl text-stone-900 mb-5 leading-tight">
@@ -108,7 +108,7 @@ export default function CurriculumOnePager() {
 
           {/* RIGHT — The artefact (real lesson excerpt) */}
           <div>
-            <div className="text-[11px] font-mono uppercase tracking-[0.14em] text-stone-500 mb-3">
+            <div className="text-[11px] font-mono uppercase tracking-[0.14em] text-stone-600 mb-3">
               II · The artefact
             </div>
             <h2 className="font-serif text-2xl text-stone-900 mb-5 leading-tight">
@@ -154,7 +154,7 @@ export default function CurriculumOnePager() {
                 </p>
               </div>
 
-              <div className="mt-4 text-[11px] font-mono text-stone-500 leading-relaxed">
+              <div className="mt-4 text-[11px] font-mono text-stone-600 leading-relaxed">
                 Continues: <em>Heat accumulation is the non-negotiable filter</em>
                 {" · "}<em>Clone × site × wine style</em>
                 {" · "}<em>Emerging alternatives in AU/NZ</em>
@@ -162,13 +162,13 @@ export default function CurriculumOnePager() {
                 {" · "}decision tree · 10 check-questions.
               </div>
 
-              <div className="mt-5 pt-4 border-t border-stone-200 text-[10px] font-mono text-stone-500 leading-relaxed">
+              <div className="mt-5 pt-4 border-t border-stone-200 text-[10px] font-mono text-stone-600 leading-relaxed">
                 Informed by: Iland (2020) §4.2 · Jackson, <em>Wine Science</em> 4e ch. 3 ·
                 AWRI Vintage & Site Selection factsheet · Lincoln WMBM 202.
               </div>
             </article>
 
-            <div className="mt-3 text-[11px] font-mono uppercase tracking-[0.14em] text-stone-500">
+            <div className="mt-3 text-[11px] font-mono uppercase tracking-[0.14em] text-stone-600">
               <Link
                 href="/curriculum/l2-1-variety-site-and-wine-style"
                 className="hover:text-amber-700 transition-colors"
@@ -184,7 +184,7 @@ export default function CurriculumOnePager() {
       {/* WHO IT'S FOR — three tight lines */}
       <section className="border-b border-stone-300/70 bg-white">
         <div className="max-w-[1180px] mx-auto px-8 py-10">
-          <div className="text-[11px] font-mono uppercase tracking-[0.14em] text-stone-500 mb-4">
+          <div className="text-[11px] font-mono uppercase tracking-[0.14em] text-stone-600 mb-4">
             III · Who it&apos;s for
           </div>
           <div className="grid md:grid-cols-3 gap-6 text-[0.95rem] text-stone-700 leading-relaxed">
@@ -207,7 +207,7 @@ export default function CurriculumOnePager() {
       {/* THE STRUCTURE — four-level map */}
       <section className="border-b border-stone-300/70">
         <div className="max-w-[1180px] mx-auto px-8 py-12">
-          <div className="text-[11px] font-mono uppercase tracking-[0.14em] text-stone-500 mb-4">
+          <div className="text-[11px] font-mono uppercase tracking-[0.14em] text-stone-600 mb-4">
             IV · The structure — four levels, thirty lessons
           </div>
           <div className="grid md:grid-cols-4 gap-4">
@@ -276,7 +276,7 @@ export default function CurriculumOnePager() {
       {/* THREE OBJECTIONS — the questions a critical reader is thinking */}
       <section className="border-b border-stone-300/70 bg-white">
         <div className="max-w-[1180px] mx-auto px-8 py-12">
-          <div className="text-[11px] font-mono uppercase tracking-[0.14em] text-stone-500 mb-6">
+          <div className="text-[11px] font-mono uppercase tracking-[0.14em] text-stone-600 mb-6">
             V · The three questions you&apos;re about to ask
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -330,7 +330,7 @@ export default function CurriculumOnePager() {
             </div>
           </div>
 
-          <div className="mt-10 pt-6 border-t border-stone-800 flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono text-stone-500 uppercase tracking-[0.12em]">
+          <div className="mt-10 pt-6 border-t border-stone-800 flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono text-stone-600 uppercase tracking-[0.12em]">
             <div>Ownology · Built by a working winemaker</div>
             <div className="flex items-center gap-3">
               <span>ownology.ai/curriculum/one-page</span>
@@ -373,7 +373,7 @@ function LevelCard({
         <span className="font-mono text-[11px] text-amber-700 font-semibold">{n}</span>
         <div className="font-serif text-base text-stone-900">{title}</div>
       </div>
-      <p className="font-serif italic text-[0.82rem] text-stone-500 mb-3 leading-snug">{tag}</p>
+      <p className="font-serif italic text-[0.82rem] text-stone-600 mb-3 leading-snug">{tag}</p>
       <ul className="space-y-1 text-[0.82rem] text-stone-700 leading-snug">
         {lessons.map((l, i) => (
           <li key={i} className="flex gap-1.5">

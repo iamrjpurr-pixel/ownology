@@ -16,9 +16,9 @@ import type { Activity, LogKind, Member, Role, WineLog } from "@/components/bran
 
 const eyebrow = "text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ow-amber)]";
 const STATUS = {
-  ok: { label: "On track", cls: "text-emerald-700 bg-emerald-600/10", Icon: CheckCircle2 },
+  ok: { label: "On track", cls: "text-emerald-700 dark:text-emerald-300 bg-emerald-600/10", Icon: CheckCircle2 },
   watch: { label: "Watch", cls: "text-[var(--ow-amber)] bg-[color-mix(in_oklch,var(--ow-amber)_12%,transparent)]", Icon: Eye },
-  alert: { label: "Action", cls: "text-red-700 bg-red-600/10", Icon: AlertTriangle },
+  alert: { label: "Action", cls: "text-red-700 dark:text-red-300 bg-red-600/10", Icon: AlertTriangle },
 };
 
 function RoleToggle({ role, setRole }: { role: Role; setRole: (r: Role) => void }) {
@@ -90,7 +90,7 @@ function VaultDemo({ role }: { role: Role }) {
       <div className="flex flex-wrap gap-2">
         {DEMO_WINES.map((w) => (
           <button key={w.id} type="button" onClick={() => setWineId(w.id)} data-testid={`demo-wine-${w.id}`}
-            className={`rounded-full border px-4 py-1.5 text-sm transition-colors duration-150 ${wineId === w.id ? "border-[var(--ow-amber)] bg-[var(--ow-amber)] text-white" : "border-[var(--ow-border-md)] text-[var(--ow-text-mid)] hover:border-[var(--ow-amber)]"}`}>
+            className={`rounded-full border px-4 py-1.5 text-sm transition-colors duration-150 ${wineId === w.id ? "border-[var(--ow-amber)] bg-[var(--ow-amber)] text-[var(--ow-bg-base)]" : "border-[var(--ow-border-md)] text-[var(--ow-text-mid)] hover:border-[var(--ow-amber)]"}`}>
             {w.vintage} {w.name}
           </button>
         ))}
@@ -208,7 +208,7 @@ export default function DemoTour() {
           <h2 className="max-w-2xl font-['Fraunces',serif] text-3xl leading-tight md:text-4xl">Ready to put your own wines in a vault?</h2>
           <p className="mt-3 max-w-xl text-sm opacity-80">Sign in, write your first spec, and invite the winemaker you work with. Your specs stay yours, and you set the level of access.</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/login?next=/brand"><Button size="lg" className="gap-2 bg-[var(--ow-amber)] text-white hover:opacity-90" data-testid="demo-cta-open-vault">Open my Brand Vault <ArrowRight className="h-4 w-4" /></Button></Link>
+            <Link href="/login?next=/brand"><Button size="lg" className="gap-2 bg-[var(--ow-amber)] text-[var(--ow-bg-base)] hover:opacity-90" data-testid="demo-cta-open-vault">Open my Brand Vault <ArrowRight className="h-4 w-4" /></Button></Link>
             <Link href="/pricing?from=demo-tour"><Button size="lg" variant="outline" className="border-current bg-transparent text-inherit hover:bg-white/10" data-testid="demo-cta-pricing">See pricing</Button></Link>
           </div>
         </section>

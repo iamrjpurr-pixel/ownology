@@ -1,0 +1,34 @@
+{
+  "summary": "Frontend-only test of the Rod/Patina fixes on preview (live prod DB). All 5 items pass. (1) /know with no ?for=, at 390x844 with an iPhone Safari UA and at 1920x800, with every /api POST aborted (24 blocked: surveyAnswer, surveyComplete, events.batch). After each Next the page is at scrollY=0 (Q1 went from 469 to 0) and survey-question is in the viewport. The PWA banner never appeared. (2) On the summary, survey-take-tour 'Take the 3-minute tour' links to /demo/tour and the click lands there. survey-open-vault 'Set up my free Brand Vault' links to /login?next=/brand. The no-sign-up note is present. Nothing overflows sideways at 390 and both buttons are fully visible. (3) For the e1test owner with an empty vault, vault-getting-started shows the 3 steps and 2 vault-survey-gaps lines (recipe + access from the seeded localStorage). vault-tour-link goes to /demo/tour. Add wine opens the 'New wine spec' dialog. Invite switches the Contractors tab to active. Add sample creates and selects 'Sample · Barossa Shiraz' with 92% Shiraz / 8% Viognier, the targets (14.2%, 3.55…) and the regime, and the toast shows 'Spec saved'. Checked at 1920 and 390 with no overflow. After a clean and re-seed, the contractor was linked to the owner brand with a temporary SQL row, then switched brand: it sees 'The owner hasn't shared any wine specs yet.' and no guided start. (4) /admin/people, search 'rod': Rod Shields shows Outreach, Survey and Account. Expanding the card shows 'Also signs in as rodshields245@gmail.com', 'Answered 8 of 8 survey questions over 2 visits' and 'Has an Ownology account · rodshields245@gmail.com'. ?q=rodshields245 pre-fills the search and returns 1 row (checked at 390). Read only, with POSTs blocked. (5) The signup-email wiring was code-reviewed and works as described; review notes are below. The e1test clean script was run at the end.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "BrandPortal WinesTab (contractor, empty)", "issue": "The right panel says 'Pick a wine to see its spec and cellar record.' even though there are no wines. It should show a waiting or empty message instead.", "selector": "main (contractor role)", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/know summary", "issues": ["The primary 'Take the 3-minute tour' button has white text on a light amber fill, which looks low-contrast (about 3:1)."]},
+      {"screen": "/brand guided start at 390", "issues": ["The fixed THEME pill overlaps the 'Or take the 3-minute tour first' link when it sits near the bottom of the viewport."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "(Medium) server/authRouter.ts provisionUserByEmail calls sendSignupEmails when the magic link is REQUESTED, before the address is verified. Typing any third-party email sends that person a welcome plus a magic link, and sends the owner a 'New sign-up' alert for an account nobody has used. Consider sending it from the magic-link verify step when the user is new (first verification).",
+    "(Low) The welcome email copy says 'Sign in with the same Google account you used today' for the email-link signup path too (via='email sign-in link'). Vary the copy by the `via` value.",
+    "(Low) In the contractor empty state, replace 'Pick a wine…' with a 'nothing shared yet' message.",
+    "(Low) Pre-existing: BrandPortal defaults to brands[0], so an invited contractor who also has an auto-provisioned winery lands on their own empty vault (with the owner guided start), not the brand that invited them."
+  ],
+  "critical_code_review_comments": [
+    "sendSignupEmails is fire-and-forget (void … .catch) in /exchange (only when isNew) and in provisionUserByEmail, so it does not block sign-in.",
+    "isTestEmail skips e1test/@example/pytest/cs-/test- addresses, and sendSignupEmails returns early when RESEND_API_KEY is missing.",
+    "The owner alert goes to ALERT_TEST_TO with replyTo set to the user and a link to /admin/people?q=<encoded email>.",
+    "KnowSurvey scroll reset is useEffect(() => window.scrollTo({top:0}), [i]), which is correct. PwaInstallBanner SUPPRESSED_PREFIXES includes /know.",
+    "The welcome email is sent before the email is verified on the magic-link path (see action_items)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100%"},
+  "seed_data_creation": "Ran e1-test-users seed. Temporarily inserted a brand_members row linking e1test-contractor to e1test-brand, plus a sample wine in the e1test owner vault. Both were removed with `npx tsx scripts/e1-test-users.ts clean`. The helper script was deleted.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Use the admin JWT in /root/admin.jwt as the app_session_id cookie. Use wait_until='domcontentloaded' because networkidle times out on this site. Abort POST requests to /api/** on /know. AdminPeople records and other-emails only render after clicking people-toggle-<key>. To test the contractor view, insert a brand_members row (winery_id of e1test-brand, email e1test-contractor@example.com, user_id, accepted_at); clean removes it. The contractor lands on its own brand first, so switch with brand-switcher → 'E1 Test Brand Co · contract'."
+}
