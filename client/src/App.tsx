@@ -94,6 +94,7 @@ const PricingComparison = lazy(() => import("./pages/PricingComparison"));
 const Learn = lazy(() => import("./pages/Learn"));
 const Demo = lazy(() => import("./pages/Demo"));
 const DemoTour = lazy(() => import("./pages/DemoTour"));
+const KnowSurvey = lazy(() => import("./pages/KnowSurvey"));
 const BrandPortal = lazy(() => import("./pages/BrandPortal"));
 const Waitlist = lazy(() => import("./pages/Waitlist"));
 const VineReference = lazy(() => import("./pages/VineReference"));
@@ -444,6 +445,7 @@ function Router() {
       <Route path={"/trial-ending"} component={TrialEndingPage} />
       <Route path={"/invite"} component={InvitePage} />
       <Route path={"/demo/tour"} component={DemoTour} />
+      <Route path={"/know"} component={KnowSurvey} />
       <Route path={"/demo"} component={Demo} />
       <Route path={"/brand"} component={BrandPortal} />
       <Route path={"/waitlist"} component={Waitlist} />
@@ -773,7 +775,7 @@ function ThemePicker() {
   // Suppress the picker on pre-auth surfaces — the bottom-left pill clashes
   // with the /try password box on mobile. All hooks above have already run,
   // so this early return is safe under rules-of-hooks.
-  const HIDDEN_ON = new Set(["/try", "/auth/callback"]);
+  const HIDDEN_ON = new Set(["/try", "/auth/callback", "/know"]);
   if (HIDDEN_ON.has(pathname) || pathname.startsWith("/i/")) return null;
 
   return (

@@ -28,6 +28,8 @@
 - **Site-wide click tracking (Jun 2026)**: `ActivityTracker` (App.tsx) + `lib/track.ts` batch page views, clicks on `[data-testid]`, `[data-track-section]` views and guide steps to `events.batch` (user_events table, 90-day prune on boot). Never records typed values, except invited prospects' demo Owen questions. `?for=<outreach slug>` stored in localStorage `ow_track_invite` (cleared if invalid; ignored for admins). First visit per slug emails OPERATOR_ALERT_EMAIL once (invite_alerts). /admin/activity (link on /admin/contacts) lists invited prospects + members, per-person visit timelines + Brand Vault summary. Testing iteration_42: backend 31/31, frontend all flows pass; minor items fixed after.
 - Next idea (proposed, not built): Owen "stuck" nudges using the click sequences.
 
+- **"If you don't already know…" survey (Jun 2026)**: public /know (personalised with ?for=<slug>, one-click first answer via &a1=yes|unsure|no). 8 Yes/Not sure/No questions one at a time with progress bar; every answer (even Yes) reveals how Ownology helps + a guided link; summary page with links + vault/tour CTAs. Answers saved (survey_answers), logged to user_events (shows in /admin/activity), and on completion appended to the CRM contact's notes + one operator alert email. Theme pill hidden on /know. Rod: /know?for=rod-patina-wines.
+
 **Backlog from this work**: watermark owner name on printed specs; contractor "propose change" → owner approve; PDF export of a wine spec for the owner; per-wine contractor scoping.
 
 ## Jul 2026 (18 Jul) · Curriculum spine strategy locked — SCOUTING SHIPPED, EXECUTION QUEUED

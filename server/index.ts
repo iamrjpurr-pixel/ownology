@@ -839,6 +839,7 @@ async function startServer() {
     "/waitlist",
     "/demo",
     "/demo/tour",
+    "/know",
     "/join",
     "/invite",
     "/login",
@@ -1949,6 +1950,9 @@ async function startServer() {
         INDEX ue_session_idx (session_id, created_at), INDEX ue_created_idx (created_at))`,
       sql`DELETE FROM user_events WHERE created_at < ${Date.now() - 90 * 24 * 60 * 60 * 1000}`,
       sql`CREATE TABLE IF NOT EXISTS invite_alerts (slug VARCHAR(120) NOT NULL PRIMARY KEY, created_at BIGINT NOT NULL)`,
+      sql`CREATE TABLE IF NOT EXISTS survey_answers (
+        session_id VARCHAR(64) NOT NULL, slug VARCHAR(120) NULL, question_id VARCHAR(32) NOT NULL,
+        answer VARCHAR(16) NOT NULL, created_at BIGINT NOT NULL, PRIMARY KEY (session_id, question_id), INDEX sa_slug_idx (slug))`,
       sql`CREATE TABLE IF NOT EXISTS stripe_events_processed (event_id VARCHAR(80) NOT NULL PRIMARY KEY, created_at BIGINT NOT NULL)`,
       sql`CREATE TABLE IF NOT EXISTS credit_refunds (
         charge_id VARCHAR(64) NOT NULL PRIMARY KEY, user_id INT NOT NULL,

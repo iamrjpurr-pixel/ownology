@@ -110,6 +110,13 @@ function checkDemoIp(ipHash: string): boolean {
   demoIpLog.set(ipHash, hits);
   return true;
 }
+const SURVEY_IDS = ["recipe", "tanks", "history", "access", "labels", "sos", "team", "next"] as const;
+const SURVEY_LABELS: Record<string, string> = {
+  recipe: "Could repeat best vintage", tanks: "Knows tank status without calling", history: "History stays with brand",
+  access: "Knows who saw/changed specs", labels: "Label records audit-ready", sos: "Knows the 6am fix",
+  team: "Team on same playbook", next: "Knows next-vintage changes",
+};
+
 type InviteContact = { first_name: string; winery: string | null; email: string | null };
 async function inviteContact(slug: string): Promise<InviteContact | null> {
   if (!slug) return null;
@@ -269,6 +276,58 @@ export const demoRouter = router({
    * DEMO_ASK_LIMIT questions per email, plus a per-IP daily ceiling. Each
    * email lands in the leads CRM with source "demo-tour".
    */
+  surveyAnswer: publicProcedure
+    .input(z.object({
+      invite: z.string().trim().max(120).optional(),
+      sessionId: z.string().min(8).max(64),
+      questionId: z.enum(SURVEY_IDS),
+      answer: z.enum(["yes", "unsure", "no"]),
+    }))
+    .mutation(async ({ input }) => {
+      const contact = input.invite ? await inviteContact(input.invite) : null;
+      const slug = contact ? input.invite! : null;
+      const now = Date.now();
+      await db.execute(sql`
+        INSERT INTO survey_answers (session_id, slug, question_id, answer, created_at)
+        VALUES (${input.sessionId}, ${slug}, ${input.questionId}, ${input.answer}, ${now})
+        ON DUPLICATE KEY UPDATE answer = ${input.answer}, created_at = ${now}`);
+      await db.execute(sql`
+        INSERT INTO user_events (user_id, slug, session_id, path, event, detail, ip_hash, created_at)
+        VALUES (NULL, ${slug}, ${input.sessionId}, '/know', 'custom', ${`survey: ${SURVEY_LABELS[input.questionId]} → ${input.answer}`}, NULL, ${now})`);
+      return { ok: true };
+    }),
+
+  surveyComplete: publicProcedure
+    .input(z.object({ invite: z.string().trim().max(120).optional(), sessionId: z.string().min(8).max(64) }))
+    .mutation(async ({ input }) => {
+      const contact = input.invite ? await inviteContact(input.invite) : null;
+      if (!contact) return { ok: true };
+      const [ins] = await db.execute(sql`INSERT IGNORE INTO invite_alerts (slug, created_at) VALUES (${`survey:${input.sessionId}`.slice(0, 120)}, ${Date.now()})`);
+      if ((ins as unknown as { affectedRows: number }).affectedRows !== 1) return { ok: true };
+      const [res] = await db.execute(sql`SELECT question_id, answer FROM survey_answers WHERE session_id = ${input.sessionId}`);
+      const lines = (res as unknown as { question_id: string; answer: string }[])
+        .map((r) => `${SURVEY_LABELS[r.question_id] ?? r.question_id}: ${r.answer === "unsure" ? "not sure" : r.answer}`);
+      const summary = `Survey ${new Date().toISOString().slice(0, 10)} · ${lines.join(" · ")}`;
+      await db.execute(sql`
+        UPDATE outreach_contacts SET notes = CONCAT(COALESCE(notes, ''), IF(COALESCE(notes, '') = '', '', '\n'), ${summary})
+        WHERE slug = ${input.invite}`);
+      const alertTo = process.env.OPERATOR_ALERT_EMAIL || process.env.OWNER_EMAIL;
+      const key = process.env.RESEND_API_KEY;
+      if (alertTo && key && !input.invite!.startsWith("e1test")) {
+        fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            from: process.env.RESEND_FROM || "Ownology Alerts <alerts@ownology.ai>",
+            to: [alertTo],
+            subject: `📝 ${contact.first_name} finished the "If you don't already know" survey`,
+            text: `${contact.first_name}${contact.winery ? ` (${contact.winery})` : ""} answered:\n\n${lines.join("\n")}\n\nTheir clicks: ${(process.env.OWNOLOGY_PROD_URL || "https://www.ownology.ai").replace(/\/$/, "")}/admin/activity?slug=${encodeURIComponent(input.invite!)}`,
+          }),
+        }).catch(() => {});
+      }
+      return { ok: true };
+    }),
+
   personalise: publicProcedure
     .input(z.object({ invite: z.string().trim().max(120) }))
     .query(async ({ input }) => {
