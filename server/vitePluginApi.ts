@@ -10,53 +10,7 @@ import { createServer } from "http";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { parse as parseCookies } from "cookie";
 
-// Same MEMBER_ONLY_PREFIXES list as production (server/index.ts). Keep in
-// sync — this middleware only exists so preview UX matches production.
-const MEMBER_ONLY_PREFIXES = [
-  "/dashboard",
-  "/cellar-brief",
-  "/cellar-tasks",
-  "/cellar-brief.pdf",
-  "/cellar-journal",
-  "/quick-entry",
-  "/the-press",
-  "/free-run/dashboard",
-  "/batch-book",
-  "/work-mode",
-  "/cellar/",
-  "/orders",
-  "/todo",
-  "/roadmap",
-  "/import",
-  "/copilot",
-  "/copilot-mockup",
-  "/site-map",
-  "/campaign-metrics",
-  "/build-index",
-  "/vineyard",
-  "/compliance",
-  "/regulations",
-  "/tank-qr",
-  "/today",
-  // Internal mockups + previews — gated so anonymous visitors see /try
-  // honeypot, not an unfinished UX (Rich audit, Feb 2026). Team access
-  // via gate-password unlock (ow_gate cookie) still works.
-  "/branding-mockup",
-  "/onboarding-mockup",
-  "/cascade-demo",
-  "/preview",
-];
-
-function pathIsMemberOnly(pathname: string): boolean {
-  for (const p of MEMBER_ONLY_PREFIXES) {
-    if (p.endsWith("/")) {
-      if (pathname === p.slice(0, -1) || pathname.startsWith(p)) return true;
-    } else {
-      if (pathname === p || pathname.startsWith(p + "/")) return true;
-    }
-  }
-  return false;
-}
+import { isPublicPath } from "./publicPaths.js";
 
 export function vitePluginApi(): Plugin {
   let apiPort: number | null = null;
@@ -67,7 +21,7 @@ export function vitePluginApi(): Plugin {
       // Dynamically import to avoid circular deps at plugin load time
       const { appRouter } = await import("./routers.js");
       const { createContext } = await import("./trpc.js");
-      const { verifyGateCookie } = await import("./gate.js");
+      const { verifyGateCookieDetailed, isTrialAllowedPath } = await import("./gate.js");
       const { COOKIE_NAME } = await import("../shared/const.js");
       const app = express();
 
@@ -83,18 +37,20 @@ export function vitePluginApi(): Plugin {
         if (!accept.includes("text/html")) return next();
         // Strip query string for prefix check.
         const pathname = url.split("?")[0];
-        if (!pathIsMemberOnly(pathname)) return next();
+        if (isPublicPath(pathname)) return next();
 
-        const cookieHeader = req.headers.cookie || "";
-        const cookies = parseCookies(cookieHeader);
-        const hasSession = Boolean(cookies[COOKIE_NAME]);
-        if (hasSession) return next();
-        // verifyGateCookie expects an express-like Request but Vite's
-        // ConnectMiddleware gives us the raw IncomingMessage. Cast is
-        // safe because verifyGateCookie only reads headers.cookie.
-        // @ts-expect-error narrow compat cast
-        const hasGate = await verifyGateCookie(req);
-        if (hasGate) return next();
+        const cookies = parseCookies(req.headers.cookie || "");
+        if (cookies[COOKIE_NAME]) return next();
+        // @ts-expect-error gate helpers only read headers.cookie
+        const gateDetail = await verifyGateCookieDetailed(req);
+        if (gateDetail) {
+          if (gateDetail.tier === "trial" && !isTrialAllowedPath(pathname)) {
+            res.statusCode = 302;
+            res.setHeader("Location", `/trial-locked?from=${encodeURIComponent(pathname)}`);
+            return res.end();
+          }
+          return next();
+        }
 
         res.statusCode = 302;
         res.setHeader("Location", `/try?from=${encodeURIComponent(pathname)}`);

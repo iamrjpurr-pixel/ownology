@@ -9,6 +9,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "./routers.js";
 import { createContext } from "./trpc.js";
 import merchRouter from "./merch/api.js";
+import { isPublicPath } from "./publicPaths.js";
 import { campaignMetricsHandler } from "./scheduled/campaignMetrics.js";
 import { vintageRemindersHandler } from "./scheduled/vintageReminders.js";
 import { regulationMonitorHandler } from "./scheduled/regulationMonitor.js";
@@ -804,110 +805,6 @@ async function startServer() {
   // layer or the OAuth callback flow would break.
   //
   // Redirect target: /try honeypot, matching the old behaviour.
-  const PUBLIC_EXACT = new Set<string>([
-    "/",
-    "/home",
-    "/why-ownology",
-    // Public competitor comparison — SEO front-door + QR landing for merch
-    "/vs/innovint-vintrace",
-    // Competitor-migration pages — public since Feb 2026 alongside the new
-    // /vs/innovint-vintrace page. Both name the incumbents openly and honestly
-    // position Ownology as the layer above/around rather than a replacement,
-    // so the earlier tortious-interference concern no longer applies.
-    "/for-innovint-users",
-    "/for-vintrace-users",
-    "/for-home-winemakers",
-    "/for-home-winemakers/troubleshooting",
-    "/for-home-winemakers/glossary",
-    "/for-home-winemakers/knowledge",
-    "/blog",
-    "/curriculum",
-    "/curriculum/about",
-    "/curriculum/one-page",
-    "/unlock",
-    "/pricing",
-    "/quiz",
-    "/compliance-score",
-    "/try",
-    "/ask",
-    "/founding-partners",
-    "/referral",
-    "/call-playbook",
-    "/free-run",
-    "/free-run/journal",
-    "/apco",
-    "/waitlist",
-    "/demo",
-    "/demo/tour",
-    "/know",
-    "/join",
-    "/invite",
-    "/login",
-    "/auth/callback",
-    "/onboarding",
-    "/privacy",
-    "/terms",
-    "/cookies",
-    "/refund",
-    "/resources",
-    "/resources/home-winery-kit",
-    "/regulations/detail",
-    "/merch",
-    "/merch/success",
-    "/merch/cancel",
-    "/cellar-journal",
-    "/how-we-trace",
-    "/reference/vine",
-    "/guide",
-    "/resume",
-    "/stats",
-    "/founding-member/success",
-    "/trial-ending",
-    "/trial-locked",
-    "/join/landscape",
-    "/join/qr",
-    "/install-ios",
-    "/pwa/install",
-    "/pwa/ios",
-    "/404",
-    "/risk-management",
-    "/app", // redirects to /free-run
-    "/robots.txt",
-    "/sitemap.xml",
-    "/favicon.ico",
-    "/manifest.json",
-    // ── Below: internal mockups + old home variants + dev previews.
-    // REMOVED from public allowlist (Feb 2026, Rich audit) — a cold visitor
-    // landing here gets cog overload from unfinished / unwired UX. Anyone
-    // on the team can still reach them by unlocking the gate wall with
-    // the shared password (ow_gate cookie), so preview flows still work.
-    // If you re-add anything here, ask: "is this ready for a stranger to
-    // land on and understand?" If no, keep it gated.
-    //   "/branding-mockup" — not-wired mockup for Roy
-    //   "/onboarding-mockup" — not-wired mockup
-    //   "/copilot-mockup" — not-wired mockup
-    //   "/cascade-demo" — theme-cascade QA page
-    //   "/home-v2" — home reorder mockup
-    //   "/home-v3" — home storytelling mockup
-    //   "/preview" — dev preview surface
-  ]);
-  const PUBLIC_PREFIXES = [
-    "/api/", // tRPC + REST endpoints enforce own auth at the procedure layer
-    "/curriculum/", // /curriculum/:slug — public curriculum lesson pages
-    "/blog/", // /blog/:slug
-    "/hi/", // /hi/:slug + /hi/producers/:id
-    "/i/", // /i/:token — magic-link invites (see server/routers/gate.ts)
-    "/cellar-journal/", // /cellar-journal/:slug
-    "/for-home-winemakers/knowledge/", // /for-home-winemakers/knowledge/:section
-    "/reference/", // /reference/cellar-book/:token — Auditor Preview Link
-  ];
-  const isPublicPath = (pathname: string): boolean => {
-    if (PUBLIC_EXACT.has(pathname)) return true;
-    for (const p of PUBLIC_PREFIXES) {
-      if (pathname.startsWith(p)) return true;
-    }
-    return false;
-  };
   app.get("*", async (req, res, next) => {
     // Only intercept HTML SPA requests. Assets (JS/CSS/PNG) served by
     // express.static above never carry `text/html` in Accept.
