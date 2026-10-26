@@ -1,0 +1,32 @@
+{
+  "summary": "Read-only frontend re-test of the iteration_46 fixes on preview (live prod DB). No submits, emails, LLM calls or ?for= slug URLs. All 6 items pass. (1) The admin hub Help cards 'Email deliverability check' and 'Weekly cellar digest — dry run' open a new tab at /api/scheduled/resend-health and /api/scheduled/weekly-cellar-digest?dryRun=1, and the main tab stays on /admin. The other Help cards (e.g. /admin/operator-guide) still navigate in-app in the same tab. (2) /admin/leads loads with no 'Rendered more hooks' error and no pageerrors. Search 'compliance' shows 4 of 9, the cold-call chip shows 3 of 9, a no-match search empties the list, and ALL restores 9. (3) /admin/contacts/pipeline renders the Outreach board (290 in pipeline, Lead/Sent/Awaiting/Replied/Booked columns). The pipeline links on /site-map, /admin/marketing-kit, /admin/operator-guide and /admin/playbook all land on the board. (4) /admin/access shows a single '← Admin' link and a single 'Access' title; the embedded gate-invites back link and title are gone. The Members tab still has Issue invite, the summary tiles and the tier/health filters. The Invite links tab has the create form (not submitted) and the 20-row table. The page does not scroll sideways at 390px. (5) crm.people returns 286 people, and Rod Shields (rod@patinawines.com.au) has kinds ['contact'] only. In the code, the survey query falls back to the user_events.session_id slug. (6) The SiteMap /i/example-token description says 'Generated at /admin/access (Invite links tab)'. The first batch of /admin/access loads came back blank, but a slow reload loaded fine with no pageerrors or 4xx, so this was the Cloudflare rate limit on the preview.",
+  "backend_issues": {"critical": [], "minor": [
+    {"endpoint": "crm.people survey query", "issue": "The survey SQL ends in .catch(() => []). Any SQL error makes 'Survey' silently disappear for everyone instead of being logged. Log the error at least. No Survey entries exist today, so the new fallback could not be confirmed with real data."}
+  ]},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/admin/access Members tab at 390px", "issues": ["Members rows overflow their card: the status ('Expired'/'Silent 7d+'), date and chevron columns are clipped past the right edge. The page itself does not scroll sideways (scrollWidth 390). Hide these columns or let them wrap on mobile."]},
+      {"screen": "/admin/access", "issues": ["AdminMembers in embedded mode still renders an empty <h1 data-testid='page-heading'>, which is an a11y and duplicate-heading smell. Render no h1 when embedded.", "On the Invites tab the body is inset about 40px from the Access header (content left edge 374px vs 333px at 1920). Roughly aligned, so minor."]},
+      {"screen": "/admin/leads", "issues": ["The search input, source chips and Add/Export buttons have no data-testid attributes."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Optional: fix the clipped Members rows at 390px on /admin/access",
+    "Optional: drop the empty h1 in embedded AdminMembers",
+    "Optional: add data-testids to the AdminLeads controls",
+    "Optional: log errors instead of silently using .catch(() => []) in the crm.people survey query"
+  ],
+  "critical_code_review_comments": [
+    "Admin.tsx ToolCard creates the Wrap component inline on every render (a new component type each render), so its subtree remounts each render. This works but is fragile. Prefer a conditional onClick or a plain <a target=_blank>.",
+    "window.open(..., 'noopener') works; a plain <a href target='_blank' rel='noopener'> would be more semantic and support middle-click."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (skipped; one read-only crm.people check passed)", "frontend": "100% (6/6 items)"},
+  "seed_data_creation": "None. Read-only.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Use the admin JWT in /root/admin.jwt as cookie app_session_id (still valid). Preview runs against the live prod DB: never open ?for=<slug> URLs and never submit forms. Blank pages during quick navigation are Cloudflare 429s; wait about 5s between loads and use wait_until=networkidle. AdminLeads chips render uppercase via CSS, so match button text case-insensitively (e.g. 'cold-call')."
+}

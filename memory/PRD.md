@@ -2005,3 +2005,13 @@ Impersonate mode (M4) · Diagnostic panels (M6) · Morning brief email (M7) · A
 - Known minor: during the first few hundred ms before sign-in status loads, links show their member targets. Home.tsx `Footer()` is unused (site footer is SiteFooter).
 
 - **Jun 2026:** 43 test founding reservations deleted (all tests / Rich self-tests; 7 came from the iteration_43 E2E re-running test_launch_readiness.py → ~15 emails). Reserve tests now skip unless ALLOW_LIVE_RESERVATION_TESTS=1.
+
+## Jun 2026 — Admin & CRM streamline (iterations 46–47)
+- NEW /admin/people (`client/src/pages/AdminPeople.tsx`, `server/routers/crmRouter.ts` → `trpc.crm.people`, owner-only): one card per person merged by lower-cased email (or outreach slug) across outreach_contacts, leads, quiz_leads, demo_submissions, survey_answers (slug, falling back to user_events session slug), founding_reservations (status editable), founding_members, gate_invites, referrals, users. Test addresses hidden (isTestEmail). Filters: Everyone / Wants to pay / Paying / In outreach / Has an account / Found us themselves.
+- NEW /admin/access (tabs Members | Invite links) — /admin/members and /admin/gate-invites redirect there; pages take `embedded` prop.
+- Admin hub regrouped into 5 sections (People & CRM, Sales & money, Marketing, Content & AI, collapsed Help/health/developer). /api/* cards open in a new tab.
+- /admin/contacts/pipeline route restored (page existed, route was missing). /admin/leads hooks crash fixed.
+- Removed pages (old links redirect): HomeV2/V3, CompetitiveAdvantage, Preview, Copilot/Branding/Onboarding mockups, AdminContactsMigrate. Aliases now redirect: /campaign-metrics, /orders, /build-index, /your-journey, /pwa/install, /pwa/ios. /founding-partners kept (sent URLs).
+- Cleaned test traffic wrongly attributed to Rod (8 events, 10 test survey answers). Rod has no real visits yet.
+- Kept as-is by choice: CRM stages. Not done: combined morning email.
+- Gotcha: the tracker remembers ?for=<slug> in the browser — testers must NEVER open real prospect links.

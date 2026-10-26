@@ -70,7 +70,7 @@ export const crmRouter = router({
       SELECT s.slug, COUNT(*) AS answers, MAX(s.created_at) AS at FROM (
         SELECT COALESCE(sa.slug, (SELECT e.slug FROM user_events e WHERE e.session_id = sa.session_id AND e.slug IS NOT NULL LIMIT 1)) AS slug, sa.created_at
         FROM survey_answers sa) s
-      WHERE s.slug IS NOT NULL GROUP BY s.slug`).catch(() => []);
+      WHERE s.slug IS NOT NULL GROUP BY s.slug`).catch((err) => { console.error("[crm.people] survey merge failed:", err); return []; });
     for (const s of survey) {
       const key = slugKey.get(s.slug);
       const p = key ? map.get(key) : null;

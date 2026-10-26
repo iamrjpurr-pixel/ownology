@@ -610,9 +610,11 @@ export default function AdminMembers({ embedded = false }: { embedded?: boolean 
           </div>
         )}
         <div style={{ display: "flex", alignItems: "flex-end", gap: "1rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
-          <h1 style={{ margin: 0, fontFamily: SERIF, fontSize: "2rem", color: HI, flex: 1 }} data-testid="page-heading">
-            {embedded ? "" : "Members · Command Center"}
-          </h1>
+          {embedded ? <span style={{ flex: 1 }} /> : (
+            <h1 style={{ margin: 0, fontFamily: SERIF, fontSize: "2rem", color: HI, flex: 1 }} data-testid="page-heading">
+              Members · Command Center
+            </h1>
+          )}
           <Button
             onClick={() => setIssuing(true)}
             data-testid="btn-issue-new"
@@ -688,7 +690,7 @@ export default function AdminMembers({ embedded = false }: { embedded?: boolean 
               data-testid={`member-row-${m.id}`}
               style={{
                 width: "100%", textAlign: "left", cursor: "pointer",
-                display: "flex", alignItems: "center", gap: "0.75rem",
+                display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap",
                 padding: "0.75rem 1rem", background: "transparent",
                 border: "none", borderBottom: `1px solid ${BORDER}`,
                 color: "inherit", fontFamily: "inherit",
