@@ -2015,3 +2015,7 @@ Impersonate mode (M4) · Diagnostic panels (M6) · Morning brief email (M7) · A
 - Cleaned test traffic wrongly attributed to Rod (8 events, 10 test survey answers). Rod has no real visits yet.
 - Kept as-is by choice: CRM stages. Not done: combined morning email.
 - Gotcha: the tracker remembers ?for=<slug> in the browser — testers must NEVER open real prospect links.
+
+### Jun 2026 update
+- DONE: Demo follow-up email (`/api/scheduled/demo-followup`, daily Railway cron). DONE: credit-pack refund reversal.
+- Next: Curriculum progress + attainment PDF (P1), LIP compliance export from Brand Vault (P1), tests not hitting live email/DB (P1).

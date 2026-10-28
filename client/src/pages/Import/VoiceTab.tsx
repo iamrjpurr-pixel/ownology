@@ -355,7 +355,7 @@ export function VoiceTab({
               className="flex-1 h-12 font-semibold"
               onClick={startRecording}
               disabled={processing}
-              style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}
+              style={{ background: "var(--primary)", color: "oklch(0.10 0.008 60)" }}
               data-testid="voice-start-btn"
             >
               <Mic size={18} className="mr-2" /> Start recording
@@ -387,7 +387,7 @@ export function VoiceTab({
                 className="flex-1 h-12 font-semibold"
                 onClick={handleTranscribe}
                 disabled={processing}
-                style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}
+                style={{ background: "var(--primary)", color: "oklch(0.10 0.008 60)" }}
                 data-testid="voice-transcribe-btn"
               >
                 {processing ? (

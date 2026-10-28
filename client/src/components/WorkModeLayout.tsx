@@ -110,6 +110,7 @@ export default function WorkModeLayout({
 
   return (
     <div
+      className="force-light"
       style={{
         minHeight: "100dvh",
         background: "#F8F9FA",
@@ -289,10 +290,10 @@ export default function WorkModeLayout({
                       fontSize: "0.56rem",
                       fontStyle: "italic",
                       letterSpacing: "0.02em",
-                      color: isActive ? "#8a5a10" : "#7a6440",
+                      color: isActive ? "#7a4f0e" : "#5c4a2e",
                       marginTop: "-0.1rem",
                       lineHeight: 1,
-                      opacity: isActive ? 0.95 : 0.7,
+                      opacity: 1,
                     }}
                   >
                     {item.pillar}

@@ -199,7 +199,7 @@ export default function Import() {
               className="w-full h-14 text-base font-bold"
               onClick={handleSave}
               disabled={saving || entries.length === 0}
-              style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}
+              style={{ background: "var(--primary)", color: "oklch(0.10 0.008 60)" }}
             >
               {saving ? (
                 <><Loader2 size={18} className="mr-2 animate-spin" /> Saving…</>

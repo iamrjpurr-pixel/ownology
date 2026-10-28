@@ -108,7 +108,7 @@ export default function CellarBrief() {
           data-testid="cellar-brief-retry"
           onClick={() => void latest.refetch()}
           className="rounded px-4 py-2 text-sm font-semibold w-fit"
-          style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}
+          style={{ background: "var(--primary)", color: "oklch(0.10 0.008 60)" }}
         >
           Try again
         </button>
@@ -529,7 +529,7 @@ function BriefCard({ card, defaultExpanded = false }: { card: Card; defaultExpan
               href={`/quick-entry?tank=${encodeURIComponent(card.vesselId)}&variety=${encodeURIComponent(card.variety)}`}
               data-testid={`brief-log-${slug}`}
               className="text-xs px-3 py-2 rounded font-semibold"
-              style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}
+              style={{ background: "var(--primary)", color: "oklch(0.10 0.008 60)" }}
             >
               + Log on {card.vesselId}
             </Link>
@@ -790,7 +790,7 @@ function QualFlagsBlock({ slug, vesselId }: { slug: string; vesselId: string }) 
               onClick={submitFlag}
               disabled={!picking || flagMut.isPending}
               className="text-xs px-3 py-1.5 rounded font-semibold"
-              style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", opacity: !picking ? 0.5 : 1, cursor: !picking ? "not-allowed" : "pointer", border: "none" }}
+              style={{ background: "var(--primary)", color: "oklch(0.10 0.008 60)", opacity: !picking ? 0.5 : 1, cursor: !picking ? "not-allowed" : "pointer", border: "none" }}
             >
               {flagMut.isPending ? "Flagging…" : "🚩 Flag"}
             </button>

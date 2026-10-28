@@ -83,10 +83,10 @@ function WinesTab({ wineryId, role, brandName, viewer, onInvite }: { wineryId: n
   // Empty vault + a known website → offer the import straight away, once per brand.
   useEffect(() => {
     const key = `ow_import_offered_${wineryId}`;
-    if (role !== "owner" || list.isLoading || wines.length || !siteUrl || localStorage.getItem(key)) return;
+    if (role !== "owner" || list.isLoading || wines.length || !siteUrl || !suggested.data?.fromContact || localStorage.getItem(key)) return;
     localStorage.setItem(key, "1");
     setImporting({ open: true, auto: true });
-  }, [role, list.isLoading, wines.length, siteUrl, wineryId]);
+  }, [role, list.isLoading, wines.length, siteUrl, suggested.data?.fromContact, wineryId]);
 
   const onSave = async (w: WineInput, wineId = editing.wine?.id) => {
     try {
@@ -128,7 +128,7 @@ function WinesTab({ wineryId, role, brandName, viewer, onInvite }: { wineryId: n
         {selected ? (
           <WineDetail wineryId={wineryId} wineId={selected} role={role} brandName={brandName} viewer={viewer} onEdit={(w) => setEditing({ open: true, wine: w })} />
         ) : role === "owner" && !list.isLoading && !wines.length ? (
-          <GettingStarted pending={save.isPending} siteHost={siteUrl ? new URL(siteUrl).host : null} onImport={() => setImporting({ open: true, auto: !!siteUrl })} onSample={() => onSave(SAMPLE_WINE, undefined)} onNew={() => setEditing({ open: true, wine: null })} onInvite={() => onInvite?.()} />
+          <GettingStarted pending={save.isPending} siteHost={siteUrl ? new URL(siteUrl).host : null} onImport={() => setImporting({ open: true, auto: false })} onSample={() => onSave(SAMPLE_WINE, undefined)} onNew={() => setEditing({ open: true, wine: null })} onInvite={() => onInvite?.()} />
         ) : (
           <div className="flex flex-col items-center py-16 text-center text-[var(--ow-text-lo)]"><WineIcon className="mb-3 h-8 w-8" /><p className="text-sm">{!list.isLoading && !wines.length ? "Nothing shared with you yet. Specs appear here as soon as the owner adds them." : "Pick a wine to see its spec and cellar record."}</p></div>
         )}

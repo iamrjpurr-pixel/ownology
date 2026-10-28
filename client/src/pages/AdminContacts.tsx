@@ -2543,7 +2543,7 @@ export default function AdminContacts() {
                         }
                       }}
                       style={{
-                        padding: "5px 14px", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)",
+                        padding: "5px 14px", background: "var(--primary)", color: "oklch(0.10 0.008 60)",
                         border: "none", borderRadius: 3, fontFamily: "'Lato',sans-serif", fontSize: "0.78rem",
                         fontWeight: 700, cursor: transcriptEnrichMutation.isPending ? "wait" : "pointer",
                         opacity: transcriptEnrichMutation.isPending || enrichTranscript.trim().length < 200 ? 0.6 : 1,
@@ -2759,7 +2759,7 @@ export default function AdminContacts() {
                   <button
                     data-testid={`copy-sms-${c.slug}`}
                     onClick={() => copy(c.slug, "sms", effectiveSms)}
-                    style={{ ...btn, background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", fontWeight: 700 }}
+                    style={{ ...btn, background: "var(--primary)", color: "oklch(0.10 0.008 60)", fontWeight: 700 }}
                   >
                     {copied === "sms" ? "✓ SMS copied" : "Copy SMS draft"}
                   </button>
@@ -3060,7 +3060,7 @@ function EmailChip({ slug, email, chipStyle, onCopy, onSaved }: {
           data-testid={`email-save-${slug}`}
           disabled={setEmail.isPending}
           onClick={() => setEmail.mutate({ slug, email: buf.trim() }, { onSuccess: () => { setEditing(false); onSaved(); } })}
-          style={{ ...small, border: "1px solid var(--ow-amber)", background: "var(--ow-amber)", color: "#111", fontWeight: 600 }}
+          style={{ ...small, border: "1px solid var(--ow-amber)", background: "var(--primary)", color: "#111", fontWeight: 600 }}
         >
           {setEmail.isPending ? "Saving…" : "Save"}
         </button>

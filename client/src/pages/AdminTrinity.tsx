@@ -34,7 +34,7 @@ function AccessDenied({ isForbidden }: { isForbidden: boolean }) {
         {isForbidden ? "Owner access required" : "Sign in required"}
       </h1>
       {!isForbidden && (
-        <a href={getLoginUrl()} className="px-6 py-2.5 rounded-sm text-sm" style={{ background: "var(--ow-amber)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif", textDecoration: "none" }}>
+        <a href={getLoginUrl()} className="px-6 py-2.5 rounded-sm text-sm" style={{ background: "var(--primary)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif", textDecoration: "none" }}>
           Sign in
         </a>
       )}
@@ -154,7 +154,7 @@ function PieceCard({
             onClick={() => onPromote(piece.id)}
             disabled={busy}
             className="px-4 py-2 rounded-sm text-xs font-medium"
-            style={{ background: "var(--ow-amber)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif", cursor: busy ? "wait" : "pointer", opacity: busy ? 0.6 : 1 }}
+            style={{ background: "var(--primary)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif", cursor: busy ? "wait" : "pointer", opacity: busy ? 0.6 : 1 }}
           >
             Promote to Featured
           </button>
@@ -284,7 +284,7 @@ function NewsletterPanel() {
                 onClick={() => approve.mutate({ id: d.id })}
                 disabled={busy}
                 className="px-4 py-2 rounded-sm text-xs font-medium"
-                style={{ background: "var(--ow-amber)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif", cursor: busy ? "wait" : "pointer", opacity: busy ? 0.6 : 1 }}
+                style={{ background: "var(--primary)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif", cursor: busy ? "wait" : "pointer", opacity: busy ? 0.6 : 1 }}
               >
                 {approve.isPending ? "Sending…" : "Approve & send now"}
               </button>
@@ -359,7 +359,7 @@ export default function AdminTrinity() {
               onClick={() => runNow.mutate()}
               disabled={runNow.isPending}
               className="px-4 py-2.5 rounded-sm text-sm font-medium"
-              style={{ background: "var(--ow-amber)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif", cursor: runNow.isPending ? "wait" : "pointer", opacity: runNow.isPending ? 0.7 : 1 }}
+              style={{ background: "var(--primary)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif", cursor: runNow.isPending ? "wait" : "pointer", opacity: runNow.isPending ? 0.7 : 1 }}
             >
               {runNow.isPending ? "Running pipeline…" : "Run pipeline now"}
             </button>

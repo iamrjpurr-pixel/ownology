@@ -289,7 +289,7 @@ export default function AdminEngagement() {
                                     data-testid={`reply-followup-generate-${c.slug}`}
                                     onClick={() => generateReplyFollowup(c.slug)}
                                     disabled={replyFollowup.isPending}
-                                    style={{ padding: "2px 8px", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.65rem", fontWeight: 700, cursor: replyFollowup.isPending ? "wait" : "pointer" }}
+                                    style={{ padding: "2px 8px", background: "var(--primary)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.65rem", fontWeight: 700, cursor: replyFollowup.isPending ? "wait" : "pointer" }}
                                   >
                                     {replyFollowup.isPending ? "✨ Drafting…" : "✨ Draft follow-up"}
                                   </button>
@@ -329,7 +329,7 @@ export default function AdminEngagement() {
                                     <button
                                       data-testid={`engagement-copy-sms-${c.slug}`}
                                       onClick={() => copySms(c.slug, sms)}
-                                      style={{ padding: "4px 12px", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.72rem", fontWeight: 700, cursor: "pointer" }}
+                                      style={{ padding: "4px 12px", background: "var(--primary)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.72rem", fontWeight: 700, cursor: "pointer" }}
                                     >
                                       {state === "sms" ? "✓ SMS copied" : "Copy follow-up SMS"}
                                     </button>

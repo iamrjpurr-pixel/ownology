@@ -131,7 +131,7 @@ export function CameraTab({
             className="flex-1 font-semibold"
             onClick={handleParse}
             disabled={parsing}
-            style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}
+            style={{ background: "var(--primary)", color: "oklch(0.10 0.008 60)" }}
           >
             {parsing ? (
               <><Loader2 size={16} className="mr-2 animate-spin" /> Analysing…</>

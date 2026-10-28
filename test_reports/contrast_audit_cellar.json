@@ -1,0 +1,48 @@
+{
+ "cellar /home": [
+  "2.42 <span @why-ownology-window> \"CON\" fg=oklch(0.72 0.014 70) cls=",
+  "4.28 <p> \"EXAMPLE QUERY\" fg=oklch(0.8 0.13 72 / 0.6) cls=data-readout text-xs mb-2",
+  "4.28 <span> \"TANK 7 \u00b7 SHIRAZ\" fg=oklch(0.8 0.13 72 / 0.6) cls=data-readout text-xs",
+  "4.28 <p @home-feature-curriculum> \"THE FOUR LEVELS\" fg=oklch(0.8 0.13 72 / 0.6) cls=data-readout text-xs mb-4",
+  "3.99 <span @cellar-brief-teaser-row-t-04-shiraz-2026> \"Attention\" fg=oklch(0.63 0.2 25) cls=",
+  "4.18 <p @home-tier-retail-the-cellar-hand> \"$28/mo retail\" fg=oklch(0.72 0.014 70) cls=",
+  "2.97 <p @home-tier-retail-the-press> \"$59/mo retail\" fg=oklch(0.6 0.015 75) cls=",
+  "4.18 <p @home-tier-retail-the-vigneron> \"$124/mo retail\" fg=oklch(0.72 0.014 70) cls="
+ ],
+ "cellar /curriculum": [],
+ "cellar /curriculum/about": [],
+ "cellar /pricing": [
+  "3.47 <span @pricing-pillar-legend> \"The four pillars:\" fg=oklch(0.72 0.014 70) cls=uppercase tracking-widest opacity-60"
+ ],
+ "cellar /demo/tour": [],
+ "cellar /know": [],
+ "cellar /why-ownology": [],
+ "cellar /cellar-journal": [],
+ "cellar /free-run": [
+  "1.23 <div> \"\ud83e\uddea\" fg=oklch(0.93 0.02 70) cls=",
+  "1.23 <div> \"\ud83d\udc43\" fg=oklch(0.93 0.02 70) cls=",
+  "1.23 <div> \"\ud83c\udf47\" fg=oklch(0.93 0.02 70) cls=",
+  "1.23 <div> \"\ud83c\udf77\" fg=oklch(0.93 0.02 70) cls=",
+  "1.23 <div> \"\ud83c\udf7d\ufe0f\" fg=oklch(0.93 0.02 70) cls=",
+  "1.23 <div> \"\ud83d\udcda\" fg=oklch(0.93 0.02 70) cls=",
+  "1.77 <strong @made-with-ownology-footer> \"Made with Ownology\" fg=oklch(0.8 0.13 72) cls=",
+  "2.32 <span @made-with-ownology-footer> \"cellar intelligence for working winemake\" fg=oklch(0.72 0.014 70) cls=",
+  "3.02 <span @worknav-pillar-press> \"Know\" fg=rgb(122, 100, 64) cls=",
+  "3.02 <span @worknav-pillar-log> \"Do\" fg=rgb(122, 100, 64) cls=",
+  "3.02 <span @worknav-pillar-tasks> \"Do\" fg=rgb(122, 100, 64) cls=",
+  "3.02 <span @worknav-pillar-more> \"Guide\" fg=rgb(122, 100, 64) cls="
+ ],
+ "cellar /guide": [],
+ "cellar /brand": [],
+ "cellar /admin": [],
+ "cellar /admin/people": [
+  "4.22 <p @people-error> \"Unable to transform response from server\" fg=oklch(0.577 0.245 27.325) cls=mt-8 text-sm text-red-600"
+ ],
+ "cellar /admin/contacts": [],
+ "cellar /dashboard": [
+  "3.02 <span @worknav-pillar-ask> \"Learn\" fg=rgb(122, 100, 64) cls=",
+  "3.02 <span @worknav-pillar-press> \"Know\" fg=rgb(122, 100, 64) cls=",
+  "3.02 <span @worknav-pillar-log> \"Do\" fg=rgb(122, 100, 64) cls=",
+  "3.02 <span @worknav-pillar-tasks> \"Do\" fg=rgb(122, 100, 64) cls="
+ ]
+}

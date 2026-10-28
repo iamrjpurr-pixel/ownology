@@ -1,0 +1,122 @@
+{
+ "red-crush /home": [
+  "4.18 <a @nav-enthusiasts> \"For Wine Enthusiasts\" fg=oklch(0.54 0.18 65) cls=inline-flex items-center rounded-full transition-colors",
+  "4.23 <a @whats-new-ribbon> \"Explore the platform\" fg=oklch(0.54 0.18 65) cls=",
+  "3.93 <p @hero-scene-gap> \"The gap \u00b7 where you sit\" fg=oklch(0.54 0.18 65) cls=",
+  "3.48 <span @hero-scene-gap-chips> \"Ownology\" fg=oklch(0.54 0.18 65) cls=",
+  "1.32 <button @hero-carousel-skip> \"Skip intro \u2193\" fg=oklch(0.75 0.015 75) cls=",
+  "1.73 <div @why-ownology-window> \"ownology.com/ask\" fg=oklch(0.36 0.006 0) cls=",
+  "2.65 <span @why-ownology-window-citation> \"cited:\" fg=oklch(0.54 0.18 65) cls=",
+  "4.18 <span @why-ownology-window-citation> \"Zoecklein \u00b7 Wine Analysis & Production, \" fg=oklch(0.54 0.18 65) cls=",
+  "2.65 <span @why-ownology-window-citation-1> \"cited:\" fg=oklch(0.54 0.18 65) cls=",
+  "4.18 <span @why-ownology-window-citation-1> \"AWRI \u00b7 MLF technical bulletin\" fg=oklch(0.54 0.18 65) cls=",
+  "1.83 <p @why-ownology-window> \"Every answer cited \u00b7 not internet\" fg=oklch(0.36 0.006 0) cls=",
+  "1.23 <span @why-ownology-window> \"CON\" fg=oklch(0.36 0.006 0) cls=",
+  "3.81 <span @why-ownology-window> \"SCIENCE\" fg=oklch(0.54 0.18 65) cls=",
+  "2.49 <p> \"EXAMPLE QUERY\" fg=oklch(0.54 0.18 65 / 0.6) cls=data-readout text-xs mb-2",
+  "2.49 <span> \"TANK 7 \u00b7 SHIRAZ\" fg=oklch(0.54 0.18 65 / 0.6) cls=data-readout text-xs",
+  "4.24 <span @home-feature-curriculum> \"Deep \u00b7 ~15 min\" fg=oklch(0.54 0.18 65) cls=",
+  "4.24 <span @home-feature-curriculum> \"Skim \u00b7 ~2 min\" fg=oklch(0.54 0.18 65) cls=",
+  "4.24 <span @home-feature-curriculum> \"Flash \u00b7 ~5 min\" fg=oklch(0.54 0.18 65) cls=",
+  "2.49 <p @home-feature-curriculum> \"THE FOUR LEVELS\" fg=oklch(0.54 0.18 65 / 0.6) cls=data-readout text-xs mb-4",
+  "2.89 <span @cellar-brief-teaser-row-t-04-shiraz-2026> \"Attention\" fg=oklch(0.63 0.2 25) cls=",
+  "1.83 <span @cellar-brief-teaser-row-t-11-grenache-2026> \"Watch\" fg=oklch(0.75 0.16 85) cls=",
+  "2.40 <span @cellar-brief-teaser-row-b-27-cabernet-2024> \"Steady\" fg=oklch(0.65 0.15 145) cls=",
+  "4.23 <p @home-tier-retail-the-cellar-hand> \"$28/mo retail\" fg=oklch(0.36 0.006 0) cls=",
+  "3.71 <div> \"Most Popular\" fg=oklch(0.16 0.012 60) cls=absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-sm text-xs",
+  "2.97 <p @home-tier-retail-the-press> \"$59/mo retail\" fg=oklch(0.6 0.015 75) cls=",
+  "4.23 <p @home-tier-retail-the-vigneron> \"$124/mo retail\" fg=oklch(0.36 0.006 0) cls="
+ ],
+ "red-crush /curriculum": [],
+ "red-crush /curriculum/about": [],
+ "red-crush /pricing": [
+  "4.03 <span> \"SAVE 2 MONTHS\" fg=oklch(0.54 0.18 65) cls=text-xs px-2 py-0.5 rounded",
+  "3.11 <button @tier-chooser-start> \"Help me choose \u2192\" fg=rgb(42, 30, 10) cls=",
+  "3.81 <span @pricing-apco-strip> \"See how \u2192\" fg=oklch(0.54 0.18 65) cls=",
+  "3.35 <span @pricing-pillar-legend> \"The four pillars:\" fg=oklch(0.36 0.006 0) cls=uppercase tracking-widest opacity-60",
+  "2.91 <span> \"GUIDE\" fg=oklch(0.65 0.1 160) cls=",
+  "4.48 <div> \"FOUNDING MEMBER\" fg=oklch(0.54 0.18 65) cls=absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs rounded-sm",
+  "2.96 <span> \"LEARN\" fg=oklch(0.65 0.1 220) cls=",
+  "2.91 <span> \"GUIDE\" fg=oklch(0.65 0.1 160) cls=",
+  "3.71 <span> \"DO\" fg=oklch(0.54 0.18 65) cls=",
+  "1.79 <p> \"Full cellar operations \u00b7 commercial scal\" fg=oklch(0.36 0.006 0) cls=",
+  "3.71 <p> \"440\" fg=oklch(0.54 0.18 65) cls=mt-1",
+  "3.71 <span @tier-retail-chip-desktop-press> \"25\" fg=oklch(0.54 0.18 65) cls=",
+  "4.48 <div> \"TEAM\" fg=oklch(0.54 0.18 65) cls=absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs rounded-sm",
+  "1.80 <h3> \"The Vigneron\" fg=oklch(0.8 0.14 75) cls=mb-1",
+  "3.55 <span> \"KNOW\" fg=oklch(0.62 0.1 45) cls=",
+  "2.96 <span> \"LEARN\" fg=oklch(0.65 0.1 220) cls=",
+  "2.91 <span> \"GUIDE\" fg=oklch(0.65 0.1 160) cls=",
+  "4.48 <div> \"MOST POPULAR\" fg=oklch(0.54 0.18 65) cls=absolute -top-3 left-4 px-2 py-0.5 text-xs rounded-sm",
+  "4.05 <span> \"1 credit\" fg=oklch(0.54 0.18 65) cls=ml-auto text-xs px-2 py-0.5 rounded-sm",
+  "4.05 <span> \"1 credit\" fg=oklch(0.54 0.18 65) cls=ml-auto text-xs px-2 py-0.5 rounded-sm",
+  "4.05 <span> \"1 credit\" fg=oklch(0.54 0.18 65) cls=ml-auto text-xs px-2 py-0.5 rounded-sm"
+ ],
+ "red-crush /demo/tour": [
+  "3.98 <span @demo-tank-T3> \"Watch\" fg=oklch(0.54 0.18 65) cls=inline-flex items-center gap-1 rounded px-2 py-0.5 text-[0.65rem] font",
+  "4.27 <span @demo-tank-T4> \"On track\" fg=oklch(0.508 0.118 165.612) cls=inline-flex items-center gap-1 rounded px-2 py-0.5 text-[0.65rem] font",
+  "4.27 <span @demo-tank-B1-12> \"On track\" fg=oklch(0.508 0.118 165.612) cls=inline-flex items-center gap-1 rounded px-2 py-0.5 text-[0.65rem] font",
+  "4.27 <span @contractor-status-1> \"active\" fg=oklch(0.508 0.118 165.612) cls=rounded px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider ",
+  "3.86 <span @contractor-status-2> \"invited\" fg=oklch(0.54 0.18 65) cls=rounded px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider "
+ ],
+ "red-crush /know": [],
+ "red-crush /why-ownology": [
+  "4.48 <em> \"what happened\" fg=oklch(0.54 0.18 65) cls=",
+  "4.48 <em> \"what to do about it\" fg=oklch(0.54 0.18 65) cls="
+ ],
+ "red-crush /cellar-journal": [
+  "4.01 <button @cj-topic-all> \"All\" fg=rgb(0, 0, 0) cls=px-3 py-1.5 rounded-full text-xs font-mono uppercase tracking-[0.15em]",
+  "2.94 <a> \"Ask Free Run \u2192\" fg=oklch(0.54 0.18 65) cls=inline-block mt-6 px-5 py-2.5 rounded-full font-mono text-[11px] upper",
+  "3.48 <button @cj-cta-freerun> \"Open Free Run \u2192\" fg=rgb(26, 20, 16) cls=px-6 py-3 rounded-full font-mono text-[11px] uppercase tracking-[0.2em"
+ ],
+ "red-crush /free-run": [
+  "3.02 <span @worknav-pillar-press> \"Know\" fg=rgb(122, 100, 64) cls=",
+  "3.02 <span @worknav-pillar-log> \"Do\" fg=rgb(122, 100, 64) cls=",
+  "3.02 <span @worknav-pillar-tasks> \"Do\" fg=rgb(122, 100, 64) cls=",
+  "3.02 <span @worknav-pillar-more> \"Guide\" fg=rgb(122, 100, 64) cls="
+ ],
+ "red-crush /guide": [
+  "3.39 <p> \"Know\" fg=oklch(0.62 0.1 45) cls=",
+  "2.82 <p> \"Learn\" fg=oklch(0.65 0.1 220) cls=",
+  "2.77 <p> \"Guide\" fg=oklch(0.65 0.1 160) cls=",
+  "3.55 <span @guide-sublink--knowledge> \"KNOW\" fg=oklch(0.62 0.1 45) cls=",
+  "3.55 <span @guide-sublink--cellar-journal> \"KNOW\" fg=oklch(0.62 0.1 45) cls=",
+  "3.55 <span @guide-sublink--blog> \"KNOW\" fg=oklch(0.62 0.1 45) cls=",
+  "2.96 <span @guide-sublink--free-run> \"LEARN\" fg=oklch(0.65 0.1 220) cls=",
+  "2.96 <span @guide-sublink--the-press-compare> \"LEARN\" fg=oklch(0.65 0.1 220) cls=",
+  "3.68 <span @guide-reveal-btn-workflow> \"Reveal \u2192\" fg=oklch(0.54 0.18 65) cls=",
+  "3.68 <span @guide-reveal-btn-checklist> \"Reveal \u2192\" fg=oklch(0.54 0.18 65) cls=",
+  "3.68 <span @guide-reveal-btn-roles> \"Reveal \u2192\" fg=oklch(0.54 0.18 65) cls=",
+  "3.68 <span @guide-reveal-btn-tiers> \"Reveal \u2192\" fg=oklch(0.54 0.18 65) cls=",
+  "3.68 <span @guide-reveal-btn-reading> \"Reveal \u2192\" fg=oklch(0.54 0.18 65) cls="
+ ],
+ "red-crush /brand": [],
+ "red-crush /admin": [
+  "3.86 <span @admin-section-people> \"Start here\" fg=oklch(0.54 0.18 65) cls=text-xs px-2 py-0.5 rounded-full",
+  "3.86 <span @admin-section-people> \"Outreach\" fg=oklch(0.54 0.18 65) cls=text-xs px-2 py-0.5 rounded-full",
+  "3.86 <span @admin-section-people> \"Live\" fg=oklch(0.54 0.18 65) cls=text-xs px-2 py-0.5 rounded-full",
+  "3.86 <span @admin-section-people> \"Access\" fg=oklch(0.54 0.18 65) cls=text-xs px-2 py-0.5 rounded-full",
+  "3.86 <span @admin-section-sales> \"Live Stripe\" fg=oklch(0.54 0.18 65) cls=text-xs px-2 py-0.5 rounded-full",
+  "3.86 <span @admin-section-sales> \"Attribution\" fg=oklch(0.54 0.18 65) cls=text-xs px-2 py-0.5 rounded-full",
+  "3.86 <span @admin-section-sales> \"Weekly\" fg=oklch(0.54 0.18 65) cls=text-xs px-2 py-0.5 rounded-full",
+  "3.86 <span @admin-section-marketing> \"AI Coach\" fg=oklch(0.54 0.18 65) cls=text-xs px-2 py-0.5 rounded-full",
+  "3.86 <span @admin-section-marketing> \"Assets\" fg=oklch(0.54 0.18 65) cls=text-xs px-2 py-0.5 rounded-full",
+  "3.86 <span @admin-section-content> \"AI Context\" fg=oklch(0.54 0.18 65) cls=text-xs px-2 py-0.5 rounded-full",
+  "3.86 <span @admin-section-help> \"Telemetry\" fg=oklch(0.54 0.18 65) cls=text-xs px-2 py-0.5 rounded-full",
+  "3.86 <span @admin-section-help> \"Telemetry\" fg=oklch(0.54 0.18 65) cls=text-xs px-2 py-0.5 rounded-full"
+ ],
+ "red-crush /admin/people": [
+  "4.50 <p @people-error> \"Unable to transform response from server\" fg=oklch(0.577 0.245 27.325) cls=mt-8 text-sm text-red-600"
+ ],
+ "red-crush /admin/contacts": [
+  "4.40 <p @card-ocr-panel> \"\ud83d\udcc7 Paste a business card or email signat\" fg=oklch(0.54 0.18 65) cls=",
+  "4.40 <label @card-ocr-upload-label> \"upload an image\" fg=oklch(0.54 0.18 65) cls=",
+  "3.91 <button @form-persona-winemaker> \"Winemaker\" fg=oklch(0.11 0.008 60) cls="
+ ],
+ "red-crush /dashboard": [
+  "3.02 <span @worknav-pillar-ask> \"Learn\" fg=rgb(122, 100, 64) cls=",
+  "3.02 <span @worknav-pillar-press> \"Know\" fg=rgb(122, 100, 64) cls=",
+  "3.02 <span @worknav-pillar-log> \"Do\" fg=rgb(122, 100, 64) cls=",
+  "3.02 <span @worknav-pillar-tasks> \"Do\" fg=rgb(122, 100, 64) cls="
+ ]
+}

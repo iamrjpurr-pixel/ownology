@@ -279,7 +279,7 @@ export default function ProductionDashboard() {
                 Upload past vintage logs — the AI tutor will then ground its advice in your actual tanks, varieties, and decisions.
               </p>
             </div>
-            <Link href="/import" data-testid="dashboard-import-cta" className="text-sm whitespace-nowrap px-4 py-2 rounded font-semibold" style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}>
+            <Link href="/import" data-testid="dashboard-import-cta" className="text-sm whitespace-nowrap px-4 py-2 rounded font-semibold" style={{ background: "var(--primary)", color: "oklch(0.10 0.008 60)" }}>
               ↥ Import past vintages
             </Link>
           </div>

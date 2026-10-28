@@ -42,7 +42,7 @@ export function WeeklyRecoOptIn({ source = "quiz_footer" }: { source?: string })
             data-testid="weekly-reco-optin-input"
             style={{ flex: 1, minWidth: 200, padding: "8px 12px", background: "var(--ow-bg-base)", border: "1px solid var(--ow-border)", borderRadius: 4, color: "var(--ow-text-hi)", fontFamily: "'Lato',sans-serif", fontSize: "0.9rem" }} />
           <button type="submit" disabled={subscribe.isPending} data-testid="weekly-reco-optin-submit"
-            style={{ padding: "8px 16px", background: "var(--ow-amber)", color: "#000", border: "none", borderRadius: 4, fontWeight: 700, cursor: "pointer", fontFamily: "'Lato',sans-serif", fontSize: "0.85rem" }}>
+            style={{ padding: "8px 16px", background: "var(--primary)", color: "#000", border: "none", borderRadius: 4, fontWeight: 700, cursor: "pointer", fontFamily: "'Lato',sans-serif", fontSize: "0.85rem" }}>
             {subscribe.isPending ? "…" : "Subscribe"}
           </button>
         </form>

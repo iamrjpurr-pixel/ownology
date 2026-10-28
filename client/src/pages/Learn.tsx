@@ -227,7 +227,7 @@ export default function Learn() {
                 ? "Come back later when cards are due — or switch to All cards to keep grinding."
                 : "Reshuffle to start again, or switch to Due today mode."}
             </p>
-            <button type="button" onClick={() => setMode(mode === "due" ? "all" : "due")} style={{ marginTop: "1.5rem", padding: "0.75rem 1.5rem", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 6, fontFamily: "'Lato',sans-serif", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}>
+            <button type="button" onClick={() => setMode(mode === "due" ? "all" : "due")} style={{ marginTop: "1.5rem", padding: "0.75rem 1.5rem", background: "var(--primary)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 6, fontFamily: "'Lato',sans-serif", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}>
               Switch to {mode === "due" ? "All cards" : "Due today"}
             </button>
           </section>
@@ -308,7 +308,7 @@ export default function Learn() {
                     type="button"
                     data-testid="learn-reveal-btn"
                     onClick={() => setRevealed(true)}
-                    style={{ width: "100%", padding: "0.85rem", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 6, fontFamily: "'Lato',sans-serif", fontWeight: 700, fontSize: "0.95rem", cursor: "pointer", letterSpacing: "0.02em" }}
+                    style={{ width: "100%", padding: "0.85rem", background: "var(--primary)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 6, fontFamily: "'Lato',sans-serif", fontWeight: 700, fontSize: "0.95rem", cursor: "pointer", letterSpacing: "0.02em" }}
                   >
                     Reveal answer ↓
                   </button>

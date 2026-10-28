@@ -9,6 +9,7 @@ import { TRPCError } from "@trpc/server";
 import { sql } from "drizzle-orm";
 import { router, protectedProcedure } from "../trpc.js";
 import { db } from "../db.js";
+import { isTestEmail } from "../../shared/testEmails.js";
 import type { Context } from "../trpc.js";
 
 type Role = "owner" | "contractor";
@@ -260,9 +261,10 @@ export const brandPortalRouter = router({
     const [rows] = await db.execute(sql`
       SELECT oc.email AS email FROM user_events e JOIN outreach_contacts oc ON oc.slug = e.slug
       WHERE e.user_id = ${ctx.user.userId ?? -1} AND e.slug IS NOT NULL AND oc.email IS NOT NULL LIMIT 1`);
-    const emails = [((rows as unknown as { email: string }[])[0]?.email ?? ""), ctx.user.email ?? ""];
-    const domain = emails.map((e) => e.trim().toLowerCase()).find((e) => e.includes("@") && !FREE.test(e))?.split("@")[1];
-    return { url: domain ? `https://${domain}` : null };
+    const contactEmail = ((rows as unknown as { email: string }[])[0]?.email ?? "").trim().toLowerCase();
+    const ok = (e: string) => e.includes("@") && !FREE.test(e) && !isTestEmail(e) && !/@[^@]*example\./.test(e);
+    const pick = [contactEmail, (ctx.user.email ?? "").trim().toLowerCase()].find(ok);
+    return { url: pick ? `https://${pick.split("@")[1]}` : null, fromContact: !!pick && pick === contactEmail };
   }),
 
   archiveWine: protectedProcedure.input(brandId.extend({ wineId: z.number().int() })).mutation(async ({ ctx, input }) => {

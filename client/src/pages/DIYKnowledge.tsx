@@ -297,7 +297,7 @@ function DIYKnowledgeHome() {
             </div>
             <Link
               href="/free-run"
-              style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.65rem 1.25rem", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", fontFamily: SANS, fontWeight: 700, fontSize: "0.875rem", borderRadius: 2, textDecoration: "none", letterSpacing: "0.04em", textTransform: "uppercase", flexShrink: 0 }}
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.65rem 1.25rem", background: "var(--primary)", color: "oklch(0.10 0.008 60)", fontFamily: SANS, fontWeight: 700, fontSize: "0.875rem", borderRadius: 2, textDecoration: "none", letterSpacing: "0.04em", textTransform: "uppercase", flexShrink: 0 }}
             >
               Ask a Question
             </Link>
@@ -573,7 +573,7 @@ function DIYSopDetail({ id }: { id: number }) {
             </div>
             <Link
               href={`/free-run?q=${encodeURIComponent(`Question about: ${displayTitle}`)}`}
-              style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.6rem 1.1rem", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", fontFamily: SANS, fontWeight: 700, fontSize: "0.82rem", borderRadius: 2, textDecoration: "none", letterSpacing: "0.04em", textTransform: "uppercase", flexShrink: 0 }}
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.6rem 1.1rem", background: "var(--primary)", color: "oklch(0.10 0.008 60)", fontFamily: SANS, fontWeight: 700, fontSize: "0.82rem", borderRadius: 2, textDecoration: "none", letterSpacing: "0.04em", textTransform: "uppercase", flexShrink: 0 }}
             >
               Ask Ownology →
             </Link>

@@ -61,7 +61,7 @@ function TierChooser() {
               style={{
                 padding: "0.55rem 1.1rem",
                 borderRadius: "2px",
-                background: "var(--ow-amber)",
+                background: "var(--primary)",
                 color: "#2A1E0A",
                 border: "none",
                 fontFamily: "'Lato', sans-serif",
@@ -103,7 +103,7 @@ function TierChooser() {
               style={{
                 padding: "0.5rem 1rem",
                 borderRadius: "2px",
-                background: "var(--ow-amber)",
+                background: "var(--primary)",
                 color: "#2A1E0A",
                 textDecoration: "none",
                 fontFamily: "'Lato', sans-serif",
@@ -1514,7 +1514,7 @@ export default function Pricing() {
             style={{
               fontFamily: "'Lato', sans-serif",
               fontSize: "0.8rem",
-              color: "var(--ow-amber)",
+              color: "var(--primary)",
               fontWeight: 700,
               whiteSpace: "nowrap",
               letterSpacing: "0.03em",

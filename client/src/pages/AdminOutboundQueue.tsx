@@ -515,7 +515,7 @@ export default function AdminOutboundQueue() {
           data-testid="bulk-rewrite-warm"
           onClick={() => runBulkRewrite("warm", false)}
           disabled={bulkRewrite.isPending || filtered.length === 0}
-          style={{ padding: "5px 12px", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.75rem", fontWeight: 700, cursor: bulkRewrite.isPending ? "wait" : "pointer", opacity: bulkRewrite.isPending || filtered.length === 0 ? 0.6 : 1 }}
+          style={{ padding: "5px 12px", background: "var(--primary)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.75rem", fontWeight: 700, cursor: bulkRewrite.isPending ? "wait" : "pointer", opacity: bulkRewrite.isPending || filtered.length === 0 ? 0.6 : 1 }}
           title="Warm tone. Empty drafts only — safe."
         >
           {bulkRewrite.isPending ? "Rewriting…" : "Warm · empty only"}
@@ -684,7 +684,7 @@ export default function AdminOutboundQueue() {
           data-testid="mobile-enrich-btn"
           onClick={runMobileEnrich}
           disabled={enrichMobiles.isPending}
-          style={{ padding: "5px 14px", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.78rem", fontWeight: 700, cursor: enrichMobiles.isPending ? "wait" : "pointer", opacity: enrichMobiles.isPending ? 0.7 : 1 }}
+          style={{ padding: "5px 14px", background: "var(--primary)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.78rem", fontWeight: 700, cursor: enrichMobiles.isPending ? "wait" : "pointer", opacity: enrichMobiles.isPending ? 0.7 : 1 }}
         >
           {enrichMobiles.isPending ? "Hunting…" : "Enrich 25 mobiles"}
         </button>
@@ -761,7 +761,7 @@ export default function AdminOutboundQueue() {
                         <button
                           data-testid={`queue-copy-sms-${c.slug}`}
                           onClick={() => copySms(c.slug, sms)}
-                          style={{ padding: "4px 12px", background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.75rem", fontWeight: 700, cursor: "pointer" }}
+                          style={{ padding: "4px 12px", background: "var(--primary)", color: "oklch(0.10 0.008 60)", border: "none", borderRadius: 3, fontSize: "0.75rem", fontWeight: 700, cursor: "pointer" }}
                         >
                           {state === "sms" ? "✓ SMS copied" : "Copy SMS"}
                         </button>

@@ -71,7 +71,7 @@ export default function AdminWeeklyRecoDigest() {
           <details style={{ marginTop: 12 }}>
             <summary style={{ cursor: "pointer", fontSize: "0.82rem", color: "var(--ow-amber)" }}>Bulk-add from paste →</summary>
             <textarea value={bulkText} onChange={(e) => setBulkText(e.target.value)} placeholder="Paste emails separated by commas, spaces, or new lines" style={{ width: "100%", minHeight: 80, marginTop: 8, padding: 8, background: "var(--ow-bg-base)", border: "1px solid var(--ow-border)", color: "var(--ow-text-hi)", borderRadius: 4, fontFamily: "'JetBrains Mono',monospace", fontSize: "0.82rem" }} />
-            <button onClick={handleBulkAdd} disabled={bulkAdd.isPending} data-testid="digest-bulk-add" style={{ marginTop: 6, padding: "5px 14px", background: "var(--ow-amber)", color: "#000", border: "none", borderRadius: 3, fontWeight: 700, fontSize: "0.78rem", cursor: "pointer" }}>
+            <button onClick={handleBulkAdd} disabled={bulkAdd.isPending} data-testid="digest-bulk-add" style={{ marginTop: 6, padding: "5px 14px", background: "var(--primary)", color: "#000", border: "none", borderRadius: 3, fontWeight: 700, fontSize: "0.78rem", cursor: "pointer" }}>
               {bulkAdd.isPending ? "Adding…" : "Add subscribers"}
             </button>
           </details>

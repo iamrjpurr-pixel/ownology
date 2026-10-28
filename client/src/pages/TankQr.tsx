@@ -62,7 +62,7 @@ export default function TankQr() {
             Scan with a phone → opens Quick Entry pre-filled for that tank.
           </p>
         </div>
-        <button onClick={() => window.print()} data-testid="tank-qr-print-button" className="px-4 py-2 rounded font-semibold" style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}>
+        <button onClick={() => window.print()} data-testid="tank-qr-print-button" className="px-4 py-2 rounded font-semibold" style={{ background: "var(--primary)", color: "oklch(0.10 0.008 60)" }}>
           🖨 Print all
         </button>
       </div>

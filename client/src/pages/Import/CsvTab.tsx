@@ -218,7 +218,7 @@ export function CsvTab({
       <Button
         className="w-full font-semibold h-12"
         onClick={handleImport}
-        style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}
+        style={{ background: "var(--primary)", color: "oklch(0.10 0.008 60)" }}
       >
         <Upload size={16} className="mr-2" /> Preview Import
       </Button>

@@ -115,7 +115,7 @@ export default function Today() {
             {feed.length === 0 ? "All clear" : `${feed.length} thing${feed.length === 1 ? "" : "s"} to handle`}
           </h1>
         </div>
-        <Link href="/quick-entry" data-testid="today-log-link" className="text-sm px-3 py-2 rounded font-semibold" style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}>
+        <Link href="/quick-entry" data-testid="today-log-link" className="text-sm px-3 py-2 rounded font-semibold" style={{ background: "var(--primary)", color: "oklch(0.10 0.008 60)" }}>
           + Log entry
         </Link>
       </div>

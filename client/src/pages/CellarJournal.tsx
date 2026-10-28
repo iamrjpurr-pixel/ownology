@@ -183,7 +183,7 @@ export function CellarJournalIndex() {
               onClick={() => setLoc("/free-run")}
               data-testid="cj-cta-freerun"
               className="px-6 py-3 rounded-full font-mono text-[11px] uppercase tracking-[0.2em]"
-              style={{ background: "var(--ow-amber)", color: "#1a1410" }}
+              style={{ background: "var(--primary)", color: "#1a1410" }}
             >
               Open Free Run →
             </button>
@@ -431,7 +431,7 @@ export function CellarJournalEntry({ slug }: { slug: string }) {
                 onClick={() => setLoc(`/free-run?q=${encodeURIComponent(entry.question)}&from=cj-${entry.slug}`)}
                 data-testid="cj-cta-scale"
                 className="px-5 py-3 rounded-full font-mono text-[11px] uppercase tracking-[0.22em] text-left flex items-center justify-between flex-1 transition hover:opacity-90"
-                style={{ background: "var(--ow-amber)", color: "#1a1410" }}
+                style={{ background: "var(--primary)", color: "#1a1410" }}
               >
                 <span>
                   <span className="block text-[10px] opacity-70">Free · 5 answers/month</span>

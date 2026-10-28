@@ -716,7 +716,7 @@ export function BulkTab({
             className="w-full h-12"
             onClick={startProcessing}
             disabled={processing || files.every((f) => f.status !== "queued")}
-            style={{ background: "var(--ow-amber)", color: "oklch(0.10 0.008 60)" }}
+            style={{ background: "var(--primary)", color: "oklch(0.10 0.008 60)" }}
             data-testid="bulk-process-btn"
           >
             {processing ? (

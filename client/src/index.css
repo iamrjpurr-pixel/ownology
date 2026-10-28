@@ -111,7 +111,7 @@ html.theme-parchment,
   --ow-text-hi:   oklch(0.16 0.012 60);   /* headings — near-black warm */
   --ow-text-mid:  oklch(0.32 0.010 60);   /* body copy — dark warm grey */
   --ow-text-lo:   oklch(0.44 0.008 60);   /* captions — 4.5:1 on cards */
-  --ow-amber:     oklch(0.50 0.14 62);    /* slightly deeper amber — clears WCAG AA on parchment (was 0.62, 3.4:1) */
+  --ow-amber:     oklch(0.45 0.13 60);    /* slightly deeper amber — clears WCAG AA on parchment (was 0.62, 3.4:1) */
   --ow-border:    oklch(0 0 0 / 0.10);
   --ow-border-md: oklch(0 0 0 / 0.18);
   --ow-shadow:    oklch(0 0 0 / 0.12);
@@ -205,7 +205,7 @@ html.theme-red-crush {
   --ow-text-hi:   oklch(0.06 0.005 0);
   --ow-text-mid:  oklch(0.18 0.005 0);
   --ow-text-lo:   oklch(0.36 0.006 0);
-  --ow-amber:     oklch(0.54 0.18 65);
+  --ow-amber:     oklch(0.46 0.16 60);
   --ow-border:    oklch(0.46 0.20 8 / 0.18); /* rose-cast border */
   --ow-border-md: oklch(0.46 0.20 8 / 0.34);
   --ow-shadow:    oklch(0.40 0.20 8 / 0.18);
@@ -249,7 +249,7 @@ html.theme-white-crush {
   --ow-text-hi:   oklch(0.06 0.005 130);
   --ow-text-mid:  oklch(0.18 0.005 130);
   --ow-text-lo:   oklch(0.36 0.006 130);
-  --ow-amber:     oklch(0.54 0.18 65);
+  --ow-amber:     oklch(0.46 0.16 60);
   --ow-border:    oklch(0.46 0.20 138 / 0.18);
   --ow-border-md: oklch(0.46 0.20 138 / 0.34);
   --ow-shadow:    oklch(0.40 0.20 138 / 0.18);

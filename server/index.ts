@@ -31,6 +31,7 @@ import { adminGuestPassCreateHandler } from "./adminGuestPassCreate.js";
 import { unlockHandler } from "./unlockHandler.js";
 import { marketingCoachEmailHandler } from "./scheduled/marketingCoachEmail.js";
 import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
+import { demoFollowupHandler } from "./scheduled/demoFollowup.js";
 import { generateLipAuditPackPdf } from "./lipAuditPackPdf.js";
 import { generateCellarBookPdf } from "./cellarBookPdf.js";
 import { isDevBypassActive } from "./devBypass.js";
@@ -659,6 +660,8 @@ async function startServer() {
   app.get("/api/scheduled/marketing-coach-email", marketingCoachEmailHandler); // GET allowed for manual triggering / dry-run
   app.post("/api/scheduled/nurture-email", express.json(), nurtureEmailHandler);
   app.get("/api/scheduled/nurture-email", nurtureEmailHandler); // GET allowed for dry-run inspection
+  app.post("/api/scheduled/demo-followup", express.json(), demoFollowupHandler);
+  app.get("/api/scheduled/demo-followup", demoFollowupHandler);
 
   // ── SEO: sitemap + robots + RSS ──────────────────────────────────────────────
   app.get("/api/cellar-journal/sitemap.xml", cellarJournalSitemapHandler);
@@ -1851,6 +1854,7 @@ async function startServer() {
         session_id VARCHAR(64) NOT NULL, slug VARCHAR(120) NULL, question_id VARCHAR(32) NOT NULL,
         answer VARCHAR(16) NOT NULL, created_at BIGINT NOT NULL, PRIMARY KEY (session_id, question_id), INDEX sa_slug_idx (slug))`,
       sql`CREATE TABLE IF NOT EXISTS stripe_events_processed (event_id VARCHAR(80) NOT NULL PRIMARY KEY, created_at BIGINT NOT NULL)`,
+      sql`CREATE TABLE IF NOT EXISTS demo_followups (email VARCHAR(200) NOT NULL PRIMARY KEY, sent_at BIGINT NOT NULL, resend_id VARCHAR(80) NULL)`,
       sql`CREATE TABLE IF NOT EXISTS credit_refunds (
         charge_id VARCHAR(64) NOT NULL PRIMARY KEY, user_id INT NOT NULL,
         credits_reversed INT NOT NULL DEFAULT 0, updated_at BIGINT NOT NULL)`,

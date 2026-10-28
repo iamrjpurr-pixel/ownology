@@ -1856,3 +1856,10 @@ public demo (/how-we-trace) → real cellar → per-vessel event log.**
   "Auto-cycling · slide 1 of 6 · hover to pause", deck auto-advances,
   hover flips caption to "Paused", TS compiles clean.
 
+
+## Jun 2026 — Demo follow-up email
+- New `server/scheduled/demoFollowup.ts` → `GET/POST /api/scheduled/demo-followup` (CRON_SECRET-guarded, `?dryRun=1` supported).
+- Sends ONE Resend email ("Your Brand Vault is one step away") 20h–7d after someone enters their email on the demo (`demo_ask_usage` / `demo_submissions`).
+- Skips: existing users, founding members, outreach contacts who already opened an account from their personal link (e.g. Rod), test emails, anyone already emailed (`demo_followups` table, auto-created on boot).
+- Railway cron added to DEPLOY_TO_RAILWAY.md: `0 23 * * *` UTC (10:00 AEST).
+- Note: credit-pack `charge.refunded` reversal was already implemented in `server/merch/api.ts` (credit_refunds table).

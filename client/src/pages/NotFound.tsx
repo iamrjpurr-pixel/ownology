@@ -61,7 +61,7 @@ export default function NotFound() {
           <Button
             onClick={handleGoHome}
             className="px-6 py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
-            style={{ background: "var(--ow-amber)", color: "#1C1813" }}
+            style={{ background: "var(--primary)", color: "#1C1813" }}
           >
             <Home className="w-4 h-4 mr-2" />
             Go Home

@@ -121,7 +121,7 @@ export default function AdminGuestPasses() {
               marginTop: "1rem",
               fontFamily: "'Lato',sans-serif", fontWeight: 700, fontSize: "0.9rem",
               padding: "0.65rem 1.25rem", borderRadius: 4,
-              background: "var(--ow-amber)", color: "#111", border: 0,
+              background: "var(--primary)", color: "#111", border: 0,
               cursor: busy ? "wait" : "pointer",
             }}
           >

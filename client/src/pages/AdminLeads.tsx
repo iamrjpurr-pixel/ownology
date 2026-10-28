@@ -108,7 +108,7 @@ function NotesCell({ lead, onSave }: { lead: Lead; onSave: (id: number, notes: s
           <button
             onClick={() => { onSave(lead.id, draft); setEditing(false); }}
             className="px-3 py-1 rounded-sm text-xs font-medium"
-            style={{ background: "var(--ow-amber)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif" }}
+            style={{ background: "var(--primary)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif" }}
           >
             Save
           </button>
@@ -255,7 +255,7 @@ function AddLeadModal({ onClose, onAdded }: { onClose: () => void; onAdded: () =
               type="submit"
               disabled={addMutation.isPending}
               className="flex-1 py-2.5 rounded-sm text-sm font-medium"
-              style={{ background: "var(--ow-amber)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif", cursor: addMutation.isPending ? "wait" : "pointer", opacity: addMutation.isPending ? 0.7 : 1 }}
+              style={{ background: "var(--primary)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif", cursor: addMutation.isPending ? "wait" : "pointer", opacity: addMutation.isPending ? 0.7 : 1 }}
             >
               {addMutation.isPending ? "Adding…" : "Add Lead"}
             </button>
@@ -291,7 +291,7 @@ function AccessDenied({ isForbidden }: { isForbidden: boolean }) {
         {isForbidden ? "Owner access required" : "Sign in required"}
       </h1>
       {!isForbidden && (
-        <a href={getLoginUrl()} className="px-6 py-2.5 rounded-sm text-sm" style={{ background: "var(--ow-amber)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif", textDecoration: "none" }}>
+        <a href={getLoginUrl()} className="px-6 py-2.5 rounded-sm text-sm" style={{ background: "var(--primary)", color: "oklch(0.12 0.01 60)", fontFamily: "'Lato',sans-serif", textDecoration: "none" }}>
           Sign in
         </a>
       )}
