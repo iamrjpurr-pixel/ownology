@@ -9,6 +9,7 @@ import { sql } from "drizzle-orm";
 import { createHash } from "crypto";
 import { router, publicProcedure, ownerProcedure } from "../trpc.js";
 import { db } from "../db.js";
+import { sendOperatorTelegram } from "../telegram.js";
 
 const hashIp = (raw: string | null | undefined) => createHash("sha256").update(raw || "unknown").digest("hex").slice(0, 32);
 
@@ -47,24 +48,6 @@ async function alertFirstVisit(slug: string) {
       text: `${c.first_name}${c.winery ? ` from ${c.winery}` : ""} is on the site right now.\n\nWatch their clicks live: ${PROD_URL}/admin/activity?slug=${encodeURIComponent(slug)}`,
     }),
   }).catch(() => {});
-}
-
-// Telegram push to the operator; chat id from env or captured once into operator_settings.
-async function sendOperatorTelegram(text: string) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  if (!token) return;
-  let chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!chatId) {
-    const [row] = await rows<{ value: string }>(sql`SELECT value FROM operator_settings WHERE name = 'telegram_chat_id' LIMIT 1`);
-    chatId = row?.value;
-  }
-  if (!chatId) return;
-  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
-  });
-  if (!res.ok) console.error("[events] Telegram alert failed:", res.status, (await res.text()).slice(0, 200));
 }
 
 // One-shot "tell me when they're back" alerts; rows in member_watches (user_id and/or ?from= tag).

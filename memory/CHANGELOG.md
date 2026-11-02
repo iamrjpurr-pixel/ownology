@@ -1869,3 +1869,11 @@ public demo (/how-we-trace) → real cellar → per-vessel event log.**
 - Rod watch armed: user 52, tag `rod-email`.
 - Phone push via Telegram bot @ownology1bot (Twilio dropped). TELEGRAM_BOT_TOKEN set in Emergent + Railway; chat id stored in operator_settings.telegram_chat_id. OPERATOR_ALERT_EMAIL added on Railway. Verified end-to-end on www.ownology.ai (Telegram + email received).
 - /know?for=slug now calls outreach.markViewed (once per tab); Rod's view_count backfilled to 6.
+
+## Jun 2026 — Outreach copilot (Telegram)
+- `server/outreachCopilot.ts` + `server/telegram.ts`. Daily 7:30am Sydney: 5 prospect cards to @ownology1bot (follow-ups of opened-but-silent first, then never-contacted; email preferred, else SMS). AI-drafted from hook (gpt-5.4-mini via chatCompletion, template fallback).
+- Buttons: Send email (Resend from richard@ownology.ai, reply-to richard+iamrjpurr, unsubscribe link + List-Unsubscribe), Open Messages (signed /api/outreach/sms/:id → sms: redirect) + "I sent it", Skip, Later (7d), Not a fit (status=skip).
+- Commands: /more (3 cards), /score. Friday scoreboard auto.
+- Webhook `/api/telegram/webhook` (secret = sha256 of token), registered + 10-min scheduler ONLY on Railway (RAILWAY_ENVIRONMENT). Once-per-day guard: operator_settings.copilot_last_run.
+- New: outreach_cards table, outreach_contacts.unsubscribed_at, /api/outreach/unsubscribe, /api/scheduled/outreach-cards (?dryRun=1, ?force=1).
+- server/_core/loadBackendEnv.ts loads backend/.env (secrets card) in preview.

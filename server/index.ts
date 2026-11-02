@@ -1,4 +1,5 @@
 import "dotenv/config";
+import "./_core/loadBackendEnv.js";
 import "./_core/forgeShim.js";
 import express from "express";
 import { createServer } from "http";
@@ -32,6 +33,7 @@ import { unlockHandler } from "./unlockHandler.js";
 import { marketingCoachEmailHandler } from "./scheduled/marketingCoachEmail.js";
 import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
 import { demoFollowupHandler } from "./scheduled/demoFollowup.js";
+import { registerOutreachCopilot, startOutreachCopilot } from "./outreachCopilot.js";
 import { generateLipAuditPackPdf } from "./lipAuditPackPdf.js";
 import { generateCellarBookPdf } from "./cellarBookPdf.js";
 import { isDevBypassActive } from "./devBypass.js";
@@ -662,6 +664,7 @@ async function startServer() {
   app.get("/api/scheduled/nurture-email", nurtureEmailHandler); // GET allowed for dry-run inspection
   app.post("/api/scheduled/demo-followup", express.json(), demoFollowupHandler);
   app.get("/api/scheduled/demo-followup", demoFollowupHandler);
+  registerOutreachCopilot(app);
 
   // ── SEO: sitemap + robots + RSS ──────────────────────────────────────────────
   app.get("/api/cellar-journal/sitemap.xml", cellarJournalSitemapHandler);
@@ -1856,6 +1859,9 @@ async function startServer() {
       sql`CREATE TABLE IF NOT EXISTS stripe_events_processed (event_id VARCHAR(80) NOT NULL PRIMARY KEY, created_at BIGINT NOT NULL)`,
       sql`CREATE TABLE IF NOT EXISTS member_watches (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NULL, tag VARCHAR(80) NULL,
         label VARCHAR(200) NOT NULL, created_at BIGINT NOT NULL, fired_at BIGINT NULL)`,
+      sql`CREATE TABLE IF NOT EXISTS outreach_cards (id INT AUTO_INCREMENT PRIMARY KEY, contact_id INT NOT NULL, kind VARCHAR(16) NOT NULL,
+        channel VARCHAR(8) NOT NULL, subject VARCHAR(200) NULL, body TEXT NOT NULL, status VARCHAR(16) NOT NULL, created_at BIGINT NOT NULL,
+        acted_at BIGINT NULL, telegram_message_id BIGINT NULL, INDEX idx_oc_contact (contact_id))`,
       sql`CREATE TABLE IF NOT EXISTS operator_settings (name VARCHAR(80) NOT NULL PRIMARY KEY, value VARCHAR(500) NOT NULL, updated_at BIGINT NOT NULL)`,
       sql`CREATE TABLE IF NOT EXISTS demo_followups (email VARCHAR(200) NOT NULL PRIMARY KEY, sent_at BIGINT NOT NULL, resend_id VARCHAR(80) NULL)`,
       sql`CREATE TABLE IF NOT EXISTS credit_refunds (
@@ -1869,6 +1875,13 @@ async function startServer() {
         console.warn("[bootstrap] brand vault table create skipped:", (e as Error).message);
       }
     }
+
+    try {
+      await db.execute(sql`ALTER TABLE outreach_contacts ADD COLUMN unsubscribed_at BIGINT NULL`);
+    } catch (e) {
+      if (!/duplicate column/i.test(String((e as { cause?: Error }).cause?.message ?? (e as Error).message))) console.warn("[bootstrap] outreach_contacts.unsubscribed_at:", (e as Error).message);
+    }
+    startOutreachCopilot();
 
     // ── Naked Angel SMS opener variant (Feb 2026) ────────────────────
     // Cohort-specific lens for Naked Wines "Angels" — winemakers who

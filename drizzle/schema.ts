@@ -1500,6 +1500,7 @@ export const outreachContacts = mysqlTable(
     // alert again for this slug (even on view 10 or 20) so the operator
     // doesn't get spammed by a curious re-visitor.
     hotAlertSentAt: bigint("hot_alert_sent_at", { mode: "number" }),
+    unsubscribedAt: bigint("unsubscribed_at", { mode: "number" }),
   },
   (t) => [
     index("oc_slug_idx").on(t.slug),
