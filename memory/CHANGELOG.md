@@ -1867,5 +1867,5 @@ public demo (/how-we-trace) → real cellar → per-vessel event log.**
 ## Jun 2026 — Return alerts (watch list)
 - `member_watches` table (user_id and/or ?from= tag, one-shot). Checked in `events.batch` (server/routers/eventsRouter.ts) → email alert + optional Twilio SMS.
 - Rod watch armed: user 52, tag `rod-email`.
-- Phone push switched to Telegram (Twilio dropped). Needs TELEGRAM_BOT_TOKEN (NOT SET — user skipped); chat id from TELEGRAM_CHAT_ID or operator_settings.telegram_chat_id (capture via getUpdates after user messages the bot).
+- Phone push via Telegram bot @ownology1bot (Twilio dropped). TELEGRAM_BOT_TOKEN set in Emergent + Railway; chat id stored in operator_settings.telegram_chat_id. OPERATOR_ALERT_EMAIL added on Railway. Verified end-to-end on www.ownology.ai (Telegram + email received).
 - /know?for=slug now calls outreach.markViewed (once per tab); Rod's view_count backfilled to 6.
