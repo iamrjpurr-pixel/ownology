@@ -49,6 +49,24 @@ async function alertFirstVisit(slug: string) {
   }).catch(() => {});
 }
 
+// Telegram push to the operator; chat id from env or captured once into operator_settings.
+async function sendOperatorTelegram(text: string) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return;
+  let chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!chatId) {
+    const [row] = await rows<{ value: string }>(sql`SELECT value FROM operator_settings WHERE name = 'telegram_chat_id' LIMIT 1`);
+    chatId = row?.value;
+  }
+  if (!chatId) return;
+  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
+  });
+  if (!res.ok) console.error("[events] Telegram alert failed:", res.status, (await res.text()).slice(0, 200));
+}
+
 // One-shot "tell me when they're back" alerts; rows in member_watches (user_id and/or ?from= tag).
 async function checkWatches(userId: number | null, details: string[]) {
   const watches = await rows<{ id: number; user_id: number | null; tag: string | null; label: string }>(sql`
@@ -58,10 +76,11 @@ async function checkWatches(userId: number | null, details: string[]) {
     if (!viaTag && !(userId && w.user_id === userId)) continue;
     const [upd] = await db.execute(sql`UPDATE member_watches SET fired_at = ${Date.now()} WHERE id = ${w.id} AND fired_at IS NULL`);
     if ((upd as unknown as { affectedRows: number }).affectedRows !== 1) continue;
-    const alertTo = process.env.OPERATOR_ALERT_EMAIL || process.env.OWNER_EMAIL;
+    const watchLink = w.user_id ? `${PROD_URL}/admin/activity?user=${w.user_id}` : `${PROD_URL}/admin/activity`;
+    void sendOperatorTelegram(`🔔 ${w.label} is back on Ownology${viaTag ? " (clicked your email)" : ""}.\n\nWatch live: ${watchLink}`).catch((err) => console.error("[events] Telegram alert error:", err));
+    const alertTo = process.env.OPERATOR_ALERT_EMAIL || process.env.OWNER_EMAIL || process.env.ADMIN_EMAILS?.split(",")[0]?.trim();
     const key = process.env.RESEND_API_KEY;
     if (!alertTo || !key) continue;
-    const watchLink = w.user_id ? `${PROD_URL}/admin/activity?user=${w.user_id}` : `${PROD_URL}/admin/activity`;
     fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },

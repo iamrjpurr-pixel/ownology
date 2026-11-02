@@ -1863,3 +1863,9 @@ public demo (/how-we-trace) → real cellar → per-vessel event log.**
 - Skips: existing users, founding members, outreach contacts who already opened an account from their personal link (e.g. Rod), test emails, anyone already emailed (`demo_followups` table, auto-created on boot).
 - Railway cron added to DEPLOY_TO_RAILWAY.md: `0 23 * * *` UTC (10:00 AEST).
 - Note: credit-pack `charge.refunded` reversal was already implemented in `server/merch/api.ts` (credit_refunds table).
+
+## Jun 2026 — Return alerts (watch list)
+- `member_watches` table (user_id and/or ?from= tag, one-shot). Checked in `events.batch` (server/routers/eventsRouter.ts) → email alert + optional Twilio SMS.
+- Rod watch armed: user 52, tag `rod-email`.
+- Phone push switched to Telegram (Twilio dropped). Needs TELEGRAM_BOT_TOKEN (NOT SET — user skipped); chat id from TELEGRAM_CHAT_ID or operator_settings.telegram_chat_id (capture via getUpdates after user messages the bot).
+- /know?for=slug now calls outreach.markViewed (once per tab); Rod's view_count backfilled to 6.

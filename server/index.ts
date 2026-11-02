@@ -1856,6 +1856,7 @@ async function startServer() {
       sql`CREATE TABLE IF NOT EXISTS stripe_events_processed (event_id VARCHAR(80) NOT NULL PRIMARY KEY, created_at BIGINT NOT NULL)`,
       sql`CREATE TABLE IF NOT EXISTS member_watches (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NULL, tag VARCHAR(80) NULL,
         label VARCHAR(200) NOT NULL, created_at BIGINT NOT NULL, fired_at BIGINT NULL)`,
+      sql`CREATE TABLE IF NOT EXISTS operator_settings (name VARCHAR(80) NOT NULL PRIMARY KEY, value VARCHAR(500) NOT NULL, updated_at BIGINT NOT NULL)`,
       sql`CREATE TABLE IF NOT EXISTS demo_followups (email VARCHAR(200) NOT NULL PRIMARY KEY, sent_at BIGINT NOT NULL, resend_id VARCHAR(80) NULL)`,
       sql`CREATE TABLE IF NOT EXISTS credit_refunds (
         charge_id VARCHAR(64) NOT NULL PRIMARY KEY, user_id INT NOT NULL,
