@@ -49,6 +49,32 @@ async function alertFirstVisit(slug: string) {
   }).catch(() => {});
 }
 
+// One-shot "tell me when they're back" alerts; rows in member_watches (user_id and/or ?from= tag).
+async function checkWatches(userId: number | null, details: string[]) {
+  const watches = await rows<{ id: number; user_id: number | null; tag: string | null; label: string }>(sql`
+    SELECT id, user_id, tag, label FROM member_watches WHERE fired_at IS NULL`);
+  for (const w of watches) {
+    const viaTag = !!w.tag && details.some((d) => d.includes(`from=${w.tag}`));
+    if (!viaTag && !(userId && w.user_id === userId)) continue;
+    const [upd] = await db.execute(sql`UPDATE member_watches SET fired_at = ${Date.now()} WHERE id = ${w.id} AND fired_at IS NULL`);
+    if ((upd as unknown as { affectedRows: number }).affectedRows !== 1) continue;
+    const alertTo = process.env.OPERATOR_ALERT_EMAIL || process.env.OWNER_EMAIL;
+    const key = process.env.RESEND_API_KEY;
+    if (!alertTo || !key) continue;
+    const watchLink = w.user_id ? `${PROD_URL}/admin/activity?user=${w.user_id}` : `${PROD_URL}/admin/activity`;
+    fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: process.env.RESEND_FROM || "Ownology Alerts <alerts@ownology.ai>",
+        to: [alertTo],
+        subject: `🔔 ${w.label} is back on Ownology${viaTag ? " — from your email" : ""}`,
+        text: `${w.label} just came back${viaTag ? " by clicking the link in your email" : ""}. They're on the site right now.\n\nWatch their clicks live: ${watchLink}`,
+      }),
+    }).catch(() => {});
+  }
+}
+
 const eventInput = z.object({
   event: z.enum(["page_view", "click", "section_view", "guide_step", "custom"]),
   path: z.string().max(300),
@@ -85,6 +111,7 @@ export const eventsRouter = router({
           INSERT INTO user_events (user_id, slug, session_id, path, event, detail, ip_hash, created_at)
           VALUES (${userId}, ${slug}, ${input.sessionId}, ${e.path}, ${e.event}, ${e.detail}, ${ip}, ${at})`);
       }
+      if (!isOperator) await checkWatches(userId, input.events.filter((e) => e.event === "page_view").map((e) => e.detail)).catch((err) => console.error("[events] watch check failed:", err));
       return { ok: true, inviteValid: input.invite ? !!slug || isOperator : undefined };
     }),
 
