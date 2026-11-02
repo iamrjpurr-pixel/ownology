@@ -60,6 +60,7 @@ export default function KnowSurvey() {
   const who = trpc.demo.personalise.useQuery({ invite: invite ?? "" }, { enabled: !!invite });
   const save = trpc.demo.surveyAnswer.useMutation();
   const complete = trpc.demo.surveyComplete.useMutation();
+  const markViewed = trpc.outreach.markViewed.useMutation();
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState<Record<string, SurveyAnswer>>({});
   const done = i >= SURVEY.length;
@@ -77,6 +78,14 @@ export default function KnowSurvey() {
     if (pre === "yes" || pre === "unsure" || pre === "no") answer(pre, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!invite) return;
+    const key = `ow_know_viewed_${invite}`;
+    try { if (sessionStorage.getItem(key)) return; sessionStorage.setItem(key, "1"); } catch { /* private mode */ }
+    markViewed.mutate({ slug: invite });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invite]);
 
   // New question → back to the top, so phones never open mid-page.
   useEffect(() => { window.scrollTo({ top: 0 }); }, [i]);
