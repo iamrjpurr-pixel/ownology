@@ -4,6 +4,12 @@ type Ev = { event: "page_view" | "click" | "section_view" | "guide_step" | "cust
 
 const SESSION_KEY = "ow_track_session";
 const INVITE_KEY = "ow_track_invite";
+const OPERATOR_KEY = "ow_operator";
+
+// Set once an admin signs in on this browser; stops our own visits counting as a prospect's.
+export function isOperatorDevice(): boolean {
+  try { return localStorage.getItem(OPERATOR_KEY) === "1"; } catch { return false; }
+}
 let queue: Ev[] = [];
 let timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -25,16 +31,21 @@ function flush() {
   timer = null;
   if (!queue.length) return;
   const events = queue.splice(0, 50);
-  const invite = localStorage.getItem(INVITE_KEY) ?? undefined;
+  const operator = isOperatorDevice();
+  const invite = operator ? undefined : localStorage.getItem(INVITE_KEY) ?? undefined;
   fetch("/api/trpc/events.batch", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
     keepalive: true,
-    body: JSON.stringify({ json: { sessionId: sessionId(), invite, events } }),
+    body: JSON.stringify({ json: { sessionId: sessionId(), invite, operator, events } }),
   })
     .then((r) => r.json())
-    .then((d) => { if (d?.result?.data?.json?.inviteValid === false) localStorage.removeItem(INVITE_KEY); })
+    .then((d) => {
+      const r = d?.result?.data?.json;
+      if (r?.inviteValid === false) localStorage.removeItem(INVITE_KEY);
+      if (r?.operator) { localStorage.setItem(OPERATOR_KEY, "1"); localStorage.removeItem(INVITE_KEY); }
+    })
     .catch(() => {});
   if (queue.length) flush();
 }

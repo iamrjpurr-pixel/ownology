@@ -106,6 +106,7 @@ export const eventsRouter = router({
     .input(z.object({
       sessionId: z.string().min(8).max(64),
       invite: z.string().trim().max(120).optional(),
+      operator: z.boolean().optional(),
       events: z.array(eventInput).min(1).max(50),
     }))
     .mutation(async ({ input, ctx }) => {
@@ -113,7 +114,8 @@ export const eventsRouter = router({
       const ip = hashIp(typeof xff === "string" && xff ? xff.split(",")[0]!.trim() : ctx.req.socket?.remoteAddress);
       if (!allowIp(ip, input.events.length)) return { ok: false };
       let slug: string | null = null;
-      const isOperator = ctx.user?.role === "admin";
+      const isAdmin = ctx.user?.role === "admin";
+      const isOperator = isAdmin || input.operator === true;
       if (input.invite && !isOperator) {
         const [c] = await rows<{ slug: string }>(sql`SELECT slug FROM outreach_contacts WHERE slug = ${input.invite} LIMIT 1`);
         slug = c?.slug ?? null;
@@ -131,7 +133,9 @@ export const eventsRouter = router({
           VALUES (${userId}, ${slug}, ${input.sessionId}, ${e.path}, ${e.event}, ${e.detail}, ${ip}, ${at})`);
       }
       if (!isOperator) await checkWatches(userId, input.events.filter((e) => e.event === "page_view").map((e) => e.detail)).catch((err) => console.error("[events] watch check failed:", err));
-      return { ok: true, inviteValid: input.invite ? !!slug || isOperator : undefined };
+      // Signed-in admin: un-attribute anything this browser session logged under a prospect's link.
+      if (isAdmin) await db.execute(sql`UPDATE user_events SET slug = NULL WHERE session_id = ${input.sessionId} AND slug IS NOT NULL`);
+      return { ok: true, inviteValid: input.invite ? !!slug || isOperator : undefined, operator: isAdmin || undefined };
     }),
 
   people: ownerProcedure.query(async () => {

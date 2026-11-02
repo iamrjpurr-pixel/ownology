@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
-import { sessionId } from "@/lib/track";
+import { sessionId, isOperatorDevice } from "@/lib/track";
 import { SURVEY, ANSWER_LABEL, type SurveyAnswer } from "@/components/survey/surveyData";
 
 const eyebrow = "text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ow-amber)]";
@@ -80,7 +80,7 @@ export default function KnowSurvey() {
   }, []);
 
   useEffect(() => {
-    if (!invite) return;
+    if (!invite || isOperatorDevice()) return;
     const key = `ow_know_viewed_${invite}`;
     try { if (sessionStorage.getItem(key)) return; sessionStorage.setItem(key, "1"); } catch { /* private mode */ }
     markViewed.mutate({ slug: invite });

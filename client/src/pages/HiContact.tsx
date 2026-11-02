@@ -29,6 +29,7 @@
  * link in /admin/contacts.
  */
 import { CSSProperties, useEffect, useRef, useState } from "react";
+import { isOperatorDevice } from "@/lib/track";
 import { useRoute, Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAutoCascade } from "@/hooks/useAutoCascade";
@@ -86,7 +87,7 @@ export default function HiContact() {
   });
 
   useEffect(() => {
-    if (!contact?.slug || fired.current) return;
+    if (!contact?.slug || fired.current || isOperatorDevice()) return;
     fired.current = true;
     markViewed.mutate({ slug: contact.slug });
   }, [contact?.slug]);
