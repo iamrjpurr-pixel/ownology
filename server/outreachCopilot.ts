@@ -12,6 +12,7 @@ import { replyAddress } from "./inboundReplies.js";
 import { buildWaHref } from "./routers/outreach-helpers.js";
 import { smsEnabled, sendSms, auMobile } from "./sms.js";
 import { isRealEvent } from "../shared/outreachSource.js";
+import { refreshIndustryNews, industryNewsText, winerySpecificNews, decideNews, jsonOf } from "./outreachNews.js";
 
 const PROD_URL = (process.env.OWNOLOGY_PROD_URL || "https://www.ownology.ai").replace(/\/$/, "");
 const DAY = 24 * 60 * 60 * 1000;
@@ -25,7 +26,7 @@ type Contact = {
   hook_text: string | null; pain_point: string | null; event: string | null; region: string | null; view_count: number;
 };
 type AutoKind = "auto1" | "auto2" | "revive";
-type Card = { id: number; contact_id: number; kind: "first" | "followup" | "reply" | "hot" | AutoKind; channel: "email" | "sms"; subject: string | null; body: string; status: string };
+type Card = { id: number; contact_id: number; kind: "first" | "followup" | "reply" | "hot" | "news" | AutoKind; channel: "email" | "sms"; subject: string | null; body: string; status: string };
 
 const rows = async <T,>(q: ReturnType<typeof sql>) => ((await db.execute(q))[0] as unknown as T[]);
 const sign = (v: string) => createHmac("sha256", process.env.JWT_SECRET || process.env.TELEGRAM_BOT_TOKEN || "ow").update(v).digest("hex").slice(0, 24);
@@ -154,7 +155,7 @@ export async function pickAutoFollowups(cap: number, now = Date.now()): Promise<
       (SELECT MAX(e.created_at) FROM user_events e WHERE e.slug = c.slug) last_seen
     FROM outreach_contacts c
     WHERE ${BASE_FILTER} AND ((c.email IS NOT NULL AND c.email <> '') OR ${sql.raw(smsEnabled() ? "(c.mobile_au IS NOT NULL AND c.mobile_au <> '')" : "FALSE")}) AND ${TOUCHED} IS NOT NULL
-      AND NOT EXISTS (SELECT 1 FROM outreach_cards k WHERE k.contact_id = c.id AND (k.status IN ('pending','queued','sending') OR (k.kind = 'hot' AND k.status = 'sent' AND k.acted_at > ${now - 4 * DAY})))`);
+      AND NOT EXISTS (SELECT 1 FROM outreach_cards k WHERE k.contact_id = c.id AND (k.status IN ('pending','queued','sending') OR (k.kind IN ('hot','news') AND k.status = 'sent' AND k.acted_at > ${now - 4 * DAY})))`);
   const out: { contact: Contact; kind: AutoKind; opened: boolean; order: number }[] = [];
   for (const c of cs) {
     if (c.a2) continue;
@@ -196,7 +197,7 @@ async function dailyCaps(): Promise<{ follow: number; texts: number; emails: num
   return days < 7 ? { follow: 10, texts: 8, emails: 10 } : days < 14 ? { follow: 15, texts: 15, emails: 15 } : { follow: 25, texts: 25, emails: 25 };
 }
 
-const AUTO_LABEL: Record<AutoKind | "first", string> = { first: "first text", revive: "fresh nudge", auto1: "day-4 follow-up", auto2: "final note" };
+const AUTO_LABEL: Record<AutoKind | "first" | "news", string> = { news: "news note", first: "first text", revive: "fresh nudge", auto1: "day-4 follow-up", auto2: "final note" };
 
 const PREVIEW_MINUTES = 30;
 
@@ -224,6 +225,7 @@ export async function prepareAutoBatch(): Promise<number> {
       console.error(`[copilot] draft ${kind} for ${contact.slug} failed:`, err);
     }
   }
+  lines.push(...(await draftNewsCards(used).catch((err) => { console.error("[copilot] news notes failed:", err); return [] as string[]; })));
   if (!lines.length) return 0;
   const at = new Date(Date.now() + PREVIEW_MINUTES * 60_000).toLocaleTimeString("en-AU", { timeZone: "Australia/Sydney", hour: "numeric", minute: "2-digit" });
   await sendOperatorTelegram(`👀 ${lines.length} automatic messages go out at ${at}.\nTo drop some, reply e.g. /remove 123 456 (the # numbers). To stop them all, tap Hold.`);
@@ -235,6 +237,47 @@ export async function prepareAutoBatch(): Promise<number> {
   if (chunk) await sendOperatorTelegram(chunk);
   await sendOperatorTelegram(`Sending at ${at} unless you hold them.`, [[{ text: "⏸ Hold all", callback_data: "oc:hold:0" }, { text: "▶️ Send now", callback_data: "oc:release:0" }]]);
   return lines.length;
+}
+
+// "Saw this and thought of you": research a few quiet prospects a day, AI decides if the news is worth a note.
+const NEWS_DAILY = 4;
+async function draftNewsCards(used: Set<string>, now = Date.now()): Promise<string[]> {
+  if (!process.env.PERPLEXITY_API_KEY) return [];
+  await refreshIndustryNews(now).catch((err) => console.error("[copilot] industry news scan failed:", err));
+  const industry = await industryNewsText(now);
+  const cs = await rows<Contact & { touched: number }>(sql`SELECT ${COLS}, ${TOUCHED} touched FROM outreach_contacts c
+    WHERE ${BASE_FILTER} AND ${TOUCHED} IS NOT NULL AND c.winery IS NOT NULL AND c.winery <> ''
+      AND NOT EXISTS (SELECT 1 FROM outreach_cards k WHERE k.contact_id = c.id AND (k.status IN ('pending','queued','sending') OR (k.status = 'sent' AND k.acted_at > ${now - 10 * DAY}) OR (k.kind = 'news' AND k.created_at > ${now - 30 * DAY})))
+      AND ${TOUCHED} < ${now - 7 * DAY}
+    ORDER BY COALESCE(c.view_count,0) DESC, ${TOUCHED} ASC LIMIT ${NEWS_DAILY * 2}`);
+  const lines: string[] = [];
+  let researched = 0;
+  for (const c of cs) {
+    if (researched >= NEWS_DAILY) break;
+    const address = (c.email || auMobile(c.mobile_au) || "").toLowerCase();
+    if (!address || used.has(address)) continue;
+    researched++;
+    try {
+      const own = await winerySpecificNews(c.winery!, c.region);
+      const past = await rows<{ channel: string; subject: string | null; body: string }>(sql`SELECT channel, subject, body FROM outreach_cards WHERE contact_id = ${c.id} AND status = 'sent' ORDER BY id DESC LIMIT 2`);
+      const context = [`Prospect: ${c.first_name}, ${c.winery}${c.region ? ` (${c.region})` : ""}`, `Contact: ${c.email ? `email ${c.email}` : "SMS only"}`,
+        c.hook_text && `Personal hook: ${c.hook_text}`, `News about their winery (last 45 days):\n${own || "none found"}`, `Australian wine industry news (last 2 weeks):\n${industry || "none"}`,
+        past.length && `What we've already sent them:\n${past.map((p) => `- ${p.channel}: ${p.subject ?? ""} ${p.body.slice(0, 300)}`).join("\n")}`].filter(Boolean).join("\n\n");
+      const d = await decideNews(context);
+      const channel: Card["channel"] = c.email ? "email" : "sms";
+      const ok = d.decision === "send" && !!d.body?.includes("{URL}") && (channel === "email" || d.body.length <= 260);
+      const [ins] = await db.execute(sql`INSERT INTO outreach_cards (contact_id, kind, channel, subject, body, status, created_at)
+        VALUES (${c.id}, 'news', ${channel}, ${ok ? (d.subject ?? "").slice(0, 200) || null : null}, ${ok ? d.body! : `[skipped] ${d.reason}`}, ${ok ? "queued" : "skipped"}, ${Date.now()})`);
+      if (!ok) continue;
+      used.add(address);
+      const id = (ins as unknown as { insertId: number }).insertId;
+      const text = channel === "sms" ? smsText(c, d.body!) : `Subject: ${d.subject}\n${d.body!.replace("{URL}", pageUrl(c))}`;
+      lines.push(`#${id} ${channel === "email" ? "✉️" : "📱"} ${c.first_name} (${c.winery}) · 📰 news note\nWhy: ${d.reason}\n${text}`);
+    } catch (err) {
+      console.error(`[copilot] news note for ${c.slug} failed:`, err);
+    }
+  }
+  return lines;
 }
 
 const holdDate = async () => (await rows<{ value: string }>(sql`SELECT value FROM operator_settings WHERE name = 'copilot_hold'`))[0]?.value ?? "";
@@ -257,7 +300,7 @@ export async function sendDueQueued(immediate = false): Promise<string[]> {
     try {
       const ref = card.channel === "email" ? await sendCardEmail(contact, card) : await sendSms(contact.mobile_au!, smsText(contact, card.body), `card:${card.id}`);
       await db.execute(sql`UPDATE outreach_cards SET status = 'sent', acted_at = ${Date.now()} WHERE id = ${card.id}`);
-      await markTouched(contact, card, `Auto ${AUTO_LABEL[card.kind as AutoKind | "first"] ?? card.kind} ${card.channel === "email" ? "emailed" : "texted"} (${ref})`);
+      await markTouched(contact, card, `Auto ${AUTO_LABEL[card.kind as AutoKind | "first" | "news"] ?? card.kind} ${card.channel === "email" ? "emailed" : "texted"} (${ref})`);
       sent.push(`• ${card.channel === "email" ? "✉️" : "📱"} ${contact.first_name}${contact.winery ? ` (${contact.winery})` : ""}`);
     } catch (err) {
       console.error(`[copilot] send card ${card.id} failed:`, err);
@@ -413,12 +456,10 @@ export async function decideHot(c: HotCandidate): Promise<HotDecision> {
     { role: "system", content: `You are the sales judgement for Rich & Gel, Australian founders of Ownology (Brand Vault + quality records + 'Ask Owen' AI for boutique winemakers). A prospect keeps opening their personal page but hasn't replied. Look at ALL the evidence and decide like a thoughtful founder, not a spammer.
 Decide "send" only if a well-timed personal note now is likely welcome: real repeated interest (several sessions or pages beyond the landing page, spread over time), enough gap since our last message, sensible local hour (8am-7pm Sydney). Decide "wait" if the signal may be fake (all views within a minute or two, likely a link scanner or forwarded email), if we messaged them very recently, or it's a bad time; "skip" if more contact would be pushy (e.g. we've already sent a final 'closing the loop' note) or the evidence says not a fit.
 If sending: pick the channel (sms only if a mobile is on file; for a shared winery inbox, write so whoever reads it can pass it on). Reference what they actually looked at, lightly, without sounding like surveillance (never say "I saw you viewed 3 times"; say e.g. "thought it might be worth a quick chat"). Offer ONE concrete low-effort next step (we load their current wines into a vault for them, or a 15-minute walkthrough). Plain warm Australian English, zero hype. They have NOT met us; never say "good to meet you"/"we chatted". Email: 50-100 words, start "G'day <first name>,", sign "Cheers,\\nRich & Gel", subject max 60 chars, include {URL} on its own line. SMS: max 200 chars, from Rich at Ownology, include {URL} once.
-Reply with ONLY the JSON object, no other text: {"decision":"send"|"wait"|"skip","reason":"one sentence for Rich explaining why","channel":"email"|"sms","subject":string,"body":string}` },
+Do your thinking silently. Your entire reply must be ONLY this JSON object, starting with {: {"decision":"send"|"wait"|"skip","reason":"one sentence for Rich explaining why","channel":"email"|"sms","subject":string,"body":string}` },
     { role: "user", content: await hotContext(c) },
-  ], { model: MODELS.PREMIUM, json: true, maxTokens: 700, temperature: 0.4, source: "outreach-hot" });
-  const m = raw.match(/\{[\s\S]*\}/);
-  if (!m) throw new Error(`No JSON in hot decision: ${raw.slice(0, 80)}`);
-  const j = JSON.parse(m[0]) as HotDecision;
+  ], { model: MODELS.PREMIUM, json: true, maxTokens: 1500, temperature: 0.3, source: "outreach-hot" });
+  const j = jsonOf<HotDecision>(raw);
   if (j.decision === "send" && (!j.body?.includes("{URL}") || (j.channel === "sms" ? !auMobile(c.mobile_au) : !c.email))) {
     j.channel = c.email ? "email" : "sms";
     if (!j.body?.includes("{URL}") || (j.channel === "sms" && !auMobile(c.mobile_au))) return { decision: "wait", reason: `Draft unusable (${j.reason})` };

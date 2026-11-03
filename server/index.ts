@@ -1866,6 +1866,8 @@ async function startServer() {
         channel VARCHAR(8) NOT NULL, subject VARCHAR(200) NULL, body TEXT NOT NULL, status VARCHAR(16) NOT NULL, created_at BIGINT NOT NULL,
         acted_at BIGINT NULL, telegram_message_id BIGINT NULL, INDEX idx_oc_contact (contact_id))`,
       sql`CREATE TABLE IF NOT EXISTS operator_settings (name VARCHAR(80) NOT NULL PRIMARY KEY, value VARCHAR(500) NOT NULL, updated_at BIGINT NOT NULL)`,
+      sql`CREATE TABLE IF NOT EXISTS outreach_news (id INT AUTO_INCREMENT PRIMARY KEY, scope VARCHAR(80) NOT NULL, headline VARCHAR(300) NOT NULL,
+        summary TEXT NULL, url VARCHAR(500) NOT NULL, news_date VARCHAR(10) NULL, created_at BIGINT NOT NULL)`,
       sql`CREATE TABLE IF NOT EXISTS demo_followups (email VARCHAR(200) NOT NULL PRIMARY KEY, sent_at BIGINT NOT NULL, resend_id VARCHAR(80) NULL)`,
       sql`CREATE TABLE IF NOT EXISTS credit_refunds (
         charge_id VARCHAR(64) NOT NULL PRIMARY KEY, user_id INT NOT NULL,
