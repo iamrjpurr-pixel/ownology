@@ -113,7 +113,7 @@ export default function Curriculum() {
                     <h3 className="font-serif text-xl text-stone-900 leading-snug mb-2 group-hover:text-stone-700">
                       {l.title}
                     </h3>
-                    <p className="text-sm text-stone-600 line-clamp-2 leading-relaxed">{l.aim}</p>
+                    <p className="text-sm text-stone-600 line-clamp-2 leading-relaxed">{l.aim?.replace(/ (\S+)$/, "\u00a0$1")}</p>
 
                     <div className="mt-3 flex items-center text-sm text-stone-600 group-hover:text-stone-800">
                       Read lesson

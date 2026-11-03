@@ -518,7 +518,7 @@ export default function ForHomeWinemakers() {
             }}
           >
             Your garage cellar's<br />
-            <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>most knowledgeable friend.</em>
+            <em style={{ color: "var(--ow-amber)", fontStyle: "italic" }}>most knowledgeable friend.</em>
           </h1>
           <p
             style={{

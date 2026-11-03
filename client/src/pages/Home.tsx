@@ -1877,7 +1877,7 @@ function CTA() {
       <div className="container relative z-10 text-center">
         <p className="section-label mb-6">Get Started</p>
         <h2 style={{fontFamily:"'Fraunces',serif", fontWeight:700, fontSize:"clamp(2rem,4.5vw,3.5rem)", color:"var(--ow-text-hi)", lineHeight:1.1, letterSpacing:"-0.02em", maxWidth:"640px", margin:"0 auto", textWrap: 'balance' as 'balance'}}>
-          Your winery's most knowledgeable apprentice is ready.
+          Your winery's most knowledgeable apprentice is ready.
         </h2>
         <p className="mt-6 mx-auto" style={{fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:"1.125rem", color:"var(--ow-text-mid)", maxWidth:"480px", lineHeight:1.7}}>
           Start your 14-day free trial. No credit card. No setup fee. Cancel anytime.

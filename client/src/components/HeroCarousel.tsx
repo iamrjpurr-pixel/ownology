@@ -338,7 +338,7 @@ export default function HeroCarousel({ onSkip }: { onSkip?: () => void }) {
         <h2 style={h1}>
           Your winery&rsquo;s most
           <br />
-          <span style={{ color: "var(--ow-amber)" }}>knowledgeable apprentice</span> is ready.
+          <span style={{ color: "var(--ow-amber)" }}>knowledgeable apprentice</span> is ready.
         </h2>
         <p style={{ fontFamily: "'Lato',sans-serif", fontWeight: 300, fontSize: "1rem", lineHeight: 1.7, color: "oklch(0.75 0.015 75)", maxWidth: 520, margin: "1.5rem auto 2rem" }}>
           Cellar-grade AI grounded in the standard cellar references your team already trusts.

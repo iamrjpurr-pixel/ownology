@@ -2024,3 +2024,4 @@ Impersonate mode (M4) · Diagnostic panels (M6) · Morning brief email (M7) · A
 - USER: Save to GitHub (Instagram DM list/badge, alert fixes, quote-strip, support@ sender). Confirm Railway has RESEND_INBOUND_API_KEY + INBOUND_REPLY_DOMAIN=in.ownology.ai.
 - USER: approve 5 pending follow-up cards (Telegram/CRM). Start @ownologyai DMs, 5-10/day; set IG password + support@ contact email.
 - AGENT: Wine Australia 45-prospect contact lookup (dry run first, ~45 Perplexity calls). Offer RESET ANGULLONG (scanner views). Pre-existing P2: charge.refunded credit reversal; tests hitting live DB/email.
+- Nov 4: DRAFT article memory/drafts/cellar-sops-small-wineries.md (sent to Telegram for review; not published). Hot auto follow-ups live after next Save to GitHub (Rod Patina likely first send). Other topical article ideas (user deferred): small-vintage paper trail, LIP plain English, smoke taint records, label/packaging rule changes 2026-28.

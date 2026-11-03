@@ -55,6 +55,7 @@ const REAL_USER = sql.raw("u.role <> 'admin' AND COALESCE(u.email,'') NOT LIKE '
 const userLine = (u: U) => [`Signed up ${day(Number(u.created_at))}`, u.last_seen ? `last seen ${day(Number(u.last_seen))}` : "never came back", `${u.wines} wine${Number(u.wines) === 1 ? "" : "s"} in vault`, u.plan && u.plan !== "free" ? "paying" : "free plan"].join(" · ");
 const userRow = (u: U, reason?: string): CrmRow => ({ key: `u${u.id}`, contactId: null, userId: u.id, name: u.name || u.email || `User ${u.id}`, winery: u.winery ?? "", line: userLine(u), at: Number(u.last_seen ?? u.created_at), reason });
 
+import { isRealEvent } from "../../shared/outreachSource.js";
 const PROD = (process.env.OWNOLOGY_PROD_URL || "https://www.ownology.ai").replace(/\/$/, "");
 const HANDLE = "@?([a-z0-9._]{2,30})";
 export function instaHandle(notes: string | null): string | null {
@@ -64,7 +65,7 @@ export function instaHandle(notes: string | null): string | null {
 }
 const instaOnly = (c: C) => !c.email && !c.mobile_au && !!instaHandle(c.notes);
 function instaDm(c: C): string {
-  const met = c.event && !/directory|youtube|podcast|article|research|website|web\b/i.test(c.event) ? c.event.replace(/\s*\(.*\)\s*$/, "") : null;
+  const met = isRealEvent(c.event) ? c.event.replace(/\s*\(.*\)\s*$/, "") : null;
   const opener = met ? `We crossed paths at ${met} and never got to share an idea with you.` : `Love what you're doing${c.winery ? ` at ${c.winery}` : ""}.`;
   return `Hi ${c.first_name}, Rich & Gel here from Ownology. ${opener} We've built one place for a winery's specs, blends, vintage notes and quality records, so they stay with the brand year after year.\n\nWe made a 90-second page just for you: ${PROD}/hi/${c.slug}\n\nNo pressure at all, happy to answer anything.`;
 }

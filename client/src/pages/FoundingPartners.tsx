@@ -687,7 +687,7 @@ export default function FoundingPartners() {
           You are the must. Ownology is the ferment.
         </p>
         <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", color: "var(--ow-text-lo)", margin: 0 }}>
-          © 2026 Ownology · Made in Adelaide Hills · support@ownology.ai
+          © 2026 Ownology · Made in Adelaide Hills · <span style={{ whiteSpace: "nowrap" }}>support@ownology.ai</span>
         </p>
         <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.72rem", color: "var(--ow-text-lo)", margin: "0.75rem 0 0" }}>
           <Link href="/join/landscape" data-testid="fp-landscape-link" style={{ color: "var(--ow-text-lo)", textDecoration: "underline" }}>

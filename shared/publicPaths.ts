@@ -24,7 +24,6 @@ export const PUBLIC_EXACT = new Set<string>([
   "/ask",
   "/founding-partners",
   "/referral",
-  "/call-playbook",
   "/free-run",
   "/free-run/journal",
   "/apco",

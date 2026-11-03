@@ -147,7 +147,7 @@ async function adminGate(
   next: express.NextFunction
 ) {
   const p = req.path;
-  const isAdminPage = p === "/admin" || p.startsWith("/admin/");
+  const isAdminPage = p === "/admin" || p.startsWith("/admin/") || p === "/call-playbook" || p === "/cold-call-playbook.md";
   const isAdminApi =
     p.startsWith("/api/trpc/admin.") ||
     p.startsWith("/api/trpc/pricing.funnelStats") ||

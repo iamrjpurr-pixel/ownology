@@ -36,6 +36,7 @@ import { useAutoCascade } from "@/hooks/useAutoCascade";
 import { HI_VARIANTS_BY_PERSONA, type HiPersona } from "@/lib/hi-personas";
 import { OWNOLOGY_SELL_STACK } from "@/lib/ownology-descriptor";
 import { AcronymTooltip } from "@/components/AcronymTooltip";
+import { isRealEvent } from "@shared/outreachSource";
 
 const CALENDLY_FALLBACK_LABEL = "Book a 20-min demo";
 
@@ -192,7 +193,7 @@ export default function HiContact() {
           G&apos;day {contact.firstName}.
         </h1>
 
-        {contact.event && (
+        {isRealEvent(contact.event) ? (
           <p style={eventLine}>
             {eventIsFuture ? (
               <>
@@ -206,12 +207,14 @@ export default function HiContact() {
               </>
             )}
           </p>
-        )}
+        ) : contact.winery ? (
+          <p style={eventLine}>Sending this your way for <strong style={amberInline}>{contact.winery}</strong>.</p>
+        ) : null}
 
         {/* Hook (Perplexity-sourced opener) — takes precedence over painPoint. */}
         {hookText && (
           <div data-testid="hi-hook" style={{ ...panelStyle, marginTop: "1.75rem" }}>
-            <p style={{ ...eyebrowStyle, marginBottom: "0.55rem" }}>Something I noticed</p>
+            <p style={{ ...eyebrowStyle, marginBottom: "0.55rem" }}>Something we noticed</p>
             <p style={bodyStyle}>
               <em style={{ color: "var(--ow-text-hi)" }}>{hookText}</em>
             </p>

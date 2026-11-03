@@ -102,6 +102,7 @@ export const outreachRouter = router({
     .input(z.object({ slug: z.string().min(1).max(80) }))
     .mutation(async ({ input, ctx }) => {
       if (ctx.user?.role === "admin") return { ok: true, skipped: "operator" as const };
+      if (/headless|bot|crawl|spider|preview|scan|playwright|puppeteer|lighthouse|ownologyaudit/i.test(String(ctx.req.headers["user-agent"] ?? ""))) return { ok: true, skipped: "bot" as const };
       const now = Date.now();
       // Read current state so we know if this is the FIRST view AND
       // whether the hot-alert has already been fired.
