@@ -10,6 +10,7 @@
  */
 import { Link, useLocation } from "wouter";
 import OwnologyLogo from "@/components/OwnologyLogo";
+import { Instagram } from "lucide-react";
 
 // Suppress on any page that provides its own minimal footer or has none at
 // all (admin surfaces, gated auth flows, work-mode-adjacent pages). This
@@ -90,6 +91,18 @@ export function SiteFooter() {
               <br />
               Ownology is the ferment.
             </p>
+            <a
+              href="https://www.instagram.com/ownologyai/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Ownology on Instagram"
+              data-testid="footer-instagram-link"
+              className="mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 transition-colors hover:text-[var(--ow-amber)]"
+              style={{ border: "1px solid var(--ow-border-md)", color: "var(--ow-text-mid)", fontFamily: "'Lato',sans-serif", fontSize: "0.8125rem" }}
+            >
+              <Instagram className="h-4 w-4" />
+              @ownologyai
+            </a>
           </div>
           {COLUMNS.map((col) => (
             <div key={col.heading}>
