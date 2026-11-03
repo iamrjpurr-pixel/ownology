@@ -16,8 +16,8 @@ const PROD_URL = (process.env.OWNOLOGY_PROD_URL || "https://www.ownology.ai").re
 const DAY = 24 * 60 * 60 * 1000;
 const DAILY_CARDS = 5;
 const SEND_HOUR_SYD = 7.5;
-const FROM = "Richard · Ownology <richard@ownology.ai>";
-const REPLY_TO = ["richard@ownology.ai", "iamrjpurr@gmail.com"];
+const FROM = "Rich & Gel · Ownology <support@ownology.ai>";
+const REPLY_TO = ["support@ownology.ai", "iamrjpurr@gmail.com"];
 
 type Contact = {
   id: number; slug: string; first_name: string; winery: string | null; email: string | null; mobile_au: string | null;
@@ -61,10 +61,10 @@ function fallbackDraft(c: Contact, kind: Card["kind"], channel: Card["channel"])
       ? `Hi ${c.first_name}, Rich from Ownology. Saw you had a look at the page I made for you${w}. Happy to answer anything, or set it up with your wines for you: {URL}`
       : `Hi ${c.first_name}${w}, Rich here. I've built Ownology, a quality and brand record for boutique winemakers. Made a 90-second page just for you: {URL}` };
   }
-  if (kind === "auto2") return { subject: `${c.first_name}, closing the loop`, body: `G'day ${c.first_name},\n\nI'll leave it here so I'm not clogging your inbox. If keeping your wines' specs, blends and vintage notes in one place ever becomes a priority${w}, the page is still yours:\n\n{URL}\n\nAll the best with the season.\n\nCheers,\nRich` };
+  if (kind === "auto2") return { subject: `${c.first_name}, closing the loop`, body: `G'day ${c.first_name},\n\nWe'll leave it here so we're not clogging your inbox. If keeping your wines' specs, blends and vintage notes in one place ever becomes a priority${w}, the page is still yours:\n\n{URL}\n\nAll the best with the season.\n\nCheers,\nRich & Gel` };
   return kind !== "first"
-    ? { subject: `${c.first_name}, quick follow-up`, body: `G'day ${c.first_name},\n\nI noticed you had a look at the page I put together for you${w}. Thanks for taking the time.\n\nIf it's useful, I can load your current wines into a Brand Vault for you, so you can see it working with your own labels rather than samples. It takes me about 10 minutes.\n\n{URL}\n\nJust reply with any questions.\n\nCheers,\nRich` }
-    : { subject: `${c.first_name}${w}, a small idea`, body: `G'day ${c.first_name},\n\nI've been building Ownology: one place for a winery's specs, blends, vintage notes and quality records, so they stay with the brand year after year.\n\nI made a 90-second page for you${w}:\n\n{URL}\n\nIf it's not a fit, no worries at all.\n\nCheers,\nRich` };
+    ? { subject: `${c.first_name}, quick follow-up`, body: `G'day ${c.first_name},\n\nWe noticed you had a look at the page we put together for you${w}. Thanks for taking the time.\n\nIf it's useful, we can load your current wines into a Brand Vault for you, so you can see it working with your own labels rather than samples. It takes us about 10 minutes.\n\n{URL}\n\nJust reply with any questions.\n\nCheers,\nRich & Gel` }
+    : { subject: `${c.first_name}${w}, a small idea`, body: `G'day ${c.first_name},\n\nWe've been building Ownology: one place for a winery's specs, blends, vintage notes and quality records, so they stay with the brand year after year.\n\nWe made a 90-second page for you${w}:\n\n{URL}\n\nIf it's not a fit, no worries at all.\n\nCheers,\nRich & Gel` };
 }
 
 export async function draftMessage(c: Contact, kind: Card["kind"], channel: Card["channel"], situation?: string): Promise<{ subject: string; body: string }> {
@@ -73,10 +73,10 @@ export async function draftMessage(c: Contact, kind: Card["kind"], channel: Card
     kind === "followup" && `They were texted/emailed before and opened their personal page ${c.view_count} time(s) but never replied.`, situation && `Situation: ${situation}`].filter(Boolean).join("\n");
   const rules = channel === "sms"
     ? "Write ONE SMS, max 200 characters, no emojis, say it is from Rich at Ownology. Must include the literal token {URL} once. Do not add sign-off phone numbers or opt-out text."
-    : "Write a short plain email (60-120 words), 2-4 short paragraphs, sign off 'Cheers,\\nRich'. Start with \"G'day <first name>,\". Must include the literal token {URL} on its own line. Subject max 60 chars, specific, no clickbait.";
+    : "Write a short plain email (60-120 words), 2-4 short paragraphs, write as 'we' (Rich & Gel), sign off 'Cheers,\\nRich & Gel'. Start with \"G'day <first name>,\". Must include the literal token {URL} on its own line. Subject max 60 chars, specific, no clickbait.";
   try {
     const raw = await chatCompletion([
-      { role: "system", content: `You write cold outreach for Rich, an Australian founder of Ownology (a Brand Vault + quality record + 'Ask Owen' AI for boutique Australian winemakers; contract winemakers can be given controlled access). Tone: warm, plain Australian English, peer-to-peer, honest, zero hype, never pushy. Rich has NOT met these people: never say "good to meet you", "we met", "great chatting" or similar. If an event is given, be coy: say "we crossed paths at <event>" and that you wanted to share an idea you didn't get to mention then (e.g. "We crossed paths at <event> and I never got to share an idea with you"). Don't claim you talked, and don't say it was busy. Don't quote their own words back at them verbatim; refer to the idea lightly. ${situation ? "Follow the Situation exactly; keep it shorter than a first email." : kind === "followup" ? "This is a gentle follow-up; acknowledge they had a look, offer to load their wines into a vault for them." : "This is a first touch; reference the personal hook naturally if given."} ${rules} Return JSON: {"subject": string, "body": string}.` },
+      { role: "system", content: `You write cold outreach for Rich & Gel, the Australian founders of Ownology (a Brand Vault + quality record + 'Ask Owen' AI for boutique Australian winemakers; contract winemakers can be given controlled access). Tone: warm, plain Australian English, peer-to-peer, honest, zero hype, never pushy. They have NOT met these people: never say "good to meet you", "we met", "great chatting" or similar. If an event is given, be coy: say "we crossed paths at <event>" and that you wanted to share an idea you didn't get to mention then (e.g. "We crossed paths at <event> and we never got to share an idea with you"). Don't claim you talked, and don't say it was busy. Don't quote their own words back at them verbatim; refer to the idea lightly. ${situation ? "Follow the Situation exactly; keep it shorter than a first email." : kind === "followup" ? "This is a gentle follow-up; acknowledge they had a look, offer to load their wines into a vault for them." : "This is a first touch; reference the personal hook naturally if given."} ${rules} Return JSON: {"subject": string, "body": string}.` },
       { role: "user", content: facts },
     ], { model: MODELS.CHEAP, json: true, maxTokens: 600, temperature: 0.7, source: "outreach-copilot" });
     const j = JSON.parse(raw) as { subject?: string; body?: string };
@@ -284,8 +284,8 @@ async function sendCardEmail(c: Contact, k: Card): Promise<string> {
   const url = pageUrl(c), unsub = unsubUrl(c);
   const wa = buildWaHref({ firstName: c.first_name, winery: c.winery });
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
-  const footText = isReply ? "" : `\n\n—\nRichard Purr · Ownology · ownology.ai${wa ? `\nPrefer WhatsApp? ${wa}` : ""}\nDon't want to hear from me again? ${unsub}`;
-  const footHtml = isReply ? "" : `<p style="font-size:12px;color:#6b7280;border-top:1px solid #e5e7eb;padding-top:12px;margin-top:28px">Richard Purr · Ownology · ownology.ai${wa ? `<br>Prefer WhatsApp? <a href="${wa}" style="color:#6b7280">Message me there</a>` : ""}<br>Don't want to hear from me again? <a href="${unsub}" style="color:#6b7280">Unsubscribe</a></p>`;
+  const footText = isReply ? "" : `\n\n—\nRich & Gel · Ownology · ownology.ai${wa ? `\nPrefer WhatsApp? ${wa}` : ""}\nDon't want to hear from us again? ${unsub}`;
+  const footHtml = isReply ? "" : `<p style="font-size:12px;color:#6b7280;border-top:1px solid #e5e7eb;padding-top:12px;margin-top:28px">Rich &amp; Gel · Ownology · ownology.ai${wa ? `<br>Prefer WhatsApp? <a href="${wa}" style="color:#6b7280">Message me there</a>` : ""}<br>Don't want to hear from us again? <a href="${unsub}" style="color:#6b7280">Unsubscribe</a></p>`;
   const text = `${k.body.replace("{URL}", url)}${footText}`;
   const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:560px;color:#111827;line-height:1.6;font-size:15px">${k.body.split(/\n\n+/).map((p) => `<p>${esc(p).replace("{URL}", `<a href="${url}" style="color:#b45309;font-weight:600">${url}</a>`).replace(/\n/g, "<br>")}</p>`).join("")}${footHtml}</div>`;
   const inbound = replyAddress(c.slug);
