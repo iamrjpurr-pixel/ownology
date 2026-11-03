@@ -51,15 +51,15 @@ async function alertFirstVisit(slug: string) {
 }
 
 // One-shot "tell me when they're back" alerts; rows in member_watches (user_id and/or ?from= tag).
-async function checkWatches(userId: number | null, details: string[]) {
-  const watches = await rows<{ id: number; user_id: number | null; tag: string | null; label: string }>(sql`
-    SELECT id, user_id, tag, label FROM member_watches WHERE fired_at IS NULL`);
+async function checkWatches(userId: number | null, slug: string | null, details: string[]) {
+  const watches = await rows<{ id: number; user_id: number | null; slug: string | null; tag: string | null; label: string }>(sql`
+    SELECT id, user_id, slug, tag, label FROM member_watches WHERE fired_at IS NULL`);
   for (const w of watches) {
     const viaTag = !!w.tag && details.some((d) => d.includes(`from=${w.tag}`));
-    if (!viaTag && !(userId && w.user_id === userId)) continue;
+    if (!viaTag && !(userId && w.user_id === userId) && !(slug && w.slug === slug)) continue;
     const [upd] = await db.execute(sql`UPDATE member_watches SET fired_at = ${Date.now()} WHERE id = ${w.id} AND fired_at IS NULL`);
     if ((upd as unknown as { affectedRows: number }).affectedRows !== 1) continue;
-    const watchLink = w.user_id ? `${PROD_URL}/admin/activity?user=${w.user_id}` : `${PROD_URL}/admin/activity`;
+    const watchLink = w.user_id ? `${PROD_URL}/admin/activity?user=${w.user_id}` : w.slug ? `${PROD_URL}/admin/activity?slug=${encodeURIComponent(w.slug)}` : `${PROD_URL}/admin/activity`;
     void sendOperatorTelegram(`🔔 ${w.label} is back on Ownology${viaTag ? " (clicked your email)" : ""}.\n\nWatch live: ${watchLink}`).catch((err) => console.error("[events] Telegram alert error:", err));
     const alertTo = process.env.OPERATOR_ALERT_EMAIL || process.env.OWNER_EMAIL || process.env.ADMIN_EMAILS?.split(",")[0]?.trim();
     const key = process.env.RESEND_API_KEY;
@@ -115,7 +115,7 @@ export const eventsRouter = router({
           INSERT INTO user_events (user_id, slug, session_id, path, event, detail, ip_hash, created_at)
           VALUES (${userId}, ${slug}, ${input.sessionId}, ${e.path}, ${e.event}, ${e.detail}, ${ip}, ${at})`);
       }
-      if (!isOperator) await checkWatches(userId, input.events.filter((e) => e.event === "page_view").map((e) => e.detail)).catch((err) => console.error("[events] watch check failed:", err));
+      if (!isOperator) await checkWatches(userId, slug, input.events.filter((e) => e.event === "page_view").map((e) => e.detail)).catch((err) => console.error("[events] watch check failed:", err));
       // Signed-in admin: un-attribute anything this browser session logged under a prospect's link.
       if (isAdmin) await db.execute(sql`UPDATE user_events SET slug = NULL WHERE session_id = ${input.sessionId} AND slug IS NOT NULL`);
       return { ok: true, inviteValid: input.invite ? !!slug || isOperator : undefined, operator: isAdmin || undefined };

@@ -380,7 +380,8 @@ const SECTIONS: { title: string; hint: string; collapsed?: boolean; tools: Admin
     title: "People & CRM",
     hint: "Who's out there, who's interested, who's paying",
     tools: [
-      T("People", "/admin/people", "Everyone once, matched by email — outreach, sign-ups, quiz, demo, survey, founding reservations, paying members, access links and accounts. Filter 'Wants to pay' to see who to call.", <IconMembers />, "Start here"),
+      T("Your CRM", "/admin/crm", "One simple page: who needs you today, your funnel, and anyone's story in plain words. Telegram does the sending.", <IconMembers />, "Start here"),
+      T("People", "/admin/people", "Everyone once, matched by email — outreach, sign-ups, quiz, demo, survey, founding reservations, paying members, access links and accounts. Filter 'Wants to pay' to see who to call.", <IconMembers />),
       T("Outreach contacts", "/admin/contacts", "Your outreach list: add a winemaker, get their personal /hi link and SMS draft, track opens, replies and bookings.", <IconLeads />, "Outreach"),
       T("Outbound queue", "/admin/contacts/outbound-queue", "Who to contact next, with AI-rewritten SMS drafts and bulk enrichment.", <IconLeads />),
       T("Replies & follow-ups", "/admin/contacts/engagement", "Paste a reply, get its tone and a follow-up draft. See who needs chasing.", <IconLeads />),

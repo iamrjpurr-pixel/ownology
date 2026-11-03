@@ -102,6 +102,7 @@ const HiContact = lazy(() => import("./pages/HiContact"));
 const AdminContacts = lazy(() => import("./pages/AdminContacts"));
 const AdminActivity = lazy(() => import("./pages/AdminActivity"));
 const AdminPeople = lazy(() => import("./pages/AdminPeople"));
+const AdminCrm = lazy(() => import("./pages/AdminCrm"));
 const AdminContactsPipeline = lazy(() => import("./pages/AdminContactsPipeline"));
 const AdminAccess = lazy(() => import("./pages/AdminAccess"));
 const AdminOutboundQueue = lazy(() => import("./pages/AdminOutboundQueue"));
@@ -485,6 +486,7 @@ function Router() {
       <Route path={"/admin/gate-invites"}><Redirect to="/admin/access?tab=invites" /></Route>
       <Route path={"/admin/access"} component={AdminAccess} />
       <Route path={"/admin/people"} component={AdminPeople} />
+      <Route path={"/admin/crm"} component={AdminCrm} />
       <Route path={"/admin/members"}><Redirect to="/admin/access?tab=members" /></Route>
       <Route path={"/trial-locked"} component={TrialLocked} />
       <Route path={"/join/landscape"} component={JoinLandscape} />

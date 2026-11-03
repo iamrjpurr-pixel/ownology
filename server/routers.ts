@@ -30,6 +30,7 @@ import { demoRouter } from "./routers/demoRouter.js";
 import { brandPortalRouter } from "./routers/brandPortal.js";
 import { eventsRouter } from "./routers/eventsRouter.js";
 import { crmRouter } from "./routers/crmRouter.js";
+import { crmHomeRouter } from "./routers/crmHome.js";
 import { wbsAdminRouter } from "./routers/wbsAdmin.js";
 import { eq, or, like, and, desc, sql } from "drizzle-orm";
 import { router, publicProcedure, ownerProcedure, protectedProcedure } from "./trpc.js";
@@ -2301,5 +2302,6 @@ export const appRouter = router({
   brandPortal: brandPortalRouter,
   events: eventsRouter,
   crm: crmRouter,
+  crmHome: crmHomeRouter,
 });
 export type AppRouter = typeof appRouter;

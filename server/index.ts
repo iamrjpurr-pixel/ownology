@@ -1881,6 +1881,11 @@ async function startServer() {
     } catch (e) {
       if (!/duplicate column/i.test(String((e as { cause?: Error }).cause?.message ?? (e as Error).message))) console.warn("[bootstrap] outreach_contacts.unsubscribed_at:", (e as Error).message);
     }
+    try {
+      await db.execute(sql`ALTER TABLE member_watches ADD COLUMN slug VARCHAR(80) NULL`);
+    } catch (e) {
+      if (!/duplicate column/i.test(String((e as { cause?: Error }).cause?.message ?? (e as Error).message))) console.warn("[bootstrap] member_watches.slug:", (e as Error).message);
+    }
     startOutreachCopilot();
 
     // ── Naked Angel SMS opener variant (Feb 2026) ────────────────────
