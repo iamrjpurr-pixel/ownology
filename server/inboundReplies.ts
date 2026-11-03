@@ -17,7 +17,7 @@ export function replyAddress(slug: string): string | null {
 }
 
 export function cleanReply(text: string): string {
-  const cut = text.split(/\r?\n(?:On .{5,200}wrote:|-{2,}\s*Original Message|From: .+\r?\nSent: )/i)[0];
+  const cut = text.split(/\r?\n(?:On [\s\S]{5,300}?wrote:|-{2,}\s*Original Message|From: .+\r?\nSent: )/i)[0];
   return cut.split(/\r?\n/).filter((l) => !l.trim().startsWith(">")).join("\n").replace(/\n{3,}/g, "\n\n").trim().slice(0, 2000);
 }
 
