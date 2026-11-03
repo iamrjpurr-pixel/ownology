@@ -1906,3 +1906,10 @@ public demo (/how-we-trace) → real cellar → per-vessel event log.**
 - Prompt: never claim meeting; events → "we crossed paths at <event> and I never got to share an idea"; don't quote their words verbatim.
 - Skipped: Adam Richardson (ATR closing), Anna Hooper (AGW industry body).
 - Tested in preview: hold blocks send, release sends queued email, removed card untouched.
+
+## Nov 3 2026 — Sender, reply catcher, alerts, Instagram DMs
+- Outreach email sender: "Rich & Gel · Ownology <support@ownology.ai>"; copy in "we" voice, sign-off "Rich & Gel". Replies go ONLY to reply+<slug>@in.ownology.ai when INBOUND_REPLY_DOMAIN set (fallback support@ + Gmail).
+- SMS: shared ClickSend numbers (user declined dedicated number). Tested: reply via shared number → CRM + Telegram OK. Internal test contact id 348 "Ownology Cellars" (status skip). Fixed leads typo "ownology cellkars".
+- Email reply catcher: in.ownology.ai lives in a SECOND Resend account (iamrjpurr, Tokyo). Webhook verified OK but 500 because RESEND_API_KEY is the sending account. Added RESEND_INBOUND_API_KEY (falls back to RESEND_API_KEY) in inboundReplies.ts. USER TODO: add RESEND_INBOUND_API_KEY + INBOUND_REPLY_DOMAIN in Railway, Save to GitHub, Replay webhook.
+- markViewed (outreach.ts): opens <90s after an email send are ignored as link scanners (no view count, no alert). Alerts now name the actual channel (texted vs emailed) and show email.
+- CRM: "Instagram only" list on /admin/crm (no email/mobile, IG handle in notes, not yet contacted) + sheet card with ready DM (from Rich's personal IG), Copy, Open ig.me, "I sent it" → insta_contacted_at. crmHome.markInstaSent. Ownology has no Instagram account.

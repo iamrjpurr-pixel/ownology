@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, ArrowRight, Search, Send, Bell, Ban, Mail, Phone, MousePointerClick, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Search, Send, Bell, Ban, Mail, Phone, MousePointerClick, ChevronRight, Instagram, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { Input } from "@/components/ui/input";
@@ -112,6 +112,26 @@ function PendingCards({ cards }: { cards: PendingCard[] }) {
   );
 }
 
+function InstaDm({ contactId, handle, dm, sentAt }: { contactId: number; handle: string; dm: string; sentAt: number | null }) {
+  const utils = trpc.useUtils();
+  const mark = trpc.crmHome.markInstaSent.useMutation({ onSuccess: () => { toast.success("Marked as messaged on Instagram"); utils.crmHome.invalidate(); }, onError: (e) => toast.error(e.message) });
+  const copy = () => navigator.clipboard.writeText(dm).then(() => toast.success("DM copied. Paste it into Instagram"), () => toast.error("Couldn't copy, select the text instead"));
+  const btn = "inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-base disabled:opacity-60";
+  return (
+    <div className={`${card} space-y-3 px-4 py-4`} data-testid="crm-insta-dm">
+      <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ow-text-lo)]">Instagram DM, from your own account</h3>
+      <p className="select-all whitespace-pre-wrap text-sm text-[var(--ow-text-mid)]" data-testid="crm-insta-dm-text">{dm}</p>
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={copy} className={`${btn} bg-[var(--ow-amber)] font-semibold text-[var(--ow-bg-base)]`} data-testid="crm-insta-copy"><Copy className="h-4 w-4" /> Copy DM</button>
+        <a href={`https://ig.me/m/${handle}`} target="_blank" rel="noreferrer" className={`${btn} border border-[var(--ow-border-md)] text-[var(--ow-text-hi)]`} data-testid="crm-insta-open"><Instagram className="h-4 w-4" /> Open @{handle}</a>
+        <button type="button" disabled={!!sentAt || mark.isPending} onClick={() => mark.mutate({ contactId })} className={`${btn} border border-[var(--ow-border-md)] text-[var(--ow-text-hi)]`} data-testid="crm-insta-mark-sent">
+          <Check className="h-4 w-4" /> {sentAt ? "Messaged on Instagram" : "I sent it"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function PersonSheet({ pick, onClose }: { pick: Pick | null; onClose: () => void }) {
   const q = trpc.crmHome.person.useQuery({ contactId: pick?.contactId ?? undefined, userId: pick?.userId ?? undefined }, { enabled: !!pick });
   const p = q.data;
@@ -129,9 +149,11 @@ function PersonSheet({ pick, onClose }: { pick: Pick | null; onClose: () => void
             <div className="flex flex-wrap gap-4 text-sm text-[var(--ow-text-mid)]">
               {p.email && <a href={`mailto:${p.email}`} className="inline-flex items-center gap-1.5 hover:text-[var(--ow-amber)]" data-testid="crm-person-email"><Mail className="h-4 w-4" />{p.email}</a>}
               {p.mobile && <a href={`tel:${p.mobile}`} className="inline-flex items-center gap-1.5 hover:text-[var(--ow-amber)]" data-testid="crm-person-mobile"><Phone className="h-4 w-4" />{p.mobile}</a>}
+              {p.instagram && <a href={`https://instagram.com/${p.instagram}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:text-[var(--ow-amber)]" data-testid="crm-person-instagram"><Instagram className="h-4 w-4" />@{p.instagram}</a>}
               {clicks && <Link href={clicks} className="inline-flex items-center gap-1.5 hover:text-[var(--ow-amber)]" data-testid="crm-person-clicks"><MousePointerClick className="h-4 w-4" />See their clicks</Link>}
             </div>
             <PendingCards cards={p.pendingCards} />
+            {p.contactId && p.instagram && p.instaDm && <InstaDm contactId={p.contactId} handle={p.instagram} dm={p.instaDm} sentAt={p.instaSentAt} />}
             <PersonActions p={p} />
             <div>
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ow-text-lo)]">Their story</h3>
@@ -197,6 +219,14 @@ export default function AdminCrm() {
         {home.isLoading && <p className="text-base text-[var(--ow-text-mid)]">Loading…</p>}
         {home.error && <p className="text-base text-red-500" data-testid="crm-error">{home.error.message}</p>}
         {home.data && <PeopleList rows={home.data.needsYou} empty="Nothing needs you right now. Telegram will ping you when someone comes back." prefix="crm-needs" onOpen={setPick} />}
+
+        {home.data && home.data.instaQueue.length > 0 && (
+          <>
+            <SectionTitle>{`Instagram only: message these yourself (${home.data.instaQueue.length})`}</SectionTitle>
+            <p className="-mt-2 mb-4 text-sm text-[var(--ow-text-mid)]">No email or mobile for these, so the daily sending skips them. Open one, copy the DM, send it from your Instagram, then tap "I sent it".</p>
+            <PeopleList rows={home.data.instaQueue} empty="" prefix="crm-insta" onOpen={setPick} />
+          </>
+        )}
 
         <SectionTitle>Your funnel</SectionTitle>
         {home.data && <Funnel funnel={home.data.funnel as { id: Stage; count: number }[]} stage={stage} onPick={(s) => setStage(stage === s ? null : s)} />}

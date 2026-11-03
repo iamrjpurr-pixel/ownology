@@ -15,10 +15,11 @@ type C = {
   event: string | null; status: string | null; view_count: number | null; created_at: number; sms_sent_at: number | null; email_sent_at: number | null;
   insta_contacted_at: number | null; linkedin_contacted_at: number | null; facebook_contacted_at: number | null; first_viewed_at: number | null;
   cta_clicked_at: number | null; replied_at: number | null; reply_text: string | null; demo_booked_at: number | null; unsubscribed_at: number | null;
+  notes: string | null;
 };
 const C_COLS = sql.raw(`c.id, c.slug, c.first_name, c.last_name, c.winery, c.email, c.mobile_au, c.event, c.status, c.view_count, c.created_at,
   c.sms_sent_at, c.email_sent_at, c.insta_contacted_at, c.linkedin_contacted_at, c.facebook_contacted_at, c.first_viewed_at,
-  c.cta_clicked_at, c.replied_at, c.reply_text, c.demo_booked_at, c.unsubscribed_at`);
+  c.cta_clicked_at, c.replied_at, c.reply_text, c.demo_booked_at, c.unsubscribed_at, c.notes`);
 const TOUCHED = sql.raw("COALESCE(c.sms_sent_at, c.email_sent_at, c.insta_contacted_at, c.linkedin_contacted_at, c.facebook_contacted_at)");
 const ACTIVE = sql.raw("COALESCE(c.status,'cold') NOT IN ('skip') AND c.unsubscribed_at IS NULL");
 
@@ -53,6 +54,20 @@ const U_SELECT = sql.raw(`SELECT u.id, u.name, u.email, u.created_at, w.name win
 const REAL_USER = sql.raw("u.role <> 'admin' AND COALESCE(u.email,'') NOT LIKE '%@example.com' AND COALESCE(u.email,'') NOT LIKE '%.example' AND COALESCE(u.email,'') NOT LIKE '%@ownology.ai' AND COALESCE(u.email,'') NOT LIKE 'e1test%'");
 const userLine = (u: U) => [`Signed up ${day(Number(u.created_at))}`, u.last_seen ? `last seen ${day(Number(u.last_seen))}` : "never came back", `${u.wines} wine${Number(u.wines) === 1 ? "" : "s"} in vault`, u.plan && u.plan !== "free" ? "paying" : "free plan"].join(" · ");
 const userRow = (u: U, reason?: string): CrmRow => ({ key: `u${u.id}`, contactId: null, userId: u.id, name: u.name || u.email || `User ${u.id}`, winery: u.winery ?? "", line: userLine(u), at: Number(u.last_seen ?? u.created_at), reason });
+
+const PROD = (process.env.OWNOLOGY_PROD_URL || "https://www.ownology.ai").replace(/\/$/, "");
+const HANDLE = "@?([a-z0-9._]{2,30})";
+export function instaHandle(notes: string | null): string | null {
+  const n = notes ?? "";
+  const m = n.match(new RegExp(`IG-personal:\\s*${HANDLE}`, "i")) ?? n.match(new RegExp(`\\b(?:IG|Insta|Instagram):\\s*${HANDLE}`, "i")) ?? n.match(/instagram\.com\/([a-z0-9._]{2,30})/i);
+  return m ? m[1].replace(/\.$/, "") : null;
+}
+const instaOnly = (c: C) => !c.email && !c.mobile_au && !!instaHandle(c.notes);
+function instaDm(c: C): string {
+  const met = c.event && !/directory|youtube|podcast|article|research|website|web\b/i.test(c.event) ? c.event.replace(/\s*\(.*\)\s*$/, "") : null;
+  const opener = met ? `We crossed paths at ${met} and I never got to share an idea with you.` : `Love what you're doing${c.winery ? ` at ${c.winery}` : ""}.`;
+  return `Hi ${c.first_name}, Rich here. ${opener} Gel and I have built Ownology: one place for a winery's specs, blends, vintage notes and quality records, so they stay with the brand year after year.\n\nWe made a 90-second page just for you: ${PROD}/hi/${c.slug}\n\nNo pressure at all, happy to answer anything.`;
+}
 
 const STAGES = ["not_contacted", "contacted", "opened", "replied", "signed_up", "paying"] as const;
 
@@ -105,7 +120,10 @@ export const crmHomeRouter = router({
     replied.forEach((c) => push(toRow(c, `Replied ${day(c.replied_at!)}${c.reply_text ? `: "${c.reply_text.slice(0, 120)}"` : ""}`, c.replied_at!)));
     stalled.forEach((u) => push(userRow(u, "Signed up but hasn't been back")));
     quiet.forEach((c) => push(toRow(c, `Warm: last visited ${day(Number(c.last_seen))}, no reply yet`, Number(c.last_seen))));
-    return { funnel, needsYou: needsYou.slice(0, 15) };
+    const insta = await rows<C>(sql`SELECT ${C_COLS} FROM outreach_contacts c WHERE ${ACTIVE} AND ${TOUCHED} IS NULL AND c.replied_at IS NULL
+      AND COALESCE(c.email,'') = '' AND COALESCE(c.mobile_au,'') = '' AND c.notes REGEXP 'IG|Insta|instagram' ORDER BY c.created_at`);
+    const instaQueue = insta.filter(instaOnly).map((c) => ({ ...toRow(c, `Instagram only: @${instaHandle(c.notes)}`), at: c.created_at }));
+    return { funnel, needsYou: needsYou.slice(0, 15), instaQueue };
   }),
 
   stage: ownerProcedure.input(z.object({ stage: z.enum(STAGES) })).query(({ input }) => stageRows(input.stage)),
@@ -168,6 +186,9 @@ export const crmHomeRouter = router({
       contactId: c?.id ?? null, userId, slug: c?.slug ?? null,
       name: c ? name(c) : u?.name || u?.email || "Unknown", winery: c?.winery ?? u?.winery ?? "",
       email: c?.email ?? u?.email ?? null, mobile: c?.mobile_au ?? null,
+      instagram: c ? instaHandle(c.notes) : null,
+      instaDm: c && instaOnly(c) && !c.unsubscribed_at && c.status !== "skip" ? instaDm(c) : null,
+      instaSentAt: c?.insta_contacted_at ?? null,
       summary: c ? contactLine(c) : u ? userLine(u) : "", wines: u ? Number(u.wines) : null,
       notFit: c?.status === "skip", watching: !!watch, canCard: !!c && !userId && pending.length === 0 && !c.unsubscribed_at && c.status !== "skip" && !!(c.email || c.mobile_au),
       story: story.map((s) => ({ ...s, day: day(s.at) })),
@@ -203,6 +224,11 @@ export const crmHomeRouter = router({
     const note = await handleCardAction(input.action, input.cardId);
     if (/not found|Already|Not an email/.test(note)) throw new TRPCError({ code: "BAD_REQUEST", message: note });
     return { note };
+  }),
+
+  markInstaSent: ownerProcedure.input(z.object({ contactId: z.number().int() })).mutation(async ({ input }) => {
+    await db.execute(sql`UPDATE outreach_contacts SET insta_contacted_at = COALESCE(insta_contacted_at, ${Date.now()}) WHERE id = ${input.contactId}`);
+    return { ok: true };
   }),
 
   notFit: ownerProcedure.input(z.object({ contactId: z.number().int() })).mutation(async ({ input }) => {
