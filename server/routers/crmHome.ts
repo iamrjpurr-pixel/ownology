@@ -50,7 +50,7 @@ const U_SELECT = sql.raw(`SELECT u.id, u.name, u.email, u.created_at, w.name win
   (SELECT MAX(e.created_at) FROM user_events e WHERE e.user_id = u.id) last_seen,
   (SELECT COUNT(*) FROM brand_wines b WHERE b.winery_id = u.winery_id AND b.archived_at IS NULL) wines
   FROM users u LEFT JOIN wineries w ON w.id = u.winery_id`);
-const REAL_USER = sql.raw("u.role <> 'admin' AND COALESCE(u.email,'') NOT LIKE '%@example.com' AND COALESCE(u.email,'') NOT LIKE 'e1test%'");
+const REAL_USER = sql.raw("u.role <> 'admin' AND COALESCE(u.email,'') NOT LIKE '%@example.com' AND COALESCE(u.email,'') NOT LIKE '%.example' AND COALESCE(u.email,'') NOT LIKE '%@ownology.ai' AND COALESCE(u.email,'') NOT LIKE 'e1test%'");
 const userLine = (u: U) => [`Signed up ${day(Number(u.created_at))}`, u.last_seen ? `last seen ${day(Number(u.last_seen))}` : "never came back", `${u.wines} wine${Number(u.wines) === 1 ? "" : "s"} in vault`, u.plan && u.plan !== "free" ? "paying" : "free plan"].join(" · ");
 const userRow = (u: U, reason?: string): CrmRow => ({ key: `u${u.id}`, contactId: null, userId: u.id, name: u.name || u.email || `User ${u.id}`, winery: u.winery ?? "", line: userLine(u), at: Number(u.last_seen ?? u.created_at), reason });
 
