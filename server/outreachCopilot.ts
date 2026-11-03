@@ -290,7 +290,7 @@ async function sendCardEmail(c: Contact, k: Card): Promise<string> {
   const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:560px;color:#111827;line-height:1.6;font-size:15px">${k.body.split(/\n\n+/).map((p) => `<p>${esc(p).replace("{URL}", `<a href="${url}" style="color:#b45309;font-weight:600">${url}</a>`).replace(/\n/g, "<br>")}</p>`).join("")}${footHtml}</div>`;
   const inbound = replyAddress(c.slug);
   const r = await new Resend(process.env.RESEND_API_KEY).emails.send({
-    from: FROM, to: [c.email], replyTo: inbound ? [inbound, ...REPLY_TO] : REPLY_TO, subject: k.subject || `${c.first_name}, a small idea`, text, html,
+    from: FROM, to: [c.email], replyTo: inbound ? [inbound] : REPLY_TO, subject: k.subject || `${c.first_name}, a small idea`, text, html,
     ...(isReply ? {} : { headers: { "List-Unsubscribe": `<${unsub}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } }),
   });
   if (r.error) throw new Error(r.error.message ?? "Resend failed");
