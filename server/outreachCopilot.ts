@@ -87,7 +87,7 @@ export async function draftMessage(c: Contact, kind: Card["kind"], channel: Card
   return fallbackDraft(c, kind, channel);
 }
 
-const smsText = (c: Contact, body: string) => {
+export const smsText = (c: Contact, body: string) => {
   const b = body.replace("{URL}", pageUrl(c));
   return `${b}${/ownology/i.test(b) ? "" : " - Rich, Ownology"}\nReply STOP to opt out`;
 };
@@ -134,7 +134,7 @@ export async function sendCardForContact(contactId: number): Promise<boolean> {
 }
 
 const AUTO_DAILY_CAP = 10;
-const SITUATION: Record<AutoKind, (opened: boolean) => string> = {
+export const SITUATION: Record<AutoKind, (opened: boolean) => string> = {
   revive: () => "We contacted them months ago and they went quiet. Send ONE fresh, very short 'still on your radar?' note; don't guilt them; mention we can load their wines into a vault for them so they see it with their own labels.",
   auto1: (opened) => opened
     ? "4 days ago we emailed/texted them and they opened their personal page since, but didn't reply. Short, friendly nudge: ask one simple question about how they keep wine specs/blend records today, and offer a 15-minute walkthrough."
@@ -184,8 +184,12 @@ const AUTO_LABEL: Record<AutoKind | "first", string> = { first: "first text", re
 export async function runAutoFollowups(): Promise<string[]> {
   const sent: string[] = [];
   const picks: { contact: Contact; kind: AutoKind | "first"; opened: boolean }[] = [...(await pickAutoFollowups()), ...(await pickAutoFirstTexts())];
+  const usedAddresses = new Set<string>();
   for (const { contact, kind, opened } of picks) {
     const channel: Card["channel"] = contact.email ? "email" : "sms";
+    const address = (channel === "email" ? contact.email! : auMobile(contact.mobile_au) ?? "").toLowerCase();
+    if (usedAddresses.has(address)) continue;
+    usedAddresses.add(address);
     if (channel === "sms" && !auMobile(contact.mobile_au)) continue;
     let cardId: number | null = null;
     try {
