@@ -2019,3 +2019,8 @@ Impersonate mode (M4) · Diagnostic panels (M6) · Morning brief email (M7) · A
 ### Jun 2026 update
 - DONE: Demo follow-up email (`/api/scheduled/demo-followup`, daily Railway cron). DONE: credit-pack refund reversal.
 - Next: Curriculum progress + attainment PDF (P1), LIP compliance export from Brand Vault (P1), tests not hitting live email/DB (P1).
+
+### Open items as of Nov 3 2026 (see CHANGELOG.md for details)
+- USER: Save to GitHub (Instagram DM list/badge, alert fixes, quote-strip, support@ sender). Confirm Railway has RESEND_INBOUND_API_KEY + INBOUND_REPLY_DOMAIN=in.ownology.ai.
+- USER: approve 5 pending follow-up cards (Telegram/CRM). Start @ownologyai DMs, 5-10/day; set IG password + support@ contact email.
+- AGENT: Wine Australia 45-prospect contact lookup (dry run first, ~45 Perplexity calls). Offer RESET ANGULLONG (scanner views). Pre-existing P2: charge.refunded credit reversal; tests hitting live DB/email.
