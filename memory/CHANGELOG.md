@@ -1877,3 +1877,9 @@ public demo (/how-we-trace) → real cellar → per-vessel event log.**
 - Webhook `/api/telegram/webhook` (secret = sha256 of token), registered + 10-min scheduler ONLY on Railway (RAILWAY_ENVIRONMENT). Once-per-day guard: operator_settings.copilot_last_run.
 - New: outreach_cards table, outreach_contacts.unsubscribed_at, /api/outreach/unsubscribe, /api/scheduled/outreach-cards (?dryRun=1, ?force=1).
 - server/_core/loadBackendEnv.ts loads backend/.env (secrets card) in preview.
+
+## Jun 2026 — Simple CRM page + automatic follow-ups
+- `/admin/crm` (client/src/pages/AdminCrm.tsx, server/routers/crmHome.ts → trpc.crmHome.*): Needs you today (visited ≤3d, replied ≤30d, signed-up idle, warm = visited 3–30d), 6-stage funnel (tap → list), search, person sheet with plain-English story + actions (Telegram card, watch, not a fit). Old 6 pages under "Old tools". Admin hub "Start here" now points here.
+- Auto email sequence in outreachCopilot.ts (runs inside the 7:30 daily job, Railway only, cap 10/day): revive (first touch >30d ago, once) → auto1 day 4 (opened vs not-opened wording) → auto2 +7d final. Stops on reply / sign-up (linked user) / unsubscribe / not a fit. Manual follow-up cards now only for SMS-only contacts. Signed-up people excluded from all outreach.
+- member_watches.slug added; watches match by slug too. Account pill hidden while a sheet is open.
+- Tested: iteration_50 (27/27 backend, frontend 100%); 2 design + 4 minor backend notes fixed after.

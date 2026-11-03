@@ -705,3 +705,6 @@ p, li, blockquote {
 /* Pages designed on a fixed light palette keep light theme tokens under any site theme,
    so theme-coloured buttons/links never land dark-on-dark or light-on-light. */
 .force-light { color: var(--foreground); color-scheme: light; }
+
+/* Hide the floating account pill while a side sheet is open (it covered the close button). */
+body:has([data-slot="sheet-content"][data-state="open"]) [data-testid="user-menu"] { display: none; }

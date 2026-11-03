@@ -24,8 +24,8 @@ function Funnel({ funnel, stage, onPick }: { funnel: { id: Stage; count: number 
     <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-6 sm:px-0" data-testid="crm-funnel">
       {funnel.map((f, i) => (
         <button key={f.id} type="button" onClick={() => onPick(f.id)} data-testid={`crm-stage-${f.id}`}
-          className={`relative min-w-[7.5rem] shrink-0 rounded-2xl border px-4 py-4 text-left transition-colors ${stage === f.id ? "border-[var(--ow-amber)] bg-[var(--ow-accent-live-soft)]" : "border-[var(--ow-border)] bg-[var(--ow-bg-card)] hover:border-[var(--ow-amber)]"}`}>
-          <span className="block font-['Fraunces',serif] text-4xl text-[var(--ow-text-hi)]">{f.count}</span>
+          className={`relative min-w-[7.5rem] shrink-0 rounded-2xl border px-3 py-4 sm:min-w-0 text-left transition-colors ${stage === f.id ? "border-[var(--ow-amber)] bg-[var(--ow-accent-live-soft)]" : "border-[var(--ow-border)] bg-[var(--ow-bg-card)] hover:border-[var(--ow-amber)]"}`}>
+          <span className="block font-['Fraunces',serif] text-4xl text-[var(--ow-text-hi)] sm:text-3xl">{f.count}</span>
           <span className="mt-1 block text-sm text-[var(--ow-text-mid)]">{STAGE_LABEL[f.id]}</span>
           {i < funnel.length - 1 && <ArrowRight className="absolute right-2 top-2 h-4 w-4 text-[var(--ow-text-lo)]" />}
         </button>

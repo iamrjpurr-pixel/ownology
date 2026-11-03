@@ -164,17 +164,20 @@ const AUTO_LABEL: Record<AutoKind, string> = { revive: "fresh nudge", auto1: "da
 export async function runAutoFollowups(): Promise<string[]> {
   const sent: string[] = [];
   for (const { contact, kind, opened } of await pickAutoFollowups()) {
+    let cardId: number | null = null;
     try {
       const d = await draftMessage(contact, kind, "email", SITUATION[kind](opened));
       const [ins] = await db.execute(sql`INSERT INTO outreach_cards (contact_id, kind, channel, subject, body, status, created_at)
         VALUES (${contact.id}, ${kind}, 'email', ${d.subject || null}, ${d.body}, 'sending', ${Date.now()})`);
-      const card: Card = { id: (ins as unknown as { insertId: number }).insertId, contact_id: contact.id, kind, channel: "email", subject: d.subject, body: d.body, status: "sending" };
+      cardId = (ins as unknown as { insertId: number }).insertId;
+      const card: Card = { id: cardId, contact_id: contact.id, kind, channel: "email", subject: d.subject, body: d.body, status: "sending" };
       const resendId = await sendCardEmail(contact, card);
       await db.execute(sql`UPDATE outreach_cards SET status = 'sent', acted_at = ${Date.now()} WHERE id = ${card.id}`);
       await markTouched(contact, card, `Auto ${AUTO_LABEL[kind]} emailed (${resendId})`);
       sent.push(`• ${contact.first_name}${contact.winery ? ` (${contact.winery})` : ""}: ${AUTO_LABEL[kind]}${kind === "auto1" ? (opened ? ", they'd opened it" : ", not opened yet") : ""}`);
     } catch (err) {
       console.error(`[copilot] auto ${kind} for ${contact.slug} failed:`, err);
+      if (cardId) await db.execute(sql`DELETE FROM outreach_cards WHERE id = ${cardId}`).catch(() => {});
     }
   }
   return sent;

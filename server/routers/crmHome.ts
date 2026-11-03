@@ -64,7 +64,7 @@ async function stageRows(stage: (typeof STAGES)[number]): Promise<CrmRow[]> {
   const where = {
     not_contacted: sql`${ACTIVE} AND ${TOUCHED} IS NULL`,
     contacted: sql`${TOUCHED} IS NOT NULL`,
-    opened: sql`COALESCE(c.view_count,0) > 0`,
+    opened: sql`COALESCE(c.view_count,0) > 0 AND ${TOUCHED} IS NOT NULL`,
     replied: sql`c.replied_at IS NOT NULL`,
   }[stage];
   const cs = await rows<C>(sql`SELECT ${C_COLS} FROM outreach_contacts c WHERE ${where} ORDER BY COALESCE(${TOUCHED}, c.created_at) DESC LIMIT 300`);
@@ -77,10 +77,10 @@ export const crmHomeRouter = router({
     const [f] = await rows<Record<string, number>>(sql`SELECT
       (SELECT COUNT(*) FROM outreach_contacts c WHERE ${ACTIVE} AND ${TOUCHED} IS NULL) not_contacted,
       (SELECT COUNT(*) FROM outreach_contacts c WHERE ${TOUCHED} IS NOT NULL) contacted,
-      (SELECT COUNT(*) FROM outreach_contacts c WHERE COALESCE(c.view_count,0) > 0) opened,
+      (SELECT COUNT(*) FROM outreach_contacts c WHERE COALESCE(c.view_count,0) > 0 AND ${TOUCHED} IS NOT NULL) opened,
       (SELECT COUNT(*) FROM outreach_contacts c WHERE c.replied_at IS NOT NULL) replied,
       (SELECT COUNT(*) FROM users u WHERE ${REAL_USER}) signed_up,
-      (SELECT COUNT(DISTINCT w.id) FROM wineries w JOIN users u ON u.winery_id = w.id WHERE u.role <> 'admin' AND w.plan IS NOT NULL AND w.plan <> 'free') paying`);
+      (SELECT COUNT(DISTINCT w.id) FROM wineries w JOIN users u ON u.winery_id = w.id WHERE ${REAL_USER} AND w.plan IS NOT NULL AND w.plan <> 'free') paying`);
     const funnel = STAGES.map((id) => ({ id, count: Number(f?.[id] ?? 0) }));
 
     const back = await rows<C & { last_at: number; visits: number }>(sql`SELECT ${C_COLS}, MAX(e.created_at) last_at, COUNT(DISTINCT e.session_id) visits
@@ -107,9 +107,10 @@ export const crmHomeRouter = router({
   stage: ownerProcedure.input(z.object({ stage: z.enum(STAGES) })).query(({ input }) => stageRows(input.stage)),
 
   search: ownerProcedure.input(z.object({ q: z.string().trim().min(2).max(80) })).query(async ({ input }) => {
-    const like = `%${input.q}%`;
+    const like = `%${input.q.replace(/[\\%_]/g, (m) => `\\${m}`)}%`;
     const cs = await rows<C>(sql`SELECT ${C_COLS} FROM outreach_contacts c WHERE CONCAT_WS(' ', c.first_name, c.last_name, c.winery, c.email, c.region) LIKE ${like} ORDER BY c.created_at DESC LIMIT 25`);
-    const us = await rows<U>(sql`${U_SELECT} WHERE ${REAL_USER} AND CONCAT_WS(' ', u.name, u.email, w.name) LIKE ${like} LIMIT 10`);
+    const us = await rows<U>(sql`${U_SELECT} WHERE ${REAL_USER} AND CONCAT_WS(' ', u.name, u.email, w.name) LIKE ${like}
+      AND NOT EXISTS (SELECT 1 FROM user_events e JOIN outreach_contacts oc ON oc.slug = e.slug WHERE e.user_id = u.id AND CONCAT_WS(' ', oc.first_name, oc.last_name, oc.winery, oc.email, oc.region) LIKE ${like}) LIMIT 10`);
     return [...cs.map((c) => toRow(c)), ...us.map((u) => userRow(u))];
   }),
 
@@ -185,6 +186,8 @@ export const crmHomeRouter = router({
       label = u?.name || u?.email || `User ${input.userId}`;
     }
     if (!slug && !input.userId) throw new TRPCError({ code: "BAD_REQUEST" });
+    const [dupe] = await rows<{ id: number }>(sql`SELECT id FROM member_watches WHERE fired_at IS NULL AND (${slug ? sql`slug = ${slug}` : sql`FALSE`} OR ${input.userId ? sql`user_id = ${input.userId}` : sql`FALSE`}) LIMIT 1`);
+    if (dupe) return { ok: true };
     await db.execute(sql`INSERT INTO member_watches (user_id, slug, tag, label, created_at) VALUES (${input.userId ?? null}, ${slug}, NULL, ${label}, ${Date.now()})`);
     return { ok: true };
   }),

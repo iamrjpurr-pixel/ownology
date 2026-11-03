@@ -1,0 +1,41 @@
+{
+  "summary": "Tested the new /admin/crm 'Your CRM' page (desktop 1920 and mobile 390), the crmHome tRPC router and the public outreach copilot endpoints against LIVE prod DB. Mutations were run only on contacts I created myself (E1TEST), then cleaned up (contacts removed, member_watches rows deleted). Backend: 27/27 pytest passed. Frontend: every requested flow works. Heading, needs list (Rod u52 'Signed up but hasn't been back'), 6 funnel tiles with counts (272/20/13/0/6/0), tile toggles stage list open and closed (Opened shows 13 rows), search ('rod' 5 rows, 'barossa' 22, nonsense shows crm-search-empty), person sheet (name, summary, dated story), Rod's Telegram button disabled with 'Already signed up, no outreach message needed', and the 6 Old tools links. /admin hub has the 'START HERE / Your CRM' card linking to /admin/crm. Mobile has no horizontal overflow except the funnel. On my E1TEST contact, Watch and Not-a-fit in the UI update the labels, the toast and the search row. No real-person actions were clicked, sendToTelegram was never called, and cron was only called with dryRun=1. Only issues found: two minor visual problems and a few code-review notes.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "crmHome.home funnel", "issue": "Stage counts don't line up. 'Opened' (13) includes contacts we never contacted (e.g. 'Ralph, Paul & Rory: Not contacted yet, opened 1x'). 'Contacted' includes skip/unsubscribed contacts, but 'Not contacted' excludes them. The 'paying' count uses role<>'admin' (no REAL_USER filter), while the paying stage list uses REAL_USER. Both are 0 today, but they could drift apart."},
+      {"endpoint": "crmHome.search", "issue": "A person who is both a contact and a user shows up twice (Rod: one c-row and one u52 row). Also, user-typed % and _ are not escaped in the LIKE search."},
+      {"endpoint": "outreachCopilot.runAutoFollowups", "issue": "If the Resend send throws, the card row stays status='sending' forever. pickAutoFollowups only excludes status='pending', so every daily run adds another 'sending' row for the same contact."},
+      {"endpoint": "crmHome.watch", "issue": "No dedupe: every call inserts a new member_watches row. The UI disables the button, but the API doesn't guard against duplicates."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/admin/crm funnel (desktop >= sm)", "issues": ["The 6th tile 'Paying' is clipped about 7px on the right and the row scrolls sideways on desktop (funnel scrollWidth 727 vs clientWidth 720). Cause: min-w-[7.5rem] on each tile is wider than one sm:grid-cols-6 column (~115px in max-w-3xl). Suggested fix: add sm:min-w-0 on tiles, or drop to 3 columns or wider at md. 'Not contacted' also wraps to 2 lines."]},
+      {"screen": "Person sheet (desktop + mobile)", "issues": ["The floating account pill (z-9998, pointer-events:none while the sheet is open) is drawn over the sheet's X close button, so the X can't be seen. Clicks still go through (verified: clicking at the X position closes the sheet). On mobile the pill also overlaps the person-name heading, so a long name would be hidden. Suggested fix: hide the pill while a sheet is open, or add top padding / move the X."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_crm_home.py", "/app/test_reports/pytest/crm_home.xml"],
+  "action_items": [
+    "Fix the desktop funnel clipping (sm:min-w-0 on the funnel tiles)",
+    "Stop the account pill from covering the sheet close X (and the name on mobile)",
+    "Check the intended behaviour: stale (>30d) contacts get 'revive', then auto1 4 days later, then auto2 a week after that. That is up to 3 automatic emails, not 'one fresh nudge'. Today's dryRun queues 10 revives. If the user meant one nudge only, skip auto1/auto2 when revive_at is set (or only allow auto1 if they open after the revive).",
+    "Handle 'sending' rows left behind when a send fails (mark them failed, or exclude them in pickAutoFollowups)",
+    "Optional: make the funnel definitions consistent (opened/contacted/paying)"
+  ],
+  "critical_code_review_comments": [
+    "outreachCopilot.ts pickAutoFollowups: the revive -> auto1 -> auto2 chain applies to revived contacts too (anchor = revive_at), so July contacts get 3 emails over about 11 days.",
+    "runAutoFollowups: a card inserted as 'sending' is never cleaned up when it fails; no retry cap.",
+    "crmHome.home 'back' list counts any user_events on a contact's slug in the last 3 days. Admin sessions are un-attributed in eventsRouter, so that part is fine.",
+    "Files are a good size (AdminCrm 182, crmHome 196, outreachCopilot 345 lines). data-testids are present on all interactive elements."
+  ],
+  "updated_files": ["/app/backend/tests/test_crm_home.py"],
+  "success_rate": {"backend": "100% (27/27)", "frontend": "100% functional; 2 minor design issues"},
+  "test_credentials": "Admin JWT from scripts/e1-admin-jwt.ts saved to /root/admin.jwt. Non-admin JWT (e1test-owner, from scripts/e1-test-users.ts seed) saved to /tmp/owner.jwt.",
+  "seed_data_creation": "Ran e1-test-users.ts seed (the existing e1test users, idempotent). Created 2 E1TEST outreach contacts (e1test-crm-*, e1test-crmui-*) and removed both, along with their member_watches rows.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run: cd /app/backend/tests && REACT_APP_BACKEND_URL=<preview> pytest test_crm_home.py (needs /root/admin.jwt and /tmp/owner.jwt). The mutation test creates and removes its own E1TEST contact, but its member_watches row must be deleted separately (slug LIKE 'e1test-crm%'). Rod (user 52) already has an active watch that existed before this run; don't touch it. Prod DB: never call sendToTelegram or the cron without dryRun=1."
+}
