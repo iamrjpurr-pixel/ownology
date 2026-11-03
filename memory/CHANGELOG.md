@@ -1889,3 +1889,11 @@ public demo (/how-we-trace) → real cellar → per-vessel event log.**
 - Outreach emails: Reply-To now includes reply+<slug>@INBOUND_REPLY_DOMAIN (only when env set) + richard + iamrjpurr; footer has "Prefer WhatsApp?" wa.me link (WHATSAPP_INBOUND_NUMBER || SMS_INBOUND_NUMBER, 0408 105 067). /hi pages already had a WhatsApp button.
 - NEEDS USER SETUP: Resend receiving domain in.ownology.ai (MX), webhook → https://www.ownology.ai/api/resend/inbound (email.received), Railway vars INBOUND_REPLY_DOMAIN=in.ownology.ai + RESEND_INBOUND_SECRET.
 - Tested in preview: processInbound with a test contact → replied/sentiment set, Telegram card, Send-this-answer email sent; unconfigured webhook returns 503.
+
+## Jun 2026 — Automatic texts (ClickSend)
+- `server/sms.ts` (sendSms, auMobile, clicksendWebhookToken = sha256("ow-clicksend:"+API key)[0:32]). Secrets CLICKSEND_USERNAME / CLICKSEND_API_KEY (values quoted in backend/.env — code strips quotes). Optional CLICKSEND_FROM.
+- When ClickSend configured: daily job auto-sends up to 8 FIRST texts to never-contacted mobile-only prospects + SMS variants of revive/day-4/day-11 (shared cap 10 with email). Manual Telegram cards become email-only first touches; SMS cards get "📱 Send text". Out-of-credit → Telegram warning + pause.
+- Inbound: POST /api/clicksend/inbound/:token (form or JSON) → STOP = unsubscribe; else replied + AI SMS draft card ("📱 Send this answer"). Idempotent via inbound_emails ("sms:<id>").
+- Reply drafts must not invent prices/features (point to /pricing).
+- Data: Taras Ochota (id 251) set to skip (deceased 2022).
+- Tested: real test SMS to Rich's mobile delivered via ClickSend; simulated inbound reply/dup/STOP/bad token all correct.

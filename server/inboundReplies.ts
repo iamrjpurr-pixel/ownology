@@ -6,6 +6,7 @@ import { sql } from "drizzle-orm";
 import { db } from "./db.js";
 import { chatCompletion, MODELS } from "./_core/llm.js";
 import { sendOperatorTelegram } from "./telegram.js";
+import { auMobile, clicksendWebhookToken } from "./sms.js";
 
 type ReplyContact = { id: number; slug: string; first_name: string; winery: string | null; email: string | null };
 const rows = async <T,>(q: ReturnType<typeof sql>) => ((await db.execute(q))[0] as unknown as T[]);
@@ -30,10 +31,10 @@ async function findContact(recipients: string[], from: string): Promise<ReplyCon
   return byEmail ?? null;
 }
 
-async function classifyAndDraft(c: ReplyContact, reply: string): Promise<{ sentiment: string; draft: string }> {
+async function classifyAndDraft(c: ReplyContact, reply: string, channel: "email" | "sms" = "email"): Promise<{ sentiment: string; draft: string }> {
   try {
     const raw = await chatCompletion([
-      { role: "system", content: `You help Rich, Australian founder of Ownology (Brand Vault + quality record + 'Ask Owen' AI for boutique winemakers), answer a prospect's email reply. 1) Classify the reply: "interested" | "objection" | "not-now" | "cold". 2) Draft Rich's answer: plain warm Australian English, 40-110 words, answer what they actually said, if interested propose a 15-minute call and offer to load their wines into a vault for them; if not-now, agree and say you'll leave it; if cold, thank them and confirm you won't email again. Start "G'day <first name>," and sign off "Cheers,\\nRich". Return JSON {"sentiment": string, "draft": string}.` },
+      { role: "system", content: `You help Rich, Australian founder of Ownology (Brand Vault + quality record + 'Ask Owen' AI for boutique winemakers), answer a prospect's email reply. 1) Classify the reply: "interested" | "objection" | "not-now" | "cold". 2) Draft Rich's answer: plain warm Australian English, 40-110 words, answer what they actually said, if interested propose a 15-minute call and offer to load their wines into a vault for them; if not-now, agree and say you'll leave it; if cold, thank them and confirm you won't email again. Never invent prices, plans, features or facts; if they ask about price, point them to https://www.ownology.ai/pricing and offer a quick call. ${channel === "sms" ? "This is a TEXT MESSAGE reply: max 280 characters, no greeting line breaks, end with '- Rich'." : "Start \"G'day <first name>,\" and sign off \"Cheers,\\nRich\"."} Return JSON {"sentiment": string, "draft": string}.` },
       { role: "user", content: `Prospect: ${c.first_name}${c.winery ? ` at ${c.winery}` : ""}\n\nTheir reply:\n${reply}` },
     ], { model: MODELS.CHEAP, json: true, maxTokens: 500, temperature: 0.5, source: "reply-catcher" });
     const j = JSON.parse(raw) as { sentiment?: string; draft?: string };
@@ -42,6 +43,7 @@ async function classifyAndDraft(c: ReplyContact, reply: string): Promise<{ senti
   } catch (err) {
     console.error("[inbound] draft failed:", err);
   }
+  if (channel === "sms") return { sentiment: "interested", draft: `Thanks ${c.first_name}! Happy to help. Would a quick 15-min call this week suit? - Rich` };
   return { sentiment: "interested", draft: `G'day ${c.first_name},\n\nThanks for getting back to me. Happy to help however suits you best. Would a quick 15-minute call this week work?\n\nCheers,\nRich` };
 }
 
@@ -105,6 +107,50 @@ async function webhook(req: Request, res: Response) {
   }
 }
 
+type SmsContact = ReplyContact & { mobile_au: string | null };
+
+export async function processSmsReply(messageId: string, from: string, body: string): Promise<void> {
+  const [ins] = await db.execute(sql`INSERT IGNORE INTO inbound_emails (email_id, created_at) VALUES (${`sms:${messageId}`}, ${Date.now()})`);
+  if ((ins as unknown as { affectedRows: number }).affectedRows !== 1) return;
+  const mobile = auMobile(from);
+  const all = mobile ? await rows<SmsContact>(sql`SELECT id, slug, first_name, winery, email, mobile_au FROM outreach_contacts WHERE mobile_au IS NOT NULL AND mobile_au <> ''`) : [];
+  const contact = all.find((c) => auMobile(c.mobile_au) === mobile);
+  const text = body.trim().slice(0, 1000);
+  if (!contact) {
+    await sendOperatorTelegram(`📱 Text from ${from} (not in your contacts):\n\n“${text}”`);
+    return;
+  }
+  if (/^\s*(stop|unsubscribe|cancel|quit|end|stop all)\s*[.!]?\s*$/i.test(text)) {
+    await db.execute(sql`UPDATE outreach_contacts SET unsubscribed_at = COALESCE(unsubscribed_at, ${Date.now()}) WHERE id = ${contact.id}`);
+    await sendOperatorTelegram(`🔕 ${contact.first_name}${contact.winery ? ` (${contact.winery})` : ""} replied STOP. No more messages will go to them.`);
+    return;
+  }
+  const { sentiment, draft } = await classifyAndDraft(contact, text, "sms");
+  await db.execute(sql`UPDATE outreach_contacts SET replied_at = ${Date.now()}, reply_text = ${text}, reply_sentiment = ${sentiment} WHERE id = ${contact.id}`);
+  const [card] = await db.execute(sql`INSERT INTO outreach_cards (contact_id, kind, channel, subject, body, status, created_at)
+    VALUES (${contact.id}, 'reply', 'sms', NULL, ${draft}, 'pending', ${Date.now()})`);
+  const cardId = (card as unknown as { insertId: number }).insertId;
+  const msg = `📱 TEXT REPLY from ${contact.first_name}${contact.winery ? ` — ${contact.winery}` : ""}\n${SENTIMENT_LABEL[sentiment]}\n\n“${text}”\n\n———\nSuggested answer:\n\n${draft}\n\n(Their automatic follow-ups have stopped.)`;
+  const messageIdTg = await sendOperatorTelegram(msg, [[{ text: "📱 Send this answer", callback_data: `oc:send:${cardId}` }, { text: "✋ I'll reply myself", callback_data: `oc:skip:${cardId}` }]]);
+  if (messageIdTg) await db.execute(sql`UPDATE outreach_cards SET telegram_message_id = ${messageIdTg} WHERE id = ${cardId}`);
+}
+
+async function smsWebhook(req: Request, res: Response) {
+  const token = clicksendWebhookToken();
+  if (!token || req.params.token !== token) { res.status(401).end(); return; }
+  const b = req.body as Record<string, unknown>;
+  const from = String(b.from ?? ""), body = String(b.body ?? b.message ?? ""), id = String(b.message_id ?? b.messageid ?? "");
+  if (!from || !body || !id) { res.status(400).end(); return; }
+  try {
+    await processSmsReply(id, from, body);
+    res.status(200).send("OK");
+  } catch (err) {
+    console.error("[inbound-sms] processing failed:", err);
+    res.status(500).end();
+  }
+}
+
 export function registerInboundReplies(app: Express) {
   app.post("/api/resend/inbound", express.raw({ type: "*/*", limit: "1mb" }), webhook);
+  app.post("/api/clicksend/inbound/:token", express.urlencoded({ extended: false, limit: "64kb" }), express.json({ limit: "64kb" }), smsWebhook);
 }

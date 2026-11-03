@@ -10,6 +10,7 @@ import { tg, operatorChatId, sendOperatorTelegram, telegramWebhookSecret, type T
 import { evaluateCronSecret } from "./scheduled/_cronSecret.js";
 import { replyAddress } from "./inboundReplies.js";
 import { buildWaHref } from "./routers/outreach-helpers.js";
+import { smsEnabled, sendSms, auMobile } from "./sms.js";
 
 const PROD_URL = (process.env.OWNOLOGY_PROD_URL || "https://www.ownology.ai").replace(/\/$/, "");
 const DAY = 24 * 60 * 60 * 1000;
@@ -42,12 +43,12 @@ const COLS = sql.raw("c.id, c.slug, c.first_name, c.winery, c.email, c.mobile_au
 
 export async function pickContacts(n: number): Promise<{ contact: Contact; kind: Card["kind"] }[]> {
   const now = Date.now();
-  const followups = await rows<Contact>(sql`SELECT ${COLS} FROM outreach_contacts c
+  const followups = smsEnabled() ? [] : await rows<Contact>(sql`SELECT ${COLS} FROM outreach_contacts c
     WHERE ${BASE_FILTER} AND (c.email IS NULL OR c.email = '') AND ${TOUCHED} IS NOT NULL AND ${TOUCHED} < ${now - 3 * DAY} AND COALESCE(c.view_count,0) > 0
       AND NOT EXISTS (SELECT 1 FROM outreach_cards k WHERE k.contact_id = c.id AND (k.kind = 'followup' AND k.status IN ('sent','pending','skipped','unfit') OR k.created_at > ${now - 7 * DAY}))
     ORDER BY c.view_count DESC LIMIT ${n}`);
   const fresh = followups.length >= n ? [] : await rows<Contact>(sql`SELECT ${COLS} FROM outreach_contacts c
-    WHERE ${BASE_FILTER} AND ${TOUCHED} IS NULL
+    WHERE ${BASE_FILTER} AND ${TOUCHED} IS NULL ${smsEnabled() ? sql`AND c.email IS NOT NULL AND c.email <> ''` : sql``}
       AND NOT EXISTS (SELECT 1 FROM outreach_cards k WHERE k.contact_id = c.id AND (k.status <> 'later' OR k.created_at > ${now - 7 * DAY}))
     ORDER BY (c.hook_text IS NOT NULL AND c.hook_text <> '') DESC, (c.email IS NOT NULL AND c.email <> '') DESC, c.created_at ASC LIMIT ${n - followups.length}`);
   return [...followups.map((contact) => ({ contact, kind: "followup" as const })), ...fresh.map((contact) => ({ contact, kind: "first" as const }))];
@@ -71,7 +72,7 @@ export async function draftMessage(c: Contact, kind: Card["kind"], channel: Card
     c.hook_text && `Personal hook (something they said/posted): ${c.hook_text}`, c.pain_point && `Likely pain point: ${c.pain_point}`,
     kind === "followup" && `They were texted/emailed before and opened their personal page ${c.view_count} time(s) but never replied.`, situation && `Situation: ${situation}`].filter(Boolean).join("\n");
   const rules = channel === "sms"
-    ? "Write ONE SMS, max 240 characters, no emojis. Must include the literal token {URL} once. Do not add sign-off phone numbers or opt-out text."
+    ? "Write ONE SMS, max 200 characters, no emojis, say it is from Rich at Ownology. Must include the literal token {URL} once. Do not add sign-off phone numbers or opt-out text."
     : "Write a short plain email (60-120 words), 2-4 short paragraphs, sign off 'Cheers,\\nRich'. Start with \"G'day <first name>,\". Must include the literal token {URL} on its own line. Subject max 60 chars, specific, no clickbait.";
   try {
     const raw = await chatCompletion([
@@ -86,7 +87,10 @@ export async function draftMessage(c: Contact, kind: Card["kind"], channel: Card
   return fallbackDraft(c, kind, channel);
 }
 
-const smsText = (c: Contact, body: string) => `${body.replace("{URL}", pageUrl(c))}\nReply STOP to opt out`;
+const smsText = (c: Contact, body: string) => {
+  const b = body.replace("{URL}", pageUrl(c));
+  return `${b}${/ownology/i.test(b) ? "" : " - Rich, Ownology"}\nReply STOP to opt out`;
+};
 
 function cardText(c: Contact, k: Card, footer?: string): string {
   if (k.kind === "reply") return [`📥 REPLY to ${c.first_name}${c.winery ? ` — ${c.winery}` : ""}`, "———", `Subject: ${k.subject}\n\n${k.body}`, footer && `———\n${footer}`].filter(Boolean).join("\n\n").slice(0, 4000);
@@ -99,6 +103,7 @@ function cardText(c: Contact, k: Card, footer?: string): string {
 function cardButtons(k: Card): TgButton[][] {
   const main: TgButton[] = k.channel === "email"
     ? [{ text: "✉️ Send email", callback_data: `oc:send:${k.id}` }]
+    : smsEnabled() ? [{ text: "📱 Send text", callback_data: `oc:send:${k.id}` }]
     : [{ text: "📱 Open Messages", url: `${PROD_URL}/api/outreach/sms/${k.id}?t=${sign(`sms:${k.id}`)}` }, { text: "✅ I sent it", callback_data: `oc:sent:${k.id}` }];
   return [main, [{ text: "⏭ Skip", callback_data: `oc:skip:${k.id}` }, { text: "💤 Later", callback_data: `oc:later:${k.id}` }, { text: "🚫 Not a fit", callback_data: `oc:unfit:${k.id}` }]];
 }
@@ -147,7 +152,7 @@ export async function pickAutoFollowups(now = Date.now()): Promise<{ contact: Co
       (SELECT MAX(k.acted_at) FROM outreach_cards k WHERE k.contact_id = c.id AND k.kind = 'auto2' AND k.status = 'sent') a2,
       (SELECT MAX(e.created_at) FROM user_events e WHERE e.slug = c.slug) last_seen
     FROM outreach_contacts c
-    WHERE ${BASE_FILTER} AND c.email IS NOT NULL AND c.email <> '' AND ${TOUCHED} IS NOT NULL
+    WHERE ${BASE_FILTER} AND ((c.email IS NOT NULL AND c.email <> '') OR ${sql.raw(smsEnabled() ? "(c.mobile_au IS NOT NULL AND c.mobile_au <> '')" : "FALSE")}) AND ${TOUCHED} IS NOT NULL
       AND NOT EXISTS (SELECT 1 FROM outreach_cards k WHERE k.contact_id = c.id AND k.status = 'pending')`);
   const out: { contact: Contact; kind: AutoKind; opened: boolean; order: number }[] = [];
   for (const c of cs) {
@@ -162,25 +167,44 @@ export async function pickAutoFollowups(now = Date.now()): Promise<{ contact: Co
   return out.sort((a, b) => a.order - b.order).slice(0, AUTO_DAILY_CAP).map(({ order: _o, ...r }) => r);
 }
 
-const AUTO_LABEL: Record<AutoKind, string> = { revive: "fresh nudge", auto1: "day-4 follow-up", auto2: "final note" };
+const FIRST_TEXTS_DAILY = 8;
+
+// Mobile-only prospects who've never been contacted get their first text automatically.
+export async function pickAutoFirstTexts(now = Date.now()): Promise<{ contact: Contact; kind: "first"; opened: boolean }[]> {
+  if (!smsEnabled()) return [];
+  const cs = await rows<Contact>(sql`SELECT ${COLS} FROM outreach_contacts c
+    WHERE ${BASE_FILTER} AND ${TOUCHED} IS NULL AND (c.email IS NULL OR c.email = '') AND c.mobile_au IS NOT NULL AND c.mobile_au <> ''
+      AND NOT EXISTS (SELECT 1 FROM outreach_cards k WHERE k.contact_id = c.id AND (k.status <> 'later' OR k.created_at > ${now - 7 * DAY}))
+    ORDER BY (c.hook_text IS NOT NULL AND c.hook_text <> '') DESC, c.created_at ASC LIMIT ${FIRST_TEXTS_DAILY * 3}`);
+  return cs.filter((c) => auMobile(c.mobile_au)).slice(0, FIRST_TEXTS_DAILY).map((contact) => ({ contact, kind: "first" as const, opened: false }));
+}
+
+const AUTO_LABEL: Record<AutoKind | "first", string> = { first: "first text", revive: "fresh nudge", auto1: "day-4 follow-up", auto2: "final note" };
 
 export async function runAutoFollowups(): Promise<string[]> {
   const sent: string[] = [];
-  for (const { contact, kind, opened } of await pickAutoFollowups()) {
+  const picks: { contact: Contact; kind: AutoKind | "first"; opened: boolean }[] = [...(await pickAutoFollowups()), ...(await pickAutoFirstTexts())];
+  for (const { contact, kind, opened } of picks) {
+    const channel: Card["channel"] = contact.email ? "email" : "sms";
+    if (channel === "sms" && !auMobile(contact.mobile_au)) continue;
     let cardId: number | null = null;
     try {
-      const d = await draftMessage(contact, kind, "email", SITUATION[kind](opened));
+      const d = await draftMessage(contact, kind, channel, kind === "first" ? undefined : SITUATION[kind](opened));
       const [ins] = await db.execute(sql`INSERT INTO outreach_cards (contact_id, kind, channel, subject, body, status, created_at)
-        VALUES (${contact.id}, ${kind}, 'email', ${d.subject || null}, ${d.body}, 'sending', ${Date.now()})`);
+        VALUES (${contact.id}, ${kind}, ${channel}, ${d.subject || null}, ${d.body}, 'sending', ${Date.now()})`);
       cardId = (ins as unknown as { insertId: number }).insertId;
-      const card: Card = { id: cardId, contact_id: contact.id, kind, channel: "email", subject: d.subject, body: d.body, status: "sending" };
-      const resendId = await sendCardEmail(contact, card);
+      const card: Card = { id: cardId, contact_id: contact.id, kind, channel, subject: d.subject, body: d.body, status: "sending" };
+      const ref = channel === "email" ? await sendCardEmail(contact, card) : await sendSms(contact.mobile_au!, smsText(contact, card.body), `card:${card.id}`);
       await db.execute(sql`UPDATE outreach_cards SET status = 'sent', acted_at = ${Date.now()} WHERE id = ${card.id}`);
-      await markTouched(contact, card, `Auto ${AUTO_LABEL[kind]} emailed (${resendId})`);
-      sent.push(`• ${contact.first_name}${contact.winery ? ` (${contact.winery})` : ""}: ${AUTO_LABEL[kind]}${kind === "auto1" ? (opened ? ", they'd opened it" : ", not opened yet") : ""}`);
+      await markTouched(contact, card, `Auto ${AUTO_LABEL[kind]} ${channel === "email" ? "emailed" : "texted"} (${ref})`);
+      sent.push(`• ${channel === "email" ? "✉️" : "📱"} ${contact.first_name}${contact.winery ? ` (${contact.winery})` : ""}: ${AUTO_LABEL[kind]}${kind === "auto1" ? (opened ? ", they'd opened it" : ", not opened yet") : ""}`);
     } catch (err) {
       console.error(`[copilot] auto ${kind} for ${contact.slug} failed:`, err);
       if (cardId) await db.execute(sql`DELETE FROM outreach_cards WHERE id = ${cardId}`).catch(() => {});
+      if (err instanceof Error && /ClickSend: (INSUFFICIENT_CREDIT|.*BALANCE)/i.test(err.message)) {
+        await sendOperatorTelegram("⚠️ ClickSend is out of credit, so texts have paused. Top up at dashboard.clicksend.com.");
+        break;
+      }
     }
   }
   return sent;
@@ -226,10 +250,16 @@ export async function handleCardAction(action: string, id: number): Promise<stri
   const time = new Date().toLocaleTimeString("en-AU", { timeZone: "Australia/Sydney", hour: "numeric", minute: "2-digit" });
   let status: string, footer: string;
   if (action === "send") {
-    if (card.channel !== "email") return "Not an email card";
-    const resendId = await sendCardEmail(contact, card);
-    await markTouched(contact, card, `Copilot ${card.kind} email sent (${resendId})`);
-    status = "sent"; footer = `✅ Emailed ${contact.email} at ${time}`;
+    if (card.channel === "sms") {
+      if (!contact.mobile_au) return "No mobile on file";
+      const ref = await sendSms(contact.mobile_au, card.kind === "reply" ? card.body : smsText(contact, card.body), `card:${card.id}`);
+      await markTouched(contact, card, `Copilot ${card.kind} text sent (${ref})`);
+      status = "sent"; footer = `✅ Texted ${contact.mobile_au} at ${time}`;
+    } else {
+      const resendId = await sendCardEmail(contact, card);
+      await markTouched(contact, card, `Copilot ${card.kind} email sent (${resendId})`);
+      status = "sent"; footer = `✅ Emailed ${contact.email} at ${time}`;
+    }
   } else if (action === "sent") {
     await markTouched(contact, card, `Copilot ${card.kind} SMS sent`);
     status = "sent"; footer = `✅ SMS marked sent at ${time}`;
@@ -270,7 +300,7 @@ export async function runDailyIfDue(force = false): Promise<{ ran: boolean; sent
   const changed = (r as unknown as { affectedRows: number }).affectedRows > 0;
   if (!changed && !force) return { ran: false };
   const autos = await runAutoFollowups();
-  if (autos.length) await sendOperatorTelegram(`🤖 Sent ${autos.length} automatic follow-up email${autos.length === 1 ? "" : "s"} for you:\n\n${autos.join("\n")}\n\nThey stop by themselves if anyone replies, signs up or unsubscribes.`);
+  if (autos.length) await sendOperatorTelegram(`🤖 Sent ${autos.length} automatic message${autos.length === 1 ? "" : "s"} for you:\n\n${autos.join("\n")}\n\nThey stop by themselves if anyone replies, signs up or unsubscribes.`);
   await sendOperatorTelegram(`☀️ Morning, Rich. Here are today's ${DAILY_CARDS} prospects to approve.`);
   const sent = await createAndSendCards(DAILY_CARDS);
   if (sent === 0) await sendOperatorTelegram("Nobody new to contact today. 🎉");
@@ -331,8 +361,8 @@ async function cronHandler(req: Request, res: Response) {
   const { dryRun, reason } = evaluateCronSecret(req, "outreach-cards", { hasApiKey: !!process.env.TELEGRAM_BOT_TOKEN });
   if (dryRun) {
     const picks = await pickContacts(DAILY_CARDS);
-    const autos = await pickAutoFollowups();
-    res.json({ ok: true, dryRun, reason, picks: picks.map((p) => ({ slug: p.contact.slug, kind: p.kind, channel: p.contact.email ? "email" : "sms" })), autos: autos.map((a) => ({ slug: a.contact.slug, kind: a.kind, opened: a.opened })) });
+    const autos = [...(await pickAutoFollowups()), ...(await pickAutoFirstTexts())];
+    res.json({ ok: true, dryRun, reason, picks: picks.map((p) => ({ slug: p.contact.slug, kind: p.kind, channel: p.contact.email ? "email" : "sms" })), autos: autos.map((a) => ({ slug: a.contact.slug, kind: a.kind, channel: a.contact.email ? "email" : "sms", opened: a.opened })) });
     return;
   }
   res.json({ ok: true, dryRun, ...(await runDailyIfDue(req.query.force === "1")) });
