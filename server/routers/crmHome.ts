@@ -65,8 +65,8 @@ export function instaHandle(notes: string | null): string | null {
 const instaOnly = (c: C) => !c.email && !c.mobile_au && !!instaHandle(c.notes);
 function instaDm(c: C): string {
   const met = c.event && !/directory|youtube|podcast|article|research|website|web\b/i.test(c.event) ? c.event.replace(/\s*\(.*\)\s*$/, "") : null;
-  const opener = met ? `We crossed paths at ${met} and I never got to share an idea with you.` : `Love what you're doing${c.winery ? ` at ${c.winery}` : ""}.`;
-  return `Hi ${c.first_name}, Rich here. ${opener} Gel and I have built Ownology: one place for a winery's specs, blends, vintage notes and quality records, so they stay with the brand year after year.\n\nWe made a 90-second page just for you: ${PROD}/hi/${c.slug}\n\nNo pressure at all, happy to answer anything.`;
+  const opener = met ? `We crossed paths at ${met} and never got to share an idea with you.` : `Love what you're doing${c.winery ? ` at ${c.winery}` : ""}.`;
+  return `Hi ${c.first_name}, Rich & Gel here from Ownology. ${opener} We've built one place for a winery's specs, blends, vintage notes and quality records, so they stay with the brand year after year.\n\nWe made a 90-second page just for you: ${PROD}/hi/${c.slug}\n\nNo pressure at all, happy to answer anything.`;
 }
 
 const STAGES = ["not_contacted", "contacted", "opened", "replied", "signed_up", "paying"] as const;

@@ -119,7 +119,7 @@ function InstaDm({ contactId, handle, dm, sentAt }: { contactId: number; handle:
   const btn = "inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-base disabled:opacity-60";
   return (
     <div className={`${card} space-y-3 px-4 py-4`} data-testid="crm-insta-dm">
-      <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ow-text-lo)]">Instagram DM, from your own account</h3>
+      <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ow-text-lo)]">Instagram DM, send from @ownologyai</h3>
       <p className="select-all whitespace-pre-wrap text-sm text-[var(--ow-text-mid)]" data-testid="crm-insta-dm-text">{dm}</p>
       <div className="flex flex-wrap gap-2">
         <button type="button" onClick={copy} className={`${btn} bg-[var(--ow-amber)] font-semibold text-[var(--ow-bg-base)]`} data-testid="crm-insta-copy"><Copy className="h-4 w-4" /> Copy DM</button>
