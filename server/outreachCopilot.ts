@@ -8,6 +8,8 @@ import { db } from "./db.js";
 import { chatCompletion, MODELS } from "./_core/llm.js";
 import { tg, operatorChatId, sendOperatorTelegram, telegramWebhookSecret, type TgButton } from "./telegram.js";
 import { evaluateCronSecret } from "./scheduled/_cronSecret.js";
+import { replyAddress } from "./inboundReplies.js";
+import { buildWaHref } from "./routers/outreach-helpers.js";
 
 const PROD_URL = (process.env.OWNOLOGY_PROD_URL || "https://www.ownology.ai").replace(/\/$/, "");
 const DAY = 24 * 60 * 60 * 1000;
@@ -21,7 +23,7 @@ type Contact = {
   hook_text: string | null; pain_point: string | null; event: string | null; region: string | null; view_count: number;
 };
 type AutoKind = "auto1" | "auto2" | "revive";
-type Card = { id: number; contact_id: number; kind: "first" | "followup" | AutoKind; channel: "email" | "sms"; subject: string | null; body: string; status: string };
+type Card = { id: number; contact_id: number; kind: "first" | "followup" | "reply" | AutoKind; channel: "email" | "sms"; subject: string | null; body: string; status: string };
 
 const rows = async <T,>(q: ReturnType<typeof sql>) => ((await db.execute(q))[0] as unknown as T[]);
 const sign = (v: string) => createHmac("sha256", process.env.JWT_SECRET || process.env.TELEGRAM_BOT_TOKEN || "ow").update(v).digest("hex").slice(0, 24);
@@ -87,6 +89,7 @@ export async function draftMessage(c: Contact, kind: Card["kind"], channel: Card
 const smsText = (c: Contact, body: string) => `${body.replace("{URL}", pageUrl(c))}\nReply STOP to opt out`;
 
 function cardText(c: Contact, k: Card, footer?: string): string {
+  if (k.kind === "reply") return [`📥 REPLY to ${c.first_name}${c.winery ? ` — ${c.winery}` : ""}`, "———", `Subject: ${k.subject}\n\n${k.body}`, footer && `———\n${footer}`].filter(Boolean).join("\n\n").slice(0, 4000);
   const head = `${k.kind === "followup" ? "🔁 FOLLOW-UP" : "🆕 NEW"} · ${k.channel === "email" ? "✉️ Email" : "📱 SMS"}\n${c.first_name}${c.winery ? ` — ${c.winery}` : ""}${c.region ? ` (${c.region})` : ""}`;
   const why = [c.hook_text && `Hook: ${c.hook_text}`, c.event && `Source: ${c.event}`, k.kind === "followup" && `Opened their page ${c.view_count}×, no reply yet`].filter(Boolean).join("\n");
   const msg = k.channel === "email" ? `Subject: ${k.subject}\n\n${k.body.replace("{URL}", pageUrl(c))}` : smsText(c, k.body);
@@ -192,13 +195,18 @@ async function loadCard(id: number): Promise<{ card: Card; contact: Contact } | 
 
 async function sendCardEmail(c: Contact, k: Card): Promise<string> {
   if (!c.email || !process.env.RESEND_API_KEY) throw new Error("No email address or Resend key");
+  const isReply = k.kind === "reply";
   const url = pageUrl(c), unsub = unsubUrl(c);
-  const text = `${k.body.replace("{URL}", url)}\n\n—\nRichard Purr · Ownology · ownology.ai\nDon't want to hear from me again? ${unsub}`;
+  const wa = buildWaHref({ firstName: c.first_name, winery: c.winery });
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
-  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:560px;color:#111827;line-height:1.6;font-size:15px">${k.body.split(/\n\n+/).map((p) => `<p>${esc(p).replace("{URL}", `<a href="${url}" style="color:#b45309;font-weight:600">${url}</a>`).replace(/\n/g, "<br>")}</p>`).join("")}<p style="font-size:12px;color:#6b7280;border-top:1px solid #e5e7eb;padding-top:12px;margin-top:28px">Richard Purr · Ownology · ownology.ai<br>Don't want to hear from me again? <a href="${unsub}" style="color:#6b7280">Unsubscribe</a></p></div>`;
+  const footText = isReply ? "" : `\n\n—\nRichard Purr · Ownology · ownology.ai${wa ? `\nPrefer WhatsApp? ${wa}` : ""}\nDon't want to hear from me again? ${unsub}`;
+  const footHtml = isReply ? "" : `<p style="font-size:12px;color:#6b7280;border-top:1px solid #e5e7eb;padding-top:12px;margin-top:28px">Richard Purr · Ownology · ownology.ai${wa ? `<br>Prefer WhatsApp? <a href="${wa}" style="color:#6b7280">Message me there</a>` : ""}<br>Don't want to hear from me again? <a href="${unsub}" style="color:#6b7280">Unsubscribe</a></p>`;
+  const text = `${k.body.replace("{URL}", url)}${footText}`;
+  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:560px;color:#111827;line-height:1.6;font-size:15px">${k.body.split(/\n\n+/).map((p) => `<p>${esc(p).replace("{URL}", `<a href="${url}" style="color:#b45309;font-weight:600">${url}</a>`).replace(/\n/g, "<br>")}</p>`).join("")}${footHtml}</div>`;
+  const inbound = replyAddress(c.slug);
   const r = await new Resend(process.env.RESEND_API_KEY).emails.send({
-    from: FROM, to: [c.email], replyTo: REPLY_TO, subject: k.subject || `${c.first_name}, a small idea`, text, html,
-    headers: { "List-Unsubscribe": `<${unsub}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" },
+    from: FROM, to: [c.email], replyTo: inbound ? [inbound, ...REPLY_TO] : REPLY_TO, subject: k.subject || `${c.first_name}, a small idea`, text, html,
+    ...(isReply ? {} : { headers: { "List-Unsubscribe": `<${unsub}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } }),
   });
   if (r.error) throw new Error(r.error.message ?? "Resend failed");
   return r.data?.id ?? "";

@@ -34,6 +34,7 @@ import { marketingCoachEmailHandler } from "./scheduled/marketingCoachEmail.js";
 import { nurtureEmailHandler } from "./scheduled/nurtureEmail.js";
 import { demoFollowupHandler } from "./scheduled/demoFollowup.js";
 import { registerOutreachCopilot, startOutreachCopilot } from "./outreachCopilot.js";
+import { registerInboundReplies } from "./inboundReplies.js";
 import { generateLipAuditPackPdf } from "./lipAuditPackPdf.js";
 import { generateCellarBookPdf } from "./cellarBookPdf.js";
 import { isDevBypassActive } from "./devBypass.js";
@@ -594,6 +595,7 @@ async function startServer() {
     return res.redirect(302, "/admin");
   });
 
+  registerInboundReplies(app); // raw body for Resend signature check — before express.json()
   // ── Stripe webhook MUST come before express.json() ──────────────────────────
   app.use("/api/stripe/webhook", express.raw({ type: "application/json" }), (req, res, next) => {
     req.url = "/webhook";
@@ -1859,6 +1861,7 @@ async function startServer() {
       sql`CREATE TABLE IF NOT EXISTS stripe_events_processed (event_id VARCHAR(80) NOT NULL PRIMARY KEY, created_at BIGINT NOT NULL)`,
       sql`CREATE TABLE IF NOT EXISTS member_watches (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NULL, tag VARCHAR(80) NULL,
         label VARCHAR(200) NOT NULL, created_at BIGINT NOT NULL, fired_at BIGINT NULL)`,
+      sql`CREATE TABLE IF NOT EXISTS inbound_emails (email_id VARCHAR(80) NOT NULL PRIMARY KEY, contact_id INT NULL, created_at BIGINT NOT NULL)`,
       sql`CREATE TABLE IF NOT EXISTS outreach_cards (id INT AUTO_INCREMENT PRIMARY KEY, contact_id INT NOT NULL, kind VARCHAR(16) NOT NULL,
         channel VARCHAR(8) NOT NULL, subject VARCHAR(200) NULL, body TEXT NOT NULL, status VARCHAR(16) NOT NULL, created_at BIGINT NOT NULL,
         acted_at BIGINT NULL, telegram_message_id BIGINT NULL, INDEX idx_oc_contact (contact_id))`,

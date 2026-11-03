@@ -1883,3 +1883,9 @@ public demo (/how-we-trace) → real cellar → per-vessel event log.**
 - Auto email sequence in outreachCopilot.ts (runs inside the 7:30 daily job, Railway only, cap 10/day): revive (first touch >30d ago, once) → auto1 day 4 (opened vs not-opened wording) → auto2 +7d final. Stops on reply / sign-up (linked user) / unsubscribe / not a fit. Manual follow-up cards now only for SMS-only contacts. Signed-up people excluded from all outreach.
 - member_watches.slug added; watches match by slug too. Account pill hidden while a sheet is open.
 - Tested: iteration_50 (27/27 backend, frontend 100%); 2 design + 4 minor backend notes fixed after.
+
+## Jun 2026 — Reply catcher + WhatsApp in emails
+- `server/inboundReplies.ts`: POST /api/resend/inbound (raw body, Resend webhooks.verify with RESEND_INBOUND_SECRET) → fetch via resend.emails.receiving.get → match contact by reply+<slug>@INBOUND_REPLY_DOMAIN or sender email → set replied_at/reply_text/reply_sentiment (stops all sequences; STOP words → unsubscribed) → Telegram card with AI-drafted answer (outreach_cards kind 'reply'; "Send this answer" / "I'll reply myself"). Idempotent via inbound_emails table.
+- Outreach emails: Reply-To now includes reply+<slug>@INBOUND_REPLY_DOMAIN (only when env set) + richard + iamrjpurr; footer has "Prefer WhatsApp?" wa.me link (WHATSAPP_INBOUND_NUMBER || SMS_INBOUND_NUMBER, 0408 105 067). /hi pages already had a WhatsApp button.
+- NEEDS USER SETUP: Resend receiving domain in.ownology.ai (MX), webhook → https://www.ownology.ai/api/resend/inbound (email.received), Railway vars INBOUND_REPLY_DOMAIN=in.ownology.ai + RESEND_INBOUND_SECRET.
+- Tested in preview: processInbound with a test contact → replied/sentiment set, Telegram card, Send-this-answer email sent; unconfigured webhook returns 503.
