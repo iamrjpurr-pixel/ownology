@@ -1897,3 +1897,12 @@ public demo (/how-we-trace) → real cellar → per-vessel event log.**
 - Reply drafts must not invent prices/features (point to /pricing).
 - Data: Taras Ochota (id 251) set to skip (deceased 2022).
 - Tested: real test SMS to Rich's mobile delivered via ClickSend; simulated inbound reply/dup/STOP/bad token all correct.
+
+## Jun 2026 — "GO": ramped auto batches + 7:00 preview
+- Daily flow (Railway scheduler, every 10 min): after 7:00 Sydney, once/day (operator_settings.copilot_prepared) → prepareAutoBatch drafts all automatic messages as outreach_cards status 'queued' and posts a Telegram preview (#id per message, ⏸ Hold all / ▶️ Send now). sendDueQueued sends queued cards >30 min old unless held today (operator_settings.copilot_hold). Commands: /remove <ids>, /release.
+- Now automatic: first emails (never-contacted with email), first texts (mobile-only), revive/day-4/day-11. Manual morning cards dropped (/more still works).
+- Ramp caps by days since operator_settings.auto_ramp_start: week1 follow 10/texts 8/emails 10; week2 15/15/15; then 25/25/25. One message per address per day.
+- SMS links use apex https://ownology.ai/hi/<slug> (ownology.ai registered with ClickSend for links).
+- Prompt: never claim meeting; events → "we crossed paths at <event> and I never got to share an idea"; don't quote their words verbatim.
+- Skipped: Adam Richardson (ATR closing), Anna Hooper (AGW industry body).
+- Tested in preview: hold blocks send, release sends queued email, removed card untouched.
