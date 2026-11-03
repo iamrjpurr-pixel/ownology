@@ -52,7 +52,7 @@ const SENTIMENT_LABEL: Record<string, string> = { interested: "🟢 Interested",
 export async function handleInbound(emailId: string): Promise<void> {
   const [ins] = await db.execute(sql`INSERT IGNORE INTO inbound_emails (email_id, created_at) VALUES (${emailId}, ${Date.now()})`);
   if ((ins as unknown as { affectedRows: number }).affectedRows !== 1) return;
-  const { data: email, error } = await new Resend(process.env.RESEND_API_KEY).emails.receiving.get(emailId);
+  const { data: email, error } = await new Resend(process.env.RESEND_INBOUND_API_KEY || process.env.RESEND_API_KEY).emails.receiving.get(emailId);
   if (error || !email) {
     await db.execute(sql`DELETE FROM inbound_emails WHERE email_id = ${emailId}`);
     throw new Error(error?.message ?? "received email not found");
