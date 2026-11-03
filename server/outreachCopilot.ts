@@ -347,6 +347,18 @@ async function markTouched(c: Contact, k: Card, note: string) {
   await db.execute(sql`UPDATE outreach_contacts SET ${col} = COALESCE(${col}, ${Date.now()}), notes = LEFT(CONCAT(COALESCE(notes,''), ${line}), 500) WHERE id = ${c.id}`);
 }
 
+// One-off email written by the operator, logged as a sent follow-up card.
+export async function sendManualEmail(contactId: number, subject: string, body: string): Promise<string> {
+  const [c] = await rows<Contact & { ok: number }>(sql`SELECT ${COLS}, (${BASE_FILTER}) ok FROM outreach_contacts c WHERE c.id = ${contactId}`);
+  if (!c || !Number(c.ok) || !c.email) throw new Error("Contact can't be emailed (unsubscribed, replied, not a fit or no email)");
+  const [ins] = await db.execute(sql`INSERT INTO outreach_cards (contact_id, kind, channel, subject, body, status, created_at) VALUES (${c.id}, 'followup', 'email', ${subject}, ${body}, 'sending', ${Date.now()})`);
+  const card: Card = { id: (ins as unknown as { insertId: number }).insertId, contact_id: c.id, kind: "followup", channel: "email", subject, body, status: "sending" };
+  const ref = await sendCardEmail(c, card);
+  await db.execute(sql`UPDATE outreach_cards SET status = 'sent', acted_at = ${Date.now()} WHERE id = ${card.id}`);
+  await markTouched(c, card, `Manual follow-up emailed (${ref})`);
+  return ref;
+}
+
 export async function handleCardAction(action: string, id: number): Promise<string> {
   const loaded = await loadCard(id);
   if (!loaded) return "Card not found";
