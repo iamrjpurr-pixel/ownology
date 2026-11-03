@@ -4,7 +4,7 @@ import { sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { router, ownerProcedure } from "../trpc.js";
 import { db } from "../db.js";
-import { sendCardForContact } from "../outreachCopilot.js";
+import { sendCardForContact, handleCardAction } from "../outreachCopilot.js";
 
 const DAY = 86_400_000;
 const rows = async <T,>(q: ReturnType<typeof sql>) => ((await db.execute(q))[0] as unknown as T[]);
@@ -94,14 +94,18 @@ export const crmHomeRouter = router({
       FROM outreach_contacts c WHERE ${ACTIVE} AND c.replied_at IS NULL AND ${TOUCHED} < ${now - 3 * DAY}
       HAVING last_seen > ${now - 30 * DAY} AND last_seen < ${now - 3 * DAY} ORDER BY last_seen DESC LIMIT 4`);
 
+    const waiting = await rows<C & { cards: number }>(sql`SELECT ${C_COLS}, COUNT(k.id) cards FROM outreach_cards k JOIN outreach_contacts c ON c.id = k.contact_id
+      WHERE k.status = 'pending' GROUP BY ${C_COLS} ORDER BY MIN(k.created_at) LIMIT 10`);
+
     const seen = new Set<string>();
     const needsYou: CrmRow[] = [];
     const push = (r: CrmRow) => { if (!seen.has(r.key)) { seen.add(r.key); needsYou.push(r); } };
+    waiting.forEach((c) => push(toRow(c, "Message written, waiting for you to send")));
     back.forEach((c) => push(toRow(c, `Came back ${day(Number(c.last_at))} (${c.visits} visit${Number(c.visits) === 1 ? "" : "s"} in 3 days)`, Number(c.last_at))));
     replied.forEach((c) => push(toRow(c, `Replied ${day(c.replied_at!)}${c.reply_text ? `: "${c.reply_text.slice(0, 120)}"` : ""}`, c.replied_at!)));
     stalled.forEach((u) => push(userRow(u, "Signed up but hasn't been back")));
     quiet.forEach((c) => push(toRow(c, `Warm: last visited ${day(Number(c.last_seen))}, no reply yet`, Number(c.last_seen))));
-    return { funnel, needsYou: needsYou.slice(0, 10) };
+    return { funnel, needsYou: needsYou.slice(0, 15) };
   }),
 
   stage: ownerProcedure.input(z.object({ stage: z.enum(STAGES) })).query(({ input }) => stageRows(input.stage)),
@@ -156,6 +160,8 @@ export const crmHomeRouter = router({
         }
       }
     }
+    const pending = c ? await rows<{ id: number; channel: string; kind: string; subject: string | null; body: string }>(sql`SELECT id, channel, kind, subject, body FROM outreach_cards WHERE contact_id = ${c.id} AND status = 'pending' ORDER BY created_at DESC`) : [];
+    const pageUrl = c ? `${(process.env.OWNOLOGY_PROD_URL || "https://www.ownology.ai").replace(/\/$/, "")}/hi/${c.slug}` : "";
     const [watch] = await rows<{ id: number }>(sql`SELECT id FROM member_watches WHERE fired_at IS NULL AND (${c ? sql`slug = ${c.slug}` : sql`FALSE`} OR ${userId ? sql`user_id = ${userId}` : sql`FALSE`}) LIMIT 1`);
     story.sort((a, b) => a.at - b.at);
     return {
@@ -163,8 +169,9 @@ export const crmHomeRouter = router({
       name: c ? name(c) : u?.name || u?.email || "Unknown", winery: c?.winery ?? u?.winery ?? "",
       email: c?.email ?? u?.email ?? null, mobile: c?.mobile_au ?? null,
       summary: c ? contactLine(c) : u ? userLine(u) : "", wines: u ? Number(u.wines) : null,
-      notFit: c?.status === "skip", watching: !!watch, canCard: !!c && !userId && !c.unsubscribed_at && c.status !== "skip" && !!(c.email || c.mobile_au),
+      notFit: c?.status === "skip", watching: !!watch, canCard: !!c && !userId && pending.length === 0 && !c.unsubscribed_at && c.status !== "skip" && !!(c.email || c.mobile_au),
       story: story.map((s) => ({ ...s, day: day(s.at) })),
+      pendingCards: pending.map((k) => ({ id: Number(k.id), channel: k.channel, kind: k.kind, subject: k.subject, body: k.body.replace("{URL}", pageUrl) })),
     };
   }),
 
@@ -190,6 +197,12 @@ export const crmHomeRouter = router({
     if (dupe) return { ok: true };
     await db.execute(sql`INSERT INTO member_watches (user_id, slug, tag, label, created_at) VALUES (${input.userId ?? null}, ${slug}, NULL, ${label}, ${Date.now()})`);
     return { ok: true };
+  }),
+
+  cardAction: ownerProcedure.input(z.object({ cardId: z.number().int(), action: z.enum(["send", "skip"]) })).mutation(async ({ input }) => {
+    const note = await handleCardAction(input.action, input.cardId);
+    if (/not found|Already|Not an email/.test(note)) throw new TRPCError({ code: "BAD_REQUEST", message: note });
+    return { note };
   }),
 
   notFit: ownerProcedure.input(z.object({ contactId: z.number().int() })).mutation(async ({ input }) => {

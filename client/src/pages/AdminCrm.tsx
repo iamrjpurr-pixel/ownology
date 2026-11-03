@@ -80,6 +80,38 @@ function PersonActions({ p }: { p: { contactId: number | null; userId: number | 
   );
 }
 
+type PendingCard = { id: number; channel: string; kind: string; subject: string | null; body: string };
+
+function PendingCards({ cards }: { cards: PendingCard[] }) {
+  const utils = trpc.useUtils();
+  const act = trpc.crmHome.cardAction.useMutation({
+    onSuccess: (r) => { toast.success(r.note); utils.crmHome.invalidate(); },
+    onError: (e) => toast.error(e.message),
+  });
+  if (!cards.length) return null;
+  return (
+    <div className="space-y-3" data-testid="crm-pending-cards">
+      <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ow-text-lo)]">Message waiting for you</h3>
+      {cards.map((k) => (
+        <div key={k.id} className={`${card} space-y-3 px-4 py-4`} data-testid={`crm-pending-${k.id}`}>
+          {k.subject && <p className="text-sm font-semibold text-[var(--ow-text-hi)]">{k.subject}</p>}
+          <p className="whitespace-pre-wrap text-sm text-[var(--ow-text-mid)]">{k.body}</p>
+          <div className="flex flex-wrap gap-2">
+            {k.channel === "email" && (
+              <button type="button" disabled={act.isPending} onClick={() => act.mutate({ cardId: k.id, action: "send" })} data-testid={`crm-pending-send-${k.id}`}
+                className="inline-flex items-center gap-2 rounded-xl bg-[var(--ow-amber)] px-4 py-2.5 text-base font-semibold text-[var(--ow-bg-base)] disabled:opacity-60">
+                <Mail className="h-4 w-4" /> {act.isPending ? "Sending…" : "Send this email"}
+              </button>
+            )}
+            <button type="button" disabled={act.isPending} onClick={() => act.mutate({ cardId: k.id, action: "skip" })} data-testid={`crm-pending-skip-${k.id}`}
+              className="rounded-xl border border-[var(--ow-border-md)] px-4 py-2.5 text-base text-[var(--ow-text-hi)] disabled:opacity-60">Skip</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function PersonSheet({ pick, onClose }: { pick: Pick | null; onClose: () => void }) {
   const q = trpc.crmHome.person.useQuery({ contactId: pick?.contactId ?? undefined, userId: pick?.userId ?? undefined }, { enabled: !!pick });
   const p = q.data;
@@ -99,6 +131,7 @@ function PersonSheet({ pick, onClose }: { pick: Pick | null; onClose: () => void
               {p.mobile && <a href={`tel:${p.mobile}`} className="inline-flex items-center gap-1.5 hover:text-[var(--ow-amber)]" data-testid="crm-person-mobile"><Phone className="h-4 w-4" />{p.mobile}</a>}
               {clicks && <Link href={clicks} className="inline-flex items-center gap-1.5 hover:text-[var(--ow-amber)]" data-testid="crm-person-clicks"><MousePointerClick className="h-4 w-4" />See their clicks</Link>}
             </div>
+            <PendingCards cards={p.pendingCards} />
             <PersonActions p={p} />
             <div>
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ow-text-lo)]">Their story</h3>
