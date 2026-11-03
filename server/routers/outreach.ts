@@ -112,6 +112,9 @@ export const outreachRouter = router({
           lastName: schema.outreachContacts.lastName,
           winery: schema.outreachContacts.winery,
           mobileAu: schema.outreachContacts.mobileAu,
+          email: schema.outreachContacts.email,
+          emailSentAt: schema.outreachContacts.emailSentAt,
+          smsSentAt: schema.outreachContacts.smsSentAt,
           firstViewedAt: schema.outreachContacts.firstViewedAt,
           viewCount: schema.outreachContacts.viewCount,
           hotAlertSentAt: schema.outreachContacts.hotAlertSentAt,
@@ -121,6 +124,11 @@ export const outreachRouter = router({
         .from(schema.outreachContacts)
         .where(eq(schema.outreachContacts.slug, input.slug))
         .limit(1);
+      // Opens within 90s of our email are mail-security link scanners, not people: don't count them.
+      const sentAt = existing.length ? Math.max(existing[0].emailSentAt ?? 0, existing[0].smsSentAt ?? 0) : 0;
+      if (sentAt && (existing[0].emailSentAt ?? 0) > (existing[0].smsSentAt ?? 0) && now - sentAt < 90_000) {
+        return { ok: true, skipped: "scanner" as const };
+      }
       const isFirstView = existing.length > 0 && !existing[0].firstViewedAt;
       const prevViewCount = existing.length > 0 ? (existing[0].viewCount ?? 0) : 0;
       const newViewCount = prevViewCount + 1;
@@ -152,6 +160,11 @@ export const outreachRouter = router({
         const fullName = `${c.firstName || "Prospect"}${c.lastName ? ` ${c.lastName}` : ""}`;
         const wineryLabel = c.winery ? ` — ${c.winery}` : "";
         const mobileLabel = c.mobileAu || "(no mobile)";
+        const viaSms = (c.smsSentAt ?? 0) >= (c.emailSentAt ?? 0) && !!c.smsSentAt;
+        const channelLine = !sentAt ? "We haven't sent them anything yet, so someone shared or found the link."
+          : viaSms ? `We texted them (${mobileLabel}). Reply to their SMS while it's warm.`
+          : `We emailed them${c.email ? ` (${c.email})` : ""}. Reply to that email thread rather than sending something new.`;
+        const contactLine = `Mobile: ${mobileLabel}${c.email ? `\nEmail: ${c.email}` : ""}`;
 
         // FIRST-VIEW alert (existing behaviour, gentler tone).
         if (isFirstView) {
@@ -165,7 +178,7 @@ export const outreachRouter = router({
               from: process.env.RESEND_FROM || "Ownology Alerts <alerts@ownology.ai>",
               to: [alertTo],
               subject: `📡 ${c.firstName || "Prospect"} just opened their link${wineryLabel}`,
-              text: `${c.firstName || "A prospect"} from ${c.winery || "an unknown winery"} just opened ${link}.\n\nThey're on the page right now. Reply to their SMS while it's warm.\n\nMobile: ${mobileLabel}\n\nAdmin: ${previewBase}/admin/contacts`,
+              text: `${c.firstName || "A prospect"} from ${c.winery || "an unknown winery"} just opened ${link}.\n\nThey're on the page right now. ${channelLine}\n\n${contactLine}\n\nAdmin: ${previewBase}/admin/contacts`,
             }),
           }).catch(() => { /* silent */ });
         }
@@ -183,7 +196,7 @@ export const outreachRouter = router({
               from: process.env.RESEND_FROM || "Ownology Alerts <alerts@ownology.ai>",
               to: [alertTo],
               subject: `🔥 ${fullName} is circling — view #${newViewCount}${wineryLabel}`,
-              text: `${fullName}${c.winery ? ` from ${c.winery}` : ""} has now opened ${link} ${newViewCount} times.\n\nThey're circling. This is the moment — call them, SMS them, or reply to their SMS if they've already texted back. A prospect on view 3+ is almost always mid-decision.\n\nMobile: ${mobileLabel}\n\nDirect follow-up SMS (copy/paste):\n"hey ${c.firstName || "there"} — noticed you had another look at that link i sent. happy to answer any Qs directly, or i can walk you through it live in 15 min. what works? — Rich P · 0408 105 067"${hookLine}\n\nEngagement dashboard: ${previewBase}/admin/contacts/engagement\nAdmin card: ${previewBase}/admin/contacts?slug=${encodeURIComponent(c.slug)}`,
+              text: `${fullName}${c.winery ? ` from ${c.winery}` : ""} has now opened ${link} ${newViewCount} times.\n\nThey're circling. ${c.mobileAu ? "This is the moment — call them, SMS them, or reply to their SMS if they've already texted back." : "No mobile on file — reply to the email thread or DM them."} A prospect on view 3+ is almost always mid-decision.\n\n${contactLine}${c.mobileAu ? `\n\nDirect follow-up SMS (copy/paste):\n"hey ${c.firstName || "there"} — noticed you had another look at that link i sent. happy to answer any Qs directly, or i can walk you through it live in 15 min. what works? — Rich P · 0408 105 067"` : ""}${hookLine}\n\nEngagement dashboard: ${previewBase}/admin/contacts/engagement\nAdmin card: ${previewBase}/admin/contacts?slug=${encodeURIComponent(c.slug)}`,
             }),
           }).catch(() => { /* silent */ });
         }
