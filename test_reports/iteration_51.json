@@ -1,0 +1,22 @@
+{
+  "summary": "Backend-only verification of 3 fixes. (1) describe() Notes line: contact 111 (ben-angullong) notes are now 366 chars (<400, after the label rewrite shortened them), so they're shown in full and start with 'Wine Australia · Our Makers directory · Profile: https://www.australianwine.com/experience/our-makers/ben-james-crossing' — no 'stralianwine' fragment. To exercise the >400 path, I ran describe() in memory with 60 synthetic padded notes (>400 chars, no DB writes). All 60 started with '…' at a whitespace boundary, matched the true tail of the notes, and were <=400 chars. (2) markViewed scanner filter, contact 348 only: Case A (card acted_at=now-60s) -> skipped:'scanner', view_count 0; Case B (acted_at=now-10min) -> counted, viewCount 1, hotAlertFired false; boundary 170s -> scanner; email_sent_at=now-30s -> scanner; Case C HeadlessChrome UA -> skipped:'bot'. Cleanup done: test card #64 deleted, and 348 reset to view_count=0, first_viewed_at/email_sent_at/sms_sent_at NULL (0 test cards left). (3) 0 notes still contain 'Auto first text emailed'; AUTO_LABEL.first === 'first message'. 15/15 main checks and 60/60 synthetic checks passed.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "telegramAssistant.describe()", "issue": "Edge case: if the last 400 chars have no whitespace (e.g. a long token or URL), the regex /^\\S*\\s+/ doesn't match, so the cut still lands mid-word. Also, if the slice already starts at a word boundary, the first whole word gets dropped. Cosmetic only."}
+    ]
+  },
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": ["/app/scripts/tmp/test_iter51_notes_scanner.ts", "/app/scripts/tmp/test_iter51_notes_synthetic.ts"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Notes can contain newlines, so the 'Notes:' entry in describe() can run over several lines. Fine for Telegram, but don't parse it as a single line.",
+    "The markViewed scanner check is skipped when sms_sent_at > emailAt (by design). The card query uses MAX(acted_at) with channel='email' AND status='sent', which is correct."
+  ],
+  "updated_files": ["/app/scripts/tmp/test_iter51_notes_scanner.ts", "/app/scripts/tmp/test_iter51_notes_synthetic.ts"],
+  "success_rate": {"backend": "100%", "frontend": "N/A (skipped)"},
+  "seed_data_creation": "Temporary outreach_cards row #64 for contact 348, now deleted. Contact 348 reset per the request. No other contacts were modified, and no emails/SMS/Telegram were sent.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Run with: cd /app && npx tsx scripts/tmp/test_iter51_notes_scanner.ts (touches only contact 348 and cleans up after itself). Env must be loaded before importing server/db.js, so use dynamic imports. The tRPC response shape is result.data.json."
+}
