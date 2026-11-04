@@ -404,7 +404,11 @@ export async function scoreboard(days = 7): Promise<string> {
     (SELECT COUNT(*) FROM outreach_contacts c WHERE ${BASE_FILTER} AND ${TOUCHED} IS NULL) left_to_contact
     FROM outreach_cards WHERE created_at > ${since}`);
   const n = (k: string) => Number(s?.[k] ?? 0);
-  return `📊 Outreach scoreboard — last ${days} days\n\nSent: ${n("sent")}\nOpened their page: ${n("opened")}\nReplied: ${n("replied")}\nNew sign-ups (all sources): ${n("signups")}\nSkipped: ${n("skipped")} · Not a fit: ${n("unfit")} · Unsubscribed: ${n("unsubscribed")}\nCards still waiting: ${n("waiting")}\n\nNever contacted yet: ${n("left_to_contact")}\n\nType /more for 3 extra cards, /score for this summary.`;
+  const sources = await rows<{ src: string; n: number }>(sql`SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(e.detail, ' ', 2), ' ', -1) src, COUNT(*) n FROM user_events e
+    LEFT JOIN users u ON u.id = e.user_id WHERE e.event = 'custom' AND e.detail LIKE 'landing %' AND e.created_at > ${since} AND COALESCE(u.role,'') <> 'admin'
+    GROUP BY src ORDER BY n DESC LIMIT 8`);
+  const visits = sources.length ? `\n\nWebsite visits by source:\n${sources.map((r) => `• ${r.src}: ${r.n}`).join("\n")}` : "";
+  return `📊 Outreach scoreboard — last ${days} days\n\nSent: ${n("sent")}\nOpened their page: ${n("opened")}\nReplied: ${n("replied")}\nNew sign-ups (all sources): ${n("signups")}\nSkipped: ${n("skipped")} · Not a fit: ${n("unfit")} · Unsubscribed: ${n("unsubscribed")}\nCards still waiting: ${n("waiting")}\n\nNever contacted yet: ${n("left_to_contact")}${visits}\n\nType /more for 3 extra cards, /score for this summary.`;
 }
 
 // Runs the morning batch once per Sydney day; DB row makes it safe across multiple instances.

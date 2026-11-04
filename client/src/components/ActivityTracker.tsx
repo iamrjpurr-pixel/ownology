@@ -4,10 +4,29 @@ import { captureInvite, flushNow, track } from "@/lib/track";
 
 let lastView = { key: "", at: 0 };
 
+// Once per browser session: where did this visitor come from?
+function landingSource(): string {
+  const q = new URLSearchParams(window.location.search);
+  const tag = q.get("utm_source") || q.get("from") || q.get("ref");
+  if (tag) return `campaign:${tag.slice(0, 60)}`;
+  if (window.location.pathname.startsWith("/hi/")) return "campaign:prospect-page";
+  let host = "";
+  try { host = document.referrer ? new URL(document.referrer).hostname.replace(/^www\./, "") : ""; } catch { /* bad referrer */ }
+  if (!host || host === window.location.hostname.replace(/^www\./, "")) return "direct";
+  if (/mail\.|outlook|gmail/.test(host)) return `email:${host}`;
+  if (/(^|\.)(google|bing|duckduckgo|yahoo|ecosia|brave)\./.test(host)) return `search:${host.split(".")[0]}`;
+  if (/instagram|facebook|fb\.|linkedin|t\.co$|twitter|x\.com|threads|tiktok|reddit|youtube/.test(host)) return `social:${host}`;
+  return `ref:${host}`;
+}
+
 export function ActivityTracker() {
   const [location] = useLocation();
 
   useEffect(() => {
+    if (!sessionStorage.getItem("ow_landing")) {
+      sessionStorage.setItem("ow_landing", "1");
+      track("custom", `landing ${landingSource()} ${window.location.pathname}`.slice(0, 300));
+    }
     const onClick = (e: MouseEvent) => {
       const el = (e.target as HTMLElement | null)?.closest?.("[data-testid]");
       if (el) track("click", el.getAttribute("data-testid") ?? "");
