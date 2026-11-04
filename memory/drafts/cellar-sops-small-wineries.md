@@ -1,149 +1,76 @@
-# Cellar SOPs for small wineries: a starter set that actually gets used
+# The vintage you didn't write down
 
-*DRAFT for Rich & Gel to check. Not published.*
+*DRAFT v2 for Rich & Gel. Not published.*
 
 **Suggested URL:** /blog/cellar-sops-small-wineries
-**Meta description:** A practical starter set of cellar SOPs for small Australian wineries: what to write first, what each one should cover, and a one-page template you can copy.
+**Meta description:** Small wineries run on memory, until vintage. A friendly guide to writing down the few cellar jobs that matter, without drowning in paperwork.
 
 ---
 
-Most small wineries run on one person's memory. That works right up until vintage, when there's a casual on the press, a contract winemaker doing the reds and you're trying to remember whether Tank 4 got its nutrient yesterday or the day before.
+It's 9pm, week three of vintage. You're on the forklift, your partner's at cellar door, and the backpacker you hired on Monday is holding a hose and looking at you.
 
-Standard operating procedures (SOPs) fix that. Not a binder nobody opens, but a handful of one-page instructions for the jobs that matter most: the jobs where a mistake costs you wine, money, compliance or someone's health.
+"Which tank was that going into again?"
 
-This is a starter set for a small cellar. You don't need all of it before next vintage. Start with three.
+Every small winery has a version of this moment. The knowledge is all there, it's just in one person's head. And that head is tired.
 
-## Why bother, when it's just you?
+That's really all an SOP is: getting the important stuff out of your head and onto a page someone else can follow. Not a binder. Not a consultant. Just a few honest notes about how *you* do things.
 
-- **Vintage help changes every year.** A good SOP means a new casual does the job your way on day one, not day five.
-- **Consistency is the product.** If a wine's great, you want to be able to do it again. Written steps and records are how you repeat a good year.
-- **Records protect your label claims.** Vintage, variety and region claims on Australian labels have to be backed by records under Wine Australia's Label Integrity Program (LIP), and those records have to be kept for years. Most of those records come straight out of your SOPs.
-- **Handover gets easier.** If you use a contract winemaker, or one day sell the brand, written procedures and records are part of what makes the wine yours.
-- **Safety.** Some cellar jobs can kill people. Those need a written procedure, full stop.
+## You don't need fifty. You need three.
 
-## What a good SOP looks like
+Big wineries have folders of procedures. You don't need that. Start with the jobs where a mistake actually hurts:
 
-Keep each one to a single page. If it won't fit, it's probably two SOPs.
+**1. Adding things to wine.**
+Sulphur, acid, yeast, nutrients: the moment where one wrong decimal point costs you a tank. Write down how you work it out, who double-checks, and where it gets recorded. If you only write one, write this one.
 
-1. **Purpose:** one line on why this job matters.
-2. **When:** what triggers it (every morning, every transfer, before bottling).
-3. **Who:** who's allowed to do it, and who signs it off.
-4. **Gear and PPE:** what to have ready before you start.
-5. **Steps:** numbered, short, in the order you actually do them.
-6. **Checks:** what "done right" looks like, with numbers where you have them.
-7. **Record:** exactly what gets written down, and where.
-8. **If it goes wrong:** who to call and what to do first.
+**2. Moving wine.**
+Every time wine goes from one tank or barrel to another, the record should move with it. This is also what lets you stand behind the vintage, variety and region on your label if anyone ever asks.
 
-Write the steps *after* doing the job, not from memory at a desk. Take photos of valve positions and hose setups; a photo beats a paragraph.
+**3. Cleaning.**
+It's the job everyone thinks they know, done five slightly different ways. One page saying "this is how we do it here" saves a lot of off-flavours.
 
-## The starter set
+And one more that isn't optional:
 
-### 1. Fruit receival
+**4. Tanks and CO₂.**
+Ferments give off carbon dioxide, and it sits low and invisible. People have died leaning into fermenters. A short "never do this alone, never climb in" sheet on the wall is worth more than anything else here.
 
-**Why:** this is where your paper trail starts. If receival records are thin, every claim further down the line is shaky.
+## Make it fit on a fridge door
 
-**Covers:** checking the load against the order, weighing, sampling for sugar and acid, noting fruit condition (rot, MOG, heat), and assigning a lot or batch number.
+If it doesn't fit on one page, nobody's reading it mid-vintage. Ours look like this:
 
-**Record:** grower and vineyard, block, variety, vintage, region, weight, docket number, sample results, time, who received it.
+> **Job:** Moving wine between tanks
+> **Why it matters:** Our labels depend on knowing what's in every tank.
+> **Before you start:** Both tanks clean? Right hoses? Tell someone.
+> **Steps:** 1… 2… 3…
+> **Done right looks like:** Volumes written down, tank tags updated.
+> **Write down:** From, to, how much, date, your initials.
+> **If something goes wrong:** Close the valve, call Rich.
 
-### 2. Crushing, destemming and pressing
+That's it. Plain words, numbers where they help, and a phone photo of the valve setup beats any paragraph.
 
-**Covers:** machine setup and checks, what goes where (juice, skins, pressings), press cycles and cuts, keeping pressings fractions separate if you use them.
+## The trick: write it while you do it
 
-**Record:** which lot went into which vessel, volumes, press fractions, any additions made at the crusher.
+Nobody sits down in July and writes beautiful procedures. Here's what actually works:
 
-### 3. Additions
+- **Next time you do the job, narrate it into your phone.** Tidy it up that night. Ten minutes.
+- **Hand it to someone new and watch.** Wherever they hesitate, that's the line to fix.
+- **Have a beer at the end of vintage and ask "what confused you?"** Then update the sheets.
+- **Keep them where the work happens.** Laminated, near the tanks. Not on a laptop up at the house.
 
-**Why:** this is the SOP most likely to save a wine, and the one auditors and buyers most want to see.
+## Why it's worth the bother
 
-**Covers:** how to calculate an addition, who double-checks the maths, how to weigh and dissolve it, how to mix it in, and how to label the vessel afterwards. Covers SO₂, acid, yeast, nutrients, enzymes, tannins and fining agents.
+It's not really about paperwork. It's about:
 
-**Check:** only use additives and processing aids permitted for wine under the Australia New Zealand Food Standards Code (Standard 4.5.1, Wine Production Requirements).
+- **Doing a great wine again.** When a vintage turns out beautifully, your notes are how you repeat it.
+- **Sleeping on your days off.** Someone else can do the job properly while you're away.
+- **Your label meaning something.** Vintage, variety and region claims need records behind them, and good habits in the cellar produce those records for free.
+- **Owning your story.** If you ever hand over to a new winemaker, or sell the brand, the know-how stays with the wine instead of walking out the door.
 
-**Record:** product, batch or lot number of the product, amount, rate, vessel, date and time, who added it, who checked it.
+## Where Ownology comes in
 
-### 4. Ferment monitoring
+SOPs say how a job should be done. The records show it actually was. Ownology keeps that second half in one place: what went into each wine, where it moved and what you noted along the way. Your next vintage, your label claims and your handover all start from the same page.
 
-**Covers:** how and when to take Baumé and temperature readings (most small cellars do at least twice daily during active ferment), what to smell and look for, and the action points: when to warm, cool, add nutrient or call the winemaker.
-
-**Record:** readings with time, actions taken. A simple chart per vessel makes a sticking ferment obvious days earlier.
-
-### 5. Cap management (reds)
-
-**Covers:** plunging or pump-over method, frequency and duration, how to avoid oxygen pick-up or splashing when you don't want it, and when to stop.
-
-**Record:** each plunge or pump-over, time, who.
-
-### 6. Transfers, racking and blending
-
-**Why:** every time wine moves, your records have to move with it. This is the core of the "one step forward, one step back" trail LIP expects.
-
-**Covers:** checking source and destination vessels are clean and correct, hose and pump setup, gas cover where needed, measuring volumes before and after, and labelling vessels the moment the move is done.
-
-**Record:** from and to vessels, volumes, losses, date, who. For blends, the components and their percentages, so you can show the blend supports any vintage, variety or region claim on the label.
-
-### 7. Cleaning and sanitation
-
-**Covers:** the difference between *cleaning* (removing soil, tartrate and residue) and *sanitising* (knocking down microbes), and doing them in that order. Tanks, hoses, pumps, fittings, presses and bottling gear each need their own short steps: which chemical, what strength, contact time, rinse, and how you check it worked.
-
-**Check:** chemicals stored and mixed per their safety data sheets (SDS). Never mix chlorine and acid products.
-
-**Record:** what was cleaned, when, with what, who.
-
-### 8. Barrel care
-
-**Covers:** topping schedule, checking free SO₂, inspecting for leaks or spoilage, cleaning and storing empty barrels, and tracking each barrel's age, cooper and history.
-
-**Record:** a barrel register plus each topping and addition.
-
-### 9. CO₂ and confined spaces (non-negotiable)
-
-**Why:** fermentation produces carbon dioxide, which is heavier than air and pools in tanks, pits and low corners. People have died in wineries after entering a tank or leaning into a fermenter.
-
-**Covers:** never entering a tank or vessel without a confined-space procedure, using ventilation and a gas monitor in ferment areas, working in pairs, and what to do if someone collapses (call for help; don't go in after them unprotected).
-
-**Reference:** Safe Work Australia's Model Code of Practice for confined spaces and your state's WHS regulator.
-
-### 10. Bottling
-
-**Covers:** pre-bottling checks on the wine (stability, dissolved oxygen and CO₂, free SO₂, clarity), filtration if used, line cleaning and sanitising, closure and label checks, fill heights, and pulling retained samples.
-
-**Record:** wine lot, bottling date, number of cases, lot code printed on the bottle, closures and dry goods used, test results, retained samples. This is what lets you trace a complaint back to a tank.
-
-## A one-page template you can copy
-
-```
-SOP: [name]                       Version: [x]   Last reviewed: [date]
-Purpose:   [one line]
-When:      [trigger]
-Who:       [does it] / [checks it]
-Gear/PPE:  [list]
-Steps:
-  1.
-  2.
-  3.
-Checks:    [what right looks like, with numbers]
-Record:    [what, where]
-If it goes wrong: [first action, who to call]
-```
-
-## How to get them written without losing a vintage
-
-- **Start with three:** additions, transfers and cleaning. They cover the most risk and most of your records.
-- **Add the safety one now**, even if it's the only other one you write.
-- **Write as you go.** The next time you do the job, jot the steps on your phone, then tidy them up that night.
-- **Review at the end of vintage.** Ask whoever did the work what was unclear, and fix that line.
-- **Keep them where the work happens.** A laminated sheet near the tank beats a perfect document on a laptop in the house.
-
-## Where Ownology fits
-
-SOPs tell people what to do. Records prove it was done. Ownology keeps the second half in one place: additions, transfers, blends and vintage notes logged against each wine, so your label claims, your handover notes and your next vintage all start from the same record. If you'd like, we'll load your current wines in for you so you can see it with your own labels.
+If you'd like to see it with your own wines, send us a couple of labels and we'll set them up for you. No charge, about ten minutes.
 
 ---
 
-**Sources and further reading**
-
-- Wine Australia, Label Integrity Program: https://www.wineaustralia.com/labelling/label-integrity-program
-- Food Standards Australia New Zealand, Food Standards Code (Standard 4.5.1 Wine Production Requirements): https://www.foodstandards.gov.au/food-standards-code
-- Safe Work Australia, Model Code of Practice: Confined spaces: https://www.safeworkaustralia.gov.au/doc/model-code-practice-confined-spaces
-- The Australian Wine Research Institute (AWRI), winemaking resources: https://www.awri.com.au/industry_support/winemaking_resources/
+*Further reading, if you want the official versions:* Wine Australia's [Label Integrity Program](https://www.wineaustralia.com/labelling/label-integrity-program), Safe Work Australia's [confined spaces code](https://www.safeworkaustralia.gov.au/doc/model-code-practice-confined-spaces), and the AWRI's [winemaking resources](https://www.awri.com.au/industry_support/winemaking_resources/).
