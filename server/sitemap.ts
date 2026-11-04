@@ -220,8 +220,7 @@ Allow: /blog/
 Disallow: /
 
 # Sitemap
-Sitemap: ${SITE_ORIGIN}/api/sitemap.xml
-Sitemap: ${SITE_ORIGIN}/api/cellar-journal/sitemap.xml
+Sitemap: ${SITE_ORIGIN}/sitemap.xml
 `;
   res.setHeader("Content-Type", "text/plain; charset=utf-8");
   res.send(txt);

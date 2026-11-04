@@ -21,5 +21,4 @@ Disallow: /for-innovint-users
 Disallow: /for-vintrace-users
 
 # Sitemaps
-Sitemap: https://ownology.ai/api/sitemap.xml
-Sitemap: https://ownology.ai/api/cellar-journal/sitemap.xml
+Sitemap: https://ownology.ai/sitemap.xml
