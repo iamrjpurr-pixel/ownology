@@ -108,6 +108,7 @@ export const outreachRouter = router({
       // whether the hot-alert has already been fired.
       const existing = await db
         .select({
+          id: schema.outreachContacts.id,
           slug: schema.outreachContacts.slug,
           firstName: schema.outreachContacts.firstName,
           lastName: schema.outreachContacts.lastName,
@@ -125,9 +126,13 @@ export const outreachRouter = router({
         .from(schema.outreachContacts)
         .where(eq(schema.outreachContacts.slug, input.slug))
         .limit(1);
-      // Opens within 90s of our email are mail-security link scanners, not people: don't count them.
-      const sentAt = existing.length ? Math.max(existing[0].emailSentAt ?? 0, existing[0].smsSentAt ?? 0) : 0;
-      if (sentAt && (existing[0].emailSentAt ?? 0) > (existing[0].smsSentAt ?? 0) && now - sentAt < 90_000) {
+      // Opens within 3 min of any email we sent (first or follow-up) are mail-security link scanners, not people.
+      const lastCardEmail = existing.length
+        ? Number(((await db.execute(sql`SELECT MAX(acted_at) at FROM outreach_cards WHERE contact_id = ${existing[0].id} AND channel = 'email' AND status = 'sent'`))[0] as unknown as { at: number | null }[])[0]?.at ?? 0)
+        : 0;
+      const emailAt = existing.length ? Math.max(existing[0].emailSentAt ?? 0, lastCardEmail) : 0;
+      const sentAt = existing.length ? Math.max(emailAt, existing[0].smsSentAt ?? 0) : 0;
+      if (emailAt && emailAt >= (existing[0].smsSentAt ?? 0) && now - emailAt < 180_000) {
         return { ok: true, skipped: "scanner" as const };
       }
       const isFirstView = existing.length > 0 && !existing[0].firstViewedAt;

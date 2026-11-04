@@ -197,7 +197,7 @@ async function dailyCaps(): Promise<{ follow: number; texts: number; emails: num
   return days < 7 ? { follow: 10, texts: 8, emails: 10 } : days < 14 ? { follow: 15, texts: 15, emails: 15 } : { follow: 25, texts: 25, emails: 25 };
 }
 
-const AUTO_LABEL: Record<AutoKind | "first" | "news", string> = { news: "news note", first: "first text", revive: "fresh nudge", auto1: "day-4 follow-up", auto2: "final note" };
+const AUTO_LABEL: Record<AutoKind | "first" | "news", string> = { news: "news note", first: "first message", revive: "fresh nudge", auto1: "day-4 follow-up", auto2: "final note" };
 
 const PREVIEW_MINUTES = 30;
 

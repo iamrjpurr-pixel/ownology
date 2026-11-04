@@ -43,7 +43,7 @@ async function findPeople(query: string | undefined): Promise<Person[]> {
   });
 }
 
-async function describe(p: Person): Promise<string> {
+export async function describe(p: Person): Promise<string> {
   const cards = await rows<{ id: number; kind: string; channel: string; status: string; subject: string | null; body: string; acted_at: number | null; created_at: number }>(
     sql`SELECT id, kind, channel, status, subject, body, acted_at, created_at FROM outreach_cards WHERE contact_id = ${p.id} ORDER BY id DESC LIMIT 6`);
   const [ev] = await rows<{ n: number; sessions: number; last: number | null }>(sql`SELECT COUNT(*) n, COUNT(DISTINCT session_id) sessions, MAX(created_at) last FROM user_events WHERE slug = ${p.slug}`);
@@ -55,7 +55,7 @@ async function describe(p: Person): Promise<string> {
     `Page views: ${p.view_count ?? 0} (first ${when(p.first_viewed_at)}); tracked visits: ${ev?.sessions ?? 0} sessions, last ${when(ev?.last ?? null)}`,
     p.replied_at ? `REPLIED ${when(p.replied_at)}: "${(p.reply_text ?? "").slice(0, 300)}"` : "No reply yet",
     cards.length ? `Messages (newest first):\n${cards.map((k) => `- #${k.id} ${when(k.acted_at ?? k.created_at)} ${k.kind} ${k.channel} [${k.status}] ${k.subject ?? ""} ${k.body.replace(/\s+/g, " ").slice(0, 140)}`).join("\n")}` : "No messages logged",
-    p.notes && `Notes: ${p.notes.slice(-300)}`,
+    p.notes && `Notes: ${p.notes.length > 400 ? `…${p.notes.slice(-400).replace(/^\S*\s+/, "")}` : p.notes}`,
   ].filter(Boolean).join("\n");
 }
 
