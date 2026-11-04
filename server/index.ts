@@ -1135,8 +1135,12 @@ async function startServer() {
     try {
       const fs = await import("fs/promises");
       const raw = await fs.readFile(path.join(staticPath, "index.html"), "utf8");
+      // Every page is its own canonical URL (index.html ships the homepage's).
+      const self = `https://ownology.ai${p === "/" ? "/" : p.replace(/\/+$/, "")}`;
       res.setHeader("Content-Type", "text/html; charset=utf-8");
-      res.send(raw.replace('__BUILD_ID__', BUILD_ID));
+      res.send(raw.replace('__BUILD_ID__', BUILD_ID)
+        .replace(/<link rel="canonical" href="[^"]*"\s*\/?>/, `<link rel="canonical" href="${self}" />`)
+        .replace(/<meta property="og:url" content="[^"]*"\s*\/?>/, `<meta property="og:url" content="${self}" />`));
     } catch {
       // Fallback if disk read fails — sendFile still delivers the shell
       res.sendFile(path.join(staticPath, "index.html"));
