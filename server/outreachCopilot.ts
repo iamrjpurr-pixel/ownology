@@ -560,7 +560,11 @@ async function webhook(req: Request, res: Response) {
       const sent = await sendDueQueued(true);
       if (!sent.length) await sendOperatorTelegram("Nothing waiting to send.");
     }
-    else if (cmd.startsWith("/help") || cmd.startsWith("/start")) await sendOperatorTelegram("Ownology copilot\n\n/more — 3 extra prospect cards\n/score — last 7 days\n/remove 123 — drop a queued message\n/release — send held messages now\n\nEvery morning at 7:00 you get a preview; it sends at 7:30.");
+    else if (cmd.startsWith("/help") || cmd.startsWith("/start")) await sendOperatorTelegram("Ownology copilot\n\nJust type in plain English, e.g.\n• How's Angullong going?\n• Who's hot?\n• Text Rod that Thursday works\n• Add a note to Castagna: call after vintage\n• Hold today's messages\n\nI'll always show you a draft with a Send button before anything goes out.\n\n/more — 3 extra prospect cards\n/score — last 7 days\n/remove 123 — drop a queued message\n/release — send held messages now");
+    else if (!cmd.startsWith("/") && cmd.length > 1) {
+      const { handleAssistantMessage } = await import("./telegramAssistant.js");
+      await handleAssistantMessage(m.text!.trim()).catch(async (err) => { console.error("[assistant]", err); await sendOperatorTelegram("⚠️ Sorry, I couldn't do that. Try rephrasing, or type /help."); });
+    }
   } catch (err) {
     console.error("[copilot] webhook error:", err);
   }
