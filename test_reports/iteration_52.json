@@ -1,0 +1,42 @@
+{
+  "summary": "Tested the new free Level 1 Curriculum unlock (email to signed cookie) end to end. The original review request was cut off, so scope came from the checkpoint diff: Level1Unlock.tsx, Curriculum.tsx, CurriculumLesson.tsx and server/routers/curriculum.ts. Backend: 12/12 pytest checks pass. Covered: anonymous visitors get free tier with redacted content; bad input returns 400 (bad email, empty email, bad role, email too long); unlock returns {ok:true} and sets an HttpOnly, Secure, 1-year ow_curriculum_l1 cookie; with the cookie, all 6 L1 lessons return full content (tier cellar_hand) while L2+ stay redacted and the list's real tier stays 'free'; the L1 token placed in ow_curriculum_guest does not escalate (label check works); a tampered token is rejected; repeat unlock with the same email is idempotent. Frontend: the unlock form shows on /curriculum for anonymous visitors, with a Free pill on Level 1 and locks on Levels 2-4. An empty submit is blocked by the browser's built-in check. Role radios work. Submit shows the toast, swaps the form for 'Level 1 is unlocked for you. Start lesson 1', changes card CTAs to 'Read lesson', and survives a reload. The lesson page opens in Deep mode and Flash cards work. The compact form on the lesson page also unlocks in place on mobile: Deep content appears and the lock icons go. L2 lessons still show the paywall. Found 1 functional UX bug, 2 minor issues and 1 robustness gap; nothing blocking.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/trpc/curriculum.unlockLevel1", "issue": "The only limit is the shared tRPC limit of 100 requests/min per IP. There is no per-email or per-IP limit on this public mutation. One IP can create about 100 junk leads a minute in the production Railway MySQL and send about 100 operator Telegram pings a minute (sendOperatorTelegram fires on every call, including repeats for the same email). Suggest a small limit, e.g. rateLimitCheck('curriculum.l1', ip, 3600_000, 5), and sending Telegram only when addLead actually inserts a row."},
+      {"endpoint": "POST /api/trpc/curriculum.unlockLevel1", "issue": "On the preview the ingress rewrites the cookie to SameSite=None; Partitioned (the code sets Lax). Not an app bug; the cookie works in the browser."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "CurriculumLesson UpsellBoundary on a Level 1 lesson (anonymous visitor)", "issue": "Clicking Deep or Flash on an L1 lesson shows the free 'Read Level 1 free' email form and, below it, the paid UpsellBoundary ('DEEP READ — CELLAR HAND AND UP … All 30 lessons unlock at the Cellar Hand tier', See pricing). The messages contradict each other. For lesson.level === 1, show only the email unlock (or reword the upsell), not the pricing paywall.", "selector": "[data-testid='upsell-boundary']", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [
+      {"flow": "/curriculum list when curriculum.list fails (e.g. 429)", "issue": "Reproduced after hitting the 100/min tRPC limit: the page shows only the hero, with stats still saying '30 lessons' (fallback `?? 30`), and then a blank area. There is no error message, no retry and no unlock form. Curriculum.tsx ignores the query's isError.", "affected_selectors": ["[data-testid='curriculum-loading']", "[data-testid='level-1']"]}
+    ],
+    "design_issues": [
+      {"screen": "Lesson header vs list cards", "issues": ["Lesson cards and the hero badge say '3 min', '4 min', '3–6 minutes each', but the lesson page header shows '~23 min' (L1.1) and '~15 min' (L1.2). readingMinutes is calculated differently at CurriculumLesson.tsx:87. The figures are inconsistent and make the '5-minute read' claim look wrong."]},
+      {"screen": "Lesson page compact Level1Unlock", "issues": ["The form wrapper is max-w-3xl while the TL;DR and body above it use a wider container, so the form looks indented and misaligned (desktop: 490-1077px vs 438-1130px).", "On mobile (390px) the unlock form sits below the hero and the whole TL;DR, well below the fold. Users see skim content without knowing they can unlock it for free."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_curriculum_level1_unlock.py", "/app/test_reports/pytest/curriculum_l1.xml", "/app/scripts/tmp/cleanup_iter52_leads.ts"],
+  "action_items": [
+    "On Level 1 lessons, don't show the paid UpsellBoundary ('Cellar Hand and up') alongside the free unlock form. Use L1-specific copy or hide the upsell when lesson.level === 1.",
+    "Add an error state to Curriculum.tsx (isError: message plus a retry button), and don't fall back to '30 lessons' when there is no data.",
+    "Add a per-IP/per-email rate limit to curriculum.unlockLevel1, and send the operator Telegram only for new leads.",
+    "Make the lesson-header reading time match the card's reading_min, or explain the difference.",
+    "Align the compact unlock form's width with the lesson content, and consider moving it above the TL;DR on mobile."
+  ],
+  "critical_code_review_comments": [
+    "curriculum.ts list(): hasLevel1(ctx.req) runs twice in bySlug (once for level1Free, once for the response). It's cheap HMAC work, but could be a single const.",
+    "useCurriculumAccess still trusts ?preview= on the client, so Deep can look unlocked while the server sends redacted content (empty sections). This predates this change; the server stays authoritative.",
+    "Level1Unlock onError always shows 'Check your email', even for 429 or network errors. Show err.message or a generic message.",
+    "unlockLevel1 doesn't store the optional name when the lead already exists (addLead returns early on email+source). Fine, but repeat sign-ups with a new name or role are silently dropped."
+  ],
+  "updated_files": ["/app/backend/tests/test_curriculum_level1_unlock.py", "/app/scripts/tmp/cleanup_iter52_leads.ts"],
+  "success_rate": {"backend": "100% (12/12)", "frontend": "~90% (all core flows pass; 1 UX contradiction, 1 missing error state)"},
+  "seed_data_creation": "Created 4 leads (source=curriculum-level1, ids 13-16, emails test_l1_*@example.com). All were deleted by id afterwards; a re-query confirmed 0 remain. Each unlock call also sent a real operator Telegram ping (TELEGRAM_BOT_TOKEN is set in the backend process env): about 5 pings, including one repeat-email call.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run: cd /app/backend && export REACT_APP_BACKEND_URL=$(grep '^REACT_APP_BACKEND_URL' /app/frontend/.env | cut -d= -f2) && python -m pytest tests/test_curriculum_level1_unlock.py -v. Use the '^' grep, because frontend/.env has comment lines that contain the variable name. Each run creates 1 lead and sends Telegram pings. Clean up with: npx tsx scripts/tmp/cleanup_iter52_leads.ts --delete (it matches test_l1_<ts>@example.com only). The tRPC limit is 100 req/min per IP; heavy UI and API testing hits 429, so wait about 60s between bursts. The DB is the shared Railway MySQL."
+}

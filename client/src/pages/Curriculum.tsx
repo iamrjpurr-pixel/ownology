@@ -14,7 +14,7 @@ const LEVEL_META: Record<number, { label: string; tagline: string; accent: strin
 };
 
 export default function Curriculum() {
-  const { data, isLoading } = trpc.curriculum.list.useQuery();
+  const { data, isLoading, isError, refetch } = trpc.curriculum.list.useQuery();
   const lessons = data?.lessons;
   const fullAccess = !!data && data.tier !== "free";
   const level1Open = fullAccess || !!data?.level1Unlocked;
@@ -42,12 +42,12 @@ export default function Curriculum() {
           </h1>
           <p className="mt-4 max-w-3xl text-lg text-stone-700 leading-relaxed">
             Short, practical lessons for small winery teams and anyone starting out. Get new staff up to speed
-            before vintage, or build your own know-how one 5-minute read at a time.
+            before vintage, or build your own know-how one short lesson at a time.
           </p>
           <div className="mt-6 flex flex-wrap gap-3 text-sm">
             <Badge variant="outline" className="bg-white" data-testid="stat-lessons">{lessons?.length ?? 30} lessons</Badge>
             <Badge variant="outline" className="bg-white" data-testid="stat-levels">4 levels, beginner to advanced</Badge>
-            <Badge variant="outline" className="bg-white" data-testid="stat-minutes">3–6 minutes each</Badge>
+            <Badge variant="outline" className="bg-white" data-testid="stat-minutes">Skim in minutes, go deeper any time</Badge>
             <Badge variant="outline" className="bg-white" data-testid="stat-free">Level 1 free</Badge>
           </div>
           {data && !level1Open && <div className="mt-8 max-w-2xl"><Level1Unlock /></div>}
@@ -60,6 +60,11 @@ export default function Curriculum() {
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-10 space-y-14">
+        {isError && (
+          <div className="rounded-lg border border-stone-300 bg-white p-6 text-stone-700" data-testid="curriculum-error">
+            Couldn't load the lessons just now. <button type="button" onClick={() => refetch()} className="underline" data-testid="curriculum-retry">Try again</button>
+          </div>
+        )}
         {isLoading && (
           <p className="text-stone-600" data-testid="curriculum-loading">Loading curriculum…</p>
         )}
@@ -67,7 +72,7 @@ export default function Curriculum() {
         {[1, 2, 3, 4].map((lvl) => {
           const meta = LEVEL_META[lvl];
           const items = byLevel.get(lvl) ?? [];
-          if (items.length === 0 && !isLoading) return null;
+          if (items.length === 0 && (!isLoading || isError)) return null;
           return (
             <section key={lvl} data-testid={`level-${lvl}`}>
               <div className="mb-6">
@@ -90,7 +95,7 @@ export default function Curriculum() {
                       <div className="text-xs text-stone-600">Lesson {l.id.replace(/^L/, "")}</div>
                       <div className="flex items-center gap-1 text-xs text-stone-600 whitespace-nowrap">
                         <Clock className="h-3 w-3" />
-                        {l.reading_min} min
+                        {l.reading_min} min skim
                       </div>
                     </div>
 

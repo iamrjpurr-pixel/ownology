@@ -117,7 +117,7 @@ export default function CurriculumLesson() {
           </span>
           <span className="text-xs text-stone-600" data-testid="lesson-id">Lesson {lesson.id.replace(/^L/, "")}</span>
           <span className="flex items-center gap-1 text-xs text-stone-600">
-            <Clock className="h-3 w-3" /> ~{readingMinutes} min
+            <Clock className="h-3 w-3" /> {lesson.reading_min} min skim{readingMinutes > lesson.reading_min ? ` · ~${readingMinutes} min full lesson` : ""}
           </span>
         </div>
 
@@ -160,7 +160,7 @@ export default function CurriculumLesson() {
       )}
 
       {/* Body by mode — GATED per feature */}
-      {lesson.level === 1 && !canDeep && <div className="max-w-3xl mx-auto px-6 pb-6"><Level1Unlock compact /></div>}
+      {lesson.level === 1 && !canDeep && <div className="max-w-4xl mx-auto px-6 pb-6"><Level1Unlock compact /></div>}
       {isV2 && lesson.sections && mode === "skim" && (
         <SkimModeContent lesson={lesson} />
       )}
@@ -168,7 +168,7 @@ export default function CurriculumLesson() {
       {isV2 && lesson.sections && mode === "deep" && (
         canDeep
           ? <DeepModeContent lesson={lesson} quizAnswers={quizAnswers} setQuizAnswers={setQuizAnswers} quizReveal={quizReveal} setQuizReveal={setQuizReveal} />
-          : <UpsellBoundary reason="deep" isAuthenticated={access.isAuthenticated} />
+          : lesson.level === 1 ? null : <UpsellBoundary reason="deep" isAuthenticated={access.isAuthenticated} />
       )}
 
       {isV2 && mode === "flash" && (
@@ -181,7 +181,7 @@ export default function CurriculumLesson() {
               onPrev={() => { setFlashIdx((flashIdx - 1 + lesson.flashcards!.length) % lesson.flashcards!.length); setFlashFlipped(false); }}
               onFlip={() => setFlashFlipped((f) => !f)}
             />
-          : <UpsellBoundary reason="flash" isAuthenticated={access.isAuthenticated} />
+          : lesson.level === 1 ? null : <UpsellBoundary reason="flash" isAuthenticated={access.isAuthenticated} />
       )}
 
       {/* v1 fallback — plain body (only for tiers that get deep read) */}
@@ -192,7 +192,7 @@ export default function CurriculumLesson() {
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{lesson.body_md}</ReactMarkdown>
               </article>
             </div>
-          : <UpsellBoundary reason="deep" isAuthenticated={access.isAuthenticated} />
+          : lesson.level === 1 ? null : <UpsellBoundary reason="deep" isAuthenticated={access.isAuthenticated} />
       )}
 
       {/* Citations — visible if user can read deep */}
