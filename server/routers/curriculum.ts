@@ -27,7 +27,12 @@ import { eq } from "drizzle-orm";
 import { router, publicProcedure } from "../trpc.js";
 import { db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
-import { verifyGuestPass, GUEST_PASS_COOKIE } from "../lib/guestPass.js";
+import { verifyGuestPass, createGuestPass, GUEST_PASS_COOKIE } from "../lib/guestPass.js";
+import { addLead } from "../db.js";
+import { sendOperatorTelegram } from "../telegram.js";
+
+const LEVEL1_COOKIE = "ow_curriculum_l1";
+const hasLevel1 = (req: Parameters<typeof extractGuestPassToken>[0]) => { const t = extractGuestPassToken(req, LEVEL1_COOKIE); return !!(t && verifyGuestPass(t)); };
 
 const SYNTH_V1_DIR = "/app/references/education/synthesis-pilot";
 const SYNTH_V2_DIR = "/app/references/education/synthesis-v2";
@@ -164,6 +169,7 @@ const curriculumRouter = router({
     // What differs is the reading-mode access, gated in bySlug.
     return {
       tier,
+      level1Unlocked: hasLevel1(ctx.req),
       lessons: cards.map((c) => ({
         id: c.id,
         slug: c.slug,
@@ -184,8 +190,22 @@ const curriculumRouter = router({
       const cards = readAll();
       const card = cards.find((c) => c.slug === input.slug);
       if (!card) return null;
-      const tier = await resolveCurriculumTier(ctx);
-      return { tier, lesson: gateLessonByTier(card, tier) };
+      const real = await resolveCurriculumTier(ctx);
+      const level1Free = card.level === 1 && real === "free" && hasLevel1(ctx.req);
+      const tier: CurriculumTier = level1Free ? "cellar_hand" : real;
+      return { tier, level1Unlocked: hasLevel1(ctx.req), lesson: gateLessonByTier(card, tier) };
+    }),
+
+  // Level 1 is free for anyone who leaves an email: lead goes to the CRM, a year-long cookie unlocks it.
+  unlockLevel1: publicProcedure
+    .input(z.object({ email: z.string().trim().toLowerCase().email().max(200), name: z.string().trim().max(100).optional(), role: z.enum(["owner", "team", "new", "other"]).default("other") }))
+    .mutation(async ({ input, ctx }) => {
+      await addLead({ email: input.email, name: input.name || undefined, source: "curriculum-level1", tags: ["curriculum", `role:${input.role}`] });
+      const { token, payload } = createGuestPass({ tier: "cellar_hand", ttlDays: 365, label: "level1" });
+      ctx.res.cookie(LEVEL1_COOKIE, token, { httpOnly: true, secure: true, sameSite: "lax", maxAge: payload.exp * 1000 - Date.now(), path: "/" });
+      const roles = { owner: "winery owner", team: "winery team member", new: "new / aspiring winemaker", other: "other" };
+      await sendOperatorTelegram(`🎓 New free Curriculum sign-up\n${input.name ? `${input.name} · ` : ""}${input.email}\n${roles[input.role]}`).catch(() => {});
+      return { ok: true };
     }),
 });
 
@@ -236,7 +256,7 @@ async function resolveCurriculumTier(ctx: {
   const guestToken = extractGuestPassToken(ctx.req);
   if (guestToken) {
     const payload = verifyGuestPass(guestToken);
-    if (payload) return payload.tier;
+    if (payload && payload.label !== "level1") return payload.tier;
   }
 
   // Admin preview escape hatch (server-enforced — admin role only)
@@ -331,16 +351,17 @@ export { curriculumRouter };
  *  won't have one. */
 function extractGuestPassToken(
   req: { headers?: Record<string, string | string[] | undefined>; cookies?: Record<string, string> } | undefined,
+  name: string = GUEST_PASS_COOKIE,
 ): string | null {
   if (!req) return null;
-  const parsed = req.cookies?.[GUEST_PASS_COOKIE];
+  const parsed = req.cookies?.[name];
   if (typeof parsed === "string" && parsed.length > 0) return parsed;
   const raw = req.headers?.cookie;
   const cookieHeader = Array.isArray(raw) ? raw.join("; ") : raw ?? "";
   if (!cookieHeader) return null;
   for (const chunk of cookieHeader.split(";")) {
     const [k, ...rest] = chunk.trim().split("=");
-    if (k === GUEST_PASS_COOKIE) return decodeURIComponent(rest.join("="));
+    if (k === name) return decodeURIComponent(rest.join("="));
   }
   return null;
 }

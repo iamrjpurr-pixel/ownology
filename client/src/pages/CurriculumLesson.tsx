@@ -13,6 +13,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link, useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { Level1Unlock } from "@/components/curriculum/Level1Unlock";
 import { useCurriculumAccess } from "@/lib/useCurriculumAccess";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -51,16 +52,19 @@ export default function CurriculumLesson() {
   const { data, isLoading } = trpc.curriculum.bySlug.useQuery({ slug }, { enabled: !!slug });
   const lesson = data?.lesson;
   const access = useCurriculumAccess();
-  const [mode, setMode] = useState<Mode>(access.canRead.deep ? "deep" : "skim");
+  // Server tier is authoritative (includes the free Level 1 unlock).
+  const canDeep = access.canRead.deep || (!!data && data.tier !== "free");
+  const canFlash = access.canRead.flash || (!!data && data.tier !== "free");
+  const [mode, setMode] = useState<Mode>(canDeep ? "deep" : "skim");
   const [flashIdx, setFlashIdx] = useState(0);
   const [flashFlipped, setFlashFlipped] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [quizReveal, setQuizReveal] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
-    setMode(access.canRead.deep ? "deep" : "skim");
+    setMode(canDeep ? "deep" : "skim");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [access.tier]);
+  }, [access.tier, data?.tier]);
 
   // NOTE: All hooks MUST run before any early return. Rules of Hooks.
   const groupedCitations = useMemo(() => {
@@ -98,8 +102,8 @@ export default function CurriculumLesson() {
           {isV2 && (
             <div className="flex items-center gap-1 bg-stone-100 rounded-full p-1" data-testid="mode-toggle">
               <ModeBtn active={mode === "skim"} onClick={() => setMode("skim")} icon={Zap} label="Skim" testid="mode-skim" />
-              <ModeBtn active={mode === "deep"} onClick={() => access.canRead.deep ? setMode("deep") : setMode("deep")} icon={BookOpen} label="Deep" testid="mode-deep" locked={!access.canRead.deep} />
-              <ModeBtn active={mode === "flash"} onClick={() => { if (access.canRead.flash) { setMode("flash"); setFlashIdx(0); setFlashFlipped(false); } else { setMode("flash"); } }} icon={Layers} label="Flash" testid="mode-flash" locked={!access.canRead.flash} />
+              <ModeBtn active={mode === "deep"} onClick={() => access.canRead.deep ? setMode("deep") : setMode("deep")} icon={BookOpen} label="Deep" testid="mode-deep" locked={!canDeep} />
+              <ModeBtn active={mode === "flash"} onClick={() => { if (canFlash) { setMode("flash"); setFlashIdx(0); setFlashFlipped(false); } else { setMode("flash"); } }} icon={Layers} label="Flash" testid="mode-flash" locked={!canFlash} />
             </div>
           )}
         </div>
@@ -111,10 +115,7 @@ export default function CurriculumLesson() {
           <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${levelMeta.accent}`} data-testid="lesson-level">
             {levelMeta.label}
           </span>
-          <span className="text-xs text-stone-600 font-mono" data-testid="lesson-id">{lesson.id}</span>
-          {lesson.wbs.map((d) => (
-            <span key={d} className="text-xs bg-stone-100 border border-stone-200 rounded px-2 py-0.5 font-mono text-stone-700">{d}</span>
-          ))}
+          <span className="text-xs text-stone-600" data-testid="lesson-id">Lesson {lesson.id.replace(/^L/, "")}</span>
           <span className="flex items-center gap-1 text-xs text-stone-600">
             <Clock className="h-3 w-3" /> ~{readingMinutes} min
           </span>
@@ -159,18 +160,19 @@ export default function CurriculumLesson() {
       )}
 
       {/* Body by mode — GATED per feature */}
+      {lesson.level === 1 && !canDeep && <div className="max-w-3xl mx-auto px-6 pb-6"><Level1Unlock compact /></div>}
       {isV2 && lesson.sections && mode === "skim" && (
         <SkimModeContent lesson={lesson} />
       )}
 
       {isV2 && lesson.sections && mode === "deep" && (
-        access.canRead.deep
+        canDeep
           ? <DeepModeContent lesson={lesson} quizAnswers={quizAnswers} setQuizAnswers={setQuizAnswers} quizReveal={quizReveal} setQuizReveal={setQuizReveal} />
           : <UpsellBoundary reason="deep" isAuthenticated={access.isAuthenticated} />
       )}
 
       {isV2 && mode === "flash" && (
-        access.canRead.flash && lesson.flashcards
+        canFlash && lesson.flashcards
           ? <FlashModeContent
               cards={lesson.flashcards}
               idx={flashIdx}
@@ -184,7 +186,7 @@ export default function CurriculumLesson() {
 
       {/* v1 fallback — plain body (only for tiers that get deep read) */}
       {!isV2 && lesson.body_md && (
-        access.canRead.deep
+        canDeep
           ? <div className="max-w-4xl mx-auto px-6 pb-10">
               <article className="prose prose-stone max-w-none prose-headings:font-serif prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3" data-testid="lesson-body">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{lesson.body_md}</ReactMarkdown>
@@ -194,7 +196,7 @@ export default function CurriculumLesson() {
       )}
 
       {/* Citations — visible if user can read deep */}
-      {access.canRead.citations && lesson.cited_in && lesson.cited_in.length > 0 && (mode !== "flash") && (
+      {(access.canRead.citations || canDeep) && lesson.cited_in && lesson.cited_in.length > 0 && (mode !== "flash") && (
         <CitedIn grouped={groupedCitations} />
       )}
     </div>
