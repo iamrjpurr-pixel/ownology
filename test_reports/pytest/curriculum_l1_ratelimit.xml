@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="2.498" timestamp="2026-11-08T21:14:29.138220+00:00" hostname="agent-env-842a39d3-d032-422d-b0f1-13c3957e8c6f"><testcase classname="test_curriculum_l1_ratelimit" name="test_rate_limit_and_spoof" time="2.426"><failure message="AssertionError: XFF spoof bypasses rate limit: [200, 200, 200]&#10;assert False&#10; +  where False = all(&lt;generator object test_rate_limit_and_spoof.&lt;locals&gt;.&lt;genexpr&gt; at 0xfba99c5f1ff0&gt;)">tests/test_curriculum_l1_ratelimit.py:35: in test_rate_limit_and_spoof
+    assert all(c == 429 for c in spoofed), f"XFF spoof bypasses rate limit: {spoofed}"
+E   AssertionError: XFF spoof bypasses rate limit: [200, 200, 200]
+E   assert False
+E    +  where False = all(&lt;generator object test_rate_limit_and_spoof.&lt;locals&gt;.&lt;genexpr&gt; at 0xfba99c5f1ff0&gt;)</failure></testcase></testsuite></testsuites>

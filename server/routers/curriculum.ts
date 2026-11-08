@@ -25,7 +25,7 @@ import path from "node:path";
 import { z } from "zod";
 import { eq, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { rateLimitCheck } from "../gate.js";
+import { rateLimitCheck, clientIpOf } from "../gate.js";
 import { router, publicProcedure } from "../trpc.js";
 import { db } from "../db.js";
 import * as schema from "../../drizzle/schema.js";
@@ -202,8 +202,7 @@ const curriculumRouter = router({
   unlockLevel1: publicProcedure
     .input(z.object({ email: z.string().trim().toLowerCase().email().max(200), name: z.string().trim().max(100).optional(), role: z.enum(["owner", "team", "new", "other"]).default("other") }))
     .mutation(async ({ input, ctx }) => {
-      const ip = String(ctx.req.headers["x-forwarded-for"] ?? ctx.req.socket?.remoteAddress ?? "unknown").split(",")[0].trim();
-      if (!rateLimitCheck("curriculum.l1", ip, 60 * 60 * 1000, 5).allowed) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many sign-ups from here. Try again later." });
+      if (!rateLimitCheck("curriculum.l1", clientIpOf(ctx.req), 60 * 60 * 1000, 5).allowed) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many sign-ups from here. Try again later." });
       const existing = await db.select({ id: schema.leads.id }).from(schema.leads).where(and(eq(schema.leads.email, input.email), eq(schema.leads.source, "curriculum-level1"))).limit(1);
       await addLead({ email: input.email, name: input.name || undefined, source: "curriculum-level1", tags: ["curriculum", `role:${input.role}`] });
       const { token, payload } = createGuestPass({ tier: "cellar_hand", ttlDays: 365, label: "level1" });

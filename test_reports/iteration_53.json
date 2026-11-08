@@ -1,0 +1,32 @@
+{
+  "summary": "Retested the 4 fixes from iteration_52 (diff eed403a..16c40e7). (1) No paid upsell on L1 lessons: PASS. For an anonymous visitor on L1.1, Deep and Flash show only the 'Read Level 1 free' form and upsell-boundary count is 0. L2 lessons still show the UpsellBoundary in Deep and Flash (count 1). (2) Curriculum list error state: PASS. The list request was forced to return 500; the page shows the 'Couldn't load the lessons just now. Try again' error box, with no loading text and no level sections. Clicking Retry recovers: lessons and the unlock form appear. (3) unlockLevel1 rate limit: partial. 5 calls per IP per hour works: the 4th call in my run returned 429 'Too many sign-ups from here. Try again later.' (the earlier suite had already used 2 calls). But anyone can BYPASS it by sending a fake X-Forwarded-For header: 3 calls with spoofed values all returned 200. Telegram now pings only for new emails; I checked this in the code (existing-lead lookup before addLead) but could not observe it from outside. (4) Reading time and form width: PASS. Cards say 'N min skim', the hero badge says 'Skim in minutes, go deeper any time', and the lesson header says '3 min skim · ~13 min full lesson', so the numbers now match. On desktop the compact unlock form lines up with the TL;DR (both x=536, w=848). The iteration_52 regression suite still passes 12/12.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/trpc/curriculum.unlockLevel1", "issue": "The rate-limit IP comes from the raw first X-Forwarded-For entry, which the client controls: curriculum.ts:205. Sending any fake X-Forwarded-For header gets around the 5/hr limit (shown: [200,200,200] after a 429). server/gate.ts already exports clientIpOf(req), which is spoof-safe because it uses req.ip with trust proxy. Fix: import clientIpOf and use `const ip = clientIpOf(ctx.req)`."},
+      {"endpoint": "tRPC error responses (preview)", "issue": "The 429 response includes data.stack with server file paths (/app/server/routers/curriculum.ts:206). Check that stack traces are stripped when NODE_ENV=production on Railway."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/curriculum error state", "issues": ["The hero still shows '30 lessons' when the list fails (`lessons?.length ?? 30`). Minor, and the number is correct anyway."]},
+      {"screen": "Lesson page mobile (390px)", "issues": ["The compact unlock form is still below the fold at y=1081, after the hero and TL;DR. This was only a suggestion in iteration_52 and was not changed."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_curriculum_l1_ratelimit.py", "/app/backend/tests/test_curriculum_level1_unlock.py", "/app/test_reports/pytest/curriculum_l1_ratelimit.xml"],
+  "action_items": [
+    "In curriculum.unlockLevel1, replace the raw x-forwarded-for parsing with clientIpOf(ctx.req) from ../gate.js, so the rate limit cannot be bypassed with a spoofed header."
+  ],
+  "critical_code_review_comments": [
+    "The 'Telegram only for new leads' check is a select followed by addLead, so two concurrent first sign-ups can both ping. This is harmless.",
+    "The rate limit counts every call, including repeats with the same email. A shared office IP gets 5 sign-ups per hour, which is fine for this audience."
+  ],
+  "updated_files": ["/app/backend/tests/test_curriculum_l1_ratelimit.py", "/app/scripts/tmp/cleanup_iter53_leads.ts"],
+  "success_rate": {"backend": "3 of 4 fixes fully verified; the rate limit works but can be bypassed (iteration_52 suite 12/12, new spoof test 0/1)", "frontend": "100% of retested fixes"},
+  "seed_data_creation": "Created 2 leads (ids 17 and 18: test_l1_1794172464@example.com and test_l1_rl_1794172469@example.com). Both were deleted by id, and a re-query found 0 left. About 2 operator Telegram pings were sent, one per new email.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Use REACT_APP_BACKEND_URL=$(grep '^REACT_APP_BACKEND_URL' /app/frontend/.env | cut -d= -f2). unlockLevel1 now allows only 5 calls per IP per hour, held in memory. test_curriculum_level1_unlock.py uses 2 of them, so running it again within an hour from the same IP will get 429 unless the backend restarts. Once the spoof fix lands, test_curriculum_l1_ratelimit.py should pass: it expects 429 even with a fake X-Forwarded-For. Pass the gate with POST /api/gate/verify {password:'middx99'}. Use wait_until='load', not 'networkidle', because trackers keep the network busy. Clean up with: npx tsx scripts/tmp/cleanup_iter53_leads.ts --delete (it reads /tmp/curriculum_l1_test_emails.txt)."
+}

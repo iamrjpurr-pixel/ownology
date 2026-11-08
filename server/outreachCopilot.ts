@@ -140,8 +140,8 @@ export const SITUATION: Record<AutoKind, (opened: boolean) => string> = {
   revive: () => "We contacted them months ago and they went quiet. Send ONE fresh, very short 'still on your radar?' note; don't guilt them; mention we can load their wines into a vault for them so they see it with their own labels.",
   auto1: (opened) => opened
     ? "4 days ago we emailed/texted them and they opened their personal page since, but didn't reply. Short, friendly nudge: ask one simple question about how they keep wine specs/blend records today, and offer a 15-minute walkthrough."
-    : "4 days ago we emailed/texted them and they haven't opened it. Very short, casual bump (2-3 sentences); assume they're busy with vintage.",
-  auto2: () => "Final message in the sequence, a week after the last nudge. Polite 'closing the loop' note: we won't keep emailing; the page stays theirs if it's ever useful. No pressure, warm sign-off.",
+    : "4 days ago we emailed/texted them and they haven't opened it. Very short, casual bump (2-3 sentences); assume they're busy. Give something useful instead of asking: our Level 1 winemaking lessons are free for their team (handy for getting casuals up to speed before vintage) at https://ownology.ai/curriculum (include that link as plain text, as well as {URL}).",
+  auto2: () => "Final message in the sequence, a week after the last nudge. Polite 'closing the loop' note: we won't keep emailing; the page stays theirs if it's ever useful; and our free Level 1 winemaking lessons are there for their team any time at https://ownology.ai/curriculum (include that link as plain text, as well as {URL}). No pressure, warm sign-off.",
 };
 
 type AutoCandidate = Contact & { touched: number; revive_at: number | null; a1: number | null; a2: number | null; last_seen: number | null };
